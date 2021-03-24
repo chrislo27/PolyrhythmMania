@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.PaintboxScreen
-import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextBlock
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
@@ -142,7 +141,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             label.bounds.height.set(100f)
             label.renderBackground.set(true)
 //            label.textAlign.set(TextAlign.RIGHT)
-            label.padding.set(10f)
+            label.bgPadding.set(10f)
             label.doXCompression.set(true)
             label.renderAlign.set(Align.left)
             label.doClipping.set(true)

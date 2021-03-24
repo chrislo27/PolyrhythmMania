@@ -43,7 +43,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     val backgroundColor: Var<Color> = Var(Color(1f, 1f, 1f, 0f))
     
     val renderBackground: Var<Boolean> = Var(false)
-    val padding: Var<Float> = Var(5f)
+    val bgPadding: Var<Float> = Var(5f)
     
     val scaleX: Var<Float> = Var(1f)
     val scaleY: Var<Float> = Var(1f)
@@ -51,8 +51,12 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     val renderAlign: Var<Int> = Var(Align.left)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
     val doXCompression: Var<Boolean> = Var(true)
-    
-    internal val internalTextBlock: Var<TextBlock> = Var {
+
+    /**
+     * Defaults to an auto-generated [TextBlock] with the given [text].
+     * If this is overwritten, this [TextLabel]'s [textColor] should be set to have a non-zero opacity.
+     */
+    val internalTextBlock: Var<TextBlock> = Var {
         TextRun(this@TextLabel.font.use(), this@TextLabel.text.use(), textColor.use(), scaleX.use(), scaleY.use()).toTextBlock()
     }
 
@@ -100,9 +104,9 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
             text.computeLayouts()
         }
 
-        val padding = element.padding.getOrCompute()
-        val textPaddingOffsetX: Float = padding
-        val textPaddingOffsetY: Float = padding
+        val bgPadding = element.bgPadding.getOrCompute()
+        val textPaddingOffsetX: Float = bgPadding
+        val textPaddingOffsetY: Float = bgPadding
         val compressX = element.doXCompression.getOrCompute()
         val align = element.renderAlign.getOrCompute()
         val xOffset: Float = when {
@@ -118,10 +122,10 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         
         if (element.renderBackground.getOrCompute()) {
             // Draw a rectangle behind the text, only sizing to the text area.
-            val bx = (x + xOffset) - padding
-            val by = (y - h + yOffset - text.height + text.firstCapHeight) - padding
-            val bw = (if (compressX) min(w, text.width) else text.width) + padding * 2
-            val bh = (text.height) + padding * 2
+            val bx = (x + xOffset) - bgPadding
+            val by = (y - h + yOffset - text.height + text.firstCapHeight) - bgPadding
+            val bw = (if (compressX) min(w, text.width) else text.width) + bgPadding * 2
+            val bh = (text.height) + bgPadding * 2
 
             val bgColor = bgColorToUse.getOrCompute()
             batch.color = bgColor
