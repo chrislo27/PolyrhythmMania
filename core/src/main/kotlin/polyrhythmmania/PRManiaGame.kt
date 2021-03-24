@@ -1,6 +1,7 @@
 package polyrhythmmania
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
@@ -15,6 +16,10 @@ import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.font.PaintboxFontFreeType
 import io.github.chrislo27.paintbox.logging.Logger
 import io.github.chrislo27.paintbox.registry.AssetRegistry
+import io.github.chrislo27.paintbox.util.WindowSize
+import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
+import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
+import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
 import org.lwjgl.glfw.GLFW
 import polyrhythmmania.init.AssetRegistryLoadingScreen
 import polyrhythmmania.world.render.TestWorldRenderScreen
@@ -30,6 +35,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 PaintboxSettings(launchArguments, logger, logToFile, PRMania.VERSION, PRMania.DEFAULT_SIZE,
                         ResizeAction.ANY_SIZE, PRMania.MINIMUM_SIZE)
     }
+    
+    private var lastWindowed: WindowSize = PRMania.DEFAULT_SIZE.copy()
 
     override fun getTitle(): String = PRMania.TITLE
 
@@ -37,7 +44,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         super.create()
         this.localizationInstance = Localization
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
-        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
+        GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
+//        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
 
         addFontsToCache(this.fontCache)
 
@@ -52,6 +60,43 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     override fun dispose() {
         super.dispose()
+    }
+
+
+    fun attemptFullscreen() {
+        lastWindowed = WindowSize(Gdx.graphics.width, Gdx.graphics.height)
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+    }
+
+    fun attemptEndFullscreen() {
+        val last = lastWindowed
+        Gdx.graphics.setWindowedMode(last.width, last.height)
+    }
+
+    fun attemptResetWindow() {
+        Gdx.graphics.setWindowedMode(PRMania.DEFAULT_SIZE.width, PRMania.DEFAULT_SIZE.height)
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        val res = super.keyDown(keycode)
+        if (!res) {
+            if (!Gdx.input.isControlDown() && !Gdx.input.isAltDown()) {
+                if (keycode == Input.Keys.F11) {
+                    if (!Gdx.input.isShiftDown()) {
+                        if (Gdx.graphics.isFullscreen) {
+                            attemptEndFullscreen()
+                        } else {
+                            attemptFullscreen()
+                        }
+                    } else {
+                        attemptResetWindow()
+                    }
+//                    persistWindowSettings()
+                    return true
+                }
+            }
+        }
+        return res
     }
 
     private fun addFontsToCache(cache: FontCache) {

@@ -1,5 +1,7 @@
 package polyrhythmmania.world
 
+import com.badlogic.gdx.math.Vector3
+import javafx.scene.Camera
 import polyrhythmmania.world.render.WorldRenderer
 
 
@@ -26,65 +28,70 @@ class World {
     }
 
     private fun populateScene() {
-        // Beginning platform
-        for (x in -1..4) {
-            for (z in 0..1) {
-                addEntity(EntityPlatform(this, x == 4).apply {
-                    this.position.set(x.toFloat(), 2f, z.toFloat() * -3)
-                })
-            }
-        }
-        // End platform
-        for (x in 13..16) {
-            for (z in 0..1) {
-                addEntity(EntityPlatform(this, false).apply {
-                    this.position.set(x.toFloat(), 2f, z.toFloat() * -3)
-                })
-            }
-        }
         // Main floor
-        for (x in 0 until 17) {
+        for (x in -1..20) {
             for (z in -6 until 3) {
-                val ent = if (z == 0 || z == -3) {
-                    if (x in 5..12) EntityPlatform(this, x == 4) else continue
+                val ent: Entity = if (z == 0 || z == -3) {
+                    EntityPlatform(this, x == 4)
                 } else EntityCube(this, x == 4)
                 addEntity(ent.apply {
                     this.position.set(x.toFloat(), 1f, z.toFloat())
                 })
             }
         }
-        // Bottom floor
-        for (x in 5..12) {
-            addEntity(EntityCube(this, x == 4).apply {
-                this.position.set(x.toFloat(), 0f, 3f)
-            })
-        }
-        for (x in 7..11) {
-            addEntity(EntityCube(this, false).apply {
-                this.position.set(x.toFloat(), 0f, 4f)
-            })
-        }
-        for (x in 8..9) {
-            addEntity(EntityCube(this, false).apply {
-                this.position.set(x.toFloat(), 0f, 5f)
-            })
-        }
-        // Top steps
-        for (x in 5 until 15) {
-            addEntity(EntityCube(this, false).apply {
-                this.position.set(x.toFloat(), 2f, -7f)
-            })
-        }
-        for (x in 6 until 13) {
-            addEntity(EntityCube(this, false).apply {
-                this.position.set(x.toFloat(), 3f, -8f)
-            })
-        }
-        addEntity(EntityCube(this, false).apply {
-            this.position.set(8f, 3f, -9f)
-        })
 
-        (entities as MutableList).shuffle()
+        // Raised platforms
+        for (x in -1..20) {
+            if (x in 5..12) continue
+            for (zMul in 0..1) {
+                val ent: Entity = EntityPlatform(this, x == 4)
+                addEntity(ent.apply {
+                    this.position.set(x.toFloat(), 2f, zMul * -3f)
+                })
+            }
+        }
+
+        // Bottom floor
+        for (x in -1..20) {
+            for (z in 3..7) {
+                val ent: Entity = EntityCube(this, x == 4)
+                addEntity(ent.apply {
+                    this.position.set(x.toFloat(), 0f, z.toFloat())
+                })
+            }
+        }
+
+        // Upper steps
+        for (x in -1..20) {
+            for (z in -7 downTo -9) {
+                val ent: Entity = EntityCube(this, false)
+                addEntity(ent.apply {
+                    this.position.set(x.toFloat(), if (z == -7) 2f else 3f, z.toFloat())
+                })
+            }
+        }
+
+        // Remove entities that are not in scene
+        val tmpVec = Vector3()
+        val leftEdge = 0f
+        val rightEdge = (5 * 16f / 9f)
+        val topEdge = (5f)
+        val bottomEdge = (0f)
+        entities.filterIsInstance<SimpleRenderedEntity>().filterNot { ent ->
+            val convertedVec = tmpVec.set(ent.position).apply {
+                val oldX = this.x
+                val oldY = this.y
+                val oldZ = this.z
+                this.x = oldX / 2f + oldZ / 2f
+                this.y = oldX * (8f / 32f) + (oldY - 3f) * 0.5f - oldZ * (8f / 32f)
+                this.z = 0f
+            }
+
+            ((convertedVec.x + ent.getWidth()) in leftEdge..rightEdge || (convertedVec.x) in leftEdge..rightEdge)
+                    && ((convertedVec.y + ent.getHeight()) in bottomEdge..topEdge || convertedVec.y in bottomEdge..topEdge)
+        }.toList().forEach { ent ->
+            removeEntity(ent)
+        }
     }
 
 }

@@ -38,7 +38,10 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     override fun getDebugString(): String {
-        return """e: ${world.entities.size}"""
+        return """e: ${world.entities.size}
+
+"""
+        
     }
 
     override fun dispose() {

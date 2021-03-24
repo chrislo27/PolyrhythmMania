@@ -22,9 +22,9 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
         protected val tmpVec = Vector3()
     }
 
-    protected open fun getTextureRegionFromTileset(tileset: Tileset): TextureRegion? = null
-    protected open fun getWidth(): Float = 1f
-    protected open fun getHeight(): Float = 1f
+    /*protected */open fun getTextureRegionFromTileset(tileset: Tileset): TextureRegion? = null
+    /*protected */open fun getWidth(): Float = 1f
+    /*protected */open fun getHeight(): Float = 1f
     
     override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
         val texReg = getTextureRegionFromTileset(tileset) ?: return

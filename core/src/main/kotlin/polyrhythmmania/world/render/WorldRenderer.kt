@@ -37,8 +37,10 @@ class WorldRenderer(val world: World, var tileset: Tileset) {
     }
     
     private val camera: OrthographicCamera = OrthographicCamera().apply {
-        setToOrtho(false, 7.5f, 5f)
+//        setToOrtho(false, 7.5f, 5f) // GBA aspect ratio
+        setToOrtho(false, 5 * (16f / 9f), 5f)
         position.set(zoom * viewportWidth / 2.0f, zoom * viewportHeight / 2.0f, 0f)
+//        zoom = 1.5f
         update()
     }
     private val tmpMatrix: Matrix4 = Matrix4()
