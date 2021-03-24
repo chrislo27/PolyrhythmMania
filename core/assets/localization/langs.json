@@ -1,0 +1,10 @@
+[
+  {
+    "name": "English",
+    "locale": {
+      "language": "", // Leave blank to use the default localization file
+      "country": "",
+      "variant": ""
+    }
+  }
+]
