@@ -18,6 +18,10 @@ abstract class Tileset(val texture: Texture) {
     abstract val padDExtended: TextureRegion
     abstract val padDPartial: TextureRegion
     
+    abstract val rodGroundFrames: Int
+    abstract val rodAerialFrames: Int
+    abstract val rodGroundAnimations: List<TextureRegion>
+    abstract val rodAerialAnimations: List<TextureRegion>
 }
 
 open class GBATileset(texture: Texture) : Tileset(texture) {
@@ -32,6 +36,19 @@ open class GBATileset(texture: Texture) : Tileset(texture) {
     override val padDRetracted: TextureRegion = TextureRegion(texture, 1, 77, 32, 40)
     override val padDExtended: TextureRegion = TextureRegion(texture, 34, 77, 32, 40)
     override val padDPartial: TextureRegion = TextureRegion(texture, 67, 77, 32, 40)
+    
+    override val rodGroundFrames: Int = 6
+    override val rodAerialFrames: Int = 6
+    override val rodGroundAnimations: List<TextureRegion> by lazy {
+        (0 until rodGroundFrames).map { i ->
+            TextureRegion(texture, 205, 1 + 17 * i, 24, 16)
+        }
+    }
+    override val rodAerialAnimations: List<TextureRegion> by lazy {
+        (0 until rodAerialFrames).map { i ->
+            TextureRegion(texture, 231, 1 + 17 * i, 24, 16)
+        }
+    }
 }
 
 class GBA2Tileset(texture: Texture) : GBATileset(texture) {
