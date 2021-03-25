@@ -16,6 +16,8 @@ apply plugin: 'kotlin'
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
+    apply plugin: "java"
+    apply plugin: "kotlin"
 
     version = "0.1.0"
     ext {
@@ -36,6 +38,36 @@ allprojects {
         maven { url "https://dl.bintray.com/spookygames/oss" }
         maven { url "https://clojars.org/repo" }
     }
+    
+    dependencies {
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        
+
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+        implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+//        implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
+        
+//        implementation "org.asynchttpclient:async-http-client:2.12.1"
+//        implementation "com.sun.activation:javax.activation:1.2.0" // Required for AHC Java 9+
+        
+        implementation "com.fasterxml.jackson.module:jackson-module-afterburner:$jackson_version"
+        implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
+        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version"
+        
+        implementation "com.beust:jcommander:1.80"
+        
+        implementation "org.slf4j:slf4j-simple:1.7.30"
+        implementation "net.lingala.zip4j:zip4j:2.6.2"
+        
+//        implementation "de.sciss:jump3r:1.0.5"
+//        implementation "com.github.chrislo27:musique-barebones:3807b60"
+        
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version"
+    }
 }
 
 project(":core") {
@@ -43,25 +75,6 @@ project(":core") {
     apply plugin: "kotlin"
 
     dependencies {
-        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-        implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
-
-        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-        implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-        implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
-//        implementation "org.asynchttpclient:async-http-client:2.12.1"
-        implementation "com.sun.activation:javax.activation:1.2.0" // Required for AHC Java 9+
-        implementation "com.fasterxml.jackson.module:jackson-module-afterburner:2.12.2"
-        implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.12.2"
-        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.2"
-        implementation "org.slf4j:slf4j-simple:1.7.30"
-        implementation "net.lingala.zip4j:zip4j:2.6.2"
-        implementation "com.beust:jcommander:1.80"
-        implementation "org.lwjgl:lwjgl-tinyfd:3.2.3"
-
-        implementation fileTree(dir: 'libs', include: ['*.jar'])
     }
 }
 
@@ -72,35 +85,14 @@ project(":desktop") {
     dependencies {
         implementation project(":core")
         
-        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-        implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
-//        implementation "net.beadsproject:beads:3.2"
-        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-        implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-        implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
-//        implementation "org.asynchttpclient:async-http-client:2.12.1"
-        implementation "com.sun.activation:javax.activation:1.2.0" // Required for AHC Java 9+
-        implementation "com.fasterxml.jackson.module:jackson-module-afterburner:2.12.2"
-        implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.12.2"
-        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.2"
-        implementation "org.slf4j:slf4j-simple:1.7.30"
-        implementation "de.sciss:jump3r:1.0.5"
-        implementation "com.github.chrislo27:musique-barebones:3807b60"
-        implementation "net.lingala.zip4j:zip4j:2.6.2"
-        implementation "com.beust:jcommander:1.80"
-        implementation "org.lwjgl:lwjgl-tinyfd:3.2.3"
-        implementation "org.lwjgl:lwjgl-tinyfd:3.2.3:natives-windows"
-        implementation "org.lwjgl:lwjgl-tinyfd:3.2.3:natives-windows-x86"
-//        implementation "org.lwjgl:lwjgl-tinyfd:3.2.3:natives-macos"
-        implementation "org.lwjgl:lwjgl-tinyfd:3.2.3:natives-linux"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows-x86"
+//        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-macos"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux"
 
         implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         implementation "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxControllersVersion"
-        
-//        implementation fileTree(dir: 'libs', include: ['*.jar'])
     }
 }
 
