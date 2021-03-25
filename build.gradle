@@ -40,7 +40,7 @@ allprojects {
     }
     
     dependencies {
-        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        implementation fileTree(dir: 'libs', includes: ['/**/*.jar'])
         
 
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
