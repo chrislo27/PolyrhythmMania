@@ -29,8 +29,8 @@ class EntityRod(world: World) : Entity(world) {
     
     var isInAir: Boolean = false
 
-    private fun getWidth(): Float = 0.75f
-    private fun getHeight(): Float = 0.5f
+    override fun getRenderWidth(): Float = 0.75f
+    override fun getRenderHeight(): Float = 0.5f
 
     override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
         val convertedVec = renderer.convertWorldToScreen(tmpVec.set(this.position))
@@ -43,7 +43,7 @@ class EntityRod(world: World) : Entity(world) {
             tileset.rodAerialAnimations[(animationAlpha * tileset.rodAerialFrames).toInt().coerceIn(0, tileset.rodAerialFrames - 1)]
         }
         
-        batch.draw(texReg, convertedVec.x - (1 / 32f), convertedVec.y, getWidth(), getHeight())
+        batch.draw(texReg, convertedVec.x - (1 / 32f), convertedVec.y, getRenderWidth(), getRenderHeight())
     }
 
 }

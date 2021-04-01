@@ -41,8 +41,7 @@ class World {
         }
 
         // Raised platforms
-        for (x in -1..20) {
-            if (x in 5..12) continue
+        for (x in -1..4) {
             for (zMul in 0..1) {
                 val ent: Entity = EntityPlatform(this, x == 4)
                 addEntity(ent.apply {
@@ -64,34 +63,13 @@ class World {
         // Upper steps
         for (x in -1..20) {
             for (z in -7 downTo -9) {
-                val ent: Entity = EntityCube(this, false)
+                val ent: Entity = EntityCube(this, x == 4)
                 addEntity(ent.apply {
                     this.position.set(x.toFloat(), if (z == -7) 2f else 3f, z.toFloat())
                 })
             }
         }
 
-        // Remove entities that are not in scene
-        val tmpVec = Vector3()
-        val leftEdge = 0f
-        val rightEdge = (5 * 16f / 9f)
-        val topEdge = (5f)
-        val bottomEdge = (0f)
-        entities.filterIsInstance<SimpleRenderedEntity>().filterNot { ent ->
-            val convertedVec = tmpVec.set(ent.position).apply {
-                val oldX = this.x
-                val oldY = this.y
-                val oldZ = this.z
-                this.x = oldX / 2f + oldZ / 2f
-                this.y = oldX * (8f / 32f) + (oldY - 3f) * 0.5f - oldZ * (8f / 32f)
-                this.z = 0f
-            }
-
-            ((convertedVec.x + ent.getWidth()) in leftEdge..rightEdge || (convertedVec.x) in leftEdge..rightEdge)
-                    && ((convertedVec.y + ent.getHeight()) in bottomEdge..topEdge || convertedVec.y in bottomEdge..topEdge)
-        }.toList().forEach { ent ->
-            removeEntity(ent)
-        }
     }
 
 }

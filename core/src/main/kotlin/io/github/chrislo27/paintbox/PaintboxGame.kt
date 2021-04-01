@@ -427,6 +427,7 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
         }
         val afterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
 //            font.data.blankLineScale = 0.75f
+            font.setFixedWidthGlyphs("1234567890")
         }
         cache["DEBUG_FONT"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-Regular.ttf"), emulatedSize,
                                                    makeParam().apply {

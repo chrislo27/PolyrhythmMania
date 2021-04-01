@@ -38,7 +38,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     
     private var lastWindowed: WindowSize = PRMania.DEFAULT_SIZE.copy()
 
-    override fun getTitle(): String = PRMania.TITLE
+    override fun getTitle(): String = "${PRMania.TITLE} ${PRMania.VERSION}"
 
     override fun create() {
         super.create()

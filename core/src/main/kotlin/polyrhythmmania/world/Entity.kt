@@ -11,6 +11,9 @@ open class Entity(val world: World) {
 
     val position: Vector3 = Vector3()
 
+    open fun getRenderWidth(): Float = 1f
+    open fun getRenderHeight(): Float = 1f
+    
     open fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
     }
     
@@ -23,13 +26,14 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
     }
 
     /*protected */open fun getTextureRegionFromTileset(tileset: Tileset): TextureRegion? = null
-    /*protected */open fun getWidth(): Float = 1f
-    /*protected */open fun getHeight(): Float = 1f
+
+    open fun getSpriteWidth(): Float = getRenderWidth()
+    open fun getSpriteHeight(): Float = getRenderHeight()
     
     override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
         val texReg = getTextureRegionFromTileset(tileset) ?: return
         val convertedVec = renderer.convertWorldToScreen(tmpVec.set(this.position))
-        batch.draw(texReg, convertedVec.x, convertedVec.y, getWidth(), getHeight())
+        batch.draw(texReg, convertedVec.x, convertedVec.y, getRenderWidth(), getRenderHeight())
     }
 
 }

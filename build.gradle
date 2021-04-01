@@ -58,6 +58,7 @@ allprojects {
         
         implementation "org.slf4j:slf4j-simple:1.7.30"
         implementation "net.lingala.zip4j:zip4j:2.6.2"
+        implementation "com.breinify:brein-time-utilities:1.7.0"
         
 //        implementation "de.sciss:jump3r:1.0.5"
 //        implementation "com.github.chrislo27:musique-barebones:3807b60"

@@ -1,11 +1,13 @@
 package polyrhythmmania.world.render
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
-import io.github.chrislo27.paintbox.util.MathHelper
+import io.github.chrislo27.paintbox.util.gdxutils.intersects
 import polyrhythmmania.world.Entity
 import polyrhythmmania.world.World
 
@@ -34,16 +36,25 @@ class WorldRenderer(val world: World, var tileset: Tileset) {
                 }
             }
         }
+        
+        // For doing entity render culling
+        private val tmpVec: Vector3 = Vector3(0f, 0f, 0f)
+        private val tmpRect: Rectangle = Rectangle(0f, 0f, 0f, 0f)
+        private val tmpRect2: Rectangle = Rectangle(0f, 0f, 0f, 0f)
     }
     
-    private val camera: OrthographicCamera = OrthographicCamera().apply {
+    val camera: OrthographicCamera = OrthographicCamera().apply {
 //        setToOrtho(false, 7.5f, 5f) // GBA aspect ratio
         setToOrtho(false, 5 * (16f / 9f), 5f)
+        zoom = 1f
         position.set(zoom * viewportWidth / 2.0f, zoom * viewportHeight / 2.0f, 0f)
 //        zoom = 1.5f
         update()
     }
     private val tmpMatrix: Matrix4 = Matrix4()
+    
+    var entitiesRenderedLastCall: Int = 0
+        private set
 
     fun render(batch: SpriteBatch) {
         tmpMatrix.set(batch.projectionMatrix)
@@ -51,14 +62,31 @@ class WorldRenderer(val world: World, var tileset: Tileset) {
         batch.projectionMatrix = camera.combined
         batch.begin()
 
+        var entitiesRendered = 0
+        this.entitiesRenderedLastCall = 0
         world.sortEntitiesByRenderOrder()
 
+        val camWidth = camera.viewportWidth * camera.zoom
+        val camHeight = camera.viewportHeight * camera.zoom
+        val leftEdge = camera.position.x - camWidth / 2f
+//        val rightEdge = camera.position.x + camWidth
+//        val topEdge = camera.position.y + camHeight
+        val bottomEdge = camera.position.y - camHeight / 2f
+        tmpRect2.set(leftEdge, bottomEdge, camWidth, camHeight)
         world.entities.forEach { entity ->
-            entity.render(this, batch, tileset)
+            val convertedVec = convertWorldToScreen(tmpVec.set(entity.position))
+            tmpRect.set(convertedVec.x, convertedVec.y, entity.getRenderWidth(), entity.getRenderHeight())
+            // Only render entities that are in scene
+            if (tmpRect.intersects(tmpRect2)) {
+                entitiesRendered++
+                entity.render(this, batch, tileset)
+            }
         }
+        this.entitiesRenderedLastCall = entitiesRendered
 
         batch.end()
         batch.projectionMatrix = tmpMatrix
+        
     }
 
     fun convertWorldToScreen(vec3: Vector3): Vector3 {
@@ -72,4 +100,9 @@ class WorldRenderer(val world: World, var tileset: Tileset) {
         }
     }
 
+    fun getDebugString(): String {
+        return """e: ${world.entities.size}  r: ${entitiesRenderedLastCall}
+
+"""
+    }
 }
