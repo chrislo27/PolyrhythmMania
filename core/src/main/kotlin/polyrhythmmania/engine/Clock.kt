@@ -1,10 +1,13 @@
 package polyrhythmmania.engine
 
-import polyrhythmmania.beads.TimingProvider
-import polyrhythmmania.beads.TimingListener
+import polyrhythmmania.soundsystem.TimingProvider
+import polyrhythmmania.soundsystem.TimingListener
 import polyrhythmmania.engine.tempo.TempoMap
 
 
+/**
+ * A [Clock] is controlled by the [timingProvider] and is responsible for converting seconds to beats.
+ */
 open class Clock(val timingProvider: TimingProvider) {
 
     val tempos: TempoMap = TempoMap(120f)
@@ -19,6 +22,8 @@ open class Clock(val timingProvider: TimingProvider) {
     @Volatile
     var beat: Float = 0f
         private set
+    @Volatile
+    var playbackSpeed: Float = 1f
     
 //    @Volatile
 //    var doUpdateSeconds: Boolean = false
@@ -35,6 +40,6 @@ open class Clock(val timingProvider: TimingProvider) {
     }
     
     protected open fun updateSeconds(delta: Float) {
-        seconds += delta
+        seconds += delta * playbackSpeed
     }
 }

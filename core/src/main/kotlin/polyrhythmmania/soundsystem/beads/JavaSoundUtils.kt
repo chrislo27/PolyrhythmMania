@@ -1,4 +1,4 @@
-package polyrhythmmania.beads
+package polyrhythmmania.soundsystem.beads
 
 import net.beadsproject.beads.core.IOAudioFormat
 import net.beadsproject.beads.core.io.JavaSoundAudioIO

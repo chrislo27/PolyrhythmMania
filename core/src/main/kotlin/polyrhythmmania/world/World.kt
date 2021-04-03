@@ -6,11 +6,23 @@ import polyrhythmmania.world.render.WorldRenderer
 
 
 class World {
+    
+    companion object {
+        val DEFAULT_ROW_LENGTH: Int = 16
+        val DEFAULT_ROW_COUNT: Int = 2
+    }
 
     val entities: List<Entity> = ArrayList()
-
+    
+    val rows: List<Row> = listOf(Row(this, DEFAULT_ROW_LENGTH, 5, 2, 0), Row(this, DEFAULT_ROW_LENGTH, 5, 2, -3))
+    val rowA: Row inline get() = rows[0]
+    val rowDpad: Row inline get() = rows[1]
+    
     init {
         populateScene()
+        rows.forEach { row ->
+            row.rowBlocks.forEach { rb -> addEntity(rb) }
+        }
     }
 
     fun addEntity(entity: Entity) {

@@ -68,17 +68,5 @@ build/
 ## OS Specific
 .DS_Store
 Thumbs.db
-/core/assets/palettes/
-/core/assets/customSounds/
 /core/assets/logs/
-/core/assets/tmpMusic/
-/core/assets/localization/temp/
-/core/assets/scripts/examples/
-/core/assets/modules/
-/core/assets/libs/docs/
-/core/assets/debug/
-/core/assets/crash/
-/core/assets/themes/
-/core/assets/test.pcm
-/assets/
-/core/assets/articles
+/core/assets/debugetc

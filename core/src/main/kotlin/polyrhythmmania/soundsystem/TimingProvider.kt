@@ -1,4 +1,6 @@
-package polyrhythmmania.beads
+package polyrhythmmania.soundsystem
+
+import java.util.concurrent.CopyOnWriteArrayList
 
 
 /**
@@ -23,4 +25,20 @@ interface TimingProvider {
 
 fun interface TimingListener {
     fun onUpdate(oldSeconds: Float, newSeconds: Float)
+}
+
+/**
+ * A [TimingProvider] where an external object updates the [seconds] field.
+ */
+class SimpleTimingProvider : TimingProvider {
+
+    @Volatile
+    override var seconds: Float = 0f
+        set(value) {
+            val old = field
+            field = value
+            onUpdate(old, value)
+        }
+    override val listeners: MutableList<TimingListener> = CopyOnWriteArrayList()
+
 }

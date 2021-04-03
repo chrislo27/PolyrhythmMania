@@ -1,12 +1,12 @@
 package polyrhythmmania.engine
 
-import polyrhythmmania.beads.TimingProvider
+import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.World
 
 
 /**
- * An [Engine] fires the [Events] based on the internal [TimingProvider].
+ * An [Engine] fires the [Event]s based on the internal [TimingProvider].
  * It also contains the [World] upon which these events operate in.
  */
 class Engine(timingProvider: TimingProvider, val world: World)
