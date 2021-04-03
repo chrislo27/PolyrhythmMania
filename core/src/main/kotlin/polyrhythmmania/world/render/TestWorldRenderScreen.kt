@@ -14,6 +14,7 @@ import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
+import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.World
 import kotlin.system.measureNanoTime
 
@@ -21,7 +22,7 @@ import kotlin.system.measureNanoTime
 class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     
     companion object {
-        private val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("sounds/Polyrhythm.ogg"))
+        private val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("debugetc/Polyrhythm.ogg"))
     }
     
     val world: World = World()
@@ -32,13 +33,16 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val timing: TimingProvider = soundSystem
     val engine: Engine = Engine(timing, world)
     
+    private val player = music.createPlayer(soundSystem.audioContext)
+    
     private var nanoTime = System.nanoTime()
     
     init {
-        soundSystem.audioContext.out.addInput(music.createPlayer(soundSystem.audioContext))
+        soundSystem.audioContext.out.addInput(player)
         soundSystem.startRealtime()
         
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
+        engine.tempos.addTempoChange(TempoChange(88f, 148.5f))
     }
 
     override fun render(delta: Float) {
@@ -107,7 +111,9 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     override fun getDebugString(): String {
-        return """${engine.getDebugString()}
+        return """${DecimalFormats.format("0.000", player.position / 1000f)}
+---
+${engine.getDebugString()}
 ---
 ${renderer.getDebugString()}
 """

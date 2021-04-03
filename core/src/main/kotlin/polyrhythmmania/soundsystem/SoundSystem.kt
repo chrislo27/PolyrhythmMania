@@ -1,6 +1,7 @@
 package polyrhythmmania.soundsystem
 
 import com.badlogic.gdx.utils.Disposable
+import io.github.chrislo27.paintbox.util.Sync
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.IOAudioFormat
 import javax.sound.sampled.*
@@ -77,6 +78,9 @@ class SoundSystem(private val mixer: Mixer,
 
     fun setPaused(paused: Boolean) {
         audioContext.out.pause(paused)
+        if (paused) {
+            timingProvider.forceSyncWithBead()
+        }
     }
 
     fun startRealtime() {
@@ -116,24 +120,34 @@ class SoundSystem(private val mixer: Mixer,
                 }
             }
             realtimeThread = thread(start = true, isDaemon = true, name = "AdaptiveTimingProvider", priority = Thread.MAX_PRIORITY) {
-                val pollRateHz = 100
-                val secondsDiff = 1f / pollRateHz
-                var waitTimeNano: Long = 1_000_000_000L / pollRateHz
-                while (!isDisposed) {
-                    val ms = waitTimeNano / 1_000_000
-                    val nanoRemainder = waitTimeNano % 1_000_000
-                    Thread.sleep(ms, nanoRemainder.toInt())
-                    val actionTimeNano = System.nanoTime()
-                    // Action
-                    if (currentlyRealTime && !isPaused) {
-                        val oldSeconds = this.seconds
-                        this.seconds += secondsDiff
-                        this.onUpdate(oldSeconds, this.seconds)
+                try {
+                    val pollRateHz = 1.0 / (512.0 / 44100.0)//100
+                    val sync = Sync()
+
+                    var nano = System.nanoTime()
+                    while (!isDisposed) {
+                        sync.sync(pollRateHz)
+
+                        // Action
+                        if (currentlyRealTime && !isPaused) {
+                            val secondsDiff = (1.0 / pollRateHz).toFloat()
+                            val oldSeconds = this.seconds
+                            this.seconds += secondsDiff
+                            this.onUpdate(oldSeconds, this.seconds)
+
+//                            val ns = System.nanoTime() - nano
+//                            println("Expected ${1000.0 / pollRateHz}, actual ${ns / 1_000_000.0}  delta ${(1000.0 / pollRateHz) - (ns / 1_000_000.0)}")
+//                            nano = System.nanoTime()
+                        }
                     }
-                    val actionDurationNano = System.nanoTime() - actionTimeNano
-                    waitTimeNano = ((1_000_000_000 / pollRateHz) - actionDurationNano).coerceAtLeast(1000)
-                }
+                } catch (e: Exception) {}
             }
+        }
+        
+        fun forceSyncWithBead() {
+            val oldSeconds = this.seconds
+            this.seconds = timingProvider.timingBead.seconds
+            this.onUpdate(oldSeconds, this.seconds)
         }
     }
 }

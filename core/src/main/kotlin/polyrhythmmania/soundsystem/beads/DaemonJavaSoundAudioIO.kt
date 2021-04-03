@@ -97,12 +97,12 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
     /**
      * Read audio from UGens and copy them into a buffer ready to write to Audio Line
      * @param audioFormat The AudioFormat
-     * @param outputBUffer The buffer that will contain the prepared bytes for the AudioLine
+     * @param outputBuffer The buffer that will contain the prepared bytes for the AudioLine
      * @param interleavedSamples Interleaved samples as floats
      * @param bufferSizeInFrames The size of interleaved samples in frames
      * @param sampleBufferSize The size of our actual sample buffer size
      */
-    private fun prepareLineBuffer(audioFormat: AudioFormat, outputBUffer: ByteArray, interleavedSamples: FloatArray, bufferSizeInFrames: Int, sampleBufferSize: Int) {
+    private fun prepareLineBuffer(audioFormat: AudioFormat, outputBuffer: ByteArray, interleavedSamples: FloatArray, bufferSizeInFrames: Int, sampleBufferSize: Int) {
         update() // this propagates update call to context
         var i = 0
         var counter = 0
@@ -112,7 +112,7 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
             }
             ++i
         }
-        AudioUtils.floatToByte(outputBUffer, 0, interleavedSamples, 0, sampleBufferSize, audioFormat.isBigEndian)
+        AudioUtils.floatToByte(outputBuffer, 0, interleavedSamples, 0, sampleBufferSize, audioFormat.isBigEndian)
     }
 
     /** Shuts down JavaSound elements, SourceDataLine and Mixer.  */

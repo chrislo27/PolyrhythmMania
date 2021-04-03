@@ -49,7 +49,7 @@ open class Sync {
      *
      * @param fps - the desired frame rate, in frames per second
      */
-    fun sync(fps: Int) {
+    fun sync(fps: Double) {
         if (fps <= 0) return
         if (!initialised) initialise()
         try {
@@ -79,29 +79,36 @@ open class Sync {
         }
 
         // schedule next frame, drop frame(s) if already too late for next frame
-        nextFrame = (nextFrame + NANOS_IN_SECOND / fps).coerceAtLeast(time)
+        nextFrame = (nextFrame + (NANOS_IN_SECOND / fps).toLong()).coerceAtLeast(time)
     }
+    
+    fun sync(fps: Int) = sync(fps.toDouble())
 
     /**
      * This method will initialise the sync method by setting initial
      * values for sleepDurations/yieldDurations and nextFrame.
-     *
-     * If running on windows it will start the sleep timer fix.
      */
     private fun initialise() {
         initialised = true
         sleepDurations.init(1000 * 1000.toLong())
         yieldDurations.init((-(time - time) * 1.333).toLong())
+        lastNano = System.nanoTime()
         nextFrame = time
     }
 
+    private var lastNano: Long = System.nanoTime()
+    private var accumulativeTime: Long = 0L
     /**
      * Get the system time in nano seconds
      *
      * @return will return the current time in nano's
      */
     private val time: Long
-        get() = (GLFW.glfwGetTime() * NANOS_IN_SECOND).toLong()
+        get() { //= (GLFW.glfwGetTime() * NANOS_IN_SECOND).toLong() // Causes full JVM crash sometimes upon closing...
+            accumulativeTime += (System.nanoTime() - lastNano)
+            lastNano = System.nanoTime()
+            return accumulativeTime
+        }
 
     private class RunningAvg(slotCount: Int) {
         companion object {
