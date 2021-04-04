@@ -11,7 +11,7 @@ import polyrhythmmania.world.render.WorldRenderer
 class EntityRowBlock(world: World, val baseY: Float) : SimpleRenderedEntity(world) {
     
     companion object {
-        val FULL_EXTENSION_TIME_BEATS: Float = 0.1f
+        val FULL_EXTENSION_TIME_BEATS: Float = 0.05f
     }
     
     enum class Type(val renderHeight: Float) {
