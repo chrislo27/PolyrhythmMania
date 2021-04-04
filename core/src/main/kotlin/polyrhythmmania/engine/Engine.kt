@@ -3,6 +3,7 @@ package polyrhythmmania.engine
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.World
+import java.util.concurrent.CopyOnWriteArrayList
 
 
 /**
@@ -12,14 +13,22 @@ import polyrhythmmania.world.World
 class Engine(timingProvider: TimingProvider, val world: World)
     : Clock(timingProvider) {
 
-    val events: List<Event> = mutableListOf()
+    val events: List<Event> = CopyOnWriteArrayList()
 
     fun addEvent(event: Event) {
-        (events as MutableList) += event
+        (this.events as MutableList) += event
     }
 
     fun removeEvent(event: Event) {
-        (events as MutableList) -= event
+        (this.events as MutableList) -= event
+    }
+    
+    fun addEvents(events: List<Event>) {
+        (this.events as MutableList).addAll(events)
+    }
+
+    fun removeEvents(events: List<Event>) {
+        (this.events as MutableList).removeAll(events)
     }
     
     fun updateEvent(event: Event, atBeat: Float) {
@@ -59,6 +68,7 @@ class Engine(timingProvider: TimingProvider, val world: World)
         events.forEach { event ->
             updateEvent(event, currentBeat)
         }
+        world.engineUpdate(this, currentBeat, currentSeconds)
     }
 
     fun getDebugString(): String {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import io.github.chrislo27.paintbox.util.gdxutils.intersects
+import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.Entity
 import polyrhythmmania.world.World
 
@@ -21,14 +22,15 @@ class WorldRenderer(val world: World, var tileset: Tileset) {
             } else if (o1.position.z > o2.position.z) {
                 1
             } else {
-                if (o1.position.x > o2.position.x) {
+                // TODO fix this
+                if (o1.position.y < o2.position.y) {
                     -1
-                } else if (o1.position.x < o2.position.x) {
+                } else if (o1.position.y > o2.position.y) {
                     1
                 } else {
-                    if (o1.position.y < o2.position.y) {
+                    if (o1.position.x > o2.position.x) {
                         -1
-                    } else if (o1.position.y > o2.position.y) {
+                    } else if (o1.position.x < o2.position.x) {
                         1
                     } else {
                         0
@@ -56,7 +58,7 @@ class WorldRenderer(val world: World, var tileset: Tileset) {
     var entitiesRenderedLastCall: Int = 0
         private set
 
-    fun render(batch: SpriteBatch) {
+    fun render(batch: SpriteBatch, engine: Engine) {
         tmpMatrix.set(batch.projectionMatrix)
         camera.update()
         batch.projectionMatrix = camera.combined
@@ -79,7 +81,7 @@ class WorldRenderer(val world: World, var tileset: Tileset) {
             // Only render entities that are in scene
             if (tmpRect.intersects(tmpRect2)) {
                 entitiesRendered++
-                entity.render(this, batch, tileset)
+                entity.render(this, batch, tileset, engine)
             }
         }
         this.entitiesRenderedLastCall = entitiesRendered

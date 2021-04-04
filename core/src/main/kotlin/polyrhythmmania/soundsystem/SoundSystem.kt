@@ -1,6 +1,7 @@
 package polyrhythmmania.soundsystem
 
 import com.badlogic.gdx.utils.Disposable
+import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.util.Sync
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.IOAudioFormat
@@ -8,6 +9,7 @@ import javax.sound.sampled.*
 import polyrhythmmania.soundsystem.beads.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.concurrent.thread
+import kotlin.math.abs
 
 
 /**
@@ -122,10 +124,11 @@ class SoundSystem(private val mixer: Mixer,
             realtimeThread = thread(start = true, isDaemon = true, name = "AdaptiveTimingProvider", priority = Thread.MAX_PRIORITY) {
                 try {
                     val pollRateHz = 1.0 / (512.0 / 44100.0)//100
+                    val forceSyncThreshold = 0.025f
                     val sync = Sync()
 
                     var nano = System.nanoTime()
-                    while (!isDisposed) {
+                    while (!this@SoundSystem.isDisposed) {
                         sync.sync(pollRateHz)
 
                         // Action
@@ -133,6 +136,13 @@ class SoundSystem(private val mixer: Mixer,
                             val secondsDiff = (1.0 / pollRateHz).toFloat()
                             val oldSeconds = this.seconds
                             this.seconds += secondsDiff
+                            
+                            if (abs(this.seconds - timingBead.seconds) >= forceSyncThreshold) {
+                                println("AdaptiveTimingProvider Force sync: this was ${this.seconds} and TimingBead was ${timingBead.seconds} (delta ${abs(this.seconds - timingBead.seconds)}, force sync threshold ${forceSyncThreshold})")
+                                // Force sync with timing bead if off by too much
+                                this.seconds = timingBead.seconds
+                            }
+                            
                             this.onUpdate(oldSeconds, this.seconds)
 
 //                            val ns = System.nanoTime() - nano
@@ -140,7 +150,10 @@ class SoundSystem(private val mixer: Mixer,
 //                            nano = System.nanoTime()
                         }
                     }
-                } catch (e: Exception) {}
+                } catch (e: Exception) {
+                    Paintbox.LOGGER.debug("AdaptiveTimingProvider thread encountered an exception")
+                    e.printStackTrace()
+                }
             }
         }
         

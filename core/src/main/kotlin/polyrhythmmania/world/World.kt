@@ -2,7 +2,9 @@ package polyrhythmmania.world
 
 import com.badlogic.gdx.math.Vector3
 import javafx.scene.Camera
+import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.render.WorldRenderer
+import java.util.concurrent.CopyOnWriteArrayList
 
 
 class World {
@@ -12,7 +14,7 @@ class World {
         val DEFAULT_ROW_COUNT: Int = 2
     }
 
-    val entities: List<Entity> = ArrayList()
+    val entities: List<Entity> = CopyOnWriteArrayList()
     
     val rows: List<Row> = listOf(Row(this, DEFAULT_ROW_LENGTH, 5, 2, 0), Row(this, DEFAULT_ROW_LENGTH, 5, 2, -3))
     val rowA: Row inline get() = rows[0]
@@ -33,6 +35,13 @@ class World {
 
     fun removeEntity(entity: Entity) {
         (entities as MutableList).remove(entity)
+    }
+    
+    fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
+        entities.forEach { entity ->
+            entity.engineUpdate(engine, beat, seconds)
+        }
+        (entities as MutableList).removeIf { it.isKilled }
     }
 
     fun sortEntitiesByRenderOrder() {

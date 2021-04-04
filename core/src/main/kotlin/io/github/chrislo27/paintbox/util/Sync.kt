@@ -1,12 +1,13 @@
 package io.github.chrislo27.paintbox.util
 
-import org.lwjgl.glfw.GLFW
 import kotlin.concurrent.thread
 
 /**
  * A highly accurate sync method that continually adapts to the system
  * it runs on to provide reliable results.
  * http://forum.lwjgl.org/index.php?topic=6582.0
+ * 
+ * Modified to not use GLFW.
  *
  * @author Riven
  * @author kappaOne
@@ -23,7 +24,7 @@ open class Sync {
                 // On Windows the sleep functions can be highly inaccurate by
                 // over 10ms making in unusable. However it can be forced to
                 // be a bit more accurate by running a separate sleeping daemon thread.
-                thread(start = true, isDaemon = true, name = "LWJGL3 Sync Timer") {
+                thread(start = true, isDaemon = true, name = "Paintbox Sync Timer") {
                     try {
                         Thread.sleep(Long.MAX_VALUE)
                     } catch (e: Exception) {
@@ -97,18 +98,16 @@ open class Sync {
     }
 
     private var lastNano: Long = System.nanoTime()
-    private var accumulativeTime: Long = 0L
+    
     /**
      * Get the system time in nano seconds
      *
      * @return will return the current time in nano's
      */
     private val time: Long
-        get() { //= (GLFW.glfwGetTime() * NANOS_IN_SECOND).toLong() // Causes full JVM crash sometimes upon closing...
-            accumulativeTime += (System.nanoTime() - lastNano)
-            lastNano = System.nanoTime()
-            return accumulativeTime
-        }
+        get() = System.nanoTime() - lastNano
+//        get() = (GLFW.glfwGetTime() * NANOS_IN_SECOND).toLong() // Causes full JVM crash upon closing due to GLFW closing
+
 
     private class RunningAvg(slotCount: Int) {
         companion object {
