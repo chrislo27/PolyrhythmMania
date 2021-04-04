@@ -39,6 +39,15 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
 
     override fun getRenderWidth(): Float = 0.75f
     override fun getRenderHeight(): Float = 0.5f
+    
+    fun explode(engine: Engine) {
+        if (isKilled) return
+        kill()
+        world.addEntity(EntityExplosion(world, engine.seconds).also {
+            it.position.set(this.position)
+            it.position.x += this.getRenderWidth() / 2f
+        })
+    }
 
     override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
         val convertedVec = renderer.convertWorldToScreen(tmpVec.set(this.position))
@@ -58,8 +67,50 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         super.engineUpdate(engine, beat, seconds)
         this.position.x = (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beat - deployBeat) * xUnitsPerBeat
         
+        if ((beat - deployBeat) >= 4f + 2f) {
+            explode(engine)
+        }
+        
         if ((beat - deployBeat) >= killAfterBeats && !isKilled) {
             kill()
+        }
+    }
+}
+
+class EntityExplosion(world: World, val secondsStarted: Float) : Entity(world) {
+
+    companion object {
+        private val tmpVec = Vector3()
+        private val STATES: List<State> = listOf(
+                State(40f / 32f, 24f / 40f),
+                State(32f / 32f, 24f / 40f),
+                State(24f / 32f, 16f / 40f),
+                State(16f / 32f, 16f / 40f),
+        )
+    }
+
+    private data class State(val renderWidth: Float, val renderHeight: Float)
+
+    private var state: State = STATES[0]
+    private val duration: Float = 8 / 60f
+
+    override fun getRenderWidth(): Float = state.renderWidth
+    override fun getRenderHeight(): Float = state.renderHeight
+
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+        if (isKilled) return
+        val secondsElapsed = engine.seconds - secondsStarted
+        val percentage = (secondsElapsed / duration).coerceIn(0f, 1f)
+        if (percentage >= 1f) {
+            kill()
+        } else {
+            val convertedVec = renderer.convertWorldToScreen(tmpVec.set(this.position))
+            val index = (percentage * STATES.size).toInt()
+            state = STATES[index]
+            val texReg = tileset.rodExplodeAnimations[index]
+            val renderWidth = getRenderWidth()
+            val renderHeight = getRenderHeight()
+            batch.draw(texReg, convertedVec.x - renderWidth / 2f + (3f / 32f), convertedVec.y + (0f / 32f), renderWidth, renderHeight)
         }
     }
 }

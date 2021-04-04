@@ -22,6 +22,9 @@ abstract class Tileset(val texture: Texture) {
     abstract val rodAerialFrames: Int
     abstract val rodGroundAnimations: List<TextureRegion>
     abstract val rodAerialAnimations: List<TextureRegion>
+    
+    abstract val rodExplodeFrames: Int
+    abstract val rodExplodeAnimations: List<TextureRegion>
 }
 
 open class GBATileset(texture: Texture) : Tileset(texture) {
@@ -49,6 +52,14 @@ open class GBATileset(texture: Texture) : Tileset(texture) {
             TextureRegion(texture, 231, 1 + 17 * i, 24, 16)
         }
     }
+    
+    override val rodExplodeFrames: Int = 4
+    override val rodExplodeAnimations: List<TextureRegion> = listOf(
+            TextureRegion(texture, 1, 119, 40, 24),
+            TextureRegion(texture, 7, 145, 32, 24),
+            TextureRegion(texture, 11, 171, 24, 16),
+            TextureRegion(texture, 14, 189, 16, 16),
+    )
 }
 
 class GBA2Tileset(texture: Texture) : GBATileset(texture) {
