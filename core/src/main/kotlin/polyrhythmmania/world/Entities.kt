@@ -3,10 +3,10 @@ package polyrhythmmania.world
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector3
-import io.github.chrislo27.paintbox.util.MathHelper
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.WorldRenderer
+import kotlin.math.floor
 
 
 class EntityPlatform(world: World, val withLine: Boolean = false) : SimpleRenderedEntity(world) {
@@ -35,6 +35,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
     private val activeBlocks: BooleanArray = BooleanArray(row.length)
     private val xUnitsPerBeat: Float = 2f
     private val killAfterBeats: Float = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
+    private var explodeAtSec: Float = Float.MAX_VALUE
 
     init {
         this.position.z = row.startZ.toFloat()
@@ -44,16 +45,15 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
     override fun getRenderWidth(): Float = 0.75f
     override fun getRenderHeight(): Float = 0.5f
 
-    fun getPosXFromBeat(beat: Float): Float {
-        return (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beat - deployBeat) * xUnitsPerBeat - (6 / 32f)
+    fun getPosXFromBeat(beatsFromDeploy: Float): Float {
+        return (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beatsFromDeploy) * xUnitsPerBeat - (6 / 32f)
     }
-    
+
     fun explode(engine: Engine) {
         if (isKilled) return
         kill()
-        world.addEntity(EntityExplosion(world, engine.seconds).also {
+        world.addEntity(EntityExplosion(world, engine.seconds, this.getRenderWidth()).also {
             it.position.set(this.position)
-            it.position.x += this.getRenderWidth() / 2f
         })
     }
 
@@ -69,35 +69,58 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         }
 
         batch.draw(texReg, convertedVec.x - (1 / 32f), convertedVec.y, getRenderWidth(), getRenderHeight())
+
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         super.engineUpdate(engine, beat, seconds)
-        
-        
+
         collisionCheck(engine, beat, seconds)
 
-
-        if ((beat - deployBeat) >= killAfterBeats && !isKilled) {
+        if (seconds >= explodeAtSec) {
+            explode(engine)
+        } else if ((beat - deployBeat) >= killAfterBeats && !isKilled) {
             kill()
         }
     }
-    
+
     private fun collisionCheck(engine: Engine, beat: Float, seconds: Float) {
         val prevPosX = this.position.x
+        val prevPosY = this.position.y
         val prevPosZ = this.position.z
-        
+
+        // Do collision check. Only works on the EntityRowBlocks for the given row.
+        // 1. Stops instantly if it hits a prematurely deployed piston
+        // 2. Stops if it hits a block when falling
+        val beatsFromDeploy = beat - deployBeat
+        val beatsFromFirst = beatsFromDeploy - 4
+        val targetX = getPosXFromBeat(beatsFromDeploy)
+        // The index that the rod is on
+        val currentIndexFloat = targetX - row.startX
+        val currentIndex = floor(currentIndexFloat).toInt()
+
+        // Check for wall stop
+        if (!collidedWithWall && (currentIndexFloat - currentIndex) >= 0.7f) {
+            val nextIndex = currentIndex + 1
+            if (nextIndex in 0 until row.length) {
+                val next = row.rowBlocks[nextIndex]
+                val heightOfNext = 1f + (if (next.pistonState != EntityRowBlock.PistonState.RETRACTED) (6f / 40f) else 0f)
+                if (next.active && prevPosY in next.position.y..(next.position.y + heightOfNext - (1f / 40f))) {
+                    collidedWithWall = true
+                    this.position.x = currentIndex + 0.7f + row.startX
+                    explodeAtSec = seconds + (1 / 3f)
+                }
+            }
+        }
         if (!collidedWithWall) {
-            val targetX = (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beat - deployBeat) * xUnitsPerBeat
-            // Do collision check. Only works on the EntityRowBlocks for the given row.
-            // 1. Stops instantly if it hits a prematurely deployed piston
-            // 2. Stops if it hits a block when falling
             this.position.x = targetX
         }
+        
+        // TODO implement falling down physics
     }
 }
 
-class EntityExplosion(world: World, val secondsStarted: Float) : Entity(world) {
+class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Float) : Entity(world) {
 
     companion object {
         private val tmpVec = Vector3()
@@ -130,7 +153,7 @@ class EntityExplosion(world: World, val secondsStarted: Float) : Entity(world) {
             val texReg = tileset.rodExplodeAnimations[index]
             val renderWidth = getRenderWidth()
             val renderHeight = getRenderHeight()
-            batch.draw(texReg, convertedVec.x - renderWidth / 2f + (3f / 32f), convertedVec.y + (0f / 32f), renderWidth, renderHeight)
+            batch.draw(texReg, convertedVec.x - renderWidth / 2f + rodWidth / 2f - (2f / 32f), convertedVec.y + (3f / 32f), renderWidth, renderHeight)
         }
     }
 }
