@@ -46,7 +46,7 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
     
     override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
         val texReg = getTextureRegionFromTileset(tileset) ?: return
-        val convertedVec = renderer.convertWorldToScreen(tmpVec.set(this.position))
+        val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(this.position))
         batch.draw(texReg, convertedVec.x, convertedVec.y, getRenderWidth(), getRenderHeight())
     }
 

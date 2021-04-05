@@ -17,8 +17,8 @@ class World {
     val entities: List<Entity> = CopyOnWriteArrayList()
     
     val rows: List<Row> = listOf(Row(this, DEFAULT_ROW_LENGTH, 5, 2, 0), Row(this, DEFAULT_ROW_LENGTH, 5, 2, -3))
-    val rowA: Row inline get() = rows[0]
-    val rowDpad: Row inline get() = rows[1]
+    val rowA: Row get() = rows[0]
+    val rowDpad: Row get() = rows[1]
     
     init {
         populateScene()
