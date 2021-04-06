@@ -174,7 +174,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                     }
                 }
                 is FallState.Falling -> {
-                    // TODO tweak gravity acceleration
+                    // Gravity acceleration
                     currentFallState.velocityY += (-50f) * deltaSec
 
                     // When falling, the Y position changes but collision detection is done to check for row start Y
