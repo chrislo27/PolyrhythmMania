@@ -90,6 +90,39 @@ class World {
                 })
             }
         }
+        
+        // Button signs
+        val signs = mutableListOf<EntitySign>()
+        signs += EntitySign(this, 0).apply {
+            this.position.set(7f, 2f, 1f)
+        }
+        signs += EntitySign(this, 2).apply {
+            this.position.set(8f, 2f, 1f)
+        }
+        signs += EntitySign(this, 3).apply {
+            this.position.set(9f, 2f, 1f)
+        }
+        signs += EntitySign(this, 4).apply {
+            this.position.set(10f, 2f, 1f)
+        }
+        signs += EntitySign(this, 1).apply {
+            this.position.set(7f, 2f, -2f)
+        }
+        signs += EntitySign(this, 2).apply {
+            this.position.set(8f, 2f, -2f)
+        }
+        signs += EntitySign(this, 3).apply {
+            this.position.set(9f, 2f, -2f)
+        }
+        signs += EntitySign(this, 4).apply {
+            this.position.set(10f, 2f, -2f)
+        }
+        signs.forEach { sign ->
+            sign.position.x += (12 / 32f)
+            sign.position.z += (10 / 40f)
+            addEntity(sign)
+        }
+        
 
     }
 

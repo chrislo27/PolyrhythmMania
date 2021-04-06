@@ -58,3 +58,12 @@ class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Flo
         }
     }
 }
+
+class EntitySign(world: World, val spriteIndex: Int) : SimpleRenderedEntity(world) {
+    override fun getRenderWidth(): Float = 0.5f
+    override fun getRenderHeight(): Float = 0.5f
+
+    override fun getTextureRegionFromTileset(tileset: Tileset): TextureRegion {
+        return tileset.buttonSigns[spriteIndex]
+    }
+}
