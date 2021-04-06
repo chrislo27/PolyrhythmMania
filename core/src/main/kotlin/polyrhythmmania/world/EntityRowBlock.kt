@@ -3,12 +3,15 @@ package polyrhythmmania.world
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.WorldRenderer
+import kotlin.math.floor
 
 
-class EntityRowBlock(world: World, val baseY: Float) : SimpleRenderedEntity(world) {
+class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex: Int)
+    : SimpleRenderedEntity(world) {
     
     companion object {
         val FULL_EXTENSION_TIME_BEATS: Float = 0.05f
@@ -34,6 +37,9 @@ class EntityRowBlock(world: World, val baseY: Float) : SimpleRenderedEntity(worl
         }
     var active: Boolean = true
     
+    val collisionHeight: Float
+        get() = if (pistonState == PistonState.RETRACTED) 1f else 1.15f
+    
     private var shouldPartiallyExtend: Boolean = false
     private var fullyExtendedAtBeat: Float = 0f
     
@@ -45,6 +51,20 @@ class EntityRowBlock(world: World, val baseY: Float) : SimpleRenderedEntity(worl
         pistonState = PistonState.FULLY_EXTENDED
         shouldPartiallyExtend = true
         fullyExtendedAtBeat = beat
+        
+        // Bounce any rods that are on this index
+        // FIXME this is for testing purposes only
+        world.entities.forEach { entity ->
+            if (entity is EntityRod) {
+                // The index that the rod is on
+                val currentIndexFloat = entity.position.x - entity.row.startX
+                val currentIndex = floor(currentIndexFloat).toInt()
+                if (currentIndex == this.rowIndex && MathUtils.isEqual(entity.position.z, this.position.z)
+                        && entity.position.y in (this.position.y + 1f)..(this.position.y + collisionHeight)) {
+                    entity.bounce(currentIndex)
+                }
+            }
+        }
     }
     
     fun spawn(percentage: Float) {

@@ -142,10 +142,75 @@ ${renderer.getDebugString()}
 
         events += EventDeployRod(engine, world.rowA, 16f - 4)
         events += EventRowBlockExtend(engine, world.rowA, 0, 16f)
-        events += EventRowBlockExtend(engine, world.rowA, 4, 18f)
+//        events += EventRowBlockExtend(engine, world.rowA, 4, 18f)
         events += EventRowBlockRetract(engine, world.rowA, -1, 22f)
 
         events += EventRowBlockDespawn(engine, world.rowA, -1, 23f)
+
+
+
+        events += EventDeployRod(engine, world.rowA, 28f - 4)
+        events += EventRowBlockSpawn(engine, world.rowA, 0, EntityRowBlock.Type.PISTON_A, 24f)
+        events += EventRowBlockSpawn(engine, world.rowA, 2, EntityRowBlock.Type.PISTON_A, 25f)
+        events += EventRowBlockSpawn(engine, world.rowA, 4, EntityRowBlock.Type.PISTON_A, 26f)
+        events += EventRowBlockSpawn(engine, world.rowA, 6, EntityRowBlock.Type.PISTON_A, 27f)
+        (8 until 16).forEach { i ->
+            events += EventRowBlockSpawn(engine, world.rowA, i, EntityRowBlock.Type.PLATFORM, 28f)
+        }
+        events += EventRowBlockExtend(engine, world.rowA, 0, 28f)
+        events += EventRowBlockExtend(engine, world.rowA, 2, 29f)
+        events += EventRowBlockExtend(engine, world.rowA, 4, 30f)
+        events += EventRowBlockExtend(engine, world.rowA, 6, 31f)
+        events += EventRowBlockRetract(engine, world.rowA, -1, 31.5f)
+
+        events += EventDeployRod(engine, world.rowA, 32f - 4)
+        events += EventRowBlockExtend(engine, world.rowA, 0, 32f)
+        events += EventRowBlockExtend(engine, world.rowA, 2, 33f)
+        events += EventRowBlockExtend(engine, world.rowA, 4, 34f)
+        events += EventRowBlockExtend(engine, world.rowA, 6, 35f)
+        events += EventRowBlockRetract(engine, world.rowA, -1, 38f)
+
+        events += EventRowBlockDespawn(engine, world.rowA, -1, 39f)
+
+        
+
+        events += EventDeployRod(engine, world.rowA, 44f - 4)
+        events += EventDeployRod(engine, world.rowDpad, 44f - 4)
+        events += EventRowBlockSpawn(engine, world.rowA, 0, EntityRowBlock.Type.PISTON_A, 40f)
+        events += EventRowBlockSpawn(engine, world.rowA, 2, EntityRowBlock.Type.PISTON_A, 41f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 0, EntityRowBlock.Type.PLATFORM, 41f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 1, EntityRowBlock.Type.PLATFORM, 41f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 2, EntityRowBlock.Type.PISTON_DPAD, 41f)
+        events += EventRowBlockSpawn(engine, world.rowA, 4, EntityRowBlock.Type.PISTON_A, 42f)
+        events += EventRowBlockSpawn(engine, world.rowA, 6, EntityRowBlock.Type.PISTON_A, 43f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 6, EntityRowBlock.Type.PISTON_DPAD, 43f)
+        (8 until 16).forEach { i ->
+            events += EventRowBlockSpawn(engine, world.rowA, i, EntityRowBlock.Type.PLATFORM, 44f)
+            if (i >= 10)
+                events += EventRowBlockSpawn(engine, world.rowDpad, i, EntityRowBlock.Type.PLATFORM, 44f)
+        }
+        events += EventRowBlockExtend(engine, world.rowA, 0, 44f)
+        events += EventRowBlockExtend(engine, world.rowA, 2, 45f)
+        events += EventRowBlockExtend(engine, world.rowDpad, 2, 45f)
+        events += EventRowBlockExtend(engine, world.rowA, 4, 46f)
+        events += EventRowBlockExtend(engine, world.rowA, 6, 47f)
+        events += EventRowBlockExtend(engine, world.rowDpad, 6, 47f)
+        events += EventRowBlockRetract(engine, world.rowA, -1, 47.5f)
+        events += EventRowBlockRetract(engine, world.rowDpad, -1, 47.5f)
+
+        events += EventDeployRod(engine, world.rowA, 48f - 4)
+        events += EventDeployRod(engine, world.rowDpad, 48f - 4)
+        events += EventRowBlockExtend(engine, world.rowA, 0, 48f)
+        events += EventRowBlockExtend(engine, world.rowA, 2, 49f)
+        events += EventRowBlockExtend(engine, world.rowDpad, 2, 49f)
+        events += EventRowBlockExtend(engine, world.rowA, 4, 50f)
+        events += EventRowBlockExtend(engine, world.rowA, 6, 51f)
+        events += EventRowBlockExtend(engine, world.rowDpad, 6, 51f)
+        events += EventRowBlockRetract(engine, world.rowA, -1, 54f)
+        events += EventRowBlockRetract(engine, world.rowDpad, -1, 54f)
+
+        events += EventRowBlockDespawn(engine, world.rowA, -1, 55f)
+        events += EventRowBlockDespawn(engine, world.rowDpad, -1, 55f)
 
         engine.addEvents(events)
     }
