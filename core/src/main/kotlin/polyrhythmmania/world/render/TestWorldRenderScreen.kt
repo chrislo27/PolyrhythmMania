@@ -146,23 +146,7 @@ ${renderer.getDebugString()}
         events += EventRowBlockRetract(engine, world.rowA, -1, 22f)
 
         events += EventRowBlockDespawn(engine, world.rowA, -1, 23f)
-        
-        
-        events += EventRowBlockSpawn(engine, world.rowDpad, -1, EntityRowBlock.Type.PLATFORM, 0f)
-        events += EventRowBlockSpawn(engine, world.rowDpad, 0, EntityRowBlock.Type.PISTON_DPAD, 0f)
-        events += EventRowBlockExtend(engine, world.rowDpad, 0, 0f)
 
         engine.addEvents(events)
-        
-        (-2 until 8).forEach { i ->
-            world.addEntity(EntityRod(world, 0f, world.rowDpad).apply {
-                this.position.x = getPosXFromBeat(i.toFloat() + 4f + 0.5f)
-                this.collidedWithWall = true
-            })
-        }
-        world.addEntity(EntityRod(world, 0f, world.rowDpad).apply {
-            this.position.x = getPosXFromBeat((-1f + 0.2f) + 4f + 0.5f)
-            this.collidedWithWall = true
-        })
     }
 }
