@@ -4,7 +4,9 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 
 
-abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float) : Event(engine) {
+abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float, 
+                             val affectThisIndexAndForward: Boolean)
+    : Event(engine) {
     
     init {
         this.beat = startBeat
@@ -17,7 +19,13 @@ abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, start
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
         if (index in 0 until row.length) {
-            entityOnStart(row.rowBlocks[index], currentBeat)
+            if (index < row.length - 1 && affectThisIndexAndForward) {
+                for (i in index until row.length) {
+                    entityOnStart(row.rowBlocks[i], currentBeat)
+                }
+            } else {
+                entityOnStart(row.rowBlocks[index], currentBeat)
+            }
         } else {
             row.rowBlocks.forEach { entity ->
                 entityOnStart(entity, currentBeat)
@@ -29,7 +37,13 @@ abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, start
         super.onUpdate(currentBeat)
         val percent = getBeatPercentage(currentBeat).coerceIn(0f, 1f)
         if (index in 0 until row.length) {
-            entityOnUpdate(row.rowBlocks[index], currentBeat, percent)
+            if (index < row.length - 1 && affectThisIndexAndForward) {
+                for (i in index until row.length) {
+                    entityOnUpdate(row.rowBlocks[i], currentBeat, percent)
+                }
+            } else {
+                entityOnUpdate(row.rowBlocks[index], currentBeat, percent)
+            }
         } else {
             row.rowBlocks.forEach { entity ->
                 entityOnUpdate(entity, currentBeat, percent)
@@ -40,7 +54,13 @@ abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, start
     override fun onEnd(currentBeat: Float) {
         super.onEnd(currentBeat)
         if (index in 0 until row.length) {
-            entityOnEnd(row.rowBlocks[index], currentBeat)
+            if (index < row.length - 1 && affectThisIndexAndForward) {
+                for (i in index until row.length) {
+                    entityOnEnd(row.rowBlocks[i], currentBeat)
+                }
+            } else {
+                entityOnEnd(row.rowBlocks[index], currentBeat)
+            }
         } else {
             row.rowBlocks.forEach { entity ->
                 entityOnEnd(entity, currentBeat)
@@ -49,8 +69,9 @@ abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, start
     }
 }
 
-class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityRowBlock.Type, startBeat: Float)
-    : EventRowBlock(engine, row, index, startBeat) {
+class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityRowBlock.Type, startBeat: Float,
+                         affectThisIndexAndForward: Boolean = false)
+    : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
     init {
         this.width = 0.125f
     }
@@ -65,7 +86,10 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityR
     }
 }
 
-class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Float) : EventRowBlock(engine, row, index, startBeat) {
+class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Float,
+                           affectThisIndexAndForward: Boolean = false)
+    : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
+    
     init {
         this.width = 0.125f
     }
@@ -75,13 +99,17 @@ class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Floa
     }
 }
 
-class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Float) : EventRowBlock(engine, row, index, startBeat) {
+class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Float,
+                           affectThisIndexAndForward: Boolean = false)
+    : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
         entity.retract()
     }
 }
 
-class EventRowBlockExtend(engine: Engine, row: Row, index: Int, startBeat: Float) : EventRowBlock(engine, row, index, startBeat) {
+class EventRowBlockExtend(engine: Engine, row: Row, index: Int, startBeat: Float,
+                          affectThisIndexAndForward: Boolean = false)
+    : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
         entity.fullyExtend(currentBeat)
     }

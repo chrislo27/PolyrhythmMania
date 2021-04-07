@@ -1,7 +1,5 @@
 package polyrhythmmania.world
 
-import com.badlogic.gdx.math.Vector3
-import javafx.scene.Camera
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.concurrent.CopyOnWriteArrayList
