@@ -131,9 +131,7 @@ ${renderer.getDebugString()}
         val events = mutableListOf<Event>()
         events += EventRowBlockSpawn(engine, world.rowA, 0, EntityRowBlock.Type.PISTON_A, 8f)
         events += EventRowBlockSpawn(engine, world.rowA, 4, EntityRowBlock.Type.PISTON_A, 10f)
-        (8 until 16).forEach { i ->
-            events += EventRowBlockSpawn(engine, world.rowA, i,  EntityRowBlock.Type.PLATFORM, 12f)
-        }
+        events += EventRowBlockSpawn(engine, world.rowA, 8, EntityRowBlock.Type.PLATFORM, 12f, true)
         
         events += EventDeployRod(engine, world.rowA, 12f - 4)
         events += EventRowBlockExtend(engine, world.rowA, 0, 12f)
@@ -154,9 +152,7 @@ ${renderer.getDebugString()}
         events += EventRowBlockSpawn(engine, world.rowA, 2, EntityRowBlock.Type.PISTON_A, 25f)
         events += EventRowBlockSpawn(engine, world.rowA, 4, EntityRowBlock.Type.PISTON_A, 26f)
         events += EventRowBlockSpawn(engine, world.rowA, 6, EntityRowBlock.Type.PISTON_A, 27f)
-        (8 until 16).forEach { i ->
-            events += EventRowBlockSpawn(engine, world.rowA, i, EntityRowBlock.Type.PLATFORM, 28f)
-        }
+        events += EventRowBlockSpawn(engine, world.rowA, 8, EntityRowBlock.Type.PLATFORM, 28f, true)
         events += EventRowBlockExtend(engine, world.rowA, 0, 28f)
         events += EventRowBlockExtend(engine, world.rowA, 2, 29f)
         events += EventRowBlockExtend(engine, world.rowA, 4, 30f)
@@ -184,11 +180,8 @@ ${renderer.getDebugString()}
         events += EventRowBlockSpawn(engine, world.rowA, 4, EntityRowBlock.Type.PISTON_A, 42f)
         events += EventRowBlockSpawn(engine, world.rowA, 6, EntityRowBlock.Type.PISTON_A, 43f)
         events += EventRowBlockSpawn(engine, world.rowDpad, 6, EntityRowBlock.Type.PISTON_DPAD, 43f)
-        (8 until 16).forEach { i ->
-            events += EventRowBlockSpawn(engine, world.rowA, i, EntityRowBlock.Type.PLATFORM, 44f)
-            if (i >= 10)
-                events += EventRowBlockSpawn(engine, world.rowDpad, i, EntityRowBlock.Type.PLATFORM, 44f)
-        }
+        events += EventRowBlockSpawn(engine, world.rowA, 8, EntityRowBlock.Type.PLATFORM, 44f, true)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 10, EntityRowBlock.Type.PLATFORM, 44f, true)
         events += EventRowBlockExtend(engine, world.rowA, 0, 44f)
         events += EventRowBlockExtend(engine, world.rowA, 2, 45f)
         events += EventRowBlockExtend(engine, world.rowDpad, 2, 45f)
