@@ -9,7 +9,7 @@ import net.beadsproject.beads.ugens.Static
 /**
  * A sample player that can play a [MusicSample].
  */
-class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
+open class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
     : PlayerLike(context, musicSample.nChannels, musicSample.nChannels) {
 
     /** The position in milliseconds.  */
@@ -32,7 +32,10 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
         outputInitializationRegime = OutputInitializationRegime.RETAIN
         outputPauseRegime = OutputPauseRegime.ZERO
     }
-    
+
+    /**
+     * Loads the start buffer based on [loopStartMs]
+     */
     fun prepareStartBuffer() {
         musicSample.moveStartBuffer(musicSample.msToSamples(loopStartMs.toDouble()).toInt())
     }

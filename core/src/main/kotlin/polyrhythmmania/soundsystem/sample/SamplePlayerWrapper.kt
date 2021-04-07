@@ -5,7 +5,7 @@ import net.beadsproject.beads.core.UGen
 import net.beadsproject.beads.ugens.SamplePlayer
 import net.beadsproject.beads.ugens.Static
 
-class SamplePlayerWrapper(private val samplePlayer: SamplePlayer)
+open class SamplePlayerWrapper(private val samplePlayer: SamplePlayer)
     : PlayerLike(samplePlayer.context, samplePlayer.outs, samplePlayer.outs) {
 
     private val loopStartUGen: Static = Static(context, 0f)

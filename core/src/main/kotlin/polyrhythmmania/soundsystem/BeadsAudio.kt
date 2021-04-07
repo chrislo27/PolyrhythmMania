@@ -1,14 +1,16 @@
 package polyrhythmmania.soundsystem
 
-import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.assets.AssetDescriptor
+import com.badlogic.gdx.assets.AssetLoaderParameters
+import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader
+import com.badlogic.gdx.assets.loaders.FileHandleResolver
+import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.utils.Array
 import net.beadsproject.beads.core.AudioContext
-import net.beadsproject.beads.core.UGen
 import net.beadsproject.beads.data.Sample
 import net.beadsproject.beads.ugens.SamplePlayer
-import polyrhythmmania.soundsystem.sample.MusicSample
-import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
-import polyrhythmmania.soundsystem.sample.PlayerLike
-import polyrhythmmania.soundsystem.sample.SamplePlayerWrapper
+import polyrhythmmania.soundsystem.sample.*
 
 
 abstract class BeadsAudio(val channels: Int, val sampleRate: Float) {
@@ -45,3 +47,48 @@ class BeadsMusic(val musicSample: MusicSample)
 //    override fun dispose() {
 //    }
 }
+
+
+
+class BeadsSoundLoader(resolver: FileHandleResolver)
+    : AsynchronousAssetLoader<BeadsSound, BeadsSoundLoader.BeadsSoundLoaderParam>(resolver) {
+    class BeadsSoundLoaderParam : AssetLoaderParameters<BeadsSound>()
+
+    var sound: BeadsSound? = null
+
+    override fun getDependencies(fileName: String?, file: FileHandle?, parameter: BeadsSoundLoaderParam?): Array<AssetDescriptor<Any>>? {
+        return null
+    }
+
+    override fun loadAsync(manager: AssetManager, fileName: String, file: FileHandle, parameter: BeadsSoundLoaderParam?) {
+        sound = GdxAudioReader.newSound(file)
+    }
+
+    override fun loadSync(manager: AssetManager, fileName: String, file: FileHandle, parameter: BeadsSoundLoaderParam?): BeadsSound? {
+        val s = sound
+        sound = null
+        return s
+    }
+}
+
+class BeadsMusicLoader(resolver: FileHandleResolver) 
+    : AsynchronousAssetLoader<BeadsMusic, BeadsMusicLoader.BeadsMusicLoaderParam>(resolver) {
+    class BeadsMusicLoaderParam : AssetLoaderParameters<BeadsMusic>()
+
+    var music: BeadsMusic? = null
+
+    override fun getDependencies(fileName: String?, file: FileHandle?, parameter: BeadsMusicLoaderParam?): Array<AssetDescriptor<Any>>? {
+        return null
+    }
+
+    override fun loadAsync(manager: AssetManager, fileName: String, file: FileHandle, parameter: BeadsMusicLoaderParam?) {
+        music = GdxAudioReader.newMusic(file)
+    }
+
+    override fun loadSync(manager: AssetManager, fileName: String, file: FileHandle, parameter: BeadsMusicLoaderParam?): BeadsMusic? {
+        val s = music
+        music = null
+        return s
+    }
+}
+

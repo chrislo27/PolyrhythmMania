@@ -7,6 +7,8 @@ import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.IOAudioFormat
 import javax.sound.sampled.*
 import polyrhythmmania.soundsystem.beads.*
+import polyrhythmmania.soundsystem.sample.PlayerLike
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.concurrent.thread
 import kotlin.math.abs
@@ -50,7 +52,9 @@ class SoundSystem(private val mixer: Mixer,
                 return first ?: supportedMixers.first()
             }
 
-            return SoundSystem(getDefaultMixer(), ioAudioFormat, bufferSize)
+            val mixer = getDefaultMixer()
+//            println("Picked mixer ${mixer.mixerInfo} ${mixer.sourceLineInfo}")
+            return SoundSystem(mixer, ioAudioFormat, bufferSize)
         }
     }
 
@@ -59,7 +63,11 @@ class SoundSystem(private val mixer: Mixer,
 
     @Volatile
     private var currentlyRealTime: Boolean = true
-
+    
+    @Volatile
+    private var currentSoundID: Long = 0L
+    private val activePlayers: MutableMap<Long, PlayerLike> = ConcurrentHashMap()
+    
     @Volatile
     private var isDisposed: Boolean = false
     private val timingProvider: AdaptiveTimingProvider = this.AdaptiveTimingProvider()
@@ -105,6 +113,19 @@ class SoundSystem(private val mixer: Mixer,
         stopRealtime()
         audioContext.out.clearInputConnections()
         audioContext.out.clearDependents()
+    }
+    
+    private fun obtainSoundID(): Long = ++currentSoundID
+    
+    fun playAudio(beadsAudio: BeadsAudio): Long {
+        val id = obtainSoundID()
+        val player = beadsAudio.createPlayer(audioContext)
+        player.killListeners += {
+            activePlayers.remove(id, it)
+        }
+        activePlayers[id] = player
+        audioContext.out.addInput(player)
+        return id
     }
 
     private inner class AdaptiveTimingProvider : TimingProvider {
