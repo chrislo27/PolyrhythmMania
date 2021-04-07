@@ -154,7 +154,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                     val fallVelo = if (currentFallState is FallState.Bouncing) {
                         (currentFallState.getYFromX(this.position.x) - currentFallState.getYFromX(prevPosX)) / deltaSec
                     } else 0f
-                    fallState = FallState.Falling(fallVelo) // FIXME the velocity may not be 0 upon hit. Should compute if Bouncing
+                    fallState = FallState.Falling(fallVelo)
                 }
             }
         }

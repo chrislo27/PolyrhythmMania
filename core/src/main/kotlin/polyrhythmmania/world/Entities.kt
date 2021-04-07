@@ -14,9 +14,31 @@ class EntityPlatform(world: World, val withLine: Boolean = false) : SimpleRender
     }
 }
 
-class EntityCube(world: World, val withLine: Boolean = false) : SimpleRenderedEntity(world) {
+class EntityCube(world: World, val withLine: Boolean = false)
+    : SimpleRenderedEntity(world) {
     override fun getTextureRegionFromTileset(tileset: Tileset): TextureRegion {
         return if (withLine) tileset.cubeWithLine else tileset.cube
+    }
+}
+
+class EntityCubeBordered(world: World)
+    : SimpleRenderedEntity(world) {
+    companion object {
+        private val tmpVec = Vector3()
+    }
+
+    override fun getTextureRegionFromTileset(tileset: Tileset): TextureRegion {
+        return tileset.cube
+    }
+
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+        super.render(renderer, batch, tileset, engine)
+        val texReg = tileset.cubeWithBlackBorder
+        val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(this.position))
+        val w = 16f / 32f
+        val h = 8f / 32f
+        val renderHeight = getRenderHeight()
+        batch.draw(texReg, convertedVec.x, convertedVec.y + (renderHeight - h), w, h)
     }
 }
 

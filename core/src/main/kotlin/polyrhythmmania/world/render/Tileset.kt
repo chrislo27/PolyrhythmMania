@@ -8,6 +8,7 @@ abstract class Tileset(val texture: Texture) {
     
     abstract val cube: TextureRegion
     abstract val cubeWithLine: TextureRegion
+    abstract val cubeWithBlackBorder: TextureRegion
     abstract val platform: TextureRegion
     abstract val platformWithLine: TextureRegion
     
@@ -38,6 +39,7 @@ abstract class Tileset(val texture: Texture) {
 open class GBATileset(texture: Texture) : Tileset(texture) {
     override val cube: TextureRegion = TextureRegion(texture, 1, 1, 32, 32)
     override val cubeWithLine: TextureRegion = TextureRegion(texture, 34, 1, 32, 32)
+    override val cubeWithBlackBorder: TextureRegion = TextureRegion(texture, 170, 93, 16, 8)
     override val platform: TextureRegion = TextureRegion(texture, 67, 1, 32, 32)
     override val platformWithLine: TextureRegion = TextureRegion(texture, 100, 1, 32, 32)
     
