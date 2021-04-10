@@ -48,10 +48,10 @@ class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Flo
     companion object {
         private val tmpVec = Vector3()
         private val STATES: List<State> = listOf(
-                State(40f / 32f, 24f / 40f),
-                State(32f / 32f, 24f / 40f),
-                State(24f / 32f, 16f / 40f),
-                State(16f / 32f, 16f / 40f),
+                State(40f / 32f, 24f / 32f),
+                State(32f / 32f, 24f / 32f),
+                State(24f / 32f, 16f / 32f),
+                State(16f / 32f, 16f / 32f),
         )
     }
 
