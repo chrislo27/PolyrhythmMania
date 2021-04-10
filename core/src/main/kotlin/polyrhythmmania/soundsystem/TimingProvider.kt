@@ -13,11 +13,30 @@ interface TimingProvider {
     val listeners: MutableList<TimingListener>
 
     /**
+     * Called when an exception occurs during update of [seconds] or calling of [listeners] ([onUpdate] function).
+     * 
+     * Implementors of [TimingProvider] are required to implement this behaviour and when it is called.
+     * @return True if the [TimingProvider] should continue updating listeners after hitting an exception, false to stop.
+     *         If an exception occurs as part of updating [seconds], the return value is ignored. 
+     */
+    fun exceptionHandler(throwable: Throwable): Boolean
+
+    /**
      * Called when the [seconds] field updates. It is the responsibility of the implementor to ensure this happens.
      */
     fun onUpdate(oldSeconds: Float, newSeconds: Float) {
-        listeners.forEach { listener -> 
-            listener.onUpdate(oldSeconds, newSeconds)
+        try {
+            for (listener in listeners) {
+                try {
+                    listener.onUpdate(oldSeconds, newSeconds)
+                } catch (t: Throwable) {
+                    if (!exceptionHandler(t)) {
+                        break
+                    }
+                }
+            }
+        } catch (t: Throwable) {
+            exceptionHandler(t)
         }
     }
     
@@ -30,7 +49,7 @@ fun interface TimingListener {
 /**
  * A [TimingProvider] where an external object updates the [seconds] field.
  */
-class SimpleTimingProvider : TimingProvider {
+class SimpleTimingProvider(private val exceptionHandler: (Throwable) -> Boolean) : TimingProvider {
 
     @Volatile
     override var seconds: Float = 0f
@@ -41,4 +60,8 @@ class SimpleTimingProvider : TimingProvider {
         }
     override val listeners: MutableList<TimingListener> = CopyOnWriteArrayList()
 
+    override fun exceptionHandler(throwable: Throwable): Boolean {
+        throw throwable
+//        return false
+    }
 }

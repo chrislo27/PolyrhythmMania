@@ -1,5 +1,6 @@
 package polyrhythmmania.soundsystem
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Disposable
 import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.util.Sync
@@ -114,7 +115,11 @@ class SoundSystem(private val mixer: Mixer,
         audioContext.out.clearInputConnections()
         audioContext.out.clearDependents()
     }
-    
+
+    override fun exceptionHandler(throwable: Throwable): Boolean {
+        return timingProvider.exceptionHandler(throwable)
+    }
+
     private fun obtainSoundID(): Long = ++currentSoundID
     
     fun playAudio(beadsAudio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long {
@@ -140,9 +145,13 @@ class SoundSystem(private val mixer: Mixer,
 
         init {
             timingBead.listeners += TimingListener { oldSeconds, newSeconds ->
-                if (!currentlyRealTime && !isPaused) {
-                    this.seconds = newSeconds
-                    this.onUpdate(oldSeconds, newSeconds)
+                try {
+                    if (!currentlyRealTime && !isPaused) {
+                        this.seconds = newSeconds
+                        this.onUpdate(oldSeconds, newSeconds)
+                    }
+                } catch (t: Throwable) {
+                    exceptionHandler(t)
                 }
             }
             realtimeThread = thread(start = true, isDaemon = true, name = "AdaptiveTimingProvider", priority = Thread.MAX_PRIORITY) {
@@ -174,9 +183,10 @@ class SoundSystem(private val mixer: Mixer,
 //                            nano = System.nanoTime()
                         }
                     }
-                } catch (e: Exception) {
+                } catch (t: Throwable) {
                     Paintbox.LOGGER.debug("AdaptiveTimingProvider thread encountered an exception")
-                    e.printStackTrace()
+                    t.printStackTrace()
+                    exceptionHandler(t)
                 }
             }
         }
@@ -185,6 +195,13 @@ class SoundSystem(private val mixer: Mixer,
             val oldSeconds = this.seconds
             this.seconds = timingProvider.timingBead.seconds
             this.onUpdate(oldSeconds, this.seconds)
+        }
+
+        override fun exceptionHandler(throwable: Throwable): Boolean {
+            Gdx.app.postRunnable { 
+                throw throwable
+            }
+            return false
         }
     }
 }

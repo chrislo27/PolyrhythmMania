@@ -1,5 +1,6 @@
 package polyrhythmmania.soundsystem.beads
 
+import com.badlogic.gdx.Gdx
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.UGen
 import polyrhythmmania.soundsystem.TimingListener
@@ -36,16 +37,27 @@ open class TimingBead(context: AudioContext) : UGen(context, 0, 0), TimingProvid
     private var nanoTime = System.nanoTime()
     
     override fun calculateBuffer() {
-        val msDelta = context.samplesToMs(bufferSize.toDouble())
-        if (msDelta != 0.0) {
+        try {
+            val msDelta = context.samplesToMs(bufferSize.toDouble())
+            if (msDelta != 0.0) {
 //            val realtimeMsDelta = (System.nanoTime() - nanoTime) / 1000000.0
 //            nanoTime = System.nanoTime()
 //            println("$msDelta    $realtimeMsDelta")
-            
-            val oldSeconds = seconds
-            ms += msDelta
-            val newSeconds = seconds
-            onUpdate(oldSeconds, newSeconds)
+
+                val oldSeconds = seconds
+                ms += msDelta
+                val newSeconds = seconds
+                onUpdate(oldSeconds, newSeconds)
+            }
+        } catch (t: Throwable) {
+            exceptionHandler(t)
         }
+    }
+
+    override fun exceptionHandler(throwable: Throwable): Boolean {
+        Gdx.app.postRunnable { 
+            throw throwable
+        }
+        return false
     }
 }
