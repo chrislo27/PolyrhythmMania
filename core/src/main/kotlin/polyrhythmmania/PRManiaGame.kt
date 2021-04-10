@@ -21,10 +21,12 @@ import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
 import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
 import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
 import org.lwjgl.glfw.GLFW
+import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
 import polyrhythmmania.world.render.TestWorldRenderScreen
 import sun.rmi.runtime.Log
 import java.io.File
+import kotlin.system.measureNanoTime
 
 
 class PRManiaGame(paintboxSettings: PaintboxSettings)
@@ -35,7 +37,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 PaintboxSettings(launchArguments, logger, logToFile, PRMania.VERSION, PRMania.DEFAULT_SIZE,
                         ResizeAction.ANY_SIZE, PRMania.MINIMUM_SIZE)
     }
-    
+
     private var lastWindowed: WindowSize = PRMania.DEFAULT_SIZE.copy()
 
     override fun getTitle(): String = "${PRMania.TITLE} ${PRMania.VERSION}"
@@ -50,8 +52,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         addFontsToCache(this.fontCache)
 
         AssetRegistry.addAssetLoader(InitalAssetLoader())
+        
 
         setScreen(AssetRegistryLoadingScreen(this).apply {
+            onStart = {
+                InputThresholds.initInputClasses()
+            }
             nextScreen = {
                 TestWorldRenderScreen(this@PRManiaGame)
             }

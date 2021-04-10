@@ -137,8 +137,8 @@ ${renderer.getDebugString()}
     }
 
     private fun addEvents() {
-//        addPr1Patterns()
-        addTestPatterns()
+        addPr1Patterns()
+//        addTestPatterns()
     }
 
     private fun addTestPatterns() {
@@ -160,9 +160,9 @@ ${renderer.getDebugString()}
         events += EventRowBlockDespawn(engine, world.rowDpad, -1, 23f)
 
         events += EventDeployRod(engine, world.rowA, 12f - 4)
-        events += EventRowBlockExtend(engine, world.rowA, 0, 12f - 1)
+        events += EventRowBlockExtend(engine, world.rowA, 0, 12f)
         events += EventRowBlockExtend(engine, world.rowA, 4, 14f)
-//        events += EventRowBlockRetract(engine, world.rowA, -1, 15.5f)
+        events += EventRowBlockRetract(engine, world.rowA, -1, 15.5f)
 
         events += EventDeployRod(engine, world.rowA, 16f - 4)
         events += EventRowBlockExtend(engine, world.rowA, 0, 16f)

@@ -14,11 +14,16 @@ class AssetRegistryLoadingScreen(main: PRManiaGame)
     private val camera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
+    var onStart: () -> Unit = {}
     var nextScreen: (() -> Screen?) = {null}
     private var firstFrame = true
     private var invokedNextScreen = false
 
     override fun render(delta: Float) {
+        if (firstFrame) {
+            onStart()
+        }
+        
         val progress = if (firstFrame) run {
             firstFrame = false
             0f
