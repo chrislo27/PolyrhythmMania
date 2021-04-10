@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
+import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.BeadsSound
@@ -17,6 +18,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
 
     companion object {
         private val tmpVec = Vector3()
+        private val EXPLODE_DELAY_SEC: Float = 1f / 3f
     }
 
     var collidedWithWall: Boolean = false
@@ -87,10 +89,12 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         }
 
         // Debug transparency for fall state
-//        when (fallState) {
-//            is FallState.Bouncing -> batch.setColor(1f, 1f, 1f, 0.25f)
-//            is FallState.Falling -> batch.setColor(1f, 1f, 1f, 0.75f)
-//        }
+        if (Paintbox.debugMode) {
+            when (fallState) {
+                is FallState.Bouncing -> batch.setColor(1f, 1f, 1f, 0.25f)
+                is FallState.Falling -> batch.setColor(1f, 1f, 1f, 0.75f)
+            }
+        }
         batch.draw(texReg, convertedVec.x - (1 / 32f), convertedVec.y, getRenderWidth(), getRenderHeight())
         batch.setColor(1f, 1f, 1f, 1f)
     }
@@ -133,10 +137,9 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         // 1. Stops instantly if it hits a prematurely deployed piston
         // 2. Stops if it hits a block when falling
         val beatsFromDeploy = beat - deployBeat
-        val beatsFromFirst = beatsFromDeploy - 4
         val targetX = getPosXFromBeat(beatsFromDeploy)
         // The index that the rod is on
-        val currentIndexFloat = targetX - row.startX
+        val currentIndexFloat = /*targetX*/ prevPosX - row.startX
         val currentIndex = floor(currentIndexFloat).toInt()
 
         // Initialize active blocks if not already done
@@ -150,9 +153,11 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
             if (nextIndex in 0 until row.length) {
                 val next = row.rowBlocks[nextIndex]
                 val heightOfNext = next.collisionHeight
-                if (next.active && prevPosY in next.position.y..(next.position.y + heightOfNext - (1f / 40f))) {
+                if (next.active && prevPosY in next.position.y..(next.position.y + heightOfNext - (1f / 32f))) {
                     collidedWithWall = true
+//                    println("$seconds Collided with wall: currentIndex = ${currentIndexFloat}  x = ${this.position.x}")
                     this.position.x = currentIndex + 0.7f + row.startX
+//                    println("$seconds After setting X: currentIndex would be ${this.position.x - row.startX}   x = ${this.position.x}")
                     
                     val currentFallState = fallState
                     val fallVelo = if (currentFallState is FallState.Bouncing) {
@@ -162,11 +167,19 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                         fallState = FallState.Falling(fallVelo)
                     }
                     engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
+                    
+                    if (currentIndexFloat < 0f) {
+                        // Standard collision detection will not take affect before index = 0
+                        if (explodeAtSec == Float.MAX_VALUE) {
+                            explodeAtSec = seconds + EXPLODE_DELAY_SEC
+                        }
+                    }
                 }
             }
         }
         if (!collidedWithWall) {
             this.position.x = targetX
+//            println("$seconds Set position X to target: ${targetX}")
         }
 
         // Control Y position
@@ -223,12 +236,13 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                             val topPart = entity.position.y + entity.collisionHeight
                             if (this.position.y < topPart) {
                                 this.position.y = topPart
+//                                println("$seconds Set pos y to ${topPart}, currentIndex = $currentIndexFloat  x = ${this.position.x}")
                             }
                         }
                     }
 
                     if (explodeAtSec == Float.MAX_VALUE && collidedWithWall) {
-                        explodeAtSec = seconds + (1 / 3f)
+                        explodeAtSec = seconds + EXPLODE_DELAY_SEC
                     }
                 }
             }

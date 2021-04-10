@@ -40,7 +40,7 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
     var active: Boolean = true
     
     val collisionHeight: Float
-        get() = if (pistonState == PistonState.RETRACTED) 1f else 1.15f
+        get() = if (type == Type.PLATFORM || pistonState == PistonState.RETRACTED) 1f else 1.15f
     
     private var shouldPartiallyExtend: Boolean = false
     private var fullyExtendedAtBeat: Float = 0f
@@ -61,17 +61,19 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
             Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_d"))
         }
         
-        
-        // Bounce any rods that are on this index
-        // FIXME this is for testing purposes only
-        world.entities.forEach { entity ->
-            if (entity is EntityRod) {
-                // The index that the rod is on
-                val currentIndexFloat = entity.position.x - entity.row.startX
-                val currentIndex = floor(currentIndexFloat).toInt()
-                if (currentIndex == this.rowIndex && MathUtils.isEqual(entity.position.z, this.position.z)
-                        && entity.position.y in (this.position.y + 1f)..(this.position.y + collisionHeight)) {
-                    entity.bounce(currentIndex)
+        if (this.type != Type.PLATFORM) {
+            // Bounce any rods that are on this index
+            // FIXME this is for testing purposes only
+            world.entities.forEach { entity ->
+                if (entity is EntityRod) {
+                    // The index that the rod is on
+                    val currentIndexFloat = entity.position.x - entity.row.startX
+                    val currentIndex = floor(currentIndexFloat).toInt()
+                    if (currentIndex == this.rowIndex && MathUtils.isEqual(entity.position.z, this.position.z)
+                            && entity.position.y in (this.position.y + 1f)..(this.position.y + collisionHeight)) {
+//                        println("The rowblock at ${this.position.x}, ${this.position.z} is bouncing the rod")
+                        entity.bounce(currentIndex)
+                    }
                 }
             }
         }

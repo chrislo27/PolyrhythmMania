@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
+import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -38,16 +39,18 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     private val player: MusicSamplePlayer = music.createPlayer(soundSystem.audioContext).apply {
         this.gain = 0.75f
+//        this.loopStartMs = 3725f
+        this.loopEndMs = 40928f //33482f
+        this.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
+        this.prepareStartBuffer()
     }
-
-    private var nanoTime = System.nanoTime()
 
     init {
         soundSystem.audioContext.out.addInput(player)
         soundSystem.startRealtime()
 
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
-        engine.tempos.addTempoChange(TempoChange(88f, 148.5f))
+//        engine.tempos.addTempoChange(TempoChange(88f, 148.5f))
 
         addEvents()
     }
@@ -62,6 +65,8 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
         super.render(delta)
     }
+
+    private var nanoTime = System.nanoTime()
 
     override fun renderUpdate() {
         super.renderUpdate()
@@ -132,15 +137,29 @@ ${renderer.getDebugString()}
     }
 
     private fun addEvents() {
+//        addPr1Patterns()
+        addTestPatterns()
+    }
+
+    private fun addTestPatterns() {
         val events = mutableListOf<Event>()
         events += EventRowBlockSpawn(engine, world.rowA, 0, EntityRowBlock.Type.PISTON_A, 8f)
         events += EventRowBlockSpawn(engine, world.rowA, 4, EntityRowBlock.Type.PISTON_A, 10f)
         events += EventRowBlockSpawn(engine, world.rowA, 8, EntityRowBlock.Type.PLATFORM, 12f, true)
         
+        // Explode test
+        events += EventRowBlockSpawn(engine, world.rowDpad, 0, EntityRowBlock.Type.PISTON_A, 8f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 1, EntityRowBlock.Type.PLATFORM, 8f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 2, EntityRowBlock.Type.PISTON_A, 8f)
+        events += EventRowBlockExtend(engine, world.rowDpad, 2, 9f)
+        events += EventRowBlockExtend(engine, world.rowDpad, 0, 13f)
+        events += EventDeployRod(engine, world.rowDpad, 8f)
+        events += EventDeployRod(engine, world.rowDpad, 12f)
+
         events += EventDeployRod(engine, world.rowA, 12f - 4)
-        events += EventRowBlockExtend(engine, world.rowA, 0, 12f)
+        events += EventRowBlockExtend(engine, world.rowA, 0, 12f - 1)
         events += EventRowBlockExtend(engine, world.rowA, 4, 14f)
-        events += EventRowBlockRetract(engine, world.rowA, -1, 15.5f)
+//        events += EventRowBlockRetract(engine, world.rowA, -1, 15.5f)
 
         events += EventDeployRod(engine, world.rowA, 16f - 4)
         events += EventRowBlockExtend(engine, world.rowA, 0, 16f)
@@ -148,6 +167,7 @@ ${renderer.getDebugString()}
         events += EventRowBlockRetract(engine, world.rowA, -1, 22f)
 
         events += EventRowBlockDespawn(engine, world.rowA, -1, 23f)
+        events += EventRowBlockDespawn(engine, world.rowDpad, -1, 23f)
 
 
 
@@ -172,7 +192,7 @@ ${renderer.getDebugString()}
 
         events += EventRowBlockDespawn(engine, world.rowA, -1, 39f)
 
-        
+
 
         events += EventDeployRod(engine, world.rowA, 44f - 4)
         events += EventDeployRod(engine, world.rowDpad, 44f - 4)
@@ -208,6 +228,157 @@ ${renderer.getDebugString()}
 
         events += EventRowBlockDespawn(engine, world.rowA, -1, 55f)
         events += EventRowBlockDespawn(engine, world.rowDpad, -1, 55f)
+
+        engine.addEvents(events)
+    }
+
+    private fun addPr1Patterns() {
+        val events = mutableListOf<Event>()
+
+        data class Spawn(val index: Int, val type: EntityRowBlock.Type, val beat: Float, val forward: Boolean = false)
+
+        fun addPattern(startBeat: Float, rowA: List<Spawn>, rowD: List<Spawn>) {
+            fun doIt(row: Row, list: List<Spawn>) {
+                list.forEach { s ->
+                    events += EventRowBlockSpawn(engine, row, s.index, s.type, startBeat + s.beat, s.forward)
+                    events += EventRowBlockExtend(engine, row, s.index, startBeat + (s.index * 0.5f) + 4f, false)
+                    events += EventRowBlockExtend(engine, row, s.index, startBeat + (s.index * 0.5f) + 8f, false)
+                }
+
+                events += EventDeployRod(engine, row, startBeat)
+                events += EventDeployRod(engine, row, startBeat + 4)
+                events += EventRowBlockRetract(engine, row, -1, startBeat + 7.5f)
+                events += EventRowBlockRetract(engine, row, -1, startBeat + 14f)
+                events += EventRowBlockDespawn(engine, row, -1, startBeat + 15f)
+            }
+            
+            if (rowA.isNotEmpty()) {
+                doIt(world.rowA, rowA)
+            }
+            if (rowD.isNotEmpty()) {
+                doIt(world.rowDpad, rowD)
+            }
+        }
+        
+        
+        addPattern(0 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), emptyList())
+        addPattern(1 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true)
+        ), emptyList())
+        
+        addPattern(2 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_A, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_A, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), emptyList())
+        addPattern(3 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_A, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_A, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), emptyList())
+        
+        addPattern(4 * 16 + 8f, emptyList(), listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_DPAD, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_DPAD, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ))
+        addPattern(5 * 16 + 8f, emptyList(), listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_DPAD, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_DPAD, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ))
+        
+        addPattern(6 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), listOf(
+                Spawn(0, EntityRowBlock.Type.PLATFORM, 1f),
+                Spawn(1, EntityRowBlock.Type.PLATFORM, 1f),
+                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+                Spawn(10, EntityRowBlock.Type.PLATFORM, 5f, true),
+        ))
+        addPattern(7 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), listOf(
+                Spawn(0, EntityRowBlock.Type.PLATFORM, 1f),
+                Spawn(1, EntityRowBlock.Type.PLATFORM, 1f),
+                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+                Spawn(10, EntityRowBlock.Type.PLATFORM, 5f, true),
+        ))
+        
+        addPattern(8 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_A, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_A, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_DPAD, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_DPAD, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ))
+        addPattern(9 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_A, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_A, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_DPAD, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_DPAD, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ))
+
+        addPattern(10 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_A, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_A, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), listOf(
+                Spawn(0, EntityRowBlock.Type.PLATFORM, 1f),
+                Spawn(1, EntityRowBlock.Type.PLATFORM, 1f),
+                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+                Spawn(10, EntityRowBlock.Type.PLATFORM, 5f, true),
+        ))
+        addPattern(11 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(2, EntityRowBlock.Type.PISTON_A, 1f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+                Spawn(6, EntityRowBlock.Type.PISTON_A, 3f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), listOf(
+                Spawn(0, EntityRowBlock.Type.PLATFORM, 1f),
+                Spawn(1, EntityRowBlock.Type.PLATFORM, 1f),
+                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+                Spawn(10, EntityRowBlock.Type.PLATFORM, 5f, true),
+        ))
+
 
         engine.addEvents(events)
     }
