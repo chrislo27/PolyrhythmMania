@@ -16,7 +16,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
 
     val soundInterface: SoundInterface = SoundInterface.createFromSoundSystem(soundSystem)
     val events: List<Event> = CopyOnWriteArrayList()
-
+    
     fun addEvent(event: Event) {
         (this.events as MutableList) += event
     }

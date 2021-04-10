@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import io.github.chrislo27.paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.floor
@@ -47,10 +49,18 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
         this.position.y = baseY - 1f
     }
     
-    fun fullyExtend(beat: Float) {
+    fun fullyExtend(engine: Engine, beat: Float) {
         pistonState = PistonState.FULLY_EXTENDED
         shouldPartiallyExtend = true
         fullyExtendedAtBeat = beat
+        
+        // FIXME tmp impl of extension sound
+        when (type) {
+            Type.PLATFORM -> { }
+            Type.PISTON_A -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_a"))
+            Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_d"))
+        }
+        
         
         // Bounce any rods that are on this index
         // FIXME this is for testing purposes only

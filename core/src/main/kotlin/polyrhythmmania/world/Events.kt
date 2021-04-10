@@ -1,7 +1,9 @@
 package polyrhythmmania.world
 
+import io.github.chrislo27.paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.soundsystem.BeadsSound
 
 
 abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float, 
@@ -79,6 +81,11 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityR
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
         entity.type = type
         entity.pistonState = EntityRowBlock.PistonState.RETRACTED
+        when (this.type) {
+            EntityRowBlock.Type.PLATFORM -> { }
+            EntityRowBlock.Type.PISTON_A -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_spawn_a"))
+            EntityRowBlock.Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_spawn_d"))
+        }
     }
 
     override fun entityOnUpdate(entity: EntityRowBlock, currentBeat: Float, percentage: Float) {
@@ -93,7 +100,12 @@ class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Floa
     init {
         this.width = 0.125f
     }
-    
+
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_despawn"))
+    }
+
     override fun entityOnUpdate(entity: EntityRowBlock, currentBeat: Float, percentage: Float) {
         entity.despawn(percentage)
     }
@@ -102,6 +114,11 @@ class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Floa
 class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Float,
                            affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_retract"))
+    }
+
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
         entity.retract()
     }
@@ -111,7 +128,7 @@ class EventRowBlockExtend(engine: Engine, row: Row, index: Int, startBeat: Float
                           affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
-        entity.fullyExtend(currentBeat)
+        entity.fullyExtend(engine, currentBeat)
     }
 }
 
