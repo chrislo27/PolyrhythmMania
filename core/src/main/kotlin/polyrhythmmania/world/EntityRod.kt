@@ -54,6 +54,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         val difference = endIndex - startIndex
         if (difference <= 0) return
         fallState = FallState.Bouncing(row.startY + 1f + difference, this.position.x, this.position.y, endIndex.toFloat() + row.startX + 0.25f, row.startY + 1f)
+//        println("Bounce from $startIndex to $endIndex")
     }
     
     fun bounce(startIndex: Int) {
@@ -157,7 +158,9 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                     val fallVelo = if (currentFallState is FallState.Bouncing) {
                         (currentFallState.getYFromX(this.position.x) - currentFallState.getYFromX(prevPosX)) / deltaSec
                     } else 0f
-                    fallState = FallState.Falling(fallVelo)
+                    if (currentFallState is FallState.Bouncing) {
+                        fallState = FallState.Falling(fallVelo)
+                    }
                     engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
                 }
             }
@@ -172,6 +175,16 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                 is FallState.Bouncing -> {
                     // When bouncing, the Y position follows an arc until the target X position is reached
                     this.position.y = currentFallState.getYFromX(this.position.x)
+
+                    val blockBelow = activeBlocks[currentIndex]
+                    if (blockBelow != null) {
+                        val entity = row.rowBlocks[currentIndex]
+                        val topPart = entity.position.y + entity.collisionHeight
+                        if (this.position.y < topPart) {
+                            this.position.y = topPart
+                        }
+                    }
+                    
                     if (this.position.x >= currentFallState.endX) {
                         fallState = FallState.Grounded
                         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
