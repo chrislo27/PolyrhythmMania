@@ -12,6 +12,8 @@ import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.WorldRenderer
 import java.sql.RowIdLifetime
+import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.floor
 
 class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(world) {
@@ -81,7 +83,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(this.position))
 
         val beatsFullAnimation = 60f / 128f
-        val animationAlpha = (((this.position.x / xUnitsPerBeat) % beatsFullAnimation) / beatsFullAnimation).coerceIn(0f, 1f) //MathHelper.getSawtoothWave(System.currentTimeMillis(), 0.2f)
+        val animationAlpha = ((((if (this.position.x < 0f) (this.position.x + floor(this.position.x).absoluteValue) else (this.position.x)) / xUnitsPerBeat) % beatsFullAnimation) / beatsFullAnimation).coerceIn(0f, 1f)
         val texReg: TextureRegion = if (!isInAir) {
             tileset.rodGroundAnimations[(animationAlpha * tileset.rodGroundFrames).toInt().coerceIn(0, tileset.rodGroundFrames - 1)]
         } else {
