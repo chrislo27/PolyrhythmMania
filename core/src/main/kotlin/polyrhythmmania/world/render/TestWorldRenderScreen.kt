@@ -148,13 +148,16 @@ ${renderer.getDebugString()}
         events += EventRowBlockSpawn(engine, world.rowA, 8, EntityRowBlock.Type.PLATFORM, 12f, true)
         
         // Explode test
-        events += EventRowBlockSpawn(engine, world.rowDpad, 0, EntityRowBlock.Type.PISTON_A, 8f)
-        events += EventRowBlockSpawn(engine, world.rowDpad, 1, EntityRowBlock.Type.PLATFORM, 8f)
-        events += EventRowBlockSpawn(engine, world.rowDpad, 2, EntityRowBlock.Type.PISTON_A, 8f)
-        events += EventRowBlockExtend(engine, world.rowDpad, 2, 9f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 0, EntityRowBlock.Type.PISTON_DPAD, 5f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 1, EntityRowBlock.Type.PLATFORM, 5.5f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 2, EntityRowBlock.Type.PISTON_DPAD, 6f)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 7, EntityRowBlock.Type.PLATFORM, 7f)
+        events += EventRowBlockExtend(engine, world.rowDpad, 2, 11f)
         events += EventRowBlockExtend(engine, world.rowDpad, 0, 13f)
+        events += EventDeployRod(engine, world.rowDpad, 5f)
         events += EventDeployRod(engine, world.rowDpad, 8f)
         events += EventDeployRod(engine, world.rowDpad, 12f)
+        events += EventRowBlockDespawn(engine, world.rowDpad, -1, 23f)
 
         events += EventDeployRod(engine, world.rowA, 12f - 4)
         events += EventRowBlockExtend(engine, world.rowA, 0, 12f - 1)
@@ -167,7 +170,6 @@ ${renderer.getDebugString()}
         events += EventRowBlockRetract(engine, world.rowA, -1, 22f)
 
         events += EventRowBlockDespawn(engine, world.rowA, -1, 23f)
-        events += EventRowBlockDespawn(engine, world.rowDpad, -1, 23f)
 
 
 
