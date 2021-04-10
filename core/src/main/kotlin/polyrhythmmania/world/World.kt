@@ -52,7 +52,7 @@ class World {
             for (z in -6 until 3) {
                 val ent: Entity = if (z == 0 || z == -3) {
                     EntityPlatform(this, x == 4)
-                } else if (rows.any { r -> z == r.startZ + 1 && x in r.startX until (r.startX + r.length) }) {
+                } else if ((z == 1 || z == -2) && x >= 5 && rows.any { r -> x in r.startX until (r.startX + r.length) }) {
                     EntityCubeBordered(this)
                 } else EntityCube(this, x == 4)
                 addEntity(ent.apply {

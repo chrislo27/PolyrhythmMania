@@ -117,16 +117,19 @@ class SoundSystem(private val mixer: Mixer,
     
     private fun obtainSoundID(): Long = ++currentSoundID
     
-    fun playAudio(beadsAudio: BeadsAudio): Long {
+    fun playAudio(beadsAudio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long {
         val id = obtainSoundID()
         val player = beadsAudio.createPlayer(audioContext)
         player.killListeners += {
             activePlayers.remove(id, it)
         }
+        callback.invoke(player)
         activePlayers[id] = player
         audioContext.out.addInput(player)
         return id
     }
+    
+    fun getPlayer(id: Long): PlayerLike? = activePlayers[id]
 
     private inner class AdaptiveTimingProvider : TimingProvider {
         override var seconds: Float = 0f

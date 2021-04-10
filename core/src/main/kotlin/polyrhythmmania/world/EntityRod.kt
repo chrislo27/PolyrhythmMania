@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
+import io.github.chrislo27.paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.WorldRenderer
@@ -45,6 +47,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         world.addEntity(EntityExplosion(world, engine.seconds, this.getRenderWidth()).also {
             it.position.set(this.position)
         })
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_explosion"))
     }
     
     fun bounce(startIndex: Int, endIndex: Int) {
@@ -155,6 +158,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                         (currentFallState.getYFromX(this.position.x) - currentFallState.getYFromX(prevPosX)) / deltaSec
                     } else 0f
                     fallState = FallState.Falling(fallVelo)
+                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
                 }
             }
         }
@@ -170,7 +174,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                     this.position.y = currentFallState.getYFromX(this.position.x)
                     if (this.position.x >= currentFallState.endX) {
                         fallState = FallState.Grounded
-                        // TODO play land sound
+                        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
                     }
                 }
                 is FallState.Falling -> {
@@ -185,7 +189,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                         this.position.y = row.startY.toFloat()
                         if (currentFallState != FallState.Grounded) {
                             fallState = FallState.Grounded
-                            // TODO play land sound
+                            engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
                         }
                     } else {
                         this.position.y = futureY

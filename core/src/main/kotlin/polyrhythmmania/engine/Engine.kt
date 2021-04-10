@@ -1,5 +1,6 @@
 package polyrhythmmania.engine
 
+import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.World
@@ -10,9 +11,10 @@ import java.util.concurrent.CopyOnWriteArrayList
  * An [Engine] fires the [Event]s based on the internal [TimingProvider].
  * It also contains the [World] upon which these events operate in.
  */
-class Engine(timingProvider: TimingProvider, val world: World)
+class Engine(timingProvider: TimingProvider, val world: World, soundSystem: SoundSystem?)
     : Clock(timingProvider) {
 
+    val soundInterface: SoundInterface = SoundInterface.createFromSoundSystem(soundSystem)
     val events: List<Event> = CopyOnWriteArrayList()
 
     fun addEvent(event: Event) {
