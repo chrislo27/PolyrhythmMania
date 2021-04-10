@@ -2,6 +2,7 @@ package polyrhythmmania.soundsystem.sample
 
 import net.beadsproject.beads.core.Bead
 import net.beadsproject.beads.core.UGen
+import net.beadsproject.beads.ugens.Gain
 import net.beadsproject.beads.ugens.SamplePlayer
 import net.beadsproject.beads.ugens.Static
 
@@ -38,9 +39,18 @@ open class SamplePlayerWrapper(private val samplePlayer: SamplePlayer)
         set(value) {
             samplePlayer.loopType = value
         }
+    
+    private val gainObj: Gain = Gain(this.context, this.outs, 1f)
+    override var gain: Float
+        get() = super.gain
+        set(value) {
+            super.gain = value
+            gainObj.gain = value
+        }
 
     init {
-        this.addInput(samplePlayer)
+        this.addInput(gainObj)
+        gainObj.addInput(samplePlayer)
         samplePlayer.setLoopStart(loopStartUGen)
         samplePlayer.setLoopEnd(loopEndUGen)
 

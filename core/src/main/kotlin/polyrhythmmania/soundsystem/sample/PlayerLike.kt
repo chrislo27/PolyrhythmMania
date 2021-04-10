@@ -13,7 +13,9 @@ abstract class PlayerLike(context: AudioContext, ins: Int, outs: Int) : UGen(con
     }
     
     val killListeners: MutableList<(PlayerLike) -> Unit> = CopyOnWriteArrayList()
-
+    
+    open var gain: Float = 1f
+    
     abstract var position: Double
     abstract var pitch: UGen
     abstract var loopType: SamplePlayer.LoopType

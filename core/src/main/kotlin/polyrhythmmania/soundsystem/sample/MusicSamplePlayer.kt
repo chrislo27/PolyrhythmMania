@@ -60,6 +60,7 @@ open class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext
         }
         val interpType = interpolationType
         pitch.update()
+        val gain = this.gain
         for (i in 0 until bufferSize) {
             val pitchValue = pitch.getValue(0, i)
 
@@ -91,7 +92,7 @@ open class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext
                 }
             }
             for (out in 0 until outs) {
-                bufOut[out][i] = tmpFrame[out]
+                bufOut[out][i] = tmpFrame[out] * gain
             }
         }
     }
