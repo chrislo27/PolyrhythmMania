@@ -40,7 +40,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
 
     private var engineUpdateLastSec: Float = Float.MAX_VALUE
     private var lastCurrentIndex: Float = Float.MAX_VALUE
-    
+
     init {
         this.position.z = row.startZ.toFloat()
         this.position.y = row.startY.toFloat() + 1f
@@ -51,7 +51,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
 
     fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
     fun getCurrentIndexFloor(posX: Float = this.position.x): Int = floor(getCurrentIndex(posX)).toInt()
-    
+
 
     fun getPosXFromBeat(beatsFromDeploy: Float): Float {
         return (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beatsFromDeploy) * xUnitsPerBeat - (6 / 32f)
@@ -63,15 +63,15 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         world.addEntity(EntityExplosion(world, engine.seconds, this.getRenderWidth()).also {
             it.position.set(this.position)
         })
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_explosion"))
+        playSfxExplosion(engine)
     }
 
     fun bounce(startIndex: Int, endIndex: Int) {
         val difference = endIndex - startIndex
         if (difference <= 0) return
-        
+
         fun indexToX(index: Int): Float = index + row.startX + 0.25f
-        
+
         val prevFallState = this.fallState
         if (prevFallState is FallState.Bouncing) {
             this.fallState = FallState.Bouncing(row.startY + 1f + difference,
@@ -205,7 +205,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                     if (currentFallState is FallState.Bouncing) {
                         fallState = FallState.Falling(fallVelo)
                     }
-                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
+                    playSfxSideCollision(engine)
 
                     if (currentIndexFloat < 0f) {
                         // Standard collision detection will not take affect before index = 0
@@ -239,7 +239,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
 
                     if (this.position.x >= currentFallState.endX) {
                         fallState = FallState.Grounded
-                        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
+                        playSfxLand(engine)
                     }
                 }
                 is FallState.Falling -> {
@@ -254,7 +254,10 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                         this.position.y = row.startY.toFloat()
                         if (currentFallState != FallState.Grounded) {
                             fallState = FallState.Grounded
-                            engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
+                            if (currentIndexFloat < 13.5f) {
+                                // TODO find a better way to not play the land SFX when the platforms retract
+                                playSfxLand(engine)
+                            }
                         }
                     } else {
                         this.position.y = futureY
@@ -297,6 +300,18 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         super.onRemovedFromWorld(engine)
         engine.inputter.submitInputsFromRod(this)
     }
+
+    private fun playSfxLand(engine: Engine) {
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
+    }
+
+    private fun playSfxSideCollision(engine: Engine) {
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
+    }
+
+    private fun playSfxExplosion(engine: Engine) {
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_explosion"))
+    }
 }
 
 sealed class FallState {
@@ -321,7 +336,7 @@ sealed class FallState {
             if (previousBounce != null && x < startX) {
                 return previousBounce.getYFromX(x)
             }
-            
+
             val alpha = ((x - startX) / (endX - startX)).coerceIn(0f, 1f)
 //            return if (endY < startY) {
 //                // One continuous arc down from startY to endY
