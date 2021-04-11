@@ -54,7 +54,7 @@ object DesktopLauncher {
             this.setInitialBackgroundColor(Color(0f, 0f, 0f, 1f))
             this.setAudioConfig(100, 4096, 16)
             this.setHdpiMode(HdpiMode.Logical)
-            this.setBackBufferConfig(8, 8, 8, 8, 16, 0, 2)
+            this.setBackBufferConfig(8, 8, 8, 8, 16, 0, /* samples = */ 2)
         }
                 .launch()
     }

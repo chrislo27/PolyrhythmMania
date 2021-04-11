@@ -75,11 +75,14 @@ open class GBATileset(texture: Texture) : Tileset(texture) {
     override val indicatorD: TextureRegion = TextureRegion(texture, 186, 39, 16, 16)
     
     override val buttonSigns: List<TextureRegion> = listOf(
-            TextureRegion(texture, 83, 137, 16, 16),
-            TextureRegion(texture, 49, 137, 16, 16),
-            TextureRegion(texture, 66, 120, 16, 16),
-            TextureRegion(texture, 83, 120, 16, 16),
-            TextureRegion(texture, 100, 120, 16, 16),
+//            TextureRegion(texture, 49, 120, 16, 16), // A with pixel in top right
+            TextureRegion(texture, 83, 137, 16, 16), // A without pixel in top right
+            
+            TextureRegion(texture, 49, 137, 16, 16), // +
+            
+            TextureRegion(texture, 66, 120, 16, 16), // BO
+            TextureRegion(texture, 83, 120, 16, 16), // TA
+            TextureRegion(texture, 100, 120, 16, 16), // N
     )
 }
 
@@ -94,10 +97,13 @@ class GBA2Tileset(texture: Texture) : GBATileset(texture) {
     override val padDPartial: TextureRegion = TextureRegion(texture, 133, 77, 32, 40)
     
     override val buttonSigns: List<TextureRegion> = listOf(
-            TextureRegion(texture, 100, 137, 16, 16),
-            TextureRegion(texture, 66, 137, 16, 16),
-            TextureRegion(texture, 66, 154, 16, 16),
-            TextureRegion(texture, 83, 154, 16, 16),
-            TextureRegion(texture, 100, 154, 16, 16),
+//            TextureRegion(texture, 49, 154, 16, 16), // A with pixel in top right
+            TextureRegion(texture, 100, 137, 16, 16), // A without pixel in top right
+            
+            TextureRegion(texture, 66, 137, 16, 16), // +
+            
+            TextureRegion(texture, 66, 154, 16, 16), // BO
+            TextureRegion(texture, 83, 154, 16, 16), // TA
+            TextureRegion(texture, 100, 154, 16, 16), // N
     )
 }

@@ -36,7 +36,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val timing: TimingProvider = soundSystem
     val engine: Engine = Engine(timing, world, soundSystem)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, GBA2Tileset(AssetRegistry["tileset_gba"]))
+        WorldRenderer(world, GBATileset(AssetRegistry["tileset_gba"]))
     }
 
     private val player: MusicSamplePlayer = music.createPlayer(soundSystem.audioContext).apply {
@@ -54,7 +54,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
 //        engine.tempos.addTempoChange(TempoChange(88f, 148.5f))
 
-        engine.inputter.areInputsLocked = false
+//        engine.inputter.areInputsLocked = false
         
         addEvents()
     }
@@ -155,7 +155,7 @@ ${renderer.getDebugString()}
     }
 
     private fun addEvents() {
-        val events: MutableList<Event> = when (1) {
+        val events: MutableList<Event> = when (3) {
             0 -> addPr1Patterns()
             1 -> {
                 engine.tempos.addTempoChange(TempoChange(0f, 148.5f))
