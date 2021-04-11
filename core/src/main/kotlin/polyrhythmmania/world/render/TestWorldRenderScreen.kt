@@ -420,18 +420,19 @@ ${renderer.getDebugString()}
     private fun addInputTestPatterns(): List<Event> {
         val events = mutableListOf<Event>()
 
-        addPattern(events, 0 * 16 + 8f, listOf(
-                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
-                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
-                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
-        ), listOf(
-                Spawn(0, EntityRowBlock.Type.PLATFORM, 1f),
-                Spawn(1, EntityRowBlock.Type.PLATFORM, 1f),
-                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
-                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
-                Spawn(10, EntityRowBlock.Type.PLATFORM, 5f, true),
-        ))
-        addPattern(events, 1 * 16 + 8f, listOf(
+        var patternIndex = 0
+//        addPattern(events, patternIndex++ * 16 + 8f, listOf(
+//                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+//                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+//                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+//        ), listOf(
+//                Spawn(0, EntityRowBlock.Type.PLATFORM, 1f),
+//                Spawn(1, EntityRowBlock.Type.PLATFORM, 1f),
+//                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+//                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+//                Spawn(10, EntityRowBlock.Type.PLATFORM, 5f, true),
+//        ))
+        addPattern(events, patternIndex++ * 16 + 8f, listOf(
                 Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
                 Spawn(1, EntityRowBlock.Type.PISTON_A, 1 * 0.5f),
                 Spawn(2, EntityRowBlock.Type.PISTON_A, 2 * 0.5f),

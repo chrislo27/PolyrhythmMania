@@ -249,9 +249,14 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                     // When falling, the Y position changes but collision detection is done to check for row start Y
                     val futureY = prevPosY + (currentFallState.velocityY * deltaSec)
 
-                    // TODO make more robust. Only checks for row start Y
-                    if (futureY <= row.startY) {
-                        this.position.y = row.startY.toFloat()
+                    val blockBelow = activeBlocks[currentIndex]
+                    val collisionY: Float = if (blockBelow != null) {
+                        val entity = row.rowBlocks[currentIndex]
+                        entity.position.y + entity.collisionHeight
+                    } else row.startY.toFloat()
+                    
+                    if (futureY <= collisionY) {
+                        this.position.y = collisionY
                         if (currentFallState != FallState.Grounded) {
                             fallState = FallState.Grounded
                             if (currentIndexFloat < 13.5f) {
