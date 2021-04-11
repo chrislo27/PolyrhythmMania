@@ -31,6 +31,7 @@ open class Entity(val world: World) {
     
     open fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {}
     
+    open fun onRemovedFromWorld(engine: Engine) {}
 }
 
 open class SimpleRenderedEntity(world: World) : Entity(world) {

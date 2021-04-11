@@ -6,6 +6,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EntityRod
 import polyrhythmmania.world.EntityRowBlock
 import polyrhythmmania.world.World
+import java.util.concurrent.CopyOnWriteArrayList
 
 
 /**
@@ -30,9 +31,18 @@ class EngineInputter(val engine: Engine) {
 
     private val world: World = engine.world
     var areInputsLocked: Boolean = true
+    
+    var totalExpectedInputs: Int = 0
+        private set
+    val inputResults: List<InputResult> = mutableListOf()
 
     init {
 
+    }
+    
+    fun clearInputs() {
+        totalExpectedInputs = 0
+        (inputResults as MutableList).clear()
     }
 
     fun onInput(type: InputType, atSeconds: Float) {
@@ -93,6 +103,13 @@ class EngineInputter(val engine: Engine) {
             rowBlock.fullyExtend(engine, atBeat)
         }
     }
+    
+    fun submitInputsFromRod(rod: EntityRod) {
+        val inputTracker = rod.inputTracker
+        totalExpectedInputs += inputTracker.expectedInputIndices.size
+        (inputResults as MutableList).addAll(inputTracker.results)
+    }
+    
 }
 
 class EventLockInputs(engine: Engine, val lockInputs: Boolean)

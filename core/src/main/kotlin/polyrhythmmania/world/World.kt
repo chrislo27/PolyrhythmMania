@@ -37,10 +37,17 @@ class World {
     }
     
     fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
+        val entities = this.entities as MutableList
         entities.forEach { entity ->
             entity.engineUpdate(engine, beat, seconds)
         }
-        (entities as MutableList).removeIf { it.isKilled }
+        
+        // Remove killed entities
+        val toRemove = entities.filter { it.isKilled }
+        if (toRemove.isNotEmpty()) {
+            toRemove.forEach { it.onRemovedFromWorld(engine) }
+            entities.removeAll(toRemove)
+        }
     }
 
     fun sortEntitiesByRenderOrder() {
@@ -120,7 +127,7 @@ class World {
         }
         signs.forEach { sign ->
             sign.position.x += (12 / 32f)
-            sign.position.z += (10 / 40f)
+            sign.position.z += (8 / 32f)
             addEntity(sign)
         }
         

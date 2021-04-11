@@ -44,6 +44,10 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
     override fun getRenderWidth(): Float = 0.75f
     override fun getRenderHeight(): Float = 0.5f
 
+    fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
+    fun getCurrentIndexFloor(posX: Float = this.position.x): Int = floor(getCurrentIndex(posX)).toInt()
+    
+
     fun getPosXFromBeat(beatsFromDeploy: Float): Float {
         return (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beatsFromDeploy) * xUnitsPerBeat - (6 / 32f)
     }
@@ -154,9 +158,6 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         }
         initializedActiveBlocks = true
     }
-
-    fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
-    fun getCurrentIndexFloor(posX: Float = this.position.x): Int = floor(getCurrentIndex(posX)).toInt()
 
     private fun collisionCheck(engine: Engine, beat: Float, seconds: Float, deltaSec: Float) {
         val prevPosX = this.position.x
@@ -281,6 +282,11 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
             this.position.y = row.startY.toFloat() + 1
         }
     }
+
+    override fun onRemovedFromWorld(engine: Engine) {
+        super.onRemovedFromWorld(engine)
+        engine.inputter.submitInputsFromRod(this)
+    }
 }
 
 sealed class FallState {
@@ -303,7 +309,6 @@ sealed class FallState {
 
         fun getYFromX(x: Float): Float {
             if (previousBounce != null && x < startX) {
-                println("using previous bounce")
                 return previousBounce.getYFromX(x)
             }
             
