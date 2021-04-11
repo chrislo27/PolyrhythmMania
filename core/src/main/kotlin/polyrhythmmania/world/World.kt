@@ -14,15 +14,16 @@ class World {
 
     val entities: List<Entity> = CopyOnWriteArrayList()
     
-    val rows: List<Row> = listOf(Row(this, DEFAULT_ROW_LENGTH, 5, 2, 0), Row(this, DEFAULT_ROW_LENGTH, 5, 2, -3))
+    val rows: List<Row> = listOf(
+            Row(this, DEFAULT_ROW_LENGTH, 5, 2, 0, false),
+            Row(this, DEFAULT_ROW_LENGTH, 5, 2, -3, true)
+    )
     val rowA: Row get() = rows[0]
     val rowDpad: Row get() = rows[1]
     
     init {
         populateScene()
-        rows.forEach { row ->
-            row.rowBlocks.forEach { rb -> addEntity(rb) }
-        }
+        rows.forEach(Row::initWithWorld)
     }
 
     fun addEntity(entity: Entity) {

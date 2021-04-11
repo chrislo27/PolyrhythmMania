@@ -77,12 +77,15 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
                 }
             }
         }
+        
+        row.updateInputIndicators()
     }
     
     fun spawn(percentage: Float) {
         val clamped = percentage.coerceIn(0f, 1f)
         active = clamped > 0f
         position.y = Interpolation.linear.apply(baseY - 1, baseY, clamped)
+        row.updateInputIndicators()
     }
     
     fun despawn(percentage: Float) {
@@ -90,11 +93,13 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
         if (active) {
             active = clamped < 1f
             position.y = Interpolation.linear.apply(baseY, baseY - 1, clamped)
+            row.updateInputIndicators()
         }
     }
     
     fun retract() {
         pistonState = PistonState.RETRACTED
+        row.updateInputIndicators()
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
