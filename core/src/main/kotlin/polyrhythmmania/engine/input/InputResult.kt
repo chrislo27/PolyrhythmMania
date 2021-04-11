@@ -3,7 +3,14 @@ package polyrhythmmania.engine.input
 import kotlin.math.absoluteValue
 
 
-data class InputResult(val type: InputType, val accuracySec: Float, val accuracyPercent: Float) {
+/**
+ * Represents one input and how accurate it was.
+ * 
+ * Both [accuracyPercent] and [accuracySec] can be negative. [accuracyPercent] is in [-1, 1]. A value of 0 
+ * for both fields means it is a perfect input.
+ * A negative value means the input was early, a positive value means it was late.
+ */
+data class InputResult(val type: InputType, val accuracyPercent: Float, val accuracySec: Float) {
     val inputScore: InputScore = run {
         val p = accuracySec.absoluteValue
         when {

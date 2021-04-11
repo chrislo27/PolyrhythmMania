@@ -25,6 +25,13 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
         }
     }
 
+    /**
+     * The index of the next piston-type [EntityRowBlock] to be triggered.
+     * Updated with a call to [updateInputIndicators]. -1 if there are none.
+     */
+    var nextActiveIndex: Int = -1
+        private set
+
     fun initWithWorld() {
         rowBlocks.forEach(world::addEntity)
         inputIndicators.forEach(world::addEntity)
@@ -43,10 +50,14 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
                 if (rowBlock.active && rowBlock.type != EntityRowBlock.Type.PLATFORM && rowBlock.pistonState == EntityRowBlock.PistonState.RETRACTED) {
                     foundActive = true
                     inputInd.visible = true
+                    nextActiveIndex = i
                 } else {
                     inputInd.visible = false
                 }
             }
+        }
+        if (!foundActive) {
+            nextActiveIndex = -1
         }
     }
 

@@ -124,6 +124,9 @@ class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Floa
     }
 }
 
+/**
+ * This is a debug event to automatically fire the piston.
+ */
 class EventRowBlockExtend(engine: Engine, row: Row, index: Int, startBeat: Float,
                           affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {

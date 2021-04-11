@@ -3,12 +3,18 @@ package polyrhythmmania.engine.input
 import com.badlogic.gdx.graphics.Color
 
 
+/**
+ * A score data structure for the results.
+ */
 data class Score(val scoreInt: Int, val scoreRaw: Float, val skillStar: Boolean, val noMiss: Boolean,
                  val title: String, val line1: String, val line2: String = "",
                  val ranking: Ranking = Ranking.getRanking(scoreInt)) {
     val butStillJustOk: Boolean = ranking == Ranking.OK && scoreInt >= 75
 }
 
+/**
+ * The three-tier ranking based on the score ([getRanking]).
+ */
 enum class Ranking(val sfx: String, val color: Color, val localization: String) {
 
     TRY_AGAIN("sfx_results_try_again", Color.valueOf("01BDFD"), "results.ranking.tryAgain"),

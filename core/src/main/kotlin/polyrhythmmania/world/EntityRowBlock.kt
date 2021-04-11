@@ -54,14 +54,13 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
         shouldPartiallyExtend = true
         fullyExtendedAtBeat = beat
         
-        // FIXME tmp impl of extension sound
         when (type) {
             Type.PLATFORM -> { }
             Type.PISTON_A -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_a"))
             Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_d"))
         }
         
-        if (this.type != Type.PLATFORM) {
+        if (this.type != Type.PLATFORM && engine.inputter.areInputsLocked) {
             // Bounce any rods that are on this index
             // FIXME this is for testing purposes only
             world.entities.forEach { entity ->

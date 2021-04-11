@@ -7,12 +7,11 @@ import com.badlogic.gdx.math.Vector3
 import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.WorldRenderer
-import java.sql.RowIdLifetime
-import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
@@ -23,15 +22,19 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         private val EXPLODE_DELAY_SEC: Float = 1f / 3f
     }
 
+    data class InputTracker(var expectedInputIndices: MutableList<Int> = mutableListOf(),
+                            val results: MutableList<InputResult> = mutableListOf())
+
     var collidedWithWall: Boolean = false
         private set
     private var fallState: FallState = FallState.Grounded
     private var initializedActiveBlocks = false
     private val activeBlocks: Array<EntityRowBlock.Type?> = Array(row.length) { null }
-    private val xUnitsPerBeat: Float = 2f
+    val xUnitsPerBeat: Float = 2f
     private val killAfterBeats: Float = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
     private var explodeAtSec: Float = Float.MAX_VALUE
     private val isInAir: Boolean get() = fallState != FallState.Grounded
+    val inputTracker: InputTracker = InputTracker()
 
     init {
         this.position.z = row.startZ.toFloat()
@@ -53,20 +56,31 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         })
         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_explosion"))
     }
-    
+
     fun bounce(startIndex: Int, endIndex: Int) {
         val difference = endIndex - startIndex
         if (difference <= 0) return
-        fallState = FallState.Bouncing(row.startY + 1f + difference, this.position.x, this.position.y, endIndex.toFloat() + row.startX + 0.25f, row.startY + 1f)
-//        println("Bounce from $startIndex to $endIndex")
+        
+        fun indexToX(index: Int): Float = index + row.startX + 0.25f
+        
+        val prevFallState = this.fallState
+        if (prevFallState is FallState.Bouncing) {
+            this.fallState = FallState.Bouncing(row.startY + 1f + difference,
+                    indexToX(startIndex), row.startY + 1f, indexToX(endIndex), row.startY + 1f,
+                    prevFallState)
+        } else {
+            this.fallState = FallState.Bouncing(row.startY + 1f + difference,
+                    this.position.x, this.position.y, indexToX(endIndex), row.startY + 1f,
+                    null)
+        }
     }
-    
+
     fun bounce(startIndex: Int) {
         if (initializedActiveBlocks && startIndex in 0 until row.length) {
             if (startIndex >= row.length - 1) {
                 bounce(startIndex, startIndex + 1)
             } else {
-                initializeActiveBlocks()
+                updateActiveBlocks()
                 var nextNonNull = startIndex + 1
                 for (i in startIndex + 1 until row.length) {
                     nextNonNull = i
@@ -123,13 +137,26 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
 
         engineUpdateLastSec = seconds
     }
-    
-    private fun initializeActiveBlocks() {
+
+    /**
+     * Recomputes what blocks are active. Blocks that were already marked active do not get unmarked.
+     * [inputTracker] will also be updated with the correct number of inputs expected.
+     */
+    fun updateActiveBlocks() {
         row.rowBlocks.forEachIndexed { index, entity ->
-            activeBlocks[index] = if (!entity.active) null else entity.type
+            if (activeBlocks[index] == null) {
+                val type = if (!entity.active) null else entity.type
+                activeBlocks[index] = type
+                if (type != null && entity.type != EntityRowBlock.Type.PLATFORM) {
+                    inputTracker.expectedInputIndices.add(index)
+                }
+            }
         }
         initializedActiveBlocks = true
     }
+
+    fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
+    fun getCurrentIndexFloor(posX: Float = this.position.x): Int = floor(getCurrentIndex(posX)).toInt()
 
     private fun collisionCheck(engine: Engine, beat: Float, seconds: Float, deltaSec: Float) {
         val prevPosX = this.position.x
@@ -142,12 +169,12 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         val beatsFromDeploy = beat - deployBeat
         val targetX = getPosXFromBeat(beatsFromDeploy)
         // The index that the rod is on
-        val currentIndexFloat = /*targetX*/ prevPosX - row.startX
+        val currentIndexFloat = getCurrentIndex(prevPosX) // /*targetX*/ 
         val currentIndex = floor(currentIndexFloat).toInt()
 
         // Initialize active blocks if not already done
         if (!initializedActiveBlocks && currentIndexFloat >= -0.7f) {
-            initializeActiveBlocks()
+            updateActiveBlocks()
         }
 
         // Check for wall stop
@@ -161,7 +188,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
 //                    println("$seconds Collided with wall: currentIndex = ${currentIndexFloat}  x = ${this.position.x}")
                     this.position.x = currentIndex + 0.7f + row.startX
 //                    println("$seconds After setting X: currentIndex would be ${this.position.x - row.startX}   x = ${this.position.x}")
-                    
+
                     val currentFallState = fallState
                     val fallVelo = if (currentFallState is FallState.Bouncing) {
                         (currentFallState.getYFromX(this.position.x) - currentFallState.getYFromX(prevPosX)) / deltaSec
@@ -170,7 +197,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                         fallState = FallState.Falling(fallVelo)
                     }
                     engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
-                    
+
                     if (currentIndexFloat < 0f) {
                         // Standard collision detection will not take affect before index = 0
                         if (explodeAtSec == Float.MAX_VALUE) {
@@ -200,7 +227,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                             this.position.y = topPart
                         }
                     }
-                    
+
                     if (this.position.x >= currentFallState.endX) {
                         fallState = FallState.Grounded
                         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
@@ -270,10 +297,16 @@ sealed class FallState {
     /**
      * The rod is mid-bounce from a piston, and has a start/end position and given height.
      */
-    class Bouncing(val peakHeight: Float, val startX: Float, val startY: Float, val endX: Float, val endY: Float)
+    class Bouncing(val peakHeight: Float, val startX: Float, val startY: Float, val endX: Float, val endY: Float,
+                   val previousBounce: Bouncing?)
         : FallState() {
 
         fun getYFromX(x: Float): Float {
+            if (previousBounce != null && x < startX) {
+                println("using previous bounce")
+                return previousBounce.getYFromX(x)
+            }
+            
             val alpha = ((x - startX) / (endX - startX)).coerceIn(0f, 1f)
 //            return if (endY < startY) {
 //                // One continuous arc down from startY to endY
@@ -282,17 +315,18 @@ sealed class FallState {
 //                // One continuous arc up from startY (bottom) to top
 //                MathUtils.lerp(startY, endY, WaveUtils.getBounceWave(alpha * 0.5f))
 //            } else {
-                return if (alpha <= 0.5f) {
-                    MathUtils.lerp(startY, peakHeight, WaveUtils.getBounceWave(alpha))
-                } else {
-                    MathUtils.lerp(peakHeight, endY, 1f - WaveUtils.getBounceWave(alpha))
-                }
+            return if (alpha <= 0.5f) {
+                MathUtils.lerp(startY, peakHeight, WaveUtils.getBounceWave(alpha))
+            } else {
+                MathUtils.lerp(peakHeight, endY, 1f - WaveUtils.getBounceWave(alpha))
+            }
 //            }
         }
 
         override fun toString(): String {
             return "Bouncing(peakHeight=$peakHeight, startX=$startX, startY=$startY, endX=$endX, endY=$endY)"
         }
-        
+
     }
 }
+

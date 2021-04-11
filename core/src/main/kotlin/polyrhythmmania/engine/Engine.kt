@@ -1,5 +1,6 @@
 package polyrhythmmania.engine
 
+import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.util.DecimalFormats
@@ -14,8 +15,14 @@ import java.util.concurrent.CopyOnWriteArrayList
 class Engine(timingProvider: TimingProvider, val world: World, soundSystem: SoundSystem?)
     : Clock(timingProvider) {
 
+    val inputter: EngineInputter = EngineInputter(this)
     val soundInterface: SoundInterface = SoundInterface.createFromSoundSystem(soundSystem)
     val events: List<Event> = CopyOnWriteArrayList()
+    private val queuedRunnables: MutableList<Runnable> = CopyOnWriteArrayList()
+    
+    fun postRunnable(runnable: Runnable) {
+        queuedRunnables += runnable
+    }
     
     fun addEvent(event: Event) {
         (this.events as MutableList) += event
@@ -67,6 +74,13 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
         super.updateSeconds(delta)
         val currentSeconds = this.seconds
         val currentBeat = this.beat
+        
+        if (queuedRunnables.isNotEmpty()) {
+            val toList = queuedRunnables.toList()
+            toList.forEach { it.run() }
+            queuedRunnables.clear()
+        }
+        
         events.forEach { event ->
             updateEvent(event, currentBeat)
         }
@@ -77,6 +91,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
         return """TimingProvider: ${DecimalFormats.format("0.000", timingProvider.seconds)} s
 Time: ${DecimalFormats.format("0.000", this.beat)} b / ${DecimalFormats.format("0.000", this.seconds)} s
 Events: ${events.size}
+Inputs locked: ${inputter.areInputsLocked}
 """.dropLast(1)
     }
 
