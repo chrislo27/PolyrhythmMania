@@ -91,7 +91,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
         return """TimingProvider: ${DecimalFormats.format("0.000", timingProvider.seconds)} s
 Time: ${DecimalFormats.format("0.000", this.beat)} b / ${DecimalFormats.format("0.000", this.seconds)} s
 Events: ${events.size}
-Inputs locked: ${inputter.areInputsLocked}
+Inputs: ${if (inputter.areInputsLocked) "locked" else "unlocked"} | ${inputter.totalExpectedInputs}
 """.dropLast(1)
     }
 

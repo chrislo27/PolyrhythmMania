@@ -35,10 +35,6 @@ class EngineInputter(val engine: Engine) {
     var totalExpectedInputs: Int = 0
         private set
     val inputResults: List<InputResult> = mutableListOf()
-
-    init {
-
-    }
     
     fun clearInputs() {
         totalExpectedInputs = 0
@@ -61,18 +57,18 @@ class EngineInputter(val engine: Engine) {
             if (rowBlock.type != rowBlockType) continue
 
             for (entity in engine.world.entities) {
-                if (entity !is EntityRod || entity.row !== row) continue
+                if (entity !is EntityRod || entity.row !== row || !entity.acceptingInputs) continue
                 val rod: EntityRod = entity
                 rod.updateActiveBlocks()
                 val inputTracker = rod.inputTracker
                 if (inputTracker.results.size >= inputTracker.expectedInputIndices.size) {
-                    Paintbox.LOGGER.debug("$rod: Skipping input because results size >= expected inputs size (${inputTracker.results.size} >= ${inputTracker.expectedInputIndices.size})")
+//                    Paintbox.LOGGER.debug("$rod: Skipping input because results size >= expected inputs size (${inputTracker.results.size} >= ${inputTracker.expectedInputIndices.size})")
                     continue
                 }
                 val nextIndexIndex = inputTracker.results.size
                 val nextBlockIndex = inputTracker.expectedInputIndices[nextIndexIndex]
                 if (nextBlockIndex != activeIndex) {
-                    Paintbox.LOGGER.debug("$rod: Skipping input because nextBlockIndex != activeIndex (${nextBlockIndex} >= ${activeIndex})")
+//                    Paintbox.LOGGER.debug("$rod: Skipping input because nextBlockIndex != activeIndex (${nextBlockIndex} >= ${activeIndex})")
                     continue
                 }
                 
@@ -88,7 +84,7 @@ class EngineInputter(val engine: Engine) {
                 Paintbox.LOGGER.debug("$rod: Input ${type}: perfectB=$perfectBeats, perfectS=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
 
                 if (atSeconds !in minSec..maxSec) {
-                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
+//                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
                     continue
                 }
                 
@@ -106,6 +102,7 @@ class EngineInputter(val engine: Engine) {
     
     fun submitInputsFromRod(rod: EntityRod) {
         val inputTracker = rod.inputTracker
+//        println("Submission from rod: ${inputTracker.expectedInputIndices}")
         totalExpectedInputs += inputTracker.expectedInputIndices.size
         (inputResults as MutableList).addAll(inputTracker.results)
     }

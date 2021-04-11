@@ -155,7 +155,7 @@ ${renderer.getDebugString()}
     }
 
     private fun addEvents() {
-        val events: MutableList<Event> = when (0) {
+        val events: MutableList<Event> = when (1) {
             0 -> addPr1Patterns()
             1 -> addInputTestPatterns()
             2 -> addTestPatterns()
@@ -168,7 +168,6 @@ ${renderer.getDebugString()}
                 e is EventRowBlockExtend
             }
         }
-        
         
         engine.addEvents(events)
     }
@@ -280,8 +279,9 @@ ${renderer.getDebugString()}
             events += EventDeployRod(engine, row, startBeat)
             events += EventDeployRod(engine, row, startBeat + 4)
             events += EventRowBlockRetract(engine, row, -1, startBeat + 7.5f)
+            events += EventRowBlockRetract(engine, row, -1, startBeat + 7.85f)
+            events += EventLockInputs(engine, true, startBeat + 13.75f)
             events += EventRowBlockRetract(engine, row, -1, startBeat + 14f)
-            events += EventLockInputs(engine, true, startBeat + 14f)
             events += EventRowBlockDespawn(engine, row, -1, startBeat + 15f)
         }
 
@@ -431,6 +431,17 @@ ${renderer.getDebugString()}
                 Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
                 Spawn(10, EntityRowBlock.Type.PLATFORM, 5f, true),
         ))
+        addPattern(events, 1 * 16 + 8f, listOf(
+                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+                Spawn(1, EntityRowBlock.Type.PISTON_A, 1 * 0.5f),
+                Spawn(2, EntityRowBlock.Type.PISTON_A, 2 * 0.5f),
+                Spawn(3, EntityRowBlock.Type.PISTON_A, 3 * 0.5f),
+                Spawn(4, EntityRowBlock.Type.PISTON_A, 4 * 0.5f),
+                Spawn(5, EntityRowBlock.Type.PISTON_A, 5 * 0.5f),
+                Spawn(6, EntityRowBlock.Type.PISTON_A, 6 * 0.5f),
+                Spawn(7, EntityRowBlock.Type.PISTON_A, 7 * 0.5f),
+                Spawn(8, EntityRowBlock.Type.PLATFORM, 4f, true),
+        ), emptyList())
         
         return events
     }

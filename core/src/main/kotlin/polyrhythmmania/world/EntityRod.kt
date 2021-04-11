@@ -22,7 +22,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         private val EXPLODE_DELAY_SEC: Float = 1f / 3f
     }
 
-    data class InputTracker(var expectedInputIndices: MutableList<Int> = mutableListOf(),
+    data class InputTracker(val expectedInputIndices: MutableList<Int> = mutableListOf(),
                             val results: MutableList<InputResult> = mutableListOf())
 
     var collidedWithWall: Boolean = false
@@ -35,7 +35,12 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
     private var explodeAtSec: Float = Float.MAX_VALUE
     private val isInAir: Boolean get() = fallState != FallState.Grounded
     val inputTracker: InputTracker = InputTracker()
+    val acceptingInputs: Boolean
+        get() = !collidedWithWall
 
+    private var engineUpdateLastSec: Float = Float.MAX_VALUE
+    private var lastCurrentIndex: Float = Float.MAX_VALUE
+    
     init {
         this.position.z = row.startZ.toFloat()
         this.position.y = row.startY.toFloat() + 1f
@@ -120,7 +125,6 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         batch.setColor(1f, 1f, 1f, 1f)
     }
 
-    private var engineUpdateLastSec: Float = Float.MAX_VALUE
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         super.engineUpdate(engine, beat, seconds)
@@ -140,6 +144,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         }
 
         engineUpdateLastSec = seconds
+        lastCurrentIndex = getCurrentIndex(this.position.x)
     }
 
     /**
@@ -147,11 +152,12 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
      * [inputTracker] will also be updated with the correct number of inputs expected.
      */
     fun updateActiveBlocks() {
+        val lastExpectedSoFar = inputTracker.expectedInputIndices.lastOrNull() ?: -1
         row.rowBlocks.forEachIndexed { index, entity ->
             if (activeBlocks[index] == null) {
                 val type = if (!entity.active) null else entity.type
                 activeBlocks[index] = type
-                if (type != null && entity.type != EntityRowBlock.Type.PLATFORM) {
+                if (type != null && entity.type != EntityRowBlock.Type.PLATFORM && index > lastExpectedSoFar) {
                     inputTracker.expectedInputIndices.add(index)
                 }
             }
@@ -173,8 +179,10 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
         val currentIndexFloat = getCurrentIndex(prevPosX) // /*targetX*/ 
         val currentIndex = floor(currentIndexFloat).toInt()
 
-        // Initialize active blocks if not already done
-        if (!initializedActiveBlocks && currentIndexFloat >= -0.7f) {
+        // Initialize active blocks
+        if (currentIndexFloat >= -0.7f) {
+            updateActiveBlocks()
+        } else if (floor(lastCurrentIndex).toInt() != floor(currentIndexFloat).toInt() && lastCurrentIndex >= 0) {
             updateActiveBlocks()
         }
 
@@ -268,6 +276,8 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                             if (this.position.y < topPart) {
                                 this.position.y = topPart
 //                                println("$seconds Set pos y to ${topPart}, currentIndex = $currentIndexFloat  x = ${this.position.x}")
+                            } else if (this.position.y - (1f / 32f) > topPart) {
+                                this.fallState = FallState.Falling(0f)
                             }
                         }
                     }
