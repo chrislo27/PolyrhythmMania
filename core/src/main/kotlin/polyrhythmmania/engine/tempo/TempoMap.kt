@@ -3,6 +3,11 @@ package polyrhythmmania.engine.tempo
 import java.util.*
 
 
+/**
+ * Represents a mapping of seconds to beats and vice versa, based on [TempoChange]s.
+ * 
+ * Values below 0 for both beats and seconds are mapped 1:1 (-1 seconds = -1 beats, etc).
+ */
 class TempoMap(startingGlobalTempo: Float) {
 
     /**
@@ -27,7 +32,7 @@ class TempoMap(startingGlobalTempo: Float) {
     
     private fun addTempoChange(tempoChange: TempoChange, update: Boolean): Boolean {
         if (tempoChange.beat < 0f) return false
-    
+        
         beatMap[tempoChange.beat] = tempoChange
         if (tempoChange.beat == 0f) {
             globalTempo = tempoChange
@@ -89,16 +94,19 @@ class TempoMap(startingGlobalTempo: Float) {
     }
 
     fun beatsToSeconds(beats: Float, disregardSwing: Boolean = false): Float {
+        if (beats < 0f) return beats
         val tc = getTempoChangeDataAtBeat(beats)
         return beatsToSeconds(tc, beats, disregardSwing)
     }
 
     fun secondsToBeats(seconds: Float, disregardSwing: Boolean = false): Float {
+        if (seconds < 0f) return seconds
         val tc = getTempoChangeDataAtSeconds(seconds)
         return secondsToBeats(tc, seconds, disregardSwing)
     }
 
     private fun beatsToSeconds(tc: TempoChangeData, beats: Float, disregardSwing: Boolean = false): Float {
+        if (beats < 0f) return beats
         val baseSeconds = tc.secondsStart
         val beatsToConvert = beats - tc.tempoChange.beat
         val addition = TempoUtils.beatsToSeconds(if (disregardSwing) beatsToConvert else
@@ -108,6 +116,7 @@ class TempoMap(startingGlobalTempo: Float) {
     }
 
     private fun secondsToBeats(tc: TempoChangeData, seconds: Float, disregardSwing: Boolean = false): Float {
+        if (seconds < 0f) return seconds
         val baseBeats = tc.tempoChange.beat
         val secondsToConvert = seconds - tc.secondsStart
         val addition = TempoUtils.secondsToBeats(secondsToConvert, tc.tempoChange.newTempo)
@@ -116,13 +125,15 @@ class TempoMap(startingGlobalTempo: Float) {
     }
 
     fun tempoAtBeat(beat: Float): Float {
+        if (beat < 0f) return 60f // 1:1 mapping of seconds and beats at this point
         return getTempoChangeDataAtBeat(beat).tempoChange.newTempo
     }
 
     fun tempoAtSeconds(seconds: Float): Float {
+        if (seconds < 0f) return 60f // 1:1 mapping of seconds and beats at this point
         return getTempoChangeDataAtSeconds(seconds).tempoChange.newTempo
     }
 
-    data class TempoChangeData(val tempoChange: TempoChange,
+    private data class TempoChangeData(val tempoChange: TempoChange,
                                val secondsStart: Float)
 }
