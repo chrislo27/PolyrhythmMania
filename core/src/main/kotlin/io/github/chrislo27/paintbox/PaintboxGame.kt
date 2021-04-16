@@ -224,7 +224,7 @@ ${getDebugString()}
 ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
 
                 font.setColor(1f, 1f, 1f, 1f)
-                font.drawCompressed(batch, string, 8f, emulatedCamera.viewportHeight - 8f, emulatedCamera.viewportWidth - 16f,
+                font.drawCompressed(batch, string, 8f, nativeCamera.viewportHeight - 8f, nativeCamera.viewportWidth - 16f,
                                     Align.left)
                 batch.end()
                 batch.projectionMatrix = debugInfo.tmpMatrix
@@ -428,6 +428,7 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
         val afterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
 //            font.data.blankLineScale = 0.75f
             font.setFixedWidthGlyphs("1234567890")
+            font.setUseIntegerPositions(false)
         }
         cache["DEBUG_FONT"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-Regular.ttf"), emulatedSize,
                                                    makeParam().apply {
