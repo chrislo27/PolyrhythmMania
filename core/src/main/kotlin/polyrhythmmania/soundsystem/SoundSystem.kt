@@ -84,6 +84,7 @@ class SoundSystem(private val mixer: Mixer,
         get() = audioContext.out.isPaused
 
     init {
+        audioContext.out.pause(true)
         audioContext.out.addDependent(timingProvider.timingBead)
     }
 
