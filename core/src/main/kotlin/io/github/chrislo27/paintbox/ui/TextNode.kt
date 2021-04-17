@@ -9,12 +9,11 @@ import io.github.chrislo27.paintbox.font.TextBlock
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.util.Var
 import kotlin.math.min
-import kotlin.system.measureNanoTime
 
 
 open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement() {
 
-    val tint: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
+    val textColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val textBlock: Var<TextBlock> = Var(textBlock)
     val renderAlign: Var<Int> = Var(Align.left)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
@@ -35,9 +34,10 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
         val w = bounds.width.getOrCompute()
         val h = bounds.height.getOrCompute()
         val lastPackedColor = batch.packedColor
+        val opacity = opacity.getOrCompute()
         val tmpColor = ColorStack.getAndPush()
-        tmpColor.set(batch.color).mul(tint.getOrCompute())
-        tmpColor.a *= opacity.getOrCompute()
+        tmpColor.set(batch.color).mul(textColor.getOrCompute())
+        tmpColor.a *= opacity
 
         if (text.isRunInfoInvalid()) {
             // Prevents flickering when drawing on first frame due to bounds not being computed yet
