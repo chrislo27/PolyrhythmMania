@@ -2,16 +2,36 @@ package io.github.chrislo27.paintbox.ui.control
 
 import com.badlogic.gdx.Input
 import io.github.chrislo27.paintbox.ui.ClickReleased
+import io.github.chrislo27.paintbox.ui.InputEvent
 import io.github.chrislo27.paintbox.ui.MouseEntered
 import io.github.chrislo27.paintbox.ui.MouseExited
 import io.github.chrislo27.paintbox.ui.skin.Skinnable
+import io.github.chrislo27.paintbox.util.ReadOnlyVar
+import io.github.chrislo27.paintbox.util.Var
 
 
 /**
  * A [Control] represents a (semi-)interactable type of UI element that is also skinnable.
- * There are also utilities to handle common user interactions.
+ * There are also utilities to handle common input interactions.
  */
 abstract class Control<SELF : Control<SELF>> : Skinnable<SELF>() {
+
+    /**
+     * If true, this [Control] will not interact with any inputs.
+     */
+    val disabled: Var<Boolean> = Var(false)
+
+    /**
+     * If true, this [Control] is disabled and will not interact.
+     * This takes into account the parent's [apparentDisabledState].
+     */
+    val apparentDisabledState: ReadOnlyVar<Boolean> = Var {
+        disabled.use() || (parent.use()?.let { parent ->
+            if (parent is Control<*>) {
+                parent.apparentDisabledState.use()
+            } else false
+        } ?: false)
+    } 
     
     var onAction: () -> Boolean = { false }
     var onLeftClick: (event: ClickReleased) -> Boolean = { false }
@@ -21,7 +41,11 @@ abstract class Control<SELF : Control<SELF>> : Skinnable<SELF>() {
     var onHoverEnd: (event: MouseExited) -> Boolean = { false }
     
     init {
-        addInputEventListener { event -> 
+        addDefaultInputEventListener()
+    }
+    
+    protected open fun defaultInputEventListener(event: InputEvent): Boolean {
+        return if (!apparentDisabledState.getOrCompute()) {
             when (event) {
                 is ClickReleased -> {
                     if (event.isWithinBounds) {
@@ -44,6 +68,14 @@ abstract class Control<SELF : Control<SELF>> : Skinnable<SELF>() {
                 }
                 else -> false
             }
+        } else {
+            false
+        }
+    }
+    
+    protected open fun addDefaultInputEventListener() {
+        addInputEventListener { event ->
+            defaultInputEventListener(event)
         }
     }
     
