@@ -70,6 +70,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
      */
     val internalTextBlock: Var<TextBlock> by lazy { createInternalTextBlockVar(this) }
 
+    @Suppress("RemoveRedundantQualifierName")
     override fun getSkinID(): String = TextLabel.SKIN_ID
 
 }
