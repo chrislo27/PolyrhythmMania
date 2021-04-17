@@ -24,7 +24,7 @@ class RectElement(initColor: Color) : UIElement() {
         val h = bounds.height.getOrCompute()
         val lastPackedColor = batch.packedColor
         
-        val opacity: Float = this.opacity.getOrCompute()
+        val opacity: Float = this.apparentOpacity.getOrCompute()
         val tmpColor: Color = ColorStack.getAndPush()
         tmpColor.set(color.getOrCompute())
         tmpColor.a *= opacity

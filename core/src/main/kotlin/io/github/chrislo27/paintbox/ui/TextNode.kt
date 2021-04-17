@@ -34,7 +34,7 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
         val w = bounds.width.getOrCompute()
         val h = bounds.height.getOrCompute()
         val lastPackedColor = batch.packedColor
-        val opacity = opacity.getOrCompute()
+        val opacity = apparentOpacity.getOrCompute()
         val tmpColor = ColorStack.getAndPush()
         tmpColor.set(batch.color).mul(textColor.getOrCompute())
         tmpColor.a *= opacity

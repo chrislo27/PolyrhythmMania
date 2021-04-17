@@ -26,7 +26,7 @@ open class ImageNode(tex: TextureRegion? = null,
             
             val tmpColor = ColorStack.getAndPush()
             tmpColor.set(tint.getOrCompute())
-            val opacity = opacity.getOrCompute()
+            val opacity = apparentOpacity.getOrCompute()
             tmpColor.a *= opacity
             
             batch.color = tmpColor

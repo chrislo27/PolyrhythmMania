@@ -29,9 +29,24 @@ open class UIElement {
     val doClipping: Var<Boolean> = Var(false)
 
     /**
-     * A recommended opacity level for implementors of [UIElement] to take into consideration.
+     * The opacity of this [UIElement].
      */
     val opacity: Var<Float> = Var(1f)
+    /**
+     * The [apparentOpacity] level of the [parent], if there is no parent then 1.0 is used.
+     */
+    val parentOpacity: ReadOnlyVar<Float> = Var {
+        parent.use()?.apparentOpacity?.use() ?: 1f
+    }
+    /**
+     * The opacity level of this [UIElement], taking into account the parent's opacity level using
+     * `parentOpacity * this.opacity`.
+     *
+     * This is to be used by the rendering implementation.
+     */
+    val apparentOpacity: ReadOnlyVar<Float> = Var {
+        parentOpacity.use() * opacity.use()
+    }
 
     @Suppress("RedundantModalityModifier")
     final fun render(originX: Float, originY: Float, batch: SpriteBatch) {

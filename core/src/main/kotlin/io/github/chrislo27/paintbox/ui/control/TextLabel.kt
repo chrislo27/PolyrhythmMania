@@ -108,7 +108,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         val w = bounds.width.getOrCompute()
         val h = bounds.height.getOrCompute()
         val lastPackedColor = batch.packedColor
-        val opacity = element.opacity.getOrCompute()
+        val opacity = element.apparentOpacity.getOrCompute()
         val tmpColor = ColorStack.getAndPush()
         tmpColor.set(batch.color).mul(textColorToUse.getOrCompute())
         tmpColor.a *= opacity
