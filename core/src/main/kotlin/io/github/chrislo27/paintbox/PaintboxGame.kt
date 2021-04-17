@@ -40,6 +40,10 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
     companion object {
         lateinit var fillTexture: Texture
             private set
+        lateinit var spritesheetTexture: Texture
+            private set
+        lateinit var paintboxSpritesheet: PaintboxSpritesheet
+            private set
         lateinit var gameInstance: PaintboxGame
             private set
         lateinit var launchArguments: List<String>  
@@ -146,12 +150,14 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
         }
         fillTexture = Texture(pixmap)
         pixmap.dispose()
+        spritesheetTexture = Texture("paintbox/paintbox_spritesheet.png").apply {
+            this.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        }
+        paintboxSpritesheet = PaintboxSpritesheet(spritesheetTexture)
         
         AssetRegistry.addAssetLoader(object : AssetRegistry.IAssetLoader {
             override fun addManagedAssets(manager: AssetManager) {}
-            override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
-                assets["paintbox_spritesheet"] = Texture("paintbox/paintbox_spritesheet.png")
-            }
+            override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {}
         })
 
         batch = SpriteBatch()
@@ -287,6 +293,7 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
         shapeRenderer.dispose()
         fontCache.dispose()
         fillTexture.dispose()
+        spritesheetTexture.dispose()
 
         ScreenRegistry.dispose()
         AssetRegistry.dispose()
@@ -423,51 +430,56 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
             color = Color(1f, 1f, 1f, 1f)
             borderColor = Color(0f, 0f, 0f, 1f)
             characters = ""
-            hinting = FreeTypeFontGenerator.Hinting.AutoFull
+            hinting = FreeTypeFontGenerator.Hinting.Full
         }
         val afterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
 //            font.data.blankLineScale = 0.75f
             font.setFixedWidthGlyphs("1234567890")
             font.setUseIntegerPositions(false)
         }
-        cache["DEBUG_FONT"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-Regular.ttf"), emulatedSize,
+        val defaultFontSize = 16
+        val normalFilename = "OpenSans-Regular.ttf"
+        val normalItalicFilename = "OpenSans-Italic.ttf"
+        val boldFilename = "OpenSans-Bold.ttf"
+        val boldItalicFilename = "OpenSans-BoldItalic.ttf"
+        cache["DEBUG_FONT"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$normalFilename"), emulatedSize,
                                                    makeParam().apply {
-                                                       size = 18
+                                                       size = defaultFontSize
                                                        borderWidth = 0f
                                                    }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-Regular.ttf"), emulatedSize,
+        cache["DEBUG_FONT_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$normalFilename"), emulatedSize,
                                                             makeParam().apply {
-                                                                size = 18
+                                                                size = defaultFontSize
                                                                 borderWidth = 1.5f
                                                             }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-Italic.ttf"), emulatedSize,
+        cache["DEBUG_FONT_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$normalItalicFilename"), emulatedSize,
                                                           makeParam().apply {
-                                                              size = 18
+                                                              size = defaultFontSize
                                                               borderWidth = 0f
                                                           }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-Italic.ttf"), emulatedSize,
+        cache["DEBUG_FONT_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$normalItalicFilename"), emulatedSize,
                                                                    makeParam().apply {
-                                                                       size = 18
+                                                                       size = defaultFontSize
                                                                        borderWidth = 1.5f
                                                                    }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BOLD"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-Bold.ttf"), emulatedSize,
+        cache["DEBUG_FONT_BOLD"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$boldFilename"), emulatedSize,
                                                         makeParam().apply {
-                                                            size = 18
+                                                            size = defaultFontSize
                                                             borderWidth = 0f
                                                         }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BOLD_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-Bold.ttf"), emulatedSize,
+        cache["DEBUG_FONT_BOLD_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$boldFilename"), emulatedSize,
                                                                  makeParam().apply {
-                                                                     size = 18
+                                                                     size = defaultFontSize
                                                                      borderWidth = 1.5f
                                                                  }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BOLD_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-BoldItalic.ttf"), emulatedSize,
+        cache["DEBUG_FONT_BOLD_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$boldItalicFilename"), emulatedSize,
                                                                makeParam().apply {
-                                                                   size = 18
+                                                                   size = defaultFontSize
                                                                    borderWidth = 0f
                                                                }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BOLD_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/OpenSans-BoldItalic.ttf"), emulatedSize,
+        cache["DEBUG_FONT_BOLD_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$boldItalicFilename"), emulatedSize,
                                                                         makeParam().apply {
-                                                                            size = 18
+                                                                            size = defaultFontSize
                                                                             borderWidth = 1.5f
                                                                         }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
     }

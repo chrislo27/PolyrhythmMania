@@ -34,6 +34,32 @@ fun SpriteBatch.drawRect(rect: Rectangle, line: Float) {
     this.drawRect(rect, line, line)
 }
 
+fun SpriteBatch.fillRoundedRect(x: Float, y: Float, w: Float, h: Float, cornerRad: Float) {
+    var roundedRad = cornerRad
+    if (roundedRad > w / 2f) {
+        roundedRad = (w / 2f)
+    }
+    if (roundedRad > h / 2f) {
+        roundedRad = (h / 2f)
+    }
+    if (roundedRad <= 0) {
+        this.fillRect(x, y - h, w, h)
+    } else {
+        val spritesheet = PaintboxGame.paintboxSpritesheet
+        val fill = spritesheet.fill
+        val roundedRect = spritesheet.roundedCorner
+        this.draw(fill, x + roundedRad, y + roundedRad, w - roundedRad * 2, h - roundedRad * 2) // Middle
+        this.draw(fill, x, y + roundedRad, (roundedRad), h - roundedRad * 2) // Left
+        this.draw(fill, x + w - roundedRad, y + roundedRad, (roundedRad), h - roundedRad * 2) // Right
+        this.draw(fill, x + roundedRad, y, w - roundedRad * 2, (roundedRad)) // Bottom
+        this.draw(fill, x + roundedRad, y + h - roundedRad, w - roundedRad * 2, (roundedRad)) // Top
+        this.draw(roundedRect, x, y + h - roundedRad, (roundedRad), (roundedRad)) // TL
+        this.draw(roundedRect, x, y + roundedRad, (roundedRad), (-roundedRad)) // BL
+        this.draw(roundedRect, x + w, y + h - roundedRad, (-roundedRad), (roundedRad)) // TR
+        this.draw(roundedRect, x + w, y + roundedRad, (-roundedRad), (-roundedRad)) // BR
+    }
+}
+
 private val quadVerts: FloatArray = FloatArray(20)
 
 /**
