@@ -21,6 +21,7 @@ import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
 import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
 import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
 import org.lwjgl.glfw.GLFW
+import polyrhythmmania.editor.TestEditorScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
 import polyrhythmmania.world.render.TestWorldRenderScreen
@@ -59,7 +60,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 InputThresholds.initInputClasses()
             }
             nextScreen = {
-                TestWorldRenderScreen(this@PRManiaGame)
+//                TestWorldRenderScreen(this@PRManiaGame)
+                TestEditorScreen(this@PRManiaGame)
             }
         })
     }
@@ -116,48 +118,53 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             color = Color(1f, 1f, 1f, 1f)
             borderColor = Color(0f, 0f, 0f, 1f)
             characters = ""
-            hinting = FreeTypeFontGenerator.Hinting.AutoFull
+            hinting = FreeTypeFontGenerator.Hinting.Full
         }
 
         val afterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
 //            font.data.blankLineScale = 0.75f
+            font.setUseIntegerPositions(false)
         }
-        cache["OpenSans"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/OpenSans-Regular.ttf"), emulatedSize,
+        val normalFilename = "OpenSans-Regular.ttf"
+        val normalItalicFilename = "OpenSans-Italic.ttf"
+        val boldFilename = "OpenSans-Bold.ttf"
+        val boldItalicFilename = "OpenSans-BoldItalic.ttf"
+        cache["OpenSans"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/$normalFilename"), emulatedSize,
                 makeParam().apply {
                     size = 18
                     borderWidth = 0f
                 }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["OpenSans_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/OpenSans-Regular.ttf"), emulatedSize,
+        cache["OpenSans_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/$normalFilename"), emulatedSize,
                 makeParam().apply {
                     size = 18
                     borderWidth = 1.5f
                 }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["OpenSans_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/OpenSans-Italic.ttf"), emulatedSize,
+        cache["OpenSans_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/$normalItalicFilename"), emulatedSize,
                 makeParam().apply {
                     size = 18
                     borderWidth = 0f
                 }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["OpenSans_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/OpenSans-Italic.ttf"), emulatedSize,
+        cache["OpenSans_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/$normalItalicFilename"), emulatedSize,
                 makeParam().apply {
                     size = 18
                     borderWidth = 1.5f
                 }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["OpenSans_BOLD"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/OpenSans-Bold.ttf"), emulatedSize,
+        cache["OpenSans_BOLD"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/$boldFilename"), emulatedSize,
                 makeParam().apply {
                     size = 18
                     borderWidth = 0f
                 }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["OpenSans_BOLD_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/OpenSans-Bold.ttf"), emulatedSize,
+        cache["OpenSans_BOLD_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/$boldFilename"), emulatedSize,
                 makeParam().apply {
                     size = 18
                     borderWidth = 1.5f
                 }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["OpenSans_BOLD_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/OpenSans-BoldItalic.ttf"), emulatedSize,
+        cache["OpenSans_BOLD_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/$boldItalicFilename"), emulatedSize,
                 makeParam().apply {
                     size = 18
                     borderWidth = 0f
                 }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["OpenSans_BOLD_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/OpenSans-BoldItalic.ttf"), emulatedSize,
+        cache["OpenSans_BOLD_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("fonts/OpenSans/$boldItalicFilename"), emulatedSize,
                 makeParam().apply {
                     size = 18
                     borderWidth = 1.5f
