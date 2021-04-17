@@ -145,6 +145,8 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             label.doXCompression.set(true)
             label.renderAlign.set(Align.left)
             label.doClipping.set(true)
+//            label.opacity.set(0.5f)
+//            label.textColor.set(Color(0f, 1f, 0f, 1f))
             
             label.setOnAction { 
                 println("hi")
