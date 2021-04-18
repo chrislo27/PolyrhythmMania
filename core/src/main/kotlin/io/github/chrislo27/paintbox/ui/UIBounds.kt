@@ -9,11 +9,12 @@ class UIBounds(val element: UIElement) {
     
     val x: Var<Float> = Var(0f)
     val y: Var<Float> = Var(0f)
-    val width: Var<Float> = Var {
-        use(element.parent)?.bounds?.width?.use() ?: 0f
-    }
-    val height: Var<Float> = Var {
-        use(element.parent)?.bounds?.height?.use() ?: 0f
+    val width: Var<Float> = Var(0f)
+    val height: Var<Float> = Var(0f)
+    
+    init {
+        bindWidthToParent(0f)
+        bindHeightToParent(0f)
     }
     
 //    val globalX: ReadOnlyVar<Float> = Var {
@@ -22,6 +23,18 @@ class UIBounds(val element: UIElement) {
 //    val globalY: ReadOnlyVar<Float> = Var {
 //        (element.parent.use()?.bounds?.globalY?.use() ?: 0f) + y.use()
 //    }
+    
+    fun bindWidthToParent(adjust: Float = 0f) {
+        this.width.bind {
+            (use(element.parent)?.let { it.bounds.width.use() } ?: 0f) + adjust
+        }
+    }
+    
+    fun bindHeightToParent(adjust: Float = 0f) {
+        this.height.bind {
+            (use(element.parent)?.let { it.bounds.height.use() } ?: 0f) + adjust
+        }
+    }
     
     fun setAll(x: Float? = null, y: Float? = null, width: Float? = null, height: Float? = null): UIBounds {
         if (x != null) this.x.set(x)
