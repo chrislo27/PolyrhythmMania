@@ -168,7 +168,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             )))
             Anchor.BottomLeft.configure(label, offsetX = 32f, offsetY = -32f)
             label.bounds.width.set(325f)
-            label.bounds.height.set(100f)
+            label.bounds.height.set(110f)
             label.renderBackground.set(true)
 //            label.textAlign.set(TextAlign.RIGHT)
             label.bgPadding.set(10f)

@@ -6,10 +6,9 @@ import com.badlogic.gdx.utils.I18NBundle
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.ObjectMap
 import io.github.chrislo27.paintbox.Paintbox
-import io.github.chrislo27.paintbox.util.ReadOnlyVar
-import io.github.chrislo27.paintbox.util.Var
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
 import java.util.*
-import kotlin.properties.Delegates
 
 
 /**

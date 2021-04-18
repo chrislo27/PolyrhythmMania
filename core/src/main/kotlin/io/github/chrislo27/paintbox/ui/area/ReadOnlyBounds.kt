@@ -1,7 +1,7 @@
 package io.github.chrislo27.paintbox.ui.area
 
 import com.badlogic.gdx.math.Rectangle
-import io.github.chrislo27.paintbox.util.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 
 
 interface ReadOnlyBounds {

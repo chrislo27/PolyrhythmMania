@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.Paintbox
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.util.Var
+import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
 
 

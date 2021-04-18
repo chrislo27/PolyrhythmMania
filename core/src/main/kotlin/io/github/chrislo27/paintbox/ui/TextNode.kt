@@ -7,7 +7,7 @@ import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextBlock
 import io.github.chrislo27.paintbox.font.TextRun
-import io.github.chrislo27.paintbox.util.Var
+import io.github.chrislo27.paintbox.binding.Var
 import kotlin.math.min
 
 

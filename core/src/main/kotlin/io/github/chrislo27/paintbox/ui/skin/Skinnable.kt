@@ -2,8 +2,6 @@ package io.github.chrislo27.paintbox.ui.skin
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chrislo27.paintbox.ui.UIElement
-import io.github.chrislo27.paintbox.util.ReadOnlyVar
-import io.github.chrislo27.paintbox.util.Var
 
 
 abstract class Skinnable<SELF : Skinnable<SELF>> : UIElement() {

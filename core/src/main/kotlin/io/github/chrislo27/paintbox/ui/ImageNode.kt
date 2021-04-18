@@ -3,7 +3,7 @@ package io.github.chrislo27.paintbox.ui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import io.github.chrislo27.paintbox.util.Var
+import io.github.chrislo27.paintbox.binding.Var
 import kotlin.math.max
 import kotlin.math.min
 

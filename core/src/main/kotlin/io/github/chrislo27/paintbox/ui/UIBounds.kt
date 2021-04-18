@@ -1,10 +1,11 @@
 package io.github.chrislo27.paintbox.ui
 
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.ui.area.Bounds
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.area.ReadOnlyBounds
-import io.github.chrislo27.paintbox.util.ReadOnlyVar
-import io.github.chrislo27.paintbox.util.Var
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
 
 
 /**
@@ -75,7 +76,7 @@ open class UIBounds {
     
     companion object {
         fun createZoneBounds(outerZoneBounds: ReadOnlyBounds, outerInsets: ReadOnlyVar<Insets>): ReadOnlyBounds {
-            val xVar: Var<Float> = Var {
+            val xVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
                 val minX = outerZoneBounds.x.use() + insets.left
                 val maxX = minX + outerZoneBounds.width.use() - insets.right - insets.left
@@ -84,7 +85,7 @@ open class UIBounds {
                     ((minX + maxX) / 2f)
                 else (minX)
             }
-            val yVar: Var<Float> = Var {
+            val yVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
                 val minY = outerZoneBounds.y.use() + insets.top
                 val maxY = minY + outerZoneBounds.height.use() - insets.bottom - insets.top
@@ -93,13 +94,13 @@ open class UIBounds {
                     ((minY + maxY) / 2f)
                 else (minY)
             }
-            val wVar: Var<Float> = Var {
+            val wVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
                 val minX = outerZoneBounds.x.use() + insets.left
                 val maxX = minX + outerZoneBounds.width.use() - insets.right - insets.left
                 if (maxX <= minX) 0f else (maxX - minX)
             }
-            val hVar: Var<Float> = Var {
+            val hVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
                 val minY = outerZoneBounds.y.use() + insets.top
                 val maxY = minY + outerZoneBounds.height.use() - insets.bottom - insets.top

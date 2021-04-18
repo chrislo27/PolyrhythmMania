@@ -113,7 +113,7 @@ internal class TestColorElement(val color: Color) : UIElement() {
                     Gdx.app.postRunnable { 
                         isMouseDown = true
                     }
-                    println((this as UIBounds).toString())
+//                    println((this as UIBounds).toString())
                 }
                 true
             } else if (evt is ClickReleased) {

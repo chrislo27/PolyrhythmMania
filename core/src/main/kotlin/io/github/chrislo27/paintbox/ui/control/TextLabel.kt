@@ -12,8 +12,8 @@ import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
 import io.github.chrislo27.paintbox.ui.skin.Skin
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
-import io.github.chrislo27.paintbox.util.ReadOnlyVar
-import io.github.chrislo27.paintbox.util.Var
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import kotlin.math.min
 

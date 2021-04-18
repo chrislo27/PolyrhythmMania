@@ -6,8 +6,8 @@ import io.github.chrislo27.paintbox.ui.InputEvent
 import io.github.chrislo27.paintbox.ui.MouseEntered
 import io.github.chrislo27.paintbox.ui.MouseExited
 import io.github.chrislo27.paintbox.ui.skin.Skinnable
-import io.github.chrislo27.paintbox.util.ReadOnlyVar
-import io.github.chrislo27.paintbox.util.Var
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
 
 
 /**

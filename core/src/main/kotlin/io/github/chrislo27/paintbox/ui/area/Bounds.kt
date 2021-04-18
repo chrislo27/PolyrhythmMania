@@ -1,13 +1,13 @@
 package io.github.chrislo27.paintbox.ui.area
 
-import io.github.chrislo27.paintbox.util.Var
+import io.github.chrislo27.paintbox.binding.FloatVar
 
 
-data class Bounds(override val x: Var<Float>, override val y: Var<Float>,
-                  override val width: Var<Float>, override val height: Var<Float>)
+data class Bounds(override val x: FloatVar, override val y: FloatVar,
+                  override val width: FloatVar, override val height: FloatVar)
     : ReadOnlyBounds {
 
     constructor(x: Float, y: Float, width: Float, height: Float)
-            : this(Var(x), Var(y), Var(width), Var(height))
+            : this(FloatVar(x), FloatVar(y), FloatVar(width), FloatVar(height))
 
 }

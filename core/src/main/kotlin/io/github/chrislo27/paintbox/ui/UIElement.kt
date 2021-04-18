@@ -3,10 +3,9 @@ package io.github.chrislo27.paintbox.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
-import io.github.chrislo27.paintbox.ui.area.Bounds
 import io.github.chrislo27.paintbox.ui.area.ReadOnlyBounds
-import io.github.chrislo27.paintbox.util.ReadOnlyVar
-import io.github.chrislo27.paintbox.util.Var
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
 
 
 open class UIElement : UIBounds() {
