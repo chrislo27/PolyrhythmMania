@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.PaintboxGame
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextBlock
@@ -44,8 +45,8 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
 
     val text: Var<String> = Var(text)
     val font: Var<PaintboxFont> = Var(font)
-    val scaleX: Var<Float> = Var(1f)
-    val scaleY: Var<Float> = Var(1f)
+    val scaleX: FloatVar = FloatVar(1f)
+    val scaleY: FloatVar = FloatVar(1f)
 
     val renderAlign: Var<Int> = Var(Align.center)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }

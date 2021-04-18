@@ -3,6 +3,7 @@ package io.github.chrislo27.paintbox.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.ui.area.ReadOnlyBounds
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
@@ -33,11 +34,11 @@ open class UIElement : UIBounds() {
     /**
      * The opacity of this [UIElement].
      */
-    val opacity: Var<Float> = Var(1f)
+    val opacity: FloatVar = FloatVar(1f)
     /**
      * The [apparentOpacity] level of the [parent], if there is no parent then 1.0 is used.
      */
-    val parentOpacity: ReadOnlyVar<Float> = Var {
+    val parentOpacity: ReadOnlyVar<Float> = FloatVar {
         parent.use()?.apparentOpacity?.use() ?: 1f
     }
     /**
@@ -46,7 +47,7 @@ open class UIElement : UIBounds() {
      *
      * This is to be used by the rendering implementation.
      */
-    val apparentOpacity: ReadOnlyVar<Float> = Var {
+    val apparentOpacity: ReadOnlyVar<Float> = FloatVar {
         parentOpacity.use() * opacity.use()
     }
     

@@ -3,6 +3,7 @@ package io.github.chrislo27.paintbox.ui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.Var
 import kotlin.math.max
 import kotlin.math.min
@@ -15,9 +16,9 @@ open class ImageNode(tex: TextureRegion? = null,
     val textureRegion: Var<TextureRegion?> = Var(tex)
     val tint: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val renderingMode: Var<ImageRenderingMode> = Var(renderingMode)
-    val rotation: Var<Float> = Var(0f)
-    val rotationPointX: Var<Float> = Var(0.5f)
-    val rotationPointY: Var<Float> = Var(0.5f)
+    val rotation: FloatVar = FloatVar(0f)
+    val rotationPointX: FloatVar = FloatVar(0.5f)
+    val rotationPointY: FloatVar = FloatVar(0.5f)
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         val tex = textureRegion.getOrCompute()

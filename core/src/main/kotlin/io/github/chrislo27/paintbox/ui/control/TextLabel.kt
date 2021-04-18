@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.PaintboxGame
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextBlock
@@ -49,8 +50,8 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
      */
     val textColor: Var<Color> = Var(Color(0f, 0f, 0f, 0f))
     
-    val scaleX: Var<Float> = Var(1f)
-    val scaleY: Var<Float> = Var(1f)
+    val scaleX: FloatVar = FloatVar(1f)
+    val scaleY: FloatVar = FloatVar(1f)
 
     /**
      * If the alpha value is 0, the skin controls what background colour is used.
@@ -58,7 +59,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     val backgroundColor: Var<Color> = Var(Color(1f, 1f, 1f, 0f))
 
     val renderBackground: Var<Boolean> = Var(false)
-    val bgPadding: Var<Float> = Var(5f)
+    val bgPadding: FloatVar = FloatVar(5f)
 
     val renderAlign: Var<Int> = Var(Align.left)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
