@@ -43,7 +43,7 @@ fun SpriteBatch.fillRoundedRect(x: Float, y: Float, w: Float, h: Float, cornerRa
         roundedRad = (h / 2f)
     }
     if (roundedRad <= 0) {
-        this.fillRect(x, y - h, w, h)
+        this.fillRect(x, y, w, h)
     } else {
         val spritesheet = PaintboxGame.paintboxSpritesheet
         val fill = spritesheet.fill
