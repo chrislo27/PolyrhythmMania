@@ -45,7 +45,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
     private fun updateDeepmostElementForMouseLocation(x: Float, y: Float) {
         val lastPath: MutableList<UIElement> = lastHoveredElementPath
         if (lastPath.isEmpty()) {
-            val newPath = sceneRoot.pathTo(x, y)
+            val newPath = sceneRoot.pathToForInput(x, y)
             lastPath.addAll(newPath)
             val evt = MouseEntered(x, y)
             newPath.forEach { it.fireEvent(evt) }
@@ -77,7 +77,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         // We found the closest parent that contains x, y, so we'll navigate to its deepest descendant that contains xy
         // starting from it, and the resulting "subpath" will be appended to our current path
         if (cursor != null && cursor.children.isNotEmpty()) {
-            val subPath = cursor.pathTo(x - offX, y - offY)
+            val subPath = cursor.pathToForInput(x - offX, y - offY)
             lastPath += subPath
             val evt = MouseEntered(x, y)
             subPath.forEach { it.fireEvent(evt) }

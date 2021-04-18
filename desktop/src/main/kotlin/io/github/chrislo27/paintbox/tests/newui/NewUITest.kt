@@ -113,6 +113,7 @@ internal class TestColorElement(val color: Color) : UIElement() {
                     Gdx.app.postRunnable { 
                         isMouseDown = true
                     }
+                    println((this as UIBounds).toString())
                 }
                 true
             } else if (evt is ClickReleased) {
@@ -137,10 +138,11 @@ internal class TestColorElement(val color: Color) : UIElement() {
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-        val x = bounds.x.getOrCompute() + originX
-        val y = originY - bounds.y.getOrCompute()
-        val w = bounds.width.getOrCompute()
-        val h = bounds.height.getOrCompute()
+        val renderBounds = this.paddingZone
+        val x = renderBounds.x.getOrCompute() + originX
+        val y = originY - renderBounds.y.getOrCompute()
+        val w = renderBounds.width.getOrCompute()
+        val h = renderBounds.height.getOrCompute()
         val packed = batch.packedColor
         TMP_COLOR.set(color)
         if (isMouseDown) {

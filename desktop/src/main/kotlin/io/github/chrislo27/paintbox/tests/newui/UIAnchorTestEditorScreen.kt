@@ -13,6 +13,7 @@ import io.github.chrislo27.paintbox.font.TextBlock
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.*
+import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
@@ -45,17 +46,18 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                 val num = 6
                 val buttonWidth = 32f
                 val buttonSpacing = 4f
-                lt.bounds.x.set(4f)
-                lt.bounds.y.set(4f)
-                lt.bounds.height.set(32f)
-                lt.bounds.width.set((buttonWidth + buttonSpacing) * num - buttonSpacing)
+//                lt.bounds.x.set(4f)
+//                lt.bounds.y.set(4f)
+//                lt.bounds.height.set(32f)
+                lt.bounds.width.set((buttonWidth + buttonSpacing) * (num + 2) - buttonSpacing)
 
                 (0 until num).forEach { i ->
                     lt += TestColorElement(Color(1f, 1f, 1f, 1f).fromHsv(360f * i / num, 0.9f, 0.8f)).apply {
-                        this.bounds.x.set(36f * i)
+                        this.bounds.x.set((buttonWidth + buttonSpacing * 2) * i)
                         this.bounds.y.set(0f)
-                        this.bounds.width.set(32f)
-                        this.bounds.height.set(32f)
+                        this.bounds.width.set(buttonWidth + buttonSpacing * 2)
+                        this.bounds.height.set(buttonWidth + buttonSpacing * 2)
+                        this.margin.set(Insets(buttonSpacing))
                         this.doClickFlash = true
                     }
                 }
@@ -112,14 +114,16 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             Anchor.BottomCentre.configure(rect, offsetY = -75f)
             rect.bounds.width.set(500f)
             rect.bounds.height.set(500f)
+            
+            rect.padding.set(Insets(10f))
 
             rect += TextNode(TextBlock(listOf(
                     TextRun(main.debugFontBoldBordered, "Hello\nline2\nline3g adwadwadwadaddadwd"),
                     TextRun(main.debugFontBoldBordered, "a separate TextRun", color = Color.RED),
                     TextRun(main.debugFontBoldBordered, "\n\n\nnananananananananananananananananananananananannananananana"),
-                                             ))).apply {
+            ))).apply {
                 renderAlign.set(Align.center)
-                doXCompression.set(false)
+                doXCompression.set(true)
                 doClipping.set(true)
 
 //                this += RectElement(Color(0f, 0f, 0f, 0.5f)).also { r2 ->
@@ -154,7 +158,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                 println("hi top label")
             }
         }
-        
+
         bg += TextLabel("").also { label ->
             label.internalTextBlock.set(TextBlock(listOf(
                     TextRun(main.debugFont, "Regular font.\n"),
@@ -173,17 +177,17 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             label.doClipping.set(true)
 //            label.opacity.set(0.5f)
 //            label.textColor.set(Color(0f, 1f, 0f, 1f))
-            
-            label.setOnAction { 
+
+            label.setOnAction {
                 println("hi bottom label")
             }
         }
-        
+
         bg += Button("Test button", font = main.debugFont).also { button ->
             Anchor.CentreLeft.configure(button, offsetX = 32f)
             button.bounds.width.set(150f)
             button.bounds.height.set(50f)
-            
+
             button.setOnAction {
                 println("hi button")
             }

@@ -30,11 +30,12 @@ open class ImageNode(tex: TextureRegion? = null,
             tmpColor.a *= opacity
             
             batch.color = tmpColor
-            
-            val x = bounds.x.getOrCompute() + originX
-            val y = originY - bounds.y.getOrCompute()
-            val w = bounds.width.getOrCompute()
-            val h = bounds.height.getOrCompute()
+
+            val renderBounds = this.contentZone
+            val x = renderBounds.x.getOrCompute() + originX
+            val y = originY - renderBounds.y.getOrCompute()
+            val w = renderBounds.width.getOrCompute()
+            val h = renderBounds.height.getOrCompute()
             
             when (val renderingMode = this.renderingMode.getOrCompute()) {
                 ImageRenderingMode.FULL -> {

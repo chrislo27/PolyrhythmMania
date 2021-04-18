@@ -165,7 +165,11 @@ class Var<T> : ReadOnlyVar<T> {
             listeners = listeners - listener
         }
     }
-    
+
+    override fun toString(): String {
+        return getOrCompute().toString()
+    }
+
     private class InvalListener(v: Var<Any>) : VarChangedListener<Any> {
         val weakRef: WeakReference<Var<Any>> = WeakReference(v)
         var disposeMe: Boolean = false

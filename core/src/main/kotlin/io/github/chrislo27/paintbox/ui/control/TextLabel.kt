@@ -103,7 +103,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         val text = element.internalTextBlock.getOrCompute()
         if (text.runs.isEmpty()) return
 
-        val bounds = element.bounds
+        val bounds = element.contentZone
         val x = bounds.x.getOrCompute() + originX
         val y = originY - bounds.y.getOrCompute()
         val w = bounds.width.getOrCompute()

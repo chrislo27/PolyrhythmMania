@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
 import io.github.chrislo27.paintbox.ui.area.Bounds
+import io.github.chrislo27.paintbox.ui.area.ReadOnlyBounds
 import io.github.chrislo27.paintbox.util.ReadOnlyVar
 import io.github.chrislo27.paintbox.util.Var
 
@@ -60,9 +61,12 @@ open class UIElement : UIBounds() {
         if (!visible.getOrCompute()) return
         
         val clip = doClipping.getOrCompute()
+        val childOriginBounds = this.contentZone
+        val childOriginX = childOriginBounds.x.getOrCompute()
+        val childOriginY = childOriginBounds.y.getOrCompute()
         renderOptionallyWithClip(originX, originY, batch, clip) { _, _, _ ->
             this.renderSelf(originX, originY, batch)
-            this.renderChildren(originX + this.bounds.x.getOrCompute(), originY - this.bounds.y.getOrCompute(), batch)
+            this.renderChildren(originX + childOriginX, originY - childOriginY, batch)
             this.renderSelfAfterChildren(originX, originY, batch)
         }
     }
@@ -141,14 +145,14 @@ open class UIElement : UIBounds() {
     fun bindWidthToParent(adjust: Float = 0f) {
         val thisBounds = this.bounds
         thisBounds.width.bind { 
-            (this@UIElement.parent.use()?.let { it.bounds.width.use() } ?: 0f) + adjust
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) + adjust
         }
     }
 
     fun bindHeightToParent(adjust: Float = 0f) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            (this@UIElement.parent.use()?.let { it.bounds.height.use() } ?: 0f) + adjust
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) + adjust
         }
     }
     
@@ -173,7 +177,7 @@ open class UIElement : UIBounds() {
     fun pathTo(x: Float, y: Float): List<UIElement> {
         val res = mutableListOf<UIElement>()
         var current: UIElement = this
-        var currentBounds: Bounds = current.bounds
+        var currentBounds: ReadOnlyBounds = current.bounds
         var xOffset: Float = currentBounds.x.getOrCompute()
         var yOffset: Float = currentBounds.y.getOrCompute()
         while (current.children.isNotEmpty()) {
@@ -181,6 +185,27 @@ open class UIElement : UIBounds() {
             res += found
             current = found
             currentBounds = current.bounds
+            xOffset += currentBounds.x.getOrCompute()
+            yOffset += currentBounds.y.getOrCompute()
+        }
+        return res
+    }
+    
+    /**
+     * Returns a list of UIElements from this element to the child that contains the point within [UIBounds.borderZone].
+     * IMPLEMENTATION NOTE: This function assumes that all the children for a parent fit inside of that parent's bounds.
+     */
+    fun pathToForInput(x: Float, y: Float): List<UIElement> {
+        val res = mutableListOf<UIElement>()
+        var current: UIElement = this
+        var currentBounds: ReadOnlyBounds = current.borderZone
+        var xOffset: Float = currentBounds.x.getOrCompute()
+        var yOffset: Float = currentBounds.y.getOrCompute()
+        while (current.children.isNotEmpty()) {
+            val found = current.children.findLast { it.borderZone.containsPointLocal(x - xOffset, y - yOffset) } ?: break
+            res += found
+            current = found
+            currentBounds = current.borderZone
             xOffset += currentBounds.x.getOrCompute()
             yOffset += currentBounds.y.getOrCompute()
         }

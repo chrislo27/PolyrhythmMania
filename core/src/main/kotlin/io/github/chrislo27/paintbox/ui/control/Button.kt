@@ -11,13 +11,13 @@ import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextBlock
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.ui.*
+import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
 import io.github.chrislo27.paintbox.ui.skin.Skin
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
 import io.github.chrislo27.paintbox.util.ReadOnlyVar
 import io.github.chrislo27.paintbox.util.Var
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
-import io.github.chrislo27.paintbox.util.gdxutils.fillRoundedRect
 import java.util.*
 import kotlin.math.min
 
@@ -70,6 +70,10 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
         } else {
             PressedState.NONE
         }
+    }
+    
+    init {
+        this.padding.set(Insets(2f))
     }
 
     @Suppress("RemoveRedundantQualifierName")
@@ -168,11 +172,11 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-        val bounds = element.bounds
-        val x = bounds.x.getOrCompute() + originX
-        val y = originY - bounds.y.getOrCompute()
-        val w = bounds.width.getOrCompute()
-        val h = bounds.height.getOrCompute()
+        val paddingBounds = element.paddingZone
+        val rectX = paddingBounds.x.getOrCompute() + originX
+        val rectY = originY - paddingBounds.y.getOrCompute()
+        val rectW = paddingBounds.width.getOrCompute()
+        val rectH = paddingBounds.height.getOrCompute()
         val lastPackedColor = batch.packedColor
         val opacity = element.apparentOpacity.getOrCompute()
 
@@ -184,35 +188,41 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
         val paintboxSpritesheet = PaintboxGame.paintboxSpritesheet
         val roundedRect: TextureRegion = paintboxSpritesheet.roundedCorner
         val spritesheetFill: TextureRegion = paintboxSpritesheet.fill
-        if (roundedRad > w / 2f) {
-            roundedRad = (w / 2f).toInt()
+        if (roundedRad > rectW / 2f) {
+            roundedRad = (rectW / 2f).toInt()
         }
-        if (roundedRad > h / 2f) {
-            roundedRad = (h / 2f).toInt()
+        if (roundedRad > rectH / 2f) {
+            roundedRad = (rectH / 2f).toInt()
         }
         if (roundedRad <= 0) {
-            batch.fillRect(x, y - h, w, h)
+            batch.fillRect(rectX, rectY - rectH, rectW, rectH)
         } else {
-            batch.fillRect(x + roundedRad, y - h + roundedRad, w - roundedRad * 2, h - roundedRad * 2)
-            batch.fillRect(x, y - h + roundedRad, (roundedRad).toFloat(), h - roundedRad * 2)
-            batch.fillRect(x + w - roundedRad, y - h + roundedRad, (roundedRad).toFloat(), h - roundedRad * 2)
-            batch.fillRect(x + roundedRad, y - h, w - roundedRad * 2, (roundedRad).toFloat())
-            batch.fillRect(x + roundedRad, y - roundedRad, w - roundedRad * 2, (roundedRad).toFloat())
+            batch.fillRect(rectX + roundedRad, rectY - rectH + roundedRad, rectW - roundedRad * 2, rectH - roundedRad * 2)
+            batch.fillRect(rectX, rectY - rectH + roundedRad, (roundedRad).toFloat(), rectH - roundedRad * 2)
+            batch.fillRect(rectX + rectW - roundedRad, rectY - rectH + roundedRad, (roundedRad).toFloat(), rectH - roundedRad * 2)
+            batch.fillRect(rectX + roundedRad, rectY - rectH, rectW - roundedRad * 2, (roundedRad).toFloat())
+            batch.fillRect(rectX + roundedRad, rectY - roundedRad, rectW - roundedRad * 2, (roundedRad).toFloat())
             val roundedCornersSet = roundedCorners
             batch.draw(if (Corner.TOP_LEFT in roundedCornersSet) roundedRect else spritesheetFill,
-                    x, y - roundedRad, (roundedRad).toFloat(), (roundedRad).toFloat()) // TL
+                    rectX, rectY - roundedRad, (roundedRad).toFloat(), (roundedRad).toFloat()) // TL
             batch.draw(if (Corner.BOTTOM_LEFT in roundedCornersSet) roundedRect else spritesheetFill,
-                    x, y - h + roundedRad, (roundedRad).toFloat(), (-roundedRad).toFloat()) // BL
+                    rectX, rectY - rectH + roundedRad, (roundedRad).toFloat(), (-roundedRad).toFloat()) // BL
             batch.draw(if (Corner.TOP_RIGHT in roundedCornersSet) roundedRect else spritesheetFill,
-                    x + w, y - roundedRad, (-roundedRad).toFloat(), (roundedRad).toFloat()) // TR
+                    rectX + rectW, rectY - roundedRad, (-roundedRad).toFloat(), (roundedRad).toFloat()) // TR
             batch.draw(if (Corner.BOTTOM_RIGHT in roundedCornersSet) roundedRect else spritesheetFill,
-                    x + w, y - h + roundedRad, (-roundedRad).toFloat(), (-roundedRad).toFloat()) // BR
+                    rectX + rectW, rectY - rectH + roundedRad, (-roundedRad).toFloat(), (-roundedRad).toFloat()) // BR
         }
         batch.packedColor = lastPackedColor
         ColorStack.pop()
 
         val text = element.internalTextBlock.getOrCompute()
         if (text.runs.isNotEmpty()) {
+            val textBounds = element.contentZone
+            val textX = textBounds.x.getOrCompute() + originX
+            val textY = originY - textBounds.y.getOrCompute()
+            val textW = textBounds.width.getOrCompute()
+            val textH = textBounds.height.getOrCompute()
+            
             val tmpColor = ColorStack.getAndPush()
             tmpColor.set(batch.color).mul(textColorToUse.getOrCompute())
             tmpColor.a *= opacity
@@ -226,17 +236,17 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
             val align = element.renderAlign.getOrCompute()
             val xOffset: Float = when {
                 Align.isLeft(align) -> 0f
-                Align.isRight(align) -> (w - (if (compressX) min(text.width, w) else text.width))
-                else -> (w - (if (compressX) min(text.width, w) else text.width)) / 2f
+                Align.isRight(align) -> (textW - (if (compressX) min(text.width, textW) else text.width))
+                else -> (textW - (if (compressX) min(text.width, textW) else text.width)) / 2f
             }
             val yOffset: Float = when {
-                Align.isTop(align) -> h - text.firstCapHeight
+                Align.isTop(align) -> textH - text.firstCapHeight
                 Align.isBottom(align) -> 0f + (text.height - text.firstCapHeight)
-                else -> h / 2 + text.height / 2 - text.firstCapHeight
+                else -> textH / 2 + text.height / 2 - text.firstCapHeight
             }
 
             batch.color = tmpColor // Sets the text colour and opacity
-            text.drawCompressed(batch, x + xOffset, y - h + yOffset, if (compressX) w else 0f, element.textAlign.getOrCompute())
+            text.drawCompressed(batch, textX + xOffset, textY - textH + yOffset, if (compressX) textW else 0f, element.textAlign.getOrCompute())
             ColorStack.pop()
         }
 

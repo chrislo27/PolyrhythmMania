@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.Paintbox
+import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.util.Var
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
 
@@ -37,14 +38,18 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     }
     
     private fun UIElement.drawDebugRect(originX: Float, originY: Float, batch: SpriteBatch, onlyVisible: Boolean) {
-        val x = bounds.x.getOrCompute() + originX
-        val y = originY - bounds.y.getOrCompute()
-        val w = bounds.width.getOrCompute()
-        val h = bounds.height.getOrCompute()
+        val thisBounds = bounds
+        val x = originX + thisBounds.x.getOrCompute()
+        val y = originY - thisBounds.y.getOrCompute()
+        val w = thisBounds.width.getOrCompute()
+        val h = thisBounds.height.getOrCompute()
         if (onlyVisible && !this.visible.getOrCompute()) return
         batch.drawRect(x, y - h, w, h, 1f)
+        
+        val childOffsetX = originX + this.contentZone.x.getOrCompute()
+        val childOffsetY = originY - this.contentZone.y.getOrCompute()
         this.children.forEach { child ->
-            child.drawDebugRect(x, y, batch, onlyVisible)
+            child.drawDebugRect(childOffsetX, childOffsetY, batch, onlyVisible)
         }
     }
 
