@@ -7,11 +7,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.PaintboxScreen
 import io.github.chrislo27.paintbox.font.TextBlock
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.*
+import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
 
@@ -78,7 +80,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                         this.bounds.height.set(32f)
                         this.doClickFlash = true
                         if (i == num / 2) {
-                            addChild(ImageNode(TextureRegion(AssetRegistry.get<Texture>("paintbox_spritesheet"), 0, 384, 128, 128), ImageRenderingMode.FULL).apply {
+                            addChild(ImageNode(PaintboxGame.paintboxSpritesheet.logo128, ImageRenderingMode.FULL).apply {
 
                             })
                         }
@@ -134,8 +136,32 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
 //                }
             }
         }
-        
+
         bg += TextLabel("Test text label.\nNewline.").also { label ->
+            Anchor.TopLeft.configure(label, offsetX = 32f, offsetY = 48f)
+            label.bounds.width.set(325f)
+            label.bounds.height.set(100f)
+            label.renderBackground.set(true)
+//            label.textAlign.set(TextAlign.RIGHT)
+            label.bgPadding.set(10f)
+            label.doXCompression.set(true)
+            label.renderAlign.set(Align.left)
+            label.doClipping.set(true)
+//            label.opacity.set(0.5f)
+//            label.textColor.set(Color(0f, 1f, 0f, 1f))
+
+            label.setOnAction {
+                println("hi top label")
+            }
+        }
+        
+        bg += TextLabel("").also { label ->
+            label.internalTextBlock.set(TextBlock(listOf(
+                    TextRun(main.debugFont, "Regular font.\n"),
+                    TextRun(main.debugFontItalic, "Italic font.\n"),
+                    TextRun(main.debugFontBold, "Bold font.\n"),
+                    TextRun(main.debugFontBoldItalic, "Bold-italic font."),
+            )))
             Anchor.BottomLeft.configure(label, offsetX = 32f, offsetY = -32f)
             label.bounds.width.set(325f)
             label.bounds.height.set(100f)
@@ -149,7 +175,27 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
 //            label.textColor.set(Color(0f, 1f, 0f, 1f))
             
             label.setOnAction { 
-                println("hi")
+                println("hi bottom label")
+            }
+        }
+        
+        bg += Button("Test button", font = main.debugFont).also { button ->
+            Anchor.CentreLeft.configure(button, offsetX = 32f)
+            button.bounds.width.set(150f)
+            button.bounds.height.set(50f)
+            
+            button.setOnAction {
+                println("hi button")
+            }
+        }
+        bg += Button("Disabled button", font = main.debugFont).also { button ->
+            Anchor.CentreLeft.configure(button, offsetX = 32f + 175f)
+            button.bounds.width.set(150f)
+            button.bounds.height.set(50f)
+            button.disabled.set(true)
+
+            button.setOnAction {
+                println("hi button disabled")
             }
         }
     }

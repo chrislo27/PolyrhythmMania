@@ -18,6 +18,7 @@ import io.github.chrislo27.paintbox.util.ReadOnlyVar
 import io.github.chrislo27.paintbox.util.Var
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import io.github.chrislo27.paintbox.util.gdxutils.fillRoundedRect
+import java.util.*
 import kotlin.math.min
 
 
@@ -124,8 +125,8 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
 
 open class ButtonSkin(element: Button) : Skin<Button>(element) {
 
-    val roundedRadius: Var<Int> = Var(5)
-    
+    val roundedRadius: Var<Int> = Var(2)
+
     val defaultTextColor: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
     val defaultBgColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val hoveredTextColor: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
@@ -136,6 +137,8 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
     val pressedAndHoveredBgColor: Var<Color> = Var(Color(0.75f, 1f, 1f, 1f))
     val disabledTextColor: Var<Color> = Var(Color(0.5f, 0.5f, 0.5f, 1f))
     val disabledBgColor: Var<Color> = Var(Color(0.8f, 0.8f, 0.8f, 1f))
+
+    val roundedCorners: EnumSet<Corner> = EnumSet.allOf(Corner::class.java)
 
     private val textColorToUse: ReadOnlyVar<Color> = Var {
         val pressedState = element.pressedState.use()
@@ -178,27 +181,33 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
         rectColor.a *= opacity
         batch.color = rectColor
         var roundedRad = roundedRadius.getOrCompute()
-//        val roundedRect: TextureRegion = PaintboxGame.paintboxSpritesheet.roundedCorner
-//        if (roundedRad > w / 2f) {
-//            roundedRad = (w / 2f).toInt()
-//        }
-//        if (roundedRad > h / 2f) {
-//            roundedRad = (h / 2f).toInt()
-//        }
-//        if (roundedRad <= 0) {
-//            batch.fillRect(x, y - h, w, h)
-//        } else {
-//            batch.fillRect(x + roundedRad, y - h + roundedRad, w - roundedRad * 2, h - roundedRad * 2)
-//            batch.fillRect(x, y - h + roundedRad, (roundedRad).toFloat(), h - roundedRad * 2)
-//            batch.fillRect(x + w - roundedRad, y - h + roundedRad, (roundedRad).toFloat(), h - roundedRad * 2)
-//            batch.fillRect(x + roundedRad, y - h, w - roundedRad * 2, (roundedRad).toFloat())
-//            batch.fillRect(x + roundedRad, y - roundedRad, w - roundedRad * 2, (roundedRad).toFloat())
-//            batch.draw(roundedRect, x, y - roundedRad, (roundedRad).toFloat(), (roundedRad).toFloat()) // TL
-//            batch.draw(roundedRect, x, y - h + roundedRad, (roundedRad).toFloat(), (-roundedRad).toFloat()) // BL
-//            batch.draw(roundedRect, x + w, y - roundedRad, (-roundedRad).toFloat(), (roundedRad).toFloat()) // TR
-//            batch.draw(roundedRect, x + w, y - h + roundedRad, (-roundedRad).toFloat(), (-roundedRad).toFloat()) // BR
-//        }
-        batch.fillRoundedRect(x, y - h, w, h, roundedRad.toFloat())
+        val paintboxSpritesheet = PaintboxGame.paintboxSpritesheet
+        val roundedRect: TextureRegion = paintboxSpritesheet.roundedCorner
+        val spritesheetFill: TextureRegion = paintboxSpritesheet.fill
+        if (roundedRad > w / 2f) {
+            roundedRad = (w / 2f).toInt()
+        }
+        if (roundedRad > h / 2f) {
+            roundedRad = (h / 2f).toInt()
+        }
+        if (roundedRad <= 0) {
+            batch.fillRect(x, y - h, w, h)
+        } else {
+            batch.fillRect(x + roundedRad, y - h + roundedRad, w - roundedRad * 2, h - roundedRad * 2)
+            batch.fillRect(x, y - h + roundedRad, (roundedRad).toFloat(), h - roundedRad * 2)
+            batch.fillRect(x + w - roundedRad, y - h + roundedRad, (roundedRad).toFloat(), h - roundedRad * 2)
+            batch.fillRect(x + roundedRad, y - h, w - roundedRad * 2, (roundedRad).toFloat())
+            batch.fillRect(x + roundedRad, y - roundedRad, w - roundedRad * 2, (roundedRad).toFloat())
+            val roundedCornersSet = roundedCorners
+            batch.draw(if (Corner.TOP_LEFT in roundedCornersSet) roundedRect else spritesheetFill,
+                    x, y - roundedRad, (roundedRad).toFloat(), (roundedRad).toFloat()) // TL
+            batch.draw(if (Corner.BOTTOM_LEFT in roundedCornersSet) roundedRect else spritesheetFill,
+                    x, y - h + roundedRad, (roundedRad).toFloat(), (-roundedRad).toFloat()) // BL
+            batch.draw(if (Corner.TOP_RIGHT in roundedCornersSet) roundedRect else spritesheetFill,
+                    x + w, y - roundedRad, (-roundedRad).toFloat(), (roundedRad).toFloat()) // TR
+            batch.draw(if (Corner.BOTTOM_RIGHT in roundedCornersSet) roundedRect else spritesheetFill,
+                    x + w, y - h + roundedRad, (-roundedRad).toFloat(), (-roundedRad).toFloat()) // BR
+        }
         batch.packedColor = lastPackedColor
         ColorStack.pop()
 
@@ -236,6 +245,13 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
 
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
         // NO-OP
+    }
+
+    enum class Corner {
+        TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT
     }
 
 }

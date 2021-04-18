@@ -3,16 +3,18 @@ package io.github.chrislo27.paintbox.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
+import io.github.chrislo27.paintbox.ui.area.Bounds
 import io.github.chrislo27.paintbox.util.ReadOnlyVar
 import io.github.chrislo27.paintbox.util.Var
 
 
-open class UIElement {
+open class UIElement : UIBounds() {
 
     val parent: Var<UIElement?> = Var(null)
-    val bounds: UIBounds by lazy { UIBounds(this) }
+    
     var children: List<UIElement> = emptyList()
         private set
+    
     val inputListeners: Var<List<InputEventListener>> = Var(emptyList())
     val sceneRoot: ReadOnlyVar<SceneRoot?> = Var {
         parent.use()?.sceneRoot?.use()
@@ -46,6 +48,11 @@ open class UIElement {
      */
     val apparentOpacity: ReadOnlyVar<Float> = Var {
         parentOpacity.use() * opacity.use()
+    }
+    
+    init {
+        bindWidthToParent(0f)
+        bindHeightToParent(0f)
     }
 
     @Suppress("RedundantModalityModifier")
@@ -106,25 +113,43 @@ open class UIElement {
      * if statement with the return value of this function. Returns false if the resultant scissor would have zero area.
      * Call [SpriteBatch.flush] before calling this function and before calling [clipEnd].
      */
-    fun clipBegin(originX: Float, originY: Float, x: Float = bounds.x.getOrCompute(), y: Float = bounds.y.getOrCompute(),
-                 width: Float = bounds.width.getOrCompute(), height: Float = bounds.height.getOrCompute()): Boolean {
+    fun clipBegin(originX: Float, originY: Float, x: Float, y: Float, width: Float, height: Float): Boolean {
         val root = sceneRoot.getOrCompute()
-        val rootWidth: Float = root?.bounds?.width?.getOrCompute() ?: width
-        val rootHeight: Float = root?.bounds?.height?.getOrCompute() ?: height
+        val rootBounds = root?.bounds
+        val rootWidth: Float = rootBounds?.width?.getOrCompute() ?: width
+        val rootHeight: Float = rootBounds?.height?.getOrCompute() ?: height
 
         val scissorX = (originX + x) / rootWidth * Gdx.graphics.width
         val scissorY = ((originY - y) / rootHeight) * Gdx.graphics.height
         val scissorW = (width / rootWidth) * Gdx.graphics.width
         val scissorH = (height / rootHeight) * Gdx.graphics.height
-        val scissor = Rectangle(scissorX, scissorY - scissorH,
-                                scissorW, scissorH)
+        val scissor = Rectangle(scissorX, scissorY - scissorH, scissorW, scissorH)
         
         val pushScissor = ScissorStack.pushScissor(scissor)
         return pushScissor
     }
     
+    fun clipBegin(originX: Float, originY: Float): Boolean {
+        val bounds = this.bounds
+        return clipBegin(originX, originY, bounds.x.getOrCompute(), bounds.y.getOrCompute(), bounds.width.getOrCompute(), bounds.height.getOrCompute())
+    }
+    
     fun clipEnd() {
         ScissorStack.popScissor()
+    }
+    
+    fun bindWidthToParent(adjust: Float = 0f) {
+        val thisBounds = this.bounds
+        thisBounds.width.bind { 
+            (this@UIElement.parent.use()?.let { it.bounds.width.use() } ?: 0f) + adjust
+        }
+    }
+
+    fun bindHeightToParent(adjust: Float = 0f) {
+        val thisBounds = this.bounds
+        thisBounds.height.bind {
+            (this@UIElement.parent.use()?.let { it.bounds.height.use() } ?: 0f) + adjust
+        }
     }
     
     protected inline fun renderOptionallyWithClip(originX: Float, originY: Float, batch: SpriteBatch, clip: Boolean,
@@ -148,14 +173,16 @@ open class UIElement {
     fun pathTo(x: Float, y: Float): List<UIElement> {
         val res = mutableListOf<UIElement>()
         var current: UIElement = this
-        var xOffset = this.bounds.x.getOrCompute()
-        var yOffset = this.bounds.y.getOrCompute()
+        var currentBounds: Bounds = current.bounds
+        var xOffset: Float = currentBounds.x.getOrCompute()
+        var yOffset: Float = currentBounds.y.getOrCompute()
         while (current.children.isNotEmpty()) {
             val found = current.children.findLast { it.bounds.containsPointLocal(x - xOffset, y - yOffset) } ?: break
             res += found
             current = found
-            xOffset += found.bounds.x.getOrCompute()
-            yOffset += found.bounds.y.getOrCompute()
+            currentBounds = current.bounds
+            xOffset += currentBounds.x.getOrCompute()
+            yOffset += currentBounds.y.getOrCompute()
         }
         return res
     }

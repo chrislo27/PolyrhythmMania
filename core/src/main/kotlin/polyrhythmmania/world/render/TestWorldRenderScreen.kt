@@ -54,7 +54,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
 //        engine.tempos.addTempoChange(TempoChange(88f, 148.5f))
 
-//        engine.inputter.areInputsLocked = false
+        engine.inputter.areInputsLocked = false
         
         addEvents()
     }
@@ -155,11 +155,12 @@ ${renderer.getDebugString()}
     }
 
     private fun addEvents() {
-        val events: MutableList<Event> = when (3) {
+        val events: MutableList<Event> = when (1) {
             0 -> addPr1Patterns()
             1 -> {
-                engine.tempos.addTempoChange(TempoChange(0f, 148.5f))
-                player.pitch.value = 148.5f / 129f
+                val speed = 1f
+                engine.tempos.addTempoChange(TempoChange(0f, 148.5f * speed))
+                player.pitch.value = 148.5f / 129f * speed
                 addPr2Patterns()
             }
             2 -> addInputTestPatterns()

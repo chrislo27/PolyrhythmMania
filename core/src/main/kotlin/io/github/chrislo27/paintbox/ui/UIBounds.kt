@@ -1,88 +1,112 @@
 package io.github.chrislo27.paintbox.ui
 
-import com.badlogic.gdx.math.Rectangle
+import io.github.chrislo27.paintbox.ui.area.Bounds
+import io.github.chrislo27.paintbox.ui.area.Insets
+import io.github.chrislo27.paintbox.ui.area.ReadOnlyBounds
 import io.github.chrislo27.paintbox.util.ReadOnlyVar
 import io.github.chrislo27.paintbox.util.Var
 
 
-class UIBounds(val element: UIElement) {
-    
-    val x: Var<Float> = Var(0f)
-    val y: Var<Float> = Var(0f)
-    val width: Var<Float> = Var(0f)
-    val height: Var<Float> = Var(0f)
-    
-    init {
-        bindWidthToParent(0f)
-        bindHeightToParent(0f)
-    }
-    
-//    val globalX: ReadOnlyVar<Float> = Var {
-//        (element.parent.use()?.bounds?.globalX?.use() ?: 0f) + x.use()
-//    }
-//    val globalY: ReadOnlyVar<Float> = Var {
-//        (element.parent.use()?.bounds?.globalY?.use() ?: 0f) + y.use()
-//    }
-    
-    fun bindWidthToParent(adjust: Float = 0f) {
-        this.width.bind {
-            (use(element.parent)?.let { it.bounds.width.use() } ?: 0f) + adjust
-        }
-    }
-    
-    fun bindHeightToParent(adjust: Float = 0f) {
-        this.height.bind {
-            (use(element.parent)?.let { it.bounds.height.use() } ?: 0f) + adjust
-        }
-    }
-    
-    fun setAll(x: Float? = null, y: Float? = null, width: Float? = null, height: Float? = null): UIBounds {
-        if (x != null) this.x.set(x)
-        if (y != null) this.x.set(y)
-        if (width != null) this.width.set(width)
-        if (height != null) this.height.set(height)
-        return this
-    }
-    
-    fun bindAll(x: (Var.Context.() -> Float)? = null, y: (Var.Context.() -> Float)? = null,
-                width: (Var.Context.() -> Float)? = null, height: (Var.Context.() -> Float)? = null): UIBounds {
-        if (x != null) this.x.bind(x)
-        if (y != null) this.x.bind(y)
-        if (width != null) this.width.bind(width)
-        if (height != null) this.height.bind(height)
-        return this
-    }
+/**
+ * Implements the bounds (margin/border/padding/content) system for [UIElement] to inherit from.
+ */
+open class UIBounds {
 
     /**
-     * Returns true if the x/y point is within this UIBounds locally. Does not account for parent offsets.
+     * The [bounds] is the total area of this [UIBounds], encompassing the margin, border, padding, and content.
      */
-    fun containsPointLocal(x: Float, y: Float): Boolean {
-        val thisX = this.x.getOrCompute()
-        val thisY = this.y.getOrCompute()
-        return x >= thisX && x <= thisX + this.width.getOrCompute() && y >= thisY && y <= thisY + this.height.getOrCompute()
-    }
+    val bounds: Bounds = Bounds(0f, 0f, 0f, 0f)
 
-//    /**
-//     * Returns true if the x/y point is within this UIBounds, accounting for parental offsets.
-//     */
-//    fun containsPointGlobal(x: Float, y: Float): Boolean {
-//        val thisX = this.globalX.getOrCompute()
-//        val thisY = this.globalY.getOrCompute()
-//        return x >= thisX && x <= thisX + this.width.getOrCompute() && y >= thisY && y <= thisY + this.height.getOrCompute()
-//    }
-    
-    fun toLocalRectangle(): Rectangle =
-            Rectangle(this.x.getOrCompute(), this.y.getOrCompute(), this.width.getOrCompute(), this.height.getOrCompute())
-    
-//    fun toGlobalRectangle(): Rectangle =
-//            Rectangle(this.globalX.getOrCompute(), this.globalY.getOrCompute(), this.width.getOrCompute(), this.height.getOrCompute())
+    /**
+     * The margin is a non-rendered, non-interactable area on the outermost area
+     * within the [bounds].
+     *
+     * By definition, the margin zone is equal to [bounds], but there is a [marginZone] property for consistency.
+     */
+    val margin: Var<Insets> = Var(Insets.ZERO)
+
+    /**
+     * The border is an area between the margin and padding. It is rendered separately and not part
+     * of each [UIElement]'s rendering zone, but is where input interactability starts.
+     *
+     * The border zone is the entire rectangular area encompassing the border and inner area, defined by
+     * [borderZone].
+     */
+    val border: Var<Insets> = Var(Insets.ZERO)
+
+    /**
+     * The padding is a zone inside the border. The innermost area inside the padding is called the content area.
+     *
+     * The padding zone is the entire rectangular area encompassing the padding and inner area, defined by
+     * [paddingZone].
+     */
+    val padding: Var<Insets> = Var(Insets.ZERO)
+
+    /**
+     * The margin zone is the rectangular area encompassing the [margin] insets and everything else inside of it.
+     *
+     * By definition, this is exactly equivalent to [bounds], and thus this implementation of [marginZone]
+     * will return [bounds].
+     * One should not attempt to cast [marginZone] to [Var], use [bounds] if you intend to mutate.
+     */
+    val marginZone: ReadOnlyBounds get() = this.bounds
+
+    /**
+     * The border zone is the rectangular area encompassing the [border] insets and everything else inside of it.
+     */
+    val borderZone: ReadOnlyBounds = createZoneBounds(marginZone, margin)
+
+    /**
+     * The padding zone is the rectangular area encompassing the [padding] insets and everything else inside of it.
+     */
+    val paddingZone: ReadOnlyBounds = createZoneBounds(borderZone, border)
+
+    /**
+     * The content zone is the innermost rectangular area bounded by the [padding] insets, not including padding.
+     */
+    val contentZone: ReadOnlyBounds = createZoneBounds(paddingZone, padding)
 
     fun toLocalString(): String {
-        return "[${x.getOrCompute()}, ${y.getOrCompute()}, ${width.getOrCompute()}, ${height.getOrCompute()}]"
+        val bounds = this.bounds
+        return "[x=${bounds.x.getOrCompute()}, y=${bounds.y.getOrCompute()}, w=${bounds.width.getOrCompute()}, h=${bounds.height.getOrCompute()}, margin=${margin.getOrCompute()}, border=${border.getOrCompute()}, padding=${padding.getOrCompute()}]"
     }
-//    fun toGlobalString(): String {
-//        return "[${globalX.getOrCompute()}, ${globalY.getOrCompute()}, ${width.getOrCompute()}, ${height.getOrCompute()}]"
-//    }
-    
+
     override fun toString(): String = toLocalString()
+    
+    companion object {
+        fun createZoneBounds(outerZoneBounds: ReadOnlyBounds, outerInsets: ReadOnlyVar<Insets>): ReadOnlyBounds {
+            val xVar: Var<Float> = Var {
+                val insets = outerInsets.use()
+                val minX = outerZoneBounds.x.use() + insets.left
+                val maxX = outerZoneBounds.x.use() + outerZoneBounds.width.use() + insets.right
+                val width = if (maxX <= minX) 0f else (maxX - minX)
+                if (width <= 0f) 
+                    ((minX + maxX) / 2f)
+                else (minX)
+            }
+            val yVar: Var<Float> = Var {
+                val insets = outerInsets.use()
+                val minY = outerZoneBounds.y.use() + insets.top
+                val maxY = outerZoneBounds.y.use() + outerZoneBounds.height.use() + insets.bottom
+                val height = if (maxY <= minY) 0f else (maxY - minY)
+                if (height <= 0f)
+                    ((minY + maxY) / 2f)
+                else (minY)
+            }
+            val wVar: Var<Float> = Var {
+                val insets = outerInsets.use()
+                val minX = outerZoneBounds.x.use() + insets.left
+                val maxX = outerZoneBounds.x.use() + outerZoneBounds.width.use() + insets.right
+                if (maxX <= minX) 0f else (maxX - minX)
+            }
+            val hVar: Var<Float> = Var {
+                val insets = outerInsets.use()
+                val minY = outerZoneBounds.y.use() + insets.top
+                val maxY = outerZoneBounds.y.use() + outerZoneBounds.height.use() + insets.bottom
+                if (maxY <= minY) 0f else (maxY - minY)
+            }
+            
+            return Bounds(xVar, yVar, wVar, hVar)
+        }
+    }
 }

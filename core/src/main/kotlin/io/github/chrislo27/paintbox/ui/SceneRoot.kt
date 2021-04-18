@@ -21,7 +21,10 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     init {
         (sceneRoot as Var).set(this)
         bounds.also { b ->
-            b.setAll(0f, 0f, width, height)
+            b.x.set(0f)
+            b.y.set(0f)
+            b.width.set(width)
+            b.height.set(height)
         }
     }
     
