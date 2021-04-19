@@ -7,6 +7,8 @@ import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.ui.area.ReadOnlyBounds
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.ui.border.Border
+import io.github.chrislo27.paintbox.ui.border.NoBorder
 
 
 open class UIElement : UIBounds() {
@@ -51,6 +53,8 @@ open class UIElement : UIBounds() {
         parentOpacity.use() * opacity.use()
     }
     
+    val borderStyle: Var<Border> = Var(NoBorder)
+    
     init {
         bindWidthToParent(0f)
         bindHeightToParent(0f)
@@ -68,6 +72,9 @@ open class UIElement : UIBounds() {
             this.renderSelf(originX, originY, batch)
             this.renderChildren(originX + childOriginX, originY - childOriginY, batch)
             this.renderSelfAfterChildren(originX, originY, batch)
+            
+            val borderStyle = this.borderStyle.getOrCompute()
+            borderStyle.renderBorder(originX, originY, batch, this)
         }
     }
     

@@ -14,6 +14,7 @@ import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
+import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
@@ -116,6 +117,9 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             rect.bounds.height.set(500f)
             
             rect.padding.set(Insets(10f))
+            rect.border.set(Insets(4f))
+            rect.borderStyle.set(SolidBorder(Color.CYAN))
+            rect.margin.set(Insets(5f))
 
             rect += TextNode(TextBlock(listOf(
                     TextRun(main.debugFontBoldBordered, "Hello\nline2\nline3g adwadwadwadaddadwd"),
