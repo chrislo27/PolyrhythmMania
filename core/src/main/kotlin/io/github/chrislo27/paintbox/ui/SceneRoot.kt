@@ -76,6 +76,21 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
             val originY = layerBounds.y.getOrCompute() + layerBounds.height.getOrCompute()
             layerRoot.render(originX, originY, batch)
         }
+
+        val drawOutlines = Paintbox.stageOutlines
+        if (drawOutlines != Paintbox.StageOutlineMode.NONE) {
+            val lastPackedColor = batch.packedColor
+            batch.setColor(0f, 1f, 0f, 1f)
+            val useOutlines = drawOutlines == Paintbox.StageOutlineMode.ONLY_VISIBLE
+            for (layer in allLayers) {
+                val layerRoot = layer.root
+                val layerBounds = layerRoot.bounds
+                val originX = layerBounds.x.getOrCompute()
+                val originY = layerBounds.y.getOrCompute() + layerBounds.height.getOrCompute()
+                layer.root.drawDebugRect(originX, originY, batch, useOutlines)
+            }
+            batch.packedColor = lastPackedColor
+        }
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
@@ -83,7 +98,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     }
     
     private fun UIElement.drawDebugRect(originX: Float, originY: Float, batch: SpriteBatch, onlyVisible: Boolean) {
-        val thisBounds = bounds
+        val thisBounds = this.bounds
         val x = originX + thisBounds.x.getOrCompute()
         val y = originY - thisBounds.y.getOrCompute()
         val w = thisBounds.width.getOrCompute()
@@ -100,17 +115,6 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
 
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
         super.renderSelfAfterChildren(originX, originY, batch)
-
-        val drawOutlines = Paintbox.stageOutlines
-        if (drawOutlines != Paintbox.StageOutlineMode.NONE) {
-            val lastPackedColor = batch.packedColor
-            batch.setColor(0f, 1f, 0f, 1f)
-            val useOutlines = drawOutlines == Paintbox.StageOutlineMode.ONLY_VISIBLE
-            for (layer in allLayers) {
-                layer.root.drawDebugRect(originX, originY, batch, useOutlines)
-            }
-            batch.packedColor = lastPackedColor
-        }
     }
 
 //    fun renderChildren(batch: SpriteBatch) {
