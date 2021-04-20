@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.PaintboxScreen
@@ -19,6 +20,8 @@ import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
+import io.github.chrislo27.paintbox.util.MathHelper
+import polyrhythmmania.util.DecimalFormats
 
 internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : PaintboxScreen() {
 
@@ -39,30 +42,30 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
         val bg = TestColorElement(Color(1f, 165f / 255f, 0.5f, 1f))
         root += bg
 
-        root.contextMenuLayer.root += TextLabel("Test context menu layer\n\n\n\n", font = main.debugFontBoldItalic).apply {
-            this.renderAlign.set(Align.center)
-            this.textAlign.set(TextAlign.LEFT)
-            this.backgroundColor.set(Color(1f, 1f, 1f, 0.75f))
-            this.renderBackground.set(true)
-            this.bgPadding.set(10f)
-            this.textColor.set(Color.BLACK)
-            
-            this.bounds.width.set(350f)
-            this.bounds.height.set(350f)
-            Anchor.Centre.configure(this)
-        }
-        root.tooltipLayer.root += TextLabel("Test tooltip layer", font = main.debugFontBold).apply {
-            this.renderAlign.set(Align.center)
-            this.textAlign.set(TextAlign.LEFT)
-            this.backgroundColor.set(Color(0f, 0f, 0f, 0.75f))
-            this.renderBackground.set(true)
-            this.bgPadding.set(10f)
-            this.textColor.set(Color.WHITE)
-            
-            this.bounds.width.set(250f)
-            this.bounds.height.set(200f)
-            Anchor.Centre.configure(this)
-        }
+//        root.contextMenuLayer.root += TextLabel("Test context menu layer\n\n\n\n", font = main.debugFontBoldItalic).apply {
+//            this.renderAlign.set(Align.center)
+//            this.textAlign.set(TextAlign.LEFT)
+//            this.backgroundColor.set(Color(1f, 1f, 1f, 0.75f))
+//            this.renderBackground.set(true)
+//            this.bgPadding.set(10f)
+//            this.textColor.set(Color.BLACK)
+//            
+//            this.bounds.width.set(350f)
+//            this.bounds.height.set(350f)
+//            Anchor.Centre.configure(this)
+//        }
+//        root.tooltipLayer.root += TextLabel("Test tooltip layer", font = main.debugFontBold).apply {
+//            this.renderAlign.set(Align.center)
+//            this.textAlign.set(TextAlign.LEFT)
+//            this.backgroundColor.set(Color(0f, 0f, 0f, 0.75f))
+//            this.renderBackground.set(true)
+//            this.bgPadding.set(10f)
+//            this.textColor.set(Color.WHITE)
+//            
+//            this.bounds.width.set(250f)
+//            this.bounds.height.set(200f)
+//            Anchor.Centre.configure(this)
+//        }
 
         // Toolbar
         bg += TestColorElement(Color(0f, 0f, 0f, 0.5f)).also { toolbar ->
@@ -217,6 +220,13 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             Anchor.CentreLeft.configure(button, offsetX = 32f)
             button.bounds.width.set(150f)
             button.bounds.height.set(50f)
+            
+            button.tooltipElement.set(Tooltip("Test tooltip text.").apply {
+                this.text.bind { 
+                    this@UIAnchorTestEditorScreen.root.frameUpdateTrigger.use()
+                    "Test: ${DecimalFormats.format("0.000", MathHelper.getTriangleWave(2f))}"
+                }
+            })
 
             button.setOnAction {
                 println("hi button")

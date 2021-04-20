@@ -1,20 +1,20 @@
 package io.github.chrislo27.paintbox.ui.control
 
 import com.badlogic.gdx.Input
-import io.github.chrislo27.paintbox.ui.ClickReleased
-import io.github.chrislo27.paintbox.ui.InputEvent
-import io.github.chrislo27.paintbox.ui.MouseEntered
-import io.github.chrislo27.paintbox.ui.MouseExited
 import io.github.chrislo27.paintbox.ui.skin.Skinnable
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.ui.*
 
 
 /**
  * A [Control] represents a (semi-)interactable type of UI element that is also skinnable.
  * There are also utilities to handle common input interactions.
  */
-abstract class Control<SELF : Control<SELF>> : Skinnable<SELF>() {
+abstract class Control<SELF : Control<SELF>>
+    : Skinnable<SELF>(), HasTooltip {
+
+    override val tooltipElement: Var<UIElement?> = Var(null)
 
     /**
      * If true, this [Control] will not interact with any inputs.

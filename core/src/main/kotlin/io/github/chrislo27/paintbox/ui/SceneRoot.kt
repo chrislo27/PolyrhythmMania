@@ -5,8 +5,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.Paintbox
+import io.github.chrislo27.paintbox.PaintboxGame
+import io.github.chrislo27.paintbox.binding.FloatVar
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.binding.VarChangedListener
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
+import kotlin.properties.Delegates
 
 
 /**
@@ -14,22 +19,56 @@ import io.github.chrislo27.paintbox.util.gdxutils.drawRect
  */
 class SceneRoot(width: Float, height: Float) : UIElement() {
     
-    val mainLayer: Layer = Layer(this)
-    val contextMenuLayer: Layer = Layer()
-    val tooltipLayer: Layer = Layer()
+    companion object {
+        const val DEFAULT_TOOLTIP_HOVER_TIME: Float = 1f
+    }
+    
+    private val mouseVector: Vector2 = Vector2()
+    val mainLayer: Layer = Layer("main", this)
+    val contextMenuLayer: Layer = Layer("contextMenu")
+    val tooltipLayer: Layer = Layer("tooltip")
     val allLayers: List<Layer> = listOf(mainLayer, contextMenuLayer, tooltipLayer)
     val allLayersReversed: List<Layer> = allLayers.asReversed()
-    
     val inputSystem: InputSystem = InputSystem(this)
+
+    /**
+     * A var that is always updated at the start of [renderAsRoot].
+     */
+    val frameUpdateTrigger: ReadOnlyVar<Boolean> = Var(false)
+    
+    
+    val tooltipHoverTime: FloatVar = FloatVar(DEFAULT_TOOLTIP_HOVER_TIME) // TODO use this
+    val currentElementWithTooltip: ReadOnlyVar<HasTooltip?> = Var(null)
+    private val currentTooltipVar: Var<UIElement?> = Var(null)
+    private var currentTooltip: UIElement? = null
     
     constructor(width: Int, height: Int) : this(width.toFloat(), height.toFloat())
     
     init {
         (sceneRoot as Var).set(this)
         updateAllLayerBounds(width, height)
+        currentTooltipVar.addListener { v ->
+            val layer = tooltipLayer
+            val root = layer.root
+            val currentElement = currentElementWithTooltip.getOrCompute()
+            val oldValue = currentTooltip
+            val newValue = v.getOrCompute()
+            if (oldValue != null) {
+                currentElement?.onTooltipEnded(oldValue)
+                root.removeChild(oldValue)
+            }
+            if (newValue != null) {
+                currentElement?.onTooltipStarted(newValue)
+                root.addChild(newValue)
+            }
+            currentTooltip = newValue
+        }
     }
     
     fun renderAsRoot(batch: SpriteBatch) {
+        (frameUpdateTrigger as Var).set(!frameUpdateTrigger.getOrCompute())
+        updateMouseVector()
+        updateTooltipPosition(mouseVector)
         for (layer in allLayers) {
             val layerRoot = layer.root
             val layerBounds = layerRoot.bounds
@@ -68,7 +107,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
             batch.setColor(0f, 1f, 0f, 1f)
             val useOutlines = drawOutlines == Paintbox.StageOutlineMode.ONLY_VISIBLE
             for (layer in allLayers) {
-                layer.root?.drawDebugRect(originX, originY, batch, useOutlines)
+                layer.root.drawDebugRect(originX, originY, batch, useOutlines)
             }
             batch.packedColor = lastPackedColor
         }
@@ -105,6 +144,38 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         resize(camera.viewportWidth, camera.viewportHeight,
                camera.position.x - (camera.zoom * camera.viewportWidth / 2.0f),
                camera.position.y - (camera.zoom * camera.viewportHeight / 2.0f))
+    }
+    
+    private fun updateTooltipPosition(mouseVector: Vector2, tooltip: UIElement? = currentTooltip) {
+        if (tooltip == null) return
+
+        tooltip.bounds.x.set(mouseVector.x)
+        tooltip.bounds.y.set(mouseVector.y - tooltip.bounds.height.getOrCompute())
+    }
+
+    /**
+     * For [InputSystem] to call when the mouse starts hovering over a [HasTooltip] [UIElement].
+     */
+    fun startTooltip(element: HasTooltip, tooltipVar: ReadOnlyVar<UIElement?>) {
+        val currentElementWithTooltip = currentElementWithTooltip as Var
+        cancelTooltip()
+        currentElementWithTooltip.set(element)
+        currentTooltipVar.bind { 
+            tooltipVar.use()
+        }
+    }
+
+    /**
+     * For [InputSystem] to call when the mouse stops hovering over the element with the active tooltip.
+     */
+    fun cancelTooltip() {
+        val currentElementWithTooltip = currentElementWithTooltip as Var
+        currentTooltipVar.set(null)
+        currentElementWithTooltip.set(null)
+    }
+    
+    private fun updateMouseVector() {
+        screenToUI(mouseVector.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat()))
     }
 
     /**
@@ -155,7 +226,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         return vector
     }
     
-    inner class Layer(rootElement: UIElement = Pane()) {
+    inner class Layer(val name: String, rootElement: UIElement = Pane()) {
         /**
          * Used by [InputSystem] for mouse-path tracking.
          */
