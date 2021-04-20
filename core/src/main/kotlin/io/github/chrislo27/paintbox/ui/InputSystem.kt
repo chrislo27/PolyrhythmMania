@@ -6,10 +6,9 @@ import io.github.chrislo27.paintbox.util.sumByFloat
 
 
 class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
-
-    private val lastHoveredElementPath: MutableList<UIElement> = mutableListOf()
+    
     private val vector: Vector2 = Vector2(0f, 0f)
-    private val clickPressedList: MutableMap<Int, Pair<List<UIElement>, UIElement?>> = mutableMapOf()
+    private val clickPressedList: MutableMap<Int, ClickPressedState> = mutableMapOf()
 
     /**
      * Represents the mouse x/y in UI space.
@@ -17,10 +16,20 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
     val mouseVector: Vector2
         get() = vector
 
-    private fun dispatchEventBasedOnMouse(evt: InputEvent): UIElement? {
-        val lastPath = lastHoveredElementPath
+    private fun dispatchEventBasedOnMouse(layer: SceneRoot.Layer, evt: InputEvent): UIElement? {
+        val lastPath = layer.lastHoveredElementPath
         for (element in lastPath) {
             if (element.fireEvent(evt)) return element
+        }
+        return null
+    }
+    
+    private fun dispatchEventBasedOnMouse(evt: InputEvent): Pair<SceneRoot.Layer, UIElement>? {
+        for (layer in sceneRoot.allLayersReversed) {
+            val result = dispatchEventBasedOnMouse(layer, evt)
+            if (result != null) {
+                return layer to result
+            }
         }
         return null
     }
@@ -42,8 +51,8 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
 //        return false
 //    }
 
-    private fun updateDeepmostElementForMouseLocation(x: Float, y: Float) {
-        val lastPath: MutableList<UIElement> = lastHoveredElementPath
+    private fun updateDeepmostElementForMouseLocation(layer: SceneRoot.Layer, x: Float, y: Float) {
+        val lastPath: MutableList<UIElement> = layer.lastHoveredElementPath
         if (lastPath.isEmpty()) {
             val newPath = sceneRoot.pathToForInput(x, y)
             lastPath.addAll(newPath)
@@ -83,6 +92,12 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
             subPath.forEach { it.fireEvent(evt) }
         }
     }
+    
+    private fun updateDeepmostElementForMouseLocation(x: Float, y: Float) {
+        sceneRoot.allLayersReversed.forEach { layer ->
+            updateDeepmostElementForMouseLocation(layer, x, y)
+        }
+    }
 
     override fun keyDown(keycode: Int): Boolean {
         return false
@@ -105,7 +120,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         
         val touch = dispatchEventBasedOnMouse(TouchDown(vec.x, vec.y, button, pointer))
         val click = dispatchEventBasedOnMouse(ClickPressed(vec.x, vec.y, button))
-        clickPressedList[button] = lastHoveredElementPath.toList() to click
+        clickPressedList[button] = ClickPressedState((click?.first?.lastHoveredElementPath?.toList() ?: emptyList()), click)
         
         return touch != null || click != null
     }
@@ -120,8 +135,9 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         val previousClick = clickPressedList[button]
         if (previousClick != null) {
             clickPressedList.remove(button)
-            previousClick.first.forEach { 
-                anyClick = it.fireEvent(ClickReleased(vec.x, vec.y, button, it === previousClick.second, it in lastHoveredElementPath)) || anyClick
+            val lastHoveredElementPath = previousClick.lastHoveredElementPath
+            lastHoveredElementPath.forEach { 
+                anyClick = it.fireEvent(ClickReleased(vec.x, vec.y, button, it === previousClick.accepted?.second, it in lastHoveredElementPath)) || anyClick
             }
         }
         
@@ -144,5 +160,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         return false
 //        return dispatchEvent(Scrolled(amountX, amountY))
     }
-
+    
+    private data class ClickPressedState(val lastHoveredElementPath: List<UIElement>,
+                                         val accepted: Pair<SceneRoot.Layer, UIElement>?)
 }

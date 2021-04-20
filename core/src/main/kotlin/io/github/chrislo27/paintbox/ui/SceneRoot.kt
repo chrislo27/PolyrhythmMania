@@ -14,22 +14,29 @@ import io.github.chrislo27.paintbox.util.gdxutils.drawRect
  */
 class SceneRoot(width: Float, height: Float) : UIElement() {
     
+    val mainLayer: Layer = Layer(this)
+    val contextMenuLayer: Layer = Layer()
+    val tooltipLayer: Layer = Layer()
+    val allLayers: List<Layer> = listOf(mainLayer, contextMenuLayer, tooltipLayer)
+    val allLayersReversed: List<Layer> = allLayers.asReversed()
+    
     val inputSystem: InputSystem = InputSystem(this)
     
     constructor(width: Int, height: Int) : this(width.toFloat(), height.toFloat())
     
     init {
         (sceneRoot as Var).set(this)
-        bounds.also { b ->
-            b.x.set(0f)
-            b.y.set(0f)
-            b.width.set(width)
-            b.height.set(height)
-        }
+        updateAllLayerBounds(width, height)
     }
     
     fun renderAsRoot(batch: SpriteBatch) {
-        render(bounds.x.getOrCompute(), bounds.y.getOrCompute() + bounds.height.getOrCompute(), batch)
+        for (layer in allLayers) {
+            val layerRoot = layer.root
+            val layerBounds = layerRoot.bounds
+            val originX = layerBounds.x.getOrCompute()
+            val originY = layerBounds.y.getOrCompute() + layerBounds.height.getOrCompute()
+            layerRoot.render(originX, originY, batch)
+        }
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
@@ -59,22 +66,39 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         if (drawOutlines != Paintbox.StageOutlineMode.NONE) {
             val lastPackedColor = batch.packedColor
             batch.setColor(0f, 1f, 0f, 1f)
-            this.drawDebugRect(originX, originY, batch, drawOutlines == Paintbox.StageOutlineMode.ONLY_VISIBLE)
+            val useOutlines = drawOutlines == Paintbox.StageOutlineMode.ONLY_VISIBLE
+            for (layer in allLayers) {
+                layer.root?.drawDebugRect(originX, originY, batch, useOutlines)
+            }
             batch.packedColor = lastPackedColor
         }
     }
 
-    fun renderChildren(batch: SpriteBatch) {
-        renderChildren(bounds.x.getOrCompute(), bounds.y.getOrCompute() + bounds.height.getOrCompute(), batch)
-    }
+//    fun renderChildren(batch: SpriteBatch) {
+//        renderChildren(bounds.x.getOrCompute(), bounds.y.getOrCompute() + bounds.height.getOrCompute(), batch)
+//    }
     
-    fun resize(width: Float, height: Float, posX: Float = 0f, posY: Float = 0f) {
+    private fun updateAllLayerBounds(width: Float, height: Float, posX: Float = 0f, posY: Float = 0f) {
+        // Intentionally updating this.bounds before other layers.
         bounds.also { b ->
             b.x.set(posX)
             b.y.set(posY)
             b.width.set(width)
             b.height.set(height)
         }
+        for (layer in allLayers) {
+            if (layer === mainLayer) continue
+            val root = layer.root
+            val bounds = root.bounds
+            bounds.x.set(posX)
+            bounds.y.set(posY)
+            bounds.width.set(width)
+            bounds.height.set(height)
+        }
+    }
+    
+    fun resize(width: Float, height: Float, posX: Float = 0f, posY: Float = 0f) {
+        updateAllLayerBounds(width, height, posX, posY)
     }
     
     fun resize(camera: OrthographicCamera) {
@@ -129,6 +153,15 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         vector.y *= screenHeight
 
         return vector
+    }
+    
+    inner class Layer(rootElement: UIElement = Pane()) {
+        /**
+         * Used by [InputSystem] for mouse-path tracking.
+         */
+        val lastHoveredElementPath: MutableList<UIElement> = mutableListOf()
+        
+        val root: UIElement = rootElement
     }
     
 }
