@@ -128,7 +128,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         val xOffset: Float = when {
             Align.isLeft(align) -> 0f + textPaddingOffsetX
             Align.isRight(align) -> (w - (if (compressX) (min(text.width, w)) else (text.width)) + textPaddingOffsetX)
-            else -> (w - (if (compressX) min(text.width, w) else text.width)) / 2f + textPaddingOffsetX
+            else -> (w - (if (compressX) min(text.width, w) else text.width)) / 2f
         }
         val yOffset: Float = when {
             Align.isTop(align) -> h - text.firstCapHeight - textPaddingOffsetY
