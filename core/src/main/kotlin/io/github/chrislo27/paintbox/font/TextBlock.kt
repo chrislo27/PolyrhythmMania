@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.ui.ColorStack
+import io.github.chrislo27.paintbox.util.gdxutils.scaleMul
 
 
 /**
@@ -32,7 +33,8 @@ data class TextBlock(val runs: List<TextRun>) {
     into the gdx BitmapFont draw function.
      */
 
-    data class TextRunInfo(val run: TextRun, val bitmapFont: BitmapFont, val glyphLayout: GlyphLayout) {
+    data class TextRunInfo(val run: TextRun, val currentFontNumber: Long, val glyphLayout: GlyphLayout) {
+        val font: PaintboxFont = run.font
         val width: Float = glyphLayout.width
         val height: Float = glyphLayout.height
         val glyphRunInfo: List<GlyphRunInfo> = glyphLayout.runs.map { glyphRun ->
@@ -70,11 +72,11 @@ data class TextBlock(val runs: List<TextRun>) {
 
 
     private fun adjustFontForTextRun(font: BitmapFont, textRun: TextRun) {
-        font.data.setScale(textRun.scaleX, textRun.scaleY)
+        font.scaleMul(textRun.scaleX, textRun.scaleY)
     }
 
     private fun resetFontForTextRun(font: BitmapFont, textRun: TextRun) {
-        font.data.setScale(1f)
+        font.scaleMul(1f / textRun.scaleX, 1f / textRun.scaleY)
     }
 
     fun computeLayouts() {
@@ -91,12 +93,13 @@ data class TextBlock(val runs: List<TextRun>) {
 
         val runInfo: List<TextRunInfo> = runs.map { textRun ->
             // Set font scales and metrics
-            val font = textRun.font.font
+            val paintboxFont = textRun.font
+            val font = paintboxFont.begin()
             adjustFontForTextRun(font, textRun)
 
             val color = Color(1f, 1f, 1f, 1f)
             Color.argb8888ToColor(color, textRun.color)
-            val textRunInfo = TextRunInfo(textRun, font, GlyphLayout(font, textRun.text, color, 0f, Align.left, false))
+            val textRunInfo = TextRunInfo(textRun, paintboxFont.getCurrentFontNumber(), GlyphLayout(font, textRun.text, color, 0f, Align.left, false))
 
             val offX = textRun.offsetXEm * font.xHeight
             val offY = textRun.offsetYEm * font.xHeight
@@ -196,6 +199,7 @@ data class TextBlock(val runs: List<TextRun>) {
 
             // Reset font scale
             resetFontForTextRun(font, textRun)
+            paintboxFont.end()
             textRunInfo
         }
 
@@ -209,7 +213,7 @@ data class TextBlock(val runs: List<TextRun>) {
 
     fun isRunInfoInvalid(): Boolean {
         return runInfo.any { l ->
-            l.run.font.font !== l.bitmapFont
+            l.run.font.getCurrentFontNumber() != l.currentFontNumber
         } || (runInfo.isEmpty() && runs.isNotEmpty())
     }
 
@@ -249,11 +253,12 @@ data class TextBlock(val runs: List<TextRun>) {
         val alignXWidth = if (shouldScaleX && maxWidth > 0f) maxWidth else this.width
 
         runInfo.forEach { textRunInfo ->
-            val font = textRunInfo.bitmapFont
+            val paintboxFont = textRunInfo.font
+            val font = paintboxFont.begin()
             adjustFontForTextRun(font, textRunInfo.run)
 
             if (scaleAnything) {
-                font.data.setScale(globalScaleX * font.data.scaleX, globalScaleY * font.data.scaleY)
+                font.scaleMul(globalScaleX, globalScaleY)
             }
 
             textRunInfo.glyphRunInfo.forEach { glyphRunInfo ->
@@ -301,7 +306,13 @@ data class TextBlock(val runs: List<TextRun>) {
                     }
                 }
             }
+            
+            if (scaleAnything) {
+                font.scaleMul(1f / globalScaleX, 1f / globalScaleY)
+            }
+            
             resetFontForTextRun(font, textRunInfo.run)
+            paintboxFont.end()
         }
         
         ColorStack.pop()

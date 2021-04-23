@@ -2,20 +2,17 @@ package io.github.chrislo27.paintbox.tests.newui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.PaintboxScreen
 import io.github.chrislo27.paintbox.PaintboxSettings
-import io.github.chrislo27.paintbox.ResizeAction
-import io.github.chrislo27.paintbox.logging.Logger
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.util.MathHelper
-import io.github.chrislo27.paintbox.util.Version
-import io.github.chrislo27.paintbox.util.WindowSize
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
-import java.io.File
+import org.lwjgl.glfw.GLFW
 
 
 internal class NewUITestGame(paintboxSettings: PaintboxSettings)
@@ -28,6 +25,21 @@ internal class NewUITestGame(paintboxSettings: PaintboxSettings)
     override fun create() {
         super.create()
         this.setScreen(UIAnchorTestEditorScreen(this))
+    }
+}
+internal class ScaledFontTestGame(paintboxSettings: PaintboxSettings)
+    : PaintboxGame(paintboxSettings) {
+
+    override fun getTitle(): String {
+        return "ScaledFont test"
+    }
+
+    override fun create() {
+        super.create()
+
+        val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
+        GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
+        this.setScreen(UIScaledFontTestScreen(this))
     }
 }
 

@@ -15,6 +15,7 @@ import io.github.chrislo27.paintbox.Paintbox.StageOutlineMode.ONLY_VISIBLE
 import io.github.chrislo27.paintbox.font.FontCache
 import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.font.PaintboxFontFreeType
+import io.github.chrislo27.paintbox.font.PaintboxFontParams
 import io.github.chrislo27.paintbox.i18n.LocalizationBase
 import io.github.chrislo27.paintbox.logging.Logger
 import io.github.chrislo27.paintbox.logging.SysOutPiper
@@ -46,10 +47,10 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
             private set
         lateinit var gameInstance: PaintboxGame
             private set
-        lateinit var launchArguments: List<String>  
+        lateinit var launchArguments: List<String>
             private set
     }
-    
+
     inner class DebugInfo {
         val numberFormat: NumberFormat = NumberFormat.getIntegerInstance()
         var memoryDeltaTime: Float = 0f
@@ -67,15 +68,15 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
             }
         }
     }
-    
+
     init {
         @Suppress("RedundantCompanionReference")
         PaintboxGame.Companion.launchArguments = paintboxSettings.launchArguments
     }
-    
+
     val version: Version = paintboxSettings.version
     val versionString: String = version.toString()
-    
+
     val startTimeMillis: Long = System.currentTimeMillis()
 
     protected val debugInfo: DebugInfo = DebugInfo()
@@ -154,7 +155,7 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
             this.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         }
         paintboxSpritesheet = PaintboxSpritesheet(spritesheetTexture)
-        
+
         AssetRegistry.addAssetLoader(object : AssetRegistry.IAssetLoader {
             override fun addManagedAssets(manager: AssetManager) {}
             override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {}
@@ -165,7 +166,7 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
         fontCache = FontCache(this)
         addDebugFonts(fontCache)
         val fontLoadNano = measureNanoTime {
-            fontCache.resizeAll(emulatedCamera.viewportWidth, emulatedCamera.viewportHeight)
+            fontCache.resizeAll(emulatedCamera.viewportWidth.toInt(), emulatedCamera.viewportHeight.toInt())
         }
         Paintbox.LOGGER.info("Initialized all ${fontCache.fonts.size} fonts in ${fontLoadNano / 1_000_000.0} ms")
 
@@ -215,8 +216,10 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
             if (Paintbox.debugMode) {
                 debugInfo.tmpMatrix.set(batch.projectionMatrix)
                 batch.projectionMatrix = nativeCamera.combined
-                val font = debugFontBoldBordered.font
                 batch.begin()
+
+                val paintboxFont = debugFontBoldBordered
+                val font = paintboxFont.begin()
                 val fps = Gdx.graphics.framesPerSecond
                 val numberFormat = debugInfo.numberFormat
                 val string =
@@ -231,7 +234,9 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
 
                 font.setColor(1f, 1f, 1f, 1f)
                 font.drawCompressed(batch, string, 8f, nativeCamera.viewportHeight - 8f, nativeCamera.viewportWidth - 16f,
-                                    Align.left)
+                        Align.left)
+                paintboxFont.end()
+
                 batch.end()
                 batch.projectionMatrix = debugInfo.tmpMatrix
             }
@@ -258,15 +263,11 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
      * the super-method last.
      */
     override fun resize(width: Int, height: Int) {
-        val lastCameraDimensions = emulatedCamera.viewportWidth to emulatedCamera.viewportHeight
         resetCameras()
-        if (paintboxSettings.resizeAction == ResizeAction.KEEP_ASPECT_RATIO &&
-                (emulatedCamera.viewportWidth to emulatedCamera.viewportHeight) != lastCameraDimensions) {
-            val nano = measureNanoTime {
-                fontCache.resizeAll(emulatedCamera.viewportWidth, emulatedCamera.viewportHeight)
-            }
-            Paintbox.LOGGER.info("Reloaded all ${fontCache.fonts.size} fonts in ${nano / 1_000_000.0} ms")
-        }
+//        val nano = measureNanoTime {
+            fontCache.resizeAll(width, height)
+//        }
+//        Paintbox.LOGGER.info("Reloaded all ${fontCache.fonts.size} fonts in ${nano / 1_000_000.0} ms")
         super.resize(width, height)
     }
 
@@ -317,9 +318,9 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
         val minimumSize = paintboxSettings.minimumSize
         when (resizeAction) {
             ResizeAction.ANY_SIZE -> emulatedCamera.setToOrtho(false, Gdx.graphics.width.toFloat(),
-                                                               Gdx.graphics.height.toFloat())
+                    Gdx.graphics.height.toFloat())
             ResizeAction.LOCKED -> emulatedCamera.setToOrtho(false, emulatedSize.width.toFloat(),
-                                                             emulatedSize.height.toFloat())
+                    emulatedSize.height.toFloat())
             ResizeAction.KEEP_ASPECT_RATIO -> {
                 val width: Float
                 val height: Float
@@ -418,9 +419,8 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         return false
     }
-    
+
     private fun addDebugFonts(cache: FontCache) {
-        val emulatedSize = paintboxSettings.emulatedSize
         fun makeParam() = FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             magFilter = Texture.TextureFilter.Linear
             minFilter = Texture.TextureFilter.Linear
@@ -432,55 +432,71 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
             characters = ""
             hinting = FreeTypeFontGenerator.Hinting.Full
         }
+
         val afterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
 //            font.data.blankLineScale = 0.75f
             font.setFixedWidthGlyphs("1234567890")
             font.setUseIntegerPositions(false)
         }
         val defaultFontSize = 16
+        val defaultBorderWidth = 1.5f
         val normalFilename = "OpenSans-Regular.ttf"
         val normalItalicFilename = "OpenSans-Italic.ttf"
         val boldFilename = "OpenSans-Bold.ttf"
         val boldItalicFilename = "OpenSans-BoldItalic.ttf"
-        cache["DEBUG_FONT"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$normalFilename"), emulatedSize,
-                                                   makeParam().apply {
-                                                       size = defaultFontSize
-                                                       borderWidth = 0f
-                                                   }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$normalFilename"), emulatedSize,
-                                                            makeParam().apply {
-                                                                size = defaultFontSize
-                                                                borderWidth = 1.5f
-                                                            }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$normalItalicFilename"), emulatedSize,
-                                                          makeParam().apply {
-                                                              size = defaultFontSize
-                                                              borderWidth = 0f
-                                                          }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$normalItalicFilename"), emulatedSize,
-                                                                   makeParam().apply {
-                                                                       size = defaultFontSize
-                                                                       borderWidth = 1.5f
-                                                                   }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BOLD"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$boldFilename"), emulatedSize,
-                                                        makeParam().apply {
-                                                            size = defaultFontSize
-                                                            borderWidth = 0f
-                                                        }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BOLD_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$boldFilename"), emulatedSize,
-                                                                 makeParam().apply {
-                                                                     size = defaultFontSize
-                                                                     borderWidth = 1.5f
-                                                                 }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BOLD_ITALIC"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$boldItalicFilename"), emulatedSize,
-                                                               makeParam().apply {
-                                                                   size = defaultFontSize
-                                                                   borderWidth = 0f
-                                                               }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_BOLD_ITALIC_BORDERED"] = PaintboxFontFreeType(Gdx.files.internal("paintbox/fonts/$boldItalicFilename"), emulatedSize,
-                                                                        makeParam().apply {
-                                                                            size = defaultFontSize
-                                                                            borderWidth = 1.5f
-                                                                        }, PaintboxFont.LoadPriority.LAZY).setAfterLoad(afterLoad)
+        cache["DEBUG_FONT"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$normalFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = defaultFontSize
+                    borderWidth = 0f
+                }).setAfterLoad(afterLoad)
+        cache["DEBUG_FONT_SCALED"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$normalFilename"), 1, 1f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = defaultFontSize * 4
+                    borderWidth = defaultBorderWidth * 4
+                }).setAfterLoad(afterLoad)
+        cache["DEBUG_FONT_BORDERED"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$normalFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = defaultFontSize
+                    borderWidth = defaultBorderWidth
+                }).setAfterLoad(afterLoad)
+        cache["DEBUG_FONT_ITALIC"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$normalItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = defaultFontSize
+                    borderWidth = 0f
+                }).setAfterLoad(afterLoad)
+        cache["DEBUG_FONT_ITALIC_BORDERED"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$normalItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = defaultFontSize
+                    borderWidth = defaultBorderWidth
+                }).setAfterLoad(afterLoad)
+        cache["DEBUG_FONT_BOLD"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$boldFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = defaultFontSize
+                    borderWidth = 0f
+                }).setAfterLoad(afterLoad)
+        cache["DEBUG_FONT_BOLD_BORDERED"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$boldFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = defaultFontSize
+                    borderWidth = defaultBorderWidth
+                }).setAfterLoad(afterLoad)
+        cache["DEBUG_FONT_BOLD_ITALIC"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$boldItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = defaultFontSize
+                    borderWidth = 0f
+                }).setAfterLoad(afterLoad)
+        cache["DEBUG_FONT_BOLD_ITALIC_BORDERED"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$boldItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = defaultFontSize
+                    borderWidth = defaultBorderWidth
+                }).setAfterLoad(afterLoad)
     }
 }

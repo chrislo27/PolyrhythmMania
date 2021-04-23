@@ -24,7 +24,7 @@ open class FontCache(val game: PaintboxGame) : Disposable {
         }
     }
 
-    fun resizeAll(width: Float, height: Float) {
+    fun resizeAll(width: Int, height: Int) {
         fonts.values.forEach {
             it.resize(width, height)
         }

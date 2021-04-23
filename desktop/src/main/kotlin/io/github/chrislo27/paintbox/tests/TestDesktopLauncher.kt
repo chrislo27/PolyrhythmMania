@@ -1,5 +1,7 @@
 package io.github.chrislo27.paintbox.tests
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.HdpiMode
 import io.github.chrislo27.paintbox.PaintboxGame
@@ -8,9 +10,11 @@ import io.github.chrislo27.paintbox.ResizeAction
 import io.github.chrislo27.paintbox.desktop.PaintboxDesktopLauncher
 import io.github.chrislo27.paintbox.logging.Logger
 import io.github.chrislo27.paintbox.tests.newui.NewUITestGame
+import io.github.chrislo27.paintbox.tests.newui.ScaledFontTestGame
 import io.github.chrislo27.paintbox.tests.textblocks.TextBlockTestGame
 import io.github.chrislo27.paintbox.util.Version
 import io.github.chrislo27.paintbox.util.WindowSize
+import org.lwjgl.glfw.GLFW
 
 
 internal object TestDesktopLauncher {
@@ -48,8 +52,11 @@ internal object TestDesktopLauncher {
         val test3: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> by lazy {
             NewUITestGame(settings) to {}
         }
+        val test4: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> by lazy {
+            ScaledFontTestGame(settings) to {}
+        }
         
-        val selectedTest: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> = test3
+        val selectedTest: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> = test4
         getDefaultLauncher(selectedTest.first).apply {
             game.programLaunchArguments = args.toList()
             selectedTest.second.invoke(this)
