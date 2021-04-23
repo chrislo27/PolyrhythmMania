@@ -56,7 +56,7 @@ internal object TestDesktopLauncher {
             ScaledFontTestGame(settings) to {}
         }
         
-        val selectedTest: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> = test4
+        val selectedTest: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> = test3
         getDefaultLauncher(selectedTest.first).apply {
             game.programLaunchArguments = args.toList()
             selectedTest.second.invoke(this)

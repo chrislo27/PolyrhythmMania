@@ -450,12 +450,6 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
                     size = defaultFontSize
                     borderWidth = 0f
                 }).setAfterLoad(afterLoad)
-        cache["DEBUG_FONT_SCALED"] = PaintboxFontFreeType(
-                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$normalFilename"), 1, 1f, true, WindowSize(1280, 720)),
-                makeParam().apply {
-                    size = defaultFontSize * 4
-                    borderWidth = defaultBorderWidth * 4
-                }).setAfterLoad(afterLoad)
         cache["DEBUG_FONT_BORDERED"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$normalFilename"), 1, 1f, false, WindowSize(1280, 720)),
                 makeParam().apply {

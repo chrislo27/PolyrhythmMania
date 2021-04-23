@@ -8,11 +8,14 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.PaintboxScreen
 import io.github.chrislo27.paintbox.font.PaintboxFont
+import io.github.chrislo27.paintbox.font.PaintboxFontFreeType
+import io.github.chrislo27.paintbox.font.PaintboxFontParams
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.SceneRoot
 import io.github.chrislo27.paintbox.ui.TextNode
 import io.github.chrislo27.paintbox.ui.UIElement
+import io.github.chrislo27.paintbox.util.WindowSize
 
 internal class UIScaledFontTestScreen(override val main: ScaledFontTestGame) : PaintboxScreen() {
 
@@ -26,6 +29,13 @@ internal class UIScaledFontTestScreen(override val main: ScaledFontTestGame) : P
 
     init {
         populate()
+
+//        cache["DEBUG_FONT_SCALED"] = PaintboxFontFreeType(
+//                PaintboxFontParams(Gdx.files.internal("paintbox/fonts/$normalFilename"), 1, 1f, true, WindowSize(1280, 720)),
+//                makeParam().apply {
+//                    size = defaultFontSize * 4
+//                    borderWidth = defaultBorderWidth * 4
+//                }).setAfterLoad(afterLoad)
     }
     
     private fun populate() {
