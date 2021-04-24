@@ -10,6 +10,7 @@ import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.binding.VarChangedListener
+import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
 import kotlin.properties.Delegates
 
@@ -39,11 +40,12 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
      */
     val frameUpdateTrigger: ReadOnlyVar<Boolean> = Var(false)
     
-    
     val tooltipHoverTime: FloatVar = FloatVar(DEFAULT_TOOLTIP_HOVER_TIME) // TODO use this
     val currentElementWithTooltip: ReadOnlyVar<HasTooltip?> = Var(null)
     private val currentTooltipVar: Var<UIElement?> = Var(null)
     private var currentTooltip: UIElement? = null
+    
+    private var rootContextMenu: ContextMenu? = null
     
     constructor(width: Int, height: Int) : this(width.toFloat(), height.toFloat())
     
@@ -156,7 +158,6 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     private fun updateTooltipPosition(tooltip: UIElement? = currentTooltip) {
         if (tooltip == null) return
 
-
         val bounds = tooltip.bounds
         val width = bounds.width.getOrCompute()
         val height = bounds.height.getOrCompute()
@@ -188,6 +189,65 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         val currentElementWithTooltip = currentElementWithTooltip as Var
         currentTooltipVar.set(null)
         currentElementWithTooltip.set(null)
+    }
+
+    /**
+     * Shows the [contextMenu] as the root menu. This will hide the existing context menu if any.
+     */
+    fun showRootContextMenu(contextMenu: ContextMenu) {
+        hideRootContextMenu()
+        addContextMenuToScene(contextMenu)
+        rootContextMenu = contextMenu
+    }
+
+    /**
+     * Hides the root context menu if any.
+     */
+    fun hideRootContextMenu() {
+        val currentRootMenu = rootContextMenu ?: return
+        removeContextMenuFromScene(currentRootMenu)
+        rootContextMenu = null
+    }
+
+    /**
+     * Adds the [contextMenu] to the scene. The [contextMenu] should be a "menu child" of another [ContextMenu],
+     * but all context menus reside on the same level of the scene graph.
+     * 
+     * This function is called from [ContextMenu.addChildMenu] so you should not call this on your own.
+     * 
+     * To show a root context menu, call [showRootContextMenu].
+     * 
+     * This does NOT connect the parent-child
+     * relationship. One should call [ContextMenu.addChildMenu] for that.
+     */
+    fun addContextMenuToScene(contextMenu: ContextMenu) {
+        // Add to the contextMenu layer scene
+        // Compute the width/height layouts
+        // Position the context menu according to its parent (if any)
+        val root = contextMenuLayer.root
+        if (contextMenu !in root.children) {
+            root.addChild(contextMenu)
+            contextMenu.computeSize()
+            // TODO position the context menu according to its parent or the mouse
+        }
+    }
+
+    /**
+     * Removes the [contextMenu] from the scene. The [contextMenu] may be a "menu child" of another [ContextMenu],
+     * but all context menus reside on the same level of the scene graph.
+     * Any children of [contextMenu] will NOT be removed, that is the responsiblity of [ContextMenu.removeChildMenu].
+     * 
+     * This function is called from [ContextMenu.removeChildMenu] so you should not call this on your own.
+     * 
+     * To hide a root context menu, call [hideRootContextMenu].
+     * 
+     * This does NOT disconnect the parent-child
+     * relationship. One should call [ContextMenu.removeChildMenu] for that.
+     */
+    fun removeContextMenuFromScene(contextMenu: ContextMenu) {
+        // Remove from the contextMenu layer scene
+        val root = contextMenuLayer.root
+        root.removeChild(contextMenu)
     }
     
     private fun updateMouseVector() {
