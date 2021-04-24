@@ -1,5 +1,7 @@
 package io.github.chrislo27.paintbox.ui
 
+import io.github.chrislo27.paintbox.binding.Var
+
 
 sealed class Anchor {
 
@@ -11,6 +13,16 @@ sealed class Anchor {
         override fun configure(element: UIElement, offsetX: Float, offsetY: Float) {
             element.bounds.x.set(offsetX)
             element.bounds.y.set(offsetY)
+        }
+        
+        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
+                               offsetY: (context: Var.Context) -> Float) {
+            element.bounds.x.bind {
+                offsetX.invoke(this)
+            }
+            element.bounds.y.bind {
+                offsetY.invoke(this)
+            }
         }
     }
 
@@ -24,6 +36,17 @@ sealed class Anchor {
             element.bounds.x.set(offsetX)
             element.bounds.y.bind {
                 (parent.use()?.bounds?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY
+            }
+        }
+        
+        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
+                               offsetY: (context: Var.Context) -> Float) {
+            val parent = element.parent
+            element.bounds.x.bind {
+                offsetX.invoke(this)
+            }
+            element.bounds.y.bind {
+                (parent.use()?.bounds?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY.invoke(this)
             }
         }
     }
@@ -40,6 +63,17 @@ sealed class Anchor {
                 (parent.use()?.bounds?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY
             }
         }
+        
+        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
+                               offsetY: (context: Var.Context) -> Float) {
+            val parent = element.parent
+            element.bounds.x.bind {
+                offsetX.invoke(this)
+            }
+            element.bounds.y.bind {
+                (parent.use()?.bounds?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY.invoke(this)
+            }
+        }
     }
 
     /**
@@ -53,6 +87,17 @@ sealed class Anchor {
                 (parent.use()?.bounds?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX
             }
             element.bounds.y.set(offsetY)
+        }
+        
+        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
+                               offsetY: (context: Var.Context) -> Float) {
+            val parent = element.parent
+            element.bounds.x.bind {
+                (parent.use()?.bounds?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX.invoke(this)
+            }
+            element.bounds.y.bind {
+                offsetY.invoke(this)
+            }
         }
     }
 
@@ -68,6 +113,17 @@ sealed class Anchor {
             }
             element.bounds.y.bind {
                 (parent.use()?.bounds?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY
+            }
+        }
+        
+        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
+                               offsetY: (context: Var.Context) -> Float) {
+            val parent = element.parent
+            element.bounds.x.bind {
+                (parent.use()?.bounds?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX.invoke(this)
+            }
+            element.bounds.y.bind {
+                (parent.use()?.bounds?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY.invoke(this)
             }
         }
     }
@@ -86,6 +142,17 @@ sealed class Anchor {
                 (parent.use()?.bounds?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY
             }
         }
+        
+        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
+                               offsetY: (context: Var.Context) -> Float) {
+            val parent = element.parent
+            element.bounds.x.bind {
+                (parent.use()?.bounds?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX.invoke(this)
+            }
+            element.bounds.y.bind {
+                (parent.use()?.bounds?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY.invoke(this)
+            }
+        }
     }
 
     /**
@@ -99,6 +166,17 @@ sealed class Anchor {
                 (parent.use()?.bounds?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX
             }
             element.bounds.y.set(offsetY)
+        }
+        
+        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
+                               offsetY: (context: Var.Context) -> Float) {
+            val parent = element.parent
+            element.bounds.x.bind {
+                (parent.use()?.bounds?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX.invoke(this)
+            }
+            element.bounds.y.bind {
+                offsetY.invoke(this)
+            }
         }
     }
 
@@ -114,6 +192,17 @@ sealed class Anchor {
             }
             element.bounds.y.bind {
                 (parent.use()?.bounds?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY
+            }
+        }
+        
+        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
+                               offsetY: (context: Var.Context) -> Float) {
+            val parent = element.parent
+            element.bounds.x.bind {
+                (parent.use()?.bounds?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX.invoke(this)
+            }
+            element.bounds.y.bind {
+                (parent.use()?.bounds?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY.invoke(this)
             }
         }
     }
@@ -132,10 +221,31 @@ sealed class Anchor {
                 (parent.use()?.bounds?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY
             }
         }
+        
+        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
+                               offsetY: (context: Var.Context) -> Float) {
+            val parent = element.parent
+            element.bounds.x.bind {
+                (parent.use()?.bounds?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX.invoke(this)
+            }
+            element.bounds.y.bind {
+                (parent.use()?.bounds?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY.invoke(this)
+            }
+        }
     }
 
-
-    abstract fun configure(element: UIElement, offsetX: Float = 0f,
-                           offsetY: Float = 0f)
+    /**
+     * Configures the [element] based on this [Anchor] with constant offsets. 
+     */
+    abstract fun configure(element: UIElement, offsetX: Float = 0f, offsetY: Float = 0f)
+    
+    /**
+     * Configures the [element] based on this [Anchor] with bindable offsets to the bounds x/y [Var] context.
+     * 
+     * The context in the [offsetX]/[offsetY] function parameters is the [Var.Context] of the bounds x/y [Var].
+     */
+    abstract fun configure(element: UIElement,
+                           offsetX: (context: Var.Context) -> Float = { 0f },
+                           offsetY: (context: Var.Context) -> Float = { 0f })
 
 }
