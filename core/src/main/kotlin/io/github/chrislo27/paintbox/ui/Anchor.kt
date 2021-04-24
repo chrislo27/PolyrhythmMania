@@ -237,7 +237,7 @@ sealed class Anchor {
     /**
      * Configures the [element] based on this [Anchor] with constant offsets. 
      */
-    abstract fun configure(element: UIElement, offsetX: Float = 0f, offsetY: Float = 0f)
+    abstract fun configure(element: UIElement, offsetX: Float, offsetY: Float)
     
     /**
      * Configures the [element] based on this [Anchor] with bindable offsets to the bounds x/y [Var] context.
@@ -245,7 +245,12 @@ sealed class Anchor {
      * The context in the [offsetX]/[offsetY] function parameters is the [Var.Context] of the bounds x/y [Var].
      */
     abstract fun configure(element: UIElement,
-                           offsetX: (context: Var.Context) -> Float = { 0f },
-                           offsetY: (context: Var.Context) -> Float = { 0f })
+                           offsetX: (context: Var.Context) -> Float /*= { 0f }*/,
+                           offsetY: (context: Var.Context) -> Float /*= { 0f }*/)
+    
+    /**
+     * Configures the [element] based on this [Anchor] with constant offsets of 0.
+     */
+    final fun configure(element: UIElement) = configure(element, 0f, 0f)
 
 }
