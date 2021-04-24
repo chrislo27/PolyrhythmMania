@@ -23,7 +23,10 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         const val DEFAULT_TOOLTIP_HOVER_TIME: Float = 1f
     }
     
+    data class MousePosition(val x: FloatVar, val y: FloatVar)
+    
     private val mouseVector: Vector2 = Vector2()
+    val mousePosition: MousePosition = MousePosition(FloatVar(0f), FloatVar(0f))
     val mainLayer: Layer = Layer("main", this)
     val contextMenuLayer: Layer = Layer("contextMenu")
     val tooltipLayer: Layer = Layer("tooltip")
@@ -68,7 +71,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     fun renderAsRoot(batch: SpriteBatch) {
         (frameUpdateTrigger as Var).set(!frameUpdateTrigger.getOrCompute())
         updateMouseVector()
-        updateTooltipPosition(mouseVector)
+        updateTooltipPosition()
         for (layer in allLayers) {
             val layerRoot = layer.root
             val layerBounds = layerRoot.bounds
@@ -150,11 +153,20 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
                camera.position.y - (camera.zoom * camera.viewportHeight / 2.0f))
     }
     
-    private fun updateTooltipPosition(mouseVector: Vector2, tooltip: UIElement? = currentTooltip) {
+    private fun updateTooltipPosition(tooltip: UIElement? = currentTooltip) {
         if (tooltip == null) return
 
-        tooltip.bounds.x.set(mouseVector.x)
-        tooltip.bounds.y.set(mouseVector.y - tooltip.bounds.height.getOrCompute())
+
+        val bounds = tooltip.bounds
+        val width = bounds.width.getOrCompute()
+        val height = bounds.height.getOrCompute()
+        val mouseX = mousePosition.x.getOrCompute()
+        val mouseY = mousePosition.y.getOrCompute()
+        val rootWidth = this.bounds.width.getOrCompute()
+        val rootHeight = this.bounds.height.getOrCompute()
+        val rightAlign = (mouseY <= height)
+        bounds.y.set((mouseY - height).coerceIn(0f, rootHeight - height))
+        bounds.x.set((if (rightAlign) (mouseX - width) else mouseX).coerceIn(0f, rootWidth - width))
     }
 
     /**
@@ -179,7 +191,10 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     }
     
     private fun updateMouseVector() {
-        screenToUI(mouseVector.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat()))
+        val vector = mouseVector
+        screenToUI(vector.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat()))
+        mousePosition.x.set(vector.x)
+        mousePosition.y.set(vector.y)
     }
 
     /**

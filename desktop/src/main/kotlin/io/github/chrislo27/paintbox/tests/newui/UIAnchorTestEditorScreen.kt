@@ -242,6 +242,28 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                 println("hi button disabled")
             }
         }
+        bg += Button("Test button right", font = main.debugFont).also { button ->
+            Anchor.CentreRight.configure(button, offsetX = -16f)
+            button.bounds.width.set(150f)
+            button.bounds.height.set(50f)
+
+            button.tooltipElement.set(Tooltip("Test very long extremely long tooltip text."))
+
+            button.setOnAction {
+                println("hi button right")
+            }
+        }
+        bg += Button("Test button top", font = main.debugFont).also { button ->
+            Anchor.TopCentre.configure(button, offsetX = 200f)
+            button.bounds.width.set(150f)
+            button.bounds.height.set(50f)
+
+            button.tooltipElement.set(Tooltip("Test very long extremely long tooltip text."))
+
+            button.setOnAction {
+                println("hi button top")
+            }
+        }
     }
 
     override fun render(delta: Float) {
