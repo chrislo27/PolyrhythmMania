@@ -141,7 +141,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
         }
 
         bg += RectElement(Color(0f, 0f, 0f, 0.5f)).also { rect ->
-            Anchor.BottomCentre.configure(rect, offsetY = -75f)
+            Anchor.BottomCentre.configure(rect, offsetX = 0f, offsetY = -75f)
             rect.bounds.width.set(500f)
             rect.bounds.height.set(500f)
             

@@ -59,7 +59,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     val backgroundColor: Var<Color> = Var(Color(1f, 1f, 1f, 0f))
 
     val renderBackground: Var<Boolean> = Var(false)
-    val bgPadding: FloatVar = FloatVar(5f)
+    val bgPadding: FloatVar = FloatVar(0f)
 
     val renderAlign: Var<Int> = Var(Align.left)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
@@ -70,6 +70,11 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
      * If this is overwritten, this [TextLabel]'s [textColor] should be set to have a non-zero opacity.
      */
     val internalTextBlock: Var<TextBlock> by lazy { createInternalTextBlockVar(this) }
+    
+    fun setScaleXY(scaleXY: Float) {
+        this.scaleX.set(scaleXY)
+        this.scaleY.set(scaleXY)
+    }
 
     @Suppress("RemoveRedundantQualifierName")
     override fun getSkinID(): String = TextLabel.SKIN_ID
@@ -125,23 +130,25 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         val textPaddingOffsetY: Float = bgPadding
         val compressX = element.doXCompression.getOrCompute()
         val align = element.renderAlign.getOrCompute()
+        val textWidth = text.width
+        val textHeight = text.height
         val xOffset: Float = when {
             Align.isLeft(align) -> 0f + textPaddingOffsetX
-            Align.isRight(align) -> (w - (if (compressX) (min(text.width, w)) else (text.width)) + textPaddingOffsetX)
-            else -> (w - (if (compressX) min(text.width, w) else text.width)) / 2f
+            Align.isRight(align) -> (w - (if (compressX) (min(textWidth, w)) else textWidth) - textPaddingOffsetX)
+            else -> (w - (if (compressX) min(textWidth, w) else textWidth)) / 2f
         }
         val yOffset: Float = when {
             Align.isTop(align) -> h - text.firstCapHeight - textPaddingOffsetY
-            Align.isBottom(align) -> 0f + (text.height - text.firstCapHeight) + textPaddingOffsetY
-            else -> (h + text.height) / 2 - text.firstCapHeight
+            Align.isBottom(align) -> 0f + (textHeight - text.firstCapHeight) + textPaddingOffsetY
+            else -> (h + textHeight) / 2 - text.firstCapHeight
         }
 
         if (element.renderBackground.getOrCompute()) {
             // Draw a rectangle behind the text, only sizing to the text area.
             val bx = (x + xOffset) - bgPadding
-            val by = (y - h + yOffset - text.height + text.firstCapHeight) - bgPadding
-            val bw = (if (compressX) min(w, text.width) else text.width) + bgPadding * 2
-            val bh = (text.height) + bgPadding * 2
+            val by = (y - h + yOffset - textHeight + text.firstCapHeight) - bgPadding
+            val bw = (if (compressX) min(w, textWidth) else textWidth) + bgPadding * 2
+            val bh = textHeight + bgPadding * 2
 
             val bgColor = ColorStack.getAndPush().set(bgColorToUse.getOrCompute())
             bgColor.a *= opacity

@@ -1,36 +1,77 @@
 package polyrhythmmania.editor.pane
 
-import com.badlogic.gdx.graphics.Color
+import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.Pane
+import io.github.chrislo27.paintbox.ui.UIElement
+import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.element.RectElement
-import io.github.chrislo27.paintbox.util.gdxutils.grey
+import polyrhythmmania.PRManiaGame
+import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.Palette
+import polyrhythmmania.editor.pane.track.AllTracksPane
 
 
-class EditorPane : Pane() {
+class EditorPane(val editor: Editor) : Pane() {
+
+    val main: PRManiaGame = editor.main
+    val palette: Palette = Palette(main)
     
-    val toolbar: Toolbar
+    val statusBarMsg: Var<String> = Var("test status bar 0123456789 — abcdefghijklmnopqrstuvwxyz")
+    
+    val bgRect: RectElement
+    val menubar: Menubar
+    val statusBar: StatusBar
+    val upperPane: UpperPane
+    val allTracksPane: AllTracksPane
     
     init {
-        val bgColor = Color().grey(0.094f)
-        val backColor1 = Color().grey(0.3f)
-        
         // Background
-        this += RectElement(bgColor) // Full pane area
+        bgRect = RectElement().apply { 
+            this.color.bind { palette.bgColor.use() }
+        }
+        this += bgRect // Full pane area
         
-        // Toolbar
-        val toolbarBacking = RectElement(backColor1).apply { 
+        val parent: UIElement = bgRect
+        
+        // Menubar
+        val menubarBacking = RectElement().apply { 
+            this.color.bind { palette.toolbarBg.use() }
             Anchor.TopLeft.configure(this)
             this.bounds.height.set(40f)
         }
-        this += toolbarBacking
-        toolbar = Toolbar().apply {
-            Anchor.Centre.configure(this)
-            val padding = 4f
-            this.bindWidthToParent(-padding * 2)
-            this.bindHeightToParent(-padding * 2)
+        parent += menubarBacking
+        menubar = Menubar(this).apply {
+            Anchor.TopLeft.configure(this)
+            this.padding.set(Insets(4f, 4f, 4f, 4f))
         }
-        toolbarBacking += toolbar
+        menubarBacking += menubar
+        
+        statusBar = StatusBar(this).apply {
+            Anchor.BottomCentre.configure(this)
+            this.bindWidthToParent()
+            this.bounds.height.set(28f)
+        }
+        parent += statusBar
+        
+        upperPane = UpperPane(this).apply {
+            Anchor.TopLeft.configure(this, offsetY = { ctx -> ctx.use(menubarBacking.bounds.height) })
+            this.bounds.height.bind { 
+                (300 * ((sceneRoot.use()?.bounds?.height?.use() ?: 720f) / 720f)).coerceAtLeast(300f)
+            }
+        }
+        parent += upperPane
+        
+        allTracksPane = AllTracksPane(this).apply {
+            Anchor.TopLeft.configure(this)
+            this.bounds.y.bind { 
+                upperPane.bounds.y.use() + upperPane.bounds.height.use()
+            }
+            this.bounds.height.bind { 
+                statusBar.bounds.y.use() - bounds.y.use()
+            }
+        }
+        parent += allTracksPane
     }
     
 }

@@ -22,13 +22,10 @@ import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
 import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
 import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
 import org.lwjgl.glfw.GLFW
-import polyrhythmmania.editor.TestEditorScreen
+import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
-import polyrhythmmania.world.render.TestWorldRenderScreen
-import sun.rmi.runtime.Log
 import java.io.File
-import kotlin.system.measureNanoTime
 
 
 class PRManiaGame(paintboxSettings: PaintboxSettings)
@@ -62,7 +59,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             }
             nextScreen = {
 //                TestWorldRenderScreen(this@PRManiaGame)
-                TestEditorScreen(this@PRManiaGame)
+                EditorScreen(this@PRManiaGame)
             }
         })
     }
@@ -179,6 +176,14 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     size = defaultFontSize
                     borderWidth = 1.5f
                 }).setAfterLoad(afterLoad)
+
+
+        cache["editor_beat_time"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/OpenSans/$normalFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    size = 24
+                    borderWidth = 0f
+                }).setAfterLoad(afterLoad)
     }
 
 
@@ -190,5 +195,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val mainFontItalicBordered: PaintboxFont inline get() = fontCache["OpenSans_ITALIC_BORDERED"]
     val mainFontBoldItalic: PaintboxFont inline get() = fontCache["OpenSans_BOLD_ITALIC"]
     val mainFontBoldItalicBordered: PaintboxFont inline get() = fontCache["OpenSans_BOLD_ITALIC_BORDERED"]
+    val fontEditorBeatTime: PaintboxFont inline get() = fontCache["editor_beat_time"]
 
 }

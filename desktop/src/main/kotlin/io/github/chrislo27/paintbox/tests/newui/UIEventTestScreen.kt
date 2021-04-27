@@ -79,7 +79,7 @@ internal class UIEventTestScreen(override val main: NewUITestGame) : PaintboxScr
                 val num = 6
                 (0 until num).forEach { i ->
                     rt += TestColorElement(Color(1f, 1f, 1f, 1f).fromHsv(360f * i / num, 0.9f, 0.8f)).apply {
-                        Anchor.TopRight.configure(this, offsetX = -36f * i)
+                        Anchor.TopRight.configure(this, offsetX = -36f * i, offsetY = 0f)
                         this.bounds.width.set(32f)
                         this.bounds.height.set(32f)
                     }

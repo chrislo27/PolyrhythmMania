@@ -34,7 +34,7 @@ class SolidBorder(initColor: Color) : Border {
         batch.color = tmpColor
         
         batch.fillRect(x, y - height, insets.left, height)
-        batch.fillRect(x + width - insets.right, y - height, insets.left, height)
+        batch.fillRect(x + width - insets.right, y - height, insets.right, height)
         val topBottomWidth = width - insets.left - insets.right
         batch.fillRect(x + insets.left, y - height, topBottomWidth, insets.bottom)
         batch.fillRect(x + insets.left, y - insets.top, topBottomWidth, insets.top)

@@ -28,6 +28,7 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
 
     companion object {
         const val SKIN_ID: String = "Button"
+        private val DEFAULT_PADDING: Insets = Insets(2f)
 
         init {
             DefaultSkins.register(SKIN_ID, SkinFactory { element: Button ->
@@ -74,7 +75,7 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     }
     
     init {
-        this.padding.set(Insets(2f))
+        this.padding.set(DEFAULT_PADDING)
     }
 
     @Suppress("RemoveRedundantQualifierName")
