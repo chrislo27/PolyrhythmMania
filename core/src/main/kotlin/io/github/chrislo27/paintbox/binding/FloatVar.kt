@@ -1,6 +1,7 @@
 package io.github.chrislo27.paintbox.binding
 
 import java.lang.ref.WeakReference
+import java.util.concurrent.ConcurrentHashMap
 
 
 /**
@@ -11,9 +12,9 @@ class FloatVar : Var<Float> {
     private var binding: FloatBinding
     private var invalidated: Boolean = true // Used for Compute and SideEffecting bindings
     private var currentValue: Float = 0f
-    private var dependencies: List<ReadOnlyVar<Any>> = emptyList()
+    private var dependencies: Set<ReadOnlyVar<Any>> = emptySet()
 
-    private var listeners: Set<VarChangedListener<Float>> = emptySet()
+    private val listeners: MutableSet<VarChangedListener<Float>> = mutableSetOf()
 
     private val invalidationListener: VarChangedListener<Any> = InvalListener(this) as VarChangedListener<Any>
 
@@ -30,7 +31,7 @@ class FloatVar : Var<Float> {
     }
 
     private fun reset() {
-        dependencies = emptyList()
+        dependencies = emptySet()
         invalidated = true
         currentValue = 0f
     }
@@ -44,7 +45,7 @@ class FloatVar : Var<Float> {
             }
         }
         if (anyNeedToBeDisposed) {
-            listeners = listeners.filter { it is InvalListener && it.disposeMe }.toSet()
+            listeners.removeIf { it is InvalListener && it.disposeMe }
         }
     }
 
@@ -86,7 +87,7 @@ class FloatVar : Var<Float> {
                     val result = binding.computation(ctx)
                     val oldDependencies = dependencies
                     oldDependencies.forEach { it.removeListener(invalidationListener) }
-                    dependencies = ctx.dependencies.toList()
+                    dependencies = ctx.dependencies
                     dependencies.forEach { it.addListener(invalidationListener) }
                     currentValue = result
                     invalidated = false
@@ -100,7 +101,7 @@ class FloatVar : Var<Float> {
                     val result = binding.sideEffectingComputation(ctx, binding.item)
                     val oldDependencies = dependencies
                     oldDependencies.forEach { it.removeListener(invalidationListener) }
-                    dependencies = ctx.dependencies.toList()
+                    dependencies = ctx.dependencies
                     dependencies.forEach { it.addListener(invalidationListener) }
                     currentValue = result
                     invalidated = false
@@ -115,13 +116,13 @@ class FloatVar : Var<Float> {
 
     override fun addListener(listener: VarChangedListener<Float>) {
         if (listener !in listeners) {
-            listeners = listeners + listener
+            listeners.add(listener)
         }
     }
 
     override fun removeListener(listener: VarChangedListener<Float>) {
         if (listener in listeners) {
-            listeners = listeners - listener
+            listeners.remove(listener)
         }
     }
 

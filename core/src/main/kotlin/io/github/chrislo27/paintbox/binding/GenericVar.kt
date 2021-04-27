@@ -1,6 +1,7 @@
 package io.github.chrislo27.paintbox.binding
 
 import java.lang.ref.WeakReference
+import java.util.concurrent.ConcurrentHashMap
 
 
 /**
@@ -11,9 +12,9 @@ class GenericVar<T> : Var<T> {
     private var binding: GenericBinding<T>
     private var invalidated: Boolean = true // Used for Compute and SideEffecting bindings
     private var currentValue: T? = null
-    private var dependencies: List<ReadOnlyVar<Any>> = emptyList()
+    private var dependencies: Set<ReadOnlyVar<Any>> = emptySet()
 
-    private var listeners: Set<VarChangedListener<T>> = emptySet()
+    private val listeners: MutableSet<VarChangedListener<T>> = mutableSetOf()
 
     private val invalidationListener: VarChangedListener<Any> = InvalListener(this as GenericVar<Any>)
 
@@ -30,7 +31,7 @@ class GenericVar<T> : Var<T> {
     }
 
     private fun reset() {
-        dependencies = emptyList()
+        dependencies = emptySet()
         invalidated = true
         currentValue = null
     }
@@ -44,7 +45,7 @@ class GenericVar<T> : Var<T> {
             }
         }
         if (anyNeedToBeDisposed) {
-            listeners = listeners.filter { it is InvalListener && it.disposeMe }.toSet()
+            listeners.removeIf { it is InvalListener && it.disposeMe }
         }
     }
 
@@ -86,7 +87,7 @@ class GenericVar<T> : Var<T> {
                     val result = binding.computation(ctx)
                     val oldDependencies = dependencies
                     oldDependencies.forEach { it.removeListener(invalidationListener) }
-                    dependencies = ctx.dependencies.toList()
+                    dependencies = ctx.dependencies
                     dependencies.forEach { it.addListener(invalidationListener) }
                     currentValue = result
                     invalidated = false
@@ -100,7 +101,7 @@ class GenericVar<T> : Var<T> {
                     val result = binding.sideEffectingComputation(ctx, binding.item)
                     val oldDependencies = dependencies
                     oldDependencies.forEach { it.removeListener(invalidationListener) }
-                    dependencies = ctx.dependencies.toList()
+                    dependencies = ctx.dependencies
                     dependencies.forEach { it.addListener(invalidationListener) }
                     currentValue = result
                     invalidated = false
@@ -114,13 +115,13 @@ class GenericVar<T> : Var<T> {
 
     override fun addListener(listener: VarChangedListener<T>) {
         if (listener !in listeners) {
-            listeners = listeners + listener
+            listeners.add(listener)
         }
     }
 
     override fun removeListener(listener: VarChangedListener<T>) {
         if (listener in listeners) {
-            listeners = listeners - listener
+            listeners.remove(listener)
         }
     }
 
