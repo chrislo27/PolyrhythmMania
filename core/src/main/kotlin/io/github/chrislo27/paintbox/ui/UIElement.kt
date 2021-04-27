@@ -184,14 +184,16 @@ open class UIElement : UIBounds() {
     fun pathTo(x: Float, y: Float): List<UIElement> {
         val res = mutableListOf<UIElement>()
         var current: UIElement = this
-        var currentBounds: ReadOnlyBounds = current.bounds
+        var currentBounds: ReadOnlyBounds = current.contentZone
         var xOffset: Float = currentBounds.x.getOrCompute()
         var yOffset: Float = currentBounds.y.getOrCompute()
         while (current.children.isNotEmpty()) {
-            val found = current.children.findLast { it.bounds.containsPointLocal(x - xOffset, y - yOffset) } ?: break
+            val found = current.children.findLast { child ->
+                child.bounds.containsPointLocal(x - xOffset, y - yOffset) 
+            } ?: break
             res += found
             current = found
-            currentBounds = current.bounds
+            currentBounds = current.contentZone
             xOffset += currentBounds.x.getOrCompute()
             yOffset += currentBounds.y.getOrCompute()
         }
@@ -199,31 +201,27 @@ open class UIElement : UIBounds() {
     }
     
     /**
-     * Returns a list of UIElements from this element to the child that contains the point within [UIBounds.borderZone].
+     * Returns a list of UIElements from this element to the child that contains the point within [UIBounds.contentZone].
      * IMPLEMENTATION NOTE: This function assumes that all the children for a parent fit inside of that parent's bounds.
      */
     fun pathToForInput(x: Float, y: Float): List<UIElement> {
         val res = mutableListOf<UIElement>()
         var current: UIElement = this
-        var currentBounds: ReadOnlyBounds = current.borderZone
+        var currentBounds: ReadOnlyBounds = current.contentZone
         var xOffset: Float = currentBounds.x.getOrCompute()
         var yOffset: Float = currentBounds.y.getOrCompute()
         while (current.children.isNotEmpty()) {
-            val found = current.children.findLast { it.borderZone.containsPointLocal(x - xOffset, y - yOffset) } ?: break
+            val found = current.children.findLast { child -> 
+                child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
+            } ?: break
             res += found
             current = found
-            currentBounds = current.borderZone
+            currentBounds = current.contentZone
             xOffset += currentBounds.x.getOrCompute()
             yOffset += currentBounds.y.getOrCompute()
         }
         return res
     }
-
-//    tailrec fun pathTo(x: Float, y: Float, startAt: UIElement = this, acc: MutableList<UIElement> = mutableListOf()): List<UIElement> {
-//        val found = startAt.children.findLast { it.bounds.containsPoint(x, y) } ?: return acc
-//        acc += found
-//        return pathTo(x - found.bounds.x.getOrCompute(), y - found.bounds.y.getOrCompute(), found, acc)
-//    }
     
     operator fun plusAssign(child: UIElement) = addChild(child)
     operator fun minusAssign(child: UIElement) = removeChild(child)

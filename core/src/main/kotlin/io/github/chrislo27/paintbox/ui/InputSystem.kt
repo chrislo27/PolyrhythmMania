@@ -72,11 +72,11 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         // then the rest of the code does nothing, achieving maximum performance.
 
         var cursor: UIElement? = lastPath.lastOrNull()
-        var offX: Float = lastPath.sumByFloat { it.bounds.x.getOrCompute() }
-        var offY: Float = lastPath.sumByFloat { it.bounds.y.getOrCompute() }
+        var offX: Float = lastPath.sumByFloat { it.contentZone.x.getOrCompute() }
+        var offY: Float = lastPath.sumByFloat { it.contentZone.y.getOrCompute() }
         if (cursor != null) {
-            offX -= cursor.bounds.x.getOrCompute()
-            offY -= cursor.bounds.y.getOrCompute()
+            offX -= cursor.contentZone.x.getOrCompute()
+            offY -= cursor.contentZone.y.getOrCompute()
         }
         // offsets should be the absolute x/y of the parent of cursor
         while (cursor != null && !cursor.borderZone.containsPointLocal(x - offX, y - offY)) {
@@ -85,8 +85,8 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
             removed.fireEvent(MouseExited(x, y))
             cursor = lastPath.lastOrNull()
             if (cursor != null) {
-                offX -= cursor.bounds.x.getOrCompute()
-                offY -= cursor.bounds.y.getOrCompute()
+                offX -= cursor.contentZone.x.getOrCompute()
+                offY -= cursor.contentZone.y.getOrCompute()
             }
         }
         // We found the closest parent that contains x, y, so we'll navigate to its deepest descendant that contains xy
