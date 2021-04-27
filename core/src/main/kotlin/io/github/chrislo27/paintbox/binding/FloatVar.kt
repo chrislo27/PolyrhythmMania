@@ -136,8 +136,10 @@ class FloatVar : Var<Float> {
         override fun onChange(v: ReadOnlyVar<Float>) {
             val parent = weakRef.get()
             if (!disposeMe && parent != null) {
-                parent.invalidated = true
-                parent.notifyListeners()
+                if (!parent.invalidated) {
+                    parent.invalidated = true
+                    parent.notifyListeners()
+                }
             } else {
                 disposeMe = true
             }
