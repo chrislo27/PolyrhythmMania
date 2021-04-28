@@ -22,7 +22,10 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 0f, offsetY = 0f)
             (this.skin as ButtonSkin).roundedRadius.set(0)
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_new"))).apply {
+//            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_new"))).apply {
+//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+//            }
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 0, 28, 14, 14)).apply {
                 this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
@@ -31,7 +34,10 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 1 + 4f * 1, offsetY = 0f)
             (this.skin as ButtonSkin).roundedRadius.set(0)
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_open"))).apply {
+//            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_open"))).apply {
+//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+//            }
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 0, 14, 14, 14)).apply {
                 this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
@@ -40,7 +46,10 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 2 + 4f * 2, offsetY = 0f)
             (this.skin as ButtonSkin).roundedRadius.set(0)
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_save"))).apply {
+//            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_save"))).apply {
+//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+//            }
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 0, 0, 14, 14)).apply {
                 this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
