@@ -10,14 +10,17 @@ import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
+import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
+import polyrhythmmania.editor.track.Track
 
 
 open class TrackPane(val allTracksPane: AllTracksPane) : Pane() {
     
     val editorPane: EditorPane = allTracksPane.editorPane
     val trackView: TrackView = allTracksPane.trackView
+    val editor: Editor = editorPane.editor
     
     val sidebarBgColor: Var<Color> = Var(Color(0f, 0f, 0f, 0f))
     val contentBgColor: Var<Color> = Var(Color(0f, 0f, 0f, 0f))

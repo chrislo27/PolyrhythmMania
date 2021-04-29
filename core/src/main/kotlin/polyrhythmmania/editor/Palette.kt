@@ -23,6 +23,10 @@ open class Palette(val main: PRManiaGame) {
     val upperPaneBorder: Var<Color> = Var.bind { borderTrim.use() }
     val previewPaneBorder: Var<Color> = Var.bind { borderTrim.use() }
     val previewPaneSeparator: Var<Color> = Var.bind { separator.use() }
+    val toolbarIconTint: Var<Color> = Var.bind { menubarIconTint.use() }
+    val toolbarIconToolNeutralTint: Var<Color> = Var.bind { toolbarIconTint.use() }
+    val toolbarIconToolActiveTint: Var<Color> = Var(Color.valueOf("00A070"))
+    val toolbarIconToolActiveBorderTint: Var<Color> = Var(Color.valueOf("00F2AD"))
     
     val trackPaneBorder: Var<Color> = Var.bind { borderTrim.use() }
     val trackPaneTimeBg: Var<Color> = Var(Color().grey(0f, 1f))

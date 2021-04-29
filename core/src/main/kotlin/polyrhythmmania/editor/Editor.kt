@@ -9,11 +9,18 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.Disposable
+import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.SceneRoot
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
+import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
+import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
+import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.pane.EditorPane
+import polyrhythmmania.editor.track.BlockType
+import polyrhythmmania.editor.track.Click
+import polyrhythmmania.editor.track.Track
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
@@ -22,6 +29,8 @@ import polyrhythmmania.world.World
 import polyrhythmmania.world.render.GBA2Tileset
 import polyrhythmmania.world.render.GBATileset
 import polyrhythmmania.world.render.WorldRenderer
+import java.util.*
+import kotlin.collections.LinkedHashMap
 
 
 class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720)) 
@@ -42,7 +51,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         WorldRenderer(world, GBATileset(AssetRegistry["tileset_gba"]))
     }
     
+    val tracks: Map<String, Track> = listOf(
+            Track("input_a", EnumSet.of(BlockType.INPUT)),
+            Track("input_dpad", EnumSet.of(BlockType.INPUT)),
+    ).associateByTo(LinkedHashMap()) { track -> track.id }
+    
     val trackView: TrackView = TrackView()
+    val tool: Var<Tool> = Var(Tool.SELECTION)
+    val click: Var<Click> = Var(Click.None)
     
     init {
         trackView.renderScale = 0.5f
@@ -75,13 +91,20 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     private fun debugRenderUpdate(delta: Float) {
+        val ctrl = Gdx.input.isControlDown()
+        val alt = Gdx.input.isAltDown()
+        val shift = Gdx.input.isShiftDown()
+        
         // FIXME remove
         val trackView = this.trackView
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            trackView.beat += 7f * delta
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            trackView.beat -= 7f * delta
+        if (!ctrl && !alt && !shift) {
+            if (Input.Keys.D in pressedButtons) {
+                trackView.beat += 7f * delta
+            }
+
+            if (Input.Keys.A in pressedButtons) {
+                trackView.beat -= 7f * delta
+            }
         }
     }
 
@@ -99,5 +122,27 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
     override fun dispose() {
         frameBuffer.disposeQuietly()
+    }
+
+    private val pressedButtons: MutableSet<Int> = mutableSetOf() 
+    
+    override fun keyDown(keycode: Int): Boolean {
+//        val ctrl = Gdx.input.isControlDown()
+//        val alt = Gdx.input.isAltDown()
+//        val shift = Gdx.input.isShiftDown()
+//        if (!ctrl && !alt && !shift && keycode == Input.Keys.D) {
+            when (keycode) {
+                Input.Keys.D, Input.Keys.A -> {
+                    pressedButtons += keycode
+                    return true
+                }
+            }
+//        }
+        return sceneRoot.inputSystem.keyDown(keycode)
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        if ((pressedButtons as MutableSet).remove(keycode)) return true
+        return sceneRoot.inputSystem.keyUp(keycode)
     }
 }

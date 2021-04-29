@@ -55,15 +55,14 @@ class BeatTrack(allTracksPane: AllTracksPane) : TrackPane(allTracksPane) {
             batch.color = tmpColor
             val lineWidth = 2f
             for (b in leftBeat.toInt()..rightBeat.toInt()) {
-                batch.fillRect(x + (b - trackView.beat) * trackView.pxPerBeat - lineWidth / 2f, y - h, lineWidth, h * 0.5f)
-                batch.fillRect(x + (b - trackView.beat + 0.5f) * trackView.pxPerBeat - lineWidth / 2f, y - h, lineWidth, h * 0.25f)
+                batch.fillRect(x + trackView.translateBeatToX(b.toFloat()) - lineWidth / 2f, y - h, lineWidth, h * 0.4f)
+                batch.fillRect(x + trackView.translateBeatToX(b.toFloat() + 0.5f) - lineWidth / 2f, y - h, lineWidth, h * 0.25f)
             }
             editorPane.main.mainFont.useFont { font ->
                 font.color = tmpColor
                 for (b in leftBeat.toInt()..rightBeat.toInt()) {
-                    val xPos = x + (b - trackView.beat) * trackView.pxPerBeat
-                    font.draw(batch, b.toString(), xPos, y - h + h * 0.5f + font.capHeight + 3f, 0f, Align.center, false)
-                    batch.fillRect(xPos, y - h, 2f, h / 2f)
+                    val xPos = x + trackView.translateBeatToX(b.toFloat())
+                    font.draw(batch, b.toString(), xPos, y - h + h * 0.4f + font.capHeight + 3f, 0f, Align.center, false)
                 }
             }
 

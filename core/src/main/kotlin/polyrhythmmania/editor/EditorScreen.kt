@@ -2,12 +2,14 @@ package polyrhythmmania.editor
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import io.github.chrislo27.paintbox.ui.SceneRoot
+import io.github.chrislo27.paintbox.ui.UIElement
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
@@ -18,6 +20,7 @@ class EditorScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val batch: SpriteBatch = main.batch
     val editor: Editor = Editor(main)
     private val sceneRoot: SceneRoot = editor.sceneRoot
+    private val processor: InputProcessor = editor
 
     init {
         editor.resize(Gdx.graphics.width, Gdx.graphics.height)
@@ -45,16 +48,26 @@ class EditorScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         }
     }
+    
+    private fun countChildren(element: UIElement): Int {
+        return 1 + element.children.size + element.children.sumBy { countChildren(it) }
+    }
+
+    override fun getDebugString(): String {
+        return """rootSize: ${countChildren(sceneRoot)}
+
+"""
+    }
 
     override fun show() {
         super.show()
-        main.inputMultiplexer.removeProcessor(sceneRoot.inputSystem)
-        main.inputMultiplexer.addProcessor(sceneRoot.inputSystem)
+        main.inputMultiplexer.removeProcessor(processor)
+        main.inputMultiplexer.addProcessor(processor)
     }
 
     override fun hide() {
         super.hide()
-        main.inputMultiplexer.removeProcessor(sceneRoot.inputSystem)
+        main.inputMultiplexer.removeProcessor(processor)
     }
 
     override fun resize(width: Int, height: Int) {

@@ -18,6 +18,7 @@ import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.Button
+import io.github.chrislo27.paintbox.ui.control.ButtonSkin
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
 import io.github.chrislo27.paintbox.util.MathHelper
@@ -110,6 +111,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                         this.bounds.y.set(0f)
                         this.bounds.width.set(32f)
                         this.bounds.height.set(32f)
+                        this.padding.set(Insets(2f))
                         this.doClickFlash = true
                         if (i == num / 2) {
                             addChild(ImageNode(PaintboxGame.paintboxSpritesheet.logo128, ImageRenderingMode.FULL).apply {
@@ -231,6 +233,18 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             button.setOnAction {
                 println("hi button")
             }
+        }
+
+        bg += Pane().also { pane ->
+            Anchor.CentreLeft.configure(pane, offsetX = 32f, offsetY = 75f)
+            pane.bounds.width.set(150f)
+            pane.bounds.height.set(50f)
+            pane.padding.set(Insets(5f))
+            pane.border.set(Insets(4f))
+            pane.borderStyle.set(SolidBorder().apply { this.color.set(Color.MAGENTA) })
+            pane.addChild(Button("Test button bounds", font = main.debugFont).also { button ->
+                (button.skin as ButtonSkin).roundedRadius.set(0)
+            })
         }
         bg += Button("Disabled button", font = main.debugFont).also { button ->
             Anchor.CentreLeft.configure(button, offsetX = 32f + 175f)
