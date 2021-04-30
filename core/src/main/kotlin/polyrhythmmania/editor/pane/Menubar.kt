@@ -25,8 +25,8 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_new"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 0, 28, 14, 14)).apply {
-                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 32, 0, 14, 14)).apply {
+//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
         this += Button("").apply {
@@ -37,8 +37,8 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_open"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 0, 14, 14, 14)).apply {
-                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 16, 0, 14, 14)).apply {
+//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
         this += Button("").apply {
@@ -50,7 +50,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
             this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 0, 0, 14, 14)).apply {
-                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
     }
