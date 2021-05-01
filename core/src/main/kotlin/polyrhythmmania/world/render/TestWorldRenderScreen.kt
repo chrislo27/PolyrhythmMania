@@ -46,6 +46,8 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
         this.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
         this.prepareStartBuffer()
     }
+    
+    private var robotMode: Boolean = true
 
     init {
         soundSystem.audioContext.out.addInput(player)
@@ -54,7 +56,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
 //        engine.tempos.addTempoChange(TempoChange(88f, 148.5f))
 
-        engine.inputter.areInputsLocked = false
+        robotMode = true
         
         addEvents()
     }
@@ -90,8 +92,16 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
                     this.soundSystem.stopRealtime()
                 }
 //                println(timeToStop / 1000000.0)
+                val camera = this.renderer.camera
+                val x = camera.position.x
+                val y = camera.position.y
+                val zoom = camera.zoom
                 this.dispose()
-                main.screen = TestWorldRenderScreen(main)
+                main.screen = TestWorldRenderScreen(main).apply { 
+                    renderer.camera.position.x = x
+                    renderer.camera.position.y = y
+                    renderer.camera.zoom = zoom
+                }
             }
         }
 
@@ -165,11 +175,15 @@ ${renderer.getDebugString()}
             }
             2 -> addInputTestPatterns()
             3 -> addTestPatterns()
+            4 -> addRemixTestPatterns()
             else -> addTestPatterns()
         }.toMutableList()
 
-        // FIXME debug
-        if (!engine.inputter.areInputsLocked) {
+        if (robotMode) {
+            events.removeIf { e ->
+                e is EventLockInputs
+            }
+        } else {
             events.removeIf { e ->
                 e is EventRowBlockExtend
             }
@@ -273,22 +287,39 @@ ${renderer.getDebugString()}
 
     data class Spawn(val index: Int, val type: EntityRowBlock.Type, val beat: Float, val forward: Boolean = false)
 
-    fun addPattern(events: MutableList<Event>, startBeat: Float, rowA: List<Spawn>, rowD: List<Spawn>) {
+    fun addPattern(events: MutableList<Event>, startBeat: Float, rowA: List<Spawn>, rowD: List<Spawn>, repeat: Boolean = true) {
         fun doIt(row: Row, list: List<Spawn>) {
             list.forEach { s ->
                 events += EventRowBlockSpawn(engine, row, s.index, s.type, startBeat + s.beat, s.forward)
                 events += EventRowBlockExtend(engine, row, s.index, startBeat + (s.index * 0.5f) + 4f, false)
-                events += EventRowBlockExtend(engine, row, s.index, startBeat + (s.index * 0.5f) + 8f, false)
+                if (repeat) {
+                    events += EventRowBlockExtend(engine, row, s.index, startBeat + (s.index * 0.5f) + 8f, false)
+                }
             }
-
-            events += EventLockInputs(engine, false, startBeat + 2f)
-            events += EventDeployRod(engine, row, startBeat)
-            events += EventDeployRod(engine, row, startBeat + 4)
-            events += EventRowBlockRetract(engine, row, -1, startBeat + 7.5f)
-            events += EventRowBlockRetract(engine, row, -1, startBeat + 7.85f)
-            events += EventLockInputs(engine, true, startBeat + 13.75f)
-            events += EventRowBlockRetract(engine, row, -1, startBeat + 14f)
-            events += EventRowBlockDespawn(engine, row, -1, startBeat + 15f)
+            
+            if (repeat) {
+                events += EventLockInputs(engine, false, startBeat + 2f)
+                events += EventDeployRod(engine, row, startBeat)
+                events += EventDeployRod(engine, row, startBeat + 4)
+                if (list.any { it.index == 7 && it.type != EntityRowBlock.Type.PLATFORM }) {
+                    events += EventRowBlockRetract(engine, row, -1, startBeat + 7.5f + 0.5f)
+                } else {
+                    events += EventRowBlockRetract(engine, row, -1, startBeat + 7.5f)
+                }
+                events += EventLockInputs(engine, true, startBeat + 13.75f)
+                events += EventRowBlockRetract(engine, row, -1, startBeat + 14f)
+                events += EventRowBlockDespawn(engine, row, -1, startBeat + 15f)
+            } else {
+                events += EventLockInputs(engine, false, startBeat + 2f)
+                events += EventDeployRod(engine, row, startBeat)
+                if (list.any { it.index == 7 && it.type != EntityRowBlock.Type.PLATFORM }) {
+                    events += EventRowBlockRetract(engine, row, -1, startBeat + 7.5f + 0.5f)
+                } else {
+                    events += EventRowBlockRetract(engine, row, -1, startBeat + 7.5f)
+                }
+                events += EventLockInputs(engine, true, startBeat + 7.25f)
+                events += EventRowBlockDespawn(engine, row, -1, startBeat + 8f)
+            }
         }
 
         if (rowA.isNotEmpty()) {
@@ -547,6 +578,87 @@ ${renderer.getDebugString()}
                 Spawn(9, EntityRowBlock.Type.PLATFORM, 4.5f, true),
         ))
         
+
+        return events
+    }
+
+
+    private fun addRemixTestPatterns(): List<Event> {
+        val events = mutableListOf<Event>()
+
+//        list.forEach { s ->
+//            events += EventRowBlockSpawn(engine, row, s.index, s.type, startBeat + s.beat, s.forward)
+//            events += EventRowBlockExtend(engine, row, s.index, startBeat + (s.index * 0.5f) + 4f, false)
+//            if (repeat) {
+//                events += EventRowBlockExtend(engine, row, s.index, startBeat + (s.index * 0.5f) + 8f, false)
+//            }
+//        }
+//
+//        if (repeat) {
+//            events += EventLockInputs(engine, false, startBeat + 2f)
+//            events += EventDeployRod(engine, row, startBeat)
+//            events += EventDeployRod(engine, row, startBeat + 4)
+//            events += EventRowBlockRetract(engine, row, -1, startBeat + 7.5f)
+//            events += EventLockInputs(engine, true, startBeat + 13.75f)
+//            events += EventRowBlockRetract(engine, row, -1, startBeat + 14f)
+//            events += EventRowBlockDespawn(engine, row, -1, startBeat + 15f)
+//        } else {
+//            events += EventLockInputs(engine, false, startBeat + 2f)
+//            events += EventDeployRod(engine, row, startBeat)
+//            events += EventRowBlockRetract(engine, row, -1, startBeat + 7.5f)
+//            events += EventLockInputs(engine, true, startBeat + 7.25f)
+//            events += EventRowBlockDespawn(engine, row, -1, startBeat + 8f)
+//        }
+        
+        events += EventRowBlockSpawn(engine, world.rowA, 0, EntityRowBlock.Type.PISTON_A, (0 * 8f + 8f) + 0f, false)
+        events += EventRowBlockSpawn(engine, world.rowA, 2, EntityRowBlock.Type.PISTON_A, (0 * 8f + 8f) + 1f, false)
+        events += EventRowBlockSpawn(engine, world.rowA, 4, EntityRowBlock.Type.PISTON_A, (0 * 8f + 8f) + 2f, false)
+        events += EventRowBlockSpawn(engine, world.rowA, 6, EntityRowBlock.Type.PISTON_A, (0 * 8f + 8f) + 3f, false)
+        events += EventRowBlockSpawn(engine, world.rowA, 8, EntityRowBlock.Type.PLATFORM, (0 * 8f + 8f) + 3f, true)
+        events += EventDeployRod(engine, world.rowA, (0 * 8f + 8f))
+        events += EventLockInputs(engine, false, (0 * 8f + 8f) + 2f)
+        events += EventLockInputs(engine, false, (0 * 8f + 8f) + 7.25f)
+        events += EventRowBlockRetract(engine, world.rowA, -1, (0 * 8f + 8f) + 7.5f)
+        events += EventRowBlockDespawn(engine, world.rowA, -1, (0 * 8f + 8f) + 7.5f)
+
+
+
+        events += EventRowBlockSpawn(engine, world.rowA, 0, EntityRowBlock.Type.PISTON_A, (1 * 8f + 8f) + 0f, false)
+        events += EventRowBlockSpawn(engine, world.rowA, 4, EntityRowBlock.Type.PISTON_A, (1 * 8f + 8f) + 2f, false)
+        events += EventRowBlockSpawn(engine, world.rowA, 8, EntityRowBlock.Type.PLATFORM, (1 * 8f + 8f) + 2f, true)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 0, EntityRowBlock.Type.PLATFORM, (1 * 8f + 8f) + 1f, false)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 1, EntityRowBlock.Type.PLATFORM, (1 * 8f + 8f) + 1f, false)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 2, EntityRowBlock.Type.PISTON_DPAD, (1 * 8f + 8f) + 1f, false)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 6, EntityRowBlock.Type.PISTON_DPAD, (1 * 8f + 8f) + 3f, false)
+        events += EventRowBlockSpawn(engine, world.rowDpad, 10, EntityRowBlock.Type.PLATFORM, (1 * 8f + 8f) + 3f, true)
+        events += EventDeployRod(engine, world.rowA, (1 * 8f + 8f))
+        events += EventDeployRod(engine, world.rowDpad, (1 * 8f + 8f))
+        events += EventLockInputs(engine, false, (1 * 8f + 8f) + 2f)
+        events += EventLockInputs(engine, false, (1 * 8f + 8f) + 7.25f)
+        events += EventRowBlockRetract(engine, world.rowA, -1, (1 * 8f + 8f) + 7.5f)
+        events += EventRowBlockDespawn(engine, world.rowA, -1, (1 * 8f + 8f) + 7.5f)
+        events += EventRowBlockRetract(engine, world.rowDpad, -1, (1 * 8f + 8f) + 7.5f)
+        events += EventRowBlockDespawn(engine, world.rowDpad, -1, (1 * 8f + 8f) + 7.5f)
+
+//        addPattern(events, 0 * 8 + 8f, listOf(
+//                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+//                Spawn(2, EntityRowBlock.Type.PISTON_A, 1f),
+//                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+//                Spawn(6, EntityRowBlock.Type.PISTON_A, 3f),
+//                Spawn(8, EntityRowBlock.Type.PLATFORM, 3f, true),
+//        ), emptyList(), repeat = false)
+//        addPattern(events, 1 * 8 + 8f, listOf(
+//                Spawn(0, EntityRowBlock.Type.PISTON_A, 0f),
+//                Spawn(4, EntityRowBlock.Type.PISTON_A, 2f),
+//                Spawn(8, EntityRowBlock.Type.PLATFORM, 2f, true),
+//        ), listOf(
+//                Spawn(0, EntityRowBlock.Type.PLATFORM, 1f),
+//                Spawn(1, EntityRowBlock.Type.PLATFORM, 1f),
+//                Spawn(2, EntityRowBlock.Type.PISTON_DPAD, 1f),
+//                Spawn(6, EntityRowBlock.Type.PISTON_DPAD, 3f),
+//                Spawn(10, EntityRowBlock.Type.PLATFORM, 3f, true),
+//        ), repeat = false)
+
 
         return events
     }

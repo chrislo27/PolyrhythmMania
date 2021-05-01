@@ -59,8 +59,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 InputThresholds.initInputClasses()
             }
             nextScreen = {
-//                TestWorldRenderScreen(this@PRManiaGame)
-                EditorScreen(this@PRManiaGame)
+                TestWorldRenderScreen(this@PRManiaGame)
+//                EditorScreen(this@PRManiaGame)
             }
         })
     }

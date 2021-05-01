@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
-import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputResult
@@ -19,323 +18,24 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
 
     companion object {
         private val tmpVec = Vector3()
-        private val EXPLODE_DELAY_SEC: Float = 1f / 3f
+        private const val EXPLODE_DELAY_SEC: Float = 1f / 3f
+        private const val GRAVITY: Float = -52f
+        private const val MIN_COLLISION_UPDATE_RATE: Int = 50
     }
 
     data class InputTracker(val expectedInputIndices: MutableList<Int> = mutableListOf(),
                             val results: MutableList<InputResult> = mutableListOf())
 
-    var collidedWithWall: Boolean = false
-        private set
-    private var fallState: FallState = FallState.Grounded
-    private var initializedActiveBlocks = false
-    private val activeBlocks: Array<EntityRowBlock.Type?> = Array(row.length) { null }
-    val xUnitsPerBeat: Float = 2f
-    private val killAfterBeats: Float = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
-    private var explodeAtSec: Float = Float.MAX_VALUE
-    private val isInAir: Boolean get() = fallState != FallState.Grounded
-    val inputTracker: InputTracker = InputTracker()
-    val acceptingInputs: Boolean
-        get() = !collidedWithWall
+    private data class Collision(
+            var collidedWithWall: Boolean = false,
+            var velocityY: Float = 0f,
+            var isInAir: Boolean = false,
+            var bounce: Bounce? = null,
+    )
 
-    private var engineUpdateLastSec: Float = Float.MAX_VALUE
-    private var lastCurrentIndex: Float = Float.MAX_VALUE
-
-    init {
-        this.position.z = row.startZ.toFloat()
-        this.position.y = row.startY.toFloat() + 1f
-    }
-
-    override fun getRenderWidth(): Float = 0.75f
-    override fun getRenderHeight(): Float = 0.5f
-
-    fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
-    fun getCurrentIndexFloor(posX: Float = this.position.x): Int = floor(getCurrentIndex(posX)).toInt()
-
-
-    fun getPosXFromBeat(beatsFromDeploy: Float): Float {
-        return (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beatsFromDeploy) * xUnitsPerBeat - (6 / 32f)
-    }
-
-    fun explode(engine: Engine) {
-        if (isKilled) return
-        kill()
-        world.addEntity(EntityExplosion(world, engine.seconds, this.getRenderWidth()).also {
-            it.position.set(this.position)
-        })
-        playSfxExplosion(engine)
-    }
-
-    fun bounce(startIndex: Int, endIndex: Int) {
-        val difference = endIndex - startIndex
-        if (difference <= 0) return
-
-        fun indexToX(index: Int): Float = index + row.startX + 0.25f
-
-        val prevFallState = this.fallState
-        if (prevFallState is FallState.Bouncing) {
-            this.fallState = FallState.Bouncing(row.startY + 1f + difference,
-                    indexToX(startIndex), row.startY + 1f, indexToX(endIndex), row.startY + 1f,
-                    prevFallState)
-        } else {
-            this.fallState = FallState.Bouncing(row.startY + 1f + difference,
-                    this.position.x, this.position.y, indexToX(endIndex), row.startY + 1f,
-                    null)
-        }
-    }
-
-    fun bounce(startIndex: Int) {
-        if (initializedActiveBlocks && startIndex in 0 until row.length) {
-            if (startIndex >= row.length - 1) {
-                bounce(startIndex, startIndex + 1)
-            } else {
-                updateActiveBlocks()
-                var nextNonNull = startIndex + 1
-                for (i in startIndex + 1 until row.length) {
-                    nextNonNull = i
-                    if (activeBlocks[i] != null) {
-                        break
-                    }
-                }
-                bounce(startIndex, nextNonNull)
-            }
-        }
-    }
-
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
-        val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(this.position))
-
-        val beatsFullAnimation = 60f / 128f
-        val posX = this.position.x
-        val animationAlpha = ((((if (posX < 0f) (posX + floor(posX).absoluteValue) else posX) / xUnitsPerBeat) % beatsFullAnimation) / beatsFullAnimation).coerceIn(0f, 1f)
-        val texReg: TextureRegion = if (!isInAir) {
-            tileset.rodGroundAnimations[(animationAlpha * tileset.rodGroundFrames).toInt().coerceIn(0, tileset.rodGroundFrames - 1)]
-        } else {
-            tileset.rodAerialAnimations[(animationAlpha * tileset.rodAerialFrames).toInt().coerceIn(0, tileset.rodAerialFrames - 1)]
-        }
-
-        // Debug transparency for fall state
-        if (Paintbox.debugMode) {
-            when (fallState) {
-                is FallState.Bouncing -> batch.setColor(1f, 1f, 1f, 0.25f)
-                is FallState.Falling -> batch.setColor(1f, 1f, 1f, 0.75f)
-            }
-        }
-        batch.draw(texReg, convertedVec.x - (1 / 32f), convertedVec.y, getRenderWidth(), getRenderHeight())
-        batch.setColor(1f, 1f, 1f, 1f)
-    }
-
-
-    override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
-        super.engineUpdate(engine, beat, seconds)
-
-        if (engineUpdateLastSec == Float.MAX_VALUE) {
-            engineUpdateLastSec = seconds
-        }
-
-        val delta = seconds - engineUpdateLastSec
-
-        collisionCheck(engine, beat, seconds, delta)
-
-        if (seconds >= explodeAtSec) {
-            explode(engine)
-        } else if ((beat - deployBeat) >= killAfterBeats && !isKilled) {
-            kill()
-        }
-
-        engineUpdateLastSec = seconds
-        lastCurrentIndex = getCurrentIndex(this.position.x)
-    }
-
-    /**
-     * Recomputes what blocks are active. Blocks that were already marked active do not get unmarked.
-     * [inputTracker] will also be updated with the correct number of inputs expected.
-     */
-    fun updateActiveBlocks() {
-        val lastExpectedSoFar = inputTracker.expectedInputIndices.lastOrNull() ?: -1
-        row.rowBlocks.forEachIndexed { index, entity ->
-            if (activeBlocks[index] == null) {
-                val type = if (!entity.active) null else entity.type
-                activeBlocks[index] = type
-                if (type != null && entity.type != EntityRowBlock.Type.PLATFORM && index > lastExpectedSoFar) {
-                    inputTracker.expectedInputIndices.add(index)
-                }
-            }
-        }
-        initializedActiveBlocks = true
-    }
-
-    private fun collisionCheck(engine: Engine, beat: Float, seconds: Float, deltaSec: Float) {
-        val prevPosX = this.position.x
-        val prevPosY = this.position.y
-        val prevPosZ = this.position.z
-
-        // Do collision check. Only works on the EntityRowBlocks for the given row.
-        // 1. Stops instantly if it hits a prematurely deployed piston
-        // 2. Stops if it hits a block when falling
-        val beatsFromDeploy = beat - deployBeat
-        val targetX = getPosXFromBeat(beatsFromDeploy)
-        // The index that the rod is on
-        val currentIndexFloat = getCurrentIndex(prevPosX) // /*targetX*/ 
-        val currentIndex = floor(currentIndexFloat).toInt()
-
-        // Initialize active blocks
-        if (currentIndexFloat >= -0.7f) {
-            updateActiveBlocks()
-        } else if (floor(lastCurrentIndex).toInt() != floor(currentIndexFloat).toInt() && lastCurrentIndex >= 0) {
-            updateActiveBlocks()
-        }
-
-        // Check for wall stop
-        if (!collidedWithWall && (currentIndexFloat - currentIndex) >= 0.7f) {
-            val nextIndex = currentIndex + 1
-            if (nextIndex in 0 until row.length) {
-                val next = row.rowBlocks[nextIndex]
-                val heightOfNext = next.collisionHeight
-                if (next.active && prevPosY in next.position.y..(next.position.y + heightOfNext - (1f / 32f))) {
-                    collidedWithWall = true
-//                    println("$seconds Collided with wall: currentIndex = ${currentIndexFloat}  x = ${this.position.x}")
-                    this.position.x = currentIndex + 0.7f + row.startX
-//                    println("$seconds After setting X: currentIndex would be ${this.position.x - row.startX}   x = ${this.position.x}")
-
-                    val currentFallState = fallState
-                    val fallVelo = if (currentFallState is FallState.Bouncing) {
-                        (currentFallState.getYFromX(this.position.x) - currentFallState.getYFromX(prevPosX)) / deltaSec
-                    } else 0f
-                    if (currentFallState is FallState.Bouncing) {
-                        fallState = FallState.Falling(fallVelo)
-                    }
-                    playSfxSideCollision(engine)
-
-                    if (currentIndexFloat < 0f) {
-                        // Standard collision detection will not take affect before index = 0
-                        if (explodeAtSec == Float.MAX_VALUE) {
-                            explodeAtSec = seconds + EXPLODE_DELAY_SEC
-                        }
-                    }
-                }
-            }
-        }
-        if (!collidedWithWall) {
-            this.position.x = targetX
-//            println("$seconds Set position X to target: ${targetX}")
-        }
-
-        // Control Y position
-        if (initializedActiveBlocks && currentIndex in 0 until row.length) {
-            when (val currentFallState = fallState) {
-                is FallState.Bouncing -> {
-                    // When bouncing, the Y position follows an arc until the target X position is reached
-                    this.position.y = currentFallState.getYFromX(this.position.x)
-
-                    val blockBelow = activeBlocks[currentIndex]
-                    if (blockBelow != null) {
-                        val entity = row.rowBlocks[currentIndex]
-                        val topPart = entity.position.y + entity.collisionHeight
-                        if (this.position.y < topPart) {
-                            this.position.y = topPart
-                        }
-                    }
-
-                    if (this.position.x >= currentFallState.endX) {
-                        fallState = FallState.Grounded
-                        playSfxLand(engine)
-                    }
-                }
-                is FallState.Falling -> {
-                    // Gravity acceleration
-                    currentFallState.velocityY += (-50f) * deltaSec
-
-                    // When falling, the Y position changes but collision detection is done to check for row start Y
-                    val futureY = prevPosY + (currentFallState.velocityY * deltaSec)
-
-                    val blockBelow = activeBlocks[currentIndex]
-                    val collisionY: Float = if (blockBelow != null) {
-                        val entity = row.rowBlocks[currentIndex]
-                        entity.position.y + entity.collisionHeight
-                    } else row.startY.toFloat()
-                    
-                    if (futureY <= collisionY) {
-                        this.position.y = collisionY
-                        if (currentFallState != FallState.Grounded) {
-                            fallState = FallState.Grounded
-                            if (currentIndexFloat < 13.5f) {
-                                // TODO find a better way to not play the land SFX when the platforms retract
-                                playSfxLand(engine)
-                            }
-                        }
-                    } else {
-                        this.position.y = futureY
-                    }
-                }
-                FallState.Grounded -> {
-                    // When grounded, the y position does not change but has to be checked if we transition to Falling
-                    // Transition to falling: entity block below is inactive (null)
-                    if (this.position.y <= row.startY) {
-                        // Don't go below floor level
-                        this.position.y = row.startY.toFloat()
-                    } else {
-                        val blockBelow = activeBlocks[currentIndex]
-                        if (blockBelow == null) {
-                            fallState = FallState.Falling(0f)
-                        } else {
-                            val entity = row.rowBlocks[currentIndex]
-                            val topPart = entity.position.y + entity.collisionHeight
-                            if (this.position.y < topPart) {
-                                this.position.y = topPart
-//                                println("$seconds Set pos y to ${topPart}, currentIndex = $currentIndexFloat  x = ${this.position.x}")
-                            } else if (this.position.y - (1f / 32f) > topPart) {
-                                this.fallState = FallState.Falling(0f)
-                            }
-                        }
-                    }
-
-                    if (explodeAtSec == Float.MAX_VALUE && collidedWithWall) {
-                        explodeAtSec = seconds + EXPLODE_DELAY_SEC
-                    }
-                }
-            }
-        } else {
-            // Before first row block
-            this.position.y = row.startY.toFloat() + 1
-        }
-    }
-
-    override fun onRemovedFromWorld(engine: Engine) {
-        super.onRemovedFromWorld(engine)
-        engine.inputter.submitInputsFromRod(this)
-    }
-
-    private fun playSfxLand(engine: Engine) {
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
-    }
-
-    private fun playSfxSideCollision(engine: Engine) {
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
-    }
-
-    private fun playSfxExplosion(engine: Engine) {
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_explosion"))
-    }
-}
-
-sealed class FallState {
-    /**
-     * The rod is not currently falling.
-     */
-    object Grounded : FallState()
-
-    /**
-     * The rod is currently falling BUT not from a bounce off a piston.
-     */
-    class Falling(var velocityY: Float) : FallState()
-
-    /**
-     * The rod is mid-bounce from a piston, and has a start/end position and given height.
-     */
-    class Bouncing(val peakHeight: Float, val startX: Float, val startY: Float, val endX: Float, val endY: Float,
-                   val previousBounce: Bouncing?)
-        : FallState() {
+    private data class Bounce(val rod: EntityRod, val peakHeight: Float,
+                              val startX: Float, val startY: Float, val endX: Float, val endY: Float,
+                              val previousBounce: Bounce?) {
 
         fun getYFromX(x: Float): Float {
             if (previousBounce != null && x < startX) {
@@ -357,11 +57,270 @@ sealed class FallState {
             }
 //            }
         }
+    }
 
-        override fun toString(): String {
-            return "Bouncing(peakHeight=$peakHeight, startX=$startX, startY=$startY, endX=$endX, endY=$endY)"
+    val xUnitsPerBeat: Float = 2f
+    private val killAfterBeats: Float = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
+
+    private var explodeAtSec: Float = Float.MAX_VALUE
+    private val collision: Collision = Collision()
+    private val isInAir: Boolean
+        get() = collision.isInAir
+
+    val inputTracker: InputTracker = InputTracker()
+    val acceptingInputs: Boolean
+        get() = !collision.collidedWithWall
+
+    private var engineUpdateLastSec: Float = Float.MAX_VALUE
+    private var collisionUpdateLastSec: Float = Float.MAX_VALUE
+    private var lastCurrentIndex: Float = Float.MAX_VALUE
+
+    init {
+        this.position.x = getPosXFromBeat(0f)
+        this.position.z = row.startZ.toFloat()
+        this.position.y = row.startY.toFloat() + 1f
+    }
+
+    override fun getRenderWidth(): Float = 0.75f
+    override fun getRenderHeight(): Float = 0.5f
+
+    fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
+    fun getCurrentIndexFloor(posX: Float = this.position.x): Int = floor(getCurrentIndex(posX)).toInt()
+    
+    fun getPosXFromBeat(beatsFromDeploy: Float): Float {
+        return (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beatsFromDeploy) * xUnitsPerBeat - (6 / 32f)
+    }
+
+    fun explode(engine: Engine) {
+        if (isKilled) return
+        kill()
+        world.addEntity(EntityExplosion(world, engine.seconds, this.getRenderWidth()).also {
+            it.position.set(this.position)
+        })
+        playSfxExplosion(engine)
+    }
+
+    fun bounce(startIndex: Int, endIndex: Int) {
+        val difference = endIndex - startIndex
+        if (difference <= 0) return
+
+        fun indexToX(index: Int): Float = index + row.startX + 0.25f
+
+        val prevBounce = collision.bounce
+        if (prevBounce != null) {
+            collision.bounce = Bounce(this, row.startY + 1f + difference, indexToX(startIndex), row.startY + 1f, indexToX(endIndex), row.startY + 1f, prevBounce)
+        } else {
+            collision.bounce = Bounce(this, row.startY + 1f + difference, this.position.x, this.position.y, indexToX(endIndex), row.startY + 1f, null)
+        }
+    }
+
+    fun bounce(startIndex: Int) {
+        if (startIndex in 0 until row.length) {
+            if (startIndex >= row.length - 1) {
+                bounce(startIndex, startIndex + 1)
+            } else {
+                updateInputIndices() // Is this really needed? Ported over from collision refactor
+
+                var nextNonNull = startIndex + 1
+                for (i in startIndex + 1 until row.length) {
+                    nextNonNull = i
+                    val rowBlock = row.rowBlocks[i]
+                    if (rowBlock.active) {
+                        break
+                    }
+                }
+                bounce(startIndex, nextNonNull)
+            }
+        }
+    }
+
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+        val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(this.position))
+
+        val beatsFullAnimation = 60f / 128f
+        val posX = this.position.x
+        val animationAlpha = ((((if (posX < 0f) (posX + floor(posX).absoluteValue) else posX) / xUnitsPerBeat) % beatsFullAnimation) / beatsFullAnimation).coerceIn(0f, 1f)
+        val texReg: TextureRegion = if (!isInAir) {
+            tileset.rodGroundAnimations[(animationAlpha * tileset.rodGroundFrames).toInt().coerceIn(0, tileset.rodGroundFrames - 1)]
+        } else {
+            tileset.rodAerialAnimations[(animationAlpha * tileset.rodAerialFrames).toInt().coerceIn(0, tileset.rodAerialFrames - 1)]
         }
 
+        batch.draw(texReg, convertedVec.x - (1 / 32f), convertedVec.y, getRenderWidth(), getRenderHeight())
+        batch.setColor(1f, 1f, 1f, 1f)
+    }
+
+    override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
+        super.engineUpdate(engine, beat, seconds)
+
+        if (engineUpdateLastSec == Float.MAX_VALUE) {
+            engineUpdateLastSec = seconds
+        }
+        if (collisionUpdateLastSec == Float.MAX_VALUE) {
+            val beatDeltaSec = engine.tempos.beatsToSeconds(beat) - engine.tempos.beatsToSeconds(deployBeat)
+            collisionUpdateLastSec = if (beatDeltaSec > 0f) {
+                engine.tempos.beatsToSeconds(deployBeat)
+            } else {
+                seconds
+            }
+        }
+
+        val engineUpdateDelta = seconds - engineUpdateLastSec
+
+        var collisionUpdateDelta = seconds - collisionUpdateLastSec
+        val minCollisionUpdateInterval = 1f / MIN_COLLISION_UPDATE_RATE
+        var count = 0
+        while (collisionUpdateDelta > 0f) {
+            collisionCheck(engine, beat, seconds, collisionUpdateDelta.coerceAtMost(minCollisionUpdateInterval))
+            collisionUpdateDelta -= minCollisionUpdateInterval
+            count++
+        }
+
+        if (seconds >= explodeAtSec) {
+            explode(engine)
+        } else if ((beat - deployBeat) >= killAfterBeats && !isKilled) {
+            kill()
+        }
+
+        engineUpdateLastSec = seconds
+        collisionUpdateLastSec = seconds
+        lastCurrentIndex = getCurrentIndex(this.position.x)
+    }
+
+    /**
+     * [inputTracker] will be updated with the correct number of inputs expected.
+     */
+    fun updateInputIndices() {
+        val lastExpectedSoFar = inputTracker.expectedInputIndices.lastOrNull() ?: -1
+        row.rowBlocks.forEachIndexed { index, entity ->
+            if (index > lastExpectedSoFar) {
+                val type = if (!entity.active) null else entity.type
+                if (type != null && entity.type != EntityRowBlock.Type.PLATFORM && index > lastExpectedSoFar) {
+                    inputTracker.expectedInputIndices.add(index)
+                }
+            }
+        }
+    }
+
+    /**
+     * Collision:
+     * - Collision is checked per engine update with a minimum of [MIN_COLLISION_UPDATE_RATE] per engine second
+     * - Rods move in a straight line on the X axis unless horizontally stopped
+     * - Rods can be horizontally stopped if it collides with the side wall of a block (incl extended pistons)
+     *   - Side collision is simply if (currentIndexFloat - currentIndex) >= 0.7f and the next block's Y > rod's Y pos
+     * - When a bouncer bounces a rod, the bouncer determines where the landing point is at moment of bounce
+     * - This puts the rod into a "bounce" state where it is not
+     * - Rods can be moved up and down by movement of the platform/piston
+     */
+    private fun collisionCheck(engine: Engine, beat: Float, seconds: Float, deltaSec: Float) {
+        val prevPosX = this.position.x
+        val prevPosY = this.position.y
+
+        // Do collision check. Only works on the EntityRowBlocks for the given row.
+        // 1. Stops instantly if it hits a prematurely deployed piston
+        // 2. Stops if it hits a block when falling
+        val beatsFromDeploy = beat - deployBeat
+        val targetX = getPosXFromBeat(beatsFromDeploy)
+        // The index that the rod is on
+        val currentIndexFloat = getCurrentIndex(prevPosX) // /*targetX*/ 
+        val currentIndex = floor(currentIndexFloat).toInt()
+        val collision = this.collision
+
+        // Initialize active blocks
+        if (currentIndexFloat >= -0.7f) {
+            updateInputIndices()
+        } else if (floor(lastCurrentIndex).toInt() != floor(currentIndexFloat).toInt() && lastCurrentIndex >= 0) {
+            updateInputIndices()
+        }
+
+        // Check for wall stop
+        if (!collision.collidedWithWall && (currentIndexFloat - currentIndex) >= 0.7f && currentIndex >= -1) {
+            val nextIndex = currentIndex + 1
+            if (nextIndex in 0 until row.length) {
+                val next = row.rowBlocks[nextIndex]
+                val heightOfNext = next.collisionHeight
+                if (next.active && prevPosY in next.position.y..(next.position.y + heightOfNext - (1f / 32f))) {
+                    collision.collidedWithWall = true
+//                    println("$seconds Collided with wall: currentIndex = ${currentIndexFloat}  x = ${this.position.x}")
+                    this.position.x = currentIndex + 0.7f + row.startX
+//                    println("$seconds After setting X: currentIndex would be ${this.position.x - row.startX}   x = ${this.position.x}")
+
+                    playSfxSideCollision(engine)
+
+                    // Standard collision detection will not take effect before index = -1
+                    if (explodeAtSec == Float.MAX_VALUE) {
+                        explodeAtSec = seconds + EXPLODE_DELAY_SEC
+                    }
+                }
+            }
+        }
+
+        // If not already collided with a wall, move X
+        if (!collision.collidedWithWall) {
+            this.position.x = targetX
+        }
+
+        // Control the Y position
+        if (currentIndex in 0 until row.length) {
+            if ((collision.bounce?.endX ?: Float.MAX_VALUE) < this.position.x) {
+                collision.bounce = null
+            }
+            val currentBounce: Bounce? = collision.bounce
+            val blockBelow: EntityRowBlock = row.rowBlocks[currentIndex]
+
+            if (currentBounce != null) {
+                val posX = this.position.x
+                this.position.y = currentBounce.getYFromX(posX)
+                collision.velocityY = (this.position.y - prevPosY) / deltaSec
+            } else {
+                val floorBelow: Float = if (!blockBelow.active) row.startY.toFloat() else {
+                    blockBelow.position.y + blockBelow.collisionHeight
+                }
+                if (floorBelow >= this.position.y) { // Push the rod up to the floor height and kill velocityY
+                    collision.velocityY = 0f
+                    this.position.y = floorBelow
+                } else if (blockBelow.retractionState == EntityRowBlock.RetractionState.RETRACTING && floorBelow + (2 / 32f) >= this.position.y) {
+                    // Magnetize the rod to the retracting block to prevent landing SFX from playing
+                    collision.velocityY = 0f
+                    this.position.y = floorBelow
+                } else {
+                    collision.velocityY += GRAVITY * deltaSec
+
+                    val veloY = collision.velocityY
+                    if (veloY != 0f) {
+                        val futureY = this.position.y + veloY * deltaSec
+                        if (futureY < floorBelow) {
+                            this.position.y = floorBelow
+                            playSfxLand(engine)
+                            collision.velocityY = 0f
+                        } else {
+                            this.position.y = futureY
+                        }
+                    }
+                }
+            }
+        } else {
+            // Set to row height when not in the block area
+            this.position.y = row.startY.toFloat() + 1
+            this.collision.velocityY = 0f
+        }
+    }
+
+    override fun onRemovedFromWorld(engine: Engine) {
+        super.onRemovedFromWorld(engine)
+        engine.inputter.submitInputsFromRod(this)
+    }
+
+    private fun playSfxLand(engine: Engine) {
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
+    }
+
+    private fun playSfxSideCollision(engine: Engine) {
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
+    }
+
+    private fun playSfxExplosion(engine: Engine) {
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_explosion"))
     }
 }
 

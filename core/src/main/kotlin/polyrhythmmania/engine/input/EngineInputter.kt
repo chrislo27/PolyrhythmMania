@@ -59,7 +59,7 @@ class EngineInputter(val engine: Engine) {
             for (entity in engine.world.entities) {
                 if (entity !is EntityRod || entity.row !== row || !entity.acceptingInputs) continue
                 val rod: EntityRod = entity
-                rod.updateActiveBlocks()
+                rod.updateInputIndices()
                 val inputTracker = rod.inputTracker
                 if (inputTracker.results.size >= inputTracker.expectedInputIndices.size) {
 //                    Paintbox.LOGGER.debug("$rod: Skipping input because results size >= expected inputs size (${inputTracker.results.size} >= ${inputTracker.expectedInputIndices.size})")

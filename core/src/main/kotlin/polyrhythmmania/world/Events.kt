@@ -104,7 +104,9 @@ class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Floa
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
         // FIXME despawn sound plays even if there is nothing to despawn
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_despawn"))
+        if (row.rowBlocks.any { it.active }) {
+            engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_despawn"))
+        }
     }
 
     override fun entityOnUpdate(entity: EntityRowBlock, currentBeat: Float, percentage: Float) {
@@ -117,7 +119,6 @@ class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Floa
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        // FIXME retract sound plays even if there is nothing to retract
         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_retract"))
     }
 

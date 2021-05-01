@@ -25,19 +25,23 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     }
     
     fun addEvent(event: Event) {
-        (this.events as MutableList) += event
+        this.events as MutableList
+        this.events += event
     }
 
     fun removeEvent(event: Event) {
-        (this.events as MutableList) -= event
+        this.events as MutableList
+        this.events -= event
     }
     
     fun addEvents(events: List<Event>) {
-        (this.events as MutableList).addAll(events)
+        this.events as MutableList
+        this.events.addAll(events)
     }
 
     fun removeEvents(events: List<Event>) {
-        (this.events as MutableList).removeAll(events)
+        this.events as MutableList
+        this.events.removeAll(events)
     }
     
     fun updateEvent(event: Event, atBeat: Float) {

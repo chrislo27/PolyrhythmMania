@@ -70,7 +70,7 @@ class World {
         }
 
         // Raised platforms
-        for (x in -1..4) {
+        for (x in -3..4) {
             for (zMul in 0..1) {
                 val ent: Entity = EntityPlatform(this, x == 4)
                 addEntity(ent.apply {
