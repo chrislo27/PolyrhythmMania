@@ -22,7 +22,7 @@ allprojects {
     version = "0.1.0"
     ext {
         appName = "PolyrhythmMania"
-        gdxVersion = '1.9.14'
+        gdxVersion = '1.10.0'
         gdxControllersVersion = '2.2.0'
     }
 
