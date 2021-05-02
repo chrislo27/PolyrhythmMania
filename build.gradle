@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        gradlePluginPortal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
@@ -23,7 +23,7 @@ allprojects {
     ext {
         appName = "PolyrhythmMania"
         gdxVersion = '1.9.14'
-        gdxControllersVersion = '2.1.0'
+        gdxControllersVersion = '2.2.0'
     }
 
     repositories {

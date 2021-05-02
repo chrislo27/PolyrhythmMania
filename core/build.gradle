@@ -13,9 +13,6 @@ compileKotlin {
     }
 }
 
-eclipse.project {
-    name = appName + "-core"
-}
 repositories {
     mavenCentral()
 }
