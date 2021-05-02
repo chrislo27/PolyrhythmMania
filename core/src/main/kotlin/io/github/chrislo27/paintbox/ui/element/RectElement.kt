@@ -14,6 +14,10 @@ class RectElement(initColor: Color) : UIElement() {
     
     constructor() : this(Color.WHITE)
     
+    constructor(binding: Var.Context.() -> Color) : this() {
+        color.bind(binding)
+    }
+    
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         val renderBounds = this.paddingZone
         val x = renderBounds.x.getOrCompute() + originX
