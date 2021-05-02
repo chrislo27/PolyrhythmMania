@@ -1,10 +1,12 @@
 package polyrhythmmania.editor.pane
 
+import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.UIElement
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
+import io.github.chrislo27.paintbox.ui.element.RectElement
 import polyrhythmmania.editor.Editor
 
 
@@ -14,6 +16,7 @@ class UpperPane(val editorPane: EditorPane) : Pane() {
     
     val previewPane: PreviewPane
     val toolbar: Toolbar
+    val instantiatorPane: InstantiatorPane
     
     init {
         
@@ -35,7 +38,19 @@ class UpperPane(val editorPane: EditorPane) : Pane() {
             this.bounds.width.bind { this@apply.bounds.height.use() * (16f / 9f) }
         }
         mainSection += previewPane
+        
+        val rightPane = Pane().apply { 
+            Anchor.TopRight.configure(this)
+            this.bindHeightToParent()
+            this.bounds.width.bind {
+                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) - previewPane.bounds.width.use()
+            }
+            this.padding.set(Insets(2f))
+        }
+        mainSection += rightPane
 
+        instantiatorPane = InstantiatorPane(this)
+        rightPane += instantiatorPane
 
         toolbar = Toolbar(this)
         toolbarBacking += toolbar

@@ -22,7 +22,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : TrackPane(allTracksPane) {
         this.contentBgColor.bind { editorPane.palette.trackPaneTimeBg.use() }
         this.bounds.height.set(48f)
 
-        timeLabel = TextLabel("00:00:00.000", font = editorPane.main.fontEditorBeatTime).apply {
+        timeLabel = TextLabel("00:00:00.000", font = editorPane.palette.beatTimeFont).apply {
             this.textAlign.set(TextAlign.RIGHT)
             this.renderAlign.set(Align.right)
             this.textColor.bind { editorPane.palette.trackPaneTimeText.use() }

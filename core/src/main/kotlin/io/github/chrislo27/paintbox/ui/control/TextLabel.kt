@@ -49,7 +49,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
      * If the alpha value is 0, the skin controls what text colour is used.
      */
     val textColor: Var<Color> = Var(Color(0f, 0f, 0f, 0f))
-    
+
     val scaleX: FloatVar = FloatVar(1f)
     val scaleY: FloatVar = FloatVar(1f)
 
@@ -70,7 +70,12 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
      * If this is overwritten, this [TextLabel]'s [textColor] should be set to have a non-zero opacity.
      */
     val internalTextBlock: Var<TextBlock> by lazy { createInternalTextBlockVar(this) }
-    
+
+    constructor(binding: Var.Context.() -> String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
+            : this("", font) {
+        text.bind(binding)
+    }
+
     fun setScaleXY(scaleXY: Float) {
         this.scaleX.set(scaleXY)
         this.scaleY.set(scaleXY)
@@ -162,7 +167,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         text.drawCompressed(batch, x + xOffset, y - h + yOffset,
                 if (compressX) (w - textPaddingOffsetX * 2f) else 0f, element.textAlign.getOrCompute())
         ColorStack.pop()
-        
+
         batch.packedColor = lastPackedColor
     }
 

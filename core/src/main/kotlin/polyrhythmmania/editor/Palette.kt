@@ -2,6 +2,7 @@ package polyrhythmmania.editor
 
 import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
 
@@ -21,6 +22,7 @@ open class Palette(val main: PRManiaGame) {
     val statusTextColor: Var<Color> = Var(Color().grey(1f, 1f))
     
     val upperPaneBorder: Var<Color> = Var.bind { borderTrim.use() }
+    val instantiatorPaneBorder: Var<Color> = Var.bind { upperPaneBorder.use() }
     val previewPaneBorder: Var<Color> = Var.bind { borderTrim.use() }
     val previewPaneSeparator: Var<Color> = Var.bind { separator.use() }
     val toolbarIconTint: Var<Color> = Var.bind { menubarIconTint.use() }
@@ -33,4 +35,10 @@ open class Palette(val main: PRManiaGame) {
     val trackPaneTimeText: Var<Color> = Var(Color().grey(1f, 1f))
     val trackPaneText: Var<Color> = Var(Color().grey(1f, 1f))
     val trackPaneTempoBg: Var<Color> = Var(Color(0.4f, 0.4f, 0.9f, 1f))
+    
+    // Fonts
+    
+    val beatTimeFont: PaintboxFont = main.fontEditorBeatTime
+    val beatTrackFont: PaintboxFont = main.fontEditorBeatTrack
+    val instantiatorFont: PaintboxFont = main.mainFontBoldBordered
 }
