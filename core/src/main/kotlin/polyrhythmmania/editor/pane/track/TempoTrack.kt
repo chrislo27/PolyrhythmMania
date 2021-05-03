@@ -1,26 +1,19 @@
 package polyrhythmmania.editor.pane.track
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.paintbox.font.TextAlign
-import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.control.TextLabel
-import io.github.chrislo27.paintbox.util.gdxutils.fillRect
-import kotlin.math.ceil
-import kotlin.math.floor
 
 
-class TempoTrack(allTracksPane: AllTracksPane) : TrackPane(allTracksPane) {
+class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, true) {
     
     val tempoMarkerPane: TempoMarkerPane = this.TempoMarkerPane()
     
     init {
-        this.sidebarBgColor.bind { editorPane.palette.trackPaneTempoBg.use() }
+        this.sidePanel.sidebarBgColor.bind { editorPane.palette.trackPaneTempoBg.use() }
+        this.sidePanel.titleText.set("Tempo")
         this.contentBgColor.bind { editorPane.palette.trackPaneTimeBg.use() }
         this.bounds.height.set(36f)
-        this.titleText.set("Tempo")
+        this.showContentBorder.set(true)
         
         this.contentSection += VerticalBeatLinesPane(editorPane)
     }

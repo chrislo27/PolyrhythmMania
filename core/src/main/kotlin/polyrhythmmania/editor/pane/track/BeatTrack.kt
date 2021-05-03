@@ -12,15 +12,16 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 
-class BeatTrack(allTracksPane: AllTracksPane) : TrackPane(allTracksPane) {
+class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, true) {
 
     val timeLabel: TextLabel
     val beatMarkerPane: BeatMarkerPane = this.BeatMarkerPane()
 
     init {
-        this.sidebarBgColor.bind { editorPane.palette.trackPaneTimeBg.use() }
+        this.sidePanel.sidebarBgColor.bind { editorPane.palette.trackPaneTimeBg.use() }
         this.contentBgColor.bind { editorPane.palette.trackPaneTimeBg.use() }
         this.bounds.height.set(48f)
+        this.showContentBorder.set(true)
 
         timeLabel = TextLabel("00:00:00.000", font = editorPane.palette.beatTimeFont).apply {
             this.textAlign.set(TextAlign.RIGHT)
@@ -29,7 +30,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : TrackPane(allTracksPane) {
             this.bgPadding.set(0f)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
         }
-        this.sidebarSection += timeLabel
+        this.sidePanel.sidebarSection += timeLabel
         
         beatMarkerPane.apply { 
             

@@ -33,7 +33,7 @@ open class Palette(val main: PRManiaGame) {
     val trackPaneBorder: Var<Color> = Var.bind { borderTrim.use() }
     val trackPaneTimeBg: Var<Color> = Var(Color().grey(0f, 1f))
     val trackPaneTimeText: Var<Color> = Var(Color().grey(1f, 1f))
-    val trackPaneText: Var<Color> = Var(Color().grey(1f, 1f))
+    val trackPaneTextColor: Var<Color> = Var(Color().grey(1f, 1f))
     val trackPaneTempoBg: Var<Color> = Var(Color(0.4f, 0.4f, 0.9f, 1f))
     val trackVerticalBeatLineColor: Var<Color> = Var(Color().grey(1f, 0.4f))
     
@@ -41,5 +41,5 @@ open class Palette(val main: PRManiaGame) {
     
     val beatTimeFont: PaintboxFont = main.fontEditorBeatTime
     val beatTrackFont: PaintboxFont = main.fontEditorBeatTrack
-    val instantiatorFont: PaintboxFont = main.mainFontBoldBordered
+    val instantiatorFont: PaintboxFont = main.fontEditorInstantiator
 }

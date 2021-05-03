@@ -422,9 +422,9 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
 
     private fun addDebugFonts(cache: FontCache) {
         fun makeParam() = FreeTypeFontGenerator.FreeTypeFontParameter().apply {
-            magFilter = Texture.TextureFilter.Linear
-            minFilter = Texture.TextureFilter.Linear
-            genMipMaps = false
+            magFilter = Texture.TextureFilter.MipMapLinearNearest
+            minFilter = Texture.TextureFilter.MipMapLinearNearest
+            genMipMaps = true
             incremental = true
             mono = false
             color = Color(1f, 1f, 1f, 1f)
