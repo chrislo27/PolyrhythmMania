@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.Disposable
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.SceneRoot
@@ -59,6 +60,9 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val trackView: TrackView = TrackView()
     val tool: Var<Tool> = Var(Tool.SELECTION)
     val click: Var<Click> = Var(Click.None)
+    val snapping: FloatVar = FloatVar(0.5f)
+    
+    val beatLines: BeatLines = BeatLines()
     
     init {
         trackView.renderScale = 0.5f
@@ -145,4 +149,6 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         if ((pressedButtons as MutableSet).remove(keycode)) return true
         return sceneRoot.inputSystem.keyUp(keycode)
     }
+    
+    data class BeatLines(var active: Boolean = false, var fromBeat: Int = 0, var toBeat: Int = 0,)
 }

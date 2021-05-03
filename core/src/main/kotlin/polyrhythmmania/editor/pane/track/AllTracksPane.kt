@@ -28,7 +28,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         tracks += tempoTrack
         
         val TRACK_COLOURS: List<Color> = (0 until 8).map { Color(1f, 1f, 1f, 1f).fromHsv((it * 3f / 8f * 360f) % 360f, 2 / 3f, 0.75f) }
-        tracks += TrackPane(this).apply { 
+        tracks += EditorTrackPane(this, "input_a").apply { 
             this.bounds.height.set(64f)
             this.sidebarBgColor.set(Color().set(TRACK_COLOURS[0]))
             this.titleText.set("A side")
@@ -38,7 +38,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
                     TextRun(editorPane.main.mainFontBordered, " side"),
             )))
         }
-        tracks += TrackPane(this).apply {
+        tracks += EditorTrackPane(this, "input_dpad").apply {
             this.bounds.height.set(64f)
             this.sidebarBgColor.set(Color().set(TRACK_COLOURS[1]))
             this.titleText.set("+ side")

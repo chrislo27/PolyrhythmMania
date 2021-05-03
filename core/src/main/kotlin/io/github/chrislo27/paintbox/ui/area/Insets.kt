@@ -9,8 +9,12 @@ data class Insets(val top: Float, val bottom: Float, val left: Float, val right:
 
         private val intCache: Array<Insets> by lazy {
             Array(11) { i ->
-                val f = i.toFloat()
-                Insets(f, f, f, f)
+                if (i == 0) {
+                    ZERO
+                } else {
+                    val f = i.toFloat()
+                    Insets(f, f, f, f)
+                }
             }
         }
 

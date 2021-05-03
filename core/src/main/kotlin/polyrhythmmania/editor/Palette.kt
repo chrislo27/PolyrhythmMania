@@ -35,6 +35,7 @@ open class Palette(val main: PRManiaGame) {
     val trackPaneTimeText: Var<Color> = Var(Color().grey(1f, 1f))
     val trackPaneText: Var<Color> = Var(Color().grey(1f, 1f))
     val trackPaneTempoBg: Var<Color> = Var(Color(0.4f, 0.4f, 0.9f, 1f))
+    val trackVerticalBeatLineColor: Var<Color> = Var(Color().grey(1f, 0.4f))
     
     // Fonts
     
