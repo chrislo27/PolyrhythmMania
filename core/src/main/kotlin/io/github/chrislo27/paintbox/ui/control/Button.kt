@@ -146,7 +146,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
 
     val roundedCorners: EnumSet<Corner> = EnumSet.allOf(Corner::class.java)
 
-    private val textColorToUse: ReadOnlyVar<Color> = Var {
+    val textColorToUse: ReadOnlyVar<Color> = Var {
         val pressedState = element.pressedState.use()
         if (element.apparentDisabledState.use()) {
             disabledTextColor.use()
@@ -159,7 +159,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
             }
         }
     }
-    private val bgColorToUse: ReadOnlyVar<Color> = Var {
+    val bgColorToUse: ReadOnlyVar<Color> = Var {
         val pressedState = element.pressedState.use()
         if (element.apparentDisabledState.use()) {
             disabledBgColor.use()
