@@ -189,8 +189,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        return false
-//        return dispatchEvent(Scrolled(amountX, amountY))
+        return dispatchEventBasedOnMouse(Scrolled(amountX, amountY)) != null
     }
 
     private data class ClickPressedState(val lastHoveredElementPathPerLayer: Map<SceneRoot.Layer, List<UIElement>>,
