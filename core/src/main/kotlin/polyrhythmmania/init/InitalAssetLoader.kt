@@ -29,7 +29,7 @@ class InitalAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_icon_button_open", "textures/ui/icon/button_open.png")
         AssetRegistry.loadAsset<Texture>("ui_icon_button_save", "textures/ui/icon/button_save.png")
         AssetRegistry.loadAsset<Texture>("ui_icon_button_play", "textures/ui/icon/button_play.png")
-        AssetRegistry.loadAsset<Texture>("ui_icon_button_io", "textures/ui/icon/buttons_io.png")
+        AssetRegistry.loadAsset<Texture>("ui_icon_buttons_editor", "textures/ui/icon/buttons_editor.png")
         AssetRegistry.loadAsset<Texture>("ui_icon_button_pause", "textures/ui/icon/button_pause.png")
         AssetRegistry.loadAsset<Texture>("ui_icon_button_stop", "textures/ui/icon/button_stop.png")
         

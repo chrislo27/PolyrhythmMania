@@ -46,6 +46,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         }
         previewSection += playbackButtonPane
         pauseButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f + 4f)
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 0 + 4f * 0, offsetY = 0f)
@@ -53,11 +54,12 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_pause"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 0, 16, 14, 14)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 0, 16, 16, 16)).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
         playButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f + 4f)
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 1 + 4f * 1, offsetY = 0f)
@@ -65,11 +67,12 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_play"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 16, 16, 14, 14)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 16, 16, 16, 16)).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
         stopButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
             this.margin.set(Insets(0f, 0f, 0f, 0f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 2 + 4f * 2, offsetY = 0f)
@@ -77,7 +80,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_stop"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 32, 16, 14, 14)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 32, 16, 16, 16)).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }

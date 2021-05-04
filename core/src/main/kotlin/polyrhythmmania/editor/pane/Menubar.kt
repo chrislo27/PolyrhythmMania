@@ -18,6 +18,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     
     init {
         this += Button("").apply {
+            this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f + 4f)
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 0f, offsetY = 0f)
@@ -25,11 +26,12 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_new"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 32, 0, 14, 14)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 32, 0, 16, 16)).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
         this += Button("").apply {
+            this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f + 4f)
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 1 + 4f * 1, offsetY = 0f)
@@ -37,11 +39,12 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_open"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 16, 0, 14, 14)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 16, 0, 16, 16)).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
         this += Button("").apply {
+            this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f + 4f)
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 2 + 4f * 2, offsetY = 0f)
@@ -49,7 +52,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_save"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_io"), 0, 0, 14, 14)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 0, 0, 16, 16)).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }

@@ -198,7 +198,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             else -> {
             }
         }
-        return inputConsumed
+        return inputConsumed || sceneRoot.inputSystem.touchUp(screenX, screenY, pointer, button)
     }
 
     fun getDebugString(): String {
