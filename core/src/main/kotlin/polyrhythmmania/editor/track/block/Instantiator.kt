@@ -31,6 +31,9 @@ object Instantiators {
         add(Instantiator("pattern", Localization.getVar("instantiator.pattern.name")) { editor ->
             BlockPattern(editor)
         })
+        add(Instantiator("test", Localization.getVar("instantiator.test.name")) { editor ->
+            BlockTest(editor)
+        })
 
         map = tempMap
         list = tempList
