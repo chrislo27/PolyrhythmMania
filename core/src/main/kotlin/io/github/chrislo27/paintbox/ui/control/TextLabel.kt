@@ -82,7 +82,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     }
 
     @Suppress("RemoveRedundantQualifierName")
-    override fun getSkinID(): String = TextLabel.SKIN_ID
+    override fun getDefaultSkinID(): String = TextLabel.SKIN_ID
 
 }
 

@@ -79,7 +79,7 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     }
 
     @Suppress("RemoveRedundantQualifierName")
-    override fun getSkinID(): String = Button.SKIN_ID
+    override fun getDefaultSkinID(): String = Button.SKIN_ID
 
     override fun defaultInputEventListener(event: InputEvent): Boolean {
         return if (!apparentDisabledState.getOrCompute()) {

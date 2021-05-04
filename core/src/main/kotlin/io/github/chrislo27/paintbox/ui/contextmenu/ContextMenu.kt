@@ -88,7 +88,7 @@ open class ContextMenu : Control<ContextMenu>() {
         }
     }
 
-    override fun getSkinID(): String = ContextMenu.SKIN_ID
+    override fun getDefaultSkinID(): String = ContextMenu.SKIN_ID
     
     open inner class ContextMenuSkin(element: ContextMenu) : Skin<ContextMenu>(element) {
 
