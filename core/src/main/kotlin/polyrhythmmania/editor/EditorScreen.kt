@@ -37,6 +37,8 @@ class EditorScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     override fun renderUpdate() {
         super.renderUpdate()
+        
+        editor.renderUpdate()
 
         // FIXME DEBUG resets editor scene
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
@@ -54,7 +56,7 @@ class EditorScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     override fun getDebugString(): String {
-        return """rootSize: ${countChildren(sceneRoot)}
+        return """${editor.getDebugString()}
 
 """
     }

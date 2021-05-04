@@ -132,7 +132,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     }
                 }
                 this.setOnAction { 
-                    editorPane.editor.tool.set(thisTool)
+                    editorPane.editor.changeTool(thisTool)
                 }
             })
         }

@@ -8,9 +8,9 @@ import polyrhythmmania.editor.track.Track
 
 
 /**
- * An [EditorTrackPane] is a track pane that directly represents a [Track] in the editor.
+ * An [EditorTrackSidePane] is a track pane that directly represents a [Track] in the editor.
  */
-class EditorTrackPane(val allTracksPane: AllTracksPane, val trackID: String)
+class EditorTrackSidePane(val allTracksPane: AllTracksPane, val trackID: String)
     : Pane() {
 
     val editorPane: EditorPane = allTracksPane.editorPane

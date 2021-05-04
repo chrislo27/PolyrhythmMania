@@ -3,6 +3,7 @@ package io.github.chrislo27.paintbox.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.ui.area.ReadOnlyBounds
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
@@ -221,6 +222,28 @@ open class UIElement : UIBounds() {
             yOffset += currentBounds.y.getOrCompute()
         }
         return res
+    }
+
+    /**
+     * Returns the xy position relative to the uppermost parent.
+     */
+    fun getPosRelativeToRoot(vector: Vector2 = Vector2(0f, 0f)): Vector2 {
+        vector.set(0f, 0f)
+        // Traverse up the tree
+        var current: UIElement = this
+        var currentParent: UIElement? = current.parent.getOrCompute()
+        while (currentParent != null) {
+            val bounds: ReadOnlyBounds = currentParent.contentZone
+            vector.x += bounds.x.getOrCompute()
+            vector.y += bounds.y.getOrCompute()
+            current = currentParent
+            currentParent = current.parent.getOrCompute()
+        }
+
+        vector.x += this.bounds.x.getOrCompute()
+        vector.y += this.bounds.y.getOrCompute()
+        
+        return vector
     }
     
     operator fun plusAssign(child: UIElement) = addChild(child)

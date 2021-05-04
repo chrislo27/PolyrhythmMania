@@ -1,14 +1,17 @@
 package polyrhythmmania.editor.pane
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.ui.Anchor
+import io.github.chrislo27.paintbox.ui.ClickPressed
 import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.track.block.Instantiator
 import polyrhythmmania.editor.track.block.Instantiators
 import kotlin.math.roundToInt
 
@@ -49,6 +52,20 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
         scrollSelector += list
     }
     
+    init {
+        addInputEventListener { event ->
+            when (event) {
+                is ClickPressed -> {
+                    if (event.button == Input.Buttons.LEFT) {
+                        editor.attemptInstantiatorDrag(list.getCurrentInstantiator())
+                        true
+                    } else false
+                }
+                else -> false
+            }
+        }
+    }
+    
 }
 
 class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
@@ -64,6 +81,11 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             textAlign.set(TextAlign.LEFT)
             textColor.set(Color.WHITE)
         }
+    }
+    
+    fun getCurrentInstantiator(): Instantiator {
+        // TODO
+        return Instantiators.list.first()
     }
     
 }
