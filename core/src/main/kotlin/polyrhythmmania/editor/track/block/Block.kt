@@ -41,6 +41,13 @@ open class Block(val editor: Editor, blockTypes: EnumSet<BlockType>) {
         batch.drawRect(renderX, editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight,
                 editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
                 trackHeight, 4f)
+        
+        if (editor.selectedBlocks[this] == true) {
+            batch.setColor(0.1f, 1f, 1f, 0.333f)
+            batch.fillRect(renderX, editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight,
+                    editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
+                    trackHeight)
+        }
     }
 
 }

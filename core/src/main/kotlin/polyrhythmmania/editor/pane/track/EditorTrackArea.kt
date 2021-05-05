@@ -1,7 +1,9 @@
 package polyrhythmmania.editor.pane.track
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.ui.*
@@ -17,7 +19,7 @@ import polyrhythmmania.editor.pane.EditorPane
 
 /**
  * The area where blocks are placed on tracks.
- * 
+ *
  * Note: Does NOT support [margin], [border], or [padding]!
  * You should wrap this [EditorTrackArea] in a [Pane] to set those properties.
  */
@@ -28,6 +30,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
 
     private val lastMouseAbsolute: Vector2 = Vector2()
     private val lastMouseRelative: Vector2 = Vector2()
+    private val tmpRect: Rectangle = Rectangle()
 
     init {
         this.doClipping.set(true)
@@ -51,10 +54,27 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     true
                 }
                 is TouchDown -> {
-                    // FIXME make this more flexible
                     onMouseMovedOrDragged(event.x, event.y)
-                    // HACK: uses lastMouseRelative side effect from onMouseMovedOrDragged
-                    (editor.click as Var).set(Click.CreateSelection(editor, getBeatFromRelative(lastMouseRelative.x), getTrackFromRelative(lastMouseRelative.y)))
+                    val relMouse = lastMouseRelative
+                    val mouseBeat = getBeatFromRelative(relMouse.x)
+                    val mouseTrack = getTrackFromRelative(relMouse.y)
+
+                    if (event.button == Input.Buttons.LEFT) {
+                        // If clicking on a selected block, start dragging 
+                        val blockClickedOn = editor.selectedBlocks.keys.firstOrNull { block ->
+                            tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f).contains(mouseBeat, mouseTrack)
+                        }
+                        if (blockClickedOn != null) {
+                            val newClick = Click.DragSelection.create(editor, editor.selectedBlocks.keys.toList(),
+                                    Vector2(mouseBeat - blockClickedOn.beat, mouseTrack - blockClickedOn.trackIndex),
+                                    blockClickedOn)
+                            if (newClick != null) {
+                                editor.click.set(newClick)
+                            }
+                        } else {
+                            editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack))
+                        }
+                    }
                     true
                 }
                 else -> false
@@ -88,7 +108,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         val y = originY - renderBounds.y.getOrCompute()
         return y - (track * allTracksPane.editorTrackHeight)
     }
-    
+
     fun trackToRenderY(originY: Float, track: Float): Float {
         val renderBounds = this.contentZone
         val y = originY - renderBounds.y.getOrCompute()
@@ -104,11 +124,11 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
         super.renderSelfAfterChildren(originX, originY, batch)
 
-        val renderBounds = this.contentZone
-        val x = renderBounds.x.getOrCompute() + originX
-        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
-        val h = renderBounds.height.getOrCompute()
+//        val renderBounds = this.contentZone
+//        val x = renderBounds.x.getOrCompute() + originX
+//        val y = originY - renderBounds.y.getOrCompute()
+//        val w = renderBounds.width.getOrCompute()
+//        val h = renderBounds.height.getOrCompute()
         val trackView = editor.trackView
         val click = editor.click.getOrCompute()
         val trackHeight = allTracksPane.editorTrackHeight
@@ -116,12 +136,6 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         val tmpColor = ColorStack.getAndPush()
 
         // FIXME refactor out?
-
-        // DEBUG
-        batch.setColor(1f, 0f, 0f, 1f)
-        batch.fillRect(lastMouseRelative.x + (this.bounds.x.getOrCompute() + originX),
-                (originY - this.bounds.y.getOrCompute()) - lastMouseRelative.y,
-                5f, 5f)
 
         // Render blocks
         editor.blocks.forEach { block ->
@@ -153,6 +167,12 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     beatToRenderX(originX, rect.x + rect.width) - renderX,
                     trackHeight * rect.height, 2f)
         }
+
+        // DEBUG
+        batch.setColor(1f, 0f, 0f, 1f)
+        batch.fillRect(lastMouseRelative.x + (this.bounds.x.getOrCompute() + originX),
+                (originY - this.bounds.y.getOrCompute()) - lastMouseRelative.y,
+                5f, 5f)
 
         ColorStack.pop()
         batch.packedColor = lastPackedColor

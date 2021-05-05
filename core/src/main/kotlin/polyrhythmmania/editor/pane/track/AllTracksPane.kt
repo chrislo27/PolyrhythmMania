@@ -52,7 +52,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         }
         editorTrackSides += EditorTrackSidePane(this, Editor.TRACK_VFX0).apply {
             this.sidePanel.sidebarBgColor.set(Color().set(trackColours[2]))
-            this.sidePanel.titleText.set("VFX0")
+            this.sidePanel.titleText.set("VFX 0")
         }
         
         editorTrackArea = EditorTrackArea(this)

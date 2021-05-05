@@ -24,6 +24,7 @@ import polyrhythmmania.editor.track.BlockType
 import polyrhythmmania.editor.track.Track
 import polyrhythmmania.editor.track.block.Block
 import polyrhythmmania.editor.track.block.Instantiator
+import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
@@ -37,8 +38,8 @@ import kotlin.collections.LinkedHashMap
 
 
 class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720))
-    : InputProcessor by sceneRoot.inputSystem, Disposable {
-    
+    : ActionHistory<Editor>(), InputProcessor by sceneRoot.inputSystem, Disposable {
+
     companion object {
         val TRACK_INPUT_A: String = "input_a"
         val TRACK_INPUT_DPAD: String = "input_dpad"
@@ -70,20 +71,21 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     // Editor tooling states
     val trackView: TrackView = TrackView()
     val tool: ReadOnlyVar<Tool> = Var(Tool.SELECTION)
-    val click: ReadOnlyVar<Click> = Var(Click.None)
+    val click: Var<Click> = Var(Click.None)
     val snapping: FloatVar = FloatVar(0.5f)
     val beatLines: BeatLines = BeatLines()
 
     // Editor scene states
-    val blocks: MutableList<Block> = CopyOnWriteArrayList()
+    val blocks: List<Block> = CopyOnWriteArrayList()
+    val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
 
     val editorPane: EditorPane
-    
+
     init {
         trackView.renderScale.set(0.5f)
         frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
     }
-    
+
     init { // This init block should be LAST
         editorPane = EditorPane(this)
         sceneRoot += editorPane
@@ -133,8 +135,10 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
         val newBlock: Block = instantiator.factory.invoke(instantiator, this)
 
-        val newClick = Click.DragSelection(this, listOf(newBlock))
-        (click as Var).set(newClick)
+        val newClick = Click.DragSelection.create(this, listOf(newBlock))
+        if (newClick != null) {
+            click.set(newClick)
+        }
     }
 
     fun changeTool(tool: Tool) {
@@ -156,6 +160,37 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
     override fun dispose() {
         frameBuffer.disposeQuietly()
+    }
+
+    fun addBlock(block: Block) {
+        this.blocks as MutableList
+        if (block !in this.blocks) {
+            this.blocks.add(block)
+        }
+    }
+
+    fun addBlocks(blocks: List<Block>) {
+        this.blocks as MutableList
+        blocks.forEach { block ->
+            if (block !in this.blocks) {
+                this.blocks.add(block)
+            }
+        }
+    }
+
+    fun removeBlock(block: Block) {
+        this.blocks as MutableList
+        this.blocks.remove(block)
+        (this.selectedBlocks as MutableMap).remove(block)
+    }
+
+    fun removeBlocks(blocks: List<Block>) {
+        this.blocks as MutableList
+        this.blocks.removeAll(blocks)
+        this.selectedBlocks as MutableMap
+        blocks.forEach { block ->
+            this.selectedBlocks.remove(block)
+        }
     }
 
     private val pressedButtons: MutableSet<Int> = mutableSetOf()
@@ -187,12 +222,12 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             is Click.DragSelection -> {
                 if (button == Input.Buttons.LEFT) {
                     currentClick.complete()
-                    (click as Var).set(Click.None)
+                    click.set(Click.None)
                     inputConsumed = true
                 } else if (button == Input.Buttons.RIGHT) {
                     // Cancel the drag
                     currentClick.abortAction()
-                    (click as Var).set(Click.None)
+                    (click as io.github.chrislo27.paintbox.binding.Var).set(Click.None)
                     inputConsumed = true
                 }
             }
@@ -200,12 +235,35 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 if (button == Input.Buttons.RIGHT) {
                     // Cancel the drag
                     currentClick.abortAction()
-                    (click as Var).set(Click.None)
+                    click.set(Click.None)
                     inputConsumed = true
                 } else if (button == Input.Buttons.LEFT) {
-                    // TODO select the entities
-                    currentClick.abortAction()
-                    (click as Var).set(Click.None)
+                    this.selectedBlocks as MutableMap
+                    val previousSelection = this.selectedBlocks.keys.toSet()
+                    val isCtrlDown = Gdx.input.isControlDown()
+                    val isShiftDown = Gdx.input.isShiftDown()
+                    val isAltDown = Gdx.input.isAltDown()
+                    val xorSelectMode = isShiftDown && !isCtrlDown && !isAltDown
+                    if (!xorSelectMode) {
+                        this.selectedBlocks.clear()
+                    }
+                    blocks.forEach { block ->
+                        if (currentClick.isBlockInSelection(block)) {
+                            if (xorSelectMode) {
+                                if (block in previousSelection) {
+                                    this.selectedBlocks.remove(block)
+                                } else {
+                                    this.selectedBlocks.put(block, true)
+                                }
+                            } else {
+                                this.selectedBlocks.put(block, true)
+                            }
+                        }
+                    }
+                    
+                    // TODO put on undo stack
+
+                    click.set(Click.None)
                     inputConsumed = true
                 }
             }
