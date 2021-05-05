@@ -18,6 +18,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
     val trackView: TrackView = allTracksPane.trackView
     val editor: Editor = editorPane.editor
 
+    private val lastMouseAbsolute: Vector2 = Vector2()
     private val lastMouseRelative: Vector2 = Vector2()
 
     init {
@@ -42,9 +43,13 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                 else -> false
             }
         }
+        editor.trackView.beat.addListener {
+            onMouseMovedOrDragged(lastMouseAbsolute.x, lastMouseAbsolute.y)
+        }
     }
     
     private fun onMouseMovedOrDragged(x: Float, y: Float) {
+        lastMouseAbsolute.set(x, y)
         val thisPos = this.getPosRelativeToRoot(lastMouseRelative)
         lastMouseRelative.x = x - thisPos.x
         lastMouseRelative.y = y - thisPos.y

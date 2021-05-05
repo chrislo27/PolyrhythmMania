@@ -30,8 +30,9 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         val tmpColor = ColorStack.getAndPush()
         val editor = editorPane.editor
         val trackView = editor.trackView
-        val leftBeat = floor(trackView.beat)
-        val rightBeat = ceil(trackView.beat + (w / trackView.pxPerBeat))
+        val trackViewBeat = trackView.beat.getOrCompute()
+        val leftBeat = floor(trackViewBeat)
+        val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.getOrCompute()))
         val lineWidth = this.lineWidth.getOrCompute()
 
         val beatLines: Editor.BeatLines = editor.beatLines

@@ -1,20 +1,21 @@
 package polyrhythmmania.editor
 
+import io.github.chrislo27.paintbox.binding.FloatVar
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+
 
 class TrackView {
-    var beat: Float = 0f
-        set(value) {
-            field = value.coerceAtLeast(0f)
-        }
-    var renderScale: Float = 1f
-    val pxPerBeat: Float 
-        get() = 128f * renderScale
+    val beat: FloatVar = FloatVar(0f)
+    val renderScale: FloatVar = FloatVar(1f)
+    val pxPerBeat: ReadOnlyVar<Float> = FloatVar {
+        128f * renderScale.use()
+    }
     
     fun translateBeatToX(beat: Float): Float {
-        return (beat - this.beat) * this.pxPerBeat
+        return (beat - this.beat.getOrCompute()) * this.pxPerBeat.getOrCompute()
     }
     
     fun translateXToBeat(x: Float): Float {
-        return (x / this.pxPerBeat) + this.beat
+        return (x / this.pxPerBeat.getOrCompute()) + this.beat.getOrCompute()
     }
 }

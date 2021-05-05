@@ -70,7 +70,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val blocks: MutableList<Block> = CopyOnWriteArrayList()
 
     init {
-        trackView.renderScale = 0.5f
+        trackView.renderScale.set(0.5f)
         frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
         populateUIScene()
     }
@@ -109,10 +109,10 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val trackView = this.trackView
         if (!ctrl && !alt && !shift) {
             if (Input.Keys.D in pressedButtons) {
-                trackView.beat += 7f * delta
+                trackView.beat.set((trackView.beat.getOrCompute() + (7f * delta)).coerceAtLeast(0f))
             }
             if (Input.Keys.A in pressedButtons) {
-                trackView.beat -= 7f * delta
+                trackView.beat.set((trackView.beat.getOrCompute() - (7f * delta)).coerceAtLeast(0f))
             }
         }
     }

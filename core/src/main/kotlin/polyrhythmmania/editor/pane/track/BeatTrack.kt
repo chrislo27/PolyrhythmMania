@@ -49,8 +49,9 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
 
             val tmpColor = ColorStack.getAndPush()
             val trackView = editorPane.editor.trackView
-            val leftBeat = floor(trackView.beat)
-            val rightBeat = ceil(trackView.beat + (w / trackView.pxPerBeat))
+            val trackViewBeat = trackView.beat.getOrCompute()
+            val leftBeat = floor(trackViewBeat)
+            val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.getOrCompute()))
 
             tmpColor.set(1f, 1f, 1f, 1f)
             batch.color = tmpColor
