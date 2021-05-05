@@ -1,8 +1,10 @@
 package polyrhythmmania.editor
 
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.util.MathHelper
 import polyrhythmmania.editor.track.block.Block
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -10,7 +12,39 @@ import kotlin.math.floor
 sealed class Click {
     object None : Click()
 
-    class CreateSelection(val editor: Editor) : Click()
+    class CreateSelection(val editor: Editor, val startBeat: Float, val startTrack: Float) : Click() {
+        val rectangle: Rectangle = Rectangle()
+
+        fun updateRectangle(mouseBeat: Float, mouseTrack: Float) {
+            val startX = startBeat
+            val startY = startTrack
+            
+            val width = mouseBeat - startX
+            val height = mouseTrack - startY
+
+            if (width < 0) {
+                val abs = abs(width)
+                rectangle.x = startX - abs
+                rectangle.width = abs
+            } else {
+                rectangle.x = startX
+                rectangle.width = width
+            }
+
+            if (height < 0) {
+                val abs = abs(height)
+                rectangle.y = startY - abs
+                rectangle.height = abs
+            } else {
+                rectangle.y = startY
+                rectangle.height = height
+            }
+        }
+
+        override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
+            updateRectangle(beat, trackY)
+        }
+    }
 
     class DragSelection(val editor: Editor, val blocks: List<Block>,
                         val mouseOffset: Vector2 = Vector2(0f, 0f),
@@ -29,9 +63,18 @@ sealed class Click {
         var track: Int = 0
 
         fun complete() {
-            // TODO place (and add if necessary) the blocks
             val beatLines = editor.beatLines
             beatLines.active = false
+
+            val editorBlocks = editor.blocks
+            this.blocks.forEach { block ->
+                if (block !in editorBlocks) {
+                    editorBlocks.add(block)
+                }
+                val region = regions.getValue(block)
+                block.beat = region.beat
+                block.trackIndex = region.track
+            }
         }
 
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {

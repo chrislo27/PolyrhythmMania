@@ -54,10 +54,11 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         WorldRenderer(world, GBATileset(AssetRegistry["tileset_gba"]))
     }
 
-    val tracks: Map<String, Track> = listOf(
+    val tracks: List<Track> = listOf(
             Track("input_a", EnumSet.of(BlockType.INPUT)),
             Track("input_dpad", EnumSet.of(BlockType.INPUT)),
-    ).associateByTo(LinkedHashMap()) { track -> track.id }
+    )
+    val trackMap: Map<String, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 
     // Editor tooling states
     val trackView: TrackView = TrackView()
@@ -69,15 +70,16 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     // Editor scene states
     val blocks: MutableList<Block> = CopyOnWriteArrayList()
 
+    val editorPane: EditorPane
+    
     init {
         trackView.renderScale.set(0.5f)
         frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
-        populateUIScene()
     }
-
-    private fun populateUIScene() {
-        sceneRoot += EditorPane(this)
-
+    
+    init { // This init block should be LAST
+        editorPane = EditorPane(this)
+        sceneRoot += editorPane
         resize(Gdx.graphics.width, Gdx.graphics.height)
     }
 
@@ -193,12 +195,29 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     currentClick.abortAction()
                     (click as Var).set(Click.None)
                     inputConsumed = true
+                } else if (button == Input.Buttons.LEFT) {
+                    // TODO select the entities
+                    currentClick.abortAction()
+                    (click as Var).set(Click.None)
+                    inputConsumed = true
                 }
             }
             else -> {
             }
         }
         return inputConsumed || sceneRoot.inputSystem.touchUp(screenX, screenY, pointer, button)
+    }
+
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        var inputConsumed = false
+
+        val currentClick = click.getOrCompute()
+        if (currentClick is Click.CreateSelection) {
+            // FIXME for creating selection
+            (sceneRoot.children.first { it is EditorPane } as EditorPane).allTracksPane.editorTrackArea.onMouseMovedOrDragged(screenX.toFloat(), screenY.toFloat())
+        }
+
+        return inputConsumed || sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer)
     }
 
     fun getDebugString(): String {

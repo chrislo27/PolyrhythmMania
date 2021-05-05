@@ -17,7 +17,7 @@ class EditorTrackSidePane(val allTracksPane: AllTracksPane, val trackID: String)
     val trackView: TrackView = allTracksPane.trackView
     val editor: Editor = editorPane.editor
     
-    val track: Track = editor.tracks[trackID] ?: error("No track found in the editor with id \"$trackID\"")
+    val track: Track = editor.trackMap[trackID] ?: error("No track found in the editor with id \"$trackID\"")
     val sidePanel: SidePanel
     
     init {
