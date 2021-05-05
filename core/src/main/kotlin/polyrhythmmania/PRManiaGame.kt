@@ -121,7 +121,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
         val afterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
 //            font.data.blankLineScale = 0.75f
-            font.setUseIntegerPositions(false)
+            font.setUseIntegerPositions(!false)
         }
         val defaultFontSize = 20
 
@@ -233,6 +233,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     size = 24
                     borderWidth = 2f
                 }).setAfterLoad(afterLoad)
+        cache["editor_instantiator_summary"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Medium.ttf"), 1, 1f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 24
+                    borderWidth = 0f
+                }).setAfterLoad(afterLoad)
         cache["rodin"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 1, 1f, false, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -261,6 +268,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontEditorBeatTime: PaintboxFont inline get() = fontCache["editor_beat_time"]
     val fontEditorBeatTrack: PaintboxFont inline get() = fontCache["editor_beat_track"]
     val fontEditorInstantiator: PaintboxFont inline get() = fontCache["editor_instantiator"]
+    val fontEditorInstantiatorSummary: PaintboxFont inline get() = fontCache["editor_instantiator_summary"]
     val fontRodin: PaintboxFont inline get() = fontCache["rodin"]
     val fontRodinBordered: PaintboxFont inline get() = fontCache["rodin_BORDERED"]
 

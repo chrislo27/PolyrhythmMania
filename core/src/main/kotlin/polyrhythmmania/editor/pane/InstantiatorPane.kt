@@ -7,12 +7,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.font.Markup
+import io.github.chrislo27.paintbox.font.TextAlign
+import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.ButtonSkin
+import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
 import io.github.chrislo27.paintbox.util.gdxutils.drawCompressed
 import polyrhythmmania.editor.Editor
@@ -51,18 +56,42 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
                 (parent.use()?.contentZone?.width?.use()
                         ?: 0f) - (middleDivider.bounds.x.use() + middleDivider.bounds.width.use())
             }
+            this.padding.set(Insets(2f))
         }
         this += descPane
+        descPane += this.InstantiatorDesc()
 
-        list = InstantiatorList(this).apply {
-
-        }
+        list = InstantiatorList(this)
         scrollSelector += list
     }
 
-    init {
-    }
 
+    inner class InstantiatorDesc : Pane() {
+        val summary: TextLabel
+        val desc: TextLabel
+
+        init {
+            val summaryHeight = 64f
+            summary = TextLabel(binding = { list.currentInstantiator.use().summary.use() }, font = editorPane.palette.instantiatorSummaryFont).apply { 
+                this.bounds.height.set(summaryHeight)
+                this.textColor.bind { editorPane.palette.instantiatorSummaryText.use() }
+                this.textAlign.set(TextAlign.LEFT)
+                this.renderAlign.set(Align.left)
+            }
+            desc = TextLabel(binding = { list.currentInstantiator.use().desc.use() }, font = editorPane.palette.instantiatorDescFont).apply {
+                this.bounds.y.set(summaryHeight)
+                this.bindHeightToParent(adjust = -summaryHeight)
+                this.textColor.bind { editorPane.palette.instantiatorDescText.use() }
+                this.textAlign.set(TextAlign.LEFT)
+                this.renderAlign.set(Align.topLeft)
+                this.setScaleXY(0.75f)
+                this.margin.set(Insets(8f, 8f, 0f, 0f))
+                this.markup.set(editorPane.palette.markup)
+            }
+            this += summary
+            this += desc
+        }
+    }
 }
 
 class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
@@ -77,6 +106,10 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
     val listView: ListView
 
     private var index: Var<Int> = Var(0)
+
+    val currentInstantiator: ReadOnlyVar<Instantiator> = Var.bind {
+        list[index.use()]
+    }
 
     init {
         val buttonWidth = 32f
@@ -98,7 +131,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             this.setOnAction {
                 scroll(-1)
             }
-            this.disabled.bind { 
+            this.disabled.bind {
                 index.use() <= 0
             }
         }
@@ -140,7 +173,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             when (event) {
                 is ClickPressed -> {
                     if (event.button == Input.Buttons.LEFT) {
-                        editor.attemptInstantiatorDrag(this.getCurrentInstantiator())
+                        editor.attemptInstantiatorDrag(this.currentInstantiator.getOrCompute())
                         true
                     } else false
                 }
@@ -162,10 +195,6 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
         if (down == 0) return
         val future = (index.getOrCompute() + down).coerceIn(list.indices)
         index.set(future)
-    }
-
-    fun getCurrentInstantiator(): Instantiator {
-        return list[index.getOrCompute()]
     }
 
     inner class ListView : Pane() {

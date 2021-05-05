@@ -2,7 +2,9 @@ package polyrhythmmania.editor
 
 import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.PaintboxFont
+import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
 
@@ -23,6 +25,8 @@ open class Palette(val main: PRManiaGame) {
     
     val upperPaneBorder: Var<Color> = Var.bind { borderTrim.use() }
     val instantiatorPaneBorder: Var<Color> = Var.bind { upperPaneBorder.use() }
+    val instantiatorSummaryText: Var<Color> = Var.bind { Color().grey(1f, 1f) }
+    val instantiatorDescText: Var<Color> = Var.bind { instantiatorSummaryText.use() }
     val previewPaneBorder: Var<Color> = Var.bind { borderTrim.use() }
     val previewPaneSeparator: Var<Color> = Var.bind { separator.use() }
     val toolbarIconTint: Var<Color> = Var.bind { menubarIconTint.use() }
@@ -42,4 +46,12 @@ open class Palette(val main: PRManiaGame) {
     val beatTimeFont: PaintboxFont = main.fontEditorBeatTime
     val beatTrackFont: PaintboxFont = main.fontEditorBeatTrack
     val instantiatorFont: PaintboxFont = main.fontEditorInstantiator
+    val instantiatorSummaryFont: PaintboxFont = main.fontEditorInstantiatorSummary
+    val instantiatorDescFont: PaintboxFont = main.fontEditorInstantiatorSummary
+    
+    // Markup
+    val markup: Markup = Markup(mapOf("bold" to main.mainFontBold, "italic" to main.mainFontItalic,
+            "bolditalic" to main.mainFontBoldItalic),
+            TextRun(main.mainFont, ""),
+            Markup.FontStyles("bold", "italic", "bolditalic"))
 }

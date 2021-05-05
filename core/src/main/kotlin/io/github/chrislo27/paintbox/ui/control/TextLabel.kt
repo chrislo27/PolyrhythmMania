@@ -5,18 +5,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.binding.FloatVar
-import io.github.chrislo27.paintbox.font.PaintboxFont
-import io.github.chrislo27.paintbox.font.TextAlign
-import io.github.chrislo27.paintbox.font.TextBlock
-import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
 import io.github.chrislo27.paintbox.ui.skin.Skin
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.font.*
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 
 /**
@@ -36,14 +34,22 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
 
         fun createInternalTextBlockVar(label: TextLabel): Var<TextBlock> {
             return Var {
-                TextRun(label.font.use(), label.text.use(), Color.WHITE,
-                        label.scaleX.use(), label.scaleY.use()).toTextBlock()
+                val markup: Markup? = label.markup.use()
+                markup?.parse(label.text.use())
+                        ?: TextRun(label.font.use(), label.text.use(), Color.WHITE,
+                                label.scaleX.use(), label.scaleY.use()).toTextBlock()
             }
         }
     }
 
     val text: Var<String> = Var(text)
     val font: Var<PaintboxFont> = Var(font)
+
+    /**
+     * The [Markup] object to use. If null, no markup parsing is done. If not null,
+     * then the markup determines the TextBlock (and other values like [textColor], [scaleX], [scaleY] are ignored).
+     */
+    val markup: Var<Markup?> = Var(null)
 
     /**
      * If the alpha value is 0, the skin controls what text colour is used.
@@ -164,7 +170,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         }
 
         batch.color = tmpColor // Sets the opacity
-        text.drawCompressed(batch, x + xOffset, y - h + yOffset,
+        text.drawCompressed(batch, x + xOffset, (y - h + yOffset),
                 if (compressX) (w - textPaddingOffsetX * 2f) else 0f, element.textAlign.getOrCompute())
         ColorStack.pop()
 
