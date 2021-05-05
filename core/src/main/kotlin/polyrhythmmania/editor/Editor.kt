@@ -38,6 +38,12 @@ import kotlin.collections.LinkedHashMap
 
 class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720))
     : InputProcessor by sceneRoot.inputSystem, Disposable {
+    
+    companion object {
+        val TRACK_INPUT_A: String = "input_a"
+        val TRACK_INPUT_DPAD: String = "input_dpad"
+        val TRACK_VFX0: String = "vfx_0"
+    }
 
     private val uiCamera: OrthographicCamera = OrthographicCamera()
     val frameBuffer: FrameBuffer
@@ -55,8 +61,9 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     val tracks: List<Track> = listOf(
-            Track("input_a", EnumSet.of(BlockType.INPUT)),
-            Track("input_dpad", EnumSet.of(BlockType.INPUT)),
+            Track(TRACK_INPUT_A, EnumSet.of(BlockType.INPUT)),
+            Track(TRACK_INPUT_DPAD, EnumSet.of(BlockType.INPUT)),
+            Track(TRACK_VFX0, EnumSet.of(BlockType.VFX)),
     )
     val trackMap: Map<String, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 

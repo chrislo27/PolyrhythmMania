@@ -5,6 +5,7 @@ import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.font.TextBlock
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.ui.Pane
+import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
 
@@ -31,7 +32,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         tracks += tempoTrack
         
         val trackColours: List<Color> = (0 until 8).map { Color(1f, 1f, 1f, 1f).fromHsv((it * 3f / 8f * 360f) % 360f, 2 / 3f, 0.75f) }
-        editorTrackSides += EditorTrackSidePane(this, "input_a").apply {
+        editorTrackSides += EditorTrackSidePane(this, Editor.TRACK_INPUT_A).apply {
             this.sidePanel.sidebarBgColor.set(Color().set(trackColours[0]))
             this.sidePanel.titleText.set("A side")
             this.sidePanel.titleLabel.internalTextBlock.set(TextBlock(listOf(
@@ -40,7 +41,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
                     TextRun(editorPane.main.mainFontBordered, " side"),
             )))
         }
-        editorTrackSides += EditorTrackSidePane(this, "input_dpad").apply {
+        editorTrackSides += EditorTrackSidePane(this, Editor.TRACK_INPUT_DPAD).apply {
             this.sidePanel.sidebarBgColor.set(Color().set(trackColours[1]))
             this.sidePanel.titleText.set("+ side")
             this.sidePanel.titleLabel.internalTextBlock.set(TextBlock(listOf(
@@ -48,6 +49,10 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
                     TextRun(editorPane.main.fontRodinBordered, "\uE110"),
                     TextRun(editorPane.main.mainFontBordered, " side"),
             )))
+        }
+        editorTrackSides += EditorTrackSidePane(this, Editor.TRACK_VFX0).apply {
+            this.sidePanel.sidebarBgColor.set(Color().set(trackColours[2]))
+            this.sidePanel.titleText.set("VFX0")
         }
         
         editorTrackArea = EditorTrackArea(this)
