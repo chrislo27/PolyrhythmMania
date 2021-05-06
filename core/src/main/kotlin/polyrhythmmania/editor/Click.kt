@@ -6,6 +6,7 @@ import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.intersects
 import polyrhythmmania.editor.track.Track
 import polyrhythmmania.editor.track.block.Block
+import polyrhythmmania.editor.undo.ReversibleAction
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -14,7 +15,9 @@ import kotlin.math.floor
 sealed class Click {
     object None : Click()
 
-    class CreateSelection(val editor: Editor, val startBeat: Float, val startTrack: Float) : Click() {
+    class CreateSelection(val editor: Editor, val startBeat: Float, val startTrack: Float,
+                          val previousSelection: Set<Block>)
+        : Click() {
         val rectangle: Rectangle = Rectangle(startBeat, startTrack, 0f, 0f)
         private val tmpRect: Rectangle = Rectangle()
 
@@ -69,6 +72,7 @@ sealed class Click {
         data class BlockRegion(var beat: Float, var track: Int)
         
         val regions: Map<Block, BlockRegion> = blocks.associateWith { BlockRegion(it.beat, it.trackIndex) }
+        val originalRegions: Map<Block, BlockRegion> = blocks.associateWith { BlockRegion(it.beat, it.trackIndex) }
         val originalOffsets: Map<Block, BlockRegion> = blocks.associateWith { block ->
             BlockRegion(block.beat - originBlock.beat, block.trackIndex - originBlock.trackIndex) 
         }

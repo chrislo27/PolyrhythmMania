@@ -18,7 +18,7 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
     private val redos: Deque<ReversibleAction<SELF>> by lazy { createDeque() }
 
     /**
-     * Mutate this object, adding the action on the undo stack, and clearing all redos.
+     * Mutate this object, adding the action on the undo stack, and clears all redos.
      */
     fun mutate(action: ReversibleAction<SELF>) {
         addActionWithoutMutating(action)
@@ -28,7 +28,7 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
     }
 
     /**
-     * Adds an action without calling the redo method of the action.
+     * Adds an action without calling the redo method of the action. Redos are cleared.
      */
     fun addActionWithoutMutating(action: ReversibleAction<SELF>) {
         redos.clear()
@@ -41,7 +41,6 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
             if (undos.size > maxItems) {
                 undos.removeLast()
             }
-
             if (redos.size > maxItems) {
                 redos.removeLast()
             }

@@ -25,6 +25,7 @@ import polyrhythmmania.editor.track.Track
 import polyrhythmmania.editor.track.block.Block
 import polyrhythmmania.editor.track.block.Instantiator
 import polyrhythmmania.editor.undo.ActionHistory
+import polyrhythmmania.editor.undo.impl.SelectionAction
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
@@ -238,30 +239,35 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     click.set(Click.None)
                     inputConsumed = true
                 } else if (button == Input.Buttons.LEFT) {
-                    this.selectedBlocks as MutableMap
                     val previousSelection = this.selectedBlocks.keys.toSet()
                     val isCtrlDown = Gdx.input.isControlDown()
                     val isShiftDown = Gdx.input.isShiftDown()
                     val isAltDown = Gdx.input.isAltDown()
                     val xorSelectMode = isShiftDown && !isCtrlDown && !isAltDown
-                    if (!xorSelectMode) {
-                        this.selectedBlocks.clear()
-                    }
-                    blocks.forEach { block ->
-                        if (currentClick.isBlockInSelection(block)) {
-                            if (xorSelectMode) {
+                    
+                    val newSelection: MutableSet<Block>
+                    if (xorSelectMode) {
+                        newSelection = previousSelection.toMutableSet()
+                        blocks.forEach { block ->
+                            if (currentClick.isBlockInSelection(block)) {
                                 if (block in previousSelection) {
-                                    this.selectedBlocks.remove(block)
+                                    newSelection.remove(block)
                                 } else {
-                                    this.selectedBlocks.put(block, true)
+                                    newSelection.add(block)
                                 }
-                            } else {
-                                this.selectedBlocks.put(block, true)
+                            }
+                        }
+                    } else {
+                        newSelection = mutableSetOf()
+                        blocks.forEach { block ->
+                            if (currentClick.isBlockInSelection(block)) {
+                                newSelection.add(block)
                             }
                         }
                     }
                     
-                    // TODO put on undo stack
+                    val selectionAction = SelectionAction(previousSelection, newSelection)
+                    this.mutate(selectionAction)
 
                     click.set(Click.None)
                     inputConsumed = true

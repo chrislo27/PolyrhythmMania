@@ -72,7 +72,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                                 editor.click.set(newClick)
                             }
                         } else {
-                            editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack))
+                            editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack, editor.selectedBlocks.keys.toSet()))
                         }
                     }
                     true
