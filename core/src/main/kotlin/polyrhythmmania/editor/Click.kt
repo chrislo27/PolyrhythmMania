@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.intersects
+import polyrhythmmania.editor.track.Track
 import polyrhythmmania.editor.track.block.Block
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -123,7 +124,14 @@ sealed class Click {
             }
             // TODO make this more flexible? Selections spanning multiple tracks cannot move between tracks
             if (encompassingRegion.track <= 1) {
-                originRegion.track = (trackY - mouseOffset.y).toInt()
+                val targetTrackIndex = (trackY - mouseOffset.y).toInt()
+                val targetTrack: Track? = editor.tracks.getOrNull(targetTrackIndex)
+                if (targetTrack != null) {
+                    val allowedTypes = targetTrack.allowedTypes
+                    if (blocks.all { b -> b.blockTypes.any { bt -> bt in allowedTypes } }) {
+                        originRegion.track = targetTrackIndex
+                    }
+                }
             }
             
             // Set other blocks relative to origin block
