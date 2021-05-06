@@ -223,9 +223,10 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             button.bounds.width.set(150f)
             button.bounds.height.set(50f)
             
+            (button.skin.getOrCompute() as ButtonSkin).roundedRadius.set(10)
             button.tooltipElement.set(Tooltip("Test tooltip text.").apply {
                 this.text.bind { 
-                    this@UIAnchorTestEditorScreen.root.frameUpdateTrigger.use()
+//                    this@UIAnchorTestEditorScreen.root.frameUpdateTrigger.use()
                     "Test: ${DecimalFormats.format("0.000", MathHelper.getTriangleWave(2f))}"
                 }
             })
@@ -243,7 +244,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             pane.border.set(Insets(4f))
             pane.borderStyle.set(SolidBorder().apply { this.color.set(Color.MAGENTA) })
             pane.addChild(Button("Test button bounds", font = main.debugFont).also { button ->
-                (button.skin as ButtonSkin).roundedRadius.set(0)
+                (button.skin.getOrCompute() as ButtonSkin).roundedRadius.set(0)
             })
         }
         bg += Button("Disabled button", font = main.debugFont).also { button ->
