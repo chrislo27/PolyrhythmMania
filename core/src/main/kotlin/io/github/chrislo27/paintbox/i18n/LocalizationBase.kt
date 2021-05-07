@@ -65,7 +65,7 @@ abstract class LocalizationBase(val baseHandle: FileHandle, val langDefFile: Fil
 
     fun getVar(key: String, argsProvider: ReadOnlyVar<List<Any?>>): ReadOnlyVar<String> {
         return Var {
-            currentBundle.use()?.getValue(key, argsProvider.use().toTypedArray()) ?: key
+            currentBundle.use()?.getValue(key, *argsProvider.use().toTypedArray()) ?: key
         }
     }
 
