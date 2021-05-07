@@ -14,7 +14,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
     val trackView: TrackView = editorPane.editor.trackView
     
     val sidebarWidth: FloatVar = FloatVar(200f)
-    val editorTrackHeight: Float = 64f
+    val editorTrackHeight: Float = 48f
     
     val beatTrack: BeatTrack
     val tempoTrack: TempoTrack

@@ -89,7 +89,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val editorPane: EditorPane
 
     init {
-        trackView.renderScale.set(0.5f)
+//        trackView.renderScale.set(0.5f)
         frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
     }
 
@@ -234,14 +234,20 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         when (currentClick) {
             is Click.DragSelection -> {
                 if (button == Input.Buttons.LEFT) {
-                    val prevSelection = this.selectedBlocks.keys.toList()
-                    currentClick.complete()
-                    if (currentClick.isNew) {
-                        this.addActionWithoutMutating(ActionGroup(PlaceAction(currentClick.blocks.toList()), SelectionAction(prevSelection.toSet(), currentClick.blocks.toSet())))
-                    } else {
-                        this.addActionWithoutMutating(MoveAction(currentClick.blocks.associateWith { block ->
-                            MoveAction.Pos(currentClick.originalRegions.getValue(block), Click.DragSelection.BlockRegion(block.beat, block.trackIndex))
-                        }))
+                    if (currentClick.wouldBeDeleted) {
+                        val prevSelection = this.selectedBlocks.keys.toList()
+                        currentClick.abortAction()
+                        this.mutate(DeletionAction(prevSelection))
+                    } else if (!currentClick.isPlacementInvalid) {
+                        val prevSelection = this.selectedBlocks.keys.toList()
+                        currentClick.complete()
+                        if (currentClick.isNew) {
+                            this.addActionWithoutMutating(ActionGroup(PlaceAction(currentClick.blocks.toList()), SelectionAction(prevSelection.toSet(), currentClick.blocks.toSet())))
+                        } else {
+                            this.addActionWithoutMutating(MoveAction(currentClick.blocks.associateWith { block ->
+                                MoveAction.Pos(currentClick.originalRegions.getValue(block), Click.DragSelection.BlockRegion(block.beat, block.trackIndex))
+                            }))
+                        }
                     }
                     
                     click.set(Click.None)

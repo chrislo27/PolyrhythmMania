@@ -8,7 +8,7 @@ class TrackView {
     val beat: FloatVar = FloatVar(0f)
     val renderScale: FloatVar = FloatVar(1f)
     val pxPerBeat: ReadOnlyVar<Float> = FloatVar {
-        128f * renderScale.use()
+        72f * renderScale.use()
     }
     
     fun translateBeatToX(beat: Float): Float {
