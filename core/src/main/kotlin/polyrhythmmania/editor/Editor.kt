@@ -25,7 +25,11 @@ import polyrhythmmania.editor.track.BlockType
 import polyrhythmmania.editor.track.Track
 import polyrhythmmania.editor.track.block.Block
 import polyrhythmmania.editor.track.block.Instantiator
+import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
+import polyrhythmmania.editor.undo.impl.DeletionAction
+import polyrhythmmania.editor.undo.impl.MoveAction
+import polyrhythmmania.editor.undo.impl.PlaceAction
 import polyrhythmmania.editor.undo.impl.SelectionAction
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -199,18 +203,24 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     private val pressedButtons: MutableSet<Int> = mutableSetOf()
 
     override fun keyDown(keycode: Int): Boolean {
-//        val ctrl = Gdx.input.isControlDown()
-//        val alt = Gdx.input.isAltDown()
-//        val shift = Gdx.input.isShiftDown()
-//        if (!ctrl && !alt && !shift && keycode == Input.Keys.D) {
+        var inputConsumed = false
+        val ctrl = Gdx.input.isControlDown()
+        val alt = Gdx.input.isAltDown()
+        val shift = Gdx.input.isShiftDown()
         when (keycode) {
             Input.Keys.D, Input.Keys.A -> {
                 pressedButtons += keycode
-                return true
+                inputConsumed = true
+            }
+            Input.Keys.DEL, Input.Keys.FORWARD_DEL -> {
+                val selected = selectedBlocks.keys.toList()
+                if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
+                    this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
+                }
             }
         }
-//        }
-        return sceneRoot.inputSystem.keyDown(keycode)
+        
+        return inputConsumed || sceneRoot.inputSystem.keyDown(keycode)
     }
 
     override fun keyUp(keycode: Int): Boolean {
@@ -224,7 +234,16 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         when (currentClick) {
             is Click.DragSelection -> {
                 if (button == Input.Buttons.LEFT) {
+                    val prevSelection = this.selectedBlocks.keys.toList()
                     currentClick.complete()
+                    if (currentClick.isNew) {
+                        this.addActionWithoutMutating(ActionGroup(PlaceAction(currentClick.blocks.toList()), SelectionAction(prevSelection.toSet(), currentClick.blocks.toSet())))
+                    } else {
+                        this.addActionWithoutMutating(MoveAction(currentClick.blocks.associateWith { block ->
+                            MoveAction.Pos(currentClick.originalRegions.getValue(block), Click.DragSelection.BlockRegion(block.beat, block.trackIndex))
+                        }))
+                    }
+                    
                     click.set(Click.None)
                     inputConsumed = true
                 } else if (button == Input.Buttons.RIGHT) {
