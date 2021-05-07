@@ -21,7 +21,7 @@ import java.lang.NumberFormatException
  * - The backslash character \ is the escape character and will escape ANY character after it, including another backslash.
  * - An unclosed start or end tag is counted as normal text.
  * ```
- * 
+ *
  * The list of attributes is defined as follows:
  * ```
  * Core tags:
@@ -35,7 +35,7 @@ import java.lang.NumberFormatException
  * offsety=1.0 : Defines the offsetXEm, should be a float
  * carryoverx=true : Defines carryOverOffsetX, should be a boolean
  * carryovery=true : Defines carryOverOffsetY, should be a boolean
- * 
+ *
  * Utility tags:
  * b : Defines font=${styles.bold}
  * i : Defines font=${styles.italic}
@@ -53,7 +53,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
         val FONT_NAME_BOLD: String = "bold"
         val FONT_NAME_ITALIC: String = "italic"
         val FONT_NAME_BOLDITALIC: String = "bolditalic"
-        
+
         val TAG_FONT: String = "font"
         val TAG_COLOR: String = "color"
         val TAG_SCALEX: String = "scalex"
@@ -113,10 +113,12 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
             var offsetY = tag.attrMap[TAG_OFFSETY]?.valueAsFloatOr(0f) ?: 0f
             var carryoverX = tag.attrMap[TAG_CARRYOVERX]?.valueAsBooleanOr(true) ?: true
             var carryoverY = tag.attrMap[TAG_CARRYOVERY]?.valueAsBooleanOr(false) ?: false
-            
 
-            val bold = (tag.attrMap[TAG_BOLD]?.valueAsBooleanOr(false) ?: false) || (tag.attrMap[TAG_BOLD2]?.valueAsBooleanOr(false) ?: false)
-            val italic = (tag.attrMap[TAG_ITALIC]?.valueAsBooleanOr(false) ?: false) || (tag.attrMap[TAG_ITALIC2]?.valueAsBooleanOr(false) ?: false)
+
+            val bold = (tag.attrMap[TAG_BOLD]?.valueAsBooleanOr(false)
+                    ?: false) || (tag.attrMap[TAG_BOLD2]?.valueAsBooleanOr(false) ?: false)
+            val italic = (tag.attrMap[TAG_ITALIC]?.valueAsBooleanOr(false)
+                    ?: false) || (tag.attrMap[TAG_ITALIC2]?.valueAsBooleanOr(false) ?: false)
             val bolditalic = bold && italic
 
             if (bolditalic) {
@@ -126,11 +128,11 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
             } else if (italic) {
                 font = fontMapping[styles.italic] ?: fontMapping.getValue(DEFAULT_FONT_NAME)
             }
-            
+
             val subscript = tag.attrMap[TAG_SUBSCRIPT]?.valueAsBooleanOr(false) ?: false
             val superscript = tag.attrMap[TAG_SUPERSCRIPT]?.valueAsBooleanOr(false) ?: false
             val exponent = tag.attrMap[TAG_EXPONENT]?.valueAsBooleanOr(false) ?: false
-            
+
             if (subscript) {
                 // scalex=0.58, scaley=0.58, offsety=-0.333
                 scaleX = 0.58f
@@ -149,7 +151,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                 scaleX = 0.58f
                 scaleY = 0.58f
             }
-            
+
             runs += TextRun(font, tag.text, color, scaleX, scaleY, offsetX, offsetY, carryoverX, carryoverY)
         }
 
@@ -210,7 +212,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
             tags += newTag
             text = ""
         }
-        
+
         return tags
     }
 
@@ -230,6 +232,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
         val currentTagAttr = mutableSetOf<Attribute>()
         var parsingAttributeValue = false
         var currentAttrKey = ""
+        var startOfTagContent = "" // Used if the tag doesn't finish, then the entire content is a Text symbol instead
         while (strIndex <= markup.length) {
             val currentChar: Char? = if (strIndex >= markup.length) null else markup[strIndex]
 
@@ -252,6 +255,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                             parsingAttributeValue = false
                             currentText = ""
                             currentAttrKey = ""
+                            startOfTagContent = "$currentChar"
                             currentTagAttr.clear()
                         } else if (currentChar == null) {
                             symbols += Symbol.Text(currentText)
@@ -261,7 +265,9 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                         }
                     } else { // Parse tag attributes
                         // End the tag definition
-                        if (currentChar == ']' || currentChar == null) {
+                        if (currentChar == null) {
+                            symbols += Symbol.Text(startOfTagContent)
+                        } else if (currentChar == ']') {
                             // Complete the last attribute if not done
                             if (parsingAttributeValue && currentAttrKey.isNotEmpty()) {
                                 currentTagAttr.add(Attribute(currentAttrKey, currentText))
@@ -289,6 +295,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                             parsingAttributeValue = false
                         } else {
                             // Parse attributes
+                            startOfTagContent += "$currentChar"
                             if (parsingAttributeValue) {
                                 if (currentChar == ' ') {
                                     // End attribute value
@@ -329,7 +336,9 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
     }
 
     data class Attribute(val key: String, val value: Any) {
-        fun valueAsIntOr(default: Int): Int = if (value is Int) value else if (value is String) (value.toIntOrNull() ?: default) else default
+        fun valueAsIntOr(default: Int): Int = if (value is Int) value else if (value is String) (value.toIntOrNull()
+                ?: default) else default
+
         fun valueAsString(): String = value.toString()
         fun valueAsFloatOr(default: Float): Float = when (val v = value) {
             is Float -> v
@@ -338,12 +347,13 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
             is String -> v.toFloatOrNull() ?: default
             else -> default
         }
+
         fun valueAsBooleanOr(default: Boolean): Boolean = when (val v = value) {
             is Boolean -> v
             is String -> if (v == "true") true else if (v == "false") false else default
             else -> default
         }
-        
+
         override fun toString(): String {
             return "$key=$value"
         }
