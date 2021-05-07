@@ -14,13 +14,13 @@ interface HasTooltip {
     val tooltipElement: Var<UIElement?>
 
     /**
-     * Called when the [tooltip] is added to the scene. 
-     * 
+     * Called when the [tooltip] is added to the scene.
+     *
      * The [tooltip] should recompute its bounds if it is dynamically sized.
      * Behaviour for [Tooltip] is already implemented by default.
      */
     fun onTooltipStarted(tooltip: UIElement) {
-        if (tooltip is Tooltip) 
+        if (tooltip is Tooltip)
             tooltip.resizeBoundsToContent()
     }
 
@@ -32,22 +32,27 @@ interface HasTooltip {
 }
 
 
+open class Tooltip
+    : TextLabel {
 
-open class Tooltip(text: String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
-    : TextLabel(text, font) {
-    
     init {
-        this.backgroundColor.set(Color(0f, 0f, 0f, 0.8f))
+        this.backgroundColor.set(Color(0f, 0f, 0f, 0.85f))
         this.textColor.set(Color.WHITE)
         this.bgPadding.set(8f)
         this.renderBackground.set(true)
         this.doXCompression.set(true)
         this.renderAlign.set(Align.topLeft)
-        
+
         this.text.addListener {
             resizeBoundsToContent()
         }
     }
+
+    constructor(text: String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
+            : super(text, font)
+
+    constructor(binding: Var.Context.() -> String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
+            : super(binding, font)
 
     fun resizeBoundsToContent() {
         val textBlock: TextBlock = this.internalTextBlock.getOrCompute()
