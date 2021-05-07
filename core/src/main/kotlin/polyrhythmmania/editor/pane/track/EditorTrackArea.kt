@@ -59,15 +59,16 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     val mouseBeat = getBeatFromRelative(relMouse.x)
                     val mouseTrack = getTrackFromRelative(relMouse.y)
 
+                    val blockClickedOn = editor.selectedBlocks.keys.firstOrNull { block ->
+                        tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f).contains(mouseBeat, mouseTrack)
+                    }
+                    
                     if (event.button == Input.Buttons.LEFT) {
                         // If clicking on a selected block, start dragging 
-                        val blockClickedOn = editor.selectedBlocks.keys.firstOrNull { block ->
-                            tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f).contains(mouseBeat, mouseTrack)
-                        }
                         if (blockClickedOn != null) {
                             val newClick = Click.DragSelection.create(editor, editor.selectedBlocks.keys.toList(),
                                     Vector2(mouseBeat - blockClickedOn.beat, mouseTrack - blockClickedOn.trackIndex),
-                                    blockClickedOn)
+                                    blockClickedOn, false)
                             if (newClick != null) {
                                 editor.click.set(newClick)
                             }

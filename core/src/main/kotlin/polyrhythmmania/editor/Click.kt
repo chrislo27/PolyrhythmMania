@@ -45,10 +45,10 @@ sealed class Click {
                 rectangle.height = height
             }
         }
-        
+
         fun isBlockInSelection(block: Block): Boolean {
             tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f)
-            
+
             return rectangle.intersects(tmpRect)
         }
 
@@ -57,30 +57,30 @@ sealed class Click {
         }
     }
 
-    class DragSelection private constructor(val editor: Editor, val blocks: List<Block>, val mouseOffset: Vector2, val originBlock: Block)
+    class DragSelection private constructor(val editor: Editor, val blocks: List<Block>, val mouseOffset: Vector2,
+                                            val originBlock: Block, val isNew: Boolean)
         : Click() {
-        
+
         companion object {
-            fun create(editor: Editor, blocks: List<Block>,
-                       mouseOffset: Vector2 = Vector2(0f, 0f),
-                       originBlock: Block = blocks.first()): DragSelection? {
+            fun create(editor: Editor, blocks: List<Block>, mouseOffset: Vector2, originBlock: Block,
+                       isNew: Boolean): DragSelection? {
                 if (blocks.isEmpty() || originBlock !in blocks) return null
-                return DragSelection(editor, blocks, mouseOffset, originBlock)
+                return DragSelection(editor, blocks, mouseOffset, originBlock, isNew)
             }
         }
-        
+
         data class BlockRegion(var beat: Float, var track: Int)
-        
+
         val regions: Map<Block, BlockRegion> = blocks.associateWith { BlockRegion(it.beat, it.trackIndex) }
         val originalRegions: Map<Block, BlockRegion> = blocks.associateWith { BlockRegion(it.beat, it.trackIndex) }
         val originalOffsets: Map<Block, BlockRegion> = blocks.associateWith { block ->
-            BlockRegion(block.beat - originBlock.beat, block.trackIndex - originBlock.trackIndex) 
+            BlockRegion(block.beat - originBlock.beat, block.trackIndex - originBlock.trackIndex)
         }
         val topmost: Block = blocks.minByOrNull { it.trackIndex }!!
         val leftmost: Block = blocks.minByOrNull { it.beat }!!
         val rightmost: Block = blocks.maxByOrNull { it.beat + it.width }!!
         val bottommost: Block = blocks.maxByOrNull { it.trackIndex + 1 }!!
-        val encompassingRegion: BlockRegion = run { 
+        val encompassingRegion: BlockRegion = run {
             BlockRegion(rightmost.beat + rightmost.width - leftmost.beat, bottommost.trackIndex - topmost.trackIndex + 1)
         }
 
@@ -88,10 +88,10 @@ sealed class Click {
         var hasBeenUpdated: Boolean = false
             private set
         var beat: Float = 0f
-        var track: Int = 0
+        var track: Int = -1
 
         fun complete() {
-            if (!hasBeenUpdated) {
+            if (!hasBeenUpdated || track !in 0 until editor.tracks.size) {
                 abortAction()
                 return
             }
@@ -113,7 +113,7 @@ sealed class Click {
             hasBeenUpdated = true
             this.beat = beat
             this.track = trackIndex
-            
+
             // Adjust block regions
             // Set origin block
             val snapping = editor.snapping.getOrCompute()
@@ -137,20 +137,20 @@ sealed class Click {
                     }
                 }
             }
-            
+
             // Set other blocks relative to origin block
             for (block in blocks) {
                 if (block === originBlock) continue
                 val region = regions.getValue(block)
                 val originalOffset = originalOffsets.getValue(block)
-                
+
                 val originalOffsetBeat = originalOffset.beat
                 val originalOffsetTrack = originalOffset.track
-                
+
                 region.beat = originRegion.beat + originalOffsetBeat
                 region.track = originRegion.track + originalOffsetTrack
             }
-            
+
             val beatLines = editor.beatLines
             beatLines.active = true
             beatLines.fromBeat = floor(beat).toInt()

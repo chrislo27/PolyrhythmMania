@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
@@ -136,7 +137,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
         val newBlock: Block = instantiator.factory.invoke(instantiator, this)
 
-        val newClick = Click.DragSelection.create(this, listOf(newBlock))
+        val newClick = Click.DragSelection.create(this, listOf(newBlock), Vector2(0f, 0f), newBlock, true)
         if (newClick != null) {
             click.set(newClick)
         }
@@ -212,7 +213,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        if ((pressedButtons as MutableSet).remove(keycode)) return true
+        if (pressedButtons.remove(keycode)) return true
         return sceneRoot.inputSystem.keyUp(keycode)
     }
 
@@ -228,7 +229,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 } else if (button == Input.Buttons.RIGHT) {
                     // Cancel the drag
                     currentClick.abortAction()
-                    (click as io.github.chrislo27.paintbox.binding.Var).set(Click.None)
+                    click.set(Click.None)
                     inputConsumed = true
                 }
             }
