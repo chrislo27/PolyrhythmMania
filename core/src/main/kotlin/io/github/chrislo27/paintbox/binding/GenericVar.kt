@@ -14,7 +14,7 @@ class GenericVar<T> : Var<T> {
     private var currentValue: T? = null
     private var dependencies: Set<ReadOnlyVar<Any>> = emptySet()
 
-    private val listeners: MutableSet<VarChangedListener<T>> = mutableSetOf()
+    private var listeners: Set<VarChangedListener<T>> = emptySet()
 
     private val invalidationListener: VarChangedListener<Any> = InvalListener(this as GenericVar<Any>)
 
@@ -45,7 +45,7 @@ class GenericVar<T> : Var<T> {
             }
         }
         if (anyNeedToBeDisposed) {
-            listeners.removeIf { it is InvalListener && it.disposeMe }
+            listeners = listeners.filter { it is InvalListener && it.disposeMe }.toSet()
         }
     }
 
@@ -115,13 +115,13 @@ class GenericVar<T> : Var<T> {
 
     override fun addListener(listener: VarChangedListener<T>) {
         if (listener !in listeners) {
-            listeners.add(listener)
+            listeners = listeners + listener
         }
     }
 
     override fun removeListener(listener: VarChangedListener<T>) {
         if (listener in listeners) {
-            listeners.remove(listener)
+            listeners = listeners - listener
         }
     }
 

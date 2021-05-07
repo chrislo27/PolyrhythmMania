@@ -14,7 +14,7 @@ class FloatVar : Var<Float> {
     private var currentValue: Float = 0f
     private var dependencies: Set<ReadOnlyVar<Any>> = emptySet()
 
-    private val listeners: MutableSet<VarChangedListener<Float>> = mutableSetOf()
+    private var listeners: Set<VarChangedListener<Float>> = emptySet()
 
     private val invalidationListener: VarChangedListener<Any> = InvalListener(this) as VarChangedListener<Any>
 
@@ -45,7 +45,7 @@ class FloatVar : Var<Float> {
             }
         }
         if (anyNeedToBeDisposed) {
-            listeners.removeIf { it is InvalListener && it.disposeMe }
+            listeners = listeners.filter { it is InvalListener && it.disposeMe }.toSet()
         }
     }
 
@@ -116,13 +116,13 @@ class FloatVar : Var<Float> {
 
     override fun addListener(listener: VarChangedListener<Float>) {
         if (listener !in listeners) {
-            listeners.add(listener)
+            listeners = listeners + listener
         }
     }
 
     override fun removeListener(listener: VarChangedListener<Float>) {
         if (listener in listeners) {
-            listeners.remove(listener)
+            listeners = listeners - listener
         }
     }
 
