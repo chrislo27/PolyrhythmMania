@@ -16,6 +16,7 @@ import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
+import kotlin.math.floor
 
 /**
  * The area where blocks are placed on tracks.
@@ -93,7 +94,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         lastMouseRelative.y = y - thisPos.y
 
         val trackY = getTrackFromRelative(lastMouseRelative.y)
-        editor.click.getOrCompute().onMouseMoved(getBeatFromRelative(lastMouseRelative.x), trackY.toInt(), trackY)
+        editor.click.getOrCompute().onMouseMoved(getBeatFromRelative(lastMouseRelative.x), floor(trackY).toInt(), trackY)
     }
 
     fun getTrackFromRelative(relY: Float = lastMouseRelative.y): Float {
@@ -147,7 +148,11 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
 
         // Render drag selection outlines
         if (click is Click.DragSelection) {
-            batch.setColor(1f, 1f, 0f, 1f) // yellow
+            if (click.isPlacementInvalid) {
+                batch.setColor(1f, 0f, 0f, 1f) 
+            } else {
+                batch.setColor(1f, 1f, 0f, 1f) // yellow
+            }
             click.regions.entries.forEach { (block, region) ->
                 val renderX = beatToRenderX(originX, region.beat)
                 batch.drawRect(renderX,

@@ -89,9 +89,11 @@ sealed class Click {
             private set
         var beat: Float = 0f
         var track: Int = -1
+        var isPlacementInvalid: Boolean = true
+            private set
 
         fun complete() {
-            if (!hasBeenUpdated || track !in 0 until editor.tracks.size) {
+            if (!hasBeenUpdated || isPlacementInvalid) {
                 abortAction()
                 return
             }
@@ -113,6 +115,7 @@ sealed class Click {
             hasBeenUpdated = true
             this.beat = beat
             this.track = trackIndex
+            this.isPlacementInvalid = trackIndex !in 0 until editor.tracks.size
 
             // Adjust block regions
             // Set origin block

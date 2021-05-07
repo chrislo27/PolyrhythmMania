@@ -37,6 +37,7 @@ import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.LinkedHashMap
+import kotlin.math.E
 
 
 class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720))
@@ -245,7 +246,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     val isShiftDown = Gdx.input.isShiftDown()
                     val isAltDown = Gdx.input.isAltDown()
                     val xorSelectMode = isShiftDown && !isCtrlDown && !isAltDown
-                    
+
                     val newSelection: MutableSet<Block>
                     if (xorSelectMode) {
                         newSelection = previousSelection.toMutableSet()
@@ -266,7 +267,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                             }
                         }
                     }
-                    
+
                     val selectionAction = SelectionAction(previousSelection, newSelection)
                     this.mutate(selectionAction)
 
@@ -284,9 +285,9 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         var inputConsumed = false
 
         val currentClick = click.getOrCompute()
-        if (currentClick is Click.CreateSelection) {
-            // FIXME for creating selection
-            (sceneRoot.children.first { it is EditorPane } as EditorPane).allTracksPane.editorTrackArea.onMouseMovedOrDragged(screenX.toFloat(), screenY.toFloat())
+        if (currentClick is Click.CreateSelection || currentClick is Click.DragSelection) {
+            editorPane.allTracksPane.editorTrackArea.onMouseMovedOrDragged(screenX.toFloat(), screenY.toFloat())
+            inputConsumed = true
         }
 
         return inputConsumed || sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer)
