@@ -19,6 +19,7 @@ import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
 import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
 import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
 import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.track.BlockType
@@ -48,9 +49,9 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     : ActionHistory<Editor>(), InputProcessor by sceneRoot.inputSystem, Disposable {
 
     companion object {
-        val TRACK_INPUT_A: String = "input_a"
-        val TRACK_INPUT_DPAD: String = "input_dpad"
-        val TRACK_VFX0: String = "vfx_0"
+        const val TRACK_INPUT_A: String = "input_a"
+        const val TRACK_INPUT_DPAD: String = "input_dpad"
+        const val TRACK_VFX0: String = "vfx_0"
     }
 
     private val uiCamera: OrthographicCamera = OrthographicCamera()
@@ -86,6 +87,10 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val blocks: List<Block> = CopyOnWriteArrayList()
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
 
+    /**
+     * Call Var<Boolean>.invert() to force the status to be updated. Used when an undo or redo takes place.
+     */
+    private val forceUpdateStatus: Var<Boolean> = Var(false)
     val editorPane: EditorPane
 
     init {
@@ -97,6 +102,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         editorPane = EditorPane(this)
         sceneRoot += editorPane
         resize(Gdx.graphics.width, Gdx.graphics.height)
+        bindStatusBar(editorPane.statusBarMsg)
     }
 
     fun render(delta: Float, batch: SpriteBatch) {
@@ -149,6 +155,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     fun changeTool(tool: Tool) {
+        if (click.getOrCompute() != Click.None) return
         this.tool as Var
         this.tool.set(tool)
     }
@@ -199,6 +206,39 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             this.selectedBlocks.remove(block)
         }
     }
+    
+    private fun bindStatusBar(msg: Var<String>) {
+        msg.bind { 
+            this@Editor.forceUpdateStatus.use()
+            val tool = this@Editor.tool.use()
+            val currentClick = this@Editor.click.use()
+            when (currentClick) {
+                is Click.CreateSelection -> Localization.getVar("editor.status.creatingSelection").use()
+                is Click.DragSelection -> {
+                    var res = Localization.getVar("editor.status.draggingSelection").use()
+                    if (currentClick.wouldBeDeleted.use()) {
+                        res += " " + Localization.getVar("editor.status.draggingSelection.willBeDeleted").use()
+                    } else if (currentClick.isPlacementInvalid.use()) {
+                        res += " " + Localization.getVar("editor.status.draggingSelection.invalidPlacement").use()
+                    }
+                    res
+                }
+                Click.None -> {
+                    when (tool) {
+                        Tool.SELECTION -> {
+                            var res = Localization.getVar("editor.status.selectionTool").use()
+                            if (selectedBlocks.isNotEmpty()) {
+                                // Size doesn't have to be a var b/c the status gets updated during a new selection
+                                res += " " + Localization.getVar("editor.status.selectionTool.selectedCount", Var(listOf(selectedBlocks.keys.size)))
+                            }
+                            res
+                        }
+                        Tool.TEMPO_CHANGE -> Localization.getVar("editor.status.tempoChangeTool").use()
+                    }
+                }
+            }
+        }
+    }
 
     private val pressedButtons: MutableSet<Int> = mutableSetOf()
 
@@ -217,10 +257,29 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
                     this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
                 }
+                inputConsumed = true
+            }
+            in Input.Keys.NUM_0..Input.Keys.NUM_9 -> {
+                if (!ctrl && !alt && !shift) {
+                    val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
+                    if (number in 0 until Tool.VALUES.size) {
+                        changeTool(Tool.VALUES.getOrNull(number) ?: Tool.SELECTION)
+                        inputConsumed = true
+                    }
+                }
             }
         }
         
         return inputConsumed || sceneRoot.inputSystem.keyDown(keycode)
+    }
+
+    override fun keyTyped(character: Char): Boolean {
+        var inputConsumed: Boolean = sceneRoot.inputSystem.keyTyped(character)
+        if (!inputConsumed) {
+            
+        }
+        
+        return inputConsumed
     }
 
     override fun keyUp(keycode: Int): Boolean {
@@ -234,15 +293,15 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         when (currentClick) {
             is Click.DragSelection -> {
                 if (button == Input.Buttons.LEFT) {
-                    if (currentClick.wouldBeDeleted) {
+                    if (currentClick.wouldBeDeleted.getOrCompute()) {
                         val prevSelection = this.selectedBlocks.keys.toList()
                         currentClick.abortAction()
                         this.mutate(DeletionAction(prevSelection))
-                    } else if (!currentClick.isPlacementInvalid) {
+                    } else if (!currentClick.isPlacementInvalid.getOrCompute()) {
                         val prevSelection = this.selectedBlocks.keys.toList()
                         currentClick.complete()
                         if (currentClick.isNew) {
-                            this.addActionWithoutMutating(ActionGroup(PlaceAction(currentClick.blocks.toList()), SelectionAction(prevSelection.toSet(), currentClick.blocks.toSet())))
+                            this.mutate(ActionGroup(PlaceAction(currentClick.blocks.toList()), SelectionAction(prevSelection.toSet(), currentClick.blocks.toSet())))
                         } else {
                             this.addActionWithoutMutating(MoveAction(currentClick.blocks.associateWith { block ->
                                 MoveAction.Pos(currentClick.originalRegions.getValue(block), Click.DragSelection.BlockRegion(block.beat, block.trackIndex))

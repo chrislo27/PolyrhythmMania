@@ -2,6 +2,8 @@ package polyrhythmmania.editor
 
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.intersects
 import polyrhythmmania.editor.track.Track
@@ -89,24 +91,20 @@ sealed class Click {
             private set
         var beat: Float = 0f
         var track: Int = -1
-        var isPlacementInvalid: Boolean = true
+        var isPlacementInvalid: ReadOnlyVar<Boolean> = Var(true)
             private set
-        var wouldBeDeleted: Boolean = false
+        var wouldBeDeleted: ReadOnlyVar<Boolean> = Var(false)
             private set
 
         fun complete() {
-            if (!hasBeenUpdated || isPlacementInvalid) {
+            if (!hasBeenUpdated || isPlacementInvalid.getOrCompute()) {
                 abortAction()
                 return
             }
             val beatLines = editor.beatLines
             beatLines.active = false
 
-            val editorBlocks = editor.blocks
             this.blocks.forEach { block ->
-                if (block !in editorBlocks) {
-                    editor.addBlock(block)
-                }
                 val region = regions.getValue(block)
                 block.beat = region.beat
                 block.trackIndex = region.track
@@ -117,8 +115,8 @@ sealed class Click {
             hasBeenUpdated = true
             this.beat = beat
             this.track = trackIndex
-            this.isPlacementInvalid = trackIndex !in 0 until editor.tracks.size
-            this.wouldBeDeleted = trackIndex < 0
+            (this.isPlacementInvalid as Var).set(trackIndex !in 0 until editor.tracks.size)
+            (this.wouldBeDeleted as Var).set(trackIndex < 0)
 
             // Adjust block regions
             // Set origin block

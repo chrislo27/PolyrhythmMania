@@ -76,3 +76,12 @@ interface Var<T> : ReadOnlyVar<T> {
         }
     }
 }
+
+// Useful extension functions
+
+/**
+ * [Sets][Var.set] this [Boolean] [Var] to be the boolean not of its value from [Var.getOrCompute].
+ */
+fun Var<Boolean>.invert() {
+    this.set(!this.getOrCompute())
+}

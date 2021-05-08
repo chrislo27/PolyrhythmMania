@@ -14,6 +14,7 @@ import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import io.github.chrislo27.paintbox.util.gdxutils.grey
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
 import kotlin.math.floor
@@ -59,22 +60,25 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     val relMouse = lastMouseRelative
                     val mouseBeat = getBeatFromRelative(relMouse.x)
                     val mouseTrack = getTrackFromRelative(relMouse.y)
+                    val currentTool: Tool = editor.tool.getOrCompute()
 
                     val blockClickedOn = editor.selectedBlocks.keys.firstOrNull { block ->
                         tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f).contains(mouseBeat, mouseTrack)
                     }
                     
-                    if (event.button == Input.Buttons.LEFT) {
-                        // If clicking on a selected block, start dragging 
-                        if (blockClickedOn != null) {
-                            val newClick = Click.DragSelection.create(editor, editor.selectedBlocks.keys.toList(),
-                                    Vector2(mouseBeat - blockClickedOn.beat, mouseTrack - blockClickedOn.trackIndex),
-                                    blockClickedOn, false)
-                            if (newClick != null) {
-                                editor.click.set(newClick)
+                    if (currentTool == Tool.SELECTION) {
+                        if (event.button == Input.Buttons.LEFT) {
+                            // If clicking on a selected block, start dragging 
+                            if (blockClickedOn != null) {
+                                val newClick = Click.DragSelection.create(editor, editor.selectedBlocks.keys.toList(),
+                                        Vector2(mouseBeat - blockClickedOn.beat, mouseTrack - blockClickedOn.trackIndex),
+                                        blockClickedOn, false)
+                                if (newClick != null) {
+                                    editor.click.set(newClick)
+                                }
+                            } else {
+                                editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack, editor.selectedBlocks.keys.toSet()))
                             }
-                        } else {
-                            editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack, editor.selectedBlocks.keys.toSet()))
                         }
                     }
                     true
@@ -148,7 +152,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
 
         // Render drag selection outlines
         if (click is Click.DragSelection) {
-            if (click.isPlacementInvalid) {
+            if (click.isPlacementInvalid.getOrCompute()) {
                 batch.setColor(1f, 0f, 0f, 1f) 
             } else {
                 batch.setColor(1f, 1f, 0f, 1f) // yellow

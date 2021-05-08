@@ -2,14 +2,17 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.ImageNode
 import io.github.chrislo27.paintbox.ui.Pane
+import io.github.chrislo27.paintbox.ui.Tooltip
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.ButtonSkin
+import polyrhythmmania.Localization
 import polyrhythmmania.editor.Tool
 
 
@@ -137,6 +140,13 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.setOnAction { 
                     editorPane.editor.changeTool(thisTool)
                 }
+                this.tooltipElement.set(Tooltip(binding = {
+                    Localization.getVar("tool.tooltip", Var.bind { 
+                        listOf(Localization.getVar(thisTool.localizationKey).use(), "${index + 1}")
+                    }).use()
+                }).apply { 
+                    this.markup.set(editorPane.palette.markup)
+                })
             })
         }
     }

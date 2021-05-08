@@ -1,6 +1,7 @@
 package polyrhythmmania.editor.pane.track
 
 import io.github.chrislo27.paintbox.ui.Pane
+import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
@@ -23,5 +24,8 @@ class EditorTrackSidePane(val allTracksPane: AllTracksPane, val trackID: String)
     init {
         sidePanel = SidePanel(editorPane)
         this += sidePanel
+        
+        this.sidePanel.titleLabel.markup.set(editorPane.palette.markupBordered)
+        this.sidePanel.titleText.bind { Localization.getVar("editor.track.${trackID}").use() }
     }
 }

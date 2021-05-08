@@ -195,7 +195,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                         this.size = fontSize
                         this.borderWidth = 0f
                     }).setAfterLoad(afterLoad)
-            cache["${familyName}_BOLD_ITALIC"] = PaintboxFontFreeType(
+            cache["${familyName}_BOLD_ITALIC_BORDERED"] = PaintboxFontFreeType(
                     PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$boldItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
                     makeParam().apply {
                         if (hinting != null) {
