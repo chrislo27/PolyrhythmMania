@@ -101,8 +101,9 @@ data class TextBlock(val runs: List<TextRun>) {
             Color.argb8888ToColor(color, textRun.color)
             val textRunInfo = TextRunInfo(textRun, paintboxFont.getCurrentFontNumber(), GlyphLayout(font, textRun.text, color, 0f, Align.left, false))
 
-            val offX = textRun.offsetXEm * font.xHeight
+            val offX = textRun.offsetXEm * font.spaceXadvance
             val offY = textRun.offsetYEm * font.xHeight
+            val xAdvanceEm = textRun.xAdvanceEm * font.spaceXadvance
             val capHeight = font.data.capHeight
             if (this.firstCapHeight == 0f) {
                 this.firstCapHeight = capHeight
@@ -166,6 +167,7 @@ data class TextBlock(val runs: List<TextRun>) {
             }
 
             // Move y down in case there are whitespace lines
+            posX += xAdvanceEm
             posY = yBeforeGlyphRuns + -(textRunInfo.glyphLayout.height - capHeight)
             lastCapHeight = font.data.capHeight
             lastDescent = font.data.descent

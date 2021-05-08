@@ -17,13 +17,14 @@ data class TextRun(
         val offsetYEm: Float = 0f,
         val carryOverOffsetX: Boolean = true,
         val carryOverOffsetY: Boolean = false,
+        val xAdvanceEm: Float = 0f,
                   ) {
     
     constructor(font: PaintboxFont, text: String, color: Color = Color.WHITE,
                 scaleX: Float = 1f, scaleY: Float = 1f,  offsetXEm: Float = 0f, offsetYEm: Float = 0f, 
-                carryOverOffsetX: Boolean = true, carryOverOffsetY: Boolean = false,)
+                carryOverOffsetX: Boolean = true, carryOverOffsetY: Boolean = false, xAdvanceEm: Float = 0f,)
             : this(font, text, Color.argb8888(color), scaleX, scaleY,
-                   offsetXEm, offsetYEm, carryOverOffsetX, carryOverOffsetY)
+                   offsetXEm, offsetYEm, carryOverOffsetX, carryOverOffsetY, xAdvanceEm)
     
     fun toTextBlock(): TextBlock = TextBlock(listOf(this))
 }

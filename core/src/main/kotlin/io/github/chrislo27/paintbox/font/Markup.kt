@@ -35,6 +35,7 @@ import java.lang.NumberFormatException
  * offsety=1.0 : Defines the offsetXEm, should be a float
  * carryoverx=true : Defines carryOverOffsetX, should be a boolean
  * carryovery=true : Defines carryOverOffsetY, should be a boolean
+ * xadvance=1.0 : Defines xAdvanceEm, should be a float
  *
  * Utility tags:
  * b : Defines font=${styles.bold}
@@ -62,6 +63,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
         val TAG_OFFSETY: String = "offsety"
         val TAG_CARRYOVERX: String = "carryoverx"
         val TAG_CARRYOVERY: String = "carryovery"
+        val TAG_XADVANCE: String = "xadvance"
         val TAG_BOLD: String = "bold"
         val TAG_BOLD2: String = "b"
         val TAG_ITALIC: String = "italic"
@@ -113,6 +115,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
             var offsetY = tag.attrMap[TAG_OFFSETY]?.valueAsFloatOr(0f) ?: 0f
             var carryoverX = tag.attrMap[TAG_CARRYOVERX]?.valueAsBooleanOr(true) ?: true
             var carryoverY = tag.attrMap[TAG_CARRYOVERY]?.valueAsBooleanOr(false) ?: false
+            var xAdvance = tag.attrMap[TAG_XADVANCE]?.valueAsFloatOr(0f) ?: 0f
 
 
             val bold = (tag.attrMap[TAG_BOLD]?.valueAsBooleanOr(false)
@@ -152,7 +155,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                 scaleY = 0.58f
             }
 
-            runs += TextRun(font, tag.text, color, scaleX, scaleY, offsetX, offsetY, carryoverX, carryoverY)
+            runs += TextRun(font, tag.text, color, scaleX, scaleY, offsetX, offsetY, carryoverX, carryoverY, xAdvance)
         }
 
         return TextBlock(runs)
@@ -168,7 +171,8 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                 Attribute(TAG_OFFSETX, defaultTextRun.offsetXEm),
                 Attribute(TAG_OFFSETY, defaultTextRun.offsetYEm),
                 Attribute(TAG_CARRYOVERX, defaultTextRun.carryOverOffsetX),
-                Attribute(TAG_CARRYOVERY, defaultTextRun.carryOverOffsetY)),
+                Attribute(TAG_CARRYOVERY, defaultTextRun.carryOverOffsetY),
+                Attribute(TAG_XADVANCE, defaultTextRun.xAdvanceEm)),
                 "")
         val tagStack = mutableListOf<Tag>(defaultRootTag)
         val tags = mutableListOf<Tag>()
