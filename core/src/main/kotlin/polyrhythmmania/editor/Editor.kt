@@ -216,7 +216,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 is Click.CreateSelection -> Localization.getVar("editor.status.creatingSelection").use()
                 is Click.DragSelection -> {
                     var res = Localization.getVar("editor.status.draggingSelection").use()
-                    if (currentClick.wouldBeDeleted.use()) {
+                    if (currentClick.wouldBeDeleted.use() && !currentClick.isNew) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.willBeDeleted").use()
                     } else if (currentClick.isPlacementInvalid.use()) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.invalidPlacement").use()
@@ -293,7 +293,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         when (currentClick) {
             is Click.DragSelection -> {
                 if (button == Input.Buttons.LEFT) {
-                    if (currentClick.wouldBeDeleted.getOrCompute()) {
+                    if (currentClick.wouldBeDeleted.getOrCompute() && !currentClick.isNew) {
                         val prevSelection = this.selectedBlocks.keys.toList()
                         currentClick.abortAction()
                         this.mutate(DeletionAction(prevSelection))
