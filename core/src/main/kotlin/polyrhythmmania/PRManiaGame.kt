@@ -11,10 +11,7 @@ import polyrhythmmania.init.InitalAssetLoader
 import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.PaintboxSettings
 import io.github.chrislo27.paintbox.ResizeAction
-import io.github.chrislo27.paintbox.font.FontCache
-import io.github.chrislo27.paintbox.font.PaintboxFont
-import io.github.chrislo27.paintbox.font.PaintboxFontFreeType
-import io.github.chrislo27.paintbox.font.PaintboxFontParams
+import io.github.chrislo27.paintbox.font.*
 import io.github.chrislo27.paintbox.logging.Logger
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.util.WindowSize
@@ -255,6 +252,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     size = defaultFontSize
                     borderWidth = 1.5f
                 }).setAfterLoad(afterLoad)
+        cache["prmania_icons"] = PaintboxFontBitmap(
+                PaintboxFontParams(Gdx.files.internal("fonts/prmania_icons/prmania_icons.fnt"), 16, 0f, false, WindowSize(1280, 720)),
+                BitmapFont(Gdx.files.internal("fonts/prmania_icons/prmania_icons.fnt"), Gdx.files.internal("fonts/prmania_icons/prmania_icons.png"), false, true),
+                true
+        )
     }
 
 
@@ -272,5 +274,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontEditorInstantiatorSummary: PaintboxFont inline get() = fontCache["editor_instantiator_summary"]
     val fontRodin: PaintboxFont inline get() = fontCache["rodin"]
     val fontRodinBordered: PaintboxFont inline get() = fontCache["rodin_BORDERED"]
+    val fontIcons: PaintboxFont inline get() = fontCache["prmania_icons"]
 
 }

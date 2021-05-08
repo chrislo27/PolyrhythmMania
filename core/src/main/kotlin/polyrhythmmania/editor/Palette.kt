@@ -55,11 +55,18 @@ open class Palette(val main: PRManiaGame) {
             "italic" to main.mainFontItalic,
             "bolditalic" to main.mainFontBoldItalic,
             "rodin" to main.fontRodin,
+            "prmania_icons" to main.fontIcons,
     ), TextRun(main.mainFont, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     val markupBordered: Markup = Markup(mapOf(
             "bold" to main.mainFontBoldBordered,
             "italic" to main.mainFontItalicBordered,
             "bolditalic" to main.mainFontBoldItalicBordered,
             "rodin" to main.fontRodinBordered,
+            "prmania_icons" to main.fontIcons,
     ), TextRun(main.mainFontBordered, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    val markupInstantiatorSummary: Markup = Markup(mapOf(
+            "rodin" to main.fontRodin,
+            "prmania_icons" to main.fontIcons,
+    ), TextRun(instantiatorSummaryFont, ""), Markup.FontStyles.ALL_DEFAULT)
+    
 }

@@ -46,7 +46,7 @@ import java.lang.NumberFormatException
  * ```
  */
 class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun,
-             val styles: FontStyles = FontStyles.DEFAULT) {
+             val styles: FontStyles = FontStyles.ALL_DEFAULT) {
 
     companion object {
         val DEFAULT_FONT_NAME: String = "DEFAULT"
@@ -79,7 +79,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
 
     data class FontStyles(val bold: String, val italic: String, val boldItalic: String) {
         companion object {
-            val DEFAULT: FontStyles = FontStyles(DEFAULT_FONT_NAME, DEFAULT_FONT_NAME, DEFAULT_FONT_NAME)
+            val ALL_DEFAULT: FontStyles = FontStyles(DEFAULT_FONT_NAME, DEFAULT_FONT_NAME, DEFAULT_FONT_NAME)
         }
     }
 

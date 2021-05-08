@@ -86,6 +86,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     // Editor scene states
     val blocks: List<Block> = CopyOnWriteArrayList()
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
+    val playbackStart: FloatVar = FloatVar(0f)
 
     /**
      * Call Var<Boolean>.invert() to force the status to be updated. Used when an undo or redo takes place.
@@ -307,6 +308,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                                 MoveAction.Pos(currentClick.originalRegions.getValue(block), Click.DragSelection.BlockRegion(block.beat, block.trackIndex))
                             }))
                         }
+                    } else {
+                        currentClick.abortAction()
                     }
                     
                     click.set(Click.None)

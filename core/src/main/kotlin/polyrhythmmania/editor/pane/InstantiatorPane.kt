@@ -77,6 +77,7 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
                 this.textColor.bind { editorPane.palette.instantiatorSummaryText.use() }
                 this.textAlign.set(TextAlign.LEFT)
                 this.renderAlign.set(Align.left)
+                this.markup.set(editorPane.palette.markupInstantiatorSummary)
             }
             desc = TextLabel(binding = { list.currentInstantiator.use().desc.use() }, font = editorPane.palette.instantiatorDescFont).apply {
                 this.bounds.y.set(summaryHeight)
