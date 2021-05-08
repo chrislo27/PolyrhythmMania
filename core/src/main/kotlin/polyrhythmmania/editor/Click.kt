@@ -6,6 +6,7 @@ import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.intersects
+import io.github.chrislo27.paintbox.util.gdxutils.overlapsEpsilon
 import polyrhythmmania.editor.track.Track
 import polyrhythmmania.editor.track.block.Block
 import polyrhythmmania.editor.undo.ReversibleAction
@@ -86,22 +87,34 @@ sealed class Click {
             BlockRegion(rightmost.beat + rightmost.width - leftmost.beat, bottommost.trackIndex - topmost.trackIndex + 1)
         }
 
+        private val editorBlocksCollidable: Map<Int, List<Block>> = (editor.blocks - blocks).groupBy { it.trackIndex }
+
         // Represents the last known position from onMouseMoved
         var hasBeenUpdated: Boolean = false
             private set
         var beat: Float = 0f
         var track: Int = -1
-        var isPlacementInvalid: ReadOnlyVar<Boolean> = Var(true)
-            private set
-        var wouldBeDeleted: ReadOnlyVar<Boolean> = Var(false)
-            private set
+        val isPlacementInvalid: ReadOnlyVar<Boolean> = Var(true)
+        val wouldBeDeleted: ReadOnlyVar<Boolean> = Var(false)
+        val collidesWithOtherBlocks: ReadOnlyVar<Boolean> = Var(false)
 
         fun didOriginBlockChange(): Boolean {
             val originalRegion = originalRegions.getValue(originBlock)
             val newRegion = regions.getValue(originBlock)
             return originalRegion != newRegion
         }
-        
+
+        fun anyBlocksWouldCollide(): Boolean {
+            val epsilon = 0.001f
+            return regions.any { (block, region) ->
+                val beat = region.beat
+                val width = block.width
+                editorBlocksCollidable[region.track]?.any { other ->
+                    beat < (other.beat + other.width - epsilon) && other.beat < (beat + width - epsilon)
+                } ?: false
+            }
+        }
+
         fun complete() {
             if (!hasBeenUpdated || isPlacementInvalid.getOrCompute() || !didOriginBlockChange()) {
                 abortAction()
@@ -161,6 +174,13 @@ sealed class Click {
 
                 region.beat = originRegion.beat + originalOffsetBeat
                 region.track = originRegion.track + originalOffsetTrack
+            }
+            
+            if (anyBlocksWouldCollide()) {
+                (this.collidesWithOtherBlocks as Var).set(true)
+                this.isPlacementInvalid.set(true)
+            } else {
+                (this.collidesWithOtherBlocks as Var).set(false)
             }
 
             val beatLines = editor.beatLines

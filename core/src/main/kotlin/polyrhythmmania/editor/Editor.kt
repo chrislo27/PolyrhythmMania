@@ -219,6 +219,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     var res = Localization.getVar("editor.status.draggingSelection").use()
                     if (currentClick.wouldBeDeleted.use() && !currentClick.isNew) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.willBeDeleted").use()
+                    } else if (currentClick.collidesWithOtherBlocks.use()) {
+                        res += " " + Localization.getVar("editor.status.draggingSelection.collides").use()
                     } else if (currentClick.isPlacementInvalid.use()) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.invalidPlacement").use()
                     }
