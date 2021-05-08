@@ -1,7 +1,6 @@
 R   82 : Rod
 s  115 : Selection tool icon
-p  112 : platform (32x32)
-P   80 : platform (same height as extended piston)
+p  112 : platform
 a   97 : A-piston retracted
 d  100 : Dpad-piston retracted
 A   65 : A-piston fully extended (yellow)
