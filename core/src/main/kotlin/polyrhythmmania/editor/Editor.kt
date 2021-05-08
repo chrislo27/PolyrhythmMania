@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Disposable
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.binding.invert
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.SceneRoot
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
@@ -95,7 +96,6 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val editorPane: EditorPane
 
     init {
-//        trackView.renderScale.set(0.5f)
         frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
     }
 
@@ -257,6 +257,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 val selected = selectedBlocks.keys.toList()
                 if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
                     this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
+                    forceUpdateStatus.invert()
                 }
                 inputConsumed = true
             }

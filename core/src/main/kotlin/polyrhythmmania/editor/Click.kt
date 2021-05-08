@@ -96,8 +96,14 @@ sealed class Click {
         var wouldBeDeleted: ReadOnlyVar<Boolean> = Var(false)
             private set
 
+        fun didOriginBlockChange(): Boolean {
+            val originalRegion = originalRegions.getValue(originBlock)
+            val newRegion = regions.getValue(originBlock)
+            return originalRegion != newRegion
+        }
+        
         fun complete() {
-            if (!hasBeenUpdated || isPlacementInvalid.getOrCompute()) {
+            if (!hasBeenUpdated || isPlacementInvalid.getOrCompute() || !didOriginBlockChange()) {
                 abortAction()
                 return
             }

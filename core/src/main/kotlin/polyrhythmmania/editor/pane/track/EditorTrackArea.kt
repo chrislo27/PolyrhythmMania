@@ -179,10 +179,10 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         }
 
         // DEBUG
-        batch.setColor(1f, 0f, 0f, 1f)
-        batch.fillRect(lastMouseRelative.x + (this.bounds.x.getOrCompute() + originX),
-                (originY - this.bounds.y.getOrCompute()) - lastMouseRelative.y,
-                5f, 5f)
+//        batch.setColor(1f, 0f, 0f, 1f)
+//        batch.fillRect(lastMouseRelative.x + (this.bounds.x.getOrCompute() + originX),
+//                (originY - this.bounds.y.getOrCompute()) - lastMouseRelative.y,
+//                5f, 5f)
 
         ColorStack.pop()
         batch.packedColor = lastPackedColor
