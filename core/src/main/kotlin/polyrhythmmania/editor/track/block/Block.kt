@@ -2,8 +2,13 @@ package polyrhythmmania.editor.track.block
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.util.gdxutils.drawCompressed
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
+import io.github.chrislo27.paintbox.util.gdxutils.scaleMul
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.track.AllTracksPane
@@ -24,6 +29,7 @@ open class Block(val editor: Editor, blockTypes: EnumSet<BlockType>) {
     var width: Float = 1f
     var trackIndex: Int = 0
     val blockTypes: Set<BlockType> = blockTypes
+    protected val defaultText: Var<String> = Var("")
 
     open fun render(batch: SpriteBatch, trackView: TrackView, editorTrackArea: EditorTrackArea,
                     offsetX: Float, offsetY: Float, trackHeight: Float, trackTint: Color) {
@@ -37,10 +43,22 @@ open class Block(val editor: Editor, blockTypes: EnumSet<BlockType>) {
         batch.fillRect(renderX, editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight,
                 editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
                 trackHeight)
+        val border = 4f
         batch.setColor(trackTint.r * 0.7f, trackTint.g * 0.7f, trackTint.b * 0.7f, 1f)
         batch.drawRect(renderX, editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight,
                 editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
-                trackHeight, 4f)
+                trackHeight, border)
+        
+        val text = defaultText.getOrCompute()
+        if (text.isNotEmpty()) {
+            val textPadding = border + 2f
+            editor.main.mainFontBoldBordered.useFont { font ->
+                font.scaleMul(0.9f)
+                font.drawCompressed(batch, text, renderX + textPadding,
+                        editorTrackArea.trackToRenderY(offsetY, trackIndex) - textPadding - 1f,
+                        editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX - textPadding * 2, Align.left)
+            }
+        }
         
         if (editor.selectedBlocks[this] == true) {
             batch.setColor(0.1f, 1f, 1f, 0.333f)
