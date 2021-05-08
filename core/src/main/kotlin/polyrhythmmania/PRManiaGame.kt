@@ -49,6 +49,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 //        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
 
         addFontsToCache(this.fontCache)
+        PRManiaColors
 
         AssetRegistry.addAssetLoader(InitalAssetLoader())
 
