@@ -113,10 +113,12 @@ sealed class Click {
 
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
             hasBeenUpdated = true
+            var beat = beat.coerceAtLeast(0f)
             this.beat = beat
             this.track = trackIndex
             (this.isPlacementInvalid as Var).set(trackIndex !in 0 until editor.tracks.size)
-            (this.wouldBeDeleted as Var).set(trackIndex < 0)
+//            (this.wouldBeDeleted as Var).set(trackIndex < 0)
+            (this.wouldBeDeleted as Var).set(trackIndex !in 0 until editor.tracks.size)
 
             // Adjust block regions
             // Set origin block
