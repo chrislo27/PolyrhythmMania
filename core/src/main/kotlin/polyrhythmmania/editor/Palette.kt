@@ -40,11 +40,13 @@ open class Palette(val main: PRManiaGame) {
     val trackPaneTextColor: Var<Color> = Var(Color().grey(1f, 1f))
     val trackPaneTempoBg: Var<Color> = Var(Color(0.4f, 0.4f, 0.9f, 1f))
     val trackVerticalBeatLineColor: Var<Color> = Var(Color().grey(1f, 0.4f))
+    val trackPlaybackStart: Var<Color> = Var(Color(0f, 1f, 0f, 1f))
 
     // Fonts
 
     val beatTimeFont: PaintboxFont = main.fontEditorBeatTime
     val beatTrackFont: PaintboxFont = main.fontEditorBeatTrack
+    val beatMarkerFont: PaintboxFont = main.fontEditorMarker
     val instantiatorFont: PaintboxFont = main.fontEditorInstantiator
     val instantiatorSummaryFont: PaintboxFont = main.fontEditorInstantiatorSummary
     val instantiatorDescFont: PaintboxFont = main.fontEditorInstantiatorSummary

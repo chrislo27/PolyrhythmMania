@@ -25,6 +25,10 @@ class InitalAssetLoader : AssetRegistry.IAssetLoader {
         
         AssetRegistry.loadAsset<Texture>("ui_icon_tool_selection", "textures/ui/icon/tool/selection.png")
         AssetRegistry.loadAsset<Texture>("ui_icon_tool_tempo_change", "textures/ui/icon/tool/tempo_change.png")
+        AssetRegistry.loadAsset<Texture>("ui_triangle_equilateral", "textures/ui/triangle_equilateral.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("ui_triangle_right", "textures/ui/triangle_right.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("ui_triangle_equilateral_bordered", "textures/ui/triangle_equilateral_bordered.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("ui_triangle_right_bordered", "textures/ui/triangle_right_bordered.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_icon_button_new", "textures/ui/icon/button_new.png")
         AssetRegistry.loadAsset<Texture>("ui_icon_button_open", "textures/ui/icon/button_open.png")
         AssetRegistry.loadAsset<Texture>("ui_icon_button_save", "textures/ui/icon/button_save.png")

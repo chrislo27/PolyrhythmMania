@@ -62,14 +62,14 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     val mouseTrack = getTrackFromRelative(relMouse.y)
                     val currentTool: Tool = editor.tool.getOrCompute()
 
-                    val blockClickedOn = editor.selectedBlocks.keys.firstOrNull { block ->
+                    val blockClickedOn = editor.blocks.firstOrNull { block ->
                         tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f).contains(mouseBeat, mouseTrack)
                     }
                     
                     if (currentTool == Tool.SELECTION) {
                         if (event.button == Input.Buttons.LEFT) {
-                            // If clicking on a selected block, start dragging 
-                            if (blockClickedOn != null) {
+                            // If clicking on a selected block, start dragging
+                            if (blockClickedOn != null && blockClickedOn in editor.selectedBlocks.keys) {
                                 val newClick = Click.DragSelection.create(editor, editor.selectedBlocks.keys.toList(),
                                         Vector2(mouseBeat - blockClickedOn.beat, mouseTrack - blockClickedOn.trackIndex),
                                         blockClickedOn, false)
@@ -78,6 +78,10 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                                 }
                             } else {
                                 editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack, editor.selectedBlocks.keys.toSet()))
+                            }
+                        } else if (event.button == Input.Buttons.RIGHT) {
+                            if (blockClickedOn == null) {
+                                editor.attemptPlaybackStartMove(mouseBeat)
                             }
                         }
                     }

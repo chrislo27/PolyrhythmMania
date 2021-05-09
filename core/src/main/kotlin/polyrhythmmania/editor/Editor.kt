@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
+import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
@@ -154,6 +155,13 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             click.set(newClick)
         }
     }
+    
+    fun attemptPlaybackStartMove(mouseBeat: Float) {
+        if (click.getOrCompute() != Click.None) return
+        click.set(Click.MoveMarker(this, playbackStart, Click.MoveMarker.MarkerType.PLAYBACK).apply { 
+            this.onMouseMoved(mouseBeat, 0, 0f)
+        })
+    }
 
     fun changeTool(tool: Tool) {
         if (click.getOrCompute() != Click.None) return
@@ -225,6 +233,13 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                         res += " " + Localization.getVar("editor.status.draggingSelection.invalidPlacement").use()
                     }
                     res
+                }
+                is Click.MoveMarker -> {
+                    when (currentClick.type) {
+                        Click.MoveMarker.MarkerType.PLAYBACK -> {
+                            Localization.getVar("editor.status.movingPlaybackStart").use()
+                        }
+                    }
                 }
                 Click.None -> {
                     when (tool) {
@@ -365,7 +380,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     inputConsumed = true
                 }
             }
-            else -> {
+            is Click.MoveMarker -> {
+                when (currentClick.type) {
+                    Click.MoveMarker.MarkerType.PLAYBACK -> {
+                        if (button == Input.Buttons.RIGHT) {
+                            currentClick.complete()
+                        }
+                    }
+                }
+                click.set(Click.None)
+                inputConsumed = true
+            }
+            Click.None -> { // Not an else so that when new Click types are added, a compile error is generated
             }
         }
         return inputConsumed || sceneRoot.inputSystem.touchUp(screenX, screenY, pointer, button)
@@ -375,7 +401,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         var inputConsumed = false
 
         val currentClick = click.getOrCompute()
-        if (currentClick is Click.CreateSelection || currentClick is Click.DragSelection) {
+        if (currentClick is Click.CreateSelection || currentClick is Click.DragSelection || currentClick is Click.MoveMarker) {
             editorPane.allTracksPane.editorTrackArea.onMouseMovedOrDragged(screenX.toFloat(), screenY.toFloat())
             inputConsumed = true
         }

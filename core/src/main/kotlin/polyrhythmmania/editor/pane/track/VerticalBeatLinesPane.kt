@@ -5,6 +5,7 @@ import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
+import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.pane.EditorPane
 import kotlin.math.ceil
@@ -57,6 +58,17 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
                 }
             }
         }
+
+
+        tmpColor.set(editorPane.palette.trackPlaybackStart.getOrCompute())
+        val currentClick = editor.click.getOrCompute()
+        if (currentClick is Click.MoveMarker && currentClick.type == Click.MoveMarker.MarkerType.PLAYBACK) {
+            batch.setColor(tmpColor.r, tmpColor.g, tmpColor.b, tmpColor.a * 0.25f)
+            batch.fillRect(x + trackView.translateBeatToX(currentClick.originalPosition), y - h, lineWidth, h)
+        }
+        batch.color = tmpColor
+        val playbackStart = editor.playbackStart.getOrCompute()
+        batch.fillRect(x + trackView.translateBeatToX(playbackStart), y - h, lineWidth, h)
 
         ColorStack.pop()
         batch.packedColor = lastPackedColor

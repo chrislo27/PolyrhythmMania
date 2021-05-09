@@ -2,14 +2,13 @@ package polyrhythmmania.editor
 
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.intersects
-import io.github.chrislo27.paintbox.util.gdxutils.overlapsEpsilon
 import polyrhythmmania.editor.track.Track
 import polyrhythmmania.editor.track.block.Block
-import polyrhythmmania.editor.undo.ReversibleAction
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -175,7 +174,7 @@ sealed class Click {
                 region.beat = originRegion.beat + originalOffsetBeat
                 region.track = originRegion.track + originalOffsetTrack
             }
-            
+
             if (anyBlocksWouldCollide()) {
                 (this.collidesWithOtherBlocks as Var).set(true)
                 this.isPlacementInvalid.set(true)
@@ -195,6 +194,35 @@ sealed class Click {
         override fun abortAction() {
             val beatLines = editor.beatLines
             beatLines.active = false
+        }
+    }
+
+    class MoveMarker(val editor: Editor, val point: FloatVar, val type: MarkerType)
+        : Click() {
+        
+        enum class MarkerType {
+            PLAYBACK,
+        }
+        
+        val originalPosition: Float = point.getOrCompute()
+        
+        fun didChange(): Boolean = point.getOrCompute() != originalPosition
+
+        fun complete() {
+            if (!didChange()) {
+                abortAction()
+                return
+            }
+        }
+        
+        override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
+            val snapping = editor.snapping.getOrCompute()
+            val snapBeat = MathHelper.snapToNearest(beat, snapping).coerceAtLeast(0f)
+            point.set(snapBeat)
+        }
+
+        override fun abortAction() {
+            point.set(originalPosition)
         }
     }
 
