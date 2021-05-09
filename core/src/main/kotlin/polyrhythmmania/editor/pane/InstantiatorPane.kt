@@ -86,7 +86,7 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
                 this.textColor.bind { editorPane.palette.instantiatorDescText.use() }
                 this.textAlign.set(TextAlign.LEFT)
                 this.renderAlign.set(Align.topLeft)
-                this.setScaleXY(0.75f)
+//                this.setScaleXY(0.75f)
                 this.margin.set(Insets(8f, 8f, 0f, 0f))
                 this.markup.set(editorPane.palette.markup)
             }
