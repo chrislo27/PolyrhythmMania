@@ -10,6 +10,7 @@ object PRManiaColors {
         fun put(key: String, color: Color) = Colors.put(key, color)
         
         put("prmania_negative", Color.valueOf("#FF4C4C"))
+        put("prmania_keystroke", Color.LIGHT_GRAY.cpy())
         put("prmania_playbackstart", Color.valueOf("#32FF32"))
     }
     
