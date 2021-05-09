@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
@@ -23,7 +24,7 @@ import io.github.chrislo27.paintbox.util.gdxutils.drawCompressed
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.track.block.Instantiator
 import polyrhythmmania.editor.track.block.Instantiators
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 
 class InstantiatorPane(val upperPane: UpperPane) : Pane() {
@@ -229,16 +230,20 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             val instantiators = instantiatorList.list
 
             paintboxFont.useFont { font ->
+                val currentTween = indexTween
                 val capHeight = font.capHeight
                 val lineHeight = font.lineHeight * 1.5f
-                val yOffset = -(h * 0.5f) + capHeight * 0.5f + (indexTween * lineHeight)
+                val yOffset = -(h * 0.5f) + capHeight * 0.5f + (currentTween * lineHeight)
                 instantiators.forEachIndexed { index, instantiator ->
+                    val offsetAmount = abs((currentTween - index)).coerceAtLeast(0f)
+                    val xOffset = ((1.6f).pow(offsetAmount) - 1) * 15f
+                    val specificOpacity = (1f - offsetAmount / 5f).coerceAtLeast(0.3f) * opacity
                     if (index == currentIndex) {
-                        font.setColor(0.65f, 1f, 1f, opacity)
+                        font.setColor(0.65f, 1f, 1f, specificOpacity)
                     } else {
-                        font.setColor(1f, 1f, 1f, opacity)
+                        font.setColor(1f, 1f, 1f, specificOpacity)
                     }
-                    font.drawCompressed(batch, instantiator.name.getOrCompute(), x, y - index * lineHeight + yOffset, w, Align.left)
+                    font.drawCompressed(batch, instantiator.name.getOrCompute(), x + xOffset, y - index * lineHeight + yOffset, w, Align.left)
                 }
             }
 

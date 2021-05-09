@@ -1,6 +1,7 @@
 package polyrhythmmania.editor.track.block
 
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 
@@ -40,6 +41,11 @@ object Instantiators {
                 Localization.getVar("instantiator.test.desc")) { editor ->
             BlockTest(editor)
         })
+        (2..19).forEach { i ->
+            add(Instantiator("test$i", Var("Test$i"),Var(""),Var("")) { editor ->
+                BlockTest(editor)
+            })
+        }
 
         map = tempMap
         list = tempList
