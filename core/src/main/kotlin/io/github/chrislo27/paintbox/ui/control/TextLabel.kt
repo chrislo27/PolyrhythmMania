@@ -35,9 +35,12 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
         fun createInternalTextBlockVar(label: TextLabel): Var<TextBlock> {
             return Var {
                 val markup: Markup? = label.markup.use()
-                markup?.parse(label.text.use())
-                        ?: TextRun(label.font.use(), label.text.use(), Color.WHITE,
-                                label.scaleX.use(), label.scaleY.use()).toTextBlock()
+                if (markup != null) {
+                    markup.parse(label.text.use())
+                } else {
+                    TextRun(label.font.use(), label.text.use(), Color.WHITE,
+                            /*label.scaleX.use(), label.scaleY.use()*/ 1f, 1f).toTextBlock()
+                }
             }
         }
     }
@@ -47,7 +50,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
 
     /**
      * The [Markup] object to use. If null, no markup parsing is done. If not null,
-     * then the markup determines the TextBlock (and other values like [textColor], [scaleX], [scaleY] are ignored).
+     * then the markup determines the TextBlock (and other values like [textColor] are ignored).
      */
     val markup: Var<Markup?> = Var(null)
 
@@ -56,7 +59,13 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
      */
     val textColor: Var<Color> = Var(Color(0f, 0f, 0f, 0f))
 
+    /**
+     * Determines the x-scale the text is rendered at.
+     */
     val scaleX: FloatVar = FloatVar(1f)
+    /**
+     * Determines the y-scale the text is rendered at.
+     */
     val scaleY: FloatVar = FloatVar(1f)
 
     /**
@@ -141,23 +150,26 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         val textPaddingOffsetY: Float = bgPadding
         val compressX = element.doXCompression.getOrCompute()
         val align = element.renderAlign.getOrCompute()
-        val textWidth = text.width
-        val textHeight = text.height
+        val scaleX = element.scaleX.getOrCompute()
+        val scaleY = element.scaleY.getOrCompute()
+        val textWidth = text.width * scaleX
+        val textHeight = text.height * scaleY
         val xOffset: Float = when {
             Align.isLeft(align) -> 0f + textPaddingOffsetX
             Align.isRight(align) -> (w - (if (compressX) (min(textWidth, w)) else textWidth) - textPaddingOffsetX)
             else -> (w - (if (compressX) min(textWidth, w) else textWidth)) / 2f
         }
+        val firstCapHeight = text.firstCapHeight * scaleY
         val yOffset: Float = when {
-            Align.isTop(align) -> h - text.firstCapHeight - textPaddingOffsetY
-            Align.isBottom(align) -> 0f + (textHeight - text.firstCapHeight) + textPaddingOffsetY
-            else -> (h + textHeight) / 2 - text.firstCapHeight
+            Align.isTop(align) -> h - firstCapHeight - textPaddingOffsetY
+            Align.isBottom(align) -> 0f + (textHeight - firstCapHeight) + textPaddingOffsetY
+            else -> (h + textHeight) / 2 - firstCapHeight
         }
 
         if (element.renderBackground.getOrCompute()) {
             // Draw a rectangle behind the text, only sizing to the text area.
             val bx = (x + xOffset) - bgPadding
-            val by = (y - h + yOffset - textHeight + text.firstCapHeight) - bgPadding
+            val by = (y - h + yOffset - textHeight + firstCapHeight) - bgPadding
             val bw = (if (compressX) min(w, textWidth) else textWidth) + bgPadding * 2
             val bh = textHeight + bgPadding * 2
 
@@ -171,7 +183,8 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
 
         batch.color = tmpColor // Sets the opacity
         text.drawCompressed(batch, x + xOffset, (y - h + yOffset),
-                if (compressX) (w - textPaddingOffsetX * 2f) else 0f, element.textAlign.getOrCompute())
+                if (compressX) (w - textPaddingOffsetX * 2f) else 0f, element.textAlign.getOrCompute(),
+                scaleX, scaleY)
         ColorStack.pop()
 
         batch.packedColor = lastPackedColor

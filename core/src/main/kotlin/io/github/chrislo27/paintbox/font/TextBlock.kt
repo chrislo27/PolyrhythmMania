@@ -251,7 +251,8 @@ data class TextBlock(val runs: List<TextRun>) {
         val globalScaleY: Float = scaleY
 
         val shouldScaleX = globalScaleX != 1f
-        val scaleAnything = shouldScaleX || globalScaleY != 1f
+        val shouldScaleY = globalScaleY != 1f
+        val scaleAnything = shouldScaleX || shouldScaleY
         val alignXWidth = if (shouldScaleX && maxWidth > 0f) maxWidth else this.width
 
         runInfo.forEach { textRunInfo ->
@@ -276,6 +277,11 @@ data class TextBlock(val runs: List<TextRun>) {
                         for (i in 0 until run.xAdvances.size) {
                             run.xAdvances[i] *= globalScaleX
                         }
+                    }
+                }
+                if (shouldScaleY) {
+                    layout.runs.forEach { run ->
+                        run.y *= globalScaleY
                     }
                 }
                 
@@ -305,6 +311,11 @@ data class TextBlock(val runs: List<TextRun>) {
                         for (i in 0 until run.xAdvances.size) {
                             run.xAdvances[i] /= globalScaleX
                         }
+                    }
+                }
+                if (shouldScaleY) {
+                    layout.runs.forEach { run ->
+                        run.y /= globalScaleY
                     }
                 }
             }
