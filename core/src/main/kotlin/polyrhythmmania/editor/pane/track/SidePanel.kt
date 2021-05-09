@@ -30,7 +30,7 @@ class SidePanel(val editorPane: EditorPane) : Pane() {
         }
         addChild(sidebarSection)
 
-        titleLabel = TextLabel("", font = editorPane.main.mainFontBordered).apply {
+        titleLabel = TextLabel("", font = editorPane.palette.sidePanelFont).apply {
             this.text.bind { titleText.use() }
             this.textColor.bind { editorPane.palette.trackPaneTextColor.use() }
             this.bgPadding.set(0f)

@@ -44,6 +44,7 @@ open class Palette(val main: PRManiaGame) {
 
     // Fonts
 
+    val sidePanelFont: PaintboxFont = main.mainFontBordered
     val beatTimeFont: PaintboxFont = main.fontEditorBeatTime
     val beatTrackFont: PaintboxFont = main.fontEditorBeatTrack
     val beatMarkerFont: PaintboxFont = main.fontEditorMarker
