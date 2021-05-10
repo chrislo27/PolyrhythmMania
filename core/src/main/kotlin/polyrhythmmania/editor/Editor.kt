@@ -35,6 +35,7 @@ import polyrhythmmania.editor.undo.impl.MoveAction
 import polyrhythmmania.editor.undo.impl.PlaceAction
 import polyrhythmmania.editor.undo.impl.SelectionAction
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -85,10 +86,11 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val snapping: FloatVar = FloatVar(0.5f)
     val beatLines: BeatLines = BeatLines()
 
-    // Editor scene states
+    // Editor objects and state
+    val playbackStart: FloatVar = FloatVar(0f)
     val blocks: List<Block> = CopyOnWriteArrayList()
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
-    val playbackStart: FloatVar = FloatVar(0f)
+    val startingTempo: FloatVar = FloatVar(TempoMap.DEFAULT_STARTING_GLOBAL_TEMPO)
 
     /**
      * Call Var<Boolean>.invert() to force the status to be updated. Used when an undo or redo takes place.
@@ -141,6 +143,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 trackView.beat.set((trackView.beat.getOrCompute() - (7f * delta)).coerceAtLeast(0f))
             }
         }
+    }
+
+    /**
+     * Call to change the "intermediate state" editor objects (like Blocks, editor tempo changes, etc)
+     * into the [engine]. This mutates the [engine] state.
+     */
+    fun compileEditorIntermediates() {
+        
     }
 
     fun attemptInstantiatorDrag(instantiator: Instantiator) {

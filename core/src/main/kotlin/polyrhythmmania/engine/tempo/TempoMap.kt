@@ -8,7 +8,11 @@ import java.util.*
  * 
  * Values below 0 for both beats and seconds are mapped 1:1 (-1 seconds = -1 beats, etc).
  */
-class TempoMap(startingGlobalTempo: Float) {
+class TempoMap(startingGlobalTempo: Float = DEFAULT_STARTING_GLOBAL_TEMPO) {
+    
+    companion object {
+        const val DEFAULT_STARTING_GLOBAL_TEMPO: Float = 60f
+    }
 
     /**
      * The global tempo is always at beat 0, seconds 0.

@@ -123,14 +123,15 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         val defaultFontSize = 20
 
-        fun addFontFamily(familyName: String, normalFilename: String = "$familyName-Regular.ttf",
+        fun addFontFamily(familyName: String, fontIDPrefix: String = familyName, 
+                          normalFilename: String = "$familyName-Regular.ttf",
                           normalItalicFilename: String = "$familyName-Italic.ttf",
                           boldFilename: String = "$familyName-Bold.ttf",
                           boldItalicFilename: String = "$familyName-BoldItalic.ttf",
                           fontSize: Int = defaultFontSize, borderWidth: Float = 1.5f, folder: String = familyName,
-                          hinting: FreeTypeFontGenerator.Hinting? = null) {
+                          hinting: FreeTypeFontGenerator.Hinting? = null, generateBordered: Boolean = true) {
 
-            cache["${familyName}"] = PaintboxFontFreeType(
+            cache["${fontIDPrefix}"] = PaintboxFontFreeType(
                     PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$normalFilename"), 1, 1f, false, WindowSize(1280, 720)),
                     makeParam().apply {
                         if (hinting != null) {
@@ -139,16 +140,18 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                         this.size = fontSize
                         this.borderWidth = 0f
                     }).setAfterLoad(afterLoad)
-            cache["${familyName}_BORDERED"] = PaintboxFontFreeType(
-                    PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$normalFilename"), 1, 1f, false, WindowSize(1280, 720)),
-                    makeParam().apply {
-                        if (hinting != null) {
-                            this.hinting = hinting
-                        }
-                        this.size = fontSize
-                        this.borderWidth = borderWidth
-                    }).setAfterLoad(afterLoad)
-            cache["${familyName}_ITALIC"] = PaintboxFontFreeType(
+            if (generateBordered) {
+                cache["${fontIDPrefix}_BORDERED"] = PaintboxFontFreeType(
+                        PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$normalFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                        makeParam().apply {
+                            if (hinting != null) {
+                                this.hinting = hinting
+                            }
+                            this.size = fontSize
+                            this.borderWidth = borderWidth
+                        }).setAfterLoad(afterLoad)
+            }
+            cache["${fontIDPrefix}_ITALIC"] = PaintboxFontFreeType(
                     PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$normalItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
                     makeParam().apply {
                         if (hinting != null) {
@@ -157,16 +160,18 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                         this.size = fontSize
                         this.borderWidth = 0f
                     }).setAfterLoad(afterLoad)
-            cache["${familyName}_ITALIC_BORDERED"] = PaintboxFontFreeType(
-                    PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$normalItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
-                    makeParam().apply {
-                        if (hinting != null) {
-                            this.hinting = hinting
-                        }
-                        this.size = fontSize
-                        this.borderWidth = borderWidth
-                    }).setAfterLoad(afterLoad)
-            cache["${familyName}_BOLD"] = PaintboxFontFreeType(
+            if (generateBordered) {
+                cache["${fontIDPrefix}_ITALIC_BORDERED"] = PaintboxFontFreeType(
+                        PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$normalItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                        makeParam().apply {
+                            if (hinting != null) {
+                                this.hinting = hinting
+                            }
+                            this.size = fontSize
+                            this.borderWidth = borderWidth
+                        }).setAfterLoad(afterLoad)
+            }
+            cache["${fontIDPrefix}_BOLD"] = PaintboxFontFreeType(
                     PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$boldFilename"), 1, 1f, false, WindowSize(1280, 720)),
                     makeParam().apply {
                         if (hinting != null) {
@@ -175,16 +180,18 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                         this.size = fontSize
                         this.borderWidth = 0f
                     }).setAfterLoad(afterLoad)
-            cache["${familyName}_BOLD_BORDERED"] = PaintboxFontFreeType(
-                    PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$boldFilename"), 1, 1f, false, WindowSize(1280, 720)),
-                    makeParam().apply {
-                        if (hinting != null) {
-                            this.hinting = hinting
-                        }
-                        this.size = fontSize
-                        this.borderWidth = borderWidth
-                    }).setAfterLoad(afterLoad)
-            cache["${familyName}_BOLD_ITALIC"] = PaintboxFontFreeType(
+            if (generateBordered) {
+                cache["${fontIDPrefix}_BOLD_BORDERED"] = PaintboxFontFreeType(
+                        PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$boldFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                        makeParam().apply {
+                            if (hinting != null) {
+                                this.hinting = hinting
+                            }
+                            this.size = fontSize
+                            this.borderWidth = borderWidth
+                        }).setAfterLoad(afterLoad)
+            }
+            cache["${fontIDPrefix}_BOLD_ITALIC"] = PaintboxFontFreeType(
                     PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$boldItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
                     makeParam().apply {
                         if (hinting != null) {
@@ -193,21 +200,25 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                         this.size = fontSize
                         this.borderWidth = 0f
                     }).setAfterLoad(afterLoad)
-            cache["${familyName}_BOLD_ITALIC_BORDERED"] = PaintboxFontFreeType(
-                    PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$boldItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
-                    makeParam().apply {
-                        if (hinting != null) {
-                            this.hinting = hinting
-                        }
-                        this.size = fontSize
-                        this.borderWidth = borderWidth
-                    }).setAfterLoad(afterLoad)
+            if (generateBordered) {
+                cache["${fontIDPrefix}_BOLD_ITALIC_BORDERED"] = PaintboxFontFreeType(
+                        PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$boldItalicFilename"), 1, 1f, false, WindowSize(1280, 720)),
+                        makeParam().apply {
+                            if (hinting != null) {
+                                this.hinting = hinting
+                            }
+                            this.size = fontSize
+                            this.borderWidth = borderWidth
+                        }).setAfterLoad(afterLoad)
+            }
         }
 
 
         addFontFamily("OpenSans")
         addFontFamily("Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight)
-
+        
+        addFontFamily(fontIDPrefix = "editor_status", familyName = "Roboto", fontSize = 16,
+                hinting = FreeTypeFontGenerator.Hinting.Slight, generateBordered = false)
 
         cache["editor_beat_time"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Medium.ttf"), 1, 1f, false, WindowSize(1280, 720)),
@@ -267,21 +278,21 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     }
 
 
-    val mainFont: PaintboxFont inline get() = fontCache["Roboto"]
-    val mainFontBordered: PaintboxFont inline get() = fontCache["Roboto_BORDERED"]
-    val mainFontBold: PaintboxFont inline get() = fontCache["Roboto_BOLD"]
-    val mainFontBoldBordered: PaintboxFont inline get() = fontCache["Roboto_BOLD_BORDERED"]
-    val mainFontItalic: PaintboxFont inline get() = fontCache["Roboto_ITALIC"]
-    val mainFontItalicBordered: PaintboxFont inline get() = fontCache["Roboto_ITALIC_BORDERED"]
-    val mainFontBoldItalic: PaintboxFont inline get() = fontCache["Roboto_BOLD_ITALIC"]
-    val mainFontBoldItalicBordered: PaintboxFont inline get() = fontCache["Roboto_BOLD_ITALIC_BORDERED"]
-    val fontEditorBeatTime: PaintboxFont inline get() = fontCache["editor_beat_time"]
-    val fontEditorBeatTrack: PaintboxFont inline get() = fontCache["editor_beat_track"]
-    val fontEditorInstantiator: PaintboxFont inline get() = fontCache["editor_instantiator"]
-    val fontEditorInstantiatorSummary: PaintboxFont inline get() = fontCache["editor_instantiator_summary"]
-    val fontRodin: PaintboxFont inline get() = fontCache["rodin"]
-    val fontRodinBordered: PaintboxFont inline get() = fontCache["rodin_BORDERED"]
-    val fontEditorMarker: PaintboxFont inline get() = fontCache["editor_marker"]
-    val fontIcons: PaintboxFont inline get() = fontCache["prmania_icons"]
+    val mainFont: PaintboxFont get() = fontCache["Roboto"]
+    val mainFontBordered: PaintboxFont get() = fontCache["Roboto_BORDERED"]
+    val mainFontBold: PaintboxFont get() = fontCache["Roboto_BOLD"]
+    val mainFontBoldBordered: PaintboxFont get() = fontCache["Roboto_BOLD_BORDERED"]
+    val mainFontItalic: PaintboxFont get() = fontCache["Roboto_ITALIC"]
+    val mainFontItalicBordered: PaintboxFont get() = fontCache["Roboto_ITALIC_BORDERED"]
+    val mainFontBoldItalic: PaintboxFont get() = fontCache["Roboto_BOLD_ITALIC"]
+    val mainFontBoldItalicBordered: PaintboxFont get() = fontCache["Roboto_BOLD_ITALIC_BORDERED"]
+    val fontIcons: PaintboxFont get() = fontCache["prmania_icons"]
+    val fontEditorBeatTime: PaintboxFont get() = fontCache["editor_beat_time"]
+    val fontEditorBeatTrack: PaintboxFont get() = fontCache["editor_beat_track"]
+    val fontEditorInstantiator: PaintboxFont get() = fontCache["editor_instantiator"]
+    val fontEditorInstantiatorSummary: PaintboxFont get() = fontCache["editor_instantiator_summary"]
+    val fontRodin: PaintboxFont get() = fontCache["rodin"]
+    val fontRodinBordered: PaintboxFont get() = fontCache["rodin_BORDERED"]
+    val fontEditorMarker: PaintboxFont get() = fontCache["editor_marker"]
 
 }

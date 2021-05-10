@@ -201,14 +201,16 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                     TextRun(main.debugFontBold, "Bold font.\n"),
                     TextRun(main.debugFontBoldItalic, "Bold-italic font."),
             )))
+//            label.setScaleXY(0.5f)
             Anchor.BottomLeft.configure(label, offsetX = 32f, offsetY = -32f)
             label.bounds.width.set(325f)
             label.bounds.height.set(110f)
             label.renderBackground.set(true)
-//            label.textAlign.set(TextAlign.RIGHT)
+            label.renderAlign.set(Align.topLeft)
+            label.textAlign.set(TextAlign.LEFT)
             label.bgPadding.set(10f)
+//            label.bgPadding.set(0f)
             label.doXCompression.set(true)
-            label.renderAlign.set(Align.left)
             label.doClipping.set(true)
 //            label.opacity.set(0.5f)
 //            label.textColor.set(Color(0f, 1f, 0f, 1f))

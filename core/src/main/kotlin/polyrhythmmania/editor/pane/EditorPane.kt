@@ -50,7 +50,7 @@ class EditorPane(val editor: Editor) : Pane() {
         statusBar = StatusBar(this).apply {
             Anchor.BottomCentre.configure(this)
             this.bindWidthToParent()
-            this.bounds.height.set(28f)
+            this.bounds.height.set(24f)
         }
         parent += statusBar
         

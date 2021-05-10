@@ -38,7 +38,7 @@ class StatusBar(val editorPane: EditorPane) : Pane() {
             this.bgPadding.set(0f)
             this.text.bind { editorPane.statusBarMsg.use() }
             this.textColor.bind { editorPane.palette.statusTextColor.use() }
-            this.markup.set(editorPane.palette.markup)
+            this.markup.set(editorPane.palette.markupStatusBar)
         }
         parent += label
     }

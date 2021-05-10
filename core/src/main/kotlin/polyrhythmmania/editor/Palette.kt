@@ -6,6 +6,7 @@ import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.util.gdxutils.grey
+import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 
 
@@ -38,7 +39,7 @@ open class Palette(val main: PRManiaGame) {
     val trackPaneTimeBg: Var<Color> = Var(Color().grey(0f, 1f))
     val trackPaneTimeText: Var<Color> = Var(Color().grey(1f, 1f))
     val trackPaneTextColor: Var<Color> = Var(Color().grey(1f, 1f))
-    val trackPaneTempoBg: Var<Color> = Var(Color(0.4f, 0.4f, 0.9f, 1f))
+    val trackPaneTempoBg: Var<Color> = Var(PRManiaColors.TEMPO)
     val trackVerticalBeatLineColor: Var<Color> = Var(Color().grey(1f, 0.4f))
     val trackPlaybackStart: Var<Color> = Var(Color(0f, 1f, 0f, 1f))
 
@@ -71,5 +72,12 @@ open class Palette(val main: PRManiaGame) {
             "rodin" to main.fontRodin,
             "prmania_icons" to main.fontIcons,
     ), TextRun(instantiatorSummaryFont, ""), Markup.FontStyles.ALL_DEFAULT)
+    val markupStatusBar: Markup = Markup(mapOf(
+            "bold" to main.fontCache["editor_status_BOLD"],
+            "italic" to main.fontCache["editor_status_ITALIC"],
+            "bolditalic" to main.fontCache["editor_status_BOLD_ITALIC"],
+            "rodin" to main.fontRodin,
+            "prmania_icons" to main.fontIcons,
+    ), TextRun(main.fontCache["editor_status"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     
 }
