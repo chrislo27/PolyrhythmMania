@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.util.gdxutils.scaleMul
+import kotlin.math.abs
 
 
 /**
@@ -96,6 +97,7 @@ data class TextBlock(val runs: List<TextRun>) {
             val paintboxFont = textRun.font
             val font = paintboxFont.begin()
             adjustFontForTextRun(font, textRun)
+            val blankLineScale = font.data.blankLineScale
 
             val color = Color(1f, 1f, 1f, 1f)
             Color.argb8888ToColor(color, textRun.color)
@@ -175,8 +177,10 @@ data class TextBlock(val runs: List<TextRun>) {
             // New line check
             if (posY < yBeforeGlyphRuns) {
                 // The posX should be where the last GlyphRun left off
-                // However, if the run ends in newlines/whitespace, then posX should be 0
-                if (textRunInfo.glyphLayout.height - capHeight > -(lastGlyphRunY)) {
+                // However, if the run ends in newlines with optional whitespace, then posX should be 0
+                val runText = textRunInfo.run.text
+                val runEndsInNewlines = runText.trimEnd().endsWith('\n') //textRunInfo.glyphLayout.height - capHeight > abs(lastGlyphRunY)
+                if (runEndsInNewlines) {
                     currentLineWidth = posX
                     posX = 0f
                     // This is a new line
