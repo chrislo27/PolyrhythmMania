@@ -5,14 +5,11 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.TextAlign
-import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
@@ -80,7 +77,7 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
                 this.renderAlign.set(Align.left)
                 this.markup.set(editorPane.palette.markupInstantiatorSummary)
             }
-            desc = TextLabel(binding = { list.currentInstantiator.use().desc.use() }, font = editorPane.palette.instantiatorDescFont).apply {
+            desc = TextLabel(binding = { list.currentInstantiator.use().desc.use() }/*, font = editorPane.palette.instantiatorDescFont*/).apply {
                 this.bounds.y.set(summaryHeight)
                 this.bindHeightToParent(adjust = -summaryHeight)
                 this.textColor.bind { editorPane.palette.instantiatorDescText.use() }
@@ -88,7 +85,7 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
                 this.renderAlign.set(Align.topLeft)
 //                this.setScaleXY(0.75f)
                 this.margin.set(Insets(8f, 8f, 0f, 0f))
-                this.markup.set(editorPane.palette.markup)
+                this.markup.set(editorPane.palette.markupInstantiatorDesc)
             }
             this += summary
             this += desc
@@ -226,7 +223,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             val lastPackedColor = batch.packedColor
             val opacity = apparentOpacity.getOrCompute()
 
-            val paintboxFont = editorPane.palette.instantiatorFont
+            val paintboxFont = editorPane.palette.instantiatorNameFont
             val instantiators = instantiatorList.list
 
             paintboxFont.useFont { font ->

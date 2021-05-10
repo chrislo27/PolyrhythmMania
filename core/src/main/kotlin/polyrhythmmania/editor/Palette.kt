@@ -49,7 +49,7 @@ open class Palette(val main: PRManiaGame) {
     val beatTimeFont: PaintboxFont = main.fontEditorBeatTime
     val beatTrackFont: PaintboxFont = main.fontEditorBeatTrack
     val beatMarkerFont: PaintboxFont = main.fontEditorMarker
-    val instantiatorFont: PaintboxFont = main.fontEditorInstantiator
+    val instantiatorNameFont: PaintboxFont = main.fontEditorInstantiatorName
     val instantiatorSummaryFont: PaintboxFont = main.fontEditorInstantiatorSummary
     val instantiatorDescFont: PaintboxFont = main.fontEditorInstantiatorSummary
 
@@ -72,6 +72,13 @@ open class Palette(val main: PRManiaGame) {
             "rodin" to main.fontRodin,
             "prmania_icons" to main.fontIcons,
     ), TextRun(instantiatorSummaryFont, ""), Markup.FontStyles.ALL_DEFAULT)
+    val markupInstantiatorDesc: Markup = Markup(mapOf(
+            "bold" to main.fontCache["editor_instantiator_desc_BOLD"],
+            "italic" to main.fontCache["editor_instantiator_desc_ITALIC"],
+            "bolditalic" to main.fontCache["editor_instantiator_desc_BOLD_ITALIC"],
+            "rodin" to main.fontRodin,
+            "prmania_icons" to main.fontIcons,
+    ), TextRun(main.fontCache["editor_instantiator_desc"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     val markupStatusBar: Markup = Markup(mapOf(
             "bold" to main.fontCache["editor_status_BOLD"],
             "italic" to main.fontCache["editor_status_ITALIC"],
