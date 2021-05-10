@@ -202,7 +202,8 @@ open class UIElement : UIBounds() {
     }
     
     /**
-     * Returns a list of UIElements from this element to the child that contains the point within [UIBounds.contentZone].
+     * Returns a list of [UIElement]s from this element to the child that contains the point within [UIBounds.contentZone].
+     * It also excludes elements that are not [visible].
      * IMPLEMENTATION NOTE: This function assumes that all the children for a parent fit inside of that parent's bounds.
      */
     fun pathToForInput(x: Float, y: Float): List<UIElement> {
@@ -213,7 +214,7 @@ open class UIElement : UIBounds() {
         var yOffset: Float = currentBounds.y.getOrCompute()
         while (current.children.isNotEmpty()) {
             val found = current.children.findLast { child -> 
-                child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
+                child.visible.getOrCompute() && child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
             } ?: break
             res += found
             current = found
