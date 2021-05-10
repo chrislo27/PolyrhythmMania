@@ -105,7 +105,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     init { // This init block should be LAST
         editorPane = EditorPane(this)
         sceneRoot += editorPane
-        resize(Gdx.graphics.width, Gdx.graphics.height)
+        resize()
         bindStatusBar(editorPane.statusBarMsg)
     }
 
@@ -179,13 +179,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         this.tool.set(tool)
     }
 
-    fun resize(w: Int, h: Int) {
+    fun resize() {
         var width = Gdx.graphics.width.toFloat()
         var height = Gdx.graphics.height.toFloat()
+        // UI scale
+        val uiScale = 1f // Note: scales don't work with inputs currently
+        width /= uiScale
+        height /= uiScale
         if (width < 1280f || height < 720f) {
             width = 1280f
             height = 720f
         }
+        
         uiCamera.setToOrtho(false, width, height)
         uiCamera.update()
         sceneRoot.resize(uiCamera)

@@ -263,9 +263,9 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
      */
     override fun resize(width: Int, height: Int) {
         resetCameras()
-//        val nano = measureNanoTime {
+        val nano = measureNanoTime {
             fontCache.resizeAll(width, height)
-//        }
+        }
 //        Paintbox.LOGGER.info("Reloaded all ${fontCache.fonts.size} fonts in ${nano / 1_000_000.0} ms")
         super.resize(width, height)
     }

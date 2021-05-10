@@ -23,7 +23,7 @@ class EditorScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val processor: InputProcessor = editor
 
     init {
-        editor.resize(Gdx.graphics.width, Gdx.graphics.height)
+        editor.resize()
     }
 
     override fun render(delta: Float) {
@@ -74,7 +74,7 @@ class EditorScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
-        editor.resize(width, height)
+        editor.resize()
     }
     
     override fun dispose() {
