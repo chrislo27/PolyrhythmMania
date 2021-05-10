@@ -16,7 +16,8 @@ import java.lang.NumberFormatException
  *   - A key-value pair is key=value
  *   - Attributes are separated by one or more spaces.
  *   - Keys and values are case sensitive.
- *   - A key without a value is treated as key=true.
+ *   - A key without a value is treated as key=true. (ex: [flag] -> flag=true)
+ *     - A key without a value starting with a exclamation mark ! is treated as key=false. (ex: [!flag] -> flag=false)
  *   - Values are either text, numbers (decimal numbers), or booleans (true/false).
  * - The backslash character \ is the escape character and will escape ANY character after it, including another backslash.
  * - An unclosed start or end tag is counted as normal text.
@@ -24,6 +25,9 @@ import java.lang.NumberFormatException
  *
  * The list of attributes is defined as follows:
  * ```
+ * Special tags:
+ * noinherit : Indicates that this tag shall not copy the attributes from the previous tag in the stack. This tag is not inherited
+ * 
  * Core tags:
  * font=font_name : Defines the font for the text run. The font_name has to be pre-defined as part of the Markup object.
  * color=#RRGGBBAA : Defines the text run color.
@@ -55,6 +59,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
         val FONT_NAME_ITALIC: String = "italic"
         val FONT_NAME_BOLDITALIC: String = "bolditalic"
 
+        val TAG_NOINHERIT: String = "noinherit"
         val TAG_FONT: String = "font"
         val TAG_COLOR: String = "color"
         val TAG_SCALEX: String = "scalex"
@@ -93,6 +98,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
 
     private fun parse(tags: List<Tag>): TextBlock {
         val runs = mutableListOf<TextRun>()
+        val stack = mutableListOf<Pair<Tag, TextRun>>()
 
         tags.forEach { tag ->
             var font = fontMapping.getValue(tag.attrMap[TAG_FONT]?.valueAsString() ?: DEFAULT_FONT_NAME)
@@ -185,14 +191,21 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                 }
                 is Symbol.StartTag -> {
                     // Push previous text segment as a Tag
-                    val topOfStack = tagStack.last()
+                    val topOfStack: Tag = tagStack.last()
                     if (text.isNotEmpty()) {
                         val newTag = topOfStack.copy(text = text)
                         tags += newTag
                         text = ""
                     }
                     // Begin the new tag
-                    tagStack += Tag(symbol.attr, "")
+                    val noinherit = symbol.attributes.any { it.key == TAG_NOINHERIT && it.valueAsBooleanOr(false) }
+                    val mergedAttributes: MutableMap<String, Attribute> = if (noinherit) mutableMapOf() else (topOfStack.attrMap.filterNot { (_, a) ->
+                        a.key == TAG_NOINHERIT
+                    }.toMutableMap())
+                    symbol.attributes.forEach { a ->
+                        mergedAttributes[a.key] = a
+                    }
+                    tagStack += Tag(mergedAttributes.values.toSet(), "")
                 }
                 Symbol.EndTag -> {
                     // Push previous text segment as a Tag
@@ -280,7 +293,11 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                             } else if (currentText.isNotEmpty()) {
                                 // Boolean true
                                 currentAttrKey = currentText
-                                currentTagAttr.add(Attribute(currentAttrKey, "true"))
+                                if (currentAttrKey.startsWith('!')) {
+                                    currentTagAttr.add(Attribute(currentAttrKey.substring(1), "false"))
+                                } else {
+                                    currentTagAttr.add(Attribute(currentAttrKey, "true"))
+                                }
                                 currentAttrKey = ""
                                 currentText = ""
                             }
@@ -319,7 +336,11 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                                     // Finished this attribute, the value is boolean true
                                     currentAttrKey = currentText
                                     currentText = ""
-                                    currentTagAttr.add(Attribute(currentAttrKey, "true"))
+                                    if (currentAttrKey.startsWith('!')) {
+                                        currentTagAttr.add(Attribute(currentAttrKey.substring(1), "false"))
+                                    } else {
+                                        currentTagAttr.add(Attribute(currentAttrKey, "true"))
+                                    }
                                     currentAttrKey = ""
                                     parsingAttributeValue = false
                                 } else {
@@ -344,6 +365,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                 ?: default) else default
 
         fun valueAsString(): String = value.toString()
+        
         fun valueAsFloatOr(default: Float): Float = when (val v = value) {
             is Float -> v
             is Double -> v.toFloat()
@@ -374,9 +396,10 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
             }
         }
 
-        class StartTag(val attr: Set<Attribute>) : Symbol() {
+        class StartTag(val attributes: Set<Attribute>) : Symbol() {
+            val attrMap: Map<String, Attribute> = attributes.associateBy { it.key }
             override fun toString(): String {
-                return "StartTag[${attr.toList().joinToString(separator = " ")}]"
+                return "StartTag[${attributes.toList().joinToString(separator = " ")}]"
             }
         }
 
