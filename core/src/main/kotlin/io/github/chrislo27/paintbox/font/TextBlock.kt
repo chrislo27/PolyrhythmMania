@@ -210,7 +210,7 @@ data class TextBlock(val runs: List<TextRun>) {
         this.runInfo = runInfo
         this.lineInfo = lineInfo
         this.width = maxPosX
-        this.height = -posY + lastCapHeight
+        this.height = -posY + firstCapHeight
     }
 
     fun isRunInfoInvalid(): Boolean {
