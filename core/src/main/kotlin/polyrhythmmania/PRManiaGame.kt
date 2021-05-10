@@ -119,6 +119,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
         val defaultAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
             font.setUseIntegerPositions(true) // Filtering doesn't kick in so badly, solves "wiggly" glyphs
+            font.setFixedWidthGlyphs("0123456789")
         }
         val defaultFontSize = 20
 

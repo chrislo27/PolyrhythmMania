@@ -35,6 +35,7 @@ import polyrhythmmania.editor.undo.impl.MoveAction
 import polyrhythmmania.editor.undo.impl.PlaceAction
 import polyrhythmmania.editor.undo.impl.SelectionAction
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
@@ -91,6 +92,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val blocks: List<Block> = CopyOnWriteArrayList()
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
     val startingTempo: FloatVar = FloatVar(TempoMap.DEFAULT_STARTING_GLOBAL_TEMPO)
+    val tempoChanges: Var<List<TempoChange>> = Var(listOf(TempoChange(5f, 150f)))
 
     /**
      * Call Var<Boolean>.invert() to force the status to be updated. Used when an undo or redo takes place.
@@ -107,6 +109,9 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         sceneRoot += editorPane
         resize()
         bindStatusBar(editorPane.statusBarMsg)
+        tool.addListener {
+            beatLines.active = false
+        }
     }
 
     fun render(delta: Float, batch: SpriteBatch) {
@@ -150,7 +155,15 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
      * into the [engine]. This mutates the [engine] state.
      */
     fun compileEditorIntermediates() {
-        
+        compileEditorTempos()
+    }
+    
+    fun compileEditorTempos() {
+        // Set starting tempo
+        val tempos = engine.tempos
+        tempos.removeTempoChangesBulk(tempos.getAllTempoChanges())
+        tempos.addTempoChange(TempoChange(0f, this.startingTempo.getOrCompute()))
+        tempos.addTempoChangesBulk(this.tempoChanges.getOrCompute().toList())
     }
 
     fun attemptInstantiatorDrag(instantiator: Instantiator) {

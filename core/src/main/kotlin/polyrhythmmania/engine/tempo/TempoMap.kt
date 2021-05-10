@@ -20,6 +20,7 @@ class TempoMap(startingGlobalTempo: Float = DEFAULT_STARTING_GLOBAL_TEMPO) {
     private var globalTempo: TempoChange = TempoChange(0f, startingGlobalTempo)
     private var globalTempoData: TempoChangeData = TempoChangeData(globalTempo, 0f)
 
+    private var allTempoChanges: List<TempoChange> = emptyList()
     private val beatMap: NavigableMap<Float, TempoChange> = TreeMap()
     private val beatMapData: NavigableMap<Float, TempoChangeData> = TreeMap()
     private val secondsMapData: NavigableMap<Float, TempoChangeData> = TreeMap()
@@ -27,6 +28,9 @@ class TempoMap(startingGlobalTempo: Float = DEFAULT_STARTING_GLOBAL_TEMPO) {
     init {
         addTempoChange(globalTempo)
     }
+    
+    fun getGlobalTempo(): TempoChange = globalTempo
+    fun getAllTempoChanges(): List<TempoChange> = allTempoChanges
     
     fun addTempoChange(tempoChange: TempoChange): Boolean =
             addTempoChange(tempoChange, true)
@@ -87,6 +91,8 @@ class TempoMap(startingGlobalTempo: Float = DEFAULT_STARTING_GLOBAL_TEMPO) {
             secondsMapData[tcData.secondsStart] = tcData
             previous = tcData
         }
+        
+        allTempoChanges = beatMap.values.toList()
     }
     
     private fun getTempoChangeDataAtBeat(beat: Float): TempoChangeData {
@@ -136,6 +142,16 @@ class TempoMap(startingGlobalTempo: Float = DEFAULT_STARTING_GLOBAL_TEMPO) {
     fun tempoAtSeconds(seconds: Float): Float {
         if (seconds < 0f) return 60f // 1:1 mapping of seconds and beats at this point
         return getTempoChangeDataAtSeconds(seconds).tempoChange.newTempo
+    }
+
+    fun swingAtBeat(beat: Float): Swing {
+        if (beat < 0f) return Swing.STRAIGHT
+        return getTempoChangeDataAtBeat(beat).tempoChange.newSwing
+    }
+
+    fun swingAtSeconds(seconds: Float): Swing {
+        if (seconds < 0f) return Swing.STRAIGHT
+        return getTempoChangeDataAtSeconds(seconds).tempoChange.newSwing
     }
 
     private data class TempoChangeData(val tempoChange: TempoChange,

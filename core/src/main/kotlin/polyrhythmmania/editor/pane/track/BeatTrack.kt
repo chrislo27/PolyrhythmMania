@@ -14,6 +14,7 @@ import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import io.github.chrislo27.paintbox.util.gdxutils.scaleMul
+import polyrhythmmania.Localization
 import polyrhythmmania.editor.Click
 import polyrhythmmania.util.DecimalFormats
 import kotlin.math.ceil
@@ -111,7 +112,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             editorPane.palette.beatMarkerFont.useFont { font ->
                 font.scaleMul(0.75f)
                 font.color = tmpColor2
-                font.draw(batch, "Beat ${DecimalFormats.format("0.000", playbackStart)}",
+                font.draw(batch, Localization.getValue("editor.beatTime", DecimalFormats.format("0.000", playbackStart)),
                         x + trackView.translateBeatToX(playbackStart) + triangleSize / 2 + 2f,
                         y - 4f, 0f, Align.left, false)
             }
