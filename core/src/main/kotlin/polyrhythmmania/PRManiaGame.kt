@@ -214,12 +214,17 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
 
 
-        addFontFamily("OpenSans")
-        addFontFamily("Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight)
+//        addFontFamily("OpenSans")
+        addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight)
         
         addFontFamily(fontIDPrefix = "editor_status", familyName = "Roboto", fontSize = 16,
                 hinting = FreeTypeFontGenerator.Hinting.Slight, generateBordered = false)
 
+        cache["prmania_icons"] = PaintboxFontBitmap(
+                PaintboxFontParams(Gdx.files.internal("fonts/prmania_icons/prmania_icons.fnt"), 16, 0f, false, WindowSize(1280, 720)),
+                BitmapFont(Gdx.files.internal("fonts/prmania_icons/prmania_icons.fnt"), Gdx.files.internal("fonts/prmania_icons/prmania_icons.png"), false, true),
+                true
+        )
         cache["editor_beat_time"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Medium.ttf"), 1, 1f, false, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -270,11 +275,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     size = 20
                     borderWidth = 1f
                 }).setAfterLoad(afterLoad)
-        cache["prmania_icons"] = PaintboxFontBitmap(
-                PaintboxFontParams(Gdx.files.internal("fonts/prmania_icons/prmania_icons.fnt"), 16, 0f, false, WindowSize(1280, 720)),
-                BitmapFont(Gdx.files.internal("fonts/prmania_icons/prmania_icons.fnt"), Gdx.files.internal("fonts/prmania_icons/prmania_icons.png"), false, true),
-                true
-        )
     }
 
 
