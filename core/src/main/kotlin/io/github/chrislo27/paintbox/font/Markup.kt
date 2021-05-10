@@ -19,6 +19,7 @@ import java.lang.NumberFormatException
  *   - A key without a value is treated as key=true. (ex: [flag] -> flag=true)
  *     - A key without a value starting with a exclamation mark ! is treated as key=false. (ex: [!flag] -> flag=false)
  *   - Values are either text, numbers (decimal numbers), or booleans (true/false).
+ *   - Attributes are parsed from left to right.
  * - The backslash character \ is the escape character and will escape ANY character after it, including another backslash.
  * - An unclosed start or end tag is counted as normal text.
  * ```
@@ -48,6 +49,7 @@ import java.lang.NumberFormatException
  * sub : Subscript. Defines scalex=0.58, scaley=0.58, offsety=-0.333
  * sup : Superscript. Defines offsety=1.333, carryovery=true
  * exp : Exponent. Defines offsety=1.333, carryovery=false, scalex=0.58, scaley=0.58
+ * scale=1.0 : Multiplies both the scalex and scaley tags by the given value
  * ```
  */
 class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun,
@@ -76,6 +78,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
         val TAG_SUBSCRIPT: String = "sub"
         val TAG_SUPERSCRIPT: String = "sup"
         val TAG_EXPONENT: String = "exp"
+        val TAG_SCALE: String = "scale"
 
 //        @JvmStatic
 //        fun main(args: Array<String>) {
@@ -123,6 +126,12 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
             var carryoverY = tag.attrMap[TAG_CARRYOVERY]?.valueAsBooleanOr(false) ?: false
             var xAdvance = tag.attrMap[TAG_XADVANCE]?.valueAsFloatOr(0f) ?: 0f
 
+            
+            val scale = tag.attrMap[TAG_SCALE]?.valueAsFloatOr(1f) ?: 1f
+            if (scale != 1f) {
+                scaleX *= scale
+                scaleY *= scale
+            }
 
             val bold = (tag.attrMap[TAG_BOLD]?.valueAsBooleanOr(false)
                     ?: false) || (tag.attrMap[TAG_BOLD2]?.valueAsBooleanOr(false) ?: false)
@@ -170,7 +179,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
     private fun parseSymbolsToTags(symbols: List<Symbol>): List<Tag> {
         if (symbols.isEmpty()) return parseSymbolsToTags(listOf(Symbol.Text("")))
 
-        val defaultRootTag = Tag(setOf(Attribute(TAG_FONT, DEFAULT_FONT_NAME),
+        val defaultRootTag = Tag(linkedSetOf(Attribute(TAG_FONT, DEFAULT_FONT_NAME),
                 Attribute(TAG_COLOR, defaultTextRun.color),
                 Attribute(TAG_SCALEX, defaultTextRun.scaleX),
                 Attribute(TAG_SCALEY, defaultTextRun.scaleY),
@@ -205,7 +214,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                     symbol.attributes.forEach { a ->
                         mergedAttributes[a.key] = a
                     }
-                    tagStack += Tag(mergedAttributes.values.toSet(), "")
+                    tagStack += Tag(LinkedHashSet(mergedAttributes.values.toList()), "")
                 }
                 Symbol.EndTag -> {
                     // Push previous text segment as a Tag
@@ -246,7 +255,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
         var currentText = ""
 
         var inTag = false
-        val currentTagAttr = mutableSetOf<Attribute>()
+        val currentTagAttr: LinkedHashSet<Attribute> = linkedSetOf()
         var parsingAttributeValue = false
         var currentAttrKey = ""
         var startOfTagContent = "" // Used if the tag doesn't finish, then the entire content is a Text symbol instead
@@ -302,7 +311,7 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
                                 currentText = ""
                             }
 
-                            val attributes = currentTagAttr.toSet()
+                            val attributes = LinkedHashSet(currentTagAttr.toList())
                             if (attributes.isEmpty()) {
                                 // An ending tag [] indicator.
                                 // Submit the EndTag symbol
@@ -385,8 +394,8 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
         }
     }
 
-    data class Tag(val attributes: Set<Attribute>, val text: String) {
-        val attrMap: Map<String, Attribute> = attributes.associateBy { it.key }
+    data class Tag(val attributes: LinkedHashSet<Attribute>, val text: String) {
+        val attrMap: LinkedHashMap<String, Attribute> = attributes.associateByTo(LinkedHashMap()) { it.key }
     }
 
     private sealed class Symbol {
@@ -396,8 +405,8 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
             }
         }
 
-        class StartTag(val attributes: Set<Attribute>) : Symbol() {
-            val attrMap: Map<String, Attribute> = attributes.associateBy { it.key }
+        class StartTag(val attributes: LinkedHashSet<Attribute>) : Symbol() {
+            val attrMap: LinkedHashMap<String, Attribute> = attributes.associateByTo(LinkedHashMap()) { it.key }
             override fun toString(): String {
                 return "StartTag[${attributes.toList().joinToString(separator = " ")}]"
             }
