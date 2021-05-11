@@ -23,6 +23,9 @@ import polyrhythmmania.PRManiaColors
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.TrackView
+import polyrhythmmania.editor.undo.impl.AddTempoChangeAction
+import polyrhythmmania.editor.undo.impl.ChangeTempoChangeAction
+import polyrhythmmania.editor.undo.impl.DeleteTempoChangeAction
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.util.DecimalFormats
 import kotlin.math.ceil
@@ -179,22 +182,18 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                     // Scrolled is handled below
                     is TouchDown -> {
                         var inputConsumed = false
-                        if (editor.tool.getOrCompute() != Tool.TEMPO_CHANGE) return@addInputEventListener false
+                        if (editor.tool.getOrCompute() != Tool.TEMPO_CHANGE || editor.click.getOrCompute() != Click.None)
+                            return@addInputEventListener false
                         val ctrl = Gdx.input.isControlDown()
                         val alt = Gdx.input.isAltDown()
                         val shift = Gdx.input.isShiftDown()
                         val tc = currentHoveredTempoChange.getOrCompute()
                         if (event.button == Input.Buttons.RIGHT && tc != null && (!ctrl && !alt && !shift)) {
-                            // TODO add undo stack
                             // Remove tempo change
-                            val tempoChanges = editor.tempoChanges.getOrCompute().toMutableList()
-                            tempoChanges.remove(tc)
-                            currentHoveredTempoChange.set(null)
-                            editor.tempoChanges.set(tempoChanges)
+                            editor.mutate(DeleteTempoChangeAction(tc))
                             inputConsumed = true
                         } else if (event.button == Input.Buttons.LEFT) {
                             if (tc == null) {
-                                // TODO add undo stack
                                 // Add tempo change
                                 val beat = MathHelper.snapToNearest(getBeatFromRelative(lastMouseRelative.x), editor.snapping.getOrCompute())
                                 if (beat > 0f) {
@@ -204,16 +203,15 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                                     val newTempo = (tempos.tempoAtBeat(beat) * (if (ctrl) 0.5f else if (shift) 2f else 1f)).coerceIn(MIN_TEMPO, MAX_TEMPO)
                                     val newTc = TempoChange(beat, newTempo, tempos.swingAtBeat(beat))
                                     if (!alt && !(ctrl && shift) && !tempoChanges.any { it.beat == newTc.beat }) {
-                                        tempoChanges.add(newTc)
+                                        editor.mutate(AddTempoChangeAction(newTc))
                                         currentHoveredTempoChange.set(newTc)
-                                        editor.tempoChanges.set(tempoChanges)
                                         inputConsumed = true
                                     }
                                 }
                             } else {
-                                // TODO add undo stack
                                 // Drag tempo change
-
+                                editor.click.set(Click.MoveTempoChange(editor, tc))
+                                currentHoveredTempoChange.set(null)
                                 inputConsumed = true
                             }
                         }
@@ -222,6 +220,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                     else -> false
                 }
             }
+            // Change tempo
             addInputEventListener(createInputListener { amt ->
                 val tc = currentHoveredTempoChange.getOrCompute()
                 if (tc != null) {
@@ -229,12 +228,15 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                     var futureTempo = originalTempo + amt
                     futureTempo = futureTempo.coerceIn(MIN_TEMPO, MAX_TEMPO)
                     if (futureTempo != originalTempo) {
-                        // TODO add undo stack
-                        val tempoChanges = editor.tempoChanges.getOrCompute().toMutableList()
-                        tempoChanges.remove(tc)
-                        tempoChanges.add(tc.copy(newTempo = futureTempo))
-                        editor.tempoChanges.set(tempoChanges)
-
+                        val peek = editor.getUndoStack().peekFirst()
+                        val newTc = tc.copy(newTempo = futureTempo)
+                        if (peek != null && peek is ChangeTempoChangeAction) {
+                            peek.undo(editor)
+                            peek.next = newTc
+                            peek.redo(editor)
+                        } else {
+                            editor.mutate(ChangeTempoChangeAction(tc, newTc))
+                        }
                         currentHoveredTempoChange.set(determineTempoChangeFromBeat(getBeatFromRelative(lastMouseRelative.x)))
                     }
                 }
@@ -251,14 +253,18 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             lastMouseRelative.y = y - thisPos.y
 
             val currentBeat = getBeatFromRelative(lastMouseRelative.x)
-            currentHoveredTempoChange.set(determineTempoChangeFromBeat(currentBeat))
+            if (editor.click.getOrCompute() == Click.None) {
+                currentHoveredTempoChange.set(determineTempoChangeFromBeat(currentBeat))
+            } else {
+                currentHoveredTempoChange.set(null)
+            }
 
             val currentTool = editor.tool.getOrCompute()
             updateBeatLines(currentTool, currentBeat)
 
             editor.click.getOrCompute().onMouseMoved(currentBeat, 0, 0f)
         }
-        
+
         private fun updateBeatLines(currentTool: Tool, currentBeat: Float) {
             val beatLines = editor.beatLines
             if (currentTool == Tool.TEMPO_CHANGE) {
@@ -301,46 +307,70 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             val lineWidth = 2f
 
             // Playback start
-            val tmpColor2 = ColorStack.getAndPush().set(PRManiaColors.TEMPO)
+            val tempoColor = ColorStack.getAndPush().set(PRManiaColors.TEMPO)
             val triangle = AssetRegistry.get<Texture>("ui_triangle_equilateral")
             val triangleSize = 12f
 
-            val hoveredTempoChange: TempoChange? = if (currentTool == Tool.TEMPO_CHANGE && lastMouseRelative.y in 0f..this.bounds.height.getOrCompute())
-                this.currentHoveredTempoChange.getOrCompute() else null
+            val tempoChanges = editor.tempoChanges.getOrCompute()
+            val currentClick = editor.click.getOrCompute()
+            val hoveredTempoChange: TempoChange? = if (currentTool == Tool.TEMPO_CHANGE) {
+                if (currentClick is Click.MoveTempoChange) {
+                    currentClick.lastValidTempoChangePos
+                } else if (lastMouseRelative.y in 0f..this.bounds.height.getOrCompute()) {
+                    val current = this.currentHoveredTempoChange.getOrCompute()
+                    if (current in tempoChanges) {
+                        current
+                    } else {
+                        this.currentHoveredTempoChange.set(null)
+                        null
+                    }
+                } else null
+            } else {
+                null
+            }
 
             editorPane.palette.beatMarkerFont.useFont { font ->
                 font.scaleMul(0.75f)
-                font.color = tmpColor2
-
-                batch.color = tmpColor2
-                val tempoChanges = editor.tempoChanges.getOrCompute()
+                
+                val clickOriginalTc: TempoChange? = if (currentClick is Click.MoveTempoChange) currentClick.tempoChange else null
                 for (tc in tempoChanges) {
                     val beat = tc.beat
                     if (beat !in (leftBeat - 2)..(rightBeat + 1)) continue
-                    if (tc === hoveredTempoChange) continue
-
-                    drawTempoChange(batch, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, tc.newTempo, font)
+                    
+                    if (tc === clickOriginalTc) {
+                        val ghostColor = ColorStack.getAndPush().set(tempoColor)
+                        val a = ghostColor.a
+                        ghostColor.a = 1f
+                        ghostColor.r *= 0.5f * a
+                        ghostColor.g *= 0.5f * a
+                        ghostColor.b *= 0.5f * a
+                        drawTempoChange(batch, ghostColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, tc.newTempo, null)
+                        ColorStack.pop()
+                    } else {
+                        drawTempoChange(batch, tempoColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, tc.newTempo, font)
+                    }
                 }
                 if (hoveredTempoChange != null) {
-                    tmpColor2.set(1f, 1f, 1f, 1f)
-                    font.color = tmpColor2
-                    batch.color = tmpColor2
+                    tempoColor.set(1f, 1f, 1f, 1f)
                     val beat = hoveredTempoChange.beat
-                    drawTempoChange(batch, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, hoveredTempoChange.newTempo, font)
+                    drawTempoChange(batch, tempoColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, hoveredTempoChange.newTempo, font)
                 }
             }
+            ColorStack.pop()
 
 
             ColorStack.pop()
             batch.packedColor = lastPackedColor
         }
 
-        private fun drawTempoChange(batch: SpriteBatch, x: Float, y: Float, h: Float, trackView: TrackView, lineWidth: Float,
-                                    triangle: Texture, triangleSize: Float, beat: Float, tempo: Float, font: BitmapFont) {
+        private fun drawTempoChange(batch: SpriteBatch, color: Color, x: Float, y: Float, h: Float, trackView: TrackView, lineWidth: Float,
+                                    triangle: Texture, triangleSize: Float, beat: Float, tempo: Float, font: BitmapFont?) {
+            font?.color = color
+            batch.color = color
             batch.fillRect(x + trackView.translateBeatToX(beat), y - h, lineWidth, h)
             batch.draw(triangle, x + trackView.translateBeatToX(beat) - triangleSize / 2 + lineWidth / 2,
                     y, triangleSize, -triangleSize)
-            font.draw(batch, Localization.getValue("editor.bpm", DecimalFormats.format("0.0#", tempo)),
+            font?.draw(batch, Localization.getValue("editor.bpm", DecimalFormats.format("0.0#", tempo)),
                     x + trackView.translateBeatToX(beat) + triangleSize / 2 + 2f,
                     y - 4f, 0f, Align.left, false)
         }

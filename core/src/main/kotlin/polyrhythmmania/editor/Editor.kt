@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
-import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
@@ -30,10 +29,7 @@ import polyrhythmmania.editor.track.block.Block
 import polyrhythmmania.editor.track.block.Instantiator
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
-import polyrhythmmania.editor.undo.impl.DeletionAction
-import polyrhythmmania.editor.undo.impl.MoveAction
-import polyrhythmmania.editor.undo.impl.PlaceAction
-import polyrhythmmania.editor.undo.impl.SelectionAction
+import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
@@ -46,7 +42,6 @@ import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.LinkedHashMap
-import kotlin.math.E
 
 
 class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720))
@@ -92,7 +87,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val blocks: List<Block> = CopyOnWriteArrayList()
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
     val startingTempo: FloatVar = FloatVar(TempoMap.DEFAULT_STARTING_GLOBAL_TEMPO)
-    val tempoChanges: Var<List<TempoChange>> = Var(listOf(TempoChange(5f, 150f)))
+    val tempoChanges: Var<List<TempoChange>> = Var(listOf())
 
     /**
      * Call Var<Boolean>.invert() to force the status to be updated. Used when an undo or redo takes place.
@@ -269,6 +264,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                         }
                     }
                 }
+                is Click.MoveTempoChange -> {
+                    val valid = currentClick.isCurrentlyValid.use()
+                    var res = Localization.getVar("editor.status.tempoChangeTool.dragging").use()
+                    if (!valid) {
+                        res += " " + Localization.getVar("editor.status.tempoChangeTool.dragging.invalidPlacement").use()
+                    }
+                    res
+                }
                 Click.None -> {
                     when (tool) {
                         Tool.SELECTION -> {
@@ -414,6 +417,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                         if (button == Input.Buttons.RIGHT) {
                             currentClick.complete()
                         }
+                    }
+                }
+                click.set(Click.None)
+                inputConsumed = true
+            }
+            is Click.MoveTempoChange -> {
+                if (button == Input.Buttons.RIGHT) {
+                    currentClick.abortAction()
+                } else if (button == Input.Buttons.LEFT) {
+                    val result = currentClick.complete()
+                    if (result != null) {
+                        this.mutate(MoveTempoChangeAction(currentClick.tempoChange, result))
                     }
                 }
                 click.set(Click.None)

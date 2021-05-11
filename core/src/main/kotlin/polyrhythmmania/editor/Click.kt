@@ -9,6 +9,7 @@ import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.intersects
 import polyrhythmmania.editor.track.Track
 import polyrhythmmania.editor.track.block.Block
+import polyrhythmmania.engine.tempo.TempoChange
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -152,7 +153,7 @@ sealed class Click {
             }
             // TODO make this more flexible? Selections spanning multiple tracks cannot move between tracks
             if (encompassingRegion.track <= 1) {
-                val targetTrackIndex = (trackY - mouseOffset.y).toInt()
+                val targetTrackIndex = (trackY /*- mouseOffset.y*/).toInt()
                 val targetTrack: Track? = editor.tracks.getOrNull(targetTrackIndex)
                 if (targetTrack != null) {
                     val allowedTypes = targetTrack.allowedTypes
@@ -199,13 +200,13 @@ sealed class Click {
 
     class MoveMarker(val editor: Editor, val point: FloatVar, val type: MarkerType)
         : Click() {
-        
+
         enum class MarkerType {
             PLAYBACK,
         }
-        
+
         val originalPosition: Float = point.getOrCompute()
-        
+
         fun didChange(): Boolean = point.getOrCompute() != originalPosition
 
         fun complete() {
@@ -214,7 +215,7 @@ sealed class Click {
                 return
             }
         }
-        
+
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
             val snapping = editor.snapping.getOrCompute()
             val snapBeat = MathHelper.snapToNearest(beat, snapping).coerceAtLeast(0f)
@@ -223,6 +224,51 @@ sealed class Click {
 
         override fun abortAction() {
             point.set(originalPosition)
+        }
+    }
+
+    class MoveTempoChange(val editor: Editor, val tempoChange: TempoChange)
+        : Click() {
+
+        var newPosition: Float = tempoChange.beat
+            private set
+        var lastValidPosition: Float = tempoChange.beat
+            private set
+        var lastValidTempoChangePos: TempoChange = tempoChange.copy(beat = lastValidPosition)
+            private set
+
+        val isCurrentlyValid: Var<Boolean> = Var(false)
+
+        fun didChange(): Boolean = newPosition != tempoChange.beat
+
+        fun complete(): TempoChange? {
+            if (!didChange() || !isPositionValid(newPosition)) {
+                abortAction()
+                return null
+            }
+            return tempoChange.copy(beat = newPosition)
+        }
+
+        fun isPositionValid(beat: Float): Boolean {
+            return beat > 0f && !editor.tempoChanges.getOrCompute().any { tc ->
+                tc !== tempoChange && tc.beat == beat
+            }
+        }
+
+        override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
+            val snapping = editor.snapping.getOrCompute()
+            val snapBeat = MathHelper.snapToNearest(beat, snapping).coerceAtLeast(0f)
+            newPosition = snapBeat
+            val isPosValid = isPositionValid(snapBeat)
+            val newPos = if (isPosValid) snapBeat else tempoChange.beat
+            if (lastValidPosition != newPos) {
+                lastValidPosition = newPos
+                lastValidTempoChangePos = tempoChange.copy(beat = newPos)
+            }
+            isCurrentlyValid.set(isPosValid)
+        }
+
+        override fun abortAction() {
         }
     }
 
