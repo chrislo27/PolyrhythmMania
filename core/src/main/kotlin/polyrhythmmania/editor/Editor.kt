@@ -48,9 +48,10 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     : ActionHistory<Editor>(), InputProcessor by sceneRoot.inputSystem, Disposable {
 
     companion object {
-        const val TRACK_INPUT_A: String = "input_a"
-        const val TRACK_INPUT_DPAD: String = "input_dpad"
-        const val TRACK_VFX0: String = "vfx_0"
+        const val TRACK_INPUT_0: String = "input_0"
+        const val TRACK_INPUT_1: String = "input_1"
+        const val TRACK_INPUT_2: String = "input_2"
+        const val TRACK_VFX_0: String = "vfx_0"
     }
 
     private val uiCamera: OrthographicCamera = OrthographicCamera()
@@ -69,9 +70,10 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     val tracks: List<Track> = listOf(
-            Track(TRACK_INPUT_A, EnumSet.of(BlockType.INPUT)),
-            Track(TRACK_INPUT_DPAD, EnumSet.of(BlockType.INPUT)),
-            Track(TRACK_VFX0, EnumSet.of(BlockType.VFX)),
+            Track(TRACK_INPUT_0, EnumSet.of(BlockType.INPUT)),
+            Track(TRACK_INPUT_1, EnumSet.of(BlockType.INPUT)),
+            Track(TRACK_INPUT_2, EnumSet.of(BlockType.INPUT)),
+            Track(TRACK_VFX_0, EnumSet.of(BlockType.VFX)),
     )
     val trackMap: Map<String, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 

@@ -97,7 +97,6 @@ data class TextBlock(val runs: List<TextRun>) {
             val paintboxFont = textRun.font
             val font = paintboxFont.begin()
             adjustFontForTextRun(font, textRun)
-            val blankLineScale = font.data.blankLineScale
 
             val color = Color(1f, 1f, 1f, 1f)
             Color.argb8888ToColor(color, textRun.color)
@@ -179,7 +178,7 @@ data class TextBlock(val runs: List<TextRun>) {
                 // The posX should be where the last GlyphRun left off
                 // However, if the run ends in newlines with optional whitespace, then posX should be 0
                 val runText = textRunInfo.run.text
-                val runEndsInNewlines = runText.trimEnd().endsWith('\n') //textRunInfo.glyphLayout.height - capHeight > abs(lastGlyphRunY)
+                val runEndsInNewlines = runText.trimEnd { it == ' ' }.endsWith('\n') //textRunInfo.glyphLayout.height - capHeight > abs(lastGlyphRunY)
                 if (runEndsInNewlines) {
                     currentLineWidth = posX
                     posX = 0f

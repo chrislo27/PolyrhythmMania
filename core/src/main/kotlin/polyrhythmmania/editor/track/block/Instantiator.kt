@@ -31,17 +31,28 @@ object Instantiators {
             tempList += instantiator
         }
 
-        add(Instantiator("pattern", Localization.getVar("instantiator.pattern.name"),
-                Localization.getVar("instantiator.pattern.summary"),
-                Localization.getVar("instantiator.pattern.desc")) { editor ->
+        add(Instantiator("spawnPattern", Localization.getVar("instantiator.spawnPattern.name"),
+                Localization.getVar("instantiator.spawnPattern.summary"),
+                Localization.getVar("instantiator.spawnPattern.desc")) { editor ->
             BlockPattern(editor)
         })
-        add(Instantiator("test", Localization.getVar("instantiator.test.name"),
-                Localization.getVar("instantiator.test.summary"),
-                Localization.getVar("instantiator.test.desc")) { editor ->
-            BlockTest(editor)
+        add(Instantiator("deployRod", Localization.getVar("instantiator.deployRod.name"),
+                Localization.getVar("instantiator.deployRod.summary"),
+                Localization.getVar("instantiator.deployRod.desc")) { editor ->
+            BlockPattern(editor) // FIXME
         })
-        (2..19).forEach { i ->
+        add(Instantiator("retractPistons", Localization.getVar("instantiator.retractPistons.name"),
+                Localization.getVar("instantiator.retractPistons.summary"),
+                Localization.getVar("instantiator.retractPistons.desc")) { editor ->
+            BlockPattern(editor) // FIXME
+        })
+        add(Instantiator("despawnPattern", Localization.getVar("instantiator.despawnPattern.name"),
+                Localization.getVar("instantiator.despawnPattern.summary"),
+                Localization.getVar("instantiator.despawnPattern.desc")) { editor ->
+            BlockPattern(editor) // FIXME
+        })
+        
+        (1..19).forEach { i ->
             add(Instantiator("test$i", Var("Test$i"),Var(""),Var("")) { editor ->
                 BlockTest(editor)
             })
