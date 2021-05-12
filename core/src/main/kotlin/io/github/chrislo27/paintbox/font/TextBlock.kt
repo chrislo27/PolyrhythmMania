@@ -217,9 +217,9 @@ data class TextBlock(val runs: List<TextRun>) {
     }
 
     fun isRunInfoInvalid(): Boolean {
-        return runInfo.any { l ->
+        return (runInfo.isEmpty() && runs.isNotEmpty()) || runInfo.any { l ->
             l.run.font.getCurrentFontNumber() != l.currentFontNumber
-        } || (runInfo.isEmpty() && runs.isNotEmpty())
+        }
     }
 
     /**
