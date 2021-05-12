@@ -41,6 +41,7 @@ abstract class Control<SELF : Control<SELF>>
     var onHoverEnd: (event: MouseExited) -> Boolean = { false }
     
     init {
+        @Suppress("LeakingThis")
         addDefaultInputEventListener()
     }
     
@@ -77,6 +78,13 @@ abstract class Control<SELF : Control<SELF>>
         addInputEventListener { event ->
             defaultInputEventListener(event)
         }
+    }
+
+    /**
+     * Attempts to trigger the [onAction] value so long if this [Control] is not [disabled][apparentDisabledState].
+     */
+    fun triggerAction(): Boolean {
+        return !apparentDisabledState.getOrCompute() && onAction()
     }
     
     @JvmName("setOnActionUnit")
