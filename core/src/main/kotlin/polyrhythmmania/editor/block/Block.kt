@@ -1,9 +1,8 @@
-package polyrhythmmania.editor.track.block
+package polyrhythmmania.editor.block
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.util.gdxutils.drawCompressed
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
@@ -11,9 +10,7 @@ import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import io.github.chrislo27.paintbox.util.gdxutils.scaleMul
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
-import polyrhythmmania.editor.pane.track.AllTracksPane
 import polyrhythmmania.editor.pane.track.EditorTrackArea
-import polyrhythmmania.editor.track.BlockType
 import java.util.*
 
 

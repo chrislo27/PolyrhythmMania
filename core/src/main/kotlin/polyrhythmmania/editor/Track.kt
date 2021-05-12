@@ -1,6 +1,7 @@
-package polyrhythmmania.editor.track
+package polyrhythmmania.editor
 
-import polyrhythmmania.editor.track.block.Block
+import polyrhythmmania.editor.block.Block
+import polyrhythmmania.editor.block.BlockType
 
 
 data class Track(val id: String, val allowedTypes: Set<BlockType>) {

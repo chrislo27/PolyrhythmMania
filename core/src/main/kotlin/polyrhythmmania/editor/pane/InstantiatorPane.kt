@@ -19,8 +19,8 @@ import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
 import io.github.chrislo27.paintbox.util.gdxutils.drawCompressed
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.track.block.Instantiator
-import polyrhythmmania.editor.track.block.Instantiators
+import polyrhythmmania.editor.block.Instantiator
+import polyrhythmmania.editor.block.Instantiators
 import kotlin.math.*
 
 

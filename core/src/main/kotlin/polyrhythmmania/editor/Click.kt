@@ -7,8 +7,7 @@ import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.intersects
-import polyrhythmmania.editor.track.Track
-import polyrhythmmania.editor.track.block.Block
+import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.tempo.TempoChange
 import kotlin.math.abs
 import kotlin.math.ceil

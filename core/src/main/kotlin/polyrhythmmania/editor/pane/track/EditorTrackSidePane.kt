@@ -5,7 +5,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.editor.track.Track
+import polyrhythmmania.editor.Track
 
 
 /**

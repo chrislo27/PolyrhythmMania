@@ -2,7 +2,7 @@ package polyrhythmmania.editor.undo.impl
 
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.track.block.Block
+import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.undo.ReversibleAction
 
 

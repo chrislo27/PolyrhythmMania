@@ -1,4 +1,4 @@
-package polyrhythmmania.editor.track.block
+package polyrhythmmania.editor.block
 
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var

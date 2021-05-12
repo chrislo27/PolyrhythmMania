@@ -1,7 +1,6 @@
-package polyrhythmmania.editor.track.block
+package polyrhythmmania.editor.block
 
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.track.BlockType
 import java.util.*
 
 

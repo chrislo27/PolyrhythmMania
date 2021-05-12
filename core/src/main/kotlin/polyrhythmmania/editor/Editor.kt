@@ -23,10 +23,9 @@ import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.editor.track.BlockType
-import polyrhythmmania.editor.track.Track
-import polyrhythmmania.editor.track.block.Block
-import polyrhythmmania.editor.track.block.Instantiator
+import polyrhythmmania.editor.block.BlockType
+import polyrhythmmania.editor.block.Block
+import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*

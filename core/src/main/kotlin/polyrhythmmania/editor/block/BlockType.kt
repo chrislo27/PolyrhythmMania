@@ -1,4 +1,4 @@
-package polyrhythmmania.editor.track
+package polyrhythmmania.editor.block
 
 
 enum class BlockType {
