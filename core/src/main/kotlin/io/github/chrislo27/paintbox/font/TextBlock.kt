@@ -250,7 +250,7 @@ data class TextBlock(val runs: List<TextRun>) {
         val tint = ColorStack.getAndPush().set(batch.color)
         val requiresTinting = tint.r != 1f || tint.g != 1f || tint.b != 1f || tint.a != 1f
 
-        val globalScaleX: Float = scaleX * (if (maxWidth <= 0f || this.width <= 0f || this.width < maxWidth) 1f else (maxWidth / this.width))
+        val globalScaleX: Float = scaleX * (if (maxWidth <= 0f || this.width <= 0f || this.width * scaleX < maxWidth) 1f else (maxWidth / (this.width * scaleX)))
         val globalScaleY: Float = scaleY
 
         val shouldScaleX = globalScaleX != 1f
