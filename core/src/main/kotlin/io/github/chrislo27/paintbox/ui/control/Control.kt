@@ -31,7 +31,23 @@ abstract class Control<SELF : Control<SELF>>
                 parent.apparentDisabledState.use()
             } else false
         } ?: false)
-    } 
+    }
+    
+    val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
+    val isPressedDown: ReadOnlyVar<Boolean> = Var(false)
+    val pressedState: ReadOnlyVar<PressedState> = Var {
+        val hovered = isHoveredOver.use()
+        val pressed = isPressedDown.use()
+        if (hovered && pressed) {
+            PressedState.PRESSED_AND_HOVERED
+        } else if (hovered) { 
+            PressedState.HOVERED
+        } else if (pressed) {
+            PressedState.PRESSED
+        } else {
+            PressedState.NONE
+        }
+    }
     
     var onAction: () -> Boolean = { false }
     var onLeftClick: (event: ClickReleased) -> Boolean = { false }
@@ -41,6 +57,31 @@ abstract class Control<SELF : Control<SELF>>
     var onHoverEnd: (event: MouseExited) -> Boolean = { false }
     
     init {
+        addInputEventListener { event ->
+            when (event) {
+                is MouseEntered -> {
+                    (isHoveredOver as Var).set(true)
+                }
+                is MouseExited -> {
+                    (isHoveredOver as Var).set(false)
+                }
+            }
+            if (!apparentDisabledState.getOrCompute()) {
+                when (event) {
+                    is ClickPressed -> {
+                        if (event.button == Input.Buttons.LEFT) {
+                            (isPressedDown as Var).set(true)
+                        }
+                    }
+                    is ClickReleased -> {
+                        if (event.button == Input.Buttons.LEFT && isPressedDown.getOrCompute()) {
+                            (isPressedDown as Var).set(false)
+                        }
+                    }
+                }
+            }
+            false
+        }
         @Suppress("LeakingThis")
         addDefaultInputEventListener()
     }
@@ -134,5 +175,11 @@ abstract class Control<SELF : Control<SELF>>
             true
         }
     }
-    
+
+    enum class PressedState {
+        NONE,
+        HOVERED,
+        PRESSED,
+        PRESSED_AND_HOVERED;
+    }
 }

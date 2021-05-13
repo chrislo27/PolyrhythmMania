@@ -58,20 +58,9 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
      */
     val internalTextBlock: Var<TextBlock> by lazy { createInternalTextBlockVar(this) }
 
-    val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
-    val isPressedDown: ReadOnlyVar<Boolean> = Var(false)
-    val pressedState: ReadOnlyVar<PressedState> = Var {
-        val hovered = isHoveredOver.use()
-        val pressed = isPressedDown.use()
-        if (hovered && pressed) {
-            PressedState.PRESSED_AND_HOVERED
-        } else if (hovered) {
-            PressedState.HOVERED
-        } else if (pressed) {
-            PressedState.PRESSED
-        } else {
-            PressedState.NONE
-        }
+    constructor(binding: Var.Context.() -> String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
+            : this("", font) {
+        text.bind(binding)
     }
     
     init {
@@ -82,27 +71,9 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     override fun getDefaultSkinID(): String = Button.SKIN_ID
 
     override fun defaultInputEventListener(event: InputEvent): Boolean {
-        when (event) {
-            is MouseEntered -> {
-                (isHoveredOver as Var).set(true)
-            }
-            is MouseExited -> {
-                (isHoveredOver as Var).set(false)
-            }
-        }
-        
         return if (!apparentDisabledState.getOrCompute()) {
             when (event) {
-                is ClickPressed -> {
-                    if (event.button == Input.Buttons.LEFT) {
-                        (isPressedDown as Var).set(true)
-                    }
-                    false
-                }
                 is ClickReleased -> {
-                    if (event.button == Input.Buttons.LEFT && isPressedDown.getOrCompute()) {
-                        (isPressedDown as Var).set(false)
-                    }
                     if (event.isWithinBounds) {
                         if (event.button == Input.Buttons.LEFT) {
                             if (!onAction()) {
@@ -126,13 +97,6 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
         } else {
             false
         }
-    }
-
-    enum class PressedState {
-        NONE,
-        HOVERED,
-        PRESSED,
-        PRESSED_AND_HOVERED;
     }
 }
 
@@ -159,10 +123,10 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
             disabledTextColor.use()
         } else {
             when (pressedState) {
-                Button.PressedState.NONE -> defaultTextColor.use()
-                Button.PressedState.HOVERED -> hoveredTextColor.use()
-                Button.PressedState.PRESSED -> pressedTextColor.use()
-                Button.PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredTextColor.use()
+                Control.PressedState.NONE -> defaultTextColor.use()
+                Control.PressedState.HOVERED -> hoveredTextColor.use()
+                Control.PressedState.PRESSED -> pressedTextColor.use()
+                Control.PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredTextColor.use()
             }
         }
     }
@@ -172,10 +136,10 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
             disabledBgColor.use()
         } else {
             when (pressedState) {
-                Button.PressedState.NONE -> defaultBgColor.use()
-                Button.PressedState.HOVERED -> hoveredBgColor.use()
-                Button.PressedState.PRESSED -> pressedBgColor.use()
-                Button.PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredBgColor.use()
+                Control.PressedState.NONE -> defaultBgColor.use()
+                Control.PressedState.HOVERED -> hoveredBgColor.use()
+                Control.PressedState.PRESSED -> pressedBgColor.use()
+                Control.PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredBgColor.use()
             }
         }
     }
@@ -255,7 +219,8 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
             }
 
             batch.color = tmpColor // Sets the text colour and opacity
-            text.drawCompressed(batch, textX + xOffset, textY - textH + yOffset, if (compressX) textW else 0f, element.textAlign.getOrCompute())
+            text.drawCompressed(batch, textX + xOffset, textY - textH + yOffset,
+                    if (compressX) (textW) else 0f, element.textAlign.getOrCompute())
             ColorStack.pop()
         }
 
