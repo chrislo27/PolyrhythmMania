@@ -34,12 +34,12 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
         this.bounds.height.set(54f)
         this.showContentBorder.set(true)
 
+        val timeTextVar = Localization.getVar("editor.currentTime", Var.bind {
+            listOf(DecimalFormats.format("0.000", editor.engineBeat.use()))
+        })
         timeLabel = TextLabel(binding = {
-            Localization.getVar("editor.currentTime", Var.bind {
-                listOf(DecimalFormats.format("0.000", editor.engineBeat.use()))
-            }).use()
-        },
-                font = editorPane.palette.beatTimeFont).apply {
+            timeTextVar.use()
+        }, font = editorPane.palette.beatTimeFont).apply {
             this.textAlign.set(TextAlign.RIGHT)
             this.renderAlign.set(Align.right)
             this.textColor.bind { editorPane.palette.trackPaneTimeText.use() }
