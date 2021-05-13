@@ -151,8 +151,8 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
         }
         fillTexture = Texture(pixmap)
         pixmap.dispose()
-        spritesheetTexture = Texture("paintbox/paintbox_spritesheet.png").apply {
-            this.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        spritesheetTexture = Texture(Gdx.files.internal("paintbox/paintbox_spritesheet.png"), true).apply {
+            this.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear)
         }
         paintboxSpritesheet = PaintboxSpritesheet(spritesheetTexture)
 
