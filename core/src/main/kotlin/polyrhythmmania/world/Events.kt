@@ -6,10 +6,10 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.soundsystem.BeadsSound
 
 
-abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float, 
+abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float,
                              val affectThisIndexAndForward: Boolean)
     : Event(engine) {
-    
+
     init {
         this.beat = startBeat
     }
@@ -77,14 +77,18 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityR
     init {
         this.width = 0.125f
     }
-    
+
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
         entity.type = type
         entity.pistonState = EntityRowBlock.PistonState.RETRACTED
-        when (this.type) {
-            EntityRowBlock.Type.PLATFORM -> { }
-            EntityRowBlock.Type.PISTON_A -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_spawn_a"))
-            EntityRowBlock.Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_spawn_d"))
+
+        if (currentBeat < this.beat + this.width) {
+            when (this.type) {
+                EntityRowBlock.Type.PLATFORM -> {
+                }
+                EntityRowBlock.Type.PISTON_A -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_spawn_a"))
+                EntityRowBlock.Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_spawn_d"))
+            }
         }
     }
 
@@ -96,16 +100,17 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityR
 class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Float,
                            affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
-    
+
     init {
         this.width = 0.125f
     }
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        // FIXME despawn sound plays even if there is nothing to despawn
-        if (row.rowBlocks.any { it.active }) {
-            engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_despawn"))
+        if (currentBeat < this.beat + this.width) {
+            if (row.rowBlocks.any { it.active }) {
+                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_despawn"))
+            }
         }
     }
 
@@ -119,7 +124,10 @@ class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Floa
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_retract"))
+
+        if (currentBeat < this.beat + 0.125f) {
+            engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_retract"))
+        }
     }
 
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
@@ -130,7 +138,7 @@ class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Floa
 class EventRowBlockExtend(engine: Engine, row: Row, index: Int, startBeat: Float,
                           affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
-    
+
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
         if (engine.autoInputs) {
             entity.fullyExtend(engine, currentBeat)
