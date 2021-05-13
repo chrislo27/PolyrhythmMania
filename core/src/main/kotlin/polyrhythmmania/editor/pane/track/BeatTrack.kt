@@ -127,6 +127,11 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                         y - 4f, 0f, Align.left, false)
             }
 
+            if (editor.playState.getOrCompute() != PlayState.STOPPED) {
+                val pos = editor.engineBeat.getOrCompute()
+                batch.fillRect(x + trackView.translateBeatToX(pos), y - h, lineWidth, h)
+            }
+
             ColorStack.pop()
 
             // Draw beat numbers

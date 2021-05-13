@@ -7,6 +7,7 @@ import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.pane.EditorPane
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -69,6 +70,10 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         batch.color = tmpColor
         val playbackStart = editor.playbackStart.getOrCompute()
         batch.fillRect(x + trackView.translateBeatToX(playbackStart), y - h, lineWidth, h)
+        if (editor.playState.getOrCompute() != PlayState.STOPPED) {
+            val pos = editor.engineBeat.getOrCompute()
+            batch.fillRect(x + trackView.translateBeatToX(pos), y - h, lineWidth, h)
+        }
 
         ColorStack.pop()
         batch.packedColor = lastPackedColor
