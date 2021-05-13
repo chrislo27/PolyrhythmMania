@@ -163,6 +163,20 @@ open class UIElement : UIBounds() {
             (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) + adjust
         }
     }
+
+    fun bindWidthToParent(adjustBinding: Var.Context.() -> Float) {
+        val thisBounds = this.bounds
+        thisBounds.width.bind {
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) + adjustBinding()
+        }
+    }
+
+    fun bindHeightToParent(adjustBinding: Var.Context.() -> Float) {
+        val thisBounds = this.bounds
+        thisBounds.height.bind {
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) + adjustBinding()
+        }
+    }
     
     protected inline fun renderOptionallyWithClip(originX: Float, originY: Float, batch: SpriteBatch, clip: Boolean,
                                                   renderFunc: (originX: Float, originY: Float, batch: SpriteBatch) -> Unit) {
