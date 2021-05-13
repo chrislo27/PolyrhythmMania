@@ -17,13 +17,15 @@ class EditorPane(val editor: Editor) : Pane() {
     val main: PRManiaGame = editor.main
     val palette: Palette = Palette(main)
     
-    val statusBarMsg: Var<String> = Var("test status bar 0123456789 — abcdefghijklmnopqrstuvwxyz")
+    val statusBarMsg: Var<String> = Var("")
     
     val bgRect: RectElement
     val menubar: Menubar
     val statusBar: StatusBar
     val upperPane: UpperPane
     val allTracksPane: AllTracksPane
+    
+    val toolbar: Toolbar get() = upperPane.toolbar
     
     init {
         // Background

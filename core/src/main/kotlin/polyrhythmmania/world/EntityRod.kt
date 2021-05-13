@@ -298,6 +298,15 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(worl
                         }
                     }
                 }
+                
+                // FIXME improve auto inputting for editor
+                if (engine.autoInputs) {
+                    if (collision.velocityY == 0f && blockBelow.active && blockBelow.type != EntityRowBlock.Type.PLATFORM 
+                            && blockBelow.pistonState == EntityRowBlock.PistonState.RETRACTED
+                            && currentIndexFloat - currentIndex in 0.25f..0.65f) {
+                        blockBelow.fullyExtend(engine, beat)
+                    }
+                }
             }
         } else {
             // Set to row height when not in the block area

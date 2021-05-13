@@ -20,6 +20,8 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     val events: List<Event> = CopyOnWriteArrayList()
     private val queuedRunnables: MutableList<Runnable> = CopyOnWriteArrayList()
     
+    var autoInputs: Boolean = false
+    
     fun postRunnable(runnable: Runnable) {
         queuedRunnables += runnable
     }

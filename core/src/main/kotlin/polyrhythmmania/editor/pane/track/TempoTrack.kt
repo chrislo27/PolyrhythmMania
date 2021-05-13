@@ -21,6 +21,7 @@ import io.github.chrislo27.paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.editor.Click
+import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.undo.impl.AddTempoChangeAction
@@ -182,62 +183,67 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                     // Scrolled is handled below
                     is TouchDown -> {
                         var inputConsumed = false
-                        if (editor.tool.getOrCompute() != Tool.TEMPO_CHANGE || editor.click.getOrCompute() != Click.None)
-                            return@addInputEventListener false
-                        val ctrl = Gdx.input.isControlDown()
-                        val alt = Gdx.input.isAltDown()
-                        val shift = Gdx.input.isShiftDown()
-                        val tc = currentHoveredTempoChange.getOrCompute()
-                        if (event.button == Input.Buttons.RIGHT && tc != null && (!ctrl && !alt && !shift)) {
-                            // Remove tempo change
-                            editor.mutate(DeleteTempoChangeAction(tc))
-                            inputConsumed = true
-                        } else if (event.button == Input.Buttons.LEFT) {
-                            if (tc == null) {
-                                // Add tempo change
-                                val beat = MathHelper.snapToNearest(getBeatFromRelative(lastMouseRelative.x), editor.snapping.getOrCompute())
-                                if (beat > 0f) {
-                                    val tempoChanges = editor.tempoChanges.getOrCompute().toMutableList()
-                                    val tempos = editor.engine.tempos
-                                    editor.compileEditorTempos()
-                                    val newTempo = (tempos.tempoAtBeat(beat) * (if (ctrl) 0.5f else if (shift) 2f else 1f)).coerceIn(MIN_TEMPO, MAX_TEMPO)
-                                    val newTc = TempoChange(beat, newTempo, tempos.swingAtBeat(beat))
-                                    if (!alt && !(ctrl && shift) && !tempoChanges.any { it.beat == newTc.beat }) {
-                                        editor.mutate(AddTempoChangeAction(newTc))
-                                        currentHoveredTempoChange.set(newTc)
-                                        inputConsumed = true
-                                    }
-                                }
-                            } else {
-                                // Drag tempo change
-                                editor.click.set(Click.MoveTempoChange(editor, tc))
-                                currentHoveredTempoChange.set(null)
+                        if (editor.playState.getOrCompute() == PlayState.STOPPED) {
+                            if (editor.tool.getOrCompute() != Tool.TEMPO_CHANGE || editor.click.getOrCompute() != Click.None)
+                                return@addInputEventListener false
+                            val ctrl = Gdx.input.isControlDown()
+                            val alt = Gdx.input.isAltDown()
+                            val shift = Gdx.input.isShiftDown()
+                            val tc = currentHoveredTempoChange.getOrCompute()
+                            if (event.button == Input.Buttons.RIGHT && tc != null && (!ctrl && !alt && !shift)) {
+                                // Remove tempo change
+                                editor.mutate(DeleteTempoChangeAction(tc))
                                 inputConsumed = true
+                            } else if (event.button == Input.Buttons.LEFT) {
+                                if (tc == null) {
+                                    // Add tempo change
+                                    val beat = MathHelper.snapToNearest(getBeatFromRelative(lastMouseRelative.x), editor.snapping.getOrCompute())
+                                    if (beat > 0f) {
+                                        val tempoChanges = editor.tempoChanges.getOrCompute().toMutableList()
+                                        val tempos = editor.engine.tempos
+                                        editor.compileEditorTempos()
+                                        val newTempo = (tempos.tempoAtBeat(beat) * (if (ctrl) 0.5f else if (shift) 2f else 1f)).coerceIn(MIN_TEMPO, MAX_TEMPO)
+                                        val newTc = TempoChange(beat, newTempo, tempos.swingAtBeat(beat))
+                                        if (!alt && !(ctrl && shift) && !tempoChanges.any { it.beat == newTc.beat }) {
+                                            editor.mutate(AddTempoChangeAction(newTc))
+                                            currentHoveredTempoChange.set(newTc)
+                                            inputConsumed = true
+                                        }
+                                    }
+                                } else {
+                                    // Drag tempo change
+                                    editor.click.set(Click.MoveTempoChange(editor, tc))
+                                    currentHoveredTempoChange.set(null)
+                                    inputConsumed = true
+                                }
                             }
                         }
                         inputConsumed
                     }
                     else -> false
                 }
+                
             }
             // Change tempo
             addInputEventListener(createInputListener { amt ->
-                val tc = currentHoveredTempoChange.getOrCompute()
-                if (tc != null) {
-                    val originalTempo = tc.newTempo
-                    var futureTempo = originalTempo + amt
-                    futureTempo = futureTempo.coerceIn(MIN_TEMPO, MAX_TEMPO)
-                    if (futureTempo != originalTempo) {
-                        val peek = editor.getUndoStack().peekFirst()
-                        val newTc = tc.copy(newTempo = futureTempo)
-                        if (peek != null && peek is ChangeTempoChangeAction) {
-                            peek.undo(editor)
-                            peek.next = newTc
-                            peek.redo(editor)
-                        } else {
-                            editor.mutate(ChangeTempoChangeAction(tc, newTc))
+                if (editor.playState.getOrCompute() == PlayState.STOPPED) {
+                    val tc = currentHoveredTempoChange.getOrCompute()
+                    if (tc != null) {
+                        val originalTempo = tc.newTempo
+                        var futureTempo = originalTempo + amt
+                        futureTempo = futureTempo.coerceIn(MIN_TEMPO, MAX_TEMPO)
+                        if (futureTempo != originalTempo) {
+                            val peek = editor.getUndoStack().peekFirst()
+                            val newTc = tc.copy(newTempo = futureTempo)
+                            if (peek != null && peek is ChangeTempoChangeAction) {
+                                peek.undo(editor)
+                                peek.next = newTc
+                                peek.redo(editor)
+                            } else {
+                                editor.mutate(ChangeTempoChangeAction(tc, newTc))
+                            }
+                            currentHoveredTempoChange.set(determineTempoChangeFromBeat(getBeatFromRelative(lastMouseRelative.x)))
                         }
-                        currentHoveredTempoChange.set(determineTempoChangeFromBeat(getBeatFromRelative(lastMouseRelative.x)))
                     }
                 }
             })
@@ -331,12 +337,12 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
             editorPane.palette.beatMarkerFont.useFont { font ->
                 font.scaleMul(0.75f)
-                
+
                 val clickOriginalTc: TempoChange? = if (currentClick is Click.MoveTempoChange) currentClick.tempoChange else null
                 for (tc in tempoChanges) {
                     val beat = tc.beat
                     if (beat !in (leftBeat - 2)..(rightBeat + 1)) continue
-                    
+
                     if (tc === clickOriginalTc) {
                         val ghostColor = ColorStack.getAndPush().set(tempoColor)
                         val a = ghostColor.a

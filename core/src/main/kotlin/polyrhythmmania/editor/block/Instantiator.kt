@@ -9,7 +9,7 @@ import polyrhythmmania.editor.Editor
 /**
  * An [Instantiator] is effectively a [Block] factory with extra metadata for the UI.
  */
-data class Instantiator(val id: String, 
+data class Instantiator(val id: String,
                         val name: ReadOnlyVar<String>,
                         val summary: ReadOnlyVar<String>,
                         val desc: ReadOnlyVar<String>,
@@ -17,10 +17,10 @@ data class Instantiator(val id: String,
                         val factory: Instantiator.(Editor) -> Block)
 
 object Instantiators {
-    
+
     val map: Map<String, Instantiator>
     val list: List<Instantiator>
-    
+
     init {
         val tempMap = mutableMapOf<String, Instantiator>()
         val tempList = mutableListOf<Instantiator>()
@@ -34,26 +34,26 @@ object Instantiators {
         add(Instantiator("spawnPattern", Localization.getVar("instantiator.spawnPattern.name"),
                 Localization.getVar("instantiator.spawnPattern.summary"),
                 Localization.getVar("instantiator.spawnPattern.desc")) { editor ->
-            BlockPattern(editor)
+            BlockSpawnPattern(editor)
         })
         add(Instantiator("deployRod", Localization.getVar("instantiator.deployRod.name"),
                 Localization.getVar("instantiator.deployRod.summary"),
                 Localization.getVar("instantiator.deployRod.desc")) { editor ->
-            BlockPattern(editor) // FIXME
+            BlockDeployRod(editor)
         })
         add(Instantiator("retractPistons", Localization.getVar("instantiator.retractPistons.name"),
                 Localization.getVar("instantiator.retractPistons.summary"),
                 Localization.getVar("instantiator.retractPistons.desc")) { editor ->
-            BlockPattern(editor) // FIXME
+            BlockRetractPistons(editor)
         })
         add(Instantiator("despawnPattern", Localization.getVar("instantiator.despawnPattern.name"),
                 Localization.getVar("instantiator.despawnPattern.summary"),
                 Localization.getVar("instantiator.despawnPattern.desc")) { editor ->
-            BlockPattern(editor) // FIXME
+            BlockDespawnPattern(editor)
         })
-        
+
         (1..19).forEach { i ->
-            add(Instantiator("test$i", Var("Test$i"),Var(""),Var("")) { editor ->
+            add(Instantiator("test$i", Var("Test$i"), Var(""), Var("[font=prmania_icons]RspladAD[]")) { editor ->
                 BlockTest(editor)
             })
         }

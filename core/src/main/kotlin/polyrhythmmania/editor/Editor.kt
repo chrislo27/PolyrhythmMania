@@ -14,6 +14,8 @@ import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.binding.invert
+import io.github.chrislo27.paintbox.font.Markup
+import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.SceneRoot
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
@@ -30,11 +32,13 @@ import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
+import polyrhythmmania.world.EntityRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.GBATileset
 import polyrhythmmania.world.render.WorldRenderer
@@ -63,10 +67,21 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         Gdx.app.postRunnable { throw it }
         true
     } //soundSystem
-    val engine: Engine = Engine(timing, world, soundSystem)
+    val engine: Engine = Engine(timing, world, soundSystem).apply { 
+        autoInputs = true
+    }
     val renderer: WorldRenderer by lazy {
         WorldRenderer(world, GBATileset(AssetRegistry["tileset_gba"]))
     }
+    
+    // Default markup used for blocks, bold is inverted
+    val blockMarkup: Markup = Markup(mapOf(
+            "bold" to main.mainFontBordered,
+            "italic" to main.mainFontItalicBordered,
+            "bolditalic" to main.mainFontBoldItalicBordered,
+            "rodin" to main.fontRodinBordered,
+            "prmania_icons" to main.fontIcons,
+    ), TextRun(main.mainFontBoldBordered, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
 
     val tracks: List<Track> = listOf(
             Track(TRACK_INPUT_0, EnumSet.of(BlockType.INPUT)),
@@ -77,6 +92,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val trackMap: Map<String, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 
     // Editor tooling states
+    val playState: ReadOnlyVar<PlayState> = Var(PlayState.STOPPED)
     val trackView: TrackView = TrackView()
     val tool: ReadOnlyVar<Tool> = Var(Tool.SELECTION)
     val click: Var<Click> = Var(Click.None)
@@ -89,6 +105,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
     val startingTempo: FloatVar = FloatVar(TempoMap.DEFAULT_STARTING_GLOBAL_TEMPO)
     val tempoChanges: Var<List<TempoChange>> = Var(listOf())
+    
+    val engineBeat: FloatVar = FloatVar(engine.beat)
 
     /**
      * Call Var<Boolean>.invert() to force the status to be updated. Used when an undo or redo takes place.
@@ -98,6 +116,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
     init {
         frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
+        soundSystem.setPaused(true)
+        soundSystem.startRealtime()
     }
 
     init { // This init block should be LAST
@@ -132,6 +152,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val shift = Gdx.input.isShiftDown()
         val delta = Gdx.graphics.deltaTime
 
+        when (playState.getOrCompute()) {
+            PlayState.PLAYING -> {
+                timing.seconds += delta
+            }
+        }
+        
+        engineBeat.set(engine.beat)
+        
         click.getOrCompute().renderUpdate()
 
         // FIXME 
@@ -151,7 +179,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
      * into the [engine]. This mutates the [engine] state.
      */
     fun compileEditorIntermediates() {
+        resetWorld()
         compileEditorTempos()
+        compileEditorBlocks()
+    }
+    
+    fun compileEditorBlocks() {
+        engine.removeEvents(engine.events.toList())
+        val events = mutableListOf<Event>()
+        blocks.toList().forEach { block ->
+            events.addAll(block.compileIntoEvents())
+        }
+        engine.addEvents(events)
     }
     
     fun compileEditorTempos() {
@@ -160,6 +199,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         tempos.removeTempoChangesBulk(tempos.getAllTempoChanges())
         tempos.addTempoChange(TempoChange(0f, this.startingTempo.getOrCompute()))
         tempos.addTempoChangesBulk(this.tempoChanges.getOrCompute().toList())
+    }
+    
+    fun resetWorld() {
+        world.entities.filterIsInstance<EntityRod>().forEach { 
+            world.removeEntity(it)
+        }
+        world.rows.forEach { row ->
+            row.rowBlocks.forEach { entity ->
+                entity.despawn(1f)
+            }
+            row.updateInputIndicators()
+        }
     }
 
     fun attemptInstantiatorDrag(instantiator: Instantiator) {
@@ -186,6 +237,31 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         if (click.getOrCompute() != Click.None) return
         this.tool as Var
         this.tool.set(tool)
+    }
+    
+    fun changePlayState(newState: PlayState) {
+        this.playState as Var
+        val lastState = this.playState.getOrCompute()
+        if (lastState == newState) return
+        if (this.click.getOrCompute() != Click.None) return
+        if (lastState == PlayState.STOPPED && newState == PlayState.PAUSED) return
+        
+        // TODO
+        if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {
+            compileEditorIntermediates()
+            timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.getOrCompute())
+        } else if (newState == PlayState.STOPPED) {
+            resetWorld()
+            timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.getOrCompute())
+        }
+        
+        if (newState == PlayState.PLAYING) {
+            soundSystem.setPaused(false)
+        } else {
+            soundSystem.setPaused(true)
+        }
+        
+        this.playState.set(newState)
     }
 
     fun resize() {
@@ -297,21 +373,42 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val ctrl = Gdx.input.isControlDown()
         val alt = Gdx.input.isAltDown()
         val shift = Gdx.input.isShiftDown()
+        val currentClick = click.getOrCompute()
         when (keycode) {
             Input.Keys.D, Input.Keys.A -> {
                 pressedButtons += keycode
                 inputConsumed = true
             }
             Input.Keys.DEL, Input.Keys.FORWARD_DEL -> {
-                val selected = selectedBlocks.keys.toList()
-                if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
-                    this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
-                    forceUpdateStatus.invert()
+                if (currentClick == Click.None) {
+                    val selected = selectedBlocks.keys.toList()
+                    if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
+                        this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
+                        forceUpdateStatus.invert()
+                    }
+                    inputConsumed = true
                 }
-                inputConsumed = true
+            }
+            Input.Keys.SPACE -> {
+                if (!alt && !ctrl && currentClick == Click.None) {
+                    val state = playState.getOrCompute()
+                    if (state == PlayState.STOPPED) {
+                        if (!shift) {
+                            changePlayState(PlayState.PLAYING)
+                            inputConsumed = true
+                        }
+                    } else {
+                        if (state == PlayState.PLAYING) {
+                            changePlayState(if (shift) PlayState.PAUSED else PlayState.STOPPED)
+                        } else { // PAUSED
+                            changePlayState(PlayState.PLAYING)
+                        }
+                        inputConsumed = true
+                    }
+                }
             }
             in Input.Keys.NUM_0..Input.Keys.NUM_9 -> {
-                if (!ctrl && !alt && !shift) {
+                if (!ctrl && !alt && !shift && currentClick == Click.None) {
                     val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
                     if (number in 0 until Tool.VALUES.size) {
                         changeTool(Tool.VALUES.getOrNull(number) ?: Tool.SELECTION)
@@ -341,103 +438,106 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         val currentClick: Click = click.getOrCompute()
         var inputConsumed = false
-        when (currentClick) {
-            is Click.DragSelection -> {
-                if (button == Input.Buttons.LEFT) {
-                    if (currentClick.wouldBeDeleted.getOrCompute() && !currentClick.isNew) {
-                        val prevSelection = this.selectedBlocks.keys.toList()
-                        currentClick.abortAction()
-                        this.mutate(DeletionAction(prevSelection))
-                    } else if (!currentClick.isPlacementInvalid.getOrCompute()) {
-                        val prevSelection = this.selectedBlocks.keys.toList()
-                        currentClick.complete()
-                        if (currentClick.isNew) {
-                            this.mutate(ActionGroup(PlaceAction(currentClick.blocks.toList()), SelectionAction(prevSelection.toSet(), currentClick.blocks.toSet())))
+        if (this.playState.getOrCompute() == PlayState.STOPPED) {
+            when (currentClick) {
+                is Click.DragSelection -> {
+                    if (button == Input.Buttons.LEFT) {
+                        if (currentClick.wouldBeDeleted.getOrCompute() && !currentClick.isNew) {
+                            val prevSelection = this.selectedBlocks.keys.toList()
+                            currentClick.abortAction()
+                            this.mutate(DeletionAction(prevSelection))
+                        } else if (!currentClick.isPlacementInvalid.getOrCompute()) {
+                            val prevSelection = this.selectedBlocks.keys.toList()
+                            currentClick.complete()
+                            if (currentClick.isNew) {
+                                this.mutate(ActionGroup(PlaceAction(currentClick.blocks.toList()), SelectionAction(prevSelection.toSet(), currentClick.blocks.toSet())))
+                            } else {
+                                this.addActionWithoutMutating(MoveAction(currentClick.blocks.associateWith { block ->
+                                    MoveAction.Pos(currentClick.originalRegions.getValue(block), Click.DragSelection.BlockRegion(block.beat, block.trackIndex))
+                                }))
+                            }
                         } else {
-                            this.addActionWithoutMutating(MoveAction(currentClick.blocks.associateWith { block ->
-                                MoveAction.Pos(currentClick.originalRegions.getValue(block), Click.DragSelection.BlockRegion(block.beat, block.trackIndex))
-                            }))
+                            currentClick.abortAction()
                         }
-                    } else {
-                        currentClick.abortAction()
-                    }
-                    
-                    click.set(Click.None)
-                    inputConsumed = true
-                } else if (button == Input.Buttons.RIGHT) {
-                    // Cancel the drag
-                    currentClick.abortAction()
-                    click.set(Click.None)
-                    inputConsumed = true
-                }
-            }
-            is Click.CreateSelection -> {
-                if (button == Input.Buttons.RIGHT) {
-                    // Cancel the drag
-                    currentClick.abortAction()
-                    click.set(Click.None)
-                    inputConsumed = true
-                } else if (button == Input.Buttons.LEFT) {
-                    val previousSelection = this.selectedBlocks.keys.toSet()
-                    val isCtrlDown = Gdx.input.isControlDown()
-                    val isShiftDown = Gdx.input.isShiftDown()
-                    val isAltDown = Gdx.input.isAltDown()
-                    val xorSelectMode = isShiftDown && !isCtrlDown && !isAltDown
 
-                    val newSelection: MutableSet<Block>
-                    if (xorSelectMode) {
-                        newSelection = previousSelection.toMutableSet()
-                        blocks.forEach { block ->
-                            if (currentClick.isBlockInSelection(block)) {
-                                if (block in previousSelection) {
-                                    newSelection.remove(block)
-                                } else {
+                        click.set(Click.None)
+                        inputConsumed = true
+                    } else if (button == Input.Buttons.RIGHT) {
+                        // Cancel the drag
+                        currentClick.abortAction()
+                        click.set(Click.None)
+                        inputConsumed = true
+                    }
+                }
+                is Click.CreateSelection -> {
+                    if (button == Input.Buttons.RIGHT) {
+                        // Cancel the drag
+                        currentClick.abortAction()
+                        click.set(Click.None)
+                        inputConsumed = true
+                    } else if (button == Input.Buttons.LEFT) {
+                        val previousSelection = this.selectedBlocks.keys.toSet()
+                        val isCtrlDown = Gdx.input.isControlDown()
+                        val isShiftDown = Gdx.input.isShiftDown()
+                        val isAltDown = Gdx.input.isAltDown()
+                        val xorSelectMode = isShiftDown && !isCtrlDown && !isAltDown
+
+                        val newSelection: MutableSet<Block>
+                        if (xorSelectMode) {
+                            newSelection = previousSelection.toMutableSet()
+                            blocks.forEach { block ->
+                                if (currentClick.isBlockInSelection(block)) {
+                                    if (block in previousSelection) {
+                                        newSelection.remove(block)
+                                    } else {
+                                        newSelection.add(block)
+                                    }
+                                }
+                            }
+                        } else {
+                            newSelection = mutableSetOf()
+                            blocks.forEach { block ->
+                                if (currentClick.isBlockInSelection(block)) {
                                     newSelection.add(block)
                                 }
                             }
                         }
-                    } else {
-                        newSelection = mutableSetOf()
-                        blocks.forEach { block ->
-                            if (currentClick.isBlockInSelection(block)) {
-                                newSelection.add(block)
+
+                        val selectionAction = SelectionAction(previousSelection, newSelection)
+                        this.mutate(selectionAction)
+
+                        click.set(Click.None)
+                        inputConsumed = true
+                    }
+                }
+                is Click.MoveMarker -> {
+                    when (currentClick.type) {
+                        Click.MoveMarker.MarkerType.PLAYBACK -> {
+                            if (button == Input.Buttons.RIGHT) {
+                                currentClick.complete()
                             }
                         }
                     }
-
-                    val selectionAction = SelectionAction(previousSelection, newSelection)
-                    this.mutate(selectionAction)
-
                     click.set(Click.None)
                     inputConsumed = true
                 }
-            }
-            is Click.MoveMarker -> {
-                when (currentClick.type) {
-                    Click.MoveMarker.MarkerType.PLAYBACK -> {
-                        if (button == Input.Buttons.RIGHT) {
-                            currentClick.complete()
+                is Click.MoveTempoChange -> {
+                    if (button == Input.Buttons.RIGHT) {
+                        currentClick.abortAction()
+                    } else if (button == Input.Buttons.LEFT) {
+                        val result = currentClick.complete()
+                        if (result != null) {
+                            this.mutate(MoveTempoChangeAction(currentClick.tempoChange, result))
                         }
                     }
+                    click.set(Click.None)
+                    inputConsumed = true
                 }
-                click.set(Click.None)
-                inputConsumed = true
-            }
-            is Click.MoveTempoChange -> {
-                if (button == Input.Buttons.RIGHT) {
-                    currentClick.abortAction()
-                } else if (button == Input.Buttons.LEFT) {
-                    val result = currentClick.complete()
-                    if (result != null) {
-                        this.mutate(MoveTempoChangeAction(currentClick.tempoChange, result))
-                    }
+                Click.None -> { // Not an else so that when new Click types are added, a compile error is generated
                 }
-                click.set(Click.None)
-                inputConsumed = true
-            }
-            Click.None -> { // Not an else so that when new Click types are added, a compile error is generated
             }
         }
+        
         return inputConsumed || sceneRoot.inputSystem.touchUp(screenX, screenY, pointer, button)
     }
 

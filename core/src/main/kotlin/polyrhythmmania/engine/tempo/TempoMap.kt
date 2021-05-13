@@ -11,7 +11,7 @@ import java.util.*
 class TempoMap(startingGlobalTempo: Float = DEFAULT_STARTING_GLOBAL_TEMPO) {
     
     companion object {
-        const val DEFAULT_STARTING_GLOBAL_TEMPO: Float = 60f
+        const val DEFAULT_STARTING_GLOBAL_TEMPO: Float = 120f
     }
 
     /**

@@ -12,10 +12,7 @@ import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import io.github.chrislo27.paintbox.util.gdxutils.grey
-import polyrhythmmania.editor.Click
-import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.Tool
-import polyrhythmmania.editor.TrackView
+import polyrhythmmania.editor.*
 import polyrhythmmania.editor.pane.EditorPane
 import kotlin.math.floor
 
@@ -56,39 +53,42 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     true
                 }
                 is TouchDown -> {
-                    onMouseMovedOrDragged(event.x, event.y)
-                    val relMouse = lastMouseRelative
-                    val mouseBeat = getBeatFromRelative(relMouse.x)
-                    val mouseTrack = getTrackFromRelative(relMouse.y)
-                    val currentTool: Tool = editor.tool.getOrCompute()
+                    if (editor.playState.getOrCompute() == PlayState.STOPPED) {
+                        onMouseMovedOrDragged(event.x, event.y)
+                        val relMouse = lastMouseRelative
+                        val mouseBeat = getBeatFromRelative(relMouse.x)
+                        val mouseTrack = getTrackFromRelative(relMouse.y)
+                        val currentTool: Tool = editor.tool.getOrCompute()
 
-                    val blockClickedOn = editor.blocks.firstOrNull { block ->
-                        tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f).contains(mouseBeat, mouseTrack)
-                    }
-                    
-                    if (currentTool == Tool.SELECTION) {
-                        if (event.button == Input.Buttons.LEFT) {
-                            // If clicking on a selected block, start dragging
-                            if (blockClickedOn != null && blockClickedOn in editor.selectedBlocks.keys) {
-                                val newClick = Click.DragSelection.create(editor, editor.selectedBlocks.keys.toList(),
-                                        Vector2(mouseBeat - blockClickedOn.beat, mouseTrack - blockClickedOn.trackIndex),
-                                        blockClickedOn, false)
-                                if (newClick != null) {
-                                    editor.click.set(newClick)
+                        val blockClickedOn = editor.blocks.firstOrNull { block ->
+                            tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f).contains(mouseBeat, mouseTrack)
+                        }
+
+                        if (currentTool == Tool.SELECTION) {
+                            if (event.button == Input.Buttons.LEFT) {
+                                // If clicking on a selected block, start dragging
+                                if (blockClickedOn != null && blockClickedOn in editor.selectedBlocks.keys) {
+                                    val newClick = Click.DragSelection.create(editor, editor.selectedBlocks.keys.toList(),
+                                            Vector2(mouseBeat - blockClickedOn.beat, mouseTrack - blockClickedOn.trackIndex),
+                                            blockClickedOn, false)
+                                    if (newClick != null) {
+                                        editor.click.set(newClick)
+                                    }
+                                } else {
+                                    editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack, editor.selectedBlocks.keys.toSet()))
                                 }
-                            } else {
-                                editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack, editor.selectedBlocks.keys.toSet()))
-                            }
-                        } else if (event.button == Input.Buttons.RIGHT) {
-                            if (blockClickedOn == null) {
-                                editor.attemptPlaybackStartMove(mouseBeat)
+                            } else if (event.button == Input.Buttons.RIGHT) {
+                                if (blockClickedOn == null) {
+                                    editor.attemptPlaybackStartMove(mouseBeat)
+                                }
                             }
                         }
-                    }
-                    true
+                        true
+                    } else false
                 }
                 else -> false
             }
+
         }
         editor.trackView.beat.addListener {
             onMouseMovedOrDragged(lastMouseAbsolute.x, lastMouseAbsolute.y)
@@ -157,7 +157,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         // Render drag selection outlines
         if (click is Click.DragSelection) {
             if (click.isPlacementInvalid.getOrCompute()) {
-                batch.setColor(1f, 0f, 0f, 1f) 
+                batch.setColor(1f, 0f, 0f, 1f)
             } else {
                 batch.setColor(1f, 1f, 0f, 1f) // yellow
             }

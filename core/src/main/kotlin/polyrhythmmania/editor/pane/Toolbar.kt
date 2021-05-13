@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.pane
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chrislo27.paintbox.binding.Var
@@ -13,6 +14,7 @@ import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.ButtonSkin
 import polyrhythmmania.Localization
+import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 
 
@@ -54,12 +56,23 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 0 + 4f * 0, offsetY = 0f)
             this.skinID.set(EditorSkins.BUTTON)
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 0, 16, 16, 16)).apply {
-//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+            val active: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 0, 16, 16, 16)
+            val inactive: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 0, 16 + 16, 16, 16)
+            this += ImageNode(null).apply { 
+                this.textureRegion.bind { 
+                    if (apparentDisabledState.use()) inactive else active
+                }
+                this.tint.bind {
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
+                }
             }
             this.tooltipElement.set(Tooltip(binding = {Localization.getVar("editor.pause").use()}).apply {
                 this.markup.set(editorPane.palette.markup)
             })
+            this.disabled.bind { editorPane.editor.playState.use() != PlayState.PLAYING }
+            this.setOnAction { 
+                editorPane.editor.changePlayState(PlayState.PAUSED)
+            }
         }
         playButton = Button("").apply {
             this.padding.set(Insets.ZERO)
@@ -67,12 +80,23 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.margin.set(Insets(0f, 0f, 0f, 4f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 1 + 4f * 1, offsetY = 0f)
             this.skinID.set(EditorSkins.BUTTON)
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 16, 16, 16, 16)).apply {
-//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+            val active: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 16, 16, 16, 16)
+            val inactive: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 16, 16 + 16, 16, 16)
+            this += ImageNode(null).apply {
+                this.textureRegion.bind {
+                    if (apparentDisabledState.use()) inactive else active
+                }
+                this.tint.bind {
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
+                }
             }
             this.tooltipElement.set(Tooltip(binding = {Localization.getVar("editor.play").use()}).apply {
                 this.markup.set(editorPane.palette.markup)
             })
+            this.disabled.bind { editorPane.editor.playState.use() == PlayState.PLAYING }
+            this.setOnAction {
+                editorPane.editor.changePlayState(PlayState.PLAYING)
+            }
         }
         stopButton = Button("").apply {
             this.padding.set(Insets.ZERO)
@@ -80,12 +104,23 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.margin.set(Insets(0f, 0f, 0f, 0f))
             Anchor.TopLeft.configure(this, offsetX = 32f * 2 + 4f * 2, offsetY = 0f)
             this.skinID.set(EditorSkins.BUTTON)
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 32, 16, 16, 16)).apply {
-//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+            val active: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 32, 16, 16, 16)
+            val inactive: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 32, 16 + 16, 16, 16)
+            this += ImageNode(null).apply {
+                this.textureRegion.bind {
+                    if (apparentDisabledState.use()) inactive else active
+                }
+                this.tint.bind {
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
+                }
             }
             this.tooltipElement.set(Tooltip(binding = {Localization.getVar("editor.stop").use()}).apply { 
                 this.markup.set(editorPane.palette.markup)
             })
+            this.disabled.bind { editorPane.editor.playState.use() == PlayState.STOPPED }
+            this.setOnAction {
+                editorPane.editor.changePlayState(PlayState.STOPPED)
+            }
         }
         playbackButtonPane += pauseButton
         playbackButtonPane += playButton

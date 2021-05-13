@@ -155,8 +155,7 @@ sealed class Click {
                 val targetTrackIndex = (trackY /*- mouseOffset.y*/).toInt()
                 val targetTrack: Track? = editor.tracks.getOrNull(targetTrackIndex)
                 if (targetTrack != null) {
-                    val allowedTypes = targetTrack.allowedTypes
-                    if (blocks.all { b -> b.blockTypes.any { bt -> bt in allowedTypes } }) {
+                    if (blocks.all { b -> targetTrack.acceptsBlock(b) }) {
                         originRegion.track = targetTrackIndex
                     }
                 }

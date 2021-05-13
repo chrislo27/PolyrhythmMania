@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.ColorStack
@@ -16,6 +17,7 @@ import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import io.github.chrislo27.paintbox.util.gdxutils.scaleMul
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Click
+import polyrhythmmania.editor.PlayState
 import polyrhythmmania.util.DecimalFormats
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -32,7 +34,12 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
         this.bounds.height.set(54f)
         this.showContentBorder.set(true)
 
-        timeLabel = TextLabel("00:00:00.000", font = editorPane.palette.beatTimeFont).apply {
+        timeLabel = TextLabel(binding = {
+            Localization.getVar("editor.currentTime", Var.bind {
+                listOf(DecimalFormats.format("0.000", editor.engineBeat.use()))
+            }).use()
+        },
+                font = editorPane.palette.beatTimeFont).apply {
             this.textAlign.set(TextAlign.RIGHT)
             this.renderAlign.set(Align.right)
             this.textColor.bind { editorPane.palette.trackPaneTimeText.use() }
@@ -50,16 +57,19 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             var consumed = false
             when (event) {
                 is TouchDown -> {
-                    if (event.button == Input.Buttons.RIGHT) {
-                        val lastMouseRelative = Vector2(0f, 0f)
-                        val thisPos = beatMarkerPane.getPosRelativeToRoot(lastMouseRelative)
-                        lastMouseRelative.x = event.x - thisPos.x
-                        lastMouseRelative.y = event.y - thisPos.y
-                        editor.attemptPlaybackStartMove(editor.trackView.translateXToBeat(lastMouseRelative.x))
-                        consumed = true
+                    if (editor.playState.getOrCompute() == PlayState.STOPPED) {
+                        if (event.button == Input.Buttons.RIGHT) {
+                            val lastMouseRelative = Vector2(0f, 0f)
+                            val thisPos = beatMarkerPane.getPosRelativeToRoot(lastMouseRelative)
+                            lastMouseRelative.x = event.x - thisPos.x
+                            lastMouseRelative.y = event.y - thisPos.y
+                            editor.attemptPlaybackStartMove(editor.trackView.translateXToBeat(lastMouseRelative.x))
+                            consumed = true
+                        }
                     }
                 }
             }
+
             consumed
         }
     }
