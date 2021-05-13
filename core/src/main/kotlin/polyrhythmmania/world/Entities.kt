@@ -43,7 +43,8 @@ class EntityCubeBordered(world: World)
 }
 
 
-class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Float) : Entity(world) {
+class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Float)
+    : Entity(world), TemporaryEntity {
 
     companion object {
         private val tmpVec = Vector3()

@@ -39,6 +39,7 @@ import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.world.EntityRod
+import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.GBATileset
 import polyrhythmmania.world.render.WorldRenderer
@@ -202,8 +203,10 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
     
     fun resetWorld() {
-        world.entities.filterIsInstance<EntityRod>().forEach { 
-            world.removeEntity(it)
+        world.entities.toList().forEach { ent ->
+            if (ent is TemporaryEntity) {
+                world.removeEntity(ent)
+            }
         }
         world.rows.forEach { row ->
             row.rowBlocks.forEach { entity ->
@@ -555,7 +558,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
     fun getDebugString(): String {
         return """Click: ${click.getOrCompute().javaClass.simpleName}
-
+engine.events: ${engine.events.size}
 """
     }
 

@@ -14,7 +14,8 @@ import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
-class EntityRod(world: World, val deployBeat: Float, val row: Row) : Entity(world) {
+class EntityRod(world: World, val deployBeat: Float, val row: Row)
+    : Entity(world), TemporaryEntity {
 
     companion object {
         private val tmpVec = Vector3()
