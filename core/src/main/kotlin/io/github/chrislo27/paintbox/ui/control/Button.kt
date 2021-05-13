@@ -82,6 +82,15 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     override fun getDefaultSkinID(): String = Button.SKIN_ID
 
     override fun defaultInputEventListener(event: InputEvent): Boolean {
+        when (event) {
+            is MouseEntered -> {
+                (isHoveredOver as Var).set(true)
+            }
+            is MouseExited -> {
+                (isHoveredOver as Var).set(false)
+            }
+        }
+        
         return if (!apparentDisabledState.getOrCompute()) {
             when (event) {
                 is ClickPressed -> {
@@ -107,11 +116,9 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
                     } else false
                 }
                 is MouseEntered -> {
-                    (isHoveredOver as Var).set(true)
                     onHoverStart(event)
                 }
                 is MouseExited -> {
-                    (isHoveredOver as Var).set(false)
                     onHoverEnd(event)
                 }
                 else -> false
