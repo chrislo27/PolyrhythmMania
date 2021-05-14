@@ -12,4 +12,6 @@ class PaintboxSpritesheet(val texture: Texture) {
     val checkboxEmpty: TextureRegion = TextureRegion(texture, 1, 35, 64, 64)
     val checkboxCheck: TextureRegion = TextureRegion(texture, 68, 35, 64, 64)
     val checkboxX: TextureRegion = TextureRegion(texture, 135, 35, 64, 64)
+    val radioButtonEmpty: TextureRegion = TextureRegion(texture, 202, 35, 64, 64)
+    val radioButtonFilled: TextureRegion = TextureRegion(texture, 269, 35, 64, 64)
 }
