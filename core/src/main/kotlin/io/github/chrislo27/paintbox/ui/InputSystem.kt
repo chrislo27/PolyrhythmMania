@@ -26,7 +26,8 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
 
     private fun dispatchEventBasedOnMouse(layer: SceneRoot.Layer, evt: InputEvent): UIElement? {
         val lastPath = layer.lastHoveredElementPath
-        for (element in lastPath) {
+        for (i in lastPath.size - 1 downTo 0) {
+            val element = lastPath[i]
             if (element.fireEvent(evt)) return element
         }
         return null
