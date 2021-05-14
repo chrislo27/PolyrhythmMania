@@ -173,10 +173,17 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         val previousClick = clickPressedList[button]
         if (previousClick != null) {
             clickPressedList.remove(button)
-            sceneRoot.allLayersReversed.forEach { layer ->
+            outer@ for (layer in sceneRoot.allLayersReversed) {
                 val lastHoveredElementPath = previousClick.lastHoveredElementPathPerLayer.getValue(layer)
-                lastHoveredElementPath.forEach {
-                    anyClick = it.fireEvent(ClickReleased(vec.x, vec.y, button, it === previousClick.accepted?.second, it in lastHoveredElementPath)) || anyClick
+                for (element in lastHoveredElementPath.asReversed()) {
+                    val eventResult = element.fireEvent(ClickReleased(vec.x, vec.y, button, element === previousClick.accepted?.second, element in lastHoveredElementPath))
+                    if (eventResult) {
+                        anyClick = true
+//                        break@outer
+                    }
+                }
+                if (anyClick) {
+                    break@outer
                 }
             }
         }

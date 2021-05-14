@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.PaintboxGame
-import io.github.chrislo27.paintbox.binding.FloatVar
-import io.github.chrislo27.paintbox.binding.ReadOnlyVar
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.binding.VarChangedListener
+import io.github.chrislo27.paintbox.binding.*
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
 import kotlin.properties.Delegates
@@ -68,10 +65,21 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
             }
             currentTooltip = newValue
         }
+        
+        contextMenuLayer.root.addInputEventListener { event ->
+            var inputConsumed = false
+            if (event is TouchDown) {
+                if (rootContextMenu != null) {
+                    hideRootContextMenu()
+                    inputConsumed = true
+                }
+            }
+            inputConsumed
+        }
     }
     
     fun renderAsRoot(batch: SpriteBatch) {
-        (frameUpdateTrigger as Var).set(!frameUpdateTrigger.getOrCompute())
+        (frameUpdateTrigger as Var).invert()
         updateMouseVector()
         updateTooltipPosition()
         for (layer in allLayers) {
@@ -146,6 +154,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     }
     
     fun resize(width: Float, height: Float, posX: Float = 0f, posY: Float = 0f) {
+        hideRootContextMenu()
         updateAllLayerBounds(width, height, posX, posY)
     }
     
@@ -207,6 +216,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         val currentRootMenu = rootContextMenu ?: return
         removeContextMenuFromScene(currentRootMenu)
         rootContextMenu = null
+        contextMenuLayer.lastHoveredElementPath.clear() // Prevents a input system path issue, forces it to be recalculated
     }
 
     /**
@@ -227,8 +237,26 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         val root = contextMenuLayer.root
         if (contextMenu !in root.children) {
             root.addChild(contextMenu)
-            contextMenu.computeSize()
-            // TODO position the context menu according to its parent or the mouse
+            
+            contextMenu.computeSize(this)
+            
+            // Temporary impl: assumes they are only root context menus and positions it at the mouse
+            val w = contextMenu.bounds.width.getOrCompute()
+            val h = contextMenu.bounds.height.getOrCompute()
+            var x = mousePosition.x.getOrCompute()
+            var y = mousePosition.y.getOrCompute()
+
+            val thisWidth = this.bounds.width.getOrCompute()
+            val thisHeight = this.bounds.height.getOrCompute()
+            if (x + w > thisWidth) x = thisWidth - w
+            if (x < 0f) x = 0f
+            if (y + h > thisHeight) y = thisHeight - h
+            if (y < 0f) y = 0f
+            
+            contextMenu.bounds.x.set(x)
+            contextMenu.bounds.y.set(y)
+            
+            // TODO position the context menu according to its parent if NOT the root
         }
     }
 
@@ -249,6 +277,8 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         val root = contextMenuLayer.root
         root.removeChild(contextMenu)
     }
+    
+    fun isContextMenuActive(): Boolean = rootContextMenu != null
     
     private fun updateMouseVector() {
         val vector = mouseVector

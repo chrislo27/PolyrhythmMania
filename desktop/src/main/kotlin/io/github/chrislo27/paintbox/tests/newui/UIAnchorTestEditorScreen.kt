@@ -17,6 +17,9 @@ import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
+import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
+import io.github.chrislo27.paintbox.ui.contextmenu.SeparatorMenuItem
+import io.github.chrislo27.paintbox.ui.contextmenu.SimpleMenuItem
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.ButtonSkin
 import io.github.chrislo27.paintbox.ui.control.TextLabel
@@ -146,7 +149,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             Anchor.BottomCentre.configure(rect, offsetX = 0f, offsetY = -75f)
             rect.bounds.width.set(500f)
             rect.bounds.height.set(500f)
-            
+
             rect.padding.set(Insets(10f))
             rect.border.set(Insets(4f))
             rect.borderStyle.set(SolidBorder(Color.CYAN))
@@ -224,10 +227,10 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             Anchor.CentreLeft.configure(button, offsetX = 32f)
             button.bounds.width.set(150f)
             button.bounds.height.set(50f)
-            
+
             (button.skin.getOrCompute() as ButtonSkin).roundedRadius.set(10)
             button.tooltipElement.set(Tooltip("Test tooltip text.").apply {
-                this.text.bind { 
+                this.text.bind {
 //                    this@UIAnchorTestEditorScreen.root.frameUpdateTrigger.use()
                     "Test: ${DecimalFormats.format("0.000", MathHelper.getTriangleWave(2f))}"
                 }
@@ -243,11 +246,30 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             pane.bounds.width.set(150f)
             pane.bounds.height.set(50f)
             pane.padding.set(Insets(5f))
+            pane.margin.set(Insets(2f))
             pane.border.set(Insets(4f))
             pane.borderStyle.set(SolidBorder().apply { this.color.set(Color.MAGENTA) })
             pane.addChild(Button("Test button bounds", font = main.debugFont).also { button ->
                 (button.skin.getOrCompute() as ButtonSkin).roundedRadius.set(0)
             })
+        }
+        bg += Button("Context menu button", font = main.debugFont).also { button ->
+            Anchor.CentreLeft.configure(button, offsetX = 32f + 175f, offsetY = 75f)
+            button.bounds.width.set(150f)
+            button.bounds.height.set(50f)
+
+            // TODO replace with proper context menu action
+            button.setOnRightClick { event ->
+                val root = button.sceneRoot.getOrCompute()
+                if (root != null) {
+                    root.showRootContextMenu(ContextMenu().apply {
+                        this.addMenuItem(SimpleMenuItem.create("First SimpleMenuItem", main.debugFont))
+                        this.addMenuItem(SimpleMenuItem.create("Second SimpleMenuItem", main.debugFont))
+                        this.addMenuItem(SeparatorMenuItem())
+                        this.addMenuItem(SimpleMenuItem.create("Third SimpleMenuItem", main.debugFont))
+                    })
+                }
+            }
         }
         bg += Button("Disabled button", font = main.debugFont).also { button ->
             Anchor.CentreLeft.configure(button, offsetX = 32f + 175f)
@@ -320,7 +342,8 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
     override fun getDebugString(): String {
         val inp = root.inputSystem
         val vector = inp.mouseVector
-        val newPath = root.pathTo(vector.x, vector.y)
+        val newPath = root.contextMenuLayer.lastHoveredElementPath
+//        val newPath = root.pathTo(vector.x, vector.y)
         return """InputSystem:
   vec: $vector
 Input:
@@ -328,7 +351,7 @@ Input:
   y: ${Gdx.input.y}
 PathTest:
   pathSize: ${newPath.size}
-  path: ${newPath.map { it.bounds }}
+  path: ${newPath.map { /*it.bounds*/ it.javaClass.simpleName }}
 """
     }
 

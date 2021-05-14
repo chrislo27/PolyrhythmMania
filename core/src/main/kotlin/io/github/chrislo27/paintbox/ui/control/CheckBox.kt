@@ -56,6 +56,12 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
             val state = checkedState.use()
             getTextureRegionForType(type, state)
         }
+        imageNode.tint.bind { 
+            textLabel.textColor.use()
+        }
+        
+        this.addChild(textLabel)
+        this.addChild(imageNode)
     }
     
     init {
