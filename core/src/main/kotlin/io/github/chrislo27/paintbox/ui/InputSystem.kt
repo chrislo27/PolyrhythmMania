@@ -6,6 +6,12 @@ import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.util.sumByFloat
 
 
+/**
+ * Handles cascading the inputs from [InputProcessor] down to the [UIElement]s.
+ * 
+ * If an event appears to not get propagated, check that it is not layered under its siblings, as the topmost element
+ * will always receive inputs.
+ */
 class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
 
     private val vector: Vector2 = Vector2(0f, 0f)
@@ -57,6 +63,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         val lastPath: MutableList<UIElement> = layer.lastHoveredElementPath
         if (lastPath.isEmpty()) {
             val newPath = layer.root.pathToForInput(x, y)
+            lastPath.add(layer.root)
             lastPath.addAll(newPath)
             tooltipMouseEntered(newPath, x, y)
             val evt = MouseEntered(x, y)
