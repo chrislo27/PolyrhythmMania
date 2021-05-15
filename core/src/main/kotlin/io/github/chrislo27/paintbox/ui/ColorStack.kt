@@ -36,12 +36,12 @@ object ColorStack  {
         return last
     }
 
-    private class ColorPool : Pool<Color>() {
+    private class ColorPool : Pool<Color>(64) {
         override fun newObject(): Color {
             return Color(1f, 1f, 1f, 1f)
         }
 
-        override fun free(color: Color?) {
+        override fun reset(`object`: Color?) {
             // Intentional: don't do a reset. The popped colour is returned so the information may be required temporarily
         }
     }
