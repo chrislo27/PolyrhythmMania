@@ -212,16 +212,25 @@ sealed class Click {
                 abortAction()
                 return
             }
+            val beatLines = editor.beatLines
+            beatLines.active = false
         }
 
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
             val snapping = editor.snapping.getOrCompute()
             val snapBeat = MathHelper.snapToNearest(beat, snapping).coerceAtLeast(0f)
             point.set(snapBeat)
+            
+            val beatLines = editor.beatLines
+            beatLines.active = true
+            beatLines.fromBeat = floor(beat).toInt()
+            beatLines.toBeat = ceil(beat).toInt()
         }
 
         override fun abortAction() {
             point.set(originalPosition)
+            val beatLines = editor.beatLines
+            beatLines.active = false
         }
     }
 
