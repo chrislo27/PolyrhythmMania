@@ -52,11 +52,14 @@ object Instantiators {
             BlockDespawnPattern(editor)
         })
 
-        (1..19).forEach { i ->
-            add(Instantiator("test$i", Var("Test$i"), Var(""), Var("[font=prmania_icons]RspladAD[]")) { editor ->
-                BlockTest(editor)
-            })
-        }
+        add(Instantiator("baselineTest", Var("Baseline Test"), Var("Description baseline test."), Var("[font=prmania_icons]RspladAD[]")) { editor ->
+            BlockTest(editor)
+        })
+//        (1..19).forEach { i ->
+//            add(Instantiator("test$i", Var("Test$i"), Var(""), Var("[font=prmania_icons]RspladAD[]")) { editor ->
+//                BlockTest(editor)
+//            })
+//        }
 
         map = tempMap
         list = tempList
