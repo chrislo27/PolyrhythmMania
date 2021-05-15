@@ -11,12 +11,12 @@ import java.util.*
 
 class BlockDeployRod(editor: Editor) : Block(editor, EnumSet.of(BlockType.INPUT)) {
 
-    val rowSettingBehaviour: RowBlockData = RowBlockData()
+    val rowData: RowBlockData = RowBlockData()
 
     init {
         this.width = 1f
         val text = Localization.getVar("block.deployRod.name", Var.bind { 
-            rowSettingBehaviour.getSymbol(this)
+            rowData.getSymbol(this)
         })
         this.defaultText.bind { text.use() }
         val block = this.defaultTextBlock.getOrCompute()
@@ -25,21 +25,21 @@ class BlockDeployRod(editor: Editor) : Block(editor, EnumSet.of(BlockType.INPUT)
 
     override fun compileIntoEvents(): List<Event> {
         val b = this.beat - 4
-        return RowSetting.getRows(rowSettingBehaviour.rowSetting.getOrCompute(), editor.world).map { row ->
+        return RowSetting.getRows(rowData.rowSetting.getOrCompute(), editor.world).map { row ->
             EventDeployRod(editor.engine, row, b)
         }
     }
 
     override fun createContextMenu(): ContextMenu {
         return ContextMenu().also { ctxmenu ->
-            ctxmenu.addMenuItem(rowSettingBehaviour.createMenuItem(editor))
+            rowData.createMenuItems(editor).forEach { ctxmenu.addMenuItem(it) }
         }
     }
 
     override fun copy(): BlockDeployRod {
         return BlockDeployRod(editor).also {
             this.copyBaseInfoTo(it)
-            it.rowSettingBehaviour.rowSetting.set(this.rowSettingBehaviour.rowSetting.getOrCompute())
+            it.rowData.rowSetting.set(this.rowData.rowSetting.getOrCompute())
         }
     }
 }

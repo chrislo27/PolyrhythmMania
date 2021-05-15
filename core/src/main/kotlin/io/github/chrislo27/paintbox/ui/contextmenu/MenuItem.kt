@@ -1,10 +1,8 @@
 package io.github.chrislo27.paintbox.ui.contextmenu
 
+import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.font.Markup
-import io.github.chrislo27.paintbox.font.PaintboxFont
-import io.github.chrislo27.paintbox.font.TextBlock
-import io.github.chrislo27.paintbox.font.TextRun
+import io.github.chrislo27.paintbox.font.*
 import io.github.chrislo27.paintbox.ui.UIElement
 
 
@@ -36,6 +34,21 @@ class SeparatorMenuItem() : MenuItem()
  */
 class CustomMenuItem(val element: UIElement) : MenuItem()
 
+class LabelMenuItem(val textBlock: TextBlock) : MenuItem() {
+    companion object {
+        fun create(text: String, font: PaintboxFont): SimpleMenuItem {
+            return SimpleMenuItem(TextRun(font, text).toTextBlock())
+        }
+
+        fun create(text: String, markup: Markup): SimpleMenuItem {
+            return SimpleMenuItem(markup.parse(text))
+        }
+    }
+    
+    var textAlign: TextAlign = TextAlign.LEFT
+    var renderAlign: Int = Align.left
+}
+
 class SimpleMenuItem(val textBlock: TextBlock) : MenuItem() {
     companion object {
         fun create(text: String, font: PaintboxFont): SimpleMenuItem {
@@ -46,6 +59,8 @@ class SimpleMenuItem(val textBlock: TextBlock) : MenuItem() {
             return SimpleMenuItem(markup.parse(text))
         }
     }
+    
+    var interactable: Boolean = true
     
     init {
         this.closeMenuAfterAction = true

@@ -1,10 +1,13 @@
 package polyrhythmmania.editor
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.font.TextRun
+import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
@@ -86,5 +89,16 @@ open class Palette(val main: PRManiaGame) {
             "rodin" to main.fontRodin,
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.fontCache["editor_status"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+
+    // Textures
+    val blockFlatTexture: Texture by lazy { AssetRegistry.get<Texture>("ui_icon_block_flat") }
+    val blockFlatPlatformRegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 0, 16 * 0, 16, 16) }
+    val blockFlatPistonARegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 1, 16 * 0, 16, 16) }
+    val blockFlatPistonDpadRegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 2, 16 * 0, 16, 16) }
+    val blockFlatNoneRegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 3, 16 * 0, 16, 16) }
+    val blockFlatCube1Region: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 0, 16 * 1, 16, 16) }
+    val blockFlatCube2Region: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 1, 16 * 1, 16, 16) }
+    val blockFlatCube1LineRegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 2, 16 * 1, 16, 16) }
+    val blockFlatCube2LineRegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 3, 16 * 1, 16, 16) }
     
 }

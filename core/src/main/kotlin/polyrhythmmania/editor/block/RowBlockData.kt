@@ -2,7 +2,10 @@ package polyrhythmmania.editor.block
 
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.ui.contextmenu.CustomMenuItem
+import io.github.chrislo27.paintbox.ui.contextmenu.LabelMenuItem
 import io.github.chrislo27.paintbox.ui.contextmenu.MenuItem
+import io.github.chrislo27.paintbox.ui.contextmenu.SeparatorMenuItem
+import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.block.contextmenu.RowSelectorMenuPane
 import polyrhythmmania.util.RodinSpecialChars
@@ -22,10 +25,14 @@ class RowBlockData(defaultSetting: RowSetting = RowSetting.ONLY_A) {
         return listOf(symbol)
     }
 
-    fun createMenuItem(editor: Editor): MenuItem {
-        return CustomMenuItem(RowSelectorMenuPane(editor.editorPane, rowSetting.getOrCompute()) { newSetting ->
-            this.rowSetting.set(newSetting)
-        })
+    fun createMenuItems(editor: Editor): List<MenuItem> {
+        return listOf(
+                LabelMenuItem.create(Localization.getValue("blockContextMenu.rowPicker"), editor.editorPane.palette.markup),
+                SeparatorMenuItem(),
+                CustomMenuItem(RowSelectorMenuPane(editor.editorPane, rowSetting.getOrCompute()) { newSetting ->
+                    this.rowSetting.set(newSetting)
+                }),
+        )
     }
 
 }

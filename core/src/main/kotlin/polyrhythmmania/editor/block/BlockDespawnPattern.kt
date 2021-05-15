@@ -11,33 +11,33 @@ import java.util.*
 
 class BlockDespawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INPUT)) {
 
-    val rowSettingBehaviour: RowBlockData = RowBlockData()
+    val rowData: RowBlockData = RowBlockData()
     
     init {
         this.width = 1f
         val text = Localization.getVar("block.despawnPattern.name", Var.bind {
-            rowSettingBehaviour.getSymbol(this)
+            rowData.getSymbol(this)
         })
         this.defaultText.bind { text.use() }
     }
     
     override fun compileIntoEvents(): List<Event> {
         val b = this.beat
-        return RowSetting.getRows(rowSettingBehaviour.rowSetting.getOrCompute(), editor.world).map { row ->
+        return RowSetting.getRows(rowData.rowSetting.getOrCompute(), editor.world).map { row ->
             EventRowBlockDespawn(editor.engine, row, -1, b)
         }
     }
 
     override fun createContextMenu(): ContextMenu {
         return ContextMenu().also { ctxmenu ->
-            ctxmenu.addMenuItem(rowSettingBehaviour.createMenuItem(editor))
+            rowData.createMenuItems(editor).forEach { ctxmenu.addMenuItem(it) }
         }
     }
 
     override fun copy(): BlockDespawnPattern {
         return BlockDespawnPattern(editor).also { 
             this.copyBaseInfoTo(it)
-            it.rowSettingBehaviour.rowSetting.set(this.rowSettingBehaviour.rowSetting.getOrCompute())
+            it.rowData.rowSetting.set(this.rowData.rowSetting.getOrCompute())
         }
     }
 }

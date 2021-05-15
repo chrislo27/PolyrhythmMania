@@ -1,26 +1,22 @@
 package polyrhythmmania.editor.block
 
+import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EntityRowBlock
-import polyrhythmmania.world.EventRowBlockExtend
 import polyrhythmmania.world.EventRowBlockSpawn
+import polyrhythmmania.world.Row
 import java.util.*
 
 
 class BlockSpawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INPUT)) {
 
     companion object {
-        val ROW_COUNT: Int = 8
+        val ROW_COUNT: Int = 10
     }
 
-    enum class Type {
-        NONE, PLATFORM, PISTON
-    }
-
-    val rowATypes: Array<Type> = Array(ROW_COUNT) { Type.NONE }
-    val rowDpadTypes: Array<Type> = Array(ROW_COUNT) { Type.NONE }
+    val patternData: PatternBlockData = PatternBlockData(ROW_COUNT)
 
     init {
         this.width = 4f
@@ -29,60 +25,122 @@ class BlockSpawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INP
 
     init {
         // FIXME debug, remove later
-        rowATypes[0] = Type.PISTON
-        rowATypes[2] = Type.PISTON
-        rowATypes[4] = Type.PISTON
-        rowATypes[6] = Type.PISTON
-//        rowATypes[8] = Type.PLATFORM
+        patternData.rowATypes[0] = CubeType.PISTON
+        patternData.rowATypes[2] = CubeType.PISTON
+        patternData.rowATypes[4] = CubeType.PISTON
+        patternData.rowATypes[6] = CubeType.PISTON
+        patternData.rowATypes[8] = CubeType.PLATFORM
+        patternData.rowATypes[9] = CubeType.PLATFORM
     }
 
     override fun compileIntoEvents(): List<Event> {
         val b = this.beat
         val events = mutableListOf<Event>()
-        var anyA = false
-        var anyDpad = false
-        for (index in 0 until ROW_COUNT) {
-            val startBeat = b + index * 0.5f
-            var type = rowATypes[index]
-            if (type != Type.NONE) {
-                anyA = true
-                events += EventRowBlockSpawn(editor.engine, editor.world.rowA, index,
-                        if (type == Type.PLATFORM) EntityRowBlock.Type.PLATFORM else EntityRowBlock.Type.PISTON_A,
-                        startBeat)
-//                if (type == Type.PISTON)
-//                    events += EventRowBlockExtend(editor.engine, editor.world.rowA, index, startBeat + 4f)
+
+        events += compileRow(b, patternData.rowATypes, editor.world.rowA, EntityRowBlock.Type.PISTON_A)
+        events += compileRow(b, patternData.rowDpadTypes, editor.world.rowDpad, EntityRowBlock.Type.PISTON_DPAD)
+
+        return events
+    }
+
+    private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityRowBlock.Type): List<Event> {
+        val events = mutableListOf<Event>()
+
+        /*
+        - Pistons show up at the time based on their position
+        - Platforms show up when:
+          - If the section encounters a piston, when said piston appears
+          - Otherwise, when the FIRST platform should appear
+        - If the very last index
+          - is a piston: fill in the rest of the blocks 2 after
+          - is a platform: fill in the rest of the blocks at the same time
+          - is nothing: fill in the rest of the blocks at the time of the first end index
+        */
+
+        val timings: FloatArray = FloatArray(rowArray.size) { it * 0.5f }
+
+        var index: Int = 0
+        while (index in 0 until rowArray.size) {
+            val type = rowArray[index]
+            if (type == CubeType.PLATFORM && index < rowArray.size - 1) {
+                // Find contiguous section
+                var subindex = index + 1
+                var endType: CubeType = rowArray[subindex]
+                while (subindex in 0 until rowArray.size) {
+                    endType = rowArray[subindex]
+                    if (endType != CubeType.PLATFORM) break
+                    subindex++
+                }
+                
+                when (endType) {
+                    CubeType.PISTON -> {
+                        for (i in index until subindex) {
+                            timings[i] = timings[subindex]
+                        }
+                        index = subindex
+                    }
+                    else -> {
+                        for (i in index until subindex) {
+                            timings[i] = timings[index]
+                        }
+                        index = subindex
+                    }
+                }
             }
-            type = rowDpadTypes[index]
-            if (type != Type.NONE) {
-                anyDpad = true
-                events += EventRowBlockSpawn(editor.engine, editor.world.rowDpad, index,
-                        if (type == Type.PLATFORM) EntityRowBlock.Type.PLATFORM else EntityRowBlock.Type.PISTON_DPAD,
-                        startBeat)
-//                if (type == Type.PISTON)
-//                    events += EventRowBlockExtend(editor.engine, editor.world.rowDpad, index, startBeat + 4f)
-            }
+            
+            index++
         }
 
-        if (anyA) {
-            events += EventRowBlockSpawn(editor.engine, editor.world.rowA, ROW_COUNT,
-                    EntityRowBlock.Type.PLATFORM,
-                    b + ROW_COUNT * 0.5f, affectThisIndexAndForward = true)
-        }
-        if (anyDpad) {
-            events += EventRowBlockSpawn(editor.engine, editor.world.rowDpad, ROW_COUNT,
-                    EntityRowBlock.Type.PLATFORM,
-                    b + ROW_COUNT * 0.5f, affectThisIndexAndForward = true)
+        timings.forEachIndexed { ind, b ->
+            val cube = rowArray[ind]
+            if (cube != CubeType.NONE) {
+                events += EventRowBlockSpawn(editor.engine, row, ind,
+                        if (cube == CubeType.PLATFORM) EntityRowBlock.Type.PLATFORM else pistonType,
+                        beat + b)
+            }
+            
+            if (ind == timings.size - 1) {
+                when (cube) {
+                    CubeType.NONE -> {
+                        val next = ind + 1
+                        if (next < row.length) {
+                            events += EventRowBlockSpawn(editor.engine, row, next, EntityRowBlock.Type.PLATFORM,
+                                    beat + next * 0.5f, affectThisIndexAndForward = true)
+                        }
+                    }
+                    CubeType.PLATFORM -> {
+                        val next = ind + 1
+                        if (next < row.length) {
+                            events += EventRowBlockSpawn(editor.engine, row, next, EntityRowBlock.Type.PLATFORM,
+                                    beat + b, affectThisIndexAndForward = true)
+                        }
+                    }
+                    CubeType.PISTON -> {
+                        val next = ind + 2
+                        if (next < row.length) {
+                            events += EventRowBlockSpawn(editor.engine, row, next, EntityRowBlock.Type.PLATFORM,
+                                    beat + next * 0.5f, affectThisIndexAndForward = true)
+                        }
+                    }
+                }
+            }
         }
 
         return events
+    }
+
+    override fun createContextMenu(): ContextMenu {
+        return ContextMenu().also { ctxmenu ->
+            patternData.createMenuItems(editor).forEach { ctxmenu.addMenuItem(it) }
+        }
     }
 
     override fun copy(): BlockSpawnPattern {
         return BlockSpawnPattern(editor).also {
             this.copyBaseInfoTo(it)
             for (i in 0 until ROW_COUNT) {
-                it.rowATypes[i] = this.rowATypes[i]
-                it.rowDpadTypes[i] = this.rowDpadTypes[i]
+                it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
+                it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }
         }
     }

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import polyrhythmmania.init.InitalAssetLoader
+import polyrhythmmania.init.InitialAssetLoader
 import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.PaintboxSettings
 import io.github.chrislo27.paintbox.ResizeAction
@@ -48,7 +48,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         addFontsToCache(this.fontCache)
         PRManiaColors
 
-        AssetRegistry.addAssetLoader(InitalAssetLoader())
+        AssetRegistry.addAssetLoader(InitialAssetLoader())
 
 
         setScreen(AssetRegistryLoadingScreen(this).apply {
