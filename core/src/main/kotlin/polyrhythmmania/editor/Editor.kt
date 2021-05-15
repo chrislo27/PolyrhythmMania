@@ -218,7 +218,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     fun attemptInstantiatorDrag(instantiator: Instantiator) {
-        if (click.getOrCompute() != Click.None) return
+        if (click.getOrCompute() != Click.None || playState.getOrCompute() != PlayState.STOPPED) return
         val currentTool = this.tool.getOrCompute()
         if (currentTool != Tool.SELECTION) return
 
@@ -231,14 +231,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
     
     fun attemptPlaybackStartMove(mouseBeat: Float) {
-        if (click.getOrCompute() != Click.None) return
+        if (click.getOrCompute() != Click.None || playState.getOrCompute() != PlayState.STOPPED) return
         click.set(Click.MoveMarker(this, playbackStart, Click.MoveMarker.MarkerType.PLAYBACK).apply { 
             this.onMouseMoved(mouseBeat, 0, 0f)
         })
     }
 
     fun changeTool(tool: Tool) {
-        if (click.getOrCompute() != Click.None) return
+        if (click.getOrCompute() != Click.None || playState.getOrCompute() != PlayState.STOPPED) return
         this.tool as Var
         this.tool.set(tool)
     }
