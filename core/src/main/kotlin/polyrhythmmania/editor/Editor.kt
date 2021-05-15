@@ -17,6 +17,7 @@ import io.github.chrislo27.paintbox.binding.invert
 import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
+import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.ui.SceneRoot
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
@@ -98,7 +99,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val trackView: TrackView = TrackView()
     val tool: ReadOnlyVar<Tool> = Var(Tool.SELECTION)
     val click: Var<Click> = Var(Click.None)
-    val snapping: FloatVar = FloatVar(0.5f)
+    val snapping: FloatVar = FloatVar(0.25f)
     val beatLines: BeatLines = BeatLines()
 
     // Editor objects and state
@@ -166,12 +167,13 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
         // FIXME 
         val trackView = this.trackView
-        if (!ctrl && !alt && !shift) {
-            if (Input.Keys.D in pressedButtons) {
-                trackView.beat.set((trackView.beat.getOrCompute() + (7f * delta)).coerceAtLeast(0f))
+        if (!ctrl && !alt) {
+            val panSpeed = 7f * delta * (if (shift) 10f else 1f)
+            if (Input.Keys.D in pressedButtons || Input.Keys.RIGHT in pressedButtons) {
+                trackView.beat.set((trackView.beat.getOrCompute() + panSpeed).coerceAtLeast(0f))
             }
-            if (Input.Keys.A in pressedButtons) {
-                trackView.beat.set((trackView.beat.getOrCompute() - (7f * delta)).coerceAtLeast(0f))
+            if (Input.Keys.A in pressedButtons || Input.Keys.LEFT in pressedButtons) {
+                trackView.beat.set((trackView.beat.getOrCompute() - panSpeed).coerceAtLeast(0f))
             }
         }
     }
@@ -403,7 +405,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val currentClick = click.getOrCompute()
         if (sceneRoot.isContextMenuActive()) return false
         when (keycode) {
-            Input.Keys.D, Input.Keys.A -> {
+            Input.Keys.D, Input.Keys.A, Input.Keys.LEFT, Input.Keys.RIGHT -> {
                 pressedButtons += keycode
                 inputConsumed = true
             }
@@ -584,6 +586,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     fun getDebugString(): String {
         return """Click: ${click.getOrCompute().javaClass.simpleName}
 engine.events: ${engine.events.size}
+ColorStack.numInStack: ${ColorStack.numInStack}
 """
     }
 
