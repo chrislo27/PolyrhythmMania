@@ -36,12 +36,12 @@ class CustomMenuItem(val element: UIElement) : MenuItem()
 
 class LabelMenuItem(val textBlock: TextBlock) : MenuItem() {
     companion object {
-        fun create(text: String, font: PaintboxFont): SimpleMenuItem {
-            return SimpleMenuItem(TextRun(font, text).toTextBlock())
+        fun create(text: String, font: PaintboxFont): LabelMenuItem {
+            return LabelMenuItem(TextRun(font, text).toTextBlock())
         }
 
-        fun create(text: String, markup: Markup): SimpleMenuItem {
-            return SimpleMenuItem(markup.parse(text))
+        fun create(text: String, markup: Markup): LabelMenuItem {
+            return LabelMenuItem(markup.parse(text))
         }
     }
     
