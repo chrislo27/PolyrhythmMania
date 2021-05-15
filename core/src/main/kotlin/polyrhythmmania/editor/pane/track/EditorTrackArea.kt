@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.pane.track
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -9,9 +10,7 @@ import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
-import io.github.chrislo27.paintbox.util.gdxutils.drawRect
-import io.github.chrislo27.paintbox.util.gdxutils.fillRect
-import io.github.chrislo27.paintbox.util.gdxutils.grey
+import io.github.chrislo27.paintbox.util.gdxutils.*
 import polyrhythmmania.editor.*
 import polyrhythmmania.editor.pane.EditorPane
 import kotlin.math.floor
@@ -59,6 +58,9 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                         val mouseBeat = getBeatFromRelative(relMouse.x)
                         val mouseTrack = getTrackFromRelative(relMouse.y)
                         val currentTool: Tool = editor.tool.getOrCompute()
+                        val control = Gdx.input.isControlDown()
+                        val shift = Gdx.input.isShiftDown()
+                        val alt = Gdx.input.isAltDown()
 
                         val blockClickedOn = editor.blocks.firstOrNull { block ->
                             tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f).contains(mouseBeat, mouseTrack)
@@ -68,22 +70,39 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                             if (event.button == Input.Buttons.LEFT) {
                                 // If clicking on a selected block, start dragging
                                 if (blockClickedOn != null && blockClickedOn in editor.selectedBlocks.keys) {
-                                    val newClick = Click.DragSelection.create(editor, editor.selectedBlocks.keys.toList(),
-                                            Vector2(mouseBeat - blockClickedOn.beat, mouseTrack - blockClickedOn.trackIndex),
-                                            blockClickedOn, false)
-                                    if (newClick != null) {
-                                        editor.click.set(newClick)
+                                    if (!control && !shift) {
+                                        val newClick: Click.DragSelection? = if (alt) {
+                                            // Copy
+                                            val selected = editor.selectedBlocks.keys.toList()
+                                            val copied = selected.map { it.copy() }
+                                            val originalIndex = selected.indexOf(blockClickedOn)
+                                            val newOrigin = copied[originalIndex]
+                                            Click.DragSelection.create(editor, copied,
+                                                    Vector2(mouseBeat - newOrigin.beat, mouseTrack - newOrigin.trackIndex),
+                                                    newOrigin, true)
+                                        } else {
+                                            Click.DragSelection.create(editor, editor.selectedBlocks.keys.toList(),
+                                                    Vector2(mouseBeat - blockClickedOn.beat, mouseTrack - blockClickedOn.trackIndex),
+                                                    blockClickedOn, false)
+                                        }
+                                        if (newClick != null) {
+                                            editor.click.set(newClick)
+                                        }
                                     }
                                 } else {
-                                    editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack, editor.selectedBlocks.keys.toSet()))
+                                    if (!control && !shift && !alt) {
+                                        editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack, editor.selectedBlocks.keys.toSet()))
+                                    }
                                 }
                             } else if (event.button == Input.Buttons.RIGHT) {
-                                if (blockClickedOn == null) {
-                                    editor.attemptPlaybackStartMove(mouseBeat)
-                                } else {
-                                    val ctxMenu = blockClickedOn.createContextMenu()
-                                    if (ctxMenu != null) {
-                                        editor.attemptOpenBlockContextMenu(blockClickedOn, ctxMenu)
+                                if (!control && !shift && !alt) {
+                                    if (blockClickedOn == null) {
+                                        editor.attemptPlaybackStartMove(mouseBeat)
+                                    } else {
+                                        val ctxMenu = blockClickedOn.createContextMenu()
+                                        if (ctxMenu != null) {
+                                            editor.attemptOpenBlockContextMenu(blockClickedOn, ctxMenu)
+                                        }
                                     }
                                 }
                             }
