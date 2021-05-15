@@ -6,13 +6,12 @@ import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EventRowBlockDespawn
-import polyrhythmmania.world.EventRowBlockRetract
 import java.util.*
 
 
 class BlockDespawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INPUT)) {
 
-    val rowSettingBehaviour: RowBasedBehaviour = RowBasedBehaviour()
+    val rowSettingBehaviour: RowBlockData = RowBlockData()
     
     init {
         this.width = 1f

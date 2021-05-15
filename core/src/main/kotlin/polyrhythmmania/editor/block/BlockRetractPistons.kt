@@ -5,14 +5,13 @@ import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Event
-import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.EventRowBlockRetract
 import java.util.*
 
 
 class BlockRetractPistons(editor: Editor) : Block(editor, EnumSet.of(BlockType.INPUT)) {
 
-    val rowSettingBehaviour: RowBasedBehaviour = RowBasedBehaviour()
+    val rowSettingBehaviour: RowBlockData = RowBlockData()
     
     init {
         this.width = 1f

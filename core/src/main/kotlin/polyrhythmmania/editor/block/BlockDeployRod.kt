@@ -1,23 +1,17 @@
 package polyrhythmmania.editor.block
 
 import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
-import io.github.chrislo27.paintbox.ui.contextmenu.CustomMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.block.contextmenu.RowSelectorMenuPane
-import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.EventDeployRod
 import java.util.*
 
 
 class BlockDeployRod(editor: Editor) : Block(editor, EnumSet.of(BlockType.INPUT)) {
 
-    val rowSettingBehaviour: RowBasedBehaviour = RowBasedBehaviour()
+    val rowSettingBehaviour: RowBlockData = RowBlockData()
 
     init {
         this.width = 1f

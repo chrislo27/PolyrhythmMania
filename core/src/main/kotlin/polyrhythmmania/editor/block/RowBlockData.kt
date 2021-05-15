@@ -8,7 +8,7 @@ import polyrhythmmania.editor.block.contextmenu.RowSelectorMenuPane
 import polyrhythmmania.util.RodinSpecialChars
 
 
-class RowBasedBehaviour(defaultSetting: RowSetting = RowSetting.ONLY_A) {
+class RowBlockData(defaultSetting: RowSetting = RowSetting.ONLY_A) {
 
     var rowSetting: Var<RowSetting> = Var(defaultSetting)
 
