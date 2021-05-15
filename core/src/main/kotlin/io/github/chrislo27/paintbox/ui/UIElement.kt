@@ -99,11 +99,13 @@ open class UIElement : UIBounds() {
         }
     }
 
-    fun removeChild(child: UIElement) {
+    fun removeChild(child: UIElement): Boolean {
         if (child in children) {
             children = children - child
             child.parent.set(null)
+            return true
         }
+        return false
     }
     
     fun addInputEventListener(listener: InputEventListener) {
@@ -262,7 +264,9 @@ open class UIElement : UIBounds() {
     }
     
     operator fun plusAssign(child: UIElement) = addChild(child)
-    operator fun minusAssign(child: UIElement) = removeChild(child)
+    operator fun minusAssign(child: UIElement) {
+        removeChild(child)
+    }
 
 }
 

@@ -55,9 +55,14 @@ open class ContextMenu : Control<ContextMenu>() {
      */
     private var activeMenuItems: List<MenuItemMetadata> = emptyList()
     
+    var onAddedToScene: (SceneRoot) -> Unit = {}
+    var onRemovedFromScene: (SceneRoot) -> Unit = {}
+    
     init {
         this.border.set(Insets(1f))
         this.borderStyle.set(SolidBorder(Color.BLACK))
+        this.bounds.width.set(defaultWidth.getOrCompute())
+        this.bounds.height.set(defaultWidth.getOrCompute())
         addChild(RectElement(Color().grey(1f, 0.8f)))
         
         this.addInputEventListener { event ->

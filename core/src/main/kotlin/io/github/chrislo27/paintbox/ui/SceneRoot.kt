@@ -257,6 +257,8 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
             contextMenu.bounds.y.set(y)
             
             // TODO position the context menu according to its parent if NOT the root
+            
+            contextMenu.onAddedToScene.invoke(this)
         }
     }
 
@@ -275,7 +277,9 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     fun removeContextMenuFromScene(contextMenu: ContextMenu) {
         // Remove from the contextMenu layer scene
         val root = contextMenuLayer.root
-        root.removeChild(contextMenu)
+        if (root.removeChild(contextMenu)) {
+            contextMenu.onRemovedFromScene.invoke(this)
+        }
     }
     
     fun isContextMenuActive(): Boolean = rootContextMenu != null
