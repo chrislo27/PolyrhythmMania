@@ -91,15 +91,17 @@ class BlockSpawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INP
             index++
         }
 
+        var anyNotNone = false
         timings.forEachIndexed { ind, b ->
             val cube = rowArray[ind]
             if (cube != CubeType.NONE) {
+                anyNotNone = true
                 events += EventRowBlockSpawn(editor.engine, row, ind,
                         if (cube == CubeType.PLATFORM) EntityRowBlock.Type.PLATFORM else pistonType,
                         beat + b)
             }
             
-            if (ind == timings.size - 1) {
+            if (ind == timings.size - 1 && anyNotNone) {
                 when (cube) {
                     CubeType.NONE -> {
                         val next = ind + 1
