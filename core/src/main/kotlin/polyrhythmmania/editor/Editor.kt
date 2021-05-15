@@ -18,6 +18,7 @@ import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.SceneRoot
+import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
 import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
 import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
@@ -266,6 +267,19 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         
         this.playState.set(newState)
     }
+    
+    fun attemptOpenBlockContextMenu(block: Block, contextMenu: ContextMenu) {
+        val root = sceneRoot
+        root.hideRootContextMenu()
+        blocks.forEach { it.ownedContextMenu = null }
+        block.ownedContextMenu = contextMenu
+        val existing = contextMenu.onRemovedFromScene
+        contextMenu.onRemovedFromScene = { r ->
+            existing(r)
+            block.ownedContextMenu = null
+        }
+        root.showRootContextMenu(contextMenu)
+    }
 
     fun resize() {
         var width = Gdx.graphics.width.toFloat()
@@ -308,6 +322,11 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         this.blocks as MutableList
         this.blocks.remove(block)
         (this.selectedBlocks as MutableMap).remove(block)
+        if (block.ownedContextMenu != null) {
+            if (sceneRoot.isContextMenuActive())
+                sceneRoot.hideRootContextMenu()
+            block.ownedContextMenu = null
+        }
     }
 
     fun removeBlocks(blocks: List<Block>) {
@@ -316,6 +335,11 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         this.selectedBlocks as MutableMap
         blocks.forEach { block ->
             this.selectedBlocks.remove(block)
+            if (block.ownedContextMenu != null) {
+                if (sceneRoot.isContextMenuActive()) 
+                    sceneRoot.hideRootContextMenu()
+                block.ownedContextMenu = null
+            }
         }
     }
     
@@ -377,6 +401,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val alt = Gdx.input.isAltDown()
         val shift = Gdx.input.isShiftDown()
         val currentClick = click.getOrCompute()
+        if (sceneRoot.isContextMenuActive()) return false
         when (keycode) {
             Input.Keys.D, Input.Keys.A -> {
                 pressedButtons += keycode

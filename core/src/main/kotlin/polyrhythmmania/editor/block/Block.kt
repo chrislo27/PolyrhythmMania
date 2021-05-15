@@ -7,6 +7,8 @@ import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextBlock
 import io.github.chrislo27.paintbox.font.TextRun
+import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
+import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.drawCompressed
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
@@ -35,6 +37,8 @@ abstract class Block(val editor: Editor, blockTypes: EnumSet<BlockType>) {
     protected val defaultTextBlock: Var<TextBlock> = Var.bind {
         editor.blockMarkup.parse(defaultText.use())
     }
+    
+    var ownedContextMenu: ContextMenu? = null
 
     open fun render(batch: SpriteBatch, trackView: TrackView, editorTrackArea: EditorTrackArea,
                     offsetX: Float, offsetY: Float, trackHeight: Float, trackTint: Color) {
@@ -43,6 +47,7 @@ abstract class Block(val editor: Editor, blockTypes: EnumSet<BlockType>) {
 
     protected fun defaultRender(batch: SpriteBatch, trackView: TrackView, editorTrackArea: EditorTrackArea,
                                 offsetX: Float, offsetY: Float, trackHeight: Float, trackTint: Color) {
+        val lastPackedColor = batch.packedColor
         val renderX = editorTrackArea.beatToRenderX(offsetX, this.beat)
         batch.setColor(trackTint.r, trackTint.g, trackTint.b, 1f)
         batch.fillRect(renderX, editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight,
@@ -60,7 +65,13 @@ abstract class Block(val editor: Editor, blockTypes: EnumSet<BlockType>) {
                 // Prevents flickering when drawing on first frame due to bounds not being computed yet
                 text.computeLayouts()
             }
-            batch.setColor(1f, 1f, 1f, 1f)
+            
+            if (ownedContextMenu != null) {
+                batch.setColor(MathHelper.getSineWave(0.5f), 1f, 1f, 1f)
+            } else {
+                batch.setColor(1f, 1f, 1f, 1f)
+            }
+            
             val textPadding = border + 2f
             val scale = 0.9f
             text.drawCompressed(batch, renderX + textPadding,
@@ -85,11 +96,15 @@ abstract class Block(val editor: Editor, blockTypes: EnumSet<BlockType>) {
                     editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
                     trackHeight)
         }
+        
+        batch.packedColor = lastPackedColor
     }
     
     abstract fun compileIntoEvents(): List<Event>
 
     abstract fun copy(): Block
+    
+    open fun createContextMenu(): ContextMenu? = null
 
     protected fun copyBaseInfoTo(target: Block) {
         val from: Block = this

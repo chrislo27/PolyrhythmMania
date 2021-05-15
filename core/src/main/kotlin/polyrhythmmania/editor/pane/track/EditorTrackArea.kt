@@ -80,6 +80,11 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                             } else if (event.button == Input.Buttons.RIGHT) {
                                 if (blockClickedOn == null) {
                                     editor.attemptPlaybackStartMove(mouseBeat)
+                                } else {
+                                    val ctxMenu = blockClickedOn.createContextMenu()
+                                    if (ctxMenu != null) {
+                                        editor.attemptOpenBlockContextMenu(blockClickedOn, ctxMenu)
+                                    }
                                 }
                             }
                         }
