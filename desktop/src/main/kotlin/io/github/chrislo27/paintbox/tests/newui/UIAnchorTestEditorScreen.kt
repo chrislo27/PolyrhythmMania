@@ -20,9 +20,7 @@ import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import io.github.chrislo27.paintbox.ui.contextmenu.SeparatorMenuItem
 import io.github.chrislo27.paintbox.ui.contextmenu.SimpleMenuItem
-import io.github.chrislo27.paintbox.ui.control.Button
-import io.github.chrislo27.paintbox.ui.control.ButtonSkin
-import io.github.chrislo27.paintbox.ui.control.TextLabel
+import io.github.chrislo27.paintbox.ui.control.*
 import io.github.chrislo27.paintbox.ui.element.RectElement
 import io.github.chrislo27.paintbox.util.MathHelper
 import polyrhythmmania.util.DecimalFormats
@@ -258,7 +256,6 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             button.bounds.width.set(150f)
             button.bounds.height.set(50f)
 
-            // TODO replace with proper context menu action
             button.setOnRightClick { event ->
                 val root = button.sceneRoot.getOrCompute()
                 if (root != null) {
@@ -270,6 +267,24 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                     })
                 }
             }
+        }
+        bg += CheckBox("Check box test", font = main.debugFont).also { button ->
+            Anchor.CentreLeft.configure(button, offsetX = 32f, offsetY = 75f * 2)
+            button.bounds.width.set(150f)
+            button.bounds.height.set(50f)
+        }
+        val toggleGroup = ToggleGroup()
+        bg += RadioButton("Radio button 1", font = main.debugFont).also { button ->
+            Anchor.CentreLeft.configure(button, offsetX = 32f + 175f, offsetY = 75f * 2 - 12.5f)
+            button.bounds.width.set(150f)
+            button.bounds.height.set(25f)
+            toggleGroup.addToggle(button)
+        }
+        bg += RadioButton("Radio button 2", font = main.debugFont).also { button ->
+            Anchor.CentreLeft.configure(button, offsetX = 32f + 175f, offsetY = 75f * 2 - 12.5f + 25f)
+            button.bounds.width.set(150f)
+            button.bounds.height.set(25f)
+            toggleGroup.addToggle(button)
         }
         bg += Button("Disabled button", font = main.debugFont).also { button ->
             Anchor.CentreLeft.configure(button, offsetX = 32f + 175f)

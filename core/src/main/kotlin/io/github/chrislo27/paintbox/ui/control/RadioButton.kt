@@ -21,31 +21,30 @@ import java.util.*
 import kotlin.math.min
 
 
-open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
-    : Control<CheckBox>(), Toggle {
-    
+open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
+    : Control<RadioButton>(), Toggle {
+
     companion object {
-        const val SKIN_ID: String = "CheckBox"
-        
+        const val SKIN_ID: String = "RadioButton"
+
         init {
-            DefaultSkins.register(SKIN_ID, SkinFactory { element: CheckBox ->
-                CheckBoxSkin(element)
+            DefaultSkins.register(SKIN_ID, SkinFactory { element: RadioButton ->
+                RadioButtonSkin(element)
             })
         }
     }
-    
-    enum class CheckType {
-        CHECKMARK, X,
-    }
-    
+
     val textLabel: TextLabel = TextLabel(text, font)
     val imageNode: ImageNode = ImageNode(null, ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
 
-    val checkType: Var<CheckType> = Var(CheckType.CHECKMARK)
+    /**
+     * If true, the radio button will act like a toggle and can be unselected. If false, it will only be able to be checked.
+     */
+    val actAsToggle: Var<Boolean> = Var(false)
     val checkedState: Var<Boolean> = Var(false)
     override val selectedState: Var<Boolean> = checkedState
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
-    
+
     init {
         val height = Var.bind {
             contentZone.height.use()
@@ -55,21 +54,24 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
         textLabel.margin.set(Insets(2f))
         imageNode.bounds.x.set(0f)
         imageNode.bounds.width.bind { height.use() }
-        imageNode.textureRegion.bind { 
-            val type = checkType.use()
+        imageNode.textureRegion.bind {
             val state = checkedState.use()
-            getTextureRegionForType(type, state)
+            getTextureRegionForType(state)
         }
-        imageNode.margin.set(Insets(2f))
         imageNode.tint.set(Color(0f, 0f, 0f, 1f))
-        
+        imageNode.margin.set(Insets(2f))
+
         this.addChild(textLabel)
         this.addChild(imageNode)
     }
-    
+
     init {
-        setOnAction { 
-            checkedState.invert()
+        setOnAction {
+            if (actAsToggle.getOrCompute()) {
+                checkedState.invert()
+            } else {
+                checkedState.set(true)
+            }
         }
     }
 
@@ -77,22 +79,19 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
             : this("", font) {
         textLabel.text.bind(binding)
     }
-    
-    open fun getTextureRegionForType(type: CheckType, state: Boolean): TextureRegion {
+
+    open fun getTextureRegionForType(state: Boolean): TextureRegion {
         val spritesheet = PaintboxGame.paintboxSpritesheet
-        return if (!state) spritesheet.checkboxEmpty else when (type) {
-            CheckType.CHECKMARK -> spritesheet.checkboxCheck
-            CheckType.X -> spritesheet.checkboxX
-        }
+        return if (!state) spritesheet.radioButtonEmpty else spritesheet.radioButtonFilled
     }
 
     override fun getDefaultSkinID(): String {
-        return CheckBox.SKIN_ID
+        return RadioButton.SKIN_ID
     }
 }
 
 
-open class CheckBoxSkin(element: CheckBox) : Skin<CheckBox>(element) {
+open class RadioButtonSkin(element: RadioButton) : Skin<RadioButton>(element) {
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         // NO-OP
@@ -101,5 +100,5 @@ open class CheckBoxSkin(element: CheckBox) : Skin<CheckBox>(element) {
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
         // NO-OP
     }
-    
+
 }
