@@ -158,7 +158,7 @@ class SoundSystem(private val mixer: Mixer,
             realtimeThread = thread(start = true, isDaemon = true, name = "AdaptiveTimingProvider", priority = Thread.MAX_PRIORITY) {
                 try {
                     val pollRateHz = 1.0 / (512.0 / 44100.0)//100
-                    val forceSyncThreshold = 0.025f
+                    val forceSyncThreshold = 0.030f
                     val sync = Sync()
 
                     var nano = System.nanoTime()
@@ -172,7 +172,7 @@ class SoundSystem(private val mixer: Mixer,
                             this.seconds += secondsDiff
                             
                             if (abs(this.seconds - timingBead.seconds) >= forceSyncThreshold) {
-                                println("AdaptiveTimingProvider Force sync: this was ${this.seconds} and TimingBead was ${timingBead.seconds} (delta ${abs(this.seconds - timingBead.seconds)}, force sync threshold ${forceSyncThreshold})")
+                                Paintbox.LOGGER.debug("AdaptiveTimingProvider Force sync: this was ${this.seconds} and TimingBead was ${timingBead.seconds} (delta ${abs(this.seconds - timingBead.seconds)}, force sync threshold ${forceSyncThreshold})")
                                 // Force sync with timing bead if off by too much
                                 this.seconds = timingBead.seconds
                             }
