@@ -1,6 +1,8 @@
-# Polyrhythm Mania (WIP)
+# Polyrhythm Mania (working title) (WIP)
 A game that tries to faithfully recreate the *Polyrhythm* minigame from Rhythm Tengoku (リズム天国), with a 
 built-in editor.
+
+![Polyrhythm Mania thumbnail](https://cdn.discordapp.com/attachments/306231796369195020/843572908362301450/unknown.png)
 
 ## NOTE: This project is still in development, so there are NO public compiled releases yet. Stay tuned!
 
