@@ -5,12 +5,14 @@ built-in editor.
 ## NOTE: This project is still in development, so there are NO public compiled releases yet. Stay tuned!
 
 [![GitHub license](https://img.shields.io/github/license/chrislo27/PolyrhythmMania.svg)](https://github.com/chrislo27/PolyrhythmMania/blob/dev/LICENSE.txt)
-[![Donate to the project maintainer](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VA45DPLCC4958)†
 
-## Heavy development status
+## Development status
 This project is still in development. **There will be no releases until it is ready.** When it is ready, there will be a public compiled release. 
 
-While the project is in this state, the Issues tab has been disabled and changes will be made frequently.
+Due to issues with spam and unwanted behaviour, the Issues tab has been disabled and moderation interaction settings are at a high level.
+
+[Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)
+
 
 ## Other information
 Rhythm Heaven is not my property—it is the intellectual property of Nintendo.
@@ -19,6 +21,3 @@ All used properties of Nintendo (such as names, audio, graphics, etc.) in this s
 All other trademarks and assets are property of their respective owners.
 This is a community project and this is available for others to use
 according to the [GPL-3.0 license](LICENSE.txt), without charge.
-
-† [Donations](https://donate.rhre.dev) are only made to the project maintainer, [@chrislo27](https://github.com/chrislo27).
-
