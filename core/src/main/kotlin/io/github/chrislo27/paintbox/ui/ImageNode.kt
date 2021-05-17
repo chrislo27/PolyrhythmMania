@@ -55,7 +55,7 @@ open class ImageNode(tex: TextureRegion? = null,
                     val rx: Float = w / 2 - (rw / 2)
                     val ry: Float = h / 2 - (rh / 2)
 
-                    batch.draw(tex, x + rx, y + ry - rh,
+                    batch.draw(tex, x + rx, y + ry - h,
                                rotationPointX.getOrCompute() * rw, rotationPointY.getOrCompute() * rh,
                                rw, rh,
                                1f, 1f,
