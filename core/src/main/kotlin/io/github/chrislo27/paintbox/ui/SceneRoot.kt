@@ -5,11 +5,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.Paintbox
-import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.binding.*
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
-import kotlin.properties.Delegates
 
 
 /**
@@ -26,9 +24,10 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     private val mouseVector: Vector2 = Vector2()
     val mousePosition: MousePosition = MousePosition(FloatVar(0f), FloatVar(0f))
     val mainLayer: Layer = Layer("main", this)
+    val dialogLayer: Layer = Layer("dialog", this)
     val contextMenuLayer: Layer = Layer("contextMenu")
     val tooltipLayer: Layer = Layer("tooltip")
-    val allLayers: List<Layer> = listOf(mainLayer, contextMenuLayer, tooltipLayer)
+    val allLayers: List<Layer> = listOf(mainLayer, dialogLayer, contextMenuLayer, tooltipLayer)
     val allLayersReversed: List<Layer> = allLayers.asReversed()
     val inputSystem: InputSystem = InputSystem(this)
 
@@ -43,6 +42,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     private var currentTooltip: UIElement? = null
     
     private var rootContextMenu: ContextMenu? = null
+    private var rootDialogElement: UIElement? = null
     
     constructor(width: Int, height: Int) : this(width.toFloat(), height.toFloat())
     
@@ -75,6 +75,10 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
                 }
             }
             inputConsumed
+        }
+        
+        dialogLayer.root.addInputEventListener { event ->
+            rootDialogElement != null // Dialog layer eats all input when active
         }
     }
     
@@ -207,6 +211,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         hideRootContextMenu()
         addContextMenuToScene(contextMenu)
         rootContextMenu = contextMenu
+        contextMenuLayer.lastHoveredElementPath.clear() // Prevents a input system path issue, forces it to be recalculated
     }
 
     /**
@@ -217,6 +222,26 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         removeContextMenuFromScene(currentRootMenu)
         rootContextMenu = null
         contextMenuLayer.lastHoveredElementPath.clear() // Prevents a input system path issue, forces it to be recalculated
+    }
+
+    /**
+     * Shows the [dialog] as the root dialog element. This will hide the existing dialog if any.
+     */
+    fun showRootDialog(dialog: UIElement) {
+        hideRootDialog()
+        rootDialogElement = dialog
+        dialogLayer.root.addChild(dialog)
+        dialogLayer.lastHoveredElementPath.clear() // Prevents a input system path issue, forces it to be recalculated
+    }
+
+    /**
+     * Hides the root dialog element if any.
+     */
+    fun hideRootDialog() {
+        val currentRootDialog = rootDialogElement ?: return
+        dialogLayer.root.removeChild(currentRootDialog)
+        rootDialogElement = null
+        dialogLayer.lastHoveredElementPath.clear() // Prevents a input system path issue, forces it to be recalculated
     }
 
     /**
