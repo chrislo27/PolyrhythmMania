@@ -27,8 +27,9 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
 
     init {
         val blockSize = 32f + 3f * 2
+        val clearL10NStr = Localization.getVar("blockContextMenu.spawnPattern.clear")
         
-        fun createRowPane(label: String, rowTypes: Array<CubeType>): Pane {
+        fun createRowPane(label: String, rowTypes: Array<CubeType>, isARow: Boolean): Pane {
             return Pane().also { pane ->
                 Anchor.TopLeft.configure(this)
 
@@ -48,7 +49,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
 
                 val buttons: MutableList<CubeButton> = mutableListOf()
                 rowTypes.forEachIndexed { index, cubeType ->
-                    val b = CubeButton(false, cubeType).also { button ->
+                    val b = CubeButton(isARow, cubeType).also { button ->
                         button.cube.addListener {
                             val c = it.getOrCompute()
                             rowTypes[index] = c
@@ -62,7 +63,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
                     pane.addChild(b)
                 }
 
-                pane.addChild(Button(binding = { Localization.getVar("blockContextMenu.spawnPattern.clear").use() }, font = editorPane.main.mainFont).apply {
+                pane.addChild(Button(binding = { clearL10NStr.use() }, font = editorPane.main.mainFont).apply {
                     this.bounds.width.set(blockSize * 1.5f)
                     this.bounds.height.set(blockSize * 0.75f)
                     this.bounds.x.set((data.rowCount + 1.125f) * blockSize)
@@ -74,8 +75,8 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
             }
         }
 
-        addChild(createRowPane("${RodinSpecialChars.BORDERED_DPAD}:", data.rowDpadTypes))
-        addChild(createRowPane("${RodinSpecialChars.BORDERED_A}:", data.rowATypes).also { pane ->
+        addChild(createRowPane("${RodinSpecialChars.BORDERED_DPAD}:", data.rowDpadTypes, false))
+        addChild(createRowPane("${RodinSpecialChars.BORDERED_A}:", data.rowATypes, true).also { pane ->
             pane.bounds.y.set(blockSize)
         })
         
