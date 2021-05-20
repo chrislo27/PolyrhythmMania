@@ -1,5 +1,6 @@
 package polyrhythmmania.desktop
 
+import com.badlogic.gdx.Files
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.HdpiMode
 import com.beust.jcommander.JCommander
@@ -55,6 +56,9 @@ object DesktopLauncher {
             this.setAudioConfig(100, 4096, 16)
             this.setHdpiMode(HdpiMode.Logical)
             this.setBackBufferConfig(8, 8, 8, 8, 16, 0, /* samples = */ 2)
+            
+            val sizes: List<Int> = listOf(32, 24, 16)
+            this.setWindowIcon(Files.FileType.Internal, *sizes.map { "icon/$it.png" }.toTypedArray())
         }
                 .launch()
     }
