@@ -70,34 +70,6 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     @Suppress("RemoveRedundantQualifierName")
     override fun getDefaultSkinID(): String = Button.SKIN_ID
 
-    override fun defaultInputEventListener(event: InputEvent): Boolean {
-        return if (!apparentDisabledState.getOrCompute()) {
-            when (event) {
-                is ClickReleased -> {
-                    if (event.isWithinBounds) {
-                        if (event.button == Input.Buttons.LEFT) {
-                            if (!onAction()) {
-                                onLeftClick(event)
-                            } else true
-                        } else if (event.button == Input.Buttons.RIGHT) {
-                            onRightClick(event)
-                        } else if (event.button == Input.Buttons.MIDDLE) {
-                            onMiddleClick(event)
-                        } else false
-                    } else false
-                }
-                is MouseEntered -> {
-                    onHoverStart(event)
-                }
-                is MouseExited -> {
-                    onHoverEnd(event)
-                }
-                else -> false
-            }
-        } else {
-            false
-        }
-    }
 }
 
 open class ButtonSkin(element: Button) : Skin<Button>(element) {

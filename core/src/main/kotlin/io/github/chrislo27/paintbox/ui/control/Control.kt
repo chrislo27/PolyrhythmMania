@@ -90,7 +90,7 @@ abstract class Control<SELF : Control<SELF>>
         return if (!apparentDisabledState.getOrCompute()) {
             when (event) {
                 is ClickReleased -> {
-                    if (event.isWithinBounds) {
+                    if (event.isCurrentlyWithinBounds) {
                         if (event.button == Input.Buttons.LEFT) {
                             if (!onAction()) {
                                 onLeftClick(event)

@@ -60,18 +60,21 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
 //        return false
 //    }
 
-    private fun updateDeepmostElementForMouseLocation(layer: SceneRoot.Layer, x: Float, y: Float) {
+    private fun updateDeepmostElementForMouseLocation(layer: SceneRoot.Layer, x: Float, y: Float, triggerTooltips: Boolean): Boolean {
         val lastPath: MutableList<UIElement> = layer.lastHoveredElementPath
         if (lastPath.isEmpty()) {
             val newPath = layer.root.pathToForInput(x, y)
             lastPath.add(layer.root)
             lastPath.addAll(newPath)
-            tooltipMouseEntered(newPath, x, y)
+            var wasTooltipTriggered = false
+            if (triggerTooltips) {
+                wasTooltipTriggered = tooltipMouseEntered(newPath, x, y)
+            }
             val evt = MouseEntered(x, y)
             newPath.forEach {
                 it.fireEvent(evt) 
             }
-            return
+            return wasTooltipTriggered
         }
 
         // Backtrack from last element to find the closest element containing the position, and then
@@ -99,33 +102,42 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         }
         // We found the closest parent that contains x, y, so we'll navigate to its deepest descendant that contains xy
         // starting from it, and the resulting "subpath" will be appended to our current path
+        var wasTooltipTriggered = false
         if (cursor != null && cursor.children.isNotEmpty()) {
             val subPath = cursor.pathToForInput(x - offX, y - offY)
             lastPath += subPath
-            tooltipMouseEntered(subPath, x, y)
+            if (triggerTooltips) {
+                wasTooltipTriggered = tooltipMouseEntered(subPath, x, y)
+            }
             val evt = MouseEntered(x, y)
             subPath.forEach {
                 it.fireEvent(evt)
             }
         }
+        
+        return wasTooltipTriggered
     }
 
     private fun updateDeepmostElementForMouseLocation(x: Float, y: Float) {
-        sceneRoot.allLayersReversed.forEach { layer ->
-            updateDeepmostElementForMouseLocation(layer, x, y)
+        var wasTooltipTriggered = false
+        for (layer in sceneRoot.allLayersReversed) {
+            wasTooltipTriggered = updateDeepmostElementForMouseLocation(layer, x, y,
+                    layer.enableTooltips && !wasTooltipTriggered)
+                    || wasTooltipTriggered || layer.shouldEatTooltipAccess()
         }
     }
 
-    private fun tooltipMouseEntered(path: List<UIElement>, x: Float, y: Float) {
+    private fun tooltipMouseEntered(path: List<UIElement>, x: Float, y: Float): Boolean {
         for (element in path.asReversed()) {
             if (element is HasTooltip) {
                 val tooltipElement = element.tooltipElement.getOrCompute()
                 if (tooltipElement != null) {
                     sceneRoot.startTooltip(element, element.tooltipElement)
-                    break
+                    return true
                 }
             }
         }
+        return false
     }
     
     private fun onMouseExited(element: UIElement, x: Float, y: Float) {
@@ -176,7 +188,10 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
             outer@ for (layer in sceneRoot.allLayersReversed) {
                 val lastHoveredElementPath = previousClick.lastHoveredElementPathPerLayer.getValue(layer)
                 for (element in lastHoveredElementPath.asReversed()) {
-                    val eventResult = element.fireEvent(ClickReleased(vec.x, vec.y, button, element === previousClick.accepted?.second, element in lastHoveredElementPath))
+                    val eventResult = element.fireEvent(ClickReleased(vec.x, vec.y, button,
+                            element === previousClick.accepted?.second,
+                            element in lastHoveredElementPath, element in layer.lastHoveredElementPath)
+                    )
                     if (eventResult) {
                         anyClick = true
 //                        break@outer
