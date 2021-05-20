@@ -44,7 +44,6 @@ import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
-import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.GBATileset
@@ -108,6 +107,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val click: Var<Click> = Var(Click.None)
     val snapping: FloatVar = FloatVar(0.25f)
     val beatLines: BeatLines = BeatLines()
+    var cameraPan: CameraPan? = null
 
     // Editor objects and state
     val playbackStart: FloatVar = FloatVar(0f)
@@ -161,6 +161,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
         batch.projectionMatrix = uiCamera.combined
         batch.begin()
+        
+        val cameraPan = this.cameraPan
+        if (cameraPan != null) {
+            cameraPan.update(delta, trackView)
+            if (cameraPan.isDone) {
+                this.cameraPan = null
+            }
+        }
 
         sceneRoot.renderAsRoot(batch)
 
@@ -465,14 +473,16 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val alt = Gdx.input.isAltDown()
         val shift = Gdx.input.isShiftDown()
         val currentClick = click.getOrCompute()
+        val state = playState.getOrCompute()
         if (sceneRoot.isContextMenuActive()) return false
+        
         when (keycode) {
             Input.Keys.D, Input.Keys.A, Input.Keys.LEFT, Input.Keys.RIGHT -> {
                 pressedButtons += keycode
                 inputConsumed = true
             }
             Input.Keys.DEL, Input.Keys.FORWARD_DEL -> {
-                if (currentClick == Click.None) {
+                if (currentClick == Click.None && state == PlayState.STOPPED) {
                     val selected = selectedBlocks.keys.toList()
                     if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
                         this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
@@ -481,9 +491,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     inputConsumed = true
                 }
             }
+            Input.Keys.HOME -> {
+                if (currentClick == Click.None && state == PlayState.STOPPED) {
+                    cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), 0f)
+                    inputConsumed = true
+                }
+            }
             Input.Keys.SPACE -> {
                 if (!alt && !ctrl && currentClick == Click.None) {
-                    val state = playState.getOrCompute()
                     if (state == PlayState.STOPPED) {
                         if (!shift) {
                             changePlayState(PlayState.PLAYING)

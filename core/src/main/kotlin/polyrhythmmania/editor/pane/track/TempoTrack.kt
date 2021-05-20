@@ -277,8 +277,6 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                 beatLines.active = true
                 beatLines.fromBeat = floor(currentBeat).toInt()
                 beatLines.toBeat = ceil(currentBeat).toInt()
-            } else {
-                beatLines.active = false
             }
         }
 
