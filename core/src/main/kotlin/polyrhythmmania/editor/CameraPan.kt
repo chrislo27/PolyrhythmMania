@@ -10,7 +10,7 @@ class CameraPan(val duration: Float,
     private var timeElapsed: Float = 0f
 
     val progress: Float
-        get() = (timeElapsed / duration).coerceIn(0f, 1f)
+        get() = if (duration <= 0f) 1f else (timeElapsed / duration).coerceIn(0f, 1f)
 
     val isDone: Boolean
         get() = progress >= 1f
