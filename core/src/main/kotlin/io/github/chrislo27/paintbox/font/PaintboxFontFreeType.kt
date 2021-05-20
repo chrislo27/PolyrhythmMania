@@ -85,7 +85,7 @@ class PaintboxFontFreeType(params: PaintboxFontParams,
     override fun resize(width: Int, height: Int) {
         this.dispose()
         lastWindowSize = WindowSize(width, height)
-        if (params.loadPriority == PaintboxFontParams.LoadPriority.ALWAYS || params.scaleToReferenceSize) {
+        if (params.loadPriority == PaintboxFontParams.LoadPriority.ALWAYS/* || params.scaleToReferenceSize*/) {
             load()
         }
     }
