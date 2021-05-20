@@ -23,6 +23,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     val events: List<Event> = _events
     val musicData: MusicData = MusicData(this)
     
+    var deleteEventsAfterCompletion: Boolean = true
     var autoInputs: Boolean = false
     
     fun postRunnable(runnable: Runnable) {
@@ -38,10 +39,12 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     }
     
     fun addEvents(events: List<Event>) {
+        if (events.isEmpty()) return
         this._events.addAll(events)
     }
 
     fun removeEvents(events: List<Event>) {
+        if (events.isEmpty()) return
         this._events.removeAll(events)
     }
     
@@ -88,6 +91,9 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
         
         events.forEach { event ->
             updateEvent(event, currentBeat)
+        }
+        if (deleteEventsAfterCompletion) {
+            removeEvents(_events.filter { it.updateCompletion == Event.UpdateCompletion.COMPLETED })
         }
         world.engineUpdate(this, currentBeat, currentSeconds)
         
