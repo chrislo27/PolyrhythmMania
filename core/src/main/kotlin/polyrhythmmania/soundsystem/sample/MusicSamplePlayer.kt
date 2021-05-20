@@ -41,6 +41,7 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
     fun isLoopInvalid(): Boolean = loopEndMs <= loopStartMs
 
     override fun calculateBuffer() {
+        val currentGain = gain
         val loopType = this.loopType
         if (loopType != SamplePlayer.LoopType.NO_LOOP_FORWARDS
                 && loopType != SamplePlayer.LoopType.LOOP_FORWARDS
@@ -100,7 +101,7 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
             }
 
             for (out in 0 until outs) {
-                bufOut[out][i] = tmpFrame[out]
+                bufOut[out][i] = tmpFrame[out] * currentGain
             }
             
             position += positionAddition
