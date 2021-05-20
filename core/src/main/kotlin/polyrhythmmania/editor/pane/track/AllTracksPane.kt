@@ -3,7 +3,6 @@ package polyrhythmmania.editor.pane.track
 import com.badlogic.gdx.graphics.Color
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.ui.Pane
-import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
 
@@ -16,6 +15,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
     
     val beatTrack: BeatTrack
     val tempoTrack: TempoTrack
+    val musicVolTrack: MusicVolTrack
     val editorTrackSides: List<EditorTrackSidePane>
     
     val editorTrackArea: EditorTrackArea
@@ -23,11 +23,14 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
     init {
         editorTrackSides = mutableListOf()
 
-        val tracks = mutableListOf<LongTrackPane>()
+        val topTracks = mutableListOf<LongTrackPane>()
+        val bottomTracks = mutableListOf<LongTrackPane>()
         beatTrack = BeatTrack(this)
-        tracks += beatTrack
+        topTracks += beatTrack
         tempoTrack = TempoTrack(this)
-        tracks += tempoTrack
+        topTracks += tempoTrack
+        musicVolTrack = MusicVolTrack(this)
+        bottomTracks += musicVolTrack
         
         val trackColours: List<Color> = (0 until 8).map { Color(1f, 1f, 1f, 1f).fromHsv((it * 3f / 8f * 360f) % 360f, 2 / 3f, 0.75f) }
         editorPane.editor.tracks.forEachIndexed { index, track ->
@@ -40,7 +43,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
 
         var totalHeight = 0f
         var firstTrackPane = true
-        for (trackPane in tracks) {
+        for (trackPane in topTracks) {
             trackPane.bindWidthToParent()
             trackPane.bounds.y.set(totalHeight)
             totalHeight += trackPane.bounds.height.getOrCompute()
@@ -65,5 +68,21 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         }
         editorTrackArea.bounds.height.set(totalHeight - trackAreaStart)
         this += editorTrackArea
+        for (trackPane in bottomTracks) {
+            trackPane.bindWidthToParent()
+            trackPane.bounds.y.set(totalHeight)
+            totalHeight += trackPane.bounds.height.getOrCompute()
+            this += trackPane
+            if (firstTrackPane) {
+                firstTrackPane = false
+                val b = trackPane.contentSection.bounds
+                editorTrackArea.bounds.x.set(b.x.getOrCompute())
+                editorTrackArea.bounds.width.bind {
+                    (trackPane.contentZone.width.use()) - sidebarWidth.use()
+                }
+            }
+        }
+
+
     }
 }

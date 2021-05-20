@@ -15,10 +15,13 @@ import java.util.concurrent.CopyOnWriteArrayList
 class Engine(timingProvider: TimingProvider, val world: World, soundSystem: SoundSystem?)
     : Clock(timingProvider) {
 
+    private val queuedRunnables: MutableList<Runnable> = CopyOnWriteArrayList()
+    
     val inputter: EngineInputter = EngineInputter(this)
     val soundInterface: SoundInterface = SoundInterface.createFromSoundSystem(soundSystem)
-    val events: List<Event> = CopyOnWriteArrayList()
-    private val queuedRunnables: MutableList<Runnable> = CopyOnWriteArrayList()
+    private val _events: MutableList<Event> = CopyOnWriteArrayList()
+    val events: List<Event> = _events
+    val musicData: MusicData = MusicData(this)
     
     var autoInputs: Boolean = false
     
@@ -27,23 +30,19 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     }
     
     fun addEvent(event: Event) {
-        this.events as MutableList
-        this.events += event
+        this._events += event
     }
 
     fun removeEvent(event: Event) {
-        this.events as MutableList
-        this.events -= event
+        this._events -= event
     }
     
     fun addEvents(events: List<Event>) {
-        this.events as MutableList
-        this.events.addAll(events)
+        this._events.addAll(events)
     }
 
     fun removeEvents(events: List<Event>) {
-        this.events as MutableList
-        this.events.removeAll(events)
+        this._events.removeAll(events)
     }
     
     fun updateEvent(event: Event, atBeat: Float) {

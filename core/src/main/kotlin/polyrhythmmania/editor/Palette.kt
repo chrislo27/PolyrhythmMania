@@ -43,6 +43,7 @@ open class Palette(val main: PRManiaGame) {
     val trackPaneTimeText: Var<Color> = Var(Color().grey(1f, 1f))
     val trackPaneTextColor: Var<Color> = Var(Color().grey(1f, 1f))
     val trackPaneTempoBg: Var<Color> = Var(PRManiaColors.TEMPO)
+    val trackPaneMusicVolBg: Var<Color> = Var(PRManiaColors.MUSIC_VOLUME)
     val trackVerticalBeatLineColor: Var<Color> = Var(Color().grey(1f, 0.4f))
     val trackPlaybackStart: Var<Color> = Var(Color(0f, 1f, 0f, 1f))
 

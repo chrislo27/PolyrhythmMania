@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Colors
 object PRManiaColors {
     
     val TEMPO: Color = Color(0.4f, 0.4f, 0.9f, 1f)
+    val MUSIC_VOLUME: Color = Color(1f, 0.4f, 0f, 1f)
     
     init {
         fun put(key: String, color: Color) = Colors.put(key, color)
@@ -16,6 +17,7 @@ object PRManiaColors {
         put("prmania_keystroke", Color.LIGHT_GRAY.cpy())
         put("prmania_playbackstart", Color.valueOf("#32FF32"))
         put("prmania_tempo", TEMPO)
+        put("prmania_musicvol", MUSIC_VOLUME)
     }
     
 }

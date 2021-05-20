@@ -8,6 +8,7 @@ import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.intersects
 import polyrhythmmania.editor.block.Block
+import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -272,6 +273,73 @@ sealed class Click {
                 lastValidPosition = newPos
                 lastValidTempoChangePos = tempoChange.copy(beat = newPos)
             }
+            isCurrentlyValid.set(isPosValid)
+        }
+
+        override fun abortAction() {
+        }
+    }
+
+    class DragMusicVolume(val editor: Editor, val musicVol: MusicVolume, val left: Boolean)
+        : Click() {
+
+        var beat: Float = musicVol.beat
+            private set
+        var width: Float = musicVol.width
+            private set
+        
+//        var newPosition: Float = musicVol.beat
+//            private set
+//        var lastValidPosition: Float = musicVol.beat
+//            private set
+//        var lastValidMusicVolPos: MusicVolume = musicVol.copy(beat = lastValidPosition)
+//            private set
+
+        val isCurrentlyValid: Var<Boolean> = Var(false)
+
+        fun normalizeWidth() {
+            if (width < 0) {
+                width = abs(width)
+                beat -= width
+            }
+        }
+        
+        fun didChange(): Boolean = beat != musicVol.beat || width != musicVol.width
+
+        fun complete(): MusicVolume? {
+            if (!didChange() || !isPositionValid()) {
+                abortAction()
+                return null
+            }
+            normalizeWidth()
+            return musicVol.copy(beat = beat, width = width)
+        }
+
+        fun isPositionValid(): Boolean {
+            return beat > 0f && !editor.musicVolumes.getOrCompute().any { mv ->
+                mv !== musicVol &&
+                        ((beat < mv.beat + mv.width && beat + width > mv.beat) || mv.beat == beat)
+            }
+        }
+
+        override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
+            val snapping = editor.snapping.getOrCompute()
+            val newPos = MathHelper.snapToNearest(beat, snapping).coerceAtLeast(0f)
+
+            val originalX = musicVol.beat
+            val originalEndX = musicVol.beat + musicVol.width
+
+            if (left) {
+                this.beat = newPos
+                this.width = originalEndX - newPos
+            } else {
+                this.beat = originalX
+                this.width = newPos - originalX
+            }
+
+            normalizeWidth()
+            
+            val isPosValid = isPositionValid()
             isCurrentlyValid.set(isPosValid)
         }
 

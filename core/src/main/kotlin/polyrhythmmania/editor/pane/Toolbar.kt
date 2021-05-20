@@ -175,11 +175,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.setOnAction { 
                     editorPane.editor.changeTool(thisTool)
                 }
-                this.tooltipElement.set(Tooltip(binding = {
-                    Localization.getVar("tool.tooltip", Var.bind { 
-                        listOf(Localization.getVar(thisTool.localizationKey).use(), "${index + 1}")
-                    }).use()
-                }).apply { 
+                val tooltipStr = Localization.getVar("tool.tooltip", Var.bind {
+                    listOf(Localization.getVar(thisTool.localizationKey).use(), "${index + 1}")
+                })
+                this.tooltipElement.set(Tooltip(binding = { tooltipStr.use() }).apply { 
                     this.markup.set(editorPane.palette.markup)
                 })
             })

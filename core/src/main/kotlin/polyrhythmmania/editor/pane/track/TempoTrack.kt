@@ -226,7 +226,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             }
             // Change tempo
             addInputEventListener(createInputListener { amt ->
-                if (editor.playState.getOrCompute() == PlayState.STOPPED) {
+                if (editor.playState.getOrCompute() == PlayState.STOPPED && editor.click.getOrCompute() == Click.None) {
                     val tc = currentHoveredTempoChange.getOrCompute()
                     if (tc != null) {
                         val originalTempo = tc.newTempo
@@ -235,7 +235,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                         if (futureTempo != originalTempo) {
                             val peek = editor.getUndoStack().peekFirst()
                             val newTc = tc.copy(newTempo = futureTempo)
-                            if (peek != null && peek is ChangeTempoChangeAction) {
+                            if (peek != null && peek is ChangeTempoChangeAction && peek.next === tc) {
                                 peek.undo(editor)
                                 peek.next = newTc
                                 peek.redo(editor)

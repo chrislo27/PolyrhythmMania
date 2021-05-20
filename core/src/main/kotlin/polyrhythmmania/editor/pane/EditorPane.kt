@@ -45,7 +45,7 @@ class EditorPane(val editor: Editor) : Pane() {
         parent += menubarBacking
         menubar = Menubar(this).apply {
             Anchor.TopLeft.configure(this)
-            this.padding.set(Insets(4f, 4f, 4f, 4f))
+            this.padding.set(Insets(4f))
         }
         menubarBacking += menubar
         

@@ -24,6 +24,7 @@ import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
 import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
 import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
 import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
+import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.pane.EditorPane
@@ -35,15 +36,21 @@ import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
+import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
+import polyrhythmmania.soundsystem.sample.GdxAudioReader
+import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.world.EntityRod
 import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
+import polyrhythmmania.world.render.GBA2Tileset
 import polyrhythmmania.world.render.GBATileset
+import polyrhythmmania.world.render.TestWorldRenderScreen
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
@@ -58,6 +65,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         const val TRACK_INPUT_1: String = "input_1"
         const val TRACK_INPUT_2: String = "input_2"
         const val TRACK_VFX_0: String = "vfx_0"
+        
+        private val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("debugetc/Polyrhythm.ogg"))
     }
 
     private val uiCamera: OrthographicCamera = OrthographicCamera()
@@ -77,6 +86,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         WorldRenderer(world, GBATileset(AssetRegistry["tileset_gba"]))
     }
     
+    
     // Default markup used for blocks, bold is inverted
     val blockMarkup: Markup = Markup(mapOf(
             "bold" to main.mainFontBordered,
@@ -90,7 +100,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             Track(TRACK_INPUT_0, EnumSet.of(BlockType.INPUT)),
             Track(TRACK_INPUT_1, EnumSet.of(BlockType.INPUT)),
             Track(TRACK_INPUT_2, EnumSet.of(BlockType.INPUT)),
-            Track(TRACK_VFX_0, EnumSet.of(BlockType.VFX)),
+//            Track(TRACK_VFX_0, EnumSet.of(BlockType.VFX)),
     )
     val trackMap: Map<String, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 
@@ -108,6 +118,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
     val startingTempo: FloatVar = FloatVar(TempoMap.DEFAULT_STARTING_GLOBAL_TEMPO)
     val tempoChanges: Var<List<TempoChange>> = Var(listOf())
+    val musicVolumes: Var<List<MusicVolume>> = Var(listOf())
     
     val engineBeat: FloatVar = FloatVar(engine.beat)
 
@@ -117,10 +128,20 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     private val forceUpdateStatus: Var<Boolean> = Var(false)
     val editorPane: EditorPane
 
+
+    private val player: MusicSamplePlayer = music.createPlayer(soundSystem.audioContext).apply {
+        this.gain = 0.75f
+//        this.loopStartMs = 3725f
+        this.loopEndMs = 40928f //33482f
+        this.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
+        this.prepareStartBuffer()
+    }
+    
     init {
         frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
         soundSystem.setPaused(true)
         soundSystem.startRealtime()
+        soundSystem.audioContext.out.addInput(player)
     }
 
     init { // This init block should be LAST
@@ -185,6 +206,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     fun compileEditorIntermediates() {
         resetWorld()
         compileEditorTempos()
+        compileEditorMusicVols()
         compileEditorBlocks()
     }
     
@@ -194,6 +216,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         blocks.toList().forEach { block ->
             events.addAll(block.compileIntoEvents())
         }
+        events.sortBy { it.beat }
         engine.addEvents(events)
     }
     
@@ -203,6 +226,12 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         tempos.removeTempoChangesBulk(tempos.getAllTempoChanges())
         tempos.addTempoChange(TempoChange(0f, this.startingTempo.getOrCompute()))
         tempos.addTempoChangesBulk(this.tempoChanges.getOrCompute().toList())
+    }
+    
+    fun compileEditorMusicVols() {
+        val volumeMap = engine.musicData.volumeMap
+        volumeMap.removeMusicVolumesBulk(volumeMap.getAllMusicVolumes())
+        volumeMap.addMusicVolumesBulk(this.musicVolumes.getOrCompute().toList())
     }
     
     fun resetWorld() {
@@ -255,7 +284,11 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         // TODO
         if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {
             compileEditorIntermediates()
-            timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.getOrCompute())
+            val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.getOrCompute())
+            timing.seconds = newSeconds
+
+            // FIXME remove later
+            player.position = (newSeconds * 1000) % player.musicSample.lengthMs
         } else if (newState == PlayState.STOPPED) {
             resetWorld()
             timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.getOrCompute())
@@ -378,6 +411,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     }
                     res
                 }
+                is Click.DragMusicVolume -> {
+                    val valid = currentClick.isCurrentlyValid.use()
+                    var res = Localization.getVar("editor.status.musicVolumeTool.dragging").use()
+                    if (!valid) {
+                        res += " " + Localization.getVar("editor.status.musicVolumeTool.dragging.invalidPlacement").use()
+                    }
+                    res
+                }
                 Click.None -> {
                     when (tool) {
                         Tool.SELECTION -> {
@@ -389,6 +430,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                             res
                         }
                         Tool.TEMPO_CHANGE -> Localization.getVar("editor.status.tempoChangeTool").use()
+                        Tool.MUSIC_VOLUME -> Localization.getVar("editor.status.musicVolumeTool").use()
                     }
                 }
             }
@@ -558,6 +600,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                         val result = currentClick.complete()
                         if (result != null) {
                             this.mutate(MoveTempoChangeAction(currentClick.tempoChange, result))
+                        }
+                    }
+                    click.set(Click.None)
+                    inputConsumed = true
+                }
+                is Click.DragMusicVolume -> {
+                    if (button == Input.Buttons.RIGHT) {
+                        currentClick.abortAction()
+                    } else if (button == Input.Buttons.LEFT) {
+                        val result = currentClick.complete()
+                        if (result != null) {
+                            this.mutate(ChangeMusicVolumeAction(currentClick.musicVol, result))
                         }
                     }
                     click.set(Click.None)
