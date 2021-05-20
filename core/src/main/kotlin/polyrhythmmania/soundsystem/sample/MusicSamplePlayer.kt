@@ -6,10 +6,7 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import net.beadsproject.beads.ugens.Static
 
 
-/**
- * A sample player that can play a [MusicSample].
- */
-open class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
+class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
     : PlayerLike(context, musicSample.nChannels, musicSample.nChannels) {
 
     /** The position in milliseconds.  */
@@ -23,19 +20,16 @@ open class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext
     override var loopType: SamplePlayer.LoopType = SamplePlayer.LoopType.LOOP_FORWARDS // SamplePlayer.LoopType.NO_LOOP_FORWARDS
     override var loopStartMs: Float = 0f
     override var loopEndMs: Float = 0f
-    
+
     var interpolationType: SamplePlayer.InterpolationType = SamplePlayer.InterpolationType.ADAPTIVE
 
     private val tmpFrame: FloatArray = FloatArray(outs)
-    
+
     init {
-        outputInitializationRegime = OutputInitializationRegime.RETAIN
+        outputInitializationRegime = OutputInitializationRegime.ZERO
         outputPauseRegime = OutputPauseRegime.ZERO
     }
 
-    /**
-     * Loads the start buffer based on [loopStartMs]
-     */
     fun prepareStartBuffer() {
         musicSample.moveStartBuffer(musicSample.msToSamples(loopStartMs.toDouble()).toInt())
     }
@@ -43,8 +37,8 @@ open class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext
     override fun reset() {
         position = 0.0
     }
-    
-    private fun isLoopInvalid(): Boolean = loopEndMs <= loopStartMs
+
+    fun isLoopInvalid(): Boolean = loopEndMs <= loopStartMs
 
     override fun calculateBuffer() {
         val loopType = this.loopType
@@ -58,42 +52,58 @@ open class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext
             }
             return
         }
-        val interpType = interpolationType
+
+        val interpType: SamplePlayer.InterpolationType = interpolationType
         pitch.update()
-        val gain = this.gain
         for (i in 0 until bufferSize) {
             val pitchValue = pitch.getValue(0, i)
 
             position += musicSample.samplesToMs(1.0) * pitchValue * (this.musicSample.sampleRate / context.sampleRate)
-            if (loopType == SamplePlayer.LoopType.LOOP_FORWARDS && !isLoopInvalid()) {
-                if (pitchValue > 0 && position > loopEndMs) {
-                    position = loopStartMs.toDouble()
+            var positionAddition = 0.0
+            if (loopType == SamplePlayer.LoopType.LOOP_FORWARDS && !isLoopInvalid() && pitchValue > 0 && position > loopEndMs) {
+                positionAddition = position - loopEndMs
+                position = loopStartMs.toDouble()
+            }
+            if (position < 0.0) {
+                for (out in 0 until outs) {
+                    tmpFrame[out] = 0f
                 }
             }
-            
+//            else if (position > musicSample.lengthMs) {
+//                for (out in 0 until outs) {
+////                    for (j in i until bufferSize) {
+//                        bufOut[out][i] = 0f
+////                    }
+//                }
+//                continue
+//            }
+
             when (interpType) {
                 SamplePlayer.InterpolationType.NONE -> {
-                    musicSample.getFrameNoInterp(position, tmpFrame);
+                    musicSample.getFrameNoInterp(position, tmpFrame)
                 }
                 SamplePlayer.InterpolationType.LINEAR -> {
-                    musicSample.getFrameLinear(position, tmpFrame);
+                    musicSample.getFrameLinear(position, tmpFrame)
                 }
                 SamplePlayer.InterpolationType.CUBIC -> {
-                    musicSample.getFrameCubic(position, tmpFrame);
+                    musicSample.getFrameCubic(position, tmpFrame)
                 }
                 SamplePlayer.InterpolationType.ADAPTIVE -> {
                     if (pitchValue > SamplePlayer.ADAPTIVE_INTERP_HIGH_THRESH) {
-                        musicSample.getFrameNoInterp(position, tmpFrame);
+                        musicSample.getFrameNoInterp(position, tmpFrame)
                     } else if (pitchValue > SamplePlayer.ADAPTIVE_INTERP_LOW_THRESH) {
-                        musicSample.getFrameLinear(position, tmpFrame);
+                        musicSample.getFrameLinear(position, tmpFrame)
                     } else {
-                        musicSample.getFrameCubic(position, tmpFrame);
+                        musicSample.getFrameCubic(position, tmpFrame)
                     }
                 }
             }
+
             for (out in 0 until outs) {
-                bufOut[out][i] = tmpFrame[out] * gain
+                bufOut[out][i] = tmpFrame[out]
             }
+            
+            position += positionAddition
         }
     }
 

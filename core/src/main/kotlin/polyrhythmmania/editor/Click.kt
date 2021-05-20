@@ -316,7 +316,7 @@ sealed class Click {
         }
 
         fun isPositionValid(): Boolean {
-            return beat > 0f && !editor.musicVolumes.getOrCompute().any { mv ->
+            return beat >= 0f && !editor.musicVolumes.getOrCompute().any { mv ->
                 mv !== musicVol &&
                         ((beat < mv.beat + mv.width && beat + width > mv.beat) || mv.beat == beat)
             }

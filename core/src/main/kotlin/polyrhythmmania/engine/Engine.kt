@@ -90,6 +90,8 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
             updateEvent(event, currentBeat)
         }
         world.engineUpdate(this, currentBeat, currentSeconds)
+        
+        musicData.update()
     }
 
     fun getDebugString(): String {

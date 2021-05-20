@@ -123,9 +123,9 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                                 inputConsumed = true
                             } else if (event.button == Input.Buttons.LEFT) {
                                 if (mv == null) {
-                                    // Add tempo change
+                                    // Add music volume change
                                     val beat = MathHelper.snapToNearest(getBeatFromRelative(lastMouseRelative.x), editor.snapping.getOrCompute())
-                                    if (beat > 0f) {
+                                    if (beat >= 0f) {
                                         val musicVolumes = editor.musicVolumes.getOrCompute().toMutableList()
                                         val volumes = editor.engine.musicData.volumeMap
                                         editor.compileEditorMusicVols()
