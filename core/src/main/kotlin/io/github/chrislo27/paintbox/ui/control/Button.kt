@@ -131,7 +131,6 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
         batch.color = rectColor
         var roundedRad = roundedRadius.getOrCompute()
         val paintboxSpritesheet = PaintboxGame.paintboxSpritesheet
-        val roundedRect: TextureRegion = paintboxSpritesheet.roundedCorner
         val spritesheetFill: TextureRegion = paintboxSpritesheet.fill
         if (roundedRad > rectW / 2f) {
             roundedRad = (rectW / 2f).toInt()
@@ -142,6 +141,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
         if (roundedRad <= 0) {
             batch.fillRect(rectX, rectY - rectH, rectW, rectH)
         } else {
+            val roundedRect: TextureRegion = paintboxSpritesheet.getRoundedCornerForRadius(roundedRad)
             batch.fillRect(rectX + roundedRad, rectY - rectH + roundedRad, rectW - roundedRad * 2, rectH - roundedRad * 2)
             batch.fillRect(rectX, rectY - rectH + roundedRad, (roundedRad).toFloat(), rectH - roundedRad * 2)
             batch.fillRect(rectX + rectW - roundedRad, rectY - rectH + roundedRad, (roundedRad).toFloat(), rectH - roundedRad * 2)
