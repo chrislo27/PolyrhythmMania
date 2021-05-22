@@ -8,12 +8,14 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.PixmapPacker
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
 import io.github.chrislo27.paintbox.Paintbox
+import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
 
 
 /**
@@ -92,6 +94,23 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
         val result = PackResult(newAtlas, packables, (endNano - nano) / 1_000_000.0)
         this.atlas = result
 //        println("Took ${result.timeTaken} ms to pack ${packables.size} packables")
+
+        val outputFile = config.debugOutputFile
+        if (outputFile != null) {
+            val regions = newAtlas.regions
+            if (regions.size > 0) {
+                if (regions.size > 1) Paintbox.LOGGER.debug("Packed sheet output has ${regions.size} regions, only first one will be outputted to $outputFile")
+                val td = regions.first().texture.textureData
+                if (!td.isPrepared) {
+                    td.prepare()
+                }
+                val pix = td.consumePixmap()
+                PixmapIO.writePNG(outputFile, pix)
+                if (td.disposePixmap()) {
+                    pix.disposeQuietly()
+                }
+            }
+        }
     }
 
     operator fun get(id: String): TextureAtlas.AtlasRegion {
@@ -113,6 +132,7 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
             val atlasMinFilter: Texture.TextureFilter = Texture.TextureFilter.Nearest,
             val atlasMagFilter: Texture.TextureFilter = Texture.TextureFilter.Nearest,
             val atlasMipMaps: Boolean = false,
+            val debugOutputFile: FileHandle? = null,
     )
 }
 
