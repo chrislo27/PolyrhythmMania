@@ -10,6 +10,8 @@ import com.badlogic.gdx.utils.Disposable
 import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.lazysound.LazySound
 import io.github.chrislo27.paintbox.lazysound.LazySoundLoader
+import io.github.chrislo27.paintbox.packing.PackedSheet
+import io.github.chrislo27.paintbox.packing.PackedSheetLoader
 
 /**
  * Holds all the global assets needed for a game and can be easily disposed of at the end.
@@ -30,6 +32,7 @@ object AssetRegistry : Disposable {
 
     init {
         manager.setLoader(LazySound::class.java, LazySoundLoader(manager.fileHandleResolver))
+        manager.setLoader(PackedSheet::class.java, PackedSheetLoader(manager.fileHandleResolver))
     }
 
     fun bindAsset(key: String, file: String): Pair<String, String> {
@@ -43,6 +46,10 @@ object AssetRegistry : Disposable {
 
     inline fun <reified T> loadAsset(key: String, file: String, params: AssetLoaderParameters<T>? = null) {
         manager.load(bindAsset(key, file).second, T::class.java, params)
+    }
+    
+    inline fun <reified T> loadAssetNoFile(key: String, params: AssetLoaderParameters<T>?) {
+        manager.load(bindAsset(key, key).second, T::class.java, params)
     }
 
     fun addAssetLoader(loader: IAssetLoader) {
