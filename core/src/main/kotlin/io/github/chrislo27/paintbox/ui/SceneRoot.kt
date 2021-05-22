@@ -23,10 +23,10 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     
     private val mouseVector: Vector2 = Vector2()
     val mousePosition: MousePosition = MousePosition(FloatVar(0f), FloatVar(0f))
-    val mainLayer: Layer = Layer("main", this)
-    val dialogLayer: Layer = Layer("dialog", this)
-    val contextMenuLayer: Layer = Layer("contextMenu")
-    val tooltipLayer: Layer = Layer("tooltip")
+    val mainLayer: Layer = Layer("main", enableTooltips = true, exclusiveTooltipAccess = false, rootElement = this)
+    val dialogLayer: Layer = Layer("dialog", enableTooltips = true, exclusiveTooltipAccess = true)
+    val contextMenuLayer: Layer = Layer("contextMenu", enableTooltips = true, exclusiveTooltipAccess = false)
+    val tooltipLayer: Layer = Layer("tooltip", enableTooltips = false, exclusiveTooltipAccess = false)
     val allLayers: List<Layer> = listOf(mainLayer, dialogLayer, contextMenuLayer, tooltipLayer)
     val allLayersReversed: List<Layer> = allLayers.asReversed()
     val inputSystem: InputSystem = InputSystem(this)
@@ -211,7 +211,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         hideRootContextMenu()
         addContextMenuToScene(contextMenu)
         rootContextMenu = contextMenu
-        contextMenuLayer.lastHoveredElementPath.clear() // Prevents a input system path issue, forces it to be recalculated
+        contextMenuLayer.resetHoveredElementPath()
     }
 
     /**
@@ -221,7 +221,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         val currentRootMenu = rootContextMenu ?: return
         removeContextMenuFromScene(currentRootMenu)
         rootContextMenu = null
-        contextMenuLayer.lastHoveredElementPath.clear() // Prevents a input system path issue, forces it to be recalculated
+        contextMenuLayer.resetHoveredElementPath()
     }
 
     /**
@@ -231,7 +231,8 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         hideRootDialog()
         rootDialogElement = dialog
         dialogLayer.root.addChild(dialog)
-        dialogLayer.lastHoveredElementPath.clear() // Prevents a input system path issue, forces it to be recalculated
+        dialogLayer.resetHoveredElementPath()
+        cancelTooltip()
     }
 
     /**
@@ -241,7 +242,8 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         val currentRootDialog = rootDialogElement ?: return
         dialogLayer.root.removeChild(currentRootDialog)
         rootDialogElement = null
-        dialogLayer.lastHoveredElementPath.clear() // Prevents a input system path issue, forces it to be recalculated
+        dialogLayer.resetHoveredElementPath()
+        cancelTooltip()
     }
 
     /**
@@ -284,6 +286,8 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
             // TODO position the context menu according to its parent if NOT the root
             
             contextMenu.onAddedToScene.invoke(this)
+            
+            cancelTooltip()
         }
     }
 
@@ -304,6 +308,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         val root = contextMenuLayer.root
         if (root.removeChild(contextMenu)) {
             contextMenu.onRemovedFromScene.invoke(this)
+            cancelTooltip()
         }
     }
     
@@ -364,13 +369,24 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         return vector
     }
     
-    inner class Layer(val name: String, rootElement: UIElement = Pane()) {
+    inner class Layer(val name: String, val enableTooltips: Boolean, val exclusiveTooltipAccess: Boolean,
+                      rootElement: UIElement = Pane()) {
         /**
          * Used by [InputSystem] for mouse-path tracking.
          */
         val lastHoveredElementPath: MutableList<UIElement> = mutableListOf()
         
         val root: UIElement = rootElement
+        
+        fun resetHoveredElementPath() {
+            // FIXME may need improvemnets
+            lastHoveredElementPath.clear()
+            this@SceneRoot.cancelTooltip()
+        }
+        
+        fun shouldEatTooltipAccess(): Boolean {
+            return exclusiveTooltipAccess && root.children.isNotEmpty()
+        }
     }
     
 }

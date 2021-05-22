@@ -49,4 +49,4 @@ class ClickPressed(val x: Float, val y: Float, val button: Int) : InputEvent()
  * event. [consumedPrior] will be true if this element previously consumed the [ClickPressed] event.
  */
 class ClickReleased(val x: Float, val y: Float, val button: Int, val consumedPrior: Boolean,
-                    val isWithinBounds: Boolean) : InputEvent()
+                    val wasWithinBounds: Boolean, val isCurrentlyWithinBounds: Boolean) : InputEvent()
