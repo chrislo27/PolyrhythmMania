@@ -62,32 +62,32 @@ open class Palette(val main: PRManiaGame) {
             "bold" to main.mainFontBold,
             "italic" to main.mainFontItalic,
             "bolditalic" to main.mainFontBoldItalic,
-            "rodin" to main.fontRodin,
+            "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.mainFont, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     val markupBordered: Markup = Markup(mapOf(
             "bold" to main.mainFontBoldBordered,
             "italic" to main.mainFontItalicBordered,
             "bolditalic" to main.mainFontBoldItalicBordered,
-            "rodin" to main.fontRodinBordered,
+            "rodin" to main.fontRodinFixedBordered,
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.mainFontBordered, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     val markupInstantiatorSummary: Markup = Markup(mapOf(
-            "rodin" to main.fontRodin,
+            "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
     ), TextRun(instantiatorSummaryFont, ""), Markup.FontStyles.ALL_DEFAULT)
     val markupInstantiatorDesc: Markup = Markup(mapOf(
             "bold" to main.fontCache["editor_instantiator_desc_BOLD"],
             "italic" to main.fontCache["editor_instantiator_desc_ITALIC"],
             "bolditalic" to main.fontCache["editor_instantiator_desc_BOLD_ITALIC"],
-            "rodin" to main.fontRodin,
+            "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.fontCache["editor_instantiator_desc"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     val markupStatusBar: Markup = Markup(mapOf(
             "bold" to main.fontCache["editor_status_BOLD"],
             "italic" to main.fontCache["editor_status_ITALIC"],
             "bolditalic" to main.fontCache["editor_status_BOLD_ITALIC"],
-            "rodin" to main.fontRodin,
+            "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.fontCache["editor_status"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))
 

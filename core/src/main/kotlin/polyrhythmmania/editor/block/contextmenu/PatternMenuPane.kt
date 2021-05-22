@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.block.contextmenu
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.TextAlign
@@ -11,13 +10,11 @@ import io.github.chrislo27.paintbox.ui.ImageRenderingMode
 import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
-import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.block.CubeType
 import polyrhythmmania.editor.block.PatternBlockData
-import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.util.RodinSpecialChars
 
@@ -36,7 +33,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
                 pane.bounds.width.set(blockSize * (data.rowCount + 3))
                 pane.bounds.height.set(blockSize)
 
-                pane.addChild(TextLabel(label, font = editorPane.palette.main.fontRodin).also { label ->
+                pane.addChild(TextLabel(label, font = editorPane.palette.main.fontRodinFixed).also { label ->
                     label.bounds.x.set(0f)
                     label.bounds.y.set(0 * blockSize)
                     label.bounds.width.set(blockSize * 1)

@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.TextAlign
+import io.github.chrislo27.paintbox.packing.PackedSheet
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
@@ -124,7 +125,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             this.bounds.width.set(buttonWidth)
             this.bounds.height.set(buttonWidth)
             this.skinID.set(EditorSkins.BUTTON_NO_SKIN)
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 16 * 3, 16 * 3, 16, 16)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_long"])).apply {
                 this.tint.bind { (skin.use() as ButtonSkin).bgColorToUse.use() }
             }
             this.setOnAction {
@@ -140,7 +141,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             this.bounds.width.set(buttonWidth)
             this.bounds.height.set(buttonWidth)
             this.skinID.set(EditorSkins.BUTTON_NO_SKIN)
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 16 * 3, 16 * 3, 16, 16)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_long"])).apply {
                 this.tint.bind { (skin.use() as ButtonSkin).bgColorToUse.use() }
                 rotation.set(180f)
             }
@@ -151,7 +152,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
                 index.use() >= list.size - 1
             }
         }
-        buttonPane += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 16 * 6, 16 * 4, 16, 16)).apply {
+        buttonPane += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"])).apply {
             this.padding.set(Insets.ZERO)
             Anchor.CentreLeft.configure(this)
             this.bounds.width.set(buttonWidth)

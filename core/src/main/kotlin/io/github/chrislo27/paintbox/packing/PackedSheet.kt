@@ -21,7 +21,7 @@ import io.github.chrislo27.paintbox.Paintbox
  */
 class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : Disposable {
 
-    private class PackResult(val atlas: TextureAtlas, val originalPackables: List<Packable>)
+    private class PackResult(val atlas: TextureAtlas, val originalPackables: List<Packable>, val timeTaken: Double)
         : Disposable {
 
         val regions: Map<String, TextureAtlas.AtlasRegion> = atlas.regions.associateBy { it.name }
@@ -65,6 +65,7 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
         atlas?.dispose()
         atlas = null
 
+        val nano = System.nanoTime()
         val size = config.maxSize
         val packer = PixmapPacker(size, size, config.format, config.padding, config.duplicateBorder, config.packStrategy)
         val packables = packables.values.toList()
@@ -87,7 +88,10 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
         val newAtlas = packer.generateTextureAtlas(config.atlasMinFilter, config.atlasMagFilter, config.atlasMipMaps)
 
         packer.dispose()
-        this.atlas = PackResult(newAtlas, packables)
+        val endNano = System.nanoTime()
+        val result = PackResult(newAtlas, packables, (endNano - nano) / 1_000_000.0)
+        this.atlas = result
+//        println("Took ${result.timeTaken} ms to pack ${packables.size} packables")
     }
 
     operator fun get(id: String): TextureAtlas.AtlasRegion {

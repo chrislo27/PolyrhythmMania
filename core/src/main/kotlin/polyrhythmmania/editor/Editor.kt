@@ -88,7 +88,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             "bold" to main.mainFontBordered,
             "italic" to main.mainFontItalicBordered,
             "bolditalic" to main.mainFontBoldItalicBordered,
-            "rodin" to main.fontRodinBordered,
+            "rodin" to main.fontRodinFixedBordered,
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.mainFontBoldBordered, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
 

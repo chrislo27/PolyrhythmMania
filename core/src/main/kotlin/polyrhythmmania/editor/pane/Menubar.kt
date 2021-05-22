@@ -2,6 +2,7 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import io.github.chrislo27.paintbox.packing.PackedSheet
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.ImageNode
@@ -26,7 +27,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_new"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 32, 0, 16, 16)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_new"])).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
@@ -39,7 +40,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_open"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 16, 0, 16, 16)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open"])).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
@@ -52,7 +53,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_save"))).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
 //            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_buttons_editor"), 0, 0, 16, 16)).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_save"])).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
             }
         }
