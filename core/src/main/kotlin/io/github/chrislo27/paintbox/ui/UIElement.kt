@@ -15,10 +15,10 @@ import io.github.chrislo27.paintbox.ui.border.NoBorder
 open class UIElement : UIBounds() {
 
     val parent: Var<UIElement?> = Var(null)
-    
+
     var children: List<UIElement> = emptyList()
         private set
-    
+
     val inputListeners: Var<List<InputEventListener>> = Var(emptyList())
     val sceneRoot: ReadOnlyVar<SceneRoot?> = Var {
         parent.use()?.sceneRoot?.use()
@@ -38,12 +38,14 @@ open class UIElement : UIBounds() {
      * The opacity of this [UIElement].
      */
     val opacity: FloatVar = FloatVar(1f)
+
     /**
      * The [apparentOpacity] level of the [parent], if there is no parent then 1.0 is used.
      */
     val parentOpacity: ReadOnlyVar<Float> = FloatVar {
         parent.use()?.apparentOpacity?.use() ?: 1f
     }
+
     /**
      * The opacity level of this [UIElement], taking into account the parent's opacity level using
      * `parentOpacity * this.opacity`.
@@ -53,9 +55,9 @@ open class UIElement : UIBounds() {
     val apparentOpacity: ReadOnlyVar<Float> = FloatVar {
         parentOpacity.use() * opacity.use()
     }
-    
+
     val borderStyle: Var<Border> = Var(NoBorder)
-    
+
     init {
         bindWidthToParent(0f)
         bindHeightToParent(0f)
@@ -64,7 +66,7 @@ open class UIElement : UIBounds() {
     @Suppress("RedundantModalityModifier")
     final fun render(originX: Float, originY: Float, batch: SpriteBatch) {
         if (!visible.getOrCompute()) return
-        
+
         val clip = doClipping.getOrCompute()
         val childOriginBounds = this.contentZone
         val childOriginX = childOriginBounds.x.getOrCompute()
@@ -73,41 +75,51 @@ open class UIElement : UIBounds() {
             this.renderSelf(originX, originY, batch)
             this.renderChildren(originX + childOriginX, originY - childOriginY, batch)
             this.renderSelfAfterChildren(originX, originY, batch)
-            
+
             val borderStyle = this.borderStyle.getOrCompute()
             borderStyle.renderBorder(originX, originY, batch, this)
         }
     }
-    
+
     protected open fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
     }
-    
+
     protected /*open*/ fun renderChildren(originX: Float, originY: Float, batch: SpriteBatch) {
-        children.forEach { 
+        children.forEach {
             it.render(originX, originY, batch)
         }
     }
-    
+
     protected open fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
     }
 
-    fun addChild(child: UIElement) {
+    fun addChild(child: UIElement): Boolean {
         if (child !in children) {
             child.parent.getOrCompute()?.removeChild(child)
             children = children + child
             child.parent.set(this)
+            this.onChildAdded(child)
+            return true
         }
+        return false
     }
 
     fun removeChild(child: UIElement): Boolean {
         if (child in children) {
             children = children - child
             child.parent.set(null)
+            this.onChildRemoved(child)
             return true
         }
         return false
     }
+
+    protected open fun onChildAdded(newChild: UIElement) {
+    }
     
+    protected open fun onChildRemoved(oldChild: UIElement) {
+    }
+
     fun addInputEventListener(listener: InputEventListener) {
         val current = inputListeners.getOrCompute()
         if (listener !in current) {
@@ -138,23 +150,23 @@ open class UIElement : UIBounds() {
         val scissorW = (width / rootWidth) * Gdx.graphics.width
         val scissorH = (height / rootHeight) * Gdx.graphics.height
         val scissor = Rectangle(scissorX, scissorY - scissorH, scissorW, scissorH)
-        
+
         val pushScissor = ScissorStack.pushScissor(scissor)
         return pushScissor
     }
-    
+
     fun clipBegin(originX: Float, originY: Float): Boolean {
         val bounds = this.bounds
         return clipBegin(originX, originY, bounds.x.getOrCompute(), bounds.y.getOrCompute(), bounds.width.getOrCompute(), bounds.height.getOrCompute())
     }
-    
+
     fun clipEnd() {
         ScissorStack.popScissor()
     }
-    
+
     fun bindWidthToParent(adjust: Float = 0f) {
         val thisBounds = this.bounds
-        thisBounds.width.bind { 
+        thisBounds.width.bind {
             (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) + adjust
         }
     }
@@ -179,7 +191,7 @@ open class UIElement : UIBounds() {
             (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) + adjustBinding()
         }
     }
-    
+
     protected inline fun renderOptionallyWithClip(originX: Float, originY: Float, batch: SpriteBatch, clip: Boolean,
                                                   renderFunc: (originX: Float, originY: Float, batch: SpriteBatch) -> Unit) {
         if (clip) {
@@ -206,7 +218,7 @@ open class UIElement : UIBounds() {
         var yOffset: Float = currentBounds.y.getOrCompute()
         while (current.children.isNotEmpty()) {
             val found = current.children.findLast { child ->
-                child.bounds.containsPointLocal(x - xOffset, y - yOffset) 
+                child.bounds.containsPointLocal(x - xOffset, y - yOffset)
             } ?: break
             res += found
             current = found
@@ -216,7 +228,7 @@ open class UIElement : UIBounds() {
         }
         return res
     }
-    
+
     /**
      * Returns a list of [UIElement]s from this element to the child that contains the point within [UIBounds.contentZone].
      * It also excludes elements that are not [visible].
@@ -229,7 +241,7 @@ open class UIElement : UIBounds() {
         var xOffset: Float = currentBounds.x.getOrCompute()
         var yOffset: Float = currentBounds.y.getOrCompute()
         while (current.children.isNotEmpty()) {
-            val found = current.children.findLast { child -> 
+            val found = current.children.findLast { child ->
                 child.visible.getOrCompute() && child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
             } ?: break
             res += found
@@ -259,11 +271,13 @@ open class UIElement : UIBounds() {
 
         vector.x += this.bounds.x.getOrCompute()
         vector.y += this.bounds.y.getOrCompute()
-        
+
         return vector
     }
-    
-    operator fun plusAssign(child: UIElement) = addChild(child)
+
+    operator fun plusAssign(child: UIElement) {
+        addChild(child)
+    }
     operator fun minusAssign(child: UIElement) {
         removeChild(child)
     }

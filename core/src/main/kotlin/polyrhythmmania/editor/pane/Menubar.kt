@@ -10,6 +10,8 @@ import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.ButtonSkin
+import io.github.chrislo27.paintbox.ui.layout.HBox
+import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 
 
@@ -18,43 +20,39 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     val editor: Editor = editorPane.editor
     
     init {
-        this += Button("").apply {
-            this.padding.set(Insets.ZERO)
-            this.bounds.width.set(32f + 4f)
-            this.margin.set(Insets(0f, 0f, 0f, 4f))
-            Anchor.TopLeft.configure(this, offsetX = 0f, offsetY = 0f)
-            this.skinID.set(EditorSkins.BUTTON)
-//            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_new"))).apply {
-//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
-//            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_new"])).apply {
-//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
-            }
+        val ioBox: HBox = HBox().apply { 
+            this.spacing.set(4f)
+            this.align.set(HBox.Align.CENTRE)
+            this.bounds.width.set((32f + this.spacing.getOrCompute()) * 3)
         }
-        this += Button("").apply {
-            this.padding.set(Insets.ZERO)
-            this.bounds.width.set(32f + 4f)
-            this.margin.set(Insets(0f, 0f, 0f, 4f))
-            Anchor.TopLeft.configure(this, offsetX = 32f * 1 + 4f * 1, offsetY = 0f)
-            this.skinID.set(EditorSkins.BUTTON)
-//            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_open"))).apply {
+        this.addChild(ioBox)
+        ioBox.temporarilyDisableLayouts {
+            ioBox += Button("").apply {
+                this.padding.set(Insets.ZERO)
+                this.bounds.width.set(32f)
+                this.skinID.set(EditorSkins.BUTTON)
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_new"])).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
-//            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open"])).apply {
-//                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+                }
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.new")))
             }
-        }
-        this += Button("").apply {
-            this.padding.set(Insets.ZERO)
-            this.bounds.width.set(32f + 4f)
-            this.margin.set(Insets(0f, 0f, 0f, 4f))
-            Anchor.TopLeft.configure(this, offsetX = 32f * 2 + 4f * 2, offsetY = 0f)
-            this.skinID.set(EditorSkins.BUTTON)
-//            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_icon_button_save"))).apply {
+            ioBox += Button("").apply {
+                this.padding.set(Insets.ZERO)
+                this.bounds.width.set(32f)
+                this.skinID.set(EditorSkins.BUTTON)
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open"])).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
-//            }
-            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_save"])).apply {
+                }
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.open")))
+            }
+            ioBox += Button("").apply {
+                this.padding.set(Insets.ZERO)
+                this.bounds.width.set(32f)
+                this.skinID.set(EditorSkins.BUTTON)
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_save"])).apply {
 //                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+                }
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.save")))
             }
         }
     }
