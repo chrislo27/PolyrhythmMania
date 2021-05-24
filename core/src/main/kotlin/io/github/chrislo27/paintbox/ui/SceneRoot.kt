@@ -99,7 +99,9 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
             val lastPackedColor = batch.packedColor
             batch.setColor(0f, 1f, 0f, 1f)
             val useOutlines = drawOutlines == Paintbox.StageOutlineMode.ONLY_VISIBLE
+            val isDialogPresent = this.rootDialogElement != null
             for (layer in allLayers) {
+                if (isDialogPresent && layer == mainLayer) continue
                 val layerRoot = layer.root
                 val layerBounds = layerRoot.bounds
                 val originX = layerBounds.x.getOrCompute()
