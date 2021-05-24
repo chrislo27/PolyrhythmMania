@@ -22,7 +22,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     init {
         val ioBox: HBox = HBox().apply { 
             this.spacing.set(4f)
-            this.align.set(HBox.Align.CENTRE)
+            this.align.set(HBox.Align.LEFT)
             this.bounds.width.set((32f + this.spacing.getOrCompute()) * 3)
         }
         this.addChild(ioBox)
