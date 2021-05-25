@@ -68,6 +68,12 @@ allprojects {
         implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
         implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows-x86"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux-arm64"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux-arm32"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-macos"
         
 //        implementation "org.openjdk.jol:jol-core:0.15"
     }
