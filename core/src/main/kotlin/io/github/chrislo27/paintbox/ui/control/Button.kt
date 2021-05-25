@@ -203,11 +203,4 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
         // NO-OP
     }
 
-    enum class Corner {
-        TOP_LEFT,
-        TOP_RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM_RIGHT
-    }
-
 }
