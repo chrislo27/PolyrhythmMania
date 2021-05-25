@@ -23,16 +23,16 @@ object DesktopLauncher {
 
         try {
             // Check for bad arguments but don't cause a full crash
-            JCommander.newBuilder().acceptUnknownOptions(false).addObject(Arguments()).build().parse(*args)
+            JCommander.newBuilder().acceptUnknownOptions(false).addObject(PRManiaArguments()).build().parse(*args)
         } catch (e: ParameterException) {
             println("WARNING: Failed to parse arguments. Check below for details and help documentation. You may have strange parse results from ignoring unknown options.\n")
             e.printStackTrace()
             println("\n\n")
-            printHelp(JCommander(Arguments()))
+            printHelp(JCommander(PRManiaArguments()))
             println("\n\n")
         }
 
-        val arguments = Arguments()
+        val arguments = PRManiaArguments()
         val jcommander = JCommander.newBuilder().acceptUnknownOptions(true).addObject(arguments).build()
         jcommander.parse(*args)
 
@@ -42,7 +42,7 @@ object DesktopLauncher {
         }
 
         val app = PRManiaGame(PRManiaGame.createPaintboxSettings(args.toList(), Logger(), PRMania.MAIN_FOLDER.resolve("logs/")))
-        PaintboxDesktopLauncher(app).editConfig {
+        PaintboxDesktopLauncher(app, arguments).editConfig {
             this.setAutoIconify(true)
             val emulatedSize = app.paintboxSettings.emulatedSize
             this.setWindowedMode(emulatedSize.width, emulatedSize.height)
@@ -56,6 +56,7 @@ object DesktopLauncher {
             this.setAudioConfig(100, 4096, 16)
             this.setHdpiMode(HdpiMode.Logical)
             this.setBackBufferConfig(8, 8, 8, 8, 16, 0, /* samples = */ 2)
+            this.setPreferencesConfig(".polyrhythmmania/", Files.FileType.External)
             
             val sizes: List<Int> = listOf(32, 24, 16)
             this.setWindowIcon(Files.FileType.Internal, *sizes.map { "icon/$it.png" }.toTypedArray())
