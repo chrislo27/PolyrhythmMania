@@ -28,6 +28,9 @@ open class UIElement : UIBounds() {
      * If false, this element and its children will not be rendered.
      */
     val visible: Var<Boolean> = Var(true)
+    val apparentVisibility: ReadOnlyVar<Boolean> = Var.bind { 
+        visible.use() && (parent.use()?.apparentVisibility?.use() ?: true)
+    }
 
     /**
      * If true, this element will render with [ScissorStack] clipping on its entire bounds.

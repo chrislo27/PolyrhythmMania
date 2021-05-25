@@ -90,7 +90,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
             offY -= cursor.contentZone.y.getOrCompute()
         }
         // offsets should be the absolute x/y of the parent of cursor
-        while (cursor != null && !cursor.borderZone.containsPointLocal(x - offX, y - offY)) {
+        while (cursor != null && !cursor.borderZone.containsPointLocal(x - offX, y - offY) && cursor.apparentVisibility.getOrCompute()) {
             val removed = lastPath.removeLast()
             onMouseExited(removed, x, y)
             removed.fireEvent(MouseExited(x, y))
