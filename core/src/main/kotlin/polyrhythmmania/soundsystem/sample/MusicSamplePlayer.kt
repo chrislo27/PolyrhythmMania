@@ -12,6 +12,8 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
     /** The position in milliseconds.  */
     override var position: Double = 0.0
     override var pitch: UGen = Static(context, 1f)
+    override val durationMs: Double
+        get() = musicSample.lengthMs
 
     /**
      * Only loop types [SamplePlayer.LoopType.NO_LOOP_FORWARDS] and [SamplePlayer.LoopType.LOOP_FORWARDS]

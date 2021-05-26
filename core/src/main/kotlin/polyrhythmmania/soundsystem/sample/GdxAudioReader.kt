@@ -15,8 +15,12 @@ import java.io.IOException
 
 
 object GdxAudioReader {
+    
+    fun interface AudioLoadListener {
+        fun progress(bytesReadSoFar: Long, bytesReadThisChunk: Int)
+    } 
 
-    private fun musicToPCMFile(music: OpenALMusic, file: File, bufferSize: Int = 4096 * 4): Long {
+    private fun musicToPCMFile(music: OpenALMusic, file: File, bufferSize: Int = 4096 * 4, listener: AudioLoadListener? = null): Long {
         file.createNewFile()
 
         val audioBytes = ByteArray(bufferSize)
@@ -26,11 +30,10 @@ object GdxAudioReader {
         music.reset()
         while (true) {
             val length = music.read(audioBytes)
-            if (length <= 0) {
-                break
-            }
-
+            if (length <= 0) break
+            
             currentLength += length
+            listener?.progress(currentLength, length)
             fileOutStream.write(audioBytes, 0, length)
         }
         StreamUtils.closeQuietly(fileOutStream)
@@ -38,7 +41,7 @@ object GdxAudioReader {
         return currentLength
     }
 
-    fun newSound(handle: FileHandle): BeadsSound {
+    fun newSound(handle: FileHandle, listener: AudioLoadListener? = null): BeadsSound {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
         val tempFile = File.createTempFile("GdxAudioReader-decode", ".tmp").apply {
@@ -46,7 +49,7 @@ object GdxAudioReader {
         }
         val bufferSize = 4096 * 4
         // TODO: Can we optimize this by immediately decoding and deinterleaving without writing to a tmp file first?
-        val bytesRead = musicToPCMFile(music, tempFile, bufferSize)
+        val bytesRead = musicToPCMFile(music, tempFile, bufferSize, listener)
 
         val audioBytesBuffer = ByteArray(bufferSize)
         val nFrames = bytesRead / (2 * music.channels)
@@ -82,13 +85,13 @@ object GdxAudioReader {
         return BeadsSound(sample)
     }
 
-    fun newMusic(handle: FileHandle): BeadsMusic {
+    fun newMusic(handle: FileHandle, listener: AudioLoadListener? = null): BeadsMusic {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = File.createTempFile("GdxAudioReader-decode", ".tmp").apply {
+        val tempFile = File.createTempFile("PRMania-GdxAudioReader-d", ".tmp").apply {
             deleteOnExit()
         }
-        val bytesRead = musicToPCMFile(music, tempFile)
+        val bytesRead = musicToPCMFile(music, tempFile, listener = listener)
         val musicSample = MusicSample(tempFile.toPath(), music.rate.toFloat(), music.channels)
 
         return BeadsMusic(musicSample)

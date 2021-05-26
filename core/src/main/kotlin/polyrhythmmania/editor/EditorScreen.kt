@@ -15,7 +15,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 
 
-class EditorScreen(main: PRManiaGame) : PRManiaScreen(main) {
+class EditorScreen(main: PRManiaGame, val debugMode: Boolean = false) : PRManiaScreen(main) {
 
     val batch: SpriteBatch = main.batch
     val editor: Editor = Editor(main)
@@ -40,12 +40,13 @@ class EditorScreen(main: PRManiaGame) : PRManiaScreen(main) {
         
         editor.renderUpdate()
 
-        // FIXME DEBUG resets editor scene
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+        // DEBUG resets editor scene
+        if (debugMode && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            val thisEditorScreen: EditorScreen = this
             Gdx.app.postRunnable { 
-                main.screen = EditorScreen(main)
+                main.screen = EditorScreen(main, debugMode = true)
                 Gdx.app.postRunnable {
-                    this.dispose()
+                    thisEditorScreen.dispose()
                 }
             }
         }

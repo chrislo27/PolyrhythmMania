@@ -38,6 +38,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("toolbar_pause_white", "textures/ui/icon/toolbar/pause_white.png"),
                 Packable("toolbar_play_white", "textures/ui/icon/toolbar/play_white.png"),
                 Packable("toolbar_stop_white", "textures/ui/icon/toolbar/stop_white.png"),
+                Packable("toolbar_music", "textures/ui/icon/toolbar/music.png"),
                 Packable("menubar_new", "textures/ui/icon/menubar/new.png"),
                 Packable("menubar_open", "textures/ui/icon/menubar/open.png"),
                 Packable("menubar_save", "textures/ui/icon/menubar/save.png"),
@@ -55,6 +56,10 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("cursor_thin_tail", "textures/ui/icon/cursor_thin_tail.png"),
                 Packable("cursor_wide_tail", "textures/ui/icon/cursor_wide_tail.png"),
         ), PackedSheet.Config(padding = 0, maxSize = 256, duplicateBorder = false)))
+        AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor_linear", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                Packable("x", "textures/ui/x.png"),
+        ), PackedSheet.Config(padding = 0, maxSize = 1024, duplicateBorder = false, 
+                atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
         AssetRegistry.loadAsset<Texture>("ui_triangle_equilateral", "textures/ui/triangle_equilateral.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_triangle_right", "textures/ui/triangle_right.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_triangle_equilateral_bordered", "textures/ui/triangle_equilateral_bordered.png", linearTexture())

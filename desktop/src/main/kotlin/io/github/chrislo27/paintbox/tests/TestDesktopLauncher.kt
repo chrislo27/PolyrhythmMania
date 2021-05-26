@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.HdpiMode
+import com.beust.jcommander.JCommander
 import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.PaintboxSettings
 import io.github.chrislo27.paintbox.ResizeAction
@@ -15,6 +16,8 @@ import io.github.chrislo27.paintbox.tests.textblocks.TextBlockTestGame
 import io.github.chrislo27.paintbox.util.Version
 import io.github.chrislo27.paintbox.util.WindowSize
 import org.lwjgl.glfw.GLFW
+import polyrhythmmania.desktop.DesktopLauncher
+import polyrhythmmania.desktop.PRManiaArguments
 
 
 internal object TestDesktopLauncher {
@@ -23,9 +26,18 @@ internal object TestDesktopLauncher {
     fun main(args: Array<String>) {
         // https://github.com/chrislo27/RhythmHeavenRemixEditor/issues/273
         System.setProperty("jna.nosys", "true")
+        
+        val arguments = PRManiaArguments()
+        val jcommander = JCommander.newBuilder().acceptUnknownOptions(false).addObject(arguments).build()
+        jcommander.parse(*args)
+
+        if (arguments.printHelp) {
+            println(StringBuilder().apply { jcommander.usageFormatter.usage(this) })
+            return
+        }
 
         fun getDefaultLauncher(app: PaintboxGame): PaintboxDesktopLauncher {
-            return PaintboxDesktopLauncher(app).editConfig {
+            return PaintboxDesktopLauncher(app, arguments).editConfig {
                 this.setAutoIconify(true)
                 val emulatedSize = app.paintboxSettings.emulatedSize
                 this.setWindowedMode(emulatedSize.width, emulatedSize.height)

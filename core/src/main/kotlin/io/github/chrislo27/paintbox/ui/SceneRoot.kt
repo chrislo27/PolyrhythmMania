@@ -315,6 +315,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     }
     
     fun isContextMenuActive(): Boolean = rootContextMenu != null
+    fun isDialogActive(): Boolean = rootDialogElement != null
     
     private fun updateMouseVector() {
         val vector = mouseVector

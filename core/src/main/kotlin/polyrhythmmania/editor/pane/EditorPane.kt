@@ -11,8 +11,9 @@ import io.github.chrislo27.paintbox.ui.element.RectElement
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.Palette
-import polyrhythmmania.editor.pane.dialog.DialogPane
+import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.pane.track.AllTracksPane
+import polyrhythmmania.ui.DialogPane
 
 
 class EditorPane(val editor: Editor) : Pane() {
@@ -29,6 +30,7 @@ class EditorPane(val editor: Editor) : Pane() {
     val allTracksPane: AllTracksPane
 
     val toolbar: Toolbar get() = upperPane.toolbar
+    val musicDialog: MusicDialog
 
     init {
         // Background
@@ -77,6 +79,10 @@ class EditorPane(val editor: Editor) : Pane() {
             }
         }
         parent += allTracksPane
+    }
+    
+    init {
+        musicDialog = MusicDialog(this)
     }
 
     fun createDefaultTooltip(binding: Var.Context.() -> String): Tooltip {

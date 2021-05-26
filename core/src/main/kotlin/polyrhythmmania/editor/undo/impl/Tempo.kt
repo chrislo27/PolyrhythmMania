@@ -82,3 +82,17 @@ class ChangeTempoChangeAction(val previous: TempoChange, var next: TempoChange)
         context.compileEditorTempos()
     }
 }
+
+class ChangeStartingTempoAction(val previous: Float, var next: Float)
+    : ReversibleAction<Editor> {
+
+    override fun redo(context: Editor) {
+        context.startingTempo.set(next)
+        context.compileEditorTempos()
+    }
+
+    override fun undo(context: Editor) {
+        context.startingTempo.set(previous)
+        context.compileEditorTempos()
+    }
+}

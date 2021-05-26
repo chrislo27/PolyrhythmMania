@@ -25,6 +25,7 @@ import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.undo.impl.AddTempoChangeAction
+import polyrhythmmania.editor.undo.impl.ChangeStartingTempoAction
 import polyrhythmmania.editor.undo.impl.ChangeTempoChangeAction
 import polyrhythmmania.editor.undo.impl.DeleteTempoChangeAction
 import polyrhythmmania.engine.tempo.TempoChange
@@ -115,6 +116,12 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                             var futureTempo = originalTempo + amt
                             futureTempo = futureTempo.coerceIn(MIN_TEMPO, MAX_TEMPO)
                             if (futureTempo != originalTempo) {
+                                val peek = editor.getUndoStack().peekFirst()
+                                if (peek is ChangeStartingTempoAction) {
+                                    peek.next = futureTempo
+                                } else {
+                                    editor.addActionWithoutMutating(ChangeStartingTempoAction(originalTempo, futureTempo))
+                                }
                                 editor.startingTempo.set(futureTempo)
                             }
                         })

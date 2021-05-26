@@ -33,7 +33,11 @@ abstract class AbstractHVBox : Pane() {
             }
         }
     }
-    
+
+    /**
+     * Sets [disableLayouts] to true, runs the [func], then sets [disableLayouts] to false.
+     * This is intended as an optimization when adding a set of children to avoid constant layout recomputations.
+     */
     inline fun temporarilyDisableLayouts(func: () -> Unit) {
         disableLayouts.set(true)
         func()

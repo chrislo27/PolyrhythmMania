@@ -39,6 +39,8 @@ open class SamplePlayerWrapper(private val samplePlayer: SamplePlayer)
         set(value) {
             samplePlayer.loopType = value
         }
+    override val durationMs: Double
+        get() = samplePlayer.sample?.length ?: 0.0
     
     private val gainObj: Gain = Gain(this.context, this.outs, 1f)
     override var gain: Float

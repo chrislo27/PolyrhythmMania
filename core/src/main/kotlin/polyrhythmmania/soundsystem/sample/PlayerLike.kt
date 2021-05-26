@@ -15,13 +15,27 @@ abstract class PlayerLike(context: AudioContext, ins: Int, outs: Int) : UGen(con
     val killListeners: MutableList<(PlayerLike) -> Unit> = CopyOnWriteArrayList()
     
     open var gain: Float = 1f
-    
+
+    /**
+     * Current position of the player in milliseconds
+     */
     abstract var position: Double
+    abstract val durationMs: Double
     abstract var pitch: UGen
     abstract var loopType: SamplePlayer.LoopType
     abstract var loopStartMs: Float
     abstract var loopEndMs: Float
 
+    fun useLoopParams(params: LoopParams) {
+        this.loopType = params.loopType
+        this.loopStartMs = params.startPointMs.toFloat()
+        if (params.endPointMs > 0) {
+            this.loopEndMs = params.endPointMs.toFloat()
+        } else if (params.endPointMs <= 0) {
+            this.loopEndMs = durationMs.toFloat()
+        }
+    }
+    
     override fun kill() {
         val wasDeleted = this.isDeleted
         

@@ -26,7 +26,7 @@ class PreviewPane(val upperPane: UpperPane) : Pane() {
         }
         this += parent
         
-        parent += ImageNode(TextureRegion(editor.frameBuffer.colorBufferTexture).also { tr -> 
+        parent += ImageNode(TextureRegion(editor.previewFrameBuffer.colorBufferTexture).also { tr -> 
             tr.flip(false, true)
         }, renderingMode = ImageRenderingMode.FULL)
     }

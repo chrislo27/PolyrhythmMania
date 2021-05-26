@@ -6,6 +6,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import kotlin.math.floor
 
 
 /**
@@ -35,11 +36,11 @@ class MusicSample(val pcmDataFile: Path,
     private val fileChannel: FileChannel = FileChannel.open(pcmDataFile, StandardOpenOption.READ)
     private val fileSize: Long = fileChannel.size()
     
-    val lengthMs: Double = (fileSize / 2 /*2 bytes per float*/ / nChannels / sampleRate * 1000.0).toDouble()
+    val lengthMs: Double = (fileSize / 2 /*2 bytes per float*/ / nChannels / sampleRate * 1000.0)
     val nFrames: Long = msToSamples(lengthMs).toLong()
     
-    private val startBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(msToSamples(DEFAULT_START_BUFFER_MS).toInt()) }
-    private val playbackBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(msToSamples(DEFAULT_PLAYBACK_BUFFER_MS).toInt()) }
+    private val startBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_START_BUFFER_MS).toInt()) }
+    private val playbackBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_PLAYBACK_BUFFER_MS).toInt()) }
     
     init {
         startBuffer.populate(0)
@@ -69,12 +70,12 @@ class MusicSample(val pcmDataFile: Path,
         if (frame < 0 || frame >= nFrames) {
             return
         }
-        if (startBuffer.sampleInBuffer(frame)) {
+        if (startBuffer.isSampleInBuffer(frame)) {
             for (i in 0 until nChannels) {
                 frameData[i] = startBuffer.data[i][frame - startBuffer.position]
             }
         } else {
-            if (!playbackBuffer.sampleInBuffer(frame)) {
+            if (!playbackBuffer.isSampleInBuffer(frame)) {
 //                val nano = measureNanoTime { 
                     playbackBuffer.populate((frame - 4).coerceAtLeast(0))
 //                }
@@ -95,8 +96,8 @@ class MusicSample(val pcmDataFile: Path,
      */
     fun getFrameNoInterp(posInMS: Double, result: FloatArray) {
         val frame = msToSamples(posInMS)
-        val frame_floor = Math.floor(frame).toInt()
-        getFrame(frame_floor, result)
+        val frameFloor = floor(frame).toInt()
+        getFrame(frameFloor, result)
     }
 
     /**
@@ -108,16 +109,16 @@ class MusicSample(val pcmDataFile: Path,
      */
     fun getFrameLinear(posInMS: Double, result: FloatArray) {
         val frame = msToSamples(posInMS)
-        val frame_floor = Math.floor(frame).toInt()
-        if (frame_floor > 0 && frame_floor < nFrames) {
-            val frame_frac = frame - frame_floor
-            if (frame_floor.toLong() == nFrames - 1) {
-                getFrame(frame_floor, result)
+        val frameFloor = floor(frame).toInt()
+        if (frameFloor in 1 until nFrames) {
+            val frameFrac = frame - frameFloor
+            if (frameFloor.toLong() == nFrames - 1) {
+                getFrame(frameFloor, result)
             } else { /* lerp */
-                getFrame(frame_floor, interpCurrent)
-                getFrame(frame_floor + 1, interpNext)
+                getFrame(frameFloor, interpCurrent)
+                getFrame(frameFloor + 1, interpNext)
                 for (i in 0 until nChannels) {
-                    result[i] = ((1 - frame_frac) * interpCurrent.get(i) + frame_frac * interpNext.get(i)).toFloat()
+                    result[i] = ((1 - frameFrac) * interpCurrent.get(i) + frameFrac * interpNext.get(i)).toFloat()
                 }
             }
         } else {
@@ -146,33 +147,33 @@ class MusicSample(val pcmDataFile: Path,
         var y1: Float
         var y2: Float
         for (i in 0 until nChannels) {
-            var realCurrentSample = Math.floor(frame).toInt()
+            var realCurrentSample = floor(frame).toInt()
             val fractionOffset = (frame - realCurrentSample).toFloat()
             if (realCurrentSample >= 0 && realCurrentSample < nFrames - 1) {
                 realCurrentSample--
                 if (realCurrentSample < 0) {
                     getFrame(0, interpCurrent)
-                    ym1 = interpCurrent.get(i)
+                    ym1 = interpCurrent[i]
                     realCurrentSample = 0
                 } else {
                     getFrame(realCurrentSample++, interpCurrent)
-                    ym1 = interpCurrent.get(i)
+                    ym1 = interpCurrent[i]
                 }
                 getFrame(realCurrentSample++, interpCurrent)
-                y0 = interpCurrent.get(i)
+                interpCurrent[i].also { y0 = it }
                 y1 = if (realCurrentSample >= nFrames) {
                     getFrame(nFrames.toInt() - 1, interpCurrent)
-                    interpCurrent.get(i) // ??
+                    interpCurrent[i] // ??
                 } else {
                     getFrame(realCurrentSample++, interpCurrent)
-                    interpCurrent.get(i)
+                    interpCurrent[i]
                 }
                 y2 = if (realCurrentSample >= nFrames) {
                     getFrame(nFrames.toInt() - 1, interpCurrent)
-                    interpCurrent.get(i) // ??
+                    interpCurrent[i] // ??
                 } else {
                     getFrame(realCurrentSample/*++*/, interpCurrent)
-                    interpCurrent.get(i)
+                    interpCurrent[i]
                 }
                 mu2 = fractionOffset * fractionOffset
                 a0 = y2 - y1 - ym1 + y0
@@ -228,8 +229,10 @@ class MusicSample(val pcmDataFile: Path,
         return sampleTime / sampleRate * 1000.0
     }
     
-    private inner class Buffer(val samples: Int, val bytesPerSample: Int = 2) {
+    class Buffer(val musicSample: MusicSample, val samples: Int, val bytesPerSample: Int = 2) {
         
+        val nChannels: Int = musicSample.nChannels
+        private val fileChannel: FileChannel = musicSample.fileChannel
         val data: Array<FloatArray> = Array(nChannels) { FloatArray(samples) }
         var position: Int = 0
             private set
@@ -282,7 +285,7 @@ class MusicSample(val pcmDataFile: Path,
             size = samplesRead
         }
         
-        fun sampleInBuffer(sample: Int): Boolean {
+        fun isSampleInBuffer(sample: Int): Boolean {
             return sample in position until (position + size)
         }
         

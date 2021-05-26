@@ -2,6 +2,7 @@ package polyrhythmmania
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
@@ -14,6 +15,7 @@ import io.github.chrislo27.paintbox.ResizeAction
 import io.github.chrislo27.paintbox.font.*
 import io.github.chrislo27.paintbox.logging.Logger
 import io.github.chrislo27.paintbox.registry.AssetRegistry
+import io.github.chrislo27.paintbox.util.ResolutionSetting
 import io.github.chrislo27.paintbox.util.WindowSize
 import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
 import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
@@ -35,8 +37,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     }
 
     private var lastWindowed: WindowSize = PRMania.DEFAULT_SIZE.copy()
-    
-    var blockResolutionChanges: Boolean = false
+
+    @Volatile
+    lateinit var preferences: Preferences
+        private set
+    @Volatile var blockResolutionChanges: Boolean = false
 
     override fun getTitle(): String = "${PRMania.TITLE} ${PRMania.VERSION}"
 
@@ -47,6 +52,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
 //        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
 
+        preferences = Gdx.app.getPreferences("PolyrhythmMania")
+        
         addFontsToCache(this.fontCache)
         PRManiaColors
 
@@ -59,7 +66,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             }
             nextScreen = {
 //                TestWorldRenderScreen(this@PRManiaGame)
-                EditorScreen(this@PRManiaGame)
+                EditorScreen(this@PRManiaGame, debugMode = true)
             }
         })
     }
@@ -67,7 +74,49 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun dispose() {
         super.dispose()
     }
+    
+    private val userHomeFile: File = File(System.getProperty("user.home"))
+    private val desktopFile: File = userHomeFile.resolve("Desktop")
 
+    fun persistDirectory(prefName: String, file: File) {
+        preferences.putString(prefName, file.absolutePath)
+        preferences.flush()
+    }
+
+    fun attemptRememberDirectory(prefName: String): File? {
+        val f: File = File(preferences.getString(prefName, null) ?: return null)
+        if (f.exists() && f.isDirectory)
+            return f
+        return null
+    }
+
+    fun getDefaultDirectory(): File = if (!desktopFile.exists() || !desktopFile.isDirectory) userHomeFile else desktopFile
+    
+    /**
+     * Blocks resolution changes and, if in fullscreen mode, resets to windowed mode.
+     * After the [func] block is complete, [func] should call the completionCallback function (from any thread).
+     * That will reset the resolution change block flag to its original value
+     * and also goes back to fullscreen mode if needed.
+     * 
+     * This function should only be called from the GL thread (use `Gdx.app.postRunnable` if necessary).
+     */
+    fun restoreForExternalDialog(func: (completionCallback: () -> Unit) -> Unit) {
+        val originalResBlock = this.blockResolutionChanges
+        val originalResolution = ResolutionSetting(Gdx.graphics.width, Gdx.graphics.height, Gdx.graphics.isFullscreen)
+        if (originalResolution.fullscreen) {
+            Gdx.graphics.setWindowedMode(PRMania.DEFAULT_SIZE.width, PRMania.DEFAULT_SIZE.height)
+        }
+        
+        val callback: () -> Unit = {
+            Gdx.app.postRunnable {
+                if (originalResolution.fullscreen) {
+                    Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+                }
+                this.blockResolutionChanges = originalResBlock
+            }
+        }
+        func.invoke(callback)
+    }
 
     fun attemptFullscreen() {
         lastWindowed = WindowSize(Gdx.graphics.width, Gdx.graphics.height)

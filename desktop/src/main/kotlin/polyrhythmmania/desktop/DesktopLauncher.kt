@@ -56,7 +56,7 @@ object DesktopLauncher {
             this.setAudioConfig(100, 4096, 16)
             this.setHdpiMode(HdpiMode.Logical)
             this.setBackBufferConfig(8, 8, 8, 8, 16, 0, /* samples = */ 2)
-            this.setPreferencesConfig(".polyrhythmmania/", Files.FileType.External)
+            this.setPreferencesConfig(".polyrhythmmania/prefs/", Files.FileType.External)
             
             val sizes: List<Int> = listOf(32, 24, 16)
             this.setWindowIcon(Files.FileType.Internal, *sizes.map { "icon/$it.png" }.toTypedArray())

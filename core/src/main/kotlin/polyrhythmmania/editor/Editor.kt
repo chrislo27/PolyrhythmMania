@@ -3,13 +3,13 @@ package polyrhythmmania.editor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
+import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
@@ -31,6 +31,8 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
+import polyrhythmmania.editor.music.EditorMusicData
+import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
@@ -39,7 +41,6 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
-import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -48,9 +49,11 @@ import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.GBATileset
 import polyrhythmmania.world.render.WorldRenderer
+import java.io.File
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.LinkedHashMap
+import kotlin.system.measureNanoTime
 
 
 class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720))
@@ -61,12 +64,11 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         const val TRACK_INPUT_1: String = "input_1"
         const val TRACK_INPUT_2: String = "input_2"
         const val TRACK_VFX_0: String = "vfx_0"
-
-        private val testMusic: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("debugetc/Polyrhythm.ogg"))
     }
 
     private val uiCamera: OrthographicCamera = OrthographicCamera()
-    val frameBuffer: FrameBuffer
+    val previewFrameBuffer: FrameBuffer
+    val waveformWindow: WaveformWindow
 
 
     val world: World = World()
@@ -117,6 +119,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val tempoChanges: Var<List<TempoChange>> = Var(listOf())
     val musicDelay: FloatVar = FloatVar(0f)
     val musicVolumes: Var<List<MusicVolume>> = Var(listOf())
+    val musicData: EditorMusicData = EditorMusicData()
 
     val engineBeat: FloatVar = FloatVar(engine.beat)
 
@@ -127,19 +130,30 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val editorPane: EditorPane
 
     init {
-        frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
+        previewFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
+        waveformWindow = WaveformWindow(this)
         soundSystem.setPaused(true)
         soundSystem.startRealtime()
     }
 
-    init { // TODO remove me. testing music only
-        engine.musicData.beadsMusic = testMusic
-        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)!!
-//        player.loopStartMs = 3725f
-        player.loopEndMs = 40928f //33482f
-        player.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
-        player.prepareStartBuffer()
-    }
+//    init { // TODO remove me. testing music only
+//        this.musicData.setMusic(GdxAudioReader.newMusic(Gdx.files.internal("debugetc/Polyrhythm.ogg")))
+//        engine.musicData.beadsMusic = this.musicData.beadsMusic
+//
+//        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)!!
+////        player.loopStartMs = 3725f
+//        player.loopEndMs = 40928f //33482f
+//        player.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
+//        player.prepareStartBuffer()
+//
+//        // Waveform testing
+//        val waveform = this.musicData.waveform!!
+//        val nano = measureNanoTime {
+//            waveform.generateSummaries()
+//        }
+//        Paintbox.LOGGER.debug("Took ${nano / 1_000_000f} ms to generate waveform summaries")
+////        waveform.generateTestImage(FileHandle(File(System.getProperty("user.home") + "/Desktop/waveform_test.png")))
+//    }
 
     init { // This init block should be LAST
         editorPane = EditorPane(this)
@@ -152,7 +166,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     fun render(delta: Float, batch: SpriteBatch) {
-        val frameBuffer = this.frameBuffer
+        val frameBuffer = this.previewFrameBuffer
         frameBuffer.begin()
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -161,7 +175,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
         batch.projectionMatrix = uiCamera.combined
         batch.begin()
-        
+
         val cameraPan = this.cameraPan
         if (cameraPan != null) {
             cameraPan.update(delta, trackView)
@@ -211,7 +225,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     fun compileEditorIntermediates() {
         resetWorld()
         compileEditorTempos()
-        compileEditorMusicVols()
+        compileEditorMusicInfo()
         compileEditorBlocks()
     }
 
@@ -233,9 +247,17 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         tempos.addTempoChangesBulk(this.tempoChanges.getOrCompute().toList())
     }
 
-    fun compileEditorMusicVols() {
-        engine.musicData.musicDelaySec = this.musicDelay.getOrCompute()
-        val volumeMap = engine.musicData.volumeMap
+    fun compileEditorMusicInfo() {
+        val engineMusicData = engine.musicData
+        engineMusicData.beadsMusic = this.musicData.beadsMusic
+        engineMusicData.musicDelaySec = this.musicDelay.getOrCompute()
+        engineMusicData.loopParams = this.musicData.loopParams.getOrCompute()
+        val player = engine.soundInterface.getCurrentMusicPlayer(engineMusicData.beadsMusic)
+        if (player != null) {
+            player.useLoopParams(engineMusicData.loopParams)
+        }
+        
+        val volumeMap = engineMusicData.volumeMap
         volumeMap.removeMusicVolumesBulk(volumeMap.getAllMusicVolumes())
         volumeMap.addMusicVolumesBulk(this.musicVolumes.getOrCompute().toList())
     }
@@ -305,7 +327,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                         val loopStart = player.loopStartMs
                         val loopEnd = player.loopEndMs
                         val loopDuration = (player.loopEndMs - player.loopStartMs)
-                        
+
                         if (adjustedSecs < loopEnd / 1000) {
                             player.position = (adjustedSecs * 1000) % player.musicSample.lengthMs
                         } else {
@@ -362,7 +384,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     override fun dispose() {
-        frameBuffer.disposeQuietly()
+        previewFrameBuffer.disposeQuietly()
+        waveformWindow.disposeQuietly()
     }
 
     fun addBlock(block: Block) {
@@ -475,6 +498,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val currentClick = click.getOrCompute()
         val state = playState.getOrCompute()
         if (sceneRoot.isContextMenuActive()) return false
+
+        if (sceneRoot.isDialogActive()) return false
         
         when (keycode) {
             Input.Keys.D, Input.Keys.A, Input.Keys.LEFT, Input.Keys.RIGHT -> {
