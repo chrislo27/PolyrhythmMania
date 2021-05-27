@@ -61,18 +61,26 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         }
 
 
-        tmpColor.set(editorPane.palette.trackPlaybackStart.getOrCompute())
         val currentClick = editor.click.getOrCompute()
-        if (currentClick is Click.MoveMarker && currentClick.type == Click.MoveMarker.MarkerType.PLAYBACK) {
+        if (currentClick is Click.MoveMarker) {
+            tmpColor.set(currentClick.type.color)
             batch.setColor(tmpColor.r, tmpColor.g, tmpColor.b, tmpColor.a * 0.25f)
             batch.fillRect(x + trackView.translateBeatToX(currentClick.originalPosition), y - h, lineWidth, h)
         }
-        batch.color = tmpColor
-        val playbackStart = editor.playbackStart.getOrCompute()
-        batch.fillRect(x + trackView.translateBeatToX(playbackStart), y - h, lineWidth, h)
+        
+        editor.markerMap.values.forEach { marker ->
+            tmpColor.set(marker.type.color)
+            batch.color = tmpColor
+            val markerPos = marker.beat.getOrCompute()
+            batch.fillRect(x + trackView.translateBeatToX(markerPos), y - h, lineWidth, h)
+        }
+        
         if (editor.playState.getOrCompute() != PlayState.STOPPED) {
+            val tmpColor2 = ColorStack.getAndPush().set(editorPane.palette.trackPlayback.getOrCompute())
             val pos = editor.engineBeat.getOrCompute()
+            batch.color = tmpColor2
             batch.fillRect(x + trackView.translateBeatToX(pos), y - h, lineWidth, h)
+            ColorStack.pop()
         }
 
         ColorStack.pop()

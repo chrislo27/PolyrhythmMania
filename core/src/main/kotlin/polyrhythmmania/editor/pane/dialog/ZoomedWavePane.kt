@@ -98,19 +98,21 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
 
         val relX = lastMouseRelative.x
         val window = musicDialog.window
-        val durationSec = window.widthSec.getOrCompute()  // window.musicDurationSec.getOrCompute()
+        val durationSec = window.widthSec.getOrCompute()
+        val fullDurationSec = window.musicDurationSec.getOrCompute()
         val windowX = window.x.getOrCompute()
         val centreSec = (relX / this.contentZone.width.getOrCompute()) * durationSec + windowX
 
         if (isLeftClickDown) {
-            val newPos = centreSec.coerceIn(0f, durationSec)
-            when (musicDialog.currentMarker.getOrCompute()) {
-                MusicDialog.MarkerType.FIRST_BEAT -> window.firstBeat.set(newPos)
-                MusicDialog.MarkerType.LOOP_START -> window.loopStart.set(newPos)
-                MusicDialog.MarkerType.LOOP_END -> window.loopEnd.set(newPos)
+            val newPos = centreSec.coerceIn(0f, fullDurationSec)
+            val variable = when (musicDialog.currentMarker.getOrCompute()) {
+                MusicDialog.MarkerType.FIRST_BEAT -> window.firstBeat
+                MusicDialog.MarkerType.LOOP_START -> window.loopStart
+                MusicDialog.MarkerType.LOOP_END -> window.loopEnd
             }
+            variable.set(newPos)
         } else if (isRightClickDown) {
-            window.playbackStart.set(centreSec.coerceIn(0f, window.musicDurationSec.getOrCompute()))
+            window.playbackStart.set(centreSec.coerceIn(0f, fullDurationSec))
         }
     }
 }

@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.pane.track
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -13,11 +14,11 @@ import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.TouchDown
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.control.TextLabel
-import io.github.chrislo27.paintbox.util.gdxutils.fillRect
-import io.github.chrislo27.paintbox.util.gdxutils.scaleMul
+import io.github.chrislo27.paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.PlayState
+import polyrhythmmania.editor.Tool
 import polyrhythmmania.util.DecimalFormats
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -57,14 +58,28 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             var consumed = false
             when (event) {
                 is TouchDown -> {
-                    if (editor.playState.getOrCompute() == PlayState.STOPPED) {
-                        if (event.button == Input.Buttons.RIGHT) {
-                            val lastMouseRelative = Vector2(0f, 0f)
-                            val thisPos = beatMarkerPane.getPosRelativeToRoot(lastMouseRelative)
-                            lastMouseRelative.x = event.x - thisPos.x
-                            lastMouseRelative.y = event.y - thisPos.y
-                            editor.attemptPlaybackStartMove(editor.trackView.translateXToBeat(lastMouseRelative.x))
-                            consumed = true
+                    val currentTool: Tool = editor.tool.getOrCompute()
+                    val control = Gdx.input.isControlDown()
+                    val shift = Gdx.input.isShiftDown()
+                    val alt = Gdx.input.isAltDown()
+
+                    if (editor.playState.getOrCompute() == PlayState.STOPPED && editor.click.getOrCompute() == Click.None) {
+                        if (currentTool == Tool.SELECTION) {
+                            if (event.button == Input.Buttons.RIGHT) {
+                                val lastMouseRelative = Vector2(0f, 0f)
+                                val thisPos = beatMarkerPane.getPosRelativeToRoot(lastMouseRelative)
+                                lastMouseRelative.x = event.x - thisPos.x
+                                lastMouseRelative.y = event.y - thisPos.y
+
+                                if (!shift && !alt) {
+                                    if (control) {
+                                        editor.attemptMusicDelayMove(editor.trackView.translateXToBeat(lastMouseRelative.x))
+                                    } else {
+                                        editor.attemptPlaybackStartMove(editor.trackView.translateXToBeat(lastMouseRelative.x))
+                                    }
+                                    consumed = true
+                                }
+                            }
                         }
                     }
                 }
@@ -101,13 +116,12 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                 batch.fillRect(x + trackView.translateBeatToX(b.toFloat() + 0.5f) - lineWidth / 2f, y - h, lineWidth, h * shortLineProportion)
             }
 
-            // Playback start
-            val tmpColor2 = ColorStack.getAndPush().set(editorPane.palette.trackPlaybackStart.getOrCompute())
-            val playbackStart = editor.playbackStart.getOrCompute()
+            // Markers
             val triangle = AssetRegistry.get<Texture>("ui_triangle_equilateral")
             val triangleSize = 12f
             val currentClick = editor.click.getOrCompute()
-            if (currentClick is Click.MoveMarker && currentClick.type == Click.MoveMarker.MarkerType.PLAYBACK) {
+            if (currentClick is Click.MoveMarker) {
+                val tmpColor2 = ColorStack.getAndPush().set(currentClick.type.color)
                 val playbackStartOld = currentClick.originalPosition
                 val premul = 0.25f * tmpColor2.a
                 batch.setColor(tmpColor2.r * premul, tmpColor2.g * premul, tmpColor2.b * premul, 1f)
@@ -115,21 +129,34 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                 batch.draw(triangle, x + trackView.translateBeatToX(playbackStartOld) - triangleSize / 2 + lineWidth / 2,
                         y, triangleSize, -triangleSize)
             }
-            batch.color = tmpColor2
-            batch.fillRect(x + trackView.translateBeatToX(playbackStart), y - h, lineWidth, h)
-            batch.draw(triangle, x + trackView.translateBeatToX(playbackStart) - triangleSize / 2 + lineWidth / 2,
-                    y, triangleSize, -triangleSize)
-            editorPane.palette.beatMarkerFont.useFont { font ->
-                font.scaleMul(0.75f)
-                font.color = tmpColor2
-                font.draw(batch, Localization.getValue("editor.beatTime", DecimalFormats.format("0.000", playbackStart)),
-                        x + trackView.translateBeatToX(playbackStart) + triangleSize / 2 + 2f,
-                        y - 4f, 0f, Align.left, false)
+
+            val tmpColor2 = ColorStack.getAndPush()
+
+            editor.markerMap.values.forEach { marker ->
+                val playbackStart = marker.beat.getOrCompute()
+                tmpColor2.set(marker.type.color)
+                batch.color = tmpColor2
+                batch.fillRect(x + trackView.translateBeatToX(playbackStart), y - h, lineWidth, h)
+                batch.draw(triangle, x + trackView.translateBeatToX(playbackStart) - triangleSize / 2 + lineWidth / 2,
+                        y, triangleSize, -triangleSize)
+                editorPane.palette.beatMarkerFont.useFont { font ->
+                    font.scaleMul(0.75f)
+                    font.color = tmpColor2
+                    font.draw(batch, Localization.getValue("editor.beatTime", DecimalFormats.format("0.000", playbackStart)),
+                            x + trackView.translateBeatToX(playbackStart) + triangleSize / 2 + 2f,
+                            y - 4f, 0f, Align.left, false)
+                    font.draw(batch, Localization.getValue(marker.type.localizationKey),
+                            x + trackView.translateBeatToX(playbackStart) - triangleSize / 2 - 2f,
+                            y - 4f, 0f, Align.right, false)
+                }
             }
 
             if (editor.playState.getOrCompute() != PlayState.STOPPED) {
                 val pos = editor.engineBeat.getOrCompute()
+                val tmpColor3 = ColorStack.getAndPush().set(editorPane.palette.trackPlayback.getOrCompute())
+                batch.color = tmpColor3
                 batch.fillRect(x + trackView.translateBeatToX(pos), y - h, lineWidth, h)
+                ColorStack.pop()
             }
 
             ColorStack.pop()

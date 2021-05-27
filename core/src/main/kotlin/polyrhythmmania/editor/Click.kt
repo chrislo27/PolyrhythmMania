@@ -200,10 +200,6 @@ sealed class Click {
     class MoveMarker(val editor: Editor, val point: FloatVar, val type: MarkerType)
         : Click() {
 
-        enum class MarkerType {
-            PLAYBACK,
-        }
-
         val originalPosition: Float = point.getOrCompute()
 
         fun didChange(): Boolean = point.getOrCompute() != originalPosition

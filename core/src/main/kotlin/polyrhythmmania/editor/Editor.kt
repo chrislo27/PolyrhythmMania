@@ -3,13 +3,11 @@ package polyrhythmmania.editor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
-import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
@@ -32,7 +30,6 @@ import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.music.EditorMusicData
-import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
@@ -44,16 +41,13 @@ import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
-import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.GBATileset
 import polyrhythmmania.world.render.WorldRenderer
-import java.io.File
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.LinkedHashMap
-import kotlin.system.measureNanoTime
 
 
 class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720))
@@ -112,12 +106,13 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     var cameraPan: CameraPan? = null
 
     // Editor objects and state
-    val playbackStart: FloatVar = FloatVar(0f)
+    val markerMap: Map<MarkerType, Marker> = MarkerType.VALUES.asReversed().associateWith { Marker(it) }
+    val playbackStart: FloatVar = markerMap.getValue(MarkerType.PLAYBACK_START).beat
     val blocks: List<Block> = CopyOnWriteArrayList()
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
     val startingTempo: FloatVar = FloatVar(TempoMap.DEFAULT_STARTING_GLOBAL_TEMPO)
     val tempoChanges: Var<List<TempoChange>> = Var(listOf())
-    val musicDelay: FloatVar = FloatVar(0f)
+    val musicFirstBeat: FloatVar = markerMap.getValue(MarkerType.MUSIC_FIRST_BEAT).beat
     val musicVolumes: Var<List<MusicVolume>> = Var(listOf())
     val musicData: EditorMusicData = EditorMusicData()
 
@@ -250,7 +245,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     fun compileEditorMusicInfo() {
         val engineMusicData = engine.musicData
         engineMusicData.beadsMusic = this.musicData.beadsMusic
-        engineMusicData.musicDelaySec = this.musicDelay.getOrCompute()
+        engineMusicData.musicDelaySec = engine.tempos.beatsToSeconds(this.musicFirstBeat.getOrCompute()) - this.musicData.firstBeat.getOrCompute()
         engineMusicData.loopParams = this.musicData.loopParams.getOrCompute()
         val player = engine.soundInterface.getCurrentMusicPlayer(engineMusicData.beadsMusic)
         if (player != null) {
@@ -289,11 +284,20 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         }
     }
 
-    fun attemptPlaybackStartMove(mouseBeat: Float) {
+    fun attemptMarkerMove(markerType: MarkerType, mouseBeat: Float) {
         if (click.getOrCompute() != Click.None || playState.getOrCompute() != PlayState.STOPPED) return
-        click.set(Click.MoveMarker(this, playbackStart, Click.MoveMarker.MarkerType.PLAYBACK).apply {
+        val marker = this.markerMap.getValue(markerType)
+        click.set(Click.MoveMarker(this, marker.beat, markerType).apply {
             this.onMouseMoved(mouseBeat, 0, 0f)
         })
+    }
+    
+    fun attemptPlaybackStartMove(mouseBeat: Float) {
+        attemptMarkerMove(MarkerType.PLAYBACK_START, mouseBeat)
+    }
+
+    fun attemptMusicDelayMove(mouseBeat: Float) {
+        attemptMarkerMove(MarkerType.MUSIC_FIRST_BEAT, mouseBeat)
     }
 
     fun changeTool(tool: Tool) {
@@ -319,7 +323,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 val delaySec = engine.musicData.musicDelaySec
                 if (newSeconds < delaySec) {
                     // Set player position to be negative
-                    player.position = (newSeconds - delaySec).toDouble()
+                    player.position = (newSeconds - delaySec).toDouble() * 1000.0
                 } else {
                     if (player.loopType == SamplePlayer.LoopType.LOOP_FORWARDS && !player.isLoopInvalid()) {
                         player.prepareStartBuffer()
@@ -451,9 +455,10 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 }
                 is Click.MoveMarker -> {
                     when (currentClick.type) {
-                        Click.MoveMarker.MarkerType.PLAYBACK -> {
+                        MarkerType.PLAYBACK_START ->
                             Localization.getVar("editor.status.movingPlaybackStart").use()
-                        }
+                        MarkerType.MUSIC_FIRST_BEAT ->
+                            Localization.getVar("editor.status.movingMusicFirstBeat").use()
                     }
                 }
                 is Click.MoveTempoChange -> {
@@ -646,7 +651,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 }
                 is Click.MoveMarker -> {
                     when (currentClick.type) {
-                        Click.MoveMarker.MarkerType.PLAYBACK -> {
+                        MarkerType.PLAYBACK_START -> {
                             if (button == Input.Buttons.RIGHT) {
                                 currentClick.complete()
                             }

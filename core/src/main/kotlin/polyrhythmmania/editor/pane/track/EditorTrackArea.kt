@@ -95,10 +95,16 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                                     }
                                 }
                             } else if (event.button == Input.Buttons.RIGHT) {
-                                if (!control && !shift && !alt) {
-                                    if (blockClickedOn == null) {
-                                        editor.attemptPlaybackStartMove(mouseBeat)
-                                    } else {
+                                if (blockClickedOn == null) {
+                                    if (!shift && !alt) {
+                                        if (control) {
+                                            editor.attemptMusicDelayMove(mouseBeat)
+                                        } else {
+                                            editor.attemptPlaybackStartMove(mouseBeat)
+                                        }
+                                    }
+                                } else {
+                                    if (!control && !shift && !alt) {
                                         val ctxMenu = blockClickedOn.createContextMenu()
                                         if (ctxMenu != null) {
                                             editor.attemptOpenBlockContextMenu(blockClickedOn, ctxMenu)
