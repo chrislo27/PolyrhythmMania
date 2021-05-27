@@ -386,6 +386,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     override fun dispose() {
         previewFrameBuffer.disposeQuietly()
         waveformWindow.disposeQuietly()
+
+        soundSystem.setPaused(true)
     }
 
     fun addBlock(block: Block) {

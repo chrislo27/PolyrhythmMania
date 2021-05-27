@@ -181,8 +181,8 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         val rootWidth = this.bounds.width.getOrCompute()
         val rootHeight = this.bounds.height.getOrCompute()
         val rightAlign = (mouseY <= height)
-        bounds.y.set((mouseY - height).coerceIn(0f, rootHeight - height))
-        bounds.x.set((if (rightAlign) (mouseX - width) else mouseX).coerceIn(0f, rootWidth - width))
+        bounds.y.set((mouseY - height).coerceAtMost(rootHeight - height).coerceAtLeast(0f))
+        bounds.x.set((if (rightAlign) (mouseX - width) else mouseX).coerceAtMost(rootWidth - width).coerceAtLeast(0f))
     }
 
     /**

@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.binding.FloatVar
@@ -272,7 +273,10 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
                     this.markup.set(editorPane.palette.markup)
                     this.renderAlign.set(Align.center)
                     this.textAlign.set(TextAlign.CENTRE)
-                    this.bounds.width.set(500f)
+                    this.bounds.width.set(350f)
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("editor.dialog.music.settings.playbackStart.tooltip").use() }).apply {
+                        this.markup.set(editorPane.palette.markup)
+                    })
                 })
             }
         }
@@ -329,13 +333,19 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
                     this.renderAlign.set(Align.right)
                     this.textAlign.set(TextAlign.RIGHT)
                     this.bounds.width.set(200f)
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("editor.dialog.music.settings.heading.marker.tooltip").use() }).apply {
+                        this.markup.set(editorPane.palette.markup)
+                    })
                 })
                 val toggleGroup = ToggleGroup()
                 val radioWidth = 230f
                 hbox.addChild(RadioButton("").apply {
                     val textColor = markerFirstBeat
                     val loc = Localization.getVar("editor.dialog.music.settings.marker.firstBeat", Var {
-                        listOf(convertMsToTimestamp(window.firstBeat.use() * 1000))
+                        listOf(/* intentional space */ " " + convertMsToTimestamp(window.firstBeat.use() * 1000))
+                    })
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("editor.dialog.music.settings.marker.firstBeat.tooltip").use() }).apply {
+                        this.markup.set(editorPane.palette.markup)
                     })
                     this.textLabel.text.bind { loc.use() }
                     this.textLabel.markup.set(editorPane.palette.markup)
@@ -352,7 +362,10 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
                 hbox.addChild(RadioButton("").apply {
                     val textColor = markerLoopStart
                     val loc = Localization.getVar("editor.dialog.music.settings.marker.loopStart", Var {
-                        listOf(convertMsToTimestamp(window.loopStart.use() * 1000))
+                        listOf(/* intentional space */ " " + convertMsToTimestamp(window.loopStart.use() * 1000))
+                    })
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("editor.dialog.music.settings.marker.loopStart.tooltip").use() }).apply {
+                        this.markup.set(editorPane.palette.markup)
                     })
                     this.textLabel.text.bind { loc.use() }
                     this.textLabel.markup.set(editorPane.palette.markup)
@@ -368,7 +381,10 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
                 hbox.addChild(RadioButton("").apply {
                     val textColor = markerLoopEnd
                     val loc = Localization.getVar("editor.dialog.music.settings.marker.loopEnd", Var {
-                        listOf(convertMsToTimestamp(window.loopEnd.use() * 1000))
+                        listOf(/* intentional space */ " " + convertMsToTimestamp(window.loopEnd.use() * 1000))
+                    })
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("editor.dialog.music.settings.marker.loopEnd.tooltip").use() }).apply {
+                        this.markup.set(editorPane.palette.markup)
                     })
                     this.textLabel.text.bind { loc.use() }
                     this.textLabel.markup.set(editorPane.palette.markup)
@@ -410,13 +426,13 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
                         this.markup.set(editorPane.palette.markup)
                     })
                 })
-                hbox.addChild(Button(binding = { Localization.getVar("editor.dialog.music.settings.resetLoopPoints").use() }, font = editorPane.palette.musicDialogFont).apply { 
+                hbox.addChild(Button(binding = { Localization.getVar("editor.dialog.music.settings.resetLoopPoints").use() }, font = editorPane.palette.musicDialogFont).apply {
                     this.applyDialogStyleContent()
                     this.bounds.width.set(250f)
                     this.setOnAction {
                         window.loopEnd.set(window.musicDurationSec.getOrCompute())
                     }
-                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("editor.dialog.music.settings.resetLoopPoints.tooltip").use() }).apply { 
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("editor.dialog.music.settings.resetLoopPoints.tooltip").use() }).apply {
                         this.markup.set(editorPane.palette.markup)
                     })
                 })
@@ -428,6 +444,19 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
                         window.loopEnd.set(0f)
                     }
                     this.tooltipElement.set(Tooltip(binding = { Localization.getVar("editor.dialog.music.settings.setLoopEndToEnd.tooltip").use() }).apply {
+                        this.markup.set(editorPane.palette.markup)
+                    })
+                })
+                hbox.addChild(Button(binding = { Localization.getVar("editor.dialog.music.settings.skipSilence").use() }, font = editorPane.palette.musicDialogFont).apply {
+                    this.applyDialogStyleContent()
+                    this.bounds.width.set(250f)
+                    this.setOnAction {
+                        val estimate = findStartOfNonSilence()
+                        if (estimate >= 0f) {
+                            window.firstBeat.set(estimate)
+                        }
+                    }
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("editor.dialog.music.settings.skipSilence.tooltip").use() }).apply {
                         this.markup.set(editorPane.palette.markup)
                     })
                 })
@@ -665,6 +694,18 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
         return startSec + ((minIndex - windowSize / 2) / sampleRate)
     }
 
+    fun findStartOfNonSilence(): Float {
+        val sample = editor.musicData.beadsMusic?.musicSample ?: return -1f
+        val array = FloatArray(sample.nChannels) { 0f }
+        for (i in 0 until sample.nFrames) {
+            sample.getFrame(i.toInt(), array)
+            if (array.any { !MathUtils.isEqual(it, 0f, 0.0005f) }) {
+                return sample.samplesToMs(i.toDouble()).toFloat() / 1000f
+            }
+        }
+        return -1f
+    }
+
     data class LoadingIndicator(
             val bytesSoFar: Var<Long> = Var(0L),
             val generatingWaveform: Var<Boolean> = Var(false),
@@ -712,7 +753,7 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
                 LoopParams.NO_LOOP_FORWARDS
             else LoopParams(SamplePlayer.LoopType.LOOP_FORWARDS, loopStart.getOrCompute() * 1000.0, loopEnd.getOrCompute() * 1000.0)
         }
-        
+
         fun limitWindow() {
             val dur = musicDurationSec.getOrCompute()
             if (widthSec.getOrCompute() > dur) {
