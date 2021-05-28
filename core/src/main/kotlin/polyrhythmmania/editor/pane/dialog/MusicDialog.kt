@@ -457,7 +457,7 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
 
     private fun attemptCloseDialog() {
         val substate = substate.getOrCompute()
-        if (substate == Substate.LOADING || substate == Substate.LOAD_ERROR || substate == Substate.FILE_DIALOG_OPEN) return
+        if (!(substate == Substate.NO_MUSIC || substate == Substate.HAS_MUSIC)) return
 
         stopMusicPlayback()
 
@@ -514,6 +514,7 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
 
     private fun attemptSelectMusic() {
         val prevSubstate = substate.getOrCompute()
+        if (prevSubstate == Substate.FILE_DIALOG_OPEN) return
         substate.set(Substate.FILE_DIALOG_OPEN)
         val main = editor.main
         editorPane.main.restoreForExternalDialog { completionCallback ->
