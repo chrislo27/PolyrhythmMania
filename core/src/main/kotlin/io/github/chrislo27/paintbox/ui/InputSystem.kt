@@ -190,7 +190,8 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
                 for (element in lastHoveredElementPath.asReversed()) {
                     val eventResult = element.fireEvent(ClickReleased(vec.x, vec.y, button,
                             element === previousClick.accepted?.second,
-                            element in lastHoveredElementPath, element in layer.lastHoveredElementPath)
+                            element in lastHoveredElementPath,
+                            element in layer.lastHoveredElementPath && element.apparentVisibility.getOrCompute())
                     )
                     if (eventResult) {
                         anyClick = true

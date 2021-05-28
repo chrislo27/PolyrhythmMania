@@ -245,7 +245,7 @@ open class UIElement : UIBounds() {
         var yOffset: Float = currentBounds.y.getOrCompute()
         while (current.children.isNotEmpty()) {
             val found = current.children.findLast { child ->
-                child.visible.getOrCompute() && child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
+                child.apparentVisibility.getOrCompute() && child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
             } ?: break
             res += found
             current = found
