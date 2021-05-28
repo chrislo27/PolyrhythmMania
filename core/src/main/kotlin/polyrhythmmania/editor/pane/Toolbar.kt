@@ -2,7 +2,6 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.packing.PackedSheet
@@ -10,17 +9,13 @@ import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.ImageNode
 import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.Tooltip
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.Button
-import io.github.chrislo27.paintbox.ui.control.ButtonSkin
 import io.github.chrislo27.paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
-import polyrhythmmania.editor.pane.dialog.BasicDialog
-import polyrhythmmania.editor.pane.dialog.MusicDialog
 
 
 class Toolbar(val upperPane: UpperPane) : Pane() {
@@ -183,15 +178,15 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         }
 
 
-        val musicControlsPane = HBox().apply {
+        val leftControlPane = HBox().apply {
             Anchor.TopLeft.configure(this)
             this.align.set(HBox.Align.LEFT)
             this.spacing.set(4f)
             this.bounds.width.set((32f + this.spacing.getOrCompute()) * tools.size)
         }
-        mainSection += musicControlsPane
-        musicControlsPane.temporarilyDisableLayouts {
-            musicControlsPane.addChild(Button("").apply {
+        mainSection += leftControlPane
+        leftControlPane.temporarilyDisableLayouts {
+            leftControlPane.addChild(Button("").apply {
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_music"])).apply {
