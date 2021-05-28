@@ -45,6 +45,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("menubar_save", "textures/ui/icon/menubar/save.png"),
                 Packable("menubar_exit", "textures/ui/icon/menubar/exit.png"),
                 Packable("menubar_undo", "textures/ui/icon/menubar/undo.png"),
+                Packable("menubar_undo_white", "textures/ui/icon/menubar/undo_white.png"),
                 Packable("arrow_long", "textures/ui/icon/arrow/arrow_long.png"),
                 Packable("arrow_long_empty", "textures/ui/icon/arrow/arrow_long_empty.png"),
                 Packable("arrow_long_semi", "textures/ui/icon/arrow/arrow_long_semi.png"),

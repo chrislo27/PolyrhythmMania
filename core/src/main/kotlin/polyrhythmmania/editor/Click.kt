@@ -204,13 +204,14 @@ sealed class Click {
 
         fun didChange(): Boolean = point.getOrCompute() != originalPosition
 
-        fun complete() {
+        fun complete(): Boolean {
             if (!didChange()) {
                 abortAction()
-                return
+                return false
             }
             val beatLines = editor.beatLines
             beatLines.active = false
+            return true
         }
 
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {

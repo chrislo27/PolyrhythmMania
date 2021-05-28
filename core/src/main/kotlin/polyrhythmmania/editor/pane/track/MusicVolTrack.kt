@@ -167,7 +167,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                         var futureVol: Int = (originalVol + amt)
                         futureVol = futureVol.coerceIn(MusicVolume.MIN_VOLUME, MusicVolume.MAX_VOLUME)
                         if (futureVol != originalVol) {
-                            val peek = editor.getUndoStack().peekFirst()
+                            val peek = editor.peekAtUndoStack()
                             val newMv = mv.copy(newVolume = futureVol)
                             if (peek != null && peek is ChangeMusicVolumeAction && peek.next === mv) {
                                 peek.undo(editor)

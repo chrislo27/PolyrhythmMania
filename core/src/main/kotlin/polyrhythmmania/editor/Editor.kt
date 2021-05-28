@@ -196,7 +196,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val currentPlayState = playState.getOrCompute()
         if (currentPlayState == PlayState.PLAYING) {
             timing.seconds += delta
-            
+
             val currentEngineBeat = engine.beat
             engineBeat.set(currentEngineBeat)
             val floorBeat = floor(engine.beat).toInt()
@@ -261,7 +261,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         if (player != null) {
             player.useLoopParams(engineMusicData.loopParams)
         }
-        
+
         val volumeMap = engineMusicData.volumeMap
         volumeMap.removeMusicVolumesBulk(volumeMap.getAllMusicVolumes())
         volumeMap.addMusicVolumesBulk(this.musicVolumes.getOrCompute().toList())
@@ -301,13 +301,25 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             this.onMouseMoved(mouseBeat, 0, 0f)
         })
     }
-    
+
     fun attemptPlaybackStartMove(mouseBeat: Float) {
         attemptMarkerMove(MarkerType.PLAYBACK_START, mouseBeat)
     }
 
     fun attemptMusicDelayMove(mouseBeat: Float) {
         attemptMarkerMove(MarkerType.MUSIC_FIRST_BEAT, mouseBeat)
+    }
+
+    fun attemptUndo() {
+        if (canUndo()) {
+            this.undo()
+        }
+    }
+
+    fun attemptRedo() {
+        if (canRedo()) {
+            this.redo()
+        }
     }
 
     fun changeTool(tool: Tool) {
@@ -499,13 +511,13 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         if (sceneRoot.isContextMenuActive()) return false
 
         if (sceneRoot.isDialogActive()) return false
-        
+
         when (keycode) {
             Input.Keys.D, Input.Keys.A, Input.Keys.LEFT, Input.Keys.RIGHT -> {
                 pressedButtons += keycode
                 inputConsumed = true
             }
-            Input.Keys.DEL, Input.Keys.FORWARD_DEL -> {
+            Input.Keys.DEL, Input.Keys.FORWARD_DEL -> { // BACKSPACE or DELETE: Delete selection
                 if (currentClick == Click.None && state == PlayState.STOPPED) {
                     val selected = selectedBlocks.keys.toList()
                     if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
@@ -515,13 +527,13 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     inputConsumed = true
                 }
             }
-            Input.Keys.HOME -> {
+            Input.Keys.HOME -> { // HOME: Jump to beat 0
                 if (currentClick == Click.None && state == PlayState.STOPPED) {
                     cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), 0f)
                     inputConsumed = true
                 }
             }
-            Input.Keys.SPACE -> {
+            Input.Keys.SPACE -> { // SPACE: Play state
                 if (!alt && !ctrl && currentClick == Click.None) {
                     if (state == PlayState.STOPPED) {
                         if (!shift) {
@@ -538,7 +550,25 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     }
                 }
             }
-            in Input.Keys.NUM_0..Input.Keys.NUM_9 -> {
+            Input.Keys.Z -> { // CTRL+Z: Undo // CTRL+SHIFT+Z: Redo
+                if (currentClick == Click.None && state == PlayState.STOPPED) {
+                    if (ctrl && !alt) {
+                        if (shift) {
+                            attemptRedo()
+                        } else {
+                            attemptUndo()
+                        }
+                    }
+                }
+            }
+            Input.Keys.Y -> { // CTRL+Y: Redo
+                if (currentClick == Click.None && state == PlayState.STOPPED) {
+                    if (ctrl && !alt && !shift) {
+                        attemptRedo()
+                    }
+                }
+            }
+            in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
                 if (!ctrl && !alt && !shift && currentClick == Click.None) {
                     val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
                     if (number in 0 until Tool.VALUES.size) {
@@ -553,6 +583,9 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     override fun keyTyped(character: Char): Boolean {
+        if (sceneRoot.isContextMenuActive()) return false
+        if (sceneRoot.isDialogActive()) return false
+        
         var inputConsumed: Boolean = sceneRoot.inputSystem.keyTyped(character)
         if (!inputConsumed) {
 
@@ -643,9 +676,17 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 }
                 is Click.MoveMarker -> {
                     when (currentClick.type) {
-                        MarkerType.PLAYBACK_START -> {
+                        MarkerType.PLAYBACK_START, MarkerType.MUSIC_FIRST_BEAT -> {
                             if (button == Input.Buttons.RIGHT) {
-                                currentClick.complete()
+                                val didChange = currentClick.complete()
+                                if (didChange) {
+                                    val peek = peekAtUndoStack()
+                                    if (peek != null && peek is MoveMarkerAction && peek.marker == currentClick.type) {
+                                        peek.next = currentClick.point.getOrCompute()
+                                    } else {
+                                        this.addActionWithoutMutating(MoveMarkerAction(currentClick.type, currentClick.originalPosition, currentClick.point.getOrCompute()))
+                                    }
+                                }
                             }
                         }
                     }

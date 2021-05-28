@@ -116,7 +116,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                             var futureTempo = originalTempo + amt
                             futureTempo = futureTempo.coerceIn(MIN_TEMPO, MAX_TEMPO)
                             if (futureTempo != originalTempo) {
-                                val peek = editor.getUndoStack().peekFirst()
+                                val peek = editor.peekAtUndoStack()
                                 if (peek is ChangeStartingTempoAction) {
                                     peek.next = futureTempo
                                 } else {
@@ -240,7 +240,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                         var futureTempo = originalTempo + amt
                         futureTempo = futureTempo.coerceIn(MIN_TEMPO, MAX_TEMPO)
                         if (futureTempo != originalTempo) {
-                            val peek = editor.getUndoStack().peekFirst()
+                            val peek = editor.peekAtUndoStack()
                             val newTc = tc.copy(newTempo = futureTempo)
                             if (peek != null && peek is ChangeTempoChangeAction && peek.next === tc) {
                                 peek.undo(editor)

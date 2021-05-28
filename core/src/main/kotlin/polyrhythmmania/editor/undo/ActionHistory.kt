@@ -1,5 +1,7 @@
 package polyrhythmmania.editor.undo
 
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
 import java.util.*
 
 /**
@@ -16,6 +18,9 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
 
     private val undos: Deque<ReversibleAction<SELF>> by lazy { createDeque() }
     private val redos: Deque<ReversibleAction<SELF>> by lazy { createDeque() }
+    
+    val undoStackSize: ReadOnlyVar<Int> = Var(0)
+    val redoStackSize: ReadOnlyVar<Int> = Var(0)
 
     /**
      * Mutate this object, adding the action on the undo stack, and clears all redos.
@@ -34,6 +39,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
         redos.clear()
         undos.push(action)
         ensureCapacity()
+        (undoStackSize as Var).set(undos.size)
+        (redoStackSize as Var).set(redos.size)
     }
 
     fun ensureCapacity() {
@@ -55,6 +62,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
 
         redos.push(action)
         ensureCapacity()
+        (undoStackSize as Var).set(undos.size)
+        (redoStackSize as Var).set(redos.size)
 
         return true
     }
@@ -67,6 +76,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
 
         undos.push(action)
         ensureCapacity()
+        (undoStackSize as Var).set(undos.size)
+        (redoStackSize as Var).set(redos.size)
 
         return true
     }
@@ -78,9 +89,10 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
     fun clear() {
         undos.clear()
         redos.clear()
+        (undoStackSize as Var).set(0)
+        (redoStackSize as Var).set(0)
     }
-
-    fun getUndoStack(): Deque<ReversibleAction<SELF>> = undos
-    fun getRedoStack(): Deque<ReversibleAction<SELF>> = redos
+    
+    fun peekAtUndoStack(): ReversibleAction<SELF>? = undos.peekFirst()
 
 }
