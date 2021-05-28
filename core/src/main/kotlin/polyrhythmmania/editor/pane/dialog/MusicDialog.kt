@@ -94,7 +94,7 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
                 this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
             }
-            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.generic.close")))
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("common.close")))
             this.disabled.bind {
                 val ss = substate.use()
                 !(ss == Substate.NO_MUSIC || ss == Substate.HAS_MUSIC)
@@ -214,7 +214,7 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
             }
         }
         bottomPane.addChild(this.loadMusicErrorBottomPane)
-        this.loadMusicErrorBottomPane.addChild(Button(binding = { Localization.getVar("editor.dialog.music.okButton").use() }, font = editorPane.palette.musicDialogFont).apply {
+        this.loadMusicErrorBottomPane.addChild(Button(binding = { Localization.getVar("common.ok").use() }, font = editorPane.palette.musicDialogFont).apply {
             this.bounds.width.set(250f)
             this.applyDialogStyleBottom()
             this.setOnAction {

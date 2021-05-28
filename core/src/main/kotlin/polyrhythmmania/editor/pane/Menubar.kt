@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chrislo27.paintbox.packing.PackedSheet
 import io.github.chrislo27.paintbox.registry.AssetRegistry
+import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.ImageNode
 import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.area.Insets
@@ -24,6 +25,8 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     val undoButton: Button
     val redoButton: Button
     
+    val exitButton: Button
+    
     init {
         fun separator(): Pane {
             return Pane().apply { 
@@ -38,6 +41,13 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.bounds.width.set((32f + this.spacing.getOrCompute()) * 6)
         }
         this.addChild(leftBox)
+        val rightBox: HBox = HBox().apply {
+            Anchor.TopRight.configure(this)
+            this.spacing.set(4f)
+            this.align.set(HBox.Align.RIGHT)
+            this.bounds.width.set((32f + this.spacing.getOrCompute()) * 3)
+        }
+        this.addChild(rightBox)
         
         ioNew = Button("").apply {
             this.padding.set(Insets.ZERO)
@@ -101,6 +111,17 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             }
         }
         
+        exitButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f)
+            this.skinID.set(EditorSkins.BUTTON)
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_exit"]))
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.exit")))
+            this.setOnAction {
+                editor.attemptExitToTitle()
+            }
+        }
+        
         leftBox.temporarilyDisableLayouts {
             leftBox += ioNew
             leftBox += ioOpen
@@ -108,6 +129,9 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             leftBox += separator()
             leftBox += undoButton
             leftBox += redoButton
+        }
+        rightBox.temporarilyDisableLayouts { 
+            rightBox += exitButton
         }
     }
 }

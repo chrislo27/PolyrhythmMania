@@ -56,6 +56,7 @@ open class Palette(val main: PRManiaGame) {
     val instantiatorNameFont: PaintboxFont = main.fontEditorInstantiatorName
     val instantiatorSummaryFont: PaintboxFont = main.fontEditorInstantiatorSummary
     val instantiatorDescFont: PaintboxFont = main.fontEditorInstantiatorSummary
+    val exitDialogFont: PaintboxFont = main.mainFont
     val musicDialogFont: PaintboxFont = main.mainFont
     val musicDialogFontBold: PaintboxFont = main.mainFontBold
 

@@ -29,6 +29,7 @@ import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.music.EditorMusicData
+import polyrhythmmania.editor.pane.dialog.ExitConfirmDialog
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
@@ -311,14 +312,20 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     fun attemptUndo() {
-        if (canUndo()) {
+        if (canUndo() && click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             this.undo()
         }
     }
 
     fun attemptRedo() {
-        if (canRedo()) {
+        if (canRedo() && click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             this.redo()
+        }
+    }
+
+    fun attemptExitToTitle() {
+        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+            editorPane.openDialog(ExitConfirmDialog(editorPane))
         }
     }
 

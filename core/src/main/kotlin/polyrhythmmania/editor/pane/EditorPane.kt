@@ -104,7 +104,11 @@ class EditorPane(val editor: Editor) : Pane() {
     }
 
     fun closeDialog() {
-        sceneRoot.getOrCompute()?.hideRootDialog()
+        val root = sceneRoot.getOrCompute()
+        if (root != null) {
+            root.hideRootContextMenu()
+            root.hideRootDialog()
+        }
     }
 
     fun openDialog(dialog: DialogPane) {
