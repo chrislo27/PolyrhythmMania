@@ -22,7 +22,6 @@ import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
 import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
 import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
 import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
-import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.pane.EditorPane
@@ -38,6 +37,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
+import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -48,6 +48,7 @@ import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.LinkedHashMap
+import kotlin.math.floor
 
 
 class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720))
@@ -115,6 +116,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     val musicFirstBeat: FloatVar = markerMap.getValue(MarkerType.MUSIC_FIRST_BEAT).beat
     val musicVolumes: Var<List<MusicVolume>> = Var(listOf())
     val musicData: EditorMusicData = EditorMusicData()
+    val metronomeEnabled: Var<Boolean> = Var(false)
+    private var lastMetronomeBeat: Int = -1
 
     val engineBeat: FloatVar = FloatVar(engine.beat)
 
@@ -190,13 +193,20 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val shift = Gdx.input.isShiftDown()
         val delta = Gdx.graphics.deltaTime
 
-        when (playState.getOrCompute()) {
-            PlayState.PLAYING -> {
-                timing.seconds += delta
+        val currentPlayState = playState.getOrCompute()
+        if (currentPlayState == PlayState.PLAYING) {
+            timing.seconds += delta
+            
+            val currentEngineBeat = engine.beat
+            engineBeat.set(currentEngineBeat)
+            val floorBeat = floor(engine.beat).toInt()
+            if (floorBeat > lastMetronomeBeat) {
+                lastMetronomeBeat = floorBeat
+                if (metronomeEnabled.getOrCompute()) {
+                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_cowbell"))
+                }
             }
         }
-
-        engineBeat.set(engine.beat)
 
         click.getOrCompute().renderUpdate()
 
@@ -318,29 +328,11 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.getOrCompute())
             timing.seconds = newSeconds
             engine.musicData.update()
+            val engineBeatFloor = floor(engine.beat)
+            lastMetronomeBeat = if (engineBeatFloor == engine.beat) (engineBeatFloor.toInt() - 1) else engineBeatFloor.toInt()
             val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
             if (player != null) {
-                val delaySec = engine.musicData.musicDelaySec
-                if (newSeconds < delaySec) {
-                    // Set player position to be negative
-                    player.position = (newSeconds - delaySec).toDouble() * 1000.0
-                } else {
-                    if (player.loopType == SamplePlayer.LoopType.LOOP_FORWARDS && !player.isLoopInvalid()) {
-                        player.prepareStartBuffer()
-                        val adjustedSecs = newSeconds - delaySec
-                        val loopStart = player.loopStartMs
-                        val loopEnd = player.loopEndMs
-                        val loopDuration = (player.loopEndMs - player.loopStartMs)
-
-                        if (adjustedSecs < loopEnd / 1000) {
-                            player.position = (adjustedSecs * 1000) % player.musicSample.lengthMs
-                        } else {
-                            player.position = (((adjustedSecs * 1000 - loopStart) % loopDuration + loopStart)) % player.musicSample.lengthMs
-                        }
-                    } else {
-                        player.position = ((newSeconds - delaySec) * 1000) % player.musicSample.lengthMs
-                    }
-                }
+                engine.musicData.setPlayerPositionToCurrentSec()
                 player.pause(false)
             }
         } else if (newState == PlayState.STOPPED) {

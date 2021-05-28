@@ -80,7 +80,7 @@ class EditorPane(val editor: Editor) : Pane() {
         }
         parent += allTracksPane
     }
-    
+
     init {
         musicDialog = MusicDialog(this)
     }
@@ -97,6 +97,10 @@ class EditorPane(val editor: Editor) : Pane() {
 
     fun createDefaultTooltip(str: String): Tooltip {
         return createDefaultTooltip { str }
+    }
+
+    fun styleIndentedButton(button: IndentedButton) {
+        button.indentedButtonBorderColor.bind { palette.toolbarIndentedButtonBorderTint.use() }
     }
 
     fun closeDialog() {

@@ -128,7 +128,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.margin.set(Insets(0f, 0f, 2f, 4f))
         }
         this += mainSection
-        
+
         val tools = Tool.VALUES
         val toolsPane = HBox().apply {
             Anchor.TopRight.configure(this)
@@ -137,35 +137,15 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.bounds.width.set((32f + this.spacing.getOrCompute()) * tools.size)
         }
         mainSection += toolsPane
-        val toolActiveBorder: Insets = Insets(2f)
         toolsPane.temporarilyDisableLayouts {
             tools.forEachIndexed { index, thisTool ->
-                toolsPane.addChild(Button("").apply {
+                toolsPane.addChild(IndentedButton("").apply {
                     this.bounds.width.set(32f)
                     this.skinID.set(EditorSkins.BUTTON)
-                    this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_tool")[thisTool.textureKey])).apply {
-                        this.tint.bind {
-                            val selectedTool = editorPane.editor.tool.use()
-                            if (selectedTool == thisTool) {
-                                editorPane.palette.toolbarIconToolActiveTint.use()
-                            } else {
-                                editorPane.palette.toolbarIconToolNeutralTint.use()
-                            }
-                        }
-                    }
-                    this.borderStyle.set(SolidBorder().apply {
-                        this.color.bind {
-                            editorPane.palette.toolbarIconToolActiveBorderTint.use()
-                        }
-                    })
-                    this.border.bind {
-                        val selectedTool = editorPane.editor.tool.use()
-                        if (selectedTool == thisTool) {
-                            toolActiveBorder
-                        } else {
-                            Insets.ZERO
-                        }
-                    }
+                    this.padding.set(Insets.ZERO)
+                    this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_tool")[thisTool.textureKey]))
+                    editorPane.styleIndentedButton(this)
+                    this.selectedState.bind { editorPane.editor.tool.use() == thisTool }
                     this.setOnAction {
                         editorPane.editor.changeTool(thisTool)
                     }
@@ -201,6 +181,25 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     }
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.music")))
+            })
+            leftControlPane.addChild(IndentedButton("").apply {
+                editorPane.styleIndentedButton(this)
+                this.bounds.width.set(32f)
+                this.skinID.set(EditorSkins.BUTTON)
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.metronome")))
+                this.selectedState.addListener {
+                    editorPane.editor.metronomeEnabled.set(it.getOrCompute())
+                }
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_metronome"])).apply {
+                    this.tint.bind { // TODO remove this
+                        val isActive = selectedState.use()
+                        if (isActive) {
+                            editorPane.palette.toolbarIconToolActiveTint.use()
+                        } else {
+                            editorPane.palette.toolbarIconToolNeutralTint.use()
+                        }
+                    }
+                }
             })
         }
     }
