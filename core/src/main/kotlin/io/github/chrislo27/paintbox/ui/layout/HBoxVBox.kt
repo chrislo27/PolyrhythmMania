@@ -117,13 +117,11 @@ abstract class AbstractHVBox : Pane() {
                 InternalAlignment.MAX -> (thisWidth - totalSize)
             }
             
-            var spacingAcc = 0f
             for (i in 0 until cacheSize) {
                 val d = elementCache[i]
                 val element = d.element
                 val pos = getPositional(element)
-                pos.set(d.previousAccumulation + offset + spacingAcc)
-                spacingAcc += spacingValue
+                pos.set(d.previousAccumulation + offset)
             }
         }
     }
