@@ -41,7 +41,7 @@ class EditorScreen(main: PRManiaGame, val debugMode: Boolean = false) : PRManiaS
         editor.renderUpdate()
 
         // DEBUG resets editor scene
-        if (debugMode && Gdx.input.isKeyJustPressed(Input.Keys.R) && false) {
+        if (debugMode && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             val thisEditorScreen: EditorScreen = this
             Gdx.app.postRunnable { 
                 main.screen = EditorScreen(main, debugMode = true)

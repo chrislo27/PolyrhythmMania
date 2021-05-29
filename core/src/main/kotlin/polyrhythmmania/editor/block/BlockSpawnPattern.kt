@@ -3,6 +3,7 @@ package polyrhythmmania.editor.block
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EntityRowBlock
 import polyrhythmmania.world.EventRowBlockSpawn
@@ -10,7 +11,7 @@ import polyrhythmmania.world.Row
 import java.util.*
 
 
-class BlockSpawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INPUT)) {
+class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INPUT)) {
 
     companion object {
         val ROW_COUNT: Int = 10
@@ -24,7 +25,7 @@ class BlockSpawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INP
     }
 
     init {
-        // FIXME debug, remove later
+        // Default settings.
         patternData.rowATypes[0] = CubeType.PISTON
         patternData.rowATypes[2] = CubeType.PISTON
         patternData.rowATypes[4] = CubeType.PISTON
@@ -37,8 +38,9 @@ class BlockSpawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INP
         val b = this.beat
         val events = mutableListOf<Event>()
 
-        events += compileRow(b, patternData.rowATypes, editor.world.rowA, EntityRowBlock.Type.PISTON_A)
-        events += compileRow(b, patternData.rowDpadTypes, editor.world.rowDpad, EntityRowBlock.Type.PISTON_DPAD)
+        val world = engine.world
+        events += compileRow(b, patternData.rowATypes, world.rowA, EntityRowBlock.Type.PISTON_A)
+        events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityRowBlock.Type.PISTON_DPAD)
 
         return events
     }
@@ -96,7 +98,7 @@ class BlockSpawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INP
             val cube = rowArray[ind]
             if (cube != CubeType.NONE) {
                 anyNotNone = true
-                events += EventRowBlockSpawn(editor.engine, row, ind,
+                events += EventRowBlockSpawn(engine, row, ind,
                         if (cube == CubeType.PLATFORM) EntityRowBlock.Type.PLATFORM else pistonType,
                         beat + b)
             }
@@ -106,21 +108,21 @@ class BlockSpawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INP
                     CubeType.NONE -> {
                         val next = ind + 1
                         if (next < row.length) {
-                            events += EventRowBlockSpawn(editor.engine, row, next, EntityRowBlock.Type.PLATFORM,
+                            events += EventRowBlockSpawn(engine, row, next, EntityRowBlock.Type.PLATFORM,
                                     beat + next * 0.5f, affectThisIndexAndForward = true)
                         }
                     }
                     CubeType.PLATFORM -> {
                         val next = ind + 1
                         if (next < row.length) {
-                            events += EventRowBlockSpawn(editor.engine, row, next, EntityRowBlock.Type.PLATFORM,
+                            events += EventRowBlockSpawn(engine, row, next, EntityRowBlock.Type.PLATFORM,
                                     beat + b, affectThisIndexAndForward = true)
                         }
                     }
                     CubeType.PISTON -> {
                         val next = ind + 2
                         if (next < row.length) {
-                            events += EventRowBlockSpawn(editor.engine, row, next, EntityRowBlock.Type.PLATFORM,
+                            events += EventRowBlockSpawn(engine, row, next, EntityRowBlock.Type.PLATFORM,
                                     beat + next * 0.5f, affectThisIndexAndForward = true)
                         }
                     }
@@ -131,14 +133,14 @@ class BlockSpawnPattern(editor: Editor) : Block(editor, EnumSet.of(BlockType.INP
         return events
     }
 
-    override fun createContextMenu(): ContextMenu {
+    override fun createContextMenu(editor: Editor): ContextMenu {
         return ContextMenu().also { ctxmenu ->
             patternData.createMenuItems(editor).forEach { ctxmenu.addMenuItem(it) }
         }
     }
 
     override fun copy(): BlockSpawnPattern {
-        return BlockSpawnPattern(editor).also {
+        return BlockSpawnPattern(engine).also {
             this.copyBaseInfoTo(it)
             for (i in 0 until ROW_COUNT) {
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]

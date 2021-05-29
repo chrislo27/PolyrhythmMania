@@ -1,11 +1,11 @@
 package polyrhythmmania.editor.block
 
-import polyrhythmmania.editor.Editor
+import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import java.util.*
 
 
-class BlockTest(editor: Editor) : Block(editor, EnumSet.allOf(BlockType::class.java)) {
+class BlockTest(engine: Engine) : Block(engine, EnumSet.allOf(BlockType::class.java)) {
     init {
         this.width = 4f
         this.defaultText.set("test block")
@@ -14,7 +14,7 @@ class BlockTest(editor: Editor) : Block(editor, EnumSet.allOf(BlockType::class.j
     override fun compileIntoEvents(): List<Event> = emptyList()
 
     override fun copy(): BlockTest {
-        return BlockTest(editor).also {
+        return BlockTest(engine).also {
             this.copyBaseInfoTo(it)
         }
     }

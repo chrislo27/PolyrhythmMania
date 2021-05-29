@@ -105,7 +105,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                                     }
                                 } else {
                                     if (!control && !shift && !alt) {
-                                        val ctxMenu = blockClickedOn.createContextMenu()
+                                        val ctxMenu = blockClickedOn.createContextMenu(editor)
                                         if (ctxMenu != null) {
                                             editor.attemptOpenBlockContextMenu(blockClickedOn, ctxMenu)
                                         }
@@ -180,7 +180,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         // Render blocks
         editor.blocks.forEach { block ->
             val track = allTracksPane.editorTrackSides.getOrNull(block.trackIndex)
-            block.render(batch, trackView, this, originX, originY, trackHeight,
+            block.render(editor, batch, trackView, this, originX, originY, trackHeight,
                     track?.sidePanel?.sidebarBgColor?.getOrCompute() ?: Color.WHITE)
         }
 

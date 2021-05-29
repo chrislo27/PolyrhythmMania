@@ -27,26 +27,27 @@ import java.util.*
  * A [Block] has a temporal position, represented by [beat], and a visual non-zero [width]. It also has
  * a [trackIndex] which represents what track index the [Block] sits on.
  */
-abstract class Block(val editor: Editor, blockTypes: EnumSet<BlockType>) {
+abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
 
     var beat: Float = 0f
     var width: Float = 1f
     var trackIndex: Int = 0
     val blockTypes: Set<BlockType> = blockTypes
     protected val defaultText: Var<String> = Var("")
-    protected val defaultTextBlock: Var<TextBlock> = Var.bind {
-        editor.blockMarkup.parse(defaultText.use())
-    }
+    protected var isDefaultTextBlockInitialized: Boolean = false
+    protected lateinit var defaultTextBlock: Var<TextBlock>
     
     var ownedContextMenu: ContextMenu? = null
 
-    open fun render(batch: SpriteBatch, trackView: TrackView, editorTrackArea: EditorTrackArea,
-                    offsetX: Float, offsetY: Float, trackHeight: Float, trackTint: Color) {
-        defaultRender(batch, trackView, editorTrackArea, offsetX, offsetY, trackHeight, trackTint)
-    }
-
-    protected fun defaultRender(batch: SpriteBatch, trackView: TrackView, editorTrackArea: EditorTrackArea,
+    protected fun defaultRender(editor: Editor, batch: SpriteBatch, trackView: TrackView, editorTrackArea: EditorTrackArea,
                                 offsetX: Float, offsetY: Float, trackHeight: Float, trackTint: Color) {
+        if (!isDefaultTextBlockInitialized) {
+            isDefaultTextBlockInitialized = true
+            defaultTextBlock = Var.bind {
+                editor.blockMarkup.parse(defaultText.use())
+            }
+        }
+        
         val lastPackedColor = batch.packedColor
         val renderX = editorTrackArea.beatToRenderX(offsetX, this.beat)
         batch.setColor(trackTint.r, trackTint.g, trackTint.b, 1f)
@@ -99,12 +100,17 @@ abstract class Block(val editor: Editor, blockTypes: EnumSet<BlockType>) {
         
         batch.packedColor = lastPackedColor
     }
+
+    open fun render(editor: Editor, batch: SpriteBatch, trackView: TrackView, editorTrackArea: EditorTrackArea,
+                    offsetX: Float, offsetY: Float, trackHeight: Float, trackTint: Color) {
+        defaultRender(editor, batch, trackView, editorTrackArea, offsetX, offsetY, trackHeight, trackTint)
+    }
     
     abstract fun compileIntoEvents(): List<Event>
 
     abstract fun copy(): Block
     
-    open fun createContextMenu(): ContextMenu? = null
+    open fun createContextMenu(editor: Editor): ContextMenu? = null
 
     protected fun copyBaseInfoTo(target: Block) {
         val from: Block = this

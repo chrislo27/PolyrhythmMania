@@ -296,7 +296,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val currentTool = this.tool.getOrCompute()
         if (currentTool != Tool.SELECTION) return
 
-        val newBlock: Block = instantiator.factory.invoke(instantiator, this)
+        val newBlock: Block = instantiator.factory.invoke(instantiator, engine)
 
         val newClick = Click.DragSelection.create(this, listOf(newBlock), Vector2(0f, 0f), newBlock, true)
         if (newClick != null) {
