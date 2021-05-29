@@ -30,13 +30,14 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.ui.BasicDialog
 import polyrhythmmania.util.DecimalFormats
 import java.io.File
 import kotlin.concurrent.thread
 import kotlin.math.abs
 
 
-class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
+class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     companion object {
         const val WAVEFORM_HEIGHT: Int = 48
@@ -505,7 +506,6 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
             player.position = window.playbackStart.getOrCompute() * 1000.0
-//            player.loopType = SamplePlayer.LoopType.NO_LOOP_FORWARDS
             player.useLoopParams(window.createLoopParams())
             player.pause(false)
             editor.soundSystem.setPaused(false)
@@ -550,11 +550,7 @@ class MusicDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
                             editor.musicData.setMusic(newMusic)
                             editor.musicData.waveform?.generateSummaries()
                             Gdx.app.postRunnable {
-                                window.reset()
-                                window.musicDurationSec.set((newMusic.musicSample.lengthMs / 1000).toFloat())
-                                window.limitWindow()
-                                editor.compileEditorMusicInfo()
-                                editor.waveformWindow.generateOverall()
+                                editor.updateForNewMusicData(newMusic)
                                 substate.set(Substate.HAS_MUSIC)
                             }
                         } catch (e: Exception) {

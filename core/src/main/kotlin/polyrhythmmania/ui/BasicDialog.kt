@@ -1,4 +1,4 @@
-package polyrhythmmania.editor.pane.dialog
+package polyrhythmmania.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
@@ -12,14 +12,13 @@ import io.github.chrislo27.paintbox.ui.control.ButtonSkin
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
 import io.github.chrislo27.paintbox.util.gdxutils.grey
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.ui.DialogPane
 
 
-open class BasicDialog(val editorPane: EditorPane) : DialogPane() {
+open class BasicDialog(val main: PRManiaGame) : DialogPane() {
 
-    val editor: Editor = editorPane.editor
     val titleLabel: TextLabel
     val topPane: Pane
     val contentPane: Pane
@@ -81,7 +80,7 @@ open class BasicDialog(val editorPane: EditorPane) : DialogPane() {
 //        contentPane.addChild(RectElement(Color.GREEN))
 //        bottomPane.addChild(RectElement(Color.BLUE))
 
-        titleLabel = TextLabel("", font = editorPane.main.fontEditorDialogTitle).apply {
+        titleLabel = TextLabel("", font = main.fontEditorDialogTitle).apply {
             this.textAlign.set(TextAlign.LEFT)
             this.renderAlign.set(Align.left)
             this.textColor.set(Color.WHITE)

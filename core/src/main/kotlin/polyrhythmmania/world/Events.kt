@@ -156,3 +156,15 @@ class EventDeployRod(engine: Engine, val row: Row, startBeat: Float) : Event(eng
         engine.world.addEntity(EntityRod(engine.world, this.beat, row))
     }
 }
+
+class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
+    init {
+        this.beat = startBeat
+    }
+
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+        // TODO
+        
+    }
+}

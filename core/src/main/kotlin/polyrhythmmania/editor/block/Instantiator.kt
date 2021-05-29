@@ -31,6 +31,11 @@ object Instantiators {
             tempList += instantiator
         }
 
+        add(Instantiator("endState", Localization.getVar("instantiator.endState.name"),
+                Localization.getVar("instantiator.endState.summary"),
+                Localization.getVar("instantiator.endState.desc")) { editor ->
+            BlockEndState(editor)
+        })
         add(Instantiator("spawnPattern", Localization.getVar("instantiator.spawnPattern.name"),
                 Localization.getVar("instantiator.spawnPattern.summary"),
                 Localization.getVar("instantiator.spawnPattern.desc")) { editor ->
@@ -52,9 +57,9 @@ object Instantiators {
             BlockDespawnPattern(editor)
         })
 
-        add(Instantiator("baselineTest", Var("Baseline Test"), Var("Description baseline test."), Var("[font=prmania_icons]RspladAD[]")) { editor ->
-            BlockTest(editor)
-        })
+//        add(Instantiator("baselineTest", Var("Baseline Test"), Var("Description baseline test."), Var("[font=prmania_icons]RspladAD[]")) { editor ->
+//            BlockTest(editor)
+//        })
 //        (1..19).forEach { i ->
 //            add(Instantiator("test$i", Var("Test$i"), Var(""), Var("[font=prmania_icons]RspladAD[]")) { editor ->
 //                BlockTest(editor)

@@ -10,9 +10,10 @@ import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
+import polyrhythmmania.ui.BasicDialog
 
 
-class ExitConfirmDialog(editorPane: EditorPane) : BasicDialog(editorPane) {
+class ExitConfirmDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     init {
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.exit.title").use() }

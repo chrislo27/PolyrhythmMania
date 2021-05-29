@@ -38,10 +38,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
-import polyrhythmmania.soundsystem.BeadsSound
-import polyrhythmmania.soundsystem.SimpleTimingProvider
-import polyrhythmmania.soundsystem.SoundSystem
-import polyrhythmmania.soundsystem.TimingProvider
+import polyrhythmmania.soundsystem.*
 import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.GBATileset
@@ -184,7 +181,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         }
 
         sceneRoot.renderAsRoot(batch)
-
+        
         batch.end()
     }
 
@@ -280,6 +277,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             }
             row.updateInputIndicators()
         }
+    }
+
+    /**
+     * Should be called on GL thread only. Renders the music waveform for the music dialog and sets up other values.
+     */
+    fun updateForNewMusicData(beadsMusic: BeadsMusic) {
+        val window = editorPane.musicDialog.window
+        window.reset()
+        window.musicDurationSec.set((beadsMusic.musicSample.lengthMs / 1000).toFloat())
+        window.limitWindow()
+        this.compileEditorMusicInfo()
+        this.waveformWindow.generateOverall()
     }
 
     fun attemptInstantiatorDrag(instantiator: Instantiator) {
