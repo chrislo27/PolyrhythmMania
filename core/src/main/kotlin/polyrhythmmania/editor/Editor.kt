@@ -132,6 +132,17 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         soundSystem.startRealtime()
     }
 
+    init {
+        engine.endSignalReceived.addListener {
+            if (it.getOrCompute() && playState.getOrCompute() == PlayState.PLAYING) {
+                changePlayState(PlayState.STOPPED)
+            }
+        }
+        tool.addListener {
+            beatLines.active = false
+        }
+    }
+
 //    init { // TODO remove me. testing music only
 //        this.musicData.setMusic(GdxAudioReader.newMusic(Gdx.files.internal("debugetc/Polyrhythm.ogg")))
 //        engine.musicData.beadsMusic = this.musicData.beadsMusic
@@ -156,9 +167,6 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         sceneRoot += editorPane
         resize()
         bindStatusBar(editorPane.statusBarMsg)
-        tool.addListener {
-            beatLines.active = false
-        }
     }
 
     fun render(delta: Float, batch: SpriteBatch) {
@@ -181,7 +189,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         }
 
         sceneRoot.renderAsRoot(batch)
-        
+
         batch.end()
     }
 
@@ -353,6 +361,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
         if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {
             compileEditorIntermediates()
+            engine.resetEndSignal()
             val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.getOrCompute())
             timing.seconds = newSeconds
             engine.musicData.update()
@@ -601,7 +610,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     override fun keyTyped(character: Char): Boolean {
         if (sceneRoot.isContextMenuActive()) return false
         if (sceneRoot.isDialogActive()) return false
-        
+
         var inputConsumed: Boolean = sceneRoot.inputSystem.keyTyped(character)
         if (!inputConsumed) {
 

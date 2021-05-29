@@ -1,5 +1,6 @@
 package polyrhythmmania.engine
 
+import io.github.chrislo27.paintbox.binding.Var
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -25,6 +26,12 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     
     var deleteEventsAfterCompletion: Boolean = true
     var autoInputs: Boolean = false
+    
+    var endSignalReceived: Var<Boolean> = Var(false)
+    
+    fun resetEndSignal() {
+        endSignalReceived.set(false)
+    }
     
     fun postRunnable(runnable: Runnable) {
         queuedRunnables += runnable

@@ -164,7 +164,8 @@ class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        // TODO
-        
+        engine.postRunnable {
+            engine.endSignalReceived.set(true)
+        }
     }
 }
