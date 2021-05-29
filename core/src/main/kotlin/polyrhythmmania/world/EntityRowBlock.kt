@@ -46,6 +46,7 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
     var active: Boolean = true
     var retractionState: RetractionState = RetractionState.NEUTRAL
         private set
+    private var retractionPercentage: Float = 0f
 
     val collisionHeight: Float
         get() = if (type == Type.PLATFORM || pistonState == PistonState.RETRACTED) 1f else 1.15f
@@ -90,19 +91,23 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
 
     fun spawn(percentage: Float) {
         val clamped = percentage.coerceIn(0f, 1f)
+        if (retractionPercentage > clamped) return
         active = clamped > 0f
         position.y = Interpolation.linear.apply(baseY - 1, baseY, clamped)
         row.updateInputIndicators()
         retractionState = if (clamped <= 0f) RetractionState.NEUTRAL else RetractionState.EXTENDING
+        retractionPercentage = clamped
     }
 
     fun despawn(percentage: Float) {
         val clamped = percentage.coerceIn(0f, 1f)
+        if (retractionPercentage < (1f - clamped)) return
         if (active) {
             active = clamped < 1f
             position.y = Interpolation.linear.apply(baseY, baseY - 1, clamped)
             row.updateInputIndicators()
             retractionState = if (clamped < 1f) RetractionState.NEUTRAL else RetractionState.RETRACTING
+            retractionPercentage = 1f - clamped
         }
     }
 
