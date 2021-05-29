@@ -331,12 +331,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     fun attemptUndo() {
         if (canUndo() && click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             this.undo()
+            forceUpdateStatus.invert()
         }
     }
 
     fun attemptRedo() {
         if (canRedo() && click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             this.redo()
+            forceUpdateStatus.invert()
         }
     }
 
