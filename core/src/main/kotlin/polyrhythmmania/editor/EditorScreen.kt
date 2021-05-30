@@ -3,6 +3,8 @@ package polyrhythmmania.editor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
@@ -22,6 +24,8 @@ class EditorScreen(main: PRManiaGame, val debugMode: Boolean = false) : PRManiaS
     private val sceneRoot: SceneRoot = editor.sceneRoot
     private val processor: InputProcessor = editor
 
+    private var lastWindowListener: Lwjgl3WindowListener? = null
+    
     init {
         editor.resize()
     }
@@ -53,7 +57,7 @@ class EditorScreen(main: PRManiaGame, val debugMode: Boolean = false) : PRManiaS
     }
     
     private fun countChildren(element: UIElement): Int {
-        return 1 + element.children.size + element.children.sumBy { countChildren(it) }
+        return 1 + element.children.size + element.children.sumOf { countChildren(it) }
     }
 
     override fun getDebugString(): String {
@@ -66,11 +70,17 @@ class EditorScreen(main: PRManiaGame, val debugMode: Boolean = false) : PRManiaS
         super.show()
         main.inputMultiplexer.removeProcessor(processor)
         main.inputMultiplexer.addProcessor(processor)
+        
+        // TODO: should the window listener be wrapped since only the filesDropped function is used? Then other listeners can retain their impls
+        val window = (Gdx.graphics as Lwjgl3Graphics).window
+        lastWindowListener = window.windowListener
+        window.windowListener = editor
     }
 
     override fun hide() {
         super.hide()
         main.inputMultiplexer.removeProcessor(processor)
+        (Gdx.graphics as Lwjgl3Graphics).window.windowListener = lastWindowListener
     }
 
     override fun resize(width: Int, height: Int) {
