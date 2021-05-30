@@ -15,10 +15,6 @@ import io.github.chrislo27.paintbox.util.gdxutils.drawRect
  */
 class SceneRoot(width: Float, height: Float) : UIElement() {
     
-    companion object {
-        const val DEFAULT_TOOLTIP_HOVER_TIME: Float = 1f
-    }
-    
     data class MousePosition(val x: FloatVar, val y: FloatVar)
     
     private val mouseVector: Vector2 = Vector2()
@@ -36,7 +32,6 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
      */
     val frameUpdateTrigger: ReadOnlyVar<Boolean> = Var(false)
     
-    val tooltipHoverTime: FloatVar = FloatVar(DEFAULT_TOOLTIP_HOVER_TIME) // TODO use this
     val currentElementWithTooltip: ReadOnlyVar<HasTooltip?> = Var(null)
     private val currentTooltipVar: Var<UIElement?> = Var(null)
     private var currentTooltip: UIElement? = null
@@ -316,6 +311,8 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     
     fun isContextMenuActive(): Boolean = rootContextMenu != null
     fun isDialogActive(): Boolean = rootDialogElement != null
+    fun getCurrentRootContextMenu(): UIElement? = rootContextMenu
+    fun getCurrentRootDialog(): UIElement? = rootDialogElement
     
     private fun updateMouseVector() {
         val vector = mouseVector
