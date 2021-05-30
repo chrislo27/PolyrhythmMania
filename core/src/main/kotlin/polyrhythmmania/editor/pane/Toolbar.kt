@@ -28,6 +28,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
     val pauseButton: Button
     val playButton: Button
     val stopButton: Button
+    
+    val tapalongPane: TapalongPane
 
     init {
         this.border.set(Insets(2f, 2f, 0f, 0f))
@@ -158,13 +160,18 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         }
 
 
+        tapalongPane = TapalongPane(this).apply {
+            this.bounds.width.set(300f)
+        }
         val leftControlPane = HBox().apply {
             Anchor.TopLeft.configure(this)
             this.align.set(HBox.Align.LEFT)
             this.spacing.set(4f)
-            this.bounds.width.set((32f + this.spacing.getOrCompute()) * tools.size)
+            this.bounds.width.set((32f + this.spacing.getOrCompute()) * 3 + tapalongPane.bounds.width.getOrCompute())
         }
         mainSection += leftControlPane
+        
+        
         leftControlPane.temporarilyDisableLayouts {
             leftControlPane.addChild(Button("").apply {
                 this.bounds.width.set(32f)
@@ -201,6 +208,28 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     }
                 }
             })
+            leftControlPane.addChild(IndentedButton("").apply {
+                editorPane.styleIndentedButton(this)
+                this.bounds.width.set(32f)
+                this.skinID.set(EditorSkins.BUTTON)
+                val inactiveTooltip = Localization.getVar("editor.button.tapalong")
+                val activeTooltip = Localization.getVar("editor.button.tapalong.active")
+                this.tooltipElement.set(editorPane.createDefaultTooltip {
+                    if (this@apply.selectedState.use()) activeTooltip.use() else inactiveTooltip.use()
+                })
+                tapalongPane.visible.bind { selectedState.use() }
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tapalong"])).apply {
+                    this.tint.bind { // TODO remove this
+                        val isActive = selectedState.use()
+                        if (isActive) {
+                            editorPane.palette.toolbarIconToolActiveTint.use()
+                        } else {
+                            editorPane.palette.toolbarIconToolNeutralTint.use()
+                        }
+                    }
+                }
+            })
+            leftControlPane.addChild(tapalongPane)
         }
     }
 

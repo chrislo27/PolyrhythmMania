@@ -40,6 +40,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("toolbar_stop_white", "textures/ui/icon/toolbar/stop_white.png"),
                 Packable("toolbar_music", "textures/ui/icon/toolbar/music.png"),
                 Packable("toolbar_metronome", "textures/ui/icon/toolbar/metronome.png"),
+                Packable("toolbar_tapalong", "textures/ui/icon/toolbar/tapalong.png"),
                 Packable("menubar_new", "textures/ui/icon/menubar/new.png"),
                 Packable("menubar_open", "textures/ui/icon/menubar/open.png"),
                 Packable("menubar_save", "textures/ui/icon/menubar/save.png"),

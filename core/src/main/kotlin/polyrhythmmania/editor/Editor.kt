@@ -577,6 +577,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                     }
                 }
             }
+            Input.Keys.T -> {
+                if (!shift && !alt && !ctrl && currentClick == Click.None) {
+                    val tapalongPane = editorPane.toolbar.tapalongPane
+                    if (tapalongPane.apparentVisibility.getOrCompute()) {
+                        tapalongPane.tap()
+                    }
+                }
+            }
             Input.Keys.Z -> { // CTRL+Z: Undo // CTRL+SHIFT+Z: Redo
                 if (currentClick == Click.None && state == PlayState.STOPPED) {
                     if (ctrl && !alt) {
