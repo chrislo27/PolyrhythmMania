@@ -3,6 +3,8 @@ package polyrhythmmania.editor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -17,6 +19,7 @@ import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.ui.SceneRoot
+import io.github.chrislo27.paintbox.ui.UIElement
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
 import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
@@ -27,9 +30,11 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Block
+import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.music.EditorMusicData
 import polyrhythmmania.editor.pane.dialog.ExitConfirmDialog
+import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
@@ -50,7 +55,7 @@ import kotlin.math.floor
 
 
 class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720))
-    : ActionHistory<Editor>(), InputProcessor by sceneRoot.inputSystem, Disposable {
+    : ActionHistory<Editor>(), InputProcessor by sceneRoot.inputSystem, Disposable, Lwjgl3WindowListener {
 
     companion object {
         const val TRACK_INPUT_0: String = "input_0"
@@ -142,25 +147,6 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             beatLines.active = false
         }
     }
-
-//    init { // TODO remove me. testing music only
-//        this.musicData.setMusic(GdxAudioReader.newMusic(Gdx.files.internal("debugetc/Polyrhythm.ogg")))
-//        engine.musicData.beadsMusic = this.musicData.beadsMusic
-//
-//        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)!!
-////        player.loopStartMs = 3725f
-//        player.loopEndMs = 40928f //33482f
-//        player.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
-//        player.prepareStartBuffer()
-//
-//        // Waveform testing
-//        val waveform = this.musicData.waveform!!
-//        val nano = measureNanoTime {
-//            waveform.generateSummaries()
-//        }
-//        Paintbox.LOGGER.debug("Took ${nano / 1_000_000f} ms to generate waveform summaries")
-////        waveform.generateTestImage(FileHandle(File(System.getProperty("user.home") + "/Desktop/waveform_test.png")))
-//    }
 
     init { // This init block should be LAST
         editorPane = EditorPane(this)
@@ -344,7 +330,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
     fun attemptExitToTitle() {
         if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
-            editorPane.openDialog(ExitConfirmDialog(editorPane))
+            editorPane.openDialog(editorPane.exitConfirmDialog)
         }
     }
 
@@ -557,6 +543,17 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             Input.Keys.HOME -> { // HOME: Jump to beat 0
                 if (currentClick == Click.None && state == PlayState.STOPPED) {
                     cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), 0f)
+                    inputConsumed = true
+                }
+            }
+            Input.Keys.END -> { // END: Jump to first BlockEndState OR last block
+                if (currentClick == Click.None && state == PlayState.STOPPED) {
+                    val blocks = this.blocks.sortedBy { it.beat }
+                    if (blocks.isNotEmpty()) {
+                        val firstEndBlock: BlockEndState? = blocks.firstOrNull { it is BlockEndState } as? BlockEndState?
+                        val targetBlock: Block = firstEndBlock ?: blocks.last()
+                        cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), (targetBlock.beat).coerceAtLeast(0f))
+                    }
                     inputConsumed = true
                 }
             }
@@ -777,6 +774,42 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 engine.events: ${engine.events.size}
 ColorStack.numInStack: ${ColorStack.numInStack}
 """
+    }
+    
+    // Lwjgl3WindowListener functions:
+    
+    override fun filesDropped(files: Array<out String>?) {
+        if (files == null || files.isEmpty()) return
+        
+        val currentDialog: UIElement? = sceneRoot.getCurrentRootDialog()
+        when (currentDialog) {
+            is MusicDialog -> {
+                
+            }
+            else -> {}
+        }
+    }
+
+    override fun created(window: Lwjgl3Window?) {
+    }
+
+    override fun iconified(isIconified: Boolean) {
+    }
+
+    override fun maximized(isMaximized: Boolean) {
+    }
+
+    override fun focusLost() {
+    }
+
+    override fun focusGained() {
+    }
+
+    override fun closeRequested(): Boolean {
+        return true
+    }
+    
+    override fun refreshRequested() {
     }
 
     data class BeatLines(var active: Boolean = false, var fromBeat: Int = 0, var toBeat: Int = 0)
