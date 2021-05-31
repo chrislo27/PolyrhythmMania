@@ -152,7 +152,7 @@ open class UIElement : UIBounds() {
         val scissorY = ((originY - y) / rootHeight) * Gdx.graphics.height
         val scissorW = (width / rootWidth) * Gdx.graphics.width
         val scissorH = (height / rootHeight) * Gdx.graphics.height
-        val scissor = Rectangle(scissorX, scissorY - scissorH, scissorW, scissorH)
+        val scissor = RectangleStack.getAndPush().set(scissorX, scissorY - scissorH, scissorW, scissorH)
 
         val pushScissor = ScissorStack.pushScissor(scissor)
         return pushScissor
@@ -164,7 +164,10 @@ open class UIElement : UIBounds() {
     }
 
     fun clipEnd() {
-        ScissorStack.popScissor()
+        val rect = ScissorStack.popScissor()
+        if (rect != null) {
+            RectangleStack.pop()
+        }
     }
 
     fun bindWidthToParent(adjust: Float = 0f) {
