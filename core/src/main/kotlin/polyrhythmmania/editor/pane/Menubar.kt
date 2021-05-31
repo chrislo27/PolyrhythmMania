@@ -63,7 +63,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open"]))
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.open")))
             this.setOnAction {
-                editor.attemptLoad()
+                editor.attemptLoad(null)
             }
         }
         ioSave = Button("").apply {

@@ -43,6 +43,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     companion object {
         const val WAVEFORM_HEIGHT: Int = 48
+        
+        val SUPPORTED_MUSIC_EXTENSIONS: List<String> = listOf("*.ogg", "*.mp3", "*.wav")
     }
 
     enum class Substate {
@@ -188,7 +190,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.bounds.width.set(400f)
             this.applyDialogStyleBottom()
             this.setOnAction {
-                attemptSelectMusic()
+                attemptSelectMusic(null)
             }
         }
         selectMusicButtomPane.addChild(selectMusicButton)
@@ -518,45 +520,57 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
 
-    private fun attemptSelectMusic() {
+    fun attemptSelectMusic(dropPath: String?) {
         val prevSubstate = substate.getOrCompute()
         if (prevSubstate == Substate.FILE_DIALOG_OPEN) return
+        stopMusicPlayback()
         substate.set(Substate.FILE_DIALOG_OPEN)
         val main = editor.main
-        editorPane.main.restoreForExternalDialog { completionCallback ->
+        
+        fun loadFile(file: File) {
+            try {
+                val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
+                Gdx.app.postRunnable {
+                    main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC, newInitialDirectory)
+                    loadingProgress.reset()
+                    window.reset()
+                    substate.set(Substate.LOADING)
+                }
+
+                val tmp: File = TempFileUtils.createTempFile("music", deleteOnExit = true, suffix = ".${file.extension}")
+                file.copyTo(tmp, overwrite = true)
+
+                loadMusic(tmp, true)
+            } catch (e: Exception) {
+                Paintbox.LOGGER.warn("Error occurred while loading music:")
+                e.printStackTrace()
+                Gdx.app.postRunnable {
+                    substate.set(Substate.LOAD_ERROR)
+                    val exClassName = e.javaClass.name
+                    errorLabel.text.set(Localization.getValue("editor.dialog.music.loadError", exClassName))
+                }
+            }
+        }
+        
+        if (dropPath != null) {
             thread(isDaemon = true) {
-                val title = Localization.getValue("fileChooser.musicSelect.title")
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.musicSelect.filter"), listOf("*.ogg", "*.mp3", "*.wav")).copyWithExtensionsInDesc()
-                TinyFDWrapper.openFile(title,
-                        main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC)
-                                ?: main.getDefaultDirectory(), filter) { file: File? ->
-                    completionCallback()
-                    if (file != null) {
-                        try {
-                            val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
+                loadFile(File(dropPath))
+            }
+        } else {
+            editorPane.main.restoreForExternalDialog { completionCallback ->
+                thread(isDaemon = true) {
+                    val title = Localization.getValue("fileChooser.musicSelect.title")
+                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.musicSelect.filter"), SUPPORTED_MUSIC_EXTENSIONS).copyWithExtensionsInDesc()
+                    TinyFDWrapper.openFile(title,
+                            main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC)
+                                    ?: main.getDefaultDirectory(), filter) { file: File? ->
+                        completionCallback()
+                        if (file != null) {
+                            loadFile(file)
+                        } else {
                             Gdx.app.postRunnable {
-                                main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC, newInitialDirectory)
-                                loadingProgress.reset()
-                                window.reset()
-                                substate.set(Substate.LOADING)
+                                substate.set(prevSubstate)
                             }
-
-                            val tmp: File = TempFileUtils.createTempFile("music", deleteOnExit = true, suffix = ".${file.extension}")
-                            file.copyTo(tmp, overwrite = true)
-
-                            loadMusic(tmp, true)
-                        } catch (e: Exception) {
-                            Paintbox.LOGGER.warn("Error occurred while loading music:")
-                            e.printStackTrace()
-                            Gdx.app.postRunnable {
-                                substate.set(Substate.LOAD_ERROR)
-                                val exClassName = e.javaClass.name
-                                errorLabel.text.set(Localization.getValue("editor.dialog.music.loadError", exClassName))
-                            }
-                        }
-                    } else {
-                        Gdx.app.postRunnable {
-                            substate.set(prevSubstate)
                         }
                     }
                 }

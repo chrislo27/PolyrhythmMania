@@ -104,36 +104,38 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
 
-    fun prepareShow(): LoadDialog {
-        descLabel.text.set(Localization.getValue("common.closeFileChooser"))
-        // Open file chooser
-
-        substate.set(Substate.FILE_DIALOG_OPEN)
-        editorPane.main.restoreForExternalDialog { completionCallback ->
-            thread(isDaemon = true) {
-                val title = Localization.getValue("fileChooser.load.title")
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.filter"), listOf("*.${Container.FILE_EXTENSION}")).copyWithExtensionsInDesc()
-                TinyFDWrapper.openFile(title,
-                        main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)
-                                ?: main.getDefaultDirectory(), filter) { file: File? ->
-                    completionCallback()
-                    if (file != null) {
-                        val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
-
-                        Gdx.app.postRunnable {
-                            main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, newInitialDirectory)
-                            load(file)
-                        }
-                    } else {
-                        Gdx.app.postRunnable {
-                            substate.set(Substate.LOADED)
-                            attemptCloseDialog()
+    fun prepareShow(dropPath: String?): LoadDialog {
+        if (dropPath == null) {
+            descLabel.text.set(Localization.getValue("common.closeFileChooser"))
+            substate.set(Substate.FILE_DIALOG_OPEN)
+            editorPane.main.restoreForExternalDialog { completionCallback ->
+                thread(isDaemon = true) {
+                    val title = Localization.getValue("fileChooser.load.title")
+                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.filter"), listOf("*.${Container.FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                    TinyFDWrapper.openFile(title,
+                            main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)
+                                    ?: main.getDefaultDirectory(), filter) { file: File? ->
+                        completionCallback()
+                        if (file != null) {
+                            Gdx.app.postRunnable {
+                                load(file)
+                            }
+                        } else {
+                            Gdx.app.postRunnable {
+                                substate.set(Substate.LOADED)
+                                attemptCloseDialog()
+                            }
                         }
                     }
                 }
             }
+        } else {
+            val file = File(dropPath)
+            Gdx.app.postRunnable {
+                load(file)
+            }
         }
-
+ 
         return this
     }
 
@@ -176,6 +178,9 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     substate.set(Substate.LOADED)
                     descLabel.text.set(Localization.getValue("editor.dialog.load.loaded", loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
                     loaded = LoadData(newEditorScreen, loadMetadata)
+
+                    val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
+                    main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, newInitialDirectory)
                 }
             } catch (e: Exception) {
                 Paintbox.LOGGER.warn("Error occurred while loading container:")

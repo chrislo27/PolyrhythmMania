@@ -99,7 +99,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     Container file format:
       - Compressed zip archive with file extension .prmania
       - /manifest.json
-      - /res
+      - /res/
         - Contains the ExternalResources
      */
 

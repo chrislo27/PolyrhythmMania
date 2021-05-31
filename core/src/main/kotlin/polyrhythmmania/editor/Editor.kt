@@ -338,9 +338,9 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         }
     }
     
-    fun attemptLoad() {
+    fun attemptLoad(dropPath: String?) {
         if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
-            editorPane.openDialog(editorPane.loadDialog.prepareShow())
+            editorPane.openDialog(editorPane.loadDialog.prepareShow(dropPath))
         }
     }
 
@@ -621,7 +621,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
             Input.Keys.O -> { // CTRL+O: Open
                 if (currentClick == Click.None && state == PlayState.STOPPED) {
                     if (ctrl && !shift && !alt) {
-                        attemptLoad()
+                        attemptLoad(null)
                     }
                 }
             }
@@ -806,12 +806,19 @@ engine.events: ${engine.events.size}
     override fun filesDropped(files: Array<out String>?) {
         if (files == null || files.isEmpty()) return
         
+        val firstPath = files.first()
         val currentDialog: UIElement? = sceneRoot.getCurrentRootDialog()
         when (currentDialog) {
             is MusicDialog -> {
-                // TODO pass along to MusicDialog once files are refactored
+                if (MusicDialog.SUPPORTED_MUSIC_EXTENSIONS.any { firstPath.endsWith(it.substring(1)) }) {
+                    currentDialog.attemptSelectMusic(firstPath)
+                }
             }
-            else -> {}
+            else -> {
+                if (firstPath.endsWith(".${Container.FILE_EXTENSION}")) {
+                    attemptLoad(firstPath)
+                }
+            }
         }
     }
 
