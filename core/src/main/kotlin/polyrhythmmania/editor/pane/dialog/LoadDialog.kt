@@ -174,6 +174,8 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         
                         newEditor.updateForNewMusicData()
                     }
+                    
+                    newEditor.editorPane.saveDialog.assignSaveLocation(newFile)
 
                     substate.set(Substate.LOADED)
                     descLabel.text.set(Localization.getValue("editor.dialog.load.loaded", loadMetadata.programVersion, "${loadMetadata.containerVersion}"))

@@ -38,6 +38,8 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     @Volatile
     private var lastSaveLoc: File? = null
+    @Volatile
+    private var firstTime: Boolean = true
 
     init {
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.save.title").use() }
@@ -65,12 +67,16 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
         contentPane.addChild(descLabel)
     }
+    
+    fun assignSaveLocation(file: File) {
+        lastSaveLoc = file
+    }
 
     fun prepareShow(forceSaveAs: Boolean): SaveDialog {
         descLabel.text.set("")
 
         val location: File? = lastSaveLoc
-        if (forceSaveAs || location == null) {
+        if (forceSaveAs || location == null || firstTime) {
             descLabel.text.set(Localization.getValue("common.closeFileChooser"))
             // Open file chooser
 
@@ -121,6 +127,7 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
             editor.container.writeToFile(newFile)
             lastSaveLoc = newFile
+            firstTime = false
 
             Gdx.app.postRunnable {
                 substate.set(Substate.DONE)

@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.pane
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chrislo27.paintbox.packing.PackedSheet
@@ -11,6 +12,9 @@ import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.element.RectElement
 import io.github.chrislo27.paintbox.ui.layout.HBox
+import io.github.chrislo27.paintbox.util.gdxutils.isAltDown
+import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
+import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 
@@ -73,7 +77,10 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_save"]))
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.save")))
             this.setOnAction { 
-                editor.attemptSave(false)
+                val control = Gdx.input.isControlDown()
+                val alt = Gdx.input.isAltDown()
+                val shift = Gdx.input.isShiftDown()
+                editor.attemptSave(forceSaveAs = !control && alt && !shift)
             }
         }
         undoButton = Button("").apply {
