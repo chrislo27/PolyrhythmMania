@@ -20,6 +20,7 @@ import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.element.RectElement
 import io.github.chrislo27.paintbox.util.gdxutils.drawCompressed
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.block.Instantiators
 import kotlin.math.*
@@ -100,14 +101,14 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
     val editorPane: EditorPane = instantiatorPane.editorPane
     val editor: Editor = instantiatorPane.editor
 
-    private val list: List<Instantiator> = Instantiators.list
+    private val list: List<Instantiator<*>> = Instantiators.list
     val buttonPane: Pane
     val listPane: Pane
     val listView: ListView
 
     private var index: Var<Int> = Var(0)
 
-    val currentInstantiator: ReadOnlyVar<Instantiator> = Var.bind {
+    val currentInstantiator: ReadOnlyVar<Instantiator<*>> = Var.bind {
         list[index.use()]
     }
 
@@ -173,7 +174,8 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             when (event) {
                 is ClickPressed -> {
                     if (event.button == Input.Buttons.LEFT) {
-                        editor.attemptInstantiatorDrag(this.currentInstantiator.getOrCompute())
+                        @Suppress("UNCHECKED_CAST")
+                        editor.attemptInstantiatorDrag(this.currentInstantiator.getOrCompute() as Instantiator<Block>)
                         true
                     } else false
                 }

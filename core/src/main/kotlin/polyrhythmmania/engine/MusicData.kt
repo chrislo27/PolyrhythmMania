@@ -1,18 +1,17 @@
 package polyrhythmmania.engine
 
-import io.github.chrislo27.paintbox.binding.Var
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.engine.music.MusicVolMap
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
-import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 
 
 class MusicData(val engine: Engine) {
 
-    var musicDelaySec: Float = 0f
     val volumeMap: MusicVolMap = MusicVolMap()
     var loopParams: LoopParams = LoopParams.NO_LOOP_FORWARDS
+    var firstBeatSec: Float = 0f
+    var musicFirstBeat: Float = 0f
 
     var beadsMusic: BeadsMusic? = null
 
@@ -31,7 +30,7 @@ class MusicData(val engine: Engine) {
         val player = engine.soundInterface.getCurrentMusicPlayer(music)
         if (player != null) {
             val newSeconds = engine.seconds
-            val delaySec = engine.musicData.musicDelaySec
+            val delaySec = engine.musicData.computeMusicDelaySec()
             if (newSeconds < delaySec) {
                 // Set player position to be negative
                 player.position = (newSeconds - delaySec).toDouble() * 1000.0
@@ -53,6 +52,10 @@ class MusicData(val engine: Engine) {
                 }
             }
         }
+    }
+    
+    fun computeMusicDelaySec(): Float {
+        return engine.tempos.beatsToSeconds(this.musicFirstBeat) - this.firstBeatSec
     }
 
 }

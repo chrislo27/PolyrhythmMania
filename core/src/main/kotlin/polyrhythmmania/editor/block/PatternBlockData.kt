@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.block
 
+import com.eclipsesource.json.JsonObject
 import io.github.chrislo27.paintbox.ui.contextmenu.CustomMenuItem
 import io.github.chrislo27.paintbox.ui.contextmenu.LabelMenuItem
 import io.github.chrislo27.paintbox.ui.contextmenu.MenuItem

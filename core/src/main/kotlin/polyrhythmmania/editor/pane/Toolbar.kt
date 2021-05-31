@@ -14,6 +14,7 @@ import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
+import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 
@@ -183,8 +184,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
                 this.setOnAction {
                     Gdx.app.postRunnable {
-                        editorPane.editor.changePlayState(PlayState.STOPPED)
-                        editorPane.openDialog(editorPane.musicDialog.prepareShow())
+                        if (editorPane.editor.click.getOrCompute() == Click.None) {
+                            editorPane.editor.changePlayState(PlayState.STOPPED)
+                            editorPane.openDialog(editorPane.musicDialog.prepareShow())
+                        }
                     }
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.music")))

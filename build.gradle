@@ -50,14 +50,15 @@ allprojects {
 //        implementation "org.asynchttpclient:async-http-client:2.12.1"
 //        implementation "com.sun.activation:javax.activation:1.2.0" // Required for AHC Java 9+
         
-        implementation "com.fasterxml.jackson.module:jackson-module-afterburner:$jackson_version"
-        implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
-        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version"
+//        implementation "com.fasterxml.jackson.module:jackson-module-afterburner:$jackson_version"
+//        implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
+//        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version"
+        implementation "com.eclipsesource.minimal-json:minimal-json:0.9.5"
         
         implementation "com.beust:jcommander:1.80"
         
         implementation "org.slf4j:slf4j-simple:1.7.30"
-        implementation "net.lingala.zip4j:zip4j:2.6.2"
+        implementation "net.lingala.zip4j:zip4j:2.8.0"
         implementation "com.breinify:brein-time-utilities:1.7.0"
         
 //        implementation "de.sciss:jump3r:1.0.5"
@@ -68,12 +69,6 @@ allprojects {
         implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
         implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows-x86"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux-arm64"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux-arm32"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-macos"
         
 //        implementation "org.openjdk.jol:jol-core:0.15"
     }
@@ -93,11 +88,13 @@ project(":desktop") {
 
     dependencies {
         implementation project(":core")
-        
+
         implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows"
         implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows-x86"
-//        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-macos"
         implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux-arm64"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux-arm32"
+        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-macos"
 
         implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"

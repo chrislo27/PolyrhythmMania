@@ -1,5 +1,8 @@
 package polyrhythmmania.editor.block
 
+import com.eclipsesource.json.Json
+import com.eclipsesource.json.JsonArray
+import com.eclipsesource.json.JsonObject
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
@@ -8,6 +11,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EntityRowBlock
 import polyrhythmmania.world.EventRowBlockSpawn
 import polyrhythmmania.world.Row
+import polyrhythmmania.world.World
 import java.util.*
 
 
@@ -17,14 +21,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
         val ROW_COUNT: Int = 10
     }
 
-    val patternData: PatternBlockData = PatternBlockData(ROW_COUNT)
-
-    init {
-        this.width = 4f
-        this.defaultText.bind { Localization.getVar("block.spawnPattern.name").use() }
-    }
-
-    init {
+    var patternData: PatternBlockData = PatternBlockData(ROW_COUNT).also { patternData ->
         // Default settings.
         patternData.rowATypes[0] = CubeType.PISTON
         patternData.rowATypes[2] = CubeType.PISTON
@@ -32,6 +29,12 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
         patternData.rowATypes[6] = CubeType.PISTON
         patternData.rowATypes[8] = CubeType.PLATFORM
         patternData.rowATypes[9] = CubeType.PLATFORM
+    }
+        private set
+
+    init {
+        this.width = 4f
+        this.defaultText.bind { Localization.getVar("block.spawnPattern.name").use() }
     }
 
     override fun compileIntoEvents(): List<Event> {
@@ -73,7 +76,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
                     if (endType != CubeType.PLATFORM) break
                     subindex++
                 }
-                
+
                 when (endType) {
                     CubeType.PISTON -> {
                         for (i in index until subindex) {
@@ -89,7 +92,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
                     }
                 }
             }
-            
+
             index++
         }
 
@@ -102,7 +105,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
                         if (cube == CubeType.PLATFORM) EntityRowBlock.Type.PLATFORM else pistonType,
                         beat + b)
             }
-            
+
             if (ind == timings.size - 1 && anyNotNone) {
                 when (cube) {
                     CubeType.NONE -> {
@@ -145,6 +148,56 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
             for (i in 0 until ROW_COUNT) {
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
+            }
+        }
+    }
+
+    override fun writeToJson(obj: JsonObject) {
+        super.writeToJson(obj)
+        obj.add("patternData", Json.`object`().also { o ->
+            val patData = this.patternData
+            o.add("rowCount", patData.rowCount)
+            o.add("a", Json.array().also { a ->
+                patData.rowATypes.forEach { cubeType ->
+                    a.add(cubeType.jsonId)
+                }
+            })
+            o.add("dpad", Json.array().also { a ->
+                patData.rowDpadTypes.forEach { cubeType ->
+                    a.add(cubeType.jsonId)
+                }
+            })
+        })
+    }
+
+    override fun readFromJson(obj: JsonObject) {
+        super.readFromJson(obj)
+        val patternDataObj = obj.get("patternData")
+        if (patternDataObj != null && patternDataObj.isObject) {
+            patternDataObj as JsonObject
+            val rowCount: Int = patternDataObj.getInt("rowCount", 0)
+            if (rowCount > 0 && rowCount < World.DEFAULT_ROW_LENGTH) {
+                val newPatData = PatternBlockData(rowCount)
+                val a = patternDataObj.get("a")
+                if (a != null && a.isArray) {
+                    a as JsonArray
+                    a.forEachIndexed { index, value ->
+                        if (index < rowCount && value.isNumber) {
+                            newPatData.rowATypes[index] = CubeType.INDEX_MAP[value.asInt()] ?: CubeType.NONE
+                        }
+                    }
+                }
+                val dpad = patternDataObj.get("dpad")
+                if (dpad != null && dpad.isArray) {
+                    dpad as JsonArray
+                    dpad.forEachIndexed { index, value ->
+                        if (index < rowCount && value.isNumber) {
+                            newPatData.rowDpadTypes[index] = CubeType.INDEX_MAP[value.asInt()] ?: CubeType.NONE
+                        }
+                    }
+                }
+
+                this.patternData = newPatData
             }
         }
     }

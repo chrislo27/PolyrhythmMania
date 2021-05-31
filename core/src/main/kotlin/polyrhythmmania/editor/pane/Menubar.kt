@@ -62,6 +62,9 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.skinID.set(EditorSkins.BUTTON)
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open"]))
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.open")))
+            this.setOnAction {
+                editor.attemptLoad()
+            }
         }
         ioSave = Button("").apply {
             this.padding.set(Insets.ZERO)
@@ -69,6 +72,9 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.skinID.set(EditorSkins.BUTTON)
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_save"]))
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.save")))
+            this.setOnAction { 
+                editor.attemptSave(false)
+            }
         }
         undoButton = Button("").apply {
             this.padding.set(Insets.ZERO)

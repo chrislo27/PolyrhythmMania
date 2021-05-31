@@ -117,7 +117,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         val y = originY - thisBounds.y.getOrCompute()
         val w = thisBounds.width.getOrCompute()
         val h = thisBounds.height.getOrCompute()
-        if (onlyVisible && !this.visible.getOrCompute()) return
+        if (onlyVisible && !this.apparentVisibility.getOrCompute()) return
         batch.drawRect(x, y - h, w, h, 1f)
         
         val childOffsetX = originX + this.contentZone.x.getOrCompute()

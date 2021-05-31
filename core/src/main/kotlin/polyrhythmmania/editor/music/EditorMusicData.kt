@@ -2,12 +2,14 @@ package polyrhythmmania.editor.music
 
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.Var
+import polyrhythmmania.container.ExternalResource
+import polyrhythmmania.editor.Editor
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import kotlin.io.path.deleteIfExists
 
 
-class EditorMusicData {
+class EditorMusicData(val editor: Editor) {
     
     var beadsMusic: BeadsMusic? = null
         private set(value) {
@@ -19,16 +21,16 @@ class EditorMusicData {
     var waveform: Waveform? = null
         private set // Set when beadsMusic is set
     var loopParams: Var<LoopParams> = Var(LoopParams.NO_LOOP_FORWARDS)
-    var firstBeat: FloatVar = FloatVar(0f)
+    var firstBeatSec: FloatVar = FloatVar(0f)
     
-    fun setMusic(beadsMusic: BeadsMusic) {
+    fun setMusic(beadsMusic: BeadsMusic, compressedMusicRes: ExternalResource) {
         if (this.beadsMusic != null) {
             removeMusic()
         }
-        // FIXME should this be here?
         loopParams.set(LoopParams.NO_LOOP_FORWARDS)
-        firstBeat.set(0f)
+        firstBeatSec.set(0f)
         this.beadsMusic = beadsMusic
+        editor.container.setCompressedMusic(compressedMusicRes)
     }
     
     fun removeMusic() {
@@ -37,6 +39,7 @@ class EditorMusicData {
             m.musicSample.close()
             m.musicSample.pcmDataFile.deleteIfExists()
             this.beadsMusic = null
+            editor.container.setCompressedMusic(null)
         }
     }
 }

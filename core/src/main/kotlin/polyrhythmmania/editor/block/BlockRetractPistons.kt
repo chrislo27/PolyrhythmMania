@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.block
 
+import com.eclipsesource.json.JsonObject
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
@@ -40,5 +41,15 @@ class BlockRetractPistons(engine: Engine) : Block(engine, EnumSet.of(BlockType.I
             this.copyBaseInfoTo(it)
             it.rowData.rowSetting.set(this.rowData.rowSetting.getOrCompute())
         }
+    }
+
+    override fun writeToJson(obj: JsonObject) {
+        super.writeToJson(obj)
+        rowData.writeToJson(obj)
+    }
+
+    override fun readFromJson(obj: JsonObject) {
+        super.readFromJson(obj)
+        rowData.readFromJson(obj)
     }
 }

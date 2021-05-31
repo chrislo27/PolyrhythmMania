@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.block
 
+import com.eclipsesource.json.JsonObject
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.ui.contextmenu.CustomMenuItem
 import io.github.chrislo27.paintbox.ui.contextmenu.LabelMenuItem
@@ -33,6 +34,14 @@ class RowBlockData(defaultSetting: RowSetting = RowSetting.ONLY_A) {
                     this.rowSetting.set(newSetting)
                 }),
         )
+    }
+    
+    fun writeToJson(obj: JsonObject) {
+        obj.add("rowSetting", rowSetting.getOrCompute().jsonId)
+    }
+
+    fun readFromJson(obj: JsonObject) {
+        rowSetting.set(RowSetting.INDEX_MAP[obj.getInt("rowSetting", 0)] ?: RowSetting.ONLY_A)
     }
 
 }

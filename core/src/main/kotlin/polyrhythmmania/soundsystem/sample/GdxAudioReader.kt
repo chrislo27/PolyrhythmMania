@@ -9,6 +9,7 @@ import net.beadsproject.beads.data.Sample
 import polyrhythmmania.soundsystem.BeadsAudio
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.util.TempFileUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -44,9 +45,7 @@ object GdxAudioReader {
     fun newSound(handle: FileHandle, listener: AudioLoadListener? = null): BeadsSound {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = File.createTempFile("GdxAudioReader-decode", ".tmp").apply {
-            deleteOnExit()
-        }
+        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec", true)
         val bufferSize = 4096 * 4
         // TODO: Can we optimize this by immediately decoding and deinterleaving without writing to a tmp file first?
         val bytesRead = musicToPCMFile(music, tempFile, bufferSize, listener)
@@ -88,9 +87,7 @@ object GdxAudioReader {
     fun newMusic(handle: FileHandle, listener: AudioLoadListener? = null): BeadsMusic {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = File.createTempFile("PRMania-GdxAudioReader-d", ".tmp").apply {
-            deleteOnExit()
-        }
+        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec", true)
         val bytesRead = musicToPCMFile(music, tempFile, listener = listener)
         val musicSample = MusicSample(tempFile.toPath(), music.rate.toFloat(), music.channels)
 

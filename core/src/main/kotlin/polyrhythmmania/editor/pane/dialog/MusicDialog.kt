@@ -26,12 +26,14 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PreferenceKeys
+import polyrhythmmania.container.Container
+import polyrhythmmania.container.ExternalResource
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
-import polyrhythmmania.ui.BasicDialog
 import polyrhythmmania.util.DecimalFormats
+import polyrhythmmania.util.TempFileUtils
 import java.io.File
 import kotlin.concurrent.thread
 import kotlin.math.abs
@@ -124,7 +126,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         contentPane.addChild(fileDialogOpenPane)
 
         // File dialog open
-        fileDialogOpenPane.addChild(TextLabel(binding = { Localization.getVar("editor.dialog.music.closeFileDialog").use() }).apply {
+        fileDialogOpenPane.addChild(TextLabel(binding = { Localization.getVar("common.closeFileChooser").use() }).apply {
             this.markup.set(editorPane.palette.markup)
             this.textColor.set(Color.WHITE.cpy())
             this.renderAlign.set(Align.center)
@@ -209,6 +211,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.align.set(HBox.Align.CENTRE)
             this.spacing.set(16f)
             this.bindWidthToParent { -1 * bounds.height.use() * 3 }
+            this.bindWidthToParent { -200f }
             this.visible.bind {
                 val ss = substate.use()
                 ss == Substate.LOAD_ERROR
@@ -221,6 +224,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.setOnAction {
                 substate.set(Substate.NO_MUSIC)
             }
+            this.tooltipElement.set(editorPane.createDefaultTooltip("Test tooltip."))
         })
     }
 
@@ -463,7 +467,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         stopMusicPlayback()
 
         // Push changes to editor
-        editor.musicData.firstBeat.set(this.window.firstBeat.getOrCompute())
+        editor.musicData.firstBeatSec.set(this.window.firstBeat.getOrCompute())
         editor.musicData.loopParams.set(this.window.createLoopParams())
 
         editorPane.closeDialog()
@@ -477,7 +481,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         load.durationMs.set(currentMusic?.musicSample?.lengthMs?.toFloat() ?: 0f)
 
         // Copy over music details
-        this.window.firstBeat.set(editor.musicData.firstBeat.getOrCompute())
+        this.window.firstBeat.set(editor.musicData.firstBeatSec.getOrCompute())
         val loopParams = editor.musicData.loopParams.getOrCompute()
         if (loopParams == LoopParams.NO_LOOP_FORWARDS) {
             this.window.doLooping.set(false)
@@ -488,6 +492,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.window.loopStart.set((loopParams.startPointMs / 1000).toFloat())
             this.window.loopEnd.set((loopParams.endPointMs / 1000).toFloat())
         }
+
+        stopMusicPlayback()
 
         return this
     }
@@ -519,40 +525,26 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val main = editor.main
         editorPane.main.restoreForExternalDialog { completionCallback ->
             thread(isDaemon = true) {
-                val title = Localization.getValue("fileDialog.musicSelect.title")
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileDialog.musicSelect.filter"), listOf("*.ogg", "*.mp3", "*.wav")).copyWithExtensionsInDesc()
+                val title = Localization.getValue("fileChooser.musicSelect.title")
+                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.musicSelect.filter"), listOf("*.ogg", "*.mp3", "*.wav")).copyWithExtensionsInDesc()
                 TinyFDWrapper.openFile(title,
                         main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC)
                                 ?: main.getDefaultDirectory(), filter) { file: File? ->
                     completionCallback()
                     if (file != null) {
-                        val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
-                        Gdx.app.postRunnable {
-                            main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC, newInitialDirectory)
-                            loadingProgress.reset()
-                            window.reset()
-                            substate.set(Substate.LOADING)
-                        }
-                        editor.musicData.removeMusic()
                         try {
-                            var lastUpdateMs = 0L
-                            val listener = GdxAudioReader.AudioLoadListener { bytesSoFar, _ ->
-                                if ((System.currentTimeMillis() - lastUpdateMs) >= 200L) {
-                                    lastUpdateMs = System.currentTimeMillis()
-                                    loadingProgress.bytesSoFar.set(bytesSoFar)
-                                }
-                            }
-                            val newMusic: BeadsMusic = GdxAudioReader.newMusic(FileHandle(file), listener)
+                            val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
                             Gdx.app.postRunnable {
-                                loadingProgress.generatingWaveform.set(true)
-                                loadingProgress.durationMs.set(newMusic.musicSample.lengthMs.toFloat())
+                                main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC, newInitialDirectory)
+                                loadingProgress.reset()
+                                window.reset()
+                                substate.set(Substate.LOADING)
                             }
-                            editor.musicData.setMusic(newMusic)
-                            editor.musicData.waveform?.generateSummaries()
-                            Gdx.app.postRunnable {
-                                editor.updateForNewMusicData(newMusic)
-                                substate.set(Substate.HAS_MUSIC)
-                            }
+
+                            val tmp: File = TempFileUtils.createTempFile("music", deleteOnExit = true, suffix = ".${file.extension}")
+                            file.copyTo(tmp, overwrite = true)
+
+                            loadMusic(tmp, true)
                         } catch (e: Exception) {
                             Paintbox.LOGGER.warn("Error occurred while loading music:")
                             e.printStackTrace()
@@ -572,12 +564,36 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
 
-    fun convertMsToTimestamp(ms: Float): String {
-        val min = (ms / 60_000).toInt()
-        val sec = (ms / 1000 % 60).toInt()
-        val msPart = (ms % 1000).toInt()
+    private fun loadMusic(compressedFile: File, isFileTemp: Boolean) {
+        editor.musicData.removeMusic()
+        var lastUpdateMs = 0L
+        val listener = GdxAudioReader.AudioLoadListener { bytesSoFar, _ ->
+            if ((System.currentTimeMillis() - lastUpdateMs) >= 200L) {
+                lastUpdateMs = System.currentTimeMillis()
+                loadingProgress.bytesSoFar.set(bytesSoFar)
+            }
+        }
+        val externalRes = ExternalResource(Container.KEY_COMPRESSED_MUSIC, compressedFile, isFileTemp)
+        val newMusic: BeadsMusic = GdxAudioReader.newMusic(FileHandle(compressedFile), listener)
+        Gdx.app.postRunnable {
+            loadingProgress.generatingWaveform.set(true)
+            loadingProgress.durationMs.set(newMusic.musicSample.lengthMs.toFloat())
+        }
+        editor.musicData.setMusic(newMusic, externalRes)
+        editor.musicData.waveform?.generateSummaries()
+        Gdx.app.postRunnable {
+            editor.updateForNewMusicData()
+            substate.set(Substate.HAS_MUSIC)
+        }
+    }
 
-        return "${DecimalFormats.format("00", min)}:${DecimalFormats.format("00", sec)}.${DecimalFormats.format("000", msPart)}"
+    fun convertMsToTimestamp(ms: Float): String {
+        val msAbs = abs(ms)
+        val min = (msAbs / 60_000).toInt()
+        val sec = (msAbs / 1000 % 60).toInt()
+        val msPart = (msAbs % 1000).toInt()
+
+        return "${if (ms < 0) "-" else ""}${DecimalFormats.format("00", min)}:${DecimalFormats.format("00", sec)}.${DecimalFormats.format("000", msPart)}"
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
@@ -592,6 +608,10 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 currentMusicPosition.set(-1f)
             } else {
                 currentMusicPosition.set((player.position / 1000).toFloat())
+            }
+            
+            if (player.position > player.musicSample.lengthMs) {
+                stopMusicPlayback()
             }
 
             if (substate.getOrCompute() == Substate.HAS_MUSIC) {
@@ -727,9 +747,10 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
 
         fun createLoopParams(): LoopParams {
-            return if (!doLooping.getOrCompute())
-                LoopParams.NO_LOOP_FORWARDS
-            else LoopParams(SamplePlayer.LoopType.LOOP_FORWARDS, loopStart.getOrCompute() * 1000.0, loopEnd.getOrCompute() * 1000.0)
+            return LoopParams(if (doLooping.getOrCompute()) 
+                SamplePlayer.LoopType.LOOP_FORWARDS 
+            else SamplePlayer.LoopType.NO_LOOP_FORWARDS, 
+                    loopStart.getOrCompute() * 1000.0, loopEnd.getOrCompute() * 1000.0)
         }
 
         fun limitWindow() {

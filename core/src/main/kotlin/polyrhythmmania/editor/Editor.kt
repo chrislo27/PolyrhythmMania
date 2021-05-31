@@ -17,7 +17,6 @@ import io.github.chrislo27.paintbox.binding.invert
 import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
-import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.ui.SceneRoot
 import io.github.chrislo27.paintbox.ui.UIElement
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
@@ -27,13 +26,13 @@ import io.github.chrislo27.paintbox.util.gdxutils.isControlDown
 import io.github.chrislo27.paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.Container
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.music.EditorMusicData
-import polyrhythmmania.editor.pane.dialog.ExitConfirmDialog
 import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
@@ -46,10 +45,8 @@ import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.soundsystem.*
 import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
-import polyrhythmmania.world.render.GBATileset
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.LinkedHashMap
 import kotlin.math.floor
 
@@ -67,20 +64,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     private val uiCamera: OrthographicCamera = OrthographicCamera()
     val previewFrameBuffer: FrameBuffer
     val waveformWindow: WaveformWindow
+    
 
-
-    val world: World = World()
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()
     val timing: TimingProvider = SimpleTimingProvider {
         Gdx.app.postRunnable { throw it }
         true
     } //soundSystem
-    val engine: Engine = Engine(timing, world, soundSystem).apply {
-        autoInputs = true
-    }
-    val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, GBATileset(AssetRegistry["tileset_gba"]))
-    }
+    val container: Container = Container(this.soundSystem, this.timing)
+    
+    val world: World get() = container.world
+    val engine: Engine get() = container.engine
+    val renderer: WorldRenderer get() = container.renderer
 
 
     // Default markup used for blocks, bold is inverted
@@ -112,13 +107,13 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     // Editor objects and state
     val markerMap: Map<MarkerType, Marker> = MarkerType.VALUES.asReversed().associateWith { Marker(it) }
     val playbackStart: FloatVar = markerMap.getValue(MarkerType.PLAYBACK_START).beat
-    val blocks: List<Block> = CopyOnWriteArrayList()
+    val blocks: List<Block> get() = container.blocks
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
     val startingTempo: FloatVar = FloatVar(TempoMap.DEFAULT_STARTING_GLOBAL_TEMPO)
     val tempoChanges: Var<List<TempoChange>> = Var(listOf())
     val musicFirstBeat: FloatVar = markerMap.getValue(MarkerType.MUSIC_FIRST_BEAT).beat
     val musicVolumes: Var<List<MusicVolume>> = Var(listOf())
-    val musicData: EditorMusicData = EditorMusicData()
+    val musicData: EditorMusicData by lazy { EditorMusicData(this) }
     val metronomeEnabled: Var<Boolean> = Var(false)
     private var lastMetronomeBeat: Int = -1
 
@@ -138,6 +133,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     init {
+        engine.autoInputs = true
         engine.endSignalReceived.addListener {
             if (it.getOrCompute() && playState.getOrCompute() == PlayState.PLAYING) {
                 changePlayState(PlayState.STOPPED)
@@ -247,8 +243,9 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     fun compileEditorMusicInfo() {
         val engineMusicData = engine.musicData
         engineMusicData.beadsMusic = this.musicData.beadsMusic
-        engineMusicData.musicDelaySec = engine.tempos.beatsToSeconds(this.musicFirstBeat.getOrCompute()) - this.musicData.firstBeat.getOrCompute()
         engineMusicData.loopParams = this.musicData.loopParams.getOrCompute()
+        engineMusicData.firstBeatSec = this.musicData.firstBeatSec.getOrCompute()
+        engineMusicData.musicFirstBeat = this.musicFirstBeat.getOrCompute()
         val player = engine.soundInterface.getCurrentMusicPlayer(engineMusicData.beadsMusic)
         if (player != null) {
             player.useLoopParams(engineMusicData.loopParams)
@@ -276,7 +273,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     /**
      * Should be called on GL thread only. Renders the music waveform for the music dialog and sets up other values.
      */
-    fun updateForNewMusicData(beadsMusic: BeadsMusic) {
+    fun updateForNewMusicData() {
+        val beadsMusic: BeadsMusic = musicData.beadsMusic ?: return
         val window = editorPane.musicDialog.window
         window.reset()
         window.musicDurationSec.set((beadsMusic.musicSample.lengthMs / 1000).toFloat())
@@ -285,7 +283,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         this.waveformWindow.generateOverall()
     }
 
-    fun attemptInstantiatorDrag(instantiator: Instantiator) {
+    fun attemptInstantiatorDrag(instantiator: Instantiator<Block>) {
         if (click.getOrCompute() != Click.None || playState.getOrCompute() != PlayState.STOPPED) return
         val currentTool = this.tool.getOrCompute()
         if (currentTool != Tool.SELECTION) return
@@ -331,6 +329,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     fun attemptExitToTitle() {
         if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             editorPane.openDialog(editorPane.exitConfirmDialog)
+        }
+    }
+    
+    fun attemptSave(forceSaveAs: Boolean) {
+        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+            editorPane.openDialog(editorPane.saveDialog.prepareShow(forceSaveAs))
+        }
+    }
+    
+    fun attemptLoad() {
+        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+            editorPane.openDialog(editorPane.loadDialog.prepareShow())
         }
     }
 
@@ -412,24 +422,24 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     }
 
     fun addBlock(block: Block) {
-        this.blocks as MutableList
-        if (block !in this.blocks) {
-            this.blocks.add(block)
+        val blocks = this.blocks as MutableList
+        if (block !in blocks) {
+            blocks.add(block)
         }
     }
 
-    fun addBlocks(blocks: List<Block>) {
-        this.blocks as MutableList
-        blocks.forEach { block ->
-            if (block !in this.blocks) {
-                this.blocks.add(block)
+    fun addBlocks(blocksToAdd: List<Block>) {
+        val blocks = this.blocks as MutableList
+        blocksToAdd.forEach { block ->
+            if (block !in blocks) {
+                blocks.add(block)
             }
         }
     }
 
     fun removeBlock(block: Block) {
-        this.blocks as MutableList
-        this.blocks.remove(block)
+        val blocks = this.blocks as MutableList
+        blocks.remove(block)
         (this.selectedBlocks as MutableMap).remove(block)
         if (block.ownedContextMenu != null) {
             if (sceneRoot.isContextMenuActive())
@@ -438,9 +448,9 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         }
     }
 
-    fun removeBlocks(blocks: List<Block>) {
-        this.blocks as MutableList
-        this.blocks.removeAll(blocks)
+    fun removeBlocks(blocksToAdd: List<Block>) {
+        val blocks = this.blocks as MutableList
+        blocks.removeAll(blocksToAdd)
         this.selectedBlocks as MutableMap
         blocks.forEach { block ->
             this.selectedBlocks.remove(block)
@@ -521,8 +531,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         val shift = Gdx.input.isShiftDown()
         val currentClick = click.getOrCompute()
         val state = playState.getOrCompute()
+        
         if (sceneRoot.isContextMenuActive()) return false
-
         if (sceneRoot.isDialogActive()) return false
 
         when (keycode) {
@@ -597,6 +607,20 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
                 if (currentClick == Click.None && state == PlayState.STOPPED) {
                     if (ctrl && !alt && !shift) {
                         attemptRedo()
+                    }
+                }
+            }
+            Input.Keys.S -> { // CTRL+S: Save // CTRL+ALT+S: Save As
+                if (currentClick == Click.None && state == PlayState.STOPPED) {
+                    if (ctrl && !shift) {
+                        attemptSave(alt)
+                    }
+                }
+            }
+            Input.Keys.O -> { // CTRL+O: Open
+                if (currentClick == Click.None && state == PlayState.STOPPED) {
+                    if (ctrl && !shift && !alt) {
+                        attemptLoad()
                     }
                 }
             }
@@ -772,8 +796,8 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
     fun getDebugString(): String {
         return """Click: ${click.getOrCompute().javaClass.simpleName}
 engine.events: ${engine.events.size}
-ColorStack.numInStack: ${ColorStack.numInStack}
 """
+        //path: ${sceneRoot.dialogLayer.lastHoveredElementPath.map { "${it::class.java.simpleName} [${it.bounds.x.getOrCompute()}, ${it.bounds.y.getOrCompute()}, ${it.bounds.width.getOrCompute()}, ${it.bounds.height.getOrCompute()}]" }}
     }
     
     // Lwjgl3WindowListener functions:
@@ -784,7 +808,7 @@ ColorStack.numInStack: ${ColorStack.numInStack}
         val currentDialog: UIElement? = sceneRoot.getCurrentRootDialog()
         when (currentDialog) {
             is MusicDialog -> {
-                
+                // TODO pass along to MusicDialog once files are refactored
             }
             else -> {}
         }

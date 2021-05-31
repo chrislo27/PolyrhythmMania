@@ -3,6 +3,7 @@ package polyrhythmmania.editor.block
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
+import com.eclipsesource.json.JsonObject
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextBlock
@@ -117,6 +118,18 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
         target.beat = from.beat
         target.width = from.width
         target.trackIndex = from.trackIndex
+    }
+    
+    open fun writeToJson(obj: JsonObject) {
+        obj.add("b", beat)
+        obj.add("w", width)
+        obj.add("t", trackIndex)
+    }
+    
+    open fun readFromJson(obj: JsonObject) {
+        this.beat = obj.getFloat("b", this.beat).coerceAtLeast(0f)
+        this.width = obj.getFloat("w", this.width).coerceAtLeast(0f)
+        this.trackIndex = obj.getInt("t", this.trackIndex).coerceAtLeast(0)
     }
 
 }
