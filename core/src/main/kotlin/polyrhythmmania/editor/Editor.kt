@@ -419,6 +419,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         waveformWindow.disposeQuietly()
 
         soundSystem.setPaused(true)
+        container.disposeQuietly()
     }
 
     fun addBlock(block: Block) {

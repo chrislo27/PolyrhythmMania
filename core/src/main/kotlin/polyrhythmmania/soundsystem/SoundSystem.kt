@@ -27,7 +27,7 @@ class SoundSystem(private val mixer: Mixer,
     companion object {
         val AUDIO_FORMAT_44100: IOAudioFormat = IOAudioFormat(44_100f, 16, 2, 2, true, true)
         val AUDIO_FORMAT_48000: IOAudioFormat = IOAudioFormat(48_000f, 16, 2, 2, true, true)
-        val DEFAULT_AUDIO_FORMAT: IOAudioFormat = AUDIO_FORMAT_44100
+        val DEFAULT_AUDIO_FORMAT: IOAudioFormat = AUDIO_FORMAT_48000
 
         fun createDefaultSoundSystem(ioAudioFormat: IOAudioFormat = DEFAULT_AUDIO_FORMAT,
                                      bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE): SoundSystem {
@@ -184,6 +184,7 @@ class SoundSystem(private val mixer: Mixer,
 //                            nano = System.nanoTime()
                         }
                     }
+//                    Paintbox.LOGGER.debug("End of AdaptiveTimingProvider, dying.")
                 } catch (t: Throwable) {
                     Paintbox.LOGGER.debug("AdaptiveTimingProvider thread encountered an exception")
                     t.printStackTrace()

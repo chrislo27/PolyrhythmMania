@@ -91,10 +91,11 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     val currentScreen = main.screen
                     if (currentScreen is EditorScreen) {
                         Gdx.app.postRunnable {
+                            main.screen = null
                             currentScreen.dispose()
+                            main.screen = newScreen
                         }
                     }
-                    main.screen = newScreen
                 }
             }
         }
