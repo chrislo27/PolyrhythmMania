@@ -86,9 +86,6 @@ class Menubar(val editorPane: EditorPane) : Pane() {
                 this.textureRegion.bind {
                     if (apparentDisabledState.use()) inactive else active
                 }
-                this.tint.bind {
-                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
-                }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.undo")))
             this.disabled.bind { editor.undoStackSize.use() <= 0 }
@@ -106,9 +103,9 @@ class Menubar(val editorPane: EditorPane) : Pane() {
                 this.textureRegion.bind {
                     if (apparentDisabledState.use()) inactive else active
                 }
-                this.tint.bind {
-                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
-                }
+//                this.tint.bind {
+//                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
+//                }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.redo")))
             this.disabled.bind { editor.redoStackSize.use() <= 0 }

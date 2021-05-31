@@ -177,11 +177,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             leftControlPane.addChild(Button("").apply {
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
-                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_music"])).apply {
-                    this.tint.bind {
-                        editorPane.palette.toolbarIconToolNeutralTint.use()
-                    }
-                }
+                this.padding.set(Insets.ZERO)
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_music"]))
                 this.setOnAction {
                     Gdx.app.postRunnable {
                         if (editorPane.editor.click.getOrCompute() == Click.None) {
@@ -196,18 +193,17 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 editorPane.styleIndentedButton(this)
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
+                this.padding.set(Insets.ZERO)
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.metronome")))
                 this.selectedState.addListener {
                     editorPane.editor.metronomeEnabled.set(it.getOrCompute())
                 }
-                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_metronome"])).apply {
-                    this.tint.bind { // TODO remove this
+                val inactive = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_metronome"])
+                val active = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_metronome_active"])
+                this += ImageNode(null).apply {
+                    this.textureRegion.bind {
                         val isActive = selectedState.use()
-                        if (isActive) {
-                            editorPane.palette.toolbarIconToolActiveTint.use()
-                        } else {
-                            editorPane.palette.toolbarIconToolNeutralTint.use()
-                        }
+                        if (isActive) active else inactive
                     }
                 }
             })
@@ -215,22 +211,14 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 editorPane.styleIndentedButton(this)
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
+                this.padding.set(Insets.ZERO)
                 val inactiveTooltip = Localization.getVar("editor.button.tapalong")
                 val activeTooltip = Localization.getVar("editor.button.tapalong.active")
                 this.tooltipElement.set(editorPane.createDefaultTooltip {
                     if (this@apply.selectedState.use()) activeTooltip.use() else inactiveTooltip.use()
                 })
                 tapalongPane.visible.bind { selectedState.use() }
-                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tapalong"])).apply {
-                    this.tint.bind { // TODO remove this
-                        val isActive = selectedState.use()
-                        if (isActive) {
-                            editorPane.palette.toolbarIconToolActiveTint.use()
-                        } else {
-                            editorPane.palette.toolbarIconToolNeutralTint.use()
-                        }
-                    }
-                }
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tapalong"]))
             })
             leftControlPane.addChild(tapalongPane)
         }
