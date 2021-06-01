@@ -336,6 +336,12 @@ class Editor(val main: PRManiaGame)
         }
     }
     
+    fun attemptNewLevel() {
+        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+            editorPane.openDialog(editorPane.newDialog)
+        }
+    }
+    
     fun attemptSave(forceSaveAs: Boolean) {
         if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             editorPane.openDialog(editorPane.saveDialog.prepareShow(forceSaveAs))
@@ -629,6 +635,13 @@ class Editor(val main: PRManiaGame)
                 if (currentClick == Click.None && state == PlayState.STOPPED) {
                     if (ctrl && !shift && !alt) {
                         attemptLoad(null)
+                    }
+                }
+            }
+            Input.Keys.N -> { // CTRL+N: New
+                if (currentClick == Click.None && state == PlayState.STOPPED) {
+                    if (ctrl && !shift && !alt) {
+                        attemptNewLevel()
                     }
                 }
             }
