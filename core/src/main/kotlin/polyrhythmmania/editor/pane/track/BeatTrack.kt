@@ -6,20 +6,25 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.registry.AssetRegistry
+import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.TouchDown
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.control.TextLabel
+import io.github.chrislo27.paintbox.ui.layout.HBox
+import io.github.chrislo27.paintbox.ui.layout.VBox
 import io.github.chrislo27.paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.util.DecimalFormats
+import polyrhythmmania.util.TimeUtils
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -27,6 +32,8 @@ import kotlin.math.floor
 class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, true) {
 
     val timeLabel: TextLabel
+    val secLabel: TextLabel
+    val bpmLabel: TextLabel
     val beatMarkerPane: BeatMarkerPane
 
     init {
@@ -35,9 +42,26 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
         this.bounds.height.set(54f)
         this.showContentBorder.set(true)
 
+        val vbox = VBox().apply { 
+            Anchor.Centre.configure(this)
+            this.spacing.set(0f)
+            this.align.set(VBox.Align.CENTRE)
+        }
+        this.sidePanel.sidebarSection += vbox
+        
         val timeTextVar = Localization.getVar("editor.currentTime", Var.bind {
             listOf(DecimalFormats.format("0.000", editor.engineBeat.use()))
         })
+        val secondsTextVar = Var {
+            editor.engineBeat.use()
+            TimeUtils.convertMsToTimestamp(editor.engine.seconds * 1000)
+        }
+        val bpmVar = FloatVar {
+            editor.engine.tempos.tempoAtBeat(editor.engineBeat.use())
+        }
+        val bpmTextVar = Var {
+            "♩=${DecimalFormats.format("0.0", bpmVar.use())}"
+        }
         timeLabel = TextLabel(binding = {
             timeTextVar.use()
         }, font = editorPane.palette.beatTimeFont).apply {
@@ -46,8 +70,45 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.textColor.bind { editorPane.palette.trackPaneTimeText.use() }
             this.bgPadding.set(0f)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
+            this.bounds.height.set(28f)
         }
-        this.sidePanel.sidebarSection += timeLabel
+        val secondsBox = Pane().apply {
+            this.bounds.height.set(16f)
+        }
+        secLabel = TextLabel(binding = {
+            secondsTextVar.use()
+        }, font = editorPane.palette.beatSecondsFont).apply {
+            Anchor.CentreRight.configure(this)
+            this.textAlign.set(TextAlign.RIGHT)
+            this.renderAlign.set(Align.right)
+            this.textColor.bind { editorPane.palette.trackPaneTimeText.use() }
+            this.bgPadding.set(0f)
+            this.padding.set(Insets(0f, 0f, 4f, 4f))
+            this.bounds.width.bind {
+                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.5f
+            }
+        }
+        secondsBox += secLabel
+        bpmLabel = TextLabel(binding = {
+            bpmTextVar.use()
+        }, font = editorPane.main.fontRodinFixed).apply {
+            Anchor.CentreLeft.configure(this)
+            this.textAlign.set(TextAlign.LEFT)
+            this.renderAlign.set(Align.left)
+            this.textColor.bind { editorPane.palette.trackPaneTimeText.use() }
+            this.bgPadding.set(0f)
+            this.padding.set(Insets(0f, 0f, 4f, 4f))
+            this.bounds.width.bind {
+                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.35f
+            }
+            this.setScaleXY(0.75f)
+        }
+        secondsBox += bpmLabel
+        
+        vbox.temporarilyDisableLayouts { 
+            vbox += timeLabel
+            vbox += secondsBox
+        }
 
         beatMarkerPane = this.BeatMarkerPane()
         this.contentSection += beatMarkerPane

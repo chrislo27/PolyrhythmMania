@@ -34,6 +34,7 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.TempFileUtils
+import polyrhythmmania.util.TimeUtils
 import java.io.File
 import kotlin.concurrent.thread
 import kotlin.math.abs
@@ -601,13 +602,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
 
-    fun convertMsToTimestamp(ms: Float): String {
-        val msAbs = abs(ms)
-        val min = (msAbs / 60_000).toInt()
-        val sec = (msAbs / 1000 % 60).toInt()
-        val msPart = (msAbs % 1000).toInt()
-
-        return "${if (ms < 0) "-" else ""}${DecimalFormats.format("00", min)}:${DecimalFormats.format("00", sec)}.${DecimalFormats.format("000", msPart)}"
+    private fun convertMsToTimestamp(ms: Float): String {
+        return TimeUtils.convertMsToTimestamp(ms)
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {

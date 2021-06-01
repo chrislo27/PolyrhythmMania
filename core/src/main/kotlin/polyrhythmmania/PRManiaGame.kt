@@ -284,14 +284,15 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 },
                 true
         )
-        cache["editor_beat_time"] = PaintboxFontFreeType(
-                PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Medium.ttf"), 1, 1f, false, WindowSize(1280, 720)),
-                makeParam().apply {
-                    hinting = FreeTypeFontGenerator.Hinting.Slight
-                    size = 24
-                    borderWidth = 0f
-                    padTop = 1
-                }).setAfterLoad(defaultAfterLoad)
+        // Effectively the same as "editor_instantiator_summary"
+//        cache["editor_beat_time"] = PaintboxFontFreeType(
+//                PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Medium.ttf"), 1, 1f, false, WindowSize(1280, 720)),
+//                makeParam().apply {
+//                    hinting = FreeTypeFontGenerator.Hinting.Slight
+//                    size = 24
+//                    borderWidth = 0f
+//                }
+//        ).setAfterLoad(defaultAfterLoad)
         cache["editor_beat_track"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Medium.ttf"), 1, 1f, false, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -360,7 +361,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val mainFontBoldItalic: PaintboxFont get() = fontCache["Roboto_BOLD_ITALIC"]
     val mainFontBoldItalicBordered: PaintboxFont get() = fontCache["Roboto_BOLD_ITALIC_BORDERED"]
     val fontIcons: PaintboxFont get() = fontCache["prmania_icons"]
-    val fontEditorBeatTime: PaintboxFont get() = fontCache["editor_beat_time"]
+    val fontEditorBeatTime: PaintboxFont get() = fontCache["editor_instantiator_summary"] // fontCache["editor_beat_time"]
     val fontEditorBeatTrack: PaintboxFont get() = fontCache["editor_beat_track"]
     val fontEditorInstantiatorName: PaintboxFont get() = fontCache["editor_instantiator"]
     val fontEditorInstantiatorSummary: PaintboxFont get() = fontCache["editor_instantiator_summary"]
