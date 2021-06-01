@@ -399,6 +399,9 @@ class Editor(val main: PRManiaGame)
             block.ownedContextMenu = null
         }
         root.showRootContextMenu(contextMenu)
+        editorPane.enqueueAnimation(contextMenu.opacity, 0f, 1f).apply {
+            onStart = { contextMenu.visible.set(true) }
+        }
     }
 
     fun resize() {
