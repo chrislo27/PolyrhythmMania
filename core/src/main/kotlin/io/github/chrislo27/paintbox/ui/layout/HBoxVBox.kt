@@ -1,6 +1,7 @@
 package io.github.chrislo27.paintbox.ui.layout
 
 import io.github.chrislo27.paintbox.binding.FloatVar
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.binding.VarChangedListener
 import io.github.chrislo27.paintbox.ui.Pane
@@ -64,6 +65,11 @@ abstract class AbstractHVBox : Pane() {
     }
 
     /**
+     * Returns either the width or height var for this box from [contentZone].
+     */
+    protected abstract fun getThisDimensional(): ReadOnlyVar<Float>
+    
+    /**
      * Returns either the width or height var for an element.
      */
     protected abstract fun getDimensional(element: UIElement): FloatVar
@@ -110,11 +116,11 @@ abstract class AbstractHVBox : Pane() {
         val align = this.internalAlignment.getOrCompute()
         if (align != InternalAlignment.MIN) {
             val totalSize = cache.last().currentAccumulation
-            val thisWidth = this.contentZone.width.getOrCompute()
+            val thisSize = getThisDimensional().getOrCompute()
             val offset: Float = when (align) {
                 InternalAlignment.MIN -> 0f // Not a possible branch
-                InternalAlignment.MIDDLE -> (thisWidth - totalSize) / 2f
-                InternalAlignment.MAX -> (thisWidth - totalSize)
+                InternalAlignment.MIDDLE -> (thisSize - totalSize) / 2f
+                InternalAlignment.MAX -> (thisSize - totalSize)
             }
             
             for (i in 0 until cacheSize) {
@@ -185,6 +191,10 @@ open class HBox : AbstractHVBox() {
     override fun getPositional(element: UIElement): FloatVar {
         return element.bounds.x
     }
+
+    override fun getThisDimensional(): ReadOnlyVar<Float> {
+        return this.contentZone.width
+    }
 }
 
 /**
@@ -214,5 +224,9 @@ open class VBox : AbstractHVBox() {
 
     override fun getPositional(element: UIElement): FloatVar {
         return element.bounds.y
+    }
+
+    override fun getThisDimensional(): ReadOnlyVar<Float> {
+        return this.contentZone.height
     }
 }
