@@ -28,7 +28,7 @@ import polyrhythmmania.util.DecimalFormats
 internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : PaintboxScreen() {
 
     private val camera: OrthographicCamera = OrthographicCamera()
-    private var root: SceneRoot = SceneRoot(Gdx.graphics.width, Gdx.graphics.height)
+    private var root: SceneRoot = SceneRoot(camera)
         private set(value) {
             main.inputMultiplexer.removeProcessor(field.inputSystem)
             field = value
@@ -40,7 +40,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
     }
 
     private fun populate() {
-        root = SceneRoot(Gdx.graphics.width, Gdx.graphics.height)
+        root = SceneRoot(camera)
         val bg = TestColorElement(Color(1f, 165f / 255f, 0.5f, 1f))
         root += bg
 
@@ -340,7 +340,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
         super.resize(width, height)
         camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         camera.update()
-        root.resize(camera)
+        root.resize()
     }
 
     override fun show() {

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
 import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.binding.*
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
@@ -13,10 +14,11 @@ import io.github.chrislo27.paintbox.util.gdxutils.drawRect
 /**
  * The [SceneRoot] element has the position 0, 0 and always has the width and height of the UI screen space.
  */
-class SceneRoot(width: Float, height: Float) : UIElement() {
+class SceneRoot(val camera: OrthographicCamera) : UIElement() {
     
     data class MousePosition(val x: FloatVar, val y: FloatVar)
     
+    private val tmpVec3: Vector3 = Vector3()
     private val mouseVector: Vector2 = Vector2()
     val mousePosition: MousePosition = MousePosition(FloatVar(0f), FloatVar(0f))
     val mainLayer: Layer = Layer("main", enableTooltips = true, exclusiveTooltipAccess = false, rootElement = this)
@@ -39,10 +41,11 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
     private var rootContextMenu: ContextMenu? = null
     private var rootDialogElement: UIElement? = null
     
-    constructor(width: Int, height: Int) : this(width.toFloat(), height.toFloat())
-    
     init {
         (sceneRoot as Var).set(this)
+        
+        val width = camera.viewportWidth
+        val height = camera.viewportHeight
         updateAllLayerBounds(width, height)
         currentTooltipVar.addListener { v ->
             val layer = tooltipLayer
@@ -72,7 +75,7 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
             inputConsumed
         }
         
-        dialogLayer.root.addInputEventListener { event ->
+        dialogLayer.root.addInputEventListener { _ ->
             rootDialogElement != null // Dialog layer eats all input when active
         }
     }
@@ -159,10 +162,11 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
         updateAllLayerBounds(width, height, posX, posY)
     }
     
-    fun resize(camera: OrthographicCamera) {
+    fun resize() {
+        val camera = this.camera
         resize(camera.viewportWidth, camera.viewportHeight,
-               camera.position.x - (camera.zoom * camera.viewportWidth / 2.0f),
-               camera.position.y - (camera.zoom * camera.viewportHeight / 2.0f))
+                camera.position.x - (camera.zoom * camera.viewportWidth / 2.0f),
+                camera.position.y - (camera.zoom * camera.viewportHeight / 2.0f))
     }
     
     private fun updateTooltipPosition(tooltip: UIElement? = currentTooltip) {
@@ -328,20 +332,10 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
      * @return The mutated [vector]
      */
     fun screenToUI(vector: Vector2): Vector2 {
-        val screenWidth = Gdx.graphics.width
-        val screenHeight = Gdx.graphics.height
-        val boundsX = bounds.x.getOrCompute()
-        val boundsY = bounds.y.getOrCompute()
-        val boundsWidth = bounds.width.getOrCompute()
-        val boundsHeight = bounds.height.getOrCompute()
-        
-        vector.x /= screenWidth
-        vector.y /= screenHeight
-        vector.x *= boundsWidth
-        vector.y *= boundsHeight
-        vector.x -= boundsX
-        vector.y -= boundsY
-        
+        tmpVec3.set(vector, 0f)
+        camera.unproject(tmpVec3)
+        vector.x = tmpVec3.x
+        vector.y = camera.viewportHeight - tmpVec3.y
         return vector
     }
 
@@ -352,20 +346,10 @@ class SceneRoot(width: Float, height: Float) : UIElement() {
      * @return The mutated [vector]
      */
     fun uiToScreen(vector: Vector2): Vector2 {
-        val screenWidth = Gdx.graphics.width
-        val screenHeight = Gdx.graphics.height
-        val boundsX = bounds.x.getOrCompute()
-        val boundsY = bounds.y.getOrCompute()
-        val boundsWidth = bounds.width.getOrCompute()
-        val boundsHeight = bounds.height.getOrCompute()
-
-        vector.x += boundsX
-        vector.y += boundsY
-        vector.x /= boundsWidth
-        vector.y /= boundsHeight
-        vector.x *= screenWidth
-        vector.y *= screenHeight
-
+        tmpVec3.set(vector, 0f)
+        camera.project(tmpVec3)
+        vector.x = tmpVec3.x
+        vector.y = camera.viewportHeight - tmpVec3.y
         return vector
     }
     

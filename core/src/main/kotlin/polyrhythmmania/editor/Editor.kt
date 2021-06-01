@@ -51,8 +51,8 @@ import kotlin.collections.LinkedHashMap
 import kotlin.math.floor
 
 
-class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 720))
-    : ActionHistory<Editor>(), InputProcessor by sceneRoot.inputSystem, Disposable, Lwjgl3WindowListener {
+class Editor(val main: PRManiaGame)
+    : ActionHistory<Editor>(), InputProcessor, Disposable, Lwjgl3WindowListener {
 
     companion object {
         const val TRACK_INPUT_0: String = "input_0"
@@ -61,10 +61,14 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         const val TRACK_VFX_0: String = "vfx_0"
     }
 
-    private val uiCamera: OrthographicCamera = OrthographicCamera()
+    private val uiCamera: OrthographicCamera = OrthographicCamera().apply { 
+        this.setToOrtho(false, 1280f, 720f)
+        this.update()
+    }
     val previewFrameBuffer: FrameBuffer
     val waveformWindow: WaveformWindow
     
+    val sceneRoot: SceneRoot = SceneRoot(uiCamera)
 
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()
     val timing: TimingProvider = SimpleTimingProvider {
@@ -411,7 +415,7 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
 
         uiCamera.setToOrtho(false, width, height)
         uiCamera.update()
-        sceneRoot.resize(uiCamera)
+        sceneRoot.resize()
     }
 
     override fun dispose() {
@@ -792,6 +796,18 @@ class Editor(val main: PRManiaGame, val sceneRoot: SceneRoot = SceneRoot(1280, 7
         }
 
         return inputConsumed || sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer)
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return sceneRoot.inputSystem.touchDown(screenX, screenY, pointer, button)
+    }
+
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        return sceneRoot.inputSystem.mouseMoved(screenX, screenY)
+    }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        return sceneRoot.inputSystem.scrolled(amountX, amountY)
     }
 
     fun getDebugString(): String {

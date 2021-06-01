@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import io.github.chrislo27.paintbox.PaintboxGame
@@ -45,7 +46,11 @@ internal class ScaledFontTestGame(paintboxSettings: PaintboxSettings)
 
 internal class UIAnchorTestNestedScreen(override val main: NewUITestGame) : PaintboxScreen() {
 
-    val root: SceneRoot = SceneRoot(Gdx.graphics.width, Gdx.graphics.height)
+    val camera = OrthographicCamera().apply { 
+        this.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        this.update()
+    }
+    val root: SceneRoot = SceneRoot(camera)
     val firstEle: UIElement = TestColorElement(Color.CHARTREUSE)
     val secondEle: UIElement = TestColorElement(Color.PURPLE)
     val thirdEle: UIElement = TestColorElement(Color.CYAN)

@@ -14,14 +14,14 @@ import io.github.chrislo27.paintbox.util.MathHelper
 internal class UIEventTestScreen(override val main: NewUITestGame) : PaintboxScreen() {
 
     private val camera: OrthographicCamera = OrthographicCamera()
-    private var root: SceneRoot = SceneRoot(Gdx.graphics.width, Gdx.graphics.height)
+    private var root: SceneRoot = SceneRoot(camera)
 
     init {
         populate()
     }
     
     private fun populate() {
-        root = SceneRoot(Gdx.graphics.width, Gdx.graphics.height)
+        root = SceneRoot(camera)
         root += TestColorElement(Color(1f, 165f / 255f, 0.5f, 1f))
         
         fun randomColor(): Color = Color(MathUtils.random(), MathUtils.random(), MathUtils.random(), 1f)
@@ -108,7 +108,7 @@ internal class UIEventTestScreen(override val main: NewUITestGame) : PaintboxScr
         super.resize(width, height)
         camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         camera.update()
-        root.resize(camera)
+        root.resize()
     }
 
     override fun dispose() {

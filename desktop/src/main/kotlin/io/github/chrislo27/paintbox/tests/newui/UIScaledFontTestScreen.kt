@@ -25,7 +25,7 @@ internal class UIScaledFontTestScreen(override val main: ScaledFontTestGame) : P
     }
     private val paintboxFont: PaintboxFont
         inline get() = main.fontCache["DEBUG_FONT_SCALED"]
-    private var root: SceneRoot = SceneRoot(Gdx.graphics.width, Gdx.graphics.height)
+    private var root: SceneRoot = SceneRoot(camera)
 
     init {
         populate()
@@ -39,7 +39,7 @@ internal class UIScaledFontTestScreen(override val main: ScaledFontTestGame) : P
     }
     
     private fun populate() {
-        root = SceneRoot(Gdx.graphics.width, Gdx.graphics.height)
+        root = SceneRoot(camera)
         root += TestColorElement(Color(1f, 165f / 255f, 0.5f, 1f))
         
         fun randomColor(): Color = Color(MathUtils.random(), MathUtils.random(), MathUtils.random(), 1f)
