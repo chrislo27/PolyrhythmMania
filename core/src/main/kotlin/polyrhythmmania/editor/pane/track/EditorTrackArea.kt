@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
@@ -22,6 +23,7 @@ import kotlin.math.floor
  * You should wrap this [EditorTrackArea] in a [Pane] to set those properties.
  */
 class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
+    
     val editorPane: EditorPane = allTracksPane.editorPane
     val trackView: TrackView = allTracksPane.trackView
     val editor: Editor = editorPane.editor
@@ -29,6 +31,10 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
     private val lastMouseAbsolute: Vector2 = Vector2()
     private val lastMouseRelative: Vector2 = Vector2()
     private val tmpRect: Rectangle = Rectangle()
+    
+    val beatWidth: FloatVar = FloatVar {
+        this@EditorTrackArea.bounds.width.use() / trackView.pxPerBeat.use()
+    }
 
     init {
         this.doClipping.set(true)

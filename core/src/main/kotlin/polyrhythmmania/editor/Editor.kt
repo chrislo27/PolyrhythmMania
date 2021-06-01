@@ -8,6 +8,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
 import io.github.chrislo27.paintbox.binding.FloatVar
@@ -59,15 +60,17 @@ class Editor(val main: PRManiaGame)
         const val TRACK_INPUT_1: String = "input_1"
         const val TRACK_INPUT_2: String = "input_2"
         const val TRACK_VFX_0: String = "vfx_0"
+        
+        val MOVE_WINDOW_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.A, Input.Keys.D)
     }
 
-    private val uiCamera: OrthographicCamera = OrthographicCamera().apply { 
+    private val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
     val previewFrameBuffer: FrameBuffer
     val waveformWindow: WaveformWindow
-    
+
     val sceneRoot: SceneRoot = SceneRoot(uiCamera)
 
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()
@@ -76,7 +79,7 @@ class Editor(val main: PRManiaGame)
         true
     } //soundSystem
     val container: Container = Container(this.soundSystem, this.timing)
-    
+
     val world: World get() = container.world
     val engine: Engine get() = container.engine
     val renderer: WorldRenderer get() = container.renderer
@@ -196,6 +199,14 @@ class Editor(val main: PRManiaGame)
                 lastMetronomeBeat = floorBeat
                 if (metronomeEnabled.getOrCompute()) {
                     engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_cowbell"))
+                }
+            }
+
+            if (this.cameraPan == null && !pressedButtons.any { it in MOVE_WINDOW_KEYCODES }) {
+                val beatWidth = editorPane.allTracksPane.editorTrackArea.beatWidth.getOrCompute()
+                val currentBeatX = trackView.beat.getOrCompute()
+                if (currentEngineBeat !in (currentBeatX)..(currentBeatX + beatWidth)) {
+                    this.cameraPan = CameraPan(0.125f, currentBeatX, currentEngineBeat, Interpolation.smoother)
                 }
             }
         }
@@ -335,19 +346,19 @@ class Editor(val main: PRManiaGame)
             editorPane.openDialog(editorPane.exitConfirmDialog)
         }
     }
-    
+
     fun attemptNewLevel() {
         if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             editorPane.openDialog(editorPane.newDialog)
         }
     }
-    
+
     fun attemptSave(forceSaveAs: Boolean) {
         if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             editorPane.openDialog(editorPane.saveDialog.prepareShow(forceSaveAs))
         }
     }
-    
+
     fun attemptLoad(dropPath: String?) {
         if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             editorPane.openDialog(editorPane.loadDialog.prepareShow(dropPath))
@@ -545,12 +556,12 @@ class Editor(val main: PRManiaGame)
         val shift = Gdx.input.isShiftDown()
         val currentClick = click.getOrCompute()
         val state = playState.getOrCompute()
-        
+
         if (sceneRoot.isContextMenuActive()) return false
         if (sceneRoot.isDialogActive()) return false
 
         when (keycode) {
-            Input.Keys.D, Input.Keys.A, Input.Keys.LEFT, Input.Keys.RIGHT -> {
+            in MOVE_WINDOW_KEYCODES -> {
                 pressedButtons += keycode
                 inputConsumed = true
             }
@@ -565,21 +576,17 @@ class Editor(val main: PRManiaGame)
                 }
             }
             Input.Keys.HOME -> { // HOME: Jump to beat 0
-                if (currentClick == Click.None && state == PlayState.STOPPED) {
-                    cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), 0f)
-                    inputConsumed = true
-                }
+                cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), 0f)
+                inputConsumed = true
             }
             Input.Keys.END -> { // END: Jump to first BlockEndState OR last block
-                if (currentClick == Click.None && state == PlayState.STOPPED) {
-                    val blocks = this.blocks.sortedBy { it.beat }
-                    if (blocks.isNotEmpty()) {
-                        val firstEndBlock: BlockEndState? = blocks.firstOrNull { it is BlockEndState } as? BlockEndState?
-                        val targetBlock: Block = firstEndBlock ?: blocks.last()
-                        cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), (targetBlock.beat).coerceAtLeast(0f))
-                    }
-                    inputConsumed = true
+                val blocks = this.blocks.sortedBy { it.beat }
+                if (blocks.isNotEmpty()) {
+                    val firstEndBlock: BlockEndState? = blocks.firstOrNull { it is BlockEndState } as? BlockEndState?
+                    val targetBlock: Block = firstEndBlock ?: blocks.last()
+                    cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), (targetBlock.beat).coerceAtLeast(0f))
                 }
+                inputConsumed = true
             }
             Input.Keys.SPACE -> { // SPACE: Play state
                 if (!alt && !ctrl && currentClick == Click.None) {
@@ -833,12 +840,12 @@ path: ${sceneRoot.contextMenuLayer.lastHoveredElementPath.map { "${it::class.jav
 """
         //path: ${sceneRoot.dialogLayer.lastHoveredElementPath.map { "${it::class.java.simpleName} [${it.bounds.x.getOrCompute()}, ${it.bounds.y.getOrCompute()}, ${it.bounds.width.getOrCompute()}, ${it.bounds.height.getOrCompute()}]" }}
     }
-    
+
     // Lwjgl3WindowListener functions:
-    
+
     override fun filesDropped(files: Array<out String>?) {
         if (files == null || files.isEmpty()) return
-        
+
         val firstPath = files.first()
         val currentDialog: UIElement? = sceneRoot.getCurrentRootDialog()
         when (currentDialog) {
@@ -873,7 +880,7 @@ path: ${sceneRoot.contextMenuLayer.lastHoveredElementPath.map { "${it::class.jav
     override fun closeRequested(): Boolean {
         return true
     }
-    
+
     override fun refreshRequested() {
     }
 
