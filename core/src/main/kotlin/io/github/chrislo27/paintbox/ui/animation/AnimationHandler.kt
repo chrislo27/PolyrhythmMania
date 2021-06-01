@@ -1,0 +1,64 @@
+package io.github.chrislo27.paintbox.ui.animation
+
+import com.badlogic.gdx.Gdx
+import io.github.chrislo27.paintbox.binding.FloatVar
+import io.github.chrislo27.paintbox.ui.SceneRoot
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
+
+
+class AnimationHandler(val sceneRoot: SceneRoot) {
+
+    private data class AnimationTuple(val animation: Animation, val varr: FloatVar, var accumulatedSeconds: Float = 0f,
+                                      var alpha: Float = 0f, var brandNew: Boolean = true)
+
+    private val animations: MutableMap<FloatVar, AnimationTuple> = ConcurrentHashMap()
+
+    /**
+     * Set to 0 to disable animations.
+     */
+    val animationSpeed: FloatVar = FloatVar(1f)
+
+    private val removeList: MutableSet<FloatVar> = mutableSetOf()
+    
+    fun frameUpdate() {
+        val delta = Gdx.graphics.deltaTime
+        val speed = animationSpeed.getOrCompute()
+        val isInstant = speed <= 0f
+        
+        animations.forEach { (_, tuple) ->
+            val animation = tuple.animation
+            val brandNew = tuple.brandNew
+            tuple.accumulatedSeconds += delta
+            if (brandNew) {
+                tuple.brandNew = false
+                tuple.animation.onStart?.invoke()
+            }
+            
+            val newAlpha = if (isInstant || animation.duration <= 0f) 1f
+            else (tuple.accumulatedSeconds / animation.duration).coerceIn(0f, 1f)
+            tuple.alpha = newAlpha
+            
+            tuple.varr.set(tuple.animation.apply(newAlpha))
+
+            if (newAlpha >= 1f) {
+                tuple.animation.onComplete?.invoke()
+                removeList.add(tuple.varr)
+            }
+        }
+        
+        if (removeList.isNotEmpty()) {
+            removeList.forEach { animations.remove(it) }
+            removeList.clear()
+        }
+    }
+
+    fun enqueueAnimation(animation: Animation, varr: FloatVar) {
+        val existing = animations.remove(varr)
+        if (existing != null) {
+            existing.varr.set(existing.animation.apply(1f))
+        }
+        animations[varr] = AnimationTuple(animation, varr)
+    }
+
+}

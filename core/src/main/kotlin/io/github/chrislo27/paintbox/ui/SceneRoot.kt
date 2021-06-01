@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.binding.*
+import io.github.chrislo27.paintbox.ui.animation.AnimationHandler
 import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
 import io.github.chrislo27.paintbox.util.gdxutils.drawRect
 
@@ -33,6 +34,7 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
      * A var that is always updated at the start of [renderAsRoot].
      */
     val frameUpdateTrigger: ReadOnlyVar<Boolean> = Var(false)
+    val animations: AnimationHandler = AnimationHandler(this)
     
     val currentElementWithTooltip: ReadOnlyVar<HasTooltip?> = Var(null)
     private val currentTooltipVar: Var<UIElement?> = Var(null)
@@ -84,6 +86,9 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         (frameUpdateTrigger as Var).invert()
         updateMouseVector()
         updateTooltipPosition()
+        
+        animations.frameUpdate()
+        
         for (layer in allLayers) {
             val layerRoot = layer.root
             val layerBounds = layerRoot.bounds
