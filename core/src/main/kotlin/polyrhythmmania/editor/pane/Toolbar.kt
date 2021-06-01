@@ -3,12 +3,14 @@ package polyrhythmmania.editor.pane
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Interpolation
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.packing.PackedSheet
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.ImageNode
 import io.github.chrislo27.paintbox.ui.Pane
+import io.github.chrislo27.paintbox.ui.animation.Animation
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.Button
@@ -29,7 +31,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
     val pauseButton: Button
     val playButton: Button
     val stopButton: Button
-    
+
     val tapalongPane: TapalongPane
 
     init {
@@ -171,8 +173,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.bounds.width.set((32f + this.spacing.getOrCompute()) * 3 + tapalongPane.bounds.width.getOrCompute())
         }
         mainSection += leftControlPane
-        
-        
+
+
         leftControlPane.temporarilyDisableLayouts {
             leftControlPane.addChild(Button("").apply {
                 this.bounds.width.set(32f)
@@ -217,7 +219,24 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.tooltipElement.set(editorPane.createDefaultTooltip {
                     if (this@apply.selectedState.use()) activeTooltip.use() else inactiveTooltip.use()
                 })
-                tapalongPane.visible.bind { selectedState.use() }
+                tapalongPane.visible.set(this.selectedState.getOrCompute())
+                selectedState.addListener {
+                    val state = it.getOrCompute()
+
+                    if (state) {
+                        editorPane.enqueueAnimation(tapalongPane.opacity, 0f, 1f, 0.125f).apply { 
+                            onStart = {
+                                tapalongPane.visible.set(true)
+                            }
+                        }
+                    } else {
+                        editorPane.enqueueAnimation(tapalongPane.opacity, 1f, 0f, 0.125f).apply {
+                            onComplete = {
+                                tapalongPane.visible.set(false)
+                            }
+                        }
+                    }
+                }
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tapalong"]))
             })
             leftControlPane.addChild(tapalongPane)

@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.ui.SceneRoot
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
 
 
 class AnimationHandler(val sceneRoot: SceneRoot) {
@@ -39,7 +38,7 @@ class AnimationHandler(val sceneRoot: SceneRoot) {
             else (tuple.accumulatedSeconds / animation.duration).coerceIn(0f, 1f)
             tuple.alpha = newAlpha
             
-            tuple.varr.set(tuple.animation.apply(newAlpha))
+            tuple.varr.set(tuple.animation.applyFunc(newAlpha))
 
             if (newAlpha >= 1f) {
                 tuple.animation.onComplete?.invoke()
@@ -56,7 +55,8 @@ class AnimationHandler(val sceneRoot: SceneRoot) {
     fun enqueueAnimation(animation: Animation, varr: FloatVar) {
         val existing = animations.remove(varr)
         if (existing != null) {
-            existing.varr.set(existing.animation.apply(1f))
+            existing.varr.set(existing.animation.applyFunc(1f))
+            existing.animation.onComplete?.invoke()
         }
         animations[varr] = AnimationTuple(animation, varr)
     }

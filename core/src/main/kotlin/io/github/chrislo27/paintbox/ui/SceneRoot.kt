@@ -223,11 +223,12 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
     /**
      * Hides the root context menu if any.
      */
-    fun hideRootContextMenu() {
-        val currentRootMenu = rootContextMenu ?: return
+    fun hideRootContextMenu(): ContextMenu? {
+        val currentRootMenu = rootContextMenu ?: return null
         removeContextMenuFromScene(currentRootMenu)
         rootContextMenu = null
         contextMenuLayer.resetHoveredElementPath()
+        return currentRootMenu
     }
 
     /**
@@ -244,12 +245,13 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
     /**
      * Hides the root dialog element if any.
      */
-    fun hideRootDialog() {
-        val currentRootDialog = rootDialogElement ?: return
+    fun hideRootDialog(): UIElement? {
+        val currentRootDialog = rootDialogElement ?: return null
         dialogLayer.root.removeChild(currentRootDialog)
         rootDialogElement = null
         dialogLayer.resetHoveredElementPath()
         cancelTooltip()
+        return currentRootDialog
     }
 
     /**

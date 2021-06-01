@@ -8,6 +8,6 @@ data class Animation(val interpolation: Interpolation, val duration: Float, val 
     var onStart: (() -> Unit)? = null
     var onComplete: (() -> Unit)? = null
     
-    fun apply(alpha: Float): Float = interpolation.apply(start, end, alpha)
+    fun applyFunc(alpha: Float): Float = interpolation.apply(start, end, alpha)
     
 }

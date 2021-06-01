@@ -1,11 +1,14 @@
 package polyrhythmmania.editor.pane
 
+import com.badlogic.gdx.math.Interpolation
+import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.Tooltip
 import io.github.chrislo27.paintbox.ui.UIElement
+import io.github.chrislo27.paintbox.ui.animation.Animation
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.element.RectElement
 import polyrhythmmania.PRManiaGame
@@ -108,6 +111,22 @@ class EditorPane(val editor: Editor) : Pane() {
         return createDefaultTooltip { str }
     }
 
+    fun createAnimation(start: Float, end: Float, duration: Float = 0.125f,
+                        interpolation: Interpolation = Interpolation.smoother): Animation {
+        return Animation(interpolation, duration, start, end)
+    }
+
+    fun enqueueAnimation(animation: Animation, varr: FloatVar) {
+        sceneRoot.getOrCompute()?.animations?.enqueueAnimation(animation, varr)
+    }
+
+    fun enqueueAnimation(varr: FloatVar, start: Float, end: Float, duration: Float = 0.125f,
+                         interpolation: Interpolation = Interpolation.smoother): Animation {
+        val animation = Animation(interpolation, duration, start, end)
+        enqueueAnimation(animation, varr)
+        return animation
+    }
+
     fun styleIndentedButton(button: IndentedButton) {
         button.indentedButtonBorderColor.bind { palette.toolbarIndentedButtonBorderTint.use() }
     }
@@ -122,7 +141,13 @@ class EditorPane(val editor: Editor) : Pane() {
 
     fun openDialog(dialog: DialogPane) {
         closeDialog()
-        sceneRoot.getOrCompute()?.showRootDialog(dialog)
+        val sceneRoot = sceneRoot.getOrCompute()
+        if (sceneRoot != null) {
+            sceneRoot.showRootDialog(dialog)
+            enqueueAnimation(dialog.opacity, 0f, 1f).apply {
+                onStart = { dialog.visible.set(true) }
+            }
+        }
     }
 
 }
