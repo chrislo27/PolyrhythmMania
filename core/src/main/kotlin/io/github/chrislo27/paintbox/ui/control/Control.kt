@@ -32,7 +32,7 @@ abstract class Control<SELF : Control<SELF>>
             } else false
         } ?: false)
     }
-    
+
     val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
     val isPressedDown: ReadOnlyVar<Boolean> = Var(false)
     val pressedState: ReadOnlyVar<PressedState> = Var {
@@ -40,7 +40,7 @@ abstract class Control<SELF : Control<SELF>>
         val pressed = isPressedDown.use()
         if (hovered && pressed) {
             PressedState.PRESSED_AND_HOVERED
-        } else if (hovered) { 
+        } else if (hovered) {
             PressedState.HOVERED
         } else if (pressed) {
             PressedState.PRESSED
@@ -48,14 +48,15 @@ abstract class Control<SELF : Control<SELF>>
             PressedState.NONE
         }
     }
-    
+
     var onAction: () -> Boolean = { false }
+    var onAltAction: () -> Boolean = { false }
     var onLeftClick: (event: ClickReleased) -> Boolean = { false }
     var onRightClick: (event: ClickReleased) -> Boolean = { false }
     var onMiddleClick: (event: ClickReleased) -> Boolean = { false }
     var onHoverStart: (event: MouseEntered) -> Boolean = { false }
     var onHoverEnd: (event: MouseExited) -> Boolean = { false }
-    
+
     init {
         addInputEventListener { event ->
             when (event) {
@@ -85,7 +86,7 @@ abstract class Control<SELF : Control<SELF>>
         @Suppress("LeakingThis")
         addDefaultInputEventListener()
     }
-    
+
     protected open fun defaultInputEventListener(event: InputEvent): Boolean {
         return if (!apparentDisabledState.getOrCompute()) {
             when (event) {
@@ -96,7 +97,9 @@ abstract class Control<SELF : Control<SELF>>
                                 onLeftClick(event)
                             } else true
                         } else if (event.button == Input.Buttons.RIGHT) {
-                            onRightClick(event)
+                            if (!onAltAction()) {
+                                onRightClick(event)
+                            } else true
                         } else if (event.button == Input.Buttons.MIDDLE) {
                             onMiddleClick(event)
                         } else false
@@ -114,7 +117,7 @@ abstract class Control<SELF : Control<SELF>>
             false
         }
     }
-    
+
     protected open fun addDefaultInputEventListener() {
         addInputEventListener { event ->
             defaultInputEventListener(event)
@@ -127,10 +130,18 @@ abstract class Control<SELF : Control<SELF>>
     fun triggerAction(): Boolean {
         return !apparentDisabledState.getOrCompute() && onAction()
     }
-    
+
     @JvmName("setOnActionUnit")
     inline fun setOnAction(crossinline value: () -> Unit) {
         onAction = {
+            value()
+            true
+        }
+    }
+
+    @JvmName("setOnAltActionUnit")
+    inline fun setOnAltAction(crossinline value: () -> Unit) {
+        onAltAction = {
             value()
             true
         }
