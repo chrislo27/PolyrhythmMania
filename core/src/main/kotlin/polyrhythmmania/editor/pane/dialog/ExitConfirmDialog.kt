@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.pane.dialog
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.font.TextAlign
@@ -53,7 +54,12 @@ class ExitConfirmDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 skin.pressedAndHoveredBgColor.set(Color(1f, 0.6f, 0.6f, 1f))
             }
             this.setOnAction {
-                // TODO quit to title screen
+                val currentScreen = main.screen
+                Gdx.app.postRunnable {
+                    main.screen = null
+                    currentScreen.dispose()
+                    main.screen = main.mainMenuScreen.prepareShow()
+                }
             }
         })
     }
