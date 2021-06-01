@@ -14,6 +14,11 @@ import io.github.chrislo27.paintbox.ui.*
 abstract class Control<SELF : Control<SELF>>
     : Skinnable<SELF>(), HasTooltip {
 
+    companion object {
+        private val DEFAULT_ACTION: () -> Boolean = { false }
+        private val DEFAULT_EVENT_ACTION: (InputEvent) -> Boolean = { false }
+    }
+
     override val tooltipElement: Var<UIElement?> = Var(null)
 
     /**
@@ -49,13 +54,13 @@ abstract class Control<SELF : Control<SELF>>
         }
     }
 
-    var onAction: () -> Boolean = { false }
-    var onAltAction: () -> Boolean = { false }
-    var onLeftClick: (event: ClickReleased) -> Boolean = { false }
-    var onRightClick: (event: ClickReleased) -> Boolean = { false }
-    var onMiddleClick: (event: ClickReleased) -> Boolean = { false }
-    var onHoverStart: (event: MouseEntered) -> Boolean = { false }
-    var onHoverEnd: (event: MouseExited) -> Boolean = { false }
+    var onAction: () -> Boolean = DEFAULT_ACTION
+    var onAltAction: () -> Boolean = DEFAULT_ACTION
+    var onLeftClick: (event: ClickReleased) -> Boolean = DEFAULT_EVENT_ACTION
+    var onRightClick: (event: ClickReleased) -> Boolean = DEFAULT_EVENT_ACTION
+    var onMiddleClick: (event: ClickReleased) -> Boolean = DEFAULT_EVENT_ACTION
+    var onHoverStart: (event: MouseEntered) -> Boolean = DEFAULT_EVENT_ACTION
+    var onHoverEnd: (event: MouseExited) -> Boolean = DEFAULT_EVENT_ACTION
 
     init {
         addInputEventListener { event ->
