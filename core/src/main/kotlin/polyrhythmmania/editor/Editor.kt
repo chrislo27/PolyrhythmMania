@@ -829,6 +829,7 @@ class Editor(val main: PRManiaGame)
     fun getDebugString(): String {
         return """Click: ${click.getOrCompute().javaClass.simpleName}
 engine.events: ${engine.events.size}
+path: ${sceneRoot.contextMenuLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
 """
         //path: ${sceneRoot.dialogLayer.lastHoveredElementPath.map { "${it::class.java.simpleName} [${it.bounds.x.getOrCompute()}, ${it.bounds.y.getOrCompute()}, ${it.bounds.width.getOrCompute()}, ${it.bounds.height.getOrCompute()}]" }}
     }

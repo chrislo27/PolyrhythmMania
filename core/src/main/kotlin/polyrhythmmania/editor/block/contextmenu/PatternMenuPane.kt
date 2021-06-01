@@ -11,7 +11,9 @@ import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
 import io.github.chrislo27.paintbox.ui.control.Button
+import io.github.chrislo27.paintbox.ui.control.ButtonSkin
 import io.github.chrislo27.paintbox.ui.control.TextLabel
+import io.github.chrislo27.paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.block.CubeType
 import polyrhythmmania.editor.block.PatternBlockData
@@ -25,7 +27,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
     init {
         val blockSize = 32f + 3f * 2
         val clearL10NStr = Localization.getVar("blockContextMenu.spawnPattern.clear")
-        
+
         fun createRowPane(label: String, rowTypes: Array<CubeType>, isARow: Boolean): Pane {
             return Pane().also { pane ->
                 Anchor.TopLeft.configure(this)
@@ -42,6 +44,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
                     label.margin.set(Insets(0f, 0f, 0f, 4f))
                     label.renderAlign.set(Align.right)
                     label.textAlign.set(TextAlign.RIGHT)
+                    label.textColor.set(Color.BLACK)
                 })
 
                 val buttons: MutableList<CubeButton> = mutableListOf()
@@ -60,25 +63,50 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
                     pane.addChild(b)
                 }
 
-                pane.addChild(Button(binding = { clearL10NStr.use() }, font = editorPane.main.mainFont).apply {
-                    this.bounds.width.set(blockSize * 1.5f)
-                    this.bounds.height.set(blockSize * 0.75f)
-                    this.bounds.x.set((data.rowCount + 1.125f) * blockSize)
-                    this.bounds.y.set(0 * blockSize + blockSize * 0.25f * 0.5f)
-                    this.setOnAction {
-                        buttons.forEach { it.cube.set(CubeType.NONE) }
-                    }
+                pane.addChild(Pane().apply {
+                    this.bounds.x.set((data.rowCount + 1) * blockSize)
+                    this.bounds.width.set(blockSize * 2)
+                    this.addChild(Button(binding = { clearL10NStr.use() }, font = editorPane.main.mainFont).apply {
+                        Anchor.Centre.configure(this)
+                        this.bounds.width.set(blockSize * 1.5f)
+                        this.bounds.height.set(blockSize * 0.75f)
+                        this.setOnAction {
+                            buttons.forEach { it.cube.set(CubeType.NONE) }
+                        }
+                    })
                 })
             }
         }
-
-        addChild(createRowPane("${RodinSpecialChars.BORDERED_DPAD}:", data.rowDpadTypes, false))
-        addChild(createRowPane("${RodinSpecialChars.BORDERED_A}:", data.rowATypes, true).also { pane ->
-            pane.bounds.y.set(blockSize)
-        })
         
-        this.bounds.width.set(490f)
-        this.bounds.height.set(80f)
+        val beatLabels = Pane().also { pane ->
+            pane.bounds.width.set(blockSize * (data.rowCount + 3))
+            pane.bounds.height.set(10f)
+            
+            for (b in 0 until (data.rowCount / 2)) {
+                pane += TextLabel("$b", font = editorPane.palette.musicDialogFontBold).apply { 
+                    this.bounds.width.set(blockSize)
+                    this.bounds.x.set((b * 2 + 1) * blockSize)
+                    this.textAlign.set(TextAlign.LEFT)
+                    this.renderAlign.set(Align.bottomLeft)
+                    this.textColor.set(Color.BLACK)
+                    this.padding.set(Insets(0f, 2f, 1f, 1f))
+                    this.setScaleXY(0.75f)
+                }
+            }
+        }
+
+        val vbox = VBox().apply { 
+            this.spacing.set(0f)
+        }
+        this += vbox
+        vbox.temporarilyDisableLayouts { 
+            vbox += beatLabels
+            vbox += createRowPane("${RodinSpecialChars.BORDERED_DPAD}:", data.rowDpadTypes, false)
+            vbox += createRowPane("${RodinSpecialChars.BORDERED_A}:", data.rowATypes, true)
+        }
+
+        this.bounds.width.set(blockSize * (data.rowCount + 3 /* label + Clear */))
+        this.bounds.height.set(90f)
     }
 
     inner class CubeButton(val isA: Boolean, cube: CubeType) : Button("") {
@@ -99,6 +127,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
             this.padding.set(Insets(2f))
             this.border.set(Insets(1f))
             this.borderStyle.set(SolidBorder(Color.BLACK))
+            image.tint.bind { (skin.use() as ButtonSkin).bgColorToUse.use() }
 //            this.skinID.set(ContextMenu.CONTEXT_MENU_BUTTON_SKIN_ID)
         }
 
@@ -108,6 +137,12 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
                 val current = this.cube.getOrCompute()
                 val currentIndex = values.indexOf(current)
                 this.cube.set(values[(currentIndex + 1) % values.size])
+            }
+            setOnAltAction {
+                val values = CubeType.VALUES
+                val current = this.cube.getOrCompute()
+                val currentIndex = values.indexOf(current)
+                this.cube.set(values[(currentIndex - 1 + values.size) % values.size])
             }
         }
     }
