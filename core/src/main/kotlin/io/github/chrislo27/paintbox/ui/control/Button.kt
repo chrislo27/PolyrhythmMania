@@ -70,6 +70,11 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     @Suppress("RemoveRedundantQualifierName")
     override fun getDefaultSkinID(): String = Button.SKIN_ID
 
+    fun setScaleXY(scaleXY: Float) {
+        this.scaleX.set(scaleXY)
+        this.scaleY.set(scaleXY)
+    }
+    
 }
 
 open class ButtonSkin(element: Button) : Skin<Button>(element) {

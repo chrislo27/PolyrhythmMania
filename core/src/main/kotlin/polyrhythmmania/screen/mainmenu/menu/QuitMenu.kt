@@ -1,0 +1,69 @@
+package polyrhythmmania.screen.mainmenu.menu
+
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.paintbox.font.TextAlign
+import io.github.chrislo27.paintbox.ui.Anchor
+import io.github.chrislo27.paintbox.ui.area.Insets
+import io.github.chrislo27.paintbox.ui.control.TextLabel
+import io.github.chrislo27.paintbox.ui.layout.HBox
+import io.github.chrislo27.paintbox.ui.layout.VBox
+import polyrhythmmania.Localization
+import kotlin.concurrent.thread
+import kotlin.system.exitProcess
+
+
+class QuitMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+
+    init {
+        this.setSize(MMMenu.WIDTH_SMALL)
+        this.titleText.bind { Localization.getVar("mainMenu.quit.title").use() }
+        this.contentPane.bounds.height.set(200f)
+        
+        val vbox = VBox().apply {
+            Anchor.TopLeft.configure(this)
+            this.spacing.set(0f)
+            this.bindHeightToParent(-40f)
+        }
+        val hbox = HBox().apply {
+            Anchor.BottomLeft.configure(this)
+            this.spacing.set(8f)
+            this.padding.set(Insets(2f))
+            this.bounds.height.set(40f)
+        }
+
+        contentPane.addChild(vbox)
+        contentPane.addChild(hbox)
+
+        vbox.temporarilyDisableLayouts {
+            vbox += TextLabel(binding = { Localization.getVar("mainMenu.quit.desc").use() }).apply {
+                this.markup.set(this@QuitMenu.markup)
+                this.bounds.height.set(80f)
+                this.padding.set(Insets(4f))
+                this.textColor.set(Color.DARK_GRAY)
+                this.renderAlign.set(Align.topLeft)
+                this.textAlign.set(TextAlign.LEFT)
+            }
+        }
+
+        hbox.temporarilyDisableLayouts {
+            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.quit.confirm").use() }).apply {
+                this.bounds.width.set(100f)
+                this.setOnAction {
+                    Gdx.app.exit()
+                    thread(isDaemon = true) {
+                        Thread.sleep(1000L)
+                        exitProcess(0)
+                    }
+                }
+            }
+            hbox += createSmallButton(binding = { Localization.getVar("common.cancel").use() }).apply {
+                this.bounds.width.set(100f)
+                this.setOnAction {
+                    menuCol.changeActiveMenu(menuCol.uppermostMenu, true)
+                }
+            }
+        }
+    }
+}
