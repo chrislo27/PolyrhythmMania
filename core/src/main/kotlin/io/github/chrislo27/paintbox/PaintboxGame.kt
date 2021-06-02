@@ -361,9 +361,12 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
                     }
                 }
                 Input.Keys.S -> {
-                    Paintbox.stageOutlines = if (Paintbox.stageOutlines == NONE) {
-                        if (Gdx.input.isShiftDown()) ONLY_VISIBLE else ALL
-                    } else NONE
+                    val old = Paintbox.stageOutlines
+                    Paintbox.stageOutlines = when (old) {
+                        NONE -> if (Gdx.input.isShiftDown()) ONLY_VISIBLE else ALL
+                        ALL -> if (Gdx.input.isShiftDown()) ONLY_VISIBLE else NONE
+                        ONLY_VISIBLE -> if (Gdx.input.isShiftDown()) ALL else NONE
+                    }
                     Paintbox.LOGGER.debug("Toggled stage outlines to ${Paintbox.stageOutlines}")
                 }
                 Input.Keys.G -> System.gc()
