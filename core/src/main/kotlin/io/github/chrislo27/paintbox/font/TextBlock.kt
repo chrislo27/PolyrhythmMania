@@ -363,15 +363,4 @@ data class TextBlock(val runs: List<TextRun>) {
         return this.copy(runs = runs.map { it.copy(color = Color.argb8888(newColor)) })
     }
 
-//    fun withLineWrapping(width: Float): TextBlock {
-//        if (isRunInfoInvalid()) computeLayouts()
-//        if (this.width <= width) return this
-//
-//        // TODO improve this
-//        val lineInfo = this.lineInfo
-//        if (lineInfo.isEmpty()) return this
-//        val
-//
-//    }
-
 }
