@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.util.gdxutils.scaleMul
-import kotlin.math.abs
 
 
 /**
@@ -54,8 +53,11 @@ data class TextBlock(val runs: List<TextRun>) {
         var posY: Float = 0f
     }
 
-    data class LineInfo(val index: Int, val width: Float, val posY: Float)
+    data class LineInfo(val index: Int, val width: Float, val posY: Float,
+            // Pair in order of (TextRun index, GlyphRunInfo index) 
+                        val glyphIndexStart: Pair<Int, Int>, val glyphIndexEndEx: Pair<Int, Int>)
 
+    var lineWrapping: Float? = null
 
     private var runInfo: List<TextRunInfo> = listOf()
     var lineInfo: List<LineInfo> = listOf()
@@ -70,6 +72,10 @@ data class TextBlock(val runs: List<TextRun>) {
         private set
     var lastDescent: Float = 0f
         private set
+    
+    constructor(runs: List<TextRun>, wrapWidth: Float) : this(runs) {
+        this.lineWrapping = wrapWidth
+    }
 
 
     private fun adjustFontForTextRun(font: BitmapFont, textRun: TextRun) {
@@ -92,7 +98,10 @@ data class TextBlock(val runs: List<TextRun>) {
         var currentLineIndex = 0
         var currentLineStartY = 0f
 
-        val runInfo: List<TextRunInfo> = runs.map { textRun ->
+        val doLineWrapping: Boolean = this.lineWrapping != null
+        val lineWrapWidth: Float = this.lineWrapping ?: 0f
+
+        val runInfo: List<TextRunInfo> = runs.mapIndexed { textRunIndex, textRun ->
             // Set font scales and metrics
             val paintboxFont = textRun.font
             val font = paintboxFont.begin()
@@ -100,7 +109,10 @@ data class TextBlock(val runs: List<TextRun>) {
 
             val color = Color(1f, 1f, 1f, 1f)
             Color.argb8888ToColor(color, textRun.color)
-            val textRunInfo = TextRunInfo(textRun, paintboxFont.getCurrentFontNumber(), GlyphLayout(font, textRun.text, color, 0f, Align.left, false))
+            val textRunInfo = TextRunInfo(textRun, paintboxFont.getCurrentFontNumber(),
+                    if (doLineWrapping)
+                        GlyphLayout(font, textRun.text, color, (lineWrapWidth - currentLineWidth).coerceAtLeast(0f), Align.left, true)
+                    else GlyphLayout(font, textRun.text, color, 0f, Align.left, false))
 
             val offX = textRun.offsetXEm * font.spaceXadvance
             val offY = textRun.offsetYEm * font.xHeight
@@ -139,7 +151,9 @@ data class TextBlock(val runs: List<TextRun>) {
                     currentLineWidth = posX
                     posX = 0f
 
-                    lineInfo += LineInfo(currentLineIndex, currentLineWidth, currentLineStartY)
+                    val firstInfoIndex = lineInfo.lastOrNull()?.glyphIndexEndEx ?: Pair(0, 0)
+                    lineInfo += LineInfo(currentLineIndex, currentLineWidth, currentLineStartY,
+                            firstInfoIndex, Pair(textRunIndex, glyphRunInfoIndex))
                     currentLineIndex++
                     currentLineWidth = 0f
                     updateCurrentLineStartY = true
@@ -183,7 +197,9 @@ data class TextBlock(val runs: List<TextRun>) {
                     currentLineWidth = posX
                     posX = 0f
                     // This is a new line
-                    lineInfo += LineInfo(currentLineIndex, currentLineWidth, currentLineStartY)
+                    val firstInfoIndex = lineInfo.lastOrNull()?.glyphIndexEndEx ?: Pair(0, 0)
+                    lineInfo += LineInfo(currentLineIndex, currentLineWidth, currentLineStartY,
+                            firstInfoIndex, Pair(textRunIndex, textRunInfo.glyphRunInfo.size))
                     currentLineIndex++
                     currentLineWidth = 0f
                     updateCurrentLineStartY = true
@@ -208,7 +224,9 @@ data class TextBlock(val runs: List<TextRun>) {
             textRunInfo
         }
 
-        lineInfo += LineInfo(currentLineIndex, currentLineWidth, currentLineStartY)
+        val firstInfoIndex = lineInfo.lastOrNull()?.glyphIndexEndEx ?: Pair(0, 0)
+        lineInfo += LineInfo(currentLineIndex, currentLineWidth, currentLineStartY,
+                firstInfoIndex, runInfo.size to runInfo.last().glyphRunInfo.size)
 
         this.runInfo = runInfo
         this.lineInfo = lineInfo
@@ -246,13 +264,13 @@ data class TextBlock(val runs: List<TextRun>) {
             return
 
         val batchColor: Float = batch.packedColor
-        
+
         val tint = ColorStack.getAndPush().set(batch.color)
         val requiresTinting = tint.r != 1f || tint.g != 1f || tint.b != 1f || tint.a != 1f
 
         val globalScaleX: Float = scaleX * (if (maxWidth <= 0f || this.width <= 0f || this.width * scaleX < maxWidth) 1f else (maxWidth / (this.width * scaleX)))
         val globalScaleY: Float = scaleY
-        
+
         if (globalScaleX <= 0f || globalScaleY <= 0f) {
             ColorStack.pop()
             return
@@ -292,7 +310,7 @@ data class TextBlock(val runs: List<TextRun>) {
                         run.y *= globalScaleY
                     }
                 }
-                
+
                 val runCount = layout.runs.size
                 if (requiresTinting) {
                     for (i in 0 until runCount) {
@@ -301,11 +319,11 @@ data class TextBlock(val runs: List<TextRun>) {
                         run.color.mul(tint)
                     }
                 }
-                
+
                 font.draw(batch, layout,
-                          x + (glyphRunInfo.posX) * globalScaleX + alignXOffset,
-                          y + (glyphRunInfo.posY) * globalScaleY)
-                
+                        x + (glyphRunInfo.posX) * globalScaleX + alignXOffset,
+                        y + (glyphRunInfo.posY) * globalScaleY)
+
                 if (requiresTinting) {
                     for (index in runCount - 1 downTo 0) {
                         val popped = ColorStack.pop() ?: continue
@@ -327,15 +345,15 @@ data class TextBlock(val runs: List<TextRun>) {
                     }
                 }
             }
-            
+
             if (scaleAnything) {
                 font.scaleMul(1f / globalScaleX, 1f / globalScaleY)
             }
-            
+
             resetFontForTextRun(font, textRunInfo.run)
             paintboxFont.end()
         }
-        
+
         ColorStack.pop()
 
         batch.packedColor = batchColor
@@ -344,5 +362,16 @@ data class TextBlock(val runs: List<TextRun>) {
     fun recolorAll(newColor: Color): TextBlock {
         return this.copy(runs = runs.map { it.copy(color = Color.argb8888(newColor)) })
     }
+
+//    fun withLineWrapping(width: Float): TextBlock {
+//        if (isRunInfoInvalid()) computeLayouts()
+//        if (this.width <= width) return this
+//
+//        // TODO improve this
+//        val lineInfo = this.lineInfo
+//        if (lineInfo.isEmpty()) return this
+//        val
+//
+//    }
 
 }

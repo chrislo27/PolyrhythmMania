@@ -39,9 +39,11 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
     }
 
-    data class TileFlip(val startX: Int, val startY: Int, val width: Int, val height: Int,
-                                 var cornerStart: Corner = Corner.TOP_LEFT,
-                                 var flipWidth: Float = 3f,) {
+    data class TileFlip(
+            val startX: Int, val startY: Int, val width: Int, val height: Int,
+            var cornerStart: Corner = Corner.TOP_LEFT,
+            var flipWidth: Float = 3f,
+    ) {
         var diagonalProgress: Float = 0f
 
         var isDone: Boolean = false
@@ -73,7 +75,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 isDone = true
             }
         }
-        
+
         fun computeDiagonalIndex(ix: Int, iy: Int): Int {
             return when (cornerStart) {
                 Corner.TOP_LEFT -> (ix - startX) + (iy - startY)
@@ -99,7 +101,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val processor: InputProcessor = sceneRoot.inputSystem
 
     private val container: Container = Container(null, SimpleTimingProvider { throw it })
-    
+
     private val menuPane: Pane = Pane()
     private val menuCollection: MenuCollection = MenuCollection(this, sceneRoot, menuPane)
 
@@ -118,6 +120,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             resetTiles()
             swapFramebuffers()
         }
+    private var transitionAway: (() -> Unit)? = null
     private var framebufferSize: WindowSize = WindowSize(0, 0)
 
     /**
@@ -192,7 +195,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.renderAlign.set(Align.topLeft)
         }
         leftPane.addChild(logoImage)
-        menuPane.apply { 
+        menuPane.apply {
             Anchor.BottomLeft.configure(this)
             this.bindHeightToParent(-(logoImage.bounds.height.getOrCompute() + logoImage.bounds.y.getOrCompute() + 32f))
         }
@@ -231,6 +234,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         batch.begin()
 
         sceneRoot.renderAsRoot(batch)
+        
+        if (this.transitionAway != null) {
+            batch.setColor(0f, 0f, 0f, 1f)
+            batch.fillRect(0f, 0f, camera.viewportWidth, camera.viewportHeight)
+            batch.setColor(1f, 1f, 1f, 1f)
+        }
 
         batch.end()
         boundFB.end()
@@ -246,7 +255,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             currentFlip.update(delta, this)
             if (currentFlip.isDone) {
                 this.flipAnimation = null
-                resetTiles()
+                val transitionAway = this.transitionAway
+                if (transitionAway != null) {
+                    this.transitionAway = null
+                    transitionAway.invoke()
+                } else {
+                    resetTiles()
+                }
             } else {
                 val tileSizeF = tileSize.toFloat()
                 val tileSizeU = tileSizeF / camera.viewportWidth
@@ -308,8 +323,14 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
     }
 
-    fun prepareShow(): MainMenuScreen {
+    fun transitionAway(action: () -> Unit) {
+        flipAnimation = TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT)
+        this.transitionAway = action
+        main.inputMultiplexer.removeProcessor(processor)
+    }
 
+    fun prepareShow(): MainMenuScreen {
+        resetTiles()
         return this
     }
 
@@ -365,7 +386,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     override fun getDebugString(): String {
         return "" +
-"""path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
+                """path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
 
 """
     }

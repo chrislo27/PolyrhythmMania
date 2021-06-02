@@ -40,6 +40,10 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
                 } else {
                     TextRun(label.font.use(), label.text.use(), Color.WHITE,
                             /*label.scaleX.use(), label.scaleY.use()*/ 1f, 1f).toTextBlock()
+                }.also { textBlock ->
+                    if (label.doLineWrapping.use()) {
+                        textBlock.lineWrapping = label.contentZone.width.use()
+                    }
                 }
             }
         }
@@ -79,6 +83,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     val renderAlign: Var<Int> = Var(Align.left)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
     val doXCompression: Var<Boolean> = Var(true)
+    val doLineWrapping: Var<Boolean> = Var(false)
 
     /**
      * Defaults to an auto-generated [TextBlock] with the given [text].

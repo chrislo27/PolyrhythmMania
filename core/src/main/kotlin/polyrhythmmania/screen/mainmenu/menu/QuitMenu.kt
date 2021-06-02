@@ -44,6 +44,7 @@ class QuitMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.textColor.set(Color.DARK_GRAY)
                 this.renderAlign.set(Align.topLeft)
                 this.textAlign.set(TextAlign.LEFT)
+                this.doLineWrapping.set(true)
             }
         }
 

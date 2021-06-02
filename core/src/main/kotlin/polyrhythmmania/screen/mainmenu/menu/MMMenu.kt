@@ -20,6 +20,7 @@ import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
 import io.github.chrislo27.paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 
 
@@ -101,7 +102,14 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
         vbox.temporarilyDisableLayouts {
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.play").use() })
-            vbox += createButton(binding = { Localization.getVar("mainMenu.main.edit").use() })
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.edit").use() }).apply { 
+                this.setOnAction { 
+                    mainMenu.transitionAway { 
+                        val main = mainMenu.main
+                        main.screen = EditorScreen(main)
+                    }
+                }
+            }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.settings").use() })
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.credits").use() })
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.quit").use() }).apply {
