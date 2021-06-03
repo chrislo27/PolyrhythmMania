@@ -21,6 +21,7 @@ class PaintboxSpritesheet(val texture: Texture) {
     val checkboxX: TextureRegion = TextureRegion(texture, 135, 35, 64, 64)
     val radioButtonEmpty: TextureRegion = TextureRegion(texture, 202, 35, 64, 64)
     val radioButtonFilled: TextureRegion = TextureRegion(texture, 269, 35, 64, 64)
+    val upArrow: TextureRegion = TextureRegion(texture, 51, 2, 30, 30)
     
     fun getRoundedCornerForRadius(rad: Int): TextureRegion {
         val radius = rad.absoluteValue
