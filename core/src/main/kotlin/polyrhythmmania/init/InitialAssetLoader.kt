@@ -61,6 +61,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("cursor_no_tail", "textures/ui/icon/cursor_no_tail.png"),
                 Packable("cursor_thin_tail", "textures/ui/icon/cursor_thin_tail.png"),
                 Packable("cursor_wide_tail", "textures/ui/icon/cursor_wide_tail.png"),
+                Packable("informational", "textures/ui/icon/informational.png"),
         ), PackedSheet.Config(padding = 0, maxSize = 256, duplicateBorder = false)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor_linear", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("x", "textures/ui/x.png"),

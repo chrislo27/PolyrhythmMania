@@ -2,14 +2,13 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.packing.PackedSheet
 import io.github.chrislo27.paintbox.registry.AssetRegistry
-import io.github.chrislo27.paintbox.ui.Anchor
-import io.github.chrislo27.paintbox.ui.ImageNode
-import io.github.chrislo27.paintbox.ui.Pane
+import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.animation.Animation
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.border.SolidBorder
@@ -50,6 +49,22 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         }
         this += previewSection
 
+
+        val leftPreviewHbox = HBox().apply {
+            Anchor.TopLeft.configure(this)
+            this.spacing.set(4f)
+            this.bounds.width.set(32f * 3 + this.spacing.getOrCompute() * 2)
+            this.align.set(HBox.Align.LEFT)
+        }
+        leftPreviewHbox.temporarilyDisableLayouts { 
+            leftPreviewHbox += object : ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["informational"])), HasTooltip {
+                override val tooltipElement: Var<UIElement?> = Var(editorPane.createDefaultTooltip(Localization.getVar("editor.preview.tooltip")))
+            }.apply { 
+                this.bounds.width.set(32f)
+            }
+        }
+        previewSection += leftPreviewHbox
+        
         val playbackButtonPane = HBox().apply {
             Anchor.Centre.configure(this)
             this.spacing.set(4f)
