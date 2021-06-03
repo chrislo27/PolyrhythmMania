@@ -61,7 +61,7 @@ class ExitConfirmDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 val main = main
                 val currentScreen = main.screen
                 Gdx.app.postRunnable {
-                    val mainMenu = main.mainMenuScreen.prepareShow()
+                    val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
                     main.screen = TransitionScreen(main, currentScreen, mainMenu,
                             FadeOut(0.125f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply { 
                         this.onEntryEnd = {

@@ -329,8 +329,11 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         main.inputMultiplexer.removeProcessor(processor)
     }
 
-    fun prepareShow(): MainMenuScreen {
+    fun prepareShow(doFlipAnimation: Boolean = false): MainMenuScreen {
         resetTiles()
+        if (doFlipAnimation) {
+            flipAnimation = TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT)
+        }
         return this
     }
 
