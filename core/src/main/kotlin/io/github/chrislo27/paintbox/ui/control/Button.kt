@@ -1,6 +1,5 @@
 package io.github.chrislo27.paintbox.ui.control
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -39,7 +38,11 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
         fun createInternalTextBlockVar(button: Button): Var<TextBlock> {
             return Var {
                 TextRun(button.font.use(), button.text.use(), Color.WHITE,
-                        button.scaleX.use(), button.scaleY.use()).toTextBlock()
+                        button.scaleX.use(), button.scaleY.use()).toTextBlock().also { textBlock ->
+                    if (button.doLineWrapping.use()) {
+                        textBlock.lineWrapping = button.contentZone.width.use()
+                    }
+                }
             }
         }
     }
@@ -52,6 +55,7 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     val renderAlign: Var<Int> = Var(Align.center)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
     val doXCompression: Var<Boolean> = Var(true)
+    val doLineWrapping: Var<Boolean> = Var(false)
 
     /**
      * Defaults to an auto-generated [TextBlock] with the given [text].

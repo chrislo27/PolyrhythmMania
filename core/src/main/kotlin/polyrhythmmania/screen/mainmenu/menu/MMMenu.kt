@@ -7,6 +7,8 @@ import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextRun
+import io.github.chrislo27.paintbox.transition.FadeIn
+import io.github.chrislo27.paintbox.transition.TransitionScreen
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.SceneRoot
@@ -71,13 +73,13 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         init {
             val grey = Color().grey(90f / 255f, 1f)
             this.defaultTextColor.set(grey)
-            this.disabledTextColor.set(Color().grey(20f / 255f))
+            this.disabledTextColor.set(Color().grey(30f / 255f))
             this.hoveredTextColor.set(Color().grey(1f))
             this.pressedTextColor.set(Color(0.4f, 1f, 1f, 1f))
             this.pressedAndHoveredTextColor.set(Color(0.5f, 1f, 1f, 1f))
             this.defaultBgColor.set(Color(1f, 1f, 1f, 0f))
             this.hoveredBgColor.set(grey.cpy().apply { a *= 0.8f })
-            this.disabledBgColor.bind { hoveredBgColor.use() }
+            this.disabledBgColor.bind { defaultBgColor.use() }
             this.pressedBgColor.bind { hoveredBgColor.use() }
             this.pressedAndHoveredBgColor.bind { hoveredBgColor.use() }
             this.roundedRadius.set(0)
@@ -101,17 +103,24 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             this.renderAlign.set(Align.left)
         }
         vbox.temporarilyDisableLayouts {
-            vbox += createButton(binding = { Localization.getVar("mainMenu.main.play").use() })
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.play").use() }).apply {
+                this.disabled.set(true)
+            }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.edit").use() }).apply { 
                 this.setOnAction { 
                     mainMenu.transitionAway { 
                         val main = mainMenu.main
-                        main.screen = EditorScreen(main)
+                        val editorScreen = EditorScreen(main)
+                        main.screen = TransitionScreen(main, main.screen, editorScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f)))
                     }
                 }
             }
-            vbox += createButton(binding = { Localization.getVar("mainMenu.main.settings").use() })
-            vbox += createButton(binding = { Localization.getVar("mainMenu.main.credits").use() })
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.settings").use() }).apply {
+                this.disabled.set(true)
+            }
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.credits").use() }).apply { 
+                this.disabled.set(true)
+            }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.quit").use() }).apply {
                 this.setOnAction {
                     menuCol.changeActiveMenu(menuCol.quitMenu, false)

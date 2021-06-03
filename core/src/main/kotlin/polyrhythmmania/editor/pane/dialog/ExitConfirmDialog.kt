@@ -4,12 +4,16 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.font.TextAlign
+import io.github.chrislo27.paintbox.transition.FadeIn
+import io.github.chrislo27.paintbox.transition.FadeOut
+import io.github.chrislo27.paintbox.transition.TransitionScreen
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.ButtonSkin
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
+import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.BasicDialog
 
@@ -54,11 +58,17 @@ class ExitConfirmDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 skin.pressedAndHoveredBgColor.set(Color(1f, 0.6f, 0.6f, 1f))
             }
             this.setOnAction {
+                val main = main
                 val currentScreen = main.screen
                 Gdx.app.postRunnable {
-                    main.screen = null
-                    currentScreen.dispose()
-                    main.screen = main.mainMenuScreen.prepareShow()
+                    val mainMenu = main.mainMenuScreen.prepareShow()
+                    main.screen = TransitionScreen(main, currentScreen, mainMenu,
+                            FadeOut(0.125f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply { 
+                        this.onEntryEnd = {
+                            if (currentScreen is EditorScreen) 
+                                currentScreen.dispose()
+                        }
+                    }
                 }
             }
         })

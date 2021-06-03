@@ -16,6 +16,17 @@ open class TransitionScreen(override val main: PaintboxGame,
                             val entryScreen: Screen?, val destScreen: Screen?,
                             entryTransition: Transition?, destTransition: Transition?)
     : PaintboxScreen() {
+    
+    companion object {
+        private val NO_OP_CALLBACK: () -> Unit = {}
+    }
+    
+    enum class Substate {
+        PRE_ENTRY,
+        DURING_ENTRY,
+        DURING_DEST,
+        FINISHED
+    }
 
     val entryTransition: Transition = entryTransition ?: Transition.EMPTY
     val destTransition: Transition = destTransition ?: Transition.EMPTY
@@ -30,6 +41,13 @@ open class TransitionScreen(override val main: PaintboxGame,
     val duration: Float = (this.entryTransition.duration + this.destTransition.duration).absoluteValue
     var timeElapsed: Float = 0f
         private set
+    
+    var onStart: () -> Unit = NO_OP_CALLBACK
+    var onEntryStart: () -> Unit = NO_OP_CALLBACK
+    var onEntryEnd: () -> Unit = NO_OP_CALLBACK
+    var onDestStart: () -> Unit = NO_OP_CALLBACK
+    var onDestEnd: () -> Unit = NO_OP_CALLBACK
+    var onFinished: () -> Unit = NO_OP_CALLBACK
 
     /**
      * The total percentage from 0.0 to 1.0 of the transition state.
@@ -63,19 +81,45 @@ open class TransitionScreen(override val main: PaintboxGame,
     val doneEntry: Boolean
         get() = percentageEntry >= 1.0f
 
+    private var substate: Substate = Substate.PRE_ENTRY
     private var lastScreen: Screen? = entryScreen
+    private var skipTimeUpdateForOneFrame: Boolean = true
 
     override fun render(delta: Float) {
         super.render(delta)
-        timeElapsed += delta
 
         // Render transition
         val transition = (if (doneEntry) destTransition else entryTransition)
         val screen = (if (doneEntry) destScreen else entryScreen)
-        if (lastScreen != screen) {
+
+        if (substate == Substate.PRE_ENTRY) {
+            skipTimeUpdateForOneFrame = true
+            this.substate = Substate.DURING_ENTRY
+            onStart.invoke()
+            onEntryStart.invoke()
+        }
+        if (substate == Substate.DURING_DEST) {
+            if (doneEntry) {
+                this.substate = Substate.DURING_DEST
+                onEntryEnd.invoke()
+                onDestStart.invoke()
+            }
+        }
+        if (substate == Substate.DURING_DEST) {
+            if (done) {
+                skipTimeUpdateForOneFrame = true
+                this.substate = Substate.FINISHED
+                onDestEnd.invoke()
+                onFinished.invoke()
+            }
+        }
+        
+        val lastScreenDiffers = lastScreen != screen
+        if (lastScreenDiffers) {
             (screen as? PaintboxScreen)?.showTransition() ?: (screen?.show())
             lastScreen = screen
         }
+        
         transition.render(this) { screen?.render(delta) }
 
         if (transition.overrideDone) {
@@ -89,6 +133,13 @@ open class TransitionScreen(override val main: PaintboxGame,
         if (done) {
             dispose()
             main.screen = destScreen
+        }
+        if (!lastScreenDiffers) {
+            if (skipTimeUpdateForOneFrame) {
+                skipTimeUpdateForOneFrame = false
+            } else {
+                timeElapsed += delta
+            }
         }
     }
 
