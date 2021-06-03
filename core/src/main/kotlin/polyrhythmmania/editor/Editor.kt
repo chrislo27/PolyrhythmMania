@@ -141,8 +141,8 @@ class Editor(val main: PRManiaGame)
 
     init {
         engine.autoInputs = true
-        engine.endSignalReceived.addListener {
-            if (it.getOrCompute() && playState.getOrCompute() == PlayState.PLAYING) {
+        engine.endSignalReceived.addListener { endSignal ->
+            if (endSignal.getOrCompute() && playState.getOrCompute() == PlayState.PLAYING) {
                 changePlayState(PlayState.STOPPED)
             }
         }

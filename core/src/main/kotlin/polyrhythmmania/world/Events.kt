@@ -1,5 +1,6 @@
 package polyrhythmmania.world
 
+import com.badlogic.gdx.Gdx
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
@@ -164,7 +165,7 @@ class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        engine.postRunnable {
+        Gdx.app.postRunnable {
             engine.endSignalReceived.set(true)
         }
     }
