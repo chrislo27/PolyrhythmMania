@@ -250,6 +250,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.bgPadding.set(8f)
             this.textColor.set(Color(1f, 1f, 1f, 1f))
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
+            this.tooltipElement.set(Tooltip("${PRMania.TITLE} ${PRMania.VERSION}", font = main.fontMainMenuMain).apply {
+                this.markup.set(markup)
+            })
         }
     }
 
