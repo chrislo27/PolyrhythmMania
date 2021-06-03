@@ -1,7 +1,7 @@
 info face="prmania_icons" size=16 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=0 aa=1 padding=0,1,1,0 spacing=1,1 outline=0
 common lineHeight=20 base=16 scaleW=512 scaleH=512 pages=1 packed=0 alphaChnl=0 redChnl=4 greenChnl=4 blueChnl=4
 page id=0 file="prmania_icons.png"
-chars count=8
+chars count=9
 char id=82   x=205   y=1    width=24     height=16     xoffset=0     yoffset=0    xadvance=24     page=0  chnl=15
 char id=115   x=496   y=0    width=16     height=16     xoffset=0     yoffset=0    xadvance=16     page=0  chnl=15
 char id=112   x=67   y=1    width=32     height=32     xoffset=0     yoffset=-9    xadvance=32     page=0  chnl=15
@@ -10,4 +10,5 @@ char id=97   x=1   y=35    width=32     height=40     xoffset=0     yoffset=-17 
 char id=100   x=1   y=77    width=32     height=40     xoffset=0     yoffset=-17    xadvance=32     page=0  chnl=15
 char id=65   x=100   y=35    width=32     height=40     xoffset=0     yoffset=-17    xadvance=32     page=0  chnl=15
 char id=68   x=100   y=77    width=32     height=40     xoffset=0     yoffset=-17    xadvance=32     page=0  chnl=15
+char id=105   x=496   y=16    width=16     height=16     xoffset=0     yoffset=0    xadvance=16     page=0  chnl=15
 kernings count=0

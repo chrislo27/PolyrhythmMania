@@ -175,7 +175,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
 
     protected val font: PaintboxFont = mainMenu.main.fontMainMenuMain
-    protected val markup: Markup = Markup(mapOf(), TextRun(font, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    protected val markup: Markup = Markup(mapOf("prmania_icons" to mainMenu.main.fontIcons),
+            TextRun(font, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     protected val titleHeight: Float = 64f
     protected val grey: Color = Color().grey(0.8f, 1f)
 

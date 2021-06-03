@@ -6,3 +6,4 @@ a   97 : A-piston retracted
 d  100 : Dpad-piston retracted
 A   65 : A-piston fully extended (yellow)
 D   68 : Dpad-piston fully extended (yellow)
+i  105 : Informational icon

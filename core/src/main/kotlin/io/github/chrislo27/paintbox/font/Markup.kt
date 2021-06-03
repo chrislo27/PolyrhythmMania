@@ -37,7 +37,7 @@ import java.lang.NumberFormatException
  * scalex=1.0 : Defines the scaleX, should be a float
  * scaley=1.0 : Defines the scaleY, should be a float
  * offsetx=1.0 : Defines the offsetXEm, should be a float
- * offsety=1.0 : Defines the offsetXEm, should be a float
+ * offsety=1.0 : Defines the offsetYEm, should be a float
  * carryoverx=true : Defines carryOverOffsetX, should be a boolean
  * carryovery=true : Defines carryOverOffsetY, should be a boolean
  * xadvance=1.0 : Defines xAdvanceEm, should be a float
@@ -104,7 +104,8 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
         val stack = mutableListOf<Pair<Tag, TextRun>>()
 
         tags.forEach { tag ->
-            var font = fontMapping.getValue(tag.attrMap[TAG_FONT]?.valueAsString() ?: DEFAULT_FONT_NAME)
+            val fontKey = tag.attrMap[TAG_FONT]?.valueAsString() ?: DEFAULT_FONT_NAME
+            var font = fontMapping.get(fontKey) ?: error("Font with key $fontKey was not found in the fontMapping.")
             val colorAttr = tag.attrMap[TAG_COLOR]?.value
             val color: Int = if (colorAttr is String) {
                 if (colorAttr.startsWith("#")) {
