@@ -10,13 +10,18 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
+import io.github.chrislo27.paintbox.ui.control.TextLabel
+import io.github.chrislo27.paintbox.ui.control.TextLabelSkin
 import io.github.chrislo27.paintbox.util.WindowSize
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
 import io.github.chrislo27.paintbox.util.gdxutils.drawQuad
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
+import io.github.chrislo27.paintbox.util.gdxutils.grey
+import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
@@ -202,6 +207,17 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         leftPane.addChild(menuPane)
 
         sceneRoot += leftPane
+        sceneRoot += TextLabel("${PRMania.VERSION}", font = main.fontMainMenuMain).apply { 
+            Anchor.BottomRight.configure(this)
+            this.bounds.height.set(32f)
+            this.bounds.width.set(300f)
+            this.renderAlign.set(Align.bottomRight)
+            this.textAlign.set(TextAlign.RIGHT)
+            this.renderBackground.set(true)
+            this.bgPadding.set(8f)
+            this.textColor.set(Color(1f, 1f, 1f, 1f))
+            (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
+        }
     }
 
     override fun render(delta: Float) {
