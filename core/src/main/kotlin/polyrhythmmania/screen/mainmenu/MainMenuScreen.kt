@@ -139,7 +139,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val colors: List<Color> = listOf(Color(1f, 0.5f, 0.5f, 1f), Color(0.5f, 1f, 0.5f, 1f), Color(0.5f, 0.5f, 1f, 1f))
 
     init {
-        createFramebuffers(Gdx.graphics.width, Gdx.graphics.height)
+        createFramebuffers(Gdx.graphics.width, Gdx.graphics.height, null)
 
         val world = container.world
         val renderer = container.renderer
@@ -342,9 +342,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         val width = Gdx.graphics.width
         val height = Gdx.graphics.height
         if (cachedFramebufferSize.width != width || cachedFramebufferSize.height != height) {
-            framebufferOld.disposeQuietly()
-            framebufferCurrent.disposeQuietly()
-            createFramebuffers(width, height)
+            createFramebuffers(width, height, Pair(framebufferOld, framebufferCurrent))
         }
     }
 
@@ -354,10 +352,28 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         framebufferCurrent = tmpBuffer
     }
 
-    private fun createFramebuffers(width: Int, height: Int) {
+    private fun createFramebuffers(width: Int, height: Int, oldBuffers: Pair<FrameBuffer, FrameBuffer>?) {
+        oldBuffers?.second?.disposeQuietly()
         this.framebufferOld = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
         this.framebufferCurrent = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
         this.framebufferSize = WindowSize(width, height)
+        // Render old old FB into new old FB
+        val oldoldFB = oldBuffers?.first
+        if (oldoldFB != null) {
+            lastProjMatrix.set(batch.projectionMatrix)
+            val camera = fullCamera
+            val newFB = this.framebufferOld
+            newFB.begin()
+            batch.projectionMatrix = camera.combined
+            batch.begin()
+            batch.setColor(1f, 1f, 1f, 1f)
+            batch.draw(oldoldFB.colorBufferTexture, 0f, 0f, camera.viewportWidth, camera.viewportHeight, 0f, 0f, 1f, 1f)
+            batch.end()
+            batch.projectionMatrix = lastProjMatrix
+            newFB.end()
+        }
+        
+        oldBuffers?.first?.disposeQuietly()
     }
 
     private fun resetTiles() {
