@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.PaintboxScreen
@@ -316,6 +317,75 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
 
             button.setOnAction {
                 println("hi button top")
+            }
+        }
+        bg += Pane().also { outerPane ->
+            Anchor.CentreRight.configure(outerPane, offsetX = -200f)
+            outerPane.bounds.width.set(150f)
+            outerPane.bounds.height.set(150f)
+
+            outerPane.border.set(Insets(2f))
+            outerPane.borderStyle.set(SolidBorder(Color(1f, 1f, 1f, 1f)))
+
+            val r = RectElement(Color(0f, 0f, 0f, 0.75f))
+            outerPane.addChild(r)
+
+            val scrollPane = Pane().also { scrollPane ->
+                scrollPane.doClipping.set(true)
+                
+//                scrollPane.addChild(RectElement(Color(0f, 1f, 0f, 1f)).apply { 
+//                    this.bounds.width.set(25f)
+//                    this.bounds.height.set(25f)
+//                    this.bounds.x.set(25f)
+//                    this.bounds.y.set(25f)
+//                })
+                scrollPane.addChild(Button("Button").apply { 
+                    this.bounds.width.set(50f)
+                    this.bounds.height.set(25f)
+                    this.bounds.x.set(125f)
+                    this.bounds.y.set(125f)
+                    this.setOnAction { 
+                        println("Button triggered inside pseudo-scroll pane")
+                    }
+                })
+                scrollPane.addChild(TextLabel("Here's some tall text that was automatically wrapped. This could be something like in a thin newspaper column.").apply {
+                    this.bounds.width.set(130f)
+                    this.bounds.height.set(300f)
+                    this.bounds.x.set(10f)
+                    this.bounds.y.set(60f)
+                    this.textColor.set(Color.WHITE)
+                    this.doLineWrapping.set(true)
+                    this.renderAlign.set(Align.topLeft)
+                    this.textAlign.set(TextAlign.LEFT)
+                })
+//                scrollPane.addChild(TextLabel("Here's some long text that was also automatically wrapped. This could be something like in a big paragraph of text.").apply {
+//                    this.bounds.width.set(300f)
+//                    this.bounds.height.set(300f)
+//                    this.bounds.x.set(10f)
+//                    this.bounds.y.set(60f)
+//                    this.textColor.set(Color.WHITE)
+//                    this.doLineWrapping.set(true)
+//                    this.renderAlign.set(Align.topLeft)
+//                    this.textAlign.set(TextAlign.LEFT)
+//                })
+            }
+            r.addChild(scrollPane)
+
+            r.addInputEventListener { event ->
+                when (event) {
+                    is MouseMoved -> {
+                        val lastMouseRelative = Vector2(0f, 0f)
+                        val thisPos = r.getPosRelativeToRoot(lastMouseRelative)
+                        lastMouseRelative.x = event.x - thisPos.x
+                        lastMouseRelative.y = event.y - thisPos.y
+
+                        scrollPane.contentOffsetX.set(-lastMouseRelative.x)
+                        scrollPane.contentOffsetY.set(-lastMouseRelative.y)
+
+                        true
+                    }
+                    else -> false
+                }
             }
         }
     }
