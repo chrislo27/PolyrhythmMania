@@ -1,5 +1,6 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.binding.Var
@@ -22,6 +23,7 @@ import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
 import io.github.chrislo27.paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 

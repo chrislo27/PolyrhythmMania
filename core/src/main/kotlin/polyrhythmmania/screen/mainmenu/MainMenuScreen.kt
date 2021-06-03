@@ -10,22 +10,31 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import io.github.chrislo27.paintbox.binding.Var
+import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.TextAlign
+import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.registry.AssetRegistry
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
+import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.control.TextLabelSkin
+import io.github.chrislo27.paintbox.ui.layout.VBox
 import io.github.chrislo27.paintbox.util.WindowSize
 import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
 import io.github.chrislo27.paintbox.util.gdxutils.drawQuad
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import io.github.chrislo27.paintbox.util.gdxutils.grey
+import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
+import polyrhythmmania.screen.mainmenu.menu.MMMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
+import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.world.EntityCube
 import polyrhythmmania.world.EntityPlatform
@@ -190,6 +199,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     init {
+        val markup = Markup(mapOf(), TextRun(main.fontMainMenuMain, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
         val leftPane = Pane().apply {
             this.margin.set(Insets(64f))
         }
@@ -207,10 +217,33 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         leftPane.addChild(menuPane)
 
         sceneRoot += leftPane
-        sceneRoot += TextLabel("${PRMania.VERSION}", font = main.fontMainMenuMain).apply { 
+        val bottomRight = VBox().apply {
+            Anchor.BottomRight.configure(this, offsetY = -32f)
+            this.spacing.set(0f)
+            this.align.set(VBox.Align.BOTTOM)
+            this.bounds.width.set(64f)
+            this.bounds.height.set(64f)
+        }
+        bottomRight.temporarilyDisableLayouts {
+            bottomRight += Button("").apply {
+                Anchor.BottomRight.configure(this)
+                this.bounds.width.set(32f)
+                this.bounds.height.set(32f)
+                this.skinID.set(UppermostMenu.BUTTON_SKIN_ID)
+                this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("github_mark")))
+                this.setOnAction {
+                    Gdx.net.openURI(PRMania.GITHUB)
+                }
+                val loc: ReadOnlyVar<String> = Localization.getVar("mainMenu.github.tooltip", Var { listOf(PRMania.GITHUB) })
+                this.tooltipElement.set(Tooltip(binding = { loc.use() }, font = main.fontMainMenuMain).apply { 
+                    this.markup.set(markup)
+                })
+            }
+        }
+        sceneRoot += bottomRight
+        sceneRoot += TextLabel("${PRMania.VERSION}", font = main.fontMainMenuMain).apply {
             Anchor.BottomRight.configure(this)
             this.bounds.height.set(32f)
-            this.bounds.width.set(300f)
             this.renderAlign.set(Align.bottomRight)
             this.textAlign.set(TextAlign.RIGHT)
             this.renderBackground.set(true)
@@ -250,7 +283,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         batch.begin()
 
         sceneRoot.renderAsRoot(batch)
-        
+
         if (this.transitionAway != null) {
             batch.setColor(0f, 0f, 0f, 1f)
             batch.fillRect(0f, 0f, camera.viewportWidth, camera.viewportHeight)
@@ -388,7 +421,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             batch.projectionMatrix = lastProjMatrix
             newFB.end()
         }
-        
+
         oldBuffers?.first?.disposeQuietly()
     }
 
