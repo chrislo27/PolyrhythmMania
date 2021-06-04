@@ -183,7 +183,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             font.setUseIntegerPositions(true) // Filtering doesn't kick in so badly, solves "wiggly" glyphs
             font.setFixedWidthGlyphs("0123456789")
         }
-        val defaultFixedFontAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
+        val defaultScaledFontAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
             font.setUseIntegerPositions(false) // Stops glyphs from being offset due to rounding
         }
         val defaultFontSize = 20
@@ -368,13 +368,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 22
-                }).setAfterLoad(defaultFixedFontAfterLoad)
+                }).setAfterLoad(defaultScaledFontAfterLoad)
         cache["mainmenu_heading"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Bold.ttf"), 40, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 40
-                }).setAfterLoad(defaultFixedFontAfterLoad)
+                }).setAfterLoad(defaultScaledFontAfterLoad)
     }
 
 
