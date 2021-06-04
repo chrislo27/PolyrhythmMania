@@ -37,12 +37,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     }
 
     private var lastWindowed: WindowSize = PRMania.DEFAULT_SIZE.copy()
-    @Volatile var blockResolutionChanges: Boolean = false
+    @Volatile
+    var blockResolutionChanges: Boolean = false
 
     @Volatile
     lateinit var preferences: Preferences
         private set
-    
+
     // Permanent screens
     lateinit var mainMenuScreen: MainMenuScreen
         private set
@@ -57,7 +58,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 //        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
 
         preferences = Gdx.app.getPreferences("PolyrhythmMania")
-        
+
         addFontsToCache(this.fontCache)
         PRManiaColors
 
@@ -84,7 +85,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun dispose() {
         super.dispose()
     }
-    
+
     private val userHomeFile: File = File(System.getProperty("user.home"))
     private val desktopFile: File = userHomeFile.resolve("Desktop")
 
@@ -101,13 +102,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     }
 
     fun getDefaultDirectory(): File = if (!desktopFile.exists() || !desktopFile.isDirectory) userHomeFile else desktopFile
-    
+
     /**
      * Blocks resolution changes and, if in fullscreen mode, resets to windowed mode.
      * After the [func] block is complete, [func] should call the completionCallback function (from any thread).
      * That will reset the resolution change block flag to its original value
      * and also goes back to fullscreen mode if needed.
-     * 
+     *
      * This function should only be called from the GL thread (use `Gdx.app.postRunnable` if necessary).
      */
     fun restoreForExternalDialog(func: (completionCallback: () -> Unit) -> Unit) {
@@ -116,7 +117,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         if (originalResolution.fullscreen) {
             Gdx.graphics.setWindowedMode(PRMania.DEFAULT_SIZE.width, PRMania.DEFAULT_SIZE.height)
         }
-        
+
         val callback: () -> Unit = {
             Gdx.app.postRunnable {
                 if (originalResolution.fullscreen) {
@@ -181,6 +182,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         val defaultAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
             font.setUseIntegerPositions(true) // Filtering doesn't kick in so badly, solves "wiggly" glyphs
             font.setFixedWidthGlyphs("0123456789")
+        }
+        val defaultFixedFontAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
+            font.setUseIntegerPositions(false) // Stops glyphs from being offset due to rounding
         }
         val defaultFontSize = 20
 
@@ -364,13 +368,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 22
-                }).setAfterLoad(defaultAfterLoad)
+                }).setAfterLoad(defaultFixedFontAfterLoad)
         cache["mainmenu_heading"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Bold.ttf"), 40, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 40
-                }).setAfterLoad(defaultAfterLoad)
+                }).setAfterLoad(defaultFixedFontAfterLoad)
     }
 
 
