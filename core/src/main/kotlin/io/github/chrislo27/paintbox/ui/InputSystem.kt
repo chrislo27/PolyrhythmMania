@@ -2,13 +2,12 @@ package io.github.chrislo27.paintbox.ui
 
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.math.Vector2
-import io.github.chrislo27.paintbox.PaintboxGame
 import io.github.chrislo27.paintbox.util.sumByFloat
 
 
 /**
  * Handles cascading the inputs from [InputProcessor] down to the [UIElement]s.
- * 
+ *
  * If an event appears to not get propagated, check that it is not layered under its siblings, as the topmost element
  * will always receive inputs.
  */
@@ -73,7 +72,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
             }
             val evt = MouseEntered(x, y)
             newPath.forEach {
-                it.fireEvent(evt) 
+                it.fireEvent(evt)
             }
             return wasTooltipTriggered
         }
@@ -91,7 +90,10 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
             offY -= cursor.contentZone.y.getOrCompute()
         }
         // offsets should be the absolute x/y of the parent of cursor
-        while (cursor != null && (!cursor.borderZone.containsPointLocal(x - offX, y - offY) || !cursor.apparentVisibility.getOrCompute())) {
+        while (cursor != null && (
+                        !cursor.borderZone.containsPointLocal(x - offX, y - offY)
+                                || !cursor.apparentVisibility.getOrCompute()
+                        )) {
             val removed = lastPath.removeLast()
             onMouseExited(removed, x, y)
             removed.fireEvent(MouseExited(x, y))
@@ -101,6 +103,41 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
                 offY -= cursor.contentZone.y.getOrCompute()
             }
         }
+
+        /*
+        Clipping check:
+        - Follow the path back up the cursor
+        - If at any point the cursor.doClipping == true, check:
+          - Does the cursor X and Y fit within the bounds?
+            - If not, trigger MouseExited for everything INCLUDING the cursor.
+         */
+        var clipCursor = cursor
+        var clipOffX = offX
+        var clipOffY = offY
+        while (clipCursor != null) {
+            if (clipCursor.doClipping.getOrCompute() && !clipCursor.borderZone.containsPointLocal(x - clipOffX, y - clipOffY)) {
+                // Delete and trigger mouse exited for everything up to and including clipCursor
+                var lastRemoved: UIElement
+                do {
+                    val removed = lastPath.removeLast()
+                    onMouseExited(removed, x, y)
+                    removed.fireEvent(MouseExited(x, y))
+                    lastRemoved = removed
+                    cursor = lastPath.lastOrNull()
+                    if (cursor != null) {
+                        offX -= cursor.contentZone.x.getOrCompute()
+                        offY -= cursor.contentZone.y.getOrCompute()
+                    }  
+                } while (lastRemoved !== clipCursor)
+            }
+            clipCursor = clipCursor.parent.getOrCompute()
+            if (clipCursor != null) {
+                clipOffX -= clipCursor.contentZone.x.getOrCompute()
+                clipOffY -= clipCursor.contentZone.y.getOrCompute()
+            }
+        }
+
+
         // We found the closest parent that contains x, y, so we'll navigate to its deepest descendant that contains xy
         // starting from it, and the resulting "subpath" will be appended to our current path
         var wasTooltipTriggered = false
@@ -115,7 +152,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
                 it.fireEvent(evt)
             }
         }
-        
+
         return wasTooltipTriggered
     }
 
@@ -140,7 +177,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         }
         return false
     }
-    
+
     private fun onMouseExited(element: UIElement, x: Float, y: Float) {
         val currentTooltipElement = sceneRoot.currentElementWithTooltip.getOrCompute()
         if (currentTooltipElement != null && element === currentTooltipElement) {
@@ -213,7 +250,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         val vec: Vector2 = sceneRoot.screenToUI(vector.set(screenX.toFloat(), screenY.toFloat()))
         updateDeepmostElementForMouseLocation(vec.x, vec.y)
-        
+
         var anyClick = false
         val pressedButton: Int? = pointerPressedButton[pointer]
         if (pressedButton != null) {
@@ -235,7 +272,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
                 }
             }
         }
-        
+
         return anyClick
     }
 

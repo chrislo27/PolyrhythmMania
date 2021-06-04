@@ -192,10 +192,10 @@ abstract class Control<SELF : Control<SELF>>
         }
     }
 
-    enum class PressedState {
-        NONE,
-        HOVERED,
-        PRESSED,
-        PRESSED_AND_HOVERED;
+    enum class PressedState(val hovered: Boolean, val pressed: Boolean) {
+        NONE(false, false),
+        HOVERED(true, false),
+        PRESSED(false, true),
+        PRESSED_AND_HOVERED(true, true);
     }
 }

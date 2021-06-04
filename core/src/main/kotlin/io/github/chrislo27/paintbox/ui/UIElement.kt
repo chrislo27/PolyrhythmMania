@@ -28,14 +28,22 @@ open class UIElement : UIBounds() {
      * If false, this element and its children will not be rendered.
      */
     val visible: Var<Boolean> = Var(true)
-    val apparentVisibility: ReadOnlyVar<Boolean> = Var.bind { 
+    val apparentVisibility: ReadOnlyVar<Boolean> = Var.bind {
         visible.use() && (parent.use()?.apparentVisibility?.use() ?: true)
     }
+
 
     /**
      * If true, this element will render with [ScissorStack] clipping on its entire bounds.
      */
     val doClipping: Var<Boolean> = Var(false)
+
+//    /**
+//     * True if this element has [doClipping] enabled, or if any other parent has [wasClipped] true.
+//     */
+//    val wasClipped: ReadOnlyVar<Boolean> = Var.bind {
+//        doClipping.use() || parent.use()?.wasClipped?.use() == true
+//    }
 
     /**
      * The opacity of this [UIElement].
@@ -119,7 +127,7 @@ open class UIElement : UIBounds() {
 
     protected open fun onChildAdded(newChild: UIElement) {
     }
-    
+
     protected open fun onChildRemoved(oldChild: UIElement) {
     }
 
@@ -247,9 +255,18 @@ open class UIElement : UIBounds() {
         var xOffset: Float = currentBounds.x.getOrCompute()
         var yOffset: Float = currentBounds.y.getOrCompute()
         while (current.children.isNotEmpty()) {
+            /*
+            Clipping check:
+            If current is clipped, then x and y MUST be within current to begin with!
+             */
+            if (current.doClipping.getOrCompute()) {
+                if (!current.bounds.containsPointLocal(x - xOffset, y - yOffset)) break
+            }
             val found = current.children.findLast { child ->
-                child.apparentVisibility.getOrCompute() && child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
+                child.apparentVisibility.getOrCompute()
+                        && child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
             } ?: break
+            
             res += found
             current = found
             currentBounds = current.contentZone
@@ -284,6 +301,7 @@ open class UIElement : UIBounds() {
     operator fun plusAssign(child: UIElement) {
         addChild(child)
     }
+
     operator fun minusAssign(child: UIElement) {
         removeChild(child)
     }
