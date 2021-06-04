@@ -407,7 +407,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         val cachedFramebufferSize = this.framebufferSize
         val width = Gdx.graphics.width
         val height = Gdx.graphics.height
-        if (cachedFramebufferSize.width != width || cachedFramebufferSize.height != height) {
+        if (width > 0 && height > 0 && (cachedFramebufferSize.width != width || cachedFramebufferSize.height != height)) {
             createFramebuffers(width, height, Pair(framebufferOld, framebufferCurrent))
         }
     }
