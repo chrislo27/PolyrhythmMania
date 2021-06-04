@@ -16,6 +16,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
 
     private val vector: Vector2 = Vector2(0f, 0f)
     private val clickPressedList: MutableMap<Int, ClickPressedState> = mutableMapOf()
+    private val pointerPressedButton: MutableMap<Int, Int> = mutableMapOf()
 
     /**
      * Represents the mouse x/y in UI space.
@@ -171,6 +172,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         val click = dispatchEventBasedOnMouse(ClickPressed(vec.x, vec.y, button))
         val allLayersPaths: Map<SceneRoot.Layer, List<UIElement>> = sceneRoot.allLayers.associateWith { it.lastHoveredElementPath.toList() }
         clickPressedList[button] = ClickPressedState(allLayersPaths, click)
+        pointerPressedButton[pointer] = button
 
         return touch != null || click != null
     }
@@ -203,6 +205,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
                 }
             }
         }
+        pointerPressedButton.remove(pointer)
 
         return touch != null || anyClick
     }
@@ -210,7 +213,30 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         val vec: Vector2 = sceneRoot.screenToUI(vector.set(screenX.toFloat(), screenY.toFloat()))
         updateDeepmostElementForMouseLocation(vec.x, vec.y)
-        return dispatchEventBasedOnMouse(TouchDragged(vec.x, vec.y, pointer)) != null
+        
+        var anyClick = false
+        val pressedButton: Int? = pointerPressedButton[pointer]
+        if (pressedButton != null) {
+            val previousClick = clickPressedList[pressedButton]
+            if (previousClick != null) {
+                outer@ for (layer in sceneRoot.allLayersReversed) {
+                    val lastHoveredElementPath = previousClick.lastHoveredElementPathPerLayer.getValue(layer)
+                    for (element in lastHoveredElementPath.asReversed()) {
+                        val eventResult = element.fireEvent(TouchDragged(vec.x, vec.y, pointer,
+                                element in layer.lastHoveredElementPath && element.apparentVisibility.getOrCompute())
+                        )
+                        if (eventResult) {
+                            anyClick = true
+                        }
+                    }
+                    if (anyClick) {
+                        break@outer
+                    }
+                }
+            }
+        }
+        
+        return anyClick
     }
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
