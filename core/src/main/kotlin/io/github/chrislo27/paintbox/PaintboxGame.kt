@@ -152,7 +152,6 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
         fillTexture = Texture(pixmap)
         pixmap.dispose()
         spritesheetTexture = Texture(Gdx.files.internal("paintbox/paintbox_spritesheet_noborder.png"), true).apply {
-//            this.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear)
             this.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         }
         paintboxSpritesheet = PaintboxSpritesheet(spritesheetTexture)
@@ -225,7 +224,7 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
                 val string =
                         """FPS: $fps
 Debug mode: ${Paintbox.DEBUG_KEY_NAME}
-  Holding ${Paintbox.DEBUG_KEY_NAME}: I - Reload I18N | S - Stage outlines (SHIFT for only visible) | G - gc
+  Holding ${Paintbox.DEBUG_KEY_NAME}: I - Reload I18N | S - UI outlines ${Paintbox.stageOutlines} (SHIFT to change mode) | G - gc
 Version: $versionString
 Memory: ${numberFormat.format(Gdx.app.nativeHeap / 1024)} / ${numberFormat.format(MemoryUtils.maxMemoryKiB)} KiB (${numberFormat.format(debugInfo.memoryDelta / 1024)} KiB/s)
 Screen: ${screen?.javaClass?.canonicalName}
@@ -363,7 +362,7 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
                 Input.Keys.S -> {
                     val old = Paintbox.stageOutlines
                     Paintbox.stageOutlines = when (old) {
-                        NONE -> if (Gdx.input.isShiftDown()) ONLY_VISIBLE else ALL
+                        NONE -> if (Gdx.input.isShiftDown()) ALL else ONLY_VISIBLE
                         ALL -> if (Gdx.input.isShiftDown()) ONLY_VISIBLE else NONE
                         ONLY_VISIBLE -> if (Gdx.input.isShiftDown()) ALL else NONE
                     }
