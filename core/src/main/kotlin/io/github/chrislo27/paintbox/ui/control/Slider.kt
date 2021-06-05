@@ -14,6 +14,7 @@ import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
 import io.github.chrislo27.paintbox.ui.skin.Skin
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
+import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 
 
@@ -24,7 +25,8 @@ open class Slider : Control<Slider>() {
     companion object {
         const val SLIDER_SKIN_ID: String = "Slider"
         const val MIN_DEFAULT: Float = 0f
-        const val MAX_DEFAULT: Float = 10f
+        const val MAX_DEFAULT: Float = 100f
+        const val TICK_DEFAULT: Float = 10f
 
         init {
             DefaultSkins.register(SLIDER_SKIN_ID, SkinFactory { element: Slider ->
@@ -35,6 +37,7 @@ open class Slider : Control<Slider>() {
 
     val minimum: FloatVar = FloatVar(MIN_DEFAULT)
     val maximum: FloatVar = FloatVar(MAX_DEFAULT)
+    val tickUnit: FloatVar = FloatVar(TICK_DEFAULT)
     private val _value: FloatVar = FloatVar(MIN_DEFAULT)
     val value: ReadOnlyVar<Float> = _value
 
@@ -64,7 +67,11 @@ open class Slider : Control<Slider>() {
     }
 
     fun setValue(value: Float) {
-        _value.set(value.coerceIn(minimum.getOrCompute(), maximum.getOrCompute()))
+        val tick = tickUnit.getOrCompute().coerceAtLeast(0f)
+        val snapped = if (tick > 0f) {
+            MathHelper.snapToNearest(value, tick)
+        } else value
+        _value.set(snapped.coerceIn(minimum.getOrCompute(), maximum.getOrCompute()))
     }
 
     protected open fun getArrowButtonTexReg(): TextureRegion {

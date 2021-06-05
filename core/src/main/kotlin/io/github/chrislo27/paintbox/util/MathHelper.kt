@@ -38,7 +38,7 @@ object MathHelper {
 
     fun snapToNearest(value: Float, interval: Float): Float {
         val abs = abs(interval)
-        if (abs == 0f)
+        if (abs <= 0f)
             return value
         return (value / abs).roundToInt() * abs
     }

@@ -450,10 +450,11 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
         }
         
         bg += Slider().apply {
-
             Anchor.CentreRight.configure(this, offsetX = -100f - 50f, offsetY = 100f)
             this.bounds.width.set(200f)
             this.bounds.height.set(30f)
+            this.maximum.set(3.14f)
+            this.tickUnit.set(1f)
         }
     }
 
