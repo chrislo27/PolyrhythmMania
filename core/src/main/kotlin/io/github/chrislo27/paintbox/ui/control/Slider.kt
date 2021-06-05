@@ -108,14 +108,22 @@ open class Slider : Control<Slider>() {
             val opacity = element.apparentOpacity.getOrCompute()
             val tmpColor = ColorStack.getAndPush()
 
+            val lineH = rectH * 0.5f
+            val linePad = 4f
             tmpColor.set(bgColor.getOrCompute())
             tmpColor.a *= opacity
             batch.color = tmpColor
-            batch.fillRect(rectX, rectY - rectH, rectW, rectH)
+            batch.fillRect(rectX + linePad, rectY - rectH * 0.5f - lineH * 0.5f, rectW - linePad * 2, lineH)
             tmpColor.set(filledColor.getOrCompute())
             tmpColor.a *= opacity
             batch.color = tmpColor
-            batch.fillRect(rectX, rectY - rectH, rectW * element.convertValueToPercentage(element._value.getOrCompute()), rectH)
+            val valueAsPercent = element.convertValueToPercentage(element._value.getOrCompute())
+            batch.fillRect(rectX + linePad, rectY - rectH * 0.5f - lineH * 0.5f, (rectW - linePad * 2) * valueAsPercent, lineH)
+
+            tmpColor.mul(0.97f)
+            batch.color = tmpColor
+            val circleH = rectH
+            batch.draw(PaintboxGame.paintboxSpritesheet.circleFilled, rectX + (valueAsPercent * (rectW - circleH)), rectY - rectH, circleH, circleH)
 
             batch.packedColor = lastPackedColor
             ColorStack.pop()
