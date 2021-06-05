@@ -6,6 +6,7 @@ import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.util.gdxutils.maxX
 import io.github.chrislo27.paintbox.util.gdxutils.maxY
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import java.lang.Float.max
 import java.lang.Float.min
@@ -16,6 +17,8 @@ import kotlin.math.floor
 
 class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val menuPane: Pane) {
     
+    val main: PRManiaGame = mainMenu.main
+    
     val menus: List<MMMenu> = mutableListOf()
     val activeMenu: ReadOnlyVar<MMMenu?> = Var(null)
     
@@ -24,11 +27,13 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val uppermostMenu: UppermostMenu = UppermostMenu(this)
     val quitMenu: QuitMenu = QuitMenu(this)
     val settingsMenu: SettingsMenu = SettingsMenu(this)
+    val audioSettingsMenu: AudioSettingsMenu = AudioSettingsMenu(this)
     
     init {
         addMenu(uppermostMenu)
         addMenu(quitMenu)
         addMenu(settingsMenu)
+        addMenu(audioSettingsMenu)
         
         changeActiveMenu(uppermostMenu, false, instant = true)
         menuStack.push(uppermostMenu)

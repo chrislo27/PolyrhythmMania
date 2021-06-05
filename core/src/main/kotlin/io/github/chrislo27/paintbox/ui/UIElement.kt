@@ -13,6 +13,10 @@ import io.github.chrislo27.paintbox.ui.border.NoBorder
 
 open class UIElement : UIBounds() {
 
+    companion object {
+        private val DEFAULT_MULTIPLIER_BINDING: Var.Context.() -> Float = { 1f }
+    }
+
     val parent: Var<UIElement?> = Var(null)
 
     var children: List<UIElement> = emptyList()
@@ -191,31 +195,19 @@ open class UIElement : UIBounds() {
         }
     }
 
-    fun bindWidthToParent(multiplier: Float = 1f, adjustBinding: Var.Context.() -> Float) {
+    fun bindWidthToParent(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * multiplier + adjustBinding()
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() }
+                    ?: 0f) * multiplierBinding() + adjustBinding()
         }
     }
 
-    fun bindHeightToParent(multiplier: Float = 1f, adjustBinding: Var.Context.() -> Float) {
+    fun bindHeightToParent(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) * multiplier + adjustBinding()
-        }
-    }
-
-    fun bindWidthToParent(multiplierBinding: Var.Context.() -> Float = { 1f }, adjustBinding: Var.Context.() -> Float) {
-        val thisBounds = this.bounds
-        thisBounds.width.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * multiplierBinding() + adjustBinding()
-        }
-    }
-
-    fun bindHeightToParent(multiplierBinding: Var.Context.() -> Float = { 1f }, adjustBinding: Var.Context.() -> Float) {
-        val thisBounds = this.bounds
-        thisBounds.height.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) * multiplierBinding() + adjustBinding()
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() }
+                    ?: 0f) * multiplierBinding() + adjustBinding()
         }
     }
 
@@ -279,7 +271,7 @@ open class UIElement : UIBounds() {
                 child.apparentVisibility.getOrCompute()
                         && child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
             } ?: break
-            
+
             res += found
             current = found
             currentBounds = current.contentZone

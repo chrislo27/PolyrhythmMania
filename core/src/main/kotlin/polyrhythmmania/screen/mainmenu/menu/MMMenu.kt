@@ -1,16 +1,15 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
+import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.Markup
 import io.github.chrislo27.paintbox.font.PaintboxFont
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextRun
-import io.github.chrislo27.paintbox.ui.Anchor
-import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.SceneRoot
-import io.github.chrislo27.paintbox.ui.UIElement
+import io.github.chrislo27.paintbox.ui.*
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.control.Button
 import io.github.chrislo27.paintbox.ui.control.TextLabel
@@ -36,6 +35,7 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
     companion object {
         const val WIDTH_EXTRA_SMALL: Float = 0.3f
         const val WIDTH_SMALL: Float = 0.4f
+        const val WIDTH_MID: Float = 0.5f
         const val WIDTH_MEDIUM: Float = 0.6f
         const val WIDTH_LARGE: Float = 0.75f
         const val WIDTH_FULL: Float = 1f
@@ -129,8 +129,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
     protected fun createLongButton(binding: Var.Context.() -> String): Button = Button(binding, font = font).apply {
         this.skinID.set(BUTTON_LONG_SKIN_ID)
-        this.padding.set(Insets(8f, 8f, 16f, 16f))
-        this.bounds.height.set(48f)
+        this.padding.set(Insets(4f, 4f, 12f, 12f))
+        this.bounds.height.set(40f)
         this.textAlign.set(TextAlign.LEFT)
         this.renderAlign.set(Align.left)
     }
@@ -141,5 +141,59 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         this.textAlign.set(TextAlign.CENTRE)
         this.renderAlign.set(Align.center)
         this.setScaleXY(0.75f)
+    }
+    
+    protected fun createSettingsOption(labelText: Var.Context.() -> String): SettingsOptionPane {
+        return SettingsOptionPane(labelText, this.font).apply {
+            this.bounds.height.set(36f)
+        }
+    }
+
+    open class SettingsOptionPane(labelText: Var.Context.() -> String, font: PaintboxFont) : Pane() {
+
+        val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
+        val textColorVar: ReadOnlyVar<Color> = Var.bind {
+            if (isHoveredOver.use()) UppermostMenu.ButtonSkin.HOVERED_TEXT else UppermostMenu.ButtonSkin.TEXT_COLOR
+        }
+        val bgColorVar: ReadOnlyVar<Color> = Var.bind {
+            if (isHoveredOver.use()) UppermostMenu.ButtonSkin.HOVERED_BG else UppermostMenu.ButtonSkin.BG_COLOR
+        }
+
+        val label: TextLabel
+        val content: Pane
+
+        init {
+            val rect = RectElement(binding = { bgColorVar.use() }).apply {
+                this.padding.set(Insets(4f))
+            }
+            addChild(rect)
+            
+            label = TextLabel(labelText, font).apply {
+                Anchor.TopLeft.configure(this)
+                this.bindWidthToParent(adjust = 0f, multiplier = 0.5f)
+                this.textColor.bind { textColorVar.use() }
+                this.renderAlign.set(Align.left)
+                this.textAlign.set(TextAlign.RIGHT)
+            }
+            rect.addChild(label)
+            
+            content = Pane().apply {
+                Anchor.TopRight.configure(this)
+                this.bindWidthToParent(adjust = 0f, multiplier = 0.5f)
+            }
+            rect.addChild(content)
+
+            addInputEventListener { event ->
+                when (event) {
+                    is MouseEntered -> {
+                        (isHoveredOver as Var).set(true)
+                    }
+                    is MouseExited -> {
+                        (isHoveredOver as Var).set(false)
+                    }
+                }
+                false
+            }
+        }
     }
 }

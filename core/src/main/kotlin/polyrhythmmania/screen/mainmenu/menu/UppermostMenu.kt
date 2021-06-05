@@ -31,24 +31,38 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
 
     open class ButtonSkin(element: Button) : io.github.chrislo27.paintbox.ui.control.ButtonSkin(element) {
+        companion object {
+            val TEXT_COLOR: Color = Color().grey(90f / 255f, 1f)
+            val DISABLED_TEXT: Color = Color().grey(30f / 255f)
+            val HOVERED_TEXT: Color = Color().grey(1f)
+            val PRESSED_TEXT: Color = Color(0.4f, 1f, 1f, 1f)
+            val PRESSED_AND_HOVERED_TEXT: Color = Color(0.5f, 1f, 1f, 1f)
+            
+            val BG_COLOR: Color = Color(1f, 1f, 1f, 0f)
+            val HOVERED_BG: Color = Color().grey(90f / 255f, 0.8f)
+            val DISABLED_BG: Color = BG_COLOR.cpy()
+            val PRESSED_BG: Color = HOVERED_BG.cpy()
+            val PRESSED_AND_HOVERED_BG: Color = HOVERED_BG.cpy()
+        }
+        
         init {
-            val grey = Color().grey(90f / 255f, 1f)
+            val grey = TEXT_COLOR
             this.defaultTextColor.set(grey)
-            this.disabledTextColor.set(Color().grey(30f / 255f))
-            this.hoveredTextColor.set(Color().grey(1f))
-            this.pressedTextColor.set(Color(0.4f, 1f, 1f, 1f))
-            this.pressedAndHoveredTextColor.set(Color(0.5f, 1f, 1f, 1f))
-            this.defaultBgColor.set(Color(1f, 1f, 1f, 0f))
-            this.hoveredBgColor.set(grey.cpy().apply { a *= 0.8f })
-            this.disabledBgColor.bind { defaultBgColor.use() }
-            this.pressedBgColor.bind { hoveredBgColor.use() }
-            this.pressedAndHoveredBgColor.bind { hoveredBgColor.use() }
+            this.disabledTextColor.set(DISABLED_TEXT)
+            this.hoveredTextColor.set(HOVERED_TEXT)
+            this.pressedTextColor.set(PRESSED_TEXT)
+            this.pressedAndHoveredTextColor.set(PRESSED_AND_HOVERED_TEXT)
+            this.defaultBgColor.set(BG_COLOR)
+            this.hoveredBgColor.set(HOVERED_BG)
+            this.disabledBgColor.set(DISABLED_BG)
+            this.pressedBgColor.set(PRESSED_BG)
+            this.pressedAndHoveredBgColor.set(PRESSED_AND_HOVERED_BG)
             this.roundedRadius.set(0)
         }
     }
 
     init {
-        this.setSize(WIDTH_SMALL)
+        this.setSize(WIDTH_EXTRA_SMALL)
         val vbox = VBox().apply {
             this.spacing.set(0f)
             this.align.set(VBox.Align.BOTTOM)
@@ -94,4 +108,5 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
         this += vbox
     }
+    
 }
