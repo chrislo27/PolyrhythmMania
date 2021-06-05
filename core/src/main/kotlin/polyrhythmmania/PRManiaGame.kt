@@ -39,9 +39,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     private var lastWindowed: WindowSize = PRMania.DEFAULT_SIZE.copy()
     @Volatile
     var blockResolutionChanges: Boolean = false
-
-    @Volatile
+    
     lateinit var preferences: Preferences
+        private set
+    lateinit var settings: Settings
         private set
 
     // Permanent screens
@@ -61,6 +62,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
         addFontsToCache(this.fontCache)
         PRManiaColors
+        settings = Settings(this, preferences).apply { 
+            load()
+        }
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())
 

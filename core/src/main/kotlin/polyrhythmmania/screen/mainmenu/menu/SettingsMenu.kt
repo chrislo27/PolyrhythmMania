@@ -14,12 +14,12 @@ import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 
-class QuitMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     init {
-        this.setSize(MMMenu.WIDTH_SMALL)
-        this.titleText.bind { Localization.getVar("mainMenu.quit.title").use() }
-        this.contentPane.bounds.height.set(200f)
+        this.setSize(MMMenu.WIDTH_EXTRA_SMALL)
+        this.titleText.bind { Localization.getVar("mainMenu.settings.title").use() }
+        this.contentPane.bounds.height.set(300f)
         
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)
@@ -37,29 +37,19 @@ class QuitMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         contentPane.addChild(hbox)
 
         vbox.temporarilyDisableLayouts {
-            vbox += TextLabel(binding = { Localization.getVar("mainMenu.quit.desc").use() }).apply {
-                this.markup.set(this@QuitMenu.markup)
-                this.bounds.height.set(80f)
-                this.padding.set(Insets(4f))
-                this.textColor.set(Color.DARK_GRAY)
-                this.renderAlign.set(Align.topLeft)
-                this.textAlign.set(TextAlign.LEFT)
-                this.doLineWrapping.set(true)
+            vbox += createLongButton { Localization.getVar("mainMenu.settings.audio").use() }.apply {
+                this.disabled.set(true)
+            }
+            vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {
+                this.disabled.set(true)
+            }
+            vbox += createLongButton { Localization.getVar("mainMenu.settings.input").use() }.apply { 
+                this.disabled.set(true)
             }
         }
 
         hbox.temporarilyDisableLayouts {
-            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.quit.confirm").use() }).apply {
-                this.bounds.width.set(100f)
-                this.setOnAction {
-                    Gdx.app.exit()
-                    thread(isDaemon = true) {
-                        Thread.sleep(1000L)
-                        exitProcess(0)
-                    }
-                }
-            }
-            hbox += createSmallButton(binding = { Localization.getVar("common.cancel").use() }).apply {
+            hbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
                 this.bounds.width.set(100f)
                 this.setOnAction {
                     menuCol.popLastMenu()

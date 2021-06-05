@@ -9,6 +9,7 @@ import io.github.chrislo27.paintbox.util.gdxutils.maxY
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import java.lang.Float.max
 import java.lang.Float.min
+import java.util.*
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -18,17 +19,22 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val menus: List<MMMenu> = mutableListOf()
     val activeMenu: ReadOnlyVar<MMMenu?> = Var(null)
     
+    private val menuStack: Deque<MMMenu> = ArrayDeque()
+    
     val uppermostMenu: UppermostMenu = UppermostMenu(this)
     val quitMenu: QuitMenu = QuitMenu(this)
+    val settingsMenu: SettingsMenu = SettingsMenu(this)
     
     init {
         addMenu(uppermostMenu)
         addMenu(quitMenu)
+        addMenu(settingsMenu)
         
         changeActiveMenu(uppermostMenu, false, instant = true)
+        menuStack.push(uppermostMenu)
     }
     
-    fun addMenu(menu: MMMenu) {
+    private fun addMenu(menu: MMMenu) {
         menus as MutableList
         menus.add(menu)
         
@@ -77,5 +83,18 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         menus.forEach { it.visible.set(false) }
         menu.visible.set(true)
         (activeMenu as Var).set(menu)
+    }
+    
+    fun pushNewMenu(menu: MMMenu, instant: Boolean = false) {
+        changeActiveMenu(menu, false, instant)
+        menuStack.push(menu)
+    }
+
+    fun popLastMenu(instant: Boolean = false): MMMenu {
+        if (menuStack.size <= 1) return menuStack.peek()
+        val popped = menuStack.pop()
+        val menu = menuStack.peek()
+        changeActiveMenu(menu, true, instant)
+        return popped
     }
 }

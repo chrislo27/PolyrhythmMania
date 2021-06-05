@@ -45,15 +45,7 @@ class SoundSystem(private val mixer: Mixer,
                 }
             }
 
-            fun getDefaultMixer(): Mixer {
-                val first = supportedMixers.firstOrNull {
-                    val name = it.mixerInfo.name
-                    !name.startsWith("Port ") || name.contains("Primary Sound Driver")
-                }
-                return first ?: supportedMixers.first()
-            }
-
-            val mixer = getDefaultMixer()
+            val mixer = MixerHandler.getDefaultMixer(supportedMixers)
 //            println("Picked mixer ${mixer.mixerInfo} ${mixer.sourceLineInfo}")
             return SoundSystem(mixer, ioAudioFormat, bufferSize)
         }
