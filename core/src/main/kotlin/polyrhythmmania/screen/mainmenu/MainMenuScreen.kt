@@ -241,8 +241,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         }
         sceneRoot += bottomRight
-        sceneRoot += TextLabel("${PRMania.VERSION}", font = main.fontMainMenuMain).apply {
+        sceneRoot += Tooltip("${PRMania.VERSION}", font = main.fontMainMenuMain).apply {
             Anchor.BottomRight.configure(this)
+            resizeBoundsToContent()
             this.bounds.height.set(32f)
             this.renderAlign.set(Align.bottomRight)
             this.textAlign.set(TextAlign.RIGHT)
