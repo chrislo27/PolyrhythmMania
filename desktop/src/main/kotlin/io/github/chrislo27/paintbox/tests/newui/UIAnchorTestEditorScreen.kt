@@ -448,6 +448,13 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                 r.addChild(scrollPane)
             })
         }
+        
+        bg += Slider().apply {
+
+            Anchor.CentreRight.configure(this, offsetX = -100f - 50f, offsetY = 100f)
+            this.bounds.width.set(200f)
+            this.bounds.height.set(30f)
+        }
     }
 
     override fun render(delta: Float) {
