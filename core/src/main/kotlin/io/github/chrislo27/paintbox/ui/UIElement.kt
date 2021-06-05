@@ -2,7 +2,6 @@ package io.github.chrislo27.paintbox.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import io.github.chrislo27.paintbox.binding.FloatVar
 import io.github.chrislo27.paintbox.ui.area.ReadOnlyBounds
@@ -70,8 +69,8 @@ open class UIElement : UIBounds() {
     val borderStyle: Var<Border> = Var(NoBorder)
 
     init {
-        bindWidthToParent(0f)
-        bindHeightToParent(0f)
+        bindWidthToParent(adjust = 0f, multiplier = 1f)
+        bindHeightToParent(adjust = 0f, multiplier = 1f)
     }
 
     @Suppress("RedundantModalityModifier")
@@ -178,31 +177,45 @@ open class UIElement : UIBounds() {
         }
     }
 
-    fun bindWidthToParent(adjust: Float = 0f) {
+    fun bindWidthToParent(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) + adjust
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * multiplier + adjust
         }
     }
 
-    fun bindHeightToParent(adjust: Float = 0f) {
+    fun bindHeightToParent(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) + adjust
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) * multiplier + adjust
         }
     }
 
-    fun bindWidthToParent(adjustBinding: Var.Context.() -> Float) {
+    fun bindWidthToParent(multiplier: Float = 1f, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) + adjustBinding()
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * multiplier + adjustBinding()
         }
     }
 
-    fun bindHeightToParent(adjustBinding: Var.Context.() -> Float) {
+    fun bindHeightToParent(multiplier: Float = 1f, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) + adjustBinding()
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) * multiplier + adjustBinding()
+        }
+    }
+
+    fun bindWidthToParent(multiplierBinding: Var.Context.() -> Float = { 1f }, adjustBinding: Var.Context.() -> Float) {
+        val thisBounds = this.bounds
+        thisBounds.width.bind {
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * multiplierBinding() + adjustBinding()
+        }
+    }
+
+    fun bindHeightToParent(multiplierBinding: Var.Context.() -> Float = { 1f }, adjustBinding: Var.Context.() -> Float) {
+        val thisBounds = this.bounds
+        thisBounds.height.bind {
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) * multiplierBinding() + adjustBinding()
         }
     }
 
