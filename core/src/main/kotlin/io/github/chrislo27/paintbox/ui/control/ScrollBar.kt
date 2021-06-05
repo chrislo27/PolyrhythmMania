@@ -15,6 +15,7 @@ import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
 import io.github.chrislo27.paintbox.ui.skin.Skin
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
+import io.github.chrislo27.paintbox.util.gdxutils.fillRoundedRect
 import java.awt.MouseInfo
 
 
@@ -364,16 +365,24 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
             val scrollableThumbArea = element.maximum.getOrCompute() - element.minimum.getOrCompute()
             when (element.orientation) {
                 Orientation.HORIZONTAL -> {
-                    batch.fillRect(rectX + thumbBounds.x.getOrCompute()
+                    batch.fillRoundedRect(rectX + thumbBounds.x.getOrCompute()
                             + (if (element.orientation == Orientation.HORIZONTAL) (currentValue / scrollableThumbArea * (thumbBounds.width.getOrCompute() - thumbW)) else 0f),
                             rectY - rectH + thumbBounds.y.getOrCompute(),
-                            thumbW, thumbH)
+                            thumbW, thumbH, thumbH / 2f)
+//                    batch.fillRect(rectX + thumbBounds.x.getOrCompute()
+//                            + (if (element.orientation == Orientation.HORIZONTAL) (currentValue / scrollableThumbArea * (thumbBounds.width.getOrCompute() - thumbW)) else 0f),
+//                            rectY - rectH + thumbBounds.y.getOrCompute(),
+//                            thumbW, thumbH)
                 }
                 Orientation.VERTICAL -> {
-                    batch.fillRect(rectX + thumbBounds.x.getOrCompute(),
+                    batch.fillRoundedRect(rectX + thumbBounds.x.getOrCompute(),
                             rectY - rectH + thumbBounds.y.getOrCompute() + (thumbBounds.height.getOrCompute() - thumbH)
                                     - (if (element.orientation == Orientation.VERTICAL) (currentValue / scrollableThumbArea * (thumbBounds.height.getOrCompute() - thumbH)) else 0f),
-                            thumbW, thumbH)
+                            thumbW, thumbH, thumbW / 2f)
+//                    batch.fillRect(rectX + thumbBounds.x.getOrCompute(),
+//                            rectY - rectH + thumbBounds.y.getOrCompute() + (thumbBounds.height.getOrCompute() - thumbH)
+//                                    - (if (element.orientation == Orientation.VERTICAL) (currentValue / scrollableThumbArea * (thumbBounds.height.getOrCompute() - thumbH)) else 0f),
+//                            thumbW, thumbH)
                 }
             }
 
