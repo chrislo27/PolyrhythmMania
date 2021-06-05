@@ -388,16 +388,17 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             // Black out old frame buffer
             lastProjMatrix.set(batch.projectionMatrix)
             val camera = fullCamera
-            val newFB = this.framebufferOld
-            newFB.begin()
-            batch.projectionMatrix = camera.combined
-            batch.begin()
-            batch.setColor(0f, 0f, 0f, 1f)
-            batch.fillRect(0f, 0f, camera.viewportWidth, camera.viewportHeight)
-            batch.setColor(1f, 1f, 1f, 1f)
-            batch.end()
-            batch.projectionMatrix = lastProjMatrix
-            newFB.end()
+            listOf(framebufferOld, framebufferCurrent).forEach { newFB ->
+                newFB.begin()
+                batch.projectionMatrix = camera.combined
+                batch.begin()
+                batch.setColor(0f, 0f, 0f, 1f)
+                batch.fillRect(0f, 0f, camera.viewportWidth, camera.viewportHeight)
+                batch.setColor(1f, 1f, 1f, 1f)
+                batch.end()
+                batch.projectionMatrix = lastProjMatrix
+                newFB.end()
+            }
             
             flipAnimation = TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT)
         }
