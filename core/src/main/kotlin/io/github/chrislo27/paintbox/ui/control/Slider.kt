@@ -16,6 +16,7 @@ import io.github.chrislo27.paintbox.ui.skin.Skin
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
 import io.github.chrislo27.paintbox.util.MathHelper
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
+import io.github.chrislo27.paintbox.util.gdxutils.fillRoundedRect
 
 
 /**
@@ -108,21 +109,22 @@ open class Slider : Control<Slider>() {
             val opacity = element.apparentOpacity.getOrCompute()
             val tmpColor = ColorStack.getAndPush()
 
-            val lineH = rectH * 0.5f
+            val lineH = rectH * 0.4f
             val linePad = 4f
+            val circleH = rectH
+            
             tmpColor.set(bgColor.getOrCompute())
             tmpColor.a *= opacity
             batch.color = tmpColor
-            batch.fillRect(rectX + linePad, rectY - rectH * 0.5f - lineH * 0.5f, rectW - linePad * 2, lineH)
+            batch.fillRoundedRect(rectX + linePad, rectY - rectH * 0.5f - lineH * 0.5f, rectW - linePad * 2, lineH, lineH * 0.5f)
             tmpColor.set(filledColor.getOrCompute())
             tmpColor.a *= opacity
             batch.color = tmpColor
             val valueAsPercent = element.convertValueToPercentage(element._value.getOrCompute())
-            batch.fillRect(rectX + linePad, rectY - rectH * 0.5f - lineH * 0.5f, (rectW - linePad * 2) * valueAsPercent, lineH)
+            batch.fillRoundedRect(rectX + linePad, rectY - rectH * 0.5f - lineH * 0.5f, (rectW - linePad * 2) * valueAsPercent, lineH, lineH * 0.5f)
 
             tmpColor.mul(0.97f)
             batch.color = tmpColor
-            val circleH = rectH
             batch.draw(PaintboxGame.paintboxSpritesheet.circleFilled, rectX + (valueAsPercent * (rectW - circleH)), rectY - rectH, circleH, circleH)
 
             batch.packedColor = lastPackedColor
