@@ -1,36 +1,29 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.TextAlign
 import io.github.chrislo27.paintbox.font.TextRun
 import io.github.chrislo27.paintbox.ui.Anchor
-import io.github.chrislo27.paintbox.ui.ColorStack
 import io.github.chrislo27.paintbox.ui.Pane
 import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.control.ScrollBar
 import io.github.chrislo27.paintbox.ui.control.ScrollPane
 import io.github.chrislo27.paintbox.ui.control.ScrollPaneSkin
 import io.github.chrislo27.paintbox.ui.control.TextLabel
 import io.github.chrislo27.paintbox.ui.layout.HBox
 import io.github.chrislo27.paintbox.ui.layout.VBox
-import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
-import io.github.chrislo27.paintbox.ui.skin.SkinFactory
-import io.github.chrislo27.paintbox.util.gdxutils.fillRect
-import io.github.chrislo27.paintbox.util.gdxutils.fillRoundedRect
 import io.github.chrislo27.paintbox.util.sumByFloat
 import polyrhythmmania.Localization
 import polyrhythmmania.credits.Credits
 import polyrhythmmania.ui.PRManiaSkins
-import kotlin.math.ceil
+import kotlin.math.max
 
 
 class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     companion object {
-        private const val ROW_HEIGHT: Float = 40f
+        private const val ROW_HEIGHT: Float = 36f
         private val HEADING_TEXT_COLOR: Color = Color.valueOf("564F2BFF")
         private val NAME_TEXT_COLOR: Color = Color.valueOf("323232FF")
     }
@@ -64,7 +57,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
             this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
-            
+
             val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
             this.vBar.skinID.set(scrollBarSkinID)
             this.hBar.skinID.set(scrollBarSkinID)
@@ -81,12 +74,12 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Credits.credits.forEach { (header, names) ->
                 vbox += createCreditRow(header, names)
             }
-            vbox += TextLabel(binding = {Localization.getVar("credits.licenseInfo").use()}, font = font).apply {
+            vbox += TextLabel(binding = { Localization.getVar("credits.licenseInfo").use() }, font = font).apply {
                 Anchor.TopLeft.configure(this)
                 this.bindWidthToParent(adjust = 0f, multiplier = 1f)
                 this.bounds.x.set(0f)
                 this.bounds.height.set(ROW_HEIGHT * 2)
-                this.padding.set(Insets(8f, 8f, 6f, 6f))
+                this.padding.set(Insets(12f, 8f, 6f, 6f))
                 this.markup.set(this@CreditsMenu.markup)
                 this.textColor.set(NAME_TEXT_COLOR)
                 this.renderAlign.set(Align.topLeft)
@@ -112,43 +105,63 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
 
     private fun createCreditRow(headingLoc: String, names: List<String>): Pane {
-        return Pane().apply {
-            val nameColumns = 2
-            val rowCount = ceil(names.size / nameColumns.toFloat()).toInt()
-            this.bounds.height.set(rowCount * ROW_HEIGHT)
+        fun getRowHeight(name: String): Float = name.count { it == '\n' } * 0.75f + 1
+        fun getHeadingRowHeight(name: String): Float = name.count { it == '\n' } * 0.75f + 1f
 
-            val headingLabel = TextLabel(binding = { Localization.getVar(headingLoc).use() }, font = font).apply {
+        return Pane().apply {
+            val numNameColumns = 2
+
+            val headingVar = Localization.getVar(headingLoc)
+            val headingLabel = TextLabel(binding = { headingVar.use() }, font = font).apply {
                 Anchor.TopLeft.configure(this)
                 this.bounds.width.set(220f)
-                this.bounds.height.set(ROW_HEIGHT)
-                this.padding.set(Insets(4f, 4f, 0f, 8f))
+                this.bounds.height.bind { ROW_HEIGHT * getHeadingRowHeight(text.use()) }
+                this.padding.set(Insets(12f, 2f, 0f, 8f))
                 this.textColor.set(HEADING_TEXT_COLOR)
-                this.renderAlign.set(Align.right)
+                this.renderAlign.set(Align.topRight)
                 this.textAlign.set(TextAlign.RIGHT)
             }
             addChild(headingLabel)
+            var currentRowY = 0f
+            var currentRowHeight = 0f
             addChild(Pane().apply {
                 Anchor.TopRight.configure(this)
                 this.bindWidthToParent(adjustBinding = { -headingLabel.bounds.width.use() })
-                names.forEachIndexed { index, str ->
-                    val row = index / nameColumns
-                    val col = index % nameColumns
 
+                var currentRow = -1
+                names.forEachIndexed { index, str ->
+                    val row = index / numNameColumns
+                    val col = index % numNameColumns
+
+                    if (row != currentRow) {
+                        currentRow = row
+                        currentRowY += currentRowHeight
+                        currentRowHeight = 0f
+                    }
+
+                    val rh = getRowHeight(str)
                     addChild(TextLabel(str, font = font).apply {
                         Anchor.TopLeft.configure(this)
-                        this.bindWidthToParent(adjust = 0f, multiplier = 1f / nameColumns)
+                        this.bindWidthToParent(adjust = 0f, multiplier = 1f / numNameColumns)
                         this.bounds.x.bind { bounds.width.use() * col }
-                        this.bounds.height.set(ROW_HEIGHT)
-                        this.bounds.y.set(ROW_HEIGHT * row)
-                        this.padding.set(Insets(4f, 4f, 6f, 0f))
+                        this.bounds.height.set(rh * ROW_HEIGHT)
+                        this.bounds.y.set(currentRowY)
+                        this.padding.set(Insets(12f, 2f, 6f, 2f))
                         this.markup.set(this@CreditsMenu.markup)
                         this.textColor.set(NAME_TEXT_COLOR)
-                        this.renderAlign.set(Align.left)
+                        this.renderAlign.set(Align.topLeft)
                         this.textAlign.set(TextAlign.LEFT)
                     })
+                    currentRowHeight = max(currentRowHeight, rh * ROW_HEIGHT)
                 }
             })
+
+            val bottomMargin = ROW_HEIGHT * 0.25f
+            this.margin.set(Insets(0f, bottomMargin, 0f, 0f))
+            this.bounds.height.bind {
+                max((headingLabel.bounds.height.use()), (currentRowY + currentRowHeight)) + bottomMargin
+            }
         }
     }
-    
+
 }
