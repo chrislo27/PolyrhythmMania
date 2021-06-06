@@ -72,7 +72,11 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    class LongButtonSkin(element: Button) : UppermostMenu.ButtonSkin(element)
+    class LongButtonSkin(element: Button) : UppermostMenu.ButtonSkin(element) {
+        init {
+            this.disabledTextColor.set(Color().grey(150f / 255f))
+        }
+    }
 
     class SmallButtonSkin(element: Button) : io.github.chrislo27.paintbox.ui.control.ButtonSkin(element) {
         init {

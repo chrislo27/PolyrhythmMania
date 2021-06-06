@@ -1,6 +1,5 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import io.github.chrislo27.paintbox.Paintbox
 import io.github.chrislo27.paintbox.ui.Anchor
 import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.layout.HBox
@@ -9,13 +8,13 @@ import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 
 
-class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
-    private val settings: Settings = menuCol.main.settings
+//    private val settings: Settings = menuCol.main.settings
     
     init {
-        this.setSize(MMMenu.WIDTH_EXTRA_SMALL)
-        this.titleText.bind { Localization.getVar("mainMenu.settings.title").use() }
+        this.setSize(MMMenu.WIDTH_SMALL)
+        this.titleText.bind { Localization.getVar("mainMenu.play.title").use() }
         this.contentPane.bounds.height.set(250f)
         
         val vbox = VBox().apply {
@@ -34,15 +33,10 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         contentPane.addChild(hbox)
 
         vbox.temporarilyDisableLayouts {
-            vbox += createLongButton { Localization.getVar("mainMenu.settings.audio").use() }.apply {
-                this.setOnAction { 
-                    menuCol.pushNewMenu(menuCol.audioSettingsMenu)
-                }
+            vbox += createLongButton { Localization.getVar("mainMenu.play.playSavedLevel").use() }.apply {
+                
             }
-//            vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {
-//            }
-            vbox += createLongButton { Localization.getVar("mainMenu.settings.input").use() }.apply { 
-                this.disabled.set(true)
+            vbox += createLongButton { Localization.getVar("mainMenu.play").use() }.apply {
             }
         }
 
@@ -51,8 +45,6 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.bounds.width.set(100f)
                 this.setOnAction {
                     menuCol.popLastMenu()
-                    settings.persist()
-                    Paintbox.LOGGER.info("Settings persisted")
                 }
             }
         }

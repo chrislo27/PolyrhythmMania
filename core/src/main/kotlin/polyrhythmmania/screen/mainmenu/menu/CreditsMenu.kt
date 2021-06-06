@@ -27,6 +27,8 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         private val HEADING_TEXT_COLOR: Color = Color.valueOf("564F2BFF")
         private val NAME_TEXT_COLOR: Color = Color.valueOf("323232FF")
     }
+    
+    private val scrollPane: ScrollPane
 
     init {
         this.setSize(MMMenu.WIDTH_MEDIUM)
@@ -49,7 +51,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
 
-        val scrollPane = ScrollPane().apply {
+        scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
             this.bindHeightToParent(-40f)
 
@@ -102,6 +104,11 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         scrollPane.setContent(vbox)
+    }
+    
+    fun resetScroll() {
+        scrollPane.vBar.setValue(0f)
+        scrollPane.hBar.setValue(0f)
     }
 
     private fun createCreditRow(headingLoc: String, names: List<String>): Pane {

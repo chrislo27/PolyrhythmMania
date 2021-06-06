@@ -27,6 +27,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val uppermostMenu: UppermostMenu = UppermostMenu(this)
     val quitMenu: QuitMenu = QuitMenu(this)
     val creditsMenu: CreditsMenu = CreditsMenu(this)
+    val playMenu: PlayMenu = PlayMenu(this)
     val settingsMenu: SettingsMenu = SettingsMenu(this)
     val audioSettingsMenu: AudioSettingsMenu = AudioSettingsMenu(this)
     
@@ -34,6 +35,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(uppermostMenu)
         addMenu(quitMenu)
         addMenu(creditsMenu)
+        addMenu(playMenu)
         addMenu(settingsMenu)
         addMenu(audioSettingsMenu)
         
