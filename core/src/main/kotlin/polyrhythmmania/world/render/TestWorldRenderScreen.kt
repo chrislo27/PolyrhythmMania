@@ -56,7 +56,11 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
 //        engine.tempos.addTempoChange(TempoChange(88f, 148.5f))
 
-        robotMode = true
+        robotMode = false
+        
+        if (robotMode) {
+            engine.autoInputs = true
+        }
         
         addEvents()
     }
