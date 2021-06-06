@@ -101,9 +101,8 @@ open class ScrollPane : Control<ScrollPane>() {
         }
         hBar.minimum.set(0f)
         vBar.minimum.set(0f)
-        // Binding maximum to currentWidthDiff leads to a very long loop of processing or stack overflow error
-        hBar.maximum.set(100f)
-        vBar.maximum.set(100f)
+        hBar.maximum.bind { contentWidthDiff.use().coerceAtLeast(0f) }
+        vBar.maximum.bind { contentHeightDiff.use().coerceAtLeast(0f) }
         hBar.visibleAmount.bind {
             val barMax = hBar.maximum.use()
             ((contentPaneWidth.use() / currentW.use()) * barMax)
@@ -136,52 +135,6 @@ open class ScrollPane : Control<ScrollPane>() {
             false
         }
     }
-
-//    protected fun updateScrollBounds() {
-//        val current = currentContent.getOrCompute()
-//        var currentW = 0f
-//        var currentH = 0f
-//
-//        if (current != null) {
-//            currentW = current.bounds.width.getOrCompute()
-//            currentH = current.bounds.height.getOrCompute()
-//        }
-//
-//        // Set scroll bars' visibility based on policy and currentContent bounds relative to contentPane
-//        val contentPaneWidth = contentPane.contentZone.width.getOrCompute()
-//        val contentPaneHeight = contentPane.contentZone.height.getOrCompute()
-//        val contentWidthDiff = currentW - contentPaneWidth
-//        val contentHeightDiff = currentH - contentPaneHeight
-//        val shouldShowHbar: Boolean = when (hBarPolicy.getOrCompute()) {
-//            ScrollBarPolicy.NEVER -> false
-//            ScrollBarPolicy.ALWAYS -> true
-//            ScrollBarPolicy.AS_NEEDED -> contentWidthDiff > 0f
-//        }
-//        val shouldShowVbar: Boolean = when (vBarPolicy.getOrCompute()) {
-//            ScrollBarPolicy.NEVER -> false
-//            ScrollBarPolicy.ALWAYS -> true
-//            ScrollBarPolicy.AS_NEEDED -> contentHeightDiff > 0f
-//        }
-//
-//        hBar.visible.set(shouldShowHbar)
-//        vBar.visible.set(shouldShowVbar)
-//
-//        hBar.minimum.set(0f)
-//        hBar.maximum.set(contentWidthDiff.coerceAtLeast(0f))
-//        hBar.visibleAmount.set(
-//                ((contentPaneWidth / currentW) * hBar.maximum.getOrCompute())
-//                        .coerceAtMost(hBar.maximum.getOrCompute())
-//                        .coerceAtLeast(minThumbSize.getOrCompute())
-//        )
-//
-//        vBar.minimum.set(0f)
-//        vBar.maximum.set(contentHeightDiff.coerceAtLeast(0f))
-//        vBar.visibleAmount.set(
-//                ((contentPaneHeight / currentH) * vBar.maximum.getOrCompute())
-//                        .coerceAtMost(vBar.maximum.getOrCompute())
-//                        .coerceAtLeast(minThumbSize.getOrCompute())
-//        )
-//    }
 
     protected open fun createScrollBar(orientation: ScrollBar.Orientation): ScrollBar {
         return ScrollBar(orientation)

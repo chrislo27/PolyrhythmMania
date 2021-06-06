@@ -16,7 +16,6 @@ import io.github.chrislo27.paintbox.ui.skin.Skin
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import io.github.chrislo27.paintbox.util.gdxutils.fillRoundedRect
-import java.awt.MouseInfo
 
 
 /**
@@ -52,7 +51,11 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     val maximum: FloatVar = FloatVar(MAX_DEFAULT)
     val visibleAmount: FloatVar = FloatVar(VISIBLE_AMOUNT_DEFAULT)
     private val _value: FloatVar = FloatVar(MIN_DEFAULT)
-    val value: ReadOnlyVar<Float> = _value
+    val value: ReadOnlyVar<Float> = FloatVar {
+        val min = minimum.use()
+        val max = maximum.use()
+        _value.use().coerceIn(min, max)
+    }
     val thumbPressedState: ReadOnlyVar<PressedState> get() = thumbArea.pressedState
 
     protected val decreaseButton: UnitIncreaseButton
@@ -67,7 +70,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
                 Orientation.HORIZONTAL -> this.bounds.width.bind { bounds.height.use() }
             }
             this.skinID.set(ScrollBar.SCROLLBAR_INC_BUTTON_SKIN_ID)
-            this.disabled.bind { _value.use() <= minimum.use() }
+            this.disabled.bind { value.use() <= minimum.use() }
             this.setOnAction {
                 decrement()
             }
@@ -79,7 +82,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
                 Orientation.HORIZONTAL -> this.bounds.width.bind { bounds.height.use() }
             }
             this.skinID.set(ScrollBar.SCROLLBAR_INC_BUTTON_SKIN_ID)
-            this.disabled.bind { _value.use() >= maximum.use() }
+            this.disabled.bind { value.use() >= maximum.use() }
             this.setOnAction {
                 increment()
             }
@@ -101,33 +104,24 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
         this.addChild(thumbArea)
     }
 
-    init {
-        minimum.addListener {
-            setValue(_value.getOrCompute())
-        }
-        maximum.addListener {
-            setValue(_value.getOrCompute())
-        }
-    }
-
     fun setValue(value: Float) {
         _value.set(value.coerceIn(minimum.getOrCompute(), maximum.getOrCompute()))
     }
 
     fun increment() {
-        setValue(_value.getOrCompute() + unitIncrement.getOrCompute())
+        setValue(value.getOrCompute() + unitIncrement.getOrCompute())
     }
 
     fun decrement() {
-        setValue(_value.getOrCompute() - unitIncrement.getOrCompute())
+        setValue(value.getOrCompute() - unitIncrement.getOrCompute())
     }
 
     fun incrementBlock() {
-        setValue(_value.getOrCompute() + blockIncrement.getOrCompute())
+        setValue(value.getOrCompute() + blockIncrement.getOrCompute())
     }
 
     fun decrementBlock() {
-        setValue(_value.getOrCompute() - blockIncrement.getOrCompute())
+        setValue(value.getOrCompute() - blockIncrement.getOrCompute())
     }
 
     protected open fun getArrowButtonTexReg(): TextureRegion {
@@ -297,7 +291,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
 //            val visibleAmt = scrollBar.visibleAmount.getOrCompute()
             val min = scrollBar.minimum.getOrCompute()
             val max = scrollBar.maximum.getOrCompute()
-            return ((scrollBar._value.getOrCompute() - min) / (max - min))
+            return ((scrollBar.value.getOrCompute() - min) / (max - min))
         }
 
         /**
@@ -361,7 +355,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
             val thumbH = (if (element.orientation == Orientation.HORIZONTAL)
                 (1f)
             else (element.convertValueToPercentage(element.visibleAmount.getOrCompute()))) * thumbBounds.height.getOrCompute()
-            val currentValue = element._value.getOrCompute()
+            val currentValue = element.value.getOrCompute()
             val scrollableThumbArea = element.maximum.getOrCompute() - element.minimum.getOrCompute()
             when (element.orientation) {
                 Orientation.HORIZONTAL -> {
