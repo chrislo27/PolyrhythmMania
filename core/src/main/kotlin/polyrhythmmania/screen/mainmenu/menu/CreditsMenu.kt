@@ -80,7 +80,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 Anchor.TopLeft.configure(this)
                 this.bindWidthToParent(adjust = 0f, multiplier = 1f)
                 this.bounds.x.set(0f)
-                this.bounds.height.set(ROW_HEIGHT * 2)
+                this.bounds.height.set(100f)
                 this.padding.set(Insets(12f, 8f, 6f, 6f))
                 this.markup.set(this@CreditsMenu.markup)
                 this.textColor.set(NAME_TEXT_COLOR)
