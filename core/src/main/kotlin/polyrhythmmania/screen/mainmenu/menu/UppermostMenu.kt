@@ -1,9 +1,11 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.font.TextAlign
+import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.area.Insets
@@ -76,6 +78,9 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             this.bounds.height.set(buttonHeight)
             this.textAlign.set(TextAlign.LEFT)
             this.renderAlign.set(Align.left)
+            this.setOnHoverStart {
+                menuCol.playBlipSound()
+            }
         }
         vbox.temporarilyDisableLayouts {
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.play").use() }).apply {
@@ -84,8 +89,9 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 }
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.edit").use() }).apply { 
-                this.setOnAction { 
-                    mainMenu.transitionAway { 
+                this.setOnAction {
+                    AssetRegistry.get<Sound>("sfx_menu_enter_game").play(menuCol.settings.menuSfxVolume.getOrCompute() / 100f)
+                    mainMenu.transitionAway {
                         val main = mainMenu.main
                         val editorScreen = EditorScreen(main)
                         main.screen = TransitionScreen(main, main.screen, editorScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f)))

@@ -3,6 +3,7 @@ package polyrhythmmania.init
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import paintbox.packing.Packable
 import paintbox.packing.PackedSheet
@@ -78,6 +79,12 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         listOf("applause", "despawn", "explosion", "input_a", "input_d", "land", "retract", "side_collision",
                 "spawn_a", "spawn_d", "cowbell",).forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_$it", "sounds/${it}.wav")
+        }
+//        listOf("enter", "exit", "robot_off", "robot_on").forEach {
+//            AssetRegistry.loadAsset<Sound>("sfx_pause_$it", "sounds/pause/${it}.ogg")
+//        }
+        listOf("blip", "select", "deselect", "enter_game").forEach {
+            AssetRegistry.loadAsset<Sound>("sfx_menu_$it", "sounds/menu/${it}.ogg")
         }
     }
 

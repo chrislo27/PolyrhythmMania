@@ -1,12 +1,15 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.Vector2
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.util.gdxutils.maxX
 import paintbox.util.gdxutils.maxY
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.Settings
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import java.lang.Float.max
 import java.lang.Float.min
@@ -18,6 +21,7 @@ import kotlin.math.floor
 class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val menuPane: Pane) {
     
     val main: PRManiaGame = mainMenu.main
+    val settings: Settings = main.settings
     
     val menus: List<MMMenu> = mutableListOf()
     val activeMenu: ReadOnlyVar<MMMenu?> = Var(null)
@@ -63,8 +67,12 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         menuStack.push(uppermostMenu)
     }
     
-    fun changeActiveMenu(menu: MMMenu, backOut: Boolean, instant: Boolean = false) {
+    fun changeActiveMenu(menu: MMMenu, backOut: Boolean, instant: Boolean = false, playSound: Boolean = true) {
         if (!instant) {
+            if (playSound) {
+                AssetRegistry.get<Sound>("sfx_menu_${if (backOut) "deselect" else "select"}").play(settings.menuSfxVolume.getOrCompute() / 100f)
+            }
+            
             val changedBounds = RectangleStack.getAndPush().apply {
                 val currentBounds = menu.bounds
                 val relToRoot = menu.getPosRelativeToRoot(Vector2())
@@ -116,5 +124,11 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         val menu = menuStack.peek()
         changeActiveMenu(menu, true, instant)
         return popped
+    }
+
+    fun playBlipSound() {
+        val sound = AssetRegistry.get<Sound>("sfx_menu_blip")
+        sound.stop()
+        sound.play(this.settings.menuSfxVolume.getOrCompute() / 100f)
     }
 }

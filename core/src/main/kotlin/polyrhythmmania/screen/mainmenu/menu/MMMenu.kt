@@ -1,6 +1,7 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.ReadOnlyVar
@@ -9,6 +10,7 @@ import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
+import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
@@ -102,6 +104,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             TextRun(font, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     protected val titleHeight: Float = 64f
     protected val grey: Color = Color().grey(0.8f, 1f)
+    protected val blipSoundListener: (MouseEntered?) -> Unit = {
+        menuCol.playBlipSound()
+    }
 
     protected val titleText: Var<String> = Var("")
     protected val titleLabel: TextLabel
@@ -140,6 +145,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         this.bounds.height.set(40f)
         this.textAlign.set(TextAlign.LEFT)
         this.renderAlign.set(Align.left)
+        this.setOnHoverStart(blipSoundListener)
     }
 
     protected fun createSmallButton(binding: Var.Context.() -> String): Button = Button(binding, font = font).apply {
@@ -148,11 +154,18 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         this.textAlign.set(TextAlign.CENTRE)
         this.renderAlign.set(Align.center)
         this.setScaleXY(0.75f)
+//        this.setOnHoverStart(blipSoundListener)
     }
     
     protected fun createSettingsOption(labelText: Var.Context.() -> String): SettingsOptionPane {
         return SettingsOptionPane(labelText, this.font).apply {
             this.bounds.height.set(36f)
+            this.addInputEventListener {
+                if (it is MouseEntered) {
+                    blipSoundListener(null)
+                }
+                false
+            }
         }
     }
 
