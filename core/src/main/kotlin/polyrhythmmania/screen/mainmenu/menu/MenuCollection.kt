@@ -43,13 +43,24 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         menuStack.push(uppermostMenu)
     }
     
-    private fun addMenu(menu: MMMenu) {
+    fun addMenu(menu: MMMenu) {
         menus as MutableList
         menus.add(menu)
         
         menu.visible.set(false)
         menuPane.addChild(menu)
         Anchor.BottomLeft.configure(menu)
+    }
+    
+    fun removeMenu(menu: MMMenu) {
+        menus as MutableList
+        menus.remove(menu)
+        menuPane.removeChild(menu)
+    }
+    
+    fun resetMenuStack() {
+        menuStack.clear()
+        menuStack.push(uppermostMenu)
     }
     
     fun changeActiveMenu(menu: MMMenu, backOut: Boolean, instant: Boolean = false) {
@@ -94,7 +105,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         (activeMenu as Var).set(menu)
     }
     
-    fun pushNewMenu(menu: MMMenu, instant: Boolean = false) {
+    fun pushNextMenu(menu: MMMenu, instant: Boolean = false) {
         changeActiveMenu(menu, false, instant)
         menuStack.push(menu)
     }

@@ -41,7 +41,7 @@ class QuitMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.markup.set(this@QuitMenu.markup)
                 this.bounds.height.set(80f)
                 this.padding.set(Insets(4f))
-                this.textColor.set(Color.DARK_GRAY)
+                this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
                 this.renderAlign.set(Align.topLeft)
                 this.textAlign.set(TextAlign.LEFT)
                 this.doLineWrapping.set(true)

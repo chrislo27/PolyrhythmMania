@@ -384,6 +384,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     fun prepareShow(doFlipAnimation: Boolean = false): MainMenuScreen {
         resetTiles()
+        menuCollection.changeActiveMenu(menuCollection.uppermostMenu, false, instant = true)
+        menuCollection.resetMenuStack()
         if (doFlipAnimation) {
             // Black out old frame buffer
             lastProjMatrix.set(batch.projectionMatrix)
@@ -402,6 +404,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             
             flipAnimation = TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT)
         }
+        
         return this
     }
 

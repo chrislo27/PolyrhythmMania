@@ -74,7 +74,6 @@ class Editor(val main: PRManiaGame)
     val sceneRoot: SceneRoot = SceneRoot(uiCamera)
 
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply { 
-        // FIXME should this dynamically get the right gameplay volume from Settings?
         this.audioContext.out.gain = main.settings.gameplayVolume.getOrCompute() / 100f
     }
     val timing: TimingProvider = SimpleTimingProvider {

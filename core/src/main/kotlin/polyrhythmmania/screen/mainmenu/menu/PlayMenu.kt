@@ -5,18 +5,17 @@ import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.ui.layout.HBox
 import io.github.chrislo27.paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
-import polyrhythmmania.Settings
 
 
 class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
 //    private val settings: Settings = menuCol.main.settings
-    
+
     init {
         this.setSize(MMMenu.WIDTH_SMALL)
         this.titleText.bind { Localization.getVar("mainMenu.play.title").use() }
         this.contentPane.bounds.height.set(250f)
-        
+
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)
             this.spacing.set(0f)
@@ -34,9 +33,16 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             vbox += createLongButton { Localization.getVar("mainMenu.play.playSavedLevel").use() }.apply {
-                
+                this.setOnAction {
+                    val loadMenu = LoadSavedLevelMenu(menuCol)
+                    menuCol.addMenu(loadMenu)
+                    menuCol.pushNextMenu(loadMenu)
+                }
             }
-            vbox += createLongButton { Localization.getVar("mainMenu.play").use() }.apply {
+//            vbox += createLongButton { Localization.getVar("mainMenu.play").use() }.apply {
+//            }
+            vbox += createLongButton { "...Other modes (possibly) coming soon!" }.apply {
+                this.disabled.set(true)
             }
         }
 
@@ -49,4 +55,5 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
     }
+    
 }

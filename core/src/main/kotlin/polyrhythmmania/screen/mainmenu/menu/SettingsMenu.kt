@@ -36,7 +36,7 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         vbox.temporarilyDisableLayouts {
             vbox += createLongButton { Localization.getVar("mainMenu.settings.audio").use() }.apply {
                 this.setOnAction { 
-                    menuCol.pushNewMenu(menuCol.audioSettingsMenu)
+                    menuCol.pushNextMenu(menuCol.audioSettingsMenu)
                 }
             }
 //            vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {

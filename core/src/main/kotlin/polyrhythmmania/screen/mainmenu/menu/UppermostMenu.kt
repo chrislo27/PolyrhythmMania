@@ -80,7 +80,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         vbox.temporarilyDisableLayouts {
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.play").use() }).apply {
                 this.setOnAction {
-                    menuCol.pushNewMenu(menuCol.playMenu)
+                    menuCol.pushNextMenu(menuCol.playMenu)
                 }
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.edit").use() }).apply { 
@@ -94,19 +94,19 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.settings").use() }).apply {
                 this.setOnAction {
-                    menuCol.pushNewMenu(menuCol.settingsMenu)
+                    menuCol.pushNextMenu(menuCol.settingsMenu)
                 }
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.credits").use() }).apply {
                 this.setOnAction {
-                    menuCol.pushNewMenu(menuCol.creditsMenu.apply { 
+                    menuCol.pushNextMenu(menuCol.creditsMenu.apply { 
                         resetScroll()
                     })
                 }
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.quit").use() }).apply {
                 this.setOnAction {
-                    menuCol.pushNewMenu(menuCol.quitMenu)
+                    menuCol.pushNextMenu(menuCol.quitMenu)
                 }
             }
         }

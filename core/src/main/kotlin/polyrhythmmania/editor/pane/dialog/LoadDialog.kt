@@ -178,7 +178,10 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     newEditor.editorPane.saveDialog.assignSaveLocation(newFile)
 
                     substate.set(Substate.LOADED)
-                    descLabel.text.set(Localization.getValue("editor.dialog.load.loaded", loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
+                    descLabel.text.set(Localization.getValue("editor.dialog.load.loaded",
+                                    Localization.getValue("editor.dialog.load.loadedInformation",
+                                            loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
+                    )
                     loaded = LoadData(newEditorScreen, loadMetadata)
 
                     val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
