@@ -113,7 +113,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     init {
         titleLabel = TextLabel(binding = { titleText.use() }, font = main.fontMainMenuHeading).apply {
             this.bounds.height.set(titleHeight)
-            this.bgPadding.set(16f)
+            this.bgPadding.set(Insets(16f, 16f, 16f, 32f))
             this.backgroundColor.set(grey)
             this.renderBackground.set(true)
             this.renderAlign.set(Align.bottomLeft)

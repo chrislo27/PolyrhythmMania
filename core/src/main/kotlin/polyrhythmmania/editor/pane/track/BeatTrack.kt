@@ -68,7 +68,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.textAlign.set(TextAlign.RIGHT)
             this.renderAlign.set(Align.right)
             this.textColor.bind { editorPane.palette.trackPaneTimeText.use() }
-            this.bgPadding.set(0f)
+            this.bgPadding.set(Insets.ZERO)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.height.set(28f)
         }
@@ -82,7 +82,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.textAlign.set(TextAlign.RIGHT)
             this.renderAlign.set(Align.right)
             this.textColor.bind { editorPane.palette.trackPaneTimeText.use() }
-            this.bgPadding.set(0f)
+            this.bgPadding.set(Insets.ZERO)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.width.bind {
                 (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.5f
@@ -96,7 +96,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.textAlign.set(TextAlign.LEFT)
             this.renderAlign.set(Align.left)
             this.textColor.bind { editorPane.palette.trackPaneTimeText.use() }
-            this.bgPadding.set(0f)
+            this.bgPadding.set(Insets.ZERO)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.width.bind {
                 (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.35f

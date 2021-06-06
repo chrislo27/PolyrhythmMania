@@ -35,7 +35,7 @@ class StatusBar(val editorPane: EditorPane) : Pane() {
             this.renderAlign.set(Align.left)
             this.textAlign.set(TextAlign.LEFT)
             this.doXCompression.set(true)
-            this.bgPadding.set(0f)
+            this.bgPadding.set(Insets.ZERO)
             this.text.bind { editorPane.statusBarMsg.use() }
             this.textColor.bind { editorPane.palette.statusTextColor.use() }
             this.markup.set(editorPane.palette.markupStatusBar)

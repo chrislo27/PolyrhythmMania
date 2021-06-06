@@ -12,6 +12,7 @@ import io.github.chrislo27.paintbox.ui.skin.SkinFactory
 import io.github.chrislo27.paintbox.binding.ReadOnlyVar
 import io.github.chrislo27.paintbox.binding.Var
 import io.github.chrislo27.paintbox.font.*
+import io.github.chrislo27.paintbox.ui.area.Insets
 import io.github.chrislo27.paintbox.util.gdxutils.fillRect
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -78,7 +79,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     val backgroundColor: Var<Color> = Var(Color(1f, 1f, 1f, 0f))
 
     val renderBackground: Var<Boolean> = Var(false)
-    val bgPadding: FloatVar = FloatVar(0f)
+    val bgPadding: Var<Insets> = Var.bind { padding.use() }
 
     val renderAlign: Var<Int> = Var(Align.left)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
@@ -150,9 +151,9 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
             text.computeLayouts()
         }
 
-        val bgPadding = element.bgPadding.getOrCompute()
-        val textPaddingOffsetX: Float = bgPadding
-        val textPaddingOffsetY: Float = bgPadding
+        val bgPaddingInsets = element.bgPadding.getOrCompute()
+        val textPaddingOffsetX: Float = bgPaddingInsets.left
+        val textPaddingOffsetY: Float = bgPaddingInsets.top
         val compressX = element.doXCompression.getOrCompute()
         val align = element.renderAlign.getOrCompute()
         val scaleX = element.scaleX.getOrCompute()
@@ -173,10 +174,10 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
 
         if (element.renderBackground.getOrCompute()) {
             // Draw a rectangle behind the text, only sizing to the text area.
-            val bx = (x + xOffset) - bgPadding
-            val by = (y - h + yOffset - textHeight + firstCapHeight) - bgPadding
-            val bw = (if (compressX) min(w, textWidth) else textWidth) + bgPadding * 2
-            val bh = textHeight + bgPadding * 2
+            val bx = (x + xOffset) - bgPaddingInsets.left
+            val by = (y - h + yOffset - textHeight + firstCapHeight) - bgPaddingInsets.top
+            val bw = (if (compressX) min(w, textWidth) else textWidth) + bgPaddingInsets.left + bgPaddingInsets.right
+            val bh = textHeight + bgPaddingInsets.top + bgPaddingInsets.bottom
 
             val bgColor = ColorStack.getAndPush().set(bgColorToUse.getOrCompute())
             bgColor.a *= opacity

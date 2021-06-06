@@ -33,7 +33,7 @@ class SidePanel(val editorPane: EditorPane) : Pane() {
         titleLabel = TextLabel("", font = editorPane.palette.sidePanelFont).apply {
             this.text.bind { titleText.use() }
             this.textColor.bind { editorPane.palette.trackPaneTextColor.use() }
-            this.bgPadding.set(0f)
+            this.bgPadding.set(Insets.ZERO)
             this.padding.set(Insets(6f, 2f, 2f, 2f))
             this.renderAlign.set(Align.topLeft)
             this.textAlign.set(TextAlign.LEFT)
