@@ -98,19 +98,11 @@ open class TransitionScreen(override val main: PaintboxGame,
             onStart.invoke()
             onEntryStart.invoke()
         }
-        if (substate == Substate.DURING_DEST) {
+        if (substate == Substate.DURING_ENTRY) {
             if (doneEntry) {
                 this.substate = Substate.DURING_DEST
                 onEntryEnd.invoke()
                 onDestStart.invoke()
-            }
-        }
-        if (substate == Substate.DURING_DEST) {
-            if (done) {
-                skipTimeUpdateForOneFrame = true
-                this.substate = Substate.FINISHED
-                onDestEnd.invoke()
-                onFinished.invoke()
             }
         }
         
@@ -131,6 +123,12 @@ open class TransitionScreen(override val main: PaintboxGame,
         }
 
         if (done) {
+            if (substate == Substate.DURING_DEST) {
+                skipTimeUpdateForOneFrame = true
+                this.substate = Substate.FINISHED
+                onDestEnd.invoke()
+                onFinished.invoke()
+            }
             dispose()
             main.screen = destScreen
         }
