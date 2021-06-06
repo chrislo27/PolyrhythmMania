@@ -39,9 +39,10 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNewMenu(menuCol.audioSettingsMenu)
                 }
             }
-            vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {
-            }
+//            vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {
+//            }
             vbox += createLongButton { Localization.getVar("mainMenu.settings.input").use() }.apply { 
+                this.disabled.set(true)
             }
         }
 

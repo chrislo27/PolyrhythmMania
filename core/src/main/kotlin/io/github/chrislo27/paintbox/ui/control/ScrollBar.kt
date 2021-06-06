@@ -58,9 +58,9 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     }
     val thumbPressedState: ReadOnlyVar<PressedState> get() = thumbArea.pressedState
 
-    protected val decreaseButton: UnitIncreaseButton
-    protected val increaseButton: UnitIncreaseButton
-    protected val thumbArea: ThumbPane
+    val decreaseButton: UnitIncreaseButton
+    val increaseButton: UnitIncreaseButton
+    val thumbArea: ThumbPane
 
     init {
         decreaseButton = UnitIncreaseButton(this, getArrowButtonTexReg(), this.orientation, false).apply {
@@ -128,13 +128,13 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
         return PaintboxGame.paintboxSpritesheet.upArrow
     }
 
-    protected fun convertValueToPercentage(v: Float): Float {
+    fun convertValueToPercentage(v: Float): Float {
         val min = minimum.getOrCompute()
         val max = maximum.getOrCompute()
         return ((v - min) / (max - min)).coerceIn(0f, 1f)
     }
 
-    protected fun convertPercentageToValue(v: Float): Float {
+    fun convertPercentageToValue(v: Float): Float {
         val min = minimum.getOrCompute()
         val max = maximum.getOrCompute()
         return (v * (max - min) + min).coerceIn(min, max)
@@ -341,10 +341,12 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
             batch.fillRect(rectX, rectY - rectH, rectW, rectH)
 
             val pressedState = element.thumbArea.pressedState.getOrCompute()
-            tmpColor.set((if (element.apparentDisabledState.getOrCompute()) disabledColor
-            else if (pressedState.pressed) thumbPressedColor
-            else if (pressedState.hovered) thumbHoveredColor
-            else thumbColor).getOrCompute())
+            tmpColor.set((when {
+                element.apparentDisabledState.getOrCompute() -> disabledColor
+                pressedState.pressed -> thumbPressedColor
+                pressedState.hovered -> thumbHoveredColor
+                else -> thumbColor
+            }).getOrCompute())
             tmpColor.a *= opacity
             batch.color = tmpColor
             val thumb = element.thumbArea

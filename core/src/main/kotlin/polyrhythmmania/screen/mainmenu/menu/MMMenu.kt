@@ -18,6 +18,7 @@ import io.github.chrislo27.paintbox.ui.layout.VBox
 import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
 import io.github.chrislo27.paintbox.ui.skin.SkinFactory
 import io.github.chrislo27.paintbox.util.gdxutils.grey
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 
 
@@ -50,6 +51,7 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
         }
     }
 }
+
 
 /**
  * Standard menu.
@@ -90,8 +92,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    protected val font: PaintboxFont = mainMenu.main.fontMainMenuMain
-    protected val markup: Markup = Markup(mapOf("prmania_icons" to mainMenu.main.fontIcons),
+    protected val main: PRManiaGame get() = mainMenu.main
+    protected val font: PaintboxFont = main.fontMainMenuMain
+    protected val markup: Markup = Markup(mapOf("prmania_icons" to main.fontIcons, "rodin" to main.fontMainMenuRodin),
             TextRun(font, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     protected val titleHeight: Float = 64f
     protected val grey: Color = Color().grey(0.8f, 1f)
@@ -104,7 +107,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
 
     init {
-        titleLabel = TextLabel(binding = { titleText.use() }, font = mainMenu.main.fontMainMenuHeading).apply {
+        titleLabel = TextLabel(binding = { titleText.use() }, font = main.fontMainMenuHeading).apply {
             this.bounds.height.set(titleHeight)
             this.bgPadding.set(16f)
             this.backgroundColor.set(grey)

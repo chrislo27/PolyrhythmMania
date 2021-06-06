@@ -24,6 +24,7 @@ import org.lwjgl.glfw.GLFW
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
+import polyrhythmmania.ui.PRManiaSkins
 import java.io.File
 
 
@@ -62,6 +63,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
         addFontsToCache(this.fontCache)
         PRManiaColors
+        PRManiaSkins
         settings = Settings(this, preferences).apply { 
             load()
         }
@@ -379,6 +381,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 40
                 }).setAfterLoad(defaultScaledFontAfterLoad)
+        cache["mainmenu_rodin"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 22, 0f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 22
+                }).setAfterLoad(defaultScaledFontAfterLoad)
     }
 
 
@@ -401,5 +409,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontEditorDialogTitle: PaintboxFont get() = fontCache["editor_dialog_title"]
     val fontMainMenuMain: PaintboxFont get() = fontCache["mainmenu_main"]
     val fontMainMenuHeading: PaintboxFont get() = fontCache["mainmenu_heading"]
+    val fontMainMenuRodin: PaintboxFont get() = fontCache["mainmenu_rodin"]
 
 }

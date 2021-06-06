@@ -95,8 +95,10 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     menuCol.pushNewMenu(menuCol.settingsMenu)
                 }
             }
-            vbox += createButton(binding = { Localization.getVar("mainMenu.main.credits").use() }).apply { 
-                this.disabled.set(true)
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.credits").use() }).apply {
+                this.setOnAction {
+                    menuCol.pushNewMenu(menuCol.creditsMenu)
+                }
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.quit").use() }).apply {
                 this.setOnAction {
