@@ -24,8 +24,12 @@ import org.lwjgl.glfw.GLFW
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
+import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.ui.PRManiaSkins
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
+import kotlin.concurrent.thread
 
 
 class PRManiaGame(paintboxSettings: PaintboxSettings)
@@ -81,9 +85,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 initializeScreens()
             }
             nextScreenProducer = {
-                polyrhythmmania.world.render.TestWorldRenderScreen(this@PRManiaGame)
+//                polyrhythmmania.world.render.TestWorldRenderScreen(this@PRManiaGame)
 //                EditorScreen(this@PRManiaGame, debugMode = true)
-//                mainMenuScreen.prepareShow()
+                mainMenuScreen.prepareShow()
             }
         })
     }
@@ -147,6 +151,19 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     fun attemptResetWindow() {
         Gdx.graphics.setWindowedMode(PRMania.DEFAULT_SIZE.width, PRMania.DEFAULT_SIZE.height)
+    }
+
+    override fun exceptionHandler(t: Throwable) {
+        val currentScreen = this.screen
+        if (currentScreen !is CrashScreen) {
+//            thread(start = true, isDaemon = true, name = "Crash Remix Recovery") {
+//                RemixRecovery.saveRemixInRecovery()
+//            }
+            setScreen(CrashScreen(this, t, currentScreen))
+        } else {
+            super.exceptionHandler(t)
+            Gdx.app.exit()
+        }
     }
 
     override fun keyDown(keycode: Int): Boolean {
@@ -375,6 +392,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 22
                 }).setAfterLoad(defaultScaledFontAfterLoad)
+        cache["mainmenu_thin"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Regular.ttf"), 22, 0f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 22
+                }).setAfterLoad(defaultScaledFontAfterLoad)
         cache["mainmenu_heading"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Bold.ttf"), 40, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -408,6 +431,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontEditorMarker: PaintboxFont get() = fontCache["editor_marker"]
     val fontEditorDialogTitle: PaintboxFont get() = fontCache["editor_dialog_title"]
     val fontMainMenuMain: PaintboxFont get() = fontCache["mainmenu_main"]
+    val fontMainMenuThin: PaintboxFont get() = fontCache["mainmenu_thin"]
     val fontMainMenuHeading: PaintboxFont get() = fontCache["mainmenu_heading"]
     val fontMainMenuRodin: PaintboxFont get() = fontCache["mainmenu_rodin"]
 
