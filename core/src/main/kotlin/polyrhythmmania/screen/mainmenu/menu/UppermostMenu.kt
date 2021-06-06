@@ -2,16 +2,16 @@ package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.font.TextAlign
-import io.github.chrislo27.paintbox.transition.FadeIn
-import io.github.chrislo27.paintbox.transition.TransitionScreen
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.control.Button
-import io.github.chrislo27.paintbox.ui.layout.VBox
-import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
-import io.github.chrislo27.paintbox.ui.skin.SkinFactory
-import io.github.chrislo27.paintbox.util.gdxutils.grey
+import paintbox.binding.Var
+import paintbox.font.TextAlign
+import paintbox.transition.FadeIn
+import paintbox.transition.TransitionScreen
+import paintbox.ui.area.Insets
+import paintbox.ui.control.Button
+import paintbox.ui.layout.VBox
+import paintbox.ui.skin.DefaultSkins
+import paintbox.ui.skin.SkinFactory
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.EditorScreen
 
@@ -30,7 +30,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    open class ButtonSkin(element: Button) : io.github.chrislo27.paintbox.ui.control.ButtonSkin(element) {
+    open class ButtonSkin(element: Button) : paintbox.ui.control.ButtonSkin(element) {
         companion object {
             val TEXT_COLOR: Color = Color().grey(90f / 255f, 1f)
             val DISABLED_TEXT: Color = Color().grey(30f / 255f)

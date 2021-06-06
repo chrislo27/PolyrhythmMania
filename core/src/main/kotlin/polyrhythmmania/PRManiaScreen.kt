@@ -1,6 +1,6 @@
 package polyrhythmmania
 
-import io.github.chrislo27.paintbox.PaintboxScreen
+import paintbox.PaintboxScreen
 
 
 abstract class PRManiaScreen(override val main: PRManiaGame) : PaintboxScreen() {

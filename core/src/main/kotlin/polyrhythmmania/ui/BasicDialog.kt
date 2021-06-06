@@ -2,16 +2,16 @@ package polyrhythmmania.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.paintbox.font.TextAlign
-import io.github.chrislo27.paintbox.ui.Anchor
-import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.border.SolidBorder
-import io.github.chrislo27.paintbox.ui.control.Button
-import io.github.chrislo27.paintbox.ui.control.ButtonSkin
-import io.github.chrislo27.paintbox.ui.control.TextLabel
-import io.github.chrislo27.paintbox.ui.element.RectElement
-import io.github.chrislo27.paintbox.util.gdxutils.grey
+import paintbox.font.TextAlign
+import paintbox.ui.Anchor
+import paintbox.ui.Pane
+import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
+import paintbox.ui.control.Button
+import paintbox.ui.control.ButtonSkin
+import paintbox.ui.control.TextLabel
+import paintbox.ui.element.RectElement
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.pane.EditorPane

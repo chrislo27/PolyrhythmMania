@@ -3,7 +3,7 @@ package polyrhythmmania.screen.mainmenu
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector3
-import io.github.chrislo27.paintbox.util.MathHelper
+import paintbox.util.MathHelper
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.SimpleRenderedEntity
 import polyrhythmmania.world.World

@@ -3,21 +3,21 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.paintbox.binding.ReadOnlyVar
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.font.Markup
-import io.github.chrislo27.paintbox.font.PaintboxFont
-import io.github.chrislo27.paintbox.font.TextAlign
-import io.github.chrislo27.paintbox.font.TextRun
-import io.github.chrislo27.paintbox.ui.*
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.control.Button
-import io.github.chrislo27.paintbox.ui.control.TextLabel
-import io.github.chrislo27.paintbox.ui.element.RectElement
-import io.github.chrislo27.paintbox.ui.layout.VBox
-import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
-import io.github.chrislo27.paintbox.ui.skin.SkinFactory
-import io.github.chrislo27.paintbox.util.gdxutils.grey
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
+import paintbox.font.Markup
+import paintbox.font.PaintboxFont
+import paintbox.font.TextAlign
+import paintbox.font.TextRun
+import paintbox.ui.*
+import paintbox.ui.area.Insets
+import paintbox.ui.control.Button
+import paintbox.ui.control.TextLabel
+import paintbox.ui.element.RectElement
+import paintbox.ui.layout.VBox
+import paintbox.ui.skin.DefaultSkins
+import paintbox.ui.skin.SkinFactory
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 
@@ -78,7 +78,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    class SmallButtonSkin(element: Button) : io.github.chrislo27.paintbox.ui.control.ButtonSkin(element) {
+    class SmallButtonSkin(element: Button) : paintbox.ui.control.ButtonSkin(element) {
         init {
             this.defaultTextColor.set(Color().grey(0f, 1f))
             this.disabledTextColor.set(Color().grey(100f / 255f))

@@ -3,7 +3,7 @@ package polyrhythmmania.editor.block
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonArray
 import com.eclipsesource.json.JsonObject
-import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
+import paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine

@@ -1,10 +1,10 @@
 package polyrhythmmania.editor.pane.track
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.github.chrislo27.paintbox.binding.FloatVar
-import io.github.chrislo27.paintbox.ui.ColorStack
-import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.util.gdxutils.fillRect
+import paintbox.binding.FloatVar
+import paintbox.ui.ColorStack
+import paintbox.ui.Pane
+import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.PlayState

@@ -10,9 +10,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import io.github.chrislo27.paintbox.ui.SceneRoot
-import io.github.chrislo27.paintbox.ui.UIElement
-import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
+import paintbox.ui.SceneRoot
+import paintbox.ui.UIElement
+import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 

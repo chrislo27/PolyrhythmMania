@@ -2,11 +2,11 @@ package polyrhythmmania.editor
 
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
-import io.github.chrislo27.paintbox.binding.FloatVar
-import io.github.chrislo27.paintbox.binding.ReadOnlyVar
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.util.MathHelper
-import io.github.chrislo27.paintbox.util.gdxutils.intersects
+import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
+import paintbox.util.MathHelper
+import paintbox.util.gdxutils.intersects
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange

@@ -1,10 +1,10 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import io.github.chrislo27.paintbox.Paintbox
-import io.github.chrislo27.paintbox.ui.Anchor
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.layout.HBox
-import io.github.chrislo27.paintbox.ui.layout.VBox
+import paintbox.Paintbox
+import paintbox.ui.Anchor
+import paintbox.ui.area.Insets
+import paintbox.ui.layout.HBox
+import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 

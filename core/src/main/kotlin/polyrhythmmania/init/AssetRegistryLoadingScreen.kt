@@ -3,9 +3,9 @@ package polyrhythmmania.init
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
-import io.github.chrislo27.paintbox.registry.AssetRegistry
-import io.github.chrislo27.paintbox.util.gdxutils.drawRect
-import io.github.chrislo27.paintbox.util.gdxutils.fillRect
+import paintbox.registry.AssetRegistry
+import paintbox.util.gdxutils.drawRect
+import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 

@@ -2,16 +2,16 @@ package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.paintbox.Paintbox
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.font.TextAlign
-import io.github.chrislo27.paintbox.ui.Anchor
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.control.TextLabel
-import io.github.chrislo27.paintbox.ui.layout.HBox
-import io.github.chrislo27.paintbox.ui.layout.VBox
-import io.github.chrislo27.paintbox.util.TinyFDWrapper
-import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
+import paintbox.Paintbox
+import paintbox.binding.Var
+import paintbox.font.TextAlign
+import paintbox.ui.Anchor
+import paintbox.ui.area.Insets
+import paintbox.ui.control.TextLabel
+import paintbox.ui.layout.HBox
+import paintbox.ui.layout.VBox
+import paintbox.util.TinyFDWrapper
+import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container

@@ -1,7 +1,7 @@
 package polyrhythmmania.editor
 
 import com.badlogic.gdx.graphics.Color
-import io.github.chrislo27.paintbox.binding.FloatVar
+import paintbox.binding.FloatVar
 import polyrhythmmania.PRManiaColors
 
 

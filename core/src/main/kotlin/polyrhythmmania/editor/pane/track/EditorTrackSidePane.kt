@@ -1,6 +1,6 @@
 package polyrhythmmania.editor.pane.track
 
-import io.github.chrislo27.paintbox.ui.Pane
+import paintbox.ui.Pane
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView

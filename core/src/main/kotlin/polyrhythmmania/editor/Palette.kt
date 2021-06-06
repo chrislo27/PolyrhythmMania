@@ -3,12 +3,12 @@ package polyrhythmmania.editor
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.font.Markup
-import io.github.chrislo27.paintbox.font.PaintboxFont
-import io.github.chrislo27.paintbox.font.TextRun
-import io.github.chrislo27.paintbox.registry.AssetRegistry
-import io.github.chrislo27.paintbox.util.gdxutils.grey
+import paintbox.binding.Var
+import paintbox.font.Markup
+import paintbox.font.PaintboxFont
+import paintbox.font.TextRun
+import paintbox.registry.AssetRegistry
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 

@@ -1,12 +1,12 @@
 package polyrhythmmania.editor.block.contextmenu
 
-import io.github.chrislo27.paintbox.PaintboxGame
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.font.PaintboxFont
-import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.contextmenu.ContextMenu
-import io.github.chrislo27.paintbox.ui.control.RadioButton
-import io.github.chrislo27.paintbox.ui.control.ToggleGroup
+import paintbox.PaintboxGame
+import paintbox.binding.Var
+import paintbox.font.PaintboxFont
+import paintbox.ui.Pane
+import paintbox.ui.contextmenu.ContextMenu
+import paintbox.ui.control.RadioButton
+import paintbox.ui.control.ToggleGroup
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.editor.pane.EditorPane

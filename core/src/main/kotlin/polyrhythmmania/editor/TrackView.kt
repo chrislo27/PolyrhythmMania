@@ -1,7 +1,7 @@
 package polyrhythmmania.editor
 
-import io.github.chrislo27.paintbox.binding.FloatVar
-import io.github.chrislo27.paintbox.binding.ReadOnlyVar
+import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyVar
 
 
 class TrackView {

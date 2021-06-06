@@ -2,13 +2,13 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import io.github.chrislo27.paintbox.ui.ImageNode
-import io.github.chrislo27.paintbox.ui.ImageRenderingMode
-import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.UIElement
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.border.SolidBorder
-import io.github.chrislo27.paintbox.ui.element.RectElement
+import paintbox.ui.ImageNode
+import paintbox.ui.ImageRenderingMode
+import paintbox.ui.Pane
+import paintbox.ui.UIElement
+import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
+import paintbox.ui.element.RectElement
 import polyrhythmmania.editor.Editor
 
 

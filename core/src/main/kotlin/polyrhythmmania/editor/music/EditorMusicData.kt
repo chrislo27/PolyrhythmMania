@@ -1,7 +1,7 @@
 package polyrhythmmania.editor.music
 
-import io.github.chrislo27.paintbox.binding.FloatVar
-import io.github.chrislo27.paintbox.binding.Var
+import paintbox.binding.FloatVar
+import paintbox.binding.Var
 import polyrhythmmania.container.ExternalResource
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.soundsystem.BeadsMusic

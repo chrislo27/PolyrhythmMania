@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
-import io.github.chrislo27.paintbox.util.gdxutils.intersects
+import paintbox.util.gdxutils.intersects
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.Entity
 import polyrhythmmania.world.World

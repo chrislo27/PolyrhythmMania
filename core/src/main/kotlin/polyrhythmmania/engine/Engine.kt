@@ -1,6 +1,6 @@
 package polyrhythmmania.engine
 
-import io.github.chrislo27.paintbox.binding.Var
+import paintbox.binding.Var
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider

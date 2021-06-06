@@ -1,8 +1,8 @@
 package polyrhythmmania.editor.block
 
-import io.github.chrislo27.paintbox.Paintbox
-import io.github.chrislo27.paintbox.binding.ReadOnlyVar
-import io.github.chrislo27.paintbox.binding.Var
+import paintbox.Paintbox
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine

@@ -1,6 +1,6 @@
 package polyrhythmmania.engine.input
 
-import io.github.chrislo27.paintbox.Paintbox
+import paintbox.Paintbox
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EntityRod

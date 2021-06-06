@@ -1,15 +1,15 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Color
-import io.github.chrislo27.paintbox.PaintboxGame
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.binding.invert
-import io.github.chrislo27.paintbox.font.PaintboxFont
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.border.SolidBorder
-import io.github.chrislo27.paintbox.ui.control.Button
-import io.github.chrislo27.paintbox.ui.control.Toggle
-import io.github.chrislo27.paintbox.ui.control.ToggleGroup
+import paintbox.PaintboxGame
+import paintbox.binding.Var
+import paintbox.binding.invert
+import paintbox.font.PaintboxFont
+import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
+import paintbox.ui.control.Button
+import paintbox.ui.control.Toggle
+import paintbox.ui.control.ToggleGroup
 
 
 class IndentedButton : Button, Toggle {

@@ -4,7 +4,7 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.PixmapIO
-import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
+import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.soundsystem.sample.MusicSample
 import java.io.File
 import kotlin.math.roundToInt

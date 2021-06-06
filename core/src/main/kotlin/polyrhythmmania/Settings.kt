@@ -1,7 +1,7 @@
 package polyrhythmmania
 
 import com.badlogic.gdx.Preferences
-import io.github.chrislo27.paintbox.binding.Var
+import paintbox.binding.Var
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME

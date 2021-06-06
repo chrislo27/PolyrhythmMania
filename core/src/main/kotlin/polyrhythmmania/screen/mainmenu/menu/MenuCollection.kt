@@ -1,11 +1,11 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.math.Vector2
-import io.github.chrislo27.paintbox.binding.ReadOnlyVar
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.ui.*
-import io.github.chrislo27.paintbox.util.gdxutils.maxX
-import io.github.chrislo27.paintbox.util.gdxutils.maxY
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
+import paintbox.ui.*
+import paintbox.util.gdxutils.maxX
+import paintbox.util.gdxutils.maxY
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import java.lang.Float.max

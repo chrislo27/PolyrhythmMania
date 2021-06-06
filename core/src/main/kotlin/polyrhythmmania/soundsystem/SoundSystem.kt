@@ -2,8 +2,8 @@ package polyrhythmmania.soundsystem
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Disposable
-import io.github.chrislo27.paintbox.Paintbox
-import io.github.chrislo27.paintbox.util.Sync
+import paintbox.Paintbox
+import paintbox.util.Sync
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.IOAudioFormat
 import javax.sound.sampled.*

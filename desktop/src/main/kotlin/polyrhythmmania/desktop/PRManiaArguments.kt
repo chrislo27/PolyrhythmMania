@@ -1,7 +1,7 @@
 package polyrhythmmania.desktop
 
 import com.beust.jcommander.Parameter
-import io.github.chrislo27.paintbox.desktop.PaintboxArguments
+import paintbox.desktop.PaintboxArguments
 
 class PRManiaArguments : PaintboxArguments() {
 

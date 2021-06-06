@@ -1,7 +1,7 @@
 package polyrhythmmania.world
 
 import com.badlogic.gdx.Gdx
-import io.github.chrislo27.paintbox.registry.AssetRegistry
+import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.soundsystem.BeadsSound

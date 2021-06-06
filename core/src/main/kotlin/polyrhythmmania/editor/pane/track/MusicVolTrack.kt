@@ -9,11 +9,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.registry.AssetRegistry
-import io.github.chrislo27.paintbox.ui.*
-import io.github.chrislo27.paintbox.util.MathHelper
-import io.github.chrislo27.paintbox.util.gdxutils.*
+import paintbox.binding.Var
+import paintbox.registry.AssetRegistry
+import paintbox.ui.*
+import paintbox.util.MathHelper
+import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.editor.Click

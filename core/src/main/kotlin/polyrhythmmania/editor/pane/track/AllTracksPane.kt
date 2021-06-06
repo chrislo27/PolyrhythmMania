@@ -1,8 +1,8 @@
 package polyrhythmmania.editor.pane.track
 
 import com.badlogic.gdx.graphics.Color
-import io.github.chrislo27.paintbox.binding.FloatVar
-import io.github.chrislo27.paintbox.ui.Pane
+import paintbox.binding.FloatVar
+import paintbox.ui.Pane
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
 

@@ -1,10 +1,10 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.github.chrislo27.paintbox.ui.control.Button
-import io.github.chrislo27.paintbox.ui.control.ButtonSkin
-import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
-import io.github.chrislo27.paintbox.ui.skin.SkinFactory
+import paintbox.ui.control.Button
+import paintbox.ui.control.ButtonSkin
+import paintbox.ui.skin.DefaultSkins
+import paintbox.ui.skin.SkinFactory
 
 
 object EditorSkins {

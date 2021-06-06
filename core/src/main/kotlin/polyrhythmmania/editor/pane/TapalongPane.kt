@@ -2,13 +2,13 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.paintbox.binding.FloatVar
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.font.TextAlign
-import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.control.Button
-import io.github.chrislo27.paintbox.ui.control.TextLabel
-import io.github.chrislo27.paintbox.ui.layout.HBox
+import paintbox.binding.FloatVar
+import paintbox.binding.Var
+import paintbox.font.TextAlign
+import paintbox.ui.Pane
+import paintbox.ui.control.Button
+import paintbox.ui.control.TextLabel
+import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.util.DecimalFormats
 

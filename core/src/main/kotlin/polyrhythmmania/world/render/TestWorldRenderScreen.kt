@@ -3,8 +3,8 @@ package polyrhythmmania.world.render
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
-import io.github.chrislo27.paintbox.registry.AssetRegistry
-import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
+import paintbox.registry.AssetRegistry
+import paintbox.util.gdxutils.disposeQuietly
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen

@@ -1,7 +1,7 @@
 package polyrhythmmania
 
-import io.github.chrislo27.paintbox.util.Version
-import io.github.chrislo27.paintbox.util.WindowSize
+import paintbox.util.Version
+import paintbox.util.WindowSize
 import java.io.File
 
 

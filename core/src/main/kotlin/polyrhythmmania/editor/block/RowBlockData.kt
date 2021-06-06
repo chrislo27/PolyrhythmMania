@@ -1,11 +1,11 @@
 package polyrhythmmania.editor.block
 
 import com.eclipsesource.json.JsonObject
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.ui.contextmenu.CustomMenuItem
-import io.github.chrislo27.paintbox.ui.contextmenu.LabelMenuItem
-import io.github.chrislo27.paintbox.ui.contextmenu.MenuItem
-import io.github.chrislo27.paintbox.ui.contextmenu.SeparatorMenuItem
+import paintbox.binding.Var
+import paintbox.ui.contextmenu.CustomMenuItem
+import paintbox.ui.contextmenu.LabelMenuItem
+import paintbox.ui.contextmenu.MenuItem
+import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.block.contextmenu.RowSelectorMenuPane

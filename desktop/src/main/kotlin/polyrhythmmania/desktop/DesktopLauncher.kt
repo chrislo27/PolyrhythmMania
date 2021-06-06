@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.HdpiMode
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.ParameterException
-import io.github.chrislo27.paintbox.desktop.PaintboxDesktopLauncher
-import io.github.chrislo27.paintbox.logging.Logger
+import paintbox.desktop.PaintboxDesktopLauncher
+import paintbox.logging.Logger
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 

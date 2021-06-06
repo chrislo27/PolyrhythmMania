@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
-import io.github.chrislo27.paintbox.registry.AssetRegistry
+import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.render.Tileset

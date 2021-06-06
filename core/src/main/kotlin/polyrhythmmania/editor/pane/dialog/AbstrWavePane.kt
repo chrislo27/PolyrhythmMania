@@ -4,8 +4,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
-import io.github.chrislo27.paintbox.ui.*
-import io.github.chrislo27.paintbox.util.gdxutils.fillRect
+import paintbox.ui.*
+import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.pane.EditorPane
 

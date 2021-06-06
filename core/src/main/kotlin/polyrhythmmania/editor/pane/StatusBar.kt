@@ -1,13 +1,13 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.utils.Align
-import io.github.chrislo27.paintbox.font.TextAlign
-import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.UIElement
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.border.SolidBorder
-import io.github.chrislo27.paintbox.ui.control.TextLabel
-import io.github.chrislo27.paintbox.ui.element.RectElement
+import paintbox.font.TextAlign
+import paintbox.ui.Pane
+import paintbox.ui.UIElement
+import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
+import paintbox.ui.control.TextLabel
+import paintbox.ui.element.RectElement
 import polyrhythmmania.editor.Editor
 
 

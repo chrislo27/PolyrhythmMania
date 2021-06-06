@@ -4,10 +4,10 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
-import io.github.chrislo27.paintbox.packing.Packable
-import io.github.chrislo27.paintbox.packing.PackedSheet
-import io.github.chrislo27.paintbox.packing.PackedSheetLoader
-import io.github.chrislo27.paintbox.registry.AssetRegistry
+import paintbox.packing.Packable
+import paintbox.packing.PackedSheet
+import paintbox.packing.PackedSheetLoader
+import paintbox.registry.AssetRegistry
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsMusicLoader
 import polyrhythmmania.soundsystem.BeadsSound

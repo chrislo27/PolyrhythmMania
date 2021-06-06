@@ -1,7 +1,7 @@
 package polyrhythmmania.editor.undo
 
-import io.github.chrislo27.paintbox.binding.ReadOnlyVar
-import io.github.chrislo27.paintbox.binding.Var
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
 import java.util.*
 
 /**

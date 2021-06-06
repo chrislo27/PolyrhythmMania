@@ -7,9 +7,9 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import com.eclipsesource.json.JsonValue
 import com.eclipsesource.json.WriterConfig
-import io.github.chrislo27.paintbox.registry.AssetRegistry
-import io.github.chrislo27.paintbox.util.Version
-import io.github.chrislo27.paintbox.util.gdxutils.disposeQuietly
+import paintbox.registry.AssetRegistry
+import paintbox.util.Version
+import paintbox.util.gdxutils.disposeQuietly
 import net.beadsproject.beads.ugens.SamplePlayer
 import net.lingala.zip4j.ZipFile
 import polyrhythmmania.PRMania

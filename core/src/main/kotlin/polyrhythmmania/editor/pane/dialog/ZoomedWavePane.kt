@@ -2,8 +2,8 @@ package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.ui.*
+import paintbox.binding.Var
+import paintbox.ui.*
 import kotlin.system.measureNanoTime
 
 

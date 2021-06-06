@@ -3,8 +3,8 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import io.github.chrislo27.paintbox.ui.*
-import io.github.chrislo27.paintbox.util.gdxutils.drawRect
+import paintbox.ui.*
+import paintbox.util.gdxutils.drawRect
 
 
 class OverallWavePane(musicDialog: MusicDialog) : AbstrWavePane(musicDialog) {

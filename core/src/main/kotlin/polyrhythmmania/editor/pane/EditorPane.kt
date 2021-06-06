@@ -1,16 +1,16 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.math.Interpolation
-import io.github.chrislo27.paintbox.binding.FloatVar
-import io.github.chrislo27.paintbox.binding.ReadOnlyVar
-import io.github.chrislo27.paintbox.binding.Var
-import io.github.chrislo27.paintbox.ui.Anchor
-import io.github.chrislo27.paintbox.ui.Pane
-import io.github.chrislo27.paintbox.ui.Tooltip
-import io.github.chrislo27.paintbox.ui.UIElement
-import io.github.chrislo27.paintbox.ui.animation.Animation
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.element.RectElement
+import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
+import paintbox.ui.Anchor
+import paintbox.ui.Pane
+import paintbox.ui.Tooltip
+import paintbox.ui.UIElement
+import paintbox.ui.animation.Animation
+import paintbox.ui.area.Insets
+import paintbox.ui.element.RectElement
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.Palette

@@ -2,13 +2,13 @@ package polyrhythmmania.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.github.chrislo27.paintbox.ui.ColorStack
-import io.github.chrislo27.paintbox.ui.area.Insets
-import io.github.chrislo27.paintbox.ui.control.ScrollBar
-import io.github.chrislo27.paintbox.ui.skin.DefaultSkins
-import io.github.chrislo27.paintbox.ui.skin.SkinFactory
-import io.github.chrislo27.paintbox.util.gdxutils.fillRect
-import io.github.chrislo27.paintbox.util.gdxutils.fillRoundedRect
+import paintbox.ui.ColorStack
+import paintbox.ui.area.Insets
+import paintbox.ui.control.ScrollBar
+import paintbox.ui.skin.DefaultSkins
+import paintbox.ui.skin.SkinFactory
+import paintbox.util.gdxutils.fillRect
+import paintbox.util.gdxutils.fillRoundedRect
 
 
 object PRManiaSkins {
