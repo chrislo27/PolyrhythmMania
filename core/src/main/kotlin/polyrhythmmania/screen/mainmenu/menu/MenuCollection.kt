@@ -113,16 +113,16 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         (activeMenu as Var).set(menu)
     }
     
-    fun pushNextMenu(menu: MMMenu, instant: Boolean = false) {
-        changeActiveMenu(menu, false, instant)
+    fun pushNextMenu(menu: MMMenu, instant: Boolean = false, playSound: Boolean = true) {
+        changeActiveMenu(menu, false, instant, playSound)
         menuStack.push(menu)
     }
 
-    fun popLastMenu(instant: Boolean = false): MMMenu {
+    fun popLastMenu(instant: Boolean = false, playSound: Boolean = true): MMMenu {
         if (menuStack.size <= 1) return menuStack.peek()
         val popped = menuStack.pop()
         val menu = menuStack.peek()
-        changeActiveMenu(menu, true, instant)
+        changeActiveMenu(menu, true, instant, playSound)
         return popped
     }
 

@@ -24,6 +24,7 @@ import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.util.RodinSpecialChars
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -85,7 +86,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setOnAction {
                     loaded?.newContainer?.disposeQuietly()
                     loaded = null
-                    removeSelfFromMenuCol()
+                    removeSelfFromMenuCol(true)
                 }
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.play.playAction").use() }).apply {
@@ -108,6 +109,14 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
             }
+            hbox += TextLabel("(Tmp.) Press D for ${RodinSpecialChars.BORDERED_DPAD}, J for ${RodinSpecialChars.BORDERED_A}", font = main.fontMainMenuRodin).apply { 
+                this.bounds.width.set(300f)
+                this.textColor.set(Color.BLACK)
+                this.visible.bind {
+                    substate.use() == Substate.LOADED
+                }
+                this.setScaleXY(0.8f)
+            }
         }
     }
 
@@ -125,7 +134,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             loadFile(file)
                         } else { // Cancelled out
                             Gdx.app.postRunnable {
-                                removeSelfFromMenuCol()
+                                removeSelfFromMenuCol(false)
                             }
                         }
                     }
@@ -134,8 +143,8 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
     }
     
-    fun removeSelfFromMenuCol() {
-        menuCol.popLastMenu()
+    fun removeSelfFromMenuCol(playSound: Boolean) {
+        menuCol.popLastMenu(playSound = playSound)
         menuCol.removeMenu(this)
     }
 
