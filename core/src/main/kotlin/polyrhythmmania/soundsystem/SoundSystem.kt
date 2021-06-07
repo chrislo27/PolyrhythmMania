@@ -130,6 +130,7 @@ class SoundSystem(private val mixer: Mixer,
     fun getPlayer(id: Long): PlayerLike? = activePlayers[id]
 
     private inner class AdaptiveTimingProvider : TimingProvider {
+        @Volatile
         override var seconds: Float = 0f
         override val listeners: MutableList<TimingListener> = CopyOnWriteArrayList()
 
@@ -187,7 +188,7 @@ class SoundSystem(private val mixer: Mixer,
         
         fun forceSyncWithBead() {
             val oldSeconds = this.seconds
-            this.seconds = timingProvider.timingBead.seconds
+            this.seconds = timingBead.seconds
             this.onUpdate(oldSeconds, this.seconds)
         }
 

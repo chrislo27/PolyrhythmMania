@@ -2,7 +2,7 @@ package paintbox.ui
 
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.math.Vector2
-import paintbox.util.sumByFloat
+import paintbox.util.sumOfFloat
 
 
 /**
@@ -83,8 +83,8 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         // then the rest of the code does nothing, achieving maximum performance.
 
         var cursor: UIElement? = lastPath.lastOrNull()
-        var offX: Float = lastPath.sumByFloat { it.contentZone.x.getOrCompute() }
-        var offY: Float = lastPath.sumByFloat { it.contentZone.y.getOrCompute() }
+        var offX: Float = lastPath.sumOfFloat { it.contentZone.x.getOrCompute() }
+        var offY: Float = lastPath.sumOfFloat { it.contentZone.y.getOrCompute() }
         if (cursor != null) {
             offX -= cursor.contentZone.x.getOrCompute()
             offY -= cursor.contentZone.y.getOrCompute()

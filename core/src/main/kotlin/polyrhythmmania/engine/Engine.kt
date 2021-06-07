@@ -96,10 +96,14 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
             queuedRunnables.clear()
         }
         
+        var anyToDelete = false
         events.forEach { event ->
             updateEvent(event, currentBeat)
+            if (!anyToDelete && event.updateCompletion == Event.UpdateCompletion.COMPLETED) {
+                anyToDelete = true
+            }
         }
-        if (deleteEventsAfterCompletion) {
+        if (anyToDelete && deleteEventsAfterCompletion) {
             removeEvents(_events.filter { it.updateCompletion == Event.UpdateCompletion.COMPLETED })
         }
         world.engineUpdate(this, currentBeat, currentSeconds)

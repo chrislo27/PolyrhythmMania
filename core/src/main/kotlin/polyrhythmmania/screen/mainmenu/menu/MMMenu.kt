@@ -100,8 +100,11 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
     protected val main: PRManiaGame get() = mainMenu.main
     protected val font: PaintboxFont = main.fontMainMenuMain
-    protected val markup: Markup = Markup(mapOf("prmania_icons" to main.fontIcons, "rodin" to main.fontMainMenuRodin),
-            TextRun(font, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    protected val markup: Markup = Markup(mapOf(
+            "prmania_icons" to main.fontIcons,
+            "rodin" to main.fontMainMenuRodin,
+            "thin" to main.fontMainMenuThin
+    ), TextRun(font, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
     protected val titleHeight: Float = 64f
     protected val grey: Color = Color().grey(0.8f, 1f)
     protected val blipSoundListener: (MouseEntered?) -> Unit = {

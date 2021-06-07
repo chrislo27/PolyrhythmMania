@@ -13,7 +13,7 @@ import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.sumByFloat
+import paintbox.util.sumOfFloat
 import polyrhythmmania.Localization
 import polyrhythmmania.credits.Credits
 import polyrhythmmania.ui.PRManiaSkins
@@ -100,7 +100,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.internalTextBlock.bind { textBlock.use() }
             }
 
-            vbox.bounds.height.set(vbox.children.sumByFloat { it.bounds.height.getOrCompute() })
+            vbox.bounds.height.set(vbox.children.sumOfFloat { it.bounds.height.getOrCompute() })
         }
 
         scrollPane.setContent(vbox)

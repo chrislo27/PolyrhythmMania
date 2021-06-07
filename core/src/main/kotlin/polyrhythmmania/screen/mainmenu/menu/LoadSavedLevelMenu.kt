@@ -1,10 +1,15 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.Var
 import paintbox.font.TextAlign
+import paintbox.registry.AssetRegistry
+import paintbox.transition.FadeIn
+import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
@@ -15,9 +20,7 @@ import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
-import polyrhythmmania.editor.EditorScreen
-import polyrhythmmania.editor.pane.dialog.LoadDialog
-import polyrhythmmania.soundsystem.SimpleTimingProvider
+import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.soundsystem.SoundSystem
 import java.io.File
 import kotlin.concurrent.thread
@@ -92,7 +95,15 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
                 this.setOnAction {
-                    // TODO play!
+                    val loadedData = loaded
+                    if (loadedData != null) {
+                        AssetRegistry.get<Sound>("sfx_menu_enter_game").play(menuCol.settings.menuSfxVolume.getOrCompute() / 100f)
+                        mainMenu.transitionAway {
+                            val main = mainMenu.main
+                            val playScreen = PlayScreen(main, loadedData.newContainer)
+                            main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f)))
+                        }
+                    }
                 }
             }
         }
@@ -138,10 +149,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val newSoundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
             this.audioContext.out.gain = main.settings.gameplayVolume.getOrCompute() / 100f
         }
-        val newContainer: Container = Container(newSoundSystem, SimpleTimingProvider {
-            Gdx.app.postRunnable { throw it }
-            true
-        })
+        val newContainer: Container = Container(newSoundSystem, newSoundSystem)
 
         try {
             val loadMetadata = newContainer.readFromFile(newFile)

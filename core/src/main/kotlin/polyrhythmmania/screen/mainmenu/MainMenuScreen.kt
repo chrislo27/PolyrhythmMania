@@ -117,7 +117,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val container: Container = Container(null, SimpleTimingProvider { throw it })
 
     private val menuPane: Pane = Pane()
-    private val menuCollection: MenuCollection = MenuCollection(this, sceneRoot, menuPane)
+    val menuCollection: MenuCollection = MenuCollection(this, sceneRoot, menuPane)
 
     private val gradientStart: Color = Color(0f, 32f / 255f, 55f / 255f, 1f)
     private val gradientEnd: Color = Color.BLACK.cpy()
@@ -146,11 +146,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
      * The current framebuffer is what's drawn for this frame.
      */
     private lateinit var framebufferCurrent: FrameBuffer
-
-
-    // FIXME remove this later
-    private var colorIndex: Int = 0
-    private val colors: List<Color> = listOf(Color(1f, 0.5f, 0.5f, 1f), Color(0.5f, 1f, 0.5f, 1f), Color(0.5f, 0.5f, 1f, 1f))
 
     init {
         createFramebuffers(Gdx.graphics.width, Gdx.graphics.height, null)
@@ -366,10 +361,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     override fun renderUpdate() {
         super.renderUpdate()
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            colorIndex = (colorIndex + 1) % colors.size
-            flipAnimation = TileFlip(5, 5, 16, 9, cornerStart = Corner.TOP_LEFT)
-        }
         // FIXME DEBUG remove later 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             main.screen = MainMenuScreen(main)
@@ -477,7 +468,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     override fun getDebugString(): String {
         return "" +
                 """path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
-
+currentMenu: ${menuCollection.activeMenu.getOrCompute()?.javaClass?.simpleName}
 """
     }
 }

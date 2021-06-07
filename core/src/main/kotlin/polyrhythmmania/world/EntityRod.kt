@@ -120,8 +120,6 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
             if (startIndex >= row.length - 1) {
                 bounce(startIndex, startIndex + 1)
             } else {
-                updateInputIndices() // Is this really needed? Ported over from collision refactor
-
                 var nextNonNull = startIndex + 1
                 for (i in startIndex + 1 until row.length) {
                     nextNonNull = i
@@ -191,12 +189,13 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
     /**
      * [inputTracker] will be updated with the correct number of inputs expected.
      */
-    fun updateInputIndices() {
+    fun updateInputIndices(currentBeat: Float) {
         val lastExpectedSoFar = inputTracker.expectedInputIndices.lastOrNull() ?: -1
+        val currentIndexFloor = getCurrentIndexFloor(this.position.x)
         row.rowBlocks.forEachIndexed { index, entity ->
-            if (index > lastExpectedSoFar) {
+            if (index > lastExpectedSoFar && index >= currentIndexFloor) {
                 val type = if (!entity.active) null else entity.type
-                if (type != null && entity.type != EntityRowBlock.Type.PLATFORM && index > lastExpectedSoFar) {
+                if (type != null && entity.type != EntityRowBlock.Type.PLATFORM) {
                     inputTracker.expectedInputIndices.add(index)
                 }
             }
@@ -229,9 +228,9 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
 
         // Initialize active blocks
         if (currentIndexFloat >= -0.7f) {
-            updateInputIndices()
+            updateInputIndices(beat)
         } else if (floor(lastCurrentIndex).toInt() != floor(currentIndexFloat).toInt() && lastCurrentIndex >= 0) {
-            updateInputIndices()
+            updateInputIndices(beat)
         }
 
         // Check for wall stop
@@ -300,7 +299,6 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
                     }
                 }
                 
-                // FIXME improve auto inputting for editor
                 if (engine.autoInputs) {
                     if (collision.velocityY == 0f && blockBelow.active && blockBelow.type != EntityRowBlock.Type.PLATFORM 
                             && blockBelow.pistonState == EntityRowBlock.PistonState.RETRACTED

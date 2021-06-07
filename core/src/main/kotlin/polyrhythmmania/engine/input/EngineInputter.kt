@@ -59,7 +59,7 @@ class EngineInputter(val engine: Engine) {
             for (entity in engine.world.entities) {
                 if (entity !is EntityRod || entity.row !== row || !entity.acceptingInputs) continue
                 val rod: EntityRod = entity
-                rod.updateInputIndices()
+                rod.updateInputIndices(atBeat)
                 val inputTracker = rod.inputTracker
                 if (inputTracker.results.size >= inputTracker.expectedInputIndices.size) {
 //                    Paintbox.LOGGER.debug("$rod: Skipping input because results size >= expected inputs size (${inputTracker.results.size} >= ${inputTracker.expectedInputIndices.size})")
@@ -81,18 +81,17 @@ class EngineInputter(val engine: Engine) {
                 val minSec = perfectSeconds - InputThresholds.MAX_OFFSET_SEC
                 val maxSec = perfectSeconds + InputThresholds.MAX_OFFSET_SEC
 
-                Paintbox.LOGGER.debug("$rod: Input ${type}: perfectB=$perfectBeats, perfectS=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
-
                 if (atSeconds !in minSec..maxSec) {
 //                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
                     continue
                 }
                 
                 val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
-                inputTracker.results += InputResult(type, accuracyPercent, differenceSec)
+                val inputResult = InputResult(type, accuracyPercent, differenceSec)
+                Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.")}: Input ${type}: ${inputResult.inputScore} perfectB=$perfectBeats, perfectS=$perfectSeconds, diffS=$differenceSec, minmaxS=[$minSec, $maxSec], actualS=$atSeconds")
+                inputTracker.results += inputResult
                 // Bounce the rod
                 rod.bounce(nextBlockIndex)
-                
             }
             
             // Trigger this piston
@@ -102,7 +101,6 @@ class EngineInputter(val engine: Engine) {
     
     fun submitInputsFromRod(rod: EntityRod) {
         val inputTracker = rod.inputTracker
-//        println("Submission from rod: ${inputTracker.expectedInputIndices}")
         totalExpectedInputs += inputTracker.expectedInputIndices.size
         (inputResults as MutableList).addAll(inputTracker.results)
     }
