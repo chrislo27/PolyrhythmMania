@@ -218,6 +218,9 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         addContextMenuToScene(contextMenu)
         rootContextMenu = contextMenu
         contextMenuLayer.resetHoveredElementPath()
+        Gdx.app.postRunnable {
+            contextMenuLayer.resetHoveredElementPath()
+        }
     }
 
     /**
@@ -228,6 +231,9 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         removeContextMenuFromScene(currentRootMenu)
         rootContextMenu = null
         contextMenuLayer.resetHoveredElementPath()
+        Gdx.app.postRunnable {
+            contextMenuLayer.resetHoveredElementPath()
+        }
         return currentRootMenu
     }
 
@@ -239,6 +245,9 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         rootDialogElement = dialog
         dialogLayer.root.addChild(dialog)
         dialogLayer.resetHoveredElementPath()
+        Gdx.app.postRunnable {
+            dialogLayer.resetHoveredElementPath()
+        }
         cancelTooltip()
     }
 
@@ -250,6 +259,9 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         dialogLayer.root.removeChild(currentRootDialog)
         rootDialogElement = null
         dialogLayer.resetHoveredElementPath()
+        Gdx.app.postRunnable {
+            dialogLayer.resetHoveredElementPath()
+        }
         cancelTooltip()
         return currentRootDialog
     }
