@@ -23,6 +23,8 @@ object Instantiators {
 
     val map: Map<String, Instantiator<*>>
     val list: List<Instantiator<*>>
+    
+    val endStateInstantiator: Instantiator<BlockEndState>
 
     init {
         val tempMap = mutableMapOf<String, Instantiator<*>>()
@@ -34,11 +36,12 @@ object Instantiators {
             tempList += instantiator
         }
 
-        add(Instantiator("endState", BlockEndState::class.java, Localization.getVar("instantiator.endState.name"),
+        endStateInstantiator = Instantiator("endState", BlockEndState::class.java, Localization.getVar("instantiator.endState.name"),
                 Localization.getVar("instantiator.endState.summary"),
                 Localization.getVar("instantiator.endState.desc")) { engine ->
             BlockEndState(engine)
-        })
+        }
+        add(endStateInstantiator)
         add(Instantiator("spawnPattern", BlockSpawnPattern::class.java, Localization.getVar("instantiator.spawnPattern.name"),
                 Localization.getVar("instantiator.spawnPattern.summary"),
                 Localization.getVar("instantiator.spawnPattern.desc")) { engine ->

@@ -20,6 +20,8 @@ import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
+import polyrhythmmania.editor.block.BlockEndState
+import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.soundsystem.SoundSystem
 import java.io.File
@@ -153,14 +155,23 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         try {
             val loadMetadata = newContainer.readFromFile(newFile)
+            
+            if (newContainer.blocks.none { it is BlockEndState }) {
+                Gdx.app.postRunnable {
+                    substate.set(Substate.LOAD_ERROR)
+                    descLabel.text.set(Localization.getValue("mainMenu.play.noEndState",
+                            Localization.getValue(Instantiators.endStateInstantiator.name.getOrCompute())))
+                    newContainer.disposeQuietly()
+                }
+            } else {
+                Gdx.app.postRunnable {
+                    substate.set(Substate.LOADED)
+                    descLabel.text.set(Localization.getValue("editor.dialog.load.loadedInformation", loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
+                    loaded = LoadData(newContainer, loadMetadata)
 
-            Gdx.app.postRunnable {
-                substate.set(Substate.LOADED)
-                descLabel.text.set(Localization.getValue("editor.dialog.load.loadedInformation", loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
-                loaded = LoadData(newContainer, loadMetadata)
-
-                val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
-                main.persistDirectory(PreferenceKeys.FILE_CHOOSER_PLAY_SAVED_LEVEL, newInitialDirectory)
+                    val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
+                    main.persistDirectory(PreferenceKeys.FILE_CHOOSER_PLAY_SAVED_LEVEL, newInitialDirectory)
+                }
             }
         } catch (e: Exception) {
             Paintbox.LOGGER.warn("Error occurred while loading container:")
@@ -169,6 +180,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Gdx.app.postRunnable {
                 substate.set(Substate.LOAD_ERROR)
                 descLabel.text.set(Localization.getValue("editor.dialog.load.loadError", exClassName))
+                newContainer.disposeQuietly()
             }
         }
     }
