@@ -738,7 +738,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             val loopEnd: FloatVar = FloatVar(0f),
     ) {
         companion object {
-            const val DEFAULT_WIDTH: Float = 5f
+            const val DEFAULT_WIDTH: Float = 4f
         }
 
         init {
