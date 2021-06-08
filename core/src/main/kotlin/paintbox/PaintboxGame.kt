@@ -264,7 +264,9 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
     override fun resize(width: Int, height: Int) {
         resetCameras()
         val nano = measureNanoTime {
-            fontCache.resizeAll(width, height)
+            val nativeCamWidth = nativeCamera.viewportWidth.toInt()
+            val nativeCamHeight = nativeCamera.viewportHeight.toInt()
+            fontCache.resizeAll(nativeCamWidth, nativeCamHeight)
         }
 //        Paintbox.LOGGER.info("Reloaded all ${fontCache.fonts.size} fonts in ${nano / 1_000_000.0} ms")
         super.resize(width, height)
@@ -310,11 +312,16 @@ ${(screen as? PaintboxScreen)?.getDebugString() ?: ""}"""
     }
 
     fun resetCameras() {
-        nativeCamera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-        nativeCamera.update()
         val resizeAction = paintboxSettings.resizeAction
         val emulatedSize = paintboxSettings.emulatedSize
         val minimumSize = paintboxSettings.minimumSize
+        
+        nativeCamera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        if (nativeCamera.viewportWidth < minimumSize.width || nativeCamera.viewportHeight < minimumSize.height) {
+            nativeCamera.setToOrtho(false, minimumSize.width.toFloat(), minimumSize.height.toFloat())
+        }
+        nativeCamera.update()
+        
         when (resizeAction) {
             ResizeAction.ANY_SIZE -> emulatedCamera.setToOrtho(false, Gdx.graphics.width.toFloat(),
                     Gdx.graphics.height.toFloat())
