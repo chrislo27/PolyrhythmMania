@@ -59,12 +59,15 @@ open class ContextMenu : Control<ContextMenu>() {
     var onAddedToScene: (SceneRoot) -> Unit = {}
     var onRemovedFromScene: (SceneRoot) -> Unit = {}
 
+    protected val backgroundRect: RectElement
+    
     init {
         this.border.set(Insets(1f))
         this.borderStyle.set(SolidBorder(Color.BLACK))
         this.bounds.width.set(defaultWidth.getOrCompute())
         this.bounds.height.set(defaultWidth.getOrCompute())
-        addChild(RectElement(Color().grey(1f, 0.8f)))
+        backgroundRect = RectElement(Color().grey(1f, 0.8f))
+        addChild(backgroundRect)
 
         this.addInputEventListener { event ->
             true // Accepts any input events so the context menu doesn't get closed
@@ -205,14 +208,14 @@ open class ContextMenu : Control<ContextMenu>() {
         }
 
         activeMenuItems.forEach { old ->
-            removeChild(old.element)
+            backgroundRect.removeChild(old.element)
         }
 
         var posY = 0f
         for (it in metadata) {
             val ele = it.element
             ele.bounds.y.set(posY)
-            addChild(ele)
+            backgroundRect.addChild(ele)
             posY += ele.bounds.height.getOrCompute()
         }
         activeMenuItems = metadata
