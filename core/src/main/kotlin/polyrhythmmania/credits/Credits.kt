@@ -11,8 +11,8 @@ object Credits {
                     "garbo",
             ),
             "credits.qa" to abcSorted(
-                    "Lvl100Feraligatr", "<...>"
-            ),
+                    "Lvl100Feraligatr",
+            ) + listOf("Tourneycord Discord server"),
             "credits.resourcesAndTechnologies" to listOf(
                     "[font=rodin]リズム天国[] assets\nby Nintendo",
                     "libGDX",
