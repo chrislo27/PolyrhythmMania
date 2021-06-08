@@ -23,6 +23,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.util.RodinSpecialChars
 import java.io.File
@@ -109,7 +110,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
             }
-            hbox += TextLabel("(Tmp.) Press D for ${RodinSpecialChars.BORDERED_DPAD}, J for ${RodinSpecialChars.BORDERED_A}", font = main.fontMainMenuRodin).apply { 
+            hbox += TextLabel("(Tmp.) Press D for ${RodinSpecialChars.BORDERED_DPAD}, J for ${RodinSpecialChars.BORDERED_A}", font = main.fontMainMenuRodin).apply {
                 this.bounds.width.set(300f)
                 this.textColor.set(Color.BLACK)
                 this.visible.bind {
@@ -142,7 +143,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
     }
-    
+
     fun removeSelfFromMenuCol(playSound: Boolean) {
         menuCol.popLastMenu(playSound = playSound)
         menuCol.removeMenu(this)
@@ -160,11 +161,16 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val newSoundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
             this.audioContext.out.gain = main.settings.gameplayVolume.getOrCompute() / 100f
         }
-        val newContainer: Container = Container(newSoundSystem, newSoundSystem)
+        val newContainer: Container = Container(newSoundSystem, SimpleTimingProvider {
+            Gdx.app.postRunnable {
+throw it
+            }
+            true
+        })
 
         try {
             val loadMetadata = newContainer.readFromFile(newFile)
-            
+
             if (newContainer.blocks.none { it is BlockEndState }) {
                 Gdx.app.postRunnable {
                     substate.set(Substate.LOAD_ERROR)

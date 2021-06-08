@@ -20,6 +20,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.screen.mainmenu.menu.TemporaryResultsMenu
+import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.world.EntityRod
@@ -70,6 +71,10 @@ class PlayScreen(main: PRManiaGame, val container: Container)
     
     override fun renderUpdate() {
         super.renderUpdate()
+        
+        if (!isPaused && timing is SimpleTimingProvider) {
+            timing.seconds += Gdx.graphics.deltaTime
+        }
         
         // DEBUG
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
