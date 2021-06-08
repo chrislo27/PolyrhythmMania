@@ -170,10 +170,10 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
         super.renderSelfAfterChildren(originX, originY, batch)
 
-//        val renderBounds = this.contentZone
+        val renderBounds = this.contentZone
 //        val x = renderBounds.x.getOrCompute() + originX
 //        val y = originY - renderBounds.y.getOrCompute()
-//        val w = renderBounds.width.getOrCompute()
+        val w = renderBounds.width.getOrCompute()
 //        val h = renderBounds.height.getOrCompute()
         val trackView = editor.trackView
         val click = editor.click.getOrCompute()
@@ -184,10 +184,16 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         // FIXME refactor out?
 
         // Render blocks
+        val leftSide = beatToRenderX(originX, trackView.beat.getOrCompute())
+        val rightSide = leftSide + w
         editor.blocks.forEach { block ->
-            val track = allTracksPane.editorTrackSides.getOrNull(block.trackIndex)
-            block.render(editor, batch, trackView, this, originX, originY, trackHeight,
-                    track?.sidePanel?.sidebarBgColor?.getOrCompute() ?: Color.WHITE)
+            val blockLeftSide = beatToRenderX(originX, block.beat)
+            val blockRightSide = beatToRenderX(originX, block.beat + block.width)
+            if (leftSide <= blockRightSide && rightSide >= blockLeftSide) {
+                val track = allTracksPane.editorTrackSides.getOrNull(block.trackIndex)
+                block.render(editor, batch, trackView, this, originX, originY, trackHeight,
+                        track?.sidePanel?.sidebarBgColor?.getOrCompute() ?: Color.WHITE)
+            }
         }
 
         // Render drag selection outlines
