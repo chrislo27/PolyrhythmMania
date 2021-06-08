@@ -60,6 +60,28 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         }
     }
 
+    fun startGame() {
+        timing.seconds = 0f
+        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
+        if (player != null) {
+            engine.musicData.setPlayerPositionToCurrentSec()
+            player.pause(false)
+        }
+        container.engine.autoInputs = !false
+        container.engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
+
+        engine.endSignalReceived.addListener { endSignal ->
+            if (endSignal.getOrCompute()) {
+                Gdx.app.postRunnable {
+                    isFinished = true
+                }
+            }
+        }
+
+        soundSystem.startRealtime()
+        unpauseGame()
+    }
+    
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -92,28 +114,6 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 }
             }
         }
-    }
-    
-    fun startGame() {
-        timing.seconds = 0f
-        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
-        if (player != null) {
-            engine.musicData.setPlayerPositionToCurrentSec()
-            player.pause(false)
-        }
-        container.engine.autoInputs = false
-        container.engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
-
-        engine.endSignalReceived.addListener { endSignal ->
-            if (endSignal.getOrCompute()) {
-                Gdx.app.postRunnable {
-                    isFinished = true
-                }
-            }
-        }
-
-        soundSystem.startRealtime()
-        unpauseGame()
     }
     
     private fun transitionToResults() {

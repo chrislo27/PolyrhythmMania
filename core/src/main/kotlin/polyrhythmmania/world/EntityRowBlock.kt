@@ -70,9 +70,8 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
             Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_d"))
         }
 
-        if (this.type != Type.PLATFORM && engine.inputter.areInputsLocked) {
+        if (this.type != Type.PLATFORM && engine.autoInputs) {
             // Bounce any rods that are on this index
-            // FIXME this is for testing purposes only
             world.entities.forEach { entity ->
                 if (entity is EntityRod) {
                     // The index that the rod is on
