@@ -26,7 +26,6 @@ import paintbox.ui.layout.VBox
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
 import paintbox.util.gdxutils.disposeQuietly
-import paintbox.util.gdxutils.fillRect
 import paintbox.util.sumOfFloat
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
@@ -111,14 +110,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 this.bounds.height.set(64f)
                 this.skinFactory.set(skinFactory)
                 this.setOnAction {
-                    val blocks = container.blocks.toList()
-                    engine.removeEvents(engine.events.toList())
-                    engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
-                    container.world.resetWorld()
-                    Gdx.app.postRunnable {
-                        playMenuSound("sfx_menu_enter_game")
-                        startGame()
-                    }
+                    resetAndStartOver()
                 }
             }
             vbox += Button("Quit to Main Menu", font = main.fontMainMenuMain).apply {
@@ -260,6 +252,19 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         main.inputMultiplexer.removeProcessor(inputProcessor)
         if (playSound) {
             playMenuSound("sfx_pause_exit")
+        }
+    }
+    
+    private fun resetAndStartOver(playSound: Boolean = true) {
+        val blocks = container.blocks.toList()
+        engine.removeEvents(engine.events.toList())
+        engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
+        container.world.resetWorld()
+        Gdx.app.postRunnable {
+            if (playSound) {
+                playMenuSound("sfx_menu_enter_game")
+            }
+            startGame()
         }
     }
 
