@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.utils.Align
 import polyrhythmmania.init.InitialAssetLoader
 import paintbox.PaintboxGame
 import paintbox.PaintboxSettings
@@ -17,10 +18,8 @@ import paintbox.logging.Logger
 import paintbox.registry.AssetRegistry
 import paintbox.util.ResolutionSetting
 import paintbox.util.WindowSize
-import paintbox.util.gdxutils.isAltDown
-import paintbox.util.gdxutils.isControlDown
-import paintbox.util.gdxutils.isShiftDown
 import org.lwjgl.glfw.GLFW
+import paintbox.util.gdxutils.*
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
@@ -94,6 +93,35 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     override fun dispose() {
         super.dispose()
+    }
+
+    override fun postRender() {
+        val batch = this.batch
+
+        val cam = nativeCamera
+        batch.projectionMatrix = cam.combined
+        batch.begin()
+        
+        batch.setColor(1f, 1f, 1f, 1f)
+
+        @Suppress("ConstantConditionIf")
+        if (PRMania.enableEarlyAccessMessage) {
+            val paintboxFont = fontRodinFixedBordered
+            paintboxFont.useFont { font ->
+                val height = 0.985f
+                val alpha = if (cam.getInputY() / cam.viewportHeight in (height - font.capHeight / cam.viewportHeight)..(height)) 0.35f else 1f
+                font.setColor(1f, 1f, 1f, alpha)
+                font.drawCompressed(batch, "Non-final pre-release version ${PRMania.VERSION}. Content subject to change. Do not redistribute.",
+                        0f,
+                        height * cam.viewportHeight,
+                        cam.viewportWidth, Align.center)
+                font.setColor(1f, 1f, 1f, 1f)
+            }
+        }
+        
+        batch.end()
+        
+        super.postRender()
     }
 
     private val userHomeFile: File = File(System.getProperty("user.home"))
