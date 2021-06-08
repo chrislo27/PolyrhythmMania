@@ -33,7 +33,12 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
         private set
 
     fun initWithWorld() {
-        rowBlocks.forEach(world::addEntity)
+        rowBlocks.forEach {
+            world.addEntity(it)
+            it.retract()
+            it.despawn(1f)
+            it.type = EntityRowBlock.Type.PLATFORM
+        }
         inputIndicators.forEach(world::addEntity)
         updateInputIndicators()
     }

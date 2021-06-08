@@ -22,8 +22,7 @@ class World {
     val rowDpad: Row get() = rows[1]
     
     init {
-        populateScene()
-        rows.forEach(Row::initWithWorld)
+        resetWorld()
     }
 
     fun addEntity(entity: Entity) {
@@ -53,8 +52,15 @@ class World {
     fun sortEntitiesByRenderOrder() {
         (entities as MutableList).sortWith(WorldRenderer.comparatorRenderOrder)
     }
+    
+    fun resetWorld() {
+        populateScene()
+        rows.forEach(Row::initWithWorld)
+    }
 
     private fun populateScene() {
+        entities.toList().forEach { removeEntity(it) }
+        
         // Main floor
         for (x in -1..20) {
             for (z in -6 until 3) {

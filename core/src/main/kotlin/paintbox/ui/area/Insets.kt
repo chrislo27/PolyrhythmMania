@@ -8,7 +8,7 @@ data class Insets(val top: Float, val bottom: Float, val left: Float, val right:
         val ZERO: Insets = Insets(0f, 0f, 0f, 0f)
 
         private val intCache: Array<Insets> by lazy {
-            Array(11) { i ->
+            Array(1 + 20) { i ->
                 if (i == 0) {
                     ZERO
                 } else {

@@ -48,7 +48,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     init {
         this.setSize(WIDTH_MID)
         this.titleText.bind { Localization.getVar("mainMenu.play.playSavedLevel").use() }
-        this.contentPane.bounds.height.set(250f)
+        this.contentPane.bounds.height.set(300f)
 
         val content = VBox().apply {
             Anchor.TopLeft.configure(this)
@@ -163,7 +163,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         val newContainer: Container = Container(newSoundSystem, SimpleTimingProvider {
             Gdx.app.postRunnable {
-throw it
+                throw it
             }
             true
         })
