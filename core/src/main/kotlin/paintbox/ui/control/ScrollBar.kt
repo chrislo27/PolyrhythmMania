@@ -87,7 +87,6 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
                 increment()
             }
         }
-        // FIXME
         thumbArea = ThumbPane(this).apply {
             Anchor.Centre.configure(this)
             when (orientation) {

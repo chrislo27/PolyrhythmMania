@@ -138,7 +138,6 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                                         }
                                     }
                                 } else {
-                                    // TODO implement dragging/resizing of music volume
                                     val snap = editor.snapping.getOrCompute()
                                     val mouseX = getBeatFromRelative(lastMouseRelative.x)
                                     val left = MathUtils.isEqual(mv.beat, mouseX, snap * 0.5f)

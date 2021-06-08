@@ -361,7 +361,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     override fun renderUpdate() {
         super.renderUpdate()
-//        // FIXME DEBUG remove later 
+//        // DEBUG remove later 
 //        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
 //            main.screen = MainMenuScreen(main)
 //        }
