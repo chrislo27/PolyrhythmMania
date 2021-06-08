@@ -290,11 +290,13 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                         engine.postRunnable {
                             engine.inputter.onInput(InputType.DPAD, atSeconds)
                         }
+                        consumed = true
                     }
                     Input.Keys.J -> {
                         engine.postRunnable {
                             engine.inputter.onInput(InputType.A, atSeconds)
                         }
+                        consumed = true
                     }
                 }
             }
