@@ -67,7 +67,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             engine.musicData.setPlayerPositionToCurrentSec()
             player.pause(false)
         }
-        container.engine.autoInputs = !false
+        container.engine.autoInputs = false
         container.engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
 
         engine.endSignalReceived.addListener { endSignal ->
