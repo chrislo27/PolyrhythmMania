@@ -266,7 +266,7 @@ open class UIElement : UIBounds() {
             If current is clipped, then x and y MUST be within current to begin with!
              */
             if (current.doClipping.getOrCompute()) {
-                if (!current.bounds.containsPointLocal(x - xOffset, y - yOffset)) break
+                if (!current.bounds.containsPointLocal(x, y)) break
             }
             val found = current.children.findLast { child ->
                 child.apparentVisibility.getOrCompute()
