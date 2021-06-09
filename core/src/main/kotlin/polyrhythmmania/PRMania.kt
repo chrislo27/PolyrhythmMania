@@ -19,6 +19,6 @@ object PRMania {
         mkdirs()
     }
     
-    val enableEarlyAccessMessage: Boolean = false
+    val enableEarlyAccessMessage: Boolean = true
     
 }
