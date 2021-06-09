@@ -815,11 +815,11 @@ class Editor(val main: PRManiaGame)
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         var inputConsumed = false
 
-        val currentClick = click.getOrCompute()
-        if (currentClick is Click.CreateSelection || currentClick is Click.DragSelection || currentClick is Click.MoveMarker) {
-            editorPane.allTracksPane.editorTrackArea.onMouseMovedOrDragged(screenX.toFloat(), screenY.toFloat())
-            inputConsumed = true
-        }
+//        val currentClick = click.getOrCompute()
+//        if (currentClick is Click.CreateSelection || currentClick is Click.DragSelection || currentClick is Click.MoveMarker) {
+//            editorPane.allTracksPane.editorTrackArea.onMouseMovedOrDragged(screenX.toFloat(), screenY.toFloat())
+//            inputConsumed = true
+//        }
 
         return inputConsumed || sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer)
     }
