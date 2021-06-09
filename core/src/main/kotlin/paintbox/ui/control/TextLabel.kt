@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
-import paintbox.ui.ColorStack
+import paintbox.util.ColorStack
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
@@ -15,7 +15,6 @@ import paintbox.font.*
 import paintbox.ui.area.Insets
 import paintbox.util.gdxutils.fillRect
 import kotlin.math.min
-import kotlin.math.roundToInt
 
 
 /**

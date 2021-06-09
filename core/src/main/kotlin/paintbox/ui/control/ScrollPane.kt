@@ -5,11 +5,11 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
-import paintbox.binding.VarChangedListener
 import paintbox.ui.*
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
+import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.isShiftDown
 

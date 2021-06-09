@@ -8,6 +8,7 @@ import paintbox.font.TextAlign
 import paintbox.font.TextBlock
 import paintbox.font.TextRun
 import paintbox.binding.Var
+import paintbox.util.ColorStack
 import kotlin.math.min
 
 

@@ -1,6 +1,5 @@
 package paintbox.ui.control
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -10,12 +9,11 @@ import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.ui.*
-import paintbox.ui.area.Insets
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
+import paintbox.util.ColorStack
 import paintbox.util.MathHelper
-import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.fillRoundedRect
 
 

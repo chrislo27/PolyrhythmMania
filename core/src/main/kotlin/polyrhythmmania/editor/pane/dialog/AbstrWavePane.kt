@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import paintbox.ui.*
+import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.pane.EditorPane

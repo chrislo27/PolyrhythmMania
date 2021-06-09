@@ -6,6 +6,7 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
+import paintbox.util.RectangleStack
 import paintbox.util.gdxutils.maxX
 import paintbox.util.gdxutils.maxY
 import polyrhythmmania.PRManiaGame

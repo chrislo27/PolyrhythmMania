@@ -14,6 +14,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
+import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.fillRoundedRect
 

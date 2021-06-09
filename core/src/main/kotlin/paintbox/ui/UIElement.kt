@@ -9,6 +9,7 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.ui.border.Border
 import paintbox.ui.border.NoBorder
+import paintbox.util.RectangleStack
 
 
 open class UIElement : UIBounds() {

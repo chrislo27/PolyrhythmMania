@@ -2,7 +2,7 @@ package polyrhythmmania.editor.pane.track
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import paintbox.binding.FloatVar
-import paintbox.ui.ColorStack
+import paintbox.util.ColorStack
 import paintbox.ui.Pane
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.Click

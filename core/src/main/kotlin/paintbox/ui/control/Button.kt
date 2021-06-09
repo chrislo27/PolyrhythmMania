@@ -17,6 +17,7 @@ import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
 import java.util.*
 import kotlin.math.min

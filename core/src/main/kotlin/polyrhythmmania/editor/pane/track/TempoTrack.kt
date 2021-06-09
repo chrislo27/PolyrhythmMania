@@ -16,6 +16,7 @@ import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
+import paintbox.util.ColorStack
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization

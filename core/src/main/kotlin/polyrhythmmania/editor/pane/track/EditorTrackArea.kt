@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import paintbox.binding.FloatVar
-import paintbox.binding.Var
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
+import paintbox.util.ColorStack
 import paintbox.util.gdxutils.*
 import polyrhythmmania.editor.*
 import polyrhythmmania.editor.pane.EditorPane

@@ -11,12 +11,11 @@ import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
-import paintbox.ui.ColorStack
+import paintbox.util.ColorStack
 import paintbox.ui.Pane
 import paintbox.ui.TouchDown
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
-import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization

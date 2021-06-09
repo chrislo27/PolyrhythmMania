@@ -1,7 +1,8 @@
-package paintbox.ui
+package paintbox.util
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Pool
 
 
@@ -74,5 +75,19 @@ object RectangleStack : ResourceStack<Rectangle>() {
 
     override fun resetWhenFreed(obj: Rectangle?) {
         // Intentional: don't do a reset. The popped rectangle is returned so the information may be required temporarily
+    }
+}
+
+object Vector2Stack : ResourceStack<Vector2>() {
+    override fun newObject(): Vector2 {
+        return Vector2()
+    }
+
+    override fun resetBeforePushed(obj: Vector2) {
+        obj.set(0f, 0f)
+    }
+
+    override fun resetWhenFreed(obj: Vector2?) {
+        // Intentional: don't do a reset. The popped vec2 is returned so the information may be required temporarily
     }
 }

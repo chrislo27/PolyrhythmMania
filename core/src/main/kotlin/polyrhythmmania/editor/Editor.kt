@@ -21,6 +21,7 @@ import paintbox.registry.AssetRegistry
 import paintbox.ui.SceneRoot
 import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
+import paintbox.util.Vector2Stack
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
@@ -817,8 +818,10 @@ class Editor(val main: PRManiaGame)
 
         val currentClick = click.getOrCompute()
         if (currentClick is Click.CreateSelection || currentClick is Click.DragSelection || currentClick is Click.MoveMarker) {
-            editorPane.allTracksPane.editorTrackArea.onMouseMovedOrDragged(screenX.toFloat(), screenY.toFloat())
+            val vec = sceneRoot.screenToUI(Vector2Stack.getAndPush().set(screenX.toFloat(), screenY.toFloat()))
+            editorPane.allTracksPane.editorTrackArea.onMouseMovedOrDragged(vec.x, vec.y)
             inputConsumed = true
+            Vector2Stack.pop()
         }
 
         return inputConsumed || sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer)

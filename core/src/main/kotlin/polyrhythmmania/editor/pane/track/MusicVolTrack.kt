@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
+import paintbox.util.ColorStack
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization

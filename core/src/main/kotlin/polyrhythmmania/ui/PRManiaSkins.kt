@@ -2,7 +2,7 @@ package polyrhythmmania.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import paintbox.ui.ColorStack
+import paintbox.util.ColorStack
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollBar
 import paintbox.ui.skin.DefaultSkins

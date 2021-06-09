@@ -3,22 +3,16 @@ package paintbox.ui.control
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
-import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.binding.invert
 import paintbox.font.PaintboxFont
-import paintbox.ui.ColorStack
 import paintbox.ui.ImageNode
 import paintbox.ui.ImageRenderingMode
 import paintbox.ui.area.Insets
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
-import paintbox.util.gdxutils.fillRect
-import java.util.*
-import kotlin.math.min
 
 
 open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)

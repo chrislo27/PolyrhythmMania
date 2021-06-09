@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
+import paintbox.util.ColorStack
 import kotlin.math.max
 import kotlin.math.min
 

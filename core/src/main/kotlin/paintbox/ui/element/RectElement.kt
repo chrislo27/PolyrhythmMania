@@ -2,7 +2,7 @@ package paintbox.ui.element
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import paintbox.ui.ColorStack
+import paintbox.util.ColorStack
 import paintbox.ui.UIElement
 import paintbox.binding.Var
 import paintbox.util.gdxutils.fillRect

@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.PaintboxGame
 import paintbox.binding.Var
-import paintbox.ui.ColorStack
-import paintbox.ui.Corner
+import paintbox.util.ColorStack
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.util.gdxutils.fillRect
