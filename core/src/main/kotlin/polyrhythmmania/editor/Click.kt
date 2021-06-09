@@ -196,6 +196,10 @@ sealed class Click {
             val beatLines = editor.beatLines
             beatLines.active = false
         }
+        
+        override fun getDebugString(): String {
+            return "mouseOffset: ${mouseOffset}"
+        }
     }
 
     class MoveMarker(val editor: Editor, val point: FloatVar, val type: MarkerType)
@@ -354,4 +358,6 @@ sealed class Click {
 
     open fun abortAction() {
     }
+    
+    open fun getDebugString(): String = ""
 }

@@ -837,7 +837,9 @@ class Editor(val main: PRManiaGame)
     }
 
     fun getDebugString(): String {
-        return """Click: ${click.getOrCompute().javaClass.simpleName}
+        val click = this.click.getOrCompute()
+        val clickDebugString = click.getDebugString()
+        return """Click: ${click.javaClass.simpleName}${if (clickDebugString.isNotEmpty()) "\n$clickDebugString" else ""}
 engine.events: ${engine.events.size}
 path: ${sceneRoot.contextMenuLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
 """
