@@ -16,6 +16,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
     val beatTrack: BeatTrack
     val tempoTrack: TempoTrack
     val musicVolTrack: MusicVolTrack
+    val scrubTrack: ScrubTrack
     val editorTrackSides: List<EditorTrackSidePane>
     
     val editorTrackArea: EditorTrackArea
@@ -31,6 +32,8 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         topTracks += tempoTrack
         musicVolTrack = MusicVolTrack(this)
         bottomTracks += musicVolTrack
+        scrubTrack = ScrubTrack(this)
+        bottomTracks += scrubTrack
         
         val trackColours: List<Color> = (0 until 8).map { Color(1f, 1f, 1f, 1f).fromHsv((it * 3f / 8f * 360f) % 360f, 2 / 3f, 0.75f) }
         editorPane.editor.tracks.forEachIndexed { index, track ->

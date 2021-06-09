@@ -573,12 +573,9 @@ class Editor(val main: PRManiaGame)
                 cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), 0f)
                 inputConsumed = true
             }
-            Input.Keys.END -> { // END: Jump to first BlockEndState OR last block
-                val blocks = this.blocks.sortedBy { it.beat }
-                if (blocks.isNotEmpty()) {
-                    val firstEndBlock: BlockEndState? = blocks.firstOrNull { it is BlockEndState } as? BlockEndState?
-                    val targetBlock: Block = firstEndBlock ?: blocks.last()
-                    cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), (targetBlock.beat).coerceAtLeast(0f))
+            Input.Keys.END -> { // END: Jump to stopping position
+                if (this.blocks.isNotEmpty()) {
+                    cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), (container.stopPosition.getOrCompute()).coerceAtLeast(0f))
                 }
                 inputConsumed = true
             }
@@ -834,7 +831,7 @@ class Editor(val main: PRManiaGame)
         val clickDebugString = click.getDebugString()
         return """Click: ${click.javaClass.simpleName}${if (clickDebugString.isNotEmpty()) "\n$clickDebugString" else ""}
 engine.events: ${engine.events.size}
-path: ${sceneRoot.contextMenuLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
+path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
 """
         //path: ${sceneRoot.dialogLayer.lastHoveredElementPath.map { "${it::class.java.simpleName} [${it.bounds.x.getOrCompute()}, ${it.bounds.y.getOrCompute()}, ${it.bounds.width.getOrCompute()}, ${it.bounds.height.getOrCompute()}]" }}
     }

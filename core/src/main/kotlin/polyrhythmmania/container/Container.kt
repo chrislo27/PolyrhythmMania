@@ -1,6 +1,5 @@
 package polyrhythmmania.container
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.Disposable
 import com.eclipsesource.json.Json
@@ -12,11 +11,13 @@ import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import net.beadsproject.beads.ugens.SamplePlayer
 import net.lingala.zip4j.ZipFile
+import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyVar
 import polyrhythmmania.PRMania
 import polyrhythmmania.editor.block.Block
+import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.block.Instantiators
-import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.Swing
@@ -69,6 +70,16 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val resources: Map<String, ExternalResource> get() = _resources
     var compressedMusic: ExternalResource? = null
         private set
+    
+    var lastBlockPosition: FloatVar = FloatVar(0f) // Position of very last block
+        private set
+    var endBlockPosition: FloatVar = FloatVar(Float.POSITIVE_INFINITY) // Position of first End State block
+        private set
+    val stopPosition: ReadOnlyVar<Float> = FloatVar {
+        // endPosition if < Infinity, otherwise lastBlockPosition
+        val endBlockPos = endBlockPosition.use()
+        if (endBlockPos < Float.POSITIVE_INFINITY) endBlockPos else lastBlockPosition.use()
+    }
 
     fun setCompressedMusic(res: ExternalResource?) {
         removeResource(KEY_COMPRESSED_MUSIC)
@@ -89,11 +100,19 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         val removed = _resources.remove(key)
         removed?.dispose()
     }
+    
+    fun updateLastPoints() {
+        val blocks = this.blocks.sortedBy { it.beat }
+        val firstEndBlock: BlockEndState? = blocks.firstOrNull { it is BlockEndState } as? BlockEndState?
+        lastBlockPosition.set(blocks.lastOrNull()?.beat ?: 0f)
+        endBlockPosition.set(firstEndBlock?.beat ?: 0f)
+    }
 
     fun addBlock(block: Block) {
         val blocks = this._blocks
         if (block !in blocks) {
             blocks.add(block)
+            updateLastPoints()
         }
     }
 
@@ -104,16 +123,19 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 blocks.add(block)
             }
         }
+        updateLastPoints()
     }
 
     fun removeBlock(block: Block) {
         val blocks = this._blocks
         blocks.remove(block)
+        updateLastPoints()
     }
 
     fun removeBlocks(blocksToAdd: List<Block>) {
         val blocks = this._blocks
         blocks.removeAll(blocksToAdd)
+        updateLastPoints()
     }
 
     override fun dispose() {

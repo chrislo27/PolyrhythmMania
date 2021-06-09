@@ -6,6 +6,7 @@ import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.TextLabel
@@ -22,7 +23,7 @@ open class LongTrackPane(val allTracksPane: AllTracksPane, val hasContent: Boole
     
     val contentBgColor: Var<Color> = Var(Color(0f, 0f, 0f, 0f))
     val showContentBorder: Var<Boolean> = Var(false)
-    val contentSection: Pane
+    val contentSection: UIElement
     val sidePanel: SidePanel
     
     init {
@@ -33,7 +34,7 @@ open class LongTrackPane(val allTracksPane: AllTracksPane, val hasContent: Boole
         addChild(sidebarSection)
         sidePanel = SidePanel(editorPane)
         sidebarSection += sidePanel
-        contentSection = Pane().apply {
+        contentSection = RectElement().apply {
             Anchor.TopLeft.configure(this)
             this.bounds.x.bind { sidebarSection.bounds.x.use() + sidebarSection.bounds.width.use() }
             this.bounds.width.bind {
@@ -43,8 +44,9 @@ open class LongTrackPane(val allTracksPane: AllTracksPane, val hasContent: Boole
             
             this.border.bind { if (showContentBorder.use()) Insets(0f, 2f, 0f, 0f) else Insets.ZERO }
             this.borderStyle.set(SolidBorder().apply { this.color.bind { editorPane.palette.trackPaneBorder.use() }})
+
+            this.color.bind { contentBgColor.use() }
         }
-        this.contentSection += RectElement().apply { this.color.bind { contentBgColor.use() } }
         if (hasContent)
             addChild(contentSection)
         

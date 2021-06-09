@@ -32,6 +32,8 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
         const val BLOCK_DEFAULT: Float = 20f
         const val VISIBLE_AMOUNT_DEFAULT: Float = 15f
 
+        protected val DEFAULT_USER_CHANGED_VALUE_LISTENER: (Float) -> Unit = {}
+
         init {
             DefaultSkins.register(ScrollBar.SCROLLBAR_SKIN_ID, SkinFactory { element: ScrollBar ->
                 ScrollBarSkin(element)
@@ -62,6 +64,8 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     val decreaseButton: UnitIncreaseButton
     val increaseButton: UnitIncreaseButton
     val thumbArea: ThumbPane
+
+    var userChangedValueListener: (newValue: Float) -> Unit = DEFAULT_USER_CHANGED_VALUE_LISTENER
 
     init {
         decreaseButton = UnitIncreaseButton(this, getArrowButtonTexReg(), this.orientation, false).apply {
@@ -105,23 +109,34 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     }
 
     fun setValue(value: Float) {
-        _value.set(value.coerceIn(minimum.getOrCompute(), maximum.getOrCompute()))
+        setValue(value, false)
+    }
+
+    protected fun setValue(value: Float, wasUserChange: Boolean) {
+        val oldValue = _value.getOrCompute()
+        val newValue = value.coerceIn(minimum.getOrCompute(), maximum.getOrCompute())
+        if (newValue != oldValue) {
+            _value.set(newValue)
+            if (wasUserChange) {
+                userChangedValueListener.invoke(newValue)
+            }
+        }
     }
 
     fun increment() {
-        setValue(value.getOrCompute() + unitIncrement.getOrCompute())
+        setValue(value.getOrCompute() + unitIncrement.getOrCompute(), true)
     }
 
     fun decrement() {
-        setValue(value.getOrCompute() - unitIncrement.getOrCompute())
+        setValue(value.getOrCompute() - unitIncrement.getOrCompute(), true)
     }
 
     fun incrementBlock() {
-        setValue(value.getOrCompute() + blockIncrement.getOrCompute())
+        setValue(value.getOrCompute() + blockIncrement.getOrCompute(), true)
     }
 
     fun decrementBlock() {
-        setValue(value.getOrCompute() - blockIncrement.getOrCompute())
+        setValue(value.getOrCompute() - blockIncrement.getOrCompute(), true)
     }
 
     protected open fun getArrowButtonTexReg(): TextureRegion {
@@ -237,7 +252,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
                         is TouchDragged -> {
                             if (pressedState.getOrCompute().pressed) {
                                 val newValue = scrollBar.convertPercentageToValue(mousePercent - pressedOrigin)
-                                scrollBar.setValue(newValue)
+                                scrollBar.setValue(newValue, true)
                                 true
                             } else false
                         }

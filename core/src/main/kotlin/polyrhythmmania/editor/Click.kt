@@ -128,6 +128,7 @@ sealed class Click {
                 block.beat = region.beat
                 block.trackIndex = region.track
             }
+            editor.container.updateLastPoints()
         }
 
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
