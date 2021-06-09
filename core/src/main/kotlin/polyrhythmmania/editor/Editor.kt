@@ -451,24 +451,15 @@ class Editor(val main: PRManiaGame)
     }
 
     fun addBlock(block: Block) {
-        val blocks = this.blocks as MutableList
-        if (block !in blocks) {
-            blocks.add(block)
-        }
+        container.addBlock(block)
     }
 
     fun addBlocks(blocksToAdd: List<Block>) {
-        val blocks = this.blocks as MutableList
-        blocksToAdd.forEach { block ->
-            if (block !in blocks) {
-                blocks.add(block)
-            }
-        }
+        container.addBlocks(blocksToAdd)
     }
 
     fun removeBlock(block: Block) {
-        val blocks = this.blocks as MutableList
-        blocks.remove(block)
+        container.removeBlock(block)
         (this.selectedBlocks as MutableMap).remove(block)
         if (block.ownedContextMenu != null) {
             if (sceneRoot.isContextMenuActive())
@@ -478,8 +469,7 @@ class Editor(val main: PRManiaGame)
     }
 
     fun removeBlocks(blocksToAdd: List<Block>) {
-        val blocks = this.blocks as MutableList
-        blocks.removeAll(blocksToAdd)
+        container.removeBlocks(blocksToAdd)
         this.selectedBlocks as MutableMap
         blocks.forEach { block ->
             this.selectedBlocks.remove(block)

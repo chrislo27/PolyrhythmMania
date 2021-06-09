@@ -62,7 +62,8 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val renderer: WorldRenderer by lazy {
         WorldRenderer(world, GBATileset(AssetRegistry["tileset_gba"]))
     }
-    val blocks: MutableList<Block> = CopyOnWriteArrayList()
+    val _blocks: MutableList<Block> = CopyOnWriteArrayList()
+    val blocks: List<Block> get() = _blocks
 
     private val _resources: MutableMap<String, ExternalResource> = ConcurrentHashMap()
     val resources: Map<String, ExternalResource> get() = _resources
@@ -87,6 +88,32 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     fun removeResource(key: String) {
         val removed = _resources.remove(key)
         removed?.dispose()
+    }
+
+    fun addBlock(block: Block) {
+        val blocks = this._blocks
+        if (block !in blocks) {
+            blocks.add(block)
+        }
+    }
+
+    fun addBlocks(blocksToAdd: List<Block>) {
+        val blocks = this._blocks
+        blocksToAdd.forEach { block ->
+            if (block !in blocks) {
+                blocks.add(block)
+            }
+        }
+    }
+
+    fun removeBlock(block: Block) {
+        val blocks = this._blocks
+        blocks.remove(block)
+    }
+
+    fun removeBlocks(blocksToAdd: List<Block>) {
+        val blocks = this._blocks
+        blocks.removeAll(blocksToAdd)
     }
 
     override fun dispose() {
@@ -286,7 +313,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             block.readFromJson(obj)
             blocks.add(block)
         }
-        this.blocks.addAll(blocks)
+        this.addBlocks(blocks)
         engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
 
         resourcesMap.forEach { (key, res) ->
