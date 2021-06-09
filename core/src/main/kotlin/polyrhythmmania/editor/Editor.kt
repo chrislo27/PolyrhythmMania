@@ -61,7 +61,9 @@ class Editor(val main: PRManiaGame)
         const val TRACK_INPUT_2: String = "input_2"
         const val TRACK_VFX_0: String = "vfx_0"
         
-        val MOVE_WINDOW_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.A, Input.Keys.D)
+        val MOVE_WINDOW_LEFT_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.A)
+        val MOVE_WINDOW_RIGHT_KEYCODES: Set<Int> = setOf(Input.Keys.RIGHT, Input.Keys.D)
+        val MOVE_WINDOW_KEYCODES: Set<Int> = (MOVE_WINDOW_LEFT_KEYCODES + MOVE_WINDOW_RIGHT_KEYCODES)
     }
 
     private val uiCamera: OrthographicCamera = OrthographicCamera().apply {
@@ -215,14 +217,13 @@ class Editor(val main: PRManiaGame)
 
         click.getOrCompute().renderUpdate()
 
-        // FIXME 
         val trackView = this.trackView
-        if (!ctrl && !alt) {
+        if (!ctrl) {
             val panSpeed = 7f * delta * (if (shift) 10f else 1f)
-            if (Input.Keys.D in pressedButtons || Input.Keys.RIGHT in pressedButtons) {
+            if (MOVE_WINDOW_RIGHT_KEYCODES.any { it in pressedButtons }) {
                 trackView.beat.set((trackView.beat.getOrCompute() + panSpeed).coerceAtLeast(0f))
             }
-            if (Input.Keys.A in pressedButtons || Input.Keys.LEFT in pressedButtons) {
+            if (MOVE_WINDOW_LEFT_KEYCODES.any { it in pressedButtons }) {
                 trackView.beat.set((trackView.beat.getOrCompute() - panSpeed).coerceAtLeast(0f))
             }
         }
