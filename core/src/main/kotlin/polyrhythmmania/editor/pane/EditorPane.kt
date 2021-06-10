@@ -35,6 +35,7 @@ class EditorPane(val editor: Editor) : Pane() {
     val toolbar: Toolbar get() = upperPane.toolbar
     val musicDialog: MusicDialog
     val exitConfirmDialog: ExitConfirmDialog
+    val settingsDialog: SettingsDialog
     val saveDialog: SaveDialog
     val loadDialog: LoadDialog
     val newDialog: NewDialog
@@ -91,6 +92,7 @@ class EditorPane(val editor: Editor) : Pane() {
     init {
         musicDialog = MusicDialog(this)
         exitConfirmDialog = ExitConfirmDialog(this)
+        settingsDialog = SettingsDialog(this)
         saveDialog = SaveDialog(this)
         loadDialog = LoadDialog(this)
         newDialog = NewDialog(this)

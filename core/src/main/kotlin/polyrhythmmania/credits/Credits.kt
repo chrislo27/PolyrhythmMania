@@ -12,7 +12,7 @@ object Credits {
             ),
             "credits.qa" to abcSorted(
                     "Lvl100Feraligatr", "Gosh",
-            ) + listOf("Tourneycord Discord server"),
+            ) + listOf("Tourneycord Discord\nserver"),
             "credits.resourcesAndTechnologies" to listOf(
                     "[font=rodin]リズム天国[] assets\nby Nintendo",
                     "libGDX",

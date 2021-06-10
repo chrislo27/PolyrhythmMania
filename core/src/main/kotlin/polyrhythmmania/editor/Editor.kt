@@ -28,6 +28,7 @@ import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.block.BlockType
@@ -73,6 +74,7 @@ class Editor(val main: PRManiaGame)
     }
     val previewFrameBuffer: FrameBuffer
     val waveformWindow: WaveformWindow
+    val settings: Settings get() = main.settings
 
     val sceneRoot: SceneRoot = SceneRoot(uiCamera)
 
@@ -342,6 +344,12 @@ class Editor(val main: PRManiaGame)
         if (canRedo() && click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
             this.redo()
             forceUpdateStatus.invert()
+        }
+    }
+    
+    fun attemptOpenSettingsDialog() {
+        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+            editorPane.openDialog(editorPane.settingsDialog)
         }
     }
 
@@ -756,7 +764,7 @@ class Editor(val main: PRManiaGame)
                                 val didChange = currentClick.complete()
                                 if (didChange) {
                                     val peek = peekAtUndoStack()
-                                    if (peek != null && peek is MoveMarkerAction && peek.marker == currentClick.type) {
+                                    if (!settings.editorDetailedMarkerUndo.getOrCompute() && peek != null && peek is MoveMarkerAction && peek.marker == currentClick.type) {
                                         peek.next = currentClick.point.getOrCompute()
                                     } else {
                                         this.addActionWithoutMutating(MoveMarkerAction(currentClick.type, currentClick.originalPosition, currentClick.point.getOrCompute()))

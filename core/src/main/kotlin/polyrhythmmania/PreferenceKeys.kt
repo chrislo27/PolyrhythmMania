@@ -12,4 +12,6 @@ object PreferenceKeys {
     val SETTINGS_MENU_MUSIC_VOLUME = "settings_menu_volume_music"
     val SETTINGS_MENU_SFX_VOLUME = "settings_menu_volume_sfx"
     
+    val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
+    
 }
