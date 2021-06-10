@@ -34,7 +34,7 @@ open class ScrollPane : Control<ScrollPane>() {
 
     val hBar: ScrollBar by lazy { createScrollBar(ScrollBar.Orientation.HORIZONTAL) }
     val vBar: ScrollBar by lazy { createScrollBar(ScrollBar.Orientation.VERTICAL) }
-    val contentPane: Pane = Pane().apply {
+    val contentPane: Pane = ContentPane().apply {
         this.doClipping.set(true)
     }
     private val currentContent: Var<UIElement?> = Var(null)
@@ -77,10 +77,13 @@ open class ScrollPane : Control<ScrollPane>() {
         Anchor.TopRight.configure(vBar)
         Anchor.TopLeft.configure(contentPane)
         contentPane.bindWidthToParent {
-            if (vBar.apparentVisibility.use()) (-barSize.use()) else 0f
+            // When the scrollbar policy is AS_NEEDED, there is an inf loop due to depending on visibility which depends on contentPane bounds
+//            if (vBar.apparentVisibility.use()) (-barSize.use()) else 0f
+            (-barSize.use())
         }
         contentPane.bindHeightToParent {
-            if (hBar.apparentVisibility.use()) (-barSize.use()) else 0f
+//            if (hBar.apparentVisibility.use()) (-barSize.use()) else 0f
+            (-barSize.use())
         }
         contentPane.contentOffsetX.bind { -hBar.value.use() }
         contentPane.contentOffsetY.bind { -vBar.value.use() }
@@ -159,6 +162,8 @@ open class ScrollPane : Control<ScrollPane>() {
     fun getContent(): UIElement? = currentContent.getOrCompute()
 
     override fun getDefaultSkinID(): String = ScrollPane.SKIN_ID
+    
+    class ContentPane : Pane()
 }
 
 open class ScrollPaneSkin(element: ScrollPane) : Skin<ScrollPane>(element) {
