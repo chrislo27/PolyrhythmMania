@@ -195,6 +195,16 @@ open class HBox : AbstractHVBox() {
     override fun getThisDimensional(): ReadOnlyVar<Float> {
         return this.contentZone.width
     }
+
+    fun sizeWidthToChildren(minimumWidth: Float = 0f) {
+        val last = children.lastOrNull()
+        var width = 0f
+        if (last != null) {
+            width = last.bounds.x.getOrCompute() + last.bounds.width.getOrCompute()
+        }
+
+        this.bounds.width.set(width.coerceAtLeast(minimumWidth))
+    }
 }
 
 /**
@@ -228,5 +238,15 @@ open class VBox : AbstractHVBox() {
 
     override fun getThisDimensional(): ReadOnlyVar<Float> {
         return this.contentZone.height
+    }
+    
+    fun sizeHeightToChildren(minimumHeight: Float = 0f) {
+        val last = children.lastOrNull()
+        var height = 0f
+        if (last != null) {
+            height = last.bounds.y.getOrCompute() + last.bounds.height.getOrCompute()
+        }
+        
+        this.bounds.height.set(height.coerceAtLeast(minimumHeight))
     }
 }
