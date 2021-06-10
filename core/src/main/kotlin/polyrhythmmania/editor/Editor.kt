@@ -352,6 +352,12 @@ class Editor(val main: PRManiaGame)
             editorPane.openDialog(editorPane.settingsDialog)
         }
     }
+    
+    fun attemptOpenHelpDialog() {
+        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+            editorPane.openDialog(editorPane.helpDialog)
+        }
+    }
 
     fun attemptExitToTitle() {
         if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {

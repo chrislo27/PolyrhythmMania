@@ -15,6 +15,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.Palette
 import polyrhythmmania.editor.pane.dialog.*
+import polyrhythmmania.editor.pane.dialog.help.HelpDialog
 import polyrhythmmania.editor.pane.track.AllTracksPane
 import polyrhythmmania.ui.DialogPane
 
@@ -36,6 +37,7 @@ class EditorPane(val editor: Editor) : Pane() {
     val musicDialog: MusicDialog
     val exitConfirmDialog: ExitConfirmDialog
     val settingsDialog: SettingsDialog
+    val helpDialog: HelpDialog
     val saveDialog: SaveDialog
     val loadDialog: LoadDialog
     val newDialog: NewDialog
@@ -93,6 +95,7 @@ class EditorPane(val editor: Editor) : Pane() {
         musicDialog = MusicDialog(this)
         exitConfirmDialog = ExitConfirmDialog(this)
         settingsDialog = SettingsDialog(this)
+        helpDialog = HelpDialog(this)
         saveDialog = SaveDialog(this)
         loadDialog = LoadDialog(this)
         newDialog = NewDialog(this)

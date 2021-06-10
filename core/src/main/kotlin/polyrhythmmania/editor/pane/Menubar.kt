@@ -29,6 +29,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     val undoButton: Button
     val redoButton: Button
     
+    val helpButton: Button
     val settingsButton: Button
     val exitButton: Button
     
@@ -125,6 +126,18 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             }
         }
         
+        helpButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f)
+            this.skinID.set(EditorSkins.BUTTON)
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["help"])).apply { 
+                this.tint.bind { editorPane.palette.menubarIconTint.use() }
+            }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.help")))
+            this.setOnAction {
+                editor.attemptOpenHelpDialog()
+            }
+        }
         settingsButton = Button("").apply {
             this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
@@ -157,6 +170,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             leftBox += redoButton
         }
         rightBox.temporarilyDisableLayouts { 
+            rightBox += helpButton
             rightBox += settingsButton
             rightBox += separator()
             rightBox += exitButton
