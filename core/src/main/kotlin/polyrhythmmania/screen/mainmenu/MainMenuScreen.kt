@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
+import paintbox.Paintbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
@@ -19,7 +20,6 @@ import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
-import paintbox.ui.control.TextLabel
 import paintbox.ui.control.TextLabelSkin
 import paintbox.ui.layout.VBox
 import paintbox.util.WindowSize
@@ -33,7 +33,6 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
 import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
-import polyrhythmmania.screen.mainmenu.menu.MMMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -365,7 +364,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     override fun renderUpdate() {
         super.renderUpdate()
         // DEBUG remove later 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+        if (Paintbox.debugMode && Paintbox.stageOutlines != Paintbox.StageOutlineMode.NONE && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             main.screen = MainMenuScreen(main)
         }
     }

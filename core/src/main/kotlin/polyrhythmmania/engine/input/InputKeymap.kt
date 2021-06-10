@@ -17,6 +17,7 @@ data class InputKeymapKeyboard(
 ) {
     companion object {
         const val TEXT_BUTTON_A: String = "${RodinSpecialChars.BORDERED_A}"
+        const val TEXT_BUTTON_DPAD_ANY: String = "${RodinSpecialChars.BORDERED_DPAD}"
         const val TEXT_BUTTON_DPAD_UP: String = "${RodinSpecialChars.BORDERED_DPAD}${RodinSpecialChars.BORDERED_JOY_U}"
         const val TEXT_BUTTON_DPAD_DOWN: String = "${RodinSpecialChars.BORDERED_DPAD}${RodinSpecialChars.BORDERED_JOY_D}"
         const val TEXT_BUTTON_DPAD_LEFT: String = "${RodinSpecialChars.BORDERED_DPAD}${RodinSpecialChars.BORDERED_JOY_L}"

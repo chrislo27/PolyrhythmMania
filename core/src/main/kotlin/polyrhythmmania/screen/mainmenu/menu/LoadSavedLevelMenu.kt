@@ -1,6 +1,7 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
@@ -22,10 +23,10 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
+import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
-import polyrhythmmania.util.RodinSpecialChars
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -110,7 +111,10 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
             }
-            hbox += TextLabel("(Tmp.) Press D for ${RodinSpecialChars.BORDERED_DPAD}, J for ${RodinSpecialChars.BORDERED_A}", font = main.fontMainMenuRodin).apply {
+            val keyboardKeybindings = main.settings.inputKeymapKeyboard.getOrCompute()
+            hbox += TextLabel("${InputKeymapKeyboard.TEXT_BUTTON_A}: ${Input.Keys.toString(keyboardKeybindings.buttonA)}\n" +
+                    "${InputKeymapKeyboard.TEXT_BUTTON_DPAD_ANY}: ${Input.Keys.toString(keyboardKeybindings.buttonDpadUp)}/${Input.Keys.toString(keyboardKeybindings.buttonDpadDown)}/${Input.Keys.toString(keyboardKeybindings.buttonDpadLeft)}/${Input.Keys.toString(keyboardKeybindings.buttonDpadRight)}",
+                    font = main.fontMainMenuRodin).apply {
                 this.bounds.width.set(300f)
                 this.textColor.set(Color.BLACK)
                 this.visible.bind {
