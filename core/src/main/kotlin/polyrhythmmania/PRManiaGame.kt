@@ -20,6 +20,7 @@ import paintbox.util.ResolutionSetting
 import paintbox.util.WindowSize
 import org.lwjgl.glfw.GLFW
 import paintbox.util.gdxutils.*
+import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
@@ -108,7 +109,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         if (PRMania.enableEarlyAccessMessage) {
             val paintboxFont = fontRodinFixedBordered
             paintboxFont.useFont { font ->
-                val height = 0.985f
+                val isEditor = this.getScreen() is EditorScreen
+                val height = if (!isEditor) 0.985f else 0.075f
                 val alpha = if (cam.getInputY() / cam.viewportHeight in (height - font.capHeight / cam.viewportHeight)..(height)) 0.35f else 1f
                 font.setColor(1f, 1f, 1f, alpha)
                 font.drawCompressed(batch, "Non-final pre-release version ${PRMania.VERSION}. Content subject to change. Do not redistribute.",
