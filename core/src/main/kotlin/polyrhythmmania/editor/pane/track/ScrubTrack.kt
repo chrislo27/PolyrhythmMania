@@ -1,8 +1,10 @@
 package polyrhythmmania.editor.pane.track
 
+import com.badlogic.gdx.graphics.Color
 import paintbox.binding.Var
 import paintbox.ui.Pane
 import paintbox.ui.control.ScrollBar
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -18,7 +20,14 @@ class ScrubTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
         val contentPane = Pane()
         scrollBar = ScrollBar(ScrollBar.Orientation.HORIZONTAL).apply { 
-//            this.skinID.set(PRManiaSkins.SCROLLBAR_SKIN)
+            (this.skin.getOrCompute() as ScrollBar.ScrollBarSkin).also { skin ->
+                skin.bgColor.set(Color().grey(0.1f, 1f))
+                skin.incrementColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
+                skin.disabledColor.set(Color(0.31f, 0.31f, 0.31f, 1f))
+                skin.thumbColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
+                skin.thumbHoveredColor.set(Color(0.70f, 0.70f, 0.70f, 1f))
+                skin.thumbPressedColor.set(Color(0.50f, 0.64f, 0.64f, 1f))
+            }
             val isDragging: Var<Boolean> = Var {
                 thumbPressedState.use().pressed
             }
@@ -31,9 +40,8 @@ class ScrubTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                 val newBeat = percentage * (if (lastPos < beatWidth) (beatWidth) else (lastPos))
                 editor.trackView.beat.set(newBeat)
             }
-            editor.trackView.beat.addListener {
+            fun updateOwnValue(newValue: Float) {
                 if (!isDragging.getOrCompute()) {
-                    val newValue = it.getOrCompute()
                     val lastPos = editor.container.lastBlockPosition.getOrCompute()
                     val pxPerBeat = editor.trackView.pxPerBeat.getOrCompute()
                     val beatWidth = contentPane.bounds.width.getOrCompute() / pxPerBeat
@@ -41,6 +49,12 @@ class ScrubTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                     val min = this.minimum.getOrCompute()
                     setValue(min + (newValue / maxBeat) * (this.maximum.getOrCompute() - min))
                 }
+            }
+            editor.trackView.beat.addListener {
+                updateOwnValue(it.getOrCompute())
+            }
+            editor.container.lastBlockPosition.addListener {
+                updateOwnValue(editor.trackView.beat.getOrCompute())
             }
         }
         contentPane += scrollBar
