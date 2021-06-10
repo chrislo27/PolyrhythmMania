@@ -160,7 +160,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                     TextRun(main.debugFontBoldBordered, "\n\n\nnananananananananananananananananananananananannananananana"),
             ))).apply {
                 renderAlign.set(Align.center)
-                doXCompression.set(true)
+                doXCompression.set(false)
                 doClipping.set(true)
 
 //                this += RectElement(Color(0f, 0f, 0f, 0.5f)).also { r2 ->
@@ -403,7 +403,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             Anchor.CentreRight.configure(this, offsetX = -100f - 50f, offsetY = -200f)
             this.bounds.width.set(200f)
             this.bounds.height.set(200f)
-            
+
             setContent(Pane().also { outerPane ->
                 outerPane.bounds.width.set(300f)
                 outerPane.bounds.height.set(500f)
@@ -414,7 +414,6 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
                 outerPane.addChild(r)
 
                 val scrollPane = Pane().also { scrollPane ->
-                    scrollPane.doClipping.set(true)
                     scrollPane.addChild(Button("Btn").apply {
                         this.bounds.width.set(50f)
                         this.bounds.height.set(25f)

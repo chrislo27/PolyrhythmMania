@@ -80,6 +80,8 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         dialogLayer.root.addInputEventListener { _ ->
             rootDialogElement != null // Dialog layer eats all input when active
         }
+        
+        (allLayers - mainLayer).forEach { l -> (l.root.sceneRoot as Var).set(this) }
     }
     
     fun renderAsRoot(batch: SpriteBatch) {
