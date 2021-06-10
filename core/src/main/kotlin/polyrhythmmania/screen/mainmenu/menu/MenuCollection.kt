@@ -35,6 +35,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val playMenu: PlayMenu = PlayMenu(this)
     val settingsMenu: SettingsMenu = SettingsMenu(this)
     val audioSettingsMenu: AudioSettingsMenu = AudioSettingsMenu(this)
+    val inputSettingsMenu: InputSettingsMenu = InputSettingsMenu(this)
     
     init {
         addMenu(uppermostMenu)
@@ -43,6 +44,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(playMenu)
         addMenu(settingsMenu)
         addMenu(audioSettingsMenu)
+        addMenu(inputSettingsMenu)
         
         changeActiveMenu(uppermostMenu, false, instant = true)
         menuStack.push(uppermostMenu)

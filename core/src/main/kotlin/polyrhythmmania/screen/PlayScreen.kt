@@ -31,6 +31,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.screen.mainmenu.menu.TemporaryResultsMenu
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -59,6 +60,8 @@ class PlayScreen(main: PRManiaGame, val container: Container)
     
     private var isPaused: Boolean = false
     private var isFinished: Boolean = false
+    
+    private val keyboardKeybinds: InputKeymapKeyboard by lazy { main.settings.inputKeymapKeyboard.getOrCompute() }
 
     init {
         var nextLayer: UIElement = sceneRoot
@@ -285,14 +288,14 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                         pauseGame(true)
                         consumed = true
                     }
-                    // TODO use keybinds!
-                    Input.Keys.D, Input.Keys.W, Input.Keys.S, Input.Keys.A -> {
+                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
+                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
                         engine.postRunnable {
                             engine.inputter.onInput(InputType.DPAD, atSeconds)
                         }
                         consumed = true
                     }
-                    Input.Keys.J -> {
+                    keyboardKeybinds.buttonA -> {
                         engine.postRunnable {
                             engine.inputter.onInput(InputType.A, atSeconds)
                         }

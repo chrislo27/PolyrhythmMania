@@ -74,8 +74,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         vbox.temporarilyDisableLayouts { 
             vbox += createCheckbox("editorSettings.detailedMarkerUndo", "editorSettings.detailedMarkerUndo.tooltip", settings.editorDetailedMarkerUndo)
         }
-        val last = vbox.children.last()
-        vbox.bounds.height.set(last.bounds.y.getOrCompute() + last.bounds.height.getOrCompute())
+        vbox.sizeHeightToChildren(300f)
         
         pane.bounds.height.bind { 
             max(vbox.bounds.height.use(), pane.parent.use()?.bounds?.height?.use() ?: 300f)

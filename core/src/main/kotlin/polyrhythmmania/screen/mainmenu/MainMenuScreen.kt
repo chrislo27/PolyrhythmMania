@@ -32,6 +32,7 @@ import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
+import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
 import polyrhythmmania.screen.mainmenu.menu.MMMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
@@ -109,6 +110,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         this.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         this.update()
     }
+
+    val pendingKeyboardBinding: Var<InputSettingsMenu.PendingKeyboardBinding?> = Var(null)
 
     private val batch: SpriteBatch = main.batch
     private val sceneRoot: SceneRoot = SceneRoot(uiCamera)
@@ -361,10 +364,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     override fun renderUpdate() {
         super.renderUpdate()
-//        // DEBUG remove later 
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-//            main.screen = MainMenuScreen(main)
-//        }
+        // DEBUG remove later 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            main.screen = MainMenuScreen(main)
+        }
     }
 
     fun transitionAway(action: () -> Unit) {
@@ -463,6 +466,22 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     override fun dispose() {
         framebufferOld.disposeQuietly()
         framebufferCurrent.disposeQuietly()
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        var consumed = false
+        val currentPendingKBBinding = pendingKeyboardBinding.getOrCompute()
+        if (currentPendingKBBinding != null) {
+            val status: InputSettingsMenu.PendingKeyboardBinding.Status =
+                    if (keycode == Input.Keys.ESCAPE) {
+                        InputSettingsMenu.PendingKeyboardBinding.Status.CANCELLED
+                    } else InputSettingsMenu.PendingKeyboardBinding.Status.GOOD
+            currentPendingKBBinding.onInput(status, keycode)
+            this.pendingKeyboardBinding.set(null)
+            consumed = true
+        }
+
+        return consumed || super.keyDown(keycode)
     }
 
     override fun getDebugString(): String {

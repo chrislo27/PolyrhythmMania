@@ -99,9 +99,8 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 this.internalTextBlock.bind { textBlock.use() }
             }
-
-            vbox.bounds.height.set(vbox.children.sumOfFloat { it.bounds.height.getOrCompute() })
         }
+        vbox.sizeHeightToChildren(100f)
 
         scrollPane.setContent(vbox)
     }

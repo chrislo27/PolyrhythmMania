@@ -160,8 +160,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 //        this.setOnHoverStart(blipSoundListener)
     }
     
-    protected fun createSettingsOption(labelText: Var.Context.() -> String): SettingsOptionPane {
-        return SettingsOptionPane(labelText, this.font).apply {
+    protected fun createSettingsOption(labelText: Var.Context.() -> String, font: PaintboxFont = this.font, percentageContent: Float = 0.5f): SettingsOptionPane {
+        return SettingsOptionPane(labelText, font, percentageContent).apply {
             this.bounds.height.set(36f)
             this.addInputEventListener {
                 if (it is MouseEntered) {
@@ -172,7 +172,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    open class SettingsOptionPane(labelText: Var.Context.() -> String, font: PaintboxFont) : Pane() {
+    open class SettingsOptionPane(labelText: Var.Context.() -> String, font: PaintboxFont, percentageContent: Float = 0.5f)
+        : Pane() {
 
         val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
         val textColorVar: ReadOnlyVar<Color> = Var.bind {
@@ -193,7 +194,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             
             label = TextLabel(labelText, font).apply {
                 Anchor.TopLeft.configure(this)
-                this.bindWidthToParent(adjust = 0f, multiplier = 0.5f)
+                this.bindWidthToParent(adjust = 0f, multiplier = 1f - percentageContent)
                 this.textColor.bind { textColorVar.use() }
                 this.renderAlign.set(Align.left)
                 this.textAlign.set(TextAlign.RIGHT)
@@ -202,7 +203,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             
             content = Pane().apply {
                 Anchor.TopRight.configure(this)
-                this.bindWidthToParent(adjust = 0f, multiplier = 0.5f)
+                this.bindWidthToParent(adjust = 0f, multiplier = percentageContent)
             }
             rect.addChild(content)
 

@@ -14,4 +14,6 @@ object PreferenceKeys {
     
     val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
     
+    val KEYMAP_KEYBOARD = "keymap_keyboard"
+    
 }

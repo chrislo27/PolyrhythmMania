@@ -39,10 +39,13 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNextMenu(menuCol.audioSettingsMenu)
                 }
             }
-//            vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {
-//            }
-            vbox += createLongButton { Localization.getVar("mainMenu.settings.input").use() }.apply { 
+            vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {
                 this.disabled.set(true)
+            }
+            vbox += createLongButton { Localization.getVar("mainMenu.settings.input").use() }.apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.inputSettingsMenu)
+                }
             }
         }
 

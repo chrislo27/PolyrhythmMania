@@ -1,11 +1,14 @@
 package polyrhythmmania
 
 import com.badlogic.gdx.Preferences
+import com.eclipsesource.json.Json
 import paintbox.binding.Var
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_DETAILED_MARKER_UNDO
+import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
+import polyrhythmmania.engine.input.InputKeymapKeyboard
 
 
 @Suppress("PrivatePropertyName")
@@ -18,12 +21,16 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_menuSfxVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, Var(50))
 
     private val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, Var(false))
+    
+    private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, Var(InputKeymapKeyboard()))
 
     val gameplayVolume: Var<Int> = kv_gameplayVolume.value
     val menuMusicVolume: Var<Int> = kv_menuMusicVolume.value
     val menuSfxVolume: Var<Int> = kv_menuSfxVolume.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
+    
+    val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
 
     fun load() {
         val prefs = this.prefs
@@ -32,6 +39,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getIntCoerceIn(kv_menuSfxVolume, 0, 100)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
+        
+        prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
     }
 
     fun persist() {
@@ -41,6 +50,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_menuSfxVolume)
                 
                 .putBoolean(kv_editorDetailedMarkerUndo)
+                
+                .putInputKeymapKeyboard(kv_keymapKeyboard)
 
                 .flush()
     }
@@ -69,5 +80,20 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
     private fun Preferences.putBoolean(kv: KeyValue<Boolean>): Preferences {
         return prefs.putBoolean(kv.key, kv.value.getOrCompute())
+    }
+
+    private fun Preferences.getInputKeymapKeyboard(kv: KeyValue<InputKeymapKeyboard>) {
+        if (prefs.contains(kv.key)) {
+            try {
+                val json = Json.parse(prefs.getString(kv.key, ""))
+                kv.value.set(InputKeymapKeyboard.fromJson(json.asObject()))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun Preferences.putInputKeymapKeyboard(kv: KeyValue<InputKeymapKeyboard>): Preferences {
+        return prefs.putString(kv.key, kv.value.getOrCompute().toJson().toString())
     }
 }
