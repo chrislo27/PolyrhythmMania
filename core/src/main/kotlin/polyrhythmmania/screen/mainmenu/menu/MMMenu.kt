@@ -3,7 +3,9 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import paintbox.PaintboxGame
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
@@ -14,6 +16,8 @@ import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
+import paintbox.ui.control.CheckBox
+import paintbox.ui.control.Slider
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
@@ -160,7 +164,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 //        this.setOnHoverStart(blipSoundListener)
     }
     
-    protected fun createSettingsOption(labelText: Var.Context.() -> String, font: PaintboxFont = this.font, percentageContent: Float = 0.5f): SettingsOptionPane {
+    protected fun createSettingsOption(labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
+                                       percentageContent: Float = 0.5f): SettingsOptionPane {
         return SettingsOptionPane(labelText, font, percentageContent).apply {
             this.bounds.height.set(36f)
             this.addInputEventListener {
@@ -171,8 +176,39 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
         }
     }
+    
+    protected fun createSliderPane(slider: Slider, labelText: Var.Context.() -> String): SettingsOptionPane {
+        return createSettingsOption(labelText).apply {
+            this.content.addChild(slider)
+            Anchor.CentreRight.configure(slider)
+        }
+    }
+    
+    protected fun createCheckboxOption(labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
+                                     percentageContent: Float = 0.5f): Pair<SettingsOptionPane, CheckBox> {
+        val settingsOptionPane = createSettingsOption(labelText, font, percentageContent)
+        val checkBox = CheckBox("").apply { 
+            Anchor.TopRight.configure(this)
+            this.boxAlignment.set(CheckBox.BoxAlign.RIGHT)
+            this.imageNode.tint.bind { settingsOptionPane.textColorVar.use() }
+            this.textLabel.textColor.bind { settingsOptionPane.textColorVar.use() }
+        }
+        settingsOptionPane.content += checkBox
+        
+        return settingsOptionPane to checkBox
+    }
 
-    open class SettingsOptionPane(labelText: Var.Context.() -> String, font: PaintboxFont, percentageContent: Float = 0.5f)
+    protected fun <T> createCycleOption(items: List<T>, firstItem: T,
+                                        labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
+                                       percentageContent: Float = 0.5f): Pair<SettingsOptionPane, CycleControl<T>> {
+        val settingsOptionPane = createSettingsOption(labelText, font, percentageContent)
+        val cycle = CycleControl<T>(settingsOptionPane, items, firstItem)
+        settingsOptionPane.content += cycle
+
+        return settingsOptionPane to cycle
+    }
+
+    open class SettingsOptionPane(labelText: Var.Context.() -> String, val font: PaintboxFont, percentageContent: Float = 0.5f)
         : Pane() {
 
         val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
@@ -218,6 +254,59 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 }
                 false
             }
+        }
+    }
+    
+    class CycleControl<T>(settingsOptionPane: SettingsOptionPane, val list: List<T>, firstItem: T) : Pane() {
+        
+        val left: Button
+        val right: Button
+        val label: TextLabel
+        
+        val currentItem: Var<T> = Var(firstItem)
+        
+        init {
+            left = Button("").apply { 
+                Anchor.TopLeft.configure(this)
+                this.bounds.width.bind { bounds.height.use() }
+                this.skinID.set(BUTTON_LONG_SKIN_ID)
+                addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply { 
+                    this.rotation.set(90f)
+                    this.padding.set(Insets(4f))
+                    this.tint.bind { settingsOptionPane.textColorVar.use() }
+                })
+                this.setOnAction { 
+                    val index = list.indexOf(currentItem.getOrCompute())
+                    val nextIndex = (index - 1 + list.size) % list.size
+                    currentItem.set(list[nextIndex])
+                }
+            }
+            right = Button("").apply { 
+                Anchor.TopRight.configure(this)
+                this.bounds.width.bind { bounds.height.use() }
+                this.skinID.set(BUTTON_LONG_SKIN_ID)
+                addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply {
+                    this.rotation.set(270f)
+                    this.padding.set(Insets(4f))
+                    this.tint.bind { settingsOptionPane.textColorVar.use() }
+                })
+                this.setOnAction {
+                    val index = list.indexOf(currentItem.getOrCompute())
+                    val nextIndex = (index + 1) % list.size
+                    currentItem.set(list[nextIndex])
+                }
+            }
+            label = TextLabel(binding = {currentItem.use().toString()}, font = settingsOptionPane.font).apply {
+                Anchor.Centre.configure(this)
+                this.bindWidthToParent { -(bounds.height.use() * 2) }
+                this.textColor.bind { settingsOptionPane.textColorVar.use() }
+                this.textAlign.set(TextAlign.CENTRE)
+                this.renderAlign.set(Align.center)
+            }
+            
+            addChild(left)
+            addChild(right)
+            addChild(label)
         }
     }
 }

@@ -44,6 +44,9 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         contentPane.addChild(hbox)
 
         vbox.temporarilyDisableLayouts {
+            vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.calibration").use() }.apply {
+                this.disabled.set(true)
+            }
             vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.keyboard").use() }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(keyboardSettings)
@@ -84,7 +87,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         init {
             this.setSize(MMMenu.WIDTH_SMALL)
-            this.titleText.bind { Localization.getVar("mainMenu.inputSettings.keyboard").use() }
+            this.titleText.bind { Localization.getVar("mainMenu.inputSettings.keyboard.title").use() }
             this.contentPane.bounds.height.set(300f)
 
             val scrollPane = ScrollPane().apply {

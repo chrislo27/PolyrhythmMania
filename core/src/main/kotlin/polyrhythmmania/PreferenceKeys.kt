@@ -11,6 +11,8 @@ object PreferenceKeys {
     val SETTINGS_GAMEPLAY_VOLUME = "settings_gameplay_volume"
     val SETTINGS_MENU_MUSIC_VOLUME = "settings_menu_volume_music"
     val SETTINGS_MENU_SFX_VOLUME = "settings_menu_volume_sfx"
+    val SETTINGS_WINDOWED_RESOLUTION = "settings_windowedResolution"
+    val SETTINGS_FULLSCREEN = "settings_fullscreen"
     
     val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
     

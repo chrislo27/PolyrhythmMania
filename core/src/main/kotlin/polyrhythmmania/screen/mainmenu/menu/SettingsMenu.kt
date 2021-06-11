@@ -40,7 +40,11 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {
-                this.disabled.set(true)
+                this.setOnAction {
+                    val menu = menuCol.videoSettingsMenu
+                    menu.prepareShow()
+                    menuCol.pushNextMenu(menu)
+                }
             }
             vbox += createLongButton { Localization.getVar("mainMenu.settings.input").use() }.apply {
                 this.setOnAction {

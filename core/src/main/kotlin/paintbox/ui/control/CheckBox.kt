@@ -7,6 +7,7 @@ import paintbox.PaintboxGame
 import paintbox.binding.Var
 import paintbox.binding.invert
 import paintbox.font.PaintboxFont
+import paintbox.font.TextAlign
 import paintbox.ui.ImageNode
 import paintbox.ui.ImageRenderingMode
 import paintbox.ui.area.Insets
@@ -32,11 +33,16 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
         CHECKMARK, X,
     }
     
+    enum class BoxAlign {
+        LEFT, RIGHT;
+    }
+    
     val textLabel: TextLabel = TextLabel(text, font)
     val imageNode: ImageNode = ImageNode(null, ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
 
     val checkType: Var<CheckType> = Var(CheckType.CHECKMARK)
     val checkedState: Var<Boolean> = Var(false)
+    val boxAlignment: Var<BoxAlign> = Var(BoxAlign.LEFT)
     override val selectedState: Var<Boolean> = checkedState
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
     
@@ -44,10 +50,10 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
         val height = Var.bind {
             contentZone.height.use()
         }
-        textLabel.bounds.x.bind { height.use() }
+        textLabel.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) height.use() else 0f }
         textLabel.bindWidthToParent { -height.use() }
         textLabel.margin.set(Insets(2f))
-        imageNode.bounds.x.set(0f)
+        imageNode.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) 0f else ((imageNode.parent.use()?.bounds?.width?.use() ?: 0f) - height.use()) }
         imageNode.bounds.width.bind { height.use() }
         imageNode.textureRegion.bind { 
             val type = checkType.use()
@@ -56,6 +62,9 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
         }
         imageNode.margin.set(Insets(2f))
         imageNode.tint.set(Color(0f, 0f, 0f, 1f))
+        
+        textLabel.renderAlign.bind { if (boxAlignment.use() == BoxAlign.LEFT) com.badlogic.gdx.utils.Align.left else com.badlogic.gdx.utils.Align.right }
+        textLabel.textAlign.bind { if (boxAlignment.use() == BoxAlign.LEFT) TextAlign.LEFT else TextAlign.RIGHT }
         
         this.addChild(textLabel)
         this.addChild(imageNode)

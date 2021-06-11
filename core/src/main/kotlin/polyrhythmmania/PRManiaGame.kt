@@ -74,6 +74,15 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())
 
+        if (settings.fullscreen.getOrCompute()) {
+            Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+        } else {
+            val res = settings.windowedResolution.getOrCompute()
+            if (Gdx.graphics.width != res.width || Gdx.graphics.height != res.height) {
+                Gdx.graphics.setWindowedMode(res.width, res.height)
+            }
+        }
+        
         fun initializeScreens() {
             mainMenuScreen = MainMenuScreen(this)
         }

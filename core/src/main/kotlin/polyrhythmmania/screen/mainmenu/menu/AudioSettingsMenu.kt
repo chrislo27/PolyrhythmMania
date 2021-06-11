@@ -84,11 +84,4 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
     }
 
-    private fun createSliderPane(slider: Slider, labelText: Var.Context.() -> String): SettingsOptionPane {
-        return createSettingsOption(labelText).apply { 
-            this.content.addChild(slider)
-            Anchor.CentreRight.configure(slider)
-        }
-    }
-
 }
