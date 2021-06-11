@@ -15,7 +15,7 @@ open class Clock(val timingProvider: TimingProvider) {
     @Volatile
     var seconds: Float = 0f
         set(value) {
-            val capped = value.coerceAtLeast(0f)
+            val capped = value//.coerceAtLeast(0f)
             field = capped
             beat = tempos.secondsToBeats(capped)
         }

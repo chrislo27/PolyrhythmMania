@@ -17,7 +17,6 @@ import kotlin.math.max
 
 class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     
-
     init {
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.help.title").use() }
 

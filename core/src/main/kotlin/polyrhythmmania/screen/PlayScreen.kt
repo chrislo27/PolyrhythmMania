@@ -195,7 +195,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
     }
 
     fun startGame() {
-        timing.seconds = 0f
+        timing.seconds = -1f
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
             engine.musicData.setPlayerPositionToCurrentSec()
@@ -335,6 +335,17 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         main.inputMultiplexer.addProcessor(inputProcessor)
         selectionIndex.set(0)
         panelAnimationValue.set(0f)
+        val ani = Animation(Interpolation.smoother, 0.25f, 0f, 1f).apply {
+            onComplete = {
+                activePanelAnimation = null
+            }
+        }
+        val oldAni = this.activePanelAnimation
+        if (oldAni != null) {
+            sceneRoot.animations.cancelAnimation(oldAni)
+        }
+        this.activePanelAnimation = ani
+        sceneRoot.animations.enqueueAnimation(ani, panelAnimationValue)
         
         if (playSound) {
             playMenuSound("sfx_pause_enter")
@@ -347,15 +358,6 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         Gdx.input.isCursorCatched = true
         main.inputMultiplexer.removeProcessor(inputProcessor)
         panelAnimationValue.set(0f)
-        val ani = Animation(Interpolation.smoother, 0.25f, 0f, 1f).apply { 
-            activePanelAnimation = null
-        }
-        val oldAni = this.activePanelAnimation
-        if (oldAni != null) {
-            sceneRoot.animations.cancelAnimation(oldAni)
-        }
-        this.activePanelAnimation = ani
-        sceneRoot.animations.enqueueAnimation(ani, panelAnimationValue)
         if (playSound) {
             playMenuSound("sfx_pause_exit")
         }
