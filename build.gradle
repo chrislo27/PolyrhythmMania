@@ -35,7 +35,6 @@ allprojects {
         maven { url "https://kotlin.bintray.com/kotlinx/" }
         maven { url 'https://jitpack.io' }
         maven { url 'https://repo.eclipse.org/content/groups/releases/' }
-        maven { url "https://dl.bintray.com/spookygames/oss" }
         maven { url "https://clojars.org/repo" }
     }
     
@@ -68,6 +67,8 @@ allprojects {
         implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
         implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version"
+        
+        implementation "space.earlygrey:shapedrawer:2.4.0"
         
 //        implementation "org.openjdk.jol:jol-core:0.15"
     }

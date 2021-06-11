@@ -112,8 +112,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             val keyboardKeybindings = main.settings.inputKeymapKeyboard.getOrCompute()
-            hbox += TextLabel("${InputKeymapKeyboard.TEXT_BUTTON_A}: ${Input.Keys.toString(keyboardKeybindings.buttonA)}\n" +
-                    "${InputKeymapKeyboard.TEXT_BUTTON_DPAD_ANY}: ${Input.Keys.toString(keyboardKeybindings.buttonDpadUp)}/${Input.Keys.toString(keyboardKeybindings.buttonDpadDown)}/${Input.Keys.toString(keyboardKeybindings.buttonDpadLeft)}/${Input.Keys.toString(keyboardKeybindings.buttonDpadRight)}",
+            hbox += TextLabel(keyboardKeybindings.toKeyboardString(false),
                     font = main.fontMainMenuRodin).apply {
                 this.bounds.width.set(300f)
                 this.textColor.set(Color.BLACK)

@@ -43,4 +43,14 @@ data class InputKeymapKeyboard(
             obj.add("dpadRight", this.buttonDpadRight)
         }
     }
+    
+    fun toKeyboardString(detailedDpad: Boolean): String {
+        return if (detailedDpad) {
+            "${TEXT_BUTTON_A}: ${Input.Keys.toString(buttonA)}\n" +
+                    "${TEXT_BUTTON_DPAD_UP}: ${Input.Keys.toString(buttonDpadUp)} / ${TEXT_BUTTON_DPAD_DOWN}: ${Input.Keys.toString(buttonDpadDown)} / ${TEXT_BUTTON_DPAD_LEFT}: ${Input.Keys.toString(buttonDpadLeft)} / ${TEXT_BUTTON_DPAD_RIGHT}: ${Input.Keys.toString(buttonDpadRight)}"
+        } else {
+            "${TEXT_BUTTON_A}: ${Input.Keys.toString(buttonA)}\n" +
+                    "${TEXT_BUTTON_DPAD_ANY}: ${Input.Keys.toString(buttonDpadUp)}/${Input.Keys.toString(buttonDpadDown)}/${Input.Keys.toString(buttonDpadLeft)}/${Input.Keys.toString(buttonDpadRight)}"
+        }
+    }
 }

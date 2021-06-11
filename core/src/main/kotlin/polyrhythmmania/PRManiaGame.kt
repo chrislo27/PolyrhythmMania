@@ -449,6 +449,14 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 22
                 }).setAfterLoad(defaultScaledFontAfterLoad)
+        cache["pausemenu_title"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/kurokane/kurokanestd.otf"), 100, 10f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 100
+                    borderWidth = 10f
+                    spaceX = -8
+                }).setAfterLoad(defaultScaledFontAfterLoad)
     }
 
 
@@ -473,5 +481,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontMainMenuThin: PaintboxFont get() = fontCache["mainmenu_thin"]
     val fontMainMenuHeading: PaintboxFont get() = fontCache["mainmenu_heading"]
     val fontMainMenuRodin: PaintboxFont get() = fontCache["mainmenu_rodin"]
+    val fontPauseMenuTitle: PaintboxFont get() = fontCache["pausemenu_title"]
 
 }
