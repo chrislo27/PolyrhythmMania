@@ -60,5 +60,12 @@ class AnimationHandler(val sceneRoot: SceneRoot) {
         }
         animations[varr] = AnimationTuple(animation, varr)
     }
+    
+    fun cancelAnimation(animation: Animation) {
+        val existing = animations.entries.firstOrNull { it.value.animation == animation } ?: return
+        animations.remove(existing.key)
+        existing.key.set(existing.value.animation.applyFunc(1f))
+        existing.value.animation.onComplete?.invoke()
+    }
 
 }

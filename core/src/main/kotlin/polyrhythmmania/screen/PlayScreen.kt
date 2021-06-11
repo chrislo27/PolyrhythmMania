@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
+import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
@@ -24,15 +25,12 @@ import paintbox.transition.FadeIn
 import paintbox.transition.FadeOut
 import paintbox.transition.TransitionScreen
 import paintbox.ui.*
+import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
-import paintbox.ui.control.Button
-import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
-import paintbox.ui.skin.Skin
-import paintbox.ui.skin.SkinFactory
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
 import paintbox.util.sumOfFloat
@@ -74,6 +72,8 @@ class PlayScreen(main: PRManiaGame, val container: Container)
     private val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
     private val maxSelectionSize: Int = 3
     private val selectionIndex: Var<Int> = Var(0)
+    private val panelAnimationValue: FloatVar = FloatVar(0f)
+    private var activePanelAnimation: Animation? = null
     private val resumeLabel: TextLabel
     private val startOverLabel: TextLabel
     private val quitLabel: TextLabel
@@ -240,9 +240,10 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             batch.setColor(1f, 1f, 1f, 1f)
 
             val pauseBg = this.pauseBg
+            val panelAni = panelAnimationValue.getOrCompute()
 
             val topLeftX1 = 0f
-            val topLeftY1 = height * pauseBg.topTriangleY
+            val topLeftY1 = height * MathUtils.lerp(1f, pauseBg.topTriangleY, panelAni)
             val topLeftX2 = 0f
             val topLeftY2 = height
             val topLeftY3 = height
@@ -252,7 +253,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             val botRightX2 = width
             val botRightY2 = 0f
             val botRightX3 = width
-            val botRightY3 = botRightY1 + (botRightX3 - botRightX1) * (pauseBg.triangleSlope)
+            val botRightY3 = botRightY1 + (botRightX3 - botRightX1) * (pauseBg.triangleSlope) * panelAni
             val triLineWidth = 12f
             shapeRenderer.prepareStencilMask(batch) {
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
@@ -333,6 +334,8 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         main.inputMultiplexer.removeProcessor(inputProcessor)
         main.inputMultiplexer.addProcessor(inputProcessor)
         selectionIndex.set(0)
+        panelAnimationValue.set(0f)
+        
         if (playSound) {
             playMenuSound("sfx_pause_enter")
         }
@@ -343,6 +346,16 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         soundSystem.setPaused(false)
         Gdx.input.isCursorCatched = true
         main.inputMultiplexer.removeProcessor(inputProcessor)
+        panelAnimationValue.set(0f)
+        val ani = Animation(Interpolation.smoother, 0.25f, 0f, 1f).apply { 
+            activePanelAnimation = null
+        }
+        val oldAni = this.activePanelAnimation
+        if (oldAni != null) {
+            sceneRoot.animations.cancelAnimation(oldAni)
+        }
+        this.activePanelAnimation = ani
+        sceneRoot.animations.enqueueAnimation(ani, panelAnimationValue)
         if (playSound) {
             playMenuSound("sfx_pause_exit")
         }
