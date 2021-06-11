@@ -151,8 +151,6 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         }
 
         val bgPaddingInsets = element.bgPadding.getOrCompute()
-        val textPaddingOffsetX: Float = bgPaddingInsets.left
-        val textPaddingOffsetY: Float = bgPaddingInsets.top
         val compressX = element.doXCompression.getOrCompute()
         val align = element.renderAlign.getOrCompute()
         val scaleX = element.scaleX.getOrCompute()
@@ -160,14 +158,14 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         val textWidth = text.width * scaleX
         val textHeight = text.height * scaleY
         val xOffset: Float = when {
-            Align.isLeft(align) -> 0f + textPaddingOffsetX
-            Align.isRight(align) -> (w - (if (compressX) (min(textWidth, w)) else textWidth) - textPaddingOffsetX)
+            Align.isLeft(align) -> 0f + bgPaddingInsets.left
+            Align.isRight(align) -> (w - ((if (compressX) (min(textWidth, w)) else textWidth)) + bgPaddingInsets.left)
             else -> (w - (if (compressX) min(textWidth, w) else textWidth)) / 2f
         }
         val firstCapHeight = text.firstCapHeight * scaleY
         val yOffset: Float = when {
-            Align.isTop(align) -> h - firstCapHeight - textPaddingOffsetY
-            Align.isBottom(align) -> 0f + (textHeight - firstCapHeight) + textPaddingOffsetY
+            Align.isTop(align) -> h - firstCapHeight - bgPaddingInsets.top
+            Align.isBottom(align) -> 0f + (textHeight - firstCapHeight) + bgPaddingInsets.bottom
             else -> (h + textHeight) / 2 - firstCapHeight
         }
 
@@ -188,8 +186,8 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
 
         batch.color = tmpColor // Sets the opacity
         text.drawCompressed(batch, x + xOffset, (y - h + yOffset),
-                if (compressX) (w - textPaddingOffsetX * 2f) else 0f, element.textAlign.getOrCompute(),
-                scaleX, scaleY)
+                if (compressX) (w - bgPaddingInsets.left - bgPaddingInsets.right) else 0f,
+                element.textAlign.getOrCompute(), scaleX, scaleY)
         ColorStack.pop()
 
         batch.packedColor = lastPackedColor
