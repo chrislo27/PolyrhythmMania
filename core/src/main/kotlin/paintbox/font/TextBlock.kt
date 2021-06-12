@@ -255,7 +255,8 @@ data class TextBlock(val runs: List<TextRun>) {
      * The [batch]'s color is used to tint.
      */
     fun drawCompressed(batch: SpriteBatch, x: Float, y: Float, maxWidth: Float,
-                       align: TextAlign = TextAlign.LEFT, scaleX: Float = 1f, scaleY: Float = 1f) {
+                       align: TextAlign = TextAlign.LEFT, scaleX: Float = 1f, scaleY: Float = 1f,
+                       alignAffectsRender: Boolean = false) {
         if (isRunInfoInvalid()) {
             computeLayouts()
         }
@@ -279,7 +280,9 @@ data class TextBlock(val runs: List<TextRun>) {
         val shouldScaleX = globalScaleX != 1f
         val shouldScaleY = globalScaleY != 1f
         val scaleAnything = shouldScaleX || shouldScaleY
-        val alignXWidth = if (shouldScaleX && maxWidth > 0f) (this.width * globalScaleX) else (this.width)
+        val alignXWidth: Float = if (alignAffectsRender) {
+            maxWidth
+        } else if (shouldScaleX && maxWidth > 0f) (this.width * globalScaleX) else (this.width)
 
         runInfo.forEach { textRunInfo ->
             val paintboxFont = textRunInfo.font
