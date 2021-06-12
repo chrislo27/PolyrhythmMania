@@ -131,9 +131,16 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         return popped
     }
 
-    fun playBlipSound() {
+    fun playBlipSound(volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f) {
         val sound = AssetRegistry.get<Sound>("sfx_menu_blip")
         sound.stop()
         sound.play(this.settings.menuSfxVolume.getOrCompute() / 100f)
+    }
+    
+    fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
+        val sound: Sound = AssetRegistry[id]
+        val menuSFXVol = this.settings.menuSfxVolume.getOrCompute() / 100f
+        val soundID = sound.play(menuSFXVol * volume, pitch, pan)
+        return sound to soundID
     }
 }

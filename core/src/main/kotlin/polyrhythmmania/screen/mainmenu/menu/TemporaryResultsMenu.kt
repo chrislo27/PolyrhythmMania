@@ -1,18 +1,27 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.font.Markup
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
+import paintbox.registry.AssetRegistry
+import paintbox.transition.FadeIn
+import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.disposeQuietly
+import polyrhythmmania.Localization
+import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.InputResult
+import polyrhythmmania.screen.PlayScreen
 
 
-class TemporaryResultsMenu(menuCol: MenuCollection, val results: Results)
+class TemporaryResultsMenu(menuCol: MenuCollection, val results: Results, val container: Container)
     : StandardMenu(menuCol) {
 
     data class Results(val expectedInputs: Int, val score: Int, val inputs: List<InputResult>)
@@ -66,6 +75,24 @@ class TemporaryResultsMenu(menuCol: MenuCollection, val results: Results)
                 this.setOnAction {
                     menuCol.popLastMenu()
                     menuCol.removeMenu(this@TemporaryResultsMenu)
+                    container.disposeQuietly()
+                }
+            }
+            hbox += createSmallButton(binding = { Localization.getVar("play.pause.startOver").use() }).apply {
+                this.bounds.width.set(200f)
+                this.setOnAction {
+                    menuCol.playMenuSound("sfx_menu_enter_game")
+                    mainMenu.transitionAway {
+                        val main = mainMenu.main
+                        val playScreen = PlayScreen(main, container)
+                        main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
+                            this.onEntryEnd = {
+                                menuCol.popLastMenu(instant = true, playSound = false)
+                                menuCol.removeMenu(this@TemporaryResultsMenu)
+                                playScreen.resetAndStartOver(playSound = false)
+                            }
+                        }
+                    }
                 }
             }
         }

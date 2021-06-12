@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
+import paintbox.binding.VarChangedListener
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -84,6 +85,18 @@ class PlayScreen(main: PRManiaGame, val container: Container)
 
     private val keyboardKeybinds: InputKeymapKeyboard by lazy { main.settings.inputKeymapKeyboard.getOrCompute() }
     private val bgSquareTexReg: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("pause_square"))
+    
+    private val endSignalListener: VarChangedListener<Boolean> = VarChangedListener {
+        if (it.getOrCompute()) {
+            Gdx.app.postRunnable {
+                soundSystem.setPaused(true)
+                container.world.entities.filterIsInstance<EntityRod>().forEach { rod ->
+                    engine.inputter.submitInputsFromRod(rod)
+                }
+                transitionToResults()
+            }
+        }
+    }
 
     init {
         var nextLayer: UIElement = sceneRoot
@@ -183,15 +196,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
     }
 
     init {
-        engine.endSignalReceived.addListener {
-            Gdx.app.postRunnable {
-                soundSystem.setPaused(true)
-                container.world.entities.filterIsInstance<EntityRod>().forEach { rod ->
-                    engine.inputter.submitInputsFromRod(rod)
-                }
-                transitionToResults()
-            }
-        }
+        engine.endSignalReceived.addListener(endSignalListener)
     }
 
     fun startGame() {
@@ -306,13 +311,13 @@ class PlayScreen(main: PRManiaGame, val container: Container)
 
         val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
         val menuCol = mainMenu.menuCollection
-        val tmpResultsMenu = TemporaryResultsMenu(menuCol, results)
+        val tmpResultsMenu = TemporaryResultsMenu(menuCol, results, container)
         menuCol.addMenu(tmpResultsMenu)
         menuCol.pushNextMenu(tmpResultsMenu, instant = true)
-        transitionAway(mainMenu) {}
+        transitionAway(mainMenu, false) {}
     }
 
-    private inline fun transitionAway(nextScreen: Screen, action: () -> Unit) {
+    private inline fun transitionAway(nextScreen: Screen, disposeContainer: Boolean, action: () -> Unit) {
         isFinished = true
         main.inputMultiplexer.removeProcessor(inputProcessor)
         Gdx.input.isCursorCatched = false
@@ -323,6 +328,9 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 FadeOut(0.5f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
             this.onEntryEnd = {
                 this@PlayScreen.dispose()
+                if (disposeContainer) {
+                    container.disposeQuietly()
+                }
             }
         }
     }
@@ -362,8 +370,8 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             playMenuSound("sfx_pause_exit")
         }
     }
-
-    private fun resetAndStartOver(playSound: Boolean = true) {
+    
+    fun resetAndStartOver(playSound: Boolean = true) {
         val blocks = container.blocks.toList()
         engine.removeEvents(engine.events.toList())
         engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
@@ -394,6 +402,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                         this.onEntryEnd = {
                             if (currentScreen is PlayScreen) {
                                 currentScreen.dispose()
+                                container.disposeQuietly()
                             }
                         }
                     }
@@ -483,7 +492,8 @@ class PlayScreen(main: PRManiaGame, val container: Container)
     }
 
     override fun dispose() {
-        container.disposeQuietly()
+        // NOTE: container instance is disposed separately
+        engine.endSignalReceived.removeListener(endSignalListener)
     }
 
     override fun getDebugString(): String {

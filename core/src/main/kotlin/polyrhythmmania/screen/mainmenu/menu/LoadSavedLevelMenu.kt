@@ -102,7 +102,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setOnAction {
                     val loadedData = loaded
                     if (loadedData != null) {
-                        AssetRegistry.get<Sound>("sfx_menu_enter_game").play(menuCol.settings.menuSfxVolume.getOrCompute() / 100f)
+                        menuCol.playMenuSound("sfx_menu_enter_game")
                         mainMenu.transitionAway {
                             val main = mainMenu.main
                             val playScreen = PlayScreen(main, loadedData.newContainer)
