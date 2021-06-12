@@ -10,4 +10,4 @@ sealed class Layer
 
 class LayerTitle(val text: String) : Layer()
 
-class LayerParagraph(val text: String) : Layer()
+class LayerParagraph(val text: String, val allocatedHeight: Float) : Layer()

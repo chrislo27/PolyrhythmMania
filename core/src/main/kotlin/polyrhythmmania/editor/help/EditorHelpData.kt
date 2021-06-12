@@ -15,6 +15,6 @@ class EditorRootDoc : HelpDocument(
         "editorHelp.root.title",
         listOf(
                 LayerTitle("editorHelp.root.title"),
-                LayerParagraph(""),
+                LayerParagraph("No content yet.", 200f),
         )
 )

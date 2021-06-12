@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.font.Markup
 import paintbox.font.TextAlign
+import paintbox.font.TextBlock
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -142,12 +143,12 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 is LayerParagraph -> {
                     TextLabel(binding = { Localization.getVar(layer.text).use() }).apply {
                         this.markup.set(this@HelpDocRenderer.markup)
-                        this.renderAlign.set(Align.center)
-                        this.textAlign.set(TextAlign.CENTRE)
-                        this.setScaleXY(0.75f)
+                        this.renderAlign.set(Align.topLeft)
+                        this.textAlign.set(TextAlign.LEFT)
                         this.textColor.set(Color.WHITE)
-                        this.bounds.height.set(80f)
-                        this.padding.set(Insets(2f, 2f, 8f, 8f))
+                        this.doLineWrapping.set(true)
+                        this.padding.set(Insets(4f, 16f, 8f, 8f))
+                        this.bounds.height.set(layer.allocatedHeight)
                     }
                 }
             }
