@@ -96,7 +96,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             nextScreenProducer = {
 //                polyrhythmmania.world.render.TestWorldRenderScreen(this@PRManiaGame)
 //                EditorScreen(this@PRManiaGame, debugMode = true)
-                mainMenuScreen.prepareShow()
+                mainMenuScreen.prepareShow(doFlipAnimation = true)
             }
         })
     }
