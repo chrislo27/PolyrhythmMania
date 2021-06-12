@@ -16,6 +16,8 @@ import paintbox.tests.textblocks.TextBlockTestGame
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import org.lwjgl.glfw.GLFW
+import paintbox.tests.newui.UIAnchorTestEditorScreen
+import paintbox.tests.newui.UITextLabelAlignTestScreen
 import polyrhythmmania.desktop.DesktopLauncher
 import polyrhythmmania.desktop.PRManiaArguments
 
@@ -62,13 +64,16 @@ internal object TestDesktopLauncher {
             TextBlockTestGame(settings) to {}
         }
         val test3: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> by lazy {
-            NewUITestGame(settings) to {}
+            NewUITestGame(settings) { UIAnchorTestEditorScreen(it) } to {}
         }
         val test4: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> by lazy {
             ScaledFontTestGame(settings) to {}
         }
+        val test5: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> by lazy {
+            NewUITestGame(settings) { UITextLabelAlignTestScreen(it) } to {}
+        }
         
-        val selectedTest: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> = test3
+        val selectedTest: Pair<PaintboxGame, (PaintboxDesktopLauncher) -> Unit> = test5
         getDefaultLauncher(selectedTest.first).apply {
             game.programLaunchArguments = args.toList()
             selectedTest.second.invoke(this)

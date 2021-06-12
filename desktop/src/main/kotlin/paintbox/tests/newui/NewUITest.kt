@@ -2,6 +2,7 @@ package paintbox.tests.newui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.Screen
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -16,7 +17,7 @@ import paintbox.util.gdxutils.fillRect
 import org.lwjgl.glfw.GLFW
 
 
-internal class NewUITestGame(paintboxSettings: PaintboxSettings)
+internal class NewUITestGame(paintboxSettings: PaintboxSettings, val screenFactory: (NewUITestGame) -> Screen)
     : PaintboxGame(paintboxSettings) {
 
     override fun getTitle(): String {
@@ -25,7 +26,7 @@ internal class NewUITestGame(paintboxSettings: PaintboxSettings)
 
     override fun create() {
         super.create()
-        this.setScreen(UIAnchorTestEditorScreen(this))
+        this.setScreen(screenFactory.invoke(this))
     }
 }
 internal class ScaledFontTestGame(paintboxSettings: PaintboxSettings)

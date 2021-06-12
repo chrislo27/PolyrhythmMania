@@ -181,7 +181,7 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
         bg += TextLabel("Test text label.\nNewline.").also { label ->
             Anchor.TopLeft.configure(label, offsetX = 32f, offsetY = 48f)
             label.bounds.width.set(325f)
-            label.bounds.height.set(100f)
+            label.bounds.height.set(75f)
             label.renderBackground.set(true)
 //            label.textAlign.set(TextAlign.RIGHT)
             label.bgPadding.set(Insets(10f))
@@ -452,6 +452,51 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             Anchor.CentreRight.configure(this, offsetX = -100f - 50f, offsetY = 100f)
             this.bounds.width.set(200f)
             this.bounds.height.set(30f)
+        }
+        
+        bg += TextLabel("NoCmpr | Render: C | TA: L").apply { 
+            this.bgPadding.set(Insets(6f))
+            this.renderBackground.set(true)
+            this.doXCompression.set(false)
+            this.renderAlign.set(Align.center)
+            this.textAlign.set(TextAlign.LEFT)
+            
+            Anchor.CentreLeft.configure(this, offsetX = 32f, offsetY = -200f + 40f * 0)
+            this.bounds.width.set(300f)
+            this.bounds.height.set(40f)
+        }
+        bg += TextLabel("Do X Compresssion Enabled | Render: C | TA: L").apply { 
+            this.bgPadding.set(Insets(6f))
+            this.renderBackground.set(true)
+            this.doXCompression.set(true)
+            this.renderAlign.set(Align.center)
+            this.textAlign.set(TextAlign.LEFT)
+            
+            Anchor.CentreLeft.configure(this, offsetX = 32f, offsetY = -200f + 40f * 1)
+            this.bounds.width.set(300f)
+            this.bounds.height.set(40f)
+        }
+        bg += TextLabel("NoCmpr | Render: C | TA: C").apply { 
+            this.bgPadding.set(Insets(6f))
+            this.renderBackground.set(true)
+            this.doXCompression.set(false)
+            this.renderAlign.set(Align.center)
+            this.textAlign.set(TextAlign.CENTRE)
+            
+            Anchor.CentreLeft.configure(this, offsetX = 32f, offsetY = -200f + 40f * 2)
+            this.bounds.width.set(300f)
+            this.bounds.height.set(40f)
+        }
+        bg += TextLabel("Do X Compresssion Enabled | Render: C | TA: C").apply { 
+            this.bgPadding.set(Insets(6f))
+            this.renderBackground.set(true)
+            this.doXCompression.set(true)
+            this.renderAlign.set(Align.center)
+            this.textAlign.set(TextAlign.CENTRE)
+            
+            Anchor.CentreLeft.configure(this, offsetX = 32f, offsetY = -200f + 40f * 3)
+            this.bounds.width.set(300f)
+            this.bounds.height.set(40f)
         }
     }
 

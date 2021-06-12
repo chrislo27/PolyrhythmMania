@@ -184,10 +184,15 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
             ColorStack.pop()
         }
 
-        batch.color = tmpColor // Sets the opacity
-        text.drawCompressed(batch, x + xOffset, (y - h + yOffset),
-                if (compressX) (w - bgPaddingInsets.left - bgPaddingInsets.right) else 0f,
-                element.textAlign.getOrCompute(), scaleX, scaleY)
+        batch.color = tmpColor // Sets the opacity of the text
+        if (compressX) {
+            val maxTextWidth = w - bgPaddingInsets.left - bgPaddingInsets.right
+            text.drawCompressed(batch, x + (xOffset).coerceAtLeast(bgPaddingInsets.left), (y - h + yOffset),
+                    maxTextWidth,
+                    element.textAlign.getOrCompute(), scaleX, scaleY)
+        } else {
+            text.drawCompressed(batch, x + xOffset, (y - h + yOffset), 0f, element.textAlign.getOrCompute(), scaleX, scaleY)
+        }
         ColorStack.pop()
 
         batch.packedColor = lastPackedColor
