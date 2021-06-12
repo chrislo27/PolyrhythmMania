@@ -10,6 +10,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
+import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
 
 
@@ -37,6 +38,11 @@ class SidePanel(val editorPane: EditorPane) : Pane() {
             this.padding.set(Insets(6f, 2f, 2f, 2f))
             this.renderAlign.set(Align.topLeft)
             this.textAlign.set(TextAlign.LEFT)
+            val tooltipLoc = Localization.getVar("editor.track.tooltip", Var { listOf(titleText.use()) })
+            val tooltipTextVar = Var {
+                if (titleText.use().isEmpty()) "" else tooltipLoc.use()
+            }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(tooltipTextVar))
         }
         sidebarSection += titleLabel
     }

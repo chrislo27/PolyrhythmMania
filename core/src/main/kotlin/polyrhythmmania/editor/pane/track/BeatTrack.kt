@@ -30,7 +30,7 @@ import kotlin.math.floor
 
 class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, true) {
 
-    val timeLabel: TextLabel
+    val beatTimeLabel: TextLabel
     val secLabel: TextLabel
     val bpmLabel: TextLabel
     val beatMarkerPane: BeatMarkerPane
@@ -61,7 +61,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
         val bpmTextVar = Var {
             "♩=${DecimalFormats.format("0.0", bpmVar.use())}"
         }
-        timeLabel = TextLabel(binding = {
+        beatTimeLabel = TextLabel(binding = {
             timeTextVar.use()
         }, font = editorPane.palette.beatTimeFont).apply {
             this.textAlign.set(TextAlign.RIGHT)
@@ -70,6 +70,10 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.bgPadding.set(Insets.ZERO)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.height.set(28f)
+            val tooltipVar = Localization.getVar("editor.track.beat.tooltip.currentBeat", Var {
+                listOf(DecimalFormats.format("0.000", editor.playbackStart.use()), DecimalFormats.format("0.000", editor.musicFirstBeat.use()))
+            })
+            this.tooltipElement.set(editorPane.createDefaultTooltip(tooltipVar))
         }
         val secondsBox = Pane().apply {
             this.bounds.height.set(16f)
@@ -86,6 +90,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.bounds.width.bind {
                 (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.5f
             }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.track.beat.tooltip.currentTime")))
         }
         secondsBox += secLabel
         bpmLabel = TextLabel(binding = {
@@ -101,11 +106,12 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                 (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.35f
             }
             this.setScaleXY(0.75f)
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.track.beat.tooltip.currentBPM")))
         }
         secondsBox += bpmLabel
         
         vbox.temporarilyDisableLayouts { 
-            vbox += timeLabel
+            vbox += beatTimeLabel
             vbox += secondsBox
         }
 

@@ -89,7 +89,6 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
                     this += TextLabel(binding = { DecimalFormats.format("0.0#", editor.startingTempo.use()) },
                             font = editorPane.palette.sidePanelFont).apply {
-                        this.padding.set(Insets(2f))
                         this.renderAlign.set(Align.center)
                         this.textAlign.set(TextAlign.CENTRE)
 
