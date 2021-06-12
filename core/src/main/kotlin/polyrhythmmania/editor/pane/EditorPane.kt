@@ -14,8 +14,8 @@ import paintbox.ui.element.RectElement
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.Palette
+import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.pane.dialog.*
-import polyrhythmmania.editor.pane.dialog.help.HelpDialog
 import polyrhythmmania.editor.pane.track.AllTracksPane
 import polyrhythmmania.ui.DialogPane
 
