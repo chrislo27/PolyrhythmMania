@@ -273,19 +273,19 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                 val clickOriginalTc: MusicVolume? = if (currentClick is Click.DragMusicVolume) currentClick.musicVol else null
                 for (mv in musicVolumes) {
                     val beat = mv.beat
-                    if (beat !in (leftBeat - 2)..(rightBeat + 1)) continue
-
-                    if (mv === clickOriginalTc) {
-                        val ghostColor = ColorStack.getAndPush().set(musicVolColor)
-                        val a = ghostColor.a
-                        ghostColor.a = 1f
-                        ghostColor.r *= 0.5f * a
-                        ghostColor.g *= 0.5f * a
-                        ghostColor.b *= 0.5f * a
-                        drawMusicVol(batch, ghostColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, mv.width, mv.newVolume, null)
-                        ColorStack.pop()
-                    } else {
-                        drawMusicVol(batch, musicVolColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, mv.width, mv.newVolume, font)
+                    if (beat <= (rightBeat + 1) && (beat + mv.width) >= (leftBeat - 2)) {
+                        if (mv === clickOriginalTc) {
+                            val ghostColor = ColorStack.getAndPush().set(musicVolColor)
+                            val a = ghostColor.a
+                            ghostColor.a = 1f
+                            ghostColor.r *= 0.5f * a
+                            ghostColor.g *= 0.5f * a
+                            ghostColor.b *= 0.5f * a
+                            drawMusicVol(batch, ghostColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, mv.width, mv.newVolume, null)
+                            ColorStack.pop()
+                        } else {
+                            drawMusicVol(batch, musicVolColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, mv.width, mv.newVolume, font)
+                        }
                     }
                 }
                 if (hoveredMusicVol != null) {
