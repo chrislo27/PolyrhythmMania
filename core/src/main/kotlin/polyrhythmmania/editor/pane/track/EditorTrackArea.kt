@@ -179,7 +179,6 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         val click = editor.click.getOrCompute()
         val trackHeight = allTracksPane.editorTrackHeight
         val lastPackedColor = batch.packedColor
-        val tmpColor = ColorStack.getAndPush()
 
         // FIXME refactor out?
 
@@ -230,7 +229,6 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
 //                (originY - this.bounds.y.getOrCompute()) - lastMouseRelative.y,
 //                5f, 5f)
 
-        ColorStack.pop()
         batch.packedColor = lastPackedColor
     }
 }
