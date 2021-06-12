@@ -138,12 +138,12 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         }
         paddingPane += optionsBg
         fun addArrowImageNode(index: Int): ArrowNode {
-            return ArrowNode(TextureRegion(/*AssetRegistry.get<Texture>("pause_rod")*/ AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"])).apply {
-                Anchor.CentreLeft.configure(this)
+            return ArrowNode(TextureRegion(/*AssetRegistry.get<Texture>("pause_rod")*/ AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_pointer_finger"])).apply {
+                Anchor.CentreLeft.configure(this, offsetY = 4f)
 //                this.bindHeightToParent(multiplier = 1.5f)
                 this.bounds.height.set(64f)
                 this.bounds.width.bind { bounds.height.use() }
-                this.bounds.x.bind { -(bounds.width.use() + optionsBorderSize) }
+                this.bounds.x.bind { -(bounds.width.use() + optionsBorderSize + 2f) }
                 this.visible.bind { selectionIndex.use() == index }
             }
         }

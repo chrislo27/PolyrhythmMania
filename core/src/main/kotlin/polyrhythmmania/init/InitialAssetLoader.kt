@@ -59,6 +59,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("arrow_short_empty", "textures/ui/icon/arrow/arrow_short_empty.png"),
                 Packable("arrow_short_semi", "textures/ui/icon/arrow/arrow_short_semi.png"),
                 Packable("arrow_instantiator_right", "textures/ui/icon/arrow/instantiator_right_arrow.png"),
+                Packable("arrow_pointer_finger", "textures/ui/icon/arrow/pointer_finger.png"),
                 Packable("cursor_no_tail", "textures/ui/icon/cursor_no_tail.png"),
                 Packable("cursor_thin_tail", "textures/ui/icon/cursor_thin_tail.png"),
                 Packable("cursor_wide_tail", "textures/ui/icon/cursor_wide_tail.png"),
