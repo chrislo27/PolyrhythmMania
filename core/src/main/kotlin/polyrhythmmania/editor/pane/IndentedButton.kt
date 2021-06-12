@@ -10,6 +10,7 @@ import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.control.Toggle
 import paintbox.ui.control.ToggleGroup
+import paintbox.ui.element.RectElement
 
 
 class IndentedButton : Button, Toggle {
@@ -26,13 +27,16 @@ class IndentedButton : Button, Toggle {
             : super(binding, font)
     
     init {
-        this.borderStyle.set(SolidBorder().apply {
-            this.color.bind {
-                indentedButtonBorderColor.use()
+        // Faux pas: users may add more buttons not into this element.
+        this += RectElement(Color(1f, 1f, 1f, 0f)).apply {
+            this.borderStyle.set(SolidBorder().apply {
+                this.color.bind {
+                    indentedButtonBorderColor.use()
+                }
+            })
+            this.border.bind {
+                if (selectedState.use()) indentedButtonBorder.use() else Insets.ZERO
             }
-        })
-        this.border.bind {
-            if (selectedState.use()) indentedButtonBorder.use() else Insets.ZERO
         }
         
         this.setOnAction {
