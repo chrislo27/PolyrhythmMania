@@ -2,6 +2,7 @@ package polyrhythmmania.editor.block
 
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.Var
+import paintbox.font.TextAlign
 import paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
@@ -18,9 +19,12 @@ class BlockRetractPistons(engine: Engine) : Block(engine, EnumSet.of(BlockType.I
     init {
         this.width = 1f
         val text = Localization.getVar("block.retractPistons.name", Var.bind {
-            rowData.getSymbol(this)
+//            rowData.getSymbolAsListArg(this)
+            listOf("")
         })
         this.defaultText.bind { text.use() }
+        this.defaultTextSecondLine.bind { "[font=rodin]${rowData.rowSetting.use().stringRepresentation}[]" }
+        this.secondLineTextAlign = TextAlign.RIGHT
     }
     
     override fun compileIntoEvents(): List<Event> {

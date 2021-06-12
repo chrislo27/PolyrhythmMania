@@ -1,14 +1,15 @@
 package polyrhythmmania.editor.block
 
+import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.Row
 import polyrhythmmania.world.World
 
 
-enum class RowSetting(val jsonId: Int) {
+enum class RowSetting(val jsonId: Int, val stringRepresentation: String) {
 
-    ONLY_A(0),
-    ONLY_DPAD(1),
-    BOTH(2);
+    ONLY_A(0, RodinSpecialChars.BORDERED_A),
+    ONLY_DPAD(1, RodinSpecialChars.BORDERED_DPAD),
+    BOTH(2, "${RodinSpecialChars.BORDERED_A}${RodinSpecialChars.BORDERED_DPAD}");
 
     companion object {
         val VALUES: List<RowSetting> = values().toList()

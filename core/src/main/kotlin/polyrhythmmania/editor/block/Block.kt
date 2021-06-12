@@ -35,8 +35,13 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
     var trackIndex: Int = 0
     val blockTypes: Set<BlockType> = blockTypes
     protected val defaultText: Var<String> = Var("")
+    protected val defaultTextSecondLine: Var<String> = Var("")
+    protected var firstLineTextAlign: TextAlign = TextAlign.LEFT
+    protected var secondLineTextAlign: TextAlign = TextAlign.LEFT
     protected var isDefaultTextBlockInitialized: Boolean = false
     protected lateinit var defaultTextBlock: Var<TextBlock>
+    protected lateinit var defaultTextBlockSecondLine: Var<TextBlock>
+    protected var textScale: Float = 1f
     
     var ownedContextMenu: ContextMenu? = null
 
@@ -46,6 +51,9 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
             isDefaultTextBlockInitialized = true
             defaultTextBlock = Var.bind {
                 editor.blockMarkup.parse(defaultText.use())
+            }
+            defaultTextBlockSecondLine = Var.bind { 
+                editor.blockMarkup.parse(defaultTextSecondLine.use())
             }
         }
         
@@ -61,6 +69,7 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
                 editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
                 trackHeight, border)
 
+        val textScale = this.textScale
         val text = defaultTextBlock.getOrCompute()
         if (text.runs.isNotEmpty()) {
             if (text.isRunInfoInvalid()) {
@@ -75,22 +84,32 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
             }
             
             val textPadding = border + 2f
-            val scale = 0.9f
+            val scale = 0.9f * textScale
             text.drawCompressed(batch, renderX + textPadding,
                     editorTrackArea.trackToRenderY(offsetY, trackIndex) - text.firstCapHeight - textPadding - 1f,
                     editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX - textPadding * 2f,
-                    TextAlign.LEFT, scale, scale)
+                    firstLineTextAlign, scale, scale, true)
         }
-//        val text = defaultText.getOrCompute()
-//        if (text.isNotEmpty()) {
-//            val textPadding = border + 2f
-//            editor.main.mainFontBoldBordered.useFont { font ->
-//                font.scaleMul(0.9f)
-//                font.drawCompressed(batch, text, renderX + textPadding,
-//                        editorTrackArea.trackToRenderY(offsetY, trackIndex) - textPadding - 1f,
-//                        editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX - textPadding * 2, Align.left)
-//            }
-//        }
+        val text2 = defaultTextBlockSecondLine.getOrCompute()
+        if (text2.runs.isNotEmpty()) {
+            if (text2.isRunInfoInvalid()) {
+                // Prevents flickering when drawing on first frame due to bounds not being computed yet
+                text2.computeLayouts()
+            }
+
+            if (ownedContextMenu != null) {
+                batch.setColor(MathHelper.getSineWave(0.5f), 1f, 1f, 1f)
+            } else {
+                batch.setColor(1f, 1f, 1f, 1f)
+            }
+
+            val textPadding = border + 2f
+            val scale = 0.9f * textScale
+            text2.drawCompressed(batch, renderX + textPadding,
+                    editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight + textPadding + 1f,
+                    editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX - textPadding * 2f,
+                    secondLineTextAlign, scale, scale, true)
+        }
 
         if (editor.selectedBlocks[this] == true) {
             batch.setColor(0.1f, 1f, 1f, 0.333f)

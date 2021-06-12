@@ -16,13 +16,9 @@ class RowBlockData(defaultSetting: RowSetting = RowSetting.ONLY_A) {
 
     var rowSetting: Var<RowSetting> = Var(defaultSetting)
 
-    fun getSymbol(ctx: Var.Context): List<Any?> {
+    fun getSymbolAsListArg(ctx: Var.Context): List<Any?> {
         val setting = ctx.use(this.rowSetting)
-        val symbol: String = when (setting) {
-            RowSetting.ONLY_A -> RodinSpecialChars.BORDERED_A
-            RowSetting.ONLY_DPAD -> RodinSpecialChars.BORDERED_DPAD
-            RowSetting.BOTH -> "${RodinSpecialChars.BORDERED_A}${RodinSpecialChars.BORDERED_DPAD}"
-        }
+        val symbol: String = setting.stringRepresentation
         return listOf(symbol)
     }
 
