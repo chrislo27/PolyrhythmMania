@@ -57,17 +57,26 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
             }
         }
         
+        val isSelected = editor.selectedBlocks[this] == true
+        
         val lastPackedColor = batch.packedColor
         val renderX = editorTrackArea.beatToRenderX(offsetX, this.beat)
         batch.setColor(trackTint.r, trackTint.g, trackTint.b, 1f)
         batch.fillRect(renderX, editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight,
                 editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
                 trackHeight)
+        
         val border = 4f
         batch.setColor(trackTint.r * 0.7f, trackTint.g * 0.7f, trackTint.b * 0.7f, 1f)
         batch.drawRect(renderX, editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight,
                 editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
                 trackHeight, border)
+        if (isSelected) {
+            batch.setColor(0f, 1f, 1f, 0.9f)
+            batch.drawRect(renderX, editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight,
+                    editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
+                    trackHeight, border)
+        }
 
         val textScale = this.textScale
         val text = defaultTextBlock.getOrCompute()
@@ -111,8 +120,8 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
                     secondLineTextAlign, scale, scale, true)
         }
 
-        if (editor.selectedBlocks[this] == true) {
-            batch.setColor(0.1f, 1f, 1f, 0.333f)
+        if (isSelected) {
+            batch.setColor(0.1f, 1f, 1f, 0.3f)
             batch.fillRect(renderX, editorTrackArea.trackToRenderY(offsetY, trackIndex) - trackHeight,
                     editorTrackArea.beatToRenderX(offsetX, this.beat + width) - renderX,
                     trackHeight)
