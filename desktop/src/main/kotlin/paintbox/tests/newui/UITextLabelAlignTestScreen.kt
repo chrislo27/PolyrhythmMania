@@ -40,6 +40,7 @@ internal class UITextLabelAlignTestScreen(override val main: NewUITestGame) : Pa
                 this.doXCompression.set(xComp)
                 this.renderAlign.set(align)
                 this.textAlign.set(textAlign)
+                this.setScaleXY(0.9f)
 
                 Anchor.TopLeft.configure(this, offsetX = 32f + 320f * indexY, offsetY = 50f + 40f * indexX)
                 this.bounds.width.set(300f)
@@ -80,20 +81,20 @@ internal class UITextLabelAlignTestScreen(override val main: NewUITestGame) : Pa
         bg += createLabel(13, 1, "Do X Compression Enabled | Render: R | TA: C", Align.right, TextAlign.CENTRE, true)
         
         // Text Align: Right
-        bg += createLabel(0, 2, "NoCmpr | Render: L | TA: C", Align.left, TextAlign.RIGHT, false)
-        bg += createLabel(1, 2, "XCmpr | Render: L | TA: C", Align.left, TextAlign.RIGHT, true)
-        bg += createLabel(2, 2, "Multi\nLine | Render: L | TA: C", Align.left, TextAlign.RIGHT, true)
-        bg += createLabel(3, 2, "Do X Compression Enabled | Render: L | TA: C", Align.left, TextAlign.RIGHT, true)
+        bg += createLabel(0, 2, "NoCmpr | Render: L | TA: R", Align.left, TextAlign.RIGHT, false)
+        bg += createLabel(1, 2, "XCmpr | Render: L | TA: R", Align.left, TextAlign.RIGHT, true)
+        bg += createLabel(2, 2, "Multi\nLine | Render: L | TA: R", Align.left, TextAlign.RIGHT, true)
+        bg += createLabel(3, 2, "Do X Compression Enabled | Render: L | TA: R", Align.left, TextAlign.RIGHT, true)
         
-        bg += createLabel(5, 2, "NoCmpr | Render: C | TA: C", Align.center, TextAlign.RIGHT, false)
-        bg += createLabel(6, 2, "XCmpr | Render: C | TA: C", Align.center, TextAlign.RIGHT, true)
-        bg += createLabel(7, 2, "Multi\nLine | Render: C | TA: C", Align.center, TextAlign.RIGHT, true)
-        bg += createLabel(8, 2, "Do X Compression Enabled | Render: C | TA: C", Align.center, TextAlign.RIGHT, true)
+        bg += createLabel(5, 2, "NoCmpr | Render: C | TA: R", Align.center, TextAlign.RIGHT, false)
+        bg += createLabel(6, 2, "XCmpr | Render: C | TA: R", Align.center, TextAlign.RIGHT, true)
+        bg += createLabel(7, 2, "Multi\nLine | Render: C | TA: R", Align.center, TextAlign.RIGHT, true)
+        bg += createLabel(8, 2, "Do X Compression Enabled | Render: C | TA: R", Align.center, TextAlign.RIGHT, true)
         
-        bg += createLabel(10, 2, "NoCmpr | Render: R | TA: C", Align.right, TextAlign.RIGHT, false)
-        bg += createLabel(11, 2, "XCmpr | Render: R | TA: C", Align.right, TextAlign.RIGHT, true)
-        bg += createLabel(12, 2, "Multi\nLine | Render: R | TA: C", Align.right, TextAlign.RIGHT, true)
-        bg += createLabel(13, 2, "Do X Compression Enabled | Render: R | TA: C", Align.right, TextAlign.RIGHT, true)
+        bg += createLabel(10, 2, "NoCmpr | Render: R | TA: R", Align.right, TextAlign.RIGHT, false)
+        bg += createLabel(11, 2, "XCmpr | Render: R | TA: R", Align.right, TextAlign.RIGHT, true)
+        bg += createLabel(12, 2, "Multi\nLine | Render: R | TA: R", Align.right, TextAlign.RIGHT, true)
+        bg += createLabel(13, 2, "Do X Compression Enabled | Render: R | TA: R", Align.right, TextAlign.RIGHT, true)
     }
 
     override fun render(delta: Float) {
