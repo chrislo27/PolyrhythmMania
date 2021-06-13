@@ -16,18 +16,20 @@ import paintbox.util.gdxutils.drawRect
  * The [SceneRoot] element has the position 0, 0 and always has the width and height of the UI screen space.
  */
 class SceneRoot(val camera: OrthographicCamera) : UIElement() {
-    
+
     data class MousePosition(val x: FloatVar, val y: FloatVar)
-    
+
     private val tmpVec3: Vector3 = Vector3()
     private val mouseVector: Vector2 = Vector2()
     val mousePosition: MousePosition = MousePosition(FloatVar(0f), FloatVar(0f))
+
     val mainLayer: Layer = Layer("main", enableTooltips = true, exclusiveTooltipAccess = false, rootElement = this)
     val dialogLayer: Layer = Layer("dialog", enableTooltips = true, exclusiveTooltipAccess = true)
     val contextMenuLayer: Layer = Layer("contextMenu", enableTooltips = true, exclusiveTooltipAccess = false)
     val tooltipLayer: Layer = Layer("tooltip", enableTooltips = false, exclusiveTooltipAccess = false)
     val allLayers: List<Layer> = listOf(mainLayer, dialogLayer, contextMenuLayer, tooltipLayer)
     val allLayersReversed: List<Layer> = allLayers.asReversed()
+
     val inputSystem: InputSystem = InputSystem(this)
 
     /**
@@ -35,17 +37,20 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
      */
     val frameUpdateTrigger: ReadOnlyVar<Boolean> = Var(false)
     val animations: AnimationHandler = AnimationHandler(this)
-    
+
     val currentElementWithTooltip: ReadOnlyVar<HasTooltip?> = Var(null)
     private val currentTooltipVar: Var<UIElement?> = Var(null)
     private var currentTooltip: UIElement? = null
-    
+
     private var rootContextMenu: ContextMenu? = null
     private var rootDialogElement: UIElement? = null
-    
+
+    private val _currentFocused: Var<Focusable?> = Var(null)
+    val currentFocusedElement: ReadOnlyVar<Focusable?> = _currentFocused
+
     init {
         (sceneRoot as Var).set(this)
-        
+
         val width = camera.viewportWidth
         val height = camera.viewportHeight
         updateAllLayerBounds(width, height)
@@ -65,7 +70,7 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
             }
             currentTooltip = newValue
         }
-        
+
         contextMenuLayer.root.addInputEventListener { event ->
             var inputConsumed = false
             if (event is TouchDown) {
@@ -76,21 +81,21 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
             }
             inputConsumed
         }
-        
+
         dialogLayer.root.addInputEventListener { _ ->
             rootDialogElement != null // Dialog layer eats all input when active
         }
-        
+
         (allLayers - mainLayer).forEach { l -> (l.root.sceneRoot as Var).set(this) }
     }
-    
+
     fun renderAsRoot(batch: SpriteBatch) {
         (frameUpdateTrigger as Var).invert()
         updateMouseVector()
         updateTooltipPosition()
-        
+
         animations.frameUpdate()
-        
+
         for (layer in allLayers) {
             val layerRoot = layer.root
             val layerBounds = layerRoot.bounds
@@ -120,7 +125,7 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         // NO-OP
     }
-    
+
     private fun UIElement.drawDebugRect(originX: Float, originY: Float, batch: SpriteBatch, onlyVisible: Boolean) {
         val thisBounds = this.bounds
         val x = originX + thisBounds.x.getOrCompute()
@@ -129,7 +134,7 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         val h = thisBounds.height.getOrCompute()
         if (onlyVisible && !this.apparentVisibility.getOrCompute()) return
         batch.drawRect(x, y - h, w, h, 1f)
-        
+
         val childOffsetX = originX + this.contentZone.x.getOrCompute()
         val childOffsetY = originY - this.contentZone.y.getOrCompute()
         this.children.forEach { child ->
@@ -141,10 +146,6 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         super.renderSelfAfterChildren(originX, originY, batch)
     }
 
-//    fun renderChildren(batch: SpriteBatch) {
-//        renderChildren(bounds.x.getOrCompute(), bounds.y.getOrCompute() + bounds.height.getOrCompute(), batch)
-//    }
-    
     private fun updateAllLayerBounds(width: Float, height: Float, posX: Float = 0f, posY: Float = 0f) {
         // Intentionally updating this.bounds before other layers.
         bounds.also { b ->
@@ -163,19 +164,31 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
             bounds.height.set(height)
         }
     }
-    
+
     fun resize(width: Float, height: Float, posX: Float = 0f, posY: Float = 0f) {
         hideRootContextMenu()
         updateAllLayerBounds(width, height, posX, posY)
     }
-    
+
     fun resize() {
         val camera = this.camera
         resize(camera.viewportWidth, camera.viewportHeight,
                 camera.position.x - (camera.zoom * camera.viewportWidth / 2.0f),
                 camera.position.y - (camera.zoom * camera.viewportHeight / 2.0f))
     }
-    
+
+    fun <E> setFocusedElement(element: E?)
+            where E : UIElement, E : Focusable {
+        val current = _currentFocused.getOrCompute()
+        if (current === element) return
+        if (current != null) {
+            _currentFocused.set(null)
+            current.onFocusLost()
+        }
+        _currentFocused.set(element)
+        element?.onFocusGained()
+    }
+
     private fun updateTooltipPosition(tooltip: UIElement? = currentTooltip) {
         if (tooltip == null) return
 
@@ -198,7 +211,7 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         val currentElementWithTooltip = currentElementWithTooltip as Var
         cancelTooltip()
         currentElementWithTooltip.set(element)
-        currentTooltipVar.bind { 
+        currentTooltipVar.bind {
             tooltipVar.use()
         }
     }
@@ -271,11 +284,11 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
     /**
      * Adds the [contextMenu] to the scene. The [contextMenu] should be a "menu child" of another [ContextMenu],
      * but all context menus reside on the same level of the scene graph.
-     * 
+     *
      * This function is called from [ContextMenu.addChildMenu] so you should not call this on your own.
-     * 
+     *
      * To show a root context menu, call [showRootContextMenu].
-     * 
+     *
      * This does NOT connect the parent-child
      * relationship. One should call [ContextMenu.addChildMenu] for that.
      */
@@ -286,9 +299,9 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         val root = contextMenuLayer.root
         if (contextMenu !in root.children) {
             root.addChild(contextMenu)
-            
+
             contextMenu.computeSize(this)
-            
+
             // Temporary impl: assumes they are only root context menus and positions it at the mouse
             val w = contextMenu.bounds.width.getOrCompute()
             val h = contextMenu.bounds.height.getOrCompute()
@@ -301,14 +314,14 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
             if (x < 0f) x = 0f
             if (y + h > thisHeight) y = thisHeight - h
             if (y < 0f) y = 0f
-            
+
             contextMenu.bounds.x.set(x)
             contextMenu.bounds.y.set(y)
-            
+
             // TODO position the context menu according to its parent if NOT the root
-            
+
             contextMenu.onAddedToScene.invoke(this)
-            
+
             cancelTooltip()
         }
     }
@@ -317,11 +330,11 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
      * Removes the [contextMenu] from the scene. The [contextMenu] may be a "menu child" of another [ContextMenu],
      * but all context menus reside on the same level of the scene graph.
      * Any children of [contextMenu] will NOT be removed, that is the responsiblity of [ContextMenu.removeChildMenu].
-     * 
+     *
      * This function is called from [ContextMenu.removeChildMenu] so you should not call this on your own.
-     * 
+     *
      * To hide a root context menu, call [hideRootContextMenu].
-     * 
+     *
      * This does NOT disconnect the parent-child
      * relationship. One should call [ContextMenu.removeChildMenu] for that.
      */
@@ -333,12 +346,12 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
             cancelTooltip()
         }
     }
-    
+
     fun isContextMenuActive(): Boolean = rootContextMenu != null
     fun isDialogActive(): Boolean = rootDialogElement != null
     fun getCurrentRootContextMenu(): UIElement? = rootContextMenu
     fun getCurrentRootDialog(): UIElement? = rootDialogElement
-    
+
     private fun updateMouseVector() {
         val vector = mouseVector
         screenToUI(vector.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat()))
@@ -373,25 +386,25 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         vector.y = camera.viewportHeight - tmpVec3.y
         return vector
     }
-    
+
     inner class Layer(val name: String, val enableTooltips: Boolean, val exclusiveTooltipAccess: Boolean,
                       rootElement: UIElement = Pane()) {
         /**
          * Used by [InputSystem] for mouse-path tracking.
          */
         val lastHoveredElementPath: MutableList<UIElement> = mutableListOf()
-        
+
         val root: UIElement = rootElement
-        
+
         fun resetHoveredElementPath() {
             // FIXME may need improvemnets
             lastHoveredElementPath.clear()
             this@SceneRoot.cancelTooltip()
         }
-        
+
         fun shouldEatTooltipAccess(): Boolean {
             return exclusiveTooltipAccess && root.children.isNotEmpty()
         }
     }
-    
+
 }

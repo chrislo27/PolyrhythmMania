@@ -42,6 +42,14 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         }
         return null
     }
+    
+    private fun dispatchFocusedEvent(evt: FocusedInputEvent): Boolean {
+        val currentFocused = sceneRoot.currentFocusedElement.getOrCompute()
+        if (currentFocused != null && currentFocused is UIElement /* Should always be true but check is for smart-casting */) {
+            return currentFocused.fireEvent(evt)
+        }
+        return false
+    }
 
     private fun UIElement.fireEvent(event: InputEvent): Boolean {
         val listeners = this.inputListeners.getOrCompute()
@@ -187,18 +195,15 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        return false
-//        return dispatchEvent(KeyDown(keycode))
+        return dispatchFocusedEvent(KeyDown(keycode))
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        return false
-//        return dispatchEvent(KeyUp(keycode))
+        return dispatchFocusedEvent(KeyUp(keycode))
     }
 
     override fun keyTyped(character: Char): Boolean {
-        return false
-//        return dispatchEvent(KeyTyped(character))
+        return dispatchFocusedEvent(KeyTyped(character))
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

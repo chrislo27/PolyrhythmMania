@@ -111,9 +111,12 @@ open class UIElement : UIBounds() {
     fun addChild(child: UIElement): Boolean {
         if (child !in children) {
             child.parent.getOrCompute()?.removeChild(child)
+            
             children = children + child
             child.parent.set(this)
             this.onChildAdded(child)
+            child.onAddedToParent(this)
+            
             return true
         }
         return false
@@ -121,18 +124,44 @@ open class UIElement : UIBounds() {
 
     fun removeChild(child: UIElement): Boolean {
         if (child in children) {
+            if (child is Focusable) {
+                // Remove focus on this child.
+                val childSceneRoot = child.sceneRoot.getOrCompute()
+                childSceneRoot?.setFocusedElement(null)
+            }
+            
             children = children - child
             child.parent.set(null)
             this.onChildRemoved(child)
+            child.onRemovedFromParent(this)
+            
             return true
         }
         return false
     }
 
+    /**
+     * Called when a child is added to this [UIElement]. This will be called BEFORE the companion call to [onAddedToParent].
+     */
     protected open fun onChildAdded(newChild: UIElement) {
     }
 
+    /**
+     * Called when a child is removed from this [UIElement]. This will be called BEFORE the companion call to [onRemovedFromParent].
+     */
     protected open fun onChildRemoved(oldChild: UIElement) {
+    }
+
+    /**
+     * Called when this [UIElement] is added to a parent. This will be called AFTER the companion call to [onChildAdded].
+     */
+    protected open fun onAddedToParent(newParent: UIElement) {
+    }
+
+    /**
+     * Called when this [UIElement] is removed from a parent. This will be called AFTER the companion call to [onChildRemoved].
+     */
+    protected open fun onRemovedFromParent(oldParent: UIElement) {
     }
 
     fun addInputEventListener(listener: InputEventListener) {
