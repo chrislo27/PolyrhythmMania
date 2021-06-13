@@ -24,6 +24,7 @@ import paintbox.ui.contextmenu.SimpleMenuItem
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.util.MathHelper
+import paintbox.util.gdxutils.isControlDown
 import polyrhythmmania.util.DecimalFormats
 
 internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : PaintboxScreen() {
@@ -454,56 +455,34 @@ internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : Pain
             this.bounds.height.set(30f)
         }
         
-        bg += TextLabel("NoCmpr | Render: C | TA: L").apply { 
-            this.bgPadding.set(Insets(6f))
-            this.renderBackground.set(true)
-            this.doXCompression.set(false)
-            this.renderAlign.set(Align.center)
-            this.textAlign.set(TextAlign.LEFT)
-            
-            Anchor.CentreLeft.configure(this, offsetX = 32f, offsetY = -200f + 40f * 0)
-            this.bounds.width.set(300f)
-            this.bounds.height.set(40f)
+        bg += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+            Anchor.TopLeft.configure(this, offsetX = 50f, offsetY = 150f)
+            this.bounds.width.set(200f)
+            this.bounds.height.set(30f)
+            this += TextField().apply { 
+                this.textColor.set(Color(1f, 1f, 1f, 1f))
+                this.padding.set(Insets(2f))
+                this.text.set("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+            }
         }
-        bg += TextLabel("Do X Compresssion Enabled | Render: C | TA: L").apply { 
-            this.bgPadding.set(Insets(6f))
-            this.renderBackground.set(true)
-            this.doXCompression.set(true)
-            this.renderAlign.set(Align.center)
-            this.textAlign.set(TextAlign.LEFT)
-            
-            Anchor.CentreLeft.configure(this, offsetX = 32f, offsetY = -200f + 40f * 1)
-            this.bounds.width.set(300f)
-            this.bounds.height.set(40f)
+        
+        bg += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+            Anchor.TopLeft.configure(this, offsetX = 50f, offsetY = 190f)
+            this.bounds.width.set(200f)
+            this.bounds.height.set(30f)
+            this += TextField().apply { 
+                this.textColor.set(Color(1f, 1f, 1f, 1f))
+                this.padding.set(Insets(2f))
+                this.text.set("Second text field Second text field Second text field")
+            }
         }
-        bg += TextLabel("NoCmpr | Render: C | TA: C").apply { 
-            this.bgPadding.set(Insets(6f))
-            this.renderBackground.set(true)
-            this.doXCompression.set(false)
-            this.renderAlign.set(Align.center)
-            this.textAlign.set(TextAlign.CENTRE)
-            
-            Anchor.CentreLeft.configure(this, offsetX = 32f, offsetY = -200f + 40f * 2)
-            this.bounds.width.set(300f)
-            this.bounds.height.set(40f)
-        }
-        bg += TextLabel("Do X Compresssion Enabled | Render: C | TA: C").apply { 
-            this.bgPadding.set(Insets(6f))
-            this.renderBackground.set(true)
-            this.doXCompression.set(true)
-            this.renderAlign.set(Align.center)
-            this.textAlign.set(TextAlign.CENTRE)
-            
-            Anchor.CentreLeft.configure(this, offsetX = 32f, offsetY = -200f + 40f * 3)
-            this.bounds.width.set(300f)
-            this.bounds.height.set(40f)
-        }
+        
     }
 
     override fun render(delta: Float) {
         super.render(delta)
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R) && Gdx.input.isControlDown()) {
             populate()
         }
 

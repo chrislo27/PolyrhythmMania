@@ -76,6 +76,13 @@ open class UIElement : UIBounds() {
     init {
         bindWidthToParent(adjust = 0f, multiplier = 1f)
         bindHeightToParent(adjust = 0f, multiplier = 1f)
+
+        @Suppress("LeakingThis")
+        if (this is Focusable) {
+            apparentVisibility.addListener {
+                if (!it.getOrCompute()) requestUnfocus()
+            }
+        }
     }
 
     @Suppress("RedundantModalityModifier")

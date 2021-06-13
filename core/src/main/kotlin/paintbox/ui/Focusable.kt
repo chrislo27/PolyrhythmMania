@@ -19,4 +19,16 @@ interface Focusable {
             root?.setFocusedElement(this)
         }
     }
+    
+    fun requestUnfocus() {
+        if (this is UIElement) {
+            val root = this.sceneRoot.getOrCompute()
+            if (root != null) {
+                val currentFocus = root.currentFocusedElement.getOrCompute()
+                if (currentFocus === this) {
+                    root.setFocusedElement(null)
+                }
+            }
+        }
+    }
 }

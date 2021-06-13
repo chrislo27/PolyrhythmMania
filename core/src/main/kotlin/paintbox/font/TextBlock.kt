@@ -111,7 +111,7 @@ data class TextBlock(val runs: List<TextRun>) {
 
             val color = Color(1f, 1f, 1f, 1f)
             Color.argb8888ToColor(color, textRun.color)
-            val textRunInfo = TextRunInfo(textRun, paintboxFont.getCurrentFontNumber(),
+            val textRunInfo = TextRunInfo(textRun, paintboxFont.currentFontNumber,
                     if (doLineWrapping) {
                         val continuationLineWidth = (lineWrapWidth - currentLineWidth).coerceAtLeast(0f)
                         // Find the trailing line's wrap point since it may not start at x=0
@@ -262,7 +262,7 @@ data class TextBlock(val runs: List<TextRun>) {
 
     fun isRunInfoInvalid(): Boolean {
         return (runInfo.isEmpty() && runs.isNotEmpty()) || runInfo.any { l ->
-            l.run.font.getCurrentFontNumber() != l.currentFontNumber
+            l.run.font.currentFontNumber != l.currentFontNumber
         }
     }
 

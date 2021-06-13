@@ -3,6 +3,8 @@ package paintbox.font
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Disposable
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.copy
 import java.lang.Float.min
@@ -26,6 +28,8 @@ class PaintboxFontFreeType(params: PaintboxFontParams,
     private var isLoaded: Boolean = false
     
     private var currentFontNum: Long = Long.MIN_VALUE + 1
+    override val currentFontNumber: Long get() = currentFontNum
+    override val currentFontNumberVar: ReadOnlyVar<Long> = Var(currentFontNum)
     private var lastWindowSize: WindowSize = WindowSize(1280, 720)
     private var upscaledFactor: Float = -1f // 
     private var generator: FreeTypeFontGenerator? = null
@@ -37,6 +41,7 @@ class PaintboxFontFreeType(params: PaintboxFontParams,
         set(value) {
             if (value !== field) {
                 currentFontNum++
+                (currentFontNumberVar as Var).set(currentFontNum)
                 
 //                val current = field
 //                if (current != null) {
@@ -122,8 +127,6 @@ class PaintboxFontFreeType(params: PaintboxFontParams,
         afterLoad = func
         return this
     }
-
-    override fun getCurrentFontNumber(): Long = currentFontNum
 
     @Synchronized
     override fun dispose() {

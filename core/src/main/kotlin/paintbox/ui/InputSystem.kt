@@ -25,12 +25,25 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
 
 
     private fun dispatchEventBasedOnMouse(layer: SceneRoot.Layer, evt: InputEvent): UIElement? {
+        val currentFocused = sceneRoot.currentFocusedElement.getOrCompute()
         val lastPath = layer.lastHoveredElementPath
+        var acceptedElement: UIElement? = null
+        var anyFired = false
         for (i in lastPath.size - 1 downTo 0) {
             val element = lastPath[i]
-            if (element.fireEvent(evt)) return element
+            anyFired = true
+            if (element.fireEvent(evt)) {
+                acceptedElement = element
+                break
+            }
         }
-        return null
+        if (anyFired) {
+            if (evt is ClickPressed && currentFocused != null && sceneRoot.currentFocusedElement.getOrCompute() !== acceptedElement) {
+                sceneRoot.setFocusedElement(null) // Unfocus if there's a ClickPressed event not on the currently focused element
+            }
+        }
+        
+        return acceptedElement
     }
 
     private fun dispatchEventBasedOnMouse(evt: InputEvent): Pair<SceneRoot.Layer, UIElement>? {
@@ -45,7 +58,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
     
     private fun dispatchFocusedEvent(evt: FocusedInputEvent): Boolean {
         val currentFocused = sceneRoot.currentFocusedElement.getOrCompute()
-        if (currentFocused != null && currentFocused is UIElement /* Should always be true but check is for smart-casting */) {
+        if (currentFocused != null && currentFocused is UIElement /* instanceof should always be true but check is for smart-casting */) {
             return currentFocused.fireEvent(evt)
         }
         return false

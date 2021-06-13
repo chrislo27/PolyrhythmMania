@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.utils.Disposable
 import paintbox.PaintboxGame
+import paintbox.binding.ReadOnlyVar
 import paintbox.util.WindowSize
 
 
@@ -71,6 +72,14 @@ abstract class PaintboxFont(val params: PaintboxFontParams)
     protected val fontDataInfo: FontDataInfo = FontDataInfo()
 
     /**
+     * Returns the current font number. The font number is changed every time the backing [BitmapFont] changes.
+     *
+     * Used by [TextBlock] to determine when text layouts expire.
+     */
+    abstract val currentFontNumber: Long
+    abstract val currentFontNumberVar: ReadOnlyVar<Long>
+
+    /**
      * Called by [PaintboxGame] whenever the window gets resized.
      */
     abstract fun resize(width: Int, height: Int)
@@ -109,13 +118,6 @@ abstract class PaintboxFont(val params: PaintboxFontParams)
      * Implementors must ensure that this function cannot be called if [begin] was not previously called.
      */
     abstract fun end()
-
-    /**
-     * Returns the current font number. The font number is changed every time the backing [BitmapFont] changes.
-     * 
-     * Used by [TextBlock] to determine when text layouts expire.
-     */
-    abstract fun getCurrentFontNumber(): Long
 
     inline fun useFont(cameraWidth: Float, cameraHeight: Float, scope: (font: BitmapFont) -> Unit) {
         val font = begin(cameraWidth, cameraHeight)

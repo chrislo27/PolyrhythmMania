@@ -1,6 +1,8 @@
 package paintbox.font
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
 
 /**
  * A wrapper around a plain [BitmapFont].
@@ -12,7 +14,9 @@ class PaintboxFontBitmap(params: PaintboxFontParams,
     : PaintboxFont(params) {
     
     private var isInBegin: Boolean = false
-    
+    override val currentFontNumber: Long = 0L // Backing font never changes
+    override val currentFontNumberVar: ReadOnlyVar<Long> = Var(currentFontNumber)
+
     init {
         this.font.data.setScale(1f)
         this.fontDataInfo.copyFromFont(font)
@@ -44,8 +48,6 @@ class PaintboxFontBitmap(params: PaintboxFontParams,
         // Sets font back to scaleXY = 1.0
         this.fontDataInfo.applyToFont(this.font)
     }
-
-    override fun getCurrentFontNumber(): Long = 0L // Backing font never changes
 
     override fun dispose() {
         if (ownsFont) {
