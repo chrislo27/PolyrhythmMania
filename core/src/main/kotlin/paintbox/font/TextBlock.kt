@@ -53,9 +53,11 @@ data class TextBlock(val runs: List<TextRun>) {
         var posY: Float = 0f
     }
 
-    data class LineInfo(val index: Int, val width: Float, val posY: Float,
+    data class LineInfo(
+            val index: Int, val width: Float, val posY: Float,
             /*// Pair in order of (TextRun index, GlyphRunInfo index) 
-                        val glyphIndexStart: Pair<Int, Int>, val glyphIndexEndEx: Pair<Int, Int>*/)
+                        val glyphIndexStart: Pair<Int, Int>, val glyphIndexEndEx: Pair<Int, Int>*/
+    )
 
     var lineWrapping: Float? = null
 
@@ -72,7 +74,7 @@ data class TextBlock(val runs: List<TextRun>) {
         private set
     var lastDescent: Float = 0f
         private set
-    
+
     constructor(runs: List<TextRun>, wrapWidth: Float) : this(runs) {
         this.lineWrapping = wrapWidth
     }
@@ -110,9 +112,27 @@ data class TextBlock(val runs: List<TextRun>) {
             val color = Color(1f, 1f, 1f, 1f)
             Color.argb8888ToColor(color, textRun.color)
             val textRunInfo = TextRunInfo(textRun, paintboxFont.getCurrentFontNumber(),
-                    if (doLineWrapping)
-                        GlyphLayout(font, textRun.text, color, (lineWrapWidth - currentLineWidth).coerceAtLeast(0f), Align.left, true)
-                    else GlyphLayout(font, textRun.text, color, 0f, Align.left, false))
+                    if (doLineWrapping) {
+                        val continuationLineWidth = (lineWrapWidth - currentLineWidth).coerceAtLeast(0f)
+                        // Find the trailing line's wrap point since it may not start at x=0
+                        var text = textRun.text
+                        val gl = GlyphLayout()
+                        if (continuationLineWidth < lineWrapWidth) {
+                            val tmpGL = gl
+                            tmpGL.setText(font, textRun.text, color, continuationLineWidth, Align.left, true)
+                            if (tmpGL.runs.size >= 2) {
+                                val first = tmpGL.runs[0]
+                                val wrapIndex = first.glyphs.size
+                                if (wrapIndex in 0 until text.length) {
+                                    text = text.substring(0, wrapIndex) + "\n" + text.substring(wrapIndex).trimStart()
+                                }
+                            }
+                        }
+                        gl.setText(font, text, color, (lineWrapWidth).coerceAtLeast(0f), Align.left, true)
+                        gl
+                    } else {
+                        GlyphLayout(font, textRun.text, color, 0f, Align.left, false)
+                    })
 
             val offX = textRun.offsetXEm * font.spaceXadvance
             val offY = textRun.offsetYEm * font.xHeight
@@ -152,8 +172,10 @@ data class TextBlock(val runs: List<TextRun>) {
                     posX = 0f
 
 //                    val firstInfoIndex = lineInfo.lastOrNull()?.glyphIndexEndEx ?: Pair(0, 0)
-                    lineInfo += LineInfo(currentLineIndex, currentLineWidth, currentLineStartY,
-                            /*firstInfoIndex, Pair(textRunIndex, glyphRunInfoIndex)*/)
+                    lineInfo += LineInfo(
+                            currentLineIndex, currentLineWidth, currentLineStartY,
+                            /*firstInfoIndex, Pair(textRunIndex, glyphRunInfoIndex)*/
+                    )
                     currentLineIndex++
                     currentLineWidth = 0f
                     updateCurrentLineStartY = true
@@ -198,8 +220,10 @@ data class TextBlock(val runs: List<TextRun>) {
                     posX = 0f
                     // This is a new line
 //                    val firstInfoIndex = lineInfo.lastOrNull()?.glyphIndexEndEx ?: Pair(0, 0)
-                    lineInfo += LineInfo(currentLineIndex, currentLineWidth, currentLineStartY,
-                            /*firstInfoIndex, Pair(textRunIndex, textRunInfo.glyphRunInfo.size)*/)
+                    lineInfo += LineInfo(
+                            currentLineIndex, currentLineWidth, currentLineStartY,
+                            /*firstInfoIndex, Pair(textRunIndex, textRunInfo.glyphRunInfo.size)*/
+                    )
                     currentLineIndex++
                     currentLineWidth = 0f
                     updateCurrentLineStartY = true
@@ -225,8 +249,10 @@ data class TextBlock(val runs: List<TextRun>) {
         }
 
 //        val firstInfoIndex = lineInfo.lastOrNull()?.glyphIndexEndEx ?: Pair(0, 0)
-        lineInfo += LineInfo(currentLineIndex, currentLineWidth, currentLineStartY,
-                /*firstInfoIndex, runInfo.size to runInfo.last().glyphRunInfo.size*/)
+        lineInfo += LineInfo(
+                currentLineIndex, currentLineWidth, currentLineStartY,
+                /*firstInfoIndex, runInfo.size to runInfo.last().glyphRunInfo.size*/
+        )
 
         this.runInfo = runInfo
         this.lineInfo = lineInfo
