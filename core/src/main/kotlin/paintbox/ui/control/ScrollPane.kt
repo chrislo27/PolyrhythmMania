@@ -19,10 +19,10 @@ import paintbox.util.gdxutils.isShiftDown
  */
 open class ScrollPane : Control<ScrollPane>() {
     companion object {
-        const val SKIN_ID: String = "ScrollPane"
+        const val SCROLLPANE_SKIN_ID: String = "ScrollPane"
 
         init {
-            DefaultSkins.register(ScrollPane.SKIN_ID, SkinFactory { element: ScrollPane ->
+            DefaultSkins.register(ScrollPane.SCROLLPANE_SKIN_ID, SkinFactory { element: ScrollPane ->
                 ScrollPaneSkin(element)
             })
         }
@@ -161,7 +161,7 @@ open class ScrollPane : Control<ScrollPane>() {
 
     fun getContent(): UIElement? = currentContent.getOrCompute()
 
-    override fun getDefaultSkinID(): String = ScrollPane.SKIN_ID
+    override fun getDefaultSkinID(): String = ScrollPane.SCROLLPANE_SKIN_ID
     
     class ContentPane : Pane()
 }

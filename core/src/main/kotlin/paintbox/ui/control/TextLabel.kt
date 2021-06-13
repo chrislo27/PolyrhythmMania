@@ -24,10 +24,10 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     : Control<TextLabel>() {
 
     companion object {
-        const val SKIN_ID: String = "TextLabel"
+        const val TEXTLABEL_SKIN_ID: String = "TextLabel"
 
         init {
-            DefaultSkins.register(SKIN_ID, SkinFactory { element: TextLabel ->
+            DefaultSkins.register(TEXTLABEL_SKIN_ID, SkinFactory { element: TextLabel ->
                 TextLabelSkin(element)
             })
         }
@@ -102,7 +102,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     }
 
     @Suppress("RemoveRedundantQualifierName")
-    override fun getDefaultSkinID(): String = TextLabel.SKIN_ID
+    override fun getDefaultSkinID(): String = TextLabel.TEXTLABEL_SKIN_ID
 
 }
 

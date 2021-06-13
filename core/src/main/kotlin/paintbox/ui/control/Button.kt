@@ -27,11 +27,11 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     : Control<Button>() {
 
     companion object {
-        const val SKIN_ID: String = "Button"
+        const val BUTTON_SKIN_ID: String = "Button"
         private val DEFAULT_PADDING: Insets = Insets(2f)
 
         init {
-            DefaultSkins.register(SKIN_ID, SkinFactory { element: Button ->
+            DefaultSkins.register(BUTTON_SKIN_ID, SkinFactory { element: Button ->
                 ButtonSkin(element)
             })
         }
@@ -73,7 +73,7 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     }
 
     @Suppress("RemoveRedundantQualifierName")
-    override fun getDefaultSkinID(): String = Button.SKIN_ID
+    override fun getDefaultSkinID(): String = Button.BUTTON_SKIN_ID
 
     fun setScaleXY(scaleXY: Float) {
         this.scaleX.set(scaleXY)

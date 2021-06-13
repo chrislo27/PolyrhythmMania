@@ -19,10 +19,10 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
     : Control<RadioButton>(), Toggle {
 
     companion object {
-        const val SKIN_ID: String = "RadioButton"
+        const val RADIO_BUTTON_SKIN_ID: String = "RadioButton"
 
         init {
-            DefaultSkins.register(SKIN_ID, SkinFactory { element: RadioButton ->
+            DefaultSkins.register(RADIO_BUTTON_SKIN_ID, SkinFactory { element: RadioButton ->
                 RadioButtonSkin(element)
             })
         }
@@ -80,7 +80,7 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
     }
 
     override fun getDefaultSkinID(): String {
-        return RadioButton.SKIN_ID
+        return RadioButton.RADIO_BUTTON_SKIN_ID
     }
 }
 

@@ -20,10 +20,10 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
     : Control<CheckBox>(), Toggle {
     
     companion object {
-        const val SKIN_ID: String = "CheckBox"
+        const val CHECKBOX_SKIN_ID: String = "CheckBox"
         
         init {
-            DefaultSkins.register(SKIN_ID, SkinFactory { element: CheckBox ->
+            DefaultSkins.register(CHECKBOX_SKIN_ID, SkinFactory { element: CheckBox ->
                 CheckBoxSkin(element)
             })
         }
@@ -90,7 +90,7 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
     }
 
     override fun getDefaultSkinID(): String {
-        return CheckBox.SKIN_ID
+        return CheckBox.CHECKBOX_SKIN_ID
     }
 }
 
