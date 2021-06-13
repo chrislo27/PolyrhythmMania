@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.help
 
+import com.badlogic.gdx.utils.Disposable
 import paintbox.ui.UIElement
 import paintbox.ui.layout.VBox
 
@@ -13,7 +14,7 @@ import paintbox.ui.layout.VBox
  */
 open class HelpDocument(val title: String, val layers: List<Layer>)
 
-abstract class DocumentRenderer {
+abstract class DocumentRenderer : Disposable {
     
     open fun renderDocument(helpData: HelpData, doc: HelpDocument): UIElement {
         return VBox().also { vbox ->

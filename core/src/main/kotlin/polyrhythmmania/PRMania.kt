@@ -28,6 +28,6 @@ object PRMania {
             WindowSize(3840, 2160),
     ).sortedBy { it.width }
     
-    val enableEarlyAccessMessage: Boolean = true
+    val enableEarlyAccessMessage: Boolean = !true
     
 }

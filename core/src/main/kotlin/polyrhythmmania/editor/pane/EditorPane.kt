@@ -2,6 +2,8 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.utils.Disposable
+import paintbox.Paintbox
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -12,6 +14,7 @@ import paintbox.ui.UIElement
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.element.RectElement
+import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.Palette
@@ -21,7 +24,7 @@ import polyrhythmmania.editor.pane.track.AllTracksPane
 import polyrhythmmania.ui.DialogPane
 
 
-class EditorPane(val editor: Editor) : Pane() {
+class EditorPane(val editor: Editor) : Pane(), Disposable {
 
     val main: PRManiaGame = editor.main
     val palette: Palette = Palette(main)
@@ -40,7 +43,8 @@ class EditorPane(val editor: Editor) : Pane() {
     val musicDialog: MusicDialog
     val exitConfirmDialog: ExitConfirmDialog
     val settingsDialog: SettingsDialog
-    val helpDialog: HelpDialog
+    var helpDialog: HelpDialog
+        private set // TODO make this a val again, var is for fast-resetting for debugging
     val saveDialog: SaveDialog
     val loadDialog: LoadDialog
     val newDialog: NewDialog
@@ -104,6 +108,14 @@ class EditorPane(val editor: Editor) : Pane() {
         newDialog = NewDialog(this)
     }
     
+    fun resetHelpDialog() {
+        closeDialog()
+        val old = helpDialog
+        helpDialog = HelpDialog(this)
+        old.disposeQuietly()
+        Paintbox.LOGGER.debug("Reset help dialog")
+    }
+    
     fun getMeasurePart(beat: Int): Int {
         return measurePartCache.getOrPut(beat) { editor.engine.timeSignatures.getMeasurePart(beat.toFloat()) }
     }
@@ -164,5 +176,9 @@ class EditorPane(val editor: Editor) : Pane() {
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
         super.renderSelfAfterChildren(originX, originY, batch)
         measurePartCache.clear()
+    }
+
+    override fun dispose() {
+        helpDialog.dispose()
     }
 }

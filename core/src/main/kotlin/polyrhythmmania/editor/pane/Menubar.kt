@@ -3,6 +3,7 @@ package polyrhythmmania.editor.pane
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import paintbox.Paintbox
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -136,6 +137,11 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.help")))
             this.setOnAction {
                 editor.attemptOpenHelpDialog()
+            }
+            this.setOnRightClick { // DEBUG
+                if (Paintbox.debugMode) {
+                    editorPane.resetHelpDialog()
+                }
             }
         }
         settingsButton = Button("").apply {

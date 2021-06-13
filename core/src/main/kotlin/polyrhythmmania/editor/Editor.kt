@@ -474,6 +474,7 @@ class Editor(val main: PRManiaGame)
     override fun dispose() {
         previewFrameBuffer.disposeQuietly()
         waveformWindow.disposeQuietly()
+        editorPane.dispose()
 
         soundSystem.setPaused(true)
         container.disposeQuietly()
