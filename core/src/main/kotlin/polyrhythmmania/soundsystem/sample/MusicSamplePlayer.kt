@@ -11,7 +11,8 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
 
     /** The position in milliseconds.  */
     override var position: Double = 0.0
-    override var pitch: UGen = Static(context, 1f)
+//    override var pitchUGen: UGen = Static(context, 1f)
+    override var pitch: Float = 1f
     override val durationMs: Double
         get() = musicSample.lengthMs
 
@@ -57,9 +58,9 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
         }
 
         val interpType: SamplePlayer.InterpolationType = interpolationType
-        pitch.update()
+//        pitch.update()
         for (i in 0 until bufferSize) {
-            val pitchValue = pitch.getValue(0, i)
+            val pitchValue = pitch // pitch.getValue(0, i)
 
             position += musicSample.samplesToMs(1.0) * pitchValue * (this.musicSample.sampleRate / context.sampleRate)
             var positionAddition = 0.0

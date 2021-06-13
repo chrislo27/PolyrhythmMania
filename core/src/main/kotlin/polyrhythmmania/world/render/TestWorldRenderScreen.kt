@@ -174,7 +174,7 @@ ${renderer.getDebugString()}
             1 -> {
                 val speed = 1f
                 engine.tempos.addTempoChange(TempoChange(0f, 148.5f * speed))
-                player.pitch.value = 148.5f / 129f * speed
+                player.pitch = 148.5f / 129f * speed
                 addPr2Patterns()
             }
             2 -> addInputTestPatterns()

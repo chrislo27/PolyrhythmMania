@@ -61,6 +61,7 @@ open class Palette(val main: PRManiaGame) {
     val musicDialogFont: PaintboxFont = main.mainFont
     val musicDialogFontBold: PaintboxFont = main.mainFontBold
     val loadDialogFont: PaintboxFont = main.mainFont
+    val musicScoreFont: PaintboxFont = main.fontEditorMusicScore
 
     // Markup
     val markup: Markup = Markup(mapOf(

@@ -159,6 +159,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     newEditor.startingTempo.set(newContainer.engine.tempos.tempoAtSeconds(0f))
                     newEditor.tempoChanges.set(newContainer.engine.tempos.getAllTempoChanges().filter { it.beat > 0f })
                     newEditor.musicVolumes.set(newContainer.engine.musicData.volumeMap.getAllMusicVolumes())
+//                    newEditor.timeSignatures.set(newContainer.engine.timeSignatures.map.values.toList())
                     
                     val musicRes: ExternalResource? = newContainer.compressedMusic
                     if (musicRes != null) {

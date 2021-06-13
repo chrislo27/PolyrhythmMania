@@ -2,6 +2,7 @@ package polyrhythmmania.engine
 
 import paintbox.binding.Var
 import polyrhythmmania.engine.input.EngineInputter
+import polyrhythmmania.engine.timesignature.TimeSignatureMap
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.util.DecimalFormats
@@ -23,6 +24,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     private val _events: MutableList<Event> = CopyOnWriteArrayList()
     val events: List<Event> = _events
     val musicData: MusicData = MusicData(this)
+    val timeSignatures: TimeSignatureMap = TimeSignatureMap()
     
     var deleteEventsAfterCompletion: Boolean = true
     var autoInputs: Boolean = false

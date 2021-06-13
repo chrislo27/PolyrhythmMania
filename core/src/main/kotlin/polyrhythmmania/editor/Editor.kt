@@ -33,7 +33,6 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Block
-import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.music.EditorMusicData
 import polyrhythmmania.editor.pane.dialog.MusicDialog
@@ -45,7 +44,9 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
+import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
+import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
@@ -129,6 +130,7 @@ class Editor(val main: PRManiaGame)
     val musicVolumes: Var<List<MusicVolume>> = Var(listOf())
     val musicData: EditorMusicData by lazy { EditorMusicData(this) }
     val metronomeEnabled: Var<Boolean> = Var(false)
+    val timeSignatures: Var<List<TimeSignature>> = Var(listOf())
     private var lastMetronomeBeat: Int = -1
 
     val engineBeat: FloatVar = FloatVar(engine.beat)
@@ -205,7 +207,11 @@ class Editor(val main: PRManiaGame)
             if (floorBeat > lastMetronomeBeat) {
                 lastMetronomeBeat = floorBeat
                 if (metronomeEnabled.getOrCompute()) {
-                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_cowbell"))
+                    val measurePart = engine.timeSignatures.getMeasurePart(floorBeat.toFloat())
+                    val pitch = if (measurePart <= -1) 1f else if (measurePart == 0) Semitones.getALPitch(8) else Semitones.getALPitch(3)
+                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { player ->
+                        player.pitch = pitch
+                    }
                 }
             }
 
@@ -239,6 +245,7 @@ class Editor(val main: PRManiaGame)
     fun compileEditorIntermediates() {
         resetWorld()
         compileEditorTempos()
+        compileEditorTimeSignatures()
         compileEditorMusicInfo()
         compileEditorBlocks()
     }
@@ -259,6 +266,14 @@ class Editor(val main: PRManiaGame)
         tempos.removeTempoChangesBulk(tempos.getAllTempoChanges())
         tempos.addTempoChange(TempoChange(0f, this.startingTempo.getOrCompute()))
         tempos.addTempoChangesBulk(this.tempoChanges.getOrCompute().toList())
+    }
+
+    fun compileEditorTimeSignatures() {
+        val ts = engine.timeSignatures
+        ts.clear()
+        this.timeSignatures.getOrCompute().forEach { t ->
+            ts.add(t)
+        }
     }
 
     fun compileEditorMusicInfo() {
@@ -549,6 +564,7 @@ class Editor(val main: PRManiaGame)
                         }
                         Tool.TEMPO_CHANGE -> Localization.getVar("editor.status.tempoChangeTool").use()
                         Tool.MUSIC_VOLUME -> Localization.getVar("editor.status.musicVolumeTool").use()
+                        Tool.TIME_SIGNATURE -> Localization.getVar("editor.status.timeSignatureTool").use()
                     }
                 }
             }

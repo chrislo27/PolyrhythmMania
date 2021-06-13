@@ -19,10 +19,16 @@ open class SamplePlayerWrapper(private val samplePlayer: SamplePlayer)
         set(value) {
             samplePlayer.position = value
         }
-    override var pitch: UGen
-        get() = samplePlayer.pitchUGen
+//    override var pitchUGen: UGen
+//        get() = samplePlayer.pitchUGen
+//        set(value) {
+//            samplePlayer.setPitch(value)
+//        }
+    private val pitchUGen: Static = Static(context, 1f)
+    override var pitch: Float
+        get() = pitchUGen.value
         set(value) {
-            samplePlayer.setPitch(value)
+            pitchUGen.value = value
         }
     override var loopStartMs: Float = 0f
         set(value) {
@@ -55,6 +61,8 @@ open class SamplePlayerWrapper(private val samplePlayer: SamplePlayer)
         gainObj.addInput(samplePlayer)
         samplePlayer.setLoopStart(loopStartUGen)
         samplePlayer.setLoopEnd(loopEndUGen)
+        
+        samplePlayer.setPitch(pitchUGen)
 
         this.outputInitializationRegime = OutputInitializationRegime.RETAIN
         this.bufOut = this.bufIn

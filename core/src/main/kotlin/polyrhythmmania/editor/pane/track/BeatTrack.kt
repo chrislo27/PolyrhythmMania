@@ -4,28 +4,30 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
+import paintbox.ui.*
 import paintbox.util.ColorStack
-import paintbox.ui.Pane
-import paintbox.ui.TouchDown
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.VBox
+import paintbox.util.Vector2Stack
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
+import polyrhythmmania.editor.undo.impl.*
+import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.util.DecimalFormats
+import polyrhythmmania.util.LelandSpecialChars
 import polyrhythmmania.util.TimeUtils
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 
 class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, true) {
@@ -34,6 +36,8 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
     val secLabel: TextLabel
     val bpmLabel: TextLabel
     val beatMarkerPane: BeatMarkerPane
+    
+    private var currentTimeSigBeat: Int = -1
 
     init {
         this.sidePanel.sidebarBgColor.bind { editorPane.palette.trackPaneTimeBg.use() }
@@ -41,13 +45,13 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
         this.bounds.height.set(54f)
         this.showContentBorder.set(true)
 
-        val vbox = VBox().apply { 
+        val vbox = VBox().apply {
             Anchor.Centre.configure(this)
             this.spacing.set(0f)
             this.align.set(VBox.Align.CENTRE)
         }
         this.sidePanel.sidebarSection += vbox
-        
+
         val timeTextVar = Localization.getVar("editor.currentTime", Var.bind {
             listOf(DecimalFormats.format("0.000", editor.engineBeat.use()))
         })
@@ -109,8 +113,8 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.track.beat.tooltip.currentBPM")))
         }
         secondsBox += bpmLabel
-        
-        vbox.temporarilyDisableLayouts { 
+
+        vbox.temporarilyDisableLayouts {
             vbox += beatTimeLabel
             vbox += secondsBox
         }
@@ -122,29 +126,80 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
     init {
         beatMarkerPane.addInputEventListener { event ->
             var consumed = false
-            when (event) {
-                is TouchDown -> {
-                    val currentTool: Tool = editor.tool.getOrCompute()
-                    val control = Gdx.input.isControlDown()
-                    val shift = Gdx.input.isShiftDown()
-                    val alt = Gdx.input.isAltDown()
-
-                    if (editor.playState.getOrCompute() == PlayState.STOPPED && editor.click.getOrCompute() == Click.None) {
-                        if (currentTool == Tool.SELECTION) {
-                            if (event.button == Input.Buttons.RIGHT) {
-                                val lastMouseRelative = Vector2(0f, 0f)
-                                val thisPos = beatMarkerPane.getPosRelativeToRoot(lastMouseRelative)
-                                lastMouseRelative.x = event.x - thisPos.x
-                                lastMouseRelative.y = event.y - thisPos.y
-
-                                if (!shift && !alt) {
-                                    if (control) {
-                                        editor.attemptMusicDelayMove(editor.trackView.translateXToBeat(lastMouseRelative.x))
-                                    } else {
-                                        editor.attemptPlaybackStartMove(editor.trackView.translateXToBeat(lastMouseRelative.x))
+            val currentTool: Tool = editor.tool.getOrCompute()
+            val control = Gdx.input.isControlDown()
+            val shift = Gdx.input.isShiftDown()
+            val alt = Gdx.input.isAltDown()
+            if (event is MouseInputEvent) {
+                val lastMouseRelative = Vector2Stack.getAndPush()
+                val thisPos = beatMarkerPane.getPosRelativeToRoot(lastMouseRelative)
+                lastMouseRelative.x = event.x - thisPos.x
+                lastMouseRelative.y = event.y - thisPos.y
+                if (editor.playState.getOrCompute() == PlayState.STOPPED && editor.click.getOrCompute() == Click.None) {
+                    when (event) {
+                        is TouchDown -> {
+                            if (currentTool == Tool.SELECTION) {
+                                if (event.button == Input.Buttons.RIGHT) {
+                                    if (!shift && !alt) {
+                                        if (control) {
+                                            editor.attemptMusicDelayMove(editor.trackView.translateXToBeat(lastMouseRelative.x))
+                                        } else {
+                                            editor.attemptPlaybackStartMove(editor.trackView.translateXToBeat(lastMouseRelative.x))
+                                        }
+                                        consumed = true
                                     }
-                                    consumed = true
                                 }
+                            } else if (currentTool == Tool.TIME_SIGNATURE && !control && !alt && !shift) {
+                                val targetBeat = (editor.trackView.translateXToBeat(lastMouseRelative.x)).roundToInt()
+                                val foundTs: TimeSignature? = editor.timeSignatures.getOrCompute().firstOrNull {
+                                    it.beat.roundToInt() == targetBeat
+                                }
+                                this.currentTimeSigBeat = targetBeat
+                                if (event.button == Input.Buttons.LEFT) {
+                                    if (foundTs == null) {
+                                        val lastTs: TimeSignature? = editor.engine.timeSignatures.getTimeSignature(targetBeat.toFloat())
+                                        editor.mutate(AddTimeSignatureAction(TimeSignature(targetBeat.toFloat(),
+                                                lastTs?.beatsPerMeasure ?: 4,
+                                                lastTs?.beatUnit ?: TimeSignature.DEFAULT_NOTE_UNIT)))
+                                        consumed = true
+                                    }
+                                } else if (event.button == Input.Buttons.RIGHT) {
+                                    if (foundTs != null) {
+                                        editor.mutate(DeleteTimeSignatureAction(foundTs))
+                                        consumed = true
+                                    }
+                                }
+                            }
+                        }
+                        is MouseMoved -> {
+                            val targetBeat = (editor.trackView.translateXToBeat(lastMouseRelative.x)).roundToInt()
+                            this.currentTimeSigBeat = targetBeat
+                        }
+                    }
+                }
+                
+                Vector2Stack.pop()
+            } else if (event is Scrolled) {
+                if (currentTool == Tool.TIME_SIGNATURE && !control && !alt && !shift) {
+                    val targetBeat = this.currentTimeSigBeat
+                    val foundTs: TimeSignature? = editor.timeSignatures.getOrCompute().firstOrNull {
+                        it.beat.roundToInt() == targetBeat
+                    }
+                    if (foundTs != null) {
+                        val originalNumerator = foundTs.beatsPerMeasure
+                        val amt = -event.amountY.roundToInt()
+                        var futureNumerator = originalNumerator + amt
+                        futureNumerator = futureNumerator.coerceIn(TimeSignature.LOWER_BEATS_PER_MEASURE,
+                                TimeSignature.UPPER_BEATS_PER_MEASURE)
+                        if (futureNumerator != originalNumerator) {
+                            val peek = editor.peekAtUndoStack()
+                            val newTc = foundTs.copy(beatsPerMeasure = futureNumerator)
+                            if (peek != null && peek is ChangeTimeSignatureAction && peek.next === foundTs) {
+                                peek.undo(editor)
+                                peek.next = newTc
+                                peek.redo(editor)
+                            } else {
+                                editor.mutate(ChangeTimeSignatureAction(foundTs, newTc))
                             }
                         }
                     }
@@ -156,6 +211,8 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
     }
 
     inner class BeatMarkerPane : Pane() {
+        private val timeSignaturesToRender: MutableList<TimeSignature> = mutableListOf()
+
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val renderBounds = this.contentZone
             val x = renderBounds.x.getOrCompute() + originX
@@ -165,7 +222,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             val lastPackedColor = batch.packedColor
 
             val tmpColor = ColorStack.getAndPush()
-            val trackView = editorPane.editor.trackView
+            val trackView = editor.trackView
             val trackViewBeat = trackView.beat.getOrCompute()
             val leftBeat = floor(trackViewBeat)
             val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.getOrCompute()))
@@ -229,12 +286,60 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
 
             // Draw beat numbers
             editorPane.palette.beatTrackFont.useFont { font ->
-                tmpColor.set(1f, 1f, 1f, 1f)
-                font.color = tmpColor
+                val timeSignatures = editor.engine.timeSignatures
                 for (b in leftBeat.toInt()..rightBeat.toInt()) {
-                    val xPos = x + trackView.translateBeatToX(b.toFloat())
-                    font.draw(batch, b.toString(), xPos, y - h + h * tallLineProportion + font.capHeight + 3f, 0f, Align.center, false)
+                    val beatF = b.toFloat()
+                    val xPos = x + trackView.translateBeatToX(beatF)
+                    val timeSigAtBeat = timeSignatures.map[beatF]
+                    if (timeSigAtBeat != null) {
+                        timeSignaturesToRender.add(timeSigAtBeat)
+                    } else {
+                        val measurePart = timeSignatures.getMeasurePart(beatF)
+                        if (measurePart > 0) {
+                            tmpColor.set(1f, 0.95f, 0.78f, 1f)
+                        } else {
+                            tmpColor.set(1f, 1f, 1f, 1f)
+                        }
+                        font.color = tmpColor
+                        font.draw(batch, b.toString(), xPos, y - h + h * tallLineProportion + font.capHeight + 3f, 0f, Align.center, false)
+                        if (measurePart == 0) {
+                            val measureNum = timeSignatures.getMeasure(beatF)
+                            tmpColor.set(0.8f, 0.8f, 0.8f, 1f)
+                            font.color = tmpColor
+                            val cap = font.capHeight
+                            font.scaleMul(0.75f)
+                            font.draw(batch, measureNum.toString(), xPos,
+                                    y - h + h * tallLineProportion + cap + font.lineHeight + 2f,
+                                    0f, Align.center, false)
+                            font.scaleMul(1f / 0.75f)
+                        }
+                    }
                 }
+            }
+
+            // Draw time signatures
+            if (timeSignaturesToRender.isNotEmpty()) {
+                editorPane.palette.musicScoreFont.useFont { font ->
+                    timeSignaturesToRender.forEach { ts ->
+                        val xPos = x + trackView.translateBeatToX(ts.beat)
+                        val offY = 26f
+                        val lineHeight = 16f
+                        
+                        if (editor.tool.getOrCompute() == Tool.TIME_SIGNATURE && ts.beat.roundToInt() == currentTimeSigBeat) {
+                            tmpColor.set(0f, 1f, 1f, 1f)
+                        } else {
+                            tmpColor.set(1f, 1f, 1f, 1f)
+                        }
+                        font.color = tmpColor
+                        val textAlign = if (ts.beat == 0f) Align.left else Align.center
+                        font.draw(batch, LelandSpecialChars.intToString(ts.beatUnit),
+                                xPos, y - h + h * tallLineProportion + offY, 0f, textAlign, false)
+                        font.draw(batch, LelandSpecialChars.intToString(ts.beatsPerMeasure),
+                                xPos, y - h + h * tallLineProportion + offY + lineHeight, 0f, textAlign, false)
+                    }
+                }
+
+                timeSignaturesToRender.clear()
             }
 
             ColorStack.pop()

@@ -31,6 +31,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("selection", "textures/ui/icon/tool/selection.png"),
                 Packable("tempo_change", "textures/ui/icon/tool/tempo_change.png"),
                 Packable("music_volume", "textures/ui/icon/tool/music_volume.png"),
+                Packable("time_signature", "textures/ui/icon/tool/time_signature.png"),
         ), PackedSheet.Config(padding = 0, maxSize = 128, duplicateBorder = false)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("toolbar_pause_color", "textures/ui/icon/toolbar/pause_color.png"),

@@ -26,6 +26,7 @@ import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.util.LelandSpecialChars
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -376,6 +377,16 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     size = 20
                     borderWidth = 2f
                 }).setAfterLoad(defaultAfterLoad)
+        cache["editor_music_score"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/Leland/Leland.otf"), 1, 2f, false, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 30
+                    borderWidth = 2f
+                    val chars = LelandSpecialChars.intToString(12340) + LelandSpecialChars.intToString(56789)
+                    characters = chars
+                    spaceX = -8
+                }).setAfterLoad(defaultAfterLoad)
         cache["editor_instantiator"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Medium.ttf"), 1, 2f, false, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -471,6 +482,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontIcons: PaintboxFont get() = fontCache["prmania_icons"]
     val fontEditorBeatTime: PaintboxFont get() = fontCache["editor_instantiator_summary"] // fontCache["editor_beat_time"]
     val fontEditorBeatTrack: PaintboxFont get() = fontCache["editor_beat_track"]
+    val fontEditorMusicScore: PaintboxFont get() = fontCache["editor_music_score"]
     val fontEditorInstantiatorName: PaintboxFont get() = fontCache["editor_instantiator"]
     val fontEditorInstantiatorSummary: PaintboxFont get() = fontCache["editor_instantiator_summary"]
     val fontRodinFixed: PaintboxFont get() = fontCache["rodin_fixed"]

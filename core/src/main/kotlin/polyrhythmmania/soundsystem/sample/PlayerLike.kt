@@ -21,7 +21,8 @@ abstract class PlayerLike(context: AudioContext, ins: Int, outs: Int) : UGen(con
      */
     abstract var position: Double
     abstract val durationMs: Double
-    abstract var pitch: UGen
+    abstract var pitch: Float
+//    abstract var pitchUGen: UGen
     abstract var loopType: SamplePlayer.LoopType
     abstract var loopStartMs: Float
     abstract var loopEndMs: Float

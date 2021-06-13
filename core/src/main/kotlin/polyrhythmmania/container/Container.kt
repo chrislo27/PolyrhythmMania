@@ -22,6 +22,7 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.Swing
 import polyrhythmmania.engine.tempo.TempoChange
+import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -51,7 +52,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     companion object {
         const val FILE_EXTENSION: String = "prmania"
-        const val CONTAINER_VERSION: Int = 1
+        const val CONTAINER_VERSION: Int = 2
 
         const val KEY_COMPRESSED_MUSIC: String = "compressed_music"
     }
@@ -222,6 +223,19 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 musicObj.add("loopStartMs", loopParams.startPointMs)
                 musicObj.add("loopEndMs", loopParams.endPointMs)
             })
+            // As of container version 2:
+            engineObj.add("timeSignatures", Json.`object`().also { timeSigObj ->
+                timeSigObj.add("list", Json.array().also { array ->
+                    engine.timeSignatures.map.values.forEach {
+                        val node = Json.`object`()
+                        node.set("beat", it.beat)
+                        node.set("divisions", it.beatsPerMeasure)
+                        node.set("beatUnit", it.beatUnit)
+                        node.set("measure", it.measure)
+                        array.add(node)
+                    }
+                })
+            })
         })
         jsonObj.add("blocks", Json.array().also { blocksArray ->
             val instantiators = Instantiators.list
@@ -322,6 +336,14 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                     musicObj.getDouble("loopStartMs", 0.0),
                     musicObj.getDouble("loopEndMs", 0.0)
             )
+        }
+        if (containerVersion >= 2) {
+            val timeSigObj = engineObj.get("timeSignatures").asObject()
+            val list = timeSigObj.get("list").asArray()
+            list.forEach { 
+                val obj = it.asObject()
+                engine.timeSignatures.add(TimeSignature(obj.getFloat("beat", 0f), obj.getInt("divisions", 4), obj.getInt("beatUnit", 4)))
+            }
         }
 
         val blocksObj = json.get("blocks").asArray()

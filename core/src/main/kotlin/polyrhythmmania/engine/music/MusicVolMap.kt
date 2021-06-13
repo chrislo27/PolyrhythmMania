@@ -1,6 +1,7 @@
 package polyrhythmmania.engine.music
 
 import com.badlogic.gdx.math.Interpolation
+import polyrhythmmania.engine.music.MusicVolume
 import java.util.*
 import kotlin.math.roundToInt
 
