@@ -212,6 +212,10 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
 
     inner class BeatMarkerPane : Pane() {
         private val timeSignaturesToRender: MutableList<TimeSignature> = mutableListOf()
+        
+        private fun getMeasurePart(beat: Int): Int {
+            return editorPane.getMeasurePart(beat)
+        }
 
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val renderBounds = this.contentZone
@@ -226,14 +230,18 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             val trackViewBeat = trackView.beat.getOrCompute()
             val leftBeat = floor(trackViewBeat)
             val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.getOrCompute()))
+            val timeSignatures = editor.engine.timeSignatures
 
             val lineWidth = 2f
             val tallLineProportion = 0.275f // 0.4f
             val shortLineProportion = tallLineProportion * 0.75f
             for (b in leftBeat.toInt()..rightBeat.toInt()) {
-                tmpColor.set(1f, 1f, 1f, 1f)
+                val measurePart = getMeasurePart(b)
+                val mainRgb = if (measurePart > 0) 0.8f else 1f
+                val mainWidth = if (measurePart == 0) (lineWidth * 3) else lineWidth
+                tmpColor.set(mainRgb, mainRgb, mainRgb, 1f)
                 batch.color = tmpColor
-                batch.fillRect(x + trackView.translateBeatToX(b.toFloat()) - lineWidth / 2f, y - h, lineWidth, h * tallLineProportion)
+                batch.fillRect(x + trackView.translateBeatToX(b.toFloat()) - mainWidth / 2f, y - h, mainWidth, h * tallLineProportion)
                 tmpColor.set(0.7f, 0.7f, 0.7f, 1f)
                 batch.color = tmpColor
                 batch.fillRect(x + trackView.translateBeatToX(b.toFloat() + 0.5f) - lineWidth / 2f, y - h, lineWidth, h * shortLineProportion)
@@ -286,7 +294,6 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
 
             // Draw beat numbers
             editorPane.palette.beatTrackFont.useFont { font ->
-                val timeSignatures = editor.engine.timeSignatures
                 for (b in leftBeat.toInt()..rightBeat.toInt()) {
                     val beatF = b.toFloat()
                     val xPos = x + trackView.translateBeatToX(beatF)
@@ -294,7 +301,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                     if (timeSigAtBeat != null) {
                         timeSignaturesToRender.add(timeSigAtBeat)
                     } else {
-                        val measurePart = timeSignatures.getMeasurePart(beatF)
+                        val measurePart = getMeasurePart(b)
                         if (measurePart > 0) {
                             tmpColor.set(1f, 0.95f, 0.78f, 1f)
                         } else {

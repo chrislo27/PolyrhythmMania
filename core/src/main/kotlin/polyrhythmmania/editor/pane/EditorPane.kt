@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.pane
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
@@ -24,6 +25,8 @@ class EditorPane(val editor: Editor) : Pane() {
 
     val main: PRManiaGame = editor.main
     val palette: Palette = Palette(main)
+    
+    private val measurePartCache: MutableMap<Int, Int> = mutableMapOf()
 
     val statusBarMsg: Var<String> = Var("")
 
@@ -100,6 +103,10 @@ class EditorPane(val editor: Editor) : Pane() {
         loadDialog = LoadDialog(this)
         newDialog = NewDialog(this)
     }
+    
+    fun getMeasurePart(beat: Int): Int {
+        return measurePartCache.getOrPut(beat) { editor.engine.timeSignatures.getMeasurePart(beat.toFloat()) }
+    }
 
     fun createDefaultTooltip(binding: Var.Context.() -> String): Tooltip {
         return Tooltip(binding = binding).apply {
@@ -154,4 +161,8 @@ class EditorPane(val editor: Editor) : Pane() {
         }
     }
 
+    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+        super.renderSelfAfterChildren(originX, originY, batch)
+        measurePartCache.clear()
+    }
 }

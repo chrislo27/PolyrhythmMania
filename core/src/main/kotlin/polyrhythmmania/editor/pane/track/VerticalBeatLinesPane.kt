@@ -43,7 +43,9 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         tmpColor.set(editorPane.palette.trackVerticalBeatLineColor.getOrCompute())
         batch.color = tmpColor
         for (b in leftBeat.toInt()..rightBeat.toInt()) {
-            batch.fillRect(x + trackView.translateBeatToX(b.toFloat()) - lineWidth / 2f, y - h, lineWidth, h)
+            val measurePart = editorPane.getMeasurePart(b)
+            val width = if (measurePart == 0) (lineWidth * 3) else lineWidth
+            batch.fillRect(x + trackView.translateBeatToX(b.toFloat()) - width / 2f, y - h, width, h)
         }
 
         if (beatLines.active) {
