@@ -63,6 +63,9 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
             this.vBar.skinID.set(scrollBarSkinID)
             this.hBar.skinID.set(scrollBarSkinID)
+            
+            this.vBar.unitIncrement.set(10f)
+            this.vBar.blockIncrement.set(40f)
         }
         contentPane.addChild(scrollPane)
 
