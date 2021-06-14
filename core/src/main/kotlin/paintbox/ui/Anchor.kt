@@ -15,8 +15,8 @@ sealed class Anchor {
             element.bounds.y.set(offsetY)
         }
         
-        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
-                               offsetY: (context: Var.Context) -> Float) {
+        override fun configure(element: UIElement, offsetX: Var.Context.() -> Float,
+                               offsetY: Var.Context.() -> Float) {
             element.bounds.x.bind {
                 offsetX.invoke(this)
             }
@@ -38,9 +38,9 @@ sealed class Anchor {
                 (parent.use()?.contentZone?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY
             }
         }
-        
-        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
-                               offsetY: (context: Var.Context) -> Float) {
+
+        override fun configure(element: UIElement, offsetX: Var.Context.() -> Float,
+                               offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
                 offsetX.invoke(this)
@@ -63,9 +63,9 @@ sealed class Anchor {
                 (parent.use()?.contentZone?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY
             }
         }
-        
-        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
-                               offsetY: (context: Var.Context) -> Float) {
+
+        override fun configure(element: UIElement, offsetX: Var.Context.() -> Float,
+                               offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
                 offsetX.invoke(this)
@@ -88,9 +88,9 @@ sealed class Anchor {
             }
             element.bounds.y.set(offsetY)
         }
-        
-        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
-                               offsetY: (context: Var.Context) -> Float) {
+
+        override fun configure(element: UIElement, offsetX: Var.Context.() -> Float,
+                               offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
                 (parent.use()?.contentZone?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX.invoke(this)
@@ -115,9 +115,9 @@ sealed class Anchor {
                 (parent.use()?.contentZone?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY
             }
         }
-        
-        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
-                               offsetY: (context: Var.Context) -> Float) {
+
+        override fun configure(element: UIElement, offsetX: Var.Context.() -> Float,
+                               offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
                 (parent.use()?.contentZone?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX.invoke(this)
@@ -142,9 +142,9 @@ sealed class Anchor {
                 (parent.use()?.contentZone?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY
             }
         }
-        
-        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
-                               offsetY: (context: Var.Context) -> Float) {
+
+        override fun configure(element: UIElement, offsetX: Var.Context.() -> Float,
+                               offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
                 (parent.use()?.contentZone?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX.invoke(this)
@@ -167,9 +167,9 @@ sealed class Anchor {
             }
             element.bounds.y.set(offsetY)
         }
-        
-        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
-                               offsetY: (context: Var.Context) -> Float) {
+
+        override fun configure(element: UIElement, offsetX: Var.Context.() -> Float,
+                               offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
                 (parent.use()?.contentZone?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX.invoke(this)
@@ -195,8 +195,8 @@ sealed class Anchor {
             }
         }
         
-        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
-                               offsetY: (context: Var.Context) -> Float) {
+        override fun configure(element: UIElement, offsetX: Var.Context.() -> Float,
+                               offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
                 (parent.use()?.contentZone?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX.invoke(this)
@@ -221,9 +221,9 @@ sealed class Anchor {
                 (parent.use()?.contentZone?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY
             }
         }
-        
-        override fun configure(element: UIElement, offsetX: (context: Var.Context) -> Float,
-                               offsetY: (context: Var.Context) -> Float) {
+
+        override fun configure(element: UIElement, offsetX: Var.Context.() -> Float,
+                               offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
                 (parent.use()?.contentZone?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX.invoke(this)
@@ -245,8 +245,8 @@ sealed class Anchor {
      * The context in the [offsetX]/[offsetY] function parameters is the [Var.Context] of the bounds x/y [Var].
      */
     abstract fun configure(element: UIElement,
-                           offsetX: (context: Var.Context) -> Float = { 0f },
-                           offsetY: (context: Var.Context) -> Float = { 0f })
+                           offsetX: Var.Context.() -> Float = { 0f },
+                           offsetY: Var.Context.() -> Float = { 0f })
     
     /**
      * Configures the [element] based on this [Anchor] with constant offsets of 0.

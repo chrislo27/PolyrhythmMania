@@ -79,7 +79,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         parent += statusBar
 
         upperPane = UpperPane(this).apply {
-            Anchor.TopLeft.configure(this, offsetY = { ctx -> ctx.use(menubarBacking.bounds.height) })
+            Anchor.TopLeft.configure(this, offsetY = { menubarBacking.bounds.height.use() })
             this.bounds.height.bind {
                 (300 * ((sceneRoot.use()?.bounds?.height?.use() ?: 720f) / 720f)).coerceAtLeast(300f)
             }
