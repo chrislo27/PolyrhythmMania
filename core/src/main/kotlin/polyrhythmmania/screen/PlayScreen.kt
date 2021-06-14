@@ -71,17 +71,19 @@ class PlayScreen(main: PRManiaGame, val container: Container)
     private val sceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val inputProcessor: InputProcessor = sceneRoot.inputSystem
     private val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
+    private val pauseBg: PauseBackground by lazy { this.PauseBackground() }
     private val maxSelectionSize: Int = 3
     private val selectionIndex: Var<Int> = Var(0)
     private val panelAnimationValue: FloatVar = FloatVar(0f)
     private var activePanelAnimation: Animation? = null
+    private val topPane: Pane
+    private val bottomPane: Pane
     private val resumeLabel: TextLabel
     private val startOverLabel: TextLabel
     private val quitLabel: TextLabel
 
     private var isPaused: Boolean = false
     private var isFinished: Boolean = false
-    private val pauseBg: PauseBackground by lazy { this.PauseBackground() }
 
     private val keyboardKeybinds: InputKeymapKeyboard by lazy { main.settings.inputKeymapKeyboard.getOrCompute() }
     private val bgSquareTexReg: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("pause_square"))
@@ -105,29 +107,43 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             nextLayer = element
         }
         addLayer(RectElement(Color(0f, 0f, 0f, 0f)))
-
-        val paddingPane = Pane().apply {
-            this.padding.set(Insets(36f, 36f / 4f, 64f, 64f / 4f))
+        
+        topPane = Pane().apply { 
+            Anchor.TopLeft.configure(this, offsetY = {
+                val h = bounds.height.use()
+                -h + panelAnimationValue.use() * h
+            })
+            this.bindHeightToParent(multiplier = 0.3333f)
+            this.bounds.width.bind { bounds.height.use() / pauseBg.triangleSlope }
+            this.padding.set(Insets(36f, 0f, 64f, 0f))
         }
-        addLayer(paddingPane)
+        nextLayer += topPane
+        bottomPane = Pane().apply { 
+            Anchor.BottomRight.configure(this, offsetY = {
+                val h = bounds.height.use()
+                h + panelAnimationValue.use() * -h
+            })
+            this.bindWidthToParent(multiplier = 0.6666f)
+            this.bounds.height.bind { bounds.width.use() * pauseBg.triangleSlope }
+        }
+        nextLayer += bottomPane
 
         val leftVbox = VBox().apply {
             this.spacing.set(16f)
             this.bounds.height.set(300f)
         }
-        nextLayer += leftVbox
+        topPane += leftVbox
 
         leftVbox.temporarilyDisableLayouts {
             leftVbox += TextLabel(binding = { Localization.getVar("play.pause.title").use() }, font = main.fontPauseMenuTitle).apply {
                 this.textColor.set(Color.WHITE)
                 this.bounds.height.set(128f)
-                this.bindWidthToParent(multiplier = 0.5f)
                 this.renderAlign.set(Align.left)
             }
         }
 
         val transparentBlack = Color(0f, 0f, 0f, 0.75f)
-        sceneRoot += TextLabel(keyboardKeybinds.toKeyboardString(true), font = main.fontMainMenuRodin).apply {
+        bottomPane += TextLabel(keyboardKeybinds.toKeyboardString(true), font = main.fontMainMenuRodin).apply {
             Anchor.BottomRight.configure(this)
             this.textColor.set(Color.WHITE)
             this.bounds.width.set(550f)
@@ -141,7 +157,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
 
         val optionsBorderSize = 12f
         val optionsBg = RectElement(transparentBlack).apply {
-            Anchor.BottomRight.configure(this, offsetY = -75f)
+            Anchor.BottomRight.configure(this, offsetY = -80f, offsetX = -15f)
             this.bounds.width.set(275f + optionsBorderSize * 2)
             this.bounds.height.set(144f + optionsBorderSize * 2)
             this.border.set(Insets(optionsBorderSize))
@@ -149,7 +165,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 this.roundedCorners.set(true)
             })
         }
-        paddingPane += optionsBg
+        bottomPane += optionsBg
         fun addArrowImageNode(index: Int): ArrowNode {
             return ArrowNode(TextureRegion(/*AssetRegistry.get<Texture>("pause_rod")*/ AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_pointer_finger"])).apply {
                 Anchor.CentreLeft.configure(this, offsetY = 4f)
@@ -245,20 +261,19 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             batch.setColor(1f, 1f, 1f, 1f)
 
             val pauseBg = this.pauseBg
-            val panelAni = panelAnimationValue.getOrCompute()
 
-            val topLeftX1 = 0f
-            val topLeftY1 = height * MathUtils.lerp(1f, pauseBg.topTriangleY, panelAni)
-            val topLeftX2 = 0f
-            val topLeftY2 = height
-            val topLeftY3 = height
-            val topLeftX3 = topLeftY1 + (topLeftY3 - topLeftY2) * (1f / pauseBg.triangleSlope)
-            val botRightX1 = width * pauseBg.botTriangleX
-            val botRightY1 = 0f
-            val botRightX2 = width
-            val botRightY2 = 0f
-            val botRightX3 = width
-            val botRightY3 = botRightY1 + (botRightX3 - botRightX1) * (pauseBg.triangleSlope) * panelAni
+            val topLeftX1 = topPane.bounds.x.getOrCompute()
+            val topLeftY1 = height - (topPane.bounds.y.getOrCompute() + topPane.bounds.height.getOrCompute())
+            val topLeftX2 = topLeftX1
+            val topLeftY2 = height - (topPane.bounds.y.getOrCompute())
+            val topLeftY3 = topLeftY2
+            val topLeftX3 = topPane.bounds.x.getOrCompute() + topPane.bounds.width.getOrCompute()
+            val botRightX1 = bottomPane.bounds.x.getOrCompute()
+            val botRightY1 = height - (bottomPane.bounds.y.getOrCompute() + bottomPane.bounds.height.getOrCompute())
+            val botRightX2 = bottomPane.bounds.x.getOrCompute() + bottomPane.bounds.width.getOrCompute()
+            val botRightY2 = botRightY1
+            val botRightX3 = botRightX2
+            val botRightY3 = height - (bottomPane.bounds.y.getOrCompute())
             val triLineWidth = 12f
             shapeRenderer.prepareStencilMask(batch) {
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
@@ -342,6 +357,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         main.inputMultiplexer.removeProcessor(inputProcessor)
         main.inputMultiplexer.addProcessor(inputProcessor)
         selectionIndex.set(0)
+        pauseBg.randomizeSeed()
         panelAnimationValue.set(0f)
         val ani = Animation(Interpolation.smoother, 0.25f, 0f, 1f).apply {
             onComplete = {
@@ -509,7 +525,9 @@ ${sceneRoot.mainLayer.lastHoveredElementPath.map { it.javaClass.simpleName }}
     }
 
     inner class PauseBackground {
-        private val seed = Random().nextInt(255)
+        private val random = Random()
+        var seed: Int = 0
+            private set
         private val hsv: FloatArray = FloatArray(3)
         var cycleSpeed: Float = 1 / 30f
         val triangleSlope: Float = 1 / 2f
@@ -518,6 +536,14 @@ ${sceneRoot.mainLayer.lastHoveredElementPath.map { it.javaClass.simpleName }}
         private val topColor: Color = Color.valueOf("4048e0")
         private val bottomColor: Color = Color.valueOf("d020a0")
 
+        init {
+            randomizeSeed()
+        }
+        
+        fun randomizeSeed() {
+            seed = random.nextInt(Short.MAX_VALUE.toInt())
+        }
+        
         fun render(delta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
             val width = camera.viewportWidth
             val height = camera.viewportHeight
