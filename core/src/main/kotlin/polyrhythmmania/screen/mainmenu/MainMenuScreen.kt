@@ -201,7 +201,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.margin.set(Insets(64f))
         }
         val logoImage = ImageNode(TextureRegion(AssetRegistry.get<Texture>("logo_2lines_en"))).apply {
-            this.bounds.height.set(192f)
+            this.bounds.height.set(175f)
 //            this.margin.set(Insets(0f, 0f, 32f, 32f))
             this.bounds.y.set(24f)
             this.renderAlign.set(Align.topLeft)
