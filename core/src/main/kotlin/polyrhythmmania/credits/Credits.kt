@@ -19,6 +19,7 @@ object Credits {
                     "LWJGL",
                     "Kotlin",
                     "Java",
+                    "Paintbox",
                     "Beads",
                     "minimal-json",
                     "JCommander",
