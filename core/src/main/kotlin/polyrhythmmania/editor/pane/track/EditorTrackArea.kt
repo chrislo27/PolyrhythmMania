@@ -58,7 +58,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     true
                 }
                 is TouchDown -> {
-                    if (editor.playState.getOrCompute() == PlayState.STOPPED && editor.click.getOrCompute() == Click.None) {
+                    if (editor.allowedToEdit.getOrCompute()) {
                         onMouseMovedOrDragged(event.x, event.y)
                         val relMouse = lastMouseRelative
                         val mouseBeat = getBeatFromRelative(relMouse.x)

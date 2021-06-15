@@ -115,6 +115,7 @@ class Editor(val main: PRManiaGame)
     val trackView: TrackView = TrackView()
     val tool: ReadOnlyVar<Tool> = Var(Tool.SELECTION)
     val click: Var<Click> = Var(Click.None)
+    val allowedToEdit: ReadOnlyVar<Boolean> = Var.bind { playState.use() == PlayState.STOPPED && click.use() == Click.None }
     val snapping: FloatVar = FloatVar(0.25f)
     val beatLines: BeatLines = BeatLines()
     var cameraPan: CameraPan? = null
@@ -320,7 +321,7 @@ class Editor(val main: PRManiaGame)
     }
 
     fun attemptInstantiatorDrag(instantiator: Instantiator<Block>) {
-        if (click.getOrCompute() != Click.None || playState.getOrCompute() != PlayState.STOPPED) return
+        if (!allowedToEdit.getOrCompute()) return
         val currentTool = this.tool.getOrCompute()
         if (currentTool != Tool.SELECTION) return
 
@@ -333,7 +334,7 @@ class Editor(val main: PRManiaGame)
     }
 
     fun attemptMarkerMove(markerType: MarkerType, mouseBeat: Float) {
-        if (click.getOrCompute() != Click.None || playState.getOrCompute() != PlayState.STOPPED) return
+        if (!allowedToEdit.getOrCompute()) return
         val marker = this.markerMap.getValue(markerType)
         click.set(Click.MoveMarker(this, marker.beat, markerType).apply {
             this.onMouseMoved(mouseBeat, 0, 0f)
@@ -349,57 +350,57 @@ class Editor(val main: PRManiaGame)
     }
 
     fun attemptUndo() {
-        if (canUndo() && click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+        if (canUndo() && allowedToEdit.getOrCompute()) {
             this.undo()
             forceUpdateStatus.invert()
         }
     }
 
     fun attemptRedo() {
-        if (canRedo() && click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+        if (canRedo() && allowedToEdit.getOrCompute()) {
             this.redo()
             forceUpdateStatus.invert()
         }
     }
     
     fun attemptOpenSettingsDialog() {
-        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+        if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.settingsDialog)
         }
     }
     
     fun attemptOpenHelpDialog() {
-        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+        if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.helpDialog)
         }
     }
 
     fun attemptExitToTitle() {
-        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+        if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.exitConfirmDialog)
         }
     }
 
     fun attemptNewLevel() {
-        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+        if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.newDialog)
         }
     }
 
     fun attemptSave(forceSaveAs: Boolean) {
-        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+        if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.saveDialog.prepareShow(forceSaveAs))
         }
     }
 
     fun attemptLoad(dropPath: String?) {
-        if (click.getOrCompute() == Click.None && playState.getOrCompute() == PlayState.STOPPED) {
+        if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.loadDialog.prepareShow(dropPath))
         }
     }
 
     fun changeTool(tool: Tool) {
-        if (click.getOrCompute() != Click.None || playState.getOrCompute() != PlayState.STOPPED) return
+        if (!allowedToEdit.getOrCompute()) return
         this.tool as Var
         this.tool.set(tool)
     }

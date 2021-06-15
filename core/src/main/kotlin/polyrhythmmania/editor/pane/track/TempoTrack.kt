@@ -233,7 +233,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             }
             // Change tempo
             addInputEventListener(createInputListener { amt ->
-                if (editor.playState.getOrCompute() == PlayState.STOPPED && editor.click.getOrCompute() == Click.None) {
+                if (editor.allowedToEdit.getOrCompute()) {
                     val tc = currentHoveredTempoChange.getOrCompute()
                     if (tc != null) {
                         val originalTempo = tc.newTempo

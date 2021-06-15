@@ -160,7 +160,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
             }
             // Change volume
             addInputEventListener(createInputListener { amt ->
-                if (editor.playState.getOrCompute() == PlayState.STOPPED && editor.click.getOrCompute() == Click.None) {
+                if (editor.allowedToEdit.getOrCompute()) {
                     val mv = currentHoveredMusicVol.getOrCompute()
                     if (mv != null) {
                         val originalVol = mv.newVolume

@@ -135,7 +135,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                 val thisPos = beatMarkerPane.getPosRelativeToRoot(lastMouseRelative)
                 lastMouseRelative.x = event.x - thisPos.x
                 lastMouseRelative.y = event.y - thisPos.y
-                if (editor.playState.getOrCompute() == PlayState.STOPPED && editor.click.getOrCompute() == Click.None) {
+                if (editor.allowedToEdit.getOrCompute()) {
                     when (event) {
                         is TouchDown -> {
                             if (currentTool == Tool.SELECTION) {
