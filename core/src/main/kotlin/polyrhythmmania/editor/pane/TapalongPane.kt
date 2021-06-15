@@ -1,11 +1,13 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.ui.Pane
+import paintbox.ui.animation.Animation
 import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
@@ -16,6 +18,10 @@ import polyrhythmmania.util.DecimalFormats
 class TapalongPane(val toolbar: Toolbar) : Pane() {
     companion object {
         const val AUTO_RESET_SEC: Int = 10
+        
+        private const val FLASH_DURATION: Float = 0.25f
+        private val TEXT_COLOR: Color = Color(1f, 1f, 1f, 1f)
+        private val FLASH_TEXT_COLOR: Color = Color(0f, 1f, 1f, 1f)
     }
 
     val editorPane: EditorPane = toolbar.editorPane
@@ -28,6 +34,7 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
         private set
     var lastTapMs: Long = timeSinceLastTap
         private set
+    private val flashAnimation: FloatVar = FloatVar(0f)
 
     init {
         val hbox = HBox().apply {
@@ -36,6 +43,11 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
         this += hbox
 
         hbox.temporarilyDisableLayouts {
+            val flashTextColor: Var<Color> = Var.sideEffecting(TEXT_COLOR.cpy()) { c ->
+                val alpha = flashAnimation.use()
+                c.set(TEXT_COLOR).lerp(FLASH_TEXT_COLOR, alpha)
+                c
+            }
             hbox.addChild(TextLabel("♩=", font = editorPane.main.fontRodinFixed).apply {
                 this.bounds.width.set(32f)
                 this.renderAlign.set(Align.right)
@@ -53,7 +65,7 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
                 this.bounds.width.set(64f)
                 this.renderAlign.set(Align.left)
                 this.textAlign.set(TextAlign.LEFT)
-                this.textColor.set(Color.WHITE)
+                this.textColor.bind { flashTextColor.use() }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("tapalong.bpmLabel")))
             })
             hbox.addChild(TextLabel("n=", font = editorPane.main.fontRodinFixed).apply {
@@ -67,7 +79,7 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
                 this.bounds.width.set(40f)
                 this.renderAlign.set(Align.left)
                 this.textAlign.set(TextAlign.LEFT)
-                this.textColor.set(Color.WHITE)
+                this.textColor.bind { flashTextColor.use() }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("tapalong.countLabel")))
             })
             hbox.addChild(Button(binding = { Localization.getVar("tapalong.reset").use() }, font = editorPane.main.mainFont).apply {
@@ -96,6 +108,8 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
         timeSinceLastTap = System.currentTimeMillis()
         lastTapMs = timeSinceLastTap
         count.set(count.getOrCompute() + 1)
+        cancelFlashAnimation()
+        sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, FLASH_DURATION, 1f, 0f), flashAnimation)
 
         if (count.getOrCompute() >= 2) {
             val average = sumDeltas / (count.getOrCompute() - 1)
@@ -107,5 +121,11 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
         sumDeltas = 0.0
         count.set(0)
         averageBpm.set(0f)
+        cancelFlashAnimation()
+    }
+    
+    private fun cancelFlashAnimation() {
+        sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(flashAnimation)
+        flashAnimation.set(0f)
     }
 }
