@@ -67,5 +67,14 @@ class AnimationHandler(val sceneRoot: SceneRoot) {
         existing.key.set(existing.value.animation.applyFunc(1f))
         existing.value.animation.onComplete?.invoke()
     }
+    
+    fun cancelAnimationFor(varr: FloatVar): Animation? {
+        val existing = animations.remove(varr)
+        if (existing != null) {
+            existing.varr.set(existing.animation.applyFunc(1f))
+            existing.animation.onComplete?.invoke()
+        }
+        return existing?.animation
+    }
 
 }
