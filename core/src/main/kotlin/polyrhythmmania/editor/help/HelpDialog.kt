@@ -181,8 +181,8 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
             is LayerParagraph -> {
                 TextLabel(binding = { Localization.getVar(layer.text).use() }).apply {
                     this.markup.set(this@HelpDocRenderer.markup)
-                    this.renderAlign.set(Align.topLeft)
-                    this.textAlign.set(TextAlign.LEFT)
+                    this.renderAlign.set(layer.renderAlign)
+                    this.textAlign.set(layer.textAlign)
                     this.textColor.set(Color.WHITE)
                     this.doLineWrapping.set(true)
                     this.padding.set(Insets(4f, 16f, 8f, 8f))
@@ -210,14 +210,16 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
             is LayerCol2 -> {
                 Pane().apply { 
                     val colSpacing = 8f
+                    val leftProp = layer.leftProportion
+                    val rightProp = 1f - leftProp
                     val left = VBox().apply { 
                         Anchor.TopLeft.configure(this)
-                        this.bindWidthToParent(multiplier = 0.5f, adjust = -colSpacing)
+                        this.bindWidthToParent(multiplier = leftProp, adjust = -colSpacing)
                     }
                     this += left
                     val right = VBox().apply {
                         Anchor.TopRight.configure(this)
-                        this.bindWidthToParent(multiplier = 0.5f, adjust = -colSpacing)
+                        this.bindWidthToParent(multiplier = rightProp, adjust = -colSpacing)
                     }
                     this += right
                     

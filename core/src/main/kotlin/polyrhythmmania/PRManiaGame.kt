@@ -120,12 +120,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             val paintboxFont = fontRodinFixedBordered
             paintboxFont.useFont { font ->
                 val isEditor = this.getScreen() is EditorScreen
-                val height = if (!isEditor) 0.985f else 0.075f
-                val alpha = if (cam.getInputY() / cam.viewportHeight in (height - font.capHeight / cam.viewportHeight)..(height)) 0.35f else 1f
+                val height = if (!isEditor) (cam.viewportHeight - 10f) else (48f)
+                val alpha = if (cam.getInputY() in (height - font.capHeight)..(height)) 0.35f else 1f
                 font.setColor(1f, 1f, 1f, alpha)
                 font.drawCompressed(batch, "Non-final pre-release version ${PRMania.VERSION}. Content subject to change. Do not redistribute.",
                         0f,
-                        height * cam.viewportHeight,
+                        height,
                         cam.viewportWidth, Align.center)
                 font.setColor(1f, 1f, 1f, 1f)
             }

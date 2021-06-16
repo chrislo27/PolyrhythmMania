@@ -34,6 +34,7 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
+import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.music.EditorMusicData
 import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.undo.ActionGroup
@@ -593,7 +594,9 @@ class Editor(val main: PRManiaGame)
         val currentClick = click.getOrCompute()
         val state = playState.getOrCompute()
 
-        if (!sceneRoot.isContextMenuActive() && !sceneRoot.isDialogActive()) {
+        val contextMenuActive = sceneRoot.isContextMenuActive()
+        val dialogActive = sceneRoot.isDialogActive()
+        if (!contextMenuActive && !dialogActive) {
             when (keycode) {
                 in MOVE_WINDOW_KEYCODES -> {
                     pressedButtons += keycode
@@ -636,53 +639,6 @@ class Editor(val main: PRManiaGame)
                         }
                     }
                 }
-                Input.Keys.T -> {
-                    if (!shift && !alt && !ctrl && currentClick == Click.None) {
-                        val tapalongPane = editorPane.toolbar.tapalongPane
-                        if (tapalongPane.apparentVisibility.getOrCompute()) {
-                            tapalongPane.tap()
-                        }
-                    }
-                }
-                Input.Keys.Z -> { // CTRL+Z: Undo // CTRL+SHIFT+Z: Redo
-                    if (currentClick == Click.None && state == PlayState.STOPPED) {
-                        if (ctrl && !alt) {
-                            if (shift) {
-                                attemptRedo()
-                            } else {
-                                attemptUndo()
-                            }
-                        }
-                    }
-                }
-                Input.Keys.Y -> { // CTRL+Y: Redo
-                    if (currentClick == Click.None && state == PlayState.STOPPED) {
-                        if (ctrl && !alt && !shift) {
-                            attemptRedo()
-                        }
-                    }
-                }
-                Input.Keys.S -> { // CTRL+S: Save // CTRL+ALT+S: Save As
-                    if (currentClick == Click.None && state == PlayState.STOPPED) {
-                        if (ctrl && !shift) {
-                            attemptSave(alt)
-                        }
-                    }
-                }
-                Input.Keys.O -> { // CTRL+O: Open
-                    if (currentClick == Click.None && state == PlayState.STOPPED) {
-                        if (ctrl && !shift && !alt) {
-                            attemptLoad(null)
-                        }
-                    }
-                }
-                Input.Keys.N -> { // CTRL+N: New
-                    if (currentClick == Click.None && state == PlayState.STOPPED) {
-                        if (ctrl && !shift && !alt) {
-                            attemptNewLevel()
-                        }
-                    }
-                }
                 in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
                     if (!ctrl && !alt && !shift && currentClick == Click.None) {
                         val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
@@ -691,6 +647,66 @@ class Editor(val main: PRManiaGame)
                             inputConsumed = true
                         }
                     }
+                }
+                Input.Keys.T -> {
+                    if (!shift && !alt && !ctrl && currentClick == Click.None) {
+                        val tapalongPane = editorPane.toolbar.tapalongPane
+                        if (tapalongPane.apparentVisibility.getOrCompute()) {
+                            tapalongPane.tap()
+                        }
+                    }
+                }
+            }
+            if (!inputConsumed && allowedToEdit.getOrCompute()) {
+                when (keycode) {
+                    Input.Keys.F1 -> { // F1: Open help menu
+                        if (!ctrl && !alt && !shift) {
+                            attemptOpenHelpDialog()
+                            inputConsumed = true
+                        }
+                    }
+                    Input.Keys.Z -> { // CTRL+Z: Undo // CTRL+SHIFT+Z: Redo
+                        if (ctrl && !alt) {
+                            if (shift) {
+                                attemptRedo()
+                            } else {
+                                attemptUndo()
+                            }
+                            inputConsumed = true
+                        }
+                    }
+                    Input.Keys.Y -> { // CTRL+Y: Redo
+                        if (ctrl && !alt && !shift) {
+                            attemptRedo()
+                            inputConsumed = true
+                        }
+                    }
+                    Input.Keys.S -> { // CTRL+S: Save // CTRL+ALT+S: Save As
+                        if (ctrl && !shift) {
+                            attemptSave(alt)
+                            inputConsumed = true
+                        }
+                    }
+                    Input.Keys.O -> { // CTRL+O: Open
+                        if (ctrl && !shift && !alt) {
+                            attemptLoad(null)
+                            inputConsumed = true
+                        }
+                    }
+                    Input.Keys.N -> { // CTRL+N: New
+                        if (ctrl && !shift && !alt) {
+                            attemptNewLevel()
+                            inputConsumed = true
+                        }
+                    }
+                }
+            }
+        } else if (!contextMenuActive && dialogActive) {
+            val currentRootDialog = sceneRoot.getCurrentRootDialog()
+            if (currentRootDialog is HelpDialog && (keycode == Input.Keys.F1 || keycode == Input.Keys.ESCAPE)) { // F1: Close help menu
+                if (!ctrl && !alt && !shift) {
+                    editorPane.closeDialog()
+                    inputConsumed = true
                 }
             }
         }

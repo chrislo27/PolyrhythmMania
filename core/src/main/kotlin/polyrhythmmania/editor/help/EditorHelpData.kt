@@ -1,11 +1,14 @@
 package polyrhythmmania.editor.help
 
+import com.badlogic.gdx.utils.Align
+
 
 object EditorHelpData {
     
     fun createHelpData(): HelpData {
         return HelpData(mapOf(
                 HelpData.ROOT_ID to EditorHelpDocRoot(),
+                "controls" to EditorHelpDocControls(),
                 "music_sync" to EditorHelpDocMusicSync(),
         ))
     }
@@ -17,9 +20,48 @@ class EditorHelpDocRoot : HelpDocument(
         listOf(
                 LayerTitle("editorHelp.root.title"),
                 LayerParagraph("editorHelp.root.pp0", 64f),
-                LayerCol3(LayerButton("editorHelp.music_sync.title", "music_sync", false), null, null)
+                LayerCol3(LayerButton("editorHelp.controls.title", "controls", false), LayerButton("editorHelp.music_sync.title", "music_sync", false), null)
         )
 )
+
+class EditorHelpDocControls : HelpDocument(
+        "editorHelp.controls.title",
+        listOf(
+                LayerParagraph("editorHelp.controls.pp0", 50f),
+                LayerParagraph("editorHelp.controls.pp1", 80f),
+                LayerParagraph("editorHelp.controls.heading.general", 20f),
+                LayerCol2(
+                        LayerParagraph("editorHelp.controls.keybinds.general.keys", 300f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.general.desc", 300f),
+                        leftProportion = 0.275f
+                ),
+                LayerParagraph("editorHelp.controls.heading.selectionTool", 20f),
+                LayerCol2(
+                        LayerParagraph("editorHelp.controls.keybinds.selectionTool.keys", 220f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.selectionTool.desc", 220f),
+                        leftProportion = 0.275f
+                ),
+                LayerParagraph("editorHelp.controls.heading.tempoChangeTool", 20f),
+                LayerCol2(
+                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.keys", 120f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.desc", 120f),
+                        leftProportion = 0.275f
+                ),
+                LayerParagraph("editorHelp.controls.heading.musicVolumeTool", 20f),
+                LayerCol2(
+                        LayerParagraph("editorHelp.controls.keybinds.musicVolumeTool.keys", 100f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.musicVolumeTool.desc", 100f),
+                        leftProportion = 0.275f
+                ),
+                LayerParagraph("editorHelp.controls.heading.timeSigTool", 20f),
+                LayerCol2(
+                        LayerParagraph("editorHelp.controls.keybinds.timeSigTool.keys", 100f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.timeSigTool.desc", 100f),
+                        leftProportion = 0.275f
+                ),
+        )
+)
+
 
 class EditorHelpDocMusicSync : HelpDocument(
         "editorHelp.music_sync.title",
