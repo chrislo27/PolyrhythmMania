@@ -48,29 +48,51 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
             this.vBar.blockIncrement.set(64f)
         }
         contentPane.addChild(scrollPane)
+
         
-        bottomPane.addChild(Button("").apply {
+        val rightHbox = HBox().apply {
             Anchor.BottomRight.configure(this)
-            this.bounds.width.bind { bounds.height.useF() }
-            this.applyDialogStyleBottom()
-            this.setOnAction {
-                editorPane.closeDialog()
+            this.align.set(HBox.Align.RIGHT)
+            this.spacing.set(12f)
+            this.bounds.width.set(300f)
+        }
+        bottomPane.addChild(rightHbox)
+        rightHbox.temporarilyDisableLayouts { 
+            rightHbox += Button("").apply {
+                this.bounds.width.set(48f)
+                this.applyDialogStyleBottom()
+                this.setOnAction {
+                    scrollPane.vBar.setValue(0f)
+                }
+                this.disabled.bind { scrollPane.vBar.value.useF() <= 0f }
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_help")["arrow_right"])).apply {
+                    this.rotation.set(90f)
+                    this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
+                }
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.help.goToTop")))
             }
-            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
-                this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
-            }
-            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("common.close")))
-            this.setOnRightClick {
-                if (Paintbox.debugMode) { // DEBUG
-                    val doc = helpData.currentDocument.getOrCompute()
-                    if (doc != null) {
-                        scrollPane.setContent(renderer.renderDocument(helpData, doc))
-                    } else {
-                        scrollPane.setContent(RectElement(Color.RED))
+            rightHbox += Button("").apply {
+                this.bounds.width.bind { bounds.height.useF() }
+                this.applyDialogStyleBottom()
+                this.setOnAction {
+                    editorPane.closeDialog()
+                }
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
+                    this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
+                }
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("common.close")))
+                this.setOnRightClick {
+                    if (Paintbox.debugMode) { // DEBUG
+                        val doc = helpData.currentDocument.getOrCompute()
+                        if (doc != null) {
+                            scrollPane.setContent(renderer.renderDocument(helpData, doc))
+                        } else {
+                            scrollPane.setContent(RectElement(Color.RED))
+                        }
                     }
                 }
             }
-        })
+        }
 
 
         helpData.currentDocument.addListener { d ->
@@ -82,15 +104,15 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
             }
         }
 
-        val hbox = HBox().apply {
+        val leftHbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
             this.align.set(HBox.Align.LEFT)
             this.spacing.set(12f)
-            this.bounds.width.set(900f)
+            this.bounds.width.set(700f)
         }
-        bottomPane.addChild(hbox)
-        hbox.temporarilyDisableLayouts { 
-            hbox += Button("").apply {
+        bottomPane.addChild(leftHbox)
+        leftHbox.temporarilyDisableLayouts { 
+            leftHbox += Button("").apply {
                 this.bounds.width.set(48f)
                 this.applyDialogStyleBottom()
                 this.setOnAction {
@@ -103,7 +125,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.help.back")))
             }
-            hbox += Button("").apply {
+            leftHbox += Button("").apply {
                 this.bounds.width.set(48f)
                 this.applyDialogStyleBottom()
                 this.setOnAction {
@@ -115,7 +137,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.help.forward")))
             }
-            hbox += Button("").apply {
+            leftHbox += Button("").apply {
                 this.bounds.width.set(48f)
                 this.applyDialogStyleBottom()
                 this.setOnAction {
