@@ -16,11 +16,16 @@ import kotlin.math.floor
 
 
 sealed class Click {
+    /**
+     * Indicates that while this Click is active, the camera should pan left/right relative to the AllTracksPane
+     */
+    interface PansCameraOnDrag
+    
     object None : Click()
 
     class CreateSelection(val editor: Editor, val startBeat: Float, val startTrack: Float,
                           val previousSelection: Set<Block>)
-        : Click() {
+        : Click(), PansCameraOnDrag {
         val rectangle: Rectangle = Rectangle(startBeat, startTrack, 0f, 0f)
         private val tmpRect: Rectangle = Rectangle()
 
@@ -62,7 +67,7 @@ sealed class Click {
 
     class DragSelection private constructor(val editor: Editor, val blocks: List<Block>, val mouseOffset: Vector2,
                                             val originBlock: Block, val isNew: Boolean)
-        : Click() {
+        : Click(), PansCameraOnDrag {
 
         companion object {
             fun create(editor: Editor, blocks: List<Block>, mouseOffset: Vector2, originBlock: Block,
@@ -204,7 +209,7 @@ sealed class Click {
     }
 
     class MoveMarker(val editor: Editor, val point: FloatVar, val type: MarkerType)
-        : Click() {
+        : Click(), PansCameraOnDrag {
 
         val originalPosition: Float = point.getOrCompute()
 
@@ -239,7 +244,7 @@ sealed class Click {
     }
 
     class MoveTempoChange(val editor: Editor, val tempoChange: TempoChange)
-        : Click() {
+        : Click(), PansCameraOnDrag {
 
         var newPosition: Float = tempoChange.beat
             private set
@@ -284,7 +289,7 @@ sealed class Click {
     }
 
     class DragMusicVolume(val editor: Editor, val musicVol: MusicVolume, val left: Boolean)
-        : Click() {
+        : Click(), PansCameraOnDrag {
 
         var beat: Float = musicVol.beat
             private set

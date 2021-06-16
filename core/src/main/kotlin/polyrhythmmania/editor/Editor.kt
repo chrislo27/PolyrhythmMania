@@ -63,7 +63,7 @@ class Editor(val main: PRManiaGame)
         const val TRACK_INPUT_1: String = "input_1"
         const val TRACK_INPUT_2: String = "input_2"
         const val TRACK_VFX_0: String = "vfx_0"
-        
+
         val MOVE_WINDOW_LEFT_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.A)
         val MOVE_WINDOW_RIGHT_KEYCODES: Set<Int> = setOf(Input.Keys.RIGHT, Input.Keys.D)
         val MOVE_WINDOW_KEYCODES: Set<Int> = (MOVE_WINDOW_LEFT_KEYCODES + MOVE_WINDOW_RIGHT_KEYCODES)
@@ -79,7 +79,7 @@ class Editor(val main: PRManiaGame)
 
     val sceneRoot: SceneRoot = SceneRoot(uiCamera)
 
-    val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply { 
+    val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
         this.audioContext.out.gain = main.settings.gameplayVolume.getOrCompute() / 100f
     }
     val timing: TimingProvider = SimpleTimingProvider {
@@ -119,6 +119,11 @@ class Editor(val main: PRManiaGame)
     val snapping: FloatVar = FloatVar(0.25f)
     val beatLines: BeatLines = BeatLines()
     var cameraPan: CameraPan? = null
+    private val pressedButtons: MutableSet<Int> = mutableSetOf()
+    private var suggestPanCameraDir: Int = 0 // Used when dragging items
+
+    // Read-only editor settings hooking into Settings
+
 
     // Editor objects and state
     val markerMap: Map<MarkerType, Marker> = MarkerType.VALUES.asReversed().associateWith { Marker(it) }
@@ -227,16 +232,23 @@ class Editor(val main: PRManiaGame)
 
         click.getOrCompute().renderUpdate()
 
-        val trackView = this.trackView
         if (!ctrl) {
-            val panSpeed = 7f * delta * (if (shift) 10f else 1f)
-            if (MOVE_WINDOW_RIGHT_KEYCODES.any { it in pressedButtons }) {
-                trackView.beat.set((trackView.beat.getOrCompute() + panSpeed).coerceAtLeast(0f))
+            val moveFast = shift
+            if (MOVE_WINDOW_RIGHT_KEYCODES.any { it in pressedButtons } || suggestPanCameraDir > 0) {
+                panCamera(+1, delta, moveFast)
             }
-            if (MOVE_WINDOW_LEFT_KEYCODES.any { it in pressedButtons }) {
-                trackView.beat.set((trackView.beat.getOrCompute() - panSpeed).coerceAtLeast(0f))
+            if (MOVE_WINDOW_LEFT_KEYCODES.any { it in pressedButtons } || suggestPanCameraDir < 0) {
+                panCamera(-1, delta, moveFast)
             }
         }
+    }
+
+    fun panCamera(dir: Int, delta: Float, fast: Boolean = Gdx.input.isShiftDown()) {
+        if (dir == 0) return
+
+        val trackView = this.trackView
+        val panSpeed = 7f * delta * (if (fast) 10f else 1f)
+        trackView.beat.set((trackView.beat.getOrCompute() + panSpeed * dir).coerceAtLeast(0f))
     }
 
     /**
@@ -362,13 +374,13 @@ class Editor(val main: PRManiaGame)
             forceUpdateStatus.invert()
         }
     }
-    
+
     fun attemptOpenSettingsDialog() {
         if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.settingsDialog)
         }
     }
-    
+
     fun attemptOpenHelpDialog() {
         if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.helpDialog)
@@ -459,7 +471,7 @@ class Editor(val main: PRManiaGame)
         var width = Gdx.graphics.width.toFloat()
         var height = Gdx.graphics.height.toFloat()
         // UI scale
-        val uiScale = 1f // Note: scales don't work with inputs currently
+        val uiScale = 1f
         width /= uiScale
         height /= uiScale
         if (width < 1280f || height < 720f) {
@@ -573,8 +585,6 @@ class Editor(val main: PRManiaGame)
         }
     }
 
-    private val pressedButtons: MutableSet<Int> = mutableSetOf()
-
     override fun keyDown(keycode: Int): Boolean {
         var inputConsumed = false
         val ctrl = Gdx.input.isControlDown()
@@ -583,104 +593,103 @@ class Editor(val main: PRManiaGame)
         val currentClick = click.getOrCompute()
         val state = playState.getOrCompute()
 
-        if (sceneRoot.isContextMenuActive()) return false
-        if (sceneRoot.isDialogActive()) return false
-
-        when (keycode) {
-            in MOVE_WINDOW_KEYCODES -> {
-                pressedButtons += keycode
-                inputConsumed = true
-            }
-            Input.Keys.DEL, Input.Keys.FORWARD_DEL -> { // BACKSPACE or DELETE: Delete selection
-                if (currentClick == Click.None && state == PlayState.STOPPED) {
-                    val selected = selectedBlocks.keys.toList()
-                    if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
-                        this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
-                        forceUpdateStatus.invert()
+        if (!sceneRoot.isContextMenuActive() && !sceneRoot.isDialogActive()) {
+            when (keycode) {
+                in MOVE_WINDOW_KEYCODES -> {
+                    pressedButtons += keycode
+                    inputConsumed = true
+                }
+                Input.Keys.DEL, Input.Keys.FORWARD_DEL -> { // BACKSPACE or DELETE: Delete selection
+                    if (currentClick == Click.None && state == PlayState.STOPPED) {
+                        val selected = selectedBlocks.keys.toList()
+                        if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
+                            this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
+                            forceUpdateStatus.invert()
+                        }
+                        inputConsumed = true
+                    }
+                }
+                Input.Keys.HOME -> { // HOME: Jump to beat 0
+                    cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), 0f)
+                    inputConsumed = true
+                }
+                Input.Keys.END -> { // END: Jump to stopping position
+                    if (this.blocks.isNotEmpty()) {
+                        cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), (container.stopPosition.getOrCompute()).coerceAtLeast(0f))
                     }
                     inputConsumed = true
                 }
-            }
-            Input.Keys.HOME -> { // HOME: Jump to beat 0
-                cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), 0f)
-                inputConsumed = true
-            }
-            Input.Keys.END -> { // END: Jump to stopping position
-                if (this.blocks.isNotEmpty()) {
-                    cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), (container.stopPosition.getOrCompute()).coerceAtLeast(0f))
-                }
-                inputConsumed = true
-            }
-            Input.Keys.SPACE -> { // SPACE: Play state
-                if (!alt && !ctrl && currentClick == Click.None) {
-                    if (state == PlayState.STOPPED) {
-                        if (!shift) {
-                            changePlayState(PlayState.PLAYING)
+                Input.Keys.SPACE -> { // SPACE: Play state
+                    if (!alt && !ctrl && currentClick == Click.None) {
+                        if (state == PlayState.STOPPED) {
+                            if (!shift) {
+                                changePlayState(PlayState.PLAYING)
+                                inputConsumed = true
+                            }
+                        } else {
+                            if (state == PlayState.PLAYING) {
+                                changePlayState(if (shift) PlayState.PAUSED else PlayState.STOPPED)
+                            } else { // PAUSED
+                                changePlayState(PlayState.PLAYING)
+                            }
                             inputConsumed = true
                         }
-                    } else {
-                        if (state == PlayState.PLAYING) {
-                            changePlayState(if (shift) PlayState.PAUSED else PlayState.STOPPED)
-                        } else { // PAUSED
-                            changePlayState(PlayState.PLAYING)
+                    }
+                }
+                Input.Keys.T -> {
+                    if (!shift && !alt && !ctrl && currentClick == Click.None) {
+                        val tapalongPane = editorPane.toolbar.tapalongPane
+                        if (tapalongPane.apparentVisibility.getOrCompute()) {
+                            tapalongPane.tap()
                         }
-                        inputConsumed = true
                     }
                 }
-            }
-            Input.Keys.T -> {
-                if (!shift && !alt && !ctrl && currentClick == Click.None) {
-                    val tapalongPane = editorPane.toolbar.tapalongPane
-                    if (tapalongPane.apparentVisibility.getOrCompute()) {
-                        tapalongPane.tap()
+                Input.Keys.Z -> { // CTRL+Z: Undo // CTRL+SHIFT+Z: Redo
+                    if (currentClick == Click.None && state == PlayState.STOPPED) {
+                        if (ctrl && !alt) {
+                            if (shift) {
+                                attemptRedo()
+                            } else {
+                                attemptUndo()
+                            }
+                        }
                     }
                 }
-            }
-            Input.Keys.Z -> { // CTRL+Z: Undo // CTRL+SHIFT+Z: Redo
-                if (currentClick == Click.None && state == PlayState.STOPPED) {
-                    if (ctrl && !alt) {
-                        if (shift) {
+                Input.Keys.Y -> { // CTRL+Y: Redo
+                    if (currentClick == Click.None && state == PlayState.STOPPED) {
+                        if (ctrl && !alt && !shift) {
                             attemptRedo()
-                        } else {
-                            attemptUndo()
                         }
                     }
                 }
-            }
-            Input.Keys.Y -> { // CTRL+Y: Redo
-                if (currentClick == Click.None && state == PlayState.STOPPED) {
-                    if (ctrl && !alt && !shift) {
-                        attemptRedo()
+                Input.Keys.S -> { // CTRL+S: Save // CTRL+ALT+S: Save As
+                    if (currentClick == Click.None && state == PlayState.STOPPED) {
+                        if (ctrl && !shift) {
+                            attemptSave(alt)
+                        }
                     }
                 }
-            }
-            Input.Keys.S -> { // CTRL+S: Save // CTRL+ALT+S: Save As
-                if (currentClick == Click.None && state == PlayState.STOPPED) {
-                    if (ctrl && !shift) {
-                        attemptSave(alt)
+                Input.Keys.O -> { // CTRL+O: Open
+                    if (currentClick == Click.None && state == PlayState.STOPPED) {
+                        if (ctrl && !shift && !alt) {
+                            attemptLoad(null)
+                        }
                     }
                 }
-            }
-            Input.Keys.O -> { // CTRL+O: Open
-                if (currentClick == Click.None && state == PlayState.STOPPED) {
-                    if (ctrl && !shift && !alt) {
-                        attemptLoad(null)
+                Input.Keys.N -> { // CTRL+N: New
+                    if (currentClick == Click.None && state == PlayState.STOPPED) {
+                        if (ctrl && !shift && !alt) {
+                            attemptNewLevel()
+                        }
                     }
                 }
-            }
-            Input.Keys.N -> { // CTRL+N: New
-                if (currentClick == Click.None && state == PlayState.STOPPED) {
-                    if (ctrl && !shift && !alt) {
-                        attemptNewLevel()
-                    }
-                }
-            }
-            in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
-                if (!ctrl && !alt && !shift && currentClick == Click.None) {
-                    val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
-                    if (number in 0 until Tool.VALUES.size) {
-                        changeTool(Tool.VALUES.getOrNull(number) ?: Tool.SELECTION)
-                        inputConsumed = true
+                in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
+                    if (!ctrl && !alt && !shift && currentClick == Click.None) {
+                        val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
+                        if (number in 0 until Tool.VALUES.size) {
+                            changeTool(Tool.VALUES.getOrNull(number) ?: Tool.SELECTION)
+                            inputConsumed = true
+                        }
                     }
                 }
             }
@@ -690,20 +699,17 @@ class Editor(val main: PRManiaGame)
     }
 
     override fun keyTyped(character: Char): Boolean {
-        if (sceneRoot.isContextMenuActive()) return false
-        if (sceneRoot.isDialogActive()) return false
-
         var inputConsumed: Boolean = sceneRoot.inputSystem.keyTyped(character)
         if (!inputConsumed) {
-
+            // Future impl here if needed. Scene root takes priority
         }
 
         return inputConsumed
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        if (pressedButtons.remove(keycode)) return true
-        return sceneRoot.inputSystem.keyUp(keycode)
+        // Intentional NON-short circuiting OR here
+        return pressedButtons.remove(keycode) or sceneRoot.inputSystem.keyUp(keycode)
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -835,13 +841,33 @@ class Editor(val main: PRManiaGame)
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         var inputConsumed = false
 
+        val allTracksPane = editorPane.allTracksPane
         val currentClick = click.getOrCompute()
+        val vec = sceneRoot.screenToUI(Vector2Stack.getAndPush().set(screenX.toFloat(), screenY.toFloat()))
         if (currentClick is Click.CreateSelection || currentClick is Click.DragSelection || currentClick is Click.MoveMarker) {
-            val vec = sceneRoot.screenToUI(Vector2Stack.getAndPush().set(screenX.toFloat(), screenY.toFloat()))
-            editorPane.allTracksPane.editorTrackArea.onMouseMovedOrDragged(vec.x, vec.y)
+            allTracksPane.editorTrackArea.onMouseMovedOrDragged(vec.x, vec.y)
             inputConsumed = true
+        }
+        
+        this.suggestPanCameraDir = 0
+        if (currentClick is Click.PansCameraOnDrag) {
+            val thisPos = allTracksPane.getPosRelativeToRoot(Vector2Stack.getAndPush())
+            thisPos.x = vec.x - thisPos.x
+            thisPos.y = vec.y - thisPos.y
+
+            val bufferZone = 20f
+            val thisWidth = allTracksPane.bounds.width.getOrCompute()
+            if (thisPos.x - bufferZone < allTracksPane.sidebarWidth.getOrCompute()) {
+                this.suggestPanCameraDir = -1
+            }
+            if (thisPos.x + bufferZone > thisWidth) {
+                this.suggestPanCameraDir = +1
+            }
+
             Vector2Stack.pop()
         }
+        
+        Vector2Stack.pop()
 
         return inputConsumed || sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer)
     }
