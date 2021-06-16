@@ -105,10 +105,10 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
             disabledTextColor.use()
         } else {
             when (pressedState) {
-                Control.PressedState.NONE -> defaultTextColor.use()
-                Control.PressedState.HOVERED -> hoveredTextColor.use()
-                Control.PressedState.PRESSED -> pressedTextColor.use()
-                Control.PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredTextColor.use()
+                PressedState.NONE -> defaultTextColor.use()
+                PressedState.HOVERED -> hoveredTextColor.use()
+                PressedState.PRESSED -> pressedTextColor.use()
+                PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredTextColor.use()
             }
         }
     }
@@ -118,10 +118,10 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
             disabledBgColor.use()
         } else {
             when (pressedState) {
-                Control.PressedState.NONE -> defaultBgColor.use()
-                Control.PressedState.HOVERED -> hoveredBgColor.use()
-                Control.PressedState.PRESSED -> pressedBgColor.use()
-                Control.PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredBgColor.use()
+                PressedState.NONE -> defaultBgColor.use()
+                PressedState.HOVERED -> hoveredBgColor.use()
+                PressedState.PRESSED -> pressedBgColor.use()
+                PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredBgColor.use()
             }
         }
     }

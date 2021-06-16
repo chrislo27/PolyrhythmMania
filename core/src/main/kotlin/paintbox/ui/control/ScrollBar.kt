@@ -174,23 +174,11 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     }
 
     class ThumbPane(val scrollBar: ScrollBar)
-        : Pane() {
+        : Pane(), HasPressedState {
 
-        val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
-        val isPressedDown: ReadOnlyVar<Boolean> = Var(false)
-        val pressedState: ReadOnlyVar<PressedState> = Var {
-            val hovered = isHoveredOver.use()
-            val pressed = isPressedDown.use()
-            if (hovered && pressed) {
-                PressedState.PRESSED_AND_HOVERED
-            } else if (hovered) {
-                PressedState.HOVERED
-            } else if (pressed) {
-                PressedState.PRESSED
-            } else {
-                PressedState.NONE
-            }
-        }
+        override val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
+        override val isPressedDown: ReadOnlyVar<Boolean> = Var(false)
+        override val pressedState: ReadOnlyVar<PressedState> = HasPressedState.createDefaultPressedStateVar(isHoveredOver, isPressedDown)
         private val lastMouseRelativeToRoot = Vector2(0f, 0f)
         private val lastMouseInside: Vector2 = lastMouseRelativeToRoot
         private var pressedOrigin: Float = 0f

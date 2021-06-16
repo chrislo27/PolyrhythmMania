@@ -15,10 +15,7 @@ import paintbox.font.TextRun
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
-import paintbox.ui.control.Button
-import paintbox.ui.control.CheckBox
-import paintbox.ui.control.Slider
-import paintbox.ui.control.TextLabel
+import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
 import paintbox.ui.skin.DefaultSkins
@@ -208,10 +205,10 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         return settingsOptionPane to cycle
     }
 
-    open class SettingsOptionPane(labelText: Var.Context.() -> String, val font: PaintboxFont, percentageContent: Float = 0.5f)
-        : Pane() {
+    open class SettingsOptionPane(labelText: Var.Context.() -> String, val font: PaintboxFont,
+                                  percentageContent: Float = 0.5f)
+        : Pane(), HasPressedState by HasPressedState.DefaultImpl() {
 
-        val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
         val textColorVar: ReadOnlyVar<Color> = Var.bind {
             if (isHoveredOver.use()) UppermostMenu.ButtonSkin.HOVERED_TEXT else UppermostMenu.ButtonSkin.TEXT_COLOR
         }
@@ -242,22 +239,14 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 this.bindWidthToParent(adjust = 0f, multiplier = percentageContent)
             }
             rect.addChild(content)
-
-            addInputEventListener { event ->
-                when (event) {
-                    is MouseEntered -> {
-                        (isHoveredOver as Var).set(true)
-                    }
-                    is MouseExited -> {
-                        (isHoveredOver as Var).set(false)
-                    }
-                }
-                false
-            }
+            
+            @Suppress("LeakingThis")
+            HasPressedState.DefaultImpl.addDefaultPressedStateInputListener(this)
         }
     }
     
-    class CycleControl<T>(settingsOptionPane: SettingsOptionPane, val list: List<T>, firstItem: T) : Pane() {
+    class CycleControl<T>(settingsOptionPane: SettingsOptionPane, val list: List<T>, firstItem: T)
+        : Pane(), HasPressedState by HasPressedState.DefaultImpl() {
         
         val left: Button
         val right: Button
@@ -307,6 +296,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             addChild(left)
             addChild(right)
             addChild(label)
+            
+            @Suppress("LeakingThis")
+            HasPressedState.DefaultImpl.addDefaultPressedStateInputListener(this)
         }
     }
 }

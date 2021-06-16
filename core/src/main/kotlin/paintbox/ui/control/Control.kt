@@ -12,7 +12,7 @@ import paintbox.ui.*
  * There are also utilities to handle common input interactions.
  */
 abstract class Control<SELF : Control<SELF>>
-    : Skinnable<SELF>(), HasTooltip {
+    : Skinnable<SELF>(), HasTooltip, HasPressedState {
 
     companion object {
         private val DEFAULT_ACTION: () -> Boolean = { false }
@@ -38,21 +38,9 @@ abstract class Control<SELF : Control<SELF>>
         } ?: false)
     }
 
-    val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
-    val isPressedDown: ReadOnlyVar<Boolean> = Var(false)
-    val pressedState: ReadOnlyVar<PressedState> = Var {
-        val hovered = isHoveredOver.use()
-        val pressed = isPressedDown.use()
-        if (hovered && pressed) {
-            PressedState.PRESSED_AND_HOVERED
-        } else if (hovered) {
-            PressedState.HOVERED
-        } else if (pressed) {
-            PressedState.PRESSED
-        } else {
-            PressedState.NONE
-        }
-    }
+    final override val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
+    final override val isPressedDown: ReadOnlyVar<Boolean> = Var(false)
+    final override val pressedState: ReadOnlyVar<PressedState> = HasPressedState.createDefaultPressedStateVar(isHoveredOver, isPressedDown)
 
     var onAction: () -> Boolean = DEFAULT_ACTION
     var onAltAction: () -> Boolean = DEFAULT_ACTION
@@ -190,12 +178,5 @@ abstract class Control<SELF : Control<SELF>>
             value(it)
             true
         }
-    }
-
-    enum class PressedState(val hovered: Boolean, val pressed: Boolean) {
-        NONE(false, false),
-        HOVERED(true, false),
-        PRESSED(false, true),
-        PRESSED_AND_HOVERED(true, true);
     }
 }

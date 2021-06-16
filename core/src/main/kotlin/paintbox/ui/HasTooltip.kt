@@ -30,6 +30,13 @@ interface HasTooltip {
      */
     fun onTooltipEnded(tooltip: UIElement) {
     }
+
+    /**
+     * A default implementation of [HasTooltip] that can be delegated to. The default element is null.
+     */
+    open class DefaultImpl : HasTooltip {
+        override val tooltipElement: Var<UIElement?> = Var(null)
+    }
 }
 
 
