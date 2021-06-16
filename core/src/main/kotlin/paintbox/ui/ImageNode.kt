@@ -86,7 +86,13 @@ open class ImageNode(tex: TextureRegion? = null,
             batch.packedColor = old
         }
     }
+}
 
+open class ImageIcon(tex: TextureRegion? = null,
+                     renderingMode: ImageRenderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
+    : ImageNode(tex, renderingMode), HasTooltip {
+    
+    override val tooltipElement: Var<UIElement?> = Var(null)
 }
 
 enum class ImageRenderingMode {

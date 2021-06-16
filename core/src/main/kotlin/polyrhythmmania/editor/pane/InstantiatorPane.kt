@@ -18,6 +18,7 @@ import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.util.gdxutils.drawCompressed
+import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
@@ -134,6 +135,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             this.disabled.bind {
                 index.use() <= 0
             }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.up.tooltip")))
         }
         buttonPane += Button("").apply {
             this.padding.set(Insets.ZERO)
@@ -151,12 +153,14 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             this.disabled.bind {
                 index.use() >= list.size - 1
             }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.down.tooltip")))
         }
-        buttonPane += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"])).apply {
+        buttonPane += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"])).apply {
             this.padding.set(Insets.ZERO)
             Anchor.CentreLeft.configure(this)
             this.bounds.width.set(buttonWidth)
             this.bounds.height.set(buttonWidth)
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.current.tooltip")))
         }
 
         listPane = Pane().apply {

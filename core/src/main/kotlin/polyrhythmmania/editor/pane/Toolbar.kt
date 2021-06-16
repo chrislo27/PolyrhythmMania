@@ -24,6 +24,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
     val previewSection: Pane
     val mainSection: Pane
 
+    val playtestButton: Button
     val pauseButton: Button
     val playButton: Button
     val stopButton: Button
@@ -54,13 +55,40 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.align.set(HBox.Align.LEFT)
         }
         leftPreviewHbox.temporarilyDisableLayouts { 
-            leftPreviewHbox += object : ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["informational"])), HasTooltip {
-                override val tooltipElement: Var<UIElement?> = Var(editorPane.createDefaultTooltip(Localization.getVar("editor.preview.tooltip")))
-            }.apply { 
+            leftPreviewHbox += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["informational"])).apply { 
                 this.bounds.width.set(32f)
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.preview.tooltip")))
             }
         }
         previewSection += leftPreviewHbox
+        val rightPreviewHbox = HBox().apply {
+            Anchor.TopRight.configure(this)
+            this.spacing.set(4f)
+            this.bounds.width.set(32f * 3 + this.spacing.get() * 2)
+            this.align.set(HBox.Align.RIGHT)
+        }
+        previewSection += rightPreviewHbox
+        
+        playtestButton = Button("").apply {
+            this.padding.set(Insets(2f))
+            this.bounds.width.set(32f)
+            this.skinID.set(EditorSkins.BUTTON)
+            val open: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_clapboard_open"])
+            val shut: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_clapboard_shut"])
+            this += ImageNode(null).apply {
+                this.textureRegion.bind {
+                    if (pressedState.use().pressed) shut else open
+                }
+            }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.playtest")))
+            this.disabled.bind { !editorPane.editor.allowedToEdit.use() }
+            this.setOnAction {
+                
+            }
+        }
+        rightPreviewHbox.temporarilyDisableLayouts {
+            rightPreviewHbox += playtestButton
+        }
         
         val playbackButtonPane = HBox().apply {
             Anchor.Centre.configure(this)
