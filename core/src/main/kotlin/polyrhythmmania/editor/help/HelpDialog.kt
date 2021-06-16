@@ -72,7 +72,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.help.goToTop")))
             }
             rightHbox += Button("").apply {
-                this.bounds.width.bind { bounds.height.useF() }
+                this.bounds.width.set(48f)
                 this.applyDialogStyleBottom()
                 this.setOnAction {
                     editorPane.closeDialog()

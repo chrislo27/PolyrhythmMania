@@ -24,8 +24,9 @@ abstract class AbstractHVBox : Pane() {
         MIN, MIDDLE, MAX
     }
     
-    protected inner class ElementData(val element: UIElement, var index: Int, var previousAccumulation: Float, var dimension: Float) {
-        val currentAccumulation: Float get() = previousAccumulation + dimension
+    protected inner class ElementData(val element: UIElement, var index: Int, var dimension: Float) {
+        var position: Float = 0f
+        var nextSpacing: Float = 0f
         
         val sizeListener: VarChangedListener<Float> = VarChangedListener { 
             this@AbstractHVBox.attemptLayout(index)
@@ -90,29 +91,30 @@ abstract class AbstractHVBox : Pane() {
         if (disableLayouts.getOrCompute() || index >= elementCache.size) return
         
         val cache = elementCache
-        var acc = if (index > 0) (cache[index - 1].currentAccumulation) else 0f
+        var acc = if (index > 0) (cache[index - 1].let { it.position + it.dimension + it.nextSpacing }) else 0f
         val cacheSize = cache.size
         val spacingValue = spacing.get()
         
         for (i in index until cacheSize) {
-            val d = elementCache[i]
+            val d = cache[i]
             val element = d.element
-            d.previousAccumulation = acc
+            d.position = acc
             d.dimension = getDimensional(element).get()
+            d.nextSpacing = spacingValue
             
             val pos = getPositional(element)
-            pos.set(d.previousAccumulation)
+            pos.set(d.position)
             
-            acc = d.currentAccumulation
+            acc += d.dimension
             if (i < cacheSize - 1) {
-                acc += spacingValue
+                acc += d.nextSpacing
             }
         }
         
         // Alignment
         val align = this.internalAlignment.getOrCompute()
         if (align != InternalAlignment.MIN) {
-            val totalSize = cache.last().currentAccumulation
+            val totalSize = cache.last().let { it.position + it.dimension }
             val thisSize = getThisDimensional().get()
             val offset: Float = when (align) {
                 InternalAlignment.MIN -> 0f // Not a possible branch
@@ -124,7 +126,7 @@ abstract class AbstractHVBox : Pane() {
                 val d = elementCache[i]
                 val element = d.element
                 val pos = getPositional(element)
-                pos.set(d.previousAccumulation + offset)
+                pos.set(d.position + offset)
             }
         }
     }
@@ -136,10 +138,10 @@ abstract class AbstractHVBox : Pane() {
         val currentCache = elementCache.toList()
         val prev = currentCache.lastOrNull()
         val dimensional = getDimensional(newChild)
-        val elementData = ElementData(newChild, currentCache.size, prev?.currentAccumulation ?: 0f, dimensional.get())
+        val elementData = ElementData(newChild, currentCache.size, dimensional.get())
         dimensional.addListener(elementData.sizeListener)
         elementCache += elementData
-        attemptLayout(currentCache.size)
+        attemptLayout((currentCache.size - 1).coerceAtLeast(0))
     }
 
     override fun onChildRemoved(oldChild: UIElement) {
