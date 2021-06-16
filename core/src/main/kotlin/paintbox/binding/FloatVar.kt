@@ -43,7 +43,8 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
     private val invalidationListener: VarChangedListener<Any> = InvalListener(this) as VarChangedListener<Any>
 
     constructor(item: Float) {
-        binding = FloatBinding.Const(item)
+        binding = FloatBinding.Const
+        currentValue = item
     }
 
     constructor(computation: Var.Context.() -> Float) {
@@ -75,12 +76,12 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
 
     override fun set(item: Float) {
         val existingBinding = binding
-        if (existingBinding is FloatBinding.Const && existingBinding.item == item) {
+        if (existingBinding is FloatBinding.Const && currentValue == item) {
             return
         }
         reset()
         currentValue = item
-        binding = FloatBinding.Const(item)
+        binding = FloatBinding.Const
         notifyListeners()
     }
 
@@ -105,7 +106,7 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
      */
     override fun get(): Float {
         val result: Float = when (val binding = this.binding) {
-            is FloatBinding.Const -> binding.item
+            is FloatBinding.Const -> this.currentValue
             is FloatBinding.Compute -> {
                 if (!invalidated) {
                     currentValue
@@ -183,18 +184,13 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
     }
 
     private sealed class FloatBinding {
-        class Const(val item: Float) : FloatBinding() {
-            override fun getValue(): Float = item
-        }
+        /**
+         * Represents a constant value. The value is actually stored in [FloatVar.currentValue].
+         */
+        object Const : FloatBinding()
 
-        class Compute(val computation: Var.Context.() -> Float) : FloatBinding() {
-            override fun getValue(): Float = computation.invoke(Var.Context())
-        }
+        class Compute(val computation: Var.Context.() -> Float) : FloatBinding()
 
-        class SideEffecting(var item: Float, val sideEffectingComputation: Var.Context.(existing: Float) -> Float) : FloatBinding() {
-            override fun getValue(): Float = item
-        }
-
-        abstract fun getValue(): Float
+        class SideEffecting(var item: Float, val sideEffectingComputation: Var.Context.(existing: Float) -> Float) : FloatBinding()
     }
 }
