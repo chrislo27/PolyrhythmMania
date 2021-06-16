@@ -36,12 +36,12 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         val contentBounds = element.contentZone
-        val rectX = contentBounds.x.getOrCompute() + originX
-        val rectY = originY - contentBounds.y.getOrCompute()
-        val rectW = contentBounds.width.getOrCompute()
-        val rectH = contentBounds.height.getOrCompute()
+        val rectX = contentBounds.x.get() + originX
+        val rectY = originY - contentBounds.y.get()
+        val rectW = contentBounds.width.get()
+        val rectH = contentBounds.height.get()
         val lastPackedColor = batch.packedColor
-        val opacity = element.apparentOpacity.getOrCompute()
+        val opacity = element.apparentOpacity.get()
         val tmpColor = ColorStack.getAndPush()
 
         tmpColor.set(bgColor.getOrCompute())
@@ -54,12 +54,12 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
         val thumbBounds = thumb.bounds
         val thumbW = (if (element.orientation == ScrollBar.Orientation.VERTICAL)
             (1f)
-        else (element.convertValueToPercentage(element.visibleAmount.getOrCompute()))) * thumbBounds.width.getOrCompute()
+        else (element.convertValueToPercentage(element.visibleAmount.get()))) * thumbBounds.width.get()
         val thumbH = (if (element.orientation == ScrollBar.Orientation.HORIZONTAL)
             (1f)
-        else (element.convertValueToPercentage(element.visibleAmount.getOrCompute()))) * thumbBounds.height.getOrCompute()
-        val currentValue = element.value.getOrCompute()
-        val scrollableThumbArea = element.maximum.getOrCompute() - element.minimum.getOrCompute()
+        else (element.convertValueToPercentage(element.visibleAmount.get()))) * thumbBounds.height.get()
+        val currentValue = element.value.get()
+        val scrollableThumbArea = element.maximum.get() - element.minimum.get()
         val thin = 2f
 
         tmpColor.set(thumbColor.getOrCompute())
@@ -67,12 +67,12 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
         batch.color = tmpColor
         when (element.orientation) {
             ScrollBar.Orientation.HORIZONTAL -> {
-                batch.fillRect(rectX + thin, rectY - rectH + thumbBounds.y.getOrCompute() + (rectH - thin) * 0.5f,
-                        thumbBounds.width.getOrCompute() - thin * 2, thin)
+                batch.fillRect(rectX + thin, rectY - rectH + thumbBounds.y.get() + (rectH - thin) * 0.5f,
+                        thumbBounds.width.get() - thin * 2, thin)
             }
             ScrollBar.Orientation.VERTICAL -> {
-                batch.fillRect(rectX + (rectW - thin) * 0.5f, rectY - rectH + thumbBounds.y.getOrCompute() + thin,
-                        thin, thumbBounds.height.getOrCompute() - thin * 2)
+                batch.fillRect(rectX + (rectW - thin) * 0.5f, rectY - rectH + thumbBounds.y.get() + thin,
+                        thin, thumbBounds.height.get() - thin * 2)
             }
         }
 
@@ -87,15 +87,15 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
         batch.color = tmpColor
         when (element.orientation) {
             ScrollBar.Orientation.HORIZONTAL -> {
-                batch.fillRoundedRect(rectX + thumbBounds.x.getOrCompute()
-                        + (if (element.orientation == ScrollBar.Orientation.HORIZONTAL) (currentValue / scrollableThumbArea * (thumbBounds.width.getOrCompute() - thumbW)) else 0f),
-                        rectY - rectH + thumbBounds.y.getOrCompute(),
+                batch.fillRoundedRect(rectX + thumbBounds.x.get()
+                        + (if (element.orientation == ScrollBar.Orientation.HORIZONTAL) (currentValue / scrollableThumbArea * (thumbBounds.width.get() - thumbW)) else 0f),
+                        rectY - rectH + thumbBounds.y.get(),
                         thumbW, thumbH, thumbH / 2f)
             }
             ScrollBar.Orientation.VERTICAL -> {
-                batch.fillRoundedRect(rectX + thumbBounds.x.getOrCompute(),
-                        rectY - rectH + thumbBounds.y.getOrCompute() + (thumbBounds.height.getOrCompute() - thumbH)
-                                - (if (element.orientation == ScrollBar.Orientation.VERTICAL) (currentValue / scrollableThumbArea * (thumbBounds.height.getOrCompute() - thumbH)) else 0f),
+                batch.fillRoundedRect(rectX + thumbBounds.x.get(),
+                        rectY - rectH + thumbBounds.y.get() + (thumbBounds.height.get() - thumbH)
+                                - (if (element.orientation == ScrollBar.Orientation.VERTICAL) (currentValue / scrollableThumbArea * (thumbBounds.height.get() - thumbH)) else 0f),
                         thumbW, thumbH, thumbW / 2f)
             }
         }

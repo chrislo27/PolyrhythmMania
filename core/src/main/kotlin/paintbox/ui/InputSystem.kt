@@ -104,11 +104,11 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         // then the rest of the code does nothing, achieving maximum performance.
 
         var cursor: UIElement? = lastPath.lastOrNull()
-        var offX: Float = lastPath.sumOfFloat { it.contentZone.x.getOrCompute() }
-        var offY: Float = lastPath.sumOfFloat { it.contentZone.y.getOrCompute() }
+        var offX: Float = lastPath.sumOfFloat { it.contentZone.x.get() }
+        var offY: Float = lastPath.sumOfFloat { it.contentZone.y.get() }
         if (cursor != null) {
-            offX -= cursor.contentZone.x.getOrCompute()
-            offY -= cursor.contentZone.y.getOrCompute()
+            offX -= cursor.contentZone.x.get()
+            offY -= cursor.contentZone.y.get()
         }
         // offsets should be the absolute x/y of the parent of cursor
         while (cursor != null && (
@@ -120,8 +120,8 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
             removed.fireEvent(MouseExited(x, y))
             cursor = lastPath.lastOrNull()
             if (cursor != null) {
-                offX -= cursor.contentZone.x.getOrCompute()
-                offY -= cursor.contentZone.y.getOrCompute()
+                offX -= cursor.contentZone.x.get()
+                offY -= cursor.contentZone.y.get()
             }
         }
 
@@ -146,15 +146,15 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
                     lastRemoved = removed
                     cursor = lastPath.lastOrNull()
                     if (cursor != null) {
-                        offX -= cursor.contentZone.x.getOrCompute()
-                        offY -= cursor.contentZone.y.getOrCompute()
+                        offX -= cursor.contentZone.x.get()
+                        offY -= cursor.contentZone.y.get()
                     }  
                 } while (lastRemoved !== clipCursor)
             }
             clipCursor = clipCursor.parent.getOrCompute()
             if (clipCursor != null) {
-                clipOffX -= clipCursor.contentZone.x.getOrCompute()
-                clipOffY -= clipCursor.contentZone.y.getOrCompute()
+                clipOffX -= clipCursor.contentZone.x.get()
+                clipOffY -= clipCursor.contentZone.y.get()
             }
         }
 

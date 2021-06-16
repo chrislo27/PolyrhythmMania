@@ -78,7 +78,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         val paintboxFont = this@TextField.font.use()
         paintboxFont.currentFontNumberVar.use()
         paintboxFont.useFont { bitmapFont ->
-            bitmapFont.scaleMul(textScale.use())
+            bitmapFont.scaleMul(textScale.useF())
             val originalText = text.use()
             val translated = translateTextToRenderable(originalText, isPassword.use(), newlineWrapChar.use())
             layout.setText(bitmapFont, translated)
@@ -162,14 +162,14 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         val clamped = position.coerceIn(0, text.getOrCompute().length)
         caretPos.set(clamped)
         // Update xOffset
-        val currentXOffset = xOffset.getOrCompute()
+        val currentXOffset = xOffset.get()
         val characterPos = characterPositions.getOrCompute()
         val newCaretOffset = characterPos[clamped.coerceIn(0, characterPos.size - 1)].coerceAtLeast(0f)
         if (newCaretOffset < currentXOffset) {
-            val contentZoneWidth = contentZone.width.getOrCompute()
+            val contentZoneWidth = contentZone.width.get()
             xOffset.set(newCaretOffset.coerceAtMost(characterPos.last() - contentZoneWidth).coerceAtLeast(0f))
         } else {
-            val contentZoneWidth = contentZone.width.getOrCompute()
+            val contentZoneWidth = contentZone.width.get()
             if (newCaretOffset > currentXOffset + contentZoneWidth) {
                 xOffset.set((newCaretOffset - contentZoneWidth).coerceAtLeast(0f))
             }
@@ -330,8 +330,8 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         lastMouseInside.x = event.x - lastMouseInside.x
         lastMouseInside.y = event.y - lastMouseInside.y
 
-        val xInContent = (lastMouseInside.x - contentZone.x.getOrCompute())//.coerceIn(0f, contentZone.width.getOrCompute().coerceAtLeast(0f))
-        val cursorX = xInContent + xOffset.getOrCompute()
+        val xInContent = (lastMouseInside.x - contentZone.x.get())//.coerceIn(0f, contentZone.width.getOrCompute().coerceAtLeast(0f))
+        val cursorX = xInContent + xOffset.get()
         // Calculate where the caret should go.
         val pos = characterPositions.getOrCompute().toList()
         if (pos.isEmpty()) {
@@ -430,34 +430,34 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     open class TextFieldSkin(element: TextField) : Skin<TextField>(element) {
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val renderBounds = element.contentZone
-            val rectX = renderBounds.x.getOrCompute() + originX
-            val rectY = originY - renderBounds.y.getOrCompute()
+            val rectX = renderBounds.x.get() + originX
+            val rectY = originY - renderBounds.y.get()
 //            val rectW = renderBounds.width.getOrCompute()
-            val rectH = renderBounds.height.getOrCompute()
+            val rectH = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
-            val opacity = element.apparentOpacity.getOrCompute()
+            val opacity = element.apparentOpacity.get()
 
             val tmpColor = ColorStack.getAndPush()
             val layout: GlyphLayout = element.glyphLayout.getOrCompute()
             val paintboxFont = element.font.getOrCompute()
             var caretHeight = 1f
-            val overallOffsetX = element.xOffset.getOrCompute()
+            val overallOffsetX = element.xOffset.get()
             val hasFocusNow = element.hasFocus.getOrCompute()
             val textColor = element.textColor.getOrCompute()
             paintboxFont.useFont { bitmapFont ->
-                bitmapFont.scaleMul(element.textScale.getOrCompute())
+                bitmapFont.scaleMul(element.textScale.get())
                 tmpColor.set(textColor)
                 tmpColor.a *= opacity
                 bitmapFont.color = tmpColor
                 bitmapFont.draw(batch, layout, rectX - overallOffsetX, rectY - (rectH - layout.height) / 2f)
-                
+
                 if (!hasFocusNow && element.text.getOrCompute().isEmpty()) {
                     tmpColor.set(textColor)
                     tmpColor.a *= opacity * 0.5f
                     bitmapFont.color = tmpColor
                     bitmapFont.draw(batch, element.emptyHintText.getOrCompute(), rectX /* no offset */, rectY - (rectH - layout.height) / 2f)
                 }
-                
+
                 bitmapFont.setColor(1f, 1f, 1f, 1f)
                 caretHeight = bitmapFont.lineHeight
             }
@@ -470,7 +470,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                     val caretPos = element.caretPos.getOrCompute()
                     val charPos = element.characterPositions.getOrCompute()
                     val posX = if (caretPos in 0 until charPos.size) charPos[caretPos] else 0f
-                    val caretWidth = element.caretWidth.getOrCompute()
+                    val caretWidth = element.caretWidth.get()
                     batch.fillRect(rectX - overallOffsetX + posX, rectY - (rectH + caretHeight) / 2f, caretWidth, caretHeight)
                 }
             }

@@ -20,19 +20,19 @@ class OverallWavePane(musicDialog: MusicDialog) : AbstrWavePane(musicDialog) {
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
         super.renderSelfAfterChildren(originX, originY, batch)
         val renderBounds = this.contentZone
-        val x = renderBounds.x.getOrCompute() + originX
-        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
-        val h = renderBounds.height.getOrCompute()
+        val x = renderBounds.x.get() + originX
+        val y = originY - renderBounds.y.get()
+        val w = renderBounds.width.get()
+        val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
         val tmpColor: Color = ColorStack.getAndPush()
         tmpColor.set(Color.WHITE)
 
         val window = musicDialog.window
-        val durationSec = window.musicDurationSec.getOrCompute()
-        val windowX = (window.x.getOrCompute() / durationSec) * w
-        val windowW = (window.widthSec.getOrCompute() / durationSec) * w
+        val durationSec = window.musicDurationSec.get()
+        val windowX = (window.x.get() / durationSec) * w
+        val windowW = (window.widthSec.get() / durationSec) * w
 
         batch.color = tmpColor
         batch.drawRect(x + windowX, y - h, windowW, h, 2f)
@@ -46,11 +46,11 @@ class OverallWavePane(musicDialog: MusicDialog) : AbstrWavePane(musicDialog) {
         
         val relX = lastMouseRelative.x
         val window = musicDialog.window
-        val durationSec = window.musicDurationSec.getOrCompute()
-        val centreSec = (relX / this.contentZone.width.getOrCompute()) * durationSec
+        val durationSec = window.musicDurationSec.get()
+        val centreSec = (relX / this.contentZone.width.get()) * durationSec
         
         if (isLeftClickDown) {
-            val widthSec = window.widthSec.getOrCompute()
+            val widthSec = window.widthSec.get()
             var leftSec = centreSec - (widthSec / 2f)
             if (leftSec + widthSec > durationSec) leftSec = durationSec - widthSec
             if (leftSec < 0) leftSec = 0f

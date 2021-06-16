@@ -45,14 +45,14 @@ class Menubar(val editorPane: EditorPane) : Pane() {
         val leftBox: HBox = HBox().apply { 
             this.spacing.set(4f)
             this.align.set(HBox.Align.LEFT)
-            this.bounds.width.set((32f + this.spacing.getOrCompute()) * 6)
+            this.bounds.width.set((32f + this.spacing.get()) * 6)
         }
         this.addChild(leftBox)
         val rightBox: HBox = HBox().apply {
             Anchor.TopRight.configure(this)
             this.spacing.set(4f)
             this.align.set(HBox.Align.RIGHT)
-            this.bounds.width.set((32f + this.spacing.getOrCompute()) * 3)
+            this.bounds.width.set((32f + this.spacing.get()) * 3)
         }
         this.addChild(rightBox)
         

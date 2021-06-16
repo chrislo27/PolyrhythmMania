@@ -59,42 +59,42 @@ abstract class AbstrWavePane(val musicDialog: MusicDialog) : Pane() {
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
         super.renderSelfAfterChildren(originX, originY, batch)
         val renderBounds = this.contentZone
-        val x = renderBounds.x.getOrCompute() + originX
-        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
-        val h = renderBounds.height.getOrCompute()
+        val x = renderBounds.x.get() + originX
+        val y = originY - renderBounds.y.get()
+        val w = renderBounds.width.get()
+        val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
         val tmpColor: Color = ColorStack.getAndPush()
         tmpColor.set(Color.WHITE)
 
         val window = musicDialog.window
-        val durationSec = window.musicDurationSec.getOrCompute()
+        val durationSec = window.musicDurationSec.get()
 
-        val visibleX = if (isFullWidth) 0f else (window.x.getOrCompute() / durationSec)
-        val visibleWidth = if (isFullWidth) 1f else (window.widthSec.getOrCompute() / durationSec)
+        val visibleX = if (isFullWidth) 0f else (window.x.get() / durationSec)
+        val visibleWidth = if (isFullWidth) 1f else (window.widthSec.get() / durationSec)
         
-        val playbackStart = window.playbackStart.getOrCompute()
+        val playbackStart = window.playbackStart.get()
         if (playbackStart / durationSec in visibleX..(visibleX + visibleWidth)) {
             batch.color = musicDialog.markerPlaybackStart
             batch.fillRect(x + ((playbackStart / durationSec) - visibleX) / visibleWidth * w, y - h, 1f, h)
         }
-        val loopStart = window.loopStart.getOrCompute()
+        val loopStart = window.loopStart.get()
         if (loopStart / durationSec in visibleX..(visibleX + visibleWidth)) {
             batch.color = musicDialog.markerLoopStart
             batch.fillRect(x + ((loopStart / durationSec) - visibleX) / visibleWidth * w, y - h, 1f, h)
         }
-        val loopEnd = window.loopEnd.getOrCompute()
+        val loopEnd = window.loopEnd.get()
         if (loopEnd / durationSec in visibleX..(visibleX + visibleWidth)) {
             batch.color = musicDialog.markerLoopEnd
             batch.fillRect(x + ((loopEnd / durationSec) - visibleX) / visibleWidth * w, y - h, 1f, h)
         }
-        val firstBeat = window.firstBeat.getOrCompute()
+        val firstBeat = window.firstBeat.get()
         if (firstBeat / durationSec in visibleX..(visibleX + visibleWidth)) {
             batch.color = musicDialog.markerFirstBeat
             batch.fillRect(x + ((firstBeat / durationSec) - visibleX) / visibleWidth * w, y - h, 1f, h)
         }
-        val musicPlayback = musicDialog.currentMusicPosition.getOrCompute()
+        val musicPlayback = musicDialog.currentMusicPosition.get()
         if (musicPlayback / durationSec in visibleX..(visibleX + visibleWidth)) {
             batch.color = musicDialog.markerPlaybackStart
             batch.fillRect(x + ((musicPlayback / durationSec) - visibleX) / visibleWidth * w, y - h, 1f, h)

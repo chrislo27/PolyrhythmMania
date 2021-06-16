@@ -32,7 +32,6 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
-import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.util.TimeUtils
 import java.io.File
@@ -92,7 +91,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
         bottomPane.addChild(Button("").apply {
             Anchor.BottomRight.configure(this)
-            this.bounds.width.bind { bounds.height.use() }
+            this.bounds.width.bind { bounds.height.useF() }
             this.applyDialogStyleBottom()
             this.setOnAction {
                 attemptCloseDialog()
@@ -154,7 +153,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             })
             val localizationWaveform = Localization.getVar("editor.dialog.music.loading.waveform", Var {
                 val load = loadingProgress
-                listOf(load.bytesSoFar.use() / 1024, convertMsToTimestamp(load.durationMs.use()))
+                listOf(load.bytesSoFar.use() / 1024, convertMsToTimestamp(load.durationMs.useF()))
             })
             this.text.bind {
                 val load = loadingProgress
@@ -179,7 +178,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             Anchor.BottomCentre.configure(this)
             this.align.set(HBox.Align.CENTRE)
             this.spacing.set(16f)
-            this.bindWidthToParent { -1 * bounds.height.use() * 3 }
+            this.bindWidthToParent { -1 * bounds.height.useF() * 3 }
             this.visible.bind {
                 val ss = substate.use()
                 ss == Substate.HAS_MUSIC || ss == Substate.NO_MUSIC
@@ -213,7 +212,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             Anchor.BottomCentre.configure(this)
             this.align.set(HBox.Align.CENTRE)
             this.spacing.set(16f)
-            this.bindWidthToParent { -1 * bounds.height.use() * 3 }
+            this.bindWidthToParent { -1 * bounds.height.useF() * 3 }
             this.bindWidthToParent { -200f }
             this.visible.bind {
                 val ss = substate.use()
@@ -257,7 +256,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 label.textAlign.set(TextAlign.LEFT)
                 label.textColor.set(Color.WHITE)
             })
-            this.addChild(TextLabel(binding = { convertMsToTimestamp(loadingProgress.durationMs.use()) }, font = editorPane.palette.musicDialogFont).also { label ->
+            this.addChild(TextLabel(binding = { convertMsToTimestamp(loadingProgress.durationMs.useF()) }, font = editorPane.palette.musicDialogFont).also { label ->
                 Anchor.TopRight.configure(label)
                 label.margin.set(Insets(0f, 2f, 0f, 0f))
                 label.bounds.width.set(120f)
@@ -275,7 +274,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.addChild(hbox)
 
             hbox.temporarilyDisableLayouts {
-                val playbackStartLoc = Localization.getVar("editor.dialog.music.settings.playbackStart", Var { listOf(convertMsToTimestamp(window.playbackStart.use() * 1000)) })
+                val playbackStartLoc = Localization.getVar("editor.dialog.music.settings.playbackStart", Var { listOf(convertMsToTimestamp(window.playbackStart.useF() * 1000)) })
                 hbox.addChild(TextLabel(binding = { playbackStartLoc.use() }).apply {
                     this.textColor.set(Color.WHITE.cpy())
                     this.markup.set(editorPane.palette.markup)
@@ -305,7 +304,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
         val zoomedWaveformLabels = Pane().apply {
             this.bounds.height.set(32f)
-            this.addChild(TextLabel(binding = { convertMsToTimestamp(window.x.use() * 1000) },
+            this.addChild(TextLabel(binding = { convertMsToTimestamp(window.x.useF() * 1000) },
                     font = editor.main.mainFont).also { label ->
                 Anchor.TopLeft.configure(label)
                 label.margin.set(Insets(0f, 2f, 0f, 0f))
@@ -314,7 +313,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 label.textAlign.set(TextAlign.LEFT)
                 label.textColor.set(Color.WHITE)
             })
-            this.addChild(TextLabel(binding = { convertMsToTimestamp((window.x.use() + window.widthSec.use()) * 1000) },
+            this.addChild(TextLabel(binding = { convertMsToTimestamp((window.x.useF() + window.widthSec.useF()) * 1000) },
                     font = editor.main.mainFont).also { label ->
                 Anchor.TopRight.configure(label)
                 label.margin.set(Insets(0f, 2f, 0f, 0f))
@@ -346,7 +345,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 hbox.addChild(RadioButton("").apply {
                     val textColor = markerFirstBeat
                     val loc = Localization.getVar("editor.dialog.music.settings.marker.firstBeat", Var {
-                        listOf(/* intentional space */ " " + convertMsToTimestamp(window.firstBeat.use() * 1000))
+                        listOf(/* intentional space */ " " + convertMsToTimestamp(window.firstBeat.useF() * 1000))
                     })
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.marker.firstBeat.tooltip")))
                     this.textLabel.text.bind { loc.use() }
@@ -364,7 +363,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 hbox.addChild(RadioButton("").apply {
                     val textColor = markerLoopStart
                     val loc = Localization.getVar("editor.dialog.music.settings.marker.loopStart", Var {
-                        listOf(/* intentional space */ " " + convertMsToTimestamp(window.loopStart.use() * 1000))
+                        listOf(/* intentional space */ " " + convertMsToTimestamp(window.loopStart.useF() * 1000))
                     })
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.marker.loopStart.tooltip")))
                     this.textLabel.text.bind { loc.use() }
@@ -381,7 +380,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 hbox.addChild(RadioButton("").apply {
                     val textColor = markerLoopEnd
                     val loc = Localization.getVar("editor.dialog.music.settings.marker.loopEnd", Var {
-                        listOf(/* intentional space */ " " + convertMsToTimestamp(window.loopEnd.use() * 1000))
+                        listOf(/* intentional space */ " " + convertMsToTimestamp(window.loopEnd.useF() * 1000))
                     })
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.marker.loopEnd.tooltip")))
                     this.textLabel.text.bind { loc.use() }
@@ -435,7 +434,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.applyDialogStyleContent()
                     this.bounds.width.set(250f)
                     this.setOnAction {
-                        window.loopEnd.set(window.musicDurationSec.getOrCompute())
+                        window.loopEnd.set(window.musicDurationSec.get())
                     }
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.setLoopEndToEnd.tooltip")))
                 })
@@ -470,7 +469,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         stopMusicPlayback()
 
         // Push changes to editor
-        editor.musicData.firstBeatSec.set(this.window.firstBeat.getOrCompute())
+        editor.musicData.firstBeatSec.set(this.window.firstBeat.get())
         editor.musicData.loopParams.set(this.window.createLoopParams())
 
         editorPane.closeDialog()
@@ -484,7 +483,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         load.durationMs.set(currentMusic?.musicSample?.lengthMs?.toFloat() ?: 0f)
 
         // Copy over music details
-        this.window.firstBeat.set(editor.musicData.firstBeatSec.getOrCompute())
+        this.window.firstBeat.set(editor.musicData.firstBeatSec.get())
         val loopParams = editor.musicData.loopParams.getOrCompute()
         if (loopParams == LoopParams.NO_LOOP_FORWARDS) {
             this.window.doLooping.set(false)
@@ -514,7 +513,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val engine = editor.engine
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
-            player.position = window.playbackStart.getOrCompute() * 1000.0
+            player.position = window.playbackStart.get() * 1000.0
             player.useLoopParams(window.createLoopParams())
             player.pause(false)
             editor.soundSystem.setPaused(false)
@@ -639,7 +638,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         MarkerType.LOOP_START -> window.loopStart
                         MarkerType.LOOP_END -> window.loopEnd
                     }
-                    val startSec = variable.getOrCompute()
+                    val startSec = variable.get()
                     var zeroCross = startSec
                     for (i in 0 until 3) { // Found that repeated iterations improves accuracy (?)
                         zeroCross = findZeroCrossing(startSec)
@@ -760,12 +759,12 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             return LoopParams(if (doLooping.getOrCompute()) 
                 SamplePlayer.LoopType.LOOP_FORWARDS 
             else SamplePlayer.LoopType.NO_LOOP_FORWARDS, 
-                    loopStart.getOrCompute() * 1000.0, loopEnd.getOrCompute() * 1000.0)
+                    loopStart.get() * 1000.0, loopEnd.get() * 1000.0)
         }
 
         fun limitWindow() {
-            val dur = musicDurationSec.getOrCompute()
-            if (widthSec.getOrCompute() > dur) {
+            val dur = musicDurationSec.get()
+            if (widthSec.get() > dur) {
                 widthSec.set(dur)
             }
         }

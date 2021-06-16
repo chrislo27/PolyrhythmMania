@@ -22,7 +22,7 @@ class NewDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
         bottomPane.addChild(Button(binding = { Localization.getVar("common.cancel").use() }, font = editorPane.palette.exitDialogFont).apply {
             Anchor.BottomRight.configure(this)
-            this.bounds.width.bind { bounds.height.use() * 3 }
+            this.bounds.width.bind { bounds.height.useF() * 3 }
             this.applyDialogStyleBottom()
             this.setOnAction {
                 editorPane.closeDialog()

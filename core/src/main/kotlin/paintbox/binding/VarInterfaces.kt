@@ -74,6 +74,29 @@ interface Var<T> : ReadOnlyVar<T> {
         fun <R> ReadOnlyVar<R>.use(): R {
             return use(this)
         }
+        
+        // Specialization methods below
+
+        @Deprecated("Don't use ReadOnlyVar<Float>, use ReadOnlyFloatVar.useF() instead to avoid explicit boxing",
+                replaceWith = ReplaceWith("(this as ReadOnlyFloatVar).useF()"),
+                level = DeprecationLevel.ERROR)
+        fun ReadOnlyVar<Float>.use(): Float {
+            return use(this)
+        }
+
+        @Deprecated("Don't use the generic use() function, use ReadOnlyFloatVar.useF() instead to avoid explicit boxing",
+                replaceWith = ReplaceWith("this.useF()"),
+                level = DeprecationLevel.ERROR)
+        fun ReadOnlyFloatVar.use(): Float {
+            return this.useF()
+        }
+        
+        // The float specialization method. Returns a primitive float.
+        @Suppress("UNCHECKED_CAST")
+        fun ReadOnlyFloatVar.useF(): Float {
+            dependencies += (this as ReadOnlyVar<Any>)
+            return this.get()
+        }
     }
 }
 

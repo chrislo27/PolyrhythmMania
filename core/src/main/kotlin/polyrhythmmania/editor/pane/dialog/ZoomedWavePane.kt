@@ -22,9 +22,9 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
         this.isFullWidth = false
         zoomedRefreshIndicator.sideEffecting(0) { existing ->
             val window = musicDialog.window
-            window.x.use()
-            window.widthSec.use()
-            window.musicDurationSec.use()
+            window.x.useF()
+            window.widthSec.useF()
+            window.musicDurationSec.useF()
 
             val nano = measureNanoTime {
                 editor.waveformWindow.generateZoomed(window)
@@ -39,19 +39,19 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         super.renderSelf(originX, originY, batch)
         val renderBounds = this.contentZone
-        val x = renderBounds.x.getOrCompute() + originX
-        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
-        val h = renderBounds.height.getOrCompute()
+        val x = renderBounds.x.get() + originX
+        val y = originY - renderBounds.y.get()
+        val w = renderBounds.width.get()
+        val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
         val tmpColor: Color = ColorStack.getAndPush()
         tmpColor.set(Color.WHITE)
 
         val window = musicDialog.window
-        val durationSec = window.musicDurationSec.getOrCompute()
-        val windowX = (window.x.getOrCompute() / durationSec)
-        val windowW = (window.widthSec.getOrCompute() / durationSec)
+        val durationSec = window.musicDurationSec.get()
+        val windowX = (window.x.get() / durationSec)
+        val windowW = (window.widthSec.get() / durationSec)
 
         if (overallPane.isLeftClickDown && suggestRenderZoomedLast && (System.currentTimeMillis() - suggestRenderZoomedLastTimeMs) < 250L) {
             batch.setColor(1f, 1f, 1f, 1f)
@@ -72,19 +72,19 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
         super.renderSelfAfterChildren(originX, originY, batch)
         val renderBounds = this.contentZone
-        val x = renderBounds.x.getOrCompute() + originX
-        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
-        val h = renderBounds.height.getOrCompute()
+        val x = renderBounds.x.get() + originX
+        val y = originY - renderBounds.y.get()
+        val w = renderBounds.width.get()
+        val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
         val tmpColor: Color = ColorStack.getAndPush()
         tmpColor.set(Color.WHITE)
 
         val window = musicDialog.window
-        val durationSec = window.musicDurationSec.getOrCompute()
-        val windowX = (window.x.getOrCompute() / durationSec) * w
-        val windowW = (window.widthSec.getOrCompute() / durationSec) * w
+        val durationSec = window.musicDurationSec.get()
+        val windowX = (window.x.get() / durationSec) * w
+        val windowW = (window.widthSec.get() / durationSec) * w
 
 //        batch.color = tmpColor
 //        batch.drawRect(x + windowX, y - h, windowW, h, 2f)
@@ -98,10 +98,10 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
 
         val relX = lastMouseRelative.x
         val window = musicDialog.window
-        val durationSec = window.widthSec.getOrCompute()
-        val fullDurationSec = window.musicDurationSec.getOrCompute()
-        val windowX = window.x.getOrCompute()
-        val centreSec = (relX / this.contentZone.width.getOrCompute()) * durationSec + windowX
+        val durationSec = window.widthSec.get()
+        val fullDurationSec = window.musicDurationSec.get()
+        val windowX = window.x.get()
+        val centreSec = (relX / this.contentZone.width.get()) * durationSec + windowX
 
         if (isLeftClickDown) {
             val newPos = centreSec.coerceIn(0f, fullDurationSec)

@@ -39,9 +39,9 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
         fun createInternalTextBlockVar(button: Button): Var<TextBlock> {
             return Var {
                 TextRun(button.font.use(), button.text.use(), Color.WHITE,
-                        button.scaleX.use(), button.scaleY.use()).toTextBlock().also { textBlock ->
+                        button.scaleX.useF(), button.scaleY.useF()).toTextBlock().also { textBlock ->
                     if (button.doLineWrapping.use()) {
-                        textBlock.lineWrapping = button.contentZone.width.use()
+                        textBlock.lineWrapping = button.contentZone.width.useF()
                     }
                 }
             }
@@ -128,12 +128,12 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         val paddingBounds = element.paddingZone
-        val rectX = paddingBounds.x.getOrCompute() + originX
-        val rectY = originY - paddingBounds.y.getOrCompute()
-        val rectW = paddingBounds.width.getOrCompute()
-        val rectH = paddingBounds.height.getOrCompute()
+        val rectX = paddingBounds.x.get() + originX
+        val rectY = originY - paddingBounds.y.get()
+        val rectW = paddingBounds.width.get()
+        val rectH = paddingBounds.height.get()
         val lastPackedColor = batch.packedColor
-        val opacity = element.apparentOpacity.getOrCompute()
+        val opacity = element.apparentOpacity.get()
 
         val rectColor: Color = ColorStack.getAndPush()
         rectColor.set(bgColorToUse.getOrCompute())
@@ -173,11 +173,11 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
         val text = element.internalTextBlock.getOrCompute()
         if (text.runs.isNotEmpty()) {
             val textBounds = element.contentZone
-            val textX = textBounds.x.getOrCompute() + originX
-            val textY = originY - textBounds.y.getOrCompute()
-            val textW = textBounds.width.getOrCompute()
-            val textH = textBounds.height.getOrCompute()
-            
+            val textX = textBounds.x.get() + originX
+            val textY = originY - textBounds.y.get()
+            val textW = textBounds.width.get()
+            val textH = textBounds.height.get()
+
             val tmpColor = ColorStack.getAndPush()
             tmpColor.set(batch.color).mul(textColorToUse.getOrCompute())
             tmpColor.a *= opacity

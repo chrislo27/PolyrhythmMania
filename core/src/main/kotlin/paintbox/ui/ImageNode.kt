@@ -30,22 +30,25 @@ open class ImageNode(tex: TextureRegion? = null,
 
             val tmpColor = ColorStack.getAndPush()
             tmpColor.set(tint.getOrCompute())
-            val opacity = apparentOpacity.getOrCompute()
+            val opacity = apparentOpacity.get()
             tmpColor.a *= opacity
 
             batch.color = tmpColor
 
             val renderBounds = this.contentZone
-            val x = renderBounds.x.getOrCompute() + originX
-            val y = originY - renderBounds.y.getOrCompute()
-            val w = renderBounds.width.getOrCompute()
-            val h = renderBounds.height.getOrCompute()
+            val x = renderBounds.x.get() + originX
+            val y = originY - renderBounds.y.get()
+            val w = renderBounds.width.get()
+            val h = renderBounds.height.get()
 
+            val rotPointX = rotationPointX.get()
+            val rotPointY = rotationPointY.get()
+            val rot = rotation.get()
             when (val renderingMode = this.renderingMode.getOrCompute()) {
                 ImageRenderingMode.FULL -> {
                     batch.draw(tex, x, y - h,
-                            rotationPointX.getOrCompute() * w, rotationPointY.getOrCompute() * h,
-                            w, h, 1f, 1f, rotation.getOrCompute())
+                            rotPointX * w, rotPointY * h,
+                            w, h, 1f, 1f, rot)
                 }
                 ImageRenderingMode.MAINTAIN_ASPECT_RATIO, ImageRenderingMode.OVERSIZE -> {
                     val aspectWidth = w / tex.regionWidth
@@ -71,10 +74,10 @@ open class ImageNode(tex: TextureRegion? = null,
 
 
                     batch.draw(tex, x + rx, y + ry - h,
-                            rotationPointX.getOrCompute() * rw, rotationPointY.getOrCompute() * rh,
+                            rotPointX * rw, rotPointY * rh,
                             rw, rh,
                             1f, 1f,
-                            rotation.getOrCompute())
+                            rot)
                 }
             }
 

@@ -2,7 +2,6 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
@@ -46,15 +45,15 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
         this += middleDivider
 
         val scrollSelector = Pane().apply {
-            this.bounds.width.bind { middleDivider.bounds.x.use() }
+            this.bounds.width.bind { middleDivider.bounds.x.useF() }
         }
         this += scrollSelector
 
         val descPane = Pane().apply {
             Anchor.TopRight.configure(this)
             this.bounds.width.bind {
-                (parent.use()?.contentZone?.width?.use()
-                        ?: 0f) - (middleDivider.bounds.x.use() + middleDivider.bounds.width.use())
+                (parent.use()?.contentZone?.width?.useF()
+                        ?: 0f) - (middleDivider.bounds.x.useF() + middleDivider.bounds.width.useF())
             }
             this.padding.set(Insets(2f))
         }
@@ -219,12 +218,12 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             }
 
             val renderBounds = this.contentZone
-            val x = renderBounds.x.getOrCompute() + originX
-            val y = originY - renderBounds.y.getOrCompute()
-            val w = renderBounds.width.getOrCompute()
-            val h = renderBounds.height.getOrCompute()
+            val x = renderBounds.x.get() + originX
+            val y = originY - renderBounds.y.get()
+            val w = renderBounds.width.get()
+            val h = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
-            val opacity = apparentOpacity.getOrCompute()
+            val opacity = apparentOpacity.get()
 
             val paintboxFont = editorPane.palette.instantiatorNameFont
             val instantiators = instantiatorList.list

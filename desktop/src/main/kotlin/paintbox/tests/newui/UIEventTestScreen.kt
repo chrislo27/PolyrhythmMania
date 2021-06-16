@@ -35,7 +35,7 @@ internal class UIEventTestScreen(override val main: NewUITestGame) : PaintboxScr
                 lt.bounds.x.set(4f)
                 lt.bounds.y.set(4f)
                 lt.bounds.height.set(32f)
-                lt.bounds.width.bind { (lt.parent.use()?.bounds?.width?.use() ?: 0f) - 8f }
+                lt.bounds.width.bind { (lt.parent.use()?.bounds?.width?.useF() ?: 0f) - 8f }
                 
                 val num = 6
                 (0 until num).forEach { i ->
@@ -74,7 +74,7 @@ internal class UIEventTestScreen(override val main: NewUITestGame) : PaintboxScr
                 rt.bounds.x.set(4f)
                 rt.bounds.y.set(4f)
                 rt.bounds.height.set(32f)
-                rt.bounds.width.bind { (rt.parent.use()?.bounds?.width?.use() ?: 0f) - 8f }
+                rt.bounds.width.bind { (rt.parent.use()?.bounds?.width?.useF() ?: 0f) - 8f }
 
                 val num = 6
                 (0 until num).forEach { i ->

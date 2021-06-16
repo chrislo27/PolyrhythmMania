@@ -12,6 +12,7 @@ import paintbox.util.gdxutils.disposeQuietly
 import net.beadsproject.beads.ugens.SamplePlayer
 import net.lingala.zip4j.ZipFile
 import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyFloatVar
 import paintbox.binding.ReadOnlyVar
 import polyrhythmmania.PRMania
 import polyrhythmmania.editor.block.Block
@@ -76,10 +77,10 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         private set
     var endBlockPosition: FloatVar = FloatVar(Float.POSITIVE_INFINITY) // Position of first End State block
         private set
-    val stopPosition: ReadOnlyVar<Float> = FloatVar {
+    val stopPosition: ReadOnlyFloatVar = FloatVar {
         // endPosition if < Infinity, otherwise lastBlockPosition
-        val endBlockPos = endBlockPosition.use()
-        if (endBlockPos < Float.POSITIVE_INFINITY) endBlockPos else lastBlockPosition.use()
+        val endBlockPos = endBlockPosition.useF()
+        if (endBlockPos < Float.POSITIVE_INFINITY) endBlockPos else lastBlockPosition.useF()
     }
 
     fun setCompressedMusic(res: ExternalResource?) {

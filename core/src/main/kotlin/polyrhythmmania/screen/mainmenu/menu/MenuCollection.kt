@@ -1,7 +1,6 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.audio.Sound
-import com.badlogic.gdx.math.Vector2
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
@@ -83,7 +82,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
                 val currentBounds = menu.bounds
                 val relToRoot = menu.getPosRelativeToRoot(Vector2Stack.getAndPush())
                 this.set(relToRoot.x, relToRoot.y,
-                        currentBounds.width.getOrCompute(), currentBounds.height.getOrCompute())
+                        currentBounds.width.get(), currentBounds.height.get())
                 Vector2Stack.pop()
             }
             
@@ -93,7 +92,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
                 val curActiveBounds = currentActive.bounds
                 val relToRoot = currentActive.getPosRelativeToRoot(Vector2Stack.getAndPush())
                 secondBounds.set(relToRoot.x, relToRoot.y,
-                        curActiveBounds.width.getOrCompute(), curActiveBounds.height.getOrCompute())
+                        curActiveBounds.width.get(), curActiveBounds.height.get())
                 Vector2Stack.pop()
                 
                 // Merge the two rectangles to be maximal.

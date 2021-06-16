@@ -10,7 +10,6 @@ import paintbox.binding.FloatVar
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
-import paintbox.util.ColorStack
 import paintbox.util.gdxutils.*
 import polyrhythmmania.editor.*
 import polyrhythmmania.editor.pane.EditorPane
@@ -33,7 +32,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
     private val tmpRect: Rectangle = Rectangle()
     
     val beatWidth: FloatVar = FloatVar {
-        this@EditorTrackArea.bounds.width.use() / trackView.pxPerBeat.use()
+        this@EditorTrackArea.bounds.width.useF() / trackView.pxPerBeat.useF()
     }
 
     init {
@@ -151,19 +150,19 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
 
     fun trackToRenderY(originY: Float, track: Int): Float {
         val renderBounds = this.contentZone
-        val y = originY - renderBounds.y.getOrCompute()
+        val y = originY - renderBounds.y.get()
         return y - (track * allTracksPane.editorTrackHeight)
     }
 
     fun trackToRenderY(originY: Float, track: Float): Float {
         val renderBounds = this.contentZone
-        val y = originY - renderBounds.y.getOrCompute()
+        val y = originY - renderBounds.y.get()
         return y - (track * allTracksPane.editorTrackHeight)
     }
 
     fun beatToRenderX(originX: Float, beat: Float): Float {
         val renderBounds = this.contentZone
-        val x = renderBounds.x.getOrCompute() + originX
+        val x = renderBounds.x.get() + originX
         return x + (trackView.translateBeatToX(beat))
     }
 
@@ -173,7 +172,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         val renderBounds = this.contentZone
 //        val x = renderBounds.x.getOrCompute() + originX
 //        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
+        val w = renderBounds.width.get()
 //        val h = renderBounds.height.getOrCompute()
         val trackView = editor.trackView
         val click = editor.click.getOrCompute()
@@ -183,7 +182,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         // FIXME refactor out?
 
         // Render blocks
-        val leftSide = beatToRenderX(originX, trackView.beat.getOrCompute())
+        val leftSide = beatToRenderX(originX, trackView.beat.get())
         val rightSide = leftSide + w
         editor.blocks.forEach { block ->
             val blockLeftSide = beatToRenderX(originX, block.beat)

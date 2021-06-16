@@ -53,17 +53,17 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
         this.sidePanel.sidebarSection += vbox
 
         val timeTextVar = Localization.getVar("editor.currentTime", Var.bind {
-            listOf(DecimalFormats.format("0.000", editor.engineBeat.use()))
+            listOf(DecimalFormats.format("0.000", editor.engineBeat.useF()))
         })
         val secondsTextVar = Var {
-            editor.engineBeat.use()
+            editor.engineBeat.useF()
             TimeUtils.convertMsToTimestamp(editor.engine.seconds * 1000)
         }
         val bpmVar = FloatVar {
-            editor.engine.tempos.tempoAtBeat(editor.engineBeat.use())
+            editor.engine.tempos.tempoAtBeat(editor.engineBeat.useF())
         }
         val bpmTextVar = Var {
-            "♩=${DecimalFormats.format("0.0", bpmVar.use())}"
+            "♩=${DecimalFormats.format("0.0", bpmVar.useF())}"
         }
         beatTimeLabel = TextLabel(binding = {
             timeTextVar.use()
@@ -75,7 +75,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.height.set(28f)
             val tooltipVar = Localization.getVar("editor.track.beat.tooltip.currentBeat", Var {
-                listOf(DecimalFormats.format("0.000", editor.playbackStart.use()), DecimalFormats.format("0.000", editor.musicFirstBeat.use()))
+                listOf(DecimalFormats.format("0.000", editor.playbackStart.useF()), DecimalFormats.format("0.000", editor.musicFirstBeat.useF()))
             })
             this.tooltipElement.set(editorPane.createDefaultTooltip(tooltipVar))
         }
@@ -92,7 +92,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.bgPadding.set(Insets.ZERO)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.width.bind {
-                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.5f
+                (parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * 0.5f
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.track.beat.tooltip.currentTime")))
         }
@@ -107,7 +107,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.bgPadding.set(Insets.ZERO)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.width.bind {
-                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.35f
+                (parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * 0.35f
             }
             this.setScaleXY(0.75f)
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.track.beat.tooltip.currentBPM")))
@@ -219,17 +219,17 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
 
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val renderBounds = this.contentZone
-            val x = renderBounds.x.getOrCompute() + originX
-            val y = originY - renderBounds.y.getOrCompute()
-            val w = renderBounds.width.getOrCompute()
-            val h = renderBounds.height.getOrCompute()
+            val x = renderBounds.x.get() + originX
+            val y = originY - renderBounds.y.get()
+            val w = renderBounds.width.get()
+            val h = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
 
             val tmpColor = ColorStack.getAndPush()
             val trackView = editor.trackView
-            val trackViewBeat = trackView.beat.getOrCompute()
+            val trackViewBeat = trackView.beat.get()
             val leftBeat = floor(trackViewBeat)
-            val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.getOrCompute()))
+            val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.get()))
             val timeSignatures = editor.engine.timeSignatures
 
             val lineWidth = 2f
@@ -264,7 +264,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             val tmpColor2 = ColorStack.getAndPush()
 
             editor.markerMap.values.forEach { marker ->
-                val playbackStart = marker.beat.getOrCompute()
+                val playbackStart = marker.beat.get()
                 tmpColor2.set(marker.type.color)
                 batch.color = tmpColor2
                 batch.fillRect(x + trackView.translateBeatToX(playbackStart), y - h, lineWidth, h)
@@ -283,7 +283,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             }
 
             if (editor.playState.getOrCompute() != PlayState.STOPPED) {
-                val pos = editor.engineBeat.getOrCompute()
+                val pos = editor.engineBeat.get()
                 val tmpColor3 = ColorStack.getAndPush().set(editorPane.palette.trackPlayback.getOrCompute())
                 batch.color = tmpColor3
                 batch.fillRect(x + trackView.translateBeatToX(pos), y - h, lineWidth, h)

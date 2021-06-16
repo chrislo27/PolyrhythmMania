@@ -23,19 +23,19 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         val renderBounds = this.contentZone
-        val x = renderBounds.x.getOrCompute() + originX
-        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
-        val h = renderBounds.height.getOrCompute()
+        val x = renderBounds.x.get() + originX
+        val y = originY - renderBounds.y.get()
+        val w = renderBounds.width.get()
+        val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
         val tmpColor = ColorStack.getAndPush()
         val editor = editorPane.editor
         val trackView = editor.trackView
-        val trackViewBeat = trackView.beat.getOrCompute()
+        val trackViewBeat = trackView.beat.get()
         val leftBeat = floor(trackViewBeat)
-        val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.getOrCompute()))
-        val lineWidth = this.lineWidth.getOrCompute()
+        val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.get()))
+        val lineWidth = this.lineWidth.get()
 
         val beatLines: Editor.BeatLines = editor.beatLines
 
@@ -49,7 +49,7 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         }
 
         if (beatLines.active) {
-            val snap = editor.snapping.getOrCompute()
+            val snap = editor.snapping.get()
             if (snap > 0f) {
                 val snapCount = (1f / snap).toInt()
                 tmpColor.a *= 0.5f
@@ -73,13 +73,13 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         editor.markerMap.values.forEach { marker ->
             tmpColor.set(marker.type.color)
             batch.color = tmpColor
-            val markerPos = marker.beat.getOrCompute()
+            val markerPos = marker.beat.get()
             batch.fillRect(x + trackView.translateBeatToX(markerPos), y - h, lineWidth, h)
         }
         
         if (editor.playState.getOrCompute() != PlayState.STOPPED) {
             val tmpColor2 = ColorStack.getAndPush().set(editorPane.palette.trackPlayback.getOrCompute())
-            val pos = editor.engineBeat.getOrCompute()
+            val pos = editor.engineBeat.get()
             batch.color = tmpColor2
             batch.fillRect(x + trackView.translateBeatToX(pos), y - h, lineWidth, h)
             ColorStack.pop()

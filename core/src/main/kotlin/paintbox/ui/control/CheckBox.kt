@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.PaintboxGame
+import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyFloatVar
 import paintbox.binding.Var
 import paintbox.binding.invert
 import paintbox.font.PaintboxFont
@@ -47,14 +49,15 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
     
     init {
-        val height = Var.bind {
-            contentZone.height.use()
+        val height: ReadOnlyFloatVar = FloatVar {
+            contentZone.height.useF()
         }
-        textLabel.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) height.use() else 0f }
-        textLabel.bindWidthToParent { -height.use() }
+        textLabel.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) height.useF() else 0f }
+        textLabel.bindWidthToParent { -height.useF() }
         textLabel.margin.set(Insets(2f))
-        imageNode.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) 0f else ((imageNode.parent.use()?.bounds?.width?.use() ?: 0f) - height.use()) }
-        imageNode.bounds.width.bind { height.use() }
+        imageNode.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) 0f else ((imageNode.parent.use()?.bounds?.width?.useF()
+                ?: 0f) - height.useF()) }
+        imageNode.bounds.width.bind { height.useF() }
         imageNode.textureRegion.bind { 
             val type = checkType.use()
             val state = checkedState.use()

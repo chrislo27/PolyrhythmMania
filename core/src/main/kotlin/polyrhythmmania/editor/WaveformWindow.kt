@@ -9,7 +9,6 @@ import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.music.Summary
 import polyrhythmmania.editor.pane.dialog.MusicDialog
-import kotlin.math.roundToInt
 
 
 /**
@@ -108,8 +107,8 @@ class WaveformWindow(val editor: Editor) : Disposable {
         val waveform = editor.musicData.waveform
         if (waveform != null) {
             val sampleRate = waveform.musicSample.sampleRate
-            val sampleCount = (window.widthSec.getOrCompute() * sampleRate).toInt()
-            val startSample = (window.x.getOrCompute() * sampleRate).toInt()
+            val sampleCount = (window.widthSec.get() * sampleRate).toInt()
+            val startSample = (window.x.get() * sampleRate).toInt()
             val entireMusicSamples = waveform.musicSample.nFrames
             
             val samplesPerPx = sampleCount / width

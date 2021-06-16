@@ -2,14 +2,11 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Interpolation
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
-import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
@@ -42,7 +39,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         // Preview section
         previewSection = Pane().apply {
             Anchor.TopLeft.configure(this)
-            this.bounds.width.bind { upperPane.previewPane.contentZone.width.use() - 2f }
+            this.bounds.width.bind { upperPane.previewPane.contentZone.width.useF() - 2f }
             this.border.set(Insets(0f, 0f, 0f, 2f))
             this.borderStyle.set(SolidBorder().apply { this.color.bind { editorPane.palette.previewPaneSeparator.use() } })
             this.padding.set(Insets(0f, 0f, 2f, 4f))
@@ -53,7 +50,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         val leftPreviewHbox = HBox().apply {
             Anchor.TopLeft.configure(this)
             this.spacing.set(4f)
-            this.bounds.width.set(32f * 3 + this.spacing.getOrCompute() * 2)
+            this.bounds.width.set(32f * 3 + this.spacing.get() * 2)
             this.align.set(HBox.Align.LEFT)
         }
         leftPreviewHbox.temporarilyDisableLayouts { 
@@ -68,7 +65,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         val playbackButtonPane = HBox().apply {
             Anchor.Centre.configure(this)
             this.spacing.set(4f)
-            this.bounds.width.set(32f * 3 + this.spacing.getOrCompute() * 2)
+            this.bounds.width.set(32f * 3 + this.spacing.get() * 2)
             this.align.set(HBox.Align.CENTRE)
         }
         previewSection += playbackButtonPane
@@ -143,7 +140,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         mainSection = Pane().apply {
             Anchor.TopRight.configure(this)
             this.bounds.width.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) - previewSection.bounds.width.use()
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) - previewSection.bounds.width.useF()
             }
             this.margin.set(Insets(0f, 0f, 2f, 4f))
         }
@@ -154,7 +151,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             Anchor.TopRight.configure(this)
             this.align.set(HBox.Align.RIGHT)
             this.spacing.set(4f)
-            this.bounds.width.set((32f + this.spacing.getOrCompute()) * tools.size)
+            this.bounds.width.set((32f + this.spacing.get()) * tools.size)
         }
         mainSection += toolsPane
         toolsPane.temporarilyDisableLayouts {
@@ -185,7 +182,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             Anchor.TopLeft.configure(this)
             this.align.set(HBox.Align.LEFT)
             this.spacing.set(4f)
-            this.bounds.width.set((32f + this.spacing.getOrCompute()) * 3 + tapalongPane.bounds.width.getOrCompute())
+            this.bounds.width.set((32f + this.spacing.get()) * 3 + tapalongPane.bounds.width.get())
         }
         mainSection += leftControlPane
 

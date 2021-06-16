@@ -30,7 +30,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
         bottomPane.addChild(Button("").apply {
             Anchor.BottomRight.configure(this)
-            this.bounds.width.bind { bounds.height.use() }
+            this.bounds.width.bind { bounds.height.useF() }
             this.applyDialogStyleBottom()
             this.setOnAction {
                 editorPane.closeDialog()
@@ -76,8 +76,8 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
         vbox.sizeHeightToChildren(300f)
         
-        pane.bounds.height.bind { 
-            max(vbox.bounds.height.use(), pane.parent.use()?.bounds?.height?.use() ?: 300f)
+        pane.bounds.height.bind {
+            max(vbox.bounds.height.useF(), pane.parent.use()?.bounds?.height?.useF() ?: 300f)
         }
         scrollPane.setContent(pane)
 

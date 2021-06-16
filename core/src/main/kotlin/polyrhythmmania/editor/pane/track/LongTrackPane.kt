@@ -29,16 +29,16 @@ open class LongTrackPane(val allTracksPane: AllTracksPane, val hasContent: Boole
     init {
         val sidebarSection = Pane().apply {
             Anchor.TopLeft.configure(this)
-            this.bounds.width.bind { allTracksPane.sidebarWidth.use() }
+            this.bounds.width.bind { allTracksPane.sidebarWidth.useF() }
         }
         addChild(sidebarSection)
         sidePanel = SidePanel(editorPane)
         sidebarSection += sidePanel
         contentSection = RectElement().apply {
             Anchor.TopLeft.configure(this)
-            this.bounds.x.bind { sidebarSection.bounds.x.use() + sidebarSection.bounds.width.use() }
+            this.bounds.x.bind { sidebarSection.bounds.x.useF() + sidebarSection.bounds.width.useF() }
             this.bounds.width.bind {
-                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) - allTracksPane.sidebarWidth.use()
+                (parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) - allTracksPane.sidebarWidth.useF()
             }
             this.doClipping.set(true)
             

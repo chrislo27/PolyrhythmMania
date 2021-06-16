@@ -147,7 +147,7 @@ sealed class Click {
 
             // Adjust block regions
             // Set origin block
-            val snapping = editor.snapping.getOrCompute()
+            val snapping = editor.snapping.get()
             val originRegion = regions.getValue(originBlock)
             val snapToRight = mouseOffset.x > originBlock.width / 2
             if (snapToRight) {
@@ -211,9 +211,9 @@ sealed class Click {
     class MoveMarker(val editor: Editor, val point: FloatVar, val type: MarkerType)
         : Click(), PansCameraOnDrag {
 
-        val originalPosition: Float = point.getOrCompute()
+        val originalPosition: Float = point.get()
 
-        fun didChange(): Boolean = point.getOrCompute() != originalPosition
+        fun didChange(): Boolean = point.get() != originalPosition
 
         fun complete(): Boolean {
             if (!didChange()) {
@@ -226,7 +226,7 @@ sealed class Click {
         }
 
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
-            val snapping = editor.snapping.getOrCompute()
+            val snapping = editor.snapping.get()
             val snapBeat = MathHelper.snapToNearest(beat, snapping).coerceAtLeast(0f)
             point.set(snapBeat)
             
@@ -272,7 +272,7 @@ sealed class Click {
         }
 
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
-            val snapping = editor.snapping.getOrCompute()
+            val snapping = editor.snapping.get()
             val snapBeat = MathHelper.snapToNearest(beat, snapping).coerceAtLeast(0f)
             newPosition = snapBeat
             val isPosValid = isPositionValid(snapBeat)
@@ -331,7 +331,7 @@ sealed class Click {
         }
 
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
-            val snapping = editor.snapping.getOrCompute()
+            val snapping = editor.snapping.get()
             val newPos = MathHelper.snapToNearest(beat, snapping).coerceAtLeast(0f)
 
             val originalX = musicVol.beat

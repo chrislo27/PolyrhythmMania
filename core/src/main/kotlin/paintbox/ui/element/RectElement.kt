@@ -17,22 +17,22 @@ class RectElement(initColor: Color) : UIElement() {
     constructor(binding: Var.Context.() -> Color) : this() {
         color.bind(binding)
     }
-    
+
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         val renderBounds = this.paddingZone
-        val x = renderBounds.x.getOrCompute() + originX
-        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
-        val h = renderBounds.height.getOrCompute()
+        val x = renderBounds.x.get() + originX
+        val y = originY - renderBounds.y.get()
+        val w = renderBounds.width.get()
+        val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
-        
-        val opacity: Float = this.apparentOpacity.getOrCompute()
+
+        val opacity: Float = this.apparentOpacity.get()
         val tmpColor: Color = ColorStack.getAndPush()
         tmpColor.set(color.getOrCompute())
         tmpColor.a *= opacity
         batch.color = tmpColor
         batch.fillRect(x, y - h, w, h)
-        
+
         ColorStack.pop()
         batch.packedColor = lastPackedColor
     }

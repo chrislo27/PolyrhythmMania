@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyFloatVar
 import paintbox.ui.area.ReadOnlyBounds
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -57,8 +58,8 @@ open class UIElement : UIBounds() {
     /**
      * The [apparentOpacity] level of the [parent], if there is no parent then 1.0 is used.
      */
-    val parentOpacity: ReadOnlyVar<Float> = FloatVar {
-        parent.use()?.apparentOpacity?.use() ?: 1f
+    val parentOpacity: ReadOnlyFloatVar = FloatVar {
+        parent.use()?.apparentOpacity?.useF() ?: 1f
     }
 
     /**
@@ -67,8 +68,8 @@ open class UIElement : UIBounds() {
      *
      * This is to be used by the rendering implementation.
      */
-    val apparentOpacity: ReadOnlyVar<Float> = FloatVar {
-        parentOpacity.use() * opacity.use()
+    val apparentOpacity: ReadOnlyFloatVar = FloatVar {
+        parentOpacity.useF() * opacity.useF()
     }
 
     val borderStyle: Var<Border> = Var(NoBorder)
@@ -91,8 +92,8 @@ open class UIElement : UIBounds() {
 
         val clip = doClipping.getOrCompute()
         val childOriginBounds = this.contentZone
-        val childOriginX = childOriginBounds.x.getOrCompute()
-        val childOriginY = childOriginBounds.y.getOrCompute()
+        val childOriginX = childOriginBounds.x.get()
+        val childOriginY = childOriginBounds.y.get()
         renderOptionallyWithClip(originX, originY, batch, clip) { _, _, _ ->
             this.renderSelf(originX, originY, batch)
             this.renderChildren(originX + childOriginX, originY - childOriginY, batch)
@@ -193,8 +194,8 @@ open class UIElement : UIBounds() {
     fun clipBegin(originX: Float, originY: Float, x: Float, y: Float, width: Float, height: Float): Boolean {
         val root = sceneRoot.getOrCompute()
         val rootBounds = root?.bounds
-        val rootWidth: Float = rootBounds?.width?.getOrCompute() ?: width
-        val rootHeight: Float = rootBounds?.height?.getOrCompute() ?: height
+        val rootWidth: Float = rootBounds?.width?.get() ?: width
+        val rootHeight: Float = rootBounds?.height?.get() ?: height
 
         val scissorX = (originX + x) / rootWidth * Gdx.graphics.width
         val scissorY = ((originY - y) / rootHeight) * Gdx.graphics.height
@@ -208,7 +209,8 @@ open class UIElement : UIBounds() {
 
     fun clipBegin(originX: Float, originY: Float): Boolean {
         val bounds = this.bounds
-        return clipBegin(originX, originY, bounds.x.getOrCompute(), bounds.y.getOrCompute(), bounds.width.getOrCompute(), bounds.height.getOrCompute())
+        return clipBegin(originX, originY, bounds.x.get(), bounds.y.get(),
+                bounds.width.get(), bounds.height.get())
     }
 
     fun clipEnd() {
@@ -221,21 +223,21 @@ open class UIElement : UIBounds() {
     fun bindWidthToParent(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * multiplier + adjust
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * multiplier + adjust
         }
     }
 
     fun bindHeightToParent(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) * multiplier + adjust
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.useF() } ?: 0f) * multiplier + adjust
         }
     }
 
     fun bindWidthToParent(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() }
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.useF() }
                     ?: 0f) * multiplierBinding() + adjustBinding()
         }
     }
@@ -243,7 +245,7 @@ open class UIElement : UIBounds() {
     fun bindHeightToParent(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() }
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.useF() }
                     ?: 0f) * multiplierBinding() + adjustBinding()
         }
     }
@@ -270,8 +272,8 @@ open class UIElement : UIBounds() {
         val res = mutableListOf<UIElement>()
         var current: UIElement = this
         var currentBounds: ReadOnlyBounds = current.contentZone
-        var xOffset: Float = currentBounds.x.getOrCompute()
-        var yOffset: Float = currentBounds.y.getOrCompute()
+        var xOffset: Float = currentBounds.x.get()
+        var yOffset: Float = currentBounds.y.get()
         while (current.children.isNotEmpty()) {
             val found = current.children.findLast { child ->
                 child.bounds.containsPointLocal(x - xOffset, y - yOffset)
@@ -279,8 +281,8 @@ open class UIElement : UIBounds() {
             res += found
             current = found
             currentBounds = current.contentZone
-            xOffset += currentBounds.x.getOrCompute()
-            yOffset += currentBounds.y.getOrCompute()
+            xOffset += currentBounds.x.get()
+            yOffset += currentBounds.y.get()
         }
         return res
     }
@@ -294,8 +296,8 @@ open class UIElement : UIBounds() {
         val res = mutableListOf<UIElement>()
         var current: UIElement = this
         var currentBounds: ReadOnlyBounds = current.contentZone
-        var xOffset: Float = currentBounds.x.getOrCompute()
-        var yOffset: Float = currentBounds.y.getOrCompute()
+        var xOffset: Float = currentBounds.x.get()
+        var yOffset: Float = currentBounds.y.get()
         while (current.children.isNotEmpty()) {
             /*
             Clipping check:
@@ -312,8 +314,8 @@ open class UIElement : UIBounds() {
             res += found
             current = found
             currentBounds = current.contentZone
-            xOffset += currentBounds.x.getOrCompute()
-            yOffset += currentBounds.y.getOrCompute()
+            xOffset += currentBounds.x.get()
+            yOffset += currentBounds.y.get()
         }
         return res
     }
@@ -328,14 +330,14 @@ open class UIElement : UIBounds() {
         var currentParent: UIElement? = current.parent.getOrCompute()
         while (currentParent != null) {
             val bounds: ReadOnlyBounds = currentParent.contentZone
-            vector.x += bounds.x.getOrCompute()
-            vector.y += bounds.y.getOrCompute()
+            vector.x += bounds.x.get()
+            vector.y += bounds.y.get()
             current = currentParent
             currentParent = current.parent.getOrCompute()
         }
 
-        vector.x += this.bounds.x.getOrCompute()
-        vector.y += this.bounds.y.getOrCompute()
+        vector.x += this.bounds.x.get()
+        vector.y += this.bounds.y.get()
 
         return vector
     }

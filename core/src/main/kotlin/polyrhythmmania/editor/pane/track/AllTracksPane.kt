@@ -49,14 +49,14 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         for (trackPane in topTracks) {
             trackPane.bindWidthToParent()
             trackPane.bounds.y.set(totalHeight)
-            totalHeight += trackPane.bounds.height.getOrCompute()
+            totalHeight += trackPane.bounds.height.get()
             this += trackPane
             if (firstTrackPane) {
                 firstTrackPane = false
                 val b = trackPane.contentSection.bounds
-                editorTrackArea.bounds.x.set(b.x.getOrCompute())
+                editorTrackArea.bounds.x.set(b.x.get())
                 editorTrackArea.bounds.width.bind {
-                    (trackPane.contentZone.width.use()) - sidebarWidth.use()
+                    (trackPane.contentZone.width.useF()) - sidebarWidth.useF()
                 }
             }
         }
@@ -64,9 +64,9 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         editorTrackArea.bounds.y.set(trackAreaStart)
         for (editorTrackPane in editorTrackSides) {
             editorTrackPane.bounds.height.set(editorTrackHeight)
-            editorTrackPane.bounds.width.bind { sidebarWidth.use() }
+            editorTrackPane.bounds.width.bind { sidebarWidth.useF() }
             editorTrackPane.bounds.y.set(totalHeight)
-            totalHeight += editorTrackPane.bounds.height.getOrCompute()
+            totalHeight += editorTrackPane.bounds.height.get()
             this += editorTrackPane
         }
         editorTrackArea.bounds.height.set(totalHeight - trackAreaStart)
@@ -74,14 +74,14 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         for (trackPane in bottomTracks) {
             trackPane.bindWidthToParent()
             trackPane.bounds.y.set(totalHeight)
-            totalHeight += trackPane.bounds.height.getOrCompute()
+            totalHeight += trackPane.bounds.height.get()
             this += trackPane
             if (firstTrackPane) {
                 firstTrackPane = false
                 val b = trackPane.contentSection.bounds
-                editorTrackArea.bounds.x.set(b.x.getOrCompute())
+                editorTrackArea.bounds.x.set(b.x.get())
                 editorTrackArea.bounds.width.bind {
-                    (trackPane.contentZone.width.use()) - sidebarWidth.use()
+                    (trackPane.contentZone.width.useF()) - sidebarWidth.useF()
                 }
             }
         }

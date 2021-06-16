@@ -31,12 +31,12 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
         if (text.runs.isEmpty()) return
 
         val renderBounds = this.contentZone
-        val x = renderBounds.x.getOrCompute() + originX
-        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
-        val h = renderBounds.height.getOrCompute()
+        val x = renderBounds.x.get() + originX
+        val y = originY - renderBounds.y.get()
+        val w = renderBounds.width.get()
+        val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
-        val opacity = apparentOpacity.getOrCompute()
+        val opacity = apparentOpacity.get()
         val tmpColor = ColorStack.getAndPush()
         tmpColor.set(batch.color).mul(textColor.getOrCompute())
         tmpColor.a *= opacity
@@ -50,7 +50,7 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
         val align = renderAlign.getOrCompute()
         val xOffset: Float = when {
             Align.isLeft(align) -> 0f
-            Align.isRight(align) -> (w - (if (compressX) min(text.width, w)  else text.width))
+            Align.isRight(align) -> (w - (if (compressX) min(text.width, w) else text.width))
             else -> (w - (if (compressX) min(text.width, w) else text.width)) / 2f
         }
         val yOffset: Float = when {
@@ -62,7 +62,7 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
         batch.color = tmpColor // Sets the opacity
         text.drawCompressed(batch, x + xOffset, y - h + yOffset, if (compressX) w else 0f, textAlign.getOrCompute())
         ColorStack.pop()
-        
+
         batch.packedColor = lastPackedColor
     }
 }

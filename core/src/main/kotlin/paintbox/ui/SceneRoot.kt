@@ -99,8 +99,8 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         for (layer in allLayers) {
             val layerRoot = layer.root
             val layerBounds = layerRoot.bounds
-            val originX = layerBounds.x.getOrCompute()
-            val originY = layerBounds.y.getOrCompute() + layerBounds.height.getOrCompute()
+            val originX = layerBounds.x.get()
+            val originY = layerBounds.y.get() + layerBounds.height.get()
             layerRoot.render(originX, originY, batch)
         }
 
@@ -114,8 +114,8 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
                 if (isDialogPresent && layer == mainLayer) continue
                 val layerRoot = layer.root
                 val layerBounds = layerRoot.bounds
-                val originX = layerBounds.x.getOrCompute()
-                val originY = layerBounds.y.getOrCompute() + layerBounds.height.getOrCompute()
+                val originX = layerBounds.x.get()
+                val originY = layerBounds.y.get() + layerBounds.height.get()
                 layer.root.drawDebugRect(originX, originY, batch, useOutlines)
             }
             batch.packedColor = lastPackedColor
@@ -128,15 +128,15 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
 
     private fun UIElement.drawDebugRect(originX: Float, originY: Float, batch: SpriteBatch, onlyVisible: Boolean) {
         val thisBounds = this.bounds
-        val x = originX + thisBounds.x.getOrCompute()
-        val y = originY - thisBounds.y.getOrCompute()
-        val w = thisBounds.width.getOrCompute()
-        val h = thisBounds.height.getOrCompute()
+        val x = originX + thisBounds.x.get()
+        val y = originY - thisBounds.y.get()
+        val w = thisBounds.width.get()
+        val h = thisBounds.height.get()
         if (onlyVisible && !this.apparentVisibility.getOrCompute()) return
         batch.drawRect(x, y - h, w, h, 1f)
 
-        val childOffsetX = originX + this.contentZone.x.getOrCompute()
-        val childOffsetY = originY - this.contentZone.y.getOrCompute()
+        val childOffsetX = originX + this.contentZone.x.get()
+        val childOffsetY = originY - this.contentZone.y.get()
         this.children.forEach { child ->
             child.drawDebugRect(childOffsetX, childOffsetY, batch, onlyVisible)
         }
@@ -193,12 +193,12 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         if (tooltip == null) return
 
         val bounds = tooltip.bounds
-        val width = bounds.width.getOrCompute()
-        val height = bounds.height.getOrCompute()
-        val mouseX = mousePosition.x.getOrCompute()
-        val mouseY = mousePosition.y.getOrCompute()
-        val rootWidth = this.bounds.width.getOrCompute()
-        val rootHeight = this.bounds.height.getOrCompute()
+        val width = bounds.width.get()
+        val height = bounds.height.get()
+        val mouseX = mousePosition.x.get()
+        val mouseY = mousePosition.y.get()
+        val rootWidth = this.bounds.width.get()
+        val rootHeight = this.bounds.height.get()
         val rightAlign = (mouseY <= height)
         bounds.y.set((mouseY - height).coerceAtMost(rootHeight - height).coerceAtLeast(0f))
         bounds.x.set((if (rightAlign) (mouseX - width) else mouseX).coerceAtMost(rootWidth - width).coerceAtLeast(0f))
@@ -303,13 +303,13 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
             contextMenu.computeSize(this)
 
             // Temporary impl: assumes they are only root context menus and positions it at the mouse
-            val w = contextMenu.bounds.width.getOrCompute()
-            val h = contextMenu.bounds.height.getOrCompute()
-            var x = mousePosition.x.getOrCompute()
-            var y = mousePosition.y.getOrCompute()
+            val w = contextMenu.bounds.width.get()
+            val h = contextMenu.bounds.height.get()
+            var x = mousePosition.x.get()
+            var y = mousePosition.y.get()
 
-            val thisWidth = this.bounds.width.getOrCompute()
-            val thisHeight = this.bounds.height.getOrCompute()
+            val thisWidth = this.bounds.width.get()
+            val thisHeight = this.bounds.height.get()
             if (x + w > thisWidth) x = thisWidth - w
             if (x < 0f) x = 0f
             if (y + h > thisHeight) y = thisHeight - h

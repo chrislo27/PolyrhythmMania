@@ -35,7 +35,7 @@ sealed class Anchor {
             val parent = element.parent
             element.bounds.x.set(offsetX)
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY
+                (parent.use()?.contentZone?.height?.useF() ?: 0f) / 2f - (element.bounds.height.useF() / 2f) + offsetY
             }
         }
 
@@ -46,7 +46,7 @@ sealed class Anchor {
                 offsetX.invoke(this)
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY.invoke(this)
+                (parent.use()?.contentZone?.height?.useF() ?: 0f) / 2f - (element.bounds.height.useF() / 2f) + offsetY.invoke(this)
             }
         }
     }
@@ -60,7 +60,7 @@ sealed class Anchor {
             val parent = element.parent
             element.bounds.x.set(offsetX)
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY
+                (parent.use()?.contentZone?.height?.useF() ?: 0f) - (element.bounds.height.useF()) + offsetY
             }
         }
 
@@ -71,7 +71,8 @@ sealed class Anchor {
                 offsetX.invoke(this)
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY.invoke(this)
+                (parent.use()?.contentZone?.height?.useF()
+                        ?: 0f) - (element.bounds.height.useF()) + offsetY.invoke(this)
             }
         }
     }
@@ -84,7 +85,7 @@ sealed class Anchor {
         override fun configure(element: UIElement, offsetX: Float, offsetY: Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) - (element.bounds.width.useF()) + offsetX
             }
             element.bounds.y.set(offsetY)
         }
@@ -93,7 +94,7 @@ sealed class Anchor {
                                offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX.invoke(this)
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) - (element.bounds.width.useF()) + offsetX.invoke(this)
             }
             element.bounds.y.bind {
                 offsetY.invoke(this)
@@ -109,10 +110,10 @@ sealed class Anchor {
         override fun configure(element: UIElement, offsetX: Float, offsetY: Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) - (element.bounds.width.useF()) + offsetX
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY
+                (parent.use()?.contentZone?.height?.useF() ?: 0f) / 2f - (element.bounds.height.useF() / 2f) + offsetY
             }
         }
 
@@ -120,10 +121,10 @@ sealed class Anchor {
                                offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX.invoke(this)
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) - (element.bounds.width.useF()) + offsetX.invoke(this)
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY.invoke(this)
+                (parent.use()?.contentZone?.height?.useF() ?: 0f) / 2f - (element.bounds.height.useF() / 2f) + offsetY.invoke(this)
             }
         }
     }
@@ -136,10 +137,10 @@ sealed class Anchor {
         override fun configure(element: UIElement, offsetX: Float, offsetY: Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) - (element.bounds.width.useF()) + offsetX
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY
+                (parent.use()?.contentZone?.height?.useF() ?: 0f) - (element.bounds.height.useF()) + offsetY
             }
         }
 
@@ -147,10 +148,11 @@ sealed class Anchor {
                                offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) - (element.bounds.width.use()) + offsetX.invoke(this)
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) - (element.bounds.width.useF()) + offsetX.invoke(this)
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY.invoke(this)
+                (parent.use()?.contentZone?.height?.useF()
+                        ?: 0f) - (element.bounds.height.useF()) + offsetY.invoke(this)
             }
         }
     }
@@ -163,7 +165,7 @@ sealed class Anchor {
         override fun configure(element: UIElement, offsetX: Float, offsetY: Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) / 2f - (element.bounds.width.useF() / 2f) + offsetX
             }
             element.bounds.y.set(offsetY)
         }
@@ -172,7 +174,7 @@ sealed class Anchor {
                                offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX.invoke(this)
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) / 2f - (element.bounds.width.useF() / 2f) + offsetX.invoke(this)
             }
             element.bounds.y.bind {
                 offsetY.invoke(this)
@@ -188,10 +190,10 @@ sealed class Anchor {
         override fun configure(element: UIElement, offsetX: Float, offsetY: Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) / 2f - (element.bounds.width.useF() / 2f) + offsetX
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY
+                (parent.use()?.contentZone?.height?.useF() ?: 0f) - (element.bounds.height.useF()) + offsetY
             }
         }
         
@@ -199,10 +201,11 @@ sealed class Anchor {
                                offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX.invoke(this)
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) / 2f - (element.bounds.width.useF() / 2f) + offsetX.invoke(this)
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) - (element.bounds.height.use()) + offsetY.invoke(this)
+                (parent.use()?.contentZone?.height?.useF()
+                        ?: 0f) - (element.bounds.height.useF()) + offsetY.invoke(this)
             }
         }
     }
@@ -215,10 +218,10 @@ sealed class Anchor {
         override fun configure(element: UIElement, offsetX: Float, offsetY: Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) / 2f - (element.bounds.width.useF() / 2f) + offsetX
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY
+                (parent.use()?.contentZone?.height?.useF() ?: 0f) / 2f - (element.bounds.height.useF() / 2f) + offsetY
             }
         }
 
@@ -226,10 +229,10 @@ sealed class Anchor {
                                offsetY: Var.Context.() -> Float) {
             val parent = element.parent
             element.bounds.x.bind {
-                (parent.use()?.contentZone?.width?.use() ?: 0f) / 2f - (element.bounds.width.use() / 2f) + offsetX.invoke(this)
+                (parent.use()?.contentZone?.width?.useF() ?: 0f) / 2f - (element.bounds.width.useF() / 2f) + offsetX.invoke(this)
             }
             element.bounds.y.bind {
-                (parent.use()?.contentZone?.height?.use() ?: 0f) / 2f - (element.bounds.height.use() / 2f) + offsetY.invoke(this)
+                (parent.use()?.contentZone?.height?.useF() ?: 0f) / 2f - (element.bounds.height.useF() / 2f) + offsetY.invoke(this)
             }
         }
     }

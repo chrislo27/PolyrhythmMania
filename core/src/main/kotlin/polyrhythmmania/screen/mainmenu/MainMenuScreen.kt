@@ -209,7 +209,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         leftPane.addChild(logoImage)
         menuPane.apply {
             Anchor.BottomLeft.configure(this)
-            this.bindHeightToParent(-(logoImage.bounds.height.getOrCompute() + logoImage.bounds.y.getOrCompute() + 32f))
+            this.bindHeightToParent(-(logoImage.bounds.height.get() + logoImage.bounds.y.get() + 32f))
         }
         leftPane.addChild(menuPane)
 

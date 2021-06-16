@@ -44,7 +44,7 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
 
         hbox.temporarilyDisableLayouts {
             val flashTextColor: Var<Color> = Var.sideEffecting(TEXT_COLOR.cpy()) { c ->
-                val alpha = flashAnimation.use()
+                val alpha = flashAnimation.useF()
                 c.set(TEXT_COLOR).lerp(FLASH_TEXT_COLOR, alpha)
                 c
             }
@@ -60,7 +60,7 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
                 if (count == 1)
                     Localization.getValue("tapalong.first")
                 else
-                    DecimalFormats.format("0.0", averageBpm.use())
+                    DecimalFormats.format("0.0", averageBpm.useF())
             }, font = editorPane.main.mainFontBold).apply {
                 this.bounds.width.set(64f)
                 this.renderAlign.set(Align.left)

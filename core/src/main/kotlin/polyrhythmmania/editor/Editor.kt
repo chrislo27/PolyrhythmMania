@@ -222,8 +222,8 @@ class Editor(val main: PRManiaGame)
             }
 
             if (this.cameraPan == null && !pressedButtons.any { it in MOVE_WINDOW_KEYCODES }) {
-                val beatWidth = editorPane.allTracksPane.editorTrackArea.beatWidth.getOrCompute()
-                val currentBeatX = trackView.beat.getOrCompute()
+                val beatWidth = editorPane.allTracksPane.editorTrackArea.beatWidth.get()
+                val currentBeatX = trackView.beat.get()
                 if (currentEngineBeat !in (currentBeatX)..(currentBeatX + beatWidth)) {
                     this.cameraPan = CameraPan(0.125f, currentBeatX, currentEngineBeat, Interpolation.smoother)
                 }
@@ -248,7 +248,7 @@ class Editor(val main: PRManiaGame)
 
         val trackView = this.trackView
         val panSpeed = 7f * delta * (if (fast) 10f else 1f)
-        trackView.beat.set((trackView.beat.getOrCompute() + panSpeed * dir).coerceAtLeast(0f))
+        trackView.beat.set((trackView.beat.get() + panSpeed * dir).coerceAtLeast(0f))
     }
 
     /**
@@ -277,7 +277,7 @@ class Editor(val main: PRManiaGame)
         // Set starting tempo
         val tempos = engine.tempos
         tempos.removeTempoChangesBulk(tempos.getAllTempoChanges())
-        tempos.addTempoChange(TempoChange(0f, this.startingTempo.getOrCompute()))
+        tempos.addTempoChange(TempoChange(0f, this.startingTempo.get()))
         tempos.addTempoChangesBulk(this.tempoChanges.getOrCompute().toList())
     }
 
@@ -293,8 +293,8 @@ class Editor(val main: PRManiaGame)
         val engineMusicData = engine.musicData
         engineMusicData.beadsMusic = this.musicData.beadsMusic
         engineMusicData.loopParams = this.musicData.loopParams.getOrCompute()
-        engineMusicData.firstBeatSec = this.musicData.firstBeatSec.getOrCompute()
-        engineMusicData.musicFirstBeat = this.musicFirstBeat.getOrCompute()
+        engineMusicData.firstBeatSec = this.musicData.firstBeatSec.get()
+        engineMusicData.musicFirstBeat = this.musicFirstBeat.get()
         val player = engine.soundInterface.getCurrentMusicPlayer(engineMusicData.beadsMusic)
         if (player != null) {
             player.useLoopParams(engineMusicData.loopParams)
@@ -427,7 +427,7 @@ class Editor(val main: PRManiaGame)
         if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {
             compileEditorIntermediates()
             engine.resetEndSignal()
-            val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.getOrCompute())
+            val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
             timing.seconds = newSeconds
             engine.musicData.update()
             val engineBeatFloor = floor(engine.beat)
@@ -439,7 +439,7 @@ class Editor(val main: PRManiaGame)
             }
         } else if (newState == PlayState.STOPPED) {
             resetWorld()
-            timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.getOrCompute())
+            timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
         }
 
         if (newState == PlayState.PLAYING) {
@@ -610,12 +610,12 @@ class Editor(val main: PRManiaGame)
                     }
                 }
                 Input.Keys.HOME -> { // HOME: Jump to beat 0
-                    cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), 0f)
+                    cameraPan = CameraPan(0.25f, trackView.beat.get(), 0f)
                     inputConsumed = true
                 }
                 Input.Keys.END -> { // END: Jump to stopping position
                     if (this.blocks.isNotEmpty()) {
-                        cameraPan = CameraPan(0.25f, trackView.beat.getOrCompute(), (container.stopPosition.getOrCompute()).coerceAtLeast(0f))
+                        cameraPan = CameraPan(0.25f, trackView.beat.get(), (container.stopPosition.get()).coerceAtLeast(0f))
                     }
                     inputConsumed = true
                 }
@@ -795,9 +795,9 @@ class Editor(val main: PRManiaGame)
                                 if (didChange) {
                                     val peek = peekAtUndoStack()
                                     if (!settings.editorDetailedMarkerUndo.getOrCompute() && peek != null && peek is MoveMarkerAction && peek.marker == currentClick.type) {
-                                        peek.next = currentClick.point.getOrCompute()
+                                        peek.next = currentClick.point.get()
                                     } else {
-                                        this.addActionWithoutMutating(MoveMarkerAction(currentClick.type, currentClick.originalPosition, currentClick.point.getOrCompute()))
+                                        this.addActionWithoutMutating(MoveMarkerAction(currentClick.type, currentClick.originalPosition, currentClick.point.get()))
                                     }
                                 }
                             }
@@ -856,8 +856,8 @@ class Editor(val main: PRManiaGame)
             thisPos.y = vec.y - thisPos.y
 
             val bufferZone = 20f
-            val thisWidth = allTracksPane.bounds.width.getOrCompute()
-            if (thisPos.x - bufferZone < allTracksPane.sidebarWidth.getOrCompute()) {
+            val thisWidth = allTracksPane.bounds.width.get()
+            if (thisPos.x - bufferZone < allTracksPane.sidebarWidth.get()) {
                 this.suggestPanCameraDir = -1
             }
             if (thisPos.x + bufferZone > thisWidth) {

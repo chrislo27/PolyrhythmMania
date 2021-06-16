@@ -1,13 +1,37 @@
 package paintbox.binding
 
 import java.lang.ref.WeakReference
-import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * The [Float] specialization of [ReadOnlyVar].
+ * 
+ * Provides the [get] method which is a primitive-type float.
+ */
+interface ReadOnlyFloatVar : ReadOnlyVar<Float> {
+
+    /**
+     * Gets (and computes if necessary) the value represented by this [ReadOnlyFloatVar].
+     * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return a primitive float value.
+     *
+     * If using this [ReadOnlyFloatVar] in a binding, use [Var.Context] to do dependency tracking,
+     * and use the float specialization specific functions ([Var.Context.useF]).
+     */
+    fun get(): Float
+
+    @Deprecated("Use ReadOnlyFloatVar.get() instead to avoid explicit boxing",
+            replaceWith = ReplaceWith("this.get()"),
+            level = DeprecationLevel.ERROR)
+    override fun getOrCompute(): Float {
+        return get() // WILL BE BOXED!
+    }
+}
 
 /**
  * The [Float] specialization of [Var].
+ *
+ * Provides the [get] method which is a primitive-type float.
  */
-class FloatVar : Var<Float> {
+class FloatVar : ReadOnlyFloatVar, Var<Float> {
     
     private var binding: FloatBinding
     private var invalidated: Boolean = true // Used for Compute and SideEffecting bindings
@@ -73,10 +97,13 @@ class FloatVar : Var<Float> {
     }
 
     override fun sideEffecting(sideEffecting: Var.Context.(existing: Float) -> Float) {
-        sideEffecting(getOrCompute(), sideEffecting)
+        sideEffecting(get(), sideEffecting)
     }
 
-    override fun getOrCompute(): Float {
+    /**
+     * The implementation of [getOrCompute] but returns a float primitive.
+     */
+    override fun get(): Float {
         val result: Float = when (val binding = this.binding) {
             is FloatBinding.Const -> binding.item
             is FloatBinding.Compute -> {
@@ -114,6 +141,14 @@ class FloatVar : Var<Float> {
         return result
     }
 
+
+    @Deprecated("Use FloatVar.get() instead to avoid explicit boxing",
+            replaceWith = ReplaceWith("this.get()"),
+            level = DeprecationLevel.ERROR)
+    override fun getOrCompute(): Float {
+        return get() // WILL BE BOXED!
+    }
+
     override fun addListener(listener: VarChangedListener<Float>) {
         if (listener !in listeners) {
             listeners = listeners + listener
@@ -127,12 +162,13 @@ class FloatVar : Var<Float> {
     }
 
     override fun toString(): String {
-        return getOrCompute().toString()
+        return get().toString()
     }
 
     private class InvalListener(v: FloatVar) : VarChangedListener<Float> {
         val weakRef: WeakReference<FloatVar> = WeakReference(v)
         var disposeMe: Boolean = false
+        
         override fun onChange(v: ReadOnlyVar<Float>) {
             val parent = weakRef.get()
             if (!disposeMe && parent != null) {

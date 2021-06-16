@@ -125,7 +125,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                             } else if (event.button == Input.Buttons.LEFT) {
                                 if (mv == null) {
                                     // Add music volume change
-                                    val beat = MathHelper.snapToNearest(getBeatFromRelative(lastMouseRelative.x), editor.snapping.getOrCompute())
+                                    val beat = MathHelper.snapToNearest(getBeatFromRelative(lastMouseRelative.x), editor.snapping.get())
                                     if (beat >= 0f) {
                                         val musicVolumes = editor.musicVolumes.getOrCompute().toMutableList()
                                         val volumes = editor.engine.musicData.volumeMap
@@ -139,7 +139,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                                         }
                                     }
                                 } else {
-                                    val snap = editor.snapping.getOrCompute()
+                                    val snap = editor.snapping.get()
                                     val mouseX = getBeatFromRelative(lastMouseRelative.x)
                                     val left = MathUtils.isEqual(mv.beat, mouseX, snap * 0.5f)
                                     val right = MathUtils.isEqual(mv.beat + mv.width, mouseX, snap * 0.5f)
@@ -220,7 +220,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
 
         private fun determineMusicVolFromBeat(beat: Float): MusicVolume? {
             if (beat < 0f) return null
-            val snapping = editor.snapping.getOrCompute()
+            val snapping = editor.snapping.get()
             val volumeMap = editor.musicVolumes.getOrCompute()
             val snappingHalf = snapping * 0.5f
             return volumeMap.firstOrNull { mv ->
@@ -230,17 +230,17 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
 
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val renderBounds = this.contentZone
-            val x = renderBounds.x.getOrCompute() + originX
-            val y = originY - renderBounds.y.getOrCompute()
-            val w = renderBounds.width.getOrCompute()
-            val h = renderBounds.height.getOrCompute()
+            val x = renderBounds.x.get() + originX
+            val y = originY - renderBounds.y.get()
+            val w = renderBounds.width.get()
+            val h = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
 
             val tmpColor = ColorStack.getAndPush()
             val trackView = editorPane.editor.trackView
-            val trackViewBeat = trackView.beat.getOrCompute()
+            val trackViewBeat = trackView.beat.get()
             val leftBeat = floor(trackViewBeat)
-            val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.getOrCompute()))
+            val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.get()))
             val currentTool = editor.tool.getOrCompute()
             val lineWidth = 2f
 
@@ -254,7 +254,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
             val hoveredMusicVol: MusicVolume? = if (currentTool == Tool.MUSIC_VOLUME) {
                 if (currentClick is Click.DragMusicVolume) {
                     MusicVolume(currentClick.beat, currentClick.width, currentClick.musicVol.newVolume)
-                } else if (lastMouseRelative.y in 0f..this.bounds.height.getOrCompute()) {
+                } else if (lastMouseRelative.y in 0f..this.bounds.height.get()) {
                     val current = this.currentHoveredMusicVol.getOrCompute()
                     if (current in musicVolumes) {
                         current

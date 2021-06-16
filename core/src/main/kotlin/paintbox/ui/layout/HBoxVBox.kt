@@ -1,9 +1,6 @@
 package paintbox.ui.layout
 
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
-import paintbox.binding.VarChangedListener
+import paintbox.binding.*
 import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Bounds
@@ -67,7 +64,7 @@ abstract class AbstractHVBox : Pane() {
     /**
      * Returns either the width or height var for this box from [contentZone].
      */
-    protected abstract fun getThisDimensional(): ReadOnlyVar<Float>
+    protected abstract fun getThisDimensional(): ReadOnlyFloatVar
     
     /**
      * Returns either the width or height var for an element.
@@ -95,13 +92,13 @@ abstract class AbstractHVBox : Pane() {
         val cache = elementCache
         var acc = if (index > 0) (cache[index - 1].currentAccumulation) else 0f
         val cacheSize = cache.size
-        val spacingValue = spacing.getOrCompute()
+        val spacingValue = spacing.get()
         
         for (i in index until cacheSize) {
             val d = elementCache[i]
             val element = d.element
             d.previousAccumulation = acc
-            d.dimension = getDimensional(element).getOrCompute()
+            d.dimension = getDimensional(element).get()
             
             val pos = getPositional(element)
             pos.set(d.previousAccumulation)
@@ -116,13 +113,13 @@ abstract class AbstractHVBox : Pane() {
         val align = this.internalAlignment.getOrCompute()
         if (align != InternalAlignment.MIN) {
             val totalSize = cache.last().currentAccumulation
-            val thisSize = getThisDimensional().getOrCompute()
+            val thisSize = getThisDimensional().get()
             val offset: Float = when (align) {
                 InternalAlignment.MIN -> 0f // Not a possible branch
                 InternalAlignment.MIDDLE -> (thisSize - totalSize) / 2f
                 InternalAlignment.MAX -> (thisSize - totalSize)
             }
-            
+
             for (i in 0 until cacheSize) {
                 val d = elementCache[i]
                 val element = d.element
@@ -139,7 +136,7 @@ abstract class AbstractHVBox : Pane() {
         val currentCache = elementCache.toList()
         val prev = currentCache.lastOrNull()
         val dimensional = getDimensional(newChild)
-        val elementData = ElementData(newChild, currentCache.size, prev?.currentAccumulation ?: 0f, dimensional.getOrCompute())
+        val elementData = ElementData(newChild, currentCache.size, prev?.currentAccumulation ?: 0f, dimensional.get())
         dimensional.addListener(elementData.sizeListener)
         elementCache += elementData
         attemptLayout(currentCache.size)
@@ -192,7 +189,7 @@ open class HBox : AbstractHVBox() {
         return element.bounds.x
     }
 
-    override fun getThisDimensional(): ReadOnlyVar<Float> {
+    override fun getThisDimensional(): ReadOnlyFloatVar {
         return this.contentZone.width
     }
 
@@ -200,7 +197,7 @@ open class HBox : AbstractHVBox() {
         val last = children.lastOrNull()
         var width = 0f
         if (last != null) {
-            width = last.bounds.x.getOrCompute() + last.bounds.width.getOrCompute()
+            width = last.bounds.x.get() + last.bounds.width.get()
         }
 
         this.bounds.width.set(width.coerceAtLeast(minimumWidth))
@@ -236,7 +233,7 @@ open class VBox : AbstractHVBox() {
         return element.bounds.y
     }
 
-    override fun getThisDimensional(): ReadOnlyVar<Float> {
+    override fun getThisDimensional(): ReadOnlyFloatVar {
         return this.contentZone.height
     }
     
@@ -244,7 +241,7 @@ open class VBox : AbstractHVBox() {
         val last = children.lastOrNull()
         var height = 0f
         if (last != null) {
-            height = last.bounds.y.getOrCompute() + last.bounds.height.getOrCompute()
+            height = last.bounds.y.get() + last.bounds.height.get()
         }
         
         this.bounds.height.set(height.coerceAtLeast(minimumHeight))

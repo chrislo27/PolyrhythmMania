@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyFloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.ui.*
@@ -38,15 +39,15 @@ open class Slider : Control<Slider>() {
     val maximum: FloatVar = FloatVar(MAX_DEFAULT)
     val tickUnit: FloatVar = FloatVar(TICK_DEFAULT)
     private val _value: FloatVar = FloatVar(MIN_DEFAULT)
-    val value: ReadOnlyVar<Float> = _value
+    val value: ReadOnlyFloatVar = _value
 
 
     init {
         minimum.addListener {
-            setValue(_value.getOrCompute())
+            setValue(_value.get())
         }
         maximum.addListener {
-            setValue(_value.getOrCompute())
+            setValue(_value.get())
         }
         
         val lastMouseRelativeToRoot = Vector2(0f, 0f)
@@ -57,7 +58,7 @@ open class Slider : Control<Slider>() {
                     lastMouseRelativeToRoot.x = event.x - lastMouseInside.x
                     lastMouseRelativeToRoot.y = event.y - lastMouseInside.y
                     
-                    setValue(convertPercentageToValue((lastMouseRelativeToRoot.x / bounds.width.getOrCompute()).coerceIn(0f, 1f)))
+                    setValue(convertPercentageToValue((lastMouseRelativeToRoot.x / bounds.width.get()).coerceIn(0f, 1f)))
                     
                     true
                 } else false
@@ -66,11 +67,11 @@ open class Slider : Control<Slider>() {
     }
 
     fun setValue(value: Float) {
-        val tick = tickUnit.getOrCompute().coerceAtLeast(0f)
+        val tick = tickUnit.get().coerceAtLeast(0f)
         val snapped = if (tick > 0f) {
             MathHelper.snapToNearest(value, tick)
         } else value
-        _value.set(snapped.coerceIn(minimum.getOrCompute(), maximum.getOrCompute()))
+        _value.set(snapped.coerceIn(minimum.get(), maximum.get()))
     }
 
     protected open fun getArrowButtonTexReg(): TextureRegion {
@@ -78,14 +79,14 @@ open class Slider : Control<Slider>() {
     }
 
     protected fun convertValueToPercentage(v: Float): Float {
-        val min = minimum.getOrCompute()
-        val max = maximum.getOrCompute()
+        val min = minimum.get()
+        val max = maximum.get()
         return ((v - min) / (max - min)).coerceIn(0f, 1f)
     }
 
     protected fun convertPercentageToValue(v: Float): Float {
-        val min = minimum.getOrCompute()
-        val max = maximum.getOrCompute()
+        val min = minimum.get()
+        val max = maximum.get()
         return (v * (max - min) + min).coerceIn(min, max)
     }
 
@@ -99,18 +100,18 @@ open class Slider : Control<Slider>() {
 
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val contentBounds = element.contentZone
-            val rectX = contentBounds.x.getOrCompute() + originX
-            val rectY = originY - contentBounds.y.getOrCompute()
-            val rectW = contentBounds.width.getOrCompute()
-            val rectH = contentBounds.height.getOrCompute()
+            val rectX = contentBounds.x.get() + originX
+            val rectY = originY - contentBounds.y.get()
+            val rectW = contentBounds.width.get()
+            val rectH = contentBounds.height.get()
             val lastPackedColor = batch.packedColor
-            val opacity = element.apparentOpacity.getOrCompute()
+            val opacity = element.apparentOpacity.get()
             val tmpColor = ColorStack.getAndPush()
 
             val lineH = rectH * 0.4f
             val linePad = 4f
             val circleH = rectH
-            
+
             tmpColor.set(bgColor.getOrCompute())
             tmpColor.a *= opacity
             batch.color = tmpColor
@@ -118,7 +119,7 @@ open class Slider : Control<Slider>() {
             tmpColor.set(filledColor.getOrCompute())
             tmpColor.a *= opacity
             batch.color = tmpColor
-            val valueAsPercent = element.convertValueToPercentage(element._value.getOrCompute())
+            val valueAsPercent = element.convertValueToPercentage(element._value.get())
             batch.fillRoundedRect(rectX + linePad, rectY - rectH * 0.5f - lineH * 0.5f, (rectW - linePad * 2) * valueAsPercent, lineH, lineH * 0.5f)
 
             tmpColor.mul(0.97f)

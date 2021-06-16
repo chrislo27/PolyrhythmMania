@@ -53,7 +53,7 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
 
     protected fun setSize(percentage: Float, adjust: Float = 0f) {
         bounds.width.bind {
-            (this@MMMenu.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * percentage + adjust
+            (this@MMMenu.parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * percentage + adjust
         }
     }
 }
@@ -140,9 +140,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             vbox += contentPane
         }
         addChild(vbox)
-        vbox.bounds.height.bind { contentPane.bounds.height.use() + titleLabel.bounds.height.use() }
+        vbox.bounds.height.bind { contentPane.bounds.height.useF() + titleLabel.bounds.height.useF() }
 
-        this.bounds.height.bind { vbox.bounds.height.use() }
+        this.bounds.height.bind { vbox.bounds.height.useF() }
         this.setSize(MMMenu.WIDTH_MEDIUM) // Default size
     }
 
@@ -268,7 +268,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         init {
             left = Button("").apply { 
                 Anchor.TopLeft.configure(this)
-                this.bounds.width.bind { bounds.height.use() }
+                this.bounds.width.bind { bounds.height.useF() }
                 this.skinID.set(BUTTON_LONG_SKIN_ID)
                 addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply { 
                     this.rotation.set(90f)
@@ -283,7 +283,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
             right = Button("").apply { 
                 Anchor.TopRight.configure(this)
-                this.bounds.width.bind { bounds.height.use() }
+                this.bounds.width.bind { bounds.height.useF() }
                 this.skinID.set(BUTTON_LONG_SKIN_ID)
                 addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply {
                     this.rotation.set(270f)
@@ -298,7 +298,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
             label = TextLabel(binding = {currentItem.use().toString()}, font = settingsOptionPane.font).apply {
                 Anchor.Centre.configure(this)
-                this.bindWidthToParent { -(bounds.height.use() * 2) }
+                this.bindWidthToParent { -(bounds.height.useF() * 2) }
                 this.textColor.bind { settingsOptionPane.textColorVar.use() }
                 this.textAlign.set(TextAlign.CENTRE)
                 this.renderAlign.set(Align.center)

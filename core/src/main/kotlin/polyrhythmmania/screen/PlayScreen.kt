@@ -110,21 +110,21 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         
         topPane = Pane().apply { 
             Anchor.TopLeft.configure(this, offsetY = {
-                val h = bounds.height.use()
-                -h + panelAnimationValue.use() * h
+                val h = bounds.height.useF()
+                -h + panelAnimationValue.useF() * h
             })
             this.bindHeightToParent(multiplier = 0.3333f)
-            this.bounds.width.bind { bounds.height.use() / pauseBg.triangleSlope }
+            this.bounds.width.bind { bounds.height.useF() / pauseBg.triangleSlope }
             this.padding.set(Insets(36f, 0f, 64f, 0f))
         }
         nextLayer += topPane
         bottomPane = Pane().apply { 
             Anchor.BottomRight.configure(this, offsetY = {
-                val h = bounds.height.use()
-                h + panelAnimationValue.use() * -h
+                val h = bounds.height.useF()
+                h + panelAnimationValue.useF() * -h
             })
             this.bindWidthToParent(multiplier = 0.6666f)
-            this.bounds.height.bind { bounds.width.use() * pauseBg.triangleSlope }
+            this.bounds.height.bind { bounds.width.useF() * pauseBg.triangleSlope }
         }
         nextLayer += bottomPane
 
@@ -171,8 +171,8 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 Anchor.CentreLeft.configure(this, offsetY = 4f)
 //                this.bindHeightToParent(multiplier = 1.5f)
                 this.bounds.height.set(64f)
-                this.bounds.width.bind { bounds.height.use() }
-                this.bounds.x.bind { -(bounds.width.use() + optionsBorderSize + 2f) }
+                this.bounds.width.bind { bounds.height.useF() }
+                this.bounds.x.bind { -(bounds.width.useF() + optionsBorderSize + 2f) }
                 this.visible.bind { selectionIndex.use() == index }
             }
         }
@@ -262,18 +262,18 @@ class PlayScreen(main: PRManiaGame, val container: Container)
 
             val pauseBg = this.pauseBg
 
-            val topLeftX1 = topPane.bounds.x.getOrCompute()
-            val topLeftY1 = height - (topPane.bounds.y.getOrCompute() + topPane.bounds.height.getOrCompute())
+            val topLeftX1 = topPane.bounds.x.get()
+            val topLeftY1 = height - (topPane.bounds.y.get() + topPane.bounds.height.get())
             val topLeftX2 = topLeftX1
-            val topLeftY2 = height - (topPane.bounds.y.getOrCompute())
+            val topLeftY2 = height - (topPane.bounds.y.get())
             val topLeftY3 = topLeftY2
-            val topLeftX3 = topPane.bounds.x.getOrCompute() + topPane.bounds.width.getOrCompute()
-            val botRightX1 = bottomPane.bounds.x.getOrCompute()
-            val botRightY1 = height - (bottomPane.bounds.y.getOrCompute() + bottomPane.bounds.height.getOrCompute())
-            val botRightX2 = bottomPane.bounds.x.getOrCompute() + bottomPane.bounds.width.getOrCompute()
+            val topLeftX3 = topPane.bounds.x.get() + topPane.bounds.width.get()
+            val botRightX1 = bottomPane.bounds.x.get()
+            val botRightY1 = height - (bottomPane.bounds.y.get() + bottomPane.bounds.height.get())
+            val botRightX2 = bottomPane.bounds.x.get() + bottomPane.bounds.width.get()
             val botRightY2 = botRightY1
             val botRightX3 = botRightX2
-            val botRightY3 = height - (bottomPane.bounds.y.getOrCompute())
+            val botRightY3 = height - (bottomPane.bounds.y.get())
             val triLineWidth = 12f
             shapeRenderer.prepareStencilMask(batch) {
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
@@ -591,10 +591,10 @@ ${sceneRoot.mainLayer.lastHoveredElementPath.map { it.javaClass.simpleName }}
     class ArrowNode(val tex: TextureRegion) : UIElement() {
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val renderBounds = this.contentZone
-            val x = renderBounds.x.getOrCompute() + originX
-            val y = originY - renderBounds.y.getOrCompute()
-            val w = renderBounds.width.getOrCompute()
-            val h = renderBounds.height.getOrCompute()
+            val x = renderBounds.x.get() + originX
+            val y = originY - renderBounds.y.get()
+            val w = renderBounds.width.get()
+            val h = renderBounds.height.get()
             val offsetXMax = (w * 0.35f)
             val offsetX = (MathHelper.getSawtoothWave(1f) * 4f).coerceIn(0f, 1f) * offsetXMax
             batch.draw(tex, x + offsetX - offsetXMax, y - h,

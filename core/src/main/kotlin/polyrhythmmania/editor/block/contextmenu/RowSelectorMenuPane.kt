@@ -4,7 +4,6 @@ import paintbox.PaintboxGame
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
 import paintbox.ui.Pane
-import paintbox.ui.contextmenu.ContextMenu
 import paintbox.ui.control.RadioButton
 import paintbox.ui.control.ToggleGroup
 import polyrhythmmania.Localization
@@ -30,7 +29,7 @@ class RowSelectorMenuPane(editorPane: EditorPane, currentRowSetting: RowSetting,
             radio.textLabel.markup.set(editorPane.palette.markup)
             toggleGroup.addToggle(radio)
 
-            posY += radio.bounds.height.getOrCompute()
+            posY += radio.bounds.height.get()
 
             this.addChild(radio)
         }

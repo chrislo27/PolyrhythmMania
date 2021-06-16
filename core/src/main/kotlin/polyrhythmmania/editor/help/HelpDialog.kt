@@ -51,7 +51,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
         
         bottomPane.addChild(Button("").apply {
             Anchor.BottomRight.configure(this)
-            this.bounds.width.bind { bounds.height.use() }
+            this.bounds.width.bind { bounds.height.useF() }
             this.applyDialogStyleBottom()
             this.setOnAction {
                 editorPane.closeDialog()
@@ -203,7 +203,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                         }
                     }
                     vbox.sizeHeightToChildren(1f)
-                    this.bounds.height.set(vbox.bounds.height.getOrCompute())
+                    this.bounds.height.set(vbox.bounds.height.get())
                 }
                 
             }
@@ -229,7 +229,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                         right += renderLayer(helpData, layer.right)
                     }
                     right.sizeHeightToChildren(1f)
-                    this.bounds.height.set(maxOf(left.bounds.height.getOrCompute(), right.bounds.height.getOrCompute()))
+                    this.bounds.height.set(maxOf(left.bounds.height.get(), right.bounds.height.get()))
                 }
             }
             is LayerCol3 ->  {
@@ -264,7 +264,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                         right += renderLayer(helpData, layer.right)
                     }
                     right.sizeHeightToChildren(1f)
-                    this.bounds.height.set(maxOf(left.bounds.height.getOrCompute(), mid.bounds.height.getOrCompute(), right.bounds.height.getOrCompute()))
+                    this.bounds.height.set(maxOf(left.bounds.height.get(), mid.bounds.height.get(), right.bounds.height.get()))
                 }
             }
             is LayerCol3Asymmetric -> {
@@ -290,7 +290,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                         right += renderLayer(helpData, layer.right)
                     }
                     right.sizeHeightToChildren(1f)
-                    this.bounds.height.set(maxOf(left.bounds.height.getOrCompute(), right.bounds.height.getOrCompute()))
+                    this.bounds.height.set(maxOf(left.bounds.height.get(), right.bounds.height.get()))
                 }
             }
             is LayerButton -> {

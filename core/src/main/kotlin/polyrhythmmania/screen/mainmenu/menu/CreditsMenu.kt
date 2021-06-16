@@ -96,7 +96,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     TextRun(label.font.use(), label.text.use(), Color.WHITE,
                             scale, scale).toTextBlock().also { textBlock ->
                         if (label.doLineWrapping.use()) {
-                            textBlock.lineWrapping = label.contentZone.width.use()
+                            textBlock.lineWrapping = label.contentZone.width.useF()
                         }
                     }
                 }
@@ -135,7 +135,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             var currentRowHeight = 0f
             addChild(Pane().apply {
                 Anchor.TopRight.configure(this)
-                this.bindWidthToParent(adjustBinding = { -headingLabel.bounds.width.use() })
+                this.bindWidthToParent(adjustBinding = { -headingLabel.bounds.width.useF() })
 
                 var currentRow = -1
                 names.forEachIndexed { index, str ->
@@ -152,7 +152,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     addChild(TextLabel(str, font = font).apply {
                         Anchor.TopLeft.configure(this)
                         this.bindWidthToParent(adjust = 0f, multiplier = 1f / numNameColumns)
-                        this.bounds.x.bind { bounds.width.use() * col }
+                        this.bounds.x.bind { bounds.width.useF() * col }
                         this.bounds.height.set(rh * ROW_HEIGHT)
                         this.bounds.y.set(currentRowY)
                         this.padding.set(Insets(12f, 2f, 6f, 2f))
@@ -168,7 +168,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             val bottomMargin = ROW_HEIGHT * 0.25f
             this.margin.set(Insets(0f, bottomMargin, 0f, 0f))
             this.bounds.height.bind {
-                max((headingLabel.bounds.height.use()), (currentRowY + currentRowHeight)) + bottomMargin
+                max((headingLabel.bounds.height.useF()), (currentRowY + currentRowHeight)) + bottomMargin
             }
         }
     }

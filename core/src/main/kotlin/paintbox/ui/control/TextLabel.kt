@@ -42,7 +42,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
                             /*label.scaleX.use(), label.scaleY.use()*/ 1f, 1f).toTextBlock()
                 }.also { textBlock ->
                     if (label.doLineWrapping.use()) {
-                        textBlock.lineWrapping = label.contentZone.width.use()
+                        textBlock.lineWrapping = label.contentZone.width.useF()
                     }
                 }
             }
@@ -135,12 +135,12 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         if (text.runs.isEmpty()) return
 
         val bounds = element.contentZone
-        val x = bounds.x.getOrCompute() + originX
-        val y = originY - bounds.y.getOrCompute()
-        val w = bounds.width.getOrCompute()
-        val h = bounds.height.getOrCompute()
+        val x = bounds.x.get() + originX
+        val y = originY - bounds.y.get()
+        val w = bounds.width.get()
+        val h = bounds.height.get()
         val lastPackedColor = batch.packedColor
-        val opacity = element.apparentOpacity.getOrCompute()
+        val opacity = element.apparentOpacity.get()
         val tmpColor = ColorStack.getAndPush()
         tmpColor.set(batch.color).mul(textColorToUse.getOrCompute())
         tmpColor.a *= opacity
@@ -153,8 +153,8 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         val bgPaddingInsets = element.bgPadding.getOrCompute()
         val compressX = element.doXCompression.getOrCompute()
         val align = element.renderAlign.getOrCompute()
-        val scaleX = element.scaleX.getOrCompute()
-        val scaleY = element.scaleY.getOrCompute()
+        val scaleX = element.scaleX.get()
+        val scaleY = element.scaleY.get()
         val textWidth = text.width * scaleX
         val textHeight = text.height * scaleY
         val xOffset: Float = when {

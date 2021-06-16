@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.PaintboxGame
+import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyFloatVar
 import paintbox.binding.Var
 import paintbox.binding.invert
 import paintbox.font.PaintboxFont
@@ -40,14 +42,14 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
 
     init {
-        val height = Var.bind {
-            contentZone.height.use()
+        val height: ReadOnlyFloatVar = FloatVar {
+            contentZone.height.useF()
         }
-        textLabel.bounds.x.bind { height.use() }
-        textLabel.bindWidthToParent { -height.use() }
+        textLabel.bounds.x.bind { height.useF() }
+        textLabel.bindWidthToParent { -height.useF() }
         textLabel.margin.set(Insets(2f))
         imageNode.bounds.x.set(0f)
-        imageNode.bounds.width.bind { height.use() }
+        imageNode.bounds.width.bind { height.useF() }
         imageNode.textureRegion.bind {
             val state = checkedState.use()
             getTextureRegionForType(state)

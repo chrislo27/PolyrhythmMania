@@ -22,7 +22,7 @@ class AnimationHandler(val sceneRoot: SceneRoot) {
     
     fun frameUpdate() {
         val delta = Gdx.graphics.deltaTime
-        val speed = animationSpeed.getOrCompute()
+        val speed = animationSpeed.get()
         val isInstant = speed <= 0f
         
         animations.forEach { (_, tuple) ->

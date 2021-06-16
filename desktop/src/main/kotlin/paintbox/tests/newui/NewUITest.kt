@@ -157,10 +157,10 @@ internal class TestColorElement(val color: Color) : UIElement() {
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         val renderBounds = this.paddingZone
-        val x = renderBounds.x.getOrCompute() + originX
-        val y = originY - renderBounds.y.getOrCompute()
-        val w = renderBounds.width.getOrCompute()
-        val h = renderBounds.height.getOrCompute()
+        val x = renderBounds.x.get() + originX
+        val y = originY - renderBounds.y.get()
+        val w = renderBounds.width.get()
+        val h = renderBounds.height.get()
         val packed = batch.packedColor
         TMP_COLOR.set(color)
         if (isMouseDown) {

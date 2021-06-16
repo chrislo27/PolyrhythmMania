@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyFloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.ui.*
@@ -54,10 +55,10 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     val maximum: FloatVar = FloatVar(MAX_DEFAULT)
     val visibleAmount: FloatVar = FloatVar(VISIBLE_AMOUNT_DEFAULT)
     private val _value: FloatVar = FloatVar(MIN_DEFAULT)
-    val value: ReadOnlyVar<Float> = FloatVar {
-        val min = minimum.use()
-        val max = maximum.use()
-        _value.use().coerceIn(min, max)
+    val value: ReadOnlyFloatVar = FloatVar {
+        val min = minimum.useF()
+        val max = maximum.useF()
+        _value.useF().coerceIn(min, max)
     }
     val thumbPressedState: ReadOnlyVar<PressedState> get() = thumbArea.pressedState
 
@@ -71,11 +72,11 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
         decreaseButton = UnitIncreaseButton(this, getArrowButtonTexReg(), this.orientation, false).apply {
             Anchor.TopLeft.configure(this)
             when (orientation) {
-                Orientation.VERTICAL -> this.bounds.height.bind { bounds.width.use() }
-                Orientation.HORIZONTAL -> this.bounds.width.bind { bounds.height.use() }
+                Orientation.VERTICAL -> this.bounds.height.bind { bounds.width.useF() }
+                Orientation.HORIZONTAL -> this.bounds.width.bind { bounds.height.useF() }
             }
             this.skinID.set(ScrollBar.SCROLLBAR_INC_BUTTON_SKIN_ID)
-            this.disabled.bind { value.use() <= minimum.use() }
+            this.disabled.bind { value.useF() <= minimum.useF() }
             this.setOnAction {
                 decrement()
             }
@@ -83,11 +84,11 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
         increaseButton = UnitIncreaseButton(this, getArrowButtonTexReg(), this.orientation, true).apply {
             Anchor.BottomRight.configure(this)
             when (orientation) {
-                Orientation.VERTICAL -> this.bounds.height.bind { bounds.width.use() }
-                Orientation.HORIZONTAL -> this.bounds.width.bind { bounds.height.use() }
+                Orientation.VERTICAL -> this.bounds.height.bind { bounds.width.useF() }
+                Orientation.HORIZONTAL -> this.bounds.width.bind { bounds.height.useF() }
             }
             this.skinID.set(ScrollBar.SCROLLBAR_INC_BUTTON_SKIN_ID)
-            this.disabled.bind { value.use() >= maximum.use() }
+            this.disabled.bind { value.useF() >= maximum.useF() }
             this.setOnAction {
                 increment()
             }
@@ -96,10 +97,10 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
             Anchor.Centre.configure(this)
             when (orientation) {
                 Orientation.VERTICAL -> {
-                    this.bindHeightToParent { -(bounds.width.use() * 2) }
+                    this.bindHeightToParent { -(bounds.width.useF() * 2) }
                 }
                 Orientation.HORIZONTAL -> {
-                    this.bindWidthToParent { -(bounds.height.use() * 2) }
+                    this.bindWidthToParent { -(bounds.height.useF() * 2) }
                 }
             }
         }
@@ -113,8 +114,8 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     }
 
     protected fun setValue(value: Float, wasUserChange: Boolean) {
-        val oldValue = _value.getOrCompute()
-        val newValue = value.coerceIn(minimum.getOrCompute(), maximum.getOrCompute())
+        val oldValue = _value.get()
+        val newValue = value.coerceIn(minimum.get(), maximum.get())
         if (newValue != oldValue) {
             _value.set(newValue)
             if (wasUserChange) {
@@ -124,19 +125,19 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     }
 
     fun increment() {
-        setValue(value.getOrCompute() + unitIncrement.getOrCompute(), true)
+        setValue(value.get() + unitIncrement.get(), true)
     }
 
     fun decrement() {
-        setValue(value.getOrCompute() - unitIncrement.getOrCompute(), true)
+        setValue(value.get() - unitIncrement.get(), true)
     }
 
     fun incrementBlock() {
-        setValue(value.getOrCompute() + blockIncrement.getOrCompute(), true)
+        setValue(value.get() + blockIncrement.get(), true)
     }
 
     fun decrementBlock() {
-        setValue(value.getOrCompute() - blockIncrement.getOrCompute(), true)
+        setValue(value.get() - blockIncrement.get(), true)
     }
 
     protected open fun getArrowButtonTexReg(): TextureRegion {
@@ -144,14 +145,14 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     }
 
     fun convertValueToPercentage(v: Float): Float {
-        val min = minimum.getOrCompute()
-        val max = maximum.getOrCompute()
+        val min = minimum.get()
+        val max = maximum.get()
         return ((v - min) / (max - min)).coerceIn(0f, 1f)
     }
 
     fun convertPercentageToValue(v: Float): Float {
-        val min = minimum.getOrCompute()
-        val max = maximum.getOrCompute()
+        val min = minimum.get()
+        val max = maximum.get()
         return (v * (max - min) + min).coerceIn(min, max)
     }
 
@@ -275,14 +276,14 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
         fun getMousePercentage(): Float {
             val orientation = scrollBar.orientation
             val thumbBounds = this.bounds
-            val thumbBoundsWidth = thumbBounds.width.getOrCompute()
-            val thumbBoundsHeight = thumbBounds.height.getOrCompute()
+            val thumbBoundsWidth = thumbBounds.width.get()
+            val thumbBoundsHeight = thumbBounds.height.get()
             val thumbW = (if (orientation == Orientation.VERTICAL)
                 (1f)
-            else (scrollBar.convertValueToPercentage(scrollBar.visibleAmount.getOrCompute()))) * thumbBoundsWidth
+            else (scrollBar.convertValueToPercentage(scrollBar.visibleAmount.get()))) * thumbBoundsWidth
             val thumbH = (if (scrollBar.orientation == Orientation.HORIZONTAL)
                 (1f)
-            else (scrollBar.convertValueToPercentage(scrollBar.visibleAmount.getOrCompute()))) * thumbBoundsHeight
+            else (scrollBar.convertValueToPercentage(scrollBar.visibleAmount.get()))) * thumbBoundsHeight
 
             return when (orientation) {
                 Orientation.HORIZONTAL -> {
@@ -304,9 +305,9 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
          */
         fun getCurrentThumbPosPercentage(): Float {
 //            val visibleAmt = scrollBar.visibleAmount.getOrCompute()
-            val min = scrollBar.minimum.getOrCompute()
-            val max = scrollBar.maximum.getOrCompute()
-            return ((scrollBar.value.getOrCompute() - min) / (max - min))
+            val min = scrollBar.minimum.get()
+            val max = scrollBar.maximum.get()
+            return ((scrollBar.value.get() - min) / (max - min))
         }
 
         /**
@@ -314,9 +315,9 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
          * of the scroll thumb, but all values will be in the range 0.0 to 1.0.
          */
         fun getCurrentThumbWidthPercentage(): Float {
-            val visibleAmt = scrollBar.visibleAmount.getOrCompute()
-            val min = scrollBar.minimum.getOrCompute()
-            val max = scrollBar.maximum.getOrCompute()
+            val visibleAmt = scrollBar.visibleAmount.get()
+            val min = scrollBar.minimum.get()
+            val max = scrollBar.maximum.get()
             return ((visibleAmt - min) / (max - min - visibleAmt))
         }
     }
@@ -341,12 +342,12 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
 
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val contentBounds = element.contentZone
-            val rectX = contentBounds.x.getOrCompute() + originX
-            val rectY = originY - contentBounds.y.getOrCompute()
-            val rectW = contentBounds.width.getOrCompute()
-            val rectH = contentBounds.height.getOrCompute()
+            val rectX = contentBounds.x.get() + originX
+            val rectY = originY - contentBounds.y.get()
+            val rectW = contentBounds.width.get()
+            val rectH = contentBounds.height.get()
             val lastPackedColor = batch.packedColor
-            val opacity = element.apparentOpacity.getOrCompute()
+            val opacity = element.apparentOpacity.get()
             val tmpColor = ColorStack.getAndPush()
 
             tmpColor.set(bgColor.getOrCompute())
@@ -368,17 +369,17 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
             val thumbBounds = thumb.bounds
             val thumbW = (if (element.orientation == Orientation.VERTICAL)
                 (1f)
-            else (element.convertValueToPercentage(element.visibleAmount.getOrCompute()))) * thumbBounds.width.getOrCompute()
+            else (element.convertValueToPercentage(element.visibleAmount.get()))) * thumbBounds.width.get()
             val thumbH = (if (element.orientation == Orientation.HORIZONTAL)
                 (1f)
-            else (element.convertValueToPercentage(element.visibleAmount.getOrCompute()))) * thumbBounds.height.getOrCompute()
-            val currentValue = element.value.getOrCompute()
-            val scrollableThumbArea = element.maximum.getOrCompute() - element.minimum.getOrCompute()
+            else (element.convertValueToPercentage(element.visibleAmount.get()))) * thumbBounds.height.get()
+            val currentValue = element.value.get()
+            val scrollableThumbArea = element.maximum.get() - element.minimum.get()
             when (element.orientation) {
                 Orientation.HORIZONTAL -> {
-                    batch.fillRoundedRect(rectX + thumbBounds.x.getOrCompute()
-                            + (if (element.orientation == Orientation.HORIZONTAL) (currentValue / scrollableThumbArea * (thumbBounds.width.getOrCompute() - thumbW)) else 0f),
-                            rectY - rectH + thumbBounds.y.getOrCompute(),
+                    batch.fillRoundedRect(rectX + thumbBounds.x.get()
+                            + (if (element.orientation == Orientation.HORIZONTAL) (currentValue / scrollableThumbArea * (thumbBounds.width.get() - thumbW)) else 0f),
+                            rectY - rectH + thumbBounds.y.get(),
                             thumbW, thumbH, thumbH / 2f)
 //                    batch.fillRect(rectX + thumbBounds.x.getOrCompute()
 //                            + (if (element.orientation == Orientation.HORIZONTAL) (currentValue / scrollableThumbArea * (thumbBounds.width.getOrCompute() - thumbW)) else 0f),
@@ -386,9 +387,9 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
 //                            thumbW, thumbH)
                 }
                 Orientation.VERTICAL -> {
-                    batch.fillRoundedRect(rectX + thumbBounds.x.getOrCompute(),
-                            rectY - rectH + thumbBounds.y.getOrCompute() + (thumbBounds.height.getOrCompute() - thumbH)
-                                    - (if (element.orientation == Orientation.VERTICAL) (currentValue / scrollableThumbArea * (thumbBounds.height.getOrCompute() - thumbH)) else 0f),
+                    batch.fillRoundedRect(rectX + thumbBounds.x.get(),
+                            rectY - rectH + thumbBounds.y.get() + (thumbBounds.height.get() - thumbH)
+                                    - (if (element.orientation == Orientation.VERTICAL) (currentValue / scrollableThumbArea * (thumbBounds.height.get() - thumbH)) else 0f),
                             thumbW, thumbH, thumbW / 2f)
 //                    batch.fillRect(rectX + thumbBounds.x.getOrCompute(),
 //                            rectY - rectH + thumbBounds.y.getOrCompute() + (thumbBounds.height.getOrCompute() - thumbH)

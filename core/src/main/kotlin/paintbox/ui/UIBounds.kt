@@ -79,7 +79,7 @@ open class UIBounds {
 
     fun toLocalString(): String {
         val bounds = this.bounds
-        return "[x=${bounds.x.getOrCompute()}, y=${bounds.y.getOrCompute()}, w=${bounds.width.getOrCompute()}, h=${bounds.height.getOrCompute()}, margin=${margin.getOrCompute()}, border=${border.getOrCompute()}, padding=${padding.getOrCompute()}, borderZone=${borderZone}, paddingZone=${paddingZone}, contentZone=${contentZone}]"
+        return "[x=${bounds.x.get()}, y=${bounds.y.get()}, w=${bounds.width.get()}, h=${bounds.height.get()}, margin=${margin.getOrCompute()}, border=${border.getOrCompute()}, padding=${padding.getOrCompute()}, borderZone=${borderZone}, paddingZone=${paddingZone}, contentZone=${contentZone}]"
     }
 
     override fun toString(): String = toLocalString()
@@ -88,8 +88,8 @@ open class UIBounds {
         fun createZoneBounds(outerZoneBounds: ReadOnlyBounds, outerInsets: ReadOnlyVar<Insets>): ReadOnlyBounds {
             val xVar: FloatVar = FloatVar {
                     val insets = outerInsets.use()
-                    val minX = outerZoneBounds.x.use() + insets.left
-                    val maxX = minX + outerZoneBounds.width.use() - insets.right - insets.left
+                    val minX = outerZoneBounds.x.useF() + insets.left
+                    val maxX = minX + outerZoneBounds.width.useF() - insets.right - insets.left
                     val width = if (maxX <= minX) 0f else (maxX - minX)
                     if (width <= 0f)
                         ((minX + maxX) / 2f)
@@ -97,8 +97,8 @@ open class UIBounds {
                 }
             val yVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
-                val minY = outerZoneBounds.y.use() + insets.top
-                val maxY = minY + outerZoneBounds.height.use() - insets.bottom - insets.top
+                val minY = outerZoneBounds.y.useF() + insets.top
+                val maxY = minY + outerZoneBounds.height.useF() - insets.bottom - insets.top
                 val height = if (maxY <= minY) 0f else (maxY - minY)
                 if (height <= 0f)
                     ((minY + maxY) / 2f)
@@ -106,14 +106,14 @@ open class UIBounds {
             }
             val wVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
-                val minX = outerZoneBounds.x.use() + insets.left
-                val maxX = minX + outerZoneBounds.width.use() - insets.right - insets.left
+                val minX = outerZoneBounds.x.useF() + insets.left
+                val maxX = minX + outerZoneBounds.width.useF() - insets.right - insets.left
                 if (maxX <= minX) 0f else (maxX - minX)
             }
             val hVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
-                val minY = outerZoneBounds.y.use() + insets.top
-                val maxY = minY + outerZoneBounds.height.use() - insets.bottom - insets.top
+                val minY = outerZoneBounds.y.useF() + insets.top
+                val maxY = minY + outerZoneBounds.height.useF() - insets.bottom - insets.top
                 if (maxY <= minY) 0f else (maxY - minY)
             }
 
@@ -124,33 +124,33 @@ open class UIBounds {
                                             contentOffsetX: FloatVar, contentOffsetY: FloatVar): ReadOnlyBounds {
             val wVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
-                val minX = outerZoneBounds.x.use() + insets.left
-                val maxX = minX + outerZoneBounds.width.use() - insets.right - insets.left
+                val minX = outerZoneBounds.x.useF() + insets.left
+                val maxX = minX + outerZoneBounds.width.useF() - insets.right - insets.left
                 if (maxX <= minX) 0f else (maxX - minX)
             }
             val hVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
-                val minY = outerZoneBounds.y.use() + insets.top
-                val maxY = minY + outerZoneBounds.height.use() - insets.bottom - insets.top
+                val minY = outerZoneBounds.y.useF() + insets.top
+                val maxY = minY + outerZoneBounds.height.useF() - insets.bottom - insets.top
                 if (maxY <= minY) 0f else (maxY - minY)
             }
             val xVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
-                val minX = outerZoneBounds.x.use() + insets.left
-                val maxX = minX + outerZoneBounds.width.use() - insets.right - insets.left
+                val minX = outerZoneBounds.x.useF() + insets.left
+                val maxX = minX + outerZoneBounds.width.useF() - insets.right - insets.left
                 val width = if (maxX <= minX) 0f else (maxX - minX)
                 (if (width <= 0f)
                     ((minX + maxX) / 2f)
-                else (minX)) + contentOffsetX.use()
+                else (minX)) + contentOffsetX.useF()
             }
             val yVar: FloatVar = FloatVar {
                 val insets = outerInsets.use()
-                val minY = outerZoneBounds.y.use() + insets.top
-                val maxY = minY + outerZoneBounds.height.use() - insets.bottom - insets.top
+                val minY = outerZoneBounds.y.useF() + insets.top
+                val maxY = minY + outerZoneBounds.height.useF() - insets.bottom - insets.top
                 val height = if (maxY <= minY) 0f else (maxY - minY)
                 (if (height <= 0f)
                     ((minY + maxY) / 2f)
-                else (minY)) + contentOffsetY.use()
+                else (minY)) + contentOffsetY.useF()
             }
 
             return Bounds(xVar, yVar, wVar, hVar)

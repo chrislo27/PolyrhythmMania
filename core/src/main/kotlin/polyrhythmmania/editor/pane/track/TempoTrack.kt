@@ -64,7 +64,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
         this.sidePanel.sidebarSection += Pane().apply {
             this.bounds.x.set(80f)
-            this.bindWidthToParent(-this.bounds.x.getOrCompute())
+            this.bindWidthToParent(-this.bounds.x.get())
             this += Pane().apply {
                 this.bounds.x.set(0f)
                 this.bounds.width.set(56f)
@@ -82,12 +82,12 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             }
             this += Pane().apply {
                 this.bounds.x.set(56f)
-                this.bindWidthToParent(-this.bounds.x.getOrCompute())
+                this.bindWidthToParent(-this.bounds.x.get())
                 this += RectElement(Color().grey(0f, 0.5f))
                 this += Pane().apply {
                     this.padding.set(Insets(2f))
 
-                    this += TextLabel(binding = { DecimalFormats.format("0.0#", editor.startingTempo.use()) },
+                    this += TextLabel(binding = { DecimalFormats.format("0.0#", editor.startingTempo.useF()) },
                             font = editorPane.palette.sidePanelFont).apply {
                         this.renderAlign.set(Align.center)
                         this.textAlign.set(TextAlign.CENTRE)
@@ -112,7 +112,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                         }
 
                         this.addInputEventListener(createInputListener { amt ->
-                            val originalTempo = editor.startingTempo.getOrCompute()
+                            val originalTempo = editor.startingTempo.get()
                             var futureTempo = originalTempo + amt
                             futureTempo = futureTempo.coerceIn(MIN_TEMPO, MAX_TEMPO)
                             if (futureTempo != originalTempo) {
@@ -204,7 +204,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                             } else if (event.button == Input.Buttons.LEFT) {
                                 if (tc == null) {
                                     // Add tempo change
-                                    val beat = MathHelper.snapToNearest(getBeatFromRelative(lastMouseRelative.x), editor.snapping.getOrCompute())
+                                    val beat = MathHelper.snapToNearest(getBeatFromRelative(lastMouseRelative.x), editor.snapping.get())
                                     if (beat > 0f) {
                                         val tempoChanges = editor.tempoChanges.getOrCompute().toMutableList()
                                         val tempos = editor.engine.tempos
@@ -293,7 +293,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
         private fun determineTempoChangeFromBeat(beat: Float): TempoChange? {
             if (beat < 0f) return null
-            val snapping = editor.snapping.getOrCompute()
+            val snapping = editor.snapping.get()
             val tempoChanges = editor.tempoChanges.getOrCompute()
             val snappingHalf = snapping * 0.5f
             return tempoChanges.firstOrNull { tc ->
@@ -303,17 +303,17 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val renderBounds = this.contentZone
-            val x = renderBounds.x.getOrCompute() + originX
-            val y = originY - renderBounds.y.getOrCompute()
-            val w = renderBounds.width.getOrCompute()
-            val h = renderBounds.height.getOrCompute()
+            val x = renderBounds.x.get() + originX
+            val y = originY - renderBounds.y.get()
+            val w = renderBounds.width.get()
+            val h = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
 
             val tmpColor = ColorStack.getAndPush()
             val trackView = editorPane.editor.trackView
-            val trackViewBeat = trackView.beat.getOrCompute()
+            val trackViewBeat = trackView.beat.get()
             val leftBeat = floor(trackViewBeat)
-            val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.getOrCompute()))
+            val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.get()))
             val currentTool = editor.tool.getOrCompute()
             val lineWidth = 2f
 
@@ -327,7 +327,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             val hoveredTempoChange: TempoChange? = if (currentTool == Tool.TEMPO_CHANGE) {
                 if (currentClick is Click.MoveTempoChange) {
                     currentClick.lastValidTempoChangePos
-                } else if (lastMouseRelative.y in 0f..this.bounds.height.getOrCompute()) {
+                } else if (lastMouseRelative.y in 0f..this.bounds.height.get()) {
                     val current = this.currentHoveredTempoChange.getOrCompute()
                     if (current in tempoChanges) {
                         current
