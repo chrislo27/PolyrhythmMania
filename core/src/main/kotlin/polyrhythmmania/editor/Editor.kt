@@ -123,7 +123,7 @@ class Editor(val main: PRManiaGame)
     private var suggestPanCameraDir: Int = 0 // Used when dragging items
 
     // Read-only editor settings hooking into Settings
-
+    val panWhenDraggingAtEdge: ReadOnlyVar<Boolean> get() = settings.editorCameraPanOnDragEdge
 
     // Editor objects and state
     val markerMap: Map<MarkerType, Marker> = MarkerType.VALUES.asReversed().associateWith { Marker(it) }
@@ -850,7 +850,7 @@ class Editor(val main: PRManiaGame)
         }
         
         this.suggestPanCameraDir = 0
-        if (currentClick is Click.PansCameraOnDrag) {
+        if (currentClick is Click.PansCameraOnDrag && panWhenDraggingAtEdge.getOrCompute()) {
             val thisPos = allTracksPane.getPosRelativeToRoot(Vector2Stack.getAndPush())
             thisPos.x = vec.x - thisPos.x
             thisPos.y = vec.y - thisPos.y

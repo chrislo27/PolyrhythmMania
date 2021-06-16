@@ -4,6 +4,7 @@ import com.badlogic.gdx.Preferences
 import com.eclipsesource.json.Json
 import paintbox.binding.Var
 import paintbox.util.WindowSize
+import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_DETAILED_MARKER_UNDO
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
@@ -26,6 +27,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, Var(false))
 
     private val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, Var(false))
+    private val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, Var(true))
     
     private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, Var(InputKeymapKeyboard()))
 
@@ -36,6 +38,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val fullscreen: Var<Boolean> = kv_fullscreen.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
+    val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
     
     val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
 
@@ -48,6 +51,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_fullscreen)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
+        prefs.getBoolean(kv_editorCameraPanOnDragEdge)
         
         prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
     }
@@ -61,6 +65,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_fullscreen)
                 
                 .putBoolean(kv_editorDetailedMarkerUndo)
+                .putBoolean(kv_editorCameraPanOnDragEdge)
                 
                 .putInputKeymapKeyboard(kv_keymapKeyboard)
 

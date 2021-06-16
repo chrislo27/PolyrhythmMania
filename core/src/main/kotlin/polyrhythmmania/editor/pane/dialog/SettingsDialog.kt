@@ -3,6 +3,7 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import paintbox.Paintbox
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
@@ -34,6 +35,8 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.applyDialogStyleBottom()
             this.setOnAction {
                 editorPane.closeDialog()
+                settings.persist()
+                Paintbox.LOGGER.info("Settings persisted (editor)")
             }
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
                 this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
@@ -73,6 +76,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         
         vbox.temporarilyDisableLayouts { 
             vbox += createCheckbox("editorSettings.detailedMarkerUndo", "editorSettings.detailedMarkerUndo.tooltip", settings.editorDetailedMarkerUndo)
+            vbox += createCheckbox("editorSettings.cameraPanOnDragEdge", "editorSettings.cameraPanOnDragEdge.tooltip", settings.editorCameraPanOnDragEdge)
         }
         vbox.sizeHeightToChildren(300f)
         
