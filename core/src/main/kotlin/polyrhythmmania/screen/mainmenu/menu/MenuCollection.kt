@@ -7,6 +7,7 @@ import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.util.RectangleStack
+import paintbox.util.Vector2Stack
 import paintbox.util.gdxutils.maxX
 import paintbox.util.gdxutils.maxY
 import polyrhythmmania.PRManiaGame
@@ -80,18 +81,20 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
             
             val changedBounds = RectangleStack.getAndPush().apply {
                 val currentBounds = menu.bounds
-                val relToRoot = menu.getPosRelativeToRoot(Vector2())
+                val relToRoot = menu.getPosRelativeToRoot(Vector2Stack.getAndPush())
                 this.set(relToRoot.x, relToRoot.y,
                         currentBounds.width.getOrCompute(), currentBounds.height.getOrCompute())
+                Vector2Stack.pop()
             }
             
             val currentActive = activeMenu.getOrCompute()
             if (currentActive != null) {
                 val secondBounds = RectangleStack.getAndPush()
                 val curActiveBounds = currentActive.bounds
-                val relToRoot = currentActive.getPosRelativeToRoot(Vector2())
+                val relToRoot = currentActive.getPosRelativeToRoot(Vector2Stack.getAndPush())
                 secondBounds.set(relToRoot.x, relToRoot.y,
                         curActiveBounds.width.getOrCompute(), curActiveBounds.height.getOrCompute())
+                Vector2Stack.pop()
                 
                 // Merge the two rectangles to be maximal.
                 changedBounds.x = min(changedBounds.x, secondBounds.x)
