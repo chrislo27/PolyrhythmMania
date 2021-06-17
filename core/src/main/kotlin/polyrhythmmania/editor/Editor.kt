@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
 import paintbox.binding.FloatVar
@@ -59,10 +58,7 @@ import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
 import kotlin.collections.LinkedHashMap
-import kotlin.math.abs
-import kotlin.math.absoluteValue
 import kotlin.math.floor
-import kotlin.math.sign
 
 
 class Editor(val main: PRManiaGame)
@@ -497,6 +493,13 @@ class Editor(val main: PRManiaGame)
         if (this.click.getOrCompute() != Click.None) return
         if (lastState == PlayState.STOPPED && newState == PlayState.PAUSED) return
 
+
+        if (newState == PlayState.PLAYING) {
+            soundSystem.setPaused(false)
+        } else {
+            soundSystem.setPaused(true)
+        }
+        
         if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {
             compileEditorIntermediates()
             engine.resetEndSignal()
@@ -513,12 +516,9 @@ class Editor(val main: PRManiaGame)
         if (newState == PlayState.PLAYING) {
             val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
             if (player != null) {
-                engine.musicData.setPlayerPositionToCurrentSec()
+                engine.musicData.setMusicPlayerPositionToCurrentSec()
                 player.pause(false)
             }
-            soundSystem.setPaused(false)
-        } else {
-            soundSystem.setPaused(true)
         }
 
         this.playState.set(newState)

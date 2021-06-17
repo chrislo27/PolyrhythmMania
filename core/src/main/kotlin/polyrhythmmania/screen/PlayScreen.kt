@@ -219,7 +219,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         timing.seconds = -1f
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
-            engine.musicData.setPlayerPositionToCurrentSec()
+            engine.musicData.setMusicPlayerPositionToCurrentSec()
             player.pause(false)
         }
         engine.autoInputs = false
@@ -380,7 +380,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         isPaused = false
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
-            engine.musicData.setPlayerPositionToCurrentSec()
+            engine.musicData.setMusicPlayerPositionToCurrentSec()
             player.pause(false)
         }
         soundSystem.setPaused(false)
