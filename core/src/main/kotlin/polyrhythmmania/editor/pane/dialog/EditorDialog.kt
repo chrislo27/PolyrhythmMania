@@ -5,8 +5,29 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.BasicDialog
 
 
-open class EditorDialog(val editorPane: EditorPane) : BasicDialog(editorPane.main) {
+abstract class EditorDialog(val editorPane: EditorPane, mergeTopAndContent: Boolean = false)
+    : BasicDialog(editorPane.main, mergeTopAndContent) {
 
     val editor: Editor = editorPane.editor
 
+    fun attemptClose() {
+        if (canCloseDialog()) {
+            onCloseDialog()
+            editorPane.closeDialog()
+        }
+    }
+
+    /**
+     * Returns false if we cannot close the dialog.
+     */
+    protected abstract fun canCloseDialog(): Boolean
+
+    /**
+     * Overridden by subclasses to do close cleanup.
+     */
+    protected open fun onCloseDialog() {
+    }
+    
+    open fun canCloseWithEscKey(): Boolean = true
+    
 }

@@ -112,7 +112,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             val keyboardKeybindings = main.settings.inputKeymapKeyboard.getOrCompute()
-            hbox += TextLabel(keyboardKeybindings.toKeyboardString(false),
+            hbox += TextLabel(keyboardKeybindings.toKeyboardString(false, true),
                     font = main.fontMainMenuRodin).apply {
                 this.bounds.width.set(300f)
                 this.textColor.set(Color.BLACK)

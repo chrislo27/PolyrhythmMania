@@ -1,12 +1,9 @@
 package polyrhythmmania.editor.pane
 
-import com.badlogic.gdx.graphics.Color
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
-import paintbox.ui.border.SolidBorder
-import paintbox.ui.element.RectElement
 import polyrhythmmania.editor.Editor
 
 

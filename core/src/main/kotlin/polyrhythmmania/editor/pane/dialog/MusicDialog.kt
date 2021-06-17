@@ -94,7 +94,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.bounds.width.bind { bounds.height.useF() }
             this.applyDialogStyleBottom()
             this.setOnAction {
-                attemptCloseDialog()
+                attemptClose()
             }
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
                 this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
@@ -462,17 +462,20 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
 
-    private fun attemptCloseDialog() {
+    override fun canCloseDialog(): Boolean {
         val substate = substate.getOrCompute()
-        if (!(substate == Substate.NO_MUSIC || substate == Substate.HAS_MUSIC)) return
+        if (!(substate == Substate.NO_MUSIC || substate == Substate.HAS_MUSIC)) return false
+        
+        return true
+    }
 
+    override fun onCloseDialog() {
+        super.onCloseDialog()
         stopMusicPlayback()
 
         // Push changes to editor
         editor.musicData.firstBeatSec.set(this.window.firstBeat.get())
         editor.musicData.loopParams.set(this.window.createLoopParams())
-
-        editorPane.closeDialog()
     }
 
     fun prepareShow(): MusicDialog {

@@ -48,7 +48,7 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.bounds.width.bind { bounds.height.useF() }
             this.applyDialogStyleBottom()
             this.setOnAction {
-                attemptCloseDialog()
+                attemptClose()
             }
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
                 this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
@@ -103,7 +103,7 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         } else {
                             Gdx.app.postRunnable {
                                 substate.set(Substate.DONE)
-                                attemptCloseDialog()
+                                attemptClose()
                             }
                         }
                     }
@@ -131,7 +131,7 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
             Gdx.app.postRunnable {
                 substate.set(Substate.DONE)
-                attemptCloseDialog()
+                attemptClose()
             }
         } catch (e: Exception) {
             Paintbox.LOGGER.warn("Error occurred while saving container:")
@@ -144,10 +144,9 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
 
-    private fun attemptCloseDialog() {
+    override fun canCloseDialog(): Boolean {
         val substate = substate.getOrCompute()
-        if (!(substate == Substate.SAVE_ERROR || substate == Substate.DONE)) return
-
-        editorPane.closeDialog()
+        if (!(substate == Substate.SAVE_ERROR || substate == Substate.DONE)) return false
+        return true
     }
 }

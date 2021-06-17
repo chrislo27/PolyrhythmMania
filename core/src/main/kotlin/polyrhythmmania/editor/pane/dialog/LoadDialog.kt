@@ -51,7 +51,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.bounds.width.bind { bounds.height.useF() }
             this.applyDialogStyleBottom()
             this.setOnAction {
-                attemptCloseDialog()
+                attemptClose()
             }
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
                 this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
@@ -85,7 +85,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.setOnAction {
                 val loadData = loaded
                 if (loadData == null) {
-                    attemptCloseDialog()
+                    attemptClose()
                 } else {
                     val newScreen = loadData.newEditorScreen
                     val currentScreen = main.screen
@@ -123,7 +123,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         } else {
                             Gdx.app.postRunnable {
                                 substate.set(Substate.LOADED)
-                                attemptCloseDialog()
+                                attemptClose()
                             }
                         }
                     }
@@ -200,17 +200,19 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
 
-    private fun attemptCloseDialog() {
-        val substate = substate.getOrCompute()
-        if (!(substate == Substate.LOAD_ERROR || substate == Substate.LOADED)) return
-
+    override fun onCloseDialog() {
         val loadData = this.loaded
         if (loadData != null) {
             this.loaded = null
             loadData.newEditorScreen.dispose()
         }
+    }
+
+    override fun canCloseDialog(): Boolean {
+        val substate = substate.getOrCompute()
+        if (!(substate == Substate.LOAD_ERROR || substate == Substate.LOADED)) return false
         
-        editorPane.closeDialog()
+        return true
     }
 
     data class LoadData(val newEditorScreen: EditorScreen, val loadMetadata: Container.LoadMetadata)

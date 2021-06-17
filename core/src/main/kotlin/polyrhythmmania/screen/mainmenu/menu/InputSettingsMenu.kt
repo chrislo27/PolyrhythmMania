@@ -52,9 +52,9 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNextMenu(keyboardSettings)
                 }
             }
-            vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.controller").use() }.apply {
-                this.disabled.set(true)
-            }
+//            vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.controller").use() }.apply {
+//                this.disabled.set(true)
+//            }
         }
 
         hbox.temporarilyDisableLayouts {

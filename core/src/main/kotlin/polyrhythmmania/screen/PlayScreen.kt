@@ -143,7 +143,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         }
 
         val transparentBlack = Color(0f, 0f, 0f, 0.75f)
-        bottomPane += TextLabel(keyboardKeybinds.toKeyboardString(true), font = main.fontMainMenuRodin).apply {
+        bottomPane += TextLabel(keyboardKeybinds.toKeyboardString(true, true), font = main.fontMainMenuRodin).apply {
             Anchor.BottomRight.configure(this)
             this.textColor.set(Color.WHITE)
             this.bounds.width.set(550f)

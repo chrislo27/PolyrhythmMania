@@ -75,7 +75,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 this.bounds.width.set(48f)
                 this.applyDialogStyleBottom()
                 this.setOnAction {
-                    editorPane.closeDialog()
+                    attemptClose()
                 }
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
                     this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
@@ -157,6 +157,13 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
 
     override fun dispose() {
         renderer.disposeQuietly()
+    }
+
+    override fun canCloseDialog(): Boolean {
+        return true
+    }
+
+    override fun onCloseDialog() {
     }
 }
 

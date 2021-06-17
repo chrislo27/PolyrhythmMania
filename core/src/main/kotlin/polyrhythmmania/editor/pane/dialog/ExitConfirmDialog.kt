@@ -28,7 +28,7 @@ class ExitConfirmDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.bounds.width.bind { bounds.height.useF() * 3 }
             this.applyDialogStyleBottom()
             this.setOnAction {
-                editorPane.closeDialog()
+                attemptClose()
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.exit.cancel.tooltip")))
         })
@@ -72,5 +72,9 @@ class ExitConfirmDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 }
             }
         })
+    }
+
+    override fun canCloseDialog(): Boolean {
+        return true
     }
 }

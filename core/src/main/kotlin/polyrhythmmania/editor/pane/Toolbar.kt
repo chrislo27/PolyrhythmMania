@@ -25,9 +25,6 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
     val mainSection: Pane
 
     val playtestButton: Button
-    val pauseButton: Button
-    val playButton: Button
-    val stopButton: Button
 
     val tapalongPane: TapalongPane
 
@@ -81,9 +78,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.playtest")))
-            this.disabled.bind { !editorPane.editor.allowedToEdit.use() }
             this.setOnAction {
-                
+                editorPane.editor.attemptStartPlaytest()
             }
         }
         rightPreviewHbox.temporarilyDisableLayouts {
@@ -97,7 +93,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.align.set(HBox.Align.CENTRE)
         }
         previewSection += playbackButtonPane
-        pauseButton = Button("").apply {
+        val pauseButton = Button("").apply {
             this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
             this.skinID.set(EditorSkins.BUTTON)
@@ -117,7 +113,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 editorPane.editor.changePlayState(PlayState.PAUSED)
             }
         }
-        playButton = Button("").apply {
+        val playButton = Button("").apply {
             this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
             this.skinID.set(EditorSkins.BUTTON)
@@ -137,7 +133,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 editorPane.editor.changePlayState(PlayState.PLAYING)
             }
         }
-        stopButton = Button("").apply {
+        val stopButton = Button("").apply {
             this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
             this.skinID.set(EditorSkins.BUTTON)
@@ -162,6 +158,9 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             playbackButtonPane += playButton
             playbackButtonPane += stopButton
         }
+        previewSection += createPlaybackButtonSet().apply { 
+            Anchor.Centre.configure(this)
+        }
 
 
         // Main section
@@ -170,7 +169,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.bounds.width.bind {
                 (parent.use()?.contentZone?.width?.useF() ?: 0f) - previewSection.bounds.width.useF()
             }
-            this.margin.set(Insets(0f, 0f, 2f, 4f))
+            this.margin.set(Insets(0f, 0f, 4f, 4f))
         }
         this += mainSection
 
@@ -281,6 +280,80 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             })
             leftControlPane.addChild(tapalongPane)
         }
+    }
+    
+    fun createPlaybackButtonSet(): Pane {
+        val playbackButtonPane = HBox().apply {
+            this.spacing.set(4f)
+            this.bounds.width.set(32f * 3 + this.spacing.get() * 2)
+            this.align.set(HBox.Align.CENTRE)
+        }
+        val pauseButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f)
+            this.skinID.set(EditorSkins.BUTTON)
+            val active: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_pause_color"])
+            val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_pause_white"])
+            this += ImageNode(null).apply {
+                this.textureRegion.bind {
+                    if (apparentDisabledState.use()) inactive else active
+                }
+                this.tint.bind {
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
+                }
+            }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.pause")))
+            this.disabled.bind { editorPane.editor.playState.use() != PlayState.PLAYING }
+            this.setOnAction {
+                editorPane.editor.changePlayState(PlayState.PAUSED)
+            }
+        }
+        val playButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f)
+            this.skinID.set(EditorSkins.BUTTON)
+            val active: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_play_color"])
+            val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_play_white"])
+            this += ImageNode(null).apply {
+                this.textureRegion.bind {
+                    if (apparentDisabledState.use()) inactive else active
+                }
+                this.tint.bind {
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
+                }
+            }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.play")))
+            this.disabled.bind { editorPane.editor.playState.use() == PlayState.PLAYING }
+            this.setOnAction {
+                editorPane.editor.changePlayState(PlayState.PLAYING)
+            }
+        }
+        val stopButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f)
+            this.skinID.set(EditorSkins.BUTTON)
+            val active: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_stop_color"])
+            val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_stop_white"])
+            this += ImageNode(null).apply {
+                this.textureRegion.bind {
+                    if (apparentDisabledState.use()) inactive else active
+                }
+                this.tint.bind {
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
+                }
+            }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.stop")))
+            this.disabled.bind { editorPane.editor.playState.use() == PlayState.STOPPED }
+            this.setOnAction {
+                editorPane.editor.changePlayState(PlayState.STOPPED)
+            }
+        }
+        playbackButtonPane.temporarilyDisableLayouts {
+            playbackButtonPane += pauseButton
+            playbackButtonPane += playButton
+            playbackButtonPane += stopButton
+        }
+        return playbackButtonPane
     }
 
 }

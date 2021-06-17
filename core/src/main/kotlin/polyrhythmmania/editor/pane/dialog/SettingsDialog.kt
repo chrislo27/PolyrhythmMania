@@ -93,4 +93,14 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 //        }
 //        bottomPane.addChild(hbox)
     }
+
+    override fun canCloseDialog(): Boolean {
+        return true
+    }
+
+    override fun onCloseDialog() {
+        super.onCloseDialog()
+        settings.persist()
+        Paintbox.LOGGER.info("Settings persisted (editor)")
+    }
 }

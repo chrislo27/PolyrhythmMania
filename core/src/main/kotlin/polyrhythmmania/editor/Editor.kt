@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
@@ -36,12 +37,15 @@ import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.music.EditorMusicData
+import polyrhythmmania.editor.pane.dialog.EditorDialog
 import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
@@ -75,6 +79,7 @@ class Editor(val main: PRManiaGame)
         this.update()
     }
     val previewFrameBuffer: FrameBuffer
+    val previewTextureRegion: TextureRegion
     val waveformWindow: WaveformWindow
     val settings: Settings get() = main.settings
 
@@ -93,6 +98,7 @@ class Editor(val main: PRManiaGame)
     val engine: Engine get() = container.engine
     val renderer: WorldRenderer get() = container.renderer
 
+    val inputKeymapKeyboard: InputKeymapKeyboard = settings.inputKeymapKeyboard.getOrCompute()
 
     // Default markup used for blocks, bold is inverted
     val blockMarkup: Markup = Markup(mapOf(
@@ -150,6 +156,9 @@ class Editor(val main: PRManiaGame)
 
     init {
         previewFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
+        previewTextureRegion = TextureRegion(previewFrameBuffer.colorBufferTexture).also { tr ->
+            tr.flip(false, true)
+        }
         waveformWindow = WaveformWindow(this)
         soundSystem.setPaused(true)
         soundSystem.startRealtime()
@@ -182,7 +191,8 @@ class Editor(val main: PRManiaGame)
         renderer.render(batch, engine)
         frameBuffer.end()
 
-        batch.projectionMatrix = uiCamera.combined
+        val camera = uiCamera
+        batch.projectionMatrix = camera.combined
         batch.begin()
 
         val cameraPan = this.cameraPan
@@ -194,7 +204,15 @@ class Editor(val main: PRManiaGame)
         }
 
         sceneRoot.renderAsRoot(batch)
-
+        
+        // Draw preview
+//        val node = editorPane.upperPane.previewPane.imageNode
+//        val nodeBounds = node.bounds
+//        val vec = node.getPosRelativeToRoot(Vector2Stack.getAndPush())
+//        val h = nodeBounds.height.get()
+//        batch.draw(previewTextureRegion, vec.x, camera.viewportHeight - vec.y - h, nodeBounds.width.get(), h)
+//        Vector2Stack.pop()
+        
         batch.end()
     }
 
@@ -392,6 +410,19 @@ class Editor(val main: PRManiaGame)
         if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.exitConfirmDialog)
         }
+    }
+
+    fun attemptStartPlaytest() {
+        editorPane.openDialog(editorPane.playtestDialog)
+        setPlaytestingEnabled(true)
+        if (playState.getOrCompute() == PlayState.STOPPED) {
+            changePlayState(PlayState.PLAYING)
+        }
+    }
+    
+    fun setPlaytestingEnabled(enabled: Boolean) {
+        engine.autoInputs = !enabled
+        engine.inputter.areInputsLocked = !enabled
     }
 
     fun attemptNewLevel() {
@@ -596,6 +627,25 @@ class Editor(val main: PRManiaGame)
 
         val contextMenuActive = sceneRoot.isContextMenuActive()
         val dialogActive = sceneRoot.isDialogActive()
+        if (!contextMenuActive && (!dialogActive || sceneRoot.getCurrentRootDialog() == editorPane.playtestDialog)) {
+            if (keycode == Input.Keys.SPACE) { // SPACE: Play state (or in Playtest dialog)
+                if (!alt && !ctrl && currentClick == Click.None) {
+                    if (state == PlayState.STOPPED) {
+                        if (!shift) {
+                            changePlayState(PlayState.PLAYING)
+                            inputConsumed = true
+                        }
+                    } else {
+                        if (state == PlayState.PLAYING) {
+                            changePlayState(if (shift) PlayState.PAUSED else PlayState.STOPPED)
+                        } else { // PAUSED
+                            changePlayState(PlayState.PLAYING)
+                        }
+                        inputConsumed = true
+                    }
+                }
+            }
+        }
         if (!contextMenuActive && !dialogActive) {
             when (keycode) {
                 in MOVE_WINDOW_KEYCODES -> {
@@ -621,23 +671,6 @@ class Editor(val main: PRManiaGame)
                         cameraPan = CameraPan(0.25f, trackView.beat.get(), (container.stopPosition.get()).coerceAtLeast(0f))
                     }
                     inputConsumed = true
-                }
-                Input.Keys.SPACE -> { // SPACE: Play state
-                    if (!alt && !ctrl && currentClick == Click.None) {
-                        if (state == PlayState.STOPPED) {
-                            if (!shift) {
-                                changePlayState(PlayState.PLAYING)
-                                inputConsumed = true
-                            }
-                        } else {
-                            if (state == PlayState.PLAYING) {
-                                changePlayState(if (shift) PlayState.PAUSED else PlayState.STOPPED)
-                            } else { // PAUSED
-                                changePlayState(PlayState.PLAYING)
-                            }
-                            inputConsumed = true
-                        }
-                    }
                 }
                 in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
                     if (!ctrl && !alt && !shift && currentClick == Click.None) {
@@ -703,15 +736,36 @@ class Editor(val main: PRManiaGame)
             }
         } else if (!contextMenuActive && dialogActive) {
             val currentRootDialog = sceneRoot.getCurrentRootDialog()
-            if (currentRootDialog is HelpDialog && (keycode == Input.Keys.F1 || keycode == Input.Keys.ESCAPE)) { // F1: Close help menu
+            // ESC: Close dialog // F1: Close help menu
+            if (currentRootDialog is EditorDialog && currentRootDialog.canCloseWithEscKey()
+                    && ((currentRootDialog is HelpDialog && keycode == Input.Keys.F1) || keycode == Input.Keys.ESCAPE)) {
                 if (!ctrl && !alt && !shift) {
-                    editorPane.closeDialog()
+                    currentRootDialog.attemptClose()
                     inputConsumed = true
+                }
+            } else if (!engine.autoInputs && !engine.inputter.areInputsLocked) {
+                val atSeconds = engine.seconds
+                val keyboardKeybinds = inputKeymapKeyboard
+                when (keycode) {
+                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
+                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
+                        engine.postRunnable {
+                            engine.inputter.onInput(InputType.DPAD, atSeconds)
+                        }
+                        inputConsumed = true
+                    }
+                    keyboardKeybinds.buttonA -> {
+                        engine.postRunnable {
+                            engine.inputter.onInput(InputType.A, atSeconds)
+                        }
+                        inputConsumed = true
+                    }
                 }
             }
         }
 
-        return inputConsumed || sceneRoot.inputSystem.keyDown(keycode)
+        inputConsumed = sceneRoot.inputSystem.keyDown(keycode) || inputConsumed
+        return inputConsumed
     }
 
     override fun keyTyped(character: Char): Boolean {

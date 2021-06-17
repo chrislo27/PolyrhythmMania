@@ -48,6 +48,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     val saveDialog: SaveDialog
     val loadDialog: LoadDialog
     val newDialog: NewDialog
+    val playtestDialog: PlaytestDialog
 
     init {
         // Background
@@ -106,6 +107,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         saveDialog = SaveDialog(this)
         loadDialog = LoadDialog(this)
         newDialog = NewDialog(this)
+        playtestDialog = PlaytestDialog(this)
     }
     
     fun resetHelpDialog() {

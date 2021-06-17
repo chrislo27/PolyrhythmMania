@@ -17,7 +17,7 @@ import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.pane.EditorPane
 
 
-open class BasicDialog(val main: PRManiaGame) : DialogPane() {
+open class BasicDialog(val main: PRManiaGame, mergeTopAndContent: Boolean) : DialogPane() {
 
     val titleLabel: TextLabel
     val topPane: Pane
@@ -58,7 +58,9 @@ open class BasicDialog(val main: PRManiaGame) : DialogPane() {
             this.borderStyle.set(SolidBorder(Color.WHITE))
             this.margin.set(Insets(0f, tbPaneMargin, 0f, 0f))
         }
-        bg.addChild(topPane)
+        if (!mergeTopAndContent) {
+            bg.addChild(topPane)
+        }
         bottomPane = Pane().apply {
             Anchor.BottomLeft.configure(this)
             this.bounds.height.set(botPaneHeight)
@@ -70,8 +72,13 @@ open class BasicDialog(val main: PRManiaGame) : DialogPane() {
         bg.addChild(bottomPane)
         contentPane = Pane().apply {
             Anchor.TopLeft.configure(this)
-            this.bounds.y.set(topPaneHeight)
-            this.bindHeightToParent(-1 * (topPaneHeight + botPaneHeight))
+            if (!mergeTopAndContent) {
+                this.bounds.y.set(topPaneHeight)
+                this.bindHeightToParent(-1 * (topPaneHeight + botPaneHeight))
+            } else {
+                this.bounds.y.set(0f)
+                this.bindHeightToParent(-1 * (botPaneHeight))
+            }
         }
         bg.addChild(contentPane)
 
