@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
 import paintbox.binding.FloatVar
@@ -22,6 +23,7 @@ import paintbox.registry.AssetRegistry
 import paintbox.ui.SceneRoot
 import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
+import paintbox.util.MathHelper
 import paintbox.util.Vector2Stack
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.isAltDown
@@ -57,7 +59,10 @@ import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
 import kotlin.collections.LinkedHashMap
+import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.floor
+import kotlin.math.sign
 
 
 class Editor(val main: PRManiaGame)
@@ -126,11 +131,13 @@ class Editor(val main: PRManiaGame)
     val snapping: FloatVar = FloatVar(0.25f)
     val beatLines: BeatLines = BeatLines()
     var cameraPan: CameraPan? = null
+    val cameraOffset: CameraOffset = CameraOffset()
     private val pressedButtons: MutableSet<Int> = mutableSetOf()
     private var suggestPanCameraDir: Int = 0 // Used when dragging items
 
     // Read-only editor settings hooking into Settings
     val panWhenDraggingAtEdge: ReadOnlyVar<Boolean> get() = settings.editorCameraPanOnDragEdge
+    val panningDuringPlaybackSetting: ReadOnlyVar<CameraPanningSetting> get() = settings.editorPanningDuringPlayback
 
     // Editor objects and state
     val markerMap: Map<MarkerType, Marker> = MarkerType.VALUES.asReversed().associateWith { Marker(it) }
@@ -240,11 +247,45 @@ class Editor(val main: PRManiaGame)
                 }
             }
 
-            if (this.cameraPan == null && !pressedButtons.any { it in MOVE_WINDOW_KEYCODES }) {
-                val beatWidth = editorPane.allTracksPane.editorTrackArea.beatWidth.get()
-                val currentBeatX = trackView.beat.get()
-                if (currentEngineBeat !in (currentBeatX)..(currentBeatX + beatWidth)) {
-                    this.cameraPan = CameraPan(0.125f, currentBeatX, currentEngineBeat, Interpolation.smoother)
+            val currentPanSetting = panningDuringPlaybackSetting.getOrCompute()
+            when (currentPanSetting) {
+                CameraPanningSetting.PAN -> {
+                    if (this.cameraPan == null && !pressedButtons.any { it in MOVE_WINDOW_KEYCODES }) {
+                        val beatWidth = editorPane.allTracksPane.editorTrackArea.beatWidth.get()
+                        val currentBeatX = trackView.beat.get()
+                        if (currentEngineBeat !in (currentBeatX)..(currentBeatX + beatWidth)) {
+                            this.cameraPan = CameraPan(0.125f, currentBeatX, currentEngineBeat, Interpolation.smoother)
+                        }
+                    }
+                }
+                CameraPanningSetting.FOLLOW -> {
+                    this.cameraPan = null
+                    val aheadAmt = 4f
+
+                    val cameraOffset = this.cameraOffset
+                    var anyManual = false
+                    if (pressedButtons.any { it in MOVE_WINDOW_LEFT_KEYCODES }) {
+                        anyManual = !anyManual
+                        
+                        val target = editorPane.allTracksPane.editorTrackArea.beatWidth.get() - aheadAmt - 3f
+                        cameraOffset.changeTarget(target)
+                    }
+                    if (pressedButtons.any { it in MOVE_WINDOW_RIGHT_KEYCODES }) {
+                        anyManual = !anyManual
+                        val target = -(aheadAmt - 1f)
+                        cameraOffset.changeTarget(target)
+                    }
+                    
+                    if (!anyManual) {
+                        val target = 0f
+                        cameraOffset.changeTarget(target)
+                    }
+                    
+                    cameraOffset.update(delta)
+
+                    val seconds = engine.seconds
+                    val linearBeat = engine.tempos.secondsToBeats(seconds, disregardSwing = true) - (aheadAmt + cameraOffset.current)
+                    trackView.beat.set(MathHelper.snapToNearest(linearBeat, 1f / trackView.pxPerBeat.get()).coerceAtLeast(0f))
                 }
             }
         }
@@ -464,17 +505,17 @@ class Editor(val main: PRManiaGame)
             engine.musicData.update()
             val engineBeatFloor = floor(engine.beat)
             lastMetronomeBeat = if (engineBeatFloor == engine.beat) (engineBeatFloor.toInt() - 1) else engineBeatFloor.toInt()
-            val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
-            if (player != null) {
-                engine.musicData.setPlayerPositionToCurrentSec()
-                player.pause(false)
-            }
         } else if (newState == PlayState.STOPPED) {
             resetWorld()
             timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
         }
 
         if (newState == PlayState.PLAYING) {
+            val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
+            if (player != null) {
+                engine.musicData.setPlayerPositionToCurrentSec()
+                player.pause(false)
+            }
             soundSystem.setPaused(false)
         } else {
             soundSystem.setPaused(true)
@@ -960,6 +1001,8 @@ class Editor(val main: PRManiaGame)
         return """Click: ${click.javaClass.simpleName}${if (clickDebugString.isNotEmpty()) "\n$clickDebugString" else ""}
 engine.events: ${engine.events.size}
 path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
+cameraOffsetCurrent: ${cameraOffset.current}
+cameraOffsetTarget: ${cameraOffset.target}
 """
         //path: ${sceneRoot.dialogLayer.lastHoveredElementPath.map { "${it::class.java.simpleName} [${it.bounds.x.getOrCompute()}, ${it.bounds.y.getOrCompute()}, ${it.bounds.width.getOrCompute()}, ${it.bounds.height.getOrCompute()}]" }}
     }

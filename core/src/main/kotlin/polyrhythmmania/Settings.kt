@@ -6,12 +6,15 @@ import paintbox.binding.Var
 import paintbox.util.WindowSize
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_DETAILED_MARKER_UNDO
+import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PANNING_DURING_PLAYBACK
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
+import polyrhythmmania.editor.CameraPanningSetting
+import polyrhythmmania.editor.EditorSetting
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 
 
@@ -28,6 +31,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
     private val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, Var(false))
     private val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, Var(true))
+    private val kv_editorPanningDuringPlayback: KeyValue<CameraPanningSetting> = KeyValue(EDITORSETTINGS_PANNING_DURING_PLAYBACK, Var(CameraPanningSetting.PAN))
     
     private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, Var(InputKeymapKeyboard()))
 
@@ -39,9 +43,11 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
+    val editorPanningDuringPlayback: Var<CameraPanningSetting> = kv_editorPanningDuringPlayback.value
     
     val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
 
+    @Suppress("UNCHECKED_CAST")
     fun load() {
         val prefs = this.prefs
         prefs.getIntCoerceIn(kv_gameplayVolume, 0, 100)
@@ -52,6 +58,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
+        prefs.getEditorSetting(kv_editorPanningDuringPlayback as KeyValue<EditorSetting>,
+                CameraPanningSetting.MAP, CameraPanningSetting.PAN)
         
         prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
     }
@@ -66,6 +74,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)
+                .putEditorSetting(kv_editorPanningDuringPlayback)
                 
                 .putInputKeymapKeyboard(kv_keymapKeyboard)
 
@@ -138,5 +147,18 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private fun Preferences.putInputKeymapKeyboard(kv: KeyValue<InputKeymapKeyboard>): Preferences {
         val prefs: Preferences = this
         return prefs.putString(kv.key, kv.value.getOrCompute().toJson().toString())
+    }
+
+    private fun Preferences.getEditorSetting(kv: KeyValue<EditorSetting>,
+                                             map: Map<String, EditorSetting>, defaultValue: EditorSetting) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            kv.value.set(map[prefs.getString(kv.key, defaultValue.persistValueID)] ?: defaultValue)
+        }
+    }
+
+    private fun Preferences.putEditorSetting(kv: KeyValue<out EditorSetting>): Preferences {
+        val prefs: Preferences = this
+        return prefs.putString(kv.key, kv.value.getOrCompute().persistValueID)
     }
 }

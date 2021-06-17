@@ -378,6 +378,11 @@ class PlayScreen(main: PRManiaGame, val container: Container)
 
     private fun unpauseGame(playSound: Boolean) {
         isPaused = false
+        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
+        if (player != null) {
+            engine.musicData.setPlayerPositionToCurrentSec()
+            player.pause(false)
+        }
         soundSystem.setPaused(false)
         Gdx.input.isCursorCatched = true
         main.inputMultiplexer.removeProcessor(inputProcessor)

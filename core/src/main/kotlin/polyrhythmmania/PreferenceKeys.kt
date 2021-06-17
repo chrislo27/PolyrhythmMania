@@ -16,6 +16,7 @@ object PreferenceKeys {
     
     val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
     val EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE = "editorsettings_camera_pan_on_drag_edge"
+    val EDITORSETTINGS_PANNING_DURING_PLAYBACK = "editorsettings_panning_during_playback"
     
     val KEYMAP_KEYBOARD = "keymap_keyboard"
     
