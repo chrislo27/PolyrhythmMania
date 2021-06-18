@@ -9,6 +9,7 @@ object EditorHelpData {
         return HelpData(mapOf(
                 HelpData.ROOT_ID to EditorHelpDocRoot(),
                 "controls" to EditorHelpDocControls(),
+                "glossary" to EditorHelpDocGlossary(),
                 "music_sync" to EditorHelpDocMusicSync(),
         ))
     }
@@ -20,7 +21,11 @@ class EditorHelpDocRoot : HelpDocument(
         listOf(
                 LayerTitle("editorHelp.root.title"),
                 LayerParagraph("editorHelp.root.pp0", 64f),
-                LayerCol3(LayerButton("editorHelp.controls.title", "controls", false), LayerButton("editorHelp.music_sync.title", "music_sync", false), null)
+                LayerCol3(
+                        LayerButton("editorHelp.controls.title", "controls", false),
+                        LayerButton("editorHelp.glossary.title", "glossary", false),
+                        LayerButton("editorHelp.music_sync.title", "music_sync", false)
+                )
         )
 )
 
@@ -59,6 +64,23 @@ class EditorHelpDocControls : HelpDocument(
                         LayerParagraph("editorHelp.controls.keybinds.timeSigTool.desc", 100f),
                         leftProportion = 0.275f
                 ),
+        )
+)
+
+class EditorHelpDocGlossary : HelpDocument(
+        "editorHelp.glossary.title",
+        listOf(
+                LayerParagraph("editorHelp.glossary.pp0", 50f),
+                LayerParagraph("editorHelp.glossary.track", 64f, renderAlign = Align.bottomLeft),
+                LayerImage("textures/help/glossary/track.png", 288f),
+                LayerParagraph("editorHelp.glossary.block", 64f, renderAlign = Align.bottomLeft),
+                LayerImage("textures/help/glossary/blocks.png", 288f),
+                LayerParagraph("editorHelp.glossary.tempoChange", 64f, renderAlign = Align.bottomLeft),
+                LayerImage("textures/help/glossary/tempo_change.png", 92f),
+                LayerParagraph("editorHelp.glossary.musicVolume", 64f, renderAlign = Align.bottomLeft),
+                LayerImage("textures/help/glossary/music_volume.png", 38f),
+                LayerParagraph("editorHelp.glossary.timeSignature", 64f, renderAlign = Align.bottomLeft),
+                LayerImage("textures/help/glossary/time_signature.png", 102f),
         )
 )
 
