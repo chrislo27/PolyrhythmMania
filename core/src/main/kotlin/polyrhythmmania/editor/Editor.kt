@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
+import paintbox.Paintbox
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -52,12 +53,15 @@ import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
+import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
+import java.io.File
 import java.util.*
 import kotlin.collections.LinkedHashMap
+import kotlin.concurrent.thread
 import kotlin.math.floor
 
 
@@ -73,6 +77,8 @@ class Editor(val main: PRManiaGame)
         val MOVE_WINDOW_LEFT_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.A)
         val MOVE_WINDOW_RIGHT_KEYCODES: Set<Int> = setOf(Input.Keys.RIGHT, Input.Keys.D)
         val MOVE_WINDOW_KEYCODES: Set<Int> = (MOVE_WINDOW_LEFT_KEYCODES + MOVE_WINDOW_RIGHT_KEYCODES)
+
+        val AUTOSAVE_INTERVALS: List<Int> = listOf(0, 1, 3, 5, 10, 15, 20, 30)
     }
 
     private val uiCamera: OrthographicCamera = OrthographicCamera().apply {
@@ -134,6 +140,7 @@ class Editor(val main: PRManiaGame)
     // Read-only editor settings hooking into Settings
     val panWhenDraggingAtEdge: ReadOnlyVar<Boolean> get() = settings.editorCameraPanOnDragEdge
     val panningDuringPlaybackSetting: ReadOnlyVar<CameraPanningSetting> get() = settings.editorPanningDuringPlayback
+    val autosaveInterval: ReadOnlyVar<Int> get() = settings.editorAutosaveInterval
 
     // Editor objects and state
     val markerMap: Map<MarkerType, Marker> = MarkerType.VALUES.asReversed().associateWith { Marker(it) }
@@ -148,6 +155,7 @@ class Editor(val main: PRManiaGame)
     val metronomeEnabled: Var<Boolean> = Var(false)
     val timeSignatures: Var<List<TimeSignature>> = Var(listOf())
     private var lastMetronomeBeat: Int = -1
+    private var timeUntilAutosave: Float = autosaveInterval.getOrCompute() * 60f
 
     val engineBeat: FloatVar = FloatVar(engine.beat)
 
@@ -176,6 +184,9 @@ class Editor(val main: PRManiaGame)
         }
         tool.addListener {
             beatLines.active = false
+        }
+        autosaveInterval.addListener {
+            timeUntilAutosave = it.getOrCompute() * 60f
         }
     }
 
@@ -207,7 +218,7 @@ class Editor(val main: PRManiaGame)
         }
 
         sceneRoot.renderAsRoot(batch)
-        
+
         // Draw preview
 //        val node = editorPane.upperPane.previewPane.imageNode
 //        val nodeBounds = node.bounds
@@ -215,7 +226,7 @@ class Editor(val main: PRManiaGame)
 //        val h = nodeBounds.height.get()
 //        batch.draw(previewTextureRegion, vec.x, camera.viewportHeight - vec.y - h, nodeBounds.width.get(), h)
 //        Vector2Stack.pop()
-        
+
         batch.end()
     }
 
@@ -224,6 +235,12 @@ class Editor(val main: PRManiaGame)
         val alt = Gdx.input.isAltDown()
         val shift = Gdx.input.isShiftDown()
         val delta = Gdx.graphics.deltaTime
+
+        val autosaveIntervalMin = autosaveInterval.getOrCompute()
+        if (autosaveIntervalMin > 0) {
+            if (timeUntilAutosave > 0f)
+                timeUntilAutosave -= delta
+        }
 
         val currentPlayState = playState.getOrCompute()
         if (currentPlayState == PlayState.PLAYING) {
@@ -262,7 +279,7 @@ class Editor(val main: PRManiaGame)
                     var anyManual = false
                     if (pressedButtons.any { it in MOVE_WINDOW_LEFT_KEYCODES }) {
                         anyManual = !anyManual
-                        
+
                         val target = editorPane.allTracksPane.editorTrackArea.beatWidth.get() - aheadAmt - 3f
                         cameraOffset.changeTarget(target)
                     }
@@ -271,17 +288,43 @@ class Editor(val main: PRManiaGame)
                         val target = -(aheadAmt - 1f)
                         cameraOffset.changeTarget(target)
                     }
-                    
+
                     if (!anyManual) {
                         val target = 0f
                         cameraOffset.changeTarget(target)
                     }
-                    
+
                     cameraOffset.update(delta)
 
                     val seconds = engine.seconds
                     val linearBeat = engine.tempos.secondsToBeats(seconds, disregardSwing = true) - (aheadAmt + cameraOffset.current)
                     trackView.beat.set(MathHelper.snapToNearest(linearBeat, 1f / trackView.pxPerBeat.get()).coerceAtLeast(0f))
+                }
+            }
+        } else {
+            if (currentPlayState == PlayState.STOPPED) {
+                if (autosaveIntervalMin > 0) {
+                    if (timeUntilAutosave <= 0f && allowedToEdit.getOrCompute() && click.getOrCompute() == Click.None) {
+                        timeUntilAutosave = autosaveIntervalMin.coerceAtLeast(1) * 60f
+                        thread(start = true, isDaemon = true, priority = Thread.MIN_PRIORITY, name = "Editor Autosave") {
+                            val currentSaveLoc = editorPane.saveDialog.getCurrentSaveLocation()
+                            val file: File = if (currentSaveLoc != null) {
+                                val suffix = ".autosave"
+                                val max = 64 // Doesn't include the container extension
+                                val newfilename = currentSaveLoc.nameWithoutExtension.take(max - suffix.length) + suffix + "." + Container.FILE_EXTENSION
+                                currentSaveLoc.resolveSibling(newfilename)
+                            } else {
+                                return@thread /* TODO force save to recovery if not yet saved */
+                            }
+                            try {
+                                container.writeToFile(file)
+                                Paintbox.LOGGER.debug("Autosave completed (interval: $autosaveIntervalMin min)")
+                            } catch (e: Exception) {
+                                Paintbox.LOGGER.warn("Autosave failed!")
+                                e.printStackTrace()
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -456,7 +499,7 @@ class Editor(val main: PRManiaGame)
             changePlayState(PlayState.PLAYING)
         }
     }
-    
+
     fun setPlaytestingEnabled(enabled: Boolean) {
         engine.autoInputs = !enabled
         engine.inputter.areInputsLocked = !enabled
@@ -499,7 +542,7 @@ class Editor(val main: PRManiaGame)
         } else {
             soundSystem.setPaused(true)
         }
-        
+
         if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {
             compileEditorIntermediates()
             engine.resetEndSignal()
@@ -959,7 +1002,7 @@ class Editor(val main: PRManiaGame)
             allTracksPane.editorTrackArea.onMouseMovedOrDragged(vec.x, vec.y)
             inputConsumed = true
         }
-        
+
         this.suggestPanCameraDir = 0
         if (currentClick is Click.PansCameraOnDrag && panWhenDraggingAtEdge.getOrCompute()) {
             val thisPos = allTracksPane.getPosRelativeToRoot(Vector2Stack.getAndPush())
@@ -977,7 +1020,7 @@ class Editor(val main: PRManiaGame)
 
             Vector2Stack.pop()
         }
-        
+
         Vector2Stack.pop()
 
         return inputConsumed || sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer)
@@ -1000,6 +1043,7 @@ class Editor(val main: PRManiaGame)
         val clickDebugString = click.getDebugString()
         return """Click: ${click.javaClass.simpleName}${if (clickDebugString.isNotEmpty()) "\n$clickDebugString" else ""}
 engine.events: ${engine.events.size}
+autosave: ${DecimalFormats.format("0.0", timeUntilAutosave)}
 path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
 cameraOffsetCurrent: ${cameraOffset.current}
 cameraOffsetTarget: ${cameraOffset.target}

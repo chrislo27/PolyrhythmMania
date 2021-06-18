@@ -71,6 +71,10 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     fun assignSaveLocation(file: File) {
         lastSaveLoc = file
     }
+    
+    fun getCurrentSaveLocation(): File? {
+        return lastSaveLoc
+    }
 
     fun prepareShow(forceSaveAs: Boolean): SaveDialog {
         descLabel.text.set("")

@@ -22,6 +22,7 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.editor.CameraPanningSetting
+import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 import kotlin.math.max
@@ -109,6 +110,11 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             vbox += createCycleOption("editorSettings.cameraPanningSetting", "editorSettings.cameraPanningSetting.tooltip",
                     settings.editorPanningDuringPlayback, CameraPanningSetting.VALUES,
                     itemToStringBinding = { Localization.getVar(it.localization).use() }).first
+            vbox += createCycleOption("editorSettings.autosaveInterval", "editorSettings.autosaveInterval.tooltip",
+                    settings.editorAutosaveInterval, Editor.AUTOSAVE_INTERVALS,
+                    itemToStringBinding = { item -> Localization.getVar("editorSettings.autosaveInterval.minutes", Var {
+                        listOf(item)
+                    }).use() }).first
         }
         vbox.sizeHeightToChildren(300f)
 
@@ -191,6 +197,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 this.textColor.set(Color.WHITE)
                 this.textAlign.set(TextAlign.CENTRE)
                 this.renderAlign.set(Align.center)
+                this.markup.set(editorPane.palette.markupInstantiatorDesc)
             }
 
             addChild(left)
