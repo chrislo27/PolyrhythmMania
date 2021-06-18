@@ -19,7 +19,9 @@ import paintbox.registry.AssetRegistry
 import paintbox.util.ResolutionSetting
 import paintbox.util.WindowSize
 import org.lwjgl.glfw.GLFW
+import paintbox.Paintbox
 import paintbox.util.gdxutils.*
+import polyrhythmmania.container.Container
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.engine.input.InputThresholds
@@ -104,6 +106,17 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     override fun dispose() {
         super.dispose()
+        try {
+            val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
+            PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->
+                f != null && f.isFile && f.extension == Container.FILE_EXTENSION && f.lastModified() < expiry
+            }?.forEach { 
+                it.delete()
+                Paintbox.LOGGER.info("Deleted old recovery file ${it.name}, lastModified() = ${it.lastModified()}, limit=$expiry")
+            }
+        } catch (s: SecurityException) {
+            s.printStackTrace()
+        }
     }
 
     override fun postRender() {

@@ -12,11 +12,11 @@ import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
 import paintbox.ui.control.Button
-import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.util.TinyFDWrapper
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.ExternalResource
@@ -30,13 +30,14 @@ import kotlin.concurrent.thread
 class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     enum class Substate {
+        PICKING_OPTION,
         FILE_DIALOG_OPEN,
         LOADING,
         LOADED,
         LOAD_ERROR,
     }
 
-    val substate: Var<Substate> = Var(Substate.FILE_DIALOG_OPEN)
+    val substate: Var<Substate> = Var(Substate.PICKING_OPTION)
 
     val descLabel: TextLabel
     val confirmButton: Button
@@ -59,7 +60,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("common.cancel")))
             this.disabled.bind {
                 val ss = substate.use()
-                !(ss == Substate.LOAD_ERROR || ss == Substate.LOADED)
+                !(ss == Substate.LOAD_ERROR || ss == Substate.LOADED || ss == Substate.PICKING_OPTION)
             }
         })
         descLabel = TextLabel("").apply {
@@ -70,18 +71,17 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
         contentPane.addChild(descLabel)
 
-        val hbox = HBox().apply {
+        val confirmHbox = HBox().apply {
             Anchor.BottomCentre.configure(this)
             this.align.set(HBox.Align.CENTRE)
             this.spacing.set(16f)
             this.bounds.width.set(700f)
+            this.visible.bind { substate.use() == Substate.LOADED }
         }
-        bottomPane.addChild(hbox)
-
+        bottomPane.addChild(confirmHbox)
         confirmButton = Button(binding = { Localization.getVar("editor.dialog.load.confirm").use() }, font = editorPane.palette.loadDialogFont).apply {
             this.bounds.width.set(600f)
             this.applyDialogStyleBottom()
-            this.visible.bind { substate.use() == Substate.LOADED }
             this.setOnAction {
                 val loadData = loaded
                 if (loadData == null) {
@@ -99,40 +99,71 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 }
             }
         }
-        hbox.temporarilyDisableLayouts {
-            hbox.addChild(confirmButton)
+        confirmHbox.temporarilyDisableLayouts {
+            confirmHbox.addChild(confirmButton)
+        }
+
+
+        val pickHbox = HBox().apply {
+            Anchor.BottomCentre.configure(this)
+            this.align.set(HBox.Align.CENTRE)
+            this.spacing.set(16f)
+            this.bounds.width.set(900f)
+            this.visible.bind { substate.use() == Substate.PICKING_OPTION }
+        }
+        bottomPane.addChild(pickHbox)
+        pickHbox.temporarilyDisableLayouts {
+            pickHbox += Button(binding = { Localization.getVar("editor.dialog.load.button.savedLevel").use() },
+                    font = editorPane.palette.loadDialogFont).apply {
+                this.bounds.width.set(500f)
+                this.applyDialogStyleBottom()
+                this.setOnAction {
+                    showFileDialog(main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)
+                            ?: main.getDefaultDirectory(), false)
+                }
+            }
+            pickHbox += Button(binding = { Localization.getVar("editor.dialog.load.button.recovery").use() },
+                    font = editorPane.palette.loadDialogFont).apply {
+                this.bounds.width.set(300f)
+                this.applyDialogStyleBottom()
+                this.setOnAction {
+                    showFileDialog(PRMania.RECOVERY_FOLDER, true)
+                }
+            }
+        }
+    }
+    
+    private fun showFileDialog(dir: File, isRecovery: Boolean) {
+        descLabel.text.set(Localization.getValue("common.closeFileChooser"))
+        substate.set(Substate.FILE_DIALOG_OPEN)
+        editorPane.main.restoreForExternalDialog { completionCallback ->
+            thread(isDaemon = true) {
+                val title = Localization.getValue("fileChooser.load.title")
+                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.filter"), listOf("*.${Container.FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                TinyFDWrapper.openFile(title, dir, filter) { file: File? ->
+                    completionCallback()
+                    if (file != null) {
+                        Gdx.app.postRunnable {
+                            load(file, isRecovery)
+                        }
+                    } else {
+                        Gdx.app.postRunnable {
+                            prepareShow(null)
+                        }
+                    }
+                }
+            }
         }
     }
 
     fun prepareShow(dropPath: String?): LoadDialog {
         if (dropPath == null) {
-            descLabel.text.set(Localization.getValue("common.closeFileChooser"))
-            substate.set(Substate.FILE_DIALOG_OPEN)
-            editorPane.main.restoreForExternalDialog { completionCallback ->
-                thread(isDaemon = true) {
-                    val title = Localization.getValue("fileChooser.load.title")
-                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.filter"), listOf("*.${Container.FILE_EXTENSION}")).copyWithExtensionsInDesc()
-                    TinyFDWrapper.openFile(title,
-                            main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD)
-                                    ?: main.getDefaultDirectory(), filter) { file: File? ->
-                        completionCallback()
-                        if (file != null) {
-                            Gdx.app.postRunnable {
-                                load(file)
-                            }
-                        } else {
-                            Gdx.app.postRunnable {
-                                substate.set(Substate.LOADED)
-                                attemptClose()
-                            }
-                        }
-                    }
-                }
-            }
+            descLabel.text.set(Localization.getValue("editor.dialog.load.desc"))
+            substate.set(Substate.PICKING_OPTION)
         } else {
             val file = File(dropPath)
             Gdx.app.postRunnable {
-                load(file)
+                load(file, false)
             }
         }
  
@@ -142,7 +173,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     /**
      * Must be called on the GL thread.
      */
-    private fun load(newFile: File) {
+    private fun load(newFile: File, isRecovery: Boolean) {
         descLabel.text.set(Localization.getValue("editor.dialog.load.loading"))
         substate.set(Substate.LOADING)
 
@@ -176,7 +207,8 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         newEditor.updateForNewMusicData()
                     }
                     
-                    newEditor.editorPane.saveDialog.assignSaveLocation(newFile)
+                    if (!isRecovery)
+                        newEditor.editorPane.saveDialog.assignSaveLocation(newFile)
 
                     substate.set(Substate.LOADED)
                     descLabel.text.set(Localization.getValue("editor.dialog.load.loaded",
@@ -185,8 +217,10 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     )
                     loaded = LoadData(newEditorScreen, loadMetadata)
 
-                    val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
-                    main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, newInitialDirectory)
+                    if (!isRecovery) {
+                        val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
+                        main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, newInitialDirectory)
+                    }
                 }
             } catch (e: Exception) {
                 Paintbox.LOGGER.warn("Error occurred while loading container:")
@@ -210,7 +244,8 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     override fun canCloseDialog(): Boolean {
         val substate = substate.getOrCompute()
-        if (!(substate == Substate.LOAD_ERROR || substate == Substate.LOADED)) return false
+        if (!(substate == Substate.LOAD_ERROR || substate == Substate.LOADED || substate == Substate.PICKING_OPTION))
+            return false
         
         return true
     }

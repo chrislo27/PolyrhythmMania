@@ -27,6 +27,7 @@ import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
@@ -56,6 +57,8 @@ import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.LinkedHashMap
 import kotlin.concurrent.thread
@@ -314,16 +317,17 @@ class Editor(val main: PRManiaGame)
                                 val newfilename = currentSaveLoc.nameWithoutExtension.take(max - suffix.length) + suffix + "." + Container.FILE_EXTENSION
                                 currentSaveLoc.resolveSibling(newfilename)
                             } else {
-                                return@thread /* TODO force save to recovery if not yet saved */
+                                val now = LocalDate.now()
+                                PRMania.RECOVERY_FOLDER.resolve("recovery_${now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ROOT))}.${Container.FILE_EXTENSION}")
                             }
                             try {
                                 container.writeToFile(file)
-                                Paintbox.LOGGER.debug("Autosave completed (interval: $autosaveIntervalMin min)")
+                                Paintbox.LOGGER.debug("Autosave completed (interval: $autosaveIntervalMin min, filename: ${file.name})")
                                 Gdx.app.postRunnable {
                                     lastAutosaveTimeMs.set(System.currentTimeMillis())
                                 }
                             } catch (e: Exception) {
-                                Paintbox.LOGGER.warn("Autosave failed!")
+                                Paintbox.LOGGER.warn("Autosave failed! filename: ${file.name}")
                                 e.printStackTrace()
                             }
                         }

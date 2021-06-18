@@ -18,6 +18,9 @@ object PRMania {
     val MAIN_FOLDER: File = File(System.getProperty("user.home") + "/.polyrhythmmania/").apply {
         mkdirs()
     }
+    val RECOVERY_FOLDER: File = MAIN_FOLDER.resolve("recovery/").apply { 
+        mkdirs()
+    }
     val commonResolutions: List<WindowSize> = listOf(
             WindowSize(1152, 648),
             WindowSize(1280, 720),
