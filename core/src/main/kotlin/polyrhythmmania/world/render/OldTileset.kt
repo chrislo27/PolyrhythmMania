@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 
 
-abstract class Tileset(val texture: Texture) {
+abstract class OldTileset(val texture: Texture) {
     
     abstract val cube: TextureRegion
     abstract val cubeWithLine: TextureRegion
@@ -36,10 +36,10 @@ abstract class Tileset(val texture: Texture) {
     abstract val buttonSigns: List<TextureRegion>
 }
 
-open class GBATileset(texture: Texture) : Tileset(texture) {
+open class GBAOldTileset(texture: Texture) : OldTileset(texture) {
     override val cube: TextureRegion = TextureRegion(texture, 1, 1, 32, 32)
     override val cubeWithLine: TextureRegion = TextureRegion(texture, 34, 1, 32, 32)
-    override val cubeWithBlackBorder: TextureRegion = TextureRegion(texture, 170, 93, 16, 8)
+    override val cubeWithBlackBorder: TextureRegion = TextureRegion(texture, 170, 93, 32, 32)
     override val platform: TextureRegion = TextureRegion(texture, 67, 1, 32, 32)
     override val platformWithLine: TextureRegion = TextureRegion(texture, 100, 1, 32, 32)
     
@@ -86,7 +86,7 @@ open class GBATileset(texture: Texture) : Tileset(texture) {
     )
 }
 
-class GBA2Tileset(texture: Texture) : GBATileset(texture) {
+class GBA2OldTileset(texture: Texture) : GBAOldTileset(texture) {
     override val cube: TextureRegion = TextureRegion(texture, 133, 1, 32, 32)
     override val cubeWithLine: TextureRegion = TextureRegion(texture, 166, 1, 32, 32)
 

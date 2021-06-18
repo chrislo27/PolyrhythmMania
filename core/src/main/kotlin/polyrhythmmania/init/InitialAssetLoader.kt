@@ -25,7 +25,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
             this.minFilter = Texture.TextureFilter.Linear
         }
         
-        AssetRegistry.loadAsset<Texture>("tileset_gba", "textures/gba_spritesheet.png")
+        AssetRegistry.loadAsset<Texture>("tileset_gba", "textures/world/gba_spritesheet.png")
         
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_tool", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("selection", "textures/ui/icon/tool/selection.png"),
@@ -46,6 +46,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("toolbar_tapalong", "textures/ui/icon/toolbar/tapalong.png"),
                 Packable("toolbar_clapboard_shut", "textures/ui/icon/toolbar/clapboard_shut.png"),
                 Packable("toolbar_clapboard_open", "textures/ui/icon/toolbar/clapboard_open.png"),
+                Packable("toolbar_tileset", "textures/ui/icon/toolbar/tileset.png"),
                 Packable("menubar_new", "textures/ui/icon/menubar/new.png"),
                 Packable("menubar_open", "textures/ui/icon/menubar/open.png"),
                 Packable("menubar_save", "textures/ui/icon/menubar/save.png"),

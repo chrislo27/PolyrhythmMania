@@ -24,6 +24,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
     val previewSection: Pane
     val mainSection: Pane
 
+    val tilesetButton: Button
     val playtestButton: Button
 
     val tapalongPane: TapalongPane
@@ -66,6 +67,16 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         }
         previewSection += rightPreviewHbox
         
+        tilesetButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f)
+            this.skinID.set(EditorSkins.BUTTON)
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tileset"]))
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.tileset")))
+            this.setOnAction {
+                
+            }
+        }
         playtestButton = Button("").apply {
             this.padding.set(Insets(2f))
             this.bounds.width.set(32f)
@@ -83,6 +94,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             }
         }
         rightPreviewHbox.temporarilyDisableLayouts {
+            rightPreviewHbox += tilesetButton
             rightPreviewHbox += playtestButton
         }
         

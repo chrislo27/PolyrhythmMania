@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.MathUtils
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.BeadsSound
-import polyrhythmmania.world.render.Tileset
+import polyrhythmmania.world.render.OldTileset
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.floor
 
@@ -127,7 +127,7 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
 
     override fun getRenderWidth(): Float = 1f
     override fun getRenderHeight(): Float = this.type.renderHeight
-    override fun getTextureRegionFromTileset(tileset: Tileset): TextureRegion {
+    override fun getTextureRegionFromTileset(tileset: OldTileset): TextureRegion {
         return when (type) {
             Type.PLATFORM -> tileset.platform
             Type.PISTON_A -> when (pistonState) {
@@ -143,7 +143,7 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
         }
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: OldTileset, engine: Engine) {
         if (active) {
             super.render(renderer, batch, tileset, engine)
         }

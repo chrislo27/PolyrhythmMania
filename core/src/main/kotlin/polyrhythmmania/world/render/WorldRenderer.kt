@@ -1,7 +1,5 @@
 package polyrhythmmania.world.render
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Matrix4
@@ -13,17 +11,13 @@ import polyrhythmmania.world.Entity
 import polyrhythmmania.world.World
 
 
-class WorldRenderer(val world: World, var tileset: Tileset) {
+class WorldRenderer(val world: World, var tileset: OldTileset) {
 
     companion object {
-        val comparatorRenderOrder: Comparator<Entity> = object : Comparator<Entity> {
-            private val tmpVec = Vector3()
-            private val tmpVec2 = Vector3()
-            override fun compare(o1: Entity, o2: Entity): Int {
-                val xyz1 = o1.position.x - o1.position.z - o1.position.y
-                val xyz2 = o2.position.x - o2.position.z - o2.position.y
-                return -xyz1.compareTo(xyz2)
-            }
+        val comparatorRenderOrder: Comparator<Entity> = Comparator<Entity> { o1, o2 ->
+            val xyz1 = o1.position.x - o1.position.z - o1.position.y
+            val xyz2 = o2.position.x - o2.position.z - o2.position.y
+            -xyz1.compareTo(xyz2)
         }
 
         fun convertWorldToScreen(vec3: Vector3): Vector3 {

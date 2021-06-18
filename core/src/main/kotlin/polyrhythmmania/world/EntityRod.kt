@@ -3,13 +3,13 @@ package polyrhythmmania.world
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
+import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
-import polyrhythmmania.world.render.Tileset
+import polyrhythmmania.world.render.OldTileset
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.absoluteValue
 import kotlin.math.floor
@@ -18,7 +18,6 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
     : Entity(world), TemporaryEntity {
 
     companion object {
-        private val tmpVec = Vector3()
         private const val EXPLODE_DELAY_SEC: Float = 1f / 3f
         private const val GRAVITY: Float = -52f
         private const val MIN_COLLISION_UPDATE_RATE: Int = 50
@@ -133,7 +132,8 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         }
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: OldTileset, engine: Engine) {
+        val tmpVec = Vector3Stack.getAndPush()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(this.position))
 
         val beatsFullAnimation = 60f / 128f
@@ -147,6 +147,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
 
         batch.draw(texReg, convertedVec.x - (1 / 32f), convertedVec.y, getRenderWidth(), getRenderHeight())
         batch.setColor(1f, 1f, 1f, 1f)
+        Vector3Stack.pop()
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {

@@ -19,7 +19,6 @@ import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
-import polyrhythmmania.soundsystem.sample.PlayerLike
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.*
 import kotlin.system.measureNanoTime
@@ -36,7 +35,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val timing: TimingProvider = soundSystem
     val engine: Engine = Engine(timing, world, soundSystem)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, GBATileset(AssetRegistry["tileset_gba"]))
+        WorldRenderer(world, GBAOldTileset(AssetRegistry["tileset_gba"]))
     }
 
     private val player: MusicSamplePlayer = music.createPlayer(soundSystem.audioContext).apply {

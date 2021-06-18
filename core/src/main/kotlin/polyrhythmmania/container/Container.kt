@@ -13,7 +13,6 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import net.lingala.zip4j.ZipFile
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
-import paintbox.binding.ReadOnlyVar
 import polyrhythmmania.PRMania
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
@@ -31,7 +30,7 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
-import polyrhythmmania.world.render.GBATileset
+import polyrhythmmania.world.render.GBAOldTileset
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
 import java.util.*
@@ -63,7 +62,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
     val engine: Engine = Engine(timing, world, soundSystem)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, GBATileset(AssetRegistry["tileset_gba"]))
+        WorldRenderer(world, GBAOldTileset(AssetRegistry["tileset_gba"]))
     }
     val _blocks: MutableList<Block> = CopyOnWriteArrayList()
     val blocks: List<Block> get() = _blocks

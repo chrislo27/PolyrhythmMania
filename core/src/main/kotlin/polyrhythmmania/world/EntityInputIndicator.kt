@@ -1,9 +1,9 @@
 package polyrhythmmania.world
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Vector3
+import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.world.render.Tileset
+import polyrhythmmania.world.render.OldTileset
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.absoluteValue
 import kotlin.math.floor
@@ -11,18 +11,15 @@ import kotlin.math.floor
 
 class EntityInputIndicator(world: World, val isDpad: Boolean)
     : Entity(world) {
-
-    companion object {
-        private val tmpVec = Vector3()
-    }
     
     var visible: Boolean = true
 
     override fun getRenderWidth(): Float = 16f / 32f
     override fun getRenderHeight(): Float = 16f / 32f
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: OldTileset, engine: Engine) {
         if (!visible) return
+        val tmpVec = Vector3Stack.getAndPush()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(this.position))
         val texReg = if (isDpad) tileset.indicatorD else tileset.indicatorA
         val renderWidth = getRenderWidth()
@@ -37,5 +34,6 @@ class EntityInputIndicator(world: World, val isDpad: Boolean)
         batch.draw(texReg, convertedVec.x - renderWidth / 2f,
                 convertedVec.y + (bumpAmt) * bumpHeight - (2f / 32f),
                 renderWidth, renderHeight)
+        Vector3Stack.pop()
     }
 }
