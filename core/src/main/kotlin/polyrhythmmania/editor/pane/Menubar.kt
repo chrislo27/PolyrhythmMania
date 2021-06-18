@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.Paintbox
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -18,6 +20,7 @@ import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import kotlin.math.roundToInt
 
 
 class Menubar(val editorPane: EditorPane) : Pane() {
@@ -81,7 +84,17 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.bounds.width.set(32f)
             this.skinID.set(EditorSkins.BUTTON)
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_save"]))
-            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.save")))
+            val tooltipArgsVar: ReadOnlyVar<List<Any?>> = Var {
+                val ms = editor.lastAutosaveTimeMs.use()
+                val autosaveInterval = editor.autosaveInterval.use()
+                if (ms > 0 || autosaveInterval <= 0) {
+                    listOf(Localization.getValue("editor.button.save.time.never"))
+                } else {
+                    listOf(Localization.getValue("editor.button.save.time",
+                            (ms / 60_000f).roundToInt()))
+                } + listOf(Localization.getValue("editorSettings.autosaveInterval.minutes", autosaveInterval))
+            }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.save", tooltipArgsVar)))
             this.setOnAction { 
                 val control = Gdx.input.isControlDown()
                 val alt = Gdx.input.isAltDown()

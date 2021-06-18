@@ -13,10 +13,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
 import paintbox.Paintbox
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
-import paintbox.binding.invert
+import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.TextRun
 import paintbox.registry.AssetRegistry
@@ -156,6 +153,7 @@ class Editor(val main: PRManiaGame)
     val timeSignatures: Var<List<TimeSignature>> = Var(listOf())
     private var lastMetronomeBeat: Int = -1
     private var timeUntilAutosave: Float = autosaveInterval.getOrCompute() * 60f
+    val lastAutosaveTimeMs: Var<Long> = Var(0L)
 
     val engineBeat: FloatVar = FloatVar(engine.beat)
 
@@ -164,6 +162,10 @@ class Editor(val main: PRManiaGame)
      */
     private val forceUpdateStatus: Var<Boolean> = Var(false)
     val editorPane: EditorPane
+    
+    private val autosaveIntervalListener: VarChangedListener<Int> = VarChangedListener {
+        timeUntilAutosave = it.getOrCompute() * 60f
+    }
 
     init {
         previewFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
@@ -185,9 +187,7 @@ class Editor(val main: PRManiaGame)
         tool.addListener {
             beatLines.active = false
         }
-        autosaveInterval.addListener {
-            timeUntilAutosave = it.getOrCompute() * 60f
-        }
+        autosaveInterval.addListener(autosaveIntervalListener)
     }
 
     init { // This init block should be LAST
@@ -319,6 +319,9 @@ class Editor(val main: PRManiaGame)
                             try {
                                 container.writeToFile(file)
                                 Paintbox.LOGGER.debug("Autosave completed (interval: $autosaveIntervalMin min)")
+                                Gdx.app.postRunnable {
+                                    lastAutosaveTimeMs.set(System.currentTimeMillis())
+                                }
                             } catch (e: Exception) {
                                 Paintbox.LOGGER.warn("Autosave failed!")
                                 e.printStackTrace()
@@ -607,6 +610,7 @@ class Editor(val main: PRManiaGame)
 
         soundSystem.setPaused(true)
         container.disposeQuietly()
+        autosaveInterval.removeListener(autosaveIntervalListener)
     }
 
     fun addBlock(block: Block) {
