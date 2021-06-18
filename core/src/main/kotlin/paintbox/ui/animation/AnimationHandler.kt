@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class AnimationHandler(val sceneRoot: SceneRoot) {
 
-    private data class AnimationTuple(val animation: Animation, val varr: FloatVar, var accumulatedSeconds: Float = 0f,
+    private data class AnimationTuple(val animation: Animation, val varr: FloatVar, var accumulatedSeconds: Float,
                                       var alpha: Float = 0f, var brandNew: Boolean = true)
 
     private val animations: MutableMap<FloatVar, AnimationTuple> = ConcurrentHashMap()
@@ -27,22 +27,26 @@ class AnimationHandler(val sceneRoot: SceneRoot) {
         
         animations.forEach { (_, tuple) ->
             val animation = tuple.animation
-            val brandNew = tuple.brandNew
             tuple.accumulatedSeconds += delta
-            if (brandNew) {
-                tuple.brandNew = false
-                tuple.animation.onStart?.invoke()
-            }
             
-            val newAlpha = if (isInstant || animation.duration <= 0f) 1f
-            else (tuple.accumulatedSeconds / animation.duration).coerceIn(0f, 1f)
-            tuple.alpha = newAlpha
-            
-            tuple.varr.set(tuple.animation.applyFunc(newAlpha))
+            if (tuple.accumulatedSeconds >= 0f) {
+                val brandNew = tuple.brandNew
+                if (brandNew) {
+                    tuple.brandNew = false
+                    tuple.animation.onStart?.invoke()
+                }
 
-            if (newAlpha >= 1f) {
-                tuple.animation.onComplete?.invoke()
-                removeList.add(tuple.varr)
+                val newAlpha = if (isInstant || animation.duration <= 0f) 1f
+                else (tuple.accumulatedSeconds / animation.duration).coerceIn(0f, 1f)
+                tuple.alpha = newAlpha
+
+                val newValue = tuple.animation.applyFunc(newAlpha)
+                tuple.varr.set(newValue)
+
+                if (newAlpha >= 1f) {
+                    tuple.animation.onComplete?.invoke()
+                    removeList.add(tuple.varr)
+                }
             }
         }
         
@@ -58,7 +62,7 @@ class AnimationHandler(val sceneRoot: SceneRoot) {
             existing.varr.set(existing.animation.applyFunc(1f))
             existing.animation.onComplete?.invoke()
         }
-        animations[varr] = AnimationTuple(animation, varr)
+        animations[varr] = AnimationTuple(animation, varr, -animation.delay)
     }
     
     fun cancelAnimation(animation: Animation) {

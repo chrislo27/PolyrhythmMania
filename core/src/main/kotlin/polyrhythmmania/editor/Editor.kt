@@ -311,6 +311,7 @@ class Editor(val main: PRManiaGame)
                         timeUntilAutosave = autosaveIntervalMin.coerceAtLeast(1) * 60f
                         thread(start = true, isDaemon = true, priority = Thread.MIN_PRIORITY, name = "Editor Autosave") {
                             val currentSaveLoc = editorPane.saveDialog.getCurrentSaveLocation()
+                            val isRecovery = currentSaveLoc == null
                             val file: File = if (currentSaveLoc != null) {
                                 val suffix = ".autosave"
                                 val max = 64 // Doesn't include the container extension
@@ -324,15 +325,23 @@ class Editor(val main: PRManiaGame)
                                 Paintbox.LOGGER.debug("Autosave completed (interval: $autosaveIntervalMin min, filename: ${file.name})")
                                 Gdx.app.postRunnable {
                                     lastAutosaveTimeMs.set(System.currentTimeMillis())
+                                    editorPane.menubar.triggerAutosaveIndicator(Localization.getValue("editor.button.save.autosave.success${if (isRecovery) ".recovery" else ""}"))
                                 }
                             } catch (e: Exception) {
                                 Paintbox.LOGGER.warn("Autosave failed! filename: ${file.name}")
                                 e.printStackTrace()
+                                Gdx.app.postRunnable {
+                                    editorPane.menubar.triggerAutosaveIndicator(Localization.getValue("editor.button.save.autosave.failure"))
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+        
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Y)) {
+            editorPane.menubar.triggerAutosaveIndicator("Test autosave indicator.")
         }
 
         click.getOrCompute().renderUpdate()

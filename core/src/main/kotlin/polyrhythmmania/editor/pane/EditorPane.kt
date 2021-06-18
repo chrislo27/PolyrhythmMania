@@ -65,7 +65,6 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
             Anchor.TopLeft.configure(this)
             this.bounds.height.set(40f)
         }
-        parent += menubarBacking
         menubar = Menubar(this).apply {
             Anchor.TopLeft.configure(this)
             this.padding.set(Insets(4f))
@@ -86,6 +85,8 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
             }
         }
         parent += upperPane
+        // Order matters here, related to autosaving text.
+        parent += menubarBacking
 
         allTracksPane = AllTracksPane(this).apply {
             Anchor.TopLeft.configure(this)
