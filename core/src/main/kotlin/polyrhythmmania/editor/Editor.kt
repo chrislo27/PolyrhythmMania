@@ -317,8 +317,7 @@ class Editor(val main: PRManiaGame)
                                 val newfilename = currentSaveLoc.nameWithoutExtension.take(max - suffix.length) + suffix + "." + Container.FILE_EXTENSION
                                 currentSaveLoc.resolveSibling(newfilename)
                             } else {
-                                val now = LocalDate.now()
-                                PRMania.RECOVERY_FOLDER.resolve("recovery_${now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ROOT))}.${Container.FILE_EXTENSION}")
+                                getRecoveryFile(true)
                             }
                             try {
                                 container.writeToFile(file)
@@ -347,6 +346,20 @@ class Editor(val main: PRManiaGame)
                 panCamera(-1, delta, moveFast)
             }
         }
+    }
+    
+    fun getRecoveryFile(overwrite: Boolean, midfix: String = ""): File {
+        val now = LocalDate.now()
+        val date = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ROOT))
+        fun file(num: Int): File {
+            return PRMania.RECOVERY_FOLDER.resolve("recovery_${date}${if (midfix.isNotEmpty()) "_${midfix}" else ""}${if (num > 0) "$num" else ""}.${Container.FILE_EXTENSION}")
+        }
+        var num = 0
+        var lastFile = file(0)
+        while (!overwrite && lastFile.exists()) {
+            lastFile = file(++num)
+        }
+        return lastFile
     }
 
     fun panCamera(dir: Int, delta: Float, fast: Boolean = Gdx.input.isShiftDown()) {

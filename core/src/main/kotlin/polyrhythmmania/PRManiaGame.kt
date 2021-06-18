@@ -102,6 +102,22 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 mainMenuScreen.prepareShow(doFlipAnimation = true)
             }
         })
+        
+        Runtime.getRuntime().addShutdownHook(thread(start = false, isDaemon = true, name = "Level Recovery Shutdown Hook") {
+            val currentScreen = getScreen()
+            if (currentScreen is EditorScreen) {
+                val editor = currentScreen.editor
+                val recoveryFile = editor.getRecoveryFile(overwrite = false)
+                val container = editor.container
+                try {
+                    container.writeToFile(recoveryFile)
+                    Paintbox.LOGGER.info("Shutdown hook recovery completed (filename: ${recoveryFile.name})")
+                } catch (e: Exception) {
+                    Paintbox.LOGGER.warn("Shutdown hook recovery failed! filename: ${recoveryFile.name}")
+                    e.printStackTrace()
+                }
+            }
+        })
     }
 
     override fun dispose() {
@@ -209,9 +225,18 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun exceptionHandler(t: Throwable) {
         val currentScreen = this.screen
         if (currentScreen !is CrashScreen) {
-//            thread(start = true, isDaemon = true, name = "Crash Remix Recovery") {
-//                RemixRecovery.saveRemixInRecovery()
-//            }
+            if (currentScreen is EditorScreen) {
+                val editor = currentScreen.editor
+                val recoveryFile = editor.getRecoveryFile(overwrite = false, midfix = "crash")
+                val container = editor.container
+                try {
+                    container.writeToFile(recoveryFile)
+                    Paintbox.LOGGER.info("Crash recovery completed (filename: ${recoveryFile.name})")
+                } catch (e: Exception) {
+                    Paintbox.LOGGER.warn("Crash recovery failed! filename: ${recoveryFile.name}")
+                    e.printStackTrace()
+                }
+            }
             setScreen(CrashScreen(this, t, currentScreen))
         } else {
             super.exceptionHandler(t)

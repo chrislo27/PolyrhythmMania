@@ -76,7 +76,7 @@ class CrashScreen(main: PRManiaGame, val throwable: Throwable, val lastScreen: S
                 this.textAlign.set(TextAlign.CENTRE)
                 this.renderAlign.set(Align.center)
             }
-            vbox += TextLabel("The program has crashed, but we are able to display this crash info screen.\nIf you can, take a screenshot of this screen as it contains useful info for the developer." /*+ "\nConsider submitting a bug report at\n[color=#8CCFFF]${PRMania.GITHUB}/issues/new/choose[]."*/).apply {
+            vbox += TextLabel("The program has crashed, but we are able to display this crash info screen.\nIf you were in the Editor, a recovery file has been saved. Access it with Load Level > Open Recovery folder.\nIf you can, take a screenshot of this screen as it contains useful info for the developer." /*+ "\nConsider submitting a bug report at\n[color=#8CCFFF]${PRMania.GITHUB}/issues/new/choose[]."*/).apply {
                 this.bounds.height.set(100f)
                 this.textColor.set(Color.WHITE)
                 this.markup.set(this@CrashScreen.markup)
