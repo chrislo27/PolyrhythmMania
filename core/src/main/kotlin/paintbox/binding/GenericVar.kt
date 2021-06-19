@@ -87,6 +87,7 @@ class GenericVar<T> : Var<T> {
                 if (!invalidated) {
                     @Suppress("UNCHECKED_CAST") (currentValue as T)
                 } else {
+                    val oldCurrentValue = currentValue
                     val ctx = Var.Context()
                     val result = binding.computation(ctx)
                     val oldDependencies = dependencies
@@ -95,12 +96,15 @@ class GenericVar<T> : Var<T> {
                     dependencies.forEach { it.addListener(invalidationListener) }
                     currentValue = result
                     invalidated = false
-                    notifyListeners()
+                    if (currentValue != oldCurrentValue) {
+                        notifyListeners()
+                    }
                     result
                 }
             }
             is GenericBinding.SideEffecting -> {
                 if (invalidated) {
+                    val oldCurrentValue = currentValue
                     val ctx = Var.Context()
                     val result = binding.sideEffectingComputation(ctx, binding.item)
                     val oldDependencies = dependencies
@@ -109,7 +113,9 @@ class GenericVar<T> : Var<T> {
                     dependencies.forEach { it.addListener(invalidationListener) }
                     currentValue = result
                     invalidated = false
-                    notifyListeners()
+                    if (currentValue != oldCurrentValue) {
+                        notifyListeners()
+                    }
                     binding.item = result
                 }
                 binding.item
