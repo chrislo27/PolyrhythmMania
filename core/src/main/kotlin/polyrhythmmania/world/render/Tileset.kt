@@ -2,6 +2,8 @@ package polyrhythmmania.world.render
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.eclipsesource.json.Json
+import com.eclipsesource.json.JsonObject
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
@@ -126,6 +128,46 @@ class Tileset(val packedSheet: PackedSheet) {
         (0 until explosionFrameCount).map { i ->
             map.getValue(i).toTinted()
         }
+    }
+    
+    fun toJson(): JsonObject {
+        return Json.`object`().apply { 
+            add("cubeBorder", cubeBorder.color.getOrCompute().toString())
+            add("cubeFaceX", cubeFaceX.color.getOrCompute().toString())
+            add("cubeFaceY", cubeFaceY.color.getOrCompute().toString())
+            add("cubeFaceZ", cubeFaceZ.color.getOrCompute().toString())
+            add("pistonFaceX", pistonFaceXColor.getOrCompute().toString())
+            add("pistonFaceZ", pistonFaceZColor.getOrCompute().toString())
+            add("signShadow", signShadowColor.getOrCompute().toString())
+        }
+    }
+    
+    fun fromJson(obj: JsonObject) {
+        fun attemptParse(id: String): Color? {
+            return try {
+                Color.valueOf(obj.getString(id, ""))
+            } catch (ignored: Exception) { null }
+        }
+        fun attemptSet(reg: TintedRegion, id: String) {
+            val c = attemptParse(id)
+            if (c != null) {
+                reg.colorObj.set(c)
+            }
+        }
+        fun attemptSet(varr: Var<Color>, id: String) {
+            val c = attemptParse(id)
+            if (c != null) {
+                varr.set(c)
+            }
+        }
+        
+        attemptSet(cubeBorder, "cubeBorder")
+        attemptSet(cubeFaceX, "cubeFaceX")
+        attemptSet(cubeFaceY, "cubeFaceY")
+        attemptSet(cubeFaceZ, "cubeFaceZ")
+        attemptSet(pistonFaceXColor, "pistonFaceX")
+        attemptSet(pistonFaceZColor, "pistonFaceZ")
+        attemptSet(signShadowColor, "signShadow")
     }
 }
 

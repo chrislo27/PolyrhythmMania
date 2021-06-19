@@ -52,7 +52,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     companion object {
         const val FILE_EXTENSION: String = "prmania"
-        const val CONTAINER_VERSION: Int = 2
+        const val CONTAINER_VERSION: Int = 3
 
         const val KEY_COMPRESSED_MUSIC: String = "compressed_music"
     }
@@ -249,6 +249,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 blocksArray.add(o)
             }
         })
+        jsonObj.add("tileset", renderer.tileset.toJson())
 
 
         // Pack
@@ -344,6 +345,10 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 val obj = it.asObject()
                 engine.timeSignatures.add(TimeSignature(obj.getFloat("beat", 0f), obj.getInt("divisions", 4), obj.getInt("beatUnit", 4)))
             }
+        }
+        if (containerVersion >= 3) {
+            val tilesetObj = engineObj.get("tileset").asObject()
+            renderer.tileset.fromJson(tilesetObj)
         }
 
         val blocksObj = json.get("blocks").asArray()
