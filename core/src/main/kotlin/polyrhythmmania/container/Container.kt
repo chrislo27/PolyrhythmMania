@@ -352,7 +352,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             }
         }
         if (containerVersion >= 3) {
-            val tilesetObj = engineObj.get("tilesetConfig").asObject()
+            val tilesetObj = json.get("tilesetConfig").asObject()
             this.tilesetConfig.fromJson(tilesetObj)
         }
 
