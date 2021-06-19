@@ -18,8 +18,10 @@ class GenericVar<T> : Var<T> {
 
     private val invalidationListener: VarChangedListener<Any> = InvalListener(this as GenericVar<Any>)
 
+    @Suppress("UNCHECKED_CAST")
     constructor(item: T) {
-        binding = GenericBinding.Const(item)
+        currentValue = item
+        binding = GenericBinding.Const as GenericBinding<T>
     }
 
     constructor(computation: Var.Context.() -> T) {
@@ -49,14 +51,15 @@ class GenericVar<T> : Var<T> {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun set(item: T) {
         val existingBinding = binding
-        if (existingBinding is GenericBinding.Const && existingBinding.item === item) {
+        if (existingBinding is GenericBinding.Const && currentValue == item) {
             return
         }
         reset()
         currentValue = item
-        binding = GenericBinding.Const(item)
+        binding = GenericBinding.Const as GenericBinding<T>
         notifyListeners()
     }
 
@@ -78,10 +81,11 @@ class GenericVar<T> : Var<T> {
 
     override fun getOrCompute(): T {
         return when (val binding = this.binding) {
-            is GenericBinding.Const -> binding.item
+            is GenericBinding.Const ->
+                @Suppress("UNCHECKED_CAST") (currentValue as T)
             is GenericBinding.Compute -> {
                 if (!invalidated) {
-                    currentValue as T
+                    @Suppress("UNCHECKED_CAST") (currentValue as T)
                 } else {
                     val ctx = Var.Context()
                     val result = binding.computation(ctx)
@@ -146,18 +150,11 @@ class GenericVar<T> : Var<T> {
     }
 
     private sealed class GenericBinding<T> {
-        class Const<T>(val item: T) : GenericBinding<T>() {
-            override fun getValue(): T = item
-        }
+        object Const : GenericBinding<Any>()
 
-        class Compute<T>(val computation: Var.Context.() -> T) : GenericBinding<T>() {
-            override fun getValue(): T = computation.invoke(Var.Context())
-        }
+        class Compute<T>(val computation: Var.Context.() -> T) : GenericBinding<T>()
 
-        class SideEffecting<T>(var item: T, val sideEffectingComputation: Var.Context.(existing: T) -> T) : GenericBinding<T>() {
-            override fun getValue(): T = item
-        }
-
-        abstract fun getValue(): T
+        class SideEffecting<T>(var item: T, val sideEffectingComputation: Var.Context.(existing: T) -> T)
+            : GenericBinding<T>()
     }
 }
