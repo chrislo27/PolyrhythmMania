@@ -31,6 +31,7 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.Tileset
+import polyrhythmmania.world.render.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
 import java.util.*
@@ -54,15 +55,19 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         const val FILE_EXTENSION: String = "prmania"
         const val CONTAINER_VERSION: Int = 3
 
-        const val KEY_COMPRESSED_MUSIC: String = "compressed_music"
+        const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
     }
 
     val world: World = World()
+    @Suppress("CanBePrimaryConstructorProperty")
     val soundSystem: SoundSystem? = soundSystem
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
     val engine: Engine = Engine(timing, world, soundSystem)
+    val tilesetConfig: TilesetConfig = TilesetConfig.createGBA1TilesetConfig()
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset.createGBA1Tileset(AssetRegistry["tileset_parts"]))
+        WorldRenderer(world, Tileset(AssetRegistry["tileset_parts"]).apply { 
+            tilesetConfig.applyTo(this)
+        })
     }
     val _blocks: MutableList<Block> = CopyOnWriteArrayList()
     val blocks: List<Block> get() = _blocks
@@ -83,7 +88,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     }
 
     fun setCompressedMusic(res: ExternalResource?) {
-        removeResource(KEY_COMPRESSED_MUSIC)
+        removeResource(RES_KEY_COMPRESSED_MUSIC)
         if (res != null) {
             addResource(res)
         }
@@ -249,7 +254,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 blocksArray.add(o)
             }
         })
-        jsonObj.add("tileset", renderer.tileset.toJson())
+        jsonObj.add("tilesetConfig", this.tilesetConfig.toJson())
 
 
         // Pack
@@ -347,8 +352,8 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             }
         }
         if (containerVersion >= 3) {
-            val tilesetObj = engineObj.get("tileset").asObject()
-            renderer.tileset.fromJson(tilesetObj)
+            val tilesetObj = engineObj.get("tilesetConfig").asObject()
+            this.tilesetConfig.fromJson(tilesetObj)
         }
 
         val blocksObj = json.get("blocks").asArray()
@@ -374,7 +379,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             }
         }
 
-        val compressedMusicRes = resources[KEY_COMPRESSED_MUSIC]
+        val compressedMusicRes = resources[RES_KEY_COMPRESSED_MUSIC]
         this.compressedMusic = compressedMusicRes
 
         // Set up music and other resources

@@ -355,8 +355,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.imageNode.tint.set(white)
                     this.imageNode.padding.set(Insets(4f))
                     this.bounds.width.set(radioWidth)
-                    this.selectedState.addListener {
-                        if (it.getOrCompute()) currentMarker.set(MarkerType.FIRST_BEAT)
+                    this.onSelected = {
+                        currentMarker.set(MarkerType.FIRST_BEAT)
                     }
                     this.checkedState.set(true) // First one only
                 })
@@ -376,6 +376,9 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.selectedState.addListener {
                         if (it.getOrCompute()) currentMarker.set(MarkerType.LOOP_START)
                     }
+                    this.onSelected = {
+                        currentMarker.set(MarkerType.LOOP_START)
+                    }
                 })
                 hbox.addChild(RadioButton("").apply {
                     val textColor = markerLoopEnd
@@ -390,8 +393,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.imageNode.tint.set(white)
                     this.imageNode.padding.set(Insets(4f))
                     this.bounds.width.set(radioWidth)
-                    this.selectedState.addListener {
-                        if (it.getOrCompute()) currentMarker.set(MarkerType.LOOP_END)
+                    this.onSelected = {
+                        currentMarker.set(MarkerType.LOOP_END)
                     }
                 })
             }
@@ -590,7 +593,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 loadingProgress.bytesSoFar.set(bytesSoFar)
             }
         }
-        val externalRes = ExternalResource(Container.KEY_COMPRESSED_MUSIC, compressedFile, isFileTemp)
+        val externalRes = ExternalResource(Container.RES_KEY_COMPRESSED_MUSIC, compressedFile, isFileTemp)
         val newMusic: BeadsMusic = GdxAudioReader.newMusic(FileHandle(compressedFile), listener)
         Gdx.app.postRunnable {
             loadingProgress.generatingWaveform.set(true)

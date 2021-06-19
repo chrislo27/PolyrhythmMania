@@ -20,34 +20,6 @@ class Tileset(val packedSheet: PackedSheet) {
                 TintedRegion(this).apply { 
                     this.color.sideEffecting { bindTo.use() }
                 }
-        
-        fun createGBA1Tileset(packedSheet: PackedSheet): Tileset {
-            return Tileset(packedSheet).apply { 
-                cubeBorder.colorObj.set(33, 214, 25)
-                cubeFaceX.colorObj.set(42, 224, 48)
-                cubeFaceY.colorObj.set(74, 255, 74)
-                cubeFaceZ.colorObj.set(42, 230, 49)
-
-                pistonFaceXColor.set(Color().set(33, 82, 206))
-                pistonFaceZColor.set(Color().set(41, 99, 255))
-
-                signShadowColor.set(Color().set(33, 214, 25))
-            }
-        }
-        
-        fun createGBA2Tileset(packedSheet: PackedSheet): Tileset {
-            return Tileset(packedSheet).apply { 
-                cubeBorder.colorObj.set(0, 16, 189)
-                cubeFaceX.colorObj.set(32, 81, 204)
-                cubeFaceY.colorObj.set(41, 99, 255)
-                cubeFaceZ.colorObj.set(33, 82, 214)
-                
-                pistonFaceXColor.set(Color().set(214, 181, 8))
-                pistonFaceZColor.set(Color().set(255, 214, 16))
-                
-                signShadowColor.set(Color().set(0, 16, 189))
-            }
-        }
     }
 
     /**
@@ -130,45 +102,6 @@ class Tileset(val packedSheet: PackedSheet) {
         }
     }
     
-    fun toJson(): JsonObject {
-        return Json.`object`().apply { 
-            add("cubeBorder", cubeBorder.color.getOrCompute().toString())
-            add("cubeFaceX", cubeFaceX.color.getOrCompute().toString())
-            add("cubeFaceY", cubeFaceY.color.getOrCompute().toString())
-            add("cubeFaceZ", cubeFaceZ.color.getOrCompute().toString())
-            add("pistonFaceX", pistonFaceXColor.getOrCompute().toString())
-            add("pistonFaceZ", pistonFaceZColor.getOrCompute().toString())
-            add("signShadow", signShadowColor.getOrCompute().toString())
-        }
-    }
-    
-    fun fromJson(obj: JsonObject) {
-        fun attemptParse(id: String): Color? {
-            return try {
-                Color.valueOf(obj.getString(id, ""))
-            } catch (ignored: Exception) { null }
-        }
-        fun attemptSet(reg: TintedRegion, id: String) {
-            val c = attemptParse(id)
-            if (c != null) {
-                reg.colorObj.set(c)
-            }
-        }
-        fun attemptSet(varr: Var<Color>, id: String) {
-            val c = attemptParse(id)
-            if (c != null) {
-                varr.set(c)
-            }
-        }
-        
-        attemptSet(cubeBorder, "cubeBorder")
-        attemptSet(cubeFaceX, "cubeFaceX")
-        attemptSet(cubeFaceY, "cubeFaceY")
-        attemptSet(cubeFaceZ, "cubeFaceZ")
-        attemptSet(pistonFaceXColor, "pistonFaceX")
-        attemptSet(pistonFaceZColor, "pistonFaceZ")
-        attemptSet(signShadowColor, "signShadow")
-    }
 }
 
 class TintedRegion(val region: TextureRegion, initColor: Color = Color.WHITE) {

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
+import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
 import paintbox.registry.AssetRegistry
@@ -44,7 +45,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
     data class HSVA(val hue: Var<Int> = Var(0), val saturation: Var<Int> = Var(0), val value: Var<Int> = Var(100), val alpha: Var<Int> = Var(255))
 
     private val hsv: HSVA = HSVA()
-    val currentColor: Var<Color> = Var.sideEffecting(Color(1f, 1f, 1f, 1f)) { c ->
+    val currentColor: ReadOnlyVar<Color> = Var.sideEffecting(Color(1f, 1f, 1f, 1f)) { c ->
         c.fromHsv(hsv.hue.use() % 360f, (hsv.saturation.use() / 100f).coerceIn(0f, 1f), (hsv.value.use() / 100f).coerceIn(0f, 1f))
         c.a = (hsv.alpha.use() / 255f).coerceIn(0f, 1f)
         c
@@ -209,13 +210,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                             if (hasFocus.getOrCompute()) {
                                 try {
                                     val newValue = Color.valueOf(t.getOrCompute())
-                                    val h = newValue.toHsv(FloatArray(3))
-                                    hsv.hue.set(h[0].roundToInt().coerceIn(0, 360))
-                                    hsv.saturation.set((h[1] * 100).roundToInt().coerceIn(0, 100))
-                                    hsv.value.set((h[2] * 100).roundToInt().coerceIn(0, 100))
-                                    if (hasAlpha) {
-                                        hsv.alpha.set((newValue.a * 255).roundToInt().coerceIn(0, 255))
-                                    }
+                                    this@ColourPicker.setColor(newValue)
                                 } catch (ignored: Exception) {}
                             }
                         }
@@ -279,6 +274,16 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
         }
         
         addChild(vbox)
+    }
+    
+    fun setColor(newValue: Color) {
+        val h = newValue.toHsv(FloatArray(3))
+        hsv.hue.set(h[0].roundToInt().coerceIn(0, 360))
+        hsv.saturation.set((h[1] * 100).roundToInt().coerceIn(0, 100))
+        hsv.value.set((h[2] * 100).roundToInt().coerceIn(0, 100))
+        if (hasAlpha) {
+            hsv.alpha.set((newValue.a * 255).roundToInt().coerceIn(0, 255))
+        }
     }
 
     override fun getDefaultSkinID(): String = COLOUR_PICKER_SKIN_ID

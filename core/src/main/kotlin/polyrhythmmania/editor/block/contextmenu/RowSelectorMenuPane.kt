@@ -50,11 +50,8 @@ class RowSelectorMenuPane(editorPane: EditorPane, currentRowSetting: RowSetting,
         : RadioButton(binding, font) {
 
         init {
-            this.checkedState.addListener {
-                val checked = it.getOrCompute()
-                if (checked) {
-                    changeListener.invoke(rowSetting)
-                }
+            this.onSelected = {
+                changeListener.invoke(rowSetting)
             }
         }
     }

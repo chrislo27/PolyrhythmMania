@@ -23,6 +23,8 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
     companion object {
         const val RADIO_BUTTON_SKIN_ID: String = "RadioButton"
 
+        private val DEFAULT_ACTION: () -> Unit = { }
+
         init {
             DefaultSkins.register(RADIO_BUTTON_SKIN_ID, SkinFactory { element: RadioButton ->
                 RadioButtonSkin(element)
@@ -40,6 +42,8 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
     val checkedState: Var<Boolean> = Var(false)
     override val selectedState: Var<Boolean> = checkedState
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
+
+    var onSelected: () -> Unit = DEFAULT_ACTION
 
     init {
         val height: ReadOnlyFloatVar = FloatVar {
@@ -67,6 +71,11 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
                 checkedState.invert()
             } else {
                 checkedState.set(true)
+            }
+        }
+        checkedState.addListener {
+            if (it.getOrCompute()) {
+                onSelected.invoke()
             }
         }
     }

@@ -40,9 +40,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.bounds.width.bind { bounds.height.useF() }
             this.applyDialogStyleBottom()
             this.setOnAction {
-                editorPane.closeDialog()
-                settings.persist()
-                Paintbox.LOGGER.info("Settings persisted (editor)")
+                attemptClose()
             }
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
                 this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
