@@ -279,32 +279,36 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             }
             Input.Keys.V -> {
                 if (control && !shift && !alt) {
-                    // Attempt to paste
-                    val charLimit = characterLimit.getOrCompute()
-                    val currentText = text.getOrCompute()
-                    val caret = caretPos.getOrCompute()
-                    try {
-                        var data: String = Gdx.app.clipboard.contents?.replace("\r", "") ?: return
-                        if (!canInputNewlines.getOrCompute()) {
-                            data = data.replace("\n", "")
-                        }
-
-                        if (data.all(inputFilter.getOrCompute()) && canPasteText.getOrCompute()) {
-                            var pasteText = data
-                            val totalSize = pasteText.length + currentText.length
-                            if (charLimit > 0 && totalSize > charLimit) {
-                                pasteText = pasteText.substring(0, charLimit - currentText.length)
-                            }
-
-                            val newText = currentText.substring(0, caret) + pasteText + currentText.substring(caret)
-                            text.set(newText)
-                            setCaret(caret + pasteText.length)
-                        }
-                    } catch (ignored: Exception) {
-                    }
+                    attemptPaste()
                 }
             }
         }
+    }
+    
+    fun attemptPaste() {
+        val charLimit = characterLimit.getOrCompute()
+        val currentText = text.getOrCompute()
+        val caret = caretPos.getOrCompute()
+        try {
+            var data: String = Gdx.app.clipboard.contents?.replace("\r", "") ?: return
+            if (!canInputNewlines.getOrCompute()) {
+                data = data.replace("\n", "")
+            }
+
+            if (data.all(inputFilter.getOrCompute()) && canPasteText.getOrCompute()) {
+                var pasteText = data
+                val totalSize = pasteText.length + currentText.length
+                if (charLimit > 0 && totalSize > charLimit) {
+                    pasteText = pasteText.substring(0, charLimit - currentText.length)
+                }
+
+                val newText = currentText.substring(0, caret) + pasteText + currentText.substring(caret)
+                text.set(newText)
+                setCaret(caret + pasteText.length)
+            }
+        } catch (ignored: Exception) {
+        }
+        
     }
 
     protected open fun onKeyUp(keycode: Int) {
