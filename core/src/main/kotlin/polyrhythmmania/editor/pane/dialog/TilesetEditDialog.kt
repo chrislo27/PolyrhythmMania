@@ -103,8 +103,7 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         scrollPane.setContent(listVbox)
 
         val previewVbox = VBox().apply {
-            // Alternative to Anchor.TopRight that doesn't depend on the vbox's own width. Performance optimization.
-            Anchor.TopLeft.configure(this, offsetX = {(parent.use()?.bounds?.width?.useF() ?: 0f) * 0.4f})
+            Anchor.TopRight.configure(this)
             this.bindWidthToParent(multiplier = 0.6f, adjust = -8f)
             this.spacing.set(12f)
         }
