@@ -68,7 +68,7 @@ class MusicData(val engine: Engine) {
                         (((adjustedSecs * 1000 - loopStart) % loopDuration + loopStart)) % player.musicSample.lengthMs
                     }
                 } else {
-                    return ((atSeconds - delaySec) * 1000) % player.musicSample.lengthMs
+                    return ((atSeconds - delaySec) * 1000.0)
                 }
             }
         }
