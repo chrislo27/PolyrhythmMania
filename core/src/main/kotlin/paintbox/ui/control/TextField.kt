@@ -53,7 +53,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         NONE, MOVE_LEFT, MOVE_RIGHT, //BACKSPACE, DELETE
     }
 
-    private val hasFocus: Var<Boolean> = Var(false)
+    val hasFocus: ReadOnlyVar<Boolean> = Var(false)
     private var caretBlinkTimer: Float = 0f
     private var keyRepeatTimer: Float = 0f
     private var keymode: KeyMode = KeyMode.NONE
@@ -403,12 +403,12 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
 
     override fun onFocusGained() {
         super.onFocusGained()
-        hasFocus.set(true)
+        (hasFocus as Var).set(true)
     }
 
     override fun onFocusLost() {
         super.onFocusLost()
-        hasFocus.set(false)
+        (hasFocus as Var).set(false)
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
@@ -448,18 +448,17 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 bitmapFont.scaleMul(element.textScale.get())
                 tmpColor.set(textColor)
                 tmpColor.a *= opacity
-                bitmapFont.color = tmpColor
+                batch.color = tmpColor
                 bitmapFont.draw(batch, layout, rectX - overallOffsetX, rectY - (rectH - layout.height) / 2f)
 
                 if (!hasFocusNow && element.text.getOrCompute().isEmpty()) {
                     tmpColor.set(textColor)
                     tmpColor.a *= opacity * 0.5f
-                    bitmapFont.color = tmpColor
+                    batch.color = tmpColor
                     bitmapFont.draw(batch, element.emptyHintText.getOrCompute(), rectX /* no offset */, rectY - (rectH - layout.height) / 2f)
                 }
 
-                bitmapFont.setColor(1f, 1f, 1f, 1f)
-                caretHeight = bitmapFont.lineHeight
+                caretHeight = bitmapFont.data.lineHeight
             }
             // Draw caret
             if (hasFocusNow) {
