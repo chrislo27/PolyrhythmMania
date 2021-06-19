@@ -57,7 +57,7 @@ open class UIBounds {
      *
      * By definition, this is exactly equivalent to [bounds], and thus this implementation of [marginZone]
      * will return [bounds].
-     * One should not attempt to cast [marginZone] to [Var], use [bounds] if you intend to mutate.
+     * One should not attempt to cast [marginZone] to [Bounds], use [bounds] if you intend to mutate.
      */
     val marginZone: ReadOnlyBounds get() = this.bounds
 

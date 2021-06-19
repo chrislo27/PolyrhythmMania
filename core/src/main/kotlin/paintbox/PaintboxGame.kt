@@ -223,8 +223,7 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
                 val numberFormat = debugInfo.numberFormat
                 val string =
                         """FPS: $fps
-Debug mode: ${Paintbox.DEBUG_KEY_NAME}
-  Holding ${Paintbox.DEBUG_KEY_NAME}: I - Reload I18N | S - UI outlines ${Paintbox.stageOutlines} (SHIFT to change mode) | G - gc
+Debug mode: ${Paintbox.DEBUG_KEY_NAME} + I - Reload I18N | S(+Shift) - UI outlines: ${Paintbox.stageOutlines} | G - gc
 Version: $versionString
 Memory: ${numberFormat.format(Gdx.app.nativeHeap / 1024)} / ${numberFormat.format(MemoryUtils.maxMemoryKiB)} KiB (${numberFormat.format(debugInfo.memoryDelta / 1024)} KiB/s)
 Screen: ${screen?.javaClass?.canonicalName}
