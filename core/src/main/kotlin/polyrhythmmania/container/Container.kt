@@ -30,7 +30,7 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
-import polyrhythmmania.world.render.GBAOldTileset
+import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
 import java.util.*
@@ -62,7 +62,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
     val engine: Engine = Engine(timing, world, soundSystem)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, GBAOldTileset(AssetRegistry["tileset_gba"]))
+        WorldRenderer(world, Tileset.createGBA1Tileset(AssetRegistry["tileset_parts"]))
     }
     val _blocks: MutableList<Block> = CopyOnWriteArrayList()
     val blocks: List<Block> get() = _blocks

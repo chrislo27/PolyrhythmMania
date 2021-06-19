@@ -1,21 +1,21 @@
 package polyrhythmmania.world
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
-import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
-import polyrhythmmania.world.render.OldTileset
+import polyrhythmmania.world.render.Tileset
+import polyrhythmmania.world.render.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
 class EntityRod(world: World, val deployBeat: Float, val row: Row)
-    : Entity(world), TemporaryEntity {
+    : SimpleRenderedEntity(world), TemporaryEntity {
 
     companion object {
         private const val EXPLODE_DELAY_SEC: Float = 1f / 3f
@@ -81,8 +81,8 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         this.position.y = row.startY.toFloat() + 1f
     }
 
-    override fun getRenderWidth(): Float = 0.75f
-    override fun getRenderHeight(): Float = 0.5f
+    override val renderWidth: Float = 0.75f
+    override val renderHeight: Float = 0.5f
 
     fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
     fun getCurrentIndexFloor(posX: Float = this.position.x): Int = floor(getCurrentIndex(posX)).toInt()
@@ -94,7 +94,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
     fun explode(engine: Engine) {
         if (isKilled) return
         kill()
-        world.addEntity(EntityExplosion(world, engine.seconds, this.getRenderWidth()).also {
+        world.addEntity(EntityExplosion(world, engine.seconds, this.renderWidth).also {
             it.position.set(this.position)
         })
         playSfxExplosion(engine)
@@ -132,22 +132,18 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         }
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: OldTileset, engine: Engine) {
-        val tmpVec = Vector3Stack.getAndPush()
-        val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(this.position))
-
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
         val beatsFullAnimation = 60f / 128f
         val posX = this.position.x
         val animationAlpha = ((((if (posX < 0f) (posX + floor(posX).absoluteValue) else posX) / xUnitsPerBeat) % beatsFullAnimation) / beatsFullAnimation).coerceIn(0f, 1f)
-        val texReg: TextureRegion = if (!isInAir) {
-            tileset.rodGroundAnimations[(animationAlpha * tileset.rodGroundFrames).toInt().coerceIn(0, tileset.rodGroundFrames - 1)]
+        val texReg: TintedRegion = if (!isInAir) {
+            tileset.rodGroundAnimations[(animationAlpha * tileset.rodGroundFrameCount).toInt().coerceIn(0, tileset.rodGroundFrameCount - 1)]
         } else {
-            tileset.rodAerialAnimations[(animationAlpha * tileset.rodAerialFrames).toInt().coerceIn(0, tileset.rodAerialFrames - 1)]
+            tileset.rodAerialAnimations[(animationAlpha * tileset.rodAerialFrameCount).toInt().coerceIn(0, tileset.rodAerialFrameCount - 1)]
         }
 
-        batch.draw(texReg, convertedVec.x - (1 / 32f), convertedVec.y, getRenderWidth(), getRenderHeight())
+        drawTintedRegion(batch, vec, texReg, -(1 / 32f), 0f, renderWidth, renderHeight)
         batch.setColor(1f, 1f, 1f, 1f)
-        Vector3Stack.pop()
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {

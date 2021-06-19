@@ -516,6 +516,7 @@ class Editor(val main: PRManiaGame)
     }
 
     fun attemptExitToTitle() {
+        changePlayState(PlayState.STOPPED)
         if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.exitConfirmDialog)
         }

@@ -25,8 +25,6 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
             this.minFilter = Texture.TextureFilter.Linear
         }
         
-        AssetRegistry.loadAsset<Texture>("tileset_gba", "textures/world/gba_spritesheet.png")
-        
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_tool", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("selection", "textures/ui/icon/tool/selection.png"),
                 Packable("tempo_change", "textures/ui/icon/tool/tempo_change.png"),

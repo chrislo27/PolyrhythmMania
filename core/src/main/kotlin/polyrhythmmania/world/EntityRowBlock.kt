@@ -1,19 +1,20 @@
 package polyrhythmmania.world
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.BeadsSound
-import polyrhythmmania.world.render.OldTileset
+import polyrhythmmania.world.render.Tileset
+import polyrhythmmania.world.render.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.floor
 
 
 class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex: Int)
-    : SimpleRenderedEntity(world) {
+    : SpriteEntity(world) {
 
     companion object {
         val FULL_EXTENSION_TIME_BEATS: Float = 0.05f
@@ -53,6 +54,9 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
 
     private var shouldPartiallyExtend: Boolean = false
     private var fullyExtendedAtBeat: Float = 0f
+
+    override val renderWidth: Float get() = 1f
+    override val renderHeight: Float get() = this.type.renderHeight
 
     init {
         this.position.y = baseY - 1f
@@ -125,27 +129,57 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
         }
     }
 
-    override fun getRenderWidth(): Float = 1f
-    override fun getRenderHeight(): Float = this.type.renderHeight
-    override fun getTextureRegionFromTileset(tileset: OldTileset): TextureRegion {
+    override val numLayers: Int
+        get() {
+            return when (type) {
+                Type.PLATFORM -> 1
+                else -> when (pistonState) {
+                    PistonState.FULLY_EXTENDED -> 3
+                    PistonState.PARTIALLY_EXTENDED -> 3
+                    PistonState.RETRACTED -> 1
+                }
+            }
+        }
+
+    override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
         return when (type) {
             Type.PLATFORM -> tileset.platform
             Type.PISTON_A -> when (pistonState) {
-                PistonState.FULLY_EXTENDED -> tileset.padAExtended
-                PistonState.PARTIALLY_EXTENDED -> tileset.padAPartial
-                PistonState.RETRACTED -> tileset.padARetracted
+                PistonState.FULLY_EXTENDED -> when (index) {
+                    0 -> tileset.pistonAExtendedFaceX
+                    1 -> tileset.pistonAExtendedFaceZ
+                    2 -> tileset.pistonAExtended
+                    else -> null
+                }
+                PistonState.PARTIALLY_EXTENDED -> when (index) {
+                    0 -> tileset.pistonAPartialFaceX
+                    1 -> tileset.pistonAPartialFaceZ
+                    2 -> tileset.pistonAPartial
+                    else -> null
+                }
+                PistonState.RETRACTED -> tileset.pistonARetracted
             }
             Type.PISTON_DPAD -> when (pistonState) {
-                PistonState.FULLY_EXTENDED -> tileset.padDExtended
-                PistonState.PARTIALLY_EXTENDED -> tileset.padDPartial
-                PistonState.RETRACTED -> tileset.padDRetracted
+                PistonState.FULLY_EXTENDED -> when (index) {
+                    0 -> tileset.pistonDpadExtendedFaceX
+                    1 -> tileset.pistonDpadExtendedFaceZ
+                    2 -> tileset.pistonDpadExtended
+                    else -> null
+                }
+                PistonState.PARTIALLY_EXTENDED -> when (index) {
+                    0 -> tileset.pistonDpadPartialFaceX
+                    1 -> tileset.pistonDpadPartialFaceZ
+                    2 -> tileset.pistonDpadPartial
+                    else -> null
+                }
+                PistonState.RETRACTED -> tileset.pistonDpadRetracted
             }
         }
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: OldTileset, engine: Engine) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
         if (active) {
-            super.render(renderer, batch, tileset, engine)
+            super.renderSimple(renderer, batch, tileset, engine, vec)
         }
     }
 }

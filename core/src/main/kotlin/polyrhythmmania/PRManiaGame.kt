@@ -26,6 +26,7 @@ import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
+import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.LelandSpecialChars
@@ -76,6 +77,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())
+        AssetRegistry.addAssetLoader(TilesetAssetLoader())
 
         if (settings.fullscreen.getOrCompute()) {
             Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)

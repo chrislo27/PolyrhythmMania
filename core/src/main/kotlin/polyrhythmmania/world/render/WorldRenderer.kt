@@ -11,7 +11,7 @@ import polyrhythmmania.world.Entity
 import polyrhythmmania.world.World
 
 
-class WorldRenderer(val world: World, var tileset: OldTileset) {
+class WorldRenderer(val world: World, var tileset: Tileset) {
 
     companion object {
         val comparatorRenderOrder: Comparator<Entity> = Comparator<Entity> { o1, o2 ->
@@ -67,13 +67,14 @@ class WorldRenderer(val world: World, var tileset: OldTileset) {
 //        val topEdge = camera.position.y + camHeight
         val bottomEdge = camera.position.y - camHeight / 2f
         tmpRect2.set(leftEdge, bottomEdge, camWidth, camHeight)
+        val currentTileset = this.tileset
         world.entities.forEach { entity ->
             val convertedVec = convertWorldToScreen(tmpVec.set(entity.position))
-            tmpRect.set(convertedVec.x, convertedVec.y, entity.getRenderWidth(), entity.getRenderHeight())
+            tmpRect.set(convertedVec.x, convertedVec.y, entity.renderWidth, entity.renderHeight)
             // Only render entities that are in scene
             if (tmpRect.intersects(tmpRect2)) {
                 entitiesRendered++
-                entity.render(this, batch, tileset, engine)
+                entity.render(this, batch, currentTileset, engine)
             }
         }
         this.entitiesRenderedLastCall = entitiesRendered

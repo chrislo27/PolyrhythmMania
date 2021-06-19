@@ -35,7 +35,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val timing: TimingProvider = soundSystem
     val engine: Engine = Engine(timing, world, soundSystem)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, GBAOldTileset(AssetRegistry["tileset_gba"]))
+        WorldRenderer(world, Tileset.createGBA1Tileset(AssetRegistry["tileset_parts"]))
     }
 
     private val player: MusicSamplePlayer = music.createPlayer(soundSystem.audioContext).apply {

@@ -27,15 +27,9 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
         : Disposable {
 
         val regions: Map<String, TextureAtlas.AtlasRegion> = atlas.regions.associateBy { it.name }
-
-        init {
-            // Consistency check
-            val keys = regions.keys
-            originalPackables.forEach { p ->
-                if (p.id !in keys)
-                    error("PackedSheet data inconsistency: pack result was missing ${p.id}. Original: ${originalPackables.map { it.id }}, regions: $keys")
-            }
-        }
+        val indexedRegions: Map<String, Map<Int, TextureAtlas.AtlasRegion>> = atlas.regions.filter { it.index >= 0 }
+                .groupBy { it.name }
+                .mapValues { (_, value) -> value.associateBy { r -> r.index } }
 
         override fun dispose() {
             atlas.dispose()
@@ -87,7 +81,8 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
             }
         }
 
-        val newAtlas = packer.generateTextureAtlas(config.atlasMinFilter, config.atlasMagFilter, config.atlasMipMaps)
+        val newAtlas = TextureAtlas()
+        packer.updateTextureAtlas(newAtlas, config.atlasMinFilter, config.atlasMagFilter, config.atlasMipMaps, config.atlasUseIndexing)
 
         packer.dispose()
         val endNano = System.nanoTime()
@@ -119,6 +114,13 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
             atlas.regions[id] ?: error("No atlas region found with ID $id")
         } else error("Atlas was not loaded. Call pack() first")
     }
+    
+    fun getIndexedRegions(id: String): Map<Int, TextureAtlas.AtlasRegion> {
+        val atlas = this.atlas
+        return if (atlas != null) {
+            atlas.indexedRegions[id] ?: error("No indexed map of atlas regions found with ID $id")
+        } else error("Atlas was not loaded. Call pack() first")
+    }
 
     override fun dispose() {
         atlas?.dispose()
@@ -132,6 +134,7 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
             val atlasMinFilter: Texture.TextureFilter = Texture.TextureFilter.Nearest,
             val atlasMagFilter: Texture.TextureFilter = Texture.TextureFilter.Nearest,
             val atlasMipMaps: Boolean = false,
+            val atlasUseIndexing: Boolean = true,
             val debugOutputFile: FileHandle? = null,
     )
 }

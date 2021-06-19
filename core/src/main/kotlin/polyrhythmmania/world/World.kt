@@ -67,7 +67,7 @@ class World {
                 val ent: Entity = if (z == 0 || z == -3) {
                     EntityPlatform(this, x == 4)
                 } else if ((z == 1 || z == -2) && x >= 5 && rows.any { r -> x in r.startX until (r.startX + r.length) }) {
-                    EntityCubeBordered(this)
+                    EntityCube(this, withBorder = true)
                 } else EntityCube(this, x == 4)
                 addEntity(ent.apply {
                     this.position.set(x.toFloat(), 1f, z.toFloat())
@@ -107,28 +107,28 @@ class World {
         
         // Button signs
         val signs = mutableListOf<EntitySign>()
-        signs += EntitySign(this, 0).apply {
+        signs += EntitySign(this, EntitySign.Type.A).apply {
             this.position.set(7f, 2f, 1f)
         }
-        signs += EntitySign(this, 2).apply {
+        signs += EntitySign(this, EntitySign.Type.BO).apply {
             this.position.set(8f, 2f, 1f)
         }
-        signs += EntitySign(this, 3).apply {
+        signs += EntitySign(this, EntitySign.Type.TA).apply {
             this.position.set(9f, 2f, 1f)
         }
-        signs += EntitySign(this, 4).apply {
+        signs += EntitySign(this, EntitySign.Type.N).apply {
             this.position.set(10f, 2f, 1f)
         }
-        signs += EntitySign(this, 1).apply {
+        signs += EntitySign(this, EntitySign.Type.DPAD).apply {
             this.position.set(7f, 2f, -2f)
         }
-        signs += EntitySign(this, 2).apply {
+        signs += EntitySign(this, EntitySign.Type.BO).apply {
             this.position.set(8f, 2f, -2f)
         }
-        signs += EntitySign(this, 3).apply {
+        signs += EntitySign(this, EntitySign.Type.TA).apply {
             this.position.set(9f, 2f, -2f)
         }
-        signs += EntitySign(this, 4).apply {
+        signs += EntitySign(this, EntitySign.Type.N).apply {
             this.position.set(10f, 2f, -2f)
         }
         signs.forEach { sign ->
