@@ -136,26 +136,20 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                 hueArrow)
         val satPane = createPropertyPane(hsv.saturation, "S: ",
                 Gradient().also { grad ->
-                    val arr = FloatArray(3)
                     grad.leftColor.sideEffecting { c -> 
-                        currentColor.use().toHsv(arr)
-                        c.fromHsv(arr[0], 0f, arr[2])
+                        c.fromHsv(hsv.hue.use().toFloat(), 0f, hsv.value.use() / 100f)
                     }
-                    grad.rightColor.sideEffecting { c -> 
-                        currentColor.use().toHsv(arr)
-                        c.fromHsv(arr[0], 1f, arr[2])
+                    grad.rightColor.sideEffecting { c ->
+                        c.fromHsv(hsv.hue.use().toFloat(), 1f, hsv.value.use() / 100f)
                     }
                 }, satArrow)
         val valuePane = createPropertyPane(hsv.value, "V: ",
                 Gradient().also { grad ->
-                    val arr = FloatArray(3)
                     grad.leftColor.sideEffecting { c -> 
-                        currentColor.use().toHsv(arr)
-                        c.fromHsv(arr[0], arr[1], 0f)
+                        c.fromHsv(hsv.hue.use().toFloat(), hsv.saturation.use() / 100f, 0f)
                     }
-                    grad.rightColor.sideEffecting { c -> 
-                        currentColor.use().toHsv(arr)
-                        c.fromHsv(arr[0], arr[1], 1f)
+                    grad.rightColor.sideEffecting { c ->
+                        c.fromHsv(hsv.hue.use().toFloat(), hsv.saturation.use() / 100f, 1f)
                     }
                 }, valueArrow)
         val alphaPane = createPropertyPane(hsv.alpha, "A: ",
