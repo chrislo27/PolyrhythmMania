@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
@@ -31,8 +32,6 @@ import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.LelandSpecialChars
 import java.io.File
-import java.io.PrintWriter
-import java.io.StringWriter
 import kotlin.concurrent.thread
 
 
@@ -40,6 +39,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     : PaintboxGame(paintboxSettings) {
 
     companion object {
+        lateinit var instance: PRManiaGame
+            private set
+        
         fun createPaintboxSettings(launchArguments: List<String>, logger: Logger, logToFile: File?): PaintboxSettings =
                 PaintboxSettings(launchArguments, logger, logToFile, PRMania.VERSION, PRMania.DEFAULT_SIZE,
                         ResizeAction.ANY_SIZE, PRMania.MINIMUM_SIZE)
@@ -53,6 +55,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         private set
     lateinit var settings: Settings
         private set
+    
+    // For colour picker
+    lateinit var colourPickerHueBar: Texture
+        private set
+    lateinit var colourPickerTransparencyGrid: Texture
+        private set
 
     // Permanent screens
     lateinit var mainMenuScreen: MainMenuScreen
@@ -62,6 +70,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     override fun create() {
         super.create()
+        PRManiaGame.instance = this
         this.localizationInstance = Localization
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
@@ -87,6 +96,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 Gdx.graphics.setWindowedMode(res.width, res.height)
             }
         }
+
+        generateColourPickerTextures()
         
         fun initializeScreens() {
             mainMenuScreen = MainMenuScreen(this)
@@ -124,6 +135,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     override fun dispose() {
         super.dispose()
+        colourPickerHueBar.disposeQuietly()
+        colourPickerTransparencyGrid.disposeQuietly()
         try {
             val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
             PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->
@@ -535,4 +548,31 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontMainMenuRodin: PaintboxFont get() = fontCache["mainmenu_rodin"]
     val fontPauseMenuTitle: PaintboxFont get() = fontCache["pausemenu_title"]
 
+    private fun generateColourPickerTextures() {
+        colourPickerHueBar = run {
+            val pixmap = Pixmap(360, 1, Pixmap.Format.RGBA8888)
+            val tmpColor = Color(1f, 1f, 1f, 1f)
+            for (i in 0 until 360) {
+                tmpColor.fromHsv(i.toFloat(), 1f, 1f)
+                pixmap.setColor(tmpColor)
+                pixmap.drawPixel(i, 0)
+            }
+            Texture(pixmap).apply {
+                this.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            }
+        }
+        colourPickerTransparencyGrid = run {
+            val pixmap = Pixmap(16, 16, Pixmap.Format.RGBA8888)
+            pixmap.setColor(0.5f, 0.5f, 0.5f, 1f)
+            pixmap.fillRectangle(0, 0, 8, 8)
+            pixmap.fillRectangle(8, 8, 8, 8)
+            pixmap.setColor(1f, 1f, 1f, 1f)
+            pixmap.fillRectangle(8, 0, 8, 8)
+            pixmap.fillRectangle(0, 8, 8, 8)
+            Texture(pixmap).apply {
+                this.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+                this.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
+            }
+        }
+    }
 }

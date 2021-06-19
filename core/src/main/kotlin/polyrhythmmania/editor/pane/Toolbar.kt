@@ -74,7 +74,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tileset"]))
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.tileset")))
             this.setOnAction {
-                
+                editorPane.editor.attemptOpenTilesetEditDialog()
             }
         }
         playtestButton = Button("").apply {

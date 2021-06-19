@@ -521,6 +521,12 @@ class Editor(val main: PRManiaGame)
             editorPane.openDialog(editorPane.exitConfirmDialog)
         }
     }
+    
+    fun attemptOpenTilesetEditDialog() {
+        if (allowedToEdit.getOrCompute()) {
+            editorPane.openDialog(editorPane.tilesetEditDialog)
+        }
+    }
 
     fun attemptStartPlaytest() {
         editorPane.openDialog(editorPane.playtestDialog)
