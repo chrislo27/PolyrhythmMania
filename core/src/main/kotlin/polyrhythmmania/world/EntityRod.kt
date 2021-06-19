@@ -142,7 +142,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
             tileset.rodAerialAnimations[(animationAlpha * tileset.rodAerialFrameCount).toInt().coerceIn(0, tileset.rodAerialFrameCount - 1)]
         }
 
-        drawTintedRegion(batch, vec, texReg, -(1 / 32f), 0f, renderWidth, renderHeight)
+        drawTintedRegion(batch, vec, texReg, -(1 / 32f), (1f / 32f), renderWidth, renderHeight)
         batch.setColor(1f, 1f, 1f, 1f)
     }
 
