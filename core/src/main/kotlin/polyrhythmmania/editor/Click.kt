@@ -165,6 +165,8 @@ sealed class Click {
                 if (targetTrack != null) {
                     if (blocks.all { b -> targetTrack.acceptsBlock(b) }) {
                         originRegion.track = targetTrackIndex
+                    } else {
+                        isPlacementInvalid.set(true)
                     }
                 }
             }
