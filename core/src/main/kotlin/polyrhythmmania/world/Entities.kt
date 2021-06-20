@@ -123,11 +123,11 @@ class EntitySign(world: World, val type: Type) : SpriteEntity(world) {
     
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return when (type) {
-            Type.A -> if (index == 1) tileset.signAShadow else tileset.signA
-            Type.DPAD -> if (index == 1) tileset.signDpadShadow else tileset.signDpad
-            Type.BO -> if (index == 1) tileset.signBoShadow else tileset.signBo
-            Type.TA -> if (index == 1) tileset.signTaShadow else tileset.signTa
-            Type.N -> if (index == 1) tileset.signNShadow else tileset.signN
+            Type.A -> if (index == 0) tileset.signAShadow else tileset.signA
+            Type.DPAD -> if (index == 0) tileset.signDpadShadow else tileset.signDpad
+            Type.BO -> if (index == 0) tileset.signBoShadow else tileset.signBo
+            Type.TA -> if (index == 0) tileset.signTaShadow else tileset.signTa
+            Type.N -> if (index == 0) tileset.signNShadow else tileset.signN
         }
     }
 }
