@@ -34,6 +34,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Block
+import polyrhythmmania.editor.block.BlockTilesetChange
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.music.EditorMusicData
@@ -120,7 +121,7 @@ class Editor(val main: PRManiaGame)
             Track(TRACK_INPUT_0, EnumSet.of(BlockType.INPUT)),
             Track(TRACK_INPUT_1, EnumSet.of(BlockType.INPUT)),
             Track(TRACK_INPUT_2, EnumSet.of(BlockType.INPUT)),
-//            Track(TRACK_VFX_0, EnumSet.of(BlockType.VFX)),
+            Track(TRACK_VFX_0, EnumSet.of(BlockType.VFX)),
     )
     val trackMap: Map<String, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 
@@ -198,6 +199,12 @@ class Editor(val main: PRManiaGame)
         sceneRoot += editorPane
         resize()
         bindStatusBar(editorPane.statusBarMsg)
+        playbackStart.addListener { ps ->
+            val newBeat = ps.getOrCompute()
+            timing.seconds = engine.tempos.beatsToSeconds(newBeat)
+            engineBeat.set(newBeat)
+            updateTilesetChangesState(newBeat) // Not consistent...
+        }
     }
 
     fun render(delta: Float, batch: SpriteBatch) {
@@ -590,6 +597,7 @@ class Editor(val main: PRManiaGame)
         } else if (newState == PlayState.STOPPED) {
             resetWorld()
             timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
+            updateTilesetChangesState()
         }
 
         if (newState == PlayState.PLAYING) {
@@ -601,6 +609,15 @@ class Editor(val main: PRManiaGame)
         }
 
         this.playState.set(newState)
+    }
+    
+    fun updateTilesetChangesState(currentBeat: Float = engine.beat) {
+        world.tilesetConfig.applyTo(renderer.tileset)
+        
+        val events = blocks.filterIsInstance<BlockTilesetChange>().flatMap { it.compileIntoEvents() }.sortedBy { it.beat }
+        events.forEach { evt ->
+            engine.updateEvent(evt, currentBeat)
+        }
     }
 
     fun attemptOpenBlockContextMenu(block: Block, contextMenu: ContextMenu) {
@@ -881,6 +898,14 @@ class Editor(val main: PRManiaGame)
                         }
                         inputConsumed = true
                     }
+                }
+            }
+        } else if (contextMenuActive && !dialogActive) {
+            val currentRootCtxMenu = sceneRoot.getCurrentRootContextMenu()
+            if (currentRootCtxMenu != null && keycode == Input.Keys.ESCAPE) {
+                if (!ctrl && !alt && !shift) {
+                    sceneRoot.hideRootContextMenu()
+                    inputConsumed = true
                 }
             }
         }

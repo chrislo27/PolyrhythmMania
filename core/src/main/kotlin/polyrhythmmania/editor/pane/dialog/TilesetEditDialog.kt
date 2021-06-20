@@ -33,7 +33,9 @@ import polyrhythmmania.world.render.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer
 
 
-class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
+class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig,
+                        val titleLocalization: String = "editor.dialog.tileset.title") 
+    : EditorDialog(editorPane) {
 
     enum class ResetDefault(val baseConfig: TilesetConfig) {
         PR1(TilesetConfig.createGBA1TilesetConfig()),
@@ -42,7 +44,6 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     private var resetDefault: ResetDefault = ResetDefault.PR1
 
-    val tilesetConfig: TilesetConfig = editor.container.tilesetConfig
     val currentMapping: Var<TilesetConfig.ColorMapping> = Var(tilesetConfig.allMappings[0])
     
     val objPreview: ObjectPreview = ObjectPreview()
@@ -53,7 +54,7 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     private val rodRotation: FloatVar = FloatVar(0f)
 
     init {
-        this.titleLabel.text.bind { Localization.getVar("editor.dialog.tileset.title").use() }
+        this.titleLabel.text.bind { Localization.getVar(titleLocalization).use() }
 
         bottomPane.addChild(Button("").apply {
             Anchor.BottomRight.configure(this)
@@ -134,6 +135,7 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                                     val defaultColor = resetDefault.baseConfig.allMappingsByID.getValue(currentMapping.id).color.getOrCompute()
                                     currentMapping.color.set(defaultColor.cpy())
                                     applyCurrentMappingToPreview(defaultColor)
+                                    updateColourPickerToMapping()
                                 }
                             }
                             v += HBox().apply {
@@ -143,7 +145,7 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                                     this += ImageNode(AssetRegistry.get<PackedSheet>("tileset_parts")["xyz"]).apply { 
                                         this.bounds.width.set(64f)
                                     }
-                                    this += TextLabel("[color=#FF0000]X-[] [color=#00D815]Y+[] [color=#0000FF]Z+[]").apply { 
+                                    this += TextLabel("[b][color=#FF0000]X-[] [color=#00D815]Y+[] [color=#0000FF]Z+[][]").apply { 
                                         this.markup.set(editorPane.palette.markup)
                                         this.bindWidthToParent(adjust = -64f)
                                         this.textColor.set(Color.WHITE)
@@ -296,7 +298,7 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     override fun onCloseDialog() {
         super.onCloseDialog()
-        tilesetConfig.applyTo(editor.container.renderer.tileset)
+        editor.updateTilesetChangesState()
     }
     
     inner class ObjectPreview : UIElement() {

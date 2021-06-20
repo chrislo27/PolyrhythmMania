@@ -1,5 +1,7 @@
 package polyrhythmmania.engine
 
+import polyrhythmmania.container.Container
+
 
 /**
  * An [Event] is an object that has a start beat and a non-negative (zero or larger) width in beats.
@@ -16,15 +18,21 @@ open class Event(val engine: Engine) : Comparable<Event> {
     var updateCompletion: UpdateCompletion = UpdateCompletion.PENDING
 
     open fun onStart(currentBeat: Float) {
-
     }
 
     open fun onUpdate(currentBeat: Float) {
-
     }
 
     open fun onEnd(currentBeat: Float) {
-        
+    }
+    
+    open fun onStartContainer(container: Container, currentBeat: Float) {
+    }
+
+    open fun onUpdateContainer(container: Container, currentBeat: Float) {
+    }
+
+    open fun onEndContainer(container: Container, currentBeat: Float) {
     }
     
     protected fun getBeatPercentage(currentBeat: Float): Float = if (width <= 0f) 1f else ((currentBeat - this.beat) / width)

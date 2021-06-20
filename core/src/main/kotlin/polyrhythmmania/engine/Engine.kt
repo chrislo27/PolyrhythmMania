@@ -1,6 +1,7 @@
 package polyrhythmmania.engine
 
 import paintbox.binding.Var
+import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.timesignature.TimeSignatureMap
 import polyrhythmmania.soundsystem.SoundSystem
@@ -14,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * An [Engine] fires the [Event]s based on the internal [TimingProvider].
  * It also contains the [World] upon which these events operate in.
  */
-class Engine(timingProvider: TimingProvider, val world: World, soundSystem: SoundSystem?)
+class Engine(timingProvider: TimingProvider, val world: World, soundSystem: SoundSystem?, val container: Container?)
     : Clock(timingProvider) {
 
     private val queuedRunnables: MutableList<Runnable> = CopyOnWriteArrayList()
@@ -58,6 +59,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     }
     
     fun updateEvent(event: Event, atBeat: Float) {
+        val container = this.container
         val eventBeat = event.beat
         val eventWidth = event.width
         val eventEndBeat = eventBeat + eventWidth
@@ -68,18 +70,29 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
                     event.onStart(atBeat)
                     event.onUpdate(atBeat)
                     event.onEnd(atBeat)
+                    if (container != null) {
+                        event.onStartContainer(container, atBeat)
+                        event.onUpdateContainer(container, atBeat)
+                        event.onEndContainer(container, atBeat)
+                    }
                     event.updateCompletion = Event.UpdateCompletion.COMPLETED
                 } else if (atBeat > eventBeat) {
                     // Now inside the event. Call onStart and onUpdate
                     event.onStart(atBeat)
                     event.onUpdate(atBeat)
+                    if (container != null) {
+                        event.onStartContainer(container, atBeat)
+                        event.onUpdateContainer(container, atBeat)
+                    }
                     event.updateCompletion = Event.UpdateCompletion.UPDATING
                 }
             }
             Event.UpdateCompletion.UPDATING -> {
                 event.onUpdate(atBeat)
+                if (container != null) event.onUpdateContainer(container, atBeat)
                 if (atBeat >= eventEndBeat) {
                     event.onEnd(atBeat)
+                    if (container != null) event.onEndContainer(container, atBeat)
                     event.updateCompletion = Event.UpdateCompletion.COMPLETED
                 }
             }

@@ -62,11 +62,10 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     @Suppress("CanBePrimaryConstructorProperty")
     val soundSystem: SoundSystem? = soundSystem
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
-    val engine: Engine = Engine(timing, world, soundSystem)
-    val tilesetConfig: TilesetConfig = TilesetConfig.createGBA1TilesetConfig()
+    val engine: Engine = Engine(timing, world, soundSystem, this)
     val renderer: WorldRenderer by lazy {
         WorldRenderer(world, Tileset(AssetRegistry["tileset_parts"]).apply { 
-            tilesetConfig.applyTo(this)
+            world.tilesetConfig.applyTo(this)
         })
     }
     val _blocks: MutableList<Block> = CopyOnWriteArrayList()
@@ -254,7 +253,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 blocksArray.add(o)
             }
         })
-        jsonObj.add("tilesetConfig", this.tilesetConfig.toJson())
+        jsonObj.add("tilesetConfig", this.world.tilesetConfig.toJson())
 
 
         // Pack
@@ -353,7 +352,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         }
         if (containerVersion >= 3) {
             val tilesetObj = json.get("tilesetConfig").asObject()
-            this.tilesetConfig.fromJson(tilesetObj)
+            this.world.tilesetConfig.fromJson(tilesetObj)
         }
 
         val blocksObj = json.get("blocks").asArray()

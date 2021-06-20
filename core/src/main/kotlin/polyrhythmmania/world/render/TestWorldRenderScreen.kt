@@ -33,7 +33,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val world: World = World()
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()
     val timing: TimingProvider = soundSystem
-    val engine: Engine = Engine(timing, world, soundSystem)
+    val engine: Engine = Engine(timing, world, soundSystem, null)
     val renderer: WorldRenderer by lazy {
         WorldRenderer(world, Tileset(AssetRegistry["tileset_parts"]).apply { 
             TilesetConfig.createGBA1TilesetConfig().applyTo(this)

@@ -1,6 +1,7 @@
 package polyrhythmmania.world
 
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.world.render.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -11,6 +12,8 @@ class World {
         val DEFAULT_ROW_LENGTH: Int = 16
         val DEFAULT_ROW_COUNT: Int = 2
     }
+    
+    val tilesetConfig: TilesetConfig = TilesetConfig.createGBA1TilesetConfig()
 
     val entities: List<Entity> = CopyOnWriteArrayList()
     

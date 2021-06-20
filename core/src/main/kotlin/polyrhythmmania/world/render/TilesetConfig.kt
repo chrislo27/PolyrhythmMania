@@ -61,6 +61,14 @@ class TilesetConfig {
             val varr = tilesetGetter(tileset)
             varr.set(color.getOrCompute().cpy())
         }
+
+        /**
+         * Linear interpolation.
+         */
+        fun applyToLerp(tileset: Tileset) {
+            val varr = tilesetGetter(tileset)
+            varr.set(color.getOrCompute().cpy())
+        }
     }
 
     val cubeBorder: ColorMapping = ColorMapping("cubeBorder", { it.cubeBorder.color })

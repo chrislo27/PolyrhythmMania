@@ -11,7 +11,7 @@ import polyrhythmmania.world.Entity
 import polyrhythmmania.world.World
 
 
-class WorldRenderer(val world: World, var tileset: Tileset) {
+class WorldRenderer(val world: World, val tileset: Tileset) {
 
     companion object {
         val comparatorRenderOrder: Comparator<Entity> = Comparator<Entity> { o1, o2 ->

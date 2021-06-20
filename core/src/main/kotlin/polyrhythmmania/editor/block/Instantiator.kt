@@ -62,6 +62,11 @@ object Instantiators {
                 Localization.getVar("instantiator.despawnPattern.desc")) { engine ->
             BlockDespawnPattern(engine)
         })
+        add(Instantiator("tilesetChange", BlockTilesetChange::class.java, Localization.getVar("instantiator.tilesetChange.name"),
+                Localization.getVar("instantiator.tilesetChange.summary"),
+                Localization.getVar("instantiator.tilesetChange.desc")) { engine ->
+            BlockTilesetChange(engine)
+        })
 
 //        add(Instantiator("baselineTest", Var("Baseline Test"), Var("Description baseline test."), Var("[font=prmania_icons]RspladAD[]")) { engine ->
 //            BlockTest(engine)

@@ -1,10 +1,13 @@
 package polyrhythmmania.world
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.world.render.TilesetConfig
 
 
 abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float,
@@ -167,6 +170,48 @@ class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
         super.onStart(currentBeat)
         Gdx.app.postRunnable {
             engine.endSignalReceived.set(true)
+        }
+    }
+}
+
+class EventTilesetChange(engine: Engine, startBeat: Float, width: Float,
+                         val tilesetCopy: TilesetConfig)
+    : Event(engine) {
+    
+    private data class ColorTarget(val start: Color, val end: Color, val current: Color = start.cpy()) {
+        fun lerp(percentage: Float): Color {
+            current.set(start).lerp(end, percentage)
+            return current
+        }
+    }
+    
+    private val colorTargets: Map<String, ColorTarget> = tilesetCopy.allMappings.associate { 
+        it.id to ColorTarget(Color(1f, 1f, 1f, 1f), it.color.getOrCompute().cpy()) 
+    }
+    
+    init {
+        this.beat = startBeat
+        this.width = width
+    }
+
+    override fun onStartContainer(container: Container, currentBeat: Float) {
+        super.onStartContainer(container, currentBeat)
+        val tileset = container.renderer.tileset
+        tilesetCopy.allMappings.forEach { m ->
+            val id = m.id
+            val target = colorTargets.getValue(id)
+            target.start.set(m.tilesetGetter.invoke(tileset).getOrCompute())
+        }
+    }
+
+    override fun onUpdateContainer(container: Container, currentBeat: Float) {
+        super.onUpdateContainer(container, currentBeat)
+        val percentage = getBeatPercentage(currentBeat).coerceIn(0f, 1f)
+        val tileset = container.renderer.tileset
+        tilesetCopy.allMappings.forEach { m ->
+            val id = m.id
+            val target = colorTargets.getValue(id)
+            m.tilesetGetter.invoke(tileset).set(target.lerp(percentage))
         }
     }
 }

@@ -397,6 +397,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         engine.removeEvents(engine.events.toList())
         engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
         container.world.resetWorld()
+        container.world.tilesetConfig.applyTo(container.renderer.tileset)
         Gdx.app.postRunnable {
             if (playSound) {
                 playMenuSound("sfx_menu_enter_game")
