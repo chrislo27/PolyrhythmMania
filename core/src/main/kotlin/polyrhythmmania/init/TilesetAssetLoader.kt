@@ -64,6 +64,7 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "sign_n_shadow",
                 "sign_ta",
                 "sign_ta_shadow",
+                "xyz",
         ).map { Packable(it, "textures/world/parts/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 256, duplicateBorder = false)))
     }
 

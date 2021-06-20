@@ -88,7 +88,7 @@ class EngineInputter(val engine: Engine) {
                 
                 val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
                 val inputResult = InputResult(type, accuracyPercent, differenceSec)
-                Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.")}: Input ${type}: ${inputResult.inputScore} perfectB=$perfectBeats, perfectS=$perfectSeconds, diffS=$differenceSec, minmaxS=[$minSec, $maxSec], actualS=$atSeconds")
+//                Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.")}: Input ${type}: ${inputResult.inputScore} perfectB=$perfectBeats, perfectS=$perfectSeconds, diffS=$differenceSec, minmaxS=[$minSec, $maxSec], actualS=$atSeconds")
                 inputTracker.results += inputResult
                 // Bounce the rod
                 rod.bounce(nextBlockIndex)

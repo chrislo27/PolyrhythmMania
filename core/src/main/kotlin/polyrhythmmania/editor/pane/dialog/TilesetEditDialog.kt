@@ -134,6 +134,23 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                                     updateCurrentMappingToPreview(defaultColor)
                                 }
                             }
+                            v += HBox().apply {
+                                this.spacing.set(8f)
+                                this.bounds.height.set(64f)
+                                this.temporarilyDisableLayouts { 
+                                    this += ImageNode(AssetRegistry.get<PackedSheet>("tileset_parts")["xyz"]).apply { 
+                                        this.bounds.width.set(64f)
+                                    }
+                                    this += TextLabel("[color=#FF0000]X-[] [color=#00D815]Y+[] [color=#0000FF]Z+[]").apply { 
+                                        this.markup.set(editorPane.palette.markup)
+                                        this.bindWidthToParent(adjust = -64f)
+                                        this.textColor.set(Color.WHITE)
+                                        this.renderBackground.set(true)
+                                        this.bgPadding.set(Insets(8f))
+                                        (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color(1f, 1f, 1f, 01f))
+                                    }
+                                }
+                            }
                         }
                     }
                 }
