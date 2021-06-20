@@ -136,6 +136,7 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             Gdx.app.postRunnable {
                 substate.set(Substate.DONE)
                 attemptClose()
+                editorPane.menubar.triggerAutosaveIndicator(Localization.getValue("editor.button.save.saveMessage"))
             }
         } catch (e: Exception) {
             Paintbox.LOGGER.warn("Error occurred while saving container:")
