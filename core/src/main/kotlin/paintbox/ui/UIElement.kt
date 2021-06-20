@@ -250,6 +250,34 @@ open class UIElement : UIBounds() {
         }
     }
 
+    fun bindWidthToSelfHeight(adjust: Float = 0f, multiplier: Float = 1f) {
+        val thisBounds = this.bounds
+        thisBounds.width.bind {
+            thisBounds.height.useF() * multiplier + adjust
+        }
+    }
+
+    fun bindHeightToSelfWidth(adjust: Float = 0f, multiplier: Float = 1f) {
+        val thisBounds = this.bounds
+        thisBounds.height.bind {
+            thisBounds.width.useF() * multiplier + adjust
+        }
+    }
+
+    fun bindWidthToSelfHeight(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
+        val thisBounds = this.bounds
+        thisBounds.width.bind {
+            thisBounds.height.useF() * multiplierBinding() + adjustBinding()
+        }
+    }
+
+    fun bindHeightToSelfWidth(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
+        val thisBounds = this.bounds
+        thisBounds.height.bind {
+            thisBounds.width.useF() * multiplierBinding() + adjustBinding()
+        }
+    }
+
     protected inline fun renderOptionallyWithClip(originX: Float, originY: Float, batch: SpriteBatch, clip: Boolean,
                                                   renderFunc: (originX: Float, originY: Float, batch: SpriteBatch) -> Unit) {
         if (clip) {

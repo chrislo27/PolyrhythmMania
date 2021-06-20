@@ -1,5 +1,6 @@
 package polyrhythmmania.init
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
@@ -53,7 +54,9 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "platform_border",
                 "platform_with_line",
                 "red_line",
-                "rods",
+//                "rods",
+                "rods_borders",
+                "rods_fill",
                 "sign_a",
                 "sign_a_shadow",
                 "sign_bo",
@@ -65,7 +68,7 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "sign_ta",
                 "sign_ta_shadow",
                 "xyz",
-        ).map { Packable(it, "textures/world/parts/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 256, duplicateBorder = false)))
+        ).map { Packable(it, "textures/world/parts/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 256, duplicateBorder = false,)))
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {

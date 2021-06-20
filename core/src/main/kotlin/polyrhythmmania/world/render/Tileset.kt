@@ -18,7 +18,7 @@ class Tileset(val packedSheet: PackedSheet) {
         
         private fun TextureRegion.toTinted(bindTo: ReadOnlyVar<Color>): TintedRegion = 
                 TintedRegion(this).apply { 
-                    this.color.sideEffecting { bindTo.use() }
+                    this.color.bind { bindTo.use() }
                 }
     }
 
@@ -80,17 +80,30 @@ class Tileset(val packedSheet: PackedSheet) {
     val signN: TintedRegion = packedSheet["sign_n"].toTinted()
     val signNShadow: TintedRegion = packedSheet["sign_n_shadow"].toTinted(signShadowColor)
 
+    val rodBorderColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
+    val rodFillColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val rodGroundFrameCount: Int = 6
     val rodAerialFrameCount: Int = 6
-    private val rodSection: TextureRegion = packedSheet["rods"]
-    val rodGroundAnimations: List<TintedRegion> by lazy {
+    private val rodBordersSection: TextureRegion = packedSheet["rods_borders"]
+    private val rodFillSection: TextureRegion = packedSheet["rods_fill"]
+    val rodGroundBorderAnimations: List<TintedRegion> by lazy {
         (0 until rodGroundFrameCount).map { i ->
-            TextureRegion(rodSection, 0, 0 + 17 * i, 24, 16).toTinted()
+            TextureRegion(rodBordersSection, 0, 0 + 17 * i, 24, 16).toTinted(rodBorderColor)
         }
     }
-    val rodAerialAnimations: List<TintedRegion> by lazy {
+    val rodGroundFillAnimations: List<TintedRegion> by lazy {
+        (0 until rodGroundFrameCount).map { i ->
+            TextureRegion(rodFillSection, 0, 0 + 17 * i, 24, 16).toTinted(rodFillColor)
+        }
+    }
+    val rodAerialBorderAnimations: List<TintedRegion> by lazy {
         (0 until rodAerialFrameCount).map { i ->
-            TextureRegion(rodSection, 26, 1 + 17 * i, 24, 16).toTinted()
+            TextureRegion(rodFillSection, 26, 1 + 17 * i, 24, 16).toTinted(rodBorderColor)
+        }
+    }
+    val rodAerialFillAnimations: List<TintedRegion> by lazy {
+        (0 until rodAerialFrameCount).map { i ->
+            TextureRegion(rodFillSection, 26, 1 + 17 * i, 24, 16).toTinted(rodFillColor)
         }
     }
 

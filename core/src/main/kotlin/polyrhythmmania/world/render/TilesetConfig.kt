@@ -15,6 +15,9 @@ class TilesetConfig {
     companion object {
         fun createGBA1TilesetConfig(): TilesetConfig {
             return TilesetConfig().apply {
+                rodBorder.color.getOrCompute().set(0, 0, 0)
+                rodFill.color.getOrCompute().set(255, 0, 0)
+                
                 cubeBorder.color.getOrCompute().set(33, 214, 25)
                 cubeFaceX.color.getOrCompute().set(42, 224, 48)
                 cubeFaceY.color.getOrCompute().set(74, 255, 74)
@@ -29,6 +32,9 @@ class TilesetConfig {
 
         fun createGBA2TilesetConfig(): TilesetConfig {
             return TilesetConfig().apply {
+                rodBorder.color.getOrCompute().set(0, 0, 0)
+                rodFill.color.getOrCompute().set(255, 0, 0)
+
                 cubeBorder.color.getOrCompute().set(0, 16, 189)
                 cubeFaceX.color.getOrCompute().set(32, 81, 204)
                 cubeFaceY.color.getOrCompute().set(41, 99, 255)
@@ -64,8 +70,11 @@ class TilesetConfig {
     val pistonFaceX: ColorMapping = ColorMapping("pistonFaceX", { it.pistonFaceXColor })
     val pistonFaceZ: ColorMapping = ColorMapping("pistonFaceZ", { it.pistonFaceZColor })
     val signShadow: ColorMapping = ColorMapping("signShadow", { it.signShadowColor })
+    val rodBorder: ColorMapping = ColorMapping("rodBorder", { it.rodBorderColor })
+    val rodFill: ColorMapping = ColorMapping("rodFill", { it.rodFillColor })
 
-    val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeFaceX, cubeFaceY, cubeFaceZ, pistonFaceX, pistonFaceZ, signShadow)
+    val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeFaceX, cubeFaceY, cubeFaceZ, pistonFaceX, pistonFaceZ,
+            signShadow, rodBorder, rodFill)
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
 
     fun copy(): TilesetConfig {
@@ -100,7 +109,9 @@ class TilesetConfig {
     fun fromJson(obj: JsonObject) {
         fun attemptParse(id: String): Color? {
             return try {
-                Color.valueOf(obj.getString(id, ""))
+                val str = obj.getString(id, "")
+                if (str == "") return null
+                Color.valueOf(str)
             } catch (ignored: Exception) {
                 null
             }

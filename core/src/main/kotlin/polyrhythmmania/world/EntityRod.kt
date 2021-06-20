@@ -14,8 +14,46 @@ import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
+open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRenderedEntity(world) {
+    
+    val xUnitsPerBeat: Float = 2f
+    open val isInAir: Boolean = isInAir
+
+    override val renderWidth: Float = 0.75f
+    override val renderHeight: Float = 0.5f
+    
+    constructor(world: World) : this(world, false)
+    
+    protected open fun getAnimationAlpha(): Float {
+        return 0f
+    }
+    
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+        val animationAlpha = getAnimationAlpha().coerceIn(0f, 1f)
+
+        val renderW = renderWidth
+        val renderH = renderHeight
+        val offsetX = -(1 / 32f)
+        val offsetY = 1f / 32f
+        val regionBorder: TintedRegion = if (!isInAir) {
+            tileset.rodGroundBorderAnimations[(animationAlpha * tileset.rodGroundFrameCount).toInt().coerceIn(0, tileset.rodGroundFrameCount - 1)]
+        } else {
+            tileset.rodAerialBorderAnimations[(animationAlpha * tileset.rodAerialFrameCount).toInt().coerceIn(0, tileset.rodAerialFrameCount - 1)]
+        }
+        drawTintedRegion(batch, vec, regionBorder, offsetX, offsetY, renderW, renderH)
+        val regionFill: TintedRegion = if (!isInAir) {
+            tileset.rodGroundFillAnimations[(animationAlpha * tileset.rodGroundFrameCount).toInt().coerceIn(0, tileset.rodGroundFrameCount - 1)]
+        } else {
+            tileset.rodAerialFillAnimations[(animationAlpha * tileset.rodAerialFrameCount).toInt().coerceIn(0, tileset.rodAerialFrameCount - 1)]
+        }
+        drawTintedRegion(batch, vec, regionFill, offsetX, offsetY, renderW, renderH)
+
+        batch.setColor(1f, 1f, 1f, 1f)
+    }
+}
+
 class EntityRod(world: World, val deployBeat: Float, val row: Row)
-    : SimpleRenderedEntity(world), TemporaryEntity {
+    : EntityRodDecor(world), TemporaryEntity {
 
     companion object {
         private const val EXPLODE_DELAY_SEC: Float = 1f / 3f
@@ -59,12 +97,11 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         }
     }
 
-    val xUnitsPerBeat: Float = 2f
     private val killAfterBeats: Float = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
 
     private var explodeAtSec: Float = Float.MAX_VALUE
     private val collision: Collision = Collision()
-    private val isInAir: Boolean
+    override val isInAir: Boolean
         get() = collision.isInAir
 
     val inputTracker: InputTracker = InputTracker()
@@ -81,8 +118,11 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         this.position.y = row.startY.toFloat() + 1f
     }
 
-    override val renderWidth: Float = 0.75f
-    override val renderHeight: Float = 0.5f
+    override fun getAnimationAlpha(): Float {
+        val beatsFullAnimation = 60f / 128f
+        val posX = this.position.x
+        return ((((if (posX < 0f) (posX + floor(posX).absoluteValue) else posX) / xUnitsPerBeat) % beatsFullAnimation) / beatsFullAnimation)
+    }
 
     fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
     fun getCurrentIndexFloor(posX: Float = this.position.x): Int = floor(getCurrentIndex(posX)).toInt()
@@ -130,20 +170,6 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
                 bounce(startIndex, nextNonNull)
             }
         }
-    }
-
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
-        val beatsFullAnimation = 60f / 128f
-        val posX = this.position.x
-        val animationAlpha = ((((if (posX < 0f) (posX + floor(posX).absoluteValue) else posX) / xUnitsPerBeat) % beatsFullAnimation) / beatsFullAnimation).coerceIn(0f, 1f)
-        val texReg: TintedRegion = if (!isInAir) {
-            tileset.rodGroundAnimations[(animationAlpha * tileset.rodGroundFrameCount).toInt().coerceIn(0, tileset.rodGroundFrameCount - 1)]
-        } else {
-            tileset.rodAerialAnimations[(animationAlpha * tileset.rodAerialFrameCount).toInt().coerceIn(0, tileset.rodAerialFrameCount - 1)]
-        }
-
-        drawTintedRegion(batch, vec, texReg, -(1 / 32f), (1f / 32f), renderWidth, renderHeight)
-        batch.setColor(1f, 1f, 1f, 1f)
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {

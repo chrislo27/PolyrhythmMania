@@ -37,7 +37,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
         bottomPane.addChild(Button("").apply {
             Anchor.BottomRight.configure(this)
-            this.bounds.width.bind { bounds.height.useF() }
+            this.bindWidthToSelfHeight()
             this.applyDialogStyleBottom()
             this.setOnAction {
                 attemptClose()
@@ -58,6 +58,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val pane = Pane()
         val vbox = VBox().apply {
             this.spacing.set(8f)
+            this.margin.set(Insets(0f, 0f, 0f, 4f))
         }
         pane += vbox
         val blockHeight = 64f
@@ -161,7 +162,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.margin.set(Insets(8f))
             left = Button("").apply {
                 Anchor.CentreLeft.configure(this)
-                this.bounds.width.bind { bounds.height.useF() }
+                this.bindWidthToSelfHeight()
                 this.skinID.set(StandardMenu.BUTTON_LONG_SKIN_ID)
                 addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply {
                     this.rotation.set(90f)
@@ -176,7 +177,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             }
             right = Button("").apply {
                 Anchor.CentreRight.configure(this)
-                this.bounds.width.bind { bounds.height.useF() }
+                this.bindWidthToSelfHeight()
                 this.skinID.set(StandardMenu.BUTTON_LONG_SKIN_ID)
                 addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply {
                     this.rotation.set(270f)

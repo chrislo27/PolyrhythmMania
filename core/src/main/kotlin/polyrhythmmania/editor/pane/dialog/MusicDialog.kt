@@ -91,7 +91,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
         bottomPane.addChild(Button("").apply {
             Anchor.BottomRight.configure(this)
-            this.bounds.width.bind { bounds.height.useF() }
+            this.bindWidthToSelfHeight()
             this.applyDialogStyleBottom()
             this.setOnAction {
                 attemptClose()

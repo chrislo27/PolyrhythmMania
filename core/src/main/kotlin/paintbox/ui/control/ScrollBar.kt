@@ -72,8 +72,8 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
         decreaseButton = UnitIncreaseButton(this, getArrowButtonTexReg(), this.orientation, false).apply {
             Anchor.TopLeft.configure(this)
             when (orientation) {
-                Orientation.VERTICAL -> this.bounds.height.bind { bounds.width.useF() }
-                Orientation.HORIZONTAL -> this.bounds.width.bind { bounds.height.useF() }
+                Orientation.VERTICAL -> this.bindHeightToSelfWidth()
+                Orientation.HORIZONTAL -> this.bindWidthToSelfHeight()
             }
             this.skinID.set(ScrollBar.SCROLLBAR_INC_BUTTON_SKIN_ID)
             this.disabled.bind { value.useF() <= minimum.useF() }
@@ -84,8 +84,8 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
         increaseButton = UnitIncreaseButton(this, getArrowButtonTexReg(), this.orientation, true).apply {
             Anchor.BottomRight.configure(this)
             when (orientation) {
-                Orientation.VERTICAL -> this.bounds.height.bind { bounds.width.useF() }
-                Orientation.HORIZONTAL -> this.bounds.width.bind { bounds.height.useF() }
+                Orientation.VERTICAL -> this.bindHeightToSelfWidth()
+                Orientation.HORIZONTAL -> this.bindWidthToSelfHeight()
             }
             this.skinID.set(ScrollBar.SCROLLBAR_INC_BUTTON_SKIN_ID)
             this.disabled.bind { value.useF() >= maximum.useF() }

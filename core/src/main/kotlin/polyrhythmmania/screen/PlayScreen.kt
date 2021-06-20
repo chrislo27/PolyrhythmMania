@@ -114,7 +114,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 -h + panelAnimationValue.useF() * h
             })
             this.bindHeightToParent(multiplier = 0.3333f)
-            this.bounds.width.bind { bounds.height.useF() / pauseBg.triangleSlope }
+            this.bindWidthToSelfHeight(multiplier = 1f / pauseBg.triangleSlope)
             this.padding.set(Insets(36f, 0f, 64f, 0f))
         }
         nextLayer += topPane
@@ -124,7 +124,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 h + panelAnimationValue.useF() * -h
             })
             this.bindWidthToParent(multiplier = 0.6666f)
-            this.bounds.height.bind { bounds.width.useF() * pauseBg.triangleSlope }
+            this.bindHeightToSelfWidth(multiplier = pauseBg.triangleSlope)
         }
         nextLayer += bottomPane
 
@@ -171,7 +171,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 Anchor.CentreLeft.configure(this, offsetY = 4f)
 //                this.bindHeightToParent(multiplier = 1.5f)
                 this.bounds.height.set(64f)
-                this.bounds.width.bind { bounds.height.useF() }
+                this.bindWidthToSelfHeight()
                 this.bounds.x.bind { -(bounds.width.useF() + optionsBorderSize + 2f) }
                 this.visible.bind { selectionIndex.use() == index }
             }

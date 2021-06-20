@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import com.eclipsesource.json.Json
+import com.eclipsesource.json.WriterConfig
+import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
@@ -19,16 +22,12 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.ColorStack
 import polyrhythmmania.Localization
-import polyrhythmmania.Settings
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.screen.mainmenu.EntityRowBlockDecor
 import polyrhythmmania.ui.ColourPicker
-import polyrhythmmania.world.EntityCube
-import polyrhythmmania.world.EntityPlatform
-import polyrhythmmania.world.EntitySign
-import polyrhythmmania.world.World
+import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.world.*
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer
@@ -50,13 +49,15 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     val colourPicker: ColourPicker = ColourPicker(false, font = editorPane.palette.musicDialogFont).apply { 
         this.setColor(currentMapping.getOrCompute().color.getOrCompute())
     }
+    
+    private val rodRotation: FloatVar = FloatVar(0f)
 
     init {
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.tileset.title").use() }
 
         bottomPane.addChild(Button("").apply {
             Anchor.BottomRight.configure(this)
-            this.bounds.width.bind { bounds.height.useF() }
+            this.bindWidthToSelfHeight()
             this.applyDialogStyleBottom()
             this.setOnAction {
                 attemptClose()
@@ -73,11 +74,12 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(0f, 0f, 0f, 0f))
             this.bindWidthToParent(multiplier = 0.4f)
             this.vBar.blockIncrement.set(64f)
+            this.vBar.skinID.set(PRManiaSkins.SCROLLBAR_SKIN)
         }
         contentPane.addChild(scrollPane)
 
         val listVbox = VBox().apply {
-            this.spacing.set(8f)
+            this.spacing.set(1f)
         }
 
         listVbox.temporarilyDisableLayouts {
@@ -93,7 +95,7 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.bounds.height.set(48f)
                     this.onSelected = {
                         currentMapping.set(mapping)
-                        colourPicker.setColor(mapping.color.getOrCompute())
+                        updateColourPickerToMapping(mapping)
                     }
                     if (index == 0) selectedState.set(true)
                 }
@@ -131,7 +133,7 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                                     val currentMapping = currentMapping.getOrCompute()
                                     val defaultColor = resetDefault.baseConfig.allMappingsByID.getValue(currentMapping.id).color.getOrCompute()
                                     currentMapping.color.set(defaultColor.cpy())
-                                    updateCurrentMappingToPreview(defaultColor)
+                                    applyCurrentMappingToPreview(defaultColor)
                                 }
                             }
                             v += HBox().apply {
@@ -151,6 +153,27 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                                     }
                                 }
                             }
+                            v += HBox().apply { 
+                                this.bounds.height.set(32f)
+                                this.spacing.set(8f)
+                                this += TextLabel(binding = { Localization.getVar("editor.dialog.tileset.rotateRod").use() }).apply {
+                                    this.markup.set(editorPane.palette.markup)
+                                    this.textColor.set(Color.WHITE)
+                                    this.bounds.width.set(100f)
+                                    this.renderAlign.set(Align.right)
+                                }
+                                this += Pane().apply {
+                                    this.padding.set(Insets(4f))
+                                    this += Slider().apply slider@{
+                                        this.bindWidthToParent(adjust = -100f)
+                                        this.minimum.set(0f)
+                                        this.maximum.set(1f)
+                                        this.tickUnit.set(0f)
+                                        this.setValue(0f)
+                                        rodRotation.bind { this@slider.value.useF() * 2f }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -165,7 +188,7 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         
         val bottomHbox = HBox().apply {
             this.spacing.set(8f)
-            this.bindWidthToParent(multiplier = 0.9f)
+            this.bindWidthToParent(adjustBinding = { -(bounds.height.useF() + 4f) })
         }
         bottomHbox.temporarilyDisableLayouts {
             bottomHbox += TextLabel(binding = { Localization.getVar("editor.dialog.tileset.resetLabel").use() },
@@ -211,11 +234,40 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         val m = tilesetConfig.allMappingsByID.getValue(baseMapping.id)
                         val baseColor = baseMapping.color.getOrCompute()
                         m.color.set(baseColor.cpy())
-                        if (m == currentMapping.getOrCompute()) {
-                            updateCurrentMappingToPreview(baseColor)
-                        }
                     }
                     tilesetConfig.applyTo(objPreview.worldRenderer.tileset)
+                    updateColourPickerToMapping()
+                }
+            }
+            bottomHbox += Button("").apply {
+                this.applyDialogStyleBottom()
+                this.bindWidthToSelfHeight()
+                this.padding.set(Insets(8f))
+                this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_copy")))
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.tileset.copyAll")))
+                this.setOnAction { 
+                    Gdx.app.clipboard.contents = tilesetConfig.toJson().toString(WriterConfig.MINIMAL)
+                }
+            }
+            bottomHbox += Button("").apply {
+                this.applyDialogStyleBottom()
+                this.bindWidthToSelfHeight()
+                this.padding.set(Insets(8f))
+                this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_paste")))
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.tileset.pasteAll")))
+                this.setOnAction { 
+                    val clipboard = Gdx.app.clipboard
+                    if (clipboard.hasContents()) {
+                        try {
+                            val jsonValue = Json.parse(clipboard.contents)
+                            if (jsonValue.isObject) {
+                                tilesetConfig.fromJson(jsonValue.asObject())
+                                applyCurrentMappingToPreview(currentMapping.getOrCompute().color.getOrCompute())
+                                tilesetConfig.applyTo(objPreview.worldRenderer.tileset)
+                                updateColourPickerToMapping()
+                            }
+                        } catch (ignored: Exception) {}
+                    }
                 }
             }
         }
@@ -224,14 +276,18 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     
     init {
         colourPicker.currentColor.addListener { c ->
-            updateCurrentMappingToPreview(c.getOrCompute().cpy())
+            applyCurrentMappingToPreview(c.getOrCompute().cpy())
         }
     }
     
-    private fun updateCurrentMappingToPreview(newColor: Color) {
+    private fun applyCurrentMappingToPreview(newColor: Color) {
         val m = currentMapping.getOrCompute()
         m.color.set(newColor.cpy())
         m.applyTo(objPreview.worldRenderer.tileset)
+    }
+    
+    private fun updateColourPickerToMapping(mapping: TilesetConfig.ColorMapping = currentMapping.getOrCompute()) {
+        colourPicker.setColor(mapping.color.getOrCompute())
     }
 
     override fun canCloseDialog(): Boolean {
@@ -250,8 +306,15 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             tilesetConfig.applyTo(this)
         })
         
+        val rodEntity: EntityRodDecor
+        
         init {
             this += ImageNode(editor.previewTextureRegion)
+            rodEntity = object : EntityRodDecor(world) {
+                override fun getAnimationAlpha(): Float {
+                    return (rodRotation.get() % 1f).coerceIn(0f, 1f)
+                }
+            }
         }
         
         init {
@@ -282,6 +345,9 @@ class TilesetEditDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             })
             world.addEntity(EntityCube(world).apply { 
                 this.position.set(7f, 0f, 2f)
+            })
+            world.addEntity(rodEntity.apply {
+                this.position.set(4f, 1f, 0f)
             })
 
             // Button signs

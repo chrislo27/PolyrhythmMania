@@ -1,7 +1,9 @@
 package polyrhythmmania.editor.help
 
 import com.badlogic.gdx.utils.Disposable
+import paintbox.ui.Pane
 import paintbox.ui.UIElement
+import paintbox.ui.area.Insets
 import paintbox.ui.layout.VBox
 
 
@@ -17,15 +19,18 @@ open class HelpDocument(val title: String, val layers: List<Layer>)
 abstract class DocumentRenderer : Disposable {
     
     open fun renderDocument(helpData: HelpData, doc: HelpDocument): UIElement {
-        return VBox().also { vbox ->
-            vbox.spacing.set(8f)
-            vbox.temporarilyDisableLayouts {
-                doc.layers.forEach { layer ->
-                    vbox += renderLayer(helpData, layer)
+        return Pane().apply {
+            this.margin.set(Insets(0f, 0f, 0f, 4f))
+            this += VBox().also { vbox ->
+                vbox.spacing.set(8f)
+                vbox.temporarilyDisableLayouts {
+                    doc.layers.forEach { layer ->
+                        vbox += renderLayer(helpData, layer)
+                    }
                 }
-            }
 
-            vbox.sizeHeightToChildren(10f)
+                vbox.sizeHeightToChildren(10f)
+            }
         }
     }
     

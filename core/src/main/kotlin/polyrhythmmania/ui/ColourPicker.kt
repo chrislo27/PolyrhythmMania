@@ -228,8 +228,8 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                 }
                 this += Button("").apply {
                     Anchor.CentreRight.configure(this, offsetX = { -(bounds.width.useF() + 2f) })
-                    this.bounds.width.bind { bounds.height.useF() }
-                    this.padding.set(Insets(4f))
+                    this.bindWidthToSelfHeight()
+                    this.padding.set(Insets(6f))
                     this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_copy")))
                     this.setOnAction {
                         Gdx.app.clipboard.contents = currentColor.getOrCompute().toStr()
@@ -237,8 +237,8 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                 }
                 this += Button("").apply { 
                     Anchor.CentreRight.configure(this)
-                    this.bounds.width.bind { bounds.height.useF() }
-                    this.padding.set(Insets(4f))
+                    this.bindWidthToSelfHeight()
+                    this.padding.set(Insets(6f))
                     this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_paste")))
                     this.setOnAction {
                         textField.text.set("")

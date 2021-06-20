@@ -27,6 +27,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Palette
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.pane.dialog.EditorDialog
+import polyrhythmmania.ui.PRManiaSkins
 
 
 class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable {
@@ -46,6 +47,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
             (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(0f, 0f, 0f, 0f))
             this.vBar.blockIncrement.set(64f)
+            this.vBar.skinID.set(PRManiaSkins.SCROLLBAR_SKIN)
         }
         contentPane.addChild(scrollPane)
 

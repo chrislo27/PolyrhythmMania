@@ -26,7 +26,7 @@ class PlaytestDialog(editorPane: EditorPane) : EditorDialog(editorPane, mergeTop
 
         bottomPane.addChild(Button("").apply {
             Anchor.BottomRight.configure(this)
-            this.bounds.width.bind { bounds.height.useF() }
+            this.bindWidthToSelfHeight()
             this.applyDialogStyleBottom()
             this.setOnAction {
                 attemptClose()

@@ -257,7 +257,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         init {
             left = Button("").apply { 
                 Anchor.TopLeft.configure(this)
-                this.bounds.width.bind { bounds.height.useF() }
+                this.bindWidthToSelfHeight()
                 this.skinID.set(BUTTON_LONG_SKIN_ID)
                 addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply { 
                     this.rotation.set(90f)
@@ -272,7 +272,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
             right = Button("").apply { 
                 Anchor.TopRight.configure(this)
-                this.bounds.width.bind { bounds.height.useF() }
+                this.bindWidthToSelfHeight()
                 this.skinID.set(BUTTON_LONG_SKIN_ID)
                 addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply {
                     this.rotation.set(270f)
