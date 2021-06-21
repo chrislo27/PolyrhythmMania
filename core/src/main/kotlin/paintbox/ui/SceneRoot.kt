@@ -228,9 +228,9 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
     /**
      * Shows the [contextMenu] as the root menu. This will hide the existing context menu if any.
      */
-    fun showRootContextMenu(contextMenu: ContextMenu) {
+    fun showRootContextMenu(contextMenu: ContextMenu, suggestOffsetX: Float = 0f, suggestOffsetY: Float = 0f) {
         hideRootContextMenu()
-        addContextMenuToScene(contextMenu)
+        addContextMenuToScene(contextMenu, suggestOffsetX, suggestOffsetY)
         rootContextMenu = contextMenu
         contextMenuLayer.resetHoveredElementPath()
 //        Gdx.app.postRunnable {
@@ -292,7 +292,7 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
      * This does NOT connect the parent-child
      * relationship. One should call [ContextMenu.addChildMenu] for that.
      */
-    fun addContextMenuToScene(contextMenu: ContextMenu) {
+    fun addContextMenuToScene(contextMenu: ContextMenu, suggestOffsetX: Float = 0f, suggestOffsetY: Float = 0f) {
         // Add to the contextMenu layer scene
         // Compute the width/height layouts
         // Position the context menu according to its parent (if any)
@@ -305,8 +305,8 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
             // Temporary impl: assumes they are only root context menus and positions it at the mouse
             val w = contextMenu.bounds.width.get()
             val h = contextMenu.bounds.height.get()
-            var x = mousePosition.x.get()
-            var y = mousePosition.y.get()
+            var x = mousePosition.x.get() + suggestOffsetX
+            var y = mousePosition.y.get() + suggestOffsetY
 
             val thisWidth = this.bounds.width.get()
             val thisHeight = this.bounds.height.get()
