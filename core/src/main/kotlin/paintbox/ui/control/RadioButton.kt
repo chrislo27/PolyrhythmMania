@@ -44,6 +44,7 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
 
     var onSelected: () -> Unit = DEFAULT_ACTION
+    var onUnselected: () -> Unit = DEFAULT_ACTION
 
     init {
         val height: ReadOnlyFloatVar = FloatVar {
@@ -76,6 +77,8 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
         checkedState.addListener {
             if (it.getOrCompute()) {
                 onSelected.invoke()
+            } else {
+                onUnselected.invoke()
             }
         }
     }

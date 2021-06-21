@@ -23,6 +23,9 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
     
     companion object {
         const val CHECKBOX_SKIN_ID: String = "CheckBox"
+
+        private val DEFAULT_ACTION: () -> Unit = { }
+        private val DEFAULT_CHECK_ACTION: (Boolean) -> Unit = { }
         
         init {
             DefaultSkins.register(CHECKBOX_SKIN_ID, SkinFactory { element: CheckBox ->
@@ -47,6 +50,10 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
     val boxAlignment: Var<BoxAlign> = Var(BoxAlign.LEFT)
     override val selectedState: Var<Boolean> = checkedState
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
+
+    var onSelected: () -> Unit = DEFAULT_ACTION
+    var onUnselected: () -> Unit = DEFAULT_ACTION
+    var onCheckChanged: (newState: Boolean) -> Unit = DEFAULT_CHECK_ACTION
     
     init {
         val height: ReadOnlyFloatVar = FloatVar {
@@ -76,6 +83,15 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
     init {
         setOnAction { 
             checkedState.invert()
+        }
+        checkedState.addListener {
+            if (it.getOrCompute()) {
+                onSelected.invoke()
+                onCheckChanged.invoke(true)
+            } else {
+                onUnselected.invoke()
+                onCheckChanged.invoke(false)
+            }
         }
     }
 
