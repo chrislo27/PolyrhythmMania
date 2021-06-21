@@ -27,7 +27,7 @@ class BlockTilesetChange(engine: Engine)
     var duration: Float = 0.5f
 
     init {
-        this.width = 1f
+        this.width = 0.5f
         val text = Localization.getVar("block.tilesetChange.name")
         this.defaultText.bind { text.use() }
     }
