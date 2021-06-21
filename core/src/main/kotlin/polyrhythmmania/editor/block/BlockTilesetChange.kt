@@ -102,10 +102,15 @@ class BlockTilesetChange(engine: Engine)
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
         obj.add("tileset", tilesetConfig.toJson())
+        obj.add("duration", duration)
     }
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
         tilesetConfig.fromJson(obj.get("tileset").asObject())
+        val durationVal = obj.get("duration")
+        if (durationVal != null && durationVal.isNumber) {
+            duration = durationVal.asFloat().coerceAtLeast(0f)
+        }
     }
 }
