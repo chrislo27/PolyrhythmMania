@@ -14,7 +14,7 @@ import java.util.*
 
 class BlockRetractPistons(engine: Engine) : Block(engine, EnumSet.of(BlockType.INPUT)) {
 
-    val rowData: RowBlockData = RowBlockData()
+    val rowData: RowBlockData = RowBlockData(RowSetting.BOTH)
     
     init {
         this.width = 1f

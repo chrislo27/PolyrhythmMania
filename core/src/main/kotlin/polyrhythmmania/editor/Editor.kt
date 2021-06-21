@@ -594,6 +594,8 @@ class Editor(val main: PRManiaGame)
             engine.musicData.update()
             val engineBeatFloor = floor(engine.beat)
             lastMetronomeBeat = if (engineBeatFloor == engine.beat) (engineBeatFloor.toInt() - 1) else engineBeatFloor.toInt()
+            cameraOffset.changeTarget(0f)
+            cameraOffset.reset()
         } else if (newState == PlayState.STOPPED) {
             resetWorld()
             timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.get())

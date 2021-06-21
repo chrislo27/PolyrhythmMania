@@ -95,6 +95,7 @@ class BlockTilesetChange(engine: Engine)
         return BlockTilesetChange(engine).also {
             this.copyBaseInfoTo(it)
             it.tilesetConfig = this.tilesetConfig.copy()
+            it.duration = this.duration
         }
     }
 

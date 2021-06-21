@@ -165,7 +165,7 @@ class SoundSystem(private val mixer: Mixer,
                             this.seconds += secondsDiff
                             
                             if (abs(this.seconds - timingBead.seconds) >= forceSyncThreshold) {
-//                                Paintbox.LOGGER.debug("AdaptiveTimingProvider Force sync: this was ${this.seconds} and TimingBead was ${timingBead.seconds} (delta ${abs(this.seconds - timingBead.seconds)}, force sync threshold ${forceSyncThreshold})")
+                                Paintbox.LOGGER.debug("AdaptiveTimingProvider Force sync: this was ${this.seconds} and TimingBead was ${timingBead.seconds} (delta ${abs(this.seconds - timingBead.seconds)}, force sync threshold ${forceSyncThreshold})")
                                 // Force sync with timing bead if off by too much
                                 this.seconds = timingBead.seconds
                             }

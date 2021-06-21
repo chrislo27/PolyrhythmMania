@@ -19,6 +19,12 @@ class CameraOffset {
         time = 0f
     }
     
+    fun reset() {
+        current = target
+        time = 0f
+        lastPrevious = target
+    }
+    
     fun update(delta: Float) {
         time += delta * speed
         time = time.coerceIn(0f, 1f)

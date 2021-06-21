@@ -78,4 +78,8 @@ class CheckBoxMenuItem(val checkState: Var<Boolean>, val textBlock: TextBlock) :
             return CheckBoxMenuItem(checkState, markup.parse(text))
         }
     }
+    
+    init {
+        this.closeMenuAfterAction = false
+    }
 }

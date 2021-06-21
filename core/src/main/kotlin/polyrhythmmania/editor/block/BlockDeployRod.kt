@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.block
 
 import com.eclipsesource.json.JsonObject
-import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
@@ -18,10 +17,7 @@ class BlockDeployRod(engine: Engine) : Block(engine, EnumSet.of(BlockType.INPUT)
 
     init {
         this.width = 1f
-        val text = Localization.getVar("block.deployRod.name", Var.bind { 
-//            rowData.getSymbolAsListArg(this)
-            listOf("")
-        })
+        val text = Localization.getVar("block.deployRod.name")
         this.defaultText.bind { text.use() }
         this.defaultTextSecondLine.bind { "[font=rodin]${rowData.rowSetting.use().stringRepresentation}[]" }
         this.secondLineTextAlign = TextAlign.RIGHT

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
+import paintbox.binding.invert
 import paintbox.font.TextAlign
 import paintbox.ui.*
 import paintbox.ui.area.Insets
@@ -192,6 +193,7 @@ open class ContextMenu : Control<ContextMenu>() {
                                 item.checkState.set(l.getOrCompute())
                             }
                             this.setOnAction {
+                                this.checkedState.invert()
                                 item.onAction.invoke()
                                 if (item.closeMenuAfterAction) {
                                     Gdx.app.postRunnable {

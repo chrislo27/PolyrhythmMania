@@ -3,7 +3,10 @@ package polyrhythmmania.editor.block
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonArray
 import com.eclipsesource.json.JsonObject
+import paintbox.binding.Var
+import paintbox.ui.contextmenu.CheckBoxMenuItem
 import paintbox.ui.contextmenu.ContextMenu
+import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
@@ -31,6 +34,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
         patternData.rowATypes[9] = CubeType.PLATFORM
     }
         private set
+    val disableTailEnd: Var<Boolean> = Var(false)
 
     init {
         this.width = 4f
@@ -106,7 +110,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
                         beat + b)
             }
 
-            if (ind == timings.size - 1 && anyNotNone) {
+            if (ind == timings.size - 1 && anyNotNone && !disableTailEnd.getOrCompute()) {
                 when (cube) {
                     CubeType.NONE -> {
                         val next = ind + 1
@@ -139,6 +143,10 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
     override fun createContextMenu(editor: Editor): ContextMenu {
         return ContextMenu().also { ctxmenu ->
             patternData.createMenuItems(editor).forEach { ctxmenu.addMenuItem(it) }
+            ctxmenu.addMenuItem(SeparatorMenuItem())
+            ctxmenu.addMenuItem(CheckBoxMenuItem.create(disableTailEnd,
+                    Localization.getValue("blockContextMenu.spawnPattern.deployTailEnd"),
+                    editor.editorPane.palette.markup))
         }
     }
 
@@ -149,6 +157,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }
+            it.disableTailEnd.set(this.disableTailEnd.getOrCompute())
         }
     }
 
@@ -168,6 +177,9 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
                 }
             })
         })
+        if (disableTailEnd.getOrCompute()) {
+            obj.add("disableTailEnd", true)
+        }
     }
 
     override fun readFromJson(obj: JsonObject) {
@@ -199,6 +211,10 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
 
                 this.patternData = newPatData
             }
+        }
+        val disableTailEndValue = obj.get("disableTailEnd")
+        if (disableTailEndValue != null && disableTailEndValue.isBoolean) {
+            disableTailEnd.set(disableTailEndValue.asBoolean())
         }
     }
 }
