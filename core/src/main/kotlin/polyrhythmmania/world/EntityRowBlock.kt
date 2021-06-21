@@ -74,6 +74,7 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
             Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_d"))
         }
 
+        // For auto-inputs only. For regular inputs, see EngineInputter
         if (this.type != Type.PLATFORM && engine.autoInputs) {
             // Bounce any rods that are on this index
             world.entities.forEach { entity ->
