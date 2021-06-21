@@ -1,7 +1,9 @@
 package polyrhythmmania.world
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
+import paintbox.util.ColorStack
 import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.render.Tileset
@@ -129,5 +131,46 @@ class EntitySign(world: World, val type: Type) : SpriteEntity(world) {
             Type.TA -> if (index == 0) tileset.signTaShadow else tileset.signTa
             Type.N -> if (index == 0) tileset.signNShadow else tileset.signN
         }
+    }
+}
+
+class EntityInputFeedback(world: World, val end: End, color: Color, val flashIndex: Int)
+    : SimpleRenderedEntity(world) {
+    
+    companion object {
+        val ACE_COLOUR: Color = Color.valueOf("FFF800")
+        val GOOD_COLOUR: Color = Color.valueOf("6DE23B")
+        val BARELY_COLOUR: Color = Color.valueOf("FF7C26")
+        val MISS_COLOUR: Color = Color.valueOf("E82727")
+    }
+    
+    enum class End {
+        LEFT, MIDDLE, RIGHT;
+    }
+    
+    private val originalColor: Color = color.cpy()
+    private val color: Color = color.cpy()
+
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+        super.renderSimple(renderer, batch, tileset, engine, vec)
+
+        val currentSec = engine.seconds
+        val flashSec = engine.inputter.inputFeedbackFlashes[flashIndex]
+        val flashTime = 0.25f
+        if (currentSec - flashSec < flashTime) {
+            val percentage = ((currentSec - flashSec) / flashTime).coerceIn(0f, 1f)
+            color.set(originalColor).lerp(Color.WHITE, 1f - percentage)
+        }
+        
+        val tintedRegion = when (end) {
+            End.LEFT -> tileset.inputFeedbackStart
+            End.MIDDLE -> tileset.inputFeedbackMiddle
+            End.RIGHT -> tileset.inputFeedbackEnd
+        }
+        val tmpColor = ColorStack.getAndPush().set(tintedRegion.color.getOrCompute())
+        tmpColor.mul(this.color)
+        batch.color = tmpColor
+        batch.draw(tintedRegion.region, vec.x, vec.y, renderWidth, renderHeight)
+        ColorStack.pop()
     }
 }

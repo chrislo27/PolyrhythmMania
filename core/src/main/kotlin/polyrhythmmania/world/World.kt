@@ -1,5 +1,6 @@
 package polyrhythmmania.world
 
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.render.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer
@@ -139,8 +140,27 @@ class World {
             sign.position.z += (8 / 32f)
             addEntity(sign)
         }
-        
 
+
+        val settings = PRManiaGame.instance.settings
+        if (settings.showInputFeedbackBar.getOrCompute()) {
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.BARELY_COLOUR, 0).apply {
+                this.position.set(7f, 1f, 3f)
+            })
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, 1).apply {
+                this.position.set(8f, 1f, 3f)
+            })
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.ACE_COLOUR, 2).apply {
+                this.position.set(9f, 1f, 3f)
+            })
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, 3).apply {
+                this.position.set(10f, 1f, 3f)
+            })
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.RIGHT, EntityInputFeedback.BARELY_COLOUR, 4).apply {
+                this.position.set(11f, 1f, 3f)
+            })
+        }
+        
     }
 
 }

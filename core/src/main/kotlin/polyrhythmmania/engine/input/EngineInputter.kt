@@ -36,9 +36,12 @@ class EngineInputter(val engine: Engine) {
         private set
     val inputResults: List<InputResult> = mutableListOf()
     
+    val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
+    
     fun clearInputs() {
         totalExpectedInputs = 0
         (inputResults as MutableList).clear()
+        inputFeedbackFlashes.fill(-10000f)
     }
 
     fun onInput(type: InputType, atSeconds: Float) {
@@ -90,6 +93,17 @@ class EngineInputter(val engine: Engine) {
                 val inputResult = InputResult(type, accuracyPercent, differenceSec)
                 Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                 inputTracker.results += inputResult
+                
+                val index: Int = when (inputResult.inputScore) {
+                    InputScore.ACE -> 2
+                    InputScore.GOOD -> if (inputResult.accuracySec < 0f) 1 else 3
+                    InputScore.BARELY -> if (inputResult.accuracySec < 0f) 0 else 4
+                    InputScore.MISS -> -1
+                }
+                if (index in inputFeedbackFlashes.indices) {
+                    inputFeedbackFlashes[index] = atSeconds
+                }
+                
                 // Bounce the rod
                 rod.bounce(nextBlockIndex)
             }

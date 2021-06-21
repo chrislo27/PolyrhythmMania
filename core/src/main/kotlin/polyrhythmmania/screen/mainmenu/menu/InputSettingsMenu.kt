@@ -22,6 +22,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     val pendingKeyboardBinding: Var<PendingKeyboardBinding?> = mainMenu.pendingKeyboardBinding
     val keyboardSettings: KeyboardInputMenu = this.KeyboardInputMenu(menuCol)
+    val feedbackSettings: InputFeedbackMenu = this.InputFeedbackMenu(menuCol)
 
     init {
         this.setSize(MMMenu.WIDTH_EXTRA_SMALL)
@@ -47,6 +48,11 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.calibration").use() }.apply {
                 this.disabled.set(true)
             }
+            vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.feedback").use() }.apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(feedbackSettings)
+                }
+            }
             vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.keyboard").use() }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(keyboardSettings)
@@ -67,6 +73,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         menuCol.addMenu(keyboardSettings)
+        menuCol.addMenu(feedbackSettings)
     }
 
     fun interface PendingKeyboardBinding {
@@ -204,6 +211,64 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 this.content.addChild(pane)
                 Anchor.Centre.configure(pane)
+            }
+        }
+    }
+
+    inner class InputFeedbackMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+        
+        init {
+            this.setSize(MMMenu.WIDTH_MID)
+            this.titleText.bind { Localization.getVar("mainMenu.inputSettings.feedback").use() }
+            this.contentPane.bounds.height.set(300f)
+
+            val scrollPane = ScrollPane().apply {
+                Anchor.TopLeft.configure(this)
+                this.bindHeightToParent(-40f)
+
+                (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+
+                this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+                this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+
+                val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+                this.vBar.skinID.set(scrollBarSkinID)
+                this.hBar.skinID.set(scrollBarSkinID)
+            }
+            val hbox = HBox().apply {
+                Anchor.BottomLeft.configure(this)
+                this.spacing.set(8f)
+                this.padding.set(Insets(2f))
+                this.bounds.height.set(40f)
+            }
+            contentPane.addChild(scrollPane)
+            contentPane.addChild(hbox)
+
+            val vbox = VBox().apply {
+                Anchor.TopLeft.configure(this)
+                this.bounds.height.set(300f)
+                this.spacing.set(0f)
+            }
+
+            vbox.temporarilyDisableLayouts {
+                val (feedbackPane, feedbackCheck) = createCheckboxOption({ Localization.getVar("mainMenu.inputSettings.feedback.bar").use() }, percentageContent = 0.25f)
+                feedbackCheck.checkedState.set(settings.showInputFeedbackBar.getOrCompute())
+                feedbackCheck.onCheckChanged = { newState ->
+                    settings.showInputFeedbackBar.set(newState)
+                }
+                vbox += feedbackPane
+            }
+            vbox.sizeHeightToChildren(100f)
+            scrollPane.setContent(vbox)
+
+            hbox.temporarilyDisableLayouts {
+                hbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
+                    this.bounds.width.set(100f)
+                    this.setOnAction {
+                        menuCol.popLastMenu()
+                    }
+                    this.disabled.bind { pendingKeyboardBinding.use() != null }
+                }
             }
         }
     }

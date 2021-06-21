@@ -115,6 +115,10 @@ class Tileset(val packedSheet: PackedSheet) {
         }
     }
     
+    val inputFeedbackStart: TintedRegion = packedSheet.getIndexedRegions("input_feedback").getValue(0).toTinted()
+    val inputFeedbackMiddle: TintedRegion = packedSheet.getIndexedRegions("input_feedback").getValue(1).toTinted()
+    val inputFeedbackEnd: TintedRegion = packedSheet.getIndexedRegions("input_feedback").getValue(2).toTinted()
+    
 }
 
 class TintedRegion(val region: TextureRegion, initColor: Color = Color.WHITE) {

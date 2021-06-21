@@ -13,6 +13,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
+import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
@@ -29,6 +30,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_menuSfxVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, Var(50))
     private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, Var(PRMania.DEFAULT_SIZE))
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, Var(false))
+    private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, Var(true))
 
     private val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, Var(false))
     private val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, Var(true))
@@ -42,6 +44,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val menuSfxVolume: Var<Int> = kv_menuSfxVolume.value
     val windowedResolution: Var<WindowSize> = kv_windowedResolution.value
     val fullscreen: Var<Boolean> = kv_fullscreen.value
+    val showInputFeedbackBar: Var<Boolean> = kv_showInputFeedbackBar.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
@@ -58,6 +61,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getIntCoerceIn(kv_menuSfxVolume, 0, 100)
         prefs.getWindowSize(kv_windowedResolution)
         prefs.getBoolean(kv_fullscreen)
+        prefs.getBoolean(kv_showInputFeedbackBar)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
@@ -75,6 +79,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_menuSfxVolume)
                 .putWindowSize(kv_windowedResolution)
                 .putBoolean(kv_fullscreen)
+                .putBoolean(kv_showInputFeedbackBar)
                 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)
