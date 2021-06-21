@@ -933,6 +933,7 @@ class Editor(val main: PRManiaGame)
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         val currentClick: Click = click.getOrCompute()
         var inputConsumed = false
+        this.suggestPanCameraDir = 0
         if (this.playState.getOrCompute() == PlayState.STOPPED) {
             when (currentClick) {
                 is Click.DragSelection -> {
@@ -1111,6 +1112,7 @@ autosave: ${DecimalFormats.format("0.0", timeUntilAutosave)}
 path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
 cameraOffsetCurrent: ${cameraOffset.current}
 cameraOffsetTarget: ${cameraOffset.target}
+suggest: $suggestPanCameraDir
 """
         //path: ${sceneRoot.dialogLayer.lastHoveredElementPath.map { "${it::class.java.simpleName} [${it.bounds.x.getOrCompute()}, ${it.bounds.y.getOrCompute()}, ${it.bounds.width.getOrCompute()}, ${it.bounds.height.getOrCompute()}]" }}
     }
