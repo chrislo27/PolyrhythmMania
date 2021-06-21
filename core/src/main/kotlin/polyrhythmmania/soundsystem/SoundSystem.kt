@@ -151,7 +151,7 @@ class SoundSystem(private val mixer: Mixer,
             realtimeThread = thread(start = true, isDaemon = true, name = "AdaptiveTimingProvider", priority = Thread.MAX_PRIORITY) {
                 try {
                     val pollRateHz = 1.0 / (512.0 / 44100.0)//100
-                    val forceSyncThreshold = 0.040f
+                    val forceSyncThreshold = 0.030f
                     val sync = Sync()
 
                     var nano = System.nanoTime()

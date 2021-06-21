@@ -61,7 +61,6 @@ class SimpleTimingProvider(private val exceptionHandler: (Throwable) -> Boolean)
     override val listeners: MutableList<TimingListener> = CopyOnWriteArrayList()
 
     override fun exceptionHandler(throwable: Throwable): Boolean {
-        throw throwable
-//        return false
+        return exceptionHandler.invoke(throwable)
     }
 }

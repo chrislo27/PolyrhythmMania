@@ -215,30 +215,6 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         engine.endSignalReceived.addListener(endSignalListener)
     }
 
-    fun startGame() {
-        timing.seconds = -1f
-        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
-        if (player != null) {
-            engine.musicData.setMusicPlayerPositionToCurrentSec()
-            player.pause(false)
-        }
-        engine.autoInputs = false
-        engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
-        engine.inputter.clearInputs()
-        engine.resetEndSignal()
-
-        engine.endSignalReceived.addListener { endSignal ->
-            if (endSignal.getOrCompute()) {
-                Gdx.app.postRunnable {
-                    isFinished = true
-                }
-            }
-        }
-
-        soundSystem.startRealtime()
-        unpauseGame(false)
-    }
-
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -350,6 +326,23 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         }
     }
 
+    fun prepareGameStart() {
+        timing.seconds = -1f
+        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
+        if (player != null) {
+            val musicSample = player.musicSample
+            musicSample.moveStartBuffer(0)
+            engine.musicData.setMusicPlayerPositionToCurrentSec()
+            player.pause(false)
+        }
+        engine.autoInputs = false
+        engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
+        engine.inputter.clearInputs()
+        engine.resetEndSignal()
+
+        soundSystem.startRealtime()
+    }
+
     private fun pauseGame(playSound: Boolean) {
         isPaused = true
         soundSystem.setPaused(true)
@@ -402,7 +395,8 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             if (playSound) {
                 playMenuSound("sfx_menu_enter_game")
             }
-            startGame()
+            prepareGameStart()
+            unpauseGame(playSound)
         }
     }
 
@@ -503,7 +497,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
 
     override fun show() {
         super.show()
-        startGame()
+        unpauseGame(false)
         Gdx.input.isCursorCatched = true
     }
 
