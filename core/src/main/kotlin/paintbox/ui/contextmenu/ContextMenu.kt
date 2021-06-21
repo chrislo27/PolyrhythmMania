@@ -60,14 +60,14 @@ open class ContextMenu : Control<ContextMenu>() {
     var onAddedToScene: (SceneRoot) -> Unit = {}
     var onRemovedFromScene: (SceneRoot) -> Unit = {}
 
-    protected val backgroundRect: RectElement
+    val backgroundRect: RectElement
     
     init {
         this.border.set(Insets(1f))
         this.borderStyle.set(SolidBorder(Color.BLACK))
         this.bounds.width.set(defaultWidth.get())
         this.bounds.height.set(defaultWidth.get())
-        backgroundRect = RectElement(Color().grey(1f, 0.8f))
+        backgroundRect = RectElement(Color().grey(1f, 0.95f))
         addChild(backgroundRect)
 
         this.addInputEventListener { event ->
