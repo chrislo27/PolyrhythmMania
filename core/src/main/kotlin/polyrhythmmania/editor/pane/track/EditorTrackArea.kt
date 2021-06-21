@@ -95,7 +95,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                                         }
                                     }
                                 } else {
-                                    if (!control && !shift && !alt) {
+                                    if (!control && !alt) {
                                         editor.click.set(Click.CreateSelection(editor, mouseBeat, mouseTrack, editor.selectedBlocks.keys.toSet()))
                                     }
                                 }
