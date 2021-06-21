@@ -28,6 +28,7 @@ import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.PRManiaGame
 import java.util.*
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 
 open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame.gameInstance.debugFont, scale: Float = 1f)
@@ -339,6 +340,9 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
 
                         true
                     } else false
+                } else if (event is Scrolled) {
+                    value.set((value.getOrCompute() - event.amountY.sign.toInt()).coerceIn(minValue, maxValue))
+                    true
                 } else false
             }
         }
