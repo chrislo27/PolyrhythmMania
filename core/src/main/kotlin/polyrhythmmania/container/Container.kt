@@ -31,7 +31,6 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.Tileset
-import polyrhythmmania.world.render.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
 import java.util.*
@@ -242,7 +241,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             })
         })
         jsonObj.add("blocks", Json.array().also { blocksArray ->
-            val instantiators = Instantiators.list
+            val instantiators = Instantiators.instantiatorList
             val classMapping: Map<Class<*>, Instantiator<*>> = instantiators.associateBy { it.blockClass }
             for (block in blocks.toList()) {
                 val o = Json.`object`()
@@ -356,7 +355,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         }
 
         val blocksObj = json.get("blocks").asArray()
-        val instantiators = Instantiators.map
+        val instantiators = Instantiators.instantiatorMap
         val blocks: MutableList<Block> = mutableListOf()
         for (value in blocksObj) {
             val obj = value.asObject()

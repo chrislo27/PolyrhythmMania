@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
@@ -20,9 +21,7 @@ import paintbox.ui.element.RectElement
 import paintbox.util.gdxutils.drawCompressed
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.block.Block
-import polyrhythmmania.editor.block.Instantiator
-import polyrhythmmania.editor.block.Instantiators
+import polyrhythmmania.editor.block.*
 import kotlin.math.*
 
 
@@ -31,7 +30,7 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
     val editorPane: EditorPane = upperPane.editorPane
     val editor: Editor = upperPane.editor
 
-    val list: InstantiatorList
+    val instantiatorList: InstantiatorList
 
     init {
         val middleDivider = RectElement(binding = { editorPane.palette.instantiatorPaneBorder.use() }).apply {
@@ -61,8 +60,8 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
         this += descPane
         descPane += this.InstantiatorDesc()
 
-        list = InstantiatorList(this)
-        scrollSelector += list
+        instantiatorList = InstantiatorList(this, Instantiators.categoryList, Instantiators.categoryMap)
+        scrollSelector += instantiatorList
     }
 
 
@@ -72,14 +71,14 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
 
         init {
             val summaryHeight = 64f
-            summary = TextLabel(binding = { list.currentInstantiator.use().summary.use() }, font = editorPane.palette.instantiatorSummaryFont).apply { 
+            summary = TextLabel(binding = { instantiatorList.currentItem.use().summary.use() }, font = editorPane.palette.instantiatorSummaryFont).apply { 
                 this.bounds.height.set(summaryHeight)
                 this.textColor.bind { editorPane.palette.instantiatorSummaryText.use() }
                 this.textAlign.set(TextAlign.LEFT)
                 this.renderAlign.set(Align.left)
                 this.markup.set(editorPane.palette.markupInstantiatorSummary)
             }
-            desc = TextLabel(binding = { list.currentInstantiator.use().desc.use() }/*, font = editorPane.palette.instantiatorDescFont*/).apply {
+            desc = TextLabel(binding = { instantiatorList.currentItem.use().desc.use() }/*, font = editorPane.palette.instantiatorDescFont*/).apply {
                 this.bounds.y.set(summaryHeight)
                 this.bindHeightToParent(adjust = -summaryHeight)
                 this.textColor.bind { editorPane.palette.instantiatorDescText.use() }
@@ -95,21 +94,40 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
     }
 }
 
-class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
+class InstantiatorList(val instantiatorPane: InstantiatorPane,
+                       val categories: List<ListCategory>,
+                       val perCategory: Map<String, List<Instantiator<*>>>
+                       )
+    : Pane() {
+    
+    data class IndexTween(val index: Var<Int> = Var(0), val tween: FloatVar = FloatVar(0f)) {
+        fun instantUpdateTween() {
+            tween.set(index.getOrCompute().toFloat())
+        }
+    }
 
-    val upperPane: UpperPane = instantiatorPane.upperPane
+    val upperPane: UpperPane get() = instantiatorPane.upperPane
     val editorPane: EditorPane = instantiatorPane.editorPane
     val editor: Editor = instantiatorPane.editor
 
-    private val list: List<Instantiator<*>> = Instantiators.list
     val buttonPane: Pane
     val listPane: Pane
     val listView: ListView
-
-    private var index: Var<Int> = Var(0)
-
-    val currentInstantiator: ReadOnlyVar<Instantiator<*>> = Var.bind {
-        list[index.use()]
+    
+    val inCategories: Var<Boolean> = Var(true)
+    
+    val currentList: Var<List<ObjectListable>> = Var(categories)
+    val categoryIndex: IndexTween = IndexTween()
+    val perCategoryIndex: Map<String, IndexTween> = perCategory.keys.associateWith { IndexTween() }
+    val currentIndex: ReadOnlyVar<IndexTween> = Var {
+        if (inCategories.use()) categoryIndex else perCategoryIndex.getValue(categories[categoryIndex.index.use()].categoryID)
+    }
+    
+    val currentItem: ReadOnlyVar<ObjectListable> = Var {
+        currentList.use()[currentIndex.use().index.use()]
+    }
+    val currentCategory: ReadOnlyVar<ListCategory> = Var {
+        categories[categoryIndex.index.use()]
     }
 
     init {
@@ -133,7 +151,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
                 scroll(-1)
             }
             this.disabled.bind {
-                index.use() <= 0
+                currentIndex.use().index.use() <= 0
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.up.tooltip")))
         }
@@ -151,16 +169,42 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
                 scroll(+1)
             }
             this.disabled.bind {
-                index.use() >= list.size - 1
+                currentIndex.use().index.use() >= (currentList.use().size - 1)
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.down.tooltip")))
         }
-        buttonPane += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"])).apply {
-            this.padding.set(Insets.ZERO)
+        buttonPane += Button("").apply {
             Anchor.CentreLeft.configure(this)
+            this.padding.set(Insets.ZERO)
             this.bounds.width.set(buttonWidth)
             this.bounds.height.set(buttonWidth)
-            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.current.tooltip")))
+            this.skinID.set(EditorSkins.BUTTON_NO_SKIN)
+            val tooltipCurrentBlock = Localization.getVar("editor.instantiators.currentBlock.tooltip")
+            val tooltipCurrentCat = Localization.getVar("editor.instantiators.currentCategory.tooltip")
+            this.tooltipElement.set(editorPane.createDefaultTooltip(binding = {
+                if (inCategories.use()) tooltipCurrentCat.use() else tooltipCurrentBlock.use()
+            }))
+            this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"]))
+            this.setOnAction {
+                if (inCategories.getOrCompute()) {
+                    changeToSpecific()
+                }
+            }
+        }
+        buttonPane += Button("").apply {
+            Anchor.CentreLeft.configure(this, offsetY = -buttonWidth)
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(buttonWidth)
+            this.bounds.height.set(buttonWidth)
+            this.skinID.set(EditorSkins.BUTTON_NO_SKIN)
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.back.tooltip")))
+            this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"]).apply { 
+                flip(true, false)
+            })
+            this.visible.bind { !inCategories.use() }
+            this.setOnAction {
+                changeToCategories()
+            }
         }
 
         listPane = Pane().apply {
@@ -176,9 +220,19 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
         listView.addInputEventListener { event ->
             when (event) {
                 is ClickPressed -> {
+                    val item = currentItem.getOrCompute()
                     if (event.button == Input.Buttons.LEFT) {
-                        @Suppress("UNCHECKED_CAST")
-                        editor.attemptInstantiatorDrag(this.currentInstantiator.getOrCompute() as Instantiator<Block>)
+                        if (inCategories.getOrCompute()) {
+                            changeToSpecific()
+                        } else {
+                            @Suppress("UNCHECKED_CAST")
+                            editor.attemptInstantiatorDrag(item as Instantiator<Block>)
+                        }
+                        true
+                    } else if (event.button == Input.Buttons.RIGHT) {
+                        if (!inCategories.getOrCompute()) {
+                            changeToCategories()
+                        }
                         true
                     } else false
                 }
@@ -195,30 +249,56 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             }
         }
     }
+    
+    private fun changeToCategories() {
+        currentList.set(categories)
+        inCategories.set(true)
+    }
+    
+    private fun changeToSpecific(category: ListCategory = categories[categoryIndex.index.getOrCompute()]) {
+        currentList.set(perCategory.getValue(category.categoryID))
+        inCategories.set(false)
+    }
+    
+    fun selectCertainInstantiator(inst: Instantiator<*>) {
+        val cat = Instantiators.instantiatorCategories[inst] ?: return
+        changeToCategories()
+        val catIndex = categories.indexOfFirst { it.categoryID == cat }
+        if (catIndex in categories.indices) {
+            categoryIndex.index.set(catIndex)
+            categoryIndex.instantUpdateTween()
+            changeToSpecific()
+            val currentInCatIndex = currentIndex.getOrCompute()
+            currentInCatIndex.index.set(currentList.getOrCompute().indexOf(inst).coerceAtLeast(0))
+//            currentInCatIndex.instantUpdateTween()
+        }
+    }
 
     fun scroll(down: Int) {
         if (down == 0) return
-        val future = (index.getOrCompute() + down).coerceIn(list.indices)
-        index.set(future)
+        val current = currentList.getOrCompute()
+        val index = currentIndex.getOrCompute()
+        val future = (index.index.getOrCompute() + down).coerceIn(current.indices)
+        index.index.set(future)
     }
 
     inner class ListView : Pane() {
-        private val instantiatorList: InstantiatorList = this@InstantiatorList
-
-        private var indexTween: Float = instantiatorList.index.getOrCompute().toFloat()
 
         init {
             this.doClipping.set(true)
         }
 
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-            val currentIndex = instantiatorList.index.getOrCompute()
+            val currentIndexTween = currentIndex.getOrCompute()
+            val currentIndex = currentIndexTween.index.getOrCompute()
+            var indexTween = currentIndexTween.tween.get()
             val indexAsFloat = currentIndex.toFloat()
             if (indexTween != indexAsFloat) {
                 indexTween = MathUtils.lerp(indexTween, indexAsFloat, (Gdx.graphics.deltaTime / 0.075f).coerceIn(0f, 1f))
                 if (MathUtils.isEqual(indexTween, indexAsFloat, 0.005f)) {
                     indexTween = indexAsFloat
                 }
+                currentIndexTween.tween.set(indexTween)
             }
 
             val renderBounds = this.contentZone
@@ -230,14 +310,14 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane) : Pane() {
             val opacity = apparentOpacity.get()
 
             val paintboxFont = editorPane.palette.instantiatorNameFont
-            val instantiators = instantiatorList.list
+            val objs = currentList.getOrCompute()
 
             paintboxFont.useFont { font ->
                 val currentTween = indexTween
                 val capHeight = font.capHeight
                 val lineHeight = font.lineHeight * 1.5f
                 val yOffset = -(h * 0.5f) + capHeight * 0.5f + (currentTween * lineHeight)
-                instantiators.forEachIndexed { index, instantiator ->
+                objs.forEachIndexed { index, instantiator ->
                     val offsetAmount = abs((currentTween - index)).coerceAtLeast(0f)
                     val xOffset = ((1.6f).pow(offsetAmount) - 1) * 15f
                     val specificOpacity = (1f - offsetAmount / 5f).coerceAtLeast(0.3f) * opacity

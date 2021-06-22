@@ -32,7 +32,7 @@ class MusicData(val engine: Engine) {
                 val currentPosition = player.position
                 if (!MathUtils.isEqual(correctPosition.toFloat(), currentPosition.toFloat(), 50f /* ms */)) {
                     player.position = correctPosition
-                    Paintbox.LOGGER.debug("[MusicData] Manually adjusted player due to desync: was $currentPosition, now $correctPosition")
+//                    Paintbox.LOGGER.debug("[MusicData] Manually adjusted player due to desync: was $currentPosition, now $correctPosition")
                 }
             }
         }

@@ -12,6 +12,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.util.gdxutils.*
 import polyrhythmmania.editor.*
+import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.editor.pane.EditorPane
 import kotlin.math.floor
 
@@ -114,6 +115,15 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                                         if (ctxMenu != null) {
                                             editor.attemptOpenBlockContextMenu(blockClickedOn, ctxMenu)
                                         }
+                                    }
+                                }
+                            } else if (event.button == Input.Buttons.MIDDLE) {
+                                if (blockClickedOn != null && !control && !shift && !alt) {
+                                    val blockClass = blockClickedOn.javaClass
+                                    val instantiator = Instantiators.instantiatorList.find { it.blockClass == blockClass }
+                                    if (instantiator != null) {
+                                        val instantiatorList = editorPane.upperPane.instantiatorPane.instantiatorList
+                                        instantiatorList.selectCertainInstantiator(instantiator)
                                     }
                                 }
                             }
