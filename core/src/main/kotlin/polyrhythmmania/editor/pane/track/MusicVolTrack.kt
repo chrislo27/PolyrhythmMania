@@ -37,7 +37,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
     private val lastMouseAbsolute: Vector2 = Vector2()
     private val lastMouseRelative: Vector2 = Vector2()
 
-    val tempoMarkerPane: TempoMarkerPane
+    val musicVolMarkerPane: MusicVolMarkerPane
 
     init {
         this.sidePanel.sidebarBgColor.bind { editorPane.palette.trackPaneMusicVolBg.use() }
@@ -52,8 +52,8 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
 
         this.contentSection += VerticalBeatLinesPane(editorPane)
 
-        this.tempoMarkerPane = this.TempoMarkerPane()
-        contentSection += this.tempoMarkerPane
+        this.musicVolMarkerPane = this.MusicVolMarkerPane()
+        contentSection += this.musicVolMarkerPane
     }
 
     private fun getScrollAmount(scrollDirection: Int, ctrl: Boolean, shift: Boolean, alt: Boolean): Int {
@@ -78,7 +78,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
         }
     }
 
-    inner class TempoMarkerPane : Pane() {
+    inner class MusicVolMarkerPane : Pane() {
 
         private val isMouseOver: Var<Boolean> = Var(false)
         private val currentHoveredMusicVol: Var<MusicVolume?> = Var(null)
