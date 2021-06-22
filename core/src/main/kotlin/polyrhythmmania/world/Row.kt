@@ -55,6 +55,7 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
                 if (rowBlock.active && rowBlock.type != EntityRowBlock.Type.PLATFORM && rowBlock.pistonState == EntityRowBlock.PistonState.RETRACTED) {
                     foundActive = true
                     inputInd.visible = true
+                    inputInd.isDpad = rowBlock.type == EntityRowBlock.Type.PISTON_DPAD
                     nextActiveIndex = i
                 } else {
                     inputInd.visible = false

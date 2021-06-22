@@ -10,7 +10,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.floor
 
 
-class EntityInputIndicator(world: World, val isDpad: Boolean)
+class EntityInputIndicator(world: World, var isDpad: Boolean)
     : SimpleRenderedEntity(world) {
     
     var visible: Boolean = true
