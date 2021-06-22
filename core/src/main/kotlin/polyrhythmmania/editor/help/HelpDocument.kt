@@ -21,7 +21,7 @@ abstract class DocumentRenderer : Disposable {
     open fun renderDocument(helpData: HelpData, doc: HelpDocument): UIElement {
         return Pane().apply {
             this.margin.set(Insets(0f, 0f, 0f, 4f))
-            this += VBox().also { vbox ->
+            val vbox = VBox().also { vbox ->
                 vbox.spacing.set(8f)
                 vbox.temporarilyDisableLayouts {
                     doc.layers.forEach { layer ->
@@ -31,6 +31,8 @@ abstract class DocumentRenderer : Disposable {
 
                 vbox.sizeHeightToChildren(10f)
             }
+            this += vbox
+            this.bounds.height.bind { vbox.bounds.height.useF() }
         }
     }
     
