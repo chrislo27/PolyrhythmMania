@@ -103,21 +103,28 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
         retractionPercentage = clamped
     }
 
-    fun despawn(percentage: Float) {
+    /**
+     * Returns true if some property was affected.
+     */
+    fun despawn(percentage: Float): Boolean {
         val clamped = percentage.coerceIn(0f, 1f)
-        if (retractionPercentage < (1f - clamped)) return
+        if (retractionPercentage < (1f - clamped)) return false
         if (active) {
             active = clamped < 1f
             position.y = Interpolation.linear.apply(baseY, baseY - 1, clamped)
             row.updateInputIndicators()
             retractionState = if (clamped < 1f) RetractionState.NEUTRAL else RetractionState.RETRACTING
             retractionPercentage = 1f - clamped
+            return true
         }
+        return false
     }
 
-    fun retract() {
+    fun retract(): Boolean {
+        val oldPistonState = pistonState
         pistonState = PistonState.RETRACTED
         row.updateInputIndicators()
+        return oldPistonState != PistonState.RETRACTED
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {

@@ -105,37 +105,61 @@ class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Floa
                            affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
 
+    /**
+     * Holds the result of [EntityRowBlock.despawn] from [entityOnUpdate] for checking if the sound should play.
+     */
+    private var anyBlocksAffected: Boolean = false
+    
     init {
         this.width = 0.125f
     }
 
     override fun onStart(currentBeat: Float) {
+        this.anyBlocksAffected = false
         super.onStart(currentBeat)
-        if (currentBeat < this.beat + this.width) {
-            if (row.rowBlocks.any { it.active }) {
-                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_despawn"))
-            }
-        }
     }
 
     override fun entityOnUpdate(entity: EntityRowBlock, currentBeat: Float, percentage: Float) {
-        entity.despawn(percentage)
+        val anyAffected = entity.despawn(percentage)
+        if (anyAffected) this.anyBlocksAffected = true
+    }
+
+    override fun onUpdate(currentBeat: Float) {
+        val oldAnyBlocksAffected = anyBlocksAffected
+        super.onUpdate(currentBeat)
+        if (!oldAnyBlocksAffected && anyBlocksAffected) { // Condition fulfilled if entities were updated on the first update
+            if (currentBeat < this.beat + this.width) {
+                if (row.rowBlocks.any { it.active }) {
+                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_despawn"))
+                }
+            }
+        }
     }
 }
 
 class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Float,
                            affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
+    
+    /**
+     * Holds the result of [EntityRowBlock.retract] from [entityOnUpdate] for checking if the sound should play.
+     */
+    private var anyBlocksAffected: Boolean = false
+    
     override fun onStart(currentBeat: Float) {
+        this.anyBlocksAffected = false
         super.onStart(currentBeat)
 
-        if (currentBeat < this.beat + 0.125f) {
+        if (anyBlocksAffected && currentBeat < this.beat + 0.125f) {
             engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_retract"))
         }
     }
 
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
-        entity.retract()
+        val result = entity.retract()
+        if (result) {
+            anyBlocksAffected = true
+        }
     }
 }
 
