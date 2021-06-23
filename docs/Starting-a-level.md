@@ -13,9 +13,9 @@ Use the waveform view to find your **First Beat**. You can play back the song an
 
 ## 3. Set where this First Beat starts
 ![Set the Music 1st Beat](https://i.imgur.com/b8LLLpG.png) <br>
-Now that you've set the First Beat in the Adjust Music dialog, you have to also set the
-**Music 1st Beat** point on the track.
-The **First Beat** you set will play EXACTLY when the playback marker passes the Music 1st Beat marker.
+Now that you've set the First Beat in the Adjust Music dialog, you may also set the
+**Music Sync** point on the track.
+The **First Beat** you set will play EXACTLY when the playback marker passes the Music Sync marker.
 Syncing your music is easy!
 
 ## 4. Getting the tempo
