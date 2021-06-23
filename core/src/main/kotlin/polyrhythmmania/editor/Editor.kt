@@ -404,7 +404,6 @@ class Editor(val main: PRManiaGame)
         blocks.sortedWith(Block.createComparator()).forEach { block ->
             events.addAll(block.compileIntoEvents())
         }
-        events.sortBy { it.beat }
         engine.addEvents(events)
     }
 
