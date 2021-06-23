@@ -11,7 +11,7 @@ object Credits {
                     "garbo", "snow krow",
             ),
             "credits.qa" to abcSorted(
-                    "Lvl100Feraligatr", "Gosh",
+                    "Lvl100Feraligatr", "Gosh", "GenericArrangements", "snow krow"
             ) + listOf("Tourneycord Discord\nserver"),
             "credits.resourcesAndTechnologies" to listOf(
                     "[font=rodin]リズム天国[] assets\nby Nintendo",
