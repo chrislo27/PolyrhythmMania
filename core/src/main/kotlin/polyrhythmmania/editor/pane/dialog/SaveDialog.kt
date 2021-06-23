@@ -128,6 +128,8 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 descLabel.text.set(Localization.getValue("editor.dialog.save.saving"))
                 substate.set(Substate.SAVING)
             }
+            
+            editor.compileEditorIntermediates()
 
             editor.container.writeToFile(newFile)
             lastSaveLoc = newFile

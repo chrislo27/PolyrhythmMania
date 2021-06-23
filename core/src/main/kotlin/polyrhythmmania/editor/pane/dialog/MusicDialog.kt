@@ -479,6 +479,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         // Push changes to editor
         editor.musicData.firstBeatSec.set(this.window.firstBeat.get())
         editor.musicData.loopParams.set(this.window.createLoopParams())
+        editor.compileEditorMusicInfo()
     }
 
     fun prepareShow(): MusicDialog {
