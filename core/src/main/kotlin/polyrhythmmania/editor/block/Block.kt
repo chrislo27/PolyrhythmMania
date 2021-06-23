@@ -20,6 +20,8 @@ import polyrhythmmania.editor.pane.track.EditorTrackArea
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import java.util.*
+import kotlin.Comparator
+
 
 
 /**
@@ -29,6 +31,17 @@ import java.util.*
  * a [trackIndex] which represents what track index the [Block] sits on.
  */
 abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
+    
+    companion object {
+        fun createComparator(): Comparator<Block> {
+            return Comparator { o1, o2 -> 
+                val beat = o1.beat.compareTo(o2.beat)
+                if (beat == 0) {
+                    o1.trackIndex.compareTo(o2.trackIndex)
+                } else beat
+            }
+        }
+    }
 
     var beat: Float = 0f
     var width: Float = 1f

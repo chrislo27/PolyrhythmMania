@@ -401,7 +401,7 @@ class Editor(val main: PRManiaGame)
     fun compileEditorBlocks() {
         engine.removeEvents(engine.events.toList())
         val events = mutableListOf<Event>()
-        blocks.toList().forEach { block ->
+        blocks.sortedWith(Block.createComparator()).forEach { block ->
             events.addAll(block.compileIntoEvents())
         }
         events.sortBy { it.beat }

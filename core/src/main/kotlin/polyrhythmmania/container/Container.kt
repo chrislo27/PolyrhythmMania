@@ -365,6 +365,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             block.readFromJson(obj)
             blocks.add(block)
         }
+        blocks.sortWith(Block.createComparator())
         this.addBlocks(blocks)
         engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
 
