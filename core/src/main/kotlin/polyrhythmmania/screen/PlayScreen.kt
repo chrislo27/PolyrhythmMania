@@ -22,9 +22,7 @@ import paintbox.binding.VarChangedListener
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.transition.FadeIn
-import paintbox.transition.FadeOut
-import paintbox.transition.TransitionScreen
+import paintbox.transition.*
 import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
@@ -384,19 +382,24 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             playMenuSound("sfx_pause_exit")
         }
     }
-    
+
     fun resetAndStartOver(playSound: Boolean = true) {
-        val blocks = container.blocks.toList()
-        engine.removeEvents(engine.events.toList())
-        engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
-        container.world.resetWorld()
-        container.world.tilesetConfig.applyTo(container.renderer.tileset)
-        Gdx.app.postRunnable {
-            if (playSound) {
-                playMenuSound("sfx_menu_enter_game")
+        if (playSound) {
+            playMenuSound("sfx_menu_enter_game")
+        }
+        val thisScreen: PlayScreen = this
+        main.screen = TransitionScreen(main, thisScreen, thisScreen, WipeToColor(Color.BLACK.cpy(), 0.4f), WipeFromColor(Color.BLACK.cpy(), 0.4f)).apply {
+            onEntryEnd = {
+                val blocks = container.blocks.toList()
+                engine.removeEvents(engine.events.toList())
+                engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
+                container.world.resetWorld()
+                container.world.tilesetConfig.applyTo(container.renderer.tileset)
+                prepareGameStart()
+                unpauseGame(false)
             }
-            prepareGameStart()
-            unpauseGame(playSound)
+            onFinished = {
+            }
         }
     }
 

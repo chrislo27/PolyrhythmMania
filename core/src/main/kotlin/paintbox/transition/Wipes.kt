@@ -7,7 +7,7 @@ import paintbox.util.gdxutils.fillRect
 import kotlin.math.absoluteValue
 
 
-open class WipeTo(val color: Color, duration: Float, val slope: Float = 4f, val interpolation: Interpolation = Interpolation.linear)
+open class WipeToColor(val color: Color, duration: Float, val slope: Float = 4f, val interpolation: Interpolation = Interpolation.linear)
     : Transition(duration) {
     override fun render(transitionScreen: TransitionScreen, screenRender: () -> Unit) {
         screenRender()
@@ -38,7 +38,7 @@ open class WipeTo(val color: Color, duration: Float, val slope: Float = 4f, val 
     }
 }
 
-open class WipeFrom(val color: Color, duration: Float, val slope: Float = 4f, val interpolation: Interpolation = Interpolation.linear)
+open class WipeFromColor(val color: Color, duration: Float, val slope: Float = 4f, val interpolation: Interpolation = Interpolation.linear)
     : Transition(duration) {
     override fun render(transitionScreen: TransitionScreen, screenRender: () -> Unit) {
         screenRender()
