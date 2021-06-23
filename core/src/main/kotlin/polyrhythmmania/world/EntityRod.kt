@@ -110,7 +110,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
 
     private var engineUpdateLastSec: Float = Float.MAX_VALUE
     private var collisionUpdateLastSec: Float = Float.MAX_VALUE
-    private var lastCurrentIndex: Float = Float.MAX_VALUE
+    private var lastCurrentIndex: Float = -10000f
 
     init {
         this.position.x = getPosXFromBeat(0f)
@@ -215,6 +215,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
     fun updateInputIndices(currentBeat: Float) {
         val lastExpectedSoFar = inputTracker.expectedInputIndices.lastOrNull() ?: -1
         val currentIndexFloor = getCurrentIndexFloor(this.position.x)
+        if (currentIndexFloor < -1) return
         row.rowBlocks.forEachIndexed { index, entity ->
             if (index > lastExpectedSoFar && index >= currentIndexFloor) {
                 val type = if (!entity.active) null else entity.type
@@ -223,6 +224,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
                 }
             }
         }
+//        println("[EntityRod] $this Input indices updated for current index $currentIndexFloor: ${inputTracker.expectedInputIndices}")
     }
 
     /**
@@ -253,6 +255,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         if (currentIndexFloat >= -0.7f) {
             updateInputIndices(beat)
         } else if (floor(lastCurrentIndex).toInt() != floor(currentIndexFloat).toInt() && lastCurrentIndex >= 0) {
+            println("last currentIndex: $lastCurrentIndex")
             updateInputIndices(beat)
         }
 
