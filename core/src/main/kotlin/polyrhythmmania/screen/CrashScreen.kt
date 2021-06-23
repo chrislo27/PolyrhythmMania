@@ -125,6 +125,7 @@ class CrashScreen(main: PRManiaGame, val throwable: Throwable, val lastScreen: S
     }
     
     init {
+        Gdx.input.isCursorCatched = false
         if (Gdx.graphics.isFullscreen) {
             Gdx.graphics.setWindowedMode(PRMania.DEFAULT_SIZE.width, PRMania.DEFAULT_SIZE.height)
         }
