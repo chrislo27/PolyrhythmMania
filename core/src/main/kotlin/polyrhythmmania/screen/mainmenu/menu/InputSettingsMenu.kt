@@ -126,21 +126,24 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
 
             vbox.temporarilyDisableLayouts {
-                vbox += createKeyboardInput(InputKeymapKeyboard.TEXT_BUTTON_A, { code ->
+                vbox += createKeyboardInput({ InputKeymapKeyboard.TEXT_BUTTON_A }, { code ->
                     inputKeymap.set(inputKeymap.getOrCompute().copy(buttonA = code))
                 }, { inputKeymap.getOrCompute().buttonA })
-                vbox += createKeyboardInput(InputKeymapKeyboard.TEXT_BUTTON_DPAD_UP, { code ->
+                vbox += createKeyboardInput({ InputKeymapKeyboard.TEXT_BUTTON_DPAD_UP }, { code ->
                     inputKeymap.set(inputKeymap.getOrCompute().copy(buttonDpadUp = code))
                 }, { inputKeymap.getOrCompute().buttonDpadUp })
-                vbox += createKeyboardInput(InputKeymapKeyboard.TEXT_BUTTON_DPAD_DOWN, { code ->
+                vbox += createKeyboardInput({ InputKeymapKeyboard.TEXT_BUTTON_DPAD_DOWN }, { code ->
                     inputKeymap.set(inputKeymap.getOrCompute().copy(buttonDpadDown = code))
                 }, { inputKeymap.getOrCompute().buttonDpadDown })
-                vbox += createKeyboardInput(InputKeymapKeyboard.TEXT_BUTTON_DPAD_LEFT, { code ->
+                vbox += createKeyboardInput({ InputKeymapKeyboard.TEXT_BUTTON_DPAD_LEFT }, { code ->
                     inputKeymap.set(inputKeymap.getOrCompute().copy(buttonDpadLeft = code))
                 }, { inputKeymap.getOrCompute().buttonDpadLeft })
-                vbox += createKeyboardInput(InputKeymapKeyboard.TEXT_BUTTON_DPAD_RIGHT, { code ->
+                vbox += createKeyboardInput({ InputKeymapKeyboard.TEXT_BUTTON_DPAD_RIGHT }, { code ->
                     inputKeymap.set(inputKeymap.getOrCompute().copy(buttonDpadRight = code))
                 }, { inputKeymap.getOrCompute().buttonDpadRight })
+                vbox += createKeyboardInput({ Localization.getVar("mainMenu.inputSettings.keyboard.keybindPause").use() }, { code ->
+                    inputKeymap.set(inputKeymap.getOrCompute().copy(pause = code))
+                }, { inputKeymap.getOrCompute().pause })
             }
             vbox.sizeHeightToChildren(100f)
             scrollPane.setContent(vbox)
@@ -163,8 +166,8 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
 
-        private fun createKeyboardInput(labelText: String, setter: (code: Int) -> Unit, getter: () -> Int): SettingsOptionPane {
-            return createSettingsOption({ labelText }, font = main.fontMainMenuRodin, percentageContent = 0.65f).apply settingsOptionPane@{
+        private fun createKeyboardInput(labelText: Var.Context.() -> String, setter: (code: Int) -> Unit, getter: () -> Int): SettingsOptionPane {
+            return createSettingsOption(labelText, font = main.fontMainMenuRodin, percentageContent = 0.65f).apply settingsOptionPane@{
                 val inwardArrows: Var<Boolean> = Var(false)
                 pendingKeyboardBinding.addListener {
                     if (it.getOrCompute() == null) inwardArrows.set(false)

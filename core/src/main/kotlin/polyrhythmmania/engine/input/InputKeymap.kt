@@ -14,6 +14,7 @@ data class InputKeymapKeyboard(
         val buttonDpadDown: Int = Input.Keys.S,
         val buttonDpadLeft: Int = Input.Keys.A,
         val buttonDpadRight: Int = Input.Keys.D,
+        val pause: Int = Input.Keys.ENTER,
 ) {
     companion object {
         const val TEXT_BUTTON_A: String = "${RodinSpecialChars.BORDERED_A}"
@@ -30,6 +31,7 @@ data class InputKeymapKeyboard(
                     obj["dpadDown"]?.asInt() ?: Input.Keys.S,
                     obj["dpadLeft"]?.asInt() ?: Input.Keys.A,
                     obj["dpadRight"]?.asInt() ?: Input.Keys.D,
+                    obj["pause"]?.asInt() ?: Input.Keys.ENTER,
             )
         }
     }
@@ -41,15 +43,16 @@ data class InputKeymapKeyboard(
             obj.add("dpadDown", this.buttonDpadDown)
             obj.add("dpadLeft", this.buttonDpadLeft)
             obj.add("dpadRight", this.buttonDpadRight)
+            obj.add("pause", this.pause)
         }
     }
     
     fun toKeyboardString(detailedDpad: Boolean, withNewline: Boolean): String {
         return if (detailedDpad) {
-            "${TEXT_BUTTON_A}: ${Input.Keys.toString(buttonA)}" + (if (withNewline) "\n" else " / ") +
-                    "${TEXT_BUTTON_DPAD_UP}: ${Input.Keys.toString(buttonDpadUp)} / ${TEXT_BUTTON_DPAD_DOWN}: ${Input.Keys.toString(buttonDpadDown)} / ${TEXT_BUTTON_DPAD_LEFT}: ${Input.Keys.toString(buttonDpadLeft)} / ${TEXT_BUTTON_DPAD_RIGHT}: ${Input.Keys.toString(buttonDpadRight)}"
+            "${TEXT_BUTTON_A}: ${Input.Keys.toString(buttonA)}" + (if (withNewline) "\n" else " | ") +
+                    "${TEXT_BUTTON_DPAD_UP}: ${Input.Keys.toString(buttonDpadUp)} | ${TEXT_BUTTON_DPAD_DOWN}: ${Input.Keys.toString(buttonDpadDown)} | ${TEXT_BUTTON_DPAD_LEFT}: ${Input.Keys.toString(buttonDpadLeft)} | ${TEXT_BUTTON_DPAD_RIGHT}: ${Input.Keys.toString(buttonDpadRight)}"
         } else {
-            "${TEXT_BUTTON_A}: ${Input.Keys.toString(buttonA)}" + (if (withNewline) "\n" else " / ") +
+            "${TEXT_BUTTON_A}: ${Input.Keys.toString(buttonA)}" + (if (withNewline) "\n" else " | ") +
                     "${TEXT_BUTTON_DPAD_ANY}: ${Input.Keys.toString(buttonDpadUp)}/${Input.Keys.toString(buttonDpadDown)}/${Input.Keys.toString(buttonDpadLeft)}/${Input.Keys.toString(buttonDpadRight)}"
         }
     }

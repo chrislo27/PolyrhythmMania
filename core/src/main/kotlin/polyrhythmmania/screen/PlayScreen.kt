@@ -442,7 +442,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         if (!isFinished) {
             if (isPaused) {
                 when (keycode) {
-                    Input.Keys.ESCAPE -> {
+                    Input.Keys.ESCAPE, keyboardKeybinds.pause -> {
                         unpauseGame(true)
                         consumed = true
                     }
@@ -464,7 +464,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             } else {
                 val atSeconds = engine.seconds
                 when (keycode) {
-                    Input.Keys.ESCAPE -> {
+                    Input.Keys.ESCAPE, keyboardKeybinds.pause -> {
                         pauseGame(true)
                         consumed = true
                     }

@@ -1,6 +1,7 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
@@ -112,7 +113,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             val keyboardKeybindings = main.settings.inputKeymapKeyboard.getOrCompute()
-            hbox += TextLabel(keyboardKeybindings.toKeyboardString(false, true),
+            hbox += TextLabel("${Localization.getValue("mainMenu.inputSettings.keyboard.keybindPause")}: ${Input.Keys.toString(keyboardKeybindings.pause)} | " + keyboardKeybindings.toKeyboardString(false, true),
                     font = main.fontMainMenuRodin).apply {
                 this.bounds.width.set(300f)
                 this.textColor.set(Color.BLACK)
