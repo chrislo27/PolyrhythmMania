@@ -49,9 +49,6 @@ allprojects {
 //        implementation "org.asynchttpclient:async-http-client:2.12.1"
 //        implementation "com.sun.activation:javax.activation:1.2.0" // Required for AHC Java 9+
         
-//        implementation "com.fasterxml.jackson.module:jackson-module-afterburner:$jackson_version"
-//        implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
-//        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version"
         implementation "com.eclipsesource.minimal-json:minimal-json:0.9.5"
         
         implementation "com.beust:jcommander:1.80"
