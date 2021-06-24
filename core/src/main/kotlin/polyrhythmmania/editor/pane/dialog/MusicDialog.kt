@@ -80,6 +80,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     val selectMusicButton: Button
     val removeMusicButton: Button
+    
+    val loopingCheckbox: CheckBox
 
     val markerPlaybackStart: Color = PRManiaColors.PLAYBACK_START.cpy()
     val markerFirstBeat: Color = PRManiaColors.MARKER_FIRST_BEAT.cpy()
@@ -399,6 +401,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 })
             }
         }
+        
+        var lCheckBox: CheckBox? = null
 
         val otherControlsPane = Pane().apply {
             this.bounds.height.set(44f)
@@ -411,6 +415,16 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this += hbox
 
             hbox.temporarilyDisableLayouts {
+                lCheckBox = CheckBox(binding = { Localization.getVar("editor.dialog.music.settings.enableLooping").use() }, font = editorPane.palette.musicDialogFont).apply {
+                    this.checkedState.set(window.doLooping.getOrCompute())
+                    this.checkedState.addListener {
+                        window.doLooping.set(it.getOrCompute())
+                    }
+                    this.imageNode.tint.set(Color.WHITE.cpy())
+                    this.textLabel.textColor.set(Color.WHITE.cpy())
+                    this.bounds.width.set(220f)
+                    this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.enableLooping.tooltip")))
+                }
                 hbox.addChild(CheckBox(binding = { Localization.getVar("editor.dialog.music.settings.enableLooping").use() }, font = editorPane.palette.musicDialogFont).apply {
                     this.checkedState.set(window.doLooping.getOrCompute())
                     window.doLooping.addListener {
@@ -454,6 +468,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 })
             }
         }
+        
+        loopingCheckbox = lCheckBox!!
 
         vbox.temporarilyDisableLayouts {
             vbox += title
@@ -502,6 +518,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.window.loopStart.set((loopParams.startPointMs / 1000).toFloat())
             this.window.loopEnd.set((loopParams.endPointMs / 1000).toFloat())
         }
+        loopingCheckbox.checkedState.set(this.window.doLooping.getOrCompute())
 
         stopMusicPlayback()
 
