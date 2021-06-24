@@ -8,8 +8,11 @@ import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.ui.Pane
 import paintbox.ui.animation.Animation
+import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.util.DecimalFormats
@@ -40,7 +43,12 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
         val hbox = HBox().apply {
             this.spacing.set(4f)
         }
-        this += hbox
+        this += RectElement(Color(1f, 1f, 1f, 0.05f)).apply {
+            this.border.set(Insets(1f))
+            this.borderStyle.set(SolidBorder(Color.WHITE))
+            this.padding.set(Insets(2f))
+            this += hbox
+        }
 
         hbox.temporarilyDisableLayouts {
             val flashTextColor: Var<Color> = Var.sideEffecting(TEXT_COLOR.cpy()) { c ->
@@ -83,13 +91,14 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("tapalong.countLabel")))
             })
             hbox.addChild(Button(binding = { Localization.getVar("tapalong.reset").use() }, font = editorPane.main.mainFont).apply {
-                this.bounds.width.set(96f)
+                this.bounds.width.set(108f)
                 this.setOnAction {
                     reset()
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("tapalong.reset.tooltip", Var { listOf(AUTO_RESET_SEC) })))
             })
         }
+        hbox.sizeWidthToChildren(100f)
     }
 
     fun tap() {
