@@ -236,6 +236,10 @@ sealed class Click {
             beatLines.active = true
             beatLines.fromBeat = floor(beat).toInt()
             beatLines.toBeat = ceil(beat).toInt()
+            
+            if (type == MarkerType.MUSIC_FIRST_BEAT) {
+                editor.compileEditorMusicInfo()
+            }
         }
 
         override fun abortAction() {

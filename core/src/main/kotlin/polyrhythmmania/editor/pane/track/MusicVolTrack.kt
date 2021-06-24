@@ -50,6 +50,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
         this.bounds.height.set(32f)
         this.showContentBorder.set(true)
 
+        this.contentSection += MusicWaveformPane(editorPane)
         this.contentSection += VerticalBeatLinesPane(editorPane)
 
         this.musicVolMarkerPane = this.MusicVolMarkerPane()
@@ -129,7 +130,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                                     if (beat >= 0f) {
                                         val musicVolumes = editor.musicVolumes.getOrCompute().toMutableList()
                                         val volumes = editor.engine.musicData.volumeMap
-                                        editor.compileEditorMusicInfo()
+                                        editor.compileEditorMusicVolumes()
                                         val newVolume = (volumes.volumeAtBeat(beat) * (if (ctrl) 0.5f else if (shift) 2f else 1f)).roundToInt().coerceIn(MusicVolume.MIN_VOLUME, MusicVolume.MAX_VOLUME)
                                         val newMv = MusicVolume(beat, 0f, newVolume)
                                         if (!alt && !(ctrl && shift) && !musicVolumes.any { newMv.beat in it.beat..(it.beat + it.width) }) {

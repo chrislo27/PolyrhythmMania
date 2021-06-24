@@ -480,6 +480,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         editor.musicData.firstBeatSec.set(this.window.firstBeat.get())
         editor.musicData.loopParams.set(this.window.createLoopParams())
         editor.compileEditorMusicInfo()
+        editor.compileEditorMusicVolumes()
     }
 
     fun prepareShow(): MusicDialog {

@@ -12,7 +12,7 @@ class DeleteMusicVolumeAction(val toDelete: MusicVolume)
         val newList = context.musicVolumes.getOrCompute().toMutableList()
         newList.remove(toDelete)
         context.musicVolumes.set(newList)
-        context.compileEditorMusicInfo()
+        context.compileEditorMusicVolumes()
     }
 
     override fun undo(context: Editor) {
@@ -20,7 +20,7 @@ class DeleteMusicVolumeAction(val toDelete: MusicVolume)
         newList.add(toDelete)
         newList.sortBy { it.beat }
         context.musicVolumes.set(newList)
-        context.compileEditorMusicInfo()
+        context.compileEditorMusicVolumes()
     }
 }
 
@@ -32,14 +32,14 @@ class AddMusicVolumeAction(val toAdd: MusicVolume)
         newList.add(toAdd)
         newList.sortBy { it.beat }
         context.musicVolumes.set(newList)
-        context.compileEditorMusicInfo()
+        context.compileEditorMusicVolumes()
     }
 
     override fun undo(context: Editor) {
         val newList = context.musicVolumes.getOrCompute().toMutableList()
         newList.remove(toAdd)
         context.musicVolumes.set(newList)
-        context.compileEditorMusicInfo()
+        context.compileEditorMusicVolumes()
     }
 }
 
@@ -51,7 +51,7 @@ class ChangeMusicVolumeAction(val previous: MusicVolume, var next: MusicVolume)
         newList.remove(previous)
         newList.add(next)
         context.musicVolumes.set(newList)
-        context.compileEditorMusicInfo()
+        context.compileEditorMusicVolumes()
     }
 
     override fun undo(context: Editor) {
@@ -59,6 +59,6 @@ class ChangeMusicVolumeAction(val previous: MusicVolume, var next: MusicVolume)
         newList.remove(next)
         newList.add(previous)
         context.musicVolumes.set(newList)
-        context.compileEditorMusicInfo()
+        context.compileEditorMusicVolumes()
     }
 }

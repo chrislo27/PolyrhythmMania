@@ -22,10 +22,7 @@ import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.util.MathHelper
 import paintbox.util.Vector2Stack
-import paintbox.util.gdxutils.disposeQuietly
-import paintbox.util.gdxutils.isAltDown
-import paintbox.util.gdxutils.isControlDown
-import paintbox.util.gdxutils.isShiftDown
+import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
@@ -229,14 +226,6 @@ class Editor(val main: PRManiaGame)
 
         sceneRoot.renderAsRoot(batch)
 
-        // Draw preview
-//        val node = editorPane.upperPane.previewPane.imageNode
-//        val nodeBounds = node.bounds
-//        val vec = node.getPosRelativeToRoot(Vector2Stack.getAndPush())
-//        val h = nodeBounds.height.get()
-//        batch.draw(previewTextureRegion, vec.x, camera.viewportHeight - vec.y - h, nodeBounds.width.get(), h)
-//        Vector2Stack.pop()
-
         batch.end()
     }
 
@@ -346,10 +335,6 @@ class Editor(val main: PRManiaGame)
                 }
             }
         }
-        
-        if (Gdx.input.isKeyJustPressed(Input.Keys.Y)) {
-            editorPane.menubar.triggerAutosaveIndicator("Test autosave indicator.")
-        }
 
         click.getOrCompute().renderUpdate()
 
@@ -395,6 +380,7 @@ class Editor(val main: PRManiaGame)
         compileEditorTempos()
         compileEditorTimeSignatures()
         compileEditorMusicInfo()
+        compileEditorMusicVolumes()
         compileEditorBlocks()
     }
 
@@ -433,7 +419,10 @@ class Editor(val main: PRManiaGame)
         if (player != null) {
             player.useLoopParams(engineMusicData.loopParams)
         }
-
+    }
+    
+    fun compileEditorMusicVolumes() {
+        val engineMusicData = engine.musicData
         val volumeMap = engineMusicData.volumeMap
         volumeMap.removeMusicVolumesBulk(volumeMap.getAllMusicVolumes())
         volumeMap.addMusicVolumesBulk(this.musicVolumes.getOrCompute().toList())
@@ -464,6 +453,7 @@ class Editor(val main: PRManiaGame)
         window.limitWindow()
         this.compileEditorMusicInfo()
         this.waveformWindow.generateOverall()
+        this.waveformWindow.invalidateBlockCache()
     }
 
     fun attemptInstantiatorDrag(instantiator: Instantiator<Block>) {

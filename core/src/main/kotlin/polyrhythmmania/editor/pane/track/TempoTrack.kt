@@ -123,6 +123,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                                     editor.addActionWithoutMutating(ChangeStartingTempoAction(originalTempo, futureTempo))
                                 }
                                 editor.startingTempo.set(futureTempo)
+                                editor.compileEditorTempos()
                             }
                         })
                     }
