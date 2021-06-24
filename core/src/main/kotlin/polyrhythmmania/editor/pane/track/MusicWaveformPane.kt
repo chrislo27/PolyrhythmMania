@@ -13,16 +13,6 @@ import kotlin.math.floor
 
 
 class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
-    
-//    data class Segment(var beat: Float, var isLoopPoint: Boolean)
-//    
-//    object SegmentStack : ResourceStack<Segment>() {
-//        override fun newObject(): Segment = Segment(0f, false)
-//        override fun resetBeforePushed(obj: Segment) {
-//        }
-//        override fun resetWhenFreed(obj: Segment?) {
-//        }
-//    }
 
     private val segmentsInRenderZone: MutableList<Float> = mutableListOf()
     
@@ -97,9 +87,6 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
             if (printDebugStuff) {
                 println("segments: $segmentsInRenderZone")
             }
-
-            var currentSegmentBeat: Float = leftBeat
-            var musicOffsetForLooping = -(musicDelaySec)
             
             var currentSegmentSec: Float = leftSec
             var blockPxOffset = 0f // Accumulated offset
