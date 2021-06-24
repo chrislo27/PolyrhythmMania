@@ -86,6 +86,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_colour_picker_copy", "textures/ui/copy.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_colour_picker_paste", "textures/ui/paste.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_icon_block_flat", "textures/ui/icon/block_flat.png")
+        AssetRegistry.loadAsset<Texture>("ui_rounded_textbox", "textures/ui/textbox.png")
         AssetRegistry.loadAsset<Texture>("github_mark", "textures/github_mark.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("logo_2lines_en", "textures/logo/logo_2lines_en.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("logo_2lines_ja", "textures/logo/logo_2lines_ja.png", linearTexture())
