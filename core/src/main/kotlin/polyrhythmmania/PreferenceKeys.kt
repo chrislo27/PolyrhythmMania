@@ -19,6 +19,7 @@ object PreferenceKeys {
     val EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE = "editorsettings_camera_pan_on_drag_edge"
     val EDITORSETTINGS_PANNING_DURING_PLAYBACK = "editorsettings_panning_during_playback"
     val EDITORSETTINGS_AUTOSAVE_INTERVAL = "editorsettings_autosave_interval"
+    val EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY = "editorsettings_music_waveform_opacity"
     
     val KEYMAP_KEYBOARD = "keymap_keyboard"
     

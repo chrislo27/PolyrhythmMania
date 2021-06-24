@@ -5,16 +5,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.PaintboxGame
+import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.Pane
-import paintbox.ui.Tooltip
+import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
@@ -79,12 +77,11 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             }
         }
 
-        fun <T> createCycleOption(text: String, tooltip: String?, bindingVar: Var<T>,
-                                  items: List<T>,
-                                  font: PaintboxFont = editorPane.palette.musicDialogFont,
-                                  percentageContent: Float = 0.5f,
-                                  itemToStringBinding: (Var.Context.(item: T) -> String)? = null): Pair<Pane, CycleControl<T>> {
-            val cycle = CycleControl(items, bindingVar, itemToStringBinding)
+        fun createGenericPane(
+                text: String, tooltip: String?, child: UIElement,
+                font: PaintboxFont = editorPane.palette.musicDialogFont,
+                percentageContent: Float = 0.5f,
+        ): Pane {
             return Pane().apply {
                 this.bounds.height.set(blockHeight)
                 addChild(TextLabel(binding = { Localization.getVar(text).use() }, font = font).apply {
@@ -96,11 +93,26 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar(tooltip)))
                     }
                 })
-                addChild(cycle.apply {
+                addChild(child.apply {
                     Anchor.TopRight.configure(this)
                     this.bindWidthToParent(multiplier = percentageContent)
                 })
-            } to cycle
+            }
+        }
+
+        fun <T> createCycleOption(text: String, tooltip: String?, bindingVar: Var<T>,
+                                  items: List<T>,
+                                  font: PaintboxFont = editorPane.palette.musicDialogFont,
+                                  percentageContent: Float = 0.5f,
+                                  itemToStringBinding: (Var.Context.(item: T) -> String)? = null): Pair<Pane, CycleControl<T>> {
+            val cycle = CycleControl(items, bindingVar, itemToStringBinding)
+            return createGenericPane(text, tooltip, cycle, font, percentageContent) to cycle
+        }
+
+        fun createSlider(text: String, tooltip: String?, slider: Slider,
+                         font: PaintboxFont = editorPane.palette.musicDialogFont,
+                         percentageContent: Float = 0.5f): Pair<Pane, Slider> {
+            return createGenericPane(text, tooltip, slider, font, percentageContent) to slider
         }
 
         vbox.temporarilyDisableLayouts {
@@ -111,9 +123,35 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     itemToStringBinding = { Localization.getVar(it.localization).use() }).first
             vbox += createCycleOption("editorSettings.autosaveInterval", "editorSettings.autosaveInterval.tooltip",
                     settings.editorAutosaveInterval, Editor.AUTOSAVE_INTERVALS,
-                    itemToStringBinding = { item -> Localization.getVar("editorSettings.autosaveInterval.minutes", Var {
-                        listOf(item)
-                    }).use() }).first
+                    itemToStringBinding = { item ->
+                        Localization.getVar("editorSettings.autosaveInterval.minutes", Var {
+                            listOf(item)
+                        }).use()
+                    }).first
+            vbox += createGenericPane("editorSettings.musicWaveformOpacity", "editorSettings.musicWaveformOpacity.tooltip",
+                    Pane().also { pane ->
+                        val slider = Slider().also { slider ->
+                            Anchor.CentreLeft.configure(slider)
+                            slider.bindWidthToParent(adjust = -100f)
+                            slider.bounds.height.set(32f)
+                            slider.minimum.set(0f)
+                            slider.maximum.set(10f)
+                            slider.tickUnit.set(1f)
+                            slider.setValue(settings.editorMusicWaveformOpacity.getOrCompute().toFloat())
+                            slider.value.addListener {
+                                settings.editorMusicWaveformOpacity.set(it.getOrCompute().toInt())
+                            }
+                        }
+                        pane += slider
+                        pane += TextLabel(binding = { "${settings.editorMusicWaveformOpacity.use() * 10}%" },
+                                font = editorPane.palette.musicDialogFont).apply {
+                            Anchor.TopRight.configure(this)
+                            this.bounds.width.set(100f)
+                            this.padding.set(Insets(4f))
+                            this.textColor.set(Color.WHITE)
+                            this.renderAlign.set(Align.center)
+                        }
+                    }, percentageContent = 0.5f)
         }
         vbox.sizeHeightToChildren(300f)
 

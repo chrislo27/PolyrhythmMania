@@ -7,6 +7,7 @@ import paintbox.util.WindowSize
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_AUTOSAVE_INTERVAL
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_DETAILED_MARKER_UNDO
+import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PANNING_DURING_PLAYBACK
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
@@ -36,6 +37,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, Var(true))
     private val kv_editorPanningDuringPlayback: KeyValue<CameraPanningSetting> = KeyValue(EDITORSETTINGS_PANNING_DURING_PLAYBACK, Var(CameraPanningSetting.PAN))
     private val kv_editorAutosaveInterval: KeyValue<Int> = KeyValue(EDITORSETTINGS_AUTOSAVE_INTERVAL, Var(5))
+    private val kv_editorMusicWaveformOpacity: KeyValue<Int> = KeyValue(EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY, Var(10))
     
     private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, Var(InputKeymapKeyboard()))
 
@@ -50,6 +52,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
     val editorPanningDuringPlayback: Var<CameraPanningSetting> = kv_editorPanningDuringPlayback.value
     val editorAutosaveInterval: Var<Int> = kv_editorAutosaveInterval.value
+    val editorMusicWaveformOpacity: Var<Int> = kv_editorMusicWaveformOpacity.value
     
     val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
 
@@ -68,6 +71,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getEditorSetting(kv_editorPanningDuringPlayback as KeyValue<EditorSetting>,
                 CameraPanningSetting.MAP, CameraPanningSetting.PAN)
         prefs.getIntCoerceIn(kv_editorAutosaveInterval, 0, Short.MAX_VALUE.toInt())
+        prefs.getIntCoerceIn(kv_editorMusicWaveformOpacity, 0, 10)
         
         prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
     }
@@ -85,6 +89,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_editorCameraPanOnDragEdge)
                 .putEditorSetting(kv_editorPanningDuringPlayback)
                 .putInt(kv_editorAutosaveInterval)
+                .putInt(kv_editorMusicWaveformOpacity)
                 
                 .putInputKeymapKeyboard(kv_keymapKeyboard)
 
