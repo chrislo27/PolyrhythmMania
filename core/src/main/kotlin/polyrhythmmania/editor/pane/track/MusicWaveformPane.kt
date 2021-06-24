@@ -5,12 +5,24 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
+import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.ui.Pane
+import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.pane.EditorPane
 import kotlin.math.floor
 
 
 class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
+    
+//    data class Segment(var beat: Float, var isLoopPoint: Boolean)
+//    
+//    object SegmentStack : ResourceStack<Segment>() {
+//        override fun newObject(): Segment = Segment(0f, false)
+//        override fun resetBeforePushed(obj: Segment) {
+//        }
+//        override fun resetWhenFreed(obj: Segment?) {
+//        }
+//    }
 
     private val segmentsInRenderZone: MutableList<Float> = mutableListOf()
     
@@ -33,13 +45,19 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
         val pxPerBeat = trackView.pxPerBeat.get()
         val leftBeat = trackViewBeat
         val rightBeat = trackViewBeat + (w / pxPerBeat)
-        val leftSec = engine.tempos.beatsToSeconds(leftBeat)
-        val rightSec = engine.tempos.beatsToSeconds(rightBeat)
+        val leftSec = engine.tempos.beatsToSeconds(leftBeat, disregardSwing = true)
+        val rightSec = engine.tempos.beatsToSeconds(rightBeat, disregardSwing = true)
 
         val segmentsInRenderZone = this.segmentsInRenderZone
         segmentsInRenderZone.clear()
+
+        /*
+        Break into seconds segments, starting at the beginning and splitting on things
+        like tempo changes (converted to sec) and loop points.
+         */
         
         val printDebugStuff = Gdx.input.isKeyJustPressed(Input.Keys.Y)
+        if (printDebugStuff) println()
         
         batch.setColor(1f, 1f, 1f, 1f * apparentOpacity.get())
         val music = editor.musicData.beadsMusic
@@ -50,68 +68,102 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                 val beat = tc.beat
                 if (beat !in (leftBeat)..(rightBeat)) continue
                 if (beat == 0f) continue
-                segmentsInRenderZone.add(tc.beat)
+                segmentsInRenderZone.add(tempos.beatsToSeconds(tc.beat, disregardSwing = false))
+            }
+
+            val engineMusicData = engine.musicData
+            val musicDelaySec = engineMusicData.computeMusicDelaySec()
+            val loopParams = engineMusicData.loopParams
+            if (loopParams.loopType == SamplePlayer.LoopType.LOOP_FORWARDS) {
+                val loopDur = loopParams.endPointMs - loopParams.startPointMs
+                if (loopDur > 0) {
+                    var ms = loopParams.startPointMs + (musicDelaySec * 1000)
+                    ms += ((leftSec * 1000.0 - ms) / loopDur).toInt() * loopDur // Jump ahead to avoid iterations
+                    while (ms < (rightSec * 1000)) {
+                        val s = (ms / 1000).toFloat()
+                        if (s in leftSec..rightSec) {
+                            segmentsInRenderZone.add(s)
+                            if (printDebugStuff) {
+                                println("Loop: point added at sec $s")
+                            }
+                        }
+                        ms += loopDur
+                    }
+                }
             }
             
             segmentsInRenderZone.sort()
             
-            /*
-            1. Break into beat segments, starting at the beginning and splitting on things like tempo changes.
-            2. For each beat segment, render the appropriate seconds of music waveform.
-             */
+            if (printDebugStuff) {
+                println("segments: $segmentsInRenderZone")
+            }
 
-            val musicDelaySec = engine.musicData.computeMusicDelaySec()
             var currentSegmentBeat: Float = leftBeat
+            var musicOffsetForLooping = -(musicDelaySec)
+            
+            var currentSegmentSec: Float = leftSec
             var blockPxOffset = 0f // Accumulated offset
             for (segment in 0 until (segmentsInRenderZone.size + 1)) {
-                val segmentStart: Float = currentSegmentBeat
-                val segmentEnd: Float = segmentsInRenderZone.getOrNull(segment) ?: rightBeat
-                val segmentStartSec: Float = tempos.beatsToSeconds(segmentStart, disregardSwing = true)
-                val segmentEndSec: Float = tempos.beatsToSeconds(segmentEnd, disregardSwing = true)
+                val segmentStartSec: Float = currentSegmentSec
+                val segmentEndSec: Float = segmentsInRenderZone.getOrNull(segment) ?: rightSec
                 
-                val currentTempo: Float = tempos.tempoAtBeat(segmentStart)
+                val currentTempo: Float = tempos.tempoAtSeconds(segmentStartSec)
                 val pxPerSec: Float = pxPerBeat / (60f / currentTempo)
-                if (printDebugStuff) {
-                    println("Segment: $segment  start/end: $segmentStart / $segmentEnd   start/end sec: $segmentStartSec / $segmentEndSec   tempo: $currentTempo   pxPerSec: $pxPerSec")
-                }
                 
-                // For each beat segment, render the music in up-to-one-second chunks.
-                // The offsets for the chunks are pre-offset by the music delay seconds
-                // TODO support loop points.
+                // DEBUG red lines at each segment split
+//                val pc = batch.packedColor
+//                batch.setColor(1f, 0f, 0f, 1f)
+//                batch.fillRect(x + blockPxOffset, y - h, 1f, h)
+//                batch.packedColor = pc
                 
-                val segmentMusicStartSec = segmentStartSec - musicDelaySec
-                val segmentMusicEndSec = segmentEndSec - musicDelaySec
-                
-                var currentSec = segmentMusicStartSec
-                while (currentSec < segmentMusicEndSec) {
-                    val currentSecFloor = floor(currentSec)
-                    val currentPlusOne = floor(currentSec + 1f) // Up to nearest whole beat
-                    val endSec = currentPlusOne.coerceAtMost(segmentMusicEndSec)
+                // Find the first music seconds.
+                val musicSeconds = (engineMusicData.getCorrectMusicPlayerPositionAt(segmentStartSec + 0.001f, delaySec = musicDelaySec) / 1000).toFloat()
+                val startCurMusicSec = musicSeconds
+                var currentMusicSec = startCurMusicSec
+                var currentSubsegmentSec = segmentStartSec
+                val originalBlockPxOffset = blockPxOffset
+                // Break into chunks, going to the nearest whole seconds if possible
+                var subsegmentIndex = 0
+                while (currentSubsegmentSec < segmentEndSec) {
+//                    val endSubsegmentSec = (floor(currentSubsegmentSec) + 1).coerceAtMost(segmentEndSec)
+//                    val durSubsegmentSec = endSubsegmentSec - currentSubsegmentSec
+                    val endMusicSec = (floor(currentMusicSec) + 1).coerceAtMost(startCurMusicSec + (segmentEndSec - segmentStartSec))
+                    val durMusicSec = endMusicSec - currentMusicSec
+                    if (durMusicSec <= 0f) break
                     
-                    val musicSec = currentSec
-                    val musicSecFloor = floor(musicSec)
+                    if (subsegmentIndex == 0 && printDebugStuff) {
+                        println("subseg at ${segmentStartSec}:\t currentMusicSec: $currentMusicSec  musicSeconds: ${musicSeconds}  musicSecondsEpsilon: ${(engineMusicData.getCorrectMusicPlayerPositionAt(segmentStartSec + 0.0001f, delaySec = musicDelaySec) / 1000).toFloat()}")
+                    }
                     
-                    val dur = endSec - currentSec
-                    
-                    val texReg: TextureRegion? = editor.waveformWindow.getSecondsBlock(musicSecFloor.toInt())
+                    val texReg: TextureRegion? = editor.waveformWindow.getSecondsBlock(floor(currentMusicSec).toInt())
                     if (texReg != null) {
                         val u = texReg.u
                         val u2 = texReg.u2
-                        
-                        val correctU = MathUtils.lerp(u, u2, currentSec - currentSecFloor)
-                        val correctU2 = MathUtils.lerp(u, u2, 1f - (currentPlusOne - endSec))
-                        
+
+                        val correctU = MathUtils.lerp(u, u2, currentMusicSec - floor(currentMusicSec))
+                        val correctU2 = MathUtils.lerp(u, u2, 1f - ((floor(currentMusicSec) + 1f) - endMusicSec))
+
                         batch.draw(texReg.texture, x + blockPxOffset,
-                                y - h, dur * pxPerSec, h,
+                                y - h, durMusicSec * pxPerSec, h,
                                 correctU, texReg.v,
                                 correctU2, texReg.v2)
                     }
 
-                    blockPxOffset += dur * pxPerSec
-                    currentSec = endSec // Go up to nearest whole sec.
+                    currentSubsegmentSec += durMusicSec
+                    currentMusicSec += durMusicSec
+                    blockPxOffset += pxPerSec * durMusicSec
+                    subsegmentIndex++
+//                    if (subsegmentIndex >= 2) break
                 }
+                if (printDebugStuff) {
+                    println("original: $originalBlockPxOffset  currentBlockPxOffset: $blockPxOffset  expectedNew: ${originalBlockPxOffset + pxPerSec * (segmentEndSec - segmentStartSec)}")
+                    println("segment length: ${segmentEndSec - segmentStartSec}  subsegment accumulated: ${currentSubsegmentSec - segmentStartSec}")
+                }
+                // Force reset blockPxOffset in case of addition issues/floating-point error
+                blockPxOffset = originalBlockPxOffset + pxPerSec * (segmentEndSec - segmentStartSec)
                 
-                currentSegmentBeat = segmentEnd
+                
+                currentSegmentSec = segmentEndSec
             }
             
         }

@@ -45,22 +45,21 @@ class MusicData(val engine: Engine) {
             player.position = getCorrectMusicPlayerPositionAt(engine.seconds)
         }
     }
-    
-    fun getCorrectMusicPlayerPositionAt(atSeconds: Float): Double {
+
+    fun getCorrectMusicPlayerPositionAt(atSeconds: Float, delaySec: Float = engine.musicData.computeMusicDelaySec()): Double {
         val music = this.beadsMusic
         val player = engine.soundInterface.getCurrentMusicPlayer(music)
         if (player != null) {
-            val delaySec = engine.musicData.computeMusicDelaySec()
             if (atSeconds < delaySec) {
                 // Set player position to be negative
-                return  (atSeconds - delaySec).toDouble() * 1000.0
+                return (atSeconds - delaySec).toDouble() * 1000.0
             } else {
                 if (player.loopType == SamplePlayer.LoopType.LOOP_FORWARDS && !player.isLoopInvalid()) {
                     player.prepareStartBuffer()
                     val adjustedSecs = atSeconds - delaySec
                     val loopStart = player.loopStartMs
                     val loopEnd = player.loopEndMs
-                    val loopDuration = (player.loopEndMs - player.loopStartMs)
+                    val loopDuration = (loopEnd - loopStart)
 
                     return if (adjustedSecs < loopEnd / 1000) {
                         (adjustedSecs * 1000) % player.musicSample.lengthMs
@@ -72,7 +71,7 @@ class MusicData(val engine: Engine) {
                 }
             }
         }
-        
+
         return 0.0
     }
     
