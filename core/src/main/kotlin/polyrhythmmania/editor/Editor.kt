@@ -440,6 +440,7 @@ class Editor(val main: PRManiaGame)
             }
             row.updateInputIndicators()
         }
+        engine.inputter.clearInputs()
     }
 
     /**
