@@ -20,6 +20,7 @@ object PreferenceKeys {
     val EDITORSETTINGS_PANNING_DURING_PLAYBACK = "editorsettings_panning_during_playback"
     val EDITORSETTINGS_AUTOSAVE_INTERVAL = "editorsettings_autosave_interval"
     val EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY = "editorsettings_music_waveform_opacity"
+    val EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW = "editorsettings_higher_accuracy_preview"
     
     val KEYMAP_KEYBOARD = "keymap_keyboard"
     

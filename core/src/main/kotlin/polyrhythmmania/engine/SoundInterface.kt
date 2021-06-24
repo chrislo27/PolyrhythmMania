@@ -44,6 +44,9 @@ sealed class SoundInterface {
         }
 
         override fun playAudio(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit): Long {
+            if (disableSounds) {
+                return -1L
+            }
             return soundSystem.playAudio(audio, callback)
         }
     }
@@ -57,6 +60,8 @@ sealed class SoundInterface {
             return -1L
         }
     }
+    
+    open var disableSounds: Boolean = false
 
     /**
      * Gets the current [MusicSamplePlayer] for the given music [audio]. It is up to each implementation

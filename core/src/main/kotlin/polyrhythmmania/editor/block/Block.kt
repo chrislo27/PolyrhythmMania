@@ -33,13 +33,15 @@ import kotlin.Comparator
 abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
     
     companion object {
-        fun createComparator(): Comparator<Block> {
-            return Comparator { o1, o2 -> 
-                val beat = o1.beat.compareTo(o2.beat)
-                if (beat == 0) {
-                    o1.trackIndex.compareTo(o2.trackIndex)
-                } else beat
-            }
+        private val comparator: Comparator<Block> = Comparator { o1, o2 ->
+            val beat = o1.beat.compareTo(o2.beat)
+            if (beat == 0) {
+                o1.trackIndex.compareTo(o2.trackIndex)
+            } else beat
+        }
+        
+        fun getComparator(): Comparator<Block> {
+            return comparator
         }
     }
 

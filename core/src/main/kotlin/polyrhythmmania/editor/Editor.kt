@@ -51,6 +51,8 @@ import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.Semitones
+import polyrhythmmania.world.EntityRod
+import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
@@ -61,6 +63,7 @@ import java.util.*
 import kotlin.collections.LinkedHashMap
 import kotlin.concurrent.thread
 import kotlin.math.floor
+import kotlin.system.measureNanoTime
 
 
 class Editor(val main: PRManiaGame)
@@ -387,7 +390,7 @@ class Editor(val main: PRManiaGame)
     fun compileEditorBlocks() {
         engine.removeEvents(engine.events.toList())
         val events = mutableListOf<Event>()
-        blocks.sortedWith(Block.createComparator()).forEach { block ->
+        blocks.sortedWith(Block.getComparator()).forEach { block ->
             events.addAll(block.compileIntoEvents())
         }
         engine.addEvents(events)
@@ -579,13 +582,41 @@ class Editor(val main: PRManiaGame)
         if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {
             compileEditorIntermediates()
             engine.resetEndSignal()
-            val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
-            timing.seconds = newSeconds
-            engine.musicData.update()
-            val engineBeatFloor = floor(engine.beat)
-            lastMetronomeBeat = if (engineBeatFloor == engine.beat) (engineBeatFloor.toInt() - 1) else engineBeatFloor.toInt()
             cameraOffset.changeTarget(0f)
             cameraOffset.reset()
+
+            val playbackStartBeats = this.playbackStart.get()
+            val newSeconds = engine.tempos.beatsToSeconds(playbackStartBeats)
+            
+            // Simulate some time before the playback start depending on deploy rod events
+            if (settings.editorHigherAccuracyPreview.getOrCompute()) {
+                val wereSoundsDisabled = engine.soundInterface.disableSounds
+                engine.soundInterface.disableSounds = true
+
+                // For each EventDeployRod, check if the window of time (4 to 4+5 beats) overlaps the playbackStartBeats
+                val rodEvents = engine.events.filter {
+                    it is EventDeployRod && playbackStartBeats in (it.beat + 4f)..(it.beat + 4f + 5f)
+                }.sorted()
+                if (rodEvents.isNotEmpty()) {
+                    val simulateFromBeat = rodEvents.first().beat + 4f
+                    if (simulateFromBeat < playbackStartBeats) {
+                        val simFromSec = engine.tempos.beatsToSeconds(simulateFromBeat) - (1 / 60f)
+                        var s = simFromSec
+                        while (s < newSeconds) {
+                            timing.seconds = s
+                            s = (s + 1 / 60f).coerceAtMost(newSeconds)
+                        }
+                    }
+                }
+                
+                engine.soundInterface.disableSounds = wereSoundsDisabled
+            }
+
+            timing.seconds = newSeconds
+            engine.musicData.update()
+            
+            val engineBeatFloor = floor(engine.beat)
+            lastMetronomeBeat = if (engineBeatFloor == engine.beat) (engineBeatFloor.toInt() - 1) else engineBeatFloor.toInt()
         } else if (newState == PlayState.STOPPED) {
             resetWorld()
             timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.get())

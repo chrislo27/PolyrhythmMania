@@ -118,6 +118,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         vbox.temporarilyDisableLayouts {
             vbox += createCheckbox("editorSettings.detailedMarkerUndo", "editorSettings.detailedMarkerUndo.tooltip", settings.editorDetailedMarkerUndo)
             vbox += createCheckbox("editorSettings.cameraPanOnDragEdge", "editorSettings.cameraPanOnDragEdge.tooltip", settings.editorCameraPanOnDragEdge)
+            vbox += createCheckbox("editorSettings.higherAccuracyPreview", "editorSettings.higherAccuracyPreview.tooltip", settings.editorHigherAccuracyPreview)
             vbox += createCycleOption("editorSettings.cameraPanningSetting", "editorSettings.cameraPanningSetting.tooltip",
                     settings.editorPanningDuringPlayback, CameraPanningSetting.VALUES,
                     itemToStringBinding = { Localization.getVar(it.localization).use() }).first

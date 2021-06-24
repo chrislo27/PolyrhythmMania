@@ -36,7 +36,10 @@ open class Event(val engine: Engine) : Comparable<Event> {
     }
     
     protected fun getBeatPercentage(currentBeat: Float): Float = if (width <= 0f) 1f else ((currentBeat - this.beat) / width)
-    
+
+    /**
+     * True if the given [beat] is within this event's beat + event width.
+     */
     fun isBeatInside(beat: Float): Boolean = beat in this.beat..(this.beat + width)
 
     final override fun compareTo(other: Event): Int {
