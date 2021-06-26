@@ -40,6 +40,8 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.InputType
+import polyrhythmmania.engine.input.Ranking
+import polyrhythmmania.engine.input.Score
 import polyrhythmmania.screen.mainmenu.menu.TemporaryResultsMenu
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
@@ -48,6 +50,7 @@ import polyrhythmmania.world.EntityRod
 import polyrhythmmania.world.render.WorldRenderer
 import space.earlygrey.shapedrawer.ShapeDrawer
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
@@ -91,7 +94,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
             Gdx.app.postRunnable {
                 soundSystem.setPaused(true)
                 container.world.entities.filterIsInstance<EntityRod>().forEach { rod ->
-                    engine.inputter.submitInputsFromRod(rod)
+                    engine.inputter.submitInputsFromRod(rod, false)
                 }
                 transitionToResults()
             }
@@ -293,10 +296,25 @@ class PlayScreen(main: PRManiaGame, val container: Container)
     private fun transitionToResults() {
         val inputter = engine.inputter
         val nInputs = inputter.totalExpectedInputs
-        val score = if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
+        val rawScore: Float = (if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
             inputScore.weight
-        } / nInputs) * 100)
-        val results = TemporaryResultsMenu.Results(nInputs, score.roundToInt().coerceIn(0, 100), inputter.inputResults)
+        } / nInputs) * 100))
+        val score: Int = rawScore.roundToInt().coerceIn(0, 100)
+        val results = TemporaryResultsMenu.Results(nInputs, score, inputter.inputResults)
+        
+        val resultsText = container.resultsText
+        val ranking = Ranking.getRanking(score)
+        val leftResults = inputter.inputResults.filter { it.type == InputType.DPAD }
+        val rightResults = inputter.inputResults.filter { it.type == InputType.A }
+        val badLeftGoodRight = leftResults.isNotEmpty() && rightResults.isNotEmpty()
+                && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
+        val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
+        val scoreObj = Score(score, rawScore, nInputs,
+                false /* TODO set skill star result*/, inputter.noMiss,
+                resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
+                lines.first, lines.second,
+                ranking
+        )
 
         val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
         val menuCol = mainMenu.menuCollection
@@ -397,8 +415,6 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 container.world.tilesetConfig.applyTo(container.renderer.tileset)
                 prepareGameStart()
                 unpauseGame(false)
-            }
-            onFinished = {
             }
         }
     }

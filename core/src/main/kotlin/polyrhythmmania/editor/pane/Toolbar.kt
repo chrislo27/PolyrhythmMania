@@ -10,6 +10,7 @@ import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Click
@@ -227,6 +228,20 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
 
 
         leftControlPane.temporarilyDisableLayouts {
+            leftControlPane.addChild(Button("").apply {
+                this.bounds.width.set(32f)
+                this.skinID.set(EditorSkins.BUTTON)
+                this.padding.set(Insets.ZERO)
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_results"]))
+                this.setOnAction {
+                    
+                }
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.results")))
+            })
+            leftControlPane.addChild(RectElement(binding = {editorPane.palette.previewPaneSeparator.use()}).apply { 
+                this.bounds.width.set(2f)
+                this.margin.set(Insets(2f, 2f, 0f, 0f))
+            })
             leftControlPane.addChild(Button("").apply {
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)

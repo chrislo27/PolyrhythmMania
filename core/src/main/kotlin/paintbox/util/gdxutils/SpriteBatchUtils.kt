@@ -3,6 +3,7 @@ package paintbox.util.gdxutils
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import paintbox.PaintboxGame
@@ -126,4 +127,14 @@ inline fun SpriteBatch.batchCall(projection: Matrix4 = this.projectionMatrix, dr
 
     this.projectionMatrix = oldProjection
     this.packedColor = oldColor
+}
+
+/**
+ * The same as [SpriteBatch.draw(texture, x, y, width, height, u, v, u2, v2)] but [u] and [v] are in the top left, and
+ * [u2] and [v2] are in the bottom right. The original [SpriteBatch] draw function has the origin in the bottom left.
+ * 
+ * The uv order for this function is more akin to [TextureRegion]'s internal uv representation.
+ */
+fun SpriteBatch.drawUV(tex: Texture, x: Float, y: Float, width: Float, height: Float, u: Float, v: Float, u2: Float, v2: Float) {
+    this.draw(tex, x, y, width, height, u, v2, u2, v)
 }

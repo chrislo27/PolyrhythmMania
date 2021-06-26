@@ -45,6 +45,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("toolbar_clapboard_shut", "textures/ui/icon/toolbar/clapboard_shut.png"),
                 Packable("toolbar_clapboard_open", "textures/ui/icon/toolbar/clapboard_open.png"),
                 Packable("toolbar_tileset", "textures/ui/icon/toolbar/tileset.png"),
+                Packable("toolbar_results", "textures/ui/icon/toolbar/results.png"),
                 Packable("menubar_new", "textures/ui/icon/menubar/new.png"),
                 Packable("menubar_open", "textures/ui/icon/menubar/open.png"),
                 Packable("menubar_save", "textures/ui/icon/menubar/save.png"),
@@ -86,7 +87,15 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_colour_picker_copy", "textures/ui/copy.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_colour_picker_paste", "textures/ui/paste.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_icon_block_flat", "textures/ui/icon/block_flat.png")
-        AssetRegistry.loadAsset<Texture>("ui_rounded_textbox", "textures/ui/textbox.png")
+        AssetRegistry.loadAsset<Texture>("ui_rounded_textbox", "textures/ui/textbox.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("results_score_bar", "textures/results/score_bar.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("results_score_bar_border", "textures/results/score_bar_border.png", linearTexture())
+        AssetRegistry.loadAssetNoFile<PackedSheet>("results_ranking", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                Packable("try_again", "textures/results/ranking/try_again.png"),
+                Packable("ok", "textures/results/ranking/ok.png"),
+                Packable("superb", "textures/results/ranking/superb.png"),
+        ), PackedSheet.Config(padding = 4, maxSize = 512, duplicateBorder = false,
+                atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
         AssetRegistry.loadAsset<Texture>("github_mark", "textures/github_mark.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("logo_2lines_en", "textures/logo/logo_2lines_en.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("logo_2lines_ja", "textures/logo/logo_2lines_ja.png", linearTexture())

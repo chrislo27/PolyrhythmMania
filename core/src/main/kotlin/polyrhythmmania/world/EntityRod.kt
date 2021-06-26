@@ -343,7 +343,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
 
     override fun onRemovedFromWorld(engine: Engine) {
         super.onRemovedFromWorld(engine)
-        engine.inputter.submitInputsFromRod(this)
+        engine.inputter.submitInputsFromRod(this, collision.collidedWithWall)
     }
 
     private fun playSfxLand(engine: Engine) {

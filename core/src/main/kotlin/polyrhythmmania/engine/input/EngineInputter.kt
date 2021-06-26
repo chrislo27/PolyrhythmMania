@@ -34,6 +34,8 @@ class EngineInputter(val engine: Engine) {
     
     var totalExpectedInputs: Int = 0
         private set
+    var noMiss: Boolean = true
+        private set
     val inputResults: List<InputResult> = mutableListOf()
     
     val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
@@ -42,6 +44,7 @@ class EngineInputter(val engine: Engine) {
         totalExpectedInputs = 0
         (inputResults as MutableList).clear()
         inputFeedbackFlashes.fill(-10000f)
+        noMiss = true
     }
 
     fun onInput(type: InputType, atSeconds: Float) {
@@ -113,10 +116,13 @@ class EngineInputter(val engine: Engine) {
         }
     }
     
-    fun submitInputsFromRod(rod: EntityRod) {
+    fun submitInputsFromRod(rod: EntityRod, exploded: Boolean) {
         val inputTracker = rod.inputTracker
         totalExpectedInputs += inputTracker.expectedInputIndices.size
         (inputResults as MutableList).addAll(inputTracker.results)
+        if (exploded && noMiss) {
+            noMiss = false
+        }
     }
     
 }

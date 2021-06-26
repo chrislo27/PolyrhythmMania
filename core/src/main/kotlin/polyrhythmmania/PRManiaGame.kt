@@ -26,9 +26,11 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.engine.input.InputThresholds
+import polyrhythmmania.engine.input.Score
 import polyrhythmmania.init.AssetRegistryLoadingScreen
 import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
+import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.LelandSpecialChars
 import java.io.File
@@ -521,6 +523,23 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     borderWidth = 10f
                     spaceX = -8
                 }).setAfterLoad(defaultScaledFontAfterLoad)
+        cache["results_main"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 32, 0f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 32
+                }).setAfterLoad(defaultScaledFontAfterLoad)
+        cache["results_score"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/kurokane/kurokanestd.otf"), 72, 6f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 72
+                    borderWidth = 6f
+                    borderColor = Color().grey(0.4f, 1f)
+                }).setAfterLoad { font ->
+            defaultScaledFontAfterLoad.invoke(this, font)
+            font.setFixedWidthGlyphs("0123456789")
+        }
     }
 
 
@@ -547,6 +566,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontMainMenuHeading: PaintboxFont get() = fontCache["mainmenu_heading"]
     val fontMainMenuRodin: PaintboxFont get() = fontCache["mainmenu_rodin"]
     val fontPauseMenuTitle: PaintboxFont get() = fontCache["pausemenu_title"]
+    val fontResultsMain: PaintboxFont get() = fontCache["results_main"]
+    val fontResultsScore: PaintboxFont get() = fontCache["results_score"]
 
     private fun generateColourPickerTextures() {
         colourPickerHueBar = run {

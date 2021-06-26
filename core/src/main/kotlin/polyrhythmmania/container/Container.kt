@@ -19,6 +19,7 @@ import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.Swing
 import polyrhythmmania.engine.tempo.TempoChange
@@ -52,7 +53,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     companion object {
         const val FILE_EXTENSION: String = "prmania"
-        const val CONTAINER_VERSION: Int = 3
+        const val CONTAINER_VERSION: Int = 4
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
     }
@@ -69,6 +70,8 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     }
     val _blocks: MutableList<Block> = CopyOnWriteArrayList()
     val blocks: List<Block> get() = _blocks
+    
+    var resultsText: ResultsText = ResultsText.DEFAULT
 
     private val _resources: MutableMap<String, ExternalResource> = ConcurrentHashMap()
     val resources: Map<String, ExternalResource> get() = _resources
@@ -253,6 +256,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             }
         })
         jsonObj.add("tilesetConfig", this.world.tilesetConfig.toJson())
+        jsonObj.add("resultsText", this.resultsText.toJson())
 
 
         // Pack
@@ -350,8 +354,14 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             }
         }
         if (containerVersion >= 3) {
-            val tilesetObj = json.get("tilesetConfig").asObject()
-            this.world.tilesetConfig.fromJson(tilesetObj)
+            val tilesetObj = json.get("tilesetConfig")?.asObject()
+            if (tilesetObj != null)
+                this.world.tilesetConfig.fromJson(tilesetObj)
+        }
+        if (containerVersion >= 4) {
+            val resultsObj = json.get("resultsText")?.asObject()
+            if (resultsObj != null)
+                this.resultsText = ResultsText.fromJson(resultsObj)
         }
 
         val blocksObj = json.get("blocks").asArray()

@@ -2,10 +2,11 @@ package paintbox
 
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.utils.Disposable
 import paintbox.transition.TransitionScreen
 
 
-abstract class PaintboxScreen : Screen, InputProcessor {
+abstract class PaintboxScreen : Screen, InputProcessor, Disposable {
 
     abstract val main: PaintboxGame
 
