@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
+import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
+import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -32,6 +34,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
     val scoreLabel: TextLabel
     val scoreValue: Var<Int> = Var.bind { score.use().scoreInt }
     val rankingPane: Pane
+    val bonusStatsPane: Pane
     private val rankingImage: ImageNode
 
     init {
@@ -39,7 +42,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
         val scoreTextFont: PaintboxFont = main.fontResultsScore
 
         val pane: Pane = this
-        pane.margin.set(Insets(64f, 64f, 128f, 128f))
+        pane.margin.set(Insets(64f, 18f, 128f, 128f))
 
         titleLabel = TextLabel(binding = { score.use().title }, font = resultsFont).apply {
             this.padding.set(Insets(10f))
@@ -65,6 +68,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             val s = score.use()
             s.line1 + (if (s.line2.isNotEmpty()) "\n\n${s.line2}" else "")
         }, font = resultsFont).apply {
+            this.markup.set(Markup(mapOf(), TextRun(resultsFont, ""), Markup.FontStyles.ALL_DEFAULT))
             this.textColor.set(Color.WHITE)
             this.renderAlign.set(Align.top)
             this.textAlign.set(TextAlign.LEFT)
@@ -105,9 +109,30 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             this.padding.set(Insets(0f, 6f, 100f, 100f))
         }
         scorePane += scoreLabel
+
+        bonusStatsPane = Pane().apply {
+            this.bounds.width.set(500f)
+            this.bounds.height.set(64f)
+            this.margin.set(Insets(16f, 0f, 32f, 0f))
+        }
+        bonusStatsPane += TextLabel(binding = {
+            val sc = score.use()
+            val noMiss = sc.noMiss
+            val skillStar = sc.skillStar
+            val list = mutableListOf<String>()
+            if (noMiss) list += "play.results.noMiss"
+            if (skillStar) list += "play.results.skillStar"
+            list.joinToString(separator = " ") { Localization.getValue(it) }
+        }, resultsFont).apply {
+            this.doXCompression.set(false)
+            this.renderAlign.set(Align.topLeft)
+            this.textColor.set(Color.WHITE)
+            this.setScaleXY(0.75f)
+        }
+        vbox += bonusStatsPane
         
         rankingPane = Pane().apply {
-            Anchor.BottomRight.configure(this, offsetY = 45f, offsetX = 64f)
+            Anchor.BottomRight.configure(this, offsetX = 64f)
             this.bounds.width.set(350f)
             this.bounds.height.set(96f)
         }
@@ -117,12 +142,15 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             AssetRegistry.get<PackedSheet>("results_ranking")[score.use().ranking.rankingIconID]
         })
         rankingPane += rankingImage
-        rankingPane += TextLabel(binding = { Localization.getVar("play.results.ranking.ok.butStillJust").use() }, resultsFont).apply {
+        rankingPane += TextLabel(binding = {
+            val sc = score.use()
+            val stillJust = sc.butStillJustOk
+            if (stillJust) Localization.getValue("play.results.ranking.ok.butStillJust") else ""
+        }, resultsFont).apply {
             this.doXCompression.set(false)
             this.renderAlign.set(Align.topRight)
             this.bounds.width.set(90f)
             this.textColor.set(Color.WHITE)
-            this.visible.bind { score.use().butStillJustOk }
             this.margin.set(Insets(10f, 0f, 0f, 0f))
             this.setScaleXY(0.75f)
         }

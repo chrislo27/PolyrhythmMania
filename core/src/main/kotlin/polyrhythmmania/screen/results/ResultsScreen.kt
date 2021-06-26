@@ -10,27 +10,39 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
+import paintbox.transition.*
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
+import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
+import paintbox.ui.control.Button
+import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.TextLabel
+import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.disposeQuietly
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.container.Container
+import polyrhythmmania.editor.pane.EditorSkins
+import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
+import polyrhythmmania.screen.PlayScreen
 import kotlin.math.min
 import kotlin.properties.Delegates
 
-class ResultsScreen(main: PRManiaGame, val score: Score)
+class ResultsScreen(main: PRManiaGame, val score: Score, val container: Container,
+                    val keyboardKeybinds: InputKeymapKeyboard)
     : PRManiaScreen(main) {
     
     private lateinit var soundFirstLine: Sound
@@ -48,6 +60,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score)
     private val sceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val inputProcessor: InputProcessor = sceneRoot.inputSystem
     private val resultsPane: ResultsPane
+    private val controlsPane: Pane
     
     private var currentStage: ResultsStage by Delegates.observable(this.Loading()) { _, old, new ->
         if (old != new) {
@@ -60,10 +73,51 @@ class ResultsScreen(main: PRManiaGame, val score: Score)
         resultsPane = ResultsPane(main, score)
         sceneRoot += resultsPane
         
+        controlsPane = HBox().apply {
+            Anchor.BottomLeft.configure(this)
+            this.align.set(HBox.Align.LEFT)
+            this.bounds.height.set(48f)
+            this.bounds.width.set(700f)
+            this.spacing.set(12f)
+
+            this += Button(Localization.getValue("play.results.back"), font = main.mainFont).apply {
+                this.bounds.width.set(300f)
+                (this.skin.getOrCompute() as ButtonSkin).roundedRadius.set(4)
+                this.setOnAction {
+                    val thisScreen = main.screen
+                    main.screen = TransitionScreen(main, thisScreen, main.mainMenuScreen,
+                            WipeToColor(Color.BLACK.cpy(), 0.4f), null).apply {
+                        onEntryEnd = {
+                            container.disposeQuietly()
+                            main.mainMenuScreen.prepareShow(doFlipAnimation = true)
+                        }
+                    }
+                }
+            }
+            this += Button(Localization.getValue("play.pause.startOver"), font = main.mainFont).apply {
+                this.bounds.width.set(220f)
+                (this.skin.getOrCompute() as ButtonSkin).roundedRadius.set(4)
+                this.setOnAction {
+                    val playScreen = PlayScreen(main, container)
+                    Gdx.input.isCursorCatched = true
+                    main.screen = TransitionScreen(main, main.screen, playScreen, FadeOut(0.5f, Color(0f, 0f, 0f, 1f)),
+                            FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                        this.onEntryEnd = {
+                            playScreen.resetAndStartOver(doWipeTransition = false, playSound = false)
+                        }
+                    }
+                }
+            }
+        }
+        
+        resultsPane += controlsPane
+        
         resultsPane.titleLabel.visible.set(false)
         resultsPane.linesLabel.text.set("")
         resultsPane.scoreValue.set(-1)
         resultsPane.rankingPane.visible.set(false)
+        resultsPane.bonusStatsPane.visible.set(false)
+        controlsPane.visible.set(false)
     }
 
     override fun render(delta: Float) {
@@ -104,9 +158,17 @@ class ResultsScreen(main: PRManiaGame, val score: Score)
             }
         }
         
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            main.screen = ResultsScreen(main, score.copy())
+        val currentStage = this.currentStage
+        if (currentStage is ScoreFilling && !currentStage.doneOverride) {
+            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)
+                    || Gdx.input.isKeyJustPressed(keyboardKeybinds.buttonA)) {
+                currentStage.doneOverride = true
+            }
         }
+        
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+//            main.screen = ResultsScreen(main, score.copy(), container, keyboardKeybinds)
+//        }
     }
 
     override fun show() {
@@ -229,7 +291,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score)
         override fun onStart() {
             super.onStart()
             playSound(if (score.line2.isEmpty()) soundEndLine else soundMiddleLine)
-            resultsPane.linesLabel.text.set(score.line1)
+            resultsPane.linesLabel.text.set("${score.line1}\n\n[color=CLEAR]${score.line2}[]")
         }
 
         override fun nextStage(): ResultsStage {
@@ -246,7 +308,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score)
         override fun onStart() {
             super.onStart()
             playSound(soundEndLine)
-            resultsPane.linesLabel.text.set(resultsPane.linesLabel.text.getOrCompute() + "\n\n" + score.line2)
+            resultsPane.linesLabel.text.set("${score.line1}\n\n${score.line2}")
         }
 
         override fun nextStage(): ResultsStage {
@@ -256,13 +318,14 @@ class ResultsScreen(main: PRManiaGame, val score: Score)
 
     private inner class ScoreFilling : ResultsStage() {
         private var soundID: Long = -1L
+        var doneOverride = false
         
         init {
             timeout = (145f / 60) * (score.scoreInt / 100f)
         }
 
         override fun isDone(): Boolean {
-            return super.isDone() // TODO add shortcut for pressing A/B to skip ahead
+            return super.isDone() || doneOverride
         }
 
         override fun onStart() {
@@ -307,6 +370,10 @@ class ResultsScreen(main: PRManiaGame, val score: Score)
             super.onStart()
             playSound(soundRanking)
             resultsPane.rankingPane.visible.set(true)
+            resultsPane.bonusStatsPane.visible.set(true)
+            controlsPane.visible.set(true)
+            controlsPane.opacity.set(0f)
+            sceneRoot.animations.enqueueAnimation(Animation(Interpolation.smooth2, 0.25f, 0f, 1f, delay = 0.75f), controlsPane.opacity)
         }
 
         override fun nextStage(): ResultsStage? {

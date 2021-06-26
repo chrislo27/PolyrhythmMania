@@ -43,6 +43,7 @@ import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.screen.mainmenu.menu.TemporaryResultsMenu
+import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -310,18 +311,20 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
         val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
         val scoreObj = Score(score, rawScore, nInputs,
-                false /* TODO set skill star result*/, inputter.noMiss,
+                false /* TODO set skill star result */, inputter.noMiss,
                 resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                 lines.first, lines.second,
                 ranking
         )
 
-        val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
-        val menuCol = mainMenu.menuCollection
-        val tmpResultsMenu = TemporaryResultsMenu(menuCol, results, container)
-        menuCol.addMenu(tmpResultsMenu)
-        menuCol.pushNextMenu(tmpResultsMenu, instant = true)
-        transitionAway(mainMenu, false) {}
+//        val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
+//        val menuCol = mainMenu.menuCollection
+//        val tmpResultsMenu = TemporaryResultsMenu(menuCol, results, container)
+//        menuCol.addMenu(tmpResultsMenu)
+//        menuCol.pushNextMenu(tmpResultsMenu, instant = true)
+//        transitionAway(mainMenu, false) {}
+        
+        transitionAway(ResultsScreen(main, scoreObj, container, keyboardKeybinds), disposeContainer = false) {}
     }
 
     private inline fun transitionAway(nextScreen: Screen, disposeContainer: Boolean, action: () -> Unit) {

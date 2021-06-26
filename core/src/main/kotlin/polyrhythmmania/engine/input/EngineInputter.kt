@@ -110,6 +110,8 @@ class EngineInputter(val engine: Engine) {
                 // Bounce the rod
                 if (inputResult.inputScore != InputScore.MISS) {
                     rod.bounce(nextBlockIndex)
+                } else {
+                    missed()
                 }
             }
             
@@ -123,8 +125,12 @@ class EngineInputter(val engine: Engine) {
         totalExpectedInputs += inputTracker.expectedInputIndices.size
         (inputResults as MutableList).addAll(inputTracker.results)
         if (exploded && noMiss) {
-            noMiss = false
+            missed()
         }
+    }
+    
+    fun missed() {
+        noMiss = false
     }
     
 }
