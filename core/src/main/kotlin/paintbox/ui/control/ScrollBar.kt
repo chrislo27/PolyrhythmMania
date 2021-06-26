@@ -29,8 +29,8 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
         const val SCROLLBAR_INC_BUTTON_SKIN_ID: String = "ScrollBar_UnitIncreaseButton"
         const val MIN_DEFAULT: Float = 0f
         const val MAX_DEFAULT: Float = 100f
-        const val UNIT_DEFAULT: Float = 1f
-        const val BLOCK_DEFAULT: Float = 20f
+        const val UNIT_DEFAULT: Float = 15f
+        const val BLOCK_DEFAULT: Float = 40f
         const val VISIBLE_AMOUNT_DEFAULT: Float = 15f
 
         protected val DEFAULT_USER_CHANGED_VALUE_LISTENER: (Float) -> Unit = {}
