@@ -41,7 +41,7 @@ data class ResultsText(
     }
 
 
-    fun generateLinesOfText(score: Int, badLeftGoodRight: Boolean): Pair<String, String> {
+    fun generateLinesOfText(score: Int, badLeftGoodRight: Boolean, doRandomization: Boolean = true): Pair<String, String> {
         val resultsText = this
         return when {
             score < 60 -> if (resultsText.firstNegative != null) {
@@ -53,7 +53,7 @@ data class ResultsText(
                         if (score < 50) Localization.getValue("play.results.defaultTryAgain.3") else "")
             }
             score in 60 until 75 -> {
-                Pair(resultsText.ok ?: Localization.getValue("play.results.defaultOK.${MathUtils.random(1, 4)}"), "")
+                Pair(resultsText.ok ?: Localization.getValue("play.results.defaultOK.${if (doRandomization) MathUtils.random(1, 4) else 1}"), "")
             }
             score >= 75 -> {
                 if (resultsText.firstPositive != null) {

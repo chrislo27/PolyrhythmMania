@@ -1,21 +1,23 @@
 package polyrhythmmania.editor.pane
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.*
+import paintbox.ui.Anchor
+import paintbox.ui.ImageIcon
+import paintbox.ui.ImageNode
+import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
-import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
+import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
 
 
 class Toolbar(val upperPane: UpperPane) : Pane() {
@@ -234,7 +236,9 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.padding.set(Insets.ZERO)
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_results"]))
                 this.setOnAction {
-                    
+                    if (editorPane.editor.allowedToEdit.getOrCompute()) {
+                        editorPane.openDialog(ResultsTextDialog(editorPane))
+                    }
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.results")))
             })
@@ -248,11 +252,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.padding.set(Insets.ZERO)
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_music"]))
                 this.setOnAction {
-                    Gdx.app.postRunnable {
-                        if (editorPane.editor.click.getOrCompute() == Click.None) {
-                            editorPane.editor.changePlayState(PlayState.STOPPED)
-                            editorPane.openDialog(editorPane.musicDialog.prepareShow())
-                        }
+                    if (editorPane.editor.allowedToEdit.getOrCompute()) {
+                        editorPane.openDialog(editorPane.musicDialog.prepareShow())
                     }
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.music")))
