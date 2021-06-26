@@ -158,18 +158,18 @@ sealed class Click {
                 originRegion.beat = newBeat
             }
             originRegion.beat = originRegion.beat.coerceAtLeast(0f)
-            // TODO make this more flexible? Selections spanning multiple tracks cannot move between tracks
-            if (encompassingRegion.track <= 1) {
-                val targetTrackIndex = (trackY /*- mouseOffset.y*/).toInt()
-                val targetTrack: Track? = editor.tracks.getOrNull(targetTrackIndex)
-                if (targetTrack != null) {
-                    if (blocks.all { b -> targetTrack.acceptsBlock(b) }) {
-                        originRegion.track = targetTrackIndex
-                    } else {
-                        isPlacementInvalid.set(true)
-                    }
-                }
+
+            val targetTrackIndex = (trackY /*- mouseOffset.y*/).toInt() // Target for originBlock
+            if (blocks.all { b ->
+                        val targetTrack: Track? = editor.tracks.getOrNull(targetTrackIndex + (b.trackIndex - originBlock.trackIndex))
+                        targetTrack?.acceptsBlock(b) == true
+                    }) {
+                isPlacementInvalid.set(false)
+            } else {
+                isPlacementInvalid.set(true)
             }
+            originRegion.track = targetTrackIndex
+            
 
             // Set other blocks relative to origin block
             for (block in blocks) {
