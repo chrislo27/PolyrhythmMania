@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
-import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.ui.*
 import paintbox.ui.skin.DefaultSkins
@@ -58,7 +57,8 @@ open class Slider : Control<Slider>() {
                     lastMouseRelativeToRoot.x = event.x - lastMouseInside.x
                     lastMouseRelativeToRoot.y = event.y - lastMouseInside.y
                     
-                    setValue(convertPercentageToValue((lastMouseRelativeToRoot.x / bounds.width.get()).coerceIn(0f, 1f)))
+                    val endCap = bounds.height.get() * 0.4f
+                    setValue(convertPercentageToValue(((lastMouseRelativeToRoot.x - endCap) / (bounds.width.get() - endCap * 2)).coerceIn(0f, 1f)))
                     
                     true
                 } else false
