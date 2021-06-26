@@ -88,7 +88,7 @@ class EngineInputter(val engine: Engine) {
                 val maxSec = perfectSeconds + InputThresholds.MAX_OFFSET_SEC
 
                 if (atSeconds !in minSec..maxSec) {
-//                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
+                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
                     continue
                 }
                 

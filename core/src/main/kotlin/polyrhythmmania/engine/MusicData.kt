@@ -2,7 +2,6 @@ package polyrhythmmania.engine
 
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
-import paintbox.Paintbox
 import polyrhythmmania.engine.music.MusicVolMap
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -46,7 +45,9 @@ class MusicData(val engine: Engine) {
         }
     }
 
-    fun getCorrectMusicPlayerPositionAt(atSeconds: Float, delaySec: Float = engine.musicData.computeMusicDelaySec()): Double {
+    fun getCorrectMusicPlayerPositionAt(atSeconds: Float,
+                                        delaySec: Float = engine.musicData.computeMusicDelaySec()
+    ): Double {
         val music = this.beadsMusic
         val player = engine.soundInterface.getCurrentMusicPlayer(music)
         if (player != null) {
@@ -76,7 +77,7 @@ class MusicData(val engine: Engine) {
     }
     
     fun computeMusicDelaySec(): Float {
-        return engine.tempos.beatsToSeconds(this.musicFirstBeat) - this.firstBeatSec
+        return ((engine.tempos.beatsToSeconds(this.musicFirstBeat) - this.firstBeatSec) * 1000 + engine.musicOffsetMs) / 1000
     }
 
 }

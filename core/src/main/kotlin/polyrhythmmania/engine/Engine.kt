@@ -29,6 +29,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     
     var deleteEventsAfterCompletion: Boolean = true
     var autoInputs: Boolean = false
+    var musicOffsetMs: Float = 0f
     
     var endSignalReceived: Var<Boolean> = Var(false)
     

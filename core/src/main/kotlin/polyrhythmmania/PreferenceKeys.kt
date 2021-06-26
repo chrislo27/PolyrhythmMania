@@ -14,6 +14,7 @@ object PreferenceKeys {
     val SETTINGS_WINDOWED_RESOLUTION = "settings_windowedResolution"
     val SETTINGS_FULLSCREEN = "settings_fullscreen"
     val SETTINGS_SHOW_INPUT_FEEDBACK_BAR = "settings_showInputFeedbackBar"
+    val SETTINGS_MUSIC_OFFSET_MS = "settings_musicOffsetMs"
     
     val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
     val EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE = "editorsettings_camera_pan_on_drag_edge"

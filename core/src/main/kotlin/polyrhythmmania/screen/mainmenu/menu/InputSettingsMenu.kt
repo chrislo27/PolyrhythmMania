@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
+import paintbox.ui.Tooltip
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
@@ -23,6 +24,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     val pendingKeyboardBinding: Var<PendingKeyboardBinding?> = mainMenu.pendingKeyboardBinding
     val keyboardSettings: KeyboardInputMenu = this.KeyboardInputMenu(menuCol)
     val feedbackSettings: InputFeedbackMenu = this.InputFeedbackMenu(menuCol)
+    val calibrationSettings: CalibrationMenu = this.CalibrationMenu(menuCol)
 
     init {
         this.setSize(MMMenu.WIDTH_EXTRA_SMALL)
@@ -46,7 +48,9 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.calibration").use() }.apply {
-                this.disabled.set(true)
+                this.setOnAction {
+                    menuCol.pushNextMenu(calibrationSettings)
+                }
             }
             vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.feedback").use() }.apply {
                 this.setOnAction {
@@ -74,6 +78,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         menuCol.addMenu(keyboardSettings)
         menuCol.addMenu(feedbackSettings)
+        menuCol.addMenu(calibrationSettings)
     }
 
     fun interface PendingKeyboardBinding {
@@ -271,6 +276,79 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         menuCol.popLastMenu()
                     }
                     this.disabled.bind { pendingKeyboardBinding.use() != null }
+                }
+            }
+        }
+    }
+
+    inner class CalibrationMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+
+        val manualOffsetSlider: Slider = Slider().apply {
+            this.bindWidthToParent(multiplier = 0.75f)
+            this.minimum.set(-100f)
+            this.maximum.set(100f)
+            this.tickUnit.set(1f)
+            this.setValue(settings.musicOffsetMs.getOrCompute().toFloat())
+            this.value.addListener { v ->
+                settings.musicOffsetMs.set(v.getOrCompute().toInt())
+            }
+        }
+        init {
+            this.setSize(MMMenu.WIDTH_MID)
+            this.titleText.bind { Localization.getVar("mainMenu.inputSettings.calibration").use() }
+            this.contentPane.bounds.height.set(300f)
+
+            val scrollPane = ScrollPane().apply {
+                Anchor.TopLeft.configure(this)
+                this.bindHeightToParent(-40f)
+
+                (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+
+                this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+                this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+
+                val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+                this.vBar.skinID.set(scrollBarSkinID)
+                this.hBar.skinID.set(scrollBarSkinID)
+            }
+            val hbox = HBox().apply {
+                Anchor.BottomLeft.configure(this)
+                this.spacing.set(8f)
+                this.padding.set(Insets(2f))
+                this.bounds.height.set(40f)
+            }
+            contentPane.addChild(scrollPane)
+            contentPane.addChild(hbox)
+
+            val vbox = VBox().apply {
+                Anchor.TopLeft.configure(this)
+                this.bounds.height.set(300f)
+                this.spacing.set(0f)
+            }
+
+            vbox.temporarilyDisableLayouts {
+                vbox += createSliderPane(manualOffsetSlider) { 
+                    Localization.getVar("mainMenu.inputSettings.calibration.musicOffset", Var.bind {listOf(manualOffsetSlider.value.useF().toInt())}).use()
+                }.apply {
+                    this.label.tooltipElement.set(Tooltip(binding = {Localization.getVar("mainMenu.inputSettings.calibration.musicOffset.tooltip").use()}, font = font))
+                }
+            }
+            vbox.sizeHeightToChildren(100f)
+            scrollPane.setContent(vbox)
+
+            hbox.temporarilyDisableLayouts {
+                hbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
+                    this.bounds.width.set(100f)
+                    this.setOnAction {
+                        menuCol.popLastMenu()
+                    }
+                    this.disabled.bind { pendingKeyboardBinding.use() != null }
+                }
+                hbox += createSmallButton(binding = { Localization.getVar("mainMenu.inputSettings.calibration.reset").use() }).apply {
+                    this.bounds.width.set(200f)
+                    this.setOnAction {
+                        manualOffsetSlider.setValue(0f)
+                    }
                 }
             }
         }

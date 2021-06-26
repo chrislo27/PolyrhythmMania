@@ -51,7 +51,6 @@ import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.Semitones
-import polyrhythmmania.world.EntityRod
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.TemporaryEntity
 import polyrhythmmania.world.World
@@ -63,7 +62,6 @@ import java.util.*
 import kotlin.collections.LinkedHashMap
 import kotlin.concurrent.thread
 import kotlin.math.floor
-import kotlin.system.measureNanoTime
 
 
 class Editor(val main: PRManiaGame)
@@ -907,6 +905,7 @@ class Editor(val main: PRManiaGame)
             } else if (!engine.autoInputs && !engine.inputter.areInputsLocked) {
                 val atSeconds = engine.seconds
                 val keyboardKeybinds = inputKeymapKeyboard
+                val calibrationMs = settings.musicOffsetMs.getOrCompute().toFloat()
                 when (keycode) {
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
                     keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {

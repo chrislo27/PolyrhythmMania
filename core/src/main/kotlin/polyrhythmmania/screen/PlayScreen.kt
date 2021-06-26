@@ -53,7 +53,8 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 
-class PlayScreen(main: PRManiaGame, val container: Container)
+class PlayScreen(main: PRManiaGame, val container: Container,
+                 val musicOffsetMs: Float = main.settings.musicOffsetMs.getOrCompute().toFloat())
     : PRManiaScreen(main) {
 
     val timing: TimingProvider get() = container.timing
@@ -355,6 +356,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         engine.autoInputs = false
         engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
         engine.inputter.clearInputs()
+        engine.musicOffsetMs = musicOffsetMs
         engine.resetEndSignal()
 
         soundSystem.startRealtime()
