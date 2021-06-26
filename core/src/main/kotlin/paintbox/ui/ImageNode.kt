@@ -23,6 +23,12 @@ open class ImageNode(tex: TextureRegion? = null,
     val rotationPointY: FloatVar = FloatVar(0.5f)
     val renderAlign: Var<Int> = Var(Align.center)
 
+    constructor(binding: Var.Context.() -> TextureRegion?,
+                renderingMode: ImageRenderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
+            : this(null, renderingMode) {
+        textureRegion.bind(binding)
+    }
+
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         val tex = textureRegion.getOrCompute()
         if (tex != null) {
