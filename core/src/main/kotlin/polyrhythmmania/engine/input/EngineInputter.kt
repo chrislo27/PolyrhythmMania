@@ -108,7 +108,9 @@ class EngineInputter(val engine: Engine) {
                 }
                 
                 // Bounce the rod
-                rod.bounce(nextBlockIndex)
+                if (inputResult.inputScore != InputScore.MISS) {
+                    rod.bounce(nextBlockIndex)
+                }
             }
             
             // Trigger this piston
