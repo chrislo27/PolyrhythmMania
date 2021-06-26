@@ -89,7 +89,7 @@ class TemporaryResultsMenu(menuCol: MenuCollection, val results: Results, val co
                             this.onEntryEnd = {
                                 menuCol.popLastMenu(instant = true, playSound = false)
                                 menuCol.removeMenu(this@TemporaryResultsMenu)
-                                playScreen.resetAndStartOver(playSound = false)
+                                playScreen.resetAndStartOver(doWipeTransition = false, playSound = false)
                             }
                         }
                     }

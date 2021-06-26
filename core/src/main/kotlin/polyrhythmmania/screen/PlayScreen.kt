@@ -401,21 +401,30 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         }
     }
 
-    fun resetAndStartOver(playSound: Boolean = true) {
+    fun resetAndStartOver(doWipeTransition: Boolean, playSound: Boolean = true) {
         if (playSound) {
             playMenuSound("sfx_menu_enter_game")
         }
         val thisScreen: PlayScreen = this
-        main.screen = TransitionScreen(main, thisScreen, thisScreen, WipeToColor(Color.BLACK.cpy(), 0.4f), WipeFromColor(Color.BLACK.cpy(), 0.4f)).apply {
-            onEntryEnd = {
-                val blocks = container.blocks.toList()
-                engine.removeEvents(engine.events.toList())
-                engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
-                container.world.resetWorld()
-                container.world.tilesetConfig.applyTo(container.renderer.tileset)
-                prepareGameStart()
-                unpauseGame(false)
+        val resetAction: () -> Unit = {
+            val blocks = container.blocks.toList()
+            engine.removeEvents(engine.events.toList())
+            engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
+            container.world.resetWorld()
+            container.world.tilesetConfig.applyTo(container.renderer.tileset)
+            prepareGameStart()
+            unpauseGame(false)
+        }
+        if (doWipeTransition) {
+            main.screen = TransitionScreen(main, thisScreen, thisScreen,
+                    WipeToColor(Color.BLACK.cpy(), 0.4f), WipeFromColor(Color.BLACK.cpy(), 0.4f)).apply {
+                onEntryEnd = resetAction
+                onStart = {
+                    Gdx.input.isCursorCatched = true
+                }
             }
+        } else {
+            resetAction()
         }
     }
 
@@ -425,7 +434,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
                 unpauseGame(true)
             }
             1 -> { // Start Over
-                resetAndStartOver()
+                resetAndStartOver(true)
             }
             2 -> { // Quit to Main Menu
                 val main = this@PlayScreen.main
