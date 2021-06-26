@@ -53,7 +53,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         NONE, MOVE_LEFT, MOVE_RIGHT, //BACKSPACE, DELETE
     }
 
-    val hasFocus: ReadOnlyVar<Boolean> = Var(false)
+    override val hasFocus: ReadOnlyVar<Boolean> = Var(false)
     private var caretBlinkTimer: Float = 0f
     private var keyRepeatTimer: Float = 0f
     private var keymode: KeyMode = KeyMode.NONE
@@ -458,8 +458,9 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 if (!hasFocusNow && element.text.getOrCompute().isEmpty()) {
                     tmpColor.set(textColor)
                     tmpColor.a *= opacity * 0.5f
-                    batch.color = tmpColor
+                    bitmapFont.color = tmpColor
                     bitmapFont.draw(batch, element.emptyHintText.getOrCompute(), rectX /* no offset */, rectY - (rectH - layout.height) / 2f)
+                    bitmapFont.setColor(1f, 1f, 1f, 1f)
                 }
 
                 caretHeight = bitmapFont.data.lineHeight

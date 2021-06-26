@@ -1,11 +1,15 @@
 package paintbox.ui
 
+import paintbox.binding.ReadOnlyVar
+
 
 /**
  * To be implemented by a [UIElement] to show it is focusable. Only one element can have focus at any point,
  * tracked by the SceneRoot.
  */
 interface Focusable {
+    
+    val hasFocus: ReadOnlyVar<Boolean>
     
     fun onFocusGained() {
     }
