@@ -14,7 +14,7 @@ data class InputKeymapKeyboard(
         val buttonDpadDown: Int = Input.Keys.S,
         val buttonDpadLeft: Int = Input.Keys.A,
         val buttonDpadRight: Int = Input.Keys.D,
-        val pause: Int = Input.Keys.ENTER,
+        val pause: Int = Input.Keys.SPACE,
 ) {
     companion object {
         const val TEXT_BUTTON_A: String = "${RodinSpecialChars.BORDERED_A}"
@@ -31,7 +31,7 @@ data class InputKeymapKeyboard(
                     obj["dpadDown"]?.asInt() ?: Input.Keys.S,
                     obj["dpadLeft"]?.asInt() ?: Input.Keys.A,
                     obj["dpadRight"]?.asInt() ?: Input.Keys.D,
-                    obj["pause"]?.asInt() ?: Input.Keys.ENTER,
+                    obj["pause"]?.asInt() ?: Input.Keys.SPACE,
             )
         }
     }
