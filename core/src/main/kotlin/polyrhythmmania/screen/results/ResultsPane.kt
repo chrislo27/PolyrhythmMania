@@ -120,9 +120,10 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             val noMiss = sc.noMiss
             val skillStar = sc.skillStar
             val list = mutableListOf<String>()
-            if (noMiss) list += "play.results.noMiss"
-            if (skillStar) list += "play.results.skillStar"
-            list.joinToString(separator = " ") { Localization.getValue(it) }
+            list += Localization.getValue("play.results.nInputs", sc.inputsHit, sc.nInputs)
+            if (noMiss) list += Localization.getValue("play.results.noMiss")
+            if (skillStar) list += Localization.getValue("play.results.skillStar")
+            list.joinToString(separator = " ") { it }
         }, resultsFont).apply {
             this.doXCompression.set(false)
             this.renderAlign.set(Align.topLeft)

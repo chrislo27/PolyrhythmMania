@@ -14,6 +14,6 @@ object InputThresholds {
         InputResult(InputType.A, 0f, 0f)
         InputScore.ACE
         Ranking.SUPERB
-        Score(0, 0f, 0, false, false, "", "")
+        Score(0, 0f, 0, 1, false, false, "", "")
     }
 }

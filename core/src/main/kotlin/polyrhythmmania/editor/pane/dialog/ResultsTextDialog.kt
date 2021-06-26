@@ -33,6 +33,7 @@ class ResultsTextDialog(editorPane: EditorPane)
 
     private val resultsText: Var<ResultsText> = Var(editor.container.resultsText)
     private val testScoreNoMiss: Var<Boolean> = Var(true)
+    private val testScoreSkillStar: Var<Boolean> = Var(false)
     private val testScoreValue: FloatVar = FloatVar(0f)
     
     private val resultsPreview: ResultsPreview
@@ -92,12 +93,24 @@ class ResultsTextDialog(editorPane: EditorPane)
                     font = editorPane.palette.musicDialogFont).apply {
                 this.bounds.height.set(32f)
                 this.selectedState.set(testScoreNoMiss.getOrCompute())
-                this.onSelected = {
+                this.onCheckChanged = {
                     testScoreNoMiss.set(this.selectedState.getOrCompute())
                 }
                 this.imageNode.padding.set(Insets(0f, 0f, 0f, 6f))
                 this.imageNode.tint.set(Color.WHITE)
                 this.textLabel.textColor.set(Color.WHITE)
+            }
+            leftVbox += CheckBox(binding = { Localization.getVar("editor.dialog.resultsText.skillStar").use() },
+                    font = editorPane.palette.musicDialogFont).apply {
+                this.bounds.height.set(32f)
+                this.selectedState.set(testScoreSkillStar.getOrCompute())
+                this.onCheckChanged = {
+                    testScoreSkillStar.set(this.selectedState.getOrCompute())
+                }
+                this.imageNode.padding.set(Insets(0f, 0f, 0f, 6f))
+                this.imageNode.tint.set(Color.WHITE)
+                this.textLabel.textColor.set(Color.WHITE)
+                this.visible.set(false) // TODO add skill star input
             }
         }
         contentPane += leftVbox
@@ -199,8 +212,10 @@ class ResultsTextDialog(editorPane: EditorPane)
             val resultsText = resultsText.use()
             val scoreInt = testScoreValue.useF().toInt()
             val lines: Pair<String, String> = resultsText.generateLinesOfText(scoreInt, false, false)
-            Score(scoreInt, scoreInt.toFloat(), 8,
-                    false /* TODO set skill star result*/, testScoreNoMiss.use(),
+            val noMiss = testScoreNoMiss.use()
+            val skillStar = testScoreSkillStar.use()
+            Score(scoreInt, scoreInt.toFloat(), if (noMiss) 8 else 7, 8,
+                    skillStar, noMiss,
                     resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                     lines.first, lines.second
             )

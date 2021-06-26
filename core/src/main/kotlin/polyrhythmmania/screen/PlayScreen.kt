@@ -38,10 +38,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.engine.input.InputType
-import polyrhythmmania.engine.input.Ranking
-import polyrhythmmania.engine.input.Score
+import polyrhythmmania.engine.input.*
 import polyrhythmmania.screen.mainmenu.menu.TemporaryResultsMenu
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -296,6 +293,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
 
     private fun transitionToResults() {
         val inputter = engine.inputter
+        val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
         val nInputs = inputter.totalExpectedInputs
         val rawScore: Float = (if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
             inputScore.weight
@@ -310,7 +308,7 @@ class PlayScreen(main: PRManiaGame, val container: Container)
         val badLeftGoodRight = leftResults.isNotEmpty() && rightResults.isNotEmpty()
                 && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
         val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
-        val scoreObj = Score(score, rawScore, nInputs,
+        val scoreObj = Score(score, rawScore, inputsHit, nInputs,
                 false /* TODO set skill star result */, inputter.noMiss,
                 resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                 lines.first, lines.second,
