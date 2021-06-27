@@ -36,6 +36,7 @@ object Instantiators {
     
     private const val CATEGORY_CORE: String = "core"
     private const val CATEGORY_VFX: String = "vfx"
+    private const val CATEGORY_ADVANCED: String = "advanced"
 
     val endStateInstantiator: Instantiator<BlockEndState>
     
@@ -80,6 +81,10 @@ object Instantiators {
                 Localization.getVar("instantiatorCategory.vfx.name"),
                 Localization.getVar("instantiatorCategory.vfx.summary"),
                 Localization.getVar("instantiatorCategory.vfx.desc")))
+        add(ListCategory(CATEGORY_ADVANCED,
+                Localization.getVar("instantiatorCategory.advanced.name"),
+                Localization.getVar("instantiatorCategory.advanced.summary"),
+                Localization.getVar("instantiatorCategory.advanced.desc")))
         
         // Basic instantiators
         endStateInstantiator = Instantiator("endState", BlockEndState::class.java,
@@ -113,6 +118,12 @@ object Instantiators {
                 Localization.getVar("instantiator.despawnPattern.desc")) { engine ->
             BlockDespawnPattern(engine)
         })
+        add(CATEGORY_CORE, Instantiator("skillStar", BlockSkillStar::class.java,
+                Localization.getVar("instantiator.skillStar.name"),
+                Localization.getVar("instantiator.skillStar.summary"),
+                Localization.getVar("instantiator.skillStar.desc")) { engine ->
+            BlockSkillStar(engine)
+        })
         
         // VFX instantiators
         add(CATEGORY_VFX, Instantiator("tilesetChange", BlockTilesetChange::class.java,
@@ -120,6 +131,14 @@ object Instantiators {
                 Localization.getVar("instantiator.tilesetChange.summary"),
                 Localization.getVar("instantiator.tilesetChange.desc")) { engine ->
             BlockTilesetChange(engine)
+        })
+        
+        // Advanced instantiators
+        add(CATEGORY_ADVANCED, Instantiator("selectiveSpawn", BlockSelectiveSpawnPattern::class.java,
+                Localization.getVar("instantiator.selectiveSpawn.name"),
+                Localization.getVar("instantiator.selectiveSpawn.summary"),
+                Localization.getVar("instantiator.selectiveSpawn.desc")) { engine ->
+            BlockSelectiveSpawnPattern(engine)
         })
 
 //        add(Instantiator("baselineTest", Var("Baseline Test"), Var("Description baseline test."), Var("[font=prmania_icons]RspladAD[]")) { engine ->

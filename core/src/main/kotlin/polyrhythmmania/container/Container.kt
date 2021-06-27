@@ -87,6 +87,14 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         val endBlockPos = endBlockPosition.useF()
         if (endBlockPos < Float.POSITIVE_INFINITY) endBlockPos else lastBlockPosition.useF()
     }
+    
+    init {
+        engine.inputter.skillStarGotten.addListener {
+            if (it.getOrCompute()) {
+                renderer.fireSkillStar()
+            }
+        }
+    }
 
     fun setCompressedMusic(res: ExternalResource?) {
         removeResource(RES_KEY_COMPRESSED_MUSIC)

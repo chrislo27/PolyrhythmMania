@@ -326,11 +326,13 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
                     }
                 }
                 
+                // Auto-inputs
                 if (engine.autoInputs) {
                     if (collision.velocityY == 0f && blockBelow.active && blockBelow.type != EntityRowBlock.Type.PLATFORM 
                             && blockBelow.pistonState == EntityRowBlock.PistonState.RETRACTED
                             && currentIndexFloat - currentIndex in 0.25f..0.65f) {
                         blockBelow.fullyExtend(engine, beat)
+                        engine.inputter.attemptSkillStar(currentIndex / this.xUnitsPerBeat + this.deployBeat + 4f)
                     }
                 }
             }

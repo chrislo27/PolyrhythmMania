@@ -33,7 +33,7 @@ class ResultsTextDialog(editorPane: EditorPane)
 
     private val resultsText: Var<ResultsText> = Var(editor.container.resultsText)
     private val testScoreNoMiss: Var<Boolean> = Var(true)
-    private val testScoreSkillStar: Var<Boolean> = Var(false)
+    private val testScoreSkillStar: Var<Boolean> = Var(true)
     private val testScoreValue: FloatVar = FloatVar(0f)
     
     private val resultsPreview: ResultsPreview
@@ -110,7 +110,6 @@ class ResultsTextDialog(editorPane: EditorPane)
                 this.imageNode.padding.set(Insets(0f, 0f, 0f, 6f))
                 this.imageNode.tint.set(Color.WHITE)
                 this.textLabel.textColor.set(Color.WHITE)
-                this.visible.set(false) // TODO add skill star input
             }
         }
         contentPane += leftVbox

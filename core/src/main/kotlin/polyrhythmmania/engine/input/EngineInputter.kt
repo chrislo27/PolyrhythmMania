@@ -1,12 +1,15 @@
 package polyrhythmmania.engine.input
 
+import com.badlogic.gdx.math.MathUtils
 import paintbox.Paintbox
+import paintbox.binding.Var
+import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.EntityRod
 import polyrhythmmania.world.EntityRowBlock
 import polyrhythmmania.world.World
-import java.util.concurrent.CopyOnWriteArrayList
 
 
 /**
@@ -31,20 +34,28 @@ class EngineInputter(val engine: Engine) {
 
     private val world: World = engine.world
     var areInputsLocked: Boolean = true
+    var skillStarBeat: Float = Float.POSITIVE_INFINITY
     
     var totalExpectedInputs: Int = 0
         private set
     var noMiss: Boolean = true
         private set
+    val skillStarGotten: Var<Boolean> = Var(false)
     val inputResults: List<InputResult> = mutableListOf()
     
     val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
+    
+    init {
+        clearInputs()
+    }
     
     fun clearInputs() {
         totalExpectedInputs = 0
         (inputResults as MutableList).clear()
         inputFeedbackFlashes.fill(-10000f)
         noMiss = true
+        skillStarGotten.set(false)
+        skillStarBeat = Float.POSITIVE_INFINITY
     }
 
     fun onInput(type: InputType, atSeconds: Float) {
@@ -110,6 +121,9 @@ class EngineInputter(val engine: Engine) {
                 // Bounce the rod
                 if (inputResult.inputScore != InputScore.MISS) {
                     rod.bounce(nextBlockIndex)
+                    if (inputResult.inputScore == InputScore.ACE) {
+                        attemptSkillStar(perfectBeats)
+                    }
                 } else {
                     missed()
                 }
@@ -131,6 +145,21 @@ class EngineInputter(val engine: Engine) {
     
     fun missed() {
         noMiss = false
+    }
+
+    fun attemptSkillStar(beat: Float): Boolean {
+        if (!skillStarGotten.getOrCompute() && MathUtils.isEqual(skillStarBeat, beat, 0.025f)) {
+            skillStarGotten.set(true)
+            onSkillStarHit()
+            return true
+        }
+        return false
+    }
+    
+    fun onSkillStarHit() {
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_skill_star")) { player ->
+            player.gain = 0.6f
+        }
     }
     
 }

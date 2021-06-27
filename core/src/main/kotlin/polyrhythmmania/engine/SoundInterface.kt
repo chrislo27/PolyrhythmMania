@@ -62,6 +62,8 @@ sealed class SoundInterface {
     }
     
     open var disableSounds: Boolean = false
+    
+    private val audioPlayedLastFrame: MutableSet<BeadsAudio> = mutableSetOf()
 
     /**
      * Gets the current [MusicSamplePlayer] for the given music [audio]. It is up to each implementation
@@ -75,5 +77,16 @@ sealed class SoundInterface {
     
     abstract fun playAudio(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long
     
+    fun playAudioNoOverlap(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long {
+        if (audio in audioPlayedLastFrame) return -1L
+        audioPlayedLastFrame += audio
+        return playAudio(audio, callback)
+    }
+    
+    open fun update(delta: Float) {
+        if (audioPlayedLastFrame.isNotEmpty()) {
+            audioPlayedLastFrame.clear()
+        }
+    }
     
 }

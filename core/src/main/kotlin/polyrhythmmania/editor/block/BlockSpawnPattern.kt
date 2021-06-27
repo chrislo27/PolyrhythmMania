@@ -1,11 +1,10 @@
 package polyrhythmmania.editor.block
 
-import com.eclipsesource.json.Json
-import com.eclipsesource.json.JsonArray
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.Var
 import paintbox.ui.contextmenu.CheckBoxMenuItem
 import paintbox.ui.contextmenu.ContextMenu
+import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
@@ -14,7 +13,6 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EntityRowBlock
 import polyrhythmmania.world.EventRowBlockSpawn
 import polyrhythmmania.world.Row
-import polyrhythmmania.world.World
 import java.util.*
 
 
@@ -142,6 +140,8 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return ContextMenu().also { ctxmenu ->
+            ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.spawnPattern"), editor.editorPane.palette.markup))
+            ctxmenu.addMenuItem(SeparatorMenuItem())
             patternData.createMenuItems(editor).forEach { ctxmenu.addMenuItem(it) }
             ctxmenu.addMenuItem(SeparatorMenuItem())
             ctxmenu.addMenuItem(CheckBoxMenuItem.create(disableTailEnd,
@@ -163,20 +163,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
 
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
-        obj.add("patternData", Json.`object`().also { o ->
-            val patData = this.patternData
-            o.add("rowCount", patData.rowCount)
-            o.add("a", Json.array().also { a ->
-                patData.rowATypes.forEach { cubeType ->
-                    a.add(cubeType.jsonId)
-                }
-            })
-            o.add("dpad", Json.array().also { a ->
-                patData.rowDpadTypes.forEach { cubeType ->
-                    a.add(cubeType.jsonId)
-                }
-            })
-        })
+        patternData.writeToJson(obj)
         if (disableTailEnd.getOrCompute()) {
             obj.add("disableTailEnd", true)
         }
@@ -184,34 +171,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        val patternDataObj = obj.get("patternData")
-        if (patternDataObj != null && patternDataObj.isObject) {
-            patternDataObj as JsonObject
-            val rowCount: Int = patternDataObj.getInt("rowCount", 0)
-            if (rowCount > 0 && rowCount < World.DEFAULT_ROW_LENGTH) {
-                val newPatData = PatternBlockData(rowCount)
-                val a = patternDataObj.get("a")
-                if (a != null && a.isArray) {
-                    a as JsonArray
-                    a.forEachIndexed { index, value ->
-                        if (index < rowCount && value.isNumber) {
-                            newPatData.rowATypes[index] = CubeType.INDEX_MAP[value.asInt()] ?: CubeType.NONE
-                        }
-                    }
-                }
-                val dpad = patternDataObj.get("dpad")
-                if (dpad != null && dpad.isArray) {
-                    dpad as JsonArray
-                    dpad.forEachIndexed { index, value ->
-                        if (index < rowCount && value.isNumber) {
-                            newPatData.rowDpadTypes[index] = CubeType.INDEX_MAP[value.asInt()] ?: CubeType.NONE
-                        }
-                    }
-                }
-
-                this.patternData = newPatData
-            }
-        }
+        this.patternData = PatternBlockData.readFromJson(obj) ?: this.patternData 
         val disableTailEndValue = obj.get("disableTailEnd")
         if (disableTailEndValue != null && disableTailEndValue.isBoolean) {
             disableTailEnd.set(disableTailEndValue.asBoolean())

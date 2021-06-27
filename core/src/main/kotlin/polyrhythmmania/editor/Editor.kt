@@ -190,6 +190,7 @@ class Editor(val main: PRManiaGame)
             beatLines.active = false
         }
         autosaveInterval.addListener(autosaveIntervalListener)
+        renderer.renderUI = false
     }
 
     init { // This init block should be LAST
@@ -537,6 +538,7 @@ class Editor(val main: PRManiaGame)
     fun setPlaytestingEnabled(enabled: Boolean) {
         engine.autoInputs = !enabled
         engine.inputter.areInputsLocked = !enabled
+        renderer.renderUI = enabled
     }
 
     fun attemptNewLevel() {
@@ -582,6 +584,7 @@ class Editor(val main: PRManiaGame)
             engine.resetEndSignal()
             cameraOffset.changeTarget(0f)
             cameraOffset.reset()
+            renderer.resetSkillStar()
 
             val playbackStartBeats = this.playbackStart.get()
             val newSeconds = engine.tempos.beatsToSeconds(playbackStartBeats)
@@ -905,7 +908,6 @@ class Editor(val main: PRManiaGame)
             } else if (!engine.autoInputs && !engine.inputter.areInputsLocked) {
                 val atSeconds = engine.seconds
                 val keyboardKeybinds = inputKeymapKeyboard
-                val calibrationMs = settings.musicOffsetMs.getOrCompute().toFloat()
                 when (keycode) {
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
                     keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {

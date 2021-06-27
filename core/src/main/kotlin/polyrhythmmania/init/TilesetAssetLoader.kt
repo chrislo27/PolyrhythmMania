@@ -23,7 +23,7 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
             this.minFilter = Texture.TextureFilter.Linear
         }
         
-        AssetRegistry.loadAsset<Texture>("tileset_gba", "textures/world/gba_spritesheet.png")
+//        AssetRegistry.loadAsset<Texture>("tileset_gba", "textures/world/gba_spritesheet.png")
 
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_parts", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "cube_border",
@@ -72,6 +72,11 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "sign_ta_shadow",
                 "xyz",
         ).map { Packable(it, "textures/world/parts/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 256, duplicateBorder = false,)))
+        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                "skill_star",
+                "skill_star_grey",
+        ).map { Packable(it, "textures/world/ui/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 256, duplicateBorder = false,
+                atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {

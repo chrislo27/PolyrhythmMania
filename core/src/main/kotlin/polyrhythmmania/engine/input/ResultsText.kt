@@ -19,12 +19,12 @@ data class ResultsText(
         val DEFAULT: ResultsText = ResultsText(null, null, null, null, null, null)
         
         fun fromJson(obj: JsonObject): ResultsText {
-            val title: String? = obj.getString("title", null)
-            val ok: String? = obj.getString("ok", null)
-            val firstNegative: String? = obj.getString("firstNegative", null)
-            val secondNegative: String? = obj.getString("secondNegative", null)
-            val firstPositive: String? = obj.getString("firstPositive", null)
-            val secondPositive: String? = obj.getString("secondPositive", null)
+            val title: String? = obj.get("title")?.takeIf { it.isString }?.asString()
+            val ok: String? = obj.get("ok")?.takeIf { it.isString }?.asString()
+            val firstNegative: String? = obj.get("firstNegative")?.takeIf { it.isString }?.asString()
+            val secondNegative: String? = obj.get("secondNegative")?.takeIf { it.isString }?.asString()
+            val firstPositive: String? = obj.get("firstPositive")?.takeIf { it.isString }?.asString()
+            val secondPositive: String? = obj.get("secondPositive")?.takeIf { it.isString }?.asString()
             return ResultsText(title, ok, firstNegative, secondNegative, firstPositive, secondPositive)
         }
     }

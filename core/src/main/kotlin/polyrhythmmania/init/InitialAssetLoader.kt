@@ -105,6 +105,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 "spawn_a", "spawn_d", "cowbell",).forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_$it", "sounds/${it}.wav")
         }
+        AssetRegistry.loadAsset<BeadsSound>("sfx_skill_star", "sounds/skill_star.ogg")
         listOf("enter", "exit", "robot_off", "robot_on").forEach {
             AssetRegistry.loadAsset<Sound>("sfx_pause_$it", "sounds/pause/${it}.ogg")
         }

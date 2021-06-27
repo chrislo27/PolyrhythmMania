@@ -1,10 +1,15 @@
 package polyrhythmmania.world.render
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
+import paintbox.packing.PackedSheet
+import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.intersects
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.Entity
@@ -45,10 +50,30 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 //        zoom = 1.5f
         update()
     }
+    val uiCamera: OrthographicCamera = OrthographicCamera().apply {
+        setToOrtho(false, 1280f, 720f)
+        update()
+    }
     private val tmpMatrix: Matrix4 = Matrix4()
 
     var entitiesRenderedLastCall: Int = 0
         private set
+    
+    var renderUI: Boolean = true
+    
+    private var skillStarSpinAnimation: Float = 0f
+    private var skillStarPulseAnimation: Float = 0f
+    
+    
+    fun fireSkillStar() {
+        skillStarSpinAnimation = 1f
+        skillStarPulseAnimation = 2f
+    }
+    
+    fun resetSkillStar() {
+        skillStarSpinAnimation = 0f
+        skillStarPulseAnimation = 0f
+    }
 
     fun render(batch: SpriteBatch, engine: Engine) {
         tmpMatrix.set(batch.projectionMatrix)
@@ -78,6 +103,45 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
             }
         }
         this.entitiesRenderedLastCall = entitiesRendered
+        
+        batch.projectionMatrix = uiCamera.combined
+
+        if (renderUI) {
+            val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
+
+            // Skill star
+            val skillStarInput = engine.inputter.skillStarBeat
+            if (skillStarInput.isFinite()) {
+                if (skillStarSpinAnimation > 0) {
+                    skillStarSpinAnimation -= Gdx.graphics.deltaTime / 1f
+                    if (skillStarSpinAnimation < 0)
+                        skillStarSpinAnimation = 0f
+                }
+                if (skillStarPulseAnimation > 0) {
+                    skillStarPulseAnimation -= Gdx.graphics.deltaTime / 0.5f
+                    if (skillStarPulseAnimation < 0)
+                        skillStarPulseAnimation = 0f
+                } else {
+                    // Pulse before skill star input
+                    val threshold = 0.1f
+                    for (i in 0 until 4) {
+                        val beatPoint = engine.tempos.beatsToSeconds(skillStarInput - i)
+                        if (engine.seconds in beatPoint..beatPoint + threshold) {
+                            skillStarPulseAnimation = 0.5f
+                            break
+                        }
+                    }
+                }
+
+                val texColoured = uiSheet["skill_star"]
+                val texGrey = uiSheet["skill_star_grey"]
+
+                val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
+                val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
+                batch.draw(if (engine.inputter.skillStarGotten.getOrCompute()) texColoured else texGrey,
+                        1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
+            }
+        }
 
         batch.end()
         batch.projectionMatrix = tmpMatrix

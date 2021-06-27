@@ -112,6 +112,8 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
             queuedRunnables.clear()
         }
         
+        soundInterface.update(delta)
+        
         var anyToDelete = false
         events.forEach { event ->
             updateEvent(event, currentBeat)
