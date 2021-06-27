@@ -166,9 +166,9 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
             }
         }
         
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-//            main.screen = ResultsScreen(main, score.copy(), container, keyboardKeybinds)
-//        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            main.screen = ResultsScreen(main, score.copy(), container, keyboardKeybinds)
+        }
     }
 
     override fun show() {

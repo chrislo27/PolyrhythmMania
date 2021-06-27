@@ -310,7 +310,7 @@ class PlayScreen(main: PRManiaGame, val container: Container,
                 && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
         val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
         val scoreObj = Score(score, rawScore, inputsHit, nInputs,
-                false /* TODO set skill star result */, inputter.noMiss,
+                inputter.skillStarGotten.getOrCompute() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
                 resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                 lines.first, lines.second,
                 ranking
