@@ -66,7 +66,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
             this.renderAlign.set(Align.center)
             this.textAlign.set(TextAlign.CENTRE)
-            this.doLineWrapping.set(true)
+//            this.doLineWrapping.set(true)
         }
         content.addChild(descLabel)
 
@@ -158,6 +158,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
      */
     private fun loadFile(newFile: File) {
         Gdx.app.postRunnable {
+            descLabel.doLineWrapping.set(false)
             descLabel.text.set(Localization.getValue("editor.dialog.load.loading"))
             substate.set(Substate.LOADING)
         }
@@ -198,6 +199,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             val exClassName = e.javaClass.name
             Gdx.app.postRunnable {
                 substate.set(Substate.LOAD_ERROR)
+                descLabel.doLineWrapping.set(true)
                 descLabel.text.set(Localization.getValue("editor.dialog.load.loadError", exClassName))
                 newContainer.disposeQuietly()
             }
