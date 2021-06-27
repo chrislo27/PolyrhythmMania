@@ -345,7 +345,6 @@ class PlayScreen(main: PRManiaGame, val container: Container,
     }
 
     fun prepareGameStart() {
-        engine.autoInputs = false
         engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
         engine.inputter.clearInputs()
         renderer.resetSkillStar()

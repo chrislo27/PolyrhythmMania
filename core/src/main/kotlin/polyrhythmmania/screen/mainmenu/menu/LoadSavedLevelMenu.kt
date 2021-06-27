@@ -16,6 +16,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
+import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
@@ -99,7 +100,12 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setOnAction {
                     val loadedData = loaded
                     if (loadedData != null) {
+                        val robotMode = Gdx.input.isShiftDown()
                         menuCol.playMenuSound("sfx_menu_enter_game")
+                        if (robotMode) {
+                            menuCol.playMenuSound("sfx_pause_robot_on")
+                            loadedData.newContainer.engine.autoInputs = true
+                        }
                         mainMenu.transitionAway {
                             val main = mainMenu.main
                             val playScreen = PlayScreen(main, loadedData.newContainer)
@@ -179,6 +185,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             if (newContainer.blocks.none { it is BlockEndState }) {
                 Gdx.app.postRunnable {
                     substate.set(Substate.LOAD_ERROR)
+                    descLabel.doLineWrapping.set(true)
                     descLabel.text.set(Localization.getValue("mainMenu.play.noEndState",
                             Localization.getValue(Instantiators.endStateInstantiator.name.getOrCompute())))
                     newContainer.disposeQuietly()
