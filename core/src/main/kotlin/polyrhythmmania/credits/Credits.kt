@@ -10,6 +10,9 @@ object Credits {
             "credits.graphicDesign" to abcSorted(
                     "garbo", "snow krow",
             ),
+            "credits.music" to abcSorted(
+                    "GenericArrangements"
+            ),
             "credits.qa" to abcSorted(
                     "Lvl100Feraligatr", "Gosh", "GenericArrangements", "snow krow", "Kievit", "Chloe"
             ) + listOf("Tourneycord Discord\nserver"),
