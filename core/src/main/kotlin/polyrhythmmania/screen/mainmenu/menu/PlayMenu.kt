@@ -39,8 +39,8 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNextMenu(loadMenu)
                 }
             }
-//            vbox += createLongButton { Localization.getVar("mainMenu.play.practice").use() }.apply {
-//            }
+            vbox += createLongButton { Localization.getVar("mainMenu.play.practice").use() }.apply {
+            }
             vbox += createLongButton { "...Other modes (possibly) coming soon!" }.apply {
                 this.disabled.set(true)
             }

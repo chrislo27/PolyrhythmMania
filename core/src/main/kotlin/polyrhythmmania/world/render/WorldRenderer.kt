@@ -2,16 +2,23 @@ package polyrhythmmania.world.render
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.Align
+import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
+import paintbox.ui.Anchor
+import paintbox.ui.SceneRoot
+import paintbox.ui.area.Insets
+import paintbox.ui.control.TextLabel
 import paintbox.util.gdxutils.intersects
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.world.Entity
 import polyrhythmmania.world.World
 
@@ -64,6 +71,22 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     private var skillStarSpinAnimation: Float = 0f
     private var skillStarPulseAnimation: Float = 0f
     
+    private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
+    private val textBoxPane: TextboxPane = TextboxPane()
+    private val textBoxLabel: TextLabel = TextLabel("", font = PRManiaGame.instance.fontGameTextbox)
+    
+    init {
+        uiSceneRoot += textBoxPane.apply { 
+            Anchor.TopCentre.configure(textBoxPane, offsetY = 64f)
+            this.bounds.width.set(1000f)
+            this.bounds.height.set(150f)
+            this.padding.set(Insets(16f, 16f, 32f, 32f))
+            this += textBoxLabel.apply { 
+                this.renderAlign.set(Align.center)
+                this.textAlign.set(TextAlign.LEFT)
+            }
+        }
+    }
     
     fun fireSkillStar() {
         skillStarSpinAnimation = 1f
@@ -141,6 +164,14 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                 batch.draw(if (engine.inputter.skillStarGotten.getOrCompute()) texColoured else texGrey,
                         1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
             }
+            
+            val textBox = engine.activeTextBox
+            textBoxPane.visible.set(textBox != null)
+            if (textBox != null) {
+                textBoxLabel.text.set(textBox.textBox.text)
+            }
+            
+            uiSceneRoot.renderAsRoot(batch)
         }
 
         batch.end()

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.disposeQuietly
 import net.beadsproject.beads.ugens.SamplePlayer
+import paintbox.util.gdxutils.isKeyJustReleased
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -116,15 +117,21 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
         
         // Inputs
         if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-            val atSeconds = engine.seconds
             engine.postRunnable {
-                engine.inputter.onInput(InputType.DPAD, atSeconds)
+                engine.inputter.onDpadButtonPressed(false)
+            }
+        } else if (Gdx.input.isKeyJustReleased(Input.Keys.F)) {
+            engine.postRunnable {
+                engine.inputter.onDpadButtonPressed(true)
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-            val atSeconds = engine.seconds
             engine.postRunnable {
-                engine.inputter.onInput(InputType.A, atSeconds)
+                engine.inputter.onAButtonPressed(false)
+            }
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+            engine.postRunnable {
+                engine.inputter.onDpadButtonPressed(true)
             }
         }
 

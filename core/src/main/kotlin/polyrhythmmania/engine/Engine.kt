@@ -1,5 +1,6 @@
 package polyrhythmmania.engine
 
+import com.badlogic.gdx.Gdx
 import paintbox.binding.Var
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.EngineInputter
@@ -27,11 +28,13 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     val musicData: MusicData = MusicData(this)
     val timeSignatures: TimeSignatureMap = TimeSignatureMap()
     
+    var endSignalReceived: Var<Boolean> = Var(false)
+    
     var deleteEventsAfterCompletion: Boolean = true
     var autoInputs: Boolean = false
     var musicOffsetMs: Float = 0f
     
-    var endSignalReceived: Var<Boolean> = Var(false)
+    var activeTextBox: ActiveTextBox? = null
     
     fun resetEndSignal() {
         endSignalReceived.set(false)
@@ -102,7 +105,20 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     }
 
     override fun updateSeconds(delta: Float) {
-        super.updateSeconds(delta)
+        val activeTextBox = this.activeTextBox
+        if (activeTextBox != null && activeTextBox.textBox.requiresInput) {
+            if (activeTextBox.secondsTimer > 0f) {
+                activeTextBox.secondsTimer -= delta
+            }
+            if (activeTextBox.secondsTimer <= 0f) {
+                if (autoInputs) {
+                    this.activeTextBox = null
+                }
+            }
+        } else {
+            super.updateSeconds(delta)
+        }
+        
         val currentSeconds = this.seconds
         val currentBeat = this.beat
         

@@ -349,6 +349,7 @@ class PlayScreen(main: PRManiaGame, val container: Container,
         engine.inputter.clearInputs()
         renderer.resetSkillStar()
         engine.musicOffsetMs = musicOffsetMs
+        engine.activeTextBox = null
         engine.resetEndSignal()
         
         timing.seconds = -1f
@@ -494,7 +495,6 @@ class PlayScreen(main: PRManiaGame, val container: Container,
                     }
                 }
             } else {
-                val atSeconds = engine.seconds
                 when (keycode) {
                     Input.Keys.ESCAPE, keyboardKeybinds.pause -> {
                         pauseGame(true)
@@ -503,13 +503,13 @@ class PlayScreen(main: PRManiaGame, val container: Container,
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
                     keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
                         engine.postRunnable {
-                            engine.inputter.onInput(InputType.DPAD, atSeconds)
+                            engine.inputter.onDpadButtonPressed(false)
                         }
                         consumed = true
                     }
                     keyboardKeybinds.buttonA -> {
                         engine.postRunnable {
-                            engine.inputter.onInput(InputType.A, atSeconds)
+                            engine.inputter.onAButtonPressed(false)
                         }
                         consumed = true
                     }
@@ -518,6 +518,31 @@ class PlayScreen(main: PRManiaGame, val container: Container,
         }
 
         return consumed || super.keyDown(keycode)
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        var consumed = false
+        if (!isFinished) {
+            if (!isPaused)  {
+                when (keycode) {
+                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
+                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
+                        engine.postRunnable {
+                            engine.inputter.onDpadButtonPressed(true)
+                        }
+                        consumed = true
+                    }
+                    keyboardKeybinds.buttonA -> {
+                        engine.postRunnable {
+                            engine.inputter.onAButtonPressed(true)
+                        }
+                        consumed = true
+                    }
+                }
+            }
+        }
+        
+        return consumed || super.keyUp(keycode)
     }
 
     private fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {

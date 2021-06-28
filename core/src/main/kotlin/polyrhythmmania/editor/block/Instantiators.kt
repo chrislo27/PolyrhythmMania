@@ -132,13 +132,19 @@ object Instantiators {
                 Localization.getVar("instantiator.tilesetChange.desc")) { engine ->
             BlockTilesetChange(engine)
         })
+        add(CATEGORY_VFX, Instantiator("textbox", BlockTextbox::class.java,
+                Localization.getVar("instantiator.textbox.name"),
+                Localization.getVar("instantiator.textbox.summary"),
+                Localization.getVar("instantiator.textbox.desc")) { engine ->
+            BlockTextbox(engine)
+        })
         
         // Advanced instantiators
-        add(CATEGORY_ADVANCED, Instantiator("selectiveSpawn", BlockSelectiveSpawnPattern::class.java,
+        add(CATEGORY_ADVANCED, Instantiator("selectiveSpawn", BlockTextbox::class.java,
                 Localization.getVar("instantiator.selectiveSpawn.name"),
                 Localization.getVar("instantiator.selectiveSpawn.summary"),
                 Localization.getVar("instantiator.selectiveSpawn.desc")) { engine ->
-            BlockSelectiveSpawnPattern(engine)
+            BlockTextbox(engine)
         })
 
 //        add(Instantiator("baselineTest", Var("Baseline Test"), Var("Description baseline test."), Var("[font=prmania_icons]RspladAD[]")) { engine ->

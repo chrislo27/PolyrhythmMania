@@ -6,6 +6,7 @@ import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.TextBox
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.render.TilesetConfig
 
@@ -238,5 +239,32 @@ class EventTilesetChange(engine: Engine, startBeat: Float, width: Float,
             val target = colorTargets.getValue(id)
             m.tilesetGetter.invoke(tileset).set(target.lerp(percentage))
         }
+    }
+}
+
+class EventTextbox(engine: Engine, startBeat: Float, duration: Float, val textbox: TextBox)
+    : Event(engine) {
+
+    init {
+        this.beat = startBeat
+        this.width = duration
+    }
+
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+        if (textbox.requiresInput) {
+            if (currentBeat in this.beat..(this.beat + 0.25f)) {
+                engine.activeTextBox = textbox.toActive()
+            }
+        } else {
+            if (currentBeat in this.beat..(this.beat + this.width)) {
+                engine.activeTextBox = textbox.toActive()
+            }
+        }
+    }
+
+    override fun onEnd(currentBeat: Float) {
+        super.onEnd(currentBeat)
+        engine.activeTextBox = null
     }
 }

@@ -57,9 +57,35 @@ class EngineInputter(val engine: Engine) {
         skillStarGotten.set(false)
         skillStarBeat = Float.POSITIVE_INFINITY
     }
+    
+    fun onAButtonPressed(release: Boolean) {
+        val activeTextBox = engine.activeTextBox
+        if (activeTextBox != null && activeTextBox.textBox.requiresInput && activeTextBox.secondsTimer <= 0f) {
+            if (!activeTextBox.isADown) {
+                if (!release) {
+                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_text_advance_1"))
+                    activeTextBox.isADown = true
+                }
+            } else {
+                if (release) {
+                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_text_advance_2"))
+                    engine.activeTextBox = null
+                }
+            }
+        } else {
+            if (!release) {
+                onInput(InputType.A)
+            }
+        }
+    }
+    fun onDpadButtonPressed(release: Boolean) {
+        if (!release) {
+            onInput(InputType.DPAD)
+        }
+    }
 
-    fun onInput(type: InputType, atSeconds: Float) {
-        if (areInputsLocked) return
+    private fun onInput(type: InputType, atSeconds: Float = engine.seconds) {
+        if (areInputsLocked || engine.activeTextBox?.textBox?.requiresInput == true) return
         val atBeat = engine.tempos.secondsToBeats(atSeconds)
         val rowBlockType: EntityRowBlock.Type = when (type) {
             InputType.A -> EntityRowBlock.Type.PISTON_A

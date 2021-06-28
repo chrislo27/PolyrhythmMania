@@ -40,6 +40,7 @@ import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
+import polyrhythmmania.engine.Clock
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.input.InputKeymapKeyboard
@@ -190,7 +191,6 @@ class Editor(val main: PRManiaGame)
             beatLines.active = false
         }
         autosaveInterval.addListener(autosaveIntervalListener)
-        renderer.renderUI = false
     }
 
     init { // This init block should be LAST
@@ -200,7 +200,9 @@ class Editor(val main: PRManiaGame)
         bindStatusBar(editorPane.statusBarMsg)
         playbackStart.addListener { ps ->
             val newBeat = ps.getOrCompute()
-            timing.seconds = engine.tempos.beatsToSeconds(newBeat)
+            val newSeconds = engine.tempos.beatsToSeconds(newBeat)
+            timing.seconds = newSeconds
+            engine.seconds = newSeconds
             engineBeat.set(newBeat)
             updateTilesetChangesState(newBeat) // Not consistent...
         }
@@ -443,6 +445,7 @@ class Editor(val main: PRManiaGame)
             row.updateInputIndicators()
         }
         engine.inputter.clearInputs()
+        engine.activeTextBox = null
     }
 
     /**
@@ -538,7 +541,6 @@ class Editor(val main: PRManiaGame)
     fun setPlaytestingEnabled(enabled: Boolean) {
         engine.autoInputs = !enabled
         engine.inputter.areInputsLocked = !enabled
-        renderer.renderUI = enabled
     }
 
     fun attemptNewLevel() {
@@ -581,6 +583,7 @@ class Editor(val main: PRManiaGame)
 
         if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {
             compileEditorIntermediates()
+            resetWorld()
             engine.resetEndSignal()
             cameraOffset.changeTarget(0f)
             cameraOffset.reset()
@@ -605,6 +608,8 @@ class Editor(val main: PRManiaGame)
                         var s = simFromSec
                         while (s < newSeconds) {
                             timing.seconds = s
+                            engine.seconds = s
+                            engine.activeTextBox = null
                             s = (s + 1 / 60f).coerceAtMost(newSeconds)
                         }
                     }
@@ -612,15 +617,17 @@ class Editor(val main: PRManiaGame)
                 
                 engine.soundInterface.disableSounds = wereSoundsDisabled
             }
-
             timing.seconds = newSeconds
+            engine.seconds = newSeconds
             engine.musicData.update()
             
             val engineBeatFloor = floor(engine.beat)
             lastMetronomeBeat = if (engineBeatFloor == engine.beat) (engineBeatFloor.toInt() - 1) else engineBeatFloor.toInt()
         } else if (newState == PlayState.STOPPED) {
             resetWorld()
-            timing.seconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
+            val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
+            timing.seconds = newSeconds
+            engine.seconds = newSeconds
             updateTilesetChangesState()
         }
 
@@ -906,19 +913,18 @@ class Editor(val main: PRManiaGame)
                     inputConsumed = true
                 }
             } else if (!engine.autoInputs && !engine.inputter.areInputsLocked) {
-                val atSeconds = engine.seconds
                 val keyboardKeybinds = inputKeymapKeyboard
                 when (keycode) {
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
                     keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
                         engine.postRunnable {
-                            engine.inputter.onInput(InputType.DPAD, atSeconds)
+                            engine.inputter.onDpadButtonPressed(false)
                         }
                         inputConsumed = true
                     }
                     keyboardKeybinds.buttonA -> {
                         engine.postRunnable {
-                            engine.inputter.onInput(InputType.A, atSeconds)
+                            engine.inputter.onAButtonPressed(false)
                         }
                         inputConsumed = true
                     }
@@ -948,8 +954,32 @@ class Editor(val main: PRManiaGame)
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        // Intentional NON-short circuiting OR here
-        return pressedButtons.remove(keycode) or sceneRoot.inputSystem.keyUp(keycode)
+        var inputConsumed = pressedButtons.remove(keycode)
+        
+        if (!engine.autoInputs && !engine.inputter.areInputsLocked) {
+            val keyboardKeybinds = inputKeymapKeyboard
+            when (keycode) {
+                keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
+                keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
+                    engine.postRunnable {
+                        engine.inputter.onDpadButtonPressed(true)
+                    }
+                    inputConsumed = true
+                }
+                keyboardKeybinds.buttonA -> {
+                    engine.postRunnable {
+                        engine.inputter.onAButtonPressed(true)
+                    }
+                    inputConsumed = true
+                }
+            }
+        }
+    
+        if (sceneRoot.inputSystem.keyUp(keycode)) {
+            inputConsumed = true
+        }
+        
+        return inputConsumed
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -1128,7 +1158,9 @@ class Editor(val main: PRManiaGame)
     fun getDebugString(): String {
         val click = this.click.getOrCompute()
         val clickDebugString = click.getDebugString()
-        return """Click: ${click.javaClass.simpleName}${if (clickDebugString.isNotEmpty()) "\n$clickDebugString" else ""}
+        return """timing: ${timing.seconds}
+
+Click: ${click.javaClass.simpleName}${if (clickDebugString.isNotEmpty()) "\n$clickDebugString" else ""}
 engine.events: ${engine.events.size}
 autosave: ${DecimalFormats.format("0.0", timeUntilAutosave)}
 path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
