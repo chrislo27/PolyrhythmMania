@@ -201,7 +201,7 @@ class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
 }
 
 class EventTilesetChange(engine: Engine, startBeat: Float, width: Float,
-                         val tilesetCopy: TilesetConfig)
+                         val tilesetCopy: TilesetConfig, val pulseMode: Boolean)
     : Event(engine) {
     
     private data class ColorTarget(val start: Color, val end: Color, val current: Color = start.cpy()) {
@@ -237,7 +237,19 @@ class EventTilesetChange(engine: Engine, startBeat: Float, width: Float,
         tilesetCopy.allMappings.forEach { m ->
             val id = m.id
             val target = colorTargets.getValue(id)
-            m.tilesetGetter.invoke(tileset).set(target.lerp(percentage))
+
+            if (!pulseMode) {
+                target.lerp(percentage)
+            } else {
+                if (percentage <= 0.5f) {
+                    target.lerp((percentage * 2).coerceIn(0f, 1f))
+                } else {
+                    target.lerp(1f - ((percentage - 0.5f) * 2).coerceIn(0f, 1f))
+                }
+            }
+            
+            val lerped: Color = target.current
+            m.tilesetGetter.invoke(tileset).set(lerped)
         }
     }
 }

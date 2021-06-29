@@ -2,6 +2,7 @@ package polyrhythmmania.editor.block
 
 import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.JsonObject
+import paintbox.binding.Var
 import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -25,6 +26,7 @@ class BlockTilesetChange(engine: Engine)
 
     var tilesetConfig: TilesetConfig = engine.world.tilesetConfig.copy()
     var duration: Float = 0.5f
+    var pulseMode: Var<Boolean> = Var(false)
 
     init {
         this.width = 0.5f
@@ -33,7 +35,8 @@ class BlockTilesetChange(engine: Engine)
     }
 
     override fun compileIntoEvents(): List<Event> {
-        return listOf(EventTilesetChange(engine, this.beat, this.duration.coerceAtLeast(0f), tilesetConfig.copy()))
+        return listOf(EventTilesetChange(engine, this.beat, this.duration.coerceAtLeast(0f), tilesetConfig.copy(),
+                pulseMode.getOrCompute()))
     }
 
     override fun createContextMenu(editor: Editor): ContextMenu {
@@ -84,6 +87,14 @@ class BlockTilesetChange(engine: Engine)
                         }
                     }
             ))
+
+            ctxmenu.addMenuItem(SeparatorMenuItem())
+            ctxmenu.addMenuItem(CheckBoxMenuItem.create(pulseMode,
+                    Localization.getValue("blockContextMenu.tilesetChange.pulseMode"), editor.editorPane.palette.markup).apply {
+                this.createTooltip = {
+                    it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.tilesetChange.pulseMode.tooltip")))
+                }
+            })
         }
     }
     
@@ -96,6 +107,7 @@ class BlockTilesetChange(engine: Engine)
             this.copyBaseInfoTo(it)
             it.tilesetConfig = this.tilesetConfig.copy()
             it.duration = this.duration
+            it.pulseMode.set(this.pulseMode.getOrCompute())
         }
     }
 
@@ -103,6 +115,7 @@ class BlockTilesetChange(engine: Engine)
         super.writeToJson(obj)
         obj.add("tileset", tilesetConfig.toJson())
         obj.add("duration", duration)
+        obj.add("pulse", pulseMode.getOrCompute())
     }
 
     override fun readFromJson(obj: JsonObject) {
@@ -111,6 +124,10 @@ class BlockTilesetChange(engine: Engine)
         val durationVal = obj.get("duration")
         if (durationVal != null && durationVal.isNumber) {
             duration = durationVal.asFloat().coerceAtLeast(0f)
+        }
+        val pulseVal = obj.get("pulse")
+        if (pulseVal != null && pulseVal.isBoolean) {
+            pulseMode.set(pulseVal.asBoolean())
         }
     }
 }
