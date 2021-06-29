@@ -185,6 +185,7 @@ class Editor(val main: PRManiaGame)
                 changePlayState(PlayState.STOPPED)
             }
         }
+        engine.soundInterface.disableSounds = true
         tool.addListener {
             beatLines.active = false
         }
@@ -199,10 +200,12 @@ class Editor(val main: PRManiaGame)
         playbackStart.addListener { ps ->
             val newBeat = ps.getOrCompute()
             val newSeconds = engine.tempos.beatsToSeconds(newBeat)
+            // Remove all other events first
+            engine.removeEvents(engine.events.toList())
             timing.seconds = newSeconds
             engine.seconds = newSeconds
             engineBeat.set(newBeat)
-            updateTilesetChangesState(newBeat) // Not consistent...
+            updateTilesetChangesState(newBeat)
         }
     }
 
@@ -575,8 +578,10 @@ class Editor(val main: PRManiaGame)
 
         if (newState == PlayState.PLAYING) {
             soundSystem.setPaused(false)
+            engine.soundInterface.disableSounds = false
         } else {
             soundSystem.setPaused(true)
+            engine.soundInterface.disableSounds = true
         }
 
         if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {

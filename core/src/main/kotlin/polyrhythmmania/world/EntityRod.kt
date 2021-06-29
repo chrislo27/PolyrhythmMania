@@ -255,7 +255,6 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         if (currentIndexFloat >= -0.7f) {
             updateInputIndices(beat)
         } else if (floor(lastCurrentIndex).toInt() != floor(currentIndexFloat).toInt() && lastCurrentIndex >= 0) {
-            println("last currentIndex: $lastCurrentIndex")
             updateInputIndices(beat)
         }
 
