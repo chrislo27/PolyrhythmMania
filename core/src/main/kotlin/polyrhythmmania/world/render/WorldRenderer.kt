@@ -1,6 +1,7 @@
 package polyrhythmmania.world.render
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
@@ -15,10 +16,12 @@ import paintbox.ui.Anchor
 import paintbox.ui.SceneRoot
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
+import paintbox.util.MathHelper
 import paintbox.util.gdxutils.intersects
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.ui.TextboxPane
+import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.Entity
 import polyrhythmmania.world.World
 
@@ -74,16 +77,23 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val textBoxPane: TextboxPane = TextboxPane()
     private val textBoxLabel: TextLabel = TextLabel("", font = PRManiaGame.instance.fontGameTextbox)
+    private val textBoxInputLabel: TextLabel = TextLabel(RodinSpecialChars.BORDERED_A, font = PRManiaGame.instance.fontGameTextbox)
     
     init {
         uiSceneRoot += textBoxPane.apply { 
             Anchor.TopCentre.configure(textBoxPane, offsetY = 64f)
             this.bounds.width.set(1000f)
             this.bounds.height.set(150f)
-            this.padding.set(Insets(16f, 16f, 32f, 32f))
+            this.padding.set(Insets(16f, 16f, 62f, 62f))
             this += textBoxLabel.apply { 
                 this.renderAlign.set(Align.center)
                 this.textAlign.set(TextAlign.LEFT)
+            }
+            this += textBoxInputLabel.apply { 
+                this.renderAlign.set(Align.right)
+                this.bounds.width.set(48f)
+                this.bounds.height.set(48f)
+                Anchor.BottomRight.configure(this, offsetX = 48f, offsetY = 10f)
             }
         }
     }
@@ -169,6 +179,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
             textBoxPane.visible.set(textBox != null)
             if (textBox != null) {
                 textBoxLabel.text.set(textBox.textBox.text)
+                textBoxInputLabel.text.set(if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f) RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A)
             }
             
             uiSceneRoot.renderAsRoot(batch)
