@@ -12,10 +12,13 @@ import paintbox.ui.UIElement
 sealed class MenuItem {
     companion object {
         val NOTHING_ACTION: () -> Unit = {}
+        val NO_TOOLTIP: (Var<UIElement?>) -> Unit = { }
     }
     
     var closeMenuAfterAction: Boolean = true
     var onAction: () -> Unit = NOTHING_ACTION
+    
+    var createTooltip: (Var<UIElement?>) -> Unit = NO_TOOLTIP
 }
 
 /**

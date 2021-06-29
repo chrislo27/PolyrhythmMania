@@ -102,8 +102,11 @@ open class ContextMenu : Control<ContextMenu>() {
                     }
                 })
             }
-            val contentPane = Pane().also { pane ->
+            
+            val contentPane: Pane = (object : Pane(), HasTooltip by HasTooltip.DefaultImpl() {
+            }).also { pane ->
                 pane.padding.set(Insets(6f, 6f, 8f, 8f))
+                item.createTooltip.invoke(pane.tooltipElement)
             }
             basePane.addChild(contentPane)
 
