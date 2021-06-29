@@ -44,7 +44,7 @@ class EngineInputter(val engine: Engine) {
     }
     
     data class PracticeData(var practiceModeEnabled: Boolean = false,
-                            var moreTimes: Int = 0, var requiredInputs: List<RequiredInput> = emptyList())
+                            val moreTimes: Var<Int> = Var(0), var requiredInputs: List<RequiredInput> = emptyList())
 
     private val world: World = engine.world
     
@@ -80,7 +80,7 @@ class EngineInputter(val engine: Engine) {
         skillStarBeat = Float.POSITIVE_INFINITY
         practice.practiceModeEnabled = false
         practice.requiredInputs = emptyList()
-        practice.moreTimes = 0
+        practice.moreTimes.set(0)
     }
     
     fun onAButtonPressed(release: Boolean) {
@@ -168,10 +168,9 @@ class EngineInputter(val engine: Engine) {
                                 ri.hitScore = inputResult.inputScore
                             }
                         }
-                        println("Required inputs: ${practice.requiredInputs}    current: $perfectBeats")
                         if (practice.requiredInputs.all { it.wasHit }) {
                             // TODO play more times sound
-                            practice.moreTimes = (practice.moreTimes - 1).coerceAtLeast(0)
+                            practice.moreTimes.set((practice.moreTimes.getOrCompute() - 1).coerceAtLeast(0))
                         }
                     }
                 }

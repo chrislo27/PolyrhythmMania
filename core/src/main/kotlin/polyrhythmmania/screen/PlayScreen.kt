@@ -53,9 +53,11 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 
-class PlayScreen(main: PRManiaGame, val container: Container,
-                 val musicOffsetMs: Float = main.settings.musicOffsetMs.getOrCompute().toFloat())
-    : PRManiaScreen(main) {
+class PlayScreen(
+        main: PRManiaGame, val container: Container,
+        val showResults: Boolean = true,
+        val musicOffsetMs: Float = main.settings.musicOffsetMs.getOrCompute().toFloat(),
+) : PRManiaScreen(main) {
 
     val timing: TimingProvider get() = container.timing
     val soundSystem: SoundSystem
@@ -95,7 +97,11 @@ class PlayScreen(main: PRManiaGame, val container: Container,
                 container.world.entities.filterIsInstance<EntityRod>().forEach { rod ->
                     engine.inputter.submitInputsFromRod(rod, false)
                 }
-                transitionToResults()
+                if (showResults) {
+                    transitionToResults()
+                } else {
+                    quitToMainMenu(false)
+                }
             }
         }
     }
@@ -443,23 +449,30 @@ class PlayScreen(main: PRManiaGame, val container: Container,
                 resetAndStartOver(true)
             }
             2 -> { // Quit to Main Menu
-                val main = this@PlayScreen.main
-                val currentScreen = main.screen
-                Gdx.app.postRunnable {
-                    val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
-                    main.screen = TransitionScreen(main, currentScreen, mainMenu,
-                            FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), null).apply {
-                        this.onEntryEnd = {
-                            if (currentScreen is PlayScreen) {
-                                currentScreen.dispose()
-                                container.disposeQuietly()
-                            }
-                        }
+                quitToMainMenu(true)
+            }
+        }
+    }
+    
+    private fun quitToMainMenu(playSound: Boolean) {
+        val main = this@PlayScreen.main
+        val currentScreen = main.screen
+        Gdx.app.postRunnable {
+            val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
+            main.screen = TransitionScreen(main, currentScreen, mainMenu,
+                    FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), null).apply {
+                this.onEntryEnd = {
+                    if (currentScreen is PlayScreen) {
+                        currentScreen.dispose()
+                        container.disposeQuietly()
                     }
                 }
-                Gdx.app.postRunnable {
-                    playMenuSound("sfx_pause_exit")
-                }
+            }
+        }
+        
+        if (playSound) {
+            Gdx.app.postRunnable {
+                playMenuSound("sfx_pause_exit")
             }
         }
     }

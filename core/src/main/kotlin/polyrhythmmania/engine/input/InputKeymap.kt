@@ -56,4 +56,8 @@ data class InputKeymapKeyboard(
                     "${TEXT_BUTTON_DPAD_ANY}: ${Input.Keys.toString(buttonDpadUp)}/${Input.Keys.toString(buttonDpadDown)}/${Input.Keys.toString(buttonDpadLeft)}/${Input.Keys.toString(buttonDpadRight)}"
         }
     }
+    
+    fun toDpadString(): String {
+        return "${Input.Keys.toString(buttonDpadUp)}/${Input.Keys.toString(buttonDpadDown)}/${Input.Keys.toString(buttonDpadLeft)}/${Input.Keys.toString(buttonDpadRight)}"
+    }
 }

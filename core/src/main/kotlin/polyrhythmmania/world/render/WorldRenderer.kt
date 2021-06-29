@@ -9,7 +9,10 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.Var
+import paintbox.font.Markup
 import paintbox.font.TextAlign
+import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -18,6 +21,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.intersects
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.ui.TextboxPane
@@ -76,16 +80,20 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val textBoxPane: TextboxPane = TextboxPane()
-    private val textBoxLabel: TextLabel = TextLabel("", font = PRManiaGame.instance.fontGameTextbox)
+    private val textBoxLabel: TextLabel = TextLabel("")
     private val textBoxInputLabel: TextLabel = TextLabel(RodinSpecialChars.BORDERED_A, font = PRManiaGame.instance.fontGameTextbox)
+    private val moreTimesLabel: TextLabel = TextLabel("")
+    private val moreTimesVar: Var<Int> = Var(0)
     
     init {
+        val baseMarkup = Markup(emptyMap(), TextRun(PRManiaGame.instance.fontGameTextbox, ""))
         uiSceneRoot += textBoxPane.apply { 
             Anchor.TopCentre.configure(textBoxPane, offsetY = 64f)
             this.bounds.width.set(1000f)
             this.bounds.height.set(150f)
             this.padding.set(Insets(16f, 16f, 62f, 62f))
             this += textBoxLabel.apply { 
+                this.markup.set(baseMarkup)
                 this.renderAlign.set(Align.center)
                 this.textAlign.set(TextAlign.LEFT)
             }
@@ -95,6 +103,18 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                 this.bounds.height.set(48f)
                 Anchor.BottomRight.configure(this, offsetX = 48f, offsetY = 10f)
             }
+        }
+        uiSceneRoot += moreTimesLabel.apply {
+            Anchor.BottomRight.configure(this)
+            val locVar = Localization.getVar("practice.moreTimes.times", Var { listOf(moreTimesVar.use()) })
+            this.text.bind { locVar.use() }
+            this.renderAlign.set(Align.right)
+            this.margin.set(Insets(0f, 16f, 0f, 16f))
+            this.markup.set(Markup(emptyMap(), TextRun(PRManiaGame.instance.fontGameMoreTimes, "")))
+            this.bounds.width.set(510f)
+            this.bounds.height.set(86f)
+            this.textColor.set(Color.WHITE)
+            this.visible.bind { moreTimesVar.use() > 0 }
         }
     }
     
@@ -109,6 +129,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     }
 
     fun render(batch: SpriteBatch, engine: Engine) {
+        
         tmpMatrix.set(batch.projectionMatrix)
         camera.update()
         batch.projectionMatrix = camera.combined
@@ -140,6 +161,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         batch.projectionMatrix = uiCamera.combined
 
         if (renderUI) {
+            moreTimesVar.set(engine.inputter.practice.moreTimes.getOrCompute())
             val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
 
             // Skill star

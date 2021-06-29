@@ -52,8 +52,8 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     mainMenu.transitionAway {
                         val main = mainMenu.main
                         Gdx.app.postRunnable {
-                            val practice: Practice = PracticeBasic(main)
-                            val playScreen = PlayScreen(main, practice.container)
+                            val practice: Practice = PracticeBasic(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
+                            val playScreen = PlayScreen(main, practice.container, false)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                 this.onEntryEnd = {
                                     practice.prepare()
