@@ -346,13 +346,14 @@ class PlayScreen(main: PRManiaGame, val container: Container,
 
     fun prepareGameStart() {
         engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
-        engine.inputter.clearInputs()
+        engine.inputter.reset()
         renderer.resetSkillStar()
         engine.musicOffsetMs = musicOffsetMs
         engine.activeTextBox = null
         engine.resetEndSignal()
         
         timing.seconds = -1f
+        engine.seconds = timing.seconds
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
             val musicSample = player.musicSample

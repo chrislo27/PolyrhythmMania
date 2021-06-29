@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Disposable
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
+import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 
@@ -21,13 +22,20 @@ abstract class Practice(val main: PRManiaGame) : Disposable {
         true
     }
     val container: Container = Container(soundSystem, timingProvider)
+    
+    val engine: Engine = container.engine
 
+    /**
+     * Call the first time to initialize the practice scene.
+     */
+    fun prepare() {
+        initialize()
+    }
+    
     /**
      * Implementors should set up music and other long-load items here.
      */
-    open fun initialize() {
-        
-    }
+    protected abstract fun initialize()
     
     override fun dispose() {
         container.disposeQuietly()

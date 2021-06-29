@@ -29,6 +29,7 @@ import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.init.AssetRegistryLoadingScreen
 import polyrhythmmania.init.TilesetAssetLoader
+import polyrhythmmania.practice.PracticeAssets
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.ui.PRManiaSkins
@@ -139,6 +140,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         super.dispose()
         colourPickerHueBar.disposeQuietly()
         colourPickerTransparencyGrid.disposeQuietly()
+        PracticeAssets.disposeQuietly()
         try {
             val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
             PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->

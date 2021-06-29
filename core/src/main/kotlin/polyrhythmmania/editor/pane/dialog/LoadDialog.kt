@@ -200,7 +200,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         newEditor.musicData.waveform?.generateSummaries()
                         
                         newEditor.musicData.firstBeatSec.set(containerMusicData.firstBeatSec)
-                        newEditor.musicFirstBeat.set(containerMusicData.musicFirstBeat)
+                        newEditor.musicFirstBeat.set(containerMusicData.musicSyncPointBeat)
                         val loopParams = containerMusicData.loopParams
                         newEditor.musicData.loopParams.set(loopParams)
                         

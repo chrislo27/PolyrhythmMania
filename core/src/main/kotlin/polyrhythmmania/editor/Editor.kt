@@ -40,11 +40,9 @@ import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
-import polyrhythmmania.engine.Clock
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
@@ -418,7 +416,7 @@ class Editor(val main: PRManiaGame)
         engineMusicData.beadsMusic = this.musicData.beadsMusic
         engineMusicData.loopParams = this.musicData.loopParams.getOrCompute()
         engineMusicData.firstBeatSec = this.musicData.firstBeatSec.get()
-        engineMusicData.musicFirstBeat = this.musicFirstBeat.get()
+        engineMusicData.musicSyncPointBeat = this.musicFirstBeat.get()
         val player = engine.soundInterface.getCurrentMusicPlayer(engineMusicData.beadsMusic)
         if (player != null) {
             player.useLoopParams(engineMusicData.loopParams)
@@ -444,7 +442,7 @@ class Editor(val main: PRManiaGame)
             }
             row.updateInputIndicators()
         }
-        engine.inputter.clearInputs()
+        engine.inputter.reset()
         engine.activeTextBox = null
     }
 

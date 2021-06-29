@@ -1,10 +1,17 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import paintbox.transition.FadeIn
+import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
+import polyrhythmmania.practice.Practice
+import polyrhythmmania.practice.PracticeBasic
+import polyrhythmmania.screen.PlayScreen
 
 
 class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -40,6 +47,23 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             vbox += createLongButton { Localization.getVar("mainMenu.play.practice").use() }.apply {
+                this.setOnAction {
+                    menuCol.playMenuSound("sfx_menu_enter_game")
+                    mainMenu.transitionAway {
+                        val main = mainMenu.main
+                        Gdx.app.postRunnable {
+                            val practice: Practice = PracticeBasic(main)
+                            val playScreen = PlayScreen(main, practice.container)
+                            main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                                this.onEntryEnd = {
+                                    practice.prepare()
+//                                    playScreen.prepareGameStart()
+                                    playScreen.resetAndStartOver(false, false)
+                                }
+                            }
+                        }
+                    }
+                }
             }
             vbox += createLongButton { "...Other modes (possibly) coming soon!" }.apply {
                 this.disabled.set(true)

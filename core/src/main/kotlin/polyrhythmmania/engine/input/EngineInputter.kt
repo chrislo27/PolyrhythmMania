@@ -4,11 +4,13 @@ import com.badlogic.gdx.math.MathUtils
 import paintbox.Paintbox
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.EntityRod
 import polyrhythmmania.world.EntityRowBlock
+import polyrhythmmania.world.Row
 import polyrhythmmania.world.World
 
 
@@ -31,31 +33,54 @@ import polyrhythmmania.world.World
  *   - It sends its input data to this [EngineInputter]
  */
 class EngineInputter(val engine: Engine) {
+    
+    companion object {
+        const val BEAT_EPSILON: Float = 0.01f
+    }
+    
+    data class RequiredInput(val beat: Float, val inputType: InputType) {
+        var wasHit: Boolean = false
+        var hitScore: InputScore = InputScore.MISS
+    }
+    
+    data class PracticeData(var practiceModeEnabled: Boolean = false,
+                            var moreTimes: Int = 0, var requiredInputs: List<RequiredInput> = emptyList())
 
     private val world: World = engine.world
+    
     var areInputsLocked: Boolean = true
     var skillStarBeat: Float = Float.POSITIVE_INFINITY
-    
+    val practice: PracticeData = PracticeData()
+
+    val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
     var totalExpectedInputs: Int = 0
         private set
     var noMiss: Boolean = true
         private set
+    
     val skillStarGotten: Var<Boolean> = Var(false)
     val inputResults: List<InputResult> = mutableListOf()
     
-    val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
     
     init {
-        clearInputs()
+        reset()
     }
     
-    fun clearInputs() {
+    fun clearInputs(beforeBeat: Float = Float.POSITIVE_INFINITY) {
         totalExpectedInputs = 0
-        (inputResults as MutableList).clear()
+        (inputResults as MutableList).removeIf { it.perfectBeat < beforeBeat }
+        practice.requiredInputs = emptyList()
+    }
+    
+    fun reset() {
+        clearInputs()
         inputFeedbackFlashes.fill(-10000f)
         noMiss = true
         skillStarGotten.set(false)
         skillStarBeat = Float.POSITIVE_INFINITY
+        practice.practiceModeEnabled = false
+        practice.requiredInputs = emptyList()
+        practice.moreTimes = 0
     }
     
     fun onAButtonPressed(release: Boolean) {
@@ -130,18 +155,35 @@ class EngineInputter(val engine: Engine) {
                 }
                 
                 val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
-                val inputResult = InputResult(type, accuracyPercent, differenceSec)
+                val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec)
                 Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                 inputTracker.results += inputResult
                 
-                val index: Int = when (inputResult.inputScore) {
+                if (practice.practiceModeEnabled && inputResult.inputScore != InputScore.MISS) {
+                    val allWereHit = practice.requiredInputs.all { it.wasHit }
+                    if (!allWereHit) {
+                        practice.requiredInputs.forEach { ri ->
+                            if (!ri.wasHit && ri.inputType == type && MathUtils.isEqual(perfectBeats, ri.beat, BEAT_EPSILON)) {
+                                ri.wasHit = true
+                                ri.hitScore = inputResult.inputScore
+                            }
+                        }
+                        println("Required inputs: ${practice.requiredInputs}    current: $perfectBeats")
+                        if (practice.requiredInputs.all { it.wasHit }) {
+                            // TODO play more times sound
+                            practice.moreTimes = (practice.moreTimes - 1).coerceAtLeast(0)
+                        }
+                    }
+                }
+                
+                val inputFeedbackIndex: Int = when (inputResult.inputScore) {
                     InputScore.ACE -> 2
                     InputScore.GOOD -> if (inputResult.accuracySec < 0f) 1 else 3
                     InputScore.BARELY -> if (inputResult.accuracySec < 0f) 0 else 4
                     InputScore.MISS -> -1
                 }
-                if (index in inputFeedbackFlashes.indices) {
-                    inputFeedbackFlashes[index] = atSeconds
+                if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
+                    inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                 }
                 
                 // Bounce the rod

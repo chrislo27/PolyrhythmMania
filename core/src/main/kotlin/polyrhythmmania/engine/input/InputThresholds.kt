@@ -11,7 +11,7 @@ object InputThresholds {
      * Forces the classloader to initialize the input-related classes to avoid possible stutter on the first input.
      */
     fun initInputClasses() {
-        InputResult(InputType.A, 0f, 0f)
+        InputResult(0f, InputType.A, 0f, 0f)
         InputScore.ACE
         Ranking.SUPERB
         Score(0, 0f, 0, 1, false, false, "", "")

@@ -179,7 +179,10 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
             textBoxPane.visible.set(textBox != null)
             if (textBox != null) {
                 textBoxLabel.text.set(textBox.textBox.text)
-                textBoxInputLabel.text.set(if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f) RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A)
+                textBoxInputLabel.text.set(if (textBox.secondsTimer > 0f) "" else {
+                    if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f)
+                        RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A
+                })
             }
             
             uiSceneRoot.renderAsRoot(batch)

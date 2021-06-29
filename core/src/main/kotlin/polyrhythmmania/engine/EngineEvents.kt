@@ -5,7 +5,7 @@ import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.Semitones
 
 
-class EventCowbell(engine: Engine, startBeat: Float, val useMeasures: Boolean)
+class EventCowbellSFX(engine: Engine, startBeat: Float, val useMeasures: Boolean)
     : Event(engine) {
 
     init {
@@ -23,5 +23,18 @@ class EventCowbell(engine: Engine, startBeat: Float, val useMeasures: Boolean)
         } else {
             engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell"))
         }
+    }
+}
+
+class EventApplauseSFX(engine: Engine, startBeat: Float)
+    : Event(engine) {
+
+    init {
+        this.beat = startBeat
+    }
+
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_applause"))
     }
 }

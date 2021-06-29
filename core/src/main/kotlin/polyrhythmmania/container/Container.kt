@@ -231,7 +231,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                     }
                 })
                 musicObj.add("firstBeatSec", musicData.firstBeatSec)
-                musicObj.add("musicFirstBeat", musicData.musicFirstBeat)
+                musicObj.add("musicFirstBeat", musicData.musicSyncPointBeat)
                 val loopParams = musicData.loopParams
                 musicObj.add("looping", loopParams.loopType == SamplePlayer.LoopType.LOOP_FORWARDS)
                 musicObj.add("loopStartMs", loopParams.startPointMs)
@@ -346,7 +346,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         )
         engine.musicData.also { musicData ->
             musicData.firstBeatSec = musicObj.getFloat("firstBeatSec", 0f)
-            musicData.musicFirstBeat = musicObj.getFloat("musicFirstBeat", 0f)
+            musicData.musicSyncPointBeat = musicObj.getFloat("musicFirstBeat", 0f)
             musicData.loopParams = LoopParams(
                     if (musicObj.getBoolean("looping", false)) SamplePlayer.LoopType.LOOP_FORWARDS else SamplePlayer.LoopType.NO_LOOP_FORWARDS,
                     musicObj.getDouble("loopStartMs", 0.0),
@@ -401,6 +401,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
         // Set up music and other resources
         if (compressedMusicRes != null) {
+            // Music reader decompressed to another file, so the original compressedMusic file is not a dependency after
             val newMusic: BeadsMusic = GdxAudioReader.newMusic(FileHandle(compressedMusicRes.file), null)
             engine.musicData.beadsMusic = newMusic
             engine.musicData.update()
