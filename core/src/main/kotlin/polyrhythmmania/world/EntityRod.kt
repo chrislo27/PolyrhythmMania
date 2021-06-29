@@ -348,15 +348,15 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
     }
 
     private fun playSfxLand(engine: Engine) {
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_land"))
+        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_land"))
     }
 
     private fun playSfxSideCollision(engine: Engine) {
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
+        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
     }
 
     private fun playSfxExplosion(engine: Engine) {
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_explosion"))
+        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_explosion"))
     }
 }
 
