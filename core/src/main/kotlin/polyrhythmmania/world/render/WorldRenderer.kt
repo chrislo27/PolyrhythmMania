@@ -4,10 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.math.Rectangle
-import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.font.Markup
@@ -20,7 +17,9 @@ import paintbox.ui.SceneRoot
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.util.MathHelper
+import paintbox.util.gdxutils.drawCompressed
 import paintbox.util.gdxutils.intersects
+import paintbox.util.gdxutils.scaleMul
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
@@ -123,7 +122,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         skillStarPulseAnimation = 2f
     }
     
-    fun resetSkillStar() {
+    fun resetAnimations() {
         skillStarSpinAnimation = 0f
         skillStarPulseAnimation = 0f
     }
@@ -205,6 +204,50 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                     if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f)
                         RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A
                 })
+            }
+
+            val clearText = engine.inputter.practice.clearText
+            if (clearText > 0f) {
+                val normalScale = 1f
+                val transitionEnd = 0.15f
+                val transitionStart = 0.2f
+                val scale: Float = when (val progress = 1f - clearText) {
+                    in 0f..transitionStart -> {
+                        Interpolation.exp10Out.apply(normalScale * 2f, normalScale, progress / transitionStart)
+                    }
+                    in (1f - transitionEnd)..1f -> {
+                        Interpolation.exp10Out.apply(normalScale, normalScale * 1.5f, (progress - (1f - transitionEnd)) / transitionEnd)
+                    }
+                    else -> normalScale
+                }
+                val alpha: Float = when (val progress = 1f - clearText) {
+                    in 0f..transitionStart -> {
+                        Interpolation.exp10Out.apply(0f, 1f, progress / transitionStart)
+                    }
+                    in (1f - transitionEnd)..1f -> {
+                        Interpolation.exp10Out.apply(1f, 0f, (progress - (1f - transitionEnd)) / transitionEnd)
+                    }
+                    else -> 1f
+                }
+                val white: Float = when (val progress = 1f - clearText) {
+                    in 0f..transitionStart * 0.75f -> {
+                        Interpolation.linear.apply(1f, 0f, progress / (transitionStart * 0.75f))
+                    }
+                    else -> 0f
+                }
+
+                val paintboxFont = PRManiaGame.instance.fontGamePracticeClear
+                paintboxFont.useFont { font ->
+                    val camera = uiCamera
+                    font.scaleMul(scale)
+                    font.setColor(1f, 1f, MathUtils.lerp(0.125f, 1f, white), alpha)
+                    font.drawCompressed(batch, Localization.getValue("practice.clear"),
+                            0f, camera.viewportHeight / 2f + font.capHeight / 2, camera.viewportWidth, Align.center)
+                    font.scaleMul(1f / scale)
+                }
+                
+                val newValue = (clearText - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f)
+                engine.inputter.practice.clearText = newValue
             }
             
             uiSceneRoot.renderAsRoot(batch)

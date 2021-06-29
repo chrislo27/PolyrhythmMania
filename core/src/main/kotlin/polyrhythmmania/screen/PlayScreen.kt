@@ -353,7 +353,7 @@ class PlayScreen(
     fun prepareGameStart() {
         engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
         engine.inputter.reset()
-        renderer.resetSkillStar()
+        renderer.resetAnimations()
         engine.musicOffsetMs = musicOffsetMs
         engine.activeTextBox = null
         engine.resetEndSignal()
