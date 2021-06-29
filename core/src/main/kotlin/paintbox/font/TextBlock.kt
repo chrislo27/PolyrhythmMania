@@ -345,7 +345,11 @@ data class TextBlock(val runs: List<TextRun>) {
                     for (i in 0 until runCount) {
                         val run = layout.runs[i]
                         ColorStack.getAndPush().set(run.color)
-                        run.color.mul(tint)
+                        if (run.color.r == 1f && run.color.g == 1f && run.color.b == 1f) {
+                            run.color.mul(tint)
+                        } else {
+                            run.color.a *= tint.a // Ignore RGB
+                        }
                     }
                 }
 
