@@ -83,7 +83,11 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
             this += Button(Localization.getValue("play.results.back"), font = main.mainFont).apply {
                 this.bounds.width.set(300f)
                 (this.skin.getOrCompute() as ButtonSkin).roundedRadius.set(4)
+                this.setOnHoverStart {
+                    playSound(AssetRegistry.get<Sound>("sfx_menu_blip"))
+                }
                 this.setOnAction {
+                    playSound(AssetRegistry.get<Sound>("sfx_pause_exit"))
                     val thisScreen = main.screen
                     main.screen = TransitionScreen(main, thisScreen, main.mainMenuScreen,
                             WipeToColor(Color.BLACK.cpy(), 0.4f), null).apply {
@@ -97,7 +101,11 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
             this += Button(Localization.getValue("play.pause.startOver"), font = main.mainFont).apply {
                 this.bounds.width.set(220f)
                 (this.skin.getOrCompute() as ButtonSkin).roundedRadius.set(4)
+                this.setOnHoverStart {
+                    playSound(AssetRegistry.get<Sound>("sfx_menu_blip"))
+                }
                 this.setOnAction {
+                    playSound(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                     val playScreen = PlayScreen(main, container)
                     Gdx.input.isCursorCatched = true
                     main.screen = TransitionScreen(main, main.screen, playScreen, FadeOut(0.5f, Color(0f, 0f, 0f, 1f)),
