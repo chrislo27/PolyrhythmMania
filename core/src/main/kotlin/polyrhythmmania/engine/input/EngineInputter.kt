@@ -225,7 +225,7 @@ class EngineInputter(val engine: Engine) {
     }
 
     fun attemptSkillStar(beat: Float): Boolean {
-        if (!skillStarGotten.getOrCompute() && MathUtils.isEqual(skillStarBeat, beat, 0.025f)) {
+        if (!skillStarGotten.getOrCompute() && MathUtils.isEqual(skillStarBeat, beat, BEAT_EPSILON)) {
             skillStarGotten.set(true)
             onSkillStarHit()
             return true
