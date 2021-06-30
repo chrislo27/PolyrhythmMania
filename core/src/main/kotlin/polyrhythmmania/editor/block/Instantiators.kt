@@ -140,11 +140,11 @@ object Instantiators {
         })
         
         // Advanced instantiators
-        add(CATEGORY_ADVANCED, Instantiator("selectiveSpawn", BlockTextbox::class.java,
+        add(CATEGORY_ADVANCED, Instantiator("selectiveSpawn", BlockSelectiveSpawnPattern::class.java,
                 Localization.getVar("instantiator.selectiveSpawn.name"),
                 Localization.getVar("instantiator.selectiveSpawn.summary"),
                 Localization.getVar("instantiator.selectiveSpawn.desc")) { engine ->
-            BlockTextbox(engine)
+            BlockSelectiveSpawnPattern(engine)
         })
 
 //        add(Instantiator("baselineTest", Var("Baseline Test"), Var("Description baseline test."), Var("[font=prmania_icons]RspladAD[]")) { engine ->
