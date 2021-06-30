@@ -448,6 +448,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         super.show()
         main.inputMultiplexer.removeProcessor(processor)
         main.inputMultiplexer.addProcessor(processor)
+        sceneRoot.cancelTooltip()
     }
 
     override fun hide() {

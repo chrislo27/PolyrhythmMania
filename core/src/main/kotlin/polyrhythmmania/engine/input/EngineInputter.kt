@@ -176,7 +176,10 @@ class EngineInputter(val engine: Engine) {
                             val newValue = (practice.moreTimes.getOrCompute() - 1).coerceAtLeast(0)
                             practice.moreTimes.set(newValue)
                             if (newValue == 0) {
+                                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_2"))
                                 practice.clearText = 1f
+                            } else {
+                                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_1"))
                             }
                         }
                     }
