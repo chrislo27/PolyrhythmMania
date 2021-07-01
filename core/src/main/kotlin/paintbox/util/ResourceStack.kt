@@ -1,6 +1,7 @@
 package paintbox.util
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -104,5 +105,18 @@ object Vector3Stack : ResourceStack<Vector3>() {
 
     override fun resetWhenFreed(obj: Vector3?) {
         // Intentional: don't do a reset. The popped vec3 is returned so the information may be required temporarily
+    }
+}
+
+object Matrix4Stack : ResourceStack<Matrix4>() {
+    override fun newObject(): Matrix4 {
+        return Matrix4()
+    }
+
+    override fun resetBeforePushed(obj: Matrix4) {
+    }
+
+    override fun resetWhenFreed(obj: Matrix4?) {
+        // Intentional: don't do a reset. The popped mat4 is returned so the information may be required temporarily
     }
 }
