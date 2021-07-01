@@ -24,6 +24,7 @@ class MusicData(val engine: Engine) {
         if (player != null) {
             val volume = volumeMap.volumeAtBeat(currentBeat)
             player.gain = volume / 100f
+            player.pitch = engine.playbackSpeed
 
             if (!player.isPaused && !player.context.out.isPaused) {
                 // Player desync correction
