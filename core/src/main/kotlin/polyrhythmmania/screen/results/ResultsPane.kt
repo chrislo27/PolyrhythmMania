@@ -14,6 +14,7 @@ import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
+import paintbox.ui.ImageRenderingMode
 import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
@@ -88,7 +89,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             this.bindWidthToParent(multiplierBinding = {
                 scoreValue.use() / 100f                                       
             }, adjustBinding = {0f})
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar"))).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar")), renderingMode = ImageRenderingMode.FULL).apply {
                 Anchor.TopLeft.configure(this)
                 this.bounds.width.bind { parent.use()?.parent?.use()?.bounds?.width?.useF() ?: 0f }
             }
