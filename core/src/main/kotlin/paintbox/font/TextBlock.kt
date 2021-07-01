@@ -308,7 +308,7 @@ data class TextBlock(val runs: List<TextRun>) {
         val scaleAnything = shouldScaleX || shouldScaleY
         val alignXWidth: Float = if (alignAffectsRender) {
             maxWidth
-        } else if (shouldScaleX && maxWidth > 0f) (this.width * globalScaleX) else (this.width)
+        } else if (shouldScaleX) (this.width * globalScaleX) else (this.width)
 
         runInfo.forEach { textRunInfo ->
             val paintboxFont = textRunInfo.font
