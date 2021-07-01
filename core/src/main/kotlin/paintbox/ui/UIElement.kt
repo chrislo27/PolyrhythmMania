@@ -197,10 +197,13 @@ open class UIElement : UIBounds() {
         val rootWidth: Float = rootBounds?.width?.get() ?: width
         val rootHeight: Float = rootBounds?.height?.get() ?: height
 
-        val scissorX = (originX + x) / rootWidth * Gdx.graphics.width
-        val scissorY = ((originY - y) / rootHeight) * Gdx.graphics.height
-        val scissorW = (width / rootWidth) * Gdx.graphics.width
-        val scissorH = (height / rootHeight) * Gdx.graphics.height
+        val camWidth = sceneRoot.getOrCompute()?.bounds?.width?.get() ?: Gdx.graphics.width.toFloat()
+        val camHeight = sceneRoot.getOrCompute()?.bounds?.height?.get() ?: Gdx.graphics.height.toFloat()
+        
+        val scissorX = (originX + x) / rootWidth * camWidth
+        val scissorY = ((originY - y) / rootHeight) * camHeight
+        val scissorW = (width / rootWidth) * camWidth
+        val scissorH = (height / rootHeight) * camHeight
         val scissor = RectangleStack.getAndPush().set(scissorX, scissorY - scissorH, scissorW, scissorH)
 
         val pushScissor = ScissorStack.pushScissor(scissor)
