@@ -165,8 +165,8 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         val firstCapHeight = text.firstCapHeight * scaleY
         val yOffset: Float = when {
             Align.isTop(align) -> h - firstCapHeight - bgPaddingInsets.top
-            Align.isBottom(align) -> 0f + (textHeight - firstCapHeight) / scaleY + bgPaddingInsets.bottom
-            else -> (h + textHeight / scaleY) / 2 - firstCapHeight / scaleY
+            Align.isBottom(align) -> 0f + (textHeight - firstCapHeight) + bgPaddingInsets.bottom
+            else -> ((h + textHeight) / 2 - firstCapHeight)
         }
 
         if (element.renderBackground.getOrCompute()) {
