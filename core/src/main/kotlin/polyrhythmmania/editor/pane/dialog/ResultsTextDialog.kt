@@ -21,6 +21,7 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.Matrix4Stack
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.engine.input.ResultsText
@@ -242,12 +243,11 @@ class ResultsTextDialog(editorPane: EditorPane)
 
             
             val cam = this.camera
-            cam.zoom = 1f / 2f
-            cam.position.x = 3.5f
-            cam.position.y = 1f
             cam.update()
 
             batch.end()
+            val prevMatrix = Matrix4Stack.getAndPush().set(batch.projectionMatrix)
+            batch.projectionMatrix = cam.combined
             val frameBuffer = editor.previewFrameBuffer
             frameBuffer.begin()
             Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
@@ -258,8 +258,10 @@ class ResultsTextDialog(editorPane: EditorPane)
             
             batch.end()
             frameBuffer.end()
+            batch.projectionMatrix = prevMatrix
             batch.begin()
-
+        
+            Matrix4Stack.pop()
 
             batch.packedColor = lastPackedColor
         }
