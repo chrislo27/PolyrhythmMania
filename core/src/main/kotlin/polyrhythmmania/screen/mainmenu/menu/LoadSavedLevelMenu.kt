@@ -7,11 +7,13 @@ import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.Var
 import paintbox.font.TextAlign
-import paintbox.font.TextRun
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
+import paintbox.ui.Pane
 import paintbox.ui.area.Insets
+import paintbox.ui.control.CheckBox
+import paintbox.ui.control.Slider
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
@@ -41,6 +43,10 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     val substate: Var<Substate> = Var(Substate.FILE_DIALOG_OPEN)
 
     val descLabel: TextLabel
+    val challengeSetting: Pane
+    
+    val goForPerfect: Var<Boolean> = Var(false)
+    val tempoUp: Var<Int> = Var(100)
 
     @Volatile
     private var loaded: LoadData? = null
@@ -69,9 +75,71 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
             this.renderAlign.set(Align.center)
             this.textAlign.set(TextAlign.CENTRE)
-//            this.doLineWrapping.set(true)
         }
         content.addChild(descLabel)
+        challengeSetting = Pane().apply {
+            Anchor.BottomLeft.configure(this)
+            this.bindHeightToParent(adjust = -96f)
+            this.margin.set(Insets(4f, 0f, 0f, 0f))
+            this.visible.set(false)
+            this += VBox().apply {
+                this.spacing.set(1f)
+                this += TextLabel(binding = { Localization.getVar("mainMenu.play.challengeSettings").use() },
+                        font = this@LoadSavedLevelMenu.font).apply {
+                    this.bounds.height.set(32f)
+                }
+                this += CheckBox(binding = { Localization.getVar("mainMenu.play.challengeSettings.perfect").use() },
+                        font = this@LoadSavedLevelMenu.font).apply {
+                    this.bounds.height.set(32f)
+                    this.checkedState.set(goForPerfect.getOrCompute())
+                    this.imageNode.tint.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                    this.textLabel.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                    this.textLabel.padding.set(Insets(0f, 0f, 4f, 0f))
+                    this.onCheckChanged = { newState ->
+                        goForPerfect.set(newState)
+                    }
+                }
+                this += HBox().apply {
+                    this.bounds.height.set(32f)
+                    this.spacing.set(8f)
+                    this += TextLabel(binding = { Localization.getVar("mainMenu.play.challengeSettings.speed").use() },
+                            font = this@LoadSavedLevelMenu.font).apply {
+                        this.bounds.width.set(100f)
+                        this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.renderAlign.set(Align.right)
+                    }
+                    val slider = Slider().apply slider@{
+                        this.bounds.width.set(200f)
+                        this.setValue(tempoUp.getOrCompute().toFloat())
+                        this.minimum.set(10f)
+                        this.maximum.set(250f)
+                        this.tickUnit.set(5f)
+                        this.value.addListener { 
+                            tempoUp.set(it.getOrCompute().toInt())
+                        }
+                        (this.skin.getOrCompute() as Slider.SliderSkin).also { skin ->
+                            val filledColors = listOf(Color.valueOf("3E5BEF"), Color(0.24f, 0.74f, 0.94f, 1f), Color.valueOf("ED3D3D"))
+                            skin.filledColor.sideEffecting { existing -> 
+                                val tempo = this@slider.value.useF().toInt()
+                                existing.set(filledColors[if (tempo < 100) 0 else if (tempo > 100) 2 else 1])
+                            }
+                        }
+                    }
+                    this += slider
+                    val percent = Localization.getVar("mainMenu.play.challengeSettings.speed.percent", Var {
+                        listOf(slider.value.useF().toInt())
+                    })
+                    this += TextLabel(binding = { percent.use() },
+                            font = this@LoadSavedLevelMenu.font).apply {
+                        this.bounds.width.set(75f)
+                        this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.renderAlign.set(Align.left)
+                        this.setScaleXY(0.9f)
+                    }
+                }
+            }
+        }
+        content.addChild(challengeSetting)
 
         contentPane.addChild(content)
         contentPane.addChild(hbox)
@@ -108,6 +176,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             menuCol.playMenuSound("sfx_pause_robot_on")
                             loadedData.newContainer.engine.autoInputs = true
                         }
+                        loadedData.newContainer.engine.playbackSpeed = tempoUp.getOrCompute() / 100f
                         mainMenu.transitionAway {
                             val main = mainMenu.main
                             val playScreen = PlayScreen(main, loadedData.newContainer)
@@ -200,6 +269,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
                     val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
                     main.persistDirectory(PreferenceKeys.FILE_CHOOSER_PLAY_SAVED_LEVEL, newInitialDirectory)
+                    challengeSetting.visible.set(true)
                 }
             }
         } catch (e: Exception) {
