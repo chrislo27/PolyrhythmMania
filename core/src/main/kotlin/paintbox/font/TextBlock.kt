@@ -122,7 +122,7 @@ data class TextBlock(val runs: List<TextRun>) {
                             tmpGL.setText(font, textRun.text, color, continuationLineWidth, Align.left, true)
                             if (tmpGL.runs.size >= 2) {
                                 val first = tmpGL.runs[0]
-                                val wrapIndex = first.glyphs.size
+                                val wrapIndex = first.glyphs.size + 1
                                 if (wrapIndex in 0 until text.length) {
                                     text = text.substring(0, wrapIndex) + "\n" + text.substring(wrapIndex).trimStart()
                                 }
