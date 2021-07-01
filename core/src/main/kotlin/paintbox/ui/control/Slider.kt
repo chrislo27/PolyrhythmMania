@@ -15,6 +15,7 @@ import paintbox.ui.skin.SkinFactory
 import paintbox.util.ColorStack
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.fillRoundedRect
+import kotlin.math.sign
 
 
 /**
@@ -62,6 +63,9 @@ open class Slider : Control<Slider>() {
                     
                     true
                 } else false
+            } else if (event is Scrolled) {
+                setValue(value.get() - event.amountY.sign.toInt() * tickUnit.get())
+                true
             } else false
         }
     }
