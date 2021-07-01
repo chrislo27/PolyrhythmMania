@@ -216,6 +216,7 @@ class ResultsTextDialog(editorPane: EditorPane)
             val skillStar = testScoreSkillStar.use()
             Score(scoreInt, scoreInt.toFloat(), if (noMiss) 8 else 7, 8,
                     skillStar, noMiss,
+                    false,
                     resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                     lines.first, lines.second
             )

@@ -10,7 +10,8 @@ import kotlin.math.absoluteValue
  * for both fields means it is a perfect input.
  * A negative value means the input was early, a positive value means it was late.
  */
-data class InputResult(val perfectBeat: Float, val type: InputType, val accuracyPercent: Float, val accuracySec: Float) {
+data class InputResult(val perfectBeat: Float, val type: InputType, val accuracyPercent: Float, val accuracySec: Float,
+                       val expectedIndex: Int) {
     val inputScore: InputScore = run {
         val p = accuracySec.absoluteValue
         when {

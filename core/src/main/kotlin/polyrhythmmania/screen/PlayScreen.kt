@@ -317,6 +317,7 @@ class PlayScreen(
         val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
         val scoreObj = Score(score, rawScore, inputsHit, nInputs,
                 inputter.skillStarGotten.getOrCompute() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
+                inputter.challenge.goingForPerfect, 
                 resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                 lines.first, lines.second,
                 ranking

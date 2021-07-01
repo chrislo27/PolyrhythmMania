@@ -170,13 +170,18 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setOnAction {
                     val loadedData = loaded
                     if (loadedData != null) {
+                        val engine = loadedData.newContainer.engine
                         val robotMode = Gdx.input.isShiftDown()
                         menuCol.playMenuSound("sfx_menu_enter_game")
                         if (robotMode) {
                             menuCol.playMenuSound("sfx_pause_robot_on")
-                            loadedData.newContainer.engine.autoInputs = true
+                            engine.autoInputs = true
                         }
-                        loadedData.newContainer.engine.playbackSpeed = tempoUp.getOrCompute() / 100f
+                        
+                        // Set challenge settings
+                        engine.playbackSpeed = tempoUp.getOrCompute() / 100f
+                        engine.inputter.challenge.goingForPerfect = goForPerfect.getOrCompute()
+                        
                         mainMenu.transitionAway {
                             val main = mainMenu.main
                             val playScreen = PlayScreen(main, loadedData.newContainer)

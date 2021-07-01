@@ -12,10 +12,7 @@ import paintbox.font.TextAlign
 import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.ImageRenderingMode
-import paintbox.ui.Pane
+import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.VBox
@@ -114,7 +111,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
         bonusStatsPane = Pane().apply {
             this.bounds.width.set(500f)
             this.bounds.height.set(64f)
-            this.margin.set(Insets(16f, 0f, 32f, 0f))
+            this.margin.set(Insets(16f, 0f, 0f, 0f))
         }
         bonusStatsPane += TextLabel(binding = {
             val sc = score.use()
@@ -122,14 +119,30 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             val skillStar = sc.skillStar
             val list = mutableListOf<String>()
             list += Localization.getValue("play.results.nInputs", sc.inputsHit, sc.nInputs)
-            if (noMiss) list += Localization.getValue("play.results.noMiss")
+            if (noMiss) list += Localization.getValue(if (sc.perfectCampaign) "play.results.perfect" else "play.results.noMiss")
             if (skillStar) list += Localization.getValue("play.results.skillStar")
             list.joinToString(separator = " ") { it }
         }, resultsFont).apply {
+            this.bounds.x.set(32f)
+            this.bindWidthToParent(adjust = -32f)
             this.doXCompression.set(false)
             this.renderAlign.set(Align.topLeft)
             this.textColor.set(Color.WHITE)
             this.setScaleXY(0.75f)
+        }
+        bonusStatsPane += ImageIcon().apply { 
+            val success = AssetRegistry.get<PackedSheet>("tileset_ui")["perfect"]
+            val failed = AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_failed"]
+            this.textureRegion.bind { 
+                val s = score.use()
+                if (!s.noMiss) failed else success
+            }
+            this.visible.bind { score.use().perfectCampaign }
+            this.bounds.width.set(48f)
+            this.bindHeightToSelfWidth()
+            this.bounds.y.set(-12f)
+            this.bounds.x.bind { -(bounds.width.useF() - 32f + 8f) }
+            this.padding.set(Insets(0f, 0f, 0f, 0f))
         }
         vbox += bonusStatsPane
         

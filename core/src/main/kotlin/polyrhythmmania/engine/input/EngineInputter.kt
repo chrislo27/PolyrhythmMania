@@ -46,6 +46,23 @@ class EngineInputter(val engine: Engine) {
     data class PracticeData(var practiceModeEnabled: Boolean = false,
                             val moreTimes: Var<Int> = Var(0), var requiredInputs: List<RequiredInput> = emptyList()) {
         var clearText: Float = 0f
+        
+        fun reset() {
+            practiceModeEnabled = false
+            requiredInputs = emptyList()
+            moreTimes.set(0)
+            clearText = 0f
+        }
+    }
+    
+    data class ChallengeData(var goingForPerfect: Boolean = false) {
+        var hit: Float = 0f
+        var failed: Boolean = false
+        
+        fun reset() {
+            hit = 0f
+            failed = false
+        }
     }
 
     private val world: World = engine.world
@@ -53,6 +70,7 @@ class EngineInputter(val engine: Engine) {
     var areInputsLocked: Boolean = true
     var skillStarBeat: Float = Float.POSITIVE_INFINITY
     val practice: PracticeData = PracticeData()
+    val challenge: ChallengeData = ChallengeData()
 
     val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
     var totalExpectedInputs: Int = 0
@@ -80,10 +98,8 @@ class EngineInputter(val engine: Engine) {
         noMiss = true
         skillStarGotten.set(false)
         skillStarBeat = Float.POSITIVE_INFINITY
-        practice.practiceModeEnabled = false
-        practice.requiredInputs = emptyList()
-        practice.moreTimes.set(0)
-        practice.clearText = 0f
+        practice.reset()
+        challenge.reset()
     }
     
     fun onAButtonPressed(release: Boolean) {
@@ -140,6 +156,9 @@ class EngineInputter(val engine: Engine) {
                 val nextBlockIndex = inputTracker.expectedInputIndices[nextIndexIndex]
                 if (nextBlockIndex != activeIndex) {
 //                    Paintbox.LOGGER.debug("$rod: Skipping input because nextBlockIndex != activeIndex (${nextBlockIndex} >= ${activeIndex})")
+                    if (activeIndex < nextBlockIndex) {
+                        missed()
+                    }
                     continue
                 }
                 
@@ -154,11 +173,14 @@ class EngineInputter(val engine: Engine) {
 
                 if (atSeconds !in minSec..maxSec) {
                     Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
+                    if (nextBlockIndex == activeIndex) {
+                        missed()
+                    }
                     continue
                 }
                 
                 val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
-                val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec)
+                val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
                 Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                 inputTracker.results += inputResult
                 
@@ -201,6 +223,9 @@ class EngineInputter(val engine: Engine) {
                     if (inputResult.inputScore == InputScore.ACE) {
                         attemptSkillStar(perfectBeats)
                     }
+                    if (challenge.goingForPerfect && !challenge.failed) {
+                        challenge.hit = 1f
+                    }
                 } else {
                     missed()
                 }
@@ -215,13 +240,24 @@ class EngineInputter(val engine: Engine) {
         val inputTracker = rod.inputTracker
         totalExpectedInputs += inputTracker.expectedInputIndices.size
         (inputResults as MutableList).addAll(inputTracker.results)
-        if (exploded && noMiss) {
-            missed()
+        if (noMiss) {
+            if (exploded || inputResults.size < inputTracker.expectedInputIndices.size || inputResults.any { it.inputScore == InputScore.MISS }) {
+                missed()
+            }
         }
     }
     
     fun missed() {
         noMiss = false
+        if (challenge.goingForPerfect) {
+            if (!challenge.failed) {
+                challenge.failed = true
+                challenge.hit = 1f
+                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail")) { player ->
+                    player.gain = 0.45f
+                }
+            }
+        }
     }
 
     fun attemptSkillStar(beat: Float): Boolean {

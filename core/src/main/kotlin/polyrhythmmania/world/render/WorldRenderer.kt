@@ -13,6 +13,8 @@ import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
+import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
@@ -81,6 +83,10 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     private val textBoxPane: TextboxPane = TextboxPane()
     private val textBoxLabel: TextLabel = TextLabel("")
     private val textBoxInputLabel: TextLabel = TextLabel(RodinSpecialChars.BORDERED_A, font = PRManiaGame.instance.fontGameTextbox)
+    private val perfectPane: Pane = Pane()
+    private val perfectIcon: ImageNode
+    private val perfectIconFlash: ImageNode
+    private val perfectIconFailed: ImageNode
     private val moreTimesLabel: TextLabel = TextLabel("")
     private val moreTimesVar: Var<Int> = Var(0)
     
@@ -115,8 +121,36 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
             this.textColor.set(Color.WHITE)
             this.visible.bind { moreTimesVar.use() > 0 }
         }
+        perfectIcon = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect"])
+        perfectIconFailed = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_failed"]).apply { 
+            this.visible.set(false)
+        }
+        perfectIconFlash = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_hit"]).apply { 
+            this.opacity.set(0f)
+        }
+        uiSceneRoot += perfectPane.apply { 
+            Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
+            this.bounds.width.set(500f)
+            this.bounds.height.set(64f)
+            this += Pane().apply {
+                this.bindWidthToSelfHeight()
+                this.padding.set(Insets(4f))
+                this += perfectIcon
+                this += perfectIconFlash
+                this += perfectIconFailed
+            }
+            this += TextLabel(binding = { Localization.getVar("play.perfect").use() },
+                    font = PRManiaGame.instance.fontGameMoreTimes).apply {
+                Anchor.TopRight.configure(this)
+                this.textColor.set(Color.WHITE)
+                this.padding.set(Insets(0f, 0f, 5f, 0f))
+                this.bindWidthToParent(adjust = -64f)
+                this.renderAlign.set(Align.left)
+                this.setScaleXY(0.6f)
+            }
+        }
     }
-    
+
     fun fireSkillStar() {
         skillStarSpinAnimation = 1f
         skillStarPulseAnimation = 2f
@@ -160,11 +194,13 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         batch.projectionMatrix = uiCamera.combined
 
         if (renderUI) {
-            moreTimesVar.set(engine.inputter.practice.moreTimes.getOrCompute())
+            val inputter = engine.inputter
+            
+            moreTimesVar.set(inputter.practice.moreTimes.getOrCompute())
             val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
 
             // Skill star
-            val skillStarInput = engine.inputter.skillStarBeat
+            val skillStarInput = inputter.skillStarBeat
             if (skillStarInput.isFinite()) {
                 if (skillStarSpinAnimation > 0) {
                     skillStarSpinAnimation -= Gdx.graphics.deltaTime / 1f
@@ -192,7 +228,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
                 val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
                 val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
-                batch.draw(if (engine.inputter.skillStarGotten.getOrCompute()) texColoured else texGrey,
+                batch.draw(if (inputter.skillStarGotten.getOrCompute()) texColoured else texGrey,
                         1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
             }
             
@@ -205,8 +241,31 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                         RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A
                 })
             }
+            
+            val challenge = inputter.challenge
+            if (challenge.goingForPerfect) {
+                perfectPane.visible.set(true)
+                challenge.hit = (challenge.hit - Gdx.graphics.deltaTime / (if (challenge.failed) 0.5f else 0.125f)).coerceIn(0f, 1f)
+                
+                perfectIconFlash.opacity.set(if (challenge.failed) 0f else challenge.hit)
+                perfectIcon.visible.set(!challenge.failed)
+                perfectIconFailed.visible.set(challenge.failed)
+                
+                if (challenge.failed && challenge.hit > 0f) {
+                    val maxShake = 3
+                    val x = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
+                    val y = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
+                    perfectIconFailed.bounds.x.set(x)
+                    perfectIconFailed.bounds.y.set(y)
+                } else {
+                    perfectIconFailed.bounds.x.set(0f)
+                    perfectIconFailed.bounds.y.set(0f)
+                }
+            } else {
+                perfectPane.visible.set(false)
+            }
 
-            val clearText = engine.inputter.practice.clearText
+            val clearText = inputter.practice.clearText
             if (clearText > 0f) {
                 val normalScale = 1f
                 val transitionEnd = 0.15f
@@ -247,7 +306,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                 }
                 
                 val newValue = (clearText - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f)
-                engine.inputter.practice.clearText = newValue
+                inputter.practice.clearText = newValue
             }
             
             uiSceneRoot.renderAsRoot(batch)

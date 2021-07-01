@@ -1,19 +1,12 @@
 package polyrhythmmania.init
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.TextureLoader
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import paintbox.packing.Packable
 import paintbox.packing.PackedSheet
 import paintbox.packing.PackedSheetLoader
 import paintbox.registry.AssetRegistry
-import polyrhythmmania.soundsystem.BeadsMusic
-import polyrhythmmania.soundsystem.BeadsMusicLoader
-import polyrhythmmania.soundsystem.BeadsSound
-import polyrhythmmania.soundsystem.BeadsSoundLoader
 
 
 class TilesetAssetLoader : AssetRegistry.IAssetLoader {
@@ -75,7 +68,10 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "skill_star",
                 "skill_star_grey",
-        ).map { Packable(it, "textures/world/ui/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 256, duplicateBorder = false,
+                "perfect",
+                "perfect_failed",
+                "perfect_hit",
+        ).map { Packable(it, "textures/world/ui/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false,
                 atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
     }
 
