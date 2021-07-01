@@ -30,6 +30,7 @@ data class Instantiator<B : Block>(val id: String,
                                    override val summary: ReadOnlyVar<String>,
                                    override val desc: ReadOnlyVar<String>,
                                    val deprecatedIDs: Set<String> = emptySet(),
+                                   val onlyOne: Boolean = false,
                                    val factory: Instantiator<B>.(Engine) -> B) : ObjectListable
 
 object Instantiators {
@@ -47,6 +48,9 @@ object Instantiators {
     val categoryMap: Map<String, List<Instantiator<*>>>
     val categoryList: List<ListCategory>
     val instantiatorCategories: Map<Instantiator<*>, String>
+
+
+    val classMapping: Map<Class<*>, Instantiator<*>>
 
     init {
         val tempMap = mutableMapOf<String, Instantiator<*>>()
@@ -90,7 +94,8 @@ object Instantiators {
         endStateInstantiator = Instantiator("endState", BlockEndState::class.java,
                 Localization.getVar("instantiator.endState.name"),
                 Localization.getVar("instantiator.endState.summary"),
-                Localization.getVar("instantiator.endState.desc")) { engine ->
+                Localization.getVar("instantiator.endState.desc"),
+                onlyOne = true) { engine ->
             BlockEndState(engine)
         }
         add(CATEGORY_CORE, endStateInstantiator)
@@ -121,7 +126,8 @@ object Instantiators {
         add(CATEGORY_CORE, Instantiator("skillStar", BlockSkillStar::class.java,
                 Localization.getVar("instantiator.skillStar.name"),
                 Localization.getVar("instantiator.skillStar.summary"),
-                Localization.getVar("instantiator.skillStar.desc")) { engine ->
+                Localization.getVar("instantiator.skillStar.desc"),
+                onlyOne = true) { engine ->
             BlockSkillStar(engine)
         })
         
@@ -162,5 +168,6 @@ object Instantiators {
         categoryList = tempCategoryList
         categoryMap = tempCategoryMap
         instantiatorCategories = tempInstCats
+        classMapping = instantiatorList.associateBy { it.blockClass }
     }
 }

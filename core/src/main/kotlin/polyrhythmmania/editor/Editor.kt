@@ -739,6 +739,8 @@ class Editor(val main: PRManiaGame)
                     var res = Localization.getVar("editor.status.draggingSelection").use()
                     if (currentClick.wouldBeDeleted.use() && !currentClick.isNew) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.willBeDeleted").use()
+                    } else if (currentClick.placementInvalidDuplicates) {
+                        res += " " + Localization.getVar("editor.status.draggingSelection.noDuplicates").use()
                     } else if (currentClick.collidesWithOtherBlocks.use()) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.collides").use()
                     } else if (currentClick.isPlacementInvalid.use()) {

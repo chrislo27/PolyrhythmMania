@@ -8,6 +8,7 @@ import paintbox.binding.Var
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.intersects
 import polyrhythmmania.editor.block.Block
+import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import kotlin.math.abs
@@ -102,6 +103,12 @@ sealed class Click {
         val isPlacementInvalid: ReadOnlyVar<Boolean> = Var(true)
         val wouldBeDeleted: ReadOnlyVar<Boolean> = Var(false)
         val collidesWithOtherBlocks: ReadOnlyVar<Boolean> = Var(false)
+        val placementInvalidDuplicates: Boolean = isNew && (blocks.mapNotNull { block ->
+            val javaClass = block.javaClass
+            (Instantiators.classMapping[javaClass] ?: return@mapNotNull null)
+        }.any { inst ->
+            inst.onlyOne && editor.blocks.any { Instantiators.classMapping[it.javaClass] == inst }
+        })
 
         fun didOriginBlockChange(): Boolean {
             val originalRegion = originalRegions.getValue(originBlock)
@@ -160,7 +167,7 @@ sealed class Click {
             originRegion.beat = originRegion.beat.coerceAtLeast(0f)
 
             val targetTrackIndex = (trackY /*- mouseOffset.y*/).toInt() // Target for originBlock
-            if (blocks.all { b ->
+            if (!placementInvalidDuplicates && blocks.all { b ->
                         val targetTrack: Track? = editor.tracks.getOrNull(targetTrackIndex + (b.trackIndex - originBlock.trackIndex))
                         targetTrack?.acceptsBlock(b) == true
                     }) {

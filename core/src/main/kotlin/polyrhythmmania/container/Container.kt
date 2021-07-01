@@ -252,8 +252,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             })
         })
         jsonObj.add("blocks", Json.array().also { blocksArray ->
-            val instantiators = Instantiators.instantiatorList
-            val classMapping: Map<Class<*>, Instantiator<*>> = instantiators.associateBy { it.blockClass }
+            val classMapping: Map<Class<*>, Instantiator<*>> = Instantiators.classMapping
             for (block in blocks.toList()) {
                 val o = Json.`object`()
                 val javaClass = block.javaClass
