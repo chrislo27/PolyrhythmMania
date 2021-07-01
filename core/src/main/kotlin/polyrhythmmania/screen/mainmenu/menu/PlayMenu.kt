@@ -1,17 +1,10 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
-import paintbox.transition.FadeIn
-import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
-import polyrhythmmania.practice.Practice
-import polyrhythmmania.practice.PracticeBasic
-import polyrhythmmania.screen.PlayScreen
 
 
 class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -21,7 +14,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     init {
         this.setSize(MMMenu.WIDTH_SMALL)
         this.titleText.bind { Localization.getVar("mainMenu.play.title").use() }
-        this.contentPane.bounds.height.set(250f)
+        this.contentPane.bounds.height.set(280f)
 
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)

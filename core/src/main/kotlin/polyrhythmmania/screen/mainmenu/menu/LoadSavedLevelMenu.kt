@@ -179,8 +179,10 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         }
                         
                         // Set challenge settings
-                        engine.playbackSpeed = tempoUp.getOrCompute() / 100f
-                        engine.inputter.challenge.goingForPerfect = goForPerfect.getOrCompute()
+                        if (!robotMode) {
+                            engine.playbackSpeed = tempoUp.getOrCompute() / 100f
+                            engine.inputter.challenge.goingForPerfect = goForPerfect.getOrCompute()
+                        }
                         
                         mainMenu.transitionAway {
                             val main = mainMenu.main

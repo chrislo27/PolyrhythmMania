@@ -1,6 +1,5 @@
 package polyrhythmmania.engine
 
-import com.badlogic.gdx.Gdx
 import paintbox.binding.Var
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.EngineInputter
