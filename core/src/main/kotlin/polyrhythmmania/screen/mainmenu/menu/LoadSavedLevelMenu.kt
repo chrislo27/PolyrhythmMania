@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.Var
 import paintbox.font.TextAlign
+import paintbox.font.TextRun
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
@@ -64,6 +65,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         descLabel = TextLabel(text = Localization.getValue("common.closeFileChooser")).apply {
             this.markup.set(this@LoadSavedLevelMenu.markup)
             this.padding.set(Insets(4f))
+            this.bounds.height.set(96f)
             this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
             this.renderAlign.set(Align.center)
             this.textAlign.set(TextAlign.CENTRE)
@@ -207,6 +209,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Gdx.app.postRunnable {
                 substate.set(Substate.LOAD_ERROR)
                 descLabel.doLineWrapping.set(true)
+                descLabel.setScaleXY(0.75f)
                 descLabel.text.set(Localization.getValue("editor.dialog.load.loadError", exClassName))
                 newContainer.disposeQuietly()
             }
