@@ -154,7 +154,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
         val world = container.world
         val renderer = container.renderer
-        world.entities.toList().forEach { world.removeEntity(it) }
+        world.clearEntities()
         renderer.camera.position.x = -2f
         renderer.camera.position.y = 0.5f
 

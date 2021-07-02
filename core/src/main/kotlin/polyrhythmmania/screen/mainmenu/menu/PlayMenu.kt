@@ -1,10 +1,14 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.graphics.Color
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
+import paintbox.ui.control.ScrollPane
+import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
+import polyrhythmmania.ui.PRManiaSkins
 
 
 class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -14,12 +18,23 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     init {
         this.setSize(MMMenu.WIDTH_SMALL)
         this.titleText.bind { Localization.getVar("mainMenu.play.title").use() }
-        this.contentPane.bounds.height.set(280f)
+        this.contentPane.bounds.height.set(300f)
 
-        val vbox = VBox().apply {
+        val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
-            this.spacing.set(0f)
             this.bindHeightToParent(-40f)
+
+            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+
+            this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+
+            val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+            this.vBar.skinID.set(scrollBarSkinID)
+            this.hBar.skinID.set(scrollBarSkinID)
+
+            this.vBar.unitIncrement.set(10f)
+            this.vBar.blockIncrement.set(40f)
         }
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
@@ -28,8 +43,16 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.bounds.height.set(40f)
         }
 
-        contentPane.addChild(vbox)
+
+        contentPane.addChild(scrollPane)
         contentPane.addChild(hbox)
+
+
+        val vbox = VBox().apply {
+            Anchor.TopLeft.configure(this)
+            this.spacing.set(0f)
+            this.bindHeightToParent(-40f)
+        }
 
         vbox.temporarilyDisableLayouts {
             vbox += createLongButton { Localization.getVar("mainMenu.play.playSavedLevel").use() }.apply {
@@ -44,10 +67,21 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNextMenu(menuCol.practiceMenu)
                 }
             }
+            vbox += createLongButton { Localization.getVar("mainMenu.play.dunk").use() }.apply {
+                
+            }
+//            vbox += createLongButton { Localization.getVar("mainMenu.play.toss").use() }.apply {
+//                
+//            }
+//            vbox += createLongButton { Localization.getVar("mainMenu.play.dash").use() }.apply {
+//                
+//            }
             vbox += createLongButton { "...Other modes (possibly) coming soon!" }.apply {
                 this.disabled.set(true)
             }
         }
+        vbox.sizeHeightToChildren(100f)
+        scrollPane.setContent(vbox)
 
         hbox.temporarilyDisableLayouts {
             hbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {

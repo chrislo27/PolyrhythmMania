@@ -321,7 +321,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
         }
         
         init {
-            world.entities.toList().forEach { world.removeEntity(it) }
+            world.clearEntities()
             for (x in 2..12) {
                 for (z in -5..4) {
                     val ent = if (z == 0) EntityPlatform(world, withLine = x == 4) else EntityCube(world, withLine = x == 4, withBorder = z == 1)

@@ -15,7 +15,8 @@ class World {
     }
     
     val tilesetConfig: TilesetConfig = TilesetConfig.createGBA1TilesetConfig()
-
+    var worldMode: WorldMode = WorldMode.POLYRHYTHM
+    
     val entities: List<Entity> = CopyOnWriteArrayList()
     
     val rows: List<Row> = listOf(
@@ -39,6 +40,10 @@ class World {
         (entities as MutableList).remove(entity)
     }
     
+    fun clearEntities() {
+        (entities as MutableList).clear()
+    }
+    
     fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         val entities = this.entities as MutableList
         entities.forEach { entity ->
@@ -57,13 +62,15 @@ class World {
         (entities as MutableList).sortWith(WorldRenderer.comparatorRenderOrder)
     }
     
+    // ------------------------------------------------------------------------------------------------------
+    
     fun resetWorld() {
         populateScene()
         rows.forEach(Row::initWithWorld)
     }
 
     private fun populateScene() {
-        entities.toList().forEach { removeEntity(it) }
+        clearEntities()
         
         // Main floor
         for (x in -1..20) {
