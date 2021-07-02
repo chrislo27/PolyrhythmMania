@@ -166,13 +166,12 @@ class EngineInputter(val engine: Engine) {
                 val perfectBeats = rod.deployBeat + 4f + nextBlockIndex / rod.xUnitsPerBeat
                 val perfectSeconds = engine.tempos.beatsToSeconds(perfectBeats)
                 
-                // TODO flexible timing solution, not using hardcoded constants in InputThresholds
                 val differenceSec = atSeconds - perfectSeconds
                 val minSec = perfectSeconds - InputThresholds.MAX_OFFSET_SEC
                 val maxSec = perfectSeconds + InputThresholds.MAX_OFFSET_SEC
 
                 if (atSeconds !in minSec..maxSec) {
-                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
+//                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
                     if (nextBlockIndex == activeIndex) {
                         missed()
                     }

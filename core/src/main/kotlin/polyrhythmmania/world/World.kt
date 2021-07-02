@@ -19,12 +19,16 @@ class World {
     
     val entities: List<Entity> = CopyOnWriteArrayList()
     
+    // World mode-specific things
+    // POLYRHYTHM
     val rows: List<Row> = listOf(
             Row(this, DEFAULT_ROW_LENGTH, 5, 2, 0, false),
             Row(this, DEFAULT_ROW_LENGTH, 5, 2, -3, true)
     )
     val rowA: Row get() = rows[0]
     val rowDpad: Row get() = rows[1]
+    // DUNK
+//    val dunkPiston: Entity
     
     init {
         resetWorld()
@@ -65,11 +69,19 @@ class World {
     // ------------------------------------------------------------------------------------------------------
     
     fun resetWorld() {
-        populateScene()
-        rows.forEach(Row::initWithWorld)
+        when (worldMode) {
+            WorldMode.POLYRHYTHM -> {
+                populateRegularScene()
+                rows.forEach(Row::initWithWorld)
+            }
+            WorldMode.DUNK -> {
+                populateDunkScene()
+            }
+            WorldMode.DASH -> TODO()
+        }
     }
 
-    private fun populateScene() {
+    private fun populateRegularScene() {
         clearEntities()
         
         // Main floor
@@ -170,4 +182,111 @@ class World {
         
     }
 
+    private fun populateDunkScene() {
+        clearEntities()
+
+        // Main floor
+        for (x in -1..9) {
+            for (z in -3 until 2) {
+                if (x >= 8 && z == -1) continue
+                val ent: Entity = if (z == -1) {
+                    EntityPlatform(this, x == 4)
+                } else if (z == 0 && x <= 7) {
+                    EntityCube(this, withBorder = true, withLine = x == 4)
+                } else EntityCube(this, withLine = x == 4)
+                addEntity(ent.apply {
+                    this.position.set(x.toFloat(), 1f, z.toFloat())
+                })
+            }
+        }
+
+        // Raised platform
+        for (x in -3..3) {
+            val ent: Entity = EntityPlatform(this)
+            addEntity(ent.apply {
+                this.position.set(x.toFloat(), 2f, -1f)
+            })
+        }
+
+        // Bottom floor
+//        for (x in -1..20) {
+//            for (z in 3..7) {
+//                val ent: Entity = EntityCube(this, x == 4)
+//                addEntity(ent.apply {
+//                    this.position.set(x.toFloat(), 0f, z.toFloat())
+//                })
+//            }
+//        }
+
+        // Upper steps
+//        for (x in -1..20) {
+//            for (z in -7 downTo -9) {
+//                val ent: Entity = EntityCube(this, x == 4)
+//                addEntity(ent.apply {
+//                    this.position.set(x.toFloat(), if (z == -7) 2f else 3f, z.toFloat())
+//                })
+//            }
+//        }
+        
+        // Hoop
+        for (y in 1..5) {
+            val ent: Entity = EntityPlatform(this, false)
+            addEntity(ent.apply { 
+                this.position.set(9f, y.toFloat(), -1f)
+            })
+        }
+        addEntity(EntityDunkBacking(this).apply { 
+            this.position.set(9f, 6f, -1f)
+        })
+        addEntity(EntityDunkBasketBack(this).apply { 
+            this.position.set(8f, 5f, -1f)
+        })
+        addEntity(EntityDunkBasketFaceX(this).apply { 
+            this.position.set(7f, 5f, -1f)
+        })
+        addEntity(EntityDunkBasketFaceZ(this).apply { 
+            this.position.set(8f, 5f, -1f)
+        })
+        addEntity(EntityDunkBasketFaceZ(this).apply { 
+            this.position.set(8f, 5f, -2f)
+        })
+
+        // Button signs
+        val signs = mutableListOf<EntitySign>()
+        signs += EntitySign(this, EntitySign.Type.A).apply {
+            this.position.set(3f, 2f, 0f)
+        }
+        signs += EntitySign(this, EntitySign.Type.BO).apply {
+            this.position.set(4f, 2f, 0f)
+        }
+        signs += EntitySign(this, EntitySign.Type.TA).apply {
+            this.position.set(5f, 2f, 0f)
+        }
+        signs += EntitySign(this, EntitySign.Type.N).apply {
+            this.position.set(6f, 2f, 0f)
+        }
+        signs.forEach { sign ->
+            sign.position.x += (12 / 32f)
+            sign.position.z += (8 / 32f)
+            addEntity(sign)
+        }
+
+
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.MISS_COLOUR, 0).apply {
+            this.position.set(5f, 1f, 2f)
+        })
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.MISS_COLOUR, 1).apply {
+            this.position.set(6f, 1f, 2f)
+        })
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.ACE_COLOUR, 2).apply {
+            this.position.set(7f, 1f, 2f)
+        })
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.MISS_COLOUR, 3).apply {
+            this.position.set(8f, 1f, 2f)
+        })
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.RIGHT, EntityInputFeedback.MISS_COLOUR, 4).apply {
+            this.position.set(9f, 1f, 2f)
+        })
+
+    }
 }
