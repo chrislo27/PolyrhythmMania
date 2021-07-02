@@ -193,7 +193,6 @@ class EngineInputter(val engine: Engine) {
                             }
                         }
                         if (practice.requiredInputs.all { it.wasHit }) {
-                            // TODO play more times sound
                             val newValue = (practice.moreTimes.getOrCompute() - 1).coerceAtLeast(0)
                             practice.moreTimes.set(newValue)
                             if (newValue == 0) {
