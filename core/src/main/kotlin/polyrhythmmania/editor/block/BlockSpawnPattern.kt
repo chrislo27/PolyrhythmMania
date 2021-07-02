@@ -10,6 +10,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.world.EntityPiston
 import polyrhythmmania.world.EntityRowBlock
 import polyrhythmmania.world.EventRowBlockSpawn
 import polyrhythmmania.world.Row
@@ -44,13 +45,13 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
         val events = mutableListOf<Event>()
 
         val world = engine.world
-        events += compileRow(b, patternData.rowATypes, world.rowA, EntityRowBlock.Type.PISTON_A)
-        events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityRowBlock.Type.PISTON_DPAD)
+        events += compileRow(b, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A)
+        events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD)
 
         return events
     }
 
-    private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityRowBlock.Type): List<Event> {
+    private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityPiston.Type): List<Event> {
         val events = mutableListOf<Event>()
 
         /*
@@ -104,7 +105,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
             if (cube != CubeType.NONE) {
                 anyNotNone = true
                 events += EventRowBlockSpawn(engine, row, ind,
-                        if (cube == CubeType.PLATFORM) EntityRowBlock.Type.PLATFORM else pistonType,
+                        if (cube == CubeType.PLATFORM) EntityPiston.Type.PLATFORM else pistonType,
                         beat + b)
             }
 
@@ -113,21 +114,21 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
                     CubeType.NONE -> {
                         val next = ind + 1
                         if (next < row.length) {
-                            events += EventRowBlockSpawn(engine, row, next, EntityRowBlock.Type.PLATFORM,
+                            events += EventRowBlockSpawn(engine, row, next, EntityPiston.Type.PLATFORM,
                                     beat + next * 0.5f, affectThisIndexAndForward = true)
                         }
                     }
                     CubeType.PLATFORM -> {
                         val next = ind + 1
                         if (next < row.length) {
-                            events += EventRowBlockSpawn(engine, row, next, EntityRowBlock.Type.PLATFORM,
+                            events += EventRowBlockSpawn(engine, row, next, EntityPiston.Type.PLATFORM,
                                     beat + b, affectThisIndexAndForward = true)
                         }
                     }
                     CubeType.PISTON -> {
                         val next = ind + 2
                         if (next < row.length) {
-                            events += EventRowBlockSpawn(engine, row, next, EntityRowBlock.Type.PLATFORM,
+                            events += EventRowBlockSpawn(engine, row, next, EntityPiston.Type.PLATFORM,
                                     beat + next * 0.5f, affectThisIndexAndForward = true)
                         }
                     }

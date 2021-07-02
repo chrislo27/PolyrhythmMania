@@ -8,10 +8,7 @@ import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.soundsystem.BeadsSound
-import polyrhythmmania.world.EntityRod
-import polyrhythmmania.world.EntityRowBlock
-import polyrhythmmania.world.Row
-import polyrhythmmania.world.World
+import polyrhythmmania.world.*
 
 
 /**
@@ -131,9 +128,9 @@ class EngineInputter(val engine: Engine) {
     private fun onInput(type: InputType, atSeconds: Float = engine.seconds) {
         if (areInputsLocked || engine.activeTextBox?.textBox?.requiresInput == true) return
         val atBeat = engine.tempos.secondsToBeats(atSeconds)
-        val rowBlockType: EntityRowBlock.Type = when (type) {
-            InputType.A -> EntityRowBlock.Type.PISTON_A
-            InputType.DPAD -> EntityRowBlock.Type.PISTON_DPAD
+        val rowBlockType: EntityPiston.Type = when (type) {
+            InputType.A -> EntityPiston.Type.PISTON_A
+            InputType.DPAD -> EntityPiston.Type.PISTON_DPAD
         }
 
         for (row in world.rows) {

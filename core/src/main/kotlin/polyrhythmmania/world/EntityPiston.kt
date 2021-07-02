@@ -1,15 +1,14 @@
-package polyrhythmmania.screen.mainmenu
+package polyrhythmmania.world
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.world.SpriteEntity
-import polyrhythmmania.world.World
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
 
 
-class EntityRowBlockDecor(world: World)
+open class EntityPiston(world: World)
     : SpriteEntity(world) {
 
     companion object {
@@ -39,18 +38,23 @@ class EntityRowBlockDecor(world: World)
     val collisionHeight: Float
         get() = if (type == Type.PLATFORM || pistonState == PistonState.RETRACTED) 1f else 1.15f
 
+    // Piston extension animation properties
     private var shouldPartiallyExtend: Boolean = false
     private var fullyExtendedAtBeat: Float = 0f
 
+    override val renderWidth: Float get() = 1f
+    override val renderHeight: Float get() = this.type.renderHeight
 
-    fun fullyExtend(engine: Engine, beat: Float) {
+    open fun fullyExtend(engine: Engine, beat: Float) {
         pistonState = PistonState.FULLY_EXTENDED
         shouldPartiallyExtend = true
         fullyExtendedAtBeat = beat
     }
 
-    fun retract() {
+    open fun retract(): Boolean {
+        val oldPistonState = pistonState
         pistonState = PistonState.RETRACTED
+        return oldPistonState != PistonState.RETRACTED
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
@@ -62,9 +66,6 @@ class EntityRowBlockDecor(world: World)
             }
         }
     }
-
-    override val renderWidth: Float get() = 1f
-    override val renderHeight: Float get() = this.type.renderHeight
 
     override val numLayers: Int
         get() {
@@ -114,9 +115,9 @@ class EntityRowBlockDecor(world: World)
         }
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
         if (active) {
-            super.render(renderer, batch, tileset, engine)
+            super.renderSimple(renderer, batch, tileset, engine, vec)
         }
     }
 }

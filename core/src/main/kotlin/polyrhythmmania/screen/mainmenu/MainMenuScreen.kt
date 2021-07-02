@@ -37,6 +37,7 @@ import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.world.EntityCube
+import polyrhythmmania.world.EntityPiston
 import polyrhythmmania.world.EntityPlatform
 import kotlin.math.ceil
 
@@ -166,8 +167,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 })
             }
             if (x == 0) {
-                world.addEntity(EntityRowBlockDecor(world).apply {
-                    this.type = EntityRowBlockDecor.Type.PISTON_A
+                world.addEntity(EntityPiston(world).apply {
+                    this.type = EntityPiston.Type.PISTON_A
                     this.position.set(x.toFloat(), 1f + MathUtils.FLOAT_ROUNDING_ERROR, -1f)
                 })
             } else {

@@ -12,10 +12,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.world.EntityRowBlock
-import polyrhythmmania.world.EventRowBlockDespawn
-import polyrhythmmania.world.EventRowBlockSpawn
-import polyrhythmmania.world.Row
+import polyrhythmmania.world.*
 import java.util.*
 
 
@@ -40,16 +37,16 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(Bloc
         val events = mutableListOf<Event>()
 
         val world = engine.world
-        events += compileRow(b, patternData.rowATypes, world.rowA, EntityRowBlock.Type.PISTON_A)
-        events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityRowBlock.Type.PISTON_DPAD)
+        events += compileRow(b, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A)
+        events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD)
 
         return events
     }
 
-    private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityRowBlock.Type): List<Event> {
+    private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityPiston.Type): List<Event> {
         val events = mutableListOf<Event>()
         
-        val ow = (if (pistonType == EntityRowBlock.Type.PISTON_A) overwriteA else overwriteDpad).getOrCompute()
+        val ow = (if (pistonType == EntityPiston.Type.PISTON_A) overwriteA else overwriteDpad).getOrCompute()
         rowArray.forEachIndexed { index, type ->
             if (type == CubeType.NONE) {
                 if (ow) {
@@ -57,7 +54,7 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(Bloc
                 }
             } else {
                 events += EventRowBlockSpawn(engine, row, index,
-                        if (type == CubeType.PLATFORM) EntityRowBlock.Type.PLATFORM else pistonType, beat)
+                        if (type == CubeType.PLATFORM) EntityPiston.Type.PLATFORM else pistonType, beat)
             }
         }
 

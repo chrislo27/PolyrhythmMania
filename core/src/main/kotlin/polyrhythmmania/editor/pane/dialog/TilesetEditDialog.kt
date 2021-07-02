@@ -25,7 +25,6 @@ import paintbox.ui.layout.VBox
 import paintbox.util.Matrix4Stack
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.screen.mainmenu.EntityRowBlockDecor
 import polyrhythmmania.ui.ColourPicker
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.*
@@ -336,15 +335,15 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                 }
             }
             
-            world.addEntity(EntityRowBlockDecor(world).apply { 
+            world.addEntity(EntityPiston(world).apply { 
                 this.position.set(6f, 0f, 0f)
-                this.type = EntityRowBlockDecor.Type.PISTON_A
-                this.pistonState = EntityRowBlockDecor.PistonState.FULLY_EXTENDED
+                this.type = EntityPiston.Type.PISTON_A
+                this.pistonState = EntityPiston.PistonState.FULLY_EXTENDED
             })
-            world.addEntity(EntityRowBlockDecor(world).apply { 
+            world.addEntity(EntityPiston(world).apply { 
                 this.position.set(9f, 0f, 0f)
-                this.type = EntityRowBlockDecor.Type.PISTON_DPAD
-                this.pistonState = EntityRowBlockDecor.PistonState.FULLY_EXTENDED
+                this.type = EntityPiston.Type.PISTON_DPAD
+                this.pistonState = EntityPiston.PistonState.FULLY_EXTENDED
             })
             world.addEntity(EntityCube(world).apply { 
                 this.position.set(7f, 0f, 2f)

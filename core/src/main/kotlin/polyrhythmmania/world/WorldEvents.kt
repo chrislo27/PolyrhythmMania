@@ -76,7 +76,7 @@ abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, start
     }
 }
 
-class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityRowBlock.Type, startBeat: Float,
+class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityPiston.Type, startBeat: Float,
                          affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
     init {
@@ -84,16 +84,16 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityR
     }
 
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
-        val didChange = !entity.active || entity.type != type || entity.pistonState != EntityRowBlock.PistonState.RETRACTED
+        val didChange = !entity.active || entity.type != type || entity.pistonState != EntityPiston.PistonState.RETRACTED
         entity.type = type
-        entity.pistonState = EntityRowBlock.PistonState.RETRACTED
+        entity.pistonState = EntityPiston.PistonState.RETRACTED
 
         if (currentBeat < this.beat + this.width && didChange) {
             when (this.type) {
-                EntityRowBlock.Type.PLATFORM -> {
+                EntityPiston.Type.PLATFORM -> {
                 }
-                EntityRowBlock.Type.PISTON_A -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_a"))
-                EntityRowBlock.Type.PISTON_DPAD -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d"))
+                EntityPiston.Type.PISTON_A -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_a"))
+                EntityPiston.Type.PISTON_DPAD -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d"))
             }
         }
     }

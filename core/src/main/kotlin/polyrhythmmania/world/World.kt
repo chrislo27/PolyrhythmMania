@@ -10,8 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 class World {
     
     companion object {
-        val DEFAULT_ROW_LENGTH: Int = 16
-        val DEFAULT_ROW_COUNT: Int = 2
+        const val DEFAULT_ROW_LENGTH: Int = 16
     }
     
     val tilesetConfig: TilesetConfig = TilesetConfig.createGBA1TilesetConfig()
@@ -207,26 +206,6 @@ class World {
                 this.position.set(x.toFloat(), 2f, -1f)
             })
         }
-
-        // Bottom floor
-//        for (x in -1..20) {
-//            for (z in 3..7) {
-//                val ent: Entity = EntityCube(this, x == 4)
-//                addEntity(ent.apply {
-//                    this.position.set(x.toFloat(), 0f, z.toFloat())
-//                })
-//            }
-//        }
-
-        // Upper steps
-//        for (x in -1..20) {
-//            for (z in -7 downTo -9) {
-//                val ent: Entity = EntityCube(this, x == 4)
-//                addEntity(ent.apply {
-//                    this.position.set(x.toFloat(), if (z == -7) 2f else 3f, z.toFloat())
-//                })
-//            }
-//        }
         
         // Hoop
         for (y in 1..5) {

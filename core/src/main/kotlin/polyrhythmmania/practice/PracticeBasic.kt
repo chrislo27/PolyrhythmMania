@@ -42,10 +42,10 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvent(EventLockInputs(engine, false, startBeat))
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 4f))
             
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityRowBlock.Type.PISTON_A, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityRowBlock.Type.PISTON_A, startBeat + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityPiston.Type.PISTON_A, startBeat + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityPiston.Type.PISTON_A, startBeat + 4f + 4 * 0.5f))
             
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityRowBlock.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
         }
         practiceSection1.loopBlock = PracticeLoopBlock(4f) { engine, startBeat -> 
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat))
@@ -84,10 +84,10 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvent(EventLockInputs(engine, false, startBeat))
             engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat + 4f))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityRowBlock.Type.PISTON_DPAD, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityRowBlock.Type.PISTON_DPAD, startBeat + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 4 * 0.5f))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityRowBlock.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
         }
         practiceSection2.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat))
@@ -132,13 +132,13 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 4f))
             engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat + 4f))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityRowBlock.Type.PISTON_A, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityRowBlock.Type.PISTON_A, startBeat + 4f + 4 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityRowBlock.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityPiston.Type.PISTON_A, startBeat + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityPiston.Type.PISTON_A, startBeat + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
             
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityRowBlock.Type.PISTON_DPAD, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityRowBlock.Type.PISTON_DPAD, startBeat + 4f + 4 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityRowBlock.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
         }
         practiceSection3.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat))
@@ -193,17 +193,17 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 4f))
             engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat + 4f))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityRowBlock.Type.PISTON_A, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 2, EntityRowBlock.Type.PISTON_A, startBeat + 4f + 2 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityRowBlock.Type.PISTON_A, startBeat + 4f + 4 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 6, EntityRowBlock.Type.PISTON_A, startBeat + 4f + 6 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityRowBlock.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityPiston.Type.PISTON_A, startBeat + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 2, EntityPiston.Type.PISTON_A, startBeat + 4f + 2 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityPiston.Type.PISTON_A, startBeat + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 6, EntityPiston.Type.PISTON_A, startBeat + 4f + 6 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityRowBlock.Type.PISTON_DPAD, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 2, EntityRowBlock.Type.PISTON_DPAD, startBeat + 4f + 2 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityRowBlock.Type.PISTON_DPAD, startBeat + 4f + 4 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 6, EntityRowBlock.Type.PISTON_DPAD, startBeat + 4f + 6 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityRowBlock.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 2, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 2 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 6, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 6 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
         }
         practiceSection4.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat))

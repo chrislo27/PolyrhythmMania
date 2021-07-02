@@ -219,7 +219,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         row.rowBlocks.forEachIndexed { index, entity ->
             if (index > lastExpectedSoFar && index >= currentIndexFloor) {
                 val type = if (!entity.active) null else entity.type
-                if (type != null && entity.type != EntityRowBlock.Type.PLATFORM) {
+                if (type != null && entity.type != EntityPiston.Type.PLATFORM) {
                     inputTracker.expectedInputIndices.add(index)
                 }
             }
@@ -327,8 +327,8 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
                 
                 // Auto-inputs
                 if (engine.autoInputs) {
-                    if (collision.velocityY == 0f && blockBelow.active && blockBelow.type != EntityRowBlock.Type.PLATFORM 
-                            && blockBelow.pistonState == EntityRowBlock.PistonState.RETRACTED
+                    if (collision.velocityY == 0f && blockBelow.active && blockBelow.type != EntityPiston.Type.PLATFORM 
+                            && blockBelow.pistonState == EntityPiston.PistonState.RETRACTED
                             && currentIndexFloat - currentIndex in 0.25f..0.65f) {
                         blockBelow.fullyExtend(engine, beat)
                         engine.inputter.attemptSkillStar(currentIndex / this.xUnitsPerBeat + this.deployBeat + 4f)

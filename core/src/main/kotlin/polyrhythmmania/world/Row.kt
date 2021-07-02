@@ -5,7 +5,7 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
 
     val rowBlocks: List<EntityRowBlock> = List(length) { index ->
         EntityRowBlock(world, startY.toFloat(), this, index).apply {
-            this.type = EntityRowBlock.Type.PLATFORM
+            this.type = EntityPiston.Type.PLATFORM
             this.active = false
             this.position.x = (startX + index).toFloat()
             this.position.z = startZ.toFloat()
@@ -37,7 +37,7 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
             world.addEntity(it)
             it.retract()
             it.despawn(1f)
-            it.type = EntityRowBlock.Type.PLATFORM
+            it.type = EntityPiston.Type.PLATFORM
         }
         inputIndicators.forEach(world::addEntity)
         updateInputIndicators()
@@ -52,10 +52,10 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
             if (foundActive) {
                 inputInd.visible = false
             } else {
-                if (rowBlock.active && rowBlock.type != EntityRowBlock.Type.PLATFORM && rowBlock.pistonState == EntityRowBlock.PistonState.RETRACTED) {
+                if (rowBlock.active && rowBlock.type != EntityPiston.Type.PLATFORM && rowBlock.pistonState == EntityPiston.PistonState.RETRACTED) {
                     foundActive = true
                     inputInd.visible = true
-                    inputInd.isDpad = rowBlock.type == EntityRowBlock.Type.PISTON_DPAD
+                    inputInd.isDpad = rowBlock.type == EntityPiston.Type.PISTON_DPAD
                     nextActiveIndex = i
                 } else {
                     inputInd.visible = false
