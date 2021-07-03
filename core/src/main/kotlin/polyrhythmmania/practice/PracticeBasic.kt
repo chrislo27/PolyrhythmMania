@@ -259,7 +259,7 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
         blocks += BlockTextbox(engine).apply { 
             this.beat = 0f
             this.requireInput.set(true)
-            this.text = Localization.getValue("practice.basic.text0")
+            this.text = Localization.getValue("practice.basic.text0", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += BlockTextbox(engine).apply { 
             this.beat = 2f
