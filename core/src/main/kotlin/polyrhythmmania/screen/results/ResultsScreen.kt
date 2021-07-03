@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
+import paintbox.Paintbox
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
@@ -80,9 +81,10 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
             this.bounds.width.set(700f)
             this.spacing.set(12f)
 
-            this += Button(Localization.getValue("play.results.back"), font = main.mainFont).apply {
+            this += Button(Localization.getValue("play.results.back"), font = main.fontResultsMain).apply {
                 this.bounds.width.set(300f)
-                (this.skin.getOrCompute() as ButtonSkin).roundedRadius.set(4)
+                (this.skin.getOrCompute() as ButtonSkin).roundedRadius.set(8)
+                this.setScaleXY(0.6f)
                 this.setOnHoverStart {
                     playSound(AssetRegistry.get<Sound>("sfx_menu_blip"))
                 }
@@ -98,9 +100,10 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
                     }
                 }
             }
-            this += Button(Localization.getValue("play.pause.startOver"), font = main.mainFont).apply {
+            this += Button(Localization.getValue("play.pause.startOver"), font = main.fontResultsMain).apply {
                 this.bounds.width.set(220f)
-                (this.skin.getOrCompute() as ButtonSkin).roundedRadius.set(4)
+                (this.skin.getOrCompute() as ButtonSkin).roundedRadius.set(8)
+                this.setScaleXY(0.6f)
                 this.setOnHoverStart {
                     playSound(AssetRegistry.get<Sound>("sfx_menu_blip"))
                 }
@@ -122,7 +125,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
         
         resultsPane.titleLabel.visible.set(false)
         resultsPane.linesLabel.text.set("")
-        resultsPane.scoreValue.set(-1)
+        resultsPane.scoreValueFloat.set(-1f)
         resultsPane.rankingPane.visible.set(false)
         resultsPane.bonusStatsPane.visible.set(false)
         controlsPane.visible.set(false)
@@ -174,7 +177,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
             }
         }
         
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+        if (Paintbox.debugMode && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             main.screen = ResultsScreen(main, score.copy(), container, keyboardKeybinds)
         }
     }
@@ -341,11 +344,11 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
         }
 
         override fun update() {
-            resultsPane.scoreValue.set(MathUtils.lerp(0f, score.scoreInt.toFloat(), (progress / timeout).coerceIn(0f, 1f)).toInt())
+            resultsPane.scoreValueFloat.set(MathUtils.lerp(0f, score.scoreInt.toFloat(), (progress / timeout).coerceIn(0f, 1f)))
         }
 
         override fun whenDone() {
-            resultsPane.scoreValue.set(score.scoreInt)
+            resultsPane.scoreValueFloat.set(score.scoreInt.toFloat())
             soundFilling.stop(soundID)
         }
 

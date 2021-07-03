@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
@@ -29,7 +31,8 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
     val titleLabel: TextLabel
     val linesLabel: TextLabel
     val scoreLabel: TextLabel
-    val scoreValue: Var<Int> = Var.bind { score.use().scoreInt }
+    val scoreValueFloat: FloatVar = FloatVar { score.use().scoreInt.toFloat() }
+    val scoreValue: ReadOnlyVar<Int> = Var.bind { scoreValueFloat.useF().toInt() }
     val rankingPane: Pane
     val bonusStatsPane: Pane
     private val rankingImage: ImageNode
@@ -83,7 +86,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
         scorePane += Pane().apply { 
             this += ImageWindowNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar"))).apply {
                 Anchor.TopLeft.configure(this)
-                this.windowU2.bind { (scoreValue.use() / 100f).coerceIn(0f, 1f) }
+                this.windowU2.bind { (scoreValueFloat.useF() / 100f).coerceIn(0f, 1f) }
             }
         }
         scorePane += ImageNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar_border")))
