@@ -197,8 +197,8 @@ open class UIElement : UIBounds() {
         val rootWidth: Float = rootBounds?.width?.get() ?: width
         val rootHeight: Float = rootBounds?.height?.get() ?: height
 
-        val camWidth = sceneRoot.getOrCompute()?.bounds?.width?.get() ?: Gdx.graphics.width.toFloat()
-        val camHeight = sceneRoot.getOrCompute()?.bounds?.height?.get() ?: Gdx.graphics.height.toFloat()
+        val camWidth = Gdx.graphics.width.toFloat() //sceneRoot.getOrCompute()?.bounds?.width?.get() ?: Gdx.graphics.width.toFloat()
+        val camHeight = Gdx.graphics.height.toFloat() //sceneRoot.getOrCompute()?.bounds?.height?.get() ?: Gdx.graphics.height.toFloat()
         
         val scissorX = (originX + x) / rootWidth * camWidth
         val scissorY = ((originY - y) / rootHeight) * camHeight
