@@ -466,7 +466,9 @@ class Editor(val main: PRManiaGame)
     fun attemptInstantiatorDrag(instantiator: Instantiator<Block>) {
         if (!allowedToEdit.getOrCompute()) return
         val currentTool = this.tool.getOrCompute()
-        if (currentTool != Tool.SELECTION) return
+        if (currentTool != Tool.SELECTION) {
+            changeTool(Tool.SELECTION)
+        }
 
         val newBlock: Block = instantiator.factory.invoke(instantiator, engine)
 
