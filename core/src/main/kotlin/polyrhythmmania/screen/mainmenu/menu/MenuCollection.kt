@@ -40,6 +40,13 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val inputSettingsMenu: InputSettingsMenu = InputSettingsMenu(this)
     
     init {
+        addStockMenus()
+        
+        changeActiveMenu(uppermostMenu, false, instant = true)
+        menuStack.push(uppermostMenu)
+    }
+    
+    private fun addStockMenus() {
         addMenu(uppermostMenu)
         addMenu(quitMenu)
         addMenu(creditsMenu)
@@ -49,9 +56,6 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(videoSettingsMenu)
         addMenu(audioSettingsMenu)
         addMenu(inputSettingsMenu)
-        
-        changeActiveMenu(uppermostMenu, false, instant = true)
-        menuStack.push(uppermostMenu)
     }
     
     fun addMenu(menu: MMMenu) {
