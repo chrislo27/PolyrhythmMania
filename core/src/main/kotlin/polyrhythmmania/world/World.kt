@@ -27,7 +27,7 @@ class World {
     val rowA: Row get() = rows[0]
     val rowDpad: Row get() = rows[1]
     // DUNK
-//    val dunkPiston: Entity
+//    val dunkPiston: EntityPiston
     
     init {
         resetWorld()

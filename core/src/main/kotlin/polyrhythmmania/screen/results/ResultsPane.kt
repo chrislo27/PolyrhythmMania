@@ -2,7 +2,6 @@ package polyrhythmmania.screen.results
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
@@ -82,13 +81,9 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
         vbox += scorePane
         
         scorePane += Pane().apply { 
-            this.doClipping.set(true)
-            this.bindWidthToParent(multiplierBinding = {
-                scoreValue.use() / 100f                                       
-            }, adjustBinding = {0f})
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar")), renderingMode = ImageRenderingMode.FULL).apply {
+            this += ImageWindowNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar"))).apply {
                 Anchor.TopLeft.configure(this)
-                this.bounds.width.bind { parent.use()?.parent?.use()?.bounds?.width?.useF() ?: 0f }
+                this.windowU2.bind { (scoreValue.use() / 100f).coerceIn(0f, 1f) }
             }
         }
         scorePane += ImageNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar_border")))
