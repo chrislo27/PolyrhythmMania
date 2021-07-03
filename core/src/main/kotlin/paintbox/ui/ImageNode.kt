@@ -3,13 +3,35 @@ package paintbox.ui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.util.ColorStack
+import paintbox.util.gdxutils.drawUV
 import kotlin.math.max
 import kotlin.math.min
 
+
+
+enum class ImageRenderingMode {
+
+    /**
+     * Draws the texture region at the full bounds of this element.
+     */
+    FULL,
+
+    /**
+     * Maintains the texture region's original aspect ratio, but doesn't oversize past the UI element bounds.
+     */
+    MAINTAIN_ASPECT_RATIO,
+
+    /**
+     * Maintains the texture region's original aspect ratio, but can oversize.
+     */
+    OVERSIZE,
+
+}
 
 open class ImageNode(tex: TextureRegion? = null,
                      renderingMode: ImageRenderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
@@ -101,21 +123,61 @@ open class ImageIcon(tex: TextureRegion? = null,
     override val tooltipElement: Var<UIElement?> = Var(null)
 }
 
-enum class ImageRenderingMode {
+/**
+ * A full-render image node, but with uv settings to control the render window of the top-left/bottom-right corners encompassed.
+ */
+open class ImageWindowNode(tex: TextureRegion? = null)
+    : UIElement() {
 
-    /**
-     * Draws the texture region at the full bounds of this element.
-     */
-    FULL,
+    val textureRegion: Var<TextureRegion?> = Var(tex)
+    val tint: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
+    val windowU: FloatVar = FloatVar(0f) 
+    val windowV: FloatVar = FloatVar(0f) 
+    val windowU2: FloatVar = FloatVar(1f) 
+    val windowV2: FloatVar = FloatVar(1f) 
 
-    /**
-     * Maintains the texture region's original aspect ratio, but doesn't oversize past the UI element bounds.
-     */
-    MAINTAIN_ASPECT_RATIO,
+    constructor(binding: Var.Context.() -> TextureRegion?)
+            : this(null) {
+        textureRegion.bind(binding)
+    }
 
-    /**
-     * Maintains the texture region's original aspect ratio, but can oversize.
-     */
-    OVERSIZE,
+    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        val tex = textureRegion.getOrCompute()
+        if (tex != null) {
+            val old = batch.packedColor
 
+            val tmpColor = ColorStack.getAndPush()
+            tmpColor.set(tint.getOrCompute())
+            val opacity = apparentOpacity.get()
+            tmpColor.a *= opacity
+
+            batch.color = tmpColor
+
+            val renderBounds = this.contentZone
+            val x = renderBounds.x.get() + originX
+            val y = originY - renderBounds.y.get()
+            val w = renderBounds.width.get()
+            val h = renderBounds.height.get()
+            
+            val u = this.windowU.get()
+            val v = this.windowV.get()
+            val u2 = this.windowU2.get()
+            val v2 = this.windowV2.get()
+
+            batch.drawUV(tex.texture,
+                    x + w * u,
+                    y - h + h * v,
+                    w * (u2 - u),
+                    h * (v2 - v),
+                    MathUtils.lerp(tex.u, tex.u2, u),
+                    MathUtils.lerp(tex.v, tex.v2, v),
+                    MathUtils.lerp(tex.u, tex.u2, u2),
+                    MathUtils.lerp(tex.v, tex.v2, v2)
+            )
+
+            ColorStack.pop()
+
+            batch.packedColor = old
+        }
+    }
 }
