@@ -596,15 +596,14 @@ class Editor(val main: PRManiaGame)
 
             val playbackStartBeats = this.playbackStart.get()
             val newSeconds = engine.tempos.beatsToSeconds(playbackStartBeats)
+            val wereSoundsDisabled = engine.soundInterface.disableSounds
+            engine.soundInterface.disableSounds = true
             
             // Simulate some time before the playback start depending on deploy rod events
             if (settings.editorHigherAccuracyPreview.getOrCompute()) {
-                val wereSoundsDisabled = engine.soundInterface.disableSounds
-                engine.soundInterface.disableSounds = true
-
                 // For each EventDeployRod, check if the window of time (4 to 4+5 beats) overlaps the playbackStartBeats
-                val rodEvents = engine.events.filter {
-                    it is EventDeployRod && playbackStartBeats in (it.beat + 4f)..(it.beat + 4f + 5f)
+                val rodEvents = engine.events.filter { e ->
+                    e is EventDeployRod && playbackStartBeats in (e.beat + 4f)..(e.beat + 4f + 5f)
                 }.sorted()
                 if (rodEvents.isNotEmpty()) {
                     val simulateFromBeat = rodEvents.first().beat + 4f
@@ -619,12 +618,12 @@ class Editor(val main: PRManiaGame)
                         }
                     }
                 }
-                
-                engine.soundInterface.disableSounds = wereSoundsDisabled
             }
+            
             timing.seconds = newSeconds
             engine.seconds = newSeconds
             engine.musicData.update()
+            engine.soundInterface.disableSounds = wereSoundsDisabled
             
             val engineBeatFloor = floor(engine.beat)
             lastMetronomeBeat = if (engineBeatFloor == engine.beat) (engineBeatFloor.toInt() - 1) else engineBeatFloor.toInt()
