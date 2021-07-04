@@ -1,5 +1,7 @@
 package polyrhythmmania.world
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
@@ -109,7 +111,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         get() = !collision.collidedWithWall
 
     private var engineUpdateLastSec: Float = Float.MAX_VALUE
-    private var collisionUpdateLastSec: Float = Float.MAX_VALUE
+    private var collisionUpdateLastBeat: Float = Float.MAX_VALUE
     private var lastCurrentIndex: Float = -10000f
 
     init {
@@ -178,24 +180,33 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         if (engineUpdateLastSec == Float.MAX_VALUE) {
             engineUpdateLastSec = seconds
         }
-        if (collisionUpdateLastSec == Float.MAX_VALUE) {
-            val beatDeltaSec = engine.tempos.beatsToSeconds(beat) - engine.tempos.beatsToSeconds(deployBeat)
-            collisionUpdateLastSec = if (beatDeltaSec > 0f) {
-                engine.tempos.beatsToSeconds(deployBeat)
+        if (collisionUpdateLastBeat == Float.MAX_VALUE) {
+            val beatDelta = beat - deployBeat
+            collisionUpdateLastBeat = if (beatDelta > 0f) {
+                deployBeat
             } else {
-                seconds
+                beat
             }
         }
 
-        val engineUpdateDelta = seconds - engineUpdateLastSec
+//        val engineUpdateDelta = seconds - engineUpdateLastSec
 
-        var collisionUpdateDelta = seconds - collisionUpdateLastSec
         val minCollisionUpdateInterval = 1f / MIN_COLLISION_UPDATE_RATE
-        var count = 0
-        while (collisionUpdateDelta > 0f) {
-            collisionCheck(engine, beat, seconds, collisionUpdateDelta.coerceAtMost(minCollisionUpdateInterval))
-            collisionUpdateDelta -= minCollisionUpdateInterval
-            count++
+        val collisionUpdateDeltaBeat = beat - collisionUpdateLastBeat
+        var iterationCount = 0
+        var updateCurrentBeat = collisionUpdateLastBeat
+        var updateCurrentSec = engine.tempos.beatsToSeconds(updateCurrentBeat)
+        var updateBeatTimeRemaining = collisionUpdateDeltaBeat
+        while (updateBeatTimeRemaining > 0f) {
+            val deltaBeat = updateBeatTimeRemaining.coerceAtMost(minCollisionUpdateInterval).coerceAtLeast(0f)
+            val deltaSec = (engine.tempos.beatsToSeconds(updateCurrentBeat + deltaBeat) - engine.tempos.beatsToSeconds(updateCurrentBeat)).coerceAtLeast(0f)
+            updateCurrentBeat += deltaBeat
+            updateCurrentSec += deltaSec
+            
+            collisionCheck(engine, updateCurrentBeat, updateCurrentSec, deltaSec)
+            
+            updateBeatTimeRemaining -= minCollisionUpdateInterval
+            iterationCount++
         }
 
         if (seconds >= explodeAtSec) {
@@ -205,7 +216,7 @@ class EntityRod(world: World, val deployBeat: Float, val row: Row)
         }
 
         engineUpdateLastSec = seconds
-        collisionUpdateLastSec = seconds
+        collisionUpdateLastBeat = beat
         lastCurrentIndex = getCurrentIndex(this.position.x)
     }
 
