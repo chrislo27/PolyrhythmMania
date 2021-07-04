@@ -599,6 +599,8 @@ class Editor(val main: PRManiaGame)
             val wereSoundsDisabled = engine.soundInterface.disableSounds
             engine.soundInterface.disableSounds = true
             
+            engine.removeEvents(engine.events.filter { it is EventDeployRod && it.beat + 4f < playbackStartBeats })
+            
             // Simulate some time before the playback start depending on deploy rod events
             if (settings.editorHigherAccuracyPreview.getOrCompute()) {
                 // For each EventDeployRod, check if the window of time (4 to 4+5 beats) overlaps the playbackStartBeats
@@ -607,6 +609,7 @@ class Editor(val main: PRManiaGame)
                 }.sorted()
                 if (rodEvents.isNotEmpty()) {
                     val simulateFromBeat = rodEvents.first().beat + 4f
+                    
                     if (simulateFromBeat < playbackStartBeats) {
                         val simFromSec = engine.tempos.beatsToSeconds(simulateFromBeat) - (1 / 60f)
                         var s = simFromSec
