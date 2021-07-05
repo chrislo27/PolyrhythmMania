@@ -44,7 +44,7 @@ import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
-import polyrhythmmania.world.entity.EntityRod
+import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.render.WorldRenderer
 import space.earlygrey.shapedrawer.ShapeDrawer
 import java.util.*
@@ -94,7 +94,7 @@ class PlayScreen(
         if (it.getOrCompute()) {
             Gdx.app.postRunnable {
                 soundSystem.setPaused(true)
-                container.world.entities.filterIsInstance<EntityRod>().forEach { rod ->
+                container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
                     engine.inputter.submitInputsFromRod(rod, false)
                 }
                 if (showResults) {

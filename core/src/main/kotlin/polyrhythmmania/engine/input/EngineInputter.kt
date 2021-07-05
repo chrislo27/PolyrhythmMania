@@ -9,13 +9,12 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
-import polyrhythmmania.world.entity.EntityRod
 
 
 /**
  * Receives the player inputs.
  *
- * Input results are stored PER [EntityRod] as the input pattern is determined at runtime. See [EntityRod.InputTracker].
+ * Input results are stored PER [EntityRodPR] as the input pattern is determined at runtime. See [EntityRodPR.InputTracker].
  *
  * **Flow:**
  *   - Pre-req: Inputs have to not be locked ([areInputsLocked] = `false`).
@@ -142,8 +141,8 @@ class EngineInputter(val engine: Engine) {
             if (rowBlock.type != rowBlockType) continue
 
             for (entity in engine.world.entities) {
-                if (entity !is EntityRod || entity.row !== row || !entity.acceptingInputs) continue
-                val rod: EntityRod = entity
+                if (entity !is EntityRodPR || entity.row !== row || !entity.acceptingInputs) continue
+                val rod: EntityRodPR = entity
                 rod.updateInputIndices(atBeat)
                 val inputTracker = rod.inputTracker
                 if (inputTracker.results.size >= inputTracker.expectedInputIndices.size) {
@@ -232,7 +231,7 @@ class EngineInputter(val engine: Engine) {
         }
     }
     
-    fun submitInputsFromRod(rod: EntityRod, exploded: Boolean) {
+    fun submitInputsFromRod(rod: EntityRodPR, exploded: Boolean) {
         val inputTracker = rod.inputTracker
         totalExpectedInputs += inputTracker.expectedInputIndices.size
         (inputResults as MutableList).addAll(inputTracker.results)

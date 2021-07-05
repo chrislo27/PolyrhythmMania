@@ -6,7 +6,7 @@ import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.input.EngineInputter
-import polyrhythmmania.world.entity.EntityRod
+import polyrhythmmania.world.EntityRodPR
 import java.util.*
 
 
@@ -83,7 +83,7 @@ class PracticeSection(engine: Engine) : Block(engine, EnumSet.allOf(BlockType::c
                 val inputBeats = loopBlock.block.invoke(engine, this.beat)
                 practice.requiredInputs = inputBeats
                 // Check existing recorded inputs
-                (engine.world.entities.filterIsInstance<EntityRod>().flatMap { it.inputTracker.results } +
+                (engine.world.entities.filterIsInstance<EntityRodPR>().flatMap { it.inputTracker.results } +
                         engine.inputter.inputResults).toSet().forEach { result ->
                     val required = inputBeats.firstOrNull { 
                         !it.wasHit && it.inputType == result.type && MathUtils.isEqual(result.perfectBeat, it.beat, EngineInputter.BEAT_EPSILON) 

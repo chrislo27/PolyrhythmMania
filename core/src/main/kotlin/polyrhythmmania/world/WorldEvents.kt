@@ -9,7 +9,6 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityPiston
-import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.render.TilesetConfig
 
 
@@ -185,7 +184,7 @@ class EventDeployRod(engine: Engine, val row: Row, startBeat: Float) : Event(eng
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        engine.world.addEntity(EntityRod(engine.world, this.beat, row))
+        engine.world.addEntity(EntityRodPR(engine.world, this.beat, row))
     }
 }
 
