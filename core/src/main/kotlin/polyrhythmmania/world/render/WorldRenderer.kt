@@ -27,7 +27,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
-import polyrhythmmania.world.Entity
+import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.World
 
 

@@ -10,8 +10,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.world.EntityPiston
-import polyrhythmmania.world.EntityRowBlock
+import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.EventRowBlockSpawn
 import polyrhythmmania.world.Row
 import java.util.*

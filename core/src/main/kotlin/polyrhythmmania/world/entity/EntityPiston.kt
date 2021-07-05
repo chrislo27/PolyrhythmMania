@@ -1,8 +1,9 @@
-package polyrhythmmania.world
+package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.world.World
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer

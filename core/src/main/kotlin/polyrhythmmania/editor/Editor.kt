@@ -51,7 +51,7 @@ import polyrhythmmania.soundsystem.*
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.EventDeployRod
-import polyrhythmmania.world.TemporaryEntity
+import polyrhythmmania.world.entity.TemporaryEntity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File

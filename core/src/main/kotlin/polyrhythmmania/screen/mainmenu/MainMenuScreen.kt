@@ -36,9 +36,9 @@ import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
 import polyrhythmmania.soundsystem.SimpleTimingProvider
-import polyrhythmmania.world.EntityCube
-import polyrhythmmania.world.EntityPiston
-import polyrhythmmania.world.EntityPlatform
+import polyrhythmmania.world.entity.EntityCube
+import polyrhythmmania.world.entity.EntityPiston
+import polyrhythmmania.world.entity.EntityPlatform
 import kotlin.math.ceil
 
 

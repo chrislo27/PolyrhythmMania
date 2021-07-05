@@ -14,7 +14,6 @@ import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.input.EventLockInputs
-import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
@@ -22,6 +21,7 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.*
+import polyrhythmmania.world.entity.EntityPiston
 import kotlin.system.measureNanoTime
 
 

@@ -2,6 +2,7 @@ package polyrhythmmania.world
 
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.render.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.concurrent.CopyOnWriteArrayList

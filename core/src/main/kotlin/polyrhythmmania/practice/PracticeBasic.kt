@@ -16,6 +16,7 @@ import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.*
+import polyrhythmmania.world.entity.EntityPiston
 
 
 class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) : Practice(main) {

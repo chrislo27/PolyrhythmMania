@@ -28,6 +28,7 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.ColourPicker
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.*
+import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer

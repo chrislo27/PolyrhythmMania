@@ -1,7 +1,5 @@
 package polyrhythmmania.editor.block
 
-import com.eclipsesource.json.Json
-import com.eclipsesource.json.JsonArray
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.Var
 import paintbox.ui.contextmenu.CheckBoxMenuItem
@@ -13,6 +11,7 @@ import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.*
+import polyrhythmmania.world.entity.EntityPiston
 import java.util.*
 
 

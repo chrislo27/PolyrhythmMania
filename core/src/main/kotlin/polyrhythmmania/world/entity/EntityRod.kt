@@ -1,7 +1,5 @@
-package polyrhythmmania.world
+package polyrhythmmania.world.entity
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
@@ -10,6 +8,9 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
+import polyrhythmmania.world.EntityRowBlock
+import polyrhythmmania.world.Row
+import polyrhythmmania.world.World
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer

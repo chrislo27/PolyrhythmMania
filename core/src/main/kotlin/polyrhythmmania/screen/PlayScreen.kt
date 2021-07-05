@@ -44,7 +44,7 @@ import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
-import polyrhythmmania.world.EntityRod
+import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.render.WorldRenderer
 import space.earlygrey.shapedrawer.ShapeDrawer
 import java.util.*

@@ -8,6 +8,8 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.world.entity.EntityPiston
+import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.render.TilesetConfig
 
 

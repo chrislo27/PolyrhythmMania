@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.MathHelper
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.world.EntityCube
+import polyrhythmmania.world.entity.EntityCube
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.WorldRenderer
