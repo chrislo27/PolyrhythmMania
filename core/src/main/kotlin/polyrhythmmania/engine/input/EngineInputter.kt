@@ -143,19 +143,21 @@ class EngineInputter(val engine: Engine) {
             for (entity in engine.world.entities) {
                 if (entity !is EntityRodPR || entity.row !== row || !entity.acceptingInputs) continue
                 val rod: EntityRodPR = entity
-                rod.updateInputIndices(atBeat)
+                rod.updateInputTracking(atBeat)
                 val inputTracker = rod.inputTracker
-                if (inputTracker.results.size >= inputTracker.expectedInputIndices.size) {
-//                    Paintbox.LOGGER.debug("$rod: Skipping input because results size >= expected inputs size (${inputTracker.results.size} >= ${inputTracker.expectedInputIndices.size})")
-                    continue
-                }
-                val nextIndexIndex = inputTracker.results.size
-                val nextBlockIndex = inputTracker.expectedInputIndices[nextIndexIndex]
-                if (nextBlockIndex != activeIndex) {
+                val nextBlockIndex = entity.getCurrentIndexFloor(entity.getPosXFromBeat(atBeat - entity.deployBeat))
+                if (nextBlockIndex !in 0 until entity.row.length) continue // Not in range
+                if (inputTracker.expected[nextBlockIndex] !is EntityRodPR.ExpectedInput.Expected) continue // Not an expected input
+                if (nextBlockIndex != activeIndex) { // Not the current active index
 //                    Paintbox.LOGGER.debug("$rod: Skipping input because nextBlockIndex != activeIndex (${nextBlockIndex} >= ${activeIndex})")
                     if (activeIndex < nextBlockIndex) {
                         missed()
                     }
+                    continue
+                }
+                if (inputTracker.results.any { it.expectedIndex == nextBlockIndex }) { // Prevent potential duplicates
+                    // Technically shouldn't happen since the active index changes when updateInputIndicators is called
+                    Paintbox.LOGGER.debug("$rod: duplicate input for index $nextBlockIndex caught and ignored!")
                     continue
                 }
                 
@@ -226,17 +228,22 @@ class EngineInputter(val engine: Engine) {
                 }
             }
             
-            // Trigger this piston
+            // Trigger this piston (will also call updateInputIndicators)
             rowBlock.fullyExtend(engine, atBeat)
         }
     }
     
-    fun submitInputsFromRod(rod: EntityRodPR, exploded: Boolean) {
+    fun submitInputsFromRod(rod: EntityRodPR) {
         val inputTracker = rod.inputTracker
-        totalExpectedInputs += inputTracker.expectedInputIndices.size
-        (inputResults as MutableList).addAll(inputTracker.results)
+        
+        val numExpected = inputTracker.expected.count { it is EntityRodPR.ExpectedInput.Expected }
+        val validResults = inputTracker.results.filter { it.inputScore != InputScore.MISS }
+        
+        totalExpectedInputs += numExpected
+        (inputResults as MutableList).addAll(validResults)
+        
         if (noMiss) {
-            if (exploded || inputResults.size < inputTracker.expectedInputIndices.size || inputResults.any { it.inputScore == InputScore.MISS }) {
+            if (rod.exploded || (numExpected > validResults.size) || inputTracker.results.any { it.inputScore == InputScore.MISS }) {
                 missed()
             }
         }

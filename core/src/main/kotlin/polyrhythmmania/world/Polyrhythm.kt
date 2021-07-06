@@ -1,6 +1,7 @@
 package polyrhythmmania.world
 
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import paintbox.registry.AssetRegistry
@@ -12,6 +13,8 @@ import polyrhythmmania.world.entity.EntityInputIndicator
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.entity.EntityRod.Companion.MIN_COLLISION_UPDATE_RATE
+import polyrhythmmania.world.render.Tileset
+import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.floor
 
 
@@ -163,22 +166,31 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
 
 }
 
-class EntityRodPR(world: World, val deployBeat: Float, val row: Row) : EntityRod(world) {
+class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(world, deployBeat) {
+
+    data class InputTracker(
+            val resultCount: Int,
+            val expected: MutableList<ExpectedInput> = MutableList(resultCount) { ExpectedInput.Unknown },
+            val results: MutableList<InputResult> = mutableListOf(),
+    )
     
-    data class InputTracker(val expectedInputIndices: MutableList<Int> = mutableListOf(),
-                            val results: MutableList<InputResult> = mutableListOf())
-    
+    sealed class ExpectedInput {
+        object Unknown : ExpectedInput()
+        object Skipped : ExpectedInput()
+        class Expected(val thisIndex: Int, val nextJumpIndex: Int) : ExpectedInput()
+    }
+
     private val killAfterBeats: Float = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
 
     private var explodeAtSec: Float = Float.MAX_VALUE
+    var exploded: Boolean = false
+        private set
 
-    private var engineUpdateLastSec: Float = Float.MAX_VALUE
-    private var collisionUpdateLastBeat: Float = Float.MAX_VALUE
     private var lastCurrentIndex: Float = -10000f
 
-    val inputTracker: InputTracker = InputTracker()
+    val inputTracker: InputTracker = InputTracker(row.length)
     val acceptingInputs: Boolean
-        get() = !collision.collidedWithWall
+        get() = !collision.collidedWithWall || exploded
     
     init {
         this.position.x = getPosXFromBeat(0f)
@@ -195,8 +207,8 @@ class EntityRodPR(world: World, val deployBeat: Float, val row: Row) : EntityRod
     }
 
     fun explode(engine: Engine) {
-        if (isKilled) return
-        kill()
+        if (isKilled || exploded) return
+        exploded = true
         world.addEntity(EntityExplosion(world, engine.seconds, this.renderWidth).also {
             it.position.set(this.position)
         })
@@ -219,85 +231,68 @@ class EntityRodPR(world: World, val deployBeat: Float, val row: Row) : EntityRod
 
     fun bounce(startIndex: Int) {
         if (startIndex in 0 until row.length) {
-            if (startIndex >= row.length - 1) {
-                bounce(startIndex, startIndex + 1)
-            } else {
-                var nextNonNull = startIndex + 1
-                for (i in startIndex + 1 until row.length) {
-                    nextNonNull = i
-                    val rowBlock = row.rowBlocks[i]
-                    if (rowBlock.active) {
-                        break
-                    }
-                }
-                bounce(startIndex, nextNonNull)
-            }
+            bounce(startIndex, getLookaheadIndex(startIndex))
         }
     }
 
     /**
-     * [inputTracker] will be updated with the correct number of inputs expected.
+     * Gets the index where the rod would bounce to in the CURRENT world state. The returned index
+     * may be out of bounds.
      */
-    fun updateInputIndices(currentBeat: Float) {
-        val lastExpectedSoFar = inputTracker.expectedInputIndices.lastOrNull() ?: -1
-        val currentIndexFloor = getCurrentIndexFloor(this.position.x)
-        if (currentIndexFloor < -1) return
-        row.rowBlocks.forEachIndexed { index, entity ->
-            if (index > lastExpectedSoFar && index >= currentIndexFloor) {
-                val type = if (!entity.active) null else entity.type
-                if (type != null && entity.type != EntityPiston.Type.PLATFORM) {
-                    inputTracker.expectedInputIndices.add(index)
+    fun getLookaheadIndex(startIndex: Int): Int {
+        return if (startIndex >= row.length - 1) {
+            startIndex + 1
+        } else {
+            var nextNonNull = startIndex + 1
+            for (i in startIndex + 1 until row.length) {
+                nextNonNull = i
+                val rowBlock = row.rowBlocks[i]
+                if (rowBlock.active) {
+                    break
                 }
             }
+            nextNonNull
         }
-//        println("[EntityRod] $this Input indices updated for current index $currentIndexFloor: ${inputTracker.expectedInputIndices}")
     }
 
+    /**
+     * Updates the internal [InputTracker]. This continues even if the rod has exploded.
+     */
+    fun updateInputTracking(beat: Float) {
+        val currentIndexFloor: Int = floor(getCurrentIndex(getPosXFromBeat(beat - deployBeat))).toInt()
+        if (currentIndexFloor < 0 || currentIndexFloor >= inputTracker.resultCount)
+            return
+        
+        val currentExpected: ExpectedInput = inputTracker.expected[currentIndexFloor]
+        if (currentExpected != ExpectedInput.Unknown)
+            return
 
+        val rowBlock = row.rowBlocks[currentIndexFloor]
+        val type = if (!rowBlock.active) null else rowBlock.type
+        if (type == null || type == EntityPiston.Type.PLATFORM) {
+            inputTracker.expected[currentIndexFloor] = ExpectedInput.Skipped
+        } else {
+            // Lookahead to where it should land.
+            val lookahead = getLookaheadIndex(currentIndexFloor)
+            inputTracker.expected[currentIndexFloor] = ExpectedInput.Expected(currentIndexFloor, lookahead)
+            for (i in currentIndexFloor + 1 until lookahead.coerceAtMost(inputTracker.resultCount - 1)) {
+                if (inputTracker.expected[i] == ExpectedInput.Unknown)
+                    inputTracker.expected[i] = ExpectedInput.Skipped
+            }
+        }
+    }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         super.engineUpdate(engine, beat, seconds)
-
-        if (engineUpdateLastSec == Float.MAX_VALUE) {
-            engineUpdateLastSec = seconds
-        }
-        if (collisionUpdateLastBeat == Float.MAX_VALUE) {
-            val beatDelta = beat - deployBeat
-            collisionUpdateLastBeat = if (beatDelta > 0f) {
-                deployBeat
-            } else {
-                beat
-            }
-        }
-
-//        val engineUpdateDelta = seconds - engineUpdateLastSec
-
-        val minCollisionUpdateInterval = 1f / MIN_COLLISION_UPDATE_RATE
-        val collisionUpdateDeltaBeat = beat - collisionUpdateLastBeat
-        var iterationCount = 0
-        var updateCurrentBeat = collisionUpdateLastBeat
-        var updateCurrentSec = engine.tempos.beatsToSeconds(updateCurrentBeat)
-        var updateBeatTimeRemaining = collisionUpdateDeltaBeat
-        while (updateBeatTimeRemaining > 0f) {
-            val deltaBeat = updateBeatTimeRemaining.coerceAtMost(minCollisionUpdateInterval).coerceAtLeast(0f)
-            val deltaSec = (engine.tempos.beatsToSeconds(updateCurrentBeat + deltaBeat) - engine.tempos.beatsToSeconds(updateCurrentBeat)).coerceAtLeast(0f)
-            updateCurrentBeat += deltaBeat
-            updateCurrentSec += deltaSec
-
-            collisionCheck(engine, updateCurrentBeat, updateCurrentSec, deltaSec)
-
-            updateBeatTimeRemaining -= minCollisionUpdateInterval
-            iterationCount++
-        }
-
-        if (seconds >= explodeAtSec) {
+        
+        if (seconds >= explodeAtSec && !exploded) {
             explode(engine)
         } else if ((beat - deployBeat) >= killAfterBeats && !isKilled) {
             kill()
         }
-
-        engineUpdateLastSec = seconds
-        collisionUpdateLastBeat = beat
+        
+        updateInputTracking(beat)
+        
         lastCurrentIndex = getCurrentIndex(this.position.x)
     }
 
@@ -311,7 +306,9 @@ class EntityRodPR(world: World, val deployBeat: Float, val row: Row) : EntityRod
      * - This puts the rod into a "bounce" state where it is not
      * - Rods can be moved up and down by movement of the platform/piston
      */
-    private fun collisionCheck(engine: Engine, beat: Float, seconds: Float, deltaSec: Float) {
+    override fun collisionCheck(engine: Engine, beat: Float, seconds: Float, deltaSec: Float) {
+        if (exploded) return
+        
         val prevPosX = this.position.x
         val prevPosY = this.position.y
 
@@ -326,10 +323,8 @@ class EntityRodPR(world: World, val deployBeat: Float, val row: Row) : EntityRod
         val collision = this.collision
 
         // Initialize active blocks
-        if (currentIndexFloat >= -0.7f) {
-            updateInputIndices(beat)
-        } else if (floor(lastCurrentIndex).toInt() != floor(currentIndexFloat).toInt() && lastCurrentIndex >= 0) {
-            updateInputIndices(beat)
+        if (currentIndexFloat >= -0.7f || (floor(lastCurrentIndex).toInt() != floor(currentIndexFloat).toInt() && lastCurrentIndex >= 0)) {
+            updateInputTracking(beat)
         }
 
         // Check for wall stop
@@ -418,6 +413,10 @@ class EntityRodPR(world: World, val deployBeat: Float, val row: Row) : EntityRod
 
     override fun onRemovedFromWorld(engine: Engine) {
         super.onRemovedFromWorld(engine)
-        engine.inputter.submitInputsFromRod(this, collision.collidedWithWall)
+        engine.inputter.submitInputsFromRod(this)
+    }
+
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+        if (!exploded) super.render(renderer, batch, tileset, engine)
     }
 }

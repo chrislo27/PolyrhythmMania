@@ -55,7 +55,7 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
     }
 }
 
-abstract class EntityRod(world: World)
+abstract class EntityRod(world: World, val deployBeat: Float)
     : EntityRodDecor(world), TemporaryEntity {
 
     companion object {
@@ -101,10 +101,56 @@ abstract class EntityRod(world: World)
     override val isInAir: Boolean
         get() = collision.isInAir
     
+    protected var engineUpdateLastSec: Float = Float.MAX_VALUE
+    protected var collisionUpdateLastBeat: Float = Float.MAX_VALUE
+    
     override fun getAnimationAlpha(): Float {
         val beatsFullAnimation = 60f / 128f
         val posX = this.position.x
         return ((((if (posX < 0f) (posX + floor(posX).absoluteValue) else posX) / xUnitsPerBeat) % beatsFullAnimation) / beatsFullAnimation)
+    }
+
+
+    override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
+        super.engineUpdate(engine, beat, seconds)
+
+        if (engineUpdateLastSec == Float.MAX_VALUE) {
+            engineUpdateLastSec = seconds
+        }
+        if (collisionUpdateLastBeat == Float.MAX_VALUE) {
+            val beatDelta = beat - deployBeat
+            collisionUpdateLastBeat = if (beatDelta > 0f) {
+                deployBeat
+            } else {
+                beat
+            }
+        }
+
+//        val engineUpdateDelta = seconds - engineUpdateLastSec
+
+        val minCollisionUpdateInterval = 1f / MIN_COLLISION_UPDATE_RATE
+        val collisionUpdateDeltaBeat = beat - collisionUpdateLastBeat
+        var iterationCount = 0
+        var updateCurrentBeat = collisionUpdateLastBeat
+        var updateCurrentSec = engine.tempos.beatsToSeconds(updateCurrentBeat)
+        var updateBeatTimeRemaining = collisionUpdateDeltaBeat
+        while (updateBeatTimeRemaining > 0f) {
+            val deltaBeat = updateBeatTimeRemaining.coerceAtMost(minCollisionUpdateInterval).coerceAtLeast(0f)
+            val deltaSec = (engine.tempos.beatsToSeconds(updateCurrentBeat + deltaBeat) - engine.tempos.beatsToSeconds(updateCurrentBeat)).coerceAtLeast(0f)
+            updateCurrentBeat += deltaBeat
+            updateCurrentSec += deltaSec
+
+            collisionCheck(engine, updateCurrentBeat, updateCurrentSec, deltaSec)
+
+            updateBeatTimeRemaining -= minCollisionUpdateInterval
+            iterationCount++
+        }
+
+        engineUpdateLastSec = seconds
+        collisionUpdateLastBeat = beat
+    }
+
+    protected open fun collisionCheck(engine: Engine, beat: Float, seconds: Float, deltaSec: Float) {
     }
 
     protected fun playSfxLand(engine: Engine) {

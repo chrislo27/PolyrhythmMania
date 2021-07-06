@@ -95,7 +95,7 @@ class PlayScreen(
             Gdx.app.postRunnable {
                 soundSystem.setPaused(true)
                 container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
-                    engine.inputter.submitInputsFromRod(rod, false)
+                    engine.inputter.submitInputsFromRod(rod)
                 }
                 if (showResults) {
                     transitionToResults()
