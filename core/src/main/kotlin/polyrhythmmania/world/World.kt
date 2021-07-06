@@ -28,7 +28,7 @@ class World {
     val rowA: Row get() = rows[0]
     val rowDpad: Row get() = rows[1]
     // DUNK
-//    val dunkPiston: EntityPiston
+    val dunkPiston: EntityPiston = EntityPiston(this)
     
     init {
         resetWorld()
@@ -207,6 +207,11 @@ class World {
                 this.position.set(x.toFloat(), 2f, -1f)
             })
         }
+        
+        addEntity(dunkPiston.apply { 
+            this.position.set(4f, 2f, -1f)
+            this.type = EntityPiston.Type.PISTON_A
+        })
         
         // Hoop
         for (y in 1..5) {
