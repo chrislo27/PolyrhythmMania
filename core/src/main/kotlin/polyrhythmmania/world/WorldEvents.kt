@@ -202,7 +202,7 @@ class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
 }
 
 class EventTilesetChange(engine: Engine, startBeat: Float, width: Float,
-                         val tilesetCopy: TilesetConfig, val pulseMode: Boolean)
+                         val tilesetCopy: TilesetConfig, val pulseMode: Boolean, val reverse: Boolean)
     : Event(engine) {
     
     private data class ColorTarget(val start: Color, val end: Color, val current: Color = start.cpy()) {
@@ -233,7 +233,10 @@ class EventTilesetChange(engine: Engine, startBeat: Float, width: Float,
 
     override fun onUpdateContainer(container: Container, currentBeat: Float) {
         super.onUpdateContainer(container, currentBeat)
-        val percentage = getBeatPercentage(currentBeat).coerceIn(0f, 1f)
+        var percentage = getBeatPercentage(currentBeat).coerceIn(0f, 1f)
+        if (reverse) {
+            percentage = 1f - percentage
+        }
         val tileset = container.renderer.tileset
         tilesetCopy.allMappings.forEach { m ->
             val id = m.id

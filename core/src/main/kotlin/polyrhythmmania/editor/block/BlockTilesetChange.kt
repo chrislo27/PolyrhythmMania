@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.Var
 import paintbox.ui.Pane
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
@@ -27,6 +28,7 @@ class BlockTilesetChange(engine: Engine)
     var tilesetConfig: TilesetConfig = engine.world.tilesetConfig.copy()
     var duration: Float = 0.5f
     var pulseMode: Var<Boolean> = Var(false)
+    var reverse: Var<Boolean> = Var(false)
 
     init {
         this.width = 0.5f
@@ -36,12 +38,12 @@ class BlockTilesetChange(engine: Engine)
 
     override fun compileIntoEvents(): List<Event> {
         return listOf(EventTilesetChange(engine, this.beat, this.duration.coerceAtLeast(0f), tilesetConfig.copy(),
-                pulseMode.getOrCompute()))
+                pulseMode.getOrCompute(), reverse.getOrCompute()))
     }
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return ContextMenu().also { ctxmenu ->
-            ctxmenu.defaultWidth.set(300f)
+            ctxmenu.defaultWidth.set(400f)
             ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("blockContextMenu.tilesetChange.edit"),
                     editor.editorPane.palette.markup).apply {
                 this.onAction = {
@@ -56,11 +58,9 @@ class BlockTilesetChange(engine: Engine)
                     HBox().apply { 
                         this.bounds.height.set(32f)
                         this.spacing.set(4f)
-                        this += RectElement(Color(0f, 0f, 0f, 1f)).apply { 
-                            this.border.set(Insets(1f))
-                            this.borderStyle.set(SolidBorder(Color.WHITE))
-                            this.padding.set(Insets(2f))
-                            this += TextField(font = editor.editorPane.palette.musicDialogFont).apply {
+
+                        fun createTextField(): Pair<UIElement, TextField> {
+                            val textField = TextField(font = editor.editorPane.palette.musicDialogFont).apply {
                                 this.textColor.set(Color(1f, 1f, 1f, 1f))
                                 this.text.set(durationToStr())
                                 this.inputFilter.set({ c -> c in '0'..'9' || c == '.' })
@@ -84,6 +84,19 @@ class BlockTilesetChange(engine: Engine)
                                     requestFocus()
                                 }
                             }
+                            
+                            return RectElement(Color(0f, 0f, 0f, 1f)).apply {
+                                this.bindWidthToParent(adjust = -4f, multiplier = 0.333f)
+                                this.border.set(Insets(1f))
+                                this.borderStyle.set(SolidBorder(Color.WHITE))
+                                this.padding.set(Insets(2f))
+                                this += textField
+                            } to textField
+                        }
+
+                        this += HBox().apply {
+                            this.spacing.set(4f)
+                            this += createTextField().first
                         }
                     }
             ))
@@ -93,6 +106,12 @@ class BlockTilesetChange(engine: Engine)
                     Localization.getValue("blockContextMenu.tilesetChange.pulseMode"), editor.editorPane.palette.markup).apply {
                 this.createTooltip = {
                     it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.tilesetChange.pulseMode.tooltip")))
+                }
+            })
+            ctxmenu.addMenuItem(CheckBoxMenuItem.create(reverse,
+                    Localization.getValue("blockContextMenu.tilesetChange.reverse"), editor.editorPane.palette.markup).apply {
+                this.createTooltip = {
+                    it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.tilesetChange.reverse.tooltip")))
                 }
             })
         }
@@ -108,6 +127,7 @@ class BlockTilesetChange(engine: Engine)
             it.tilesetConfig = this.tilesetConfig.copy()
             it.duration = this.duration
             it.pulseMode.set(this.pulseMode.getOrCompute())
+            it.reverse.set(this.reverse.getOrCompute())
         }
     }
 
@@ -116,6 +136,7 @@ class BlockTilesetChange(engine: Engine)
         obj.add("tileset", tilesetConfig.toJson())
         obj.add("duration", duration)
         obj.add("pulse", pulseMode.getOrCompute())
+        obj.add("reverse", reverse.getOrCompute())
     }
 
     override fun readFromJson(obj: JsonObject) {
@@ -128,6 +149,10 @@ class BlockTilesetChange(engine: Engine)
         val pulseVal = obj.get("pulse")
         if (pulseVal != null && pulseVal.isBoolean) {
             pulseMode.set(pulseVal.asBoolean())
+        }
+        val reverseVal = obj.get("reverse")
+        if (reverseVal != null && reverseVal.isBoolean) {
+            reverse.set(reverseVal.asBoolean())
         }
     }
 }
