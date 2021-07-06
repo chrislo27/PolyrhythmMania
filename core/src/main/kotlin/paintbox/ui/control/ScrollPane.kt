@@ -79,11 +79,13 @@ open class ScrollPane : Control<ScrollPane>() {
         contentPane.bindWidthToParent {
             // When the scrollbar policy is AS_NEEDED, there is an inf loop due to depending on visibility which depends on contentPane bounds
 //            if (vBar.apparentVisibility.use()) (-barSize.use()) else 0f
-            (-barSize.useF())
+            val policy = vBarPolicy.use()
+            if (policy == ScrollBarPolicy.NEVER) 0f else (-barSize.useF())
         }
         contentPane.bindHeightToParent {
 //            if (hBar.apparentVisibility.use()) (-barSize.use()) else 0f
-            (-barSize.useF())
+            val policy = hBarPolicy.use()
+            if (policy == ScrollBarPolicy.NEVER) 0f else (-barSize.useF())
         }
         contentPane.contentOffsetX.bind { -hBar.value.useF() }
         contentPane.contentOffsetY.bind { -vBar.value.useF() }
