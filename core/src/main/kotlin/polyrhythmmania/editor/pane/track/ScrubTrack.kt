@@ -1,10 +1,9 @@
 package polyrhythmmania.editor.pane.track
 
-import com.badlogic.gdx.graphics.Color
 import paintbox.binding.Var
 import paintbox.ui.Pane
 import paintbox.ui.control.ScrollBar
-import paintbox.util.gdxutils.grey
+import polyrhythmmania.ui.PRManiaSkins
 
 
 class ScrubTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, true) {
@@ -19,14 +18,7 @@ class ScrubTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
         val contentPane = Pane()
         scrollBar = ScrollBar(ScrollBar.Orientation.HORIZONTAL).apply { 
-            (this.skin.getOrCompute() as ScrollBar.ScrollBarSkin).also { skin ->
-                skin.bgColor.set(Color().grey(0.1f, 1f))
-                skin.incrementColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
-                skin.disabledColor.set(Color(0.31f, 0.31f, 0.31f, 1f))
-                skin.thumbColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
-                skin.thumbHoveredColor.set(Color(0.70f, 0.70f, 0.70f, 1f))
-                skin.thumbPressedColor.set(Color(0.50f, 0.64f, 0.64f, 1f))
-            }
+            this.skinID.set(PRManiaSkins.EDITOR_SCROLLBAR_SKIN)
             val isDragging: Var<Boolean> = Var {
                 thumbPressedState.use().pressed
             }

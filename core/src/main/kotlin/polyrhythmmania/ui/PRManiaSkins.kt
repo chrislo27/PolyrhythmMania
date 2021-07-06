@@ -9,15 +9,27 @@ import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.SkinFactory
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.fillRoundedRect
+import paintbox.util.gdxutils.grey
 
 
 object PRManiaSkins {
     
     const val SCROLLBAR_SKIN: String = "PRMania_ScrollBar"
+    const val EDITOR_SCROLLBAR_SKIN: String = "PRMania_ScrollBar_editor"
     
     init {
         DefaultSkins.register(SCROLLBAR_SKIN, SkinFactory { element: ScrollBar ->
             PRMScrollBarSkin(element)
+        })
+        DefaultSkins.register(EDITOR_SCROLLBAR_SKIN, SkinFactory { element: ScrollBar ->
+            ScrollBar.ScrollBarSkin(element).also { skin ->
+                skin.bgColor.set(Color().grey(0.1f, 1f))
+                skin.incrementColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
+                skin.disabledColor.set(Color(0.31f, 0.31f, 0.31f, 1f))
+                skin.thumbColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
+                skin.thumbHoveredColor.set(Color(0.70f, 0.70f, 0.70f, 1f))
+                skin.thumbPressedColor.set(Color(0.50f, 0.64f, 0.64f, 1f))
+            }
         })
     }
 }

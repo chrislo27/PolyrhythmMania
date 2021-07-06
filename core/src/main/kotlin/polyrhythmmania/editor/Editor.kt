@@ -71,6 +71,7 @@ class Editor(val main: PRManiaGame)
         const val TRACK_INPUT_1: String = "input_1"
         const val TRACK_INPUT_2: String = "input_2"
         const val TRACK_VFX_0: String = "vfx_0"
+        const val TRACK_VFX_1: String = "vfx_1"
 
         val MOVE_WINDOW_LEFT_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.A)
         val MOVE_WINDOW_RIGHT_KEYCODES: Set<Int> = setOf(Input.Keys.RIGHT, Input.Keys.D)
@@ -119,6 +120,7 @@ class Editor(val main: PRManiaGame)
             Track(TRACK_INPUT_1, EnumSet.of(BlockType.INPUT)),
             Track(TRACK_INPUT_2, EnumSet.of(BlockType.INPUT)),
             Track(TRACK_VFX_0, EnumSet.of(BlockType.VFX)),
+            Track(TRACK_VFX_1, EnumSet.of(BlockType.VFX)),
     )
     val trackMap: Map<String, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 
@@ -1148,8 +1150,10 @@ class Editor(val main: PRManiaGame)
         }
 
         Vector2Stack.pop()
+        
+        inputConsumed = sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer) || inputConsumed
 
-        return inputConsumed || sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer)
+        return inputConsumed
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
