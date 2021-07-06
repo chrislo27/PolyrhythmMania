@@ -25,6 +25,7 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
+import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
@@ -118,7 +119,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             tempoUp.set(it.getOrCompute().toInt())
                         }
                         (this.skin.getOrCompute() as Slider.SliderSkin).also { skin ->
-                            val filledColors = listOf(Color.valueOf("3E5BEF"), Color(0.24f, 0.74f, 0.94f, 1f), Color.valueOf("ED3D3D"))
+                            val filledColors = listOf(Challenges.TEMPO_DOWN_COLOR, Color(0.24f, 0.74f, 0.94f, 1f), Challenges.TEMPO_UP_COLOR)
                             skin.filledColor.sideEffecting { existing -> 
                                 val tempo = this@slider.value.useF().toInt()
                                 existing.set(filledColors[if (tempo < 100) 0 else if (tempo > 100) 2 else 1])
@@ -179,14 +180,14 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         }
                         
                         // Set challenge settings
-                        if (!robotMode) {
-                            engine.playbackSpeed = tempoUp.getOrCompute() / 100f
-                            engine.inputter.challenge.goingForPerfect = goForPerfect.getOrCompute()
-                        }
+                        val challenges: Challenges = if (!robotMode) {
+                            Challenges(tempoUp.getOrCompute(), goForPerfect.getOrCompute())
+                        } else Challenges.NO_CHANGES
+                        challenges.applyToEngine(engine)
                         
                         mainMenu.transitionAway {
                             val main = mainMenu.main
-                            val playScreen = PlayScreen(main, loadedData.newContainer)
+                            val playScreen = PlayScreen(main, loadedData.newContainer, challenges)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
                                     playScreen.prepareGameStart()

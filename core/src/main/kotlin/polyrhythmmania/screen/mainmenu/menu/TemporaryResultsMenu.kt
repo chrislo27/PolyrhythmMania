@@ -17,6 +17,7 @@ import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.container.Container
+import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.screen.PlayScreen
 
@@ -84,7 +85,7 @@ class TemporaryResultsMenu(menuCol: MenuCollection, val results: Results, val co
                     menuCol.playMenuSound("sfx_menu_enter_game")
                     mainMenu.transitionAway {
                         val main = mainMenu.main
-                        val playScreen = PlayScreen(main, container)
+                        val playScreen = PlayScreen(main, container, Challenges.NO_CHANGES)
                         main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                             this.onEntryEnd = {
                                 menuCol.popLastMenu(instant = true, playSound = false)

@@ -19,6 +19,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.ui.TextboxPane
@@ -117,7 +118,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             val skillStar = sc.skillStar
             val list = mutableListOf<String>()
             list += Localization.getValue("play.results.nInputs", sc.inputsHit, sc.nInputs)
-            if (noMiss) list += Localization.getValue(if (sc.perfectCampaign) "play.results.perfect" else "play.results.noMiss")
+            if (noMiss) list += Localization.getValue(if (sc.challenges.goingForPerfect) "play.results.perfect" else "play.results.noMiss")
             if (skillStar) list += Localization.getValue("play.results.skillStar")
             list.joinToString(separator = " ") { it }
         }, resultsFont).apply {
@@ -135,12 +136,40 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
                 val s = score.use()
                 if (!s.noMiss) failed else success
             }
-            this.visible.bind { score.use().perfectCampaign }
+            this.visible.bind { score.use().challenges.goingForPerfect }
             this.bounds.width.set(48f)
             this.bindHeightToSelfWidth()
             this.bounds.y.set(-12f)
             this.bounds.x.bind { -(bounds.width.useF() - 32f + 8f) }
             this.padding.set(Insets(0f, 0f, 0f, 0f))
+        }
+        bonusStatsPane += TextLabel(binding = {
+            val sc = score.use()
+            val challenges = sc.challenges
+            val isTempoUp = challenges.tempoUp > 100
+            if (challenges.tempoUp == 100) {
+                ""
+            } else {
+                Localization.getValue("play.results.${if (isTempoUp) "tempoUp" else "tempoDown"}", challenges.tempoUp)
+            }
+        }, resultsFont).apply {
+            this.bounds.width.set(200f)
+            this.bounds.height.set(48f)
+            this.bounds.y.set(-12f)
+            this.bounds.x.bind { -(bounds.width.useF() - 32f + 48f + 8f) }
+            this.padding.set(Insets(0f, 0f, 0f, 2f))
+            this.renderAlign.set(Align.right)
+            this.setScaleXY(0.5f)
+            this.textColor.bind {
+                val sc = score.use()
+                val challenges = sc.challenges
+                val tempoChange = challenges.tempoUp
+                when {
+                    tempoChange > 100 -> Challenges.TEMPO_UP_COLOR
+                    tempoChange < 100 -> Challenges.TEMPO_DOWN_COLOR
+                    else -> Color.WHITE
+                }
+            }
         }
         vbox += bonusStatsPane
         

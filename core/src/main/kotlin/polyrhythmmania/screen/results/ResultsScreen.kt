@@ -109,7 +109,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
                 }
                 this.setOnAction {
                     playSound(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                    val playScreen = PlayScreen(main, container)
+                    val playScreen = PlayScreen(main, container, score.challenges)
                     Gdx.input.isCursorCatched = true
                     main.screen = TransitionScreen(main, main.screen, playScreen, FadeOut(0.5f, Color(0f, 0f, 0f, 1f)),
                             FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {

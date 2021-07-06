@@ -12,6 +12,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.practice.Practice
 import polyrhythmmania.practice.PracticeBasic
@@ -52,7 +53,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             val main = mainMenu.main
                             Gdx.app.postRunnable {
                                 val practice: Practice = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-                                val playScreen = PlayScreen(main, practice.container, false)
+                                val playScreen = PlayScreen(main, practice.container, Challenges.NO_CHANGES)
                                 main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                     this.onEntryEnd = {
                                         practice.prepare()

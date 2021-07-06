@@ -54,7 +54,7 @@ import kotlin.math.roundToLong
 
 
 class PlayScreen(
-        main: PRManiaGame, val container: Container,
+        main: PRManiaGame, val container: Container, val challenges: Challenges,
         val showResults: Boolean = true,
         val musicOffsetMs: Float = main.settings.musicOffsetMs.getOrCompute().toFloat(),
 ) : PRManiaScreen(main) {
@@ -317,7 +317,7 @@ class PlayScreen(
         val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
         val scoreObj = Score(score, rawScore, inputsHit, nInputs,
                 inputter.skillStarGotten.getOrCompute() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
-                inputter.challenge.goingForPerfect, 
+                challenges,
                 resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                 lines.first, lines.second,
                 ranking

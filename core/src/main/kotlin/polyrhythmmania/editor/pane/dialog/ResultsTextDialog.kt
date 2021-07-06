@@ -24,6 +24,7 @@ import paintbox.ui.layout.VBox
 import paintbox.util.Matrix4Stack
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
+import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.screen.results.ResultsPane
@@ -216,7 +217,7 @@ class ResultsTextDialog(editorPane: EditorPane)
             val skillStar = testScoreSkillStar.use()
             Score(scoreInt, scoreInt.toFloat(), if (noMiss) 8 else 7, 8,
                     skillStar, noMiss,
-                    false,
+                    Challenges.NO_CHANGES,
                     resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                     lines.first, lines.second
             )
