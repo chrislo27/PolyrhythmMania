@@ -177,6 +177,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
     sealed class ExpectedInput {
         object Unknown : ExpectedInput()
         object Skipped : ExpectedInput()
+        object InAir : ExpectedInput()
         class Expected(val thisIndex: Int, val nextJumpIndex: Int) : ExpectedInput()
     }
 
@@ -213,6 +214,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
             it.position.set(this.position)
         })
         playSfxExplosion(engine)
+        engine.inputter.missed()
     }
 
     fun bounce(startIndex: Int, endIndex: Int) {
@@ -277,7 +279,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
             inputTracker.expected[currentIndexFloor] = ExpectedInput.Expected(currentIndexFloor, lookahead)
             for (i in currentIndexFloor + 1 until lookahead.coerceAtMost(inputTracker.resultCount - 1)) {
                 if (inputTracker.expected[i] == ExpectedInput.Unknown)
-                    inputTracker.expected[i] = ExpectedInput.Skipped
+                    inputTracker.expected[i] = ExpectedInput.InAir
             }
         }
     }
@@ -367,6 +369,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
                 val posX = this.position.x
                 this.position.y = currentBounce.getYFromX(posX)
                 collision.velocityY = (this.position.y - prevPosY) / deltaSec
+                
             } else {
                 val floorBelow: Float = if (!blockBelow.active) row.startY.toFloat() else {
                     blockBelow.position.y + blockBelow.collisionHeight
@@ -401,6 +404,21 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
                             && currentIndexFloat - currentIndex in 0.25f..0.65f) {
                         blockBelow.fullyExtend(engine, beat)
                         engine.inputter.attemptSkillStar(currentIndex / this.xUnitsPerBeat + this.deployBeat + 4f)
+                    }
+                } else {
+                    // Check if NOT in air but current expected input is that it should be in the air
+                    val currentExpectedInput: ExpectedInput? = inputTracker.expected.getOrNull(currentIndex)
+                    if (currentExpectedInput == ExpectedInput.InAir) {
+                        engine.inputter.missed()
+                    } else {
+                        // Edge case: only have to bounce one unit (check two units behind to give time for lates)
+                        val lastIndex = currentIndex - 1
+                        val last2ExpectedInput: ExpectedInput? = inputTracker.expected.getOrNull(lastIndex - 1)
+                        if (last2ExpectedInput is ExpectedInput.Expected && last2ExpectedInput.nextJumpIndex == lastIndex) {
+                            if (inputTracker.results.none { it.expectedIndex == last2ExpectedInput.thisIndex }) {
+                                engine.inputter.missed()
+                            }
+                        }
                     }
                 }
             }
