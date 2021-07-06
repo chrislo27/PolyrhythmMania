@@ -56,10 +56,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.align.set(HBox.Align.LEFT)
         }
         leftPreviewHbox.temporarilyDisableLayouts { 
-            leftPreviewHbox += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["informational"])).apply { 
-                this.bounds.width.set(32f)
-                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.preview.tooltip")))
-            }
+            
         }
         previewSection += leftPreviewHbox
         val rightPreviewHbox = HBox().apply {
