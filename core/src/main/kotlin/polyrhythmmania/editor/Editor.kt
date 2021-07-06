@@ -157,6 +157,7 @@ class Editor(val main: PRManiaGame)
     private var lastMetronomeBeat: Int = -1
     private var timeUntilAutosave: Float = autosaveInterval.getOrCompute() * 60f
     val lastAutosaveTimeMs: Var<Long> = Var(0L)
+    val playbackSpeed: FloatVar = FloatVar(1f)
 
     val engineBeat: FloatVar = FloatVar(engine.beat)
 
@@ -192,6 +193,9 @@ class Editor(val main: PRManiaGame)
             beatLines.active = false
         }
         autosaveInterval.addListener(autosaveIntervalListener)
+        playbackSpeed.addListener { 
+            engine.playbackSpeed = it.getOrCompute()
+        }
     }
 
     init { // This init block should be LAST

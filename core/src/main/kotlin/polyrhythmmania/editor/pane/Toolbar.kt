@@ -12,12 +12,15 @@ import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
+import paintbox.ui.control.Slider
+import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
+import polyrhythmmania.util.DecimalFormats
 
 
 class Toolbar(val upperPane: UpperPane) : Pane() {
@@ -52,11 +55,45 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         val leftPreviewHbox = HBox().apply {
             Anchor.TopLeft.configure(this)
             this.spacing.set(4f)
-            this.bounds.width.set(32f * 3 + this.spacing.get() * 2)
+//            this.bounds.width.set(32f * 4 + this.spacing.get() * 3)
+            this.bounds.width.set(160f)
             this.align.set(HBox.Align.LEFT)
         }
-        leftPreviewHbox.temporarilyDisableLayouts { 
-            
+        leftPreviewHbox.temporarilyDisableLayouts {
+            leftPreviewHbox += Pane().apply {
+                this.bounds.width.set(150f)
+                val labelVar = Localization.getVar("editor.playbackSpeed", Var {
+                    listOf(DecimalFormats.format("0.0#", editorPane.editor.playbackSpeed.useF()))
+                })
+                this += TextLabel(binding = { labelVar.use() }, font = editorPane.palette.beatTimeFont).apply {
+                    this.textColor.set(Color.WHITE)
+                    this.bindHeightToParent(multiplier = 0.5f)
+                    this.padding.set(Insets(1f))
+                    this.setScaleXY(0.65f)
+                    this.markup.set(editorPane.palette.markup)
+                }
+                this += Slider().apply {
+                    val setSpeeds: List<Float> = listOf(0.25f, 0.30f, 0.35f, 0.40f, 0.45f, 0.50f, 0.60f, 0.70f, 0.75f, 0.80f, 0.85f, 0.90f, 0.95f,
+                            1f,
+                            1.10f, 1.25f, 1.50f, 1.75f, 2.00f, 2.25f, 2.50f, 2.75f, 3.00f, 4.00f).sorted()
+                    val oneIndex: Int = setSpeeds.indexOf(1f)
+                    if (oneIndex == -1) error("Didn't find index of speed 1.0 for playback speed slider")
+                    
+                    Anchor.BottomLeft.configure(this)
+                    this.bindHeightToParent(multiplier = 0.5f)
+                    this.padding.set(Insets(1f))
+                    this.minimum.set(0f)
+                    this.maximum.set((setSpeeds.size - 1).toFloat())
+                    this.setValue(oneIndex.toFloat())
+                    this.tickUnit.set(1f)
+                    this.value.addListener { v ->
+                        editorPane.editor.playbackSpeed.set(setSpeeds.getOrNull(v.getOrCompute().toInt()) ?: 1f)
+                    }
+                    this.setOnRightClick { 
+                        this.setValue(oneIndex.toFloat())
+                    }
+                }
+            }
         }
         previewSection += leftPreviewHbox
         val rightPreviewHbox = HBox().apply {
