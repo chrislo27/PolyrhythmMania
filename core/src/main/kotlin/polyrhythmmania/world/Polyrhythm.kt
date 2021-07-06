@@ -330,7 +330,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
         }
 
         // Check for wall stop
-        if (!collision.collidedWithWall && (currentIndexFloat - currentIndex) >= 0.75f && currentIndex >= -1 &&
+        if (!collision.collidedWithWall && (currentIndexFloat - currentIndex) >= 0.80f && currentIndex >= -1 &&
                 collision.bounce == null /* non-null Bounce indicates that the EngineInputter accepted it */) {
             val nextIndex = currentIndex + 1
             if (nextIndex in 0 until row.length) {
