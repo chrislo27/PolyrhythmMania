@@ -117,14 +117,26 @@ data class TextBlock(val runs: List<TextRun>) {
                         // Find the trailing line's wrap point since it may not start at x=0
                         var text = textRun.text
                         val gl = GlyphLayout()
-                        if (continuationLineWidth < lineWrapWidth) {
-                            val tmpGL = gl
-                            tmpGL.setText(font, textRun.text, color, continuationLineWidth, Align.left, true)
-                            if (tmpGL.runs.size >= 2) {
-                                val first = tmpGL.runs[0]
-                                val wrapIndex = first.glyphs.size + 1
-                                if (wrapIndex in 0 until text.length) {
-                                    text = text.substring(0, wrapIndex) + "\n" + text.substring(wrapIndex).trimStart()
+                        // Don't wrap text here, we need to find the first line of runs
+                        gl.setText(font, text, color, (lineWrapWidth).coerceAtLeast(0f), Align.left, false)
+                        if (continuationLineWidth < lineWrapWidth && gl.runs.size > 0) {
+                            // The continuation line width is smaller, so find the wrap point there.
+                            // But we need to verify that the line break is where it ought to be, and NOT
+                            // a consequence of the (temp) smaller max width.   
+                            
+                            // Only the first run matters for wrapping.    
+                            val firstRunWidth = gl.runs.first().width
+                            if (firstRunWidth > continuationLineWidth) {
+                                // The contiguous block does NOT fit! Find the wrap point and inject a newline.
+                                gl.setText(font, textRun.text, color, continuationLineWidth, Align.left, true)
+                                if (gl.runs.size >= 2) {
+                                    // Inject the newline where the new run was added. The new run will always be
+                                    // the second one, since the first original run will have been split.    
+                                    val first = gl.runs[0]
+                                    val wrapIndex = first.glyphs.size + 1
+                                    if (wrapIndex in 0 until text.length) {
+                                        text = text.substring(0, wrapIndex) + "\n" + text.substring(wrapIndex).trimStart()
+                                    }
                                 }
                             }
                         }
