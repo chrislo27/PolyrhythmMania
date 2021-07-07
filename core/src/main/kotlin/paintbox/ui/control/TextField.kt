@@ -366,6 +366,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     protected fun doKeyRepeatAction() {
         val keymode = this.keymode
         when (keymode) {
+            KeyMode.NONE -> {}
             KeyMode.MOVE_LEFT, KeyMode.MOVE_RIGHT -> {
                 moveCaretFromKeypress()
             }
