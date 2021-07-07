@@ -98,6 +98,13 @@ open class Palette(val main: PRManiaGame) {
             "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.fontCache["editor_status"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    val markupHelp: Markup = markupInstantiatorDesc /*Markup(mapOf(
+            "bold" to main.fontCache["editor_help_BOLD"],
+            "italic" to main.fontCache["editor_help_ITALIC"],
+            "bolditalic" to main.fontCache["editor_help_BOLD_ITALIC"],
+            "rodin" to main.fontRodinFixed,
+            "prmania_icons" to main.fontIcons,
+    ), TextRun(main.fontCache["editor_help"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))*/
 
     // Textures
     val blockFlatTexture: Texture by lazy { AssetRegistry.get<Texture>("ui_icon_block_flat") }

@@ -466,6 +466,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     defaultAfterLoad.invoke(this, bitmapFont)
                     bitmapFont.data.blankLineScale = 0.3f
                 })
+//        addFontFamily(fontIDPrefix = "editor_help", familyName = "Roboto", fontSize = 20,
+//                hinting = FreeTypeFontGenerator.Hinting.Slight, generateBordered = false,)
         cache["rodin_fixed"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 1, 0f, false, WindowSize(1280, 720)),
                 makeParam().apply {

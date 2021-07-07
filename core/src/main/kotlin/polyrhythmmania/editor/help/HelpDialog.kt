@@ -174,7 +174,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
 class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
     private val main: PRManiaGame get() = dialog.main
     private val palette: Palette = dialog.editorPane.palette
-    private val markup: Markup = palette.markupInstantiatorDesc
+    private val markup: Markup = palette.markupHelp
     private val defaultFont: PaintboxFont = markup.defaultTextRun.font
     
     private val cachedTextures: MutableMap<String, Texture> = mutableMapOf()
