@@ -19,6 +19,7 @@ class TilesetConfig {
                 rodFill.color.getOrCompute().set(255, 8, 0)
                 
                 cubeBorder.color.getOrCompute().set(33, 214, 25)
+                cubeBorderZ.color.getOrCompute().set(24, 181, 16)
                 cubeFaceX.color.getOrCompute().set(42, 224, 48)
                 cubeFaceY.color.getOrCompute().set(74, 255, 74)
                 cubeFaceZ.color.getOrCompute().set(58, 230, 49)
@@ -36,6 +37,7 @@ class TilesetConfig {
                 rodFill.color.getOrCompute().set(255, 8, 0)
 
                 cubeBorder.color.getOrCompute().set(0, 16, 189)
+                cubeBorderZ.color.getOrCompute().set(24, 66, 173)
                 cubeFaceX.color.getOrCompute().set(32, 81, 204)
                 cubeFaceY.color.getOrCompute().set(41, 99, 255)
                 cubeFaceZ.color.getOrCompute().set(33, 82, 214)
@@ -72,6 +74,7 @@ class TilesetConfig {
     }
 
     val cubeBorder: ColorMapping = ColorMapping("cubeBorder", { it.cubeBorder.color })
+    val cubeBorderZ: ColorMapping = ColorMapping("cubeBorderZ", { it.cubeBorderZ.color })
     val cubeFaceX: ColorMapping = ColorMapping("cubeFaceX", { it.cubeFaceX.color })
     val cubeFaceY: ColorMapping = ColorMapping("cubeFaceY", { it.cubeFaceY.color })
     val cubeFaceZ: ColorMapping = ColorMapping("cubeFaceZ", { it.cubeFaceZ.color })
@@ -81,8 +84,8 @@ class TilesetConfig {
     val rodBorder: ColorMapping = ColorMapping("rodBorder", { it.rodBorderColor })
     val rodFill: ColorMapping = ColorMapping("rodFill", { it.rodFillColor })
 
-    val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeFaceX, cubeFaceY, cubeFaceZ, pistonFaceX, pistonFaceZ,
-            signShadow, rodBorder, rodFill)
+    val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeBorderZ, cubeFaceX, cubeFaceY, cubeFaceZ,
+            pistonFaceX, pistonFaceZ, signShadow, rodBorder, rodFill)
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
 
     fun copy(): TilesetConfig {

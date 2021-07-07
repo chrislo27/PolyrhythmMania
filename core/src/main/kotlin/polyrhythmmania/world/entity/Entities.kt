@@ -61,16 +61,17 @@ class EntityPlatform(world: World, val withLine: Boolean = false) : SpriteEntity
 open class EntityCube(world: World, val withLine: Boolean = false, val withBorder: Boolean = false)
     : SpriteEntity(world) {
 
-    override val numLayers: Int = 6
+    override val numLayers: Int = 7
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
         return when (index) {
             0 -> tileset.cubeBorder
-            1 -> tileset.cubeFaceX
-            2 -> tileset.cubeFaceY
-            3 -> tileset.cubeFaceZ
-            4 -> if (withLine) tileset.redLine else null
-            5 -> if (withBorder) tileset.platformBorder else null
+            1 -> tileset.cubeBorderZ
+            2 -> tileset.cubeFaceX
+            3 -> tileset.cubeFaceY
+            4 -> tileset.cubeFaceZ
+            5 -> if (withLine) tileset.redLine else null
+            6 -> if (withBorder) tileset.platformBorder else null
             else -> null
         }
     }

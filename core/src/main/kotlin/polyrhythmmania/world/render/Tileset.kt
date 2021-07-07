@@ -42,6 +42,7 @@ class Tileset(val packedSheet: PackedSheet) {
      */
     val redLine: TintedRegion = packedSheet["red_line"].toTinted()
     val cubeBorder: TintedRegion = packedSheet["cube_border"].toTinted()
+    val cubeBorderZ: TintedRegion = packedSheet["cube_border_z"].toTinted()
     val cubeFaceX: TintedRegion = packedSheet["cube_face_x"].toTinted()
     val cubeFaceY: TintedRegion = packedSheet["cube_face_y"].toTinted()
     val cubeFaceZ: TintedRegion = packedSheet["cube_face_z"].toTinted()
