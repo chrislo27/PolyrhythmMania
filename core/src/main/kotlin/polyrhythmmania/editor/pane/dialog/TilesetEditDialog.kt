@@ -49,7 +49,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     
     val objPreview: ObjectPreview = ObjectPreview()
     val colourPicker: ColourPicker = ColourPicker(false, font = editorPane.palette.musicDialogFont).apply { 
-        this.setColor(currentMapping.getOrCompute().color.getOrCompute())
+        this.setColor(currentMapping.getOrCompute().color.getOrCompute(), true)
     }
     
     private val rodRotation: FloatVar = FloatVar(0f)
@@ -290,7 +290,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     }
     
     private fun updateColourPickerToMapping(mapping: TilesetConfig.ColorMapping = currentMapping.getOrCompute()) {
-        colourPicker.setColor(mapping.color.getOrCompute())
+        colourPicker.setColor(mapping.color.getOrCompute(), true)
     }
 
     override fun canCloseDialog(): Boolean {

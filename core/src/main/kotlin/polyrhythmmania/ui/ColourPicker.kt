@@ -58,6 +58,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
     private val satArrow: MovingArrow = MovingArrow(0, 100, hsv.saturation)
     private val valueArrow: MovingArrow = MovingArrow(0, 100, hsv.value)
     private val alphaArrow: MovingArrow = MovingArrow(0, 255, hsv.alpha)
+    private val rgbTextField: TextField
     
     init {
         val rows = if (hasAlpha) 5 else 4
@@ -205,19 +206,25 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                         this.inputFilter.set({ c -> c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F' })
                         this.textColor.bind { this@ColourPicker.textColor.use() }
                         currentColor.addListener { v ->
-                            this.text.set(v.getOrCompute().toStr())
+                            if (!hasFocus.getOrCompute()) {
+                                this.text.set(v.getOrCompute().toStr())
+                            }
                         }
                         this.text.addListener { t ->
                             if (hasFocus.getOrCompute()) {
                                 try {
                                     val newValue = Color.valueOf(t.getOrCompute())
-                                    this@ColourPicker.setColor(newValue)
+                                    this@ColourPicker.setColor(newValue, false)
                                 } catch (ignored: Exception) {}
                             }
                         }
                         hasFocus.addListener { f ->
-                            if (!f.getOrCompute()) {
-                                this.text.set(currentColor.getOrCompute().toStr())
+                            if (!f.getOrCompute()) { // on focus lost
+//                                this.text.set(currentColor.getOrCompute().toStr())
+                                try {
+                                    val newValue = Color.valueOf(this.text.getOrCompute())
+                                    this@ColourPicker.setColor(newValue, false)
+                                } catch (ignored: Exception) {}
                             }
                         }
                         this.setOnRightClick { 
@@ -227,6 +234,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                     }
                     this += textField
                 }
+                rgbTextField = textField
                 this += Button("").apply {
                     Anchor.CentreRight.configure(this, offsetX = { -(bounds.width.useF() + 2f) })
                     this.bindWidthToSelfHeight()
@@ -277,13 +285,16 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
         addChild(vbox)
     }
     
-    fun setColor(newValue: Color) {
+    fun setColor(newValue: Color, setRgbTextField: Boolean) {
         val h = newValue.toHsv(FloatArray(3))
         hsv.hue.set(h[0].roundToInt().coerceIn(0, 360))
         hsv.saturation.set((h[1] * 100).roundToInt().coerceIn(0, 100))
         hsv.value.set((h[2] * 100).roundToInt().coerceIn(0, 100))
         if (hasAlpha) {
             hsv.alpha.set((newValue.a * 255).roundToInt().coerceIn(0, 255))
+        }
+        if (setRgbTextField) {
+            rgbTextField.text.set(newValue.toString().uppercase(Locale.ROOT).take(if (hasAlpha) 8 else 6))
         }
     }
 
