@@ -76,6 +76,21 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
         }
+        hbox += createSmallButton(binding = { Localization.getVar("common.reset").use() }).apply {
+            this.bounds.width.set(80f)
+            this.setOnAction {
+                val graphics = Gdx.graphics
+                val defaultWindowSize = PRMania.DEFAULT_SIZE
+                fullscreenCheck.checkedState.set(false)
+                val resList = resolutionCycle.list
+                resolutionCycle.currentItem.set(resList.first { it == defaultWindowSize })
+                
+                graphics.setWindowedMode(defaultWindowSize.width, defaultWindowSize.height)
+
+                settings.fullscreen.set(false)
+                settings.windowedResolution.set(defaultWindowSize)
+            }
+        }
     }
 
     fun prepareShow() {
