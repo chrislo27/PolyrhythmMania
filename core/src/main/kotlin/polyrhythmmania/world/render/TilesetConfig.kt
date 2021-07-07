@@ -16,12 +16,12 @@ class TilesetConfig {
         fun createGBA1TilesetConfig(): TilesetConfig {
             return TilesetConfig().apply {
                 rodBorder.color.getOrCompute().set(0, 0, 0)
-                rodFill.color.getOrCompute().set(255, 0, 0)
+                rodFill.color.getOrCompute().set(255, 8, 0)
                 
                 cubeBorder.color.getOrCompute().set(33, 214, 25)
                 cubeFaceX.color.getOrCompute().set(42, 224, 48)
                 cubeFaceY.color.getOrCompute().set(74, 255, 74)
-                cubeFaceZ.color.getOrCompute().set(42, 230, 49)
+                cubeFaceZ.color.getOrCompute().set(58, 230, 49)
 
                 pistonFaceX.color.getOrCompute().set(33, 82, 206)
                 pistonFaceZ.color.getOrCompute().set(41, 99, 255)
@@ -33,7 +33,7 @@ class TilesetConfig {
         fun createGBA2TilesetConfig(): TilesetConfig {
             return TilesetConfig().apply {
                 rodBorder.color.getOrCompute().set(0, 0, 0)
-                rodFill.color.getOrCompute().set(255, 0, 0)
+                rodFill.color.getOrCompute().set(255, 8, 0)
 
                 cubeBorder.color.getOrCompute().set(0, 16, 189)
                 cubeFaceX.color.getOrCompute().set(32, 81, 204)
