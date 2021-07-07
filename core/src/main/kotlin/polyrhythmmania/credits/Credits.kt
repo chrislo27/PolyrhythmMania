@@ -33,7 +33,8 @@ object Credits {
             "credits.specialThanks" to abcSorted(
                     "Lvl100Feraligatr",
                     "GrueKun",
-                    "spoopster"
+                    "spoopster",
+                    "Kievit",
             ),
     )
     
