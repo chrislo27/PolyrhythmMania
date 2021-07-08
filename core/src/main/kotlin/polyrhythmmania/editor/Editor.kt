@@ -627,7 +627,6 @@ class Editor(val main: PRManiaGame)
                         }
                     }
                 }
-                println(rodEvents)
             }
             
             timing.seconds = newSeconds
