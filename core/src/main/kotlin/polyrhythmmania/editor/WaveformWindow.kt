@@ -211,7 +211,9 @@ class WaveformWindow(val editor: Editor) : Disposable {
                     cacheByAge.add(first) // Move to the end of the list
                     first
                 }
+                cacheBySeconds.remove(cacheBlock.secondPos)
                 cacheBlock.generatedAt = System.currentTimeMillis()
+                cacheBlock.secondPos = seconds
                 cacheBySeconds[seconds] = cacheBlock
                 Gdx.app.postRunnable {
                     generateForCacheBlock(cacheBlock, musicData, waveform, seconds)
