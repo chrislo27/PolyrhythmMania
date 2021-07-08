@@ -30,6 +30,9 @@ class World {
     // DUNK
     val dunkPiston: EntityPiston = EntityPiston(this)
     
+    // Settings
+    var showInputFeedback: Boolean = PRManiaGame.instance.settings.showInputFeedbackBar.getOrCompute()
+    
     init {
         resetWorld()
     }
@@ -161,8 +164,7 @@ class World {
         }
 
 
-        val settings = PRManiaGame.instance.settings
-        if (settings.showInputFeedbackBar.getOrCompute()) {
+        if (showInputFeedback) {
             addEntity(EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.BARELY_COLOUR, 0).apply {
                 this.position.set(7f, 1f, 3f)
             })
