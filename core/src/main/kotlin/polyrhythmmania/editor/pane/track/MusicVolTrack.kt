@@ -69,7 +69,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
 
     private inline fun createInputListener(crossinline onScroll: (amt: Int) -> Unit): InputEventListener {
         return InputEventListener { event ->
-            if (editor.tool.getOrCompute() == Tool.MUSIC_VOLUME && editor.click.getOrCompute() == Click.None) {
+            if (editor.tool.getOrCompute() == Tool.MUSIC_VOLUME && editor.allowedToEdit.getOrCompute()) {
                 if (event is Scrolled) {
                     val scrollAmt = getScrollAmount(event.amountY.roundToInt(),
                             Gdx.input.isControlDown(), Gdx.input.isShiftDown(), Gdx.input.isAltDown())

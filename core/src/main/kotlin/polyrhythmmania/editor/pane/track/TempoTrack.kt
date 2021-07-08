@@ -143,7 +143,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
     private inline fun createInputListener(crossinline onScroll: (amt: Float) -> Unit): InputEventListener {
         return InputEventListener { event ->
-            if (editor.tool.getOrCompute() == Tool.TEMPO_CHANGE && editor.click.getOrCompute() == Click.None) {
+            if (editor.tool.getOrCompute() == Tool.TEMPO_CHANGE && editor.allowedToEdit.getOrCompute()) {
                 if (event is Scrolled) {
                     val scrollAmt = getScrollAmount(event.amountY.roundToInt(),
                             Gdx.input.isControlDown(), Gdx.input.isShiftDown(), Gdx.input.isAltDown())
