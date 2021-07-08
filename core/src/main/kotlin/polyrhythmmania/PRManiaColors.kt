@@ -2,6 +2,7 @@ package polyrhythmmania
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Colors
+import polyrhythmmania.world.entity.EntityInputFeedback
 
 
 object PRManiaColors {
@@ -14,6 +15,7 @@ object PRManiaColors {
     val MARKER_FIRST_BEAT: Color = Color(1f, 0f, 0f, 1f)
     val MARKER_LOOP_START: Color = Color(1f, 0.85f, 0f, 1f)
     val MARKER_LOOP_END: Color = Color(1f, 0.45f, 0f, 1f)
+    val ACE: Color = Color.valueOf("#EFC700")
     
     init {
         fun put(key: String, color: Color) = Colors.put(key, color)
@@ -29,6 +31,7 @@ object PRManiaColors {
         put("prmania_marker_firstbeat", MARKER_FIRST_BEAT.cpy())
         put("prmania_marker_loopstart", MARKER_LOOP_START.cpy())
         put("prmania_marker_loopend", MARKER_LOOP_END.cpy())
+        put("prmania_ace", ACE.cpy())
     }
     
 }
