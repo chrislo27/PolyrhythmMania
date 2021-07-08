@@ -91,7 +91,8 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     private val moreTimesVar: Var<Int> = Var(0)
     
     init {
-        val baseMarkup = Markup(mapOf("prmania_icons" to PRManiaGame.instance.fontIcons), TextRun(PRManiaGame.instance.fontGameTextbox, ""))
+        val baseMarkup = Markup(mapOf("prmania_icons" to PRManiaGame.instance.fontIcons),
+                TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
         uiSceneRoot += textBoxPane.apply { 
             Anchor.TopCentre.configure(textBoxPane, offsetY = 64f)
             this.bounds.width.set(1000f)

@@ -53,7 +53,9 @@ import java.lang.NumberFormatException
  * ```
  */
 class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun,
-             val styles: FontStyles = FontStyles.ALL_DEFAULT) {
+             val styles: FontStyles = FontStyles.ALL_DEFAULT,
+             val lenientMode: Boolean = false,
+) {
 
     companion object {
         val DEFAULT_FONT_NAME: String = "DEFAULT"
@@ -101,11 +103,12 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
 
     private fun parse(tags: List<Tag>): TextBlock {
         val runs = mutableListOf<TextRun>()
-        val stack = mutableListOf<Pair<Tag, TextRun>>()
+        
+        val defaultFont = fontMapping.getValue(DEFAULT_FONT_NAME)
 
         tags.forEach { tag ->
             val fontKey = tag.attrMap[TAG_FONT]?.valueAsString() ?: DEFAULT_FONT_NAME
-            var font = fontMapping.get(fontKey) ?: error("Font with key $fontKey was not found in the fontMapping.")
+            var font = fontMapping[fontKey] ?: (if (lenientMode) defaultFont else error("Font with key $fontKey was not found in the fontMapping."))
             val colorAttr = tag.attrMap[TAG_COLOR]?.value
             val color: Int = if (colorAttr is String) {
                 if (colorAttr.startsWith("#")) {
@@ -141,11 +144,11 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
             val bolditalic = bold && italic
 
             if (bolditalic) {
-                font = fontMapping[styles.boldItalic] ?: fontMapping.getValue(DEFAULT_FONT_NAME)
+                font = fontMapping[styles.boldItalic] ?: defaultFont
             } else if (bold) {
-                font = fontMapping[styles.bold] ?: fontMapping.getValue(DEFAULT_FONT_NAME)
+                font = fontMapping[styles.bold] ?: defaultFont
             } else if (italic) {
-                font = fontMapping[styles.italic] ?: fontMapping.getValue(DEFAULT_FONT_NAME)
+                font = fontMapping[styles.italic] ?: defaultFont
             }
 
             val subscript = tag.attrMap[TAG_SUBSCRIPT]?.valueAsBooleanOr(false) ?: false
