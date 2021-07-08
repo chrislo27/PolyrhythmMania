@@ -24,6 +24,10 @@ abstract class Practice(val main: PRManiaGame) : Disposable {
     val container: Container = Container(soundSystem, timingProvider)
     
     val engine: Engine = container.engine
+    
+    init {
+        container.world.showInputFeedback = true
+    }
 
     /**
      * Call the first time to initialize the practice scene.
