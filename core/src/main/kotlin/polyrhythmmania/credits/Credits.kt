@@ -35,6 +35,7 @@ object Credits {
                     "GrueKun",
                     "spoopster",
                     "Kievit",
+                    "Turtike",
             ),
     )
     
