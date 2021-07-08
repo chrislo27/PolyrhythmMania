@@ -49,6 +49,7 @@ class BlockTilesetChange(engine: Engine)
                 this.onAction = {
                     val editorPane = editor.editorPane
                     editorPane.openDialog(TilesetEditDialog(editorPane, this@BlockTilesetChange.tilesetConfig,
+                            engine.world.tilesetConfig,
                             "editor.dialog.tileset.title.block").prepareShow())
                 }
             })

@@ -35,15 +35,23 @@ import polyrhythmmania.world.render.WorldRenderer
 
 
 class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig,
-                        val titleLocalization: String = "editor.dialog.tileset.title") 
-    : EditorDialog(editorPane) {
+                        val baseTileset: TilesetConfig?,
+                        val titleLocalization: String = "editor.dialog.tileset.title",
+) : EditorDialog(editorPane) {
 
-    enum class ResetDefault(val baseConfig: TilesetConfig) {
-        PR1(TilesetConfig.createGBA1TilesetConfig()),
-        PR2(TilesetConfig.createGBA2TilesetConfig())
+    companion object {
+        private val PR1_CONFIG: TilesetConfig = TilesetConfig.createGBA1TilesetConfig()
+        private val PR2_CONFIG: TilesetConfig = TilesetConfig.createGBA2TilesetConfig()
     }
-
-    private var resetDefault: ResetDefault = ResetDefault.PR1
+    
+    data class ResetDefault(val baseConfig: TilesetConfig)
+    
+    private val availableResetDefaults: List<ResetDefault> = listOfNotNull(
+            ResetDefault(PR1_CONFIG),
+            ResetDefault(PR2_CONFIG),
+            baseTileset?.let { ResetDefault(it) }
+    )
+    private var resetDefault: ResetDefault = availableResetDefaults.first()
 
     val currentMapping: Var<TilesetConfig.ColorMapping> = Var(tilesetConfig.allMappings[0])
     
@@ -204,27 +212,48 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                 this.bounds.width.set(250f)
             }
             val toggleGroup = ToggleGroup()
-            bottomHbox += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.pr1").use() },
-                    font = editorPane.palette.musicDialogFont).apply {
-                this.textLabel.textColor.set(Color.WHITE.cpy())
-                this.imageNode.tint.set(Color.WHITE.cpy())
-                this.imageNode.padding.set(Insets(4f))
-                toggleGroup.addToggle(this)
+            bottomHbox += VBox().apply { 
+                this.spacing.set(2f)
                 this.bounds.width.set(200f)
-                this.onSelected = {
-                    resetDefault = ResetDefault.PR1
+                this += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.pr1").use() },
+                        font = editorPane.palette.musicDialogFont).apply {
+                    this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
+                    this.textLabel.textColor.set(Color.WHITE.cpy())
+                    this.imageNode.tint.set(Color.WHITE.cpy())
+                    this.imageNode.padding.set(Insets(1f))
+                    toggleGroup.addToggle(this)
+                    this.onSelected = {
+                        resetDefault = availableResetDefaults[0]
+                    }
+                    this.selectedState.set(true)
                 }
-                this.selectedState.set(true)
+                this += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.pr2").use() },
+                        font = editorPane.palette.musicDialogFont).apply {
+                    this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
+                    this.textLabel.textColor.set(Color.WHITE.cpy())
+                    this.imageNode.tint.set(Color.WHITE.cpy())
+                    this.imageNode.padding.set(Insets(1f))
+                    toggleGroup.addToggle(this)
+                    this.onSelected = {
+                        resetDefault = availableResetDefaults[1]
+                    }
+                }
             }
-            bottomHbox += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.pr2").use() },
-                    font = editorPane.palette.musicDialogFont).apply {
-                this.textLabel.textColor.set(Color.WHITE.cpy())
-                this.imageNode.tint.set(Color.WHITE.cpy())
-                this.imageNode.padding.set(Insets(4f))
-                toggleGroup.addToggle(this)
+            bottomHbox += VBox().apply {
+                this.spacing.set(2f)
                 this.bounds.width.set(200f)
-                this.onSelected = {
-                    resetDefault = ResetDefault.PR2
+                if (baseTileset != null) {
+                    this += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.base").use() },
+                            font = editorPane.palette.musicDialogFont).apply {
+                        this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
+                        this.textLabel.textColor.set(Color.WHITE.cpy())
+                        this.imageNode.tint.set(Color.WHITE.cpy())
+                        this.imageNode.padding.set(Insets(1f))
+                        toggleGroup.addToggle(this)
+                        this.onSelected = {
+                            resetDefault = availableResetDefaults[2]
+                        }
+                    }
                 }
             }
             bottomHbox += Button(binding = { Localization.getVar("editor.dialog.tileset.resetAll").use() },
