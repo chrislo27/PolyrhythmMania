@@ -49,7 +49,7 @@ class BlockTilesetChange(engine: Engine)
                 this.onAction = {
                     val editorPane = editor.editorPane
                     editorPane.openDialog(TilesetEditDialog(editorPane, this@BlockTilesetChange.tilesetConfig,
-                            "editor.dialog.tileset.title.block"))
+                            "editor.dialog.tileset.title.block").prepareShow())
                 }
             })
             ctxmenu.addMenuItem(SeparatorMenuItem())

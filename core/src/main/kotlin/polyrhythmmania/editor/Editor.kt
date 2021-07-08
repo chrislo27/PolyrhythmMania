@@ -535,7 +535,7 @@ class Editor(val main: PRManiaGame)
     
     fun attemptOpenTilesetEditDialog() {
         if (allowedToEdit.getOrCompute()) {
-            editorPane.openDialog(editorPane.tilesetEditDialog)
+            editorPane.openDialog(editorPane.tilesetEditDialog.prepareShow())
         }
     }
 

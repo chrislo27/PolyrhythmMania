@@ -292,6 +292,11 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     private fun updateColourPickerToMapping(mapping: TilesetConfig.ColorMapping = currentMapping.getOrCompute()) {
         colourPicker.setColor(mapping.color.getOrCompute(), true)
     }
+    
+    fun prepareShow(): TilesetEditDialog {
+        tilesetConfig.applyTo(objPreview.worldRenderer.tileset)
+        return this
+    }
 
     override fun canCloseDialog(): Boolean {
         return true
