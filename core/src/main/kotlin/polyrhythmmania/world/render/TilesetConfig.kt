@@ -51,7 +51,7 @@ class TilesetConfig {
     }
     
     data class ColorMapping(val id: String, val tilesetGetter: (Tileset) -> Var<Color>,
-                            val canAdjustAlpha: Boolean = false,
+                            val canAdjustAlpha: Boolean = false, val fallbackIDs: List<String> = emptyList(),
                             val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f))) {
         
         fun copyFrom(tileset: Tileset) {
@@ -74,7 +74,7 @@ class TilesetConfig {
     }
 
     val cubeBorder: ColorMapping = ColorMapping("cubeBorder", { it.cubeBorder.color })
-    val cubeBorderZ: ColorMapping = ColorMapping("cubeBorderZ", { it.cubeBorderZ.color })
+    val cubeBorderZ: ColorMapping = ColorMapping("cubeBorderZ", { it.cubeBorderZ.color }, fallbackIDs = listOf("cubeBorder"))
     val cubeFaceX: ColorMapping = ColorMapping("cubeFaceX", { it.cubeFaceX.color })
     val cubeFaceY: ColorMapping = ColorMapping("cubeFaceY", { it.cubeFaceY.color })
     val cubeFaceZ: ColorMapping = ColorMapping("cubeFaceZ", { it.cubeFaceZ.color })
@@ -130,8 +130,19 @@ class TilesetConfig {
 
         allMappings.forEach { m ->
             val c = attemptParse(m.id)
-            if (c != null)
+            if (c != null) {
                 m.color.set(c)
+            } else {
+                if (m.fallbackIDs.isNotEmpty()) {
+                    for (fallback in m.fallbackIDs) {
+                        val fallbackColor = attemptParse(fallback)
+                        if (fallbackColor != null) {
+                            m.color.set(fallbackColor)
+                            break
+                        }
+                    }
+                }
+            }
         }
     }
 }
