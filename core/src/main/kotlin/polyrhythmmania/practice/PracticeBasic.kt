@@ -53,7 +53,7 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvent(EventPracticeRetract(engine, engine.world.rowA, 0, startBeat + 3.5f, affectThisIndexAndForward = true))
             listOf(0, 4).map { EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.A) }
         }
-        practiceSection1.endBlock = PracticeEndBlock(6f) { engine, startBeat ->
+        practiceSection1.endBlock = PracticeEndBlock(12f) { engine, startBeat ->
             engine.addEvent(EventLockInputs(engine, true, startBeat))
             engine.addEvent(EventRowBlockRetract(engine, engine.world.rowA, 0, startBeat + 2f, affectThisIndexAndForward = true))
             engine.addEvent(EventRowBlockDespawn(engine, engine.world.rowA, 0, startBeat + 3f, affectThisIndexAndForward = true))
@@ -63,10 +63,40 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 0f
                 this.requireInput.set(true)
+                this.text = Localization.getValue("practice.basic.text1a")
+            }.compileIntoEvents())
+            engine.addEvents(BlockTextbox(engine).apply {
+                this.beat = startBeat + 4f + 1f
+                this.requireInput.set(true)
+                this.text = Localization.getValue("practice.basic.text1b")
+            }.compileIntoEvents())
+            engine.addEvents(BlockTextbox(engine).apply {
+                this.beat = startBeat + 4f + 2f
+                this.requireInput.set(true)
+                this.text = Localization.getValue("practice.basic.text1c")
+            }.compileIntoEvents())
+            engine.addEvents(BlockTextbox(engine).apply {
+                this.beat = startBeat + 4f + 3f
+                this.requireInput.set(true)
+                this.text = Localization.getValue("practice.basic.text1d")
+            }.compileIntoEvents())
+            engine.addEvents(BlockTextbox(engine).apply {
+                this.beat = startBeat + 4f + 4f
+                this.requireInput.set(true)
+                this.text = Localization.getValue("practice.basic.text1e")
+            }.compileIntoEvents())
+            engine.addEvents(BlockTextbox(engine).apply {
+                this.beat = startBeat + 4f + 5f
+                this.requireInput.set(true)
+                this.text = Localization.getValue("practice.basic.text1f")
+            }.compileIntoEvents())
+            engine.addEvents(BlockTextbox(engine).apply {
+                this.beat = startBeat + 4f + 6f
+                this.requireInput.set(true)
                 this.text = Localization.getValue("practice.basic.text2", keyboardKeymap.toDpadString())
             }.compileIntoEvents())
             engine.addEvents(practiceSection2.apply {
-                this.beat = startBeat + 4f + 2f
+                this.beat = startBeat + 4f + 8f
             }.compileIntoEvents())
         }
 
@@ -95,7 +125,7 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvent(EventPracticeRetract(engine, engine.world.rowDpad, 0, startBeat + 3.5f, affectThisIndexAndForward = true))
             listOf(0, 4).map { EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD) }
         }
-        practiceSection2.endBlock = PracticeEndBlock(8f) { engine, startBeat ->
+        practiceSection2.endBlock = PracticeEndBlock(7f) { engine, startBeat ->
             engine.addEvent(EventLockInputs(engine, true, startBeat))
             engine.addEvent(EventRowBlockRetract(engine, engine.world.rowDpad, 0, startBeat + 2f, affectThisIndexAndForward = true))
             engine.addEvent(EventRowBlockDespawn(engine, engine.world.rowDpad, 0, startBeat + 3f, affectThisIndexAndForward = true))
@@ -108,12 +138,12 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
                 this.text = Localization.getValue("practice.basic.text3")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
-                this.beat = startBeat + 4f + 2
+                this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
                 this.text = Localization.getValue("practice.basic.text4")
             }.compileIntoEvents())
             engine.addEvents(practiceSection3.apply {
-                this.beat = startBeat + 4f + 4
+                this.beat = startBeat + 4f + 3
             }.compileIntoEvents())
         }
         
@@ -153,7 +183,7 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
                 )
             }
         }
-        practiceSection3.endBlock = PracticeEndBlock(8f) { engine, startBeat ->
+        practiceSection3.endBlock = PracticeEndBlock(7f) { engine, startBeat ->
             engine.addEvent(EventLockInputs(engine, true, startBeat))
             engine.addEvent(EventRowBlockRetract(engine, engine.world.rowA, 0, startBeat + 2f, affectThisIndexAndForward = true))
             engine.addEvent(EventRowBlockDespawn(engine, engine.world.rowA, 0, startBeat + 3f, affectThisIndexAndForward = true))
@@ -168,12 +198,12 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
                 this.text = Localization.getValue("practice.basic.text5")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
-                this.beat = startBeat + 4f + 2
+                this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
                 this.text = Localization.getValue("practice.basic.text6")
             }.compileIntoEvents())
             engine.addEvents(practiceSection4.apply {
-                this.beat = startBeat + 4f + 4
+                this.beat = startBeat + 4f + 3
             }.compileIntoEvents())
         }
 
@@ -218,7 +248,7 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
                 )
             }
         }
-        practiceSection4.endBlock = PracticeEndBlock(8f) { engine, startBeat ->
+        practiceSection4.endBlock = PracticeEndBlock(7f) { engine, startBeat ->
             engine.addEvent(EventLockInputs(engine, true, startBeat))
             engine.addEvent(EventRowBlockRetract(engine, engine.world.rowA, 0, startBeat + 2f, affectThisIndexAndForward = true))
             engine.addEvent(EventRowBlockDespawn(engine, engine.world.rowA, 0, startBeat + 3f, affectThisIndexAndForward = true))
@@ -233,11 +263,11 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
                 this.text = Localization.getValue("practice.basic.text7")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
-                this.beat = startBeat + 4f + 2
+                this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
                 this.text = Localization.getValue("practice.basic.text8")
             }.compileIntoEvents())
-            engine.addEvent(EventEndState(engine, startBeat + 4f + 4))
+            engine.addEvent(EventEndState(engine, startBeat + 4f + 3))
         }
     }
     
@@ -263,12 +293,12 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             this.text = Localization.getValue("practice.basic.text0", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += BlockTextbox(engine).apply { 
-            this.beat = 2f
+            this.beat = 1f
             this.requireInput.set(true)
             this.text = Localization.getValue("practice.basic.text1", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += practiceSection1.apply { 
-            this.beat = 4f
+            this.beat = 3f
         }
 
         container.addBlocks(blocks)
