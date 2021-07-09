@@ -23,6 +23,7 @@ class World {
 
     // Settings
     var showInputFeedback: Boolean = PRManiaGame.instance.settings.showInputFeedbackBar.getOrCompute()
+    var worldSettings: WorldSettings = WorldSettings.DEFAULT
     
     // World mode-specific things
     // POLYRHYTHM

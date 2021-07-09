@@ -217,7 +217,7 @@ class EntityInputIndicator(world: World, var isDpad: Boolean)
     override val renderHeight: Float = 16f / 32f
 
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
-        if (!visible) return
+        if (!visible || !world.worldSettings.showInputIndicators) return
         val tintedRegion = if (isDpad) tileset.indicatorDpad else tileset.indicatorA
         val renderWidth = this.renderWidth
         val renderHeight = this.renderHeight

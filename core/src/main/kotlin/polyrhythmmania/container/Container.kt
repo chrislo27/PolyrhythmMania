@@ -31,6 +31,7 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
+import polyrhythmmania.world.WorldSettings
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
@@ -53,7 +54,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     companion object {
         const val FILE_EXTENSION: String = "prmania"
-        const val CONTAINER_VERSION: Int = 4
+        const val CONTAINER_VERSION: Int = 5
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
     }
@@ -263,7 +264,14 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             }
         })
         jsonObj.add("tilesetConfig", this.world.tilesetConfig.toJson())
-        jsonObj.add("resultsText", this.resultsText.toJson())
+        val resultsText = this.resultsText
+        if (resultsText != ResultsText.DEFAULT) {
+            jsonObj.add("resultsText", resultsText.toJson())
+        }
+        val worldSettings = this.world.worldSettings
+        if (worldSettings != WorldSettings.DEFAULT) {
+            jsonObj.add("worldSettings", worldSettings.toJson())
+        }
 
 
         // Pack
@@ -362,13 +370,21 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         }
         if (containerVersion >= 3) {
             val tilesetObj = json.get("tilesetConfig")?.asObject()
-            if (tilesetObj != null)
+            if (tilesetObj != null) {
                 this.world.tilesetConfig.fromJson(tilesetObj)
+            }
         }
         if (containerVersion >= 4) {
             val resultsObj = json.get("resultsText")?.asObject()
-            if (resultsObj != null)
+            if (resultsObj != null) {
                 this.resultsText = ResultsText.fromJson(resultsObj)
+            }
+        }
+        if (containerVersion >= 5) {
+            val worldSettingsObj = json.get("worldSettings")?.asObject()
+            if (worldSettingsObj != null) {
+                this.world.worldSettings = WorldSettings.fromJson(worldSettingsObj)
+            }
         }
 
         val blocksObj = json.get("blocks").asArray()
