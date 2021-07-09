@@ -8,6 +8,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.world.WorldSettings
 
 
 abstract class Practice(val main: PRManiaGame) : Disposable {
@@ -26,7 +27,8 @@ abstract class Practice(val main: PRManiaGame) : Disposable {
     val engine: Engine = container.engine
     
     init {
-        container.world.showInputFeedback = true
+        container.world.showInputFeedback = true // Overrides user settings
+        container.world.worldSettings = WorldSettings(showInputIndicators = true)
     }
 
     /**
