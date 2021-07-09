@@ -73,6 +73,8 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
     var entitiesRenderedLastCall: Int = 0
         private set
+    var entityRenderTimeNano: Long = 0L
+        private set
     
     var renderUI: Boolean = true
     
@@ -169,6 +171,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         batch.projectionMatrix = camera.combined
         batch.begin()
 
+        val entityRenderTime = System.nanoTime()
         var entitiesRendered = 0
         this.entitiesRenderedLastCall = 0
         world.sortEntitiesByRenderOrder()
@@ -191,6 +194,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
             }
         }
         this.entitiesRenderedLastCall = entitiesRendered
+        this.entityRenderTimeNano = System.nanoTime() - entityRenderTime
         
         batch.projectionMatrix = uiCamera.combined
 
@@ -319,8 +323,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     }
 
     fun getDebugString(): String {
-        return """e: ${world.entities.size}  r: ${entitiesRenderedLastCall}
-
+        return """e: ${world.entities.size}  r: ${entitiesRenderedLastCall} (${(entityRenderTimeNano) / 1_000_000f} ms)
 """
     }
 }

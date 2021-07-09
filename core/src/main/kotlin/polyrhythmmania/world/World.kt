@@ -1,5 +1,6 @@
 package polyrhythmmania.world
 
+import com.badlogic.gdx.utils.LongMap
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.entity.*
@@ -18,6 +19,10 @@ class World {
     var worldMode: WorldMode = WorldMode.POLYRHYTHM
     
     val entities: List<Entity> = CopyOnWriteArrayList()
+    val cubeMap: LongMap<EntityCube> = LongMap(100)
+
+    // Settings
+    var showInputFeedback: Boolean = PRManiaGame.instance.settings.showInputFeedbackBar.getOrCompute()
     
     // World mode-specific things
     // POLYRHYTHM
@@ -30,8 +35,6 @@ class World {
     // DUNK
     val dunkPiston: EntityPiston = EntityPiston(this)
     
-    // Settings
-    var showInputFeedback: Boolean = PRManiaGame.instance.settings.showInputFeedbackBar.getOrCompute()
     
     init {
         resetWorld()
@@ -40,15 +43,28 @@ class World {
     fun addEntity(entity: Entity) {
         if (entity !in entities) {
             (entities as MutableList).add(entity)
+//            if (entity is EntityCube) { // Uncomment if cube map culling is to be used
+//                synchronized(cubeMap) {
+//                    cubeMap.put(entity.getCubemapIndex(), entity)
+//                }
+//            }
         }
     }
 
     fun removeEntity(entity: Entity) {
         (entities as MutableList).remove(entity)
+//        if (entity is EntityCube) { // Uncomment if cube map culling is to be used
+//            synchronized(cubeMap) {
+//                cubeMap.remove(entity.getCubemapIndex())
+//            }
+//        }
     }
     
     fun clearEntities() {
         (entities as MutableList).clear()
+        synchronized(cubeMap) {
+            cubeMap.clear()
+        }
     }
     
     fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {

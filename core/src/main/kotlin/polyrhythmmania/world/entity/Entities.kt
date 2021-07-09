@@ -12,6 +12,7 @@ import polyrhythmmania.world.render.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.absoluteValue
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 
 open class SimpleRenderedEntity(world: World) : Entity(world) {
@@ -60,10 +61,35 @@ class EntityPlatform(world: World, val withLine: Boolean = false) : SpriteEntity
 
 open class EntityCube(world: World, val withLine: Boolean = false, val withBorder: Boolean = false)
     : SpriteEntity(world) {
+    
+    companion object {
+        fun createCubemapIndex(x: Int, y: Int, z: Int): Long {
+            val overflow = x !in Short.MIN_VALUE..Short.MAX_VALUE || y !in Short.MIN_VALUE..Short.MAX_VALUE || z !in Short.MIN_VALUE..Short.MAX_VALUE
+
+            return 0L or (if (overflow) (1L shl 63) else 0L).toLong() or (
+                    x.toShort().toLong() or (y.toShort().toLong() shl 16) or (z.toShort().toLong() shl 32)
+                    )
+        }
+    }
 
     override val numLayers: Int = 7
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
+        // Uncomment if cube map culling is to be used
+//        val cubeOccludesX = world.cubeMap[createCubemapIndex(this.position.x.roundToInt() - 1, this.position.y.roundToInt(), this.position.z.roundToInt())] != null
+//        val cubeOccludesY = world.cubeMap[createCubemapIndex(this.position.x.roundToInt(), this.position.y.roundToInt() + 1, this.position.z.roundToInt())] != null
+//        val cubeOccludesZ = world.cubeMap[createCubemapIndex(this.position.x.roundToInt(), this.position.y.roundToInt(), this.position.z.roundToInt() + 1)] != null
+//
+//        return when (index) {
+//            0 -> tileset.cubeBorder
+//            1 -> if (cubeOccludesZ) null else tileset.cubeBorderZ
+//            2 -> if (cubeOccludesX) null else tileset.cubeFaceX
+//            3 -> if (cubeOccludesY) null else tileset.cubeFaceY
+//            4 -> if (cubeOccludesZ) null else tileset.cubeFaceZ
+//            5 -> if (withLine) tileset.redLine else null
+//            6 -> if (withBorder) tileset.platformBorder else null
+//            else -> null
+//        }
         return when (index) {
             0 -> tileset.cubeBorder
             1 -> tileset.cubeBorderZ
@@ -74,6 +100,10 @@ open class EntityCube(world: World, val withLine: Boolean = false, val withBorde
             6 -> if (withBorder) tileset.platformBorder else null
             else -> null
         }
+    }
+    
+    fun getCubemapIndex(): Long {
+        return createCubemapIndex(this.position.x.roundToInt(), this.position.y.roundToInt(), this.position.z.roundToInt())
     }
 }
 
