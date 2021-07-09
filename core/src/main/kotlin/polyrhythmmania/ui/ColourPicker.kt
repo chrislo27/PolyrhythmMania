@@ -196,7 +196,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
 
                 val textField: TextField
                 this += RectElement(Color(0f, 0f, 0f, 0.9f)).apply {
-                    this.bindWidthToParent(adjustBinding = { (bounds.height.useF() + 2f) * 2f * -1 })
+                    this.bindWidthToParent(adjustBinding = { (bounds.height.useF() + 4f) * 2f * -1 })
                     this.border.set(Insets(1f))
                     this.borderStyle.set(SolidBorder(Color.WHITE))
                     this.padding.set(Insets(1f))
@@ -236,7 +236,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                 }
                 rgbTextField = textField
                 this += Button("").apply {
-                    Anchor.CentreRight.configure(this, offsetX = { -(bounds.width.useF() + 2f) })
+                    Anchor.CentreRight.configure(this, offsetX = { -(bounds.width.useF() + 4f) })
                     this.bindWidthToSelfHeight()
                     this.padding.set(Insets(6f))
                     this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_copy")))
