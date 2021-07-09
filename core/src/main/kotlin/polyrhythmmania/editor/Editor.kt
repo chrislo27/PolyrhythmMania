@@ -664,6 +664,16 @@ class Editor(val main: PRManiaGame)
         }
     }
 
+    fun attemptOpenGenericContextMenu(contextMenu: ContextMenu) {
+        val root = sceneRoot
+        root.hideRootContextMenu()
+        blocks.forEach { it.ownedContextMenu = null }
+        root.showRootContextMenu(contextMenu, suggestOffsetY = -64f)
+        editorPane.enqueueAnimation(contextMenu.opacity, 0f, 1f).apply {
+            onStart = { contextMenu.visible.set(true) }
+        }
+    }
+
     fun attemptOpenBlockContextMenu(block: Block, contextMenu: ContextMenu) {
         val root = sceneRoot
         root.hideRootContextMenu()

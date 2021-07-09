@@ -11,6 +11,10 @@ import paintbox.ui.ImageNode
 import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
+import paintbox.ui.contextmenu.CheckBoxMenuItem
+import paintbox.ui.contextmenu.ContextMenu
+import paintbox.ui.contextmenu.LabelMenuItem
+import paintbox.ui.contextmenu.SeparatorMenuItem
 import paintbox.ui.control.Button
 import paintbox.ui.control.Slider
 import paintbox.ui.control.TextLabel
@@ -275,6 +279,32 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     }
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.results")))
+            })
+            leftControlPane.addChild(Button("").apply {
+                this.bounds.width.set(32f)
+                this.skinID.set(EditorSkins.BUTTON)
+                this.padding.set(Insets.ZERO)
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_world_settings"]))
+                this.setOnAction {
+                    val editor = editorPane.editor
+                    if (editor.allowedToEdit.getOrCompute()) {
+                        editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
+                            val currentWorldSettings = editor.world.worldSettings
+                            val showInputIndicatorsVar: Var<Boolean> = Var(currentWorldSettings.showInputIndicators).apply { 
+                                addListener {
+                                    editor.world.worldSettings = editor.world.worldSettings.copy(showInputIndicators = it.getOrCompute())
+                                }
+                            }
+                            
+                            ctxmenu.defaultWidth.set(350f)
+                            ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("editor.dialog.worldSettings.title"), editorPane.palette.markup))
+                            ctxmenu.addMenuItem(SeparatorMenuItem())
+                            ctxmenu.addMenuItem(CheckBoxMenuItem.create(showInputIndicatorsVar,
+                                    Localization.getValue("editor.dialog.worldSettings.showInputIndicators"), editorPane.palette.markup))
+                        })
+                    }
+                }
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.worldSettings")))
             })
             leftControlPane.addChild(RectElement(binding = {editorPane.palette.previewPaneSeparator.use()}).apply { 
                 this.bounds.width.set(2f)

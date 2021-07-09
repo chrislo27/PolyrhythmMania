@@ -46,6 +46,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("toolbar_clapboard_open", "textures/ui/icon/toolbar/clapboard_open.png"),
                 Packable("toolbar_tileset", "textures/ui/icon/toolbar/tileset.png"),
                 Packable("toolbar_results", "textures/ui/icon/toolbar/results.png"),
+                Packable("toolbar_world_settings", "textures/ui/icon/toolbar/world_settings.png"),
                 Packable("menubar_new", "textures/ui/icon/menubar/new.png"),
                 Packable("menubar_open", "textures/ui/icon/menubar/open.png"),
                 Packable("menubar_save", "textures/ui/icon/menubar/save.png"),
