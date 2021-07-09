@@ -31,7 +31,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private val scrollPane: ScrollPane
 
     init {
-        this.setSize(MMMenu.WIDTH_MEDIUM)
+        this.setSize(0.64f)
         this.titleText.bind { Localization.getVar("mainMenu.credits.title").use() }
         this.contentPane.bounds.height.set(300f)
 
@@ -123,7 +123,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             val headingVar = Localization.getVar(headingLoc)
             val headingLabel = TextLabel(binding = { headingVar.use() }, font = font).apply {
                 Anchor.TopLeft.configure(this)
-                this.bounds.width.set(220f)
+                this.bounds.width.set(210f)
                 this.bounds.height.bind { ROW_HEIGHT * getHeadingRowHeight(text.use()) }
                 this.padding.set(Insets(12f, 2f, 0f, 8f))
                 this.textColor.set(HEADING_TEXT_COLOR)
