@@ -49,6 +49,10 @@ sealed class SoundInterface {
             }
             return soundSystem.playAudio(audio, callback)
         }
+        override fun setPaused(paused: Boolean) {
+            super.setPaused(paused)
+            soundSystem.setPaused(paused)
+        }
     }
 
     object NoOp : SoundInterface() {
@@ -61,6 +65,7 @@ sealed class SoundInterface {
         }
     }
     
+    protected var pausedState: Boolean = false
     open var disableSounds: Boolean = false
     
     private val audioPlayedLastFrame: MutableSet<BeadsAudio> = mutableSetOf()
@@ -87,6 +92,10 @@ sealed class SoundInterface {
         if (audioPlayedLastFrame.isNotEmpty()) {
             audioPlayedLastFrame.clear()
         }
+    }
+    
+    open fun setPaused(paused: Boolean) {
+        pausedState = paused
     }
     
 }

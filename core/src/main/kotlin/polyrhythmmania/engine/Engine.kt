@@ -34,6 +34,14 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     var musicOffsetMs: Float = 0f
     
     var activeTextBox: ActiveTextBox? = null
+        set(value) {
+            field = value
+            if (value != null && value.textBox.requiresInput) {
+                soundInterface.setPaused(true)
+            } else {
+                soundInterface.setPaused(false)
+            }
+        }
     
     fun resetEndSignal() {
         endSignalReceived.set(false)
