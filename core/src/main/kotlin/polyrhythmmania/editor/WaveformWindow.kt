@@ -98,7 +98,8 @@ class WaveformWindow(val editor: Editor) : Disposable {
             
             batch.color = minmaxColor
             for (x in 0 until width) {
-                val i = (x * (summaryData[0].size) / width.toFloat()).toInt().coerceIn(0, summaryData[0].size - 1)
+                val i = (x * (summaryData[0].size) / width.toFloat()).toInt()
+                if (i !in 0 until summaryData[0].size) continue
                 for (ch in 0 until channels) {
                     val summary = summaryData[ch][i]
                     val min = summary.min.coerceIn(-1f, 1f)
@@ -109,7 +110,8 @@ class WaveformWindow(val editor: Editor) : Disposable {
             }
             batch.color = rmsColor
             for (x in 0 until width) {
-                val i = (x * (summaryData[0].size) / width.toFloat()).toInt().coerceIn(0, summaryData[0].size - 1)
+                val i = (x * (summaryData[0].size) / width.toFloat()).toInt()
+                if (i !in 0 until summaryData[0].size) continue
                 for (ch in 0 until channels) {
                     val summary = summaryData[ch][i]
                     val rms = summary.rms.coerceIn(0f, 1f)
@@ -158,7 +160,8 @@ class WaveformWindow(val editor: Editor) : Disposable {
             
             batch.color = minmaxColor
             for (x in 0 until width) {
-                val i = (((x / width.toFloat() * sampleCount) + startSample) / entireMusicSamples.toFloat() * summaryData[0].size).toInt().coerceIn(0, summaryData[0].size - 1)
+                val i = (((x / width.toFloat() * sampleCount) + startSample) / entireMusicSamples.toFloat() * summaryData[0].size).toInt()
+                if (i !in 0 until summaryData[0].size) continue
                 for (ch in 0 until channels) {
                     val summary = summaryData[ch][i]
                     val min = summary.min.coerceIn(-1f, 1f)
@@ -169,7 +172,8 @@ class WaveformWindow(val editor: Editor) : Disposable {
             }
             batch.color = rmsColor
             for (x in 0 until width) {
-                val i = (((x / width.toFloat() * sampleCount) + startSample) / entireMusicSamples.toFloat() * summaryData[0].size).toInt().coerceIn(0, summaryData[0].size - 1)
+                val i = (((x / width.toFloat() * sampleCount) + startSample) / entireMusicSamples.toFloat() * summaryData[0].size).toInt()
+                if (i !in 0 until summaryData[0].size) continue
                 for (ch in 0 until channels) {
                     val summary = summaryData[ch][i]
                     val rms = summary.rms.coerceIn(0f, 1f)
@@ -261,13 +265,16 @@ class WaveformWindow(val editor: Editor) : Disposable {
         val oldSrcFunc = batch.blendSrcFunc
         val oldDstFunc = batch.blendDstFunc
         batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ZERO)
-        batch.fillRect(regionX.toFloat(), regionY.toFloat(), SECONDS_BLOCK_WIDTH.toFloat(), SECONDS_BLOCK_HEIGHT.toFloat())
+        batch.fillRect(regionX.toFloat(), regionY.toFloat(),
+                ceil(regionX + SECONDS_BLOCK_WIDTH.toFloat()) - regionX /* reduces bleed over into next block */,
+                SECONDS_BLOCK_HEIGHT.toFloat())
         batch.flush()
         batch.setBlendFunction(oldSrcFunc, oldDstFunc)
         
         batch.color = minmaxColor
         for (x in 0 until width) {
-            val i = (((x / width.toFloat() * sampleCount) + startSample) / entireMusicSamples.toFloat() * summaryData[0].size).toInt().coerceIn(0, summaryData[0].size - 1)
+            val i = (((x / width.toFloat() * sampleCount) + startSample) / entireMusicSamples.toFloat() * summaryData[0].size).toInt()
+            if (i !in 0 until summaryData[0].size) continue
             val min = (if (channels == 1) summaryData[0][i].min else min(summaryData[0][i].min, summaryData[1][i].min)).coerceIn(-1f, 1f)
             val max = (if (channels == 1) summaryData[0][i].max else max(summaryData[0][i].max, summaryData[1][i].max)).coerceIn(-1f, 1f)
             val h = ((max - min) * (heightPerCh / 2))
@@ -275,7 +282,8 @@ class WaveformWindow(val editor: Editor) : Disposable {
         }
         batch.color = rmsColor
         for (x in 0 until width) {
-            val i = (((x / width.toFloat() * sampleCount) + startSample) / entireMusicSamples.toFloat() * summaryData[0].size).toInt().coerceIn(0, summaryData[0].size - 1)
+            val i = (((x / width.toFloat() * sampleCount) + startSample) / entireMusicSamples.toFloat() * summaryData[0].size).toInt()
+            if (i !in 0 until summaryData[0].size) continue
             val rms = (if (channels == 1) summaryData[0][i].rms else ((summaryData[0][i].rms + summaryData[1][i].rms) / 2f)).coerceIn(0f, 1f)
             val h = (rms * (heightPerCh))
             batch.fillRect(regionX + x.toFloat(), regionY + (0 + 0.5f) * heightPerCh - (h / 2), 1f, h)
