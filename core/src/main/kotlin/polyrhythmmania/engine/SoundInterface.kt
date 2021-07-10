@@ -65,7 +65,8 @@ sealed class SoundInterface {
         }
     }
     
-    protected var pausedState: Boolean = false
+    var pausedState: Boolean = false
+        protected set
     open var disableSounds: Boolean = false
     
     private val audioPlayedLastFrame: MutableSet<BeadsAudio> = mutableSetOf()

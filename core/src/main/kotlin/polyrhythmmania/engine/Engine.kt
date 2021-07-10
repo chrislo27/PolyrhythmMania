@@ -35,11 +35,15 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     
     var activeTextBox: ActiveTextBox? = null
         set(value) {
+            val old = field
             field = value
             if (value != null && value.textBox.requiresInput) {
+                value.wasSoundInterfacePaused = soundInterface.pausedState
                 soundInterface.setPaused(true)
             } else {
-                soundInterface.setPaused(false)
+                if (old != null && old.textBox.requiresInput && !old.wasSoundInterfacePaused) {
+                    soundInterface.setPaused(false)
+                }
             }
         }
     
