@@ -78,8 +78,9 @@ abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, start
 }
 
 class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityPiston.Type, startBeat: Float,
-                         affectThisIndexAndForward: Boolean = false)
-    : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
+                         affectThisIndexAndForward: Boolean = false,
+                         val startPistonExtended: Boolean = false,
+) : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
     init {
         this.width = 0.125f
     }
@@ -88,6 +89,9 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityP
         val didChange = !entity.active || entity.type != type || entity.pistonState != EntityPiston.PistonState.RETRACTED
         entity.type = type
         entity.pistonState = EntityPiston.PistonState.RETRACTED
+        if (startPistonExtended) {
+            entity.fullyExtendVanity(engine, currentBeat)
+        }
 
         if (currentBeat < this.beat + this.width && didChange) {
             when (this.type) {

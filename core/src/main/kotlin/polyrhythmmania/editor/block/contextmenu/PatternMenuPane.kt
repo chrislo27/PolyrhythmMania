@@ -21,7 +21,7 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.util.RodinSpecialChars
 
 
-class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
+class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, val clearType: CubeType)
     : Pane() {
 
     init {
@@ -71,7 +71,18 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
                         this.bounds.width.set(blockSize * 1.5f)
                         this.bounds.height.set(blockSize * 0.75f)
                         this.setOnAction {
-                            buttons.forEach { it.cube.set(CubeType.NONE) }
+                            buttons.forEach { it.cube.set(clearType) }
+                        }
+                        (this.skin.getOrCompute() as ButtonSkin).also { skin ->
+                            listOf(skin.defaultBgColor, skin.disabledBgColor, skin.hoveredBgColor,
+                                    skin.pressedAndHoveredBgColor, skin.pressedBgColor,
+                                    skin.defaultTextColor, skin.disabledTextColor, skin.hoveredTextColor,
+                                    skin.pressedAndHoveredTextColor, skin.pressedTextColor).forEach {
+                                val color = it.getOrCompute()
+                                color.r = 1f - color.r
+                                color.g = 1f - color.g
+                                color.b = 1f - color.b
+                            }
                         }
                     })
                 })
@@ -119,8 +130,10 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
                 val palette = editorPane.palette
                 when (this@CubeButton.cube.use()) {
                     CubeType.NONE -> palette.blockFlatNoneRegion
+                    CubeType.NO_CHANGE -> palette.blockFlatNoChangeRegion
                     CubeType.PLATFORM -> palette.blockFlatPlatformRegion
                     CubeType.PISTON -> if (isA) palette.blockFlatPistonARegion else palette.blockFlatPistonDpadRegion
+                    CubeType.PISTON_OPEN -> if (isA) palette.blockFlatPistonAOpenRegion else palette.blockFlatPistonDpadOpenRegion
                 }
             }
             addChild(image)
@@ -133,13 +146,13 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData)
 
         init {
             setOnAction {
-                val values = CubeType.VALUES
+                val values = data.allowedCubeTypes
                 val current = this.cube.getOrCompute()
                 val currentIndex = values.indexOf(current)
                 this.cube.set(values[(currentIndex + 1) % values.size])
             }
             setOnAltAction {
-                val values = CubeType.VALUES
+                val values = data.allowedCubeTypes
                 val current = this.cube.getOrCompute()
                 val currentIndex = values.indexOf(current)
                 this.cube.set(values[(currentIndex - 1 + values.size) % values.size])

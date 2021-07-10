@@ -20,9 +20,10 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
 
     companion object {
         val ROW_COUNT: Int = 10
+        val ALLOWED_CUBE_TYPES: List<CubeType> by lazy { PatternBlockData.GENERAL_CUBE_TYPES }
     }
 
-    var patternData: PatternBlockData = PatternBlockData(ROW_COUNT).also { patternData ->
+    var patternData: PatternBlockData = PatternBlockData(ROW_COUNT, ALLOWED_CUBE_TYPES, CubeType.NONE).also { patternData ->
         // Default settings.
         patternData.rowATypes[0] = CubeType.PISTON
         patternData.rowATypes[2] = CubeType.PISTON
@@ -142,7 +143,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
         return ContextMenu().also { ctxmenu ->
             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.spawnPattern"), editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(SeparatorMenuItem())
-            patternData.createMenuItems(editor).forEach { ctxmenu.addMenuItem(it) }
+            patternData.createMenuItems(editor, CubeType.NONE).forEach { ctxmenu.addMenuItem(it) }
             ctxmenu.addMenuItem(SeparatorMenuItem())
             ctxmenu.addMenuItem(CheckBoxMenuItem.create(disableTailEnd,
                     Localization.getValue("blockContextMenu.spawnPattern.deployTailEnd"),
@@ -171,7 +172,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INP
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        this.patternData = PatternBlockData.readFromJson(obj) ?: this.patternData 
+        this.patternData = PatternBlockData.readFromJson(obj, ALLOWED_CUBE_TYPES) ?: this.patternData 
         val disableTailEndValue = obj.get("disableTailEnd")
         if (disableTailEndValue != null && disableTailEndValue.isBoolean) {
             disableTailEnd.set(disableTailEndValue.asBoolean())

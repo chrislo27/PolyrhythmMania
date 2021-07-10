@@ -1,8 +1,6 @@
 package polyrhythmmania.editor.block
 
 import com.eclipsesource.json.JsonObject
-import paintbox.binding.Var
-import paintbox.ui.contextmenu.CheckBoxMenuItem
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
@@ -19,12 +17,13 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(Bloc
 
     companion object {
         val ROW_COUNT: Int = 10
+        val ALLOWED_CUBE_TYPES: List<CubeType> by lazy { PatternBlockData.SELECTIVE_SPAWN_CUBE_TYPES }
     }
 
-    var patternData: PatternBlockData = PatternBlockData(ROW_COUNT)
+    var patternData: PatternBlockData = PatternBlockData(ROW_COUNT, ALLOWED_CUBE_TYPES, CubeType.NO_CHANGE)
         private set
-    val overwriteA: Var<Boolean> = Var(true)
-    val overwriteDpad: Var<Boolean> = Var(true)
+//    val overwriteA: Var<Boolean> = Var(true)
+//    val overwriteDpad: Var<Boolean> = Var(true)
 
     init {
         this.width = 0.5f
@@ -45,15 +44,19 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(Bloc
     private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityPiston.Type): List<Event> {
         val events = mutableListOf<Event>()
         
-        val ow = (if (pistonType == EntityPiston.Type.PISTON_A) overwriteA else overwriteDpad).getOrCompute()
         rowArray.forEachIndexed { index, type ->
-            if (type == CubeType.NONE) {
-                if (ow) {
+            when (type) {
+                CubeType.NO_CHANGE -> { /* Do nothing */}
+                CubeType.NONE -> {
                     events += EventRowBlockDespawn(engine, row, index, beat, false)
                 }
-            } else {
-                events += EventRowBlockSpawn(engine, row, index,
-                        if (type == CubeType.PLATFORM) EntityPiston.Type.PLATFORM else pistonType, beat)
+                CubeType.PISTON, CubeType.PISTON_OPEN -> {
+                    events += EventRowBlockSpawn(engine, row, index, pistonType, beat,
+                            startPistonExtended = type == CubeType.PISTON_OPEN)
+                }
+                CubeType.PLATFORM -> {
+                    events += EventRowBlockSpawn(engine, row, index, EntityPiston.Type.PLATFORM, beat)
+                }
             }
         }
 
@@ -64,14 +67,7 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(Bloc
         return ContextMenu().also { ctxmenu ->
             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.selectiveSpawn"), editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(SeparatorMenuItem())
-            patternData.createMenuItems(editor).forEach { ctxmenu.addMenuItem(it) }
-            ctxmenu.addMenuItem(SeparatorMenuItem())
-            ctxmenu.addMenuItem(CheckBoxMenuItem.create(overwriteA,
-                    Localization.getValue("blockContextMenu.selectiveSpawn.overwriteA"),
-                    editor.editorPane.palette.markup))
-            ctxmenu.addMenuItem(CheckBoxMenuItem.create(overwriteDpad,
-                    Localization.getValue("blockContextMenu.selectiveSpawn.overwriteDpad"),
-                    editor.editorPane.palette.markup))
+            patternData.createMenuItems(editor, CubeType.NO_CHANGE).forEach { ctxmenu.addMenuItem(it) }
         }
     }
 
@@ -82,22 +78,36 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(Bloc
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }
-            it.overwriteA.set(this.overwriteA.getOrCompute())
-            it.overwriteDpad.set(this.overwriteDpad.getOrCompute())
         }
     }
 
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
         patternData.writeToJson(obj)
-        obj.add("overwriteA", overwriteA.getOrCompute())
-        obj.add("overwriteDpad", overwriteDpad.getOrCompute())
     }
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        this.patternData = PatternBlockData.readFromJson(obj) ?: this.patternData
-        overwriteA.set(obj.getBoolean("overwriteA", true))
-        overwriteDpad.set(obj.getBoolean("overwriteDpad", true))
+        this.patternData = PatternBlockData.readFromJson(obj, ALLOWED_CUBE_TYPES) ?: this.patternData
+        
+        // Legacy system loading
+        val overwriteA = obj.get("overwriteA")?.takeIf { it.isBoolean }?.asBoolean() ?: true
+        val overwriteDpad = obj.get("overwriteDpad")?.takeIf { it.isBoolean }?.asBoolean() ?: true
+        if (!overwriteA) {
+            val types = this.patternData.rowATypes
+            types.forEachIndexed { index, cubeType -> 
+                if (cubeType == CubeType.NONE) {
+                    types[index] = CubeType.NO_CHANGE
+                }
+            }
+        }
+        if (!overwriteDpad) {
+            val types = this.patternData.rowDpadTypes
+            types.forEachIndexed { index, cubeType ->
+                if (cubeType == CubeType.NONE) {
+                    types[index] = CubeType.NO_CHANGE
+                }
+            }
+        }
     }
 }

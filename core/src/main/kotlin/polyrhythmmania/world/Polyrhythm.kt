@@ -34,9 +34,15 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
     init {
         this.position.y = baseY - 1f // Start in the ground
     }
+    
+    fun fullyExtendVanity(engine: Engine, beat: Float) {
+        super.fullyExtend(engine, beat)
+        row.updateInputIndicators()
+    }
 
     override fun fullyExtend(engine: Engine, beat: Float) {
         super.fullyExtend(engine, beat)
+        row.updateInputIndicators()
 
         when (type) {
             Type.PLATFORM -> {
@@ -60,8 +66,6 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
                 }
             }
         }
-
-        row.updateInputIndicators()
     }
 
     override fun retract(): Boolean {

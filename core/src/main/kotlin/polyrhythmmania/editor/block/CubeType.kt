@@ -5,6 +5,9 @@ enum class CubeType(val jsonId: Int) {
     NONE(0),
     PISTON(1),
     PLATFORM(2),
+    
+    NO_CHANGE(3),
+    PISTON_OPEN(4),
     ;
 
     companion object {
