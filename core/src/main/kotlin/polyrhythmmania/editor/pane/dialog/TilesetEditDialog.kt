@@ -54,6 +54,9 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
             baseTileset?.let { ResetDefault(it) }
     )
     private var resetDefault: ResetDefault = availableResetDefaults.first()
+    private val tempTileset: Tileset = Tileset(AssetRegistry.get<PackedSheet>("tileset_parts")).apply {
+        tilesetConfig.applyTo(this)
+    }
 
     val groupFaceYMapping: ColorMappingGroupedCubeFaceY = ColorMappingGroupedCubeFaceY("groupCubeFaceYMapping")
     val groupPistonFaceZMapping: ColorMappingGroupedPistonFaceZ = ColorMappingGroupedPistonFaceZ("groupPistonFaceZMapping")
@@ -159,9 +162,14 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                                 this.bounds.height.set(40f)
                                 this.setOnAction {
                                     val currentMapping = currentMapping.getOrCompute()
-                                    val defaultColor = resetDefault.baseConfig.allMappingsByID.getValue(currentMapping.id).color.getOrCompute()
-                                    currentMapping.color.set(defaultColor.cpy())
-                                    applyCurrentMappingToPreview(defaultColor)
+                                    val baseConfig = resetDefault.baseConfig
+                                    baseConfig.allMappings.forEach { baseMapping ->
+                                        val m = tilesetConfig.allMappingsByID.getValue(baseMapping.id)
+                                        val baseColor = baseMapping.color.getOrCompute()
+                                        m.color.set(baseColor.cpy())
+                                    }
+                                    tilesetConfig.applyTo(tempTileset)
+                                    currentMapping.color.set(currentMapping.tilesetGetter(tempTileset).getOrCompute().cpy())
                                     updateColourPickerToMapping()
                                 }
                             }
@@ -313,9 +321,12 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                             val jsonValue = Json.parse(clipboard.contents)
                             if (jsonValue.isObject) {
                                 tilesetConfig.fromJson(jsonValue.asObject())
-                                applyCurrentMappingToPreview(currentMapping.getOrCompute().color.getOrCompute())
                                 tilesetConfig.applyTo(objPreview.worldRenderer.tileset)
+//                                applyCurrentMappingToPreview(currentMapping.getOrCompute().color.getOrCompute())
+                                resetGroupMappingsToTileset()
+                                shouldColorPickerUpdateUpdateTileset = false
                                 updateColourPickerToMapping()
+                                shouldColorPickerUpdateUpdateTileset = true
                             }
                         } catch (ignored: Exception) {}
                     }
