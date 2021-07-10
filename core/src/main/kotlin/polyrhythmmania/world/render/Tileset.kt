@@ -127,6 +127,5 @@ class Tileset(val packedSheet: PackedSheet) {
 }
 
 class TintedRegion(val region: TextureRegion, initColor: Color = Color.WHITE) {
-    val colorObj: Color = Color(1f, 1f, 1f, 1f).set(initColor)
-    val color: Var<Color> = Var(colorObj)
+    val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f).set(initColor))
 }

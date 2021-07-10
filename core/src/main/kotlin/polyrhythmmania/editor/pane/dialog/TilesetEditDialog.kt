@@ -29,9 +29,11 @@ import polyrhythmmania.ui.ColourPicker
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.*
+import polyrhythmmania.world.render.ColorMapping
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer
+import kotlin.math.sign
 
 
 class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig,
@@ -53,16 +55,29 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     )
     private var resetDefault: ResetDefault = availableResetDefaults.first()
 
-    val currentMapping: Var<TilesetConfig.ColorMapping> = Var(tilesetConfig.allMappings[0])
+    val groupFaceYMapping: ColorMappingGroupedCubeFaceY = ColorMappingGroupedCubeFaceY("groupCubeFaceYMapping")
+    val groupPistonFaceZMapping: ColorMappingGroupedPistonFaceZ = ColorMappingGroupedPistonFaceZ("groupPistonFaceZMapping")
+    private val groupMappings: List<ColorMapping> = listOf(groupFaceYMapping, groupPistonFaceZMapping)
+    val allMappings: List<ColorMapping> = groupMappings + tilesetConfig.allMappings
+    val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
+    val currentMapping: Var<ColorMapping> = Var(allMappings[0])
     
     val objPreview: ObjectPreview = ObjectPreview()
     val colourPicker: ColourPicker = ColourPicker(false, font = editorPane.palette.musicDialogFont).apply { 
         this.setColor(currentMapping.getOrCompute().color.getOrCompute(), true)
     }
+
+    /**
+     * When false, updating the color in [ColourPicker] will NOT apply that colour to the tileset.
+     * Used when switching between colour properties since there's no need for it to be applied
+     */
+    private var shouldColorPickerUpdateUpdateTileset: Boolean = true
     
     private val rodRotation: FloatVar = FloatVar(0f)
 
     init {
+        resetGroupMappingsToTileset()
+        
         this.titleLabel.text.bind { Localization.getVar(titleLocalization).use() }
 
         bottomPane.addChild(Button("").apply {
@@ -94,18 +109,21 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
 
         listVbox.temporarilyDisableLayouts {
             val toggleGroup = ToggleGroup()
-            tilesetConfig.allMappings.forEachIndexed { index, mapping ->
+            allMappings.forEachIndexed { index, mapping ->
                 listVbox += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.object.${mapping.id}").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.textLabel.textColor.set(Color.WHITE.cpy())
                     this.textLabel.margin.set(Insets(0f, 0f, 8f, 8f))
+                    this.textLabel.markup.set(editorPane.palette.markup)
                     this.imageNode.tint.set(Color.WHITE.cpy())
                     this.imageNode.padding.set(Insets(4f))
                     toggleGroup.addToggle(this)
                     this.bounds.height.set(48f)
                     this.onSelected = {
                         currentMapping.set(mapping)
+                        shouldColorPickerUpdateUpdateTileset = false
                         updateColourPickerToMapping(mapping)
+                        shouldColorPickerUpdateUpdateTileset = true
                     }
                     if (index == 0) selectedState.set(true)
                 }
@@ -268,6 +286,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                         m.color.set(baseColor.cpy())
                     }
                     tilesetConfig.applyTo(objPreview.worldRenderer.tileset)
+                    resetGroupMappingsToTileset()
                     updateColourPickerToMapping()
                 }
             }
@@ -308,7 +327,15 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     
     init {
         colourPicker.currentColor.addListener { c ->
-            applyCurrentMappingToPreview(c.getOrCompute().cpy())
+            if (shouldColorPickerUpdateUpdateTileset) {
+                applyCurrentMappingToPreview(c.getOrCompute().cpy())
+            }
+        }
+    }
+    
+    private fun resetGroupMappingsToTileset() {
+        groupMappings.forEach { m ->
+            m.color.set(m.tilesetGetter(objPreview.worldRenderer.tileset).getOrCompute().cpy())
         }
     }
     
@@ -318,7 +345,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
         m.applyTo(objPreview.worldRenderer.tileset)
     }
     
-    private fun updateColourPickerToMapping(mapping: TilesetConfig.ColorMapping = currentMapping.getOrCompute()) {
+    private fun updateColourPickerToMapping(mapping: ColorMapping = currentMapping.getOrCompute()) {
         colourPicker.setColor(mapping.color.getOrCompute(), true)
     }
     
@@ -443,4 +470,66 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
             batch.packedColor = lastPackedColor
         }
     }
+
+    inner class ColorMappingGroupedCubeFaceY(id: String)
+        : ColorMapping(id, { it.cubeFaceY.color }) {
+        
+        private val hsv: FloatArray = FloatArray(3) { 0f }
+
+        override fun applyTo(tileset: Tileset) {
+            val varr = tilesetGetter(tileset)
+            val thisColor = this.color.getOrCompute()
+            varr.set(thisColor.cpy())
+            allMappingsByID.getValue("cubeFaceY").color.set(thisColor.cpy())
+
+            thisColor.toHsv(hsv)
+            hsv[1] = (hsv[1] + 0.18f * hsv[1].sign)
+            hsv[2] = (hsv[2] - 0.17f)
+            val borderColor = Color(1f, 1f, 1f, thisColor.a).fromHsv(hsv)
+            tileset.cubeBorder.color.set(borderColor.cpy())
+            allMappingsByID.getValue("cubeBorder").color.set(borderColor.cpy())
+            tileset.signShadowColor.set(borderColor.cpy())
+            allMappingsByID.getValue("signShadow").color.set(borderColor.cpy())
+
+            hsv[1] = (hsv[1] + 0.03f * hsv[1].sign)
+            hsv[2] = (hsv[2] - 0.13f)
+            val cubeBorderZColor = Color(1f, 1f, 1f, thisColor.a).fromHsv(hsv)
+            tileset.cubeBorderZ.color.set(cubeBorderZColor)
+            allMappingsByID.getValue("cubeBorderZ").color.set(cubeBorderZColor.cpy())
+            
+            // Face
+            thisColor.toHsv(hsv)
+            hsv[1] = (hsv[1] + 0.08f * hsv[1].sign)
+            hsv[2] = (hsv[2] - 0.10f)
+            val faceZColor = Color(1f, 1f, 1f, 1f).fromHsv(hsv)
+            tileset.cubeFaceZ.color.set(faceZColor.cpy())
+            allMappingsByID.getValue("cubeFaceZ").color.set(faceZColor.cpy())
+            thisColor.toHsv(hsv)
+            hsv[1] = (hsv[1] + 0.11f * hsv[1].sign)
+            hsv[2] = (hsv[2] - 0.13f)
+            val faceXColor = Color(1f, 1f, 1f, 1f).fromHsv(hsv)
+            tileset.cubeFaceX.color.set(faceXColor.cpy())
+            allMappingsByID.getValue("cubeFaceX").color.set(faceXColor.cpy())
+        }
+    }
+    
+    inner class ColorMappingGroupedPistonFaceZ(id: String)
+        : ColorMapping(id, { it.pistonFaceZColor }) {
+
+        private val hsv: FloatArray = FloatArray(3) { 0f }
+
+        override fun applyTo(tileset: Tileset) {
+            val varr = tilesetGetter(tileset)
+            val thisColor = this.color.getOrCompute()
+            varr.set(thisColor.cpy())
+            allMappingsByID.getValue("pistonFaceZ").color.set(thisColor.cpy())
+
+            thisColor.toHsv(hsv)
+            hsv[2] = (hsv[2] - 0.20f)
+            val pistonFaceX = Color(1f, 1f, 1f, thisColor.a).fromHsv(hsv)
+            tileset.pistonFaceXColor.set(pistonFaceX.cpy())
+            allMappingsByID.getValue("pistonFaceX").color.set(pistonFaceX.cpy())
+        }
+    }
+
 }

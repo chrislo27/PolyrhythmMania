@@ -3,7 +3,6 @@ package polyrhythmmania.world.render
 import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
-import paintbox.binding.Var
 import paintbox.util.gdxutils.set
 
 
@@ -47,29 +46,6 @@ class TilesetConfig {
 
                 signShadow.color.getOrCompute().set(0, 16, 189)
             }
-        }
-    }
-    
-    data class ColorMapping(val id: String, val tilesetGetter: (Tileset) -> Var<Color>,
-                            val canAdjustAlpha: Boolean = false, val fallbackIDs: List<String> = emptyList(),
-                            val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f))) {
-        
-        fun copyFrom(tileset: Tileset) {
-            val varr = tilesetGetter(tileset)
-            color.set(varr.getOrCompute().cpy())
-        }
-        
-        fun applyTo(tileset: Tileset) {
-            val varr = tilesetGetter(tileset)
-            varr.set(color.getOrCompute().cpy())
-        }
-
-        /**
-         * Linear interpolation.
-         */
-        fun applyToLerp(tileset: Tileset) {
-            val varr = tilesetGetter(tileset)
-            varr.set(color.getOrCompute().cpy())
         }
     }
 
