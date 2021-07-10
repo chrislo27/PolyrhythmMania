@@ -149,10 +149,10 @@ class ResultsTextDialog(editorPane: EditorPane)
                             this.text.addListener { t ->
                                 val newText = t.getOrCompute().takeUnless { it.isEmpty() }
                                 if (this.hasFocus.getOrCompute()) {
-                                    resultsText.set(copyFunc(resultsText.getOrCompute(), newText ?: Localization.getValue(defaultText)))
+                                    resultsText.set(copyFunc(resultsText.getOrCompute(), newText ?: ""))
                                 } else {
                                     if (newText == null) {
-                                        resultsText.set(copyFunc(resultsText.getOrCompute(), Localization.getValue(defaultText)))
+                                        resultsText.set(copyFunc(resultsText.getOrCompute(), ""))
                                     }
                                 }
                             }
