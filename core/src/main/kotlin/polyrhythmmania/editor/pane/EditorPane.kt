@@ -139,6 +139,13 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         return createDefaultTooltip { str }
     }
 
+    fun createDefaultBarSeparator(): UIElement {
+        return RectElement(binding = { palette.previewPaneSeparator.use() }).apply {
+            this.bounds.width.set(2f)
+            this.margin.set(Insets(2f, 2f, 0f, 0f))
+        }
+    }
+    
     fun createAnimation(start: Float, end: Float, duration: Float = 0.125f,
                         interpolation: Interpolation = Interpolation.smoother): Animation {
         return Animation(interpolation, duration, start, end)

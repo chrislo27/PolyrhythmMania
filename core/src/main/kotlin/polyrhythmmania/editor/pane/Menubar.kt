@@ -11,10 +11,7 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.Pane
-import paintbox.ui.Tooltip
+import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
@@ -47,11 +44,8 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     private val currentTimeSec: Var<Long> = Var(-1L)
     
     init {
-        fun separator(): Pane {
-            return Pane().apply { 
-                this.bounds.width.set(2f)
-                this.addChild(RectElement(Color.LIGHT_GRAY))
-            }
+        fun separator(): UIElement {
+            return editorPane.createDefaultBarSeparator()
         }
         
         val leftBox: HBox = HBox().apply { 

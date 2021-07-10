@@ -5,10 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
-import paintbox.ui.ImageIcon
-import paintbox.ui.ImageNode
-import paintbox.ui.Pane
+import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.CheckBoxMenuItem
@@ -44,6 +41,9 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         this.borderStyle.set(SolidBorder().apply { this.color.bind { editorPane.palette.upperPaneBorder.use() } })
         this.padding.set(Insets(2f))
 
+        fun separator(): UIElement {
+            return editorPane.createDefaultBarSeparator()
+        }
 
         // Preview section
         previewSection = Pane().apply {
@@ -306,10 +306,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.worldSettings")))
             })
-            leftControlPane.addChild(RectElement(binding = {editorPane.palette.previewPaneSeparator.use()}).apply { 
-                this.bounds.width.set(2f)
-                this.margin.set(Insets(2f, 2f, 0f, 0f))
-            })
+            leftControlPane.addChild(separator())
             leftControlPane.addChild(Button("").apply {
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
