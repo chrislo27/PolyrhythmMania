@@ -2,7 +2,6 @@ package polyrhythmmania.engine
 
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
-import paintbox.Paintbox
 import polyrhythmmania.engine.music.MusicVolMap
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -14,6 +13,7 @@ class MusicData(val engine: Engine) {
     var loopParams: LoopParams = LoopParams.NO_LOOP_FORWARDS
     var firstBeatSec: Float = 0f
     var musicSyncPointBeat: Float = 0f
+    var rate: Float = 1f
 
     var beadsMusic: BeadsMusic? = null
 
@@ -24,7 +24,7 @@ class MusicData(val engine: Engine) {
         if (player != null) {
             val volume = volumeMap.volumeAtBeat(currentBeat)
             player.gain = volume / 100f
-            player.pitch = engine.playbackSpeed
+            player.pitch = rate * engine.playbackSpeed
 
             if (!player.isPaused && !player.context.out.isPaused) {
                 // Player desync correction
@@ -56,7 +56,7 @@ class MusicData(val engine: Engine) {
         if (player != null) {
             if (atSeconds < delaySec) {
                 // Set player position to be negative
-                return (atSeconds - delaySec).toDouble() * 1000.0
+                return (atSeconds - delaySec).toDouble() * 1000.0 * rate
             } else {
                 if (player.loopType == SamplePlayer.LoopType.LOOP_FORWARDS && !player.isLoopInvalid()) {
                     player.prepareStartBuffer()
@@ -66,12 +66,12 @@ class MusicData(val engine: Engine) {
                     val loopDuration = (loopEnd - loopStart)
 
                     return if (adjustedSecs < loopEnd / 1000) {
-                        (adjustedSecs * 1000) % player.musicSample.lengthMs
+                        (adjustedSecs * 1000 * rate) % player.musicSample.lengthMs
                     } else {
-                        (((adjustedSecs * 1000 - loopStart) % loopDuration + loopStart)) % player.musicSample.lengthMs
+                        ((((adjustedSecs * 1000 - loopStart) * rate) % loopDuration + loopStart * rate)) % player.musicSample.lengthMs
                     }
                 } else {
-                    return ((atSeconds - delaySec) * 1000.0)
+                    return ((atSeconds - delaySec) * 1000.0) * rate
                 }
             }
         }

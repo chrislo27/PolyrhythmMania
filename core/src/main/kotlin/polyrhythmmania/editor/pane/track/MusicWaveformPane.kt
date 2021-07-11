@@ -27,16 +27,23 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
         val w = renderBounds.width.get()
         val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
+        
+        // TODO support music data rate rendering
+        // Broken: segments, looping
+        // May need "music seconds" time unit instead of just plain engine seconds
 
         val editor = editorPane.editor
         val engine = editor.engine
+        val engineMusicData = engine.musicData
+        val musicRate: Float = engineMusicData.rate
         val trackView = editor.trackView
         val trackViewBeat = trackView.beat.get()
         val pxPerBeat = trackView.pxPerBeat.get()
         val leftBeat = trackViewBeat
         val rightBeat = trackViewBeat + (w / pxPerBeat)
+
         val leftSec = engine.tempos.beatsToSeconds(leftBeat, disregardSwing = true)
-        val rightSec = engine.tempos.beatsToSeconds(rightBeat, disregardSwing = true)
+        val rightSec = leftSec + (engine.tempos.beatsToSeconds(rightBeat, disregardSwing = true) - leftSec) * musicRate
 
         val segmentsInRenderZone = this.segmentsInRenderZone
         segmentsInRenderZone.clear()
@@ -61,7 +68,6 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                 segmentsInRenderZone.add(tempos.beatsToSeconds(tc.beat, disregardSwing = false))
             }
 
-            val engineMusicData = engine.musicData
             val musicDelaySec = engineMusicData.computeMusicDelaySec()
             val loopParams = engineMusicData.loopParams
             if (loopParams.loopType == SamplePlayer.LoopType.LOOP_FORWARDS) {
@@ -95,13 +101,13 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                 val segmentEndSec: Float = segmentsInRenderZone.getOrNull(segment) ?: rightSec
                 
                 val currentTempo: Float = tempos.tempoAtSeconds(segmentStartSec)
-                val pxPerSec: Float = pxPerBeat / (60f / currentTempo)
+                val pxPerSec: Float = pxPerBeat / (60f / currentTempo) / musicRate
                 
                 // DEBUG red lines at each segment split
-//                val pc = batch.packedColor
-//                batch.setColor(1f, 0f, 0f, 1f)
-//                batch.fillRect(x + blockPxOffset, y - h, 1f, h)
-//                batch.packedColor = pc
+                val pc = batch.packedColor
+                batch.setColor(1f, 0f, 0f, 1f)
+                batch.fillRect(x + blockPxOffset, y - h, 1f, h)
+                batch.packedColor = pc
                 
                 // Find the first music seconds.
                 val musicSeconds = (engineMusicData.getCorrectMusicPlayerPositionAt(segmentStartSec + 0.001f, delaySec = musicDelaySec) / 1000).toFloat()
