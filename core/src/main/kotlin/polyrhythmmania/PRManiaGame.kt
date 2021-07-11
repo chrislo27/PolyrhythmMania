@@ -26,12 +26,10 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.engine.input.InputThresholds
-import polyrhythmmania.engine.input.Score
 import polyrhythmmania.init.AssetRegistryLoadingScreen
 import polyrhythmmania.init.TilesetAssetLoader
-import polyrhythmmania.practice.PracticeAssets
+import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.screen.CrashScreen
-import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.LelandSpecialChars
 import java.io.File
@@ -141,7 +139,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         super.dispose()
         colourPickerHueBar.disposeQuietly()
         colourPickerTransparencyGrid.disposeQuietly()
-        PracticeAssets.disposeQuietly()
+        SidemodeAssets.disposeQuietly()
         try {
             val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
             PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->

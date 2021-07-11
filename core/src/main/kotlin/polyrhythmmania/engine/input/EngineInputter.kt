@@ -61,6 +61,14 @@ class EngineInputter(val engine: Engine) {
             failed = false
         }
     }
+    
+    class EndlessScore {
+        val score: Var<Int> = Var(0)
+        
+        fun reset() {
+            score.set(0)
+        }
+    }
 
     private val world: World = engine.world
     
@@ -68,6 +76,7 @@ class EngineInputter(val engine: Engine) {
     var skillStarBeat: Float = Float.POSITIVE_INFINITY
     val practice: PracticeData = PracticeData()
     val challenge: ChallengeData = ChallengeData()
+    val endlessScore: EndlessScore = EndlessScore()
 
     val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
     var totalExpectedInputs: Int = 0
@@ -97,6 +106,7 @@ class EngineInputter(val engine: Engine) {
         skillStarBeat = Float.POSITIVE_INFINITY
         practice.reset()
         challenge.reset()
+        endlessScore.reset()
     }
     
     fun onAButtonPressed(release: Boolean) {

@@ -1,4 +1,4 @@
-package polyrhythmmania.practice
+package polyrhythmmania.sidemodes.practice
 
 import com.badlogic.gdx.Input
 import net.beadsproject.beads.ugens.SamplePlayer
@@ -13,6 +13,7 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
+import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.*
@@ -274,7 +275,7 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
     override fun initialize() {
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
         
-        val music: BeadsMusic = PracticeAssets.practiceTheme
+        val music: BeadsMusic = SidemodeAssets.practiceTheme
         val musicData = engine.musicData
         musicData.musicSyncPointBeat = 10_000f
         musicData.loopParams = LoopParams(SamplePlayer.LoopType.LOOP_FORWARDS, 0.0, music.musicSample.lengthMs)

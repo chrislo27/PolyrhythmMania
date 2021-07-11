@@ -165,7 +165,6 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     }
 
     fun render(batch: SpriteBatch, engine: Engine) {
-        
         tmpMatrix.set(batch.projectionMatrix)
         camera.update()
         batch.projectionMatrix = camera.combined
@@ -199,127 +198,130 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         batch.projectionMatrix = uiCamera.combined
 
         if (renderUI) {
-            val inputter = engine.inputter
-            
-            moreTimesVar.set(inputter.practice.moreTimes.getOrCompute())
-            val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
-
-            // Skill star
-            val skillStarInput = inputter.skillStarBeat
-            if (skillStarInput.isFinite()) {
-                if (skillStarSpinAnimation > 0) {
-                    skillStarSpinAnimation -= Gdx.graphics.deltaTime / 1f
-                    if (skillStarSpinAnimation < 0)
-                        skillStarSpinAnimation = 0f
-                }
-                if (skillStarPulseAnimation > 0) {
-                    skillStarPulseAnimation -= Gdx.graphics.deltaTime / 0.5f
-                    if (skillStarPulseAnimation < 0)
-                        skillStarPulseAnimation = 0f
-                } else {
-                    // Pulse before skill star input
-                    val threshold = 0.1f
-                    for (i in 0 until 4) {
-                        val beatPoint = engine.tempos.beatsToSeconds(skillStarInput - i)
-                        if (engine.seconds in beatPoint..beatPoint + threshold) {
-                            skillStarPulseAnimation = 0.5f
-                            break
-                        }
-                    }
-                }
-
-                val texColoured = uiSheet["skill_star"]
-                val texGrey = uiSheet["skill_star_grey"]
-
-                val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
-                val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
-                batch.draw(if (inputter.skillStarGotten.getOrCompute()) texColoured else texGrey,
-                        1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
-            }
-            
-            val textBox = engine.activeTextBox
-            textBoxPane.visible.set(textBox != null)
-            if (textBox != null) {
-                textBoxLabel.text.set(textBox.textBox.text)
-                textBoxInputLabel.text.set(if (textBox.secondsTimer > 0f) "" else {
-                    if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f)
-                        RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A
-                })
-            }
-            
-            val challenge = inputter.challenge
-            if (challenge.goingForPerfect) {
-                perfectPane.visible.set(true)
-                challenge.hit = (challenge.hit - Gdx.graphics.deltaTime / (if (challenge.failed) 0.5f else 0.125f)).coerceIn(0f, 1f)
-                
-                perfectIconFlash.opacity.set(if (challenge.failed) 0f else challenge.hit)
-                perfectIcon.visible.set(!challenge.failed)
-                perfectIconFailed.visible.set(challenge.failed)
-                
-                if (challenge.failed && challenge.hit > 0f) {
-                    val maxShake = 3
-                    val x = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
-                    val y = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
-                    perfectIconFailed.bounds.x.set(x)
-                    perfectIconFailed.bounds.y.set(y)
-                } else {
-                    perfectIconFailed.bounds.x.set(0f)
-                    perfectIconFailed.bounds.y.set(0f)
-                }
-            } else {
-                perfectPane.visible.set(false)
-            }
-
-            val clearText = inputter.practice.clearText
-            if (clearText > 0f) {
-                val normalScale = 1f
-                val transitionEnd = 0.15f
-                val transitionStart = 0.2f
-                val scale: Float = when (val progress = 1f - clearText) {
-                    in 0f..transitionStart -> {
-                        Interpolation.exp10Out.apply(normalScale * 2f, normalScale, progress / transitionStart)
-                    }
-                    in (1f - transitionEnd)..1f -> {
-                        Interpolation.exp10Out.apply(normalScale, normalScale * 1.5f, (progress - (1f - transitionEnd)) / transitionEnd)
-                    }
-                    else -> normalScale
-                }
-                val alpha: Float = when (val progress = 1f - clearText) {
-                    in 0f..transitionStart -> {
-                        Interpolation.exp10Out.apply(0f, 1f, progress / transitionStart)
-                    }
-                    in (1f - transitionEnd)..1f -> {
-                        Interpolation.exp10Out.apply(1f, 0f, (progress - (1f - transitionEnd)) / transitionEnd)
-                    }
-                    else -> 1f
-                }
-                val white: Float = when (val progress = 1f - clearText) {
-                    in 0f..transitionStart * 0.75f -> {
-                        Interpolation.linear.apply(1f, 0f, progress / (transitionStart * 0.75f))
-                    }
-                    else -> 0f
-                }
-
-                val paintboxFont = PRManiaGame.instance.fontGamePracticeClear
-                paintboxFont.useFont { font ->
-                    val camera = uiCamera
-                    font.scaleMul(scale)
-                    font.setColor(1f, 1f, MathUtils.lerp(0.125f, 1f, white), alpha)
-                    font.drawCompressed(batch, Localization.getValue("practice.clear"),
-                            0f, camera.viewportHeight / 2f + font.capHeight / 2, camera.viewportWidth, Align.center)
-                    font.scaleMul(1f / scale)
-                }
-                
-                val newValue = (clearText - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f)
-                inputter.practice.clearText = newValue
-            }
-            
-            uiSceneRoot.renderAsRoot(batch)
+            renderUI(batch, engine)
         }
 
         batch.end()
         batch.projectionMatrix = tmpMatrix
+    }
+    
+    private fun renderUI(batch: SpriteBatch, engine: Engine) {
+        val inputter = engine.inputter
 
+        moreTimesVar.set(inputter.practice.moreTimes.getOrCompute())
+        val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
+
+        // Skill star
+        val skillStarInput = inputter.skillStarBeat
+        if (skillStarInput.isFinite()) {
+            if (skillStarSpinAnimation > 0) {
+                skillStarSpinAnimation -= Gdx.graphics.deltaTime / 1f
+                if (skillStarSpinAnimation < 0)
+                    skillStarSpinAnimation = 0f
+            }
+            if (skillStarPulseAnimation > 0) {
+                skillStarPulseAnimation -= Gdx.graphics.deltaTime / 0.5f
+                if (skillStarPulseAnimation < 0)
+                    skillStarPulseAnimation = 0f
+            } else {
+                // Pulse before skill star input
+                val threshold = 0.1f
+                for (i in 0 until 4) {
+                    val beatPoint = engine.tempos.beatsToSeconds(skillStarInput - i)
+                    if (engine.seconds in beatPoint..beatPoint + threshold) {
+                        skillStarPulseAnimation = 0.5f
+                        break
+                    }
+                }
+            }
+
+            val texColoured = uiSheet["skill_star"]
+            val texGrey = uiSheet["skill_star_grey"]
+
+            val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
+            val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
+            batch.draw(if (inputter.skillStarGotten.getOrCompute()) texColoured else texGrey,
+                    1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
+        }
+
+        val textBox = engine.activeTextBox
+        textBoxPane.visible.set(textBox != null)
+        if (textBox != null) {
+            textBoxLabel.text.set(textBox.textBox.text)
+            textBoxInputLabel.text.set(if (textBox.secondsTimer > 0f) "" else {
+                if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f)
+                    RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A
+            })
+        }
+
+        val challenge = inputter.challenge
+        if (challenge.goingForPerfect) {
+            perfectPane.visible.set(true)
+            challenge.hit = (challenge.hit - Gdx.graphics.deltaTime / (if (challenge.failed) 0.5f else 0.125f)).coerceIn(0f, 1f)
+
+            perfectIconFlash.opacity.set(if (challenge.failed) 0f else challenge.hit)
+            perfectIcon.visible.set(!challenge.failed)
+            perfectIconFailed.visible.set(challenge.failed)
+
+            if (challenge.failed && challenge.hit > 0f) {
+                val maxShake = 3
+                val x = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
+                val y = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
+                perfectIconFailed.bounds.x.set(x)
+                perfectIconFailed.bounds.y.set(y)
+            } else {
+                perfectIconFailed.bounds.x.set(0f)
+                perfectIconFailed.bounds.y.set(0f)
+            }
+        } else {
+            perfectPane.visible.set(false)
+        }
+
+        val clearText = inputter.practice.clearText
+        if (clearText > 0f) {
+            val normalScale = 1f
+            val transitionEnd = 0.15f
+            val transitionStart = 0.2f
+            val scale: Float = when (val progress = 1f - clearText) {
+                in 0f..transitionStart -> {
+                    Interpolation.exp10Out.apply(normalScale * 2f, normalScale, progress / transitionStart)
+                }
+                in (1f - transitionEnd)..1f -> {
+                    Interpolation.exp10Out.apply(normalScale, normalScale * 1.5f, (progress - (1f - transitionEnd)) / transitionEnd)
+                }
+                else -> normalScale
+            }
+            val alpha: Float = when (val progress = 1f - clearText) {
+                in 0f..transitionStart -> {
+                    Interpolation.exp10Out.apply(0f, 1f, progress / transitionStart)
+                }
+                in (1f - transitionEnd)..1f -> {
+                    Interpolation.exp10Out.apply(1f, 0f, (progress - (1f - transitionEnd)) / transitionEnd)
+                }
+                else -> 1f
+            }
+            val white: Float = when (val progress = 1f - clearText) {
+                in 0f..transitionStart * 0.75f -> {
+                    Interpolation.linear.apply(1f, 0f, progress / (transitionStart * 0.75f))
+                }
+                else -> 0f
+            }
+
+            val paintboxFont = PRManiaGame.instance.fontGamePracticeClear
+            paintboxFont.useFont { font ->
+                val camera = uiCamera
+                font.scaleMul(scale)
+                font.setColor(1f, 1f, MathUtils.lerp(0.125f, 1f, white), alpha)
+                font.drawCompressed(batch, Localization.getValue("practice.clear"),
+                        0f, camera.viewportHeight / 2f + font.capHeight / 2, camera.viewportWidth, Align.center)
+                font.scaleMul(1f / scale)
+            }
+
+            val newValue = (clearText - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f)
+            inputter.practice.clearText = newValue
+        }
+
+        uiSceneRoot.renderAsRoot(batch)
     }
 
     fun getDebugString(): String {

@@ -1,4 +1,4 @@
-package polyrhythmmania.practice
+package polyrhythmmania.sidemodes.practice
 
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine

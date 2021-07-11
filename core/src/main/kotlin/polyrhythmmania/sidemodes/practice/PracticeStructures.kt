@@ -1,4 +1,4 @@
-package polyrhythmmania.practice
+package polyrhythmmania.sidemodes.practice
 
 import com.badlogic.gdx.math.MathUtils
 import polyrhythmmania.editor.block.Block

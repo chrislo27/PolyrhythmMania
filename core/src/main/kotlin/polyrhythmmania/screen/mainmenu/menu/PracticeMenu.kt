@@ -14,8 +14,8 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.practice.Practice
-import polyrhythmmania.practice.PracticeBasic
+import polyrhythmmania.sidemodes.practice.Practice
+import polyrhythmmania.sidemodes.practice.PracticeBasic
 import polyrhythmmania.screen.PlayScreen
 
 

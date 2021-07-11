@@ -1,4 +1,5 @@
-package polyrhythmmania.practice
+package polyrhythmmania.sidemodes
+
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Disposable
@@ -11,8 +12,8 @@ import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.world.WorldSettings
 
 
-abstract class Practice(val main: PRManiaGame) : Disposable {
-    
+abstract class SideMode(val main: PRManiaGame) : Disposable {
+
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
         this.audioContext.out.gain = main.settings.gameplayVolume.getOrCompute() / 100f
     }
@@ -23,13 +24,8 @@ abstract class Practice(val main: PRManiaGame) : Disposable {
         true
     }
     val container: Container = Container(soundSystem, timingProvider)
-    
+
     val engine: Engine = container.engine
-    
-    init {
-        container.world.showInputFeedback = true // Overrides user settings
-        container.world.worldSettings = WorldSettings(showInputIndicators = true)
-    }
 
     /**
      * Call the first time to initialize the practice scene.
@@ -37,12 +33,12 @@ abstract class Practice(val main: PRManiaGame) : Disposable {
     fun prepare() {
         initialize()
     }
-    
+
     /**
      * Implementors should set up music and other long-load items here.
      */
     protected abstract fun initialize()
-    
+
     override fun dispose() {
         container.disposeQuietly()
     }

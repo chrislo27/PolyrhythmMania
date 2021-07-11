@@ -1,17 +1,15 @@
-package polyrhythmmania.practice
+package polyrhythmmania.sidemodes
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.StreamUtils
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 
-
 /**
- * Holds some common practice mode assets like the music.
+ * Holds some common side mode assets like the practice music.
  */
-object PracticeAssets : Disposable {
+object SidemodeAssets : Disposable {
     
     val practiceTheme: BeadsMusic by lazy { GdxAudioReader.newMusic(Gdx.files.internal("music/practice.ogg"), null) }
 
