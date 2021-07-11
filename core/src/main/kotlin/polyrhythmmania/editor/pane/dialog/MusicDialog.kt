@@ -425,19 +425,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.bounds.width.set(220f)
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.enableLooping.tooltip")))
                 }
-                hbox.addChild(CheckBox(binding = { Localization.getVar("editor.dialog.music.settings.enableLooping").use() }, font = editorPane.palette.musicDialogFont).apply {
-                    this.checkedState.set(window.doLooping.getOrCompute())
-                    window.doLooping.addListener {
-                        this.checkedState.set(it.getOrCompute())
-                    }
-                    this.checkedState.addListener {
-                        window.doLooping.set(it.getOrCompute())
-                    }
-                    this.imageNode.tint.set(Color.WHITE.cpy())
-                    this.textLabel.textColor.set(Color.WHITE.cpy())
-                    this.bounds.width.set(220f)
-                    this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.enableLooping.tooltip")))
-                })
+                hbox.addChild(lCheckBox!!)
                 hbox.addChild(Button(binding = { Localization.getVar("editor.dialog.music.settings.resetLoopPoints").use() }, font = editorPane.palette.musicDialogFont).apply {
                     this.applyDialogStyleContent()
                     this.bounds.width.set(250f)
@@ -509,16 +497,17 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         // Copy over music details
         this.window.firstBeat.set(editor.musicData.firstBeatSec.get())
         val loopParams = editor.musicData.loopParams.getOrCompute()
-        if (loopParams == LoopParams.NO_LOOP_FORWARDS) {
+        if (loopParams.loopType == SamplePlayer.LoopType.NO_LOOP_FORWARDS) {
             this.window.doLooping.set(false)
             this.window.loopStart.set(0f)
             this.window.loopEnd.set(0f)
+            loopingCheckbox.checkedState.set(false)
         } else {
             this.window.doLooping.set(true)
             this.window.loopStart.set((loopParams.startPointMs / 1000).toFloat())
             this.window.loopEnd.set((loopParams.endPointMs / 1000).toFloat())
+            loopingCheckbox.checkedState.set(true)
         }
-        loopingCheckbox.checkedState.set(this.window.doLooping.getOrCompute())
 
         stopMusicPlayback()
 
