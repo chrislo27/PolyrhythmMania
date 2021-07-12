@@ -137,6 +137,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     override fun dispose() {
         super.dispose()
+        preferences.putString(PreferenceKeys.LAST_VERSION, PRMania.VERSION.toString()).flush()
         colourPickerHueBar.disposeQuietly()
         colourPickerTransparencyGrid.disposeQuietly()
         SidemodeAssets.disposeQuietly()
