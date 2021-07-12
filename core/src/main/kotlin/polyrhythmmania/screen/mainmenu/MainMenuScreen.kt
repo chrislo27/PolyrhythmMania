@@ -151,7 +151,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private lateinit var framebufferCurrent: FrameBuffer
 
     init {
-        createFramebuffers(Gdx.graphics.width, Gdx.graphics.height, null)
+        val startingWidth = Gdx.graphics.width
+        val startingHeight = Gdx.graphics.height
+        if (startingWidth > 0 && startingHeight > 0) {
+            createFramebuffers(Gdx.graphics.width, Gdx.graphics.height, null)
+        } else {
+            createFramebuffers(PRMania.WIDTH, PRMania.HEIGHT, null)
+        }
 
         val world = container.world
         val renderer = container.renderer
