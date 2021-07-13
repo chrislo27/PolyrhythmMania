@@ -9,6 +9,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.world.World
 
 
 abstract class SideMode(val main: PRManiaGame) : Disposable {
@@ -25,6 +26,7 @@ abstract class SideMode(val main: PRManiaGame) : Disposable {
     val container: Container = Container(soundSystem, timingProvider)
 
     val engine: Engine = container.engine
+    val world: World = engine.world
 
     /**
      * Call the first time to initialize the scene.

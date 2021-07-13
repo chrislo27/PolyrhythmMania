@@ -10,12 +10,13 @@ import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_DETAILED_MARKER_UNDO
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PANNING_DURING_PLAYBACK
+import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
-import polyrhythmmania.PreferenceKeys.SETTINGS_MUSIC_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
+import polyrhythmmania.PreferenceKeys.SETTINGS_MUSIC_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.editor.CameraPanningSetting
@@ -44,6 +45,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_editorHigherAccuracyPreview: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW, Var(true))
     
     private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, Var(InputKeymapKeyboard()))
+            
+    private val kv_endlessDunkHighScore: KeyValue<Int> = KeyValue(ENDLESS_DUNK_HIGHSCORE, Var(0))
 
     val gameplayVolume: Var<Int> = kv_gameplayVolume.value
     val menuMusicVolume: Var<Int> = kv_menuMusicVolume.value
@@ -61,6 +64,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val editorHigherAccuracyPreview: Var<Boolean> = kv_editorHigherAccuracyPreview.value
     
     val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
+    
+    val endlessDunkHighScore: Var<Int> = kv_endlessDunkHighScore.value
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
@@ -82,6 +87,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_editorHigherAccuracyPreview)
         
         prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
+        
+        prefs.getInt(kv_endlessDunkHighScore)
     }
 
     fun persist() {
@@ -102,6 +109,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_editorHigherAccuracyPreview)
                 
                 .putInputKeymapKeyboard(kv_keymapKeyboard)
+                
+                .putInt(kv_endlessDunkHighScore)
 
                 .flush()
     }

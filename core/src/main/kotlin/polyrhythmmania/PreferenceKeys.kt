@@ -27,4 +27,6 @@ object PreferenceKeys {
     
     val KEYMAP_KEYBOARD = "keymap_keyboard"
     
+    val ENDLESS_DUNK_HIGHSCORE = "endlessMode_dunk_highScore"
+    
 }

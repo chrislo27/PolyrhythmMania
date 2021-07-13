@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.font.Markup
 import paintbox.font.TextAlign
@@ -16,6 +17,7 @@ import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
+import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.util.MathHelper
@@ -27,8 +29,8 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
-import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.World
+import polyrhythmmania.world.entity.Entity
 
 
 class WorldRenderer(val world: World, val tileset: Tileset) {
@@ -75,12 +77,16 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         private set
     var entityRenderTimeNano: Long = 0L
         private set
-    
+
     var renderUI: Boolean = true
-    
+
+    val showEndlessModeScore: Var<Boolean> = Var(false)
+    val prevHighScore: Var<Int> = Var(-1)
+    private val currentEndlessScore: Var<Int> = Var(0)
+
     private var skillStarSpinAnimation: Float = 0f
     private var skillStarPulseAnimation: Float = 0f
-    
+
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val textBoxPane: TextboxPane = TextboxPane()
     private val textBoxLabel: TextLabel = TextLabel("")
@@ -91,21 +97,24 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     private val perfectIconFailed: ImageNode
     private val moreTimesLabel: TextLabel = TextLabel("")
     private val moreTimesVar: Var<Int> = Var(0)
+    private val endlessModeScorePane: Pane = Pane()
+    private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
+    private val endlessModeScoreLabel: TextLabel
     
     init {
         val baseMarkup = Markup(mapOf("prmania_icons" to PRManiaGame.instance.fontIcons),
                 TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
-        uiSceneRoot += textBoxPane.apply { 
+        uiSceneRoot += textBoxPane.apply {
             Anchor.TopCentre.configure(textBoxPane, offsetY = 64f)
             this.bounds.width.set(1000f)
             this.bounds.height.set(150f)
             this.padding.set(Insets(16f, 16f, 62f, 62f))
-            this += textBoxLabel.apply { 
+            this += textBoxLabel.apply {
                 this.markup.set(baseMarkup)
                 this.renderAlign.set(Align.center)
                 this.textAlign.set(TextAlign.LEFT)
             }
-            this += textBoxInputLabel.apply { 
+            this += textBoxInputLabel.apply {
                 this.renderAlign.set(Align.right)
                 this.bounds.width.set(48f)
                 this.bounds.height.set(48f)
@@ -125,13 +134,13 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
             this.visible.bind { moreTimesVar.use() > 0 }
         }
         perfectIcon = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect"])
-        perfectIconFailed = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_failed"]).apply { 
+        perfectIconFailed = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_failed"]).apply {
             this.visible.set(false)
         }
-        perfectIconFlash = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_hit"]).apply { 
+        perfectIconFlash = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_hit"]).apply {
             this.opacity.set(0f)
         }
-        uiSceneRoot += perfectPane.apply { 
+        uiSceneRoot += perfectPane.apply {
             Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
             this.bounds.width.set(500f)
             this.bounds.height.set(64f)
@@ -152,13 +161,41 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                 this.setScaleXY(0.6f)
             }
         }
+
+        uiSceneRoot += endlessModeScorePane.apply {
+            this.visible.bind { showEndlessModeScore.use() }
+            Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
+            this.bounds.width.set(400f)
+            this.bounds.height.set(200f)
+
+            val prevTextVar = Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) })
+            this += TextLabel(binding = { prevTextVar.use() },
+                    font = PRManiaGame.instance.fontGameMoreTimes).apply {
+                this.doXCompression.set(false)
+                this.renderAlign.set(Align.topLeft)
+                this.setScaleXY(0.4f)
+                this.bounds.height.set(28f)
+                this.textColor.set(Color(1f, 69f / 255f, 13f / 255f, 1f))
+            }
+            val currentScoreVar = Localization.getVar("play.endless.score", Var { listOf(currentEndlessScore.use()) })
+            endlessModeScoreLabel = TextLabel(binding = { currentScoreVar.use() },
+                    font = PRManiaGame.instance.fontPauseMenuTitle).apply {
+                this.bindHeightToParent(adjust = -32f)
+                Anchor.BottomLeft.configure(this)
+                this.renderAlign.set(Align.topLeft)
+                this.textColor.set(Color(1f, 1f, 1f, 1f))
+                this.scaleX.bind { endlessModeScoreLabelScaleXY.useF() }
+                this.scaleY.bind { endlessModeScoreLabelScaleXY.useF() }
+            }
+            this += endlessModeScoreLabel
+        }
     }
 
     fun fireSkillStar() {
         skillStarSpinAnimation = 1f
         skillStarPulseAnimation = 2f
     }
-    
+
     fun resetAnimations() {
         skillStarSpinAnimation = 0f
         skillStarPulseAnimation = 0f
@@ -194,7 +231,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         }
         this.entitiesRenderedLastCall = entitiesRendered
         this.entityRenderTimeNano = System.nanoTime() - entityRenderTime
-        
+
         batch.projectionMatrix = uiCamera.combined
 
         if (renderUI) {
@@ -204,7 +241,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         batch.end()
         batch.projectionMatrix = tmpMatrix
     }
-    
+
     private fun renderUI(batch: SpriteBatch, engine: Engine) {
         val inputter = engine.inputter
 
@@ -319,6 +356,23 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
             val newValue = (clearText - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f)
             inputter.practice.clearText = newValue
+        }
+
+        if (showEndlessModeScore.getOrCompute()) {
+            val oldScore = currentEndlessScore.getOrCompute()
+            val newScore = engine.inputter.endlessScore.score.getOrCompute()
+            if (oldScore != newScore) {
+                currentEndlessScore.set(newScore)
+                val scaleVar = endlessModeScoreLabelScaleXY
+                if (newScore > oldScore) {
+                    val newScale = 1.25f
+                    scaleVar.set(newScale)
+                    uiSceneRoot.animations.enqueueAnimation(Animation(Interpolation.pow5In, 0.25f, newScale, 1f, delay = 0.15f), scaleVar)
+                } else {
+                    uiSceneRoot.animations.cancelAnimationFor(scaleVar)
+                    scaleVar.set(1f)
+                }
+            }
         }
 
         uiSceneRoot.renderAsRoot(batch)

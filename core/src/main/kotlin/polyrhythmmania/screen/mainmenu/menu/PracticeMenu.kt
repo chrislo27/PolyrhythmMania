@@ -14,9 +14,9 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.sidemodes.practice.Practice
 import polyrhythmmania.sidemodes.practice.PracticeBasic
-import polyrhythmmania.screen.PlayScreen
 
 
 class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -57,7 +57,6 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                     this.onEntryEnd = {
                                         practice.prepare()
-//                                    playScreen.prepareGameStart()
                                         playScreen.resetAndStartOver(false, false)
                                     }
                                 }

@@ -8,6 +8,7 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.EventPlaySFX
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
+import polyrhythmmania.sidemodes.EventIncrementEndlessScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.entity.EntityPiston
@@ -108,7 +109,12 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         collision.bounce = Bounce(this, maxHeight, this.position.x, this.position.y, endX, endY, prevBounce)
         
         if (ace) {
-            engine.addEvent(EventPlaySFX(engine, inputResult.perfectBeat + 2f, "sfx_practice_moretimes_1"))
+            val dunkBeat = inputResult.perfectBeat + 2f
+            engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
+            engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
+            }.apply { 
+                this.beat = dunkBeat
+            })
         }
     }
 

@@ -13,7 +13,8 @@ import polyrhythmmania.world.EntityRodDunk
 import polyrhythmmania.world.WorldMode
 
 
-class DunkMode(main: PRManiaGame) : SideMode(main) {
+class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
+    : EndlessMode(main, prevHighScore) {
     
     init {
         container.world.worldMode = WorldMode.DUNK
