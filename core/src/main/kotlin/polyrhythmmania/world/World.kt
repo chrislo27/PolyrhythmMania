@@ -34,7 +34,7 @@ class World {
     val rowA: Row get() = rows[0]
     val rowDpad: Row get() = rows[1]
     // DUNK
-    val dunkPiston: EntityPiston = EntityPiston(this)
+    val dunkPiston: EntityPistonDunk = EntityPistonDunk(this)
     
     
     init {

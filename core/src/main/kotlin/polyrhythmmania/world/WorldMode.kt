@@ -1,8 +1,8 @@
 package polyrhythmmania.world
 
 
-enum class WorldMode {
-    POLYRHYTHM,
-    DUNK,
-    DASH,
+enum class WorldMode(val showEndlessScore: Boolean) {
+    POLYRHYTHM(false),
+    DUNK(true),
+    DASH(true),
 }

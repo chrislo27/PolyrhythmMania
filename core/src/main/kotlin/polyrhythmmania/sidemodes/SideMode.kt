@@ -9,7 +9,6 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
-import polyrhythmmania.world.WorldSettings
 
 
 abstract class SideMode(val main: PRManiaGame) : Disposable {
@@ -28,7 +27,7 @@ abstract class SideMode(val main: PRManiaGame) : Disposable {
     val engine: Engine = container.engine
 
     /**
-     * Call the first time to initialize the practice scene.
+     * Call the first time to initialize the scene.
      */
     fun prepare() {
         initialize()

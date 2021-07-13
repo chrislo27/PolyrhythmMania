@@ -2,6 +2,7 @@ package polyrhythmmania.engine
 
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.soundsystem.sample.PlayerLike
 import polyrhythmmania.util.Semitones
 
 
@@ -26,7 +27,9 @@ class EventCowbellSFX(engine: Engine, startBeat: Float, val useMeasures: Boolean
     }
 }
 
-class EventApplauseSFX(engine: Engine, startBeat: Float)
+open class EventPlaySFX(engine: Engine, startBeat: Float,
+                   val id: String, val allowOverlap: Boolean = false,
+                   val callback: (PlayerLike) -> Unit = {})
     : Event(engine) {
 
     init {
@@ -35,6 +38,23 @@ class EventApplauseSFX(engine: Engine, startBeat: Float)
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_applause"))
+        val beadsSound = AssetRegistry.get<BeadsSound>(id)
+        if (allowOverlap) {
+            engine.soundInterface.playAudio(beadsSound, callback)
+        } else {
+            engine.soundInterface.playAudioNoOverlap(beadsSound, callback)
+        }
+    }
+}
+
+class EventApplauseSFX(engine: Engine, startBeat: Float)
+    : EventPlaySFX(engine, startBeat, "sfx_applause", allowOverlap = false)
+
+class EventChangePlaybackSpeed(engine: Engine, val newSpeed: Float)
+    : Event(engine) {
+    
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+        engine.playbackSpeed = newSpeed
     }
 }

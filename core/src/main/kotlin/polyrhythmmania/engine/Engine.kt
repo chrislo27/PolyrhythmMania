@@ -158,7 +158,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
 
     fun getDebugString(): String {
         return """TimingProvider: ${DecimalFormats.format("0.000", timingProvider.seconds)} s
-Time: ${DecimalFormats.format("0.000", this.beat)} b / ${DecimalFormats.format("0.000", this.seconds)} s
+Time: ${DecimalFormats.format("0.000", this.beat)} b / ${DecimalFormats.format("0.000", this.seconds)} s / Rate ${DecimalFormats.format("0.##", playbackSpeed * 100)}%
 Events: ${events.size}
 Inputs: ${if (inputter.areInputsLocked) "locked" else "unlocked"} | results: ${inputter.inputResults.size} | totalExpected: ${inputter.totalExpectedInputs}
 Practice: ${if (inputter.practice.practiceModeEnabled) "enabled" else "disabled"} | ${inputter.practice.moreTimes} more times | [${inputter.practice.requiredInputs.joinToString(separator = ", ") { "${it.beat} ${it.inputType}${if (it.wasHit) "!" else ""}" }}]

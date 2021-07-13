@@ -119,6 +119,9 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         listOf("blip", "select", "deselect", "enter_game").forEach {
             AssetRegistry.loadAsset<Sound>("sfx_menu_$it", "sounds/menu/${it}.ogg")
         }
+        listOf("dunk").forEach {
+            AssetRegistry.loadAsset<BeadsSound>("sfx_dunk_$it", "sounds/dunk/${it}.ogg")
+        }
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {

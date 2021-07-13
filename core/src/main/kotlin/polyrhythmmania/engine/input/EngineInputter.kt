@@ -137,44 +137,126 @@ class EngineInputter(val engine: Engine) {
 
     private fun onInput(type: InputType, atSeconds: Float = engine.seconds) {
         if (areInputsLocked || engine.activeTextBox?.textBox?.requiresInput == true) return
+        
         val atBeat = engine.tempos.secondsToBeats(atSeconds)
-        val rowBlockType: EntityPiston.Type = when (type) {
-            InputType.A -> EntityPiston.Type.PISTON_A
-            InputType.DPAD -> EntityPiston.Type.PISTON_DPAD
-        }
+        
+        val worldMode = world.worldMode
+        if (worldMode == WorldMode.POLYRHYTHM) {
+            val rowBlockType: EntityPiston.Type = when (type) {
+                InputType.A -> EntityPiston.Type.PISTON_A
+                InputType.DPAD -> EntityPiston.Type.PISTON_DPAD
+            }
 
-        for (row in world.rows) {
-            row.updateInputIndicators()
-            val activeIndex = row.nextActiveIndex
-            if (activeIndex !in 0 until row.length) continue
-            val rowBlock = row.rowBlocks[activeIndex]
-            if (rowBlock.type != rowBlockType) continue
+            for (row in world.rows) {
+                row.updateInputIndicators()
+                val activeIndex = row.nextActiveIndex
+                if (activeIndex !in 0 until row.length) continue
+                val rowBlock = row.rowBlocks[activeIndex]
+                if (rowBlock.type != rowBlockType) continue
 
-            for (entity in engine.world.entities) {
-                if (entity !is EntityRodPR || entity.row !== row || !entity.acceptingInputs) continue
-                val rod: EntityRodPR = entity
-                rod.updateInputTracking(atBeat)
-                val inputTracker = rod.inputTracker
-                val nextBlockIndex = entity.getCurrentIndexFloor(entity.getPosXFromBeat(atBeat - entity.deployBeat))
-                if (nextBlockIndex !in 0 until entity.row.length) continue // Not in range
-                if (inputTracker.expected[nextBlockIndex] !is EntityRodPR.ExpectedInput.Expected) continue // Not an expected input
-                if (nextBlockIndex != activeIndex) { // Not the current active index
+                for (entity in engine.world.entities) {
+                    if (entity !is EntityRodPR || entity.row !== row || !entity.acceptingInputs) continue
+                    val rod: EntityRodPR = entity
+                    rod.updateInputTracking(atBeat)
+                    val inputTracker = rod.inputTracker
+                    val nextBlockIndex = entity.getCurrentIndexFloor(entity.getPosXFromBeat(atBeat - entity.deployBeat))
+                    if (nextBlockIndex !in 0 until entity.row.length) continue // Not in range
+                    if (inputTracker.expected[nextBlockIndex] !is EntityRodPR.ExpectedInput.Expected) continue // Not an expected input
+                    if (nextBlockIndex != activeIndex) { // Not the current active index
 //                    Paintbox.LOGGER.debug("$rod: Skipping input because nextBlockIndex != activeIndex (${nextBlockIndex} >= ${activeIndex})")
-                    if (activeIndex < nextBlockIndex) {
+                        if (activeIndex < nextBlockIndex) {
+                            missed()
+                        }
+                        continue
+                    }
+                    if (inputTracker.results.any { it.expectedIndex == nextBlockIndex }) { // Prevent potential duplicates
+                        // Technically shouldn't happen since the active index changes when updateInputIndicators is called
+                        Paintbox.LOGGER.debug("$rod: duplicate input for index $nextBlockIndex caught and ignored!")
+                        continue
+                    }
+
+                    // Compare timing
+                    val perfectBeats = rod.deployBeat + 4f + nextBlockIndex / rod.xUnitsPerBeat
+                    val perfectSeconds = engine.tempos.beatsToSeconds(perfectBeats)
+
+                    val differenceSec = atSeconds - perfectSeconds
+                    val minSec = perfectSeconds - InputThresholds.MAX_OFFSET_SEC
+                    val maxSec = perfectSeconds + InputThresholds.MAX_OFFSET_SEC
+
+                    if (atSeconds !in minSec..maxSec) {
+//                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
+                        if (nextBlockIndex == activeIndex) {
+                            missed()
+                        }
+                        continue
+                    }
+
+                    val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
+                    val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
+                    Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
+                    inputTracker.results += inputResult
+
+                    if (practice.practiceModeEnabled && inputResult.inputScore != InputScore.MISS) {
+                        val allWereHit = practice.requiredInputs.all { it.wasHit }
+                        if (!allWereHit) {
+                            practice.requiredInputs.forEach { ri ->
+                                if (!ri.wasHit && ri.inputType == type && MathUtils.isEqual(perfectBeats, ri.beat, BEAT_EPSILON)) {
+                                    ri.wasHit = true
+                                    ri.hitScore = inputResult.inputScore
+                                }
+                            }
+                            if (practice.requiredInputs.all { it.wasHit }) {
+                                val newValue = (practice.moreTimes.getOrCompute() - 1).coerceAtLeast(0)
+                                practice.moreTimes.set(newValue)
+                                if (newValue == 0) {
+                                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_2"))
+                                    practice.clearText = 1f
+                                } else {
+                                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_1"))
+                                }
+                            }
+                        }
+                    }
+
+                    val inputFeedbackIndex: Int = when (inputResult.inputScore) {
+                        InputScore.ACE -> 2
+                        InputScore.GOOD -> if (inputResult.accuracySec < 0f) 1 else 3
+                        InputScore.BARELY -> if (inputResult.accuracySec < 0f) 0 else 4
+                        InputScore.MISS -> -1
+                    }
+                    if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
+                        inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
+                    }
+
+                    // Bounce the rod
+                    if (inputResult.inputScore != InputScore.MISS) {
+                        rod.bounce(nextBlockIndex)
+                        if (inputResult.inputScore == InputScore.ACE) {
+                            attemptSkillStar(perfectBeats)
+                        }
+                        if (challenge.goingForPerfect && !challenge.failed) {
+                            challenge.hit = 1f
+                        }
+                    } else {
                         missed()
                     }
-                    continue
                 }
-                if (inputTracker.results.any { it.expectedIndex == nextBlockIndex }) { // Prevent potential duplicates
-                    // Technically shouldn't happen since the active index changes when updateInputIndicators is called
-                    Paintbox.LOGGER.debug("$rod: duplicate input for index $nextBlockIndex caught and ignored!")
-                    continue
-                }
-                
+
+                // Trigger this piston (will also call updateInputIndicators)
+                rowBlock.fullyExtend(engine, atBeat)
+            }
+        } else if (worldMode == WorldMode.DUNK && type == InputType.A) {
+            for (entity in engine.world.entities) {
+                if (entity !is EntityRodDunk) continue
+                val rod: EntityRodDunk = entity
+                val nextBlockIndex = entity.getCurrentIndexFloor(entity.getPosXFromBeat(atBeat - entity.deployBeat))
+                val activeIndex = 0
+                if (nextBlockIndex != activeIndex) continue // Not in range
+
                 // Compare timing
-                val perfectBeats = rod.deployBeat + 4f + nextBlockIndex / rod.xUnitsPerBeat
+                val perfectBeats = rod.deployBeat + 3f + nextBlockIndex / rod.xUnitsPerBeat
                 val perfectSeconds = engine.tempos.beatsToSeconds(perfectBeats)
-                
+
                 val differenceSec = atSeconds - perfectSeconds
                 val minSec = perfectSeconds - InputThresholds.MAX_OFFSET_SEC
                 val maxSec = perfectSeconds + InputThresholds.MAX_OFFSET_SEC
@@ -186,34 +268,11 @@ class EngineInputter(val engine: Engine) {
                     }
                     continue
                 }
-                
+
                 val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
                 val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
                 Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
-                inputTracker.results += inputResult
-                
-                if (practice.practiceModeEnabled && inputResult.inputScore != InputScore.MISS) {
-                    val allWereHit = practice.requiredInputs.all { it.wasHit }
-                    if (!allWereHit) {
-                        practice.requiredInputs.forEach { ri ->
-                            if (!ri.wasHit && ri.inputType == type && MathUtils.isEqual(perfectBeats, ri.beat, BEAT_EPSILON)) {
-                                ri.wasHit = true
-                                ri.hitScore = inputResult.inputScore
-                            }
-                        }
-                        if (practice.requiredInputs.all { it.wasHit }) {
-                            val newValue = (practice.moreTimes.getOrCompute() - 1).coerceAtLeast(0)
-                            practice.moreTimes.set(newValue)
-                            if (newValue == 0) {
-                                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_2"))
-                                practice.clearText = 1f
-                            } else {
-                                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_1"))
-                            }
-                        }
-                    }
-                }
-                
+
                 val inputFeedbackIndex: Int = when (inputResult.inputScore) {
                     InputScore.ACE -> 2
                     InputScore.GOOD -> if (inputResult.accuracySec < 0f) 1 else 3
@@ -223,23 +282,15 @@ class EngineInputter(val engine: Engine) {
                 if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
                     inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                 }
-                
+
                 // Bounce the rod
                 if (inputResult.inputScore != InputScore.MISS) {
-                    rod.bounce(nextBlockIndex)
-                    if (inputResult.inputScore == InputScore.ACE) {
-                        attemptSkillStar(perfectBeats)
-                    }
-                    if (challenge.goingForPerfect && !challenge.failed) {
-                        challenge.hit = 1f
-                    }
+                    rod.bounce(engine, inputResult)
                 } else {
                     missed()
                 }
             }
-            
-            // Trigger this piston (will also call updateInputIndicators)
-            rowBlock.fullyExtend(engine, atBeat)
+            world.dunkPiston.fullyExtend(engine, atBeat)
         }
     }
     

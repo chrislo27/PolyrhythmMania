@@ -6,15 +6,20 @@ import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.Tooltip
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.practice.Practice
 import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.sidemodes.DunkMode
+import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -74,25 +79,31 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNextMenu(menuCol.practiceMenu)
                 }
             }
-            vbox += createLongButton { Localization.getVar("mainMenu.play.dunk").use() }.apply {
-//                this.tooltipElement.set(Tooltip(binding = { Localization.getVar("${name}.tooltip").use() }, font = this@PracticeMenu.font))
-//                this.setOnAction {
-//                    menuCol.playMenuSound("sfx_menu_enter_game")
-//                    mainMenu.transitionAway {
-//                        val main = mainMenu.main
-//                        Gdx.app.postRunnable {
-//                            val practice: Practice = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-//                            val playScreen = PlayScreen(main, practice.container, Challenges.NO_CHANGES, showResults = false)
-//                            main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
-//                                this.onEntryEnd = {
-//                                    practice.prepare()
-////                                    playScreen.prepareGameStart()
-//                                    playScreen.resetAndStartOver(false, false)
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
+
+            fun createSidemode(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
+                return createLongButton { Localization.getVar(name).use() }.apply {
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("${name}.tooltip").use() }, font = this@PlayMenu.font))
+                    this.setOnAction {
+                        menuCol.playMenuSound("sfx_menu_enter_game")
+                        mainMenu.transitionAway {
+                            val main = mainMenu.main
+                            Gdx.app.postRunnable {
+                                val practice: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
+                                val playScreen = PlayScreen(main, practice.container, Challenges.NO_CHANGES, showResults = false)
+                                main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                                    this.onEntryEnd = {
+                                        practice.prepare()
+//                                    playScreen.prepareGameStart()
+                                        playScreen.resetAndStartOver(false, false)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            vbox += createSidemode("mainMenu.play.dunk") { main, _ ->
+                DunkMode(main)
             }
 //            vbox += createLongButton { Localization.getVar("mainMenu.play.toss").use() }.apply {
 //                
