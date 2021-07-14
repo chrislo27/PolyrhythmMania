@@ -7,19 +7,21 @@ import polyrhythmmania.engine.Event
 import java.util.*
 
 
-class LoopingEvent(engine: Engine, val duration: Float, val block: (engine: Engine, startBeat: Float) -> Unit)
+class LoopingEvent(engine: Engine, val duration: Float, val block: (engine: Engine, startBeat: Float) -> Boolean)
     : Event(engine) {
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        block.invoke(engine, this.beat)
-        engine.addEvent(LoopingEvent(engine, duration, block).also {
-            it.beat = this.beat + duration
-        })
+        val continueLoop = block.invoke(engine, this.beat)
+        if (continueLoop) {
+            engine.addEvent(LoopingEvent(engine, duration, block).also {
+                it.beat = this.beat + duration
+            })
+        }
     }
 }
 
-class LoopingEventBlock(engine: Engine, val duration: Float, val block: (engine: Engine, startBeat: Float) -> Unit)
+class LoopingEventBlock(engine: Engine, val duration: Float, val block: (engine: Engine, startBeat: Float) -> Boolean)
     : Block(engine, EnumSet.allOf(BlockType::class.java)) {
 
     override fun compileIntoEvents(): List<Event> {

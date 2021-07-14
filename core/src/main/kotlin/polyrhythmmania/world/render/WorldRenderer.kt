@@ -184,8 +184,9 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                 Anchor.BottomLeft.configure(this)
                 this.renderAlign.set(Align.topLeft)
                 this.textColor.set(Color(1f, 1f, 1f, 1f))
-                this.scaleX.bind { endlessModeScoreLabelScaleXY.useF() }
-                this.scaleY.bind { endlessModeScoreLabelScaleXY.useF() }
+                val scaleMul = 1f / 1.25f
+                this.scaleX.bind { endlessModeScoreLabelScaleXY.useF() * scaleMul }
+                this.scaleY.bind { endlessModeScoreLabelScaleXY.useF() * scaleMul }
             }
             this += endlessModeScoreLabel
         }

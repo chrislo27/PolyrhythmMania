@@ -1,5 +1,8 @@
 package polyrhythmmania.engine
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Sound
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.soundsystem.BeadsAudio
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
@@ -49,6 +52,13 @@ sealed class SoundInterface {
             }
             return soundSystem.playAudio(audio, callback)
         }
+
+        override fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float) {
+            Gdx.app.postRunnable {
+                PRManiaGame.instance.playMenuSfx(sound, volume, pitch, pan)
+            }
+        }
+        
         override fun setPaused(paused: Boolean) {
             super.setPaused(paused)
             soundSystem.setPaused(paused)
@@ -62,6 +72,9 @@ sealed class SoundInterface {
         
         override fun playAudio(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit): Long {
             return -1L
+        }
+
+        override fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float) {
         }
     }
     
@@ -83,6 +96,11 @@ sealed class SoundInterface {
     
     abstract fun playAudio(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long
     
+    abstract fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float)
+    
+    fun playMenuSfx(sound: Sound, volume: Float) = playMenuSfx(sound, volume, 1f, 0f)
+    fun playMenuSfx(sound: Sound) = playMenuSfx(sound, 1f, 1f, 0f)
+
     fun playAudioNoOverlap(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long {
         if (audio in audioPlayedLastFrame) return -1L
         audioPlayedLastFrame += audio

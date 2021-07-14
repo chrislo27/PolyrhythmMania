@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
+import paintbox.lazysound.LazySound
 import paintbox.packing.Packable
 import paintbox.packing.PackedSheet
 import paintbox.packing.PackedSheetLoader
@@ -106,11 +107,14 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 "spawn_a", "spawn_d", "cowbell",).forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_$it", "sounds/${it}.wav")
         }
-        listOf("text_advance_1", "text_advance_2", "perfect_fail").forEach {
+        listOf("perfect_fail").forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_$it", "sounds/${it}.ogg")
         }
         listOf("moretimes_1", "moretimes_2",).forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_practice_$it", "sounds/practice/${it}.ogg")
+        }
+        listOf("dunk").forEach {
+            AssetRegistry.loadAsset<BeadsSound>("sfx_dunk_$it", "sounds/dunk/${it}.ogg")
         }
         AssetRegistry.loadAsset<BeadsSound>("sfx_skill_star", "sounds/skill_star.ogg")
         listOf("enter", "exit", "robot_off", "robot_on").forEach {
@@ -119,8 +123,11 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         listOf("blip", "select", "deselect", "enter_game").forEach {
             AssetRegistry.loadAsset<Sound>("sfx_menu_$it", "sounds/menu/${it}.ogg")
         }
-        listOf("dunk").forEach {
-            AssetRegistry.loadAsset<BeadsSound>("sfx_dunk_$it", "sounds/dunk/${it}.ogg")
+        listOf("text_advance_1", "text_advance_2").forEach {
+            AssetRegistry.loadAsset<Sound>("sfx_$it", "sounds/${it}.ogg")
+        }
+        listOf("fail_music_hi", "fail_music_nohi").forEach {
+            AssetRegistry.loadAsset<LazySound>("sfx_$it", "sounds/${it}.ogg")
         }
     }
 

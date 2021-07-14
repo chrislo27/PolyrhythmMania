@@ -38,6 +38,8 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         val b = LoopingEventBlock(engine, 4f) { engine, startBeat ->
             engine.addEvent(EventDeployRodDunk(engine, startBeat))
             engine.addEvent(EventPlaySFX(engine, startBeat + 2f, "sfx_dunk_dunk"))
+            
+            true
         }
 
 

@@ -90,7 +90,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.edit").use() }).apply { 
                 this.setOnAction {
-                    AssetRegistry.get<Sound>("sfx_menu_enter_game").play(menuCol.settings.menuSfxVolume.getOrCompute() / 100f)
+                    mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                     mainMenu.transitionAway {
                         val main = mainMenu.main
                         val editorScreen = EditorScreen(main)

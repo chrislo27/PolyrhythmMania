@@ -4,7 +4,10 @@ import com.badlogic.gdx.audio.Sound
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
-import paintbox.ui.*
+import paintbox.ui.Anchor
+import paintbox.ui.Corner
+import paintbox.ui.Pane
+import paintbox.ui.SceneRoot
 import paintbox.util.RectangleStack
 import paintbox.util.Vector2Stack
 import paintbox.util.gdxutils.maxX
@@ -81,7 +84,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     fun changeActiveMenu(menu: MMMenu, backOut: Boolean, instant: Boolean = false, playSound: Boolean = true) {
         if (!instant) {
             if (playSound) {
-                AssetRegistry.get<Sound>("sfx_menu_${if (backOut) "deselect" else "select"}").play(settings.menuSfxVolume.getOrCompute() / 100f)
+                main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_${if (backOut) "deselect" else "select"}"))
             }
             
             val changedBounds = RectangleStack.getAndPush().apply {
@@ -142,13 +145,11 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     fun playBlipSound(volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f) {
         val sound = AssetRegistry.get<Sound>("sfx_menu_blip")
         sound.stop()
-        sound.play(this.settings.menuSfxVolume.getOrCompute() / 100f)
+        main.playMenuSfx(sound)
     }
     
     fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
         val sound: Sound = AssetRegistry[id]
-        val menuSFXVol = this.settings.menuSfxVolume.getOrCompute() / 100f
-        val soundID = sound.play(menuSFXVol * volume, pitch, pan)
-        return sound to soundID
+        return sound to main.playMenuSfx(sound, volume, pitch, pan)
     }
 }

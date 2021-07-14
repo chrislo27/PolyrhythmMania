@@ -7,39 +7,29 @@ import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
-import paintbox.binding.Var
-import paintbox.font.PaintboxFont
-import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
-import paintbox.transition.*
+import paintbox.transition.FadeIn
+import paintbox.transition.FadeOut
+import paintbox.transition.TransitionScreen
+import paintbox.transition.WipeToColor
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
 import paintbox.ui.animation.Animation
-import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.ButtonSkin
-import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
-import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
-import polyrhythmmania.editor.pane.EditorSkins
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.screen.PlayScreen
-import kotlin.math.min
 import kotlin.properties.Delegates
 
 class ResultsScreen(main: PRManiaGame, val score: Score, val container: Container,
@@ -206,7 +196,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
     }
     
     fun playSound(sound: Sound): Long {
-        return sound.play(main.settings.menuSfxVolume.getOrCompute() / 100f)
+        return main.playMenuSfx(sound)
     }
 
     override fun getDebugString(): String {

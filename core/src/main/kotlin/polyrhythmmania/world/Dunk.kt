@@ -5,11 +5,13 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.EventChangePlaybackSpeed
 import polyrhythmmania.engine.EventPlaySFX
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.sidemodes.EventIncrementEndlessScore
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityRod
@@ -112,6 +114,13 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
             val dunkBeat = inputResult.perfectBeat + 2f
             engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
             engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
+                val increaseEvery = 8
+                if (newScore % increaseEvery == 0) {
+                    val pitch = Semitones.getALPitch(newScore / increaseEvery).coerceAtMost(2f)
+                    engine.addEvent(EventChangePlaybackSpeed(engine, pitch).apply { 
+                        this.beat = dunkBeat
+                    })
+                }
             }.apply { 
                 this.beat = dunkBeat
             })
@@ -255,8 +264,13 @@ class EntityPistonDunk(world: World)
     override fun fullyExtend(engine: Engine, beat: Float) {
         super.fullyExtend(engine, beat)
         retractAfter = beat + 0.5f
-        
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_a"))
+
+        when (type) {
+            Type.PLATFORM -> {
+            }
+            Type.PISTON_A -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_a"))
+            Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_d"))
+        }
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {

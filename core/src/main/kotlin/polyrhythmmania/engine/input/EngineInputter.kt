@@ -1,5 +1,6 @@
 package polyrhythmmania.engine.input
 
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.MathUtils
 import paintbox.Paintbox
 import paintbox.binding.Var
@@ -7,7 +8,10 @@ import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.soundsystem.BeadsSound
-import polyrhythmmania.world.*
+import polyrhythmmania.world.EntityRodDunk
+import polyrhythmmania.world.EntityRodPR
+import polyrhythmmania.world.World
+import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.entity.EntityPiston
 
 
@@ -114,12 +118,12 @@ class EngineInputter(val engine: Engine) {
         if (activeTextBox != null && activeTextBox.textBox.requiresInput && activeTextBox.secondsTimer <= 0f) {
             if (!activeTextBox.isADown) {
                 if (!release) {
-                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_text_advance_1"))
+                    engine.soundInterface.playMenuSfx(AssetRegistry.get<Sound>("sfx_text_advance_1"))
                     activeTextBox.isADown = true
                 }
             } else {
                 if (release) {
-                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_text_advance_2"))
+                    engine.soundInterface.playMenuSfx(AssetRegistry.get<Sound>("sfx_text_advance_2"))
                     engine.activeTextBox = null
                 }
             }

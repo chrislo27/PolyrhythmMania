@@ -3,6 +3,7 @@ package polyrhythmmania
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Preferences
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
@@ -10,7 +11,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
-import polyrhythmmania.init.InitialAssetLoader
+import org.lwjgl.glfw.GLFW
+import paintbox.Paintbox
 import paintbox.PaintboxGame
 import paintbox.PaintboxSettings
 import paintbox.ResizeAction
@@ -19,17 +21,16 @@ import paintbox.logging.Logger
 import paintbox.registry.AssetRegistry
 import paintbox.util.ResolutionSetting
 import paintbox.util.WindowSize
-import org.lwjgl.glfw.GLFW
-import paintbox.Paintbox
 import paintbox.util.gdxutils.*
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.EditorScreen
-import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
+import polyrhythmmania.init.InitialAssetLoader
 import polyrhythmmania.init.TilesetAssetLoader
-import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.screen.CrashScreen
+import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.LelandSpecialChars
 import java.io.File
@@ -284,6 +285,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         return res
     }
+    
+    fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float): Long {
+        return sound.play(volume * (settings.menuSfxVolume.getOrCompute() / 100f), pitch, pan)
+    }
+    fun playMenuSfx(sound: Sound, volume: Float = 1f): Long = playMenuSfx(sound, volume, 1f, 0f)
 
     private fun addFontsToCache(cache: FontCache) {
         val emulatedSize = paintboxSettings.emulatedSize
