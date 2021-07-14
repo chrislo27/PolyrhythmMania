@@ -68,9 +68,12 @@ class EngineInputter(val engine: Engine) {
     
     class EndlessScore {
         val score: Var<Int> = Var(0)
+        val maxLives: Var<Int> = Var(0)
+        val lives: Var<Int> = Var(maxLives.getOrCompute())
         
         fun reset() {
             score.set(0)
+            lives.set(maxLives.getOrCompute())
         }
     }
 
@@ -324,6 +327,13 @@ class EngineInputter(val engine: Engine) {
                     player.gain = 0.45f
                 }
             }
+        }
+
+        val worldMode = world.worldMode
+        if (worldMode.showEndlessScore) {
+            val endlessScore = this.endlessScore
+            val newScore = (endlessScore.lives.getOrCompute() - 1).coerceIn(0, endlessScore.maxLives.getOrCompute())
+            endlessScore.lives.set(newScore)
         }
     }
 

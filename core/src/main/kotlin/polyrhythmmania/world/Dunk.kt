@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.EventChangePlaybackSpeed
 import polyrhythmmania.engine.EventPlaySFX
 import polyrhythmmania.engine.input.InputResult
@@ -64,13 +65,15 @@ class EntityDunkBasketFaceX(world: World) : SpriteEntity(world) {
 
 class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBeat) {
 
-    private val killAfterBeats: Float = 12f
+    private val killAfterBeats: Float = 7f
     private val startingX: Float = getPosXFromBeat(0f)
 
     private var explodeAtSec: Float = Float.MAX_VALUE
     var exploded: Boolean = false
         private set
 
+    private var playedDunkSfx: Boolean = false
+    private var aceWasHit: Boolean = false
 
     init {
         this.position.x = startingX
@@ -85,13 +88,15 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         return (4f + 0.5f - 3 * xUnitsPerBeat) + (beatsFromDeploy) * xUnitsPerBeat - (6 / 32f)
     }
 
-    fun explode(engine: Engine) {
+    fun explode(engine: Engine, playSound: Boolean) {
         if (isKilled || exploded) return
         exploded = true
         world.addEntity(EntityExplosion(world, engine.seconds, this.renderWidth).also {
             it.position.set(this.position)
         })
-        playSfxExplosion(engine)
+        if (playSound) {
+            playSfxExplosion(engine)
+        }
         engine.inputter.missed()
     }
 
@@ -109,20 +114,39 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         val maxHeight = if (ace) (calculatedHeight + MathUtils.lerp(-0.2f, 0.2f, lerpResult)) else (calculatedHeight)
         val prevBounce = collision.bounce
         collision.bounce = Bounce(this, maxHeight, this.position.x, this.position.y, endX, endY, prevBounce)
-        
+
+        val dunkBeat = inputResult.perfectBeat + 2f
         if (ace) {
-            val dunkBeat = inputResult.perfectBeat + 2f
-            engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
+            this.aceWasHit = true
             engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
                 val increaseEvery = 8
                 if (newScore % increaseEvery == 0) {
+                    // Increment lives
+                    engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_2"))
+                    val endlessScore = engine.inputter.endlessScore
+                    val newLives = (endlessScore.lives.getOrCompute() + 1).coerceIn(0, endlessScore.maxLives.getOrCompute())
+                    endlessScore.lives.set(newLives)
+
                     val pitch = Semitones.getALPitch(newScore / increaseEvery).coerceAtMost(2f)
                     engine.addEvent(EventChangePlaybackSpeed(engine, pitch).apply { 
                         this.beat = dunkBeat
                     })
+                } else {
+                    engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
                 }
             }.apply { 
                 this.beat = dunkBeat
+            })
+        } else {
+            engine.addEvent(object : Event(engine) {
+                init {
+                    this.beat = dunkBeat
+                }
+
+                override fun onStart(currentBeat: Float) {
+                    super.onStart(currentBeat)
+                    explode(engine, true)
+                }
             })
         }
     }
@@ -130,10 +154,18 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         super.engineUpdate(engine, beat, seconds)
+        
+        if (!isKilled && !playedDunkSfx && (beat - deployBeat) >= 2f) {
+            playedDunkSfx = true
+            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_dunk_dunk"))
+        }
 
         if (seconds >= explodeAtSec && !exploded) {
-            explode(engine)
+            explode(engine, true)
         } else if ((beat - deployBeat) >= killAfterBeats && !isKilled) {
+            if (!aceWasHit) {
+                explode(engine, true)
+            }
             kill()
         }
     }

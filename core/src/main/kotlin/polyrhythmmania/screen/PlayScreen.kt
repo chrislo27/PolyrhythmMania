@@ -23,7 +23,10 @@ import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.transition.*
-import paintbox.ui.*
+import paintbox.ui.Anchor
+import paintbox.ui.Pane
+import paintbox.ui.SceneRoot
+import paintbox.ui.UIElement
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -373,6 +376,11 @@ class PlayScreen(
     }
 
     private fun pauseGame(playSound: Boolean) {
+        val endlessScore = engine.inputter.endlessScore
+        if (endlessScore.lives.getOrCompute() <= 0 && endlessScore.maxLives.getOrCompute() > 0) {
+            return // No pausing
+        }
+        
         isPaused = true
         soundSystem.setPaused(true)
         Gdx.input.isCursorCatched = false
@@ -420,6 +428,7 @@ class PlayScreen(
         }
         val thisScreen: PlayScreen = this
         val resetAction: () -> Unit = {
+            challenges.applyToEngine(engine)
             val blocks = container.blocks.toList()
             engine.removeEvents(engine.events.toList())
             engine.addEvents(blocks.flatMap { it.compileIntoEvents() })

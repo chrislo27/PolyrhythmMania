@@ -5,7 +5,6 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.EventPlaySFX
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -18,6 +17,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     
     init {
         container.world.worldMode = WorldMode.DUNK
+        container.engine.inputter.endlessScore.maxLives.set(5)
     }
     
     override fun initialize() {
@@ -35,11 +35,10 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
-        val b = LoopingEventBlock(engine, 4f) { engine, startBeat ->
+        val b = LoopingEventBlock(engine, 4f, { engine ->
+            engine.inputter.endlessScore.lives.getOrCompute() > 0
+        }) { engine, startBeat ->
             engine.addEvent(EventDeployRodDunk(engine, startBeat))
-            engine.addEvent(EventPlaySFX(engine, startBeat + 2f, "sfx_dunk_dunk"))
-            
-            true
         }
 
 

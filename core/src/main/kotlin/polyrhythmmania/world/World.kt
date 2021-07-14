@@ -70,8 +70,20 @@ class World {
     
     fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         val entities = this.entities as MutableList
+        
         entities.forEach { entity ->
             entity.engineUpdate(engine, beat, seconds)
+        }
+
+        if (worldMode == WorldMode.DUNK) {
+            if (engine.inputter.endlessScore.lives.getOrCompute() <= 0) {
+                entities.forEach {
+                    if (it is EntityRodDunk && !it.exploded) {
+                        it.explode(engine, playSound = false)
+                        it.kill()
+                    }
+                }
+            }
         }
         
         // Remove killed entities
