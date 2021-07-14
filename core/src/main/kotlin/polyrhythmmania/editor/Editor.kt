@@ -5,7 +5,9 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -22,19 +24,22 @@ import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.util.MathHelper
 import paintbox.util.Vector2Stack
-import paintbox.util.gdxutils.*
+import paintbox.util.gdxutils.disposeQuietly
+import paintbox.util.gdxutils.isAltDown
+import paintbox.util.gdxutils.isControlDown
+import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
-import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockTilesetChange
+import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.music.EditorMusicData
+import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.pane.dialog.EditorDialog
 import polyrhythmmania.editor.pane.dialog.MusicDialog
 import polyrhythmmania.editor.undo.ActionGroup
@@ -51,14 +56,13 @@ import polyrhythmmania.soundsystem.*
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.EventDeployRod
-import polyrhythmmania.world.entity.TemporaryEntity
 import polyrhythmmania.world.World
+import polyrhythmmania.world.entity.TemporaryEntity
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.collections.LinkedHashMap
 import kotlin.concurrent.thread
 import kotlin.math.floor
 
@@ -694,7 +698,7 @@ class Editor(val main: PRManiaGame)
         var width = Gdx.graphics.width.toFloat()
         var height = Gdx.graphics.height.toFloat()
         // UI scale
-        val uiScale = 1f
+        val uiScale = 1f //(width / 1280f).coerceAtLeast(0f)
         width /= uiScale
         height /= uiScale
         if (width < 1280f || height < 720f) {

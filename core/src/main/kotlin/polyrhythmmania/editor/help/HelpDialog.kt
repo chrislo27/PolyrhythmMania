@@ -17,7 +17,10 @@ import paintbox.ui.ImageNode
 import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
-import paintbox.ui.control.*
+import paintbox.ui.control.Button
+import paintbox.ui.control.ScrollPane
+import paintbox.ui.control.ScrollPaneSkin
+import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
@@ -100,10 +103,14 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
 
         helpData.currentDocument.addListener { d ->
             val doc = d.getOrCompute()
-            if (doc != null) {
-                scrollPane.setContent(renderer.renderDocument(helpData, doc))
+            val newContent = if (doc != null) {
+                renderer.renderDocument(helpData, doc)
             } else {
-                scrollPane.setContent(RectElement(Color.RED))
+                RectElement(Color.RED)
+            }
+            if (scrollPane.getContent() != newContent) {
+                scrollPane.vBar.setValue(0f)
+                scrollPane.setContent(newContent)
             }
         }
 
