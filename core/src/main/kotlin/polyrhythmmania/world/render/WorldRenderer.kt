@@ -21,6 +21,7 @@ import paintbox.ui.SceneRoot
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.drawCompressed
@@ -103,10 +104,28 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     private val endlessModeScorePane: Pane = Pane()
     private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
     private val endlessModeScoreLabel: TextLabel
+    private val endlessModeGameOverPane: Pane = Pane()
+    private val endlessModeGameOverLabel: TextLabel
     
     init {
         val baseMarkup = Markup(mapOf("prmania_icons" to PRManiaGame.instance.fontIcons),
                 TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
+        
+        endlessModeGameOverPane.apply {
+            this.visible.set(false)
+            this += RectElement(Color(0f, 0f, 0f, 0.5f))
+        }
+        uiSceneRoot += endlessModeGameOverPane
+        
+        endlessModeGameOverLabel = TextLabel(binding = { Localization.getVar("play.endless.gameOver").use() },
+                font = PRManiaGame.instance.fontPauseMenuTitle).apply {
+            Anchor.Centre.configure(this)
+            this.bounds.height.set(350f)
+            this.textColor.set(Color(81f / 255, 107f / 255, 1f, 1f))
+            this.renderAlign.set(Align.center)
+        }
+        endlessModeGameOverPane += endlessModeGameOverLabel
+        
         uiSceneRoot += textBoxPane.apply {
             Anchor.TopCentre.configure(textBoxPane, offsetY = 64f)
             this.bounds.width.set(1000f)
@@ -386,9 +405,10 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         }
 
         if (showEndlessModeScore.getOrCompute()) {
-            currentEndlessLives.set(engine.inputter.endlessScore.lives.getOrCompute())
+            val endlessScore = engine.inputter.endlessScore
+            currentEndlessLives.set(endlessScore.lives.getOrCompute())
             val oldScore = currentEndlessScore.getOrCompute()
-            val newScore = engine.inputter.endlessScore.score.getOrCompute()
+            val newScore = endlessScore.score.getOrCompute()
             if (oldScore != newScore) {
                 currentEndlessScore.set(newScore)
                 val scaleVar = endlessModeScoreLabelScaleXY
@@ -401,6 +421,8 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                     scaleVar.set(1f)
                 }
             }
+
+            endlessModeGameOverPane.visible.set(endlessScore.gameOverUIShown.getOrCompute())
         }
 
         uiSceneRoot.renderAsRoot(batch)

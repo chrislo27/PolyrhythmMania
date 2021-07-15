@@ -3,15 +3,19 @@ package polyrhythmmania.engine.input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.MathUtils
 import paintbox.Paintbox
+import paintbox.binding.FloatVar
 import paintbox.binding.Var
+import paintbox.lazysound.LazySound
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.Localization
+import polyrhythmmania.PRManiaGame
+import polyrhythmmania.engine.ActiveTextBox
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.TextBox
+import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.soundsystem.BeadsSound
-import polyrhythmmania.world.EntityRodDunk
-import polyrhythmmania.world.EntityRodPR
-import polyrhythmmania.world.World
-import polyrhythmmania.world.WorldMode
+import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
 
 
@@ -68,12 +72,18 @@ class EngineInputter(val engine: Engine) {
     
     class EndlessScore {
         val score: Var<Int> = Var(0)
+        var highScore: Var<Int> = Var(0)
         val maxLives: Var<Int> = Var(0)
         val lives: Var<Int> = Var(maxLives.getOrCompute())
+        
+        val gameOverSeconds: FloatVar = FloatVar(Float.MAX_VALUE)
+        val gameOverUIShown: Var<Boolean> = Var(false)
         
         fun reset() {
             score.set(0)
             lives.set(maxLives.getOrCompute())
+            gameOverSeconds.set(Float.MAX_VALUE)
+            gameOverUIShown.set(false)
         }
     }
 
@@ -332,9 +342,45 @@ class EngineInputter(val engine: Engine) {
         val worldMode = world.worldMode
         if (worldMode.showEndlessScore) {
             val endlessScore = this.endlessScore
-            val newScore = (endlessScore.lives.getOrCompute() - 1).coerceIn(0, endlessScore.maxLives.getOrCompute())
+            val oldScore = endlessScore.lives.getOrCompute()
+            val newScore = (oldScore - 1).coerceIn(0, endlessScore.maxLives.getOrCompute())
             endlessScore.lives.set(newScore)
+            if (oldScore > 0 && newScore == 0) {
+                onGameOver()
+            }
         }
+    }
+    
+    fun onGameOver() {
+        engine.playbackSpeed = 1f
+        val currentSeconds = engine.seconds
+        val currentBeat = engine.beat
+        endlessScore.gameOverSeconds.set(currentSeconds)
+        val score = endlessScore.score.getOrCompute()
+        val wasNewHighScore = score > endlessScore.highScore.getOrCompute()
+        val afterBeat = engine.tempos.secondsToBeats(currentSeconds + 2f)
+        
+        engine.musicData.volumeMap.addMusicVolume(MusicVolume(currentBeat, (afterBeat - currentBeat) / 2f, 0))
+        
+        engine.addEvent(object : Event(engine) {
+            override fun onStart(currentBeat: Float) {
+                super.onStart(currentBeat)
+                
+                if (wasNewHighScore) {
+                    engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
+                    engine.activeTextBox = ActiveTextBox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true))
+                    endlessScore.highScore.set(score)
+                    PRManiaGame.instance.settings.persist()
+                } else {
+                    engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
+                    engine.activeTextBox = ActiveTextBox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true))
+                }
+                endlessScore.gameOverUIShown.set(true)
+            }
+        }.apply {
+            this.beat = afterBeat
+        })
+        engine.addEvent(EventEndState(engine, afterBeat + 0.5f))
     }
 
     fun attemptSkillStar(beat: Float): Boolean {

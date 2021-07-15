@@ -119,20 +119,24 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         if (ace) {
             this.aceWasHit = true
             engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
-                val increaseEvery = 8
-                if (newScore % increaseEvery == 0) {
+                val increaseLivesEvery = 4
+                val increaseSpeedEvery = 8
+
+                if (newScore % increaseLivesEvery == 0) {
                     // Increment lives
                     engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_2"))
                     val endlessScore = engine.inputter.endlessScore
                     val newLives = (endlessScore.lives.getOrCompute() + 1).coerceIn(0, endlessScore.maxLives.getOrCompute())
                     endlessScore.lives.set(newLives)
-
-                    val pitch = Semitones.getALPitch(newScore / increaseEvery).coerceAtMost(2f)
+                } else {
+                    engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
+                }
+                
+                if (newScore % increaseSpeedEvery == 0) {
+                    val pitch = Semitones.getALPitch(newScore / increaseSpeedEvery).coerceAtMost(2f)
                     engine.addEvent(EventChangePlaybackSpeed(engine, pitch).apply { 
                         this.beat = dunkBeat
                     })
-                } else {
-                    engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
                 }
             }.apply { 
                 this.beat = dunkBeat

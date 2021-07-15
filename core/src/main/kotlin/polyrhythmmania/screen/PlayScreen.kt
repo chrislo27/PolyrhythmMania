@@ -376,10 +376,10 @@ class PlayScreen(
     }
 
     private fun pauseGame(playSound: Boolean) {
-        val endlessScore = engine.inputter.endlessScore
-        if (endlessScore.lives.getOrCompute() <= 0 && endlessScore.maxLives.getOrCompute() > 0) {
-            return // No pausing
-        }
+//        val endlessScore = engine.inputter.endlessScore
+//        if (endlessScore.lives.getOrCompute() <= 0 && endlessScore.maxLives.getOrCompute() > 0) {
+//            return // No pausing
+//        }
         
         isPaused = true
         soundSystem.setPaused(true)
