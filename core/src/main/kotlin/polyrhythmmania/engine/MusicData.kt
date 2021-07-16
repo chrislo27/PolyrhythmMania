@@ -11,7 +11,15 @@ class MusicData(val engine: Engine) {
 
     val volumeMap: MusicVolMap = MusicVolMap()
     var loopParams: LoopParams = LoopParams.NO_LOOP_FORWARDS
+
+    /**
+     * The point in the MUSIC where it should sync up with the Music Sync marker.
+     */
     var firstBeatSec: Float = 0f
+
+    /**
+     * Where the Music Sync marker actually is in beats.
+     */
     var musicSyncPointBeat: Float = 0f
     var rate: Float = 1f
 
@@ -54,25 +62,21 @@ class MusicData(val engine: Engine) {
         val music = this.beadsMusic
         val player = engine.soundInterface.getCurrentMusicPlayer(music)
         if (player != null) {
-            if (atSeconds < delaySec) {
-                // Set player position to be negative
-                return (atSeconds - delaySec).toDouble() * 1000.0 * rate
-            } else {
-                if (player.loopType == SamplePlayer.LoopType.LOOP_FORWARDS && !player.isLoopInvalid()) {
-                    player.prepareStartBuffer()
-                    val adjustedSecs = atSeconds - delaySec
-                    val loopStart = player.loopStartMs
-                    val loopEnd = player.loopEndMs
-                    val loopDuration = (loopEnd - loopStart)
+            if (atSeconds >= delaySec && player.loopType == SamplePlayer.LoopType.LOOP_FORWARDS && !player.isLoopInvalid()) {
+                player.prepareStartBuffer()
+                val adjustedSecs = atSeconds - delaySec * rate
+                val loopStart = player.loopStartMs
+                val loopEnd = player.loopEndMs
+                val loopDuration = (loopEnd - loopStart)
 
-                    return if (adjustedSecs < loopEnd / 1000) {
-                        (adjustedSecs * 1000 * rate) % player.musicSample.lengthMs
-                    } else {
-                        ((((adjustedSecs * 1000 - loopStart) * rate) % loopDuration + loopStart * rate)) % player.musicSample.lengthMs
-                    }
+                return if (adjustedSecs < loopEnd / 1000) {
+                    (adjustedSecs * 1000 * rate) % player.musicSample.lengthMs
                 } else {
-                    return ((atSeconds - delaySec) * 1000.0) * rate
+                    ((((adjustedSecs * 1000 - loopStart) * rate) % loopDuration + loopStart * rate)) % player.musicSample.lengthMs
                 }
+            } else {
+                // When atSeconds == delaySec, time should be 0.
+                return ((atSeconds - delaySec) * 1000.0) * rate
             }
         }
 
@@ -80,7 +84,8 @@ class MusicData(val engine: Engine) {
     }
     
     fun computeMusicDelaySec(): Float {
-        return ((engine.tempos.beatsToSeconds(this.musicSyncPointBeat) - this.firstBeatSec) * 1000 + engine.musicOffsetMs) / 1000
+        val rate = this.rate
+        return ((engine.tempos.beatsToSeconds(this.musicSyncPointBeat) * rate - this.firstBeatSec) / rate * 1000 + (engine.musicOffsetMs * rate) /* <- this is a user calibration setting */) / 1000
     }
 
 }

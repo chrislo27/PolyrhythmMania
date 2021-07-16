@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
+import paintbox.Paintbox
 import paintbox.ui.Pane
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.pane.EditorPane
@@ -42,8 +43,12 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
         val leftBeat = trackViewBeat
         val rightBeat = trackViewBeat + (w / pxPerBeat)
 
-        val leftSec = engine.tempos.beatsToSeconds(leftBeat, disregardSwing = true)
-        val rightSec = leftSec + (engine.tempos.beatsToSeconds(rightBeat, disregardSwing = true) - leftSec) * musicRate
+        val leftRealSec = engine.tempos.beatsToSeconds(leftBeat, disregardSwing = true)
+        val rightRealSec = leftRealSec + (engine.tempos.beatsToSeconds(rightBeat, disregardSwing = true) - leftRealSec)
+        
+        // "Music seconds" (msec) are used since the music may have a different rate
+        val leftMsec = leftRealSec * musicRate
+        val rightMsec = rightRealSec * musicRate
 
         val segmentsInRenderZone = this.segmentsInRenderZone
         segmentsInRenderZone.clear()
@@ -58,14 +63,14 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
         
         batch.setColor(1f, 1f, 1f, 1f * apparentOpacity.get())
         val music = editor.musicData.beadsMusic
-        if (music != null && rightSec - leftSec > 0f && w >= 1f) {
+        if (music != null && rightMsec - leftMsec > 0f && w >= 1f) {
             val tempos = engine.tempos
             val tempoChanges = editor.tempoChanges.getOrCompute()
             for (tc in tempoChanges) {
                 val beat = tc.beat
                 if (beat !in (leftBeat)..(rightBeat)) continue
                 if (beat == 0f) continue
-                segmentsInRenderZone.add(tempos.beatsToSeconds(tc.beat, disregardSwing = false))
+                segmentsInRenderZone.add(tempos.beatsToSeconds(tc.beat, disregardSwing = false) * musicRate)
             }
 
             val musicDelaySec = engineMusicData.computeMusicDelaySec()
@@ -74,13 +79,13 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                 val loopDur = loopParams.endPointMs - loopParams.startPointMs
                 if (loopDur > 0) {
                     var ms = loopParams.startPointMs + (musicDelaySec * 1000)
-                    ms += ((leftSec * 1000.0 - ms) / loopDur).toInt() * loopDur // Jump ahead to avoid iterations
-                    while (ms < (rightSec * 1000)) {
+                    ms += ((leftMsec * 1000.0 - ms) / loopDur).toInt() * loopDur // Jump ahead to avoid iterations
+                    while (ms < (rightMsec * 1000)) {
                         val s = (ms / 1000).toFloat()
-                        if (s in leftSec..rightSec) {
+                        if (s in leftMsec..rightMsec) {
                             segmentsInRenderZone.add(s)
                             if (printDebugStuff) {
-                                println("Loop: point added at sec $s")
+                                println("Loop: point added at msec $s")
                             }
                         }
                         ms += loopDur
@@ -94,38 +99,40 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                 println("segments: $segmentsInRenderZone")
             }
             
-            var currentSegmentSec: Float = leftSec
+            var currentSegmentMsec: Float = leftMsec
             var blockPxOffset = 0f // Accumulated offset
             for (segment in 0 until (segmentsInRenderZone.size + 1)) {
-                val segmentStartSec: Float = currentSegmentSec
-                val segmentEndSec: Float = segmentsInRenderZone.getOrNull(segment) ?: rightSec
+                val segmentStartMsec: Float = currentSegmentMsec
+                val segmentEndMsec: Float = segmentsInRenderZone.getOrNull(segment) ?: rightMsec
                 
-                val currentTempo: Float = tempos.tempoAtSeconds(segmentStartSec)
-                val pxPerSec: Float = pxPerBeat / (60f / currentTempo) / musicRate
+                val currentTempo: Float = tempos.tempoAtSeconds(segmentStartMsec / musicRate)
+                val pxPerMsec: Float = pxPerBeat / (60f / currentTempo) / musicRate
                 
                 // DEBUG red lines at each segment split
-                val pc = batch.packedColor
-                batch.setColor(1f, 0f, 0f, 1f)
-                batch.fillRect(x + blockPxOffset, y - h, 1f, h)
-                batch.packedColor = pc
+                if (Paintbox.debugMode) {
+                    val pc = batch.packedColor
+                    batch.setColor(1f, 0f, 0f, 1f)
+                    batch.fillRect(x + blockPxOffset, y - h, 1f, h)
+                    batch.packedColor = pc
+                }
                 
                 // Find the first music seconds.
-                val musicSeconds = (engineMusicData.getCorrectMusicPlayerPositionAt(segmentStartSec + 0.001f, delaySec = musicDelaySec) / 1000).toFloat()
+                val musicSeconds = (engineMusicData.getCorrectMusicPlayerPositionAt((segmentStartMsec / musicRate) + 0.001f, delaySec = musicDelaySec) / 1000).toFloat()
                 val startCurMusicSec = musicSeconds
                 var currentMusicSec = startCurMusicSec
-                var currentSubsegmentSec = segmentStartSec
+                var currentSubsegmentMsec = segmentStartMsec
                 val originalBlockPxOffset = blockPxOffset
                 // Break into chunks, going to the nearest whole seconds if possible
                 var subsegmentIndex = 0
-                while (currentSubsegmentSec < segmentEndSec) {
+                while (currentSubsegmentMsec < segmentEndMsec) {
 //                    val endSubsegmentSec = (floor(currentSubsegmentSec) + 1).coerceAtMost(segmentEndSec)
 //                    val durSubsegmentSec = endSubsegmentSec - currentSubsegmentSec
-                    val endMusicSec = (floor(currentMusicSec) + 1).coerceAtMost(startCurMusicSec + (segmentEndSec - segmentStartSec))
-                    val durMusicSec = endMusicSec - currentMusicSec
+                    val endMusicMsec = (floor(currentMusicSec) + 1).coerceAtMost(startCurMusicSec + (segmentEndMsec - segmentStartMsec))
+                    val durMusicSec = endMusicMsec - currentMusicSec
                     if (durMusicSec <= 0f) break
                     
                     if (subsegmentIndex == 0 && printDebugStuff) {
-                        println("subseg at ${segmentStartSec}:\t currentMusicSec: $currentMusicSec  musicSeconds: ${musicSeconds}  musicSecondsEpsilon: ${(engineMusicData.getCorrectMusicPlayerPositionAt(segmentStartSec + 0.0001f, delaySec = musicDelaySec) / 1000).toFloat()}")
+                        println("subseg at ${segmentStartMsec} msec:\t currentMusicSec: $currentMusicSec  musicSeconds: ${musicSeconds}")
                     }
                     
                     val texReg: TextureRegion? = editor.waveformWindow.getSecondsBlock(floor(currentMusicSec).toInt())
@@ -134,29 +141,29 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                         val u2 = texReg.u2
 
                         val correctU = MathUtils.lerp(u, u2, currentMusicSec - floor(currentMusicSec))
-                        val correctU2 = MathUtils.lerp(u, u2, 1f - ((floor(currentMusicSec) + 1f) - endMusicSec))
+                        val correctU2 = MathUtils.lerp(u, u2, 1f - ((floor(currentMusicSec) + 1f) - endMusicMsec))
 
                         batch.draw(texReg.texture, x + blockPxOffset,
-                                y - h, durMusicSec * pxPerSec, h,
+                                y - h, durMusicSec * pxPerMsec, h,
                                 correctU, texReg.v,
                                 correctU2, texReg.v2)
                     }
 
-                    currentSubsegmentSec += durMusicSec
+                    currentSubsegmentMsec += durMusicSec
                     currentMusicSec += durMusicSec
-                    blockPxOffset += pxPerSec * durMusicSec
+                    blockPxOffset += pxPerMsec * durMusicSec
                     subsegmentIndex++
 //                    if (subsegmentIndex >= 2) break
                 }
                 if (printDebugStuff) {
-                    println("original: $originalBlockPxOffset  currentBlockPxOffset: $blockPxOffset  expectedNew: ${originalBlockPxOffset + pxPerSec * (segmentEndSec - segmentStartSec)}")
-                    println("segment length: ${segmentEndSec - segmentStartSec}  subsegment accumulated: ${currentSubsegmentSec - segmentStartSec}")
+                    println("original: $originalBlockPxOffset  currentBlockPxOffset: $blockPxOffset  expectedNew: ${originalBlockPxOffset + pxPerMsec * (segmentEndMsec - segmentStartMsec)}")
+                    println("segment length: ${segmentEndMsec - segmentStartMsec} msec  subsegment accumulated: ${currentSubsegmentMsec - segmentStartMsec}")
                 }
                 // Force reset blockPxOffset in case of addition issues/floating-point error
-                blockPxOffset = originalBlockPxOffset + pxPerSec * (segmentEndSec - segmentStartSec)
+                blockPxOffset = originalBlockPxOffset + pxPerMsec * (segmentEndMsec - segmentStartMsec)
                 
                 
-                currentSegmentSec = segmentEndSec
+                currentSegmentMsec = segmentEndMsec
             }
             
         }
