@@ -104,6 +104,8 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
             }
+            
+            // Remember to update DataSettingsMenu to reset high scores
             vbox += createSidemode("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip", Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
             }

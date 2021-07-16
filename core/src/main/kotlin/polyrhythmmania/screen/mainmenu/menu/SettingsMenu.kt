@@ -16,7 +16,7 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     init {
         this.setSize(MMMenu.WIDTH_EXTRA_SMALL)
         this.titleText.bind { Localization.getVar("mainMenu.settings.title").use() }
-        this.contentPane.bounds.height.set(250f)
+        this.contentPane.bounds.height.set(250f) // Change to 300 when adding next row
         
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)
@@ -49,6 +49,11 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createLongButton { Localization.getVar("mainMenu.settings.input").use() }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.inputSettingsMenu)
+                }
+            }
+            vbox += createLongButton { Localization.getVar("mainMenu.settings.data").use() }.apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.dataSettingsMenu)
                 }
             }
         }
