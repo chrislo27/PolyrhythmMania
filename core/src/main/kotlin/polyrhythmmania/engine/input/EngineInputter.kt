@@ -377,10 +377,15 @@ class EngineInputter(val engine: Engine) {
                 }
                 endlessScore.gameOverUIShown.set(true)
             }
+
+            override fun onEnd(currentBeat: Float) {
+                super.onEnd(currentBeat)
+                engine.addEvent(EventEndState(engine, currentBeat))
+            }
         }.apply {
             this.beat = afterBeat
+            this.width = 0.5f
         })
-        engine.addEvent(EventEndState(engine, afterBeat + 0.5f))
     }
 
     fun attemptSkillStar(beat: Float): Boolean {

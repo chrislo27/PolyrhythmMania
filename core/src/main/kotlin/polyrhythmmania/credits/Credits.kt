@@ -28,7 +28,8 @@ object Credits {
                     "JCommander",
                     "SLF4J",
                     "zip4j",
-                    "earlygrey/shapedrawer"
+                    "earlygrey/shapedrawer",
+                    "Pexels",
             ),
             "credits.specialThanks" to abcSorted(
                     "Lvl100Feraligatr",

@@ -8,6 +8,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.world.DunkWorldBackground
 import polyrhythmmania.world.EntityRodDunk
 import polyrhythmmania.world.WorldMode
 
@@ -18,6 +19,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     init {
         container.world.worldMode = WorldMode.DUNK
         container.engine.inputter.endlessScore.maxLives.set(5)
+        container.renderer.worldBackground = DunkWorldBackground
     }
     
     override fun initialize() {

@@ -1,5 +1,7 @@
 package polyrhythmmania.world
 
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
@@ -21,6 +23,7 @@ import polyrhythmmania.world.entity.SpriteEntity
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.render.bg.WorldBackground
 import kotlin.math.floor
 
 
@@ -315,5 +318,13 @@ class EntityPistonDunk(world: World)
             retractAfter = Float.MAX_VALUE
             retract()
         }
+    }
+}
+
+
+object DunkWorldBackground : WorldBackground() {
+    override fun render(batch: SpriteBatch, engine: Engine, camera: OrthographicCamera) {
+        val tex: Texture = AssetRegistry["dunk_background"]
+        batch.draw(tex, 0f, 0f, camera.viewportWidth, camera.viewportHeight)
     }
 }

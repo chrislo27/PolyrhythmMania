@@ -103,6 +103,8 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("logo_2lines_ja", "textures/logo/logo_2lines_ja.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("pause_rod", "textures/pause/rod.png")
         AssetRegistry.loadAsset<Texture>("pause_square", "textures/pause/bg_square.png")
+        AssetRegistry.loadAsset<Texture>("dunk_background", "textures/world/dunk/basketball_bg.png", linearTexture())
+        
         listOf("applause", "despawn", "explosion", "input_a", "input_d", "land", "retract", "side_collision",
                 "spawn_a", "spawn_d", "cowbell",).forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_$it", "sounds/${it}.wav")
