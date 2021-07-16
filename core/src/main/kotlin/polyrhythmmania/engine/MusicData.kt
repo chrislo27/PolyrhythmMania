@@ -64,7 +64,7 @@ class MusicData(val engine: Engine) {
         if (player != null) {
             if (atSeconds >= delaySec && player.loopType == SamplePlayer.LoopType.LOOP_FORWARDS && !player.isLoopInvalid()) {
                 player.prepareStartBuffer()
-                val adjustedSecs = (atSeconds - delaySec) * rate // Note that rate is multipled at this point
+                val adjustedSecs = (atSeconds - delaySec) * rate
                 val loopStart = player.loopStartMs
                 val loopEnd = player.loopEndMs
                 val loopDuration = (loopEnd - loopStart)
