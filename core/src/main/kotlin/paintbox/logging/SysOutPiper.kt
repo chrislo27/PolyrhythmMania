@@ -62,17 +62,17 @@ object SysOutPiper {
         builder.append("    Launch arguments: $args\n")
         builder.append("    Version: " + game.version.toString() + "\n")
         builder.append("    Application type: " + Gdx.app.type.toString() + "\n")
-        builder.append("    Lazy loading enabled: " + LazySound.loadLazilyWithAssetManager + "\n")
+        builder.append("    LazySound loading enabled: " + LazySound.loadLazilyWithAssetManager + "\n")
 
         builder.append("\n")
 
         builder.append("System Specifications:\n")
-        builder.append("    Java Version: " + System.getProperty("java.version") + " " + System.getProperty(
-                "sun.arch.data.model") + " bit" + "\n")
+        builder.append("    Java Version: " + System.getProperty("java.version") + "\n")
         builder.append("    Java Vendor: ${System.getProperty("java.vendor")}\n")
         builder.append("    Kotlin Version: ${kotlin.KotlinVersion.CURRENT}\n")
         builder.append("    OS Name: " + System.getProperty("os.name") + "\n")
         builder.append("    OS Version: " + System.getProperty("os.version") + "\n")
+        builder.append("    OS Arch: " + System.getProperty("os.arch") + "\n")
         builder.append("    JVM memory available: " + MemoryUtils.maxMemoryKiB + " KiB\n")
 
         builder.append("\n")
