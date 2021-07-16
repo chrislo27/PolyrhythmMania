@@ -28,10 +28,6 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
         val w = renderBounds.width.get()
         val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
-        
-        // TODO support music data rate rendering
-        // Broken: segments, looping
-        // May need "music seconds" time unit instead of just plain engine seconds
 
         val editor = editorPane.editor
         val engine = editor.engine
@@ -78,7 +74,7 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
             if (loopParams.loopType == SamplePlayer.LoopType.LOOP_FORWARDS) {
                 val loopDur = loopParams.endPointMs - loopParams.startPointMs
                 if (loopDur > 0) {
-                    var ms = loopParams.startPointMs + (musicDelaySec * 1000)
+                    var ms = loopParams.startPointMs + (musicDelaySec * 1000) * musicRate
                     ms += ((leftMsec * 1000.0 - ms) / loopDur).toInt() * loopDur // Jump ahead to avoid iterations
                     while (ms < (rightMsec * 1000)) {
                         val s = (ms / 1000).toFloat()
@@ -88,7 +84,11 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                                 println("Loop: point added at msec $s")
                             }
                         }
+                        val oldMs = ms
                         ms += loopDur
+                        if (ms <= oldMs) {
+                            break // Prevent an infinite loop due to floating point addition error
+                        }
                     }
                 }
             }
@@ -97,6 +97,7 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
             
             if (printDebugStuff) {
                 println("segments: $segmentsInRenderZone")
+                println("current music delay: ${musicDelaySec} sec  leftMsec: ${leftMsec}")
             }
             
             var currentSegmentMsec: Float = leftMsec
@@ -125,14 +126,12 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                 // Break into chunks, going to the nearest whole seconds if possible
                 var subsegmentIndex = 0
                 while (currentSubsegmentMsec < segmentEndMsec) {
-//                    val endSubsegmentSec = (floor(currentSubsegmentSec) + 1).coerceAtMost(segmentEndSec)
-//                    val durSubsegmentSec = endSubsegmentSec - currentSubsegmentSec
                     val endMusicMsec = (floor(currentMusicSec) + 1).coerceAtMost(startCurMusicSec + (segmentEndMsec - segmentStartMsec))
                     val durMusicSec = endMusicMsec - currentMusicSec
                     if (durMusicSec <= 0f) break
                     
                     if (subsegmentIndex == 0 && printDebugStuff) {
-                        println("subseg at ${segmentStartMsec} msec:\t currentMusicSec: $currentMusicSec  musicSeconds: ${musicSeconds}")
+                        println("segment ${segment} subseg 0 at ${segmentStartMsec} msec up to ${segmentEndMsec} msec:\t currentMusicSec: $currentMusicSec  musicSeconds: ${musicSeconds}")
                     }
                     
                     val texReg: TextureRegion? = editor.waveformWindow.getSecondsBlock(floor(currentMusicSec).toInt())

@@ -1198,6 +1198,7 @@ path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpl
 cameraOffsetCurrent: ${cameraOffset.current}
 cameraOffsetTarget: ${cameraOffset.target}
 suggest: $suggestPanCameraDir
+musicSec: ${engine.musicData.getCorrectMusicPlayerPositionAt(engine.seconds) / 1000}
 """
         //path: ${sceneRoot.dialogLayer.lastHoveredElementPath.map { "${it::class.java.simpleName} [${it.bounds.x.getOrCompute()}, ${it.bounds.y.getOrCompute()}, ${it.bounds.width.getOrCompute()}, ${it.bounds.height.getOrCompute()}]" }}
     }
