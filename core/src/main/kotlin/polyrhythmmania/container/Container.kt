@@ -6,13 +6,13 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import com.eclipsesource.json.JsonValue
 import com.eclipsesource.json.WriterConfig
-import paintbox.registry.AssetRegistry
-import paintbox.util.Version
-import paintbox.util.gdxutils.disposeQuietly
 import net.beadsproject.beads.ugens.SamplePlayer
 import net.lingala.zip4j.ZipFile
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
+import paintbox.registry.AssetRegistry
+import paintbox.util.Version
+import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
@@ -54,7 +54,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     companion object {
         const val FILE_EXTENSION: String = "prmania"
-        const val CONTAINER_VERSION: Int = 5
+        const val CONTAINER_VERSION: Int = 6
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
     }
@@ -233,6 +233,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 })
                 musicObj.add("firstBeatSec", musicData.firstBeatSec)
                 musicObj.add("musicFirstBeat", musicData.musicSyncPointBeat)
+                musicObj.add("rate", musicData.rate) // As of container version 6
                 val loopParams = musicData.loopParams
                 musicObj.add("looping", loopParams.loopType == SamplePlayer.LoopType.LOOP_FORWARDS)
                 musicObj.add("loopStartMs", loopParams.startPointMs)
@@ -359,6 +360,12 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                     musicObj.getDouble("loopStartMs", 0.0),
                     musicObj.getDouble("loopEndMs", 0.0)
             )
+            if (containerVersion >= 6) {
+                val rateField = musicObj.get("rate")?.asFloat()
+                if (rateField != null) {
+                    musicData.rate = rateField.coerceAtLeast(0f)
+                }
+            }
         }
         if (containerVersion >= 2) {
             val timeSigObj = engineObj.get("timeSignatures").asObject()

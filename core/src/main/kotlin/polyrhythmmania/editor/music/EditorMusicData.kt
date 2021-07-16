@@ -22,6 +22,7 @@ class EditorMusicData(val editor: Editor) {
         private set // Set when beadsMusic is set
     var loopParams: Var<LoopParams> = Var(LoopParams.NO_LOOP_FORWARDS)
     var firstBeatSec: FloatVar = FloatVar(0f)
+    var rate: FloatVar = FloatVar(1f)
     
     fun setMusic(beadsMusic: BeadsMusic, compressedMusicRes: ExternalResource) {
         if (this.beadsMusic != null) {
@@ -31,6 +32,7 @@ class EditorMusicData(val editor: Editor) {
         firstBeatSec.set(0f)
         this.beadsMusic = beadsMusic
         editor.container.setCompressedMusic(compressedMusicRes)
+        rate.set(1f)
     }
     
     fun removeMusic() {

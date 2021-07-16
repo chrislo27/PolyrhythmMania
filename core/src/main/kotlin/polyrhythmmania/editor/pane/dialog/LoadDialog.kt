@@ -200,6 +200,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         newEditor.musicData.waveform?.generateSummaries()
                         
                         newEditor.musicData.firstBeatSec.set(containerMusicData.firstBeatSec)
+                        newEditor.musicData.rate.set(containerMusicData.rate)
                         newEditor.musicFirstBeat.set(containerMusicData.musicSyncPointBeat)
                         val loopParams = containerMusicData.loopParams
                         newEditor.musicData.loopParams.set(loopParams)
@@ -207,8 +208,9 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         newEditor.updateForNewMusicData()
                     }
                     
-                    if (!isRecovery)
+                    if (!isRecovery) {
                         newEditor.editorPane.saveDialog.assignSaveLocation(newFile)
+                    }
 
                     substate.set(Substate.LOADED)
                     descLabel.text.set(Localization.getValue("editor.dialog.load.loaded",
