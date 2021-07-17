@@ -1,6 +1,6 @@
 # Polyrhythm Mania (WIP)
-A game that tries to faithfully recreate the *Polyrhythm* minigame from Rhythm Tengoku (リズム天国), with a 
-built-in editor.
+A game that faithfully recreates the *Polyrhythm* minigame from Rhythm Tengoku (リズム天国), with a 
+built-in level editor.
 
 ![Polyrhythm Mania thumbnail](https://cdn.discordapp.com/attachments/306231796369195020/851931738271121428/6cf14200-c863-11eb-84d4-4778b68f36b9.png)
 
@@ -16,10 +16,15 @@ Due to issues with spam and unwanted behaviour, the Issues tab has been disabled
 [Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)
 
 
+## Building from source
+This section concerns building the project from the source code. If you are looking for a pre-built download, there are none available yet (see Development status heading).
+
+This project is built using Gradle. You can build and run the game with `./gradlew :desktop:run`.
+
 ## Other information
-Rhythm Heaven is not my property—it is the intellectual property of Nintendo.
+Rhythm Heaven is the intellectual property of Nintendo.
 This program is **NOT** endorsed nor sponsored in any way by Nintendo.
 All used properties of Nintendo (such as names, audio, graphics, etc.) in this software are not intended to maliciously infringe trademark rights.
 All other trademarks and assets are property of their respective owners.
 This is a community project and this is available for others to use
-according to the [GPL-3.0 license](LICENSE.txt), without charge.
+according to the [GPL-3.0 license](LICENSE), without charge.
