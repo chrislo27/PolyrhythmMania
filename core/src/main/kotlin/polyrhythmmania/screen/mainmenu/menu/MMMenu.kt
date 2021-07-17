@@ -1,7 +1,5 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import com.badlogic.gdx.Input
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
@@ -12,7 +10,6 @@ import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
-import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
@@ -141,6 +138,18 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
         this.bounds.height.bind { vbox.bounds.height.useF() }
         this.setSize(MMMenu.WIDTH_MEDIUM) // Default size
+    }
+    
+    protected fun createTooltip(binding: Var.Context.() -> String): Tooltip {
+        return Tooltip(binding).apply { 
+            this.markup.set(this@StandardMenu.markup)
+        }
+    }
+
+    protected fun createTooltip(varr: ReadOnlyVar<String>): Tooltip {
+        return Tooltip(binding = { varr.getOrCompute() }).apply {
+            this.markup.set(this@StandardMenu.markup)
+        }
     }
 
     protected fun createLongButton(binding: Var.Context.() -> String): Button = Button(binding, font = font).apply {

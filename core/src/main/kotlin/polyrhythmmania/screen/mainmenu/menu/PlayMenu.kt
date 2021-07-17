@@ -7,7 +7,6 @@ import paintbox.binding.Var
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
-import paintbox.ui.Tooltip
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
@@ -85,7 +84,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             fun createSidemode(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
                                factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
                 return createLongButton { Localization.getVar(name).use() }.apply {
-                    this.tooltipElement.set(Tooltip(binding = { tooltipVar.use() }, font = this@PlayMenu.font))
+                    this.tooltipElement.set(createTooltip(tooltipVar))
                     this.setOnAction {
                         menuCol.playMenuSound("sfx_menu_enter_game")
                         mainMenu.transitionAway {

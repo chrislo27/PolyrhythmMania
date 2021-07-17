@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
-import paintbox.ui.Tooltip
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.layout.HBox
@@ -46,7 +45,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         vbox.temporarilyDisableLayouts {
             fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> Practice): UIElement {
                 return createLongButton { Localization.getVar(name).use() }.apply {
-                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("${name}.tooltip").use() }, font = this@PracticeMenu.font))
+                    this.tooltipElement.set(createTooltip(Localization.getVar("${name}.tooltip")))
                     this.setOnAction {
                         menuCol.playMenuSound("sfx_menu_enter_game")
                         mainMenu.transitionAway {

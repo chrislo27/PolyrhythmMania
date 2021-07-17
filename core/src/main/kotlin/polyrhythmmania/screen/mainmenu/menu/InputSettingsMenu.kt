@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
-import paintbox.ui.Tooltip
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
@@ -14,6 +13,7 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu.PendingKeyboardBinding
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -330,7 +330,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 vbox += createSliderPane(manualOffsetSlider) { 
                     Localization.getVar("mainMenu.inputSettings.calibration.musicOffset", Var.bind {listOf(manualOffsetSlider.value.useF().toInt())}).use()
                 }.apply {
-                    this.label.tooltipElement.set(Tooltip(binding = {Localization.getVar("mainMenu.inputSettings.calibration.musicOffset.tooltip").use()}, font = font))
+                    this.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.inputSettings.calibration.musicOffset.tooltip")))
                 }
             }
             vbox.sizeHeightToChildren(100f)
