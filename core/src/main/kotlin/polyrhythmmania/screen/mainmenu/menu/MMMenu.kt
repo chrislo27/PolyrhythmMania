@@ -147,7 +147,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
 
     protected fun createTooltip(varr: ReadOnlyVar<String>): Tooltip {
-        return Tooltip(binding = { varr.getOrCompute() }).apply {
+        return Tooltip(binding = { varr.use() }).apply {
             this.markup.set(this@StandardMenu.markup)
         }
     }
