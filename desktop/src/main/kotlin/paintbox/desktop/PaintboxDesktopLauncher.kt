@@ -17,9 +17,10 @@ class PaintboxDesktopLauncher(val game: PaintboxGame, val arguments: PaintboxArg
     init {
         System.setProperty("file.encoding", "UTF-8")
 
-        val fps = arguments.fps
+        val fps = arguments.fps.coerceAtLeast(0)
+        config.useVsync(arguments.vsync)
         config.setForegroundFPS(fps)
-        config.setIdleFPS(fps)
+        config.setIdleFPS(if (fps == 0) 60 else fps)
     }
 
     inline fun editConfig(func: Lwjgl3ApplicationConfiguration.() -> Unit): PaintboxDesktopLauncher {

@@ -10,7 +10,10 @@ open class PaintboxArguments {
 
     // -----------------------------------------------------------
 
-    @Parameter(names = ["--fps"], description = "Manually sets the target FPS.")
+    @Parameter(names = ["--fps"], description = "Manually sets the target FPS. Must be positive. If zero, the framerate is unbounded")
     var fps: Int = 60
+    
+    @Parameter(names = ["--vsync"], description = "Enables VSync. By default it is on.", arity = 1)
+    var vsync: Boolean = true
     
 }
