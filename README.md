@@ -7,6 +7,7 @@ built-in level editor.
 ## NOTE: This project is still in development, so there are NO public compiled releases yet. Stay tuned!
 
 [![GitHub license](https://img.shields.io/github/license/chrislo27/PolyrhythmMania.svg)](https://github.com/chrislo27/PolyrhythmMania/blob/dev/LICENSE.txt)
+[![Donate to the project maintainer](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.com/donate?hosted_button_id=9JLGHKZNWLLQ8)
 
 ## Development status
 This project is still in development. **There will be no releases until it is ready.** When it is ready, there will be a public compiled release. 
