@@ -72,7 +72,7 @@ open class EntityCube(world: World, val withLine: Boolean = false, val withBorde
         }
     }
 
-    override val numLayers: Int = 7
+    override val numLayers: Int = 6
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
         // Uncomment if cube map culling is to be used
@@ -80,7 +80,7 @@ open class EntityCube(world: World, val withLine: Boolean = false, val withBorde
 //        val cubeOccludesY = world.cubeMap[createCubemapIndex(this.position.x.roundToInt(), this.position.y.roundToInt() + 1, this.position.z.roundToInt())] != null
 //        val cubeOccludesZ = world.cubeMap[createCubemapIndex(this.position.x.roundToInt(), this.position.y.roundToInt(), this.position.z.roundToInt() + 1)] != null
 //
-//        return when (index) {
+//        return when (index) { // Update when with non-culling
 //            0 -> tileset.cubeBorder
 //            1 -> if (cubeOccludesZ) null else tileset.cubeBorderZ
 //            2 -> if (cubeOccludesX) null else tileset.cubeFaceX
@@ -91,13 +91,12 @@ open class EntityCube(world: World, val withLine: Boolean = false, val withBorde
 //            else -> null
 //        }
         return when (index) {
-            0 -> tileset.cubeBorder
+            0 -> if (withBorder) tileset.cubeBorderPlatform else tileset.cubeBorder
             1 -> tileset.cubeBorderZ
             2 -> tileset.cubeFaceX
             3 -> tileset.cubeFaceY
             4 -> tileset.cubeFaceZ
             5 -> if (withLine) tileset.redLine else null
-            6 -> if (withBorder) tileset.platformBorder else null
             else -> null
         }
     }

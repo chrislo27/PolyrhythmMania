@@ -11,15 +11,18 @@ import paintbox.util.gdxutils.set
 
 
 class Tileset(val packedSheet: PackedSheet) {
-    
+
     companion object {
-        private fun TextureRegion.toTinted(initColor: Color = Color.WHITE): TintedRegion = 
-                TintedRegion(this, initColor)
-        
-        private fun TextureRegion.toTinted(bindTo: ReadOnlyVar<Color>): TintedRegion = 
-                TintedRegion(this).apply { 
-                    this.color.bind { bindTo.use() }
-                }
+        private fun TextureRegion.toTinted(): TintedRegion = TintedRegion(this)
+        private fun TextureRegion.toTinted(initColor: Color): TintedRegion =
+            TintedRegion(this, initColor)
+
+        private fun TextureRegion.toTinted(bindTo: ReadOnlyVar<Color>): TintedRegion =
+            TintedRegion(this, binding = { bindTo.use() })
+
+        private fun TextureRegion.toEditableTinted(): EditableTintedRegion = EditableTintedRegion(this)
+        private fun TextureRegion.toEditableTinted(initColor: Color): EditableTintedRegion =
+            EditableTintedRegion(this, initColor)
     }
 
     /**
@@ -33,19 +36,18 @@ class Tileset(val packedSheet: PackedSheet) {
     val platformWithLine: TintedRegion = packedSheet["platform_with_line"].toTinted()
 
     /**
-     * Just the top -Z edge of [platform], a black line. Used on top of other cubes.
-     */
-    val platformBorder: TintedRegion = packedSheet["platform_border"].toTinted()
-
-    /**
      * The red line to be drawn on top of [cubeBorder].
      */
     val redLine: TintedRegion = packedSheet["red_line"].toTinted()
-    val cubeBorder: TintedRegion = packedSheet["cube_border"].toTinted()
-    val cubeBorderZ: TintedRegion = packedSheet["cube_border_z"].toTinted()
-    val cubeFaceX: TintedRegion = packedSheet["cube_face_x"].toTinted()
-    val cubeFaceY: TintedRegion = packedSheet["cube_face_y"].toTinted()
-    val cubeFaceZ: TintedRegion = packedSheet["cube_face_z"].toTinted()
+    val cubeBorder: EditableTintedRegion = packedSheet["cube_border"].toEditableTinted()
+    /**
+     * Just the top -Z edge of [platform] is a black line.
+     */
+    val cubeBorderPlatform: TintedRegion = packedSheet["cube_border_platform"].toTinted(cubeBorder.color)
+    val cubeBorderZ: EditableTintedRegion = packedSheet["cube_border_z"].toEditableTinted()
+    val cubeFaceX: EditableTintedRegion = packedSheet["cube_face_x"].toEditableTinted()
+    val cubeFaceY: EditableTintedRegion = packedSheet["cube_face_y"].toEditableTinted()
+    val cubeFaceZ: EditableTintedRegion = packedSheet["cube_face_z"].toEditableTinted()
     
     val pistonFaceXColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val pistonFaceZColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
@@ -126,6 +128,25 @@ class Tileset(val packedSheet: PackedSheet) {
     val dunkBacking: TintedRegion = packedSheet["hoop_back"].toTinted()
 }
 
-class TintedRegion(val region: TextureRegion, initColor: Color = Color.WHITE) {
-    val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f).set(initColor))
+open class TintedRegion(val region: TextureRegion) {
+    open val color: ReadOnlyVar<Color> = Var(Color(1f, 1f, 1f, 1f))
+    
+    constructor(region: TextureRegion, initColor: Color) : this(region) {
+        @Suppress("LeakingThis")
+        (color as Var).set(Color(1f, 1f, 1f, 1f).set(initColor))
+    }
+    constructor(region: TextureRegion, binding: Var.Context.() -> Color) : this(region) {
+        @Suppress("LeakingThis")
+        (color as Var).bind(binding)
+    }
+}
+
+class EditableTintedRegion(region: TextureRegion)
+    : TintedRegion(region) {
+    
+    override val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
+
+    constructor(region: TextureRegion, initColor: Color) : this(region) {
+        color.set(Color(1f, 1f, 1f, 1f).set(initColor))
+    }
 }
