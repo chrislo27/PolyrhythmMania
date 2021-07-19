@@ -13,6 +13,7 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
+import polyrhythmmania.sidemodes.ResetMusicVolumeBlock
 import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -38,8 +39,9 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
                 engine.addEvent(EventCowbellSFX(engine, startBeat + i, false))
             }
 
-            engine.musicData.volumeMap.removeMusicVolumesBulk(engine.musicData.volumeMap.getAllMusicVolumes().toList())
-            engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat, 0f, 100))
+            val volumeMap = engine.musicData.volumeMap
+            volumeMap.removeMusicVolumesBulk(volumeMap.getAllMusicVolumes().toList())
+            volumeMap.addMusicVolume(MusicVolume(startBeat, 0f, 100))
             
             engine.addEvent(EventLockInputs(engine, false, startBeat))
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 4f))
@@ -288,6 +290,9 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
 
+        blocks += ResetMusicVolumeBlock(engine, startingVolume = 0).apply {
+            this.beat = 0f
+        }
         blocks += BlockTextbox(engine).apply { 
             this.beat = 0f
             this.requireInput.set(true)

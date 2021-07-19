@@ -3,14 +3,17 @@ package polyrhythmmania.sidemodes
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
+import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.DunkWorldBackground
 import polyrhythmmania.world.EntityRodDunk
 import polyrhythmmania.world.WorldMode
+import java.util.*
 
 
 class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
@@ -37,14 +40,17 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
-        val b = LoopingEventBlock(engine, 4f, { engine ->
+        blocks += ResetMusicVolumeBlock(engine).apply { 
+            this.beat = 0f
+        }
+        val loop = LoopingEventBlock(engine, 4f, { engine ->
             engine.inputter.endlessScore.lives.getOrCompute() > 0
         }) { engine, startBeat ->
             engine.addEvent(EventDeployRodDunk(engine, startBeat))
         }
 
 
-        blocks += b.apply {
+        blocks += loop.apply {
             this.beat = 0f
         }
 
