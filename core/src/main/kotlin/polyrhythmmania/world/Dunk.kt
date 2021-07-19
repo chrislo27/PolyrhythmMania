@@ -77,6 +77,10 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
 
     private var playedDunkSfx: Boolean = false
     private var aceWasHit: Boolean = false
+    private var inputAccepted: Boolean = false
+    
+    val acceptingInputs: Boolean
+        get() = !collision.collidedWithWall || exploded || inputAccepted
 
     init {
         this.position.x = startingX
@@ -104,7 +108,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
     }
 
     fun bounce(engine: Engine, inputResult: InputResult) {
-        if (inputResult.inputScore == InputScore.MISS) return
+        if (inputResult.inputScore == InputScore.MISS || inputAccepted) return
 
         fun indexToX(index: Float): Float = index + world.dunkPiston.position.x
 
@@ -156,6 +160,8 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                 }
             })
         }
+        
+        inputAccepted = true
     }
 
 

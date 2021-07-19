@@ -259,7 +259,7 @@ class EngineInputter(val engine: Engine) {
             }
         } else if (worldMode == WorldMode.DUNK && type == InputType.A) {
             for (entity in engine.world.entities) {
-                if (entity !is EntityRodDunk) continue
+                if (entity !is EntityRodDunk || !entity.acceptingInputs) continue
                 val rod: EntityRodDunk = entity
                 val nextBlockIndex = entity.getCurrentIndexFloor(entity.getPosXFromBeat(atBeat - entity.deployBeat))
                 val activeIndex = 0
