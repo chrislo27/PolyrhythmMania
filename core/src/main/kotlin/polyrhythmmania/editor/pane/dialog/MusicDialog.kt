@@ -32,6 +32,7 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.util.TimeUtils
 import java.io.File
@@ -421,6 +422,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         window.doLooping.set(it.getOrCompute())
                     }
                     this.imageNode.tint.set(Color.WHITE.cpy())
+                    this.imageNode.padding.set(Insets(4f))
                     this.textLabel.textColor.set(Color.WHITE.cpy())
                     this.bounds.width.set(220f)
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.enableLooping.tooltip")))
@@ -428,7 +430,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 hbox.addChild(lCheckBox!!)
                 hbox.addChild(Button(binding = { Localization.getVar("editor.dialog.music.settings.resetLoopPoints").use() }, font = editorPane.palette.musicDialogFont).apply {
                     this.applyDialogStyleContent()
-                    this.bounds.width.set(250f)
+                    this.bounds.width.set(200f)
                     this.setOnAction {
                         window.loopStart.set(0f)
                         window.loopEnd.set(0f)
@@ -437,7 +439,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 })
                 hbox.addChild(Button(binding = { Localization.getVar("editor.dialog.music.settings.setLoopEndToEnd").use() }, font = editorPane.palette.musicDialogFont).apply {
                     this.applyDialogStyleContent()
-                    this.bounds.width.set(250f)
+                    this.bounds.width.set(230f)
                     this.setOnAction {
                         window.loopEnd.set(window.musicDurationSec.get())
                     }
@@ -445,7 +447,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 })
                 hbox.addChild(Button(binding = { Localization.getVar("editor.dialog.music.settings.skipSilence").use() }, font = editorPane.palette.musicDialogFont).apply {
                     this.applyDialogStyleContent()
-                    this.bounds.width.set(250f)
+                    this.bounds.width.set(230f)
                     this.setOnAction {
                         val estimate = findStartOfNonSilence()
                         if (estimate >= 0f) {
@@ -453,6 +455,42 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         }
                     }
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.skipSilence.tooltip")))
+                })
+                hbox.addChild(Pane().apply { 
+                    this.bounds.width.set(250f)
+                    val labelVar = Localization.getVar("editor.dialog.music.settings.rate", Var {
+                        listOf(DecimalFormats.format("0.00", editor.musicData.rate.useF()))
+                    })
+                    this += TextLabel(binding = { labelVar.use() }, font = editorPane.palette.musicDialogFont).apply {
+                        this.textColor.set(Color.WHITE)
+                        this.bindHeightToParent(multiplier = 0.5f)
+                        this.padding.set(Insets(1f))
+                        this.setScaleXY(0.8f)
+                        this.markup.set(editorPane.palette.markup)
+                        this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.rate.tooltip")))
+                    }
+                    this += Slider().apply {
+                        Anchor.BottomLeft.configure(this)
+                        this.bindHeightToParent(multiplier = 0.5f)
+                        this.padding.set(Insets(1f))
+                        this.minimum.set(10f)
+                        this.maximum.set(200f)
+                        this.tickUnit.set(1f)
+                        this.setValue(100f)
+                        this.value.addListener { v ->
+                            val newRate = v.getOrCompute() / 100f
+                            editor.musicData.rate.set(newRate)
+
+                            val engine = editor.engine
+                            val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
+                            if (player != null && !player.isPaused) {
+                                player.pitch = newRate
+                            }
+                        }
+                        this.setOnRightClick {
+                            this.setValue(100f)
+                        }
+                    }
                 })
             }
         }
@@ -529,6 +567,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         if (player != null) {
             player.position = window.playbackStart.get() * 1000.0
             player.useLoopParams(window.createLoopParams())
+            player.pitch = editor.musicData.rate.get()
             player.pause(false)
             editor.soundSystem.setPaused(false)
         }

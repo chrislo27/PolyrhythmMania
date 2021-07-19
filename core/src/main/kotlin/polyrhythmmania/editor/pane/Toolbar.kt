@@ -75,6 +75,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     this.padding.set(Insets(1f))
                     this.setScaleXY(0.65f)
                     this.markup.set(editorPane.palette.markup)
+                    this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.playbackSpeed.tooltip")))
                 }
                 this += Slider().apply {
                     val setSpeeds: List<Float> = listOf(0.25f, 0.30f, 0.35f, 0.40f, 0.45f, 0.50f, 0.60f, 0.70f, 0.75f, 0.80f, 0.85f, 0.90f, 0.95f,

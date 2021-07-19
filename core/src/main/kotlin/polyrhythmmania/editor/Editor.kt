@@ -429,6 +429,7 @@ class Editor(val main: PRManiaGame)
         engineMusicData.beadsMusic = this.musicData.beadsMusic
         engineMusicData.loopParams = this.musicData.loopParams.getOrCompute()
         engineMusicData.firstBeatSec = this.musicData.firstBeatSec.get()
+        engineMusicData.rate = this.musicData.rate.get()
         engineMusicData.musicSyncPointBeat = this.musicFirstBeat.get()
         val player = engine.soundInterface.getCurrentMusicPlayer(engineMusicData.beadsMusic)
         if (player != null) {
