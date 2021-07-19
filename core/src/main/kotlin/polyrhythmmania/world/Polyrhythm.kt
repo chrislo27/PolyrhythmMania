@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputResult
+import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.entity.EntityInputIndicator
@@ -402,25 +403,27 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
                 }
 
                 // Auto-inputs
+                val inputter = engine.inputter
                 if (engine.autoInputs) {
                     if (collision.velocityY == 0f && blockBelow.active && blockBelow.type != EntityPiston.Type.PLATFORM
                             && blockBelow.pistonState == EntityPiston.PistonState.RETRACTED
                             && currentIndexFloat - currentIndex in 0.25f..0.65f) {
                         blockBelow.fullyExtend(engine, beat)
-                        engine.inputter.attemptSkillStar(currentIndex / this.xUnitsPerBeat + this.deployBeat + 4f)
+                        inputter.attemptSkillStar(currentIndex / this.xUnitsPerBeat + this.deployBeat + 4f)
+                        inputter.inputFeedbackFlashes[inputter.getInputFeedbackIndex(InputScore.ACE, false)] = seconds
                     }
                 } else {
                     // Check if NOT in air but current expected input is that it should be in the air
                     val currentExpectedInput: ExpectedInput? = inputTracker.expected.getOrNull(currentIndex)
                     if (currentExpectedInput == ExpectedInput.InAir) {
-                        engine.inputter.missed()
+                        inputter.missed()
                     } else {
                         // Edge case: only have to bounce one unit (check two units behind to give time for lates)
                         val lastIndex = currentIndex - 1
                         val last2ExpectedInput: ExpectedInput? = inputTracker.expected.getOrNull(lastIndex - 1)
                         if (last2ExpectedInput is ExpectedInput.Expected && last2ExpectedInput.nextJumpIndex == lastIndex) {
                             if (inputTracker.results.none { it.expectedIndex == last2ExpectedInput.thisIndex }) {
-                                engine.inputter.missed()
+                                inputter.missed()
                             }
                         }
                     }

@@ -235,12 +235,7 @@ class EngineInputter(val engine: Engine) {
                         }
                     }
 
-                    val inputFeedbackIndex: Int = when (inputResult.inputScore) {
-                        InputScore.ACE -> 2
-                        InputScore.GOOD -> if (inputResult.accuracySec < 0f) 1 else 3
-                        InputScore.BARELY -> if (inputResult.accuracySec < 0f) 0 else 4
-                        InputScore.MISS -> -1
-                    }
+                    val inputFeedbackIndex: Int = getInputFeedbackIndex(inputResult.inputScore, inputResult.accuracySec < 0f)
                     if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
                         inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                     }
@@ -290,12 +285,7 @@ class EngineInputter(val engine: Engine) {
                 val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
                 Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
 
-                val inputFeedbackIndex: Int = when (inputResult.inputScore) {
-                    InputScore.ACE -> 2
-                    InputScore.GOOD -> if (inputResult.accuracySec < 0f) 1 else 3
-                    InputScore.BARELY -> if (inputResult.accuracySec < 0f) 0 else 4
-                    InputScore.MISS -> -1
-                }
+                val inputFeedbackIndex: Int = getInputFeedbackIndex(inputResult.inputScore, inputResult.accuracySec < 0f)
                 if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
                     inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                 }
@@ -308,6 +298,15 @@ class EngineInputter(val engine: Engine) {
                 }
             }
             world.dunkPiston.fullyExtend(engine, atBeat)
+        }
+    }
+    
+    fun getInputFeedbackIndex(score: InputScore, early: Boolean): Int {
+        return when (score) {
+            InputScore.ACE -> 2
+            InputScore.GOOD -> if (early) 1 else 3
+            InputScore.BARELY -> if (early) 0 else 4
+            InputScore.MISS -> -1
         }
     }
     
