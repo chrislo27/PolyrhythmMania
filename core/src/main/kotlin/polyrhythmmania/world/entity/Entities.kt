@@ -192,6 +192,8 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val flashInd
         if (currentSec - flashSec < flashTime) {
             val percentage = ((currentSec - flashSec) / flashTime).coerceIn(0f, 1f)
             color.set(originalColor).lerp(Color.WHITE, 1f - percentage)
+        } else {
+            color.set(originalColor)
         }
         
         val tintedRegion = when (end) {
