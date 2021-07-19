@@ -10,7 +10,7 @@ object PRMania {
     const val TITLE = "Polyrhythm Mania"
     const val GITHUB = "https://github.com/chrislo27/PolyrhythmMania"
     const val HOMEPAGE = "https://polyrhythmmania.rhre.dev"
-    val VERSION: Version = Version(0, 5, 0, "alpha_20210716a")
+    val VERSION: Version = Version(0, 5, 0, "alpha_20210718a")
     const val WIDTH: Int = 1280 //1080
     const val HEIGHT: Int = 720
     val DEFAULT_SIZE: WindowSize = WindowSize(WIDTH, HEIGHT)
