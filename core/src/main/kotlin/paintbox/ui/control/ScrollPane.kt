@@ -11,6 +11,8 @@ import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
+import paintbox.util.gdxutils.isAltDown
+import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
 
 
@@ -126,9 +128,10 @@ open class ScrollPane : Control<ScrollPane>() {
         addChild(vBar)
 
         this.addInputEventListener { event ->
-            if (event is Scrolled) {
-                val vBarAmount = if (Gdx.input.isShiftDown()) event.amountX else event.amountY
-                val hBarAmount = if (Gdx.input.isShiftDown()) event.amountY else event.amountX
+            if (event is Scrolled && !Gdx.input.isControlDown() && !Gdx.input.isAltDown()) {
+                val shift = Gdx.input.isShiftDown()
+                val vBarAmount = if (shift) event.amountX else event.amountY
+                val hBarAmount = if (shift) event.amountY else event.amountX
 
                 if (vBarAmount != 0f && vBar.apparentVisibility.getOrCompute() && !vBar.apparentDisabledState.getOrCompute()) {
                     if (vBarAmount > 0) vBar.incrementBlock() else vBar.decrementBlock()
