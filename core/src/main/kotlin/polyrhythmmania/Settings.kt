@@ -18,6 +18,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MUSIC_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
+import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_SKILL_STAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
@@ -35,6 +36,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, Var(PRMania.DEFAULT_SIZE))
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, Var(false))
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, Var(true))
+    private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, Var(true))
     private val kv_musicOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_MUSIC_OFFSET_MS, Var(0))
 
     private val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, Var(false))
@@ -54,6 +56,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val windowedResolution: Var<WindowSize> = kv_windowedResolution.value
     val fullscreen: Var<Boolean> = kv_fullscreen.value
     val showInputFeedbackBar: Var<Boolean> = kv_showInputFeedbackBar.value
+    val showSkillStar: Var<Boolean> = kv_showSkillStar.value
     val musicOffsetMs: Var<Int> = kv_musicOffsetMs.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
@@ -76,6 +79,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getWindowSize(kv_windowedResolution)
         prefs.getBoolean(kv_fullscreen)
         prefs.getBoolean(kv_showInputFeedbackBar)
+        prefs.getBoolean(kv_showSkillStar)
         prefs.getInt(kv_musicOffsetMs)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
@@ -93,26 +97,27 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
     fun persist() {
         prefs
-                .putInt(kv_gameplayVolume)
-                .putInt(kv_menuMusicVolume)
-                .putInt(kv_menuSfxVolume)
-                .putWindowSize(kv_windowedResolution)
-                .putBoolean(kv_fullscreen)
-                .putBoolean(kv_showInputFeedbackBar)
-                .putInt(kv_musicOffsetMs)
-                
-                .putBoolean(kv_editorDetailedMarkerUndo)
-                .putBoolean(kv_editorCameraPanOnDragEdge)
-                .putEditorSetting(kv_editorPanningDuringPlayback)
-                .putInt(kv_editorAutosaveInterval)
-                .putInt(kv_editorMusicWaveformOpacity)
-                .putBoolean(kv_editorHigherAccuracyPreview)
-                
-                .putInputKeymapKeyboard(kv_keymapKeyboard)
-                
-                .putInt(kv_endlessDunkHighScore)
+            .putInt(kv_gameplayVolume)
+            .putInt(kv_menuMusicVolume)
+            .putInt(kv_menuSfxVolume)
+            .putWindowSize(kv_windowedResolution)
+            .putBoolean(kv_fullscreen)
+            .putBoolean(kv_showInputFeedbackBar)
+            .putBoolean(kv_showSkillStar)
+            .putInt(kv_musicOffsetMs)
 
-                .flush()
+            .putBoolean(kv_editorDetailedMarkerUndo)
+            .putBoolean(kv_editorCameraPanOnDragEdge)
+            .putEditorSetting(kv_editorPanningDuringPlayback)
+            .putInt(kv_editorAutosaveInterval)
+            .putInt(kv_editorMusicWaveformOpacity)
+            .putBoolean(kv_editorHigherAccuracyPreview)
+
+            .putInputKeymapKeyboard(kv_keymapKeyboard)
+
+            .putInt(kv_endlessDunkHighScore)
+
+            .flush()
     }
 
     private fun Preferences.getInt(kv: KeyValue<Int>) {

@@ -265,6 +265,12 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     settings.showInputFeedbackBar.set(newState)
                 }
                 vbox += feedbackPane
+                val (skillStarPane, skillStarCheck) = createCheckboxOption({ Localization.getVar("mainMenu.inputSettings.feedback.skillStar").use() }, percentageContent = 0.25f)
+                skillStarCheck.checkedState.set(settings.showSkillStar.getOrCompute())
+                skillStarCheck.onCheckChanged = { newState ->
+                    settings.showSkillStar.set(newState)
+                }
+                vbox += skillStarPane
             }
             vbox.sizeHeightToChildren(100f)
             scrollPane.setContent(vbox)

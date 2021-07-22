@@ -86,6 +86,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     var worldBackground: WorldBackground = NoOpWorldBackground
 
     var renderUI: Boolean = true
+    var showSkillStarSetting: Boolean = PRManiaGame.instance.settings.showSkillStar.getOrCompute()
 
     val showEndlessModeScore: Var<Boolean> = Var(false)
     val prevHighScore: Var<Int> = Var(-1)
@@ -306,7 +307,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
         // Skill star
         val skillStarInput = inputter.skillStarBeat
-        if (skillStarInput.isFinite()) {
+        if (skillStarInput.isFinite() && showSkillStarSetting) {
             if (skillStarSpinAnimation > 0) {
                 skillStarSpinAnimation -= Gdx.graphics.deltaTime / 1f
                 if (skillStarSpinAnimation < 0)
