@@ -1,7 +1,7 @@
 package polyrhythmmania.editor.block
 
 
-enum class BlockType {
-    INPUT,
-    VFX,
+enum class BlockType(val nameLocalization: String) {
+    INPUT("blockType.input"),
+    FX("blockType.fx"),
 }

@@ -16,11 +16,12 @@ import polyrhythmmania.world.Row
 import java.util.*
 
 
-class BlockSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INPUT)) {
+class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
 
     companion object {
         val ROW_COUNT: Int = 10
         val ALLOWED_CUBE_TYPES: List<CubeType> by lazy { PatternBlockData.GENERAL_CUBE_TYPES }
+        val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.INPUT)
     }
 
     var patternData: PatternBlockData = PatternBlockData(ROW_COUNT, ALLOWED_CUBE_TYPES, CubeType.NONE).also { patternData ->

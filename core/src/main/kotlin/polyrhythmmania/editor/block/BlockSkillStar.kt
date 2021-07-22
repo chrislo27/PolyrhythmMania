@@ -7,7 +7,11 @@ import polyrhythmmania.engine.input.EventSkillStar
 import java.util.*
 
 
-class BlockSkillStar(engine: Engine) : Block(engine, EnumSet.of(BlockType.INPUT)) {
+class BlockSkillStar(engine: Engine) : Block(engine, BlockSkillStar.BLOCK_TYPES) {
+    
+    companion object {
+        val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.INPUT)
+    }
     
     init {
         this.width = 0.5f

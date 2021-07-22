@@ -11,7 +11,6 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.pane.dialog.TilesetEditDialog
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
@@ -21,7 +20,11 @@ import java.util.*
 
 
 class BlockTextbox(engine: Engine)
-    : Block(engine, EnumSet.of(BlockType.VFX)) {
+    : Block(engine, BlockTextbox.BLOCK_TYPES) {
+    
+    companion object {
+        val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
+    }
 
     var text: String = ""
     val requireInput: Var<Boolean> = Var(false)

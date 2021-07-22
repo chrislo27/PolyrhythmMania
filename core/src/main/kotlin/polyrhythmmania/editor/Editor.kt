@@ -74,8 +74,8 @@ class Editor(val main: PRManiaGame)
         const val TRACK_INPUT_0: String = "input_0"
         const val TRACK_INPUT_1: String = "input_1"
         const val TRACK_INPUT_2: String = "input_2"
-        const val TRACK_VFX_0: String = "vfx_0"
-        const val TRACK_VFX_1: String = "vfx_1"
+        const val TRACK_FX_0: String = "fx_0"
+        const val TRACK_FX_1: String = "fx_1"
 
         val MOVE_WINDOW_LEFT_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.A)
         val MOVE_WINDOW_RIGHT_KEYCODES: Set<Int> = setOf(Input.Keys.RIGHT, Input.Keys.D)
@@ -123,8 +123,8 @@ class Editor(val main: PRManiaGame)
             Track(TRACK_INPUT_0, EnumSet.of(BlockType.INPUT)),
             Track(TRACK_INPUT_1, EnumSet.of(BlockType.INPUT)),
             Track(TRACK_INPUT_2, EnumSet.of(BlockType.INPUT)),
-            Track(TRACK_VFX_0, EnumSet.of(BlockType.VFX)),
-            Track(TRACK_VFX_1, EnumSet.of(BlockType.VFX)),
+            Track(TRACK_FX_0, EnumSet.of(BlockType.FX)),
+            Track(TRACK_FX_1, EnumSet.of(BlockType.FX)),
     )
     val trackMap: Map<String, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 

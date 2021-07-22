@@ -13,11 +13,12 @@ import polyrhythmmania.world.entity.EntityPiston
 import java.util.*
 
 
-class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INPUT)) {
+class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveSpawnPattern.BLOCK_TYPES) {
 
     companion object {
         val ROW_COUNT: Int = 10
         val ALLOWED_CUBE_TYPES: List<CubeType> by lazy { PatternBlockData.SELECTIVE_SPAWN_CUBE_TYPES }
+        val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.INPUT)
     }
 
     var patternData: PatternBlockData = PatternBlockData(ROW_COUNT, ALLOWED_CUBE_TYPES, CubeType.NO_CHANGE)

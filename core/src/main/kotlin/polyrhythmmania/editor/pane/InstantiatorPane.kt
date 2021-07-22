@@ -22,6 +22,7 @@ import paintbox.util.gdxutils.drawCompressed
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.block.*
+import java.util.*
 import kotlin.math.*
 
 
@@ -68,15 +69,18 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
     inner class InstantiatorDesc : Pane() {
         val summary: TextLabel
         val desc: TextLabel
+        val allowedTracks: ImageIcon
 
         init {
             val summaryHeight = 64f
             summary = TextLabel(binding = { instantiatorList.currentItem.use().summary.use() }, font = editorPane.palette.instantiatorSummaryFont).apply { 
+                this.bindWidthToParent(adjust = -36f)
                 this.bounds.height.set(summaryHeight)
                 this.textColor.bind { editorPane.palette.instantiatorSummaryText.use() }
                 this.textAlign.set(TextAlign.LEFT)
                 this.renderAlign.set(Align.left)
                 this.markup.set(editorPane.palette.markupInstantiatorSummary)
+                this.padding.set(Insets(0f, 0f, 0f, 4f))
             }
             desc = TextLabel(binding = { instantiatorList.currentItem.use().desc.use() }/*, font = editorPane.palette.instantiatorDescFont*/).apply {
                 this.bounds.y.set(summaryHeight)
@@ -88,8 +92,31 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
                 this.margin.set(Insets(8f, 8f, 0f, 0f))
                 this.markup.set(editorPane.palette.markupInstantiatorDesc)
             }
+            allowedTracks = ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["allowed_tracks"])).apply { 
+                this.bounds.width.set(32f)
+                this.bounds.height.set(32f)
+                Anchor.TopRight.configure(this, offsetX = -2f)
+                val allowedTracksVar = Var { instantiatorList.currentItem.use().allowedTracks }
+                val tooltipVar = Localization.getVar("editor.instantiators.allowedTracks", Var {
+                    val allowedTracks = allowedTracksVar.use()
+                    if (allowedTracks == null) {
+                        listOf("null")
+                    } else if (allowedTracks == EnumSet.allOf(BlockType::class.java)) {
+                        listOf(Localization.getValue("editor.instantiators.allowedTracks.all"))
+                    } else {
+                        listOf(allowedTracks.map {
+                            Localization.getValue(it.nameLocalization)
+                        }.sorted().joinToString(separator = ", "))
+                    }
+                })
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Var {
+                    if (allowedTracksVar.use() == null) "" else tooltipVar.use()
+                }))
+                this.visible.bind { allowedTracksVar.use() != null }
+            }
             this += summary
             this += desc
+            this += allowedTracks
         }
     }
 }

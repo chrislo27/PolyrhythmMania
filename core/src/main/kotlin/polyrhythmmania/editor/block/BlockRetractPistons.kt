@@ -12,16 +12,17 @@ import polyrhythmmania.world.EventRowBlockRetract
 import java.util.*
 
 
-class BlockRetractPistons(engine: Engine) : Block(engine, EnumSet.of(BlockType.INPUT)) {
+class BlockRetractPistons(engine: Engine) : Block(engine, BlockRetractPistons.BLOCK_TYPES) {
 
+    companion object {
+        val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.INPUT)
+    }
+    
     val rowData: RowBlockData = RowBlockData(RowSetting.BOTH)
     
     init {
         this.width = 1f
-        val text = Localization.getVar("block.retractPistons.name", Var.bind {
-//            rowData.getSymbolAsListArg(this)
-            listOf("")
-        })
+        val text = Localization.getVar("block.retractPistons.name")
         this.defaultText.bind { text.use() }
         this.defaultTextSecondLine.bind { "[font=rodin]${rowData.rowSetting.use().stringRepresentation}[]" }
         this.secondLineTextAlign = TextAlign.RIGHT

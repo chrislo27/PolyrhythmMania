@@ -3,7 +3,6 @@ package polyrhythmmania.editor.block
 import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.Var
-import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -23,7 +22,11 @@ import java.util.*
 
 
 class BlockTilesetChange(engine: Engine)
-    : Block(engine, EnumSet.of(BlockType.VFX)) {
+    : Block(engine, BlockTilesetChange.BLOCK_TYPES) {
+    
+    companion object {
+        val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
+    }
 
     var tilesetConfig: TilesetConfig = engine.world.tilesetConfig.copy()
     var duration: Float = 0.5f

@@ -12,8 +12,12 @@ import polyrhythmmania.world.EventRowBlockDespawn
 import java.util.*
 
 
-class BlockDespawnPattern(engine: Engine) : Block(engine, EnumSet.of(BlockType.INPUT)) {
+class BlockDespawnPattern(engine: Engine) : Block(engine, BlockDespawnPattern.BLOCK_TYPES) {
 
+    companion object {
+        val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.INPUT)
+    }
+    
     val rowData: RowBlockData = RowBlockData(RowSetting.BOTH)
     
     init {
