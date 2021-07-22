@@ -81,6 +81,7 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityP
                          affectThisIndexAndForward: Boolean = false,
                          val startPistonExtended: Boolean = false,
 ) : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
+    
     init {
         this.width = 0.125f
     }
@@ -91,6 +92,8 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityP
         entity.pistonState = EntityPiston.PistonState.RETRACTED
         if (startPistonExtended) {
             entity.fullyExtendVanity(engine, currentBeat)
+        } else {
+            entity.retract()
         }
 
         if (currentBeat < this.beat + this.width && didChange) {

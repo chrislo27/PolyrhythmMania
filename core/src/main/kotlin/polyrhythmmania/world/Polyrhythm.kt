@@ -22,15 +22,15 @@ import kotlin.math.floor
 class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex: Int)
     : EntityPiston(world) {
 
-    enum class RetractionState {
+    enum class SpawningState {
         NEUTRAL,
-        EXTENDING,
-        RETRACTING
+        SPAWNING,
+        DESPAWNING
     }
 
-    var retractionState: RetractionState = RetractionState.NEUTRAL
+    var spawningState: SpawningState = SpawningState.NEUTRAL
         private set
-    private var retractionPercentage: Float = 0f
+    private var spawnPercentage: Float = 0f
 
     init {
         this.position.y = baseY - 1f // Start in the ground
@@ -77,12 +77,12 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
 
     fun spawn(percentage: Float) {
         val clamped = percentage.coerceIn(0f, 1f)
-        if (retractionPercentage > clamped) return
+        if (spawnPercentage > clamped) return
         active = clamped > 0f
         position.y = Interpolation.linear.apply(baseY - 1, baseY, clamped)
         row.updateInputIndicators()
-        retractionState = if (clamped <= 0f) RetractionState.NEUTRAL else RetractionState.EXTENDING
-        retractionPercentage = clamped
+        spawningState = if (clamped <= 0f) SpawningState.NEUTRAL else SpawningState.SPAWNING
+        spawnPercentage = clamped
     }
 
     /**
@@ -90,13 +90,13 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
      */
     fun despawn(percentage: Float): Boolean {
         val clamped = percentage.coerceIn(0f, 1f)
-        if (retractionPercentage < (1f - clamped)) return false
+        if (spawnPercentage < (1f - clamped)) return false
         if (active) {
             active = clamped < 1f
             position.y = Interpolation.linear.apply(baseY, baseY - 1, clamped)
             row.updateInputIndicators()
-            retractionState = if (clamped < 1f) RetractionState.NEUTRAL else RetractionState.RETRACTING
-            retractionPercentage = 1f - clamped
+            spawningState = if (clamped < 1f) SpawningState.NEUTRAL else SpawningState.DESPAWNING
+            spawnPercentage = 1f - clamped
             return true
         }
         return false
@@ -382,7 +382,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
                 if (floorBelow >= this.position.y) { // Push the rod up to the floor height and kill velocityY
                     collision.velocityY = 0f
                     this.position.y = floorBelow
-                } else if (blockBelow.retractionState == EntityRowBlock.RetractionState.RETRACTING && floorBelow + (2 / 32f) >= this.position.y) {
+                } else if (blockBelow.spawningState == EntityRowBlock.SpawningState.DESPAWNING && floorBelow + (2 / 32f) >= this.position.y) {
                     // Magnetize the rod to the retracting block to prevent landing SFX from playing
                     collision.velocityY = 0f
                     this.position.y = floorBelow

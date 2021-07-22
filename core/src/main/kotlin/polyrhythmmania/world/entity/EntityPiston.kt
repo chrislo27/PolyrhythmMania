@@ -55,6 +55,8 @@ open class EntityPiston(world: World)
     open fun retract(): Boolean {
         val oldPistonState = pistonState
         pistonState = PistonState.RETRACTED
+        shouldPartiallyExtend = false
+        fullyExtendedAtBeat = 0f
         return oldPistonState != PistonState.RETRACTED
     }
 
