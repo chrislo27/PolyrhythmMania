@@ -47,6 +47,7 @@ import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
@@ -649,6 +650,7 @@ class Editor(val main: PRManiaGame)
             timing.seconds = newSeconds
             engine.seconds = newSeconds
             updateTilesetChangesState()
+            engine.soundInterface.clearAllNonMusicAudio()
         }
 
         if (newState == PlayState.PLAYING) {

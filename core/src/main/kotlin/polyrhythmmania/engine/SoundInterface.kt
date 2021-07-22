@@ -58,7 +58,16 @@ sealed class SoundInterface {
                 PRManiaGame.instance.playMenuSfx(sound, volume, pitch, pan)
             }
         }
-        
+
+        override fun clearAllNonMusicAudio() {
+            val currentMusic = currentMusicPlayer
+            val out = soundSystem.audioContext.out
+            out.clearInputConnections()
+            if (currentMusic != null) {
+                out.addInput(currentMusic)
+            }
+        }
+
         override fun setPaused(paused: Boolean) {
             soundSystem.setPaused(paused)
         }
@@ -85,6 +94,9 @@ sealed class SoundInterface {
 
         override fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float) {
         }
+
+        override fun clearAllNonMusicAudio() {
+        }
     }
     
     open var disableSounds: Boolean = false
@@ -104,6 +116,8 @@ sealed class SoundInterface {
     abstract fun playAudio(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long
     
     abstract fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float)
+    
+    abstract fun clearAllNonMusicAudio()
     
     fun playMenuSfx(sound: Sound, volume: Float) = playMenuSfx(sound, volume, 1f, 0f)
     fun playMenuSfx(sound: Sound) = playMenuSfx(sound, 1f, 1f, 0f)
