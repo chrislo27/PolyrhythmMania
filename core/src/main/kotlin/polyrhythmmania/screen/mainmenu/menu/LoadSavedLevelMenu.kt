@@ -25,6 +25,7 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
+import polyrhythmmania.editor.pane.dialog.LoadDialog
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -268,6 +269,13 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     descLabel.doLineWrapping.set(true)
                     descLabel.text.set(Localization.getValue("mainMenu.play.noEndState",
                             Localization.getValue(Instantiators.endStateInstantiator.name.getOrCompute())))
+                    newContainer.disposeQuietly()
+                }
+            } else if (loadMetadata.isFutureVersion) {
+                Gdx.app.postRunnable {
+                    substate.set(Substate.LOAD_ERROR)
+                    descLabel.doLineWrapping.set(true)
+                    descLabel.text.set(Localization.getValue("editor.dialog.load.error.futureVersion", loadMetadata.programVersion.toString(), loadMetadata.containerVersion))
                     newContainer.disposeQuietly()
                 }
             } else {

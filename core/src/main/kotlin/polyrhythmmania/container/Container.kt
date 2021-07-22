@@ -432,5 +432,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         return LoadMetadata(containerVersion, programVersion)
     }
 
-    data class LoadMetadata(val containerVersion: Int, val programVersion: Version?)
+    data class LoadMetadata(val containerVersion: Int, val programVersion: Version?) {
+        val isFutureVersion: Boolean = (programVersion != null && programVersion > PRMania.VERSION) || (containerVersion > CONTAINER_VERSION)
+    }
 }

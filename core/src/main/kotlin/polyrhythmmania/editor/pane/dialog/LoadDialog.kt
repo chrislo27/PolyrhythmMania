@@ -184,44 +184,51 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         thread(isDaemon = true) {
             try {
                 val loadMetadata = newContainer.readFromFile(newFile)
-
-                Gdx.app.postRunnable {
-                    // Translate some aspects to the Editor
-                    newEditor.startingTempo.set(newContainer.engine.tempos.tempoAtSeconds(0f))
-                    newEditor.tempoChanges.set(newContainer.engine.tempos.getAllTempoChanges().filter { it.beat > 0f })
-                    newEditor.musicVolumes.set(newContainer.engine.musicData.volumeMap.getAllMusicVolumes())
-                    newEditor.timeSignatures.set(newContainer.engine.timeSignatures.map.values.toList())
-                    
-                    val musicRes: ExternalResource? = newContainer.compressedMusic
-                    if (musicRes != null) {
-                        val containerMusicData = newContainer.engine.musicData
-                        val beadsMusic = containerMusicData.beadsMusic!!
-                        newEditor.musicData.setMusic(beadsMusic, musicRes)
-                        newEditor.musicData.waveform?.generateSummaries()
-                        
-                        newEditor.musicData.firstBeatSec.set(containerMusicData.firstBeatSec)
-                        newEditor.musicData.rate.set(containerMusicData.rate)
-                        newEditor.musicFirstBeat.set(containerMusicData.musicSyncPointBeat)
-                        val loopParams = containerMusicData.loopParams
-                        newEditor.musicData.loopParams.set(loopParams)
-                        
-                        newEditor.updateForNewMusicData()
+                
+                if (loadMetadata.isFutureVersion) {
+                    Gdx.app.postRunnable {
+                        substate.set(Substate.LOAD_ERROR)
+                        descLabel.text.set(Localization.getValue("editor.dialog.load.error.futureVersion", loadMetadata.programVersion.toString(), loadMetadata.containerVersion))
                     }
-                    
-                    if (!isRecovery) {
-                        newEditor.editorPane.saveDialog.assignSaveLocation(newFile)
-                    }
+                } else {
+                    Gdx.app.postRunnable {
+                        // Translate some aspects to the Editor
+                        newEditor.startingTempo.set(newContainer.engine.tempos.tempoAtSeconds(0f))
+                        newEditor.tempoChanges.set(newContainer.engine.tempos.getAllTempoChanges().filter { it.beat > 0f })
+                        newEditor.musicVolumes.set(newContainer.engine.musicData.volumeMap.getAllMusicVolumes())
+                        newEditor.timeSignatures.set(newContainer.engine.timeSignatures.map.values.toList())
 
-                    substate.set(Substate.LOADED)
-                    descLabel.text.set(Localization.getValue("editor.dialog.load.loaded",
-                                    Localization.getValue("editor.dialog.load.loadedInformation",
-                                            loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
-                    )
-                    loaded = LoadData(newEditorScreen, loadMetadata)
+                        val musicRes: ExternalResource? = newContainer.compressedMusic
+                        if (musicRes != null) {
+                            val containerMusicData = newContainer.engine.musicData
+                            val beadsMusic = containerMusicData.beadsMusic!!
+                            newEditor.musicData.setMusic(beadsMusic, musicRes)
+                            newEditor.musicData.waveform?.generateSummaries()
 
-                    if (!isRecovery) {
-                        val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
-                        main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, newInitialDirectory)
+                            newEditor.musicData.firstBeatSec.set(containerMusicData.firstBeatSec)
+                            newEditor.musicData.rate.set(containerMusicData.rate)
+                            newEditor.musicFirstBeat.set(containerMusicData.musicSyncPointBeat)
+                            val loopParams = containerMusicData.loopParams
+                            newEditor.musicData.loopParams.set(loopParams)
+
+                            newEditor.updateForNewMusicData()
+                        }
+
+                        if (!isRecovery) {
+                            newEditor.editorPane.saveDialog.assignSaveLocation(newFile)
+                        }
+
+                        substate.set(Substate.LOADED)
+                        descLabel.text.set(Localization.getValue("editor.dialog.load.loaded",
+                            Localization.getValue("editor.dialog.load.loadedInformation",
+                                loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
+                        )
+                        loaded = LoadData(newEditorScreen, loadMetadata)
+
+                        if (!isRecovery) {
+                            val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
+                            main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_LOAD, newInitialDirectory)
+                        }
                     }
                 }
             } catch (e: Exception) {
