@@ -57,6 +57,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     
     fun addEvent(event: Event) {
         this._events += event
+        this._events.sort()
     }
 
     fun removeEvent(event: Event) {
@@ -66,6 +67,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     fun addEvents(events: List<Event>) {
         if (events.isEmpty()) return
         this._events.addAll(events)
+        this._events.sort()
     }
 
     fun removeEvents(events: List<Event>) {
