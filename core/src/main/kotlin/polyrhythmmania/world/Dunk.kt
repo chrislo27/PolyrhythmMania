@@ -80,7 +80,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
     private var inputAccepted: Boolean = false
     
     val acceptingInputs: Boolean
-        get() = !collision.collidedWithWall || exploded || inputAccepted
+        get() = !collision.collidedWithWall && !exploded && !inputAccepted
 
     init {
         this.position.x = startingX

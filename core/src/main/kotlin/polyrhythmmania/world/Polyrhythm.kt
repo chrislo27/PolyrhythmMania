@@ -196,7 +196,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
 
     val inputTracker: InputTracker = InputTracker(row.length)
     val acceptingInputs: Boolean
-        get() = !collision.collidedWithWall || exploded
+        get() = !collision.collidedWithWall && !exploded
     
     init {
         this.position.x = getPosXFromBeat(0f)
