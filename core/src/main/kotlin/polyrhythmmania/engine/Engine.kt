@@ -34,18 +34,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     var musicOffsetMs: Float = 0f
     
     var activeTextBox: ActiveTextBox? = null
-        set(value) {
-            val old = field
-            field = value
-            if (value != null && value.textBox.requiresInput) {
-                value.wasSoundInterfacePaused = soundInterface.pausedState
-                soundInterface.setPaused(true)
-            } else {
-                if (old != null && old.textBox.requiresInput && !old.wasSoundInterfacePaused) {
-                    soundInterface.setPaused(false)
-                }
-            }
-        }
+        private set
     
     fun resetEndSignal() {
         endSignalReceived.set(false)
@@ -73,6 +62,24 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     fun removeEvents(events: List<Event>) {
         if (events.isEmpty()) return
         this._events.removeAll(events)
+    }
+    
+    fun setActiveTextbox(newTextbox: TextBox) {
+        val newActive = newTextbox.toActive()
+
+        this.activeTextBox = newActive
+        if (newActive.textBox.requiresInput) {
+            newActive.wasSoundInterfacePaused = soundInterface.isPaused()
+            soundInterface.setPaused(true)
+        }
+    }
+    
+    fun removeActiveTextbox(unpauseSound: Boolean) {
+        val old = activeTextBox
+        activeTextBox = null
+        if (unpauseSound && old != null && old.textBox.requiresInput && !old.wasSoundInterfacePaused) {
+            soundInterface.setPaused(false)
+        }
     }
     
     fun updateEvent(event: Event, atBeat: Float) {
@@ -125,7 +132,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
             }
             if (activeTextBox.secondsTimer <= 0f) {
                 if (autoInputs) {
-                    this.activeTextBox = null
+                    removeActiveTextbox(true)
                 }
             }
         } else {

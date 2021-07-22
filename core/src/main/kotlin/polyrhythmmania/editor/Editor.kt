@@ -246,7 +246,7 @@ class Editor(val main: PRManiaGame)
 
     fun renderUpdate() {
         val ctrl = Gdx.input.isControlDown()
-        val alt = Gdx.input.isAltDown()
+//        val alt = Gdx.input.isAltDown()
         val shift = Gdx.input.isShiftDown()
         val delta = Gdx.graphics.deltaTime
 
@@ -457,7 +457,7 @@ class Editor(val main: PRManiaGame)
             row.updateInputIndicators()
         }
         engine.inputter.reset()
-        engine.activeTextBox = null
+        engine.removeActiveTextbox(false)
     }
 
     /**
@@ -627,8 +627,10 @@ class Editor(val main: PRManiaGame)
                         while (s < newSeconds) {
                             timing.seconds = s
                             engine.seconds = s
-                            engine.activeTextBox = null
+                            engine.removeActiveTextbox(false)
+                            val last = s
                             s = (s + 1 / 60f).coerceAtMost(newSeconds)
+                            if (s <= last) break
                         }
                     }
                 }

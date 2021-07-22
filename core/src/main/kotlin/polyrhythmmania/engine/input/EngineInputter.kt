@@ -137,7 +137,7 @@ class EngineInputter(val engine: Engine) {
             } else {
                 if (release) {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<Sound>("sfx_text_advance_2"))
-                    engine.activeTextBox = null
+                    engine.removeActiveTextbox(true)
                 }
             }
         } else {
@@ -367,12 +367,12 @@ class EngineInputter(val engine: Engine) {
                 
                 if (wasNewHighScore) {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
-                    engine.activeTextBox = ActiveTextBox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true))
+                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true))
                     endlessScore.highScore.set(score)
                     PRManiaGame.instance.settings.persist()
                 } else {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
-                    engine.activeTextBox = ActiveTextBox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true))
+                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true))
                 }
                 endlessScore.gameOverUIShown.set(true)
             }

@@ -277,17 +277,19 @@ class EventTextbox(engine: Engine, startBeat: Float, duration: Float, val textbo
         super.onStart(currentBeat)
         if (textbox.requiresInput) {
             if (currentBeat in this.beat..(this.beat + 0.25f)) {
-                engine.activeTextBox = textbox.toActive()
+                engine.setActiveTextbox(textbox)
             }
         } else {
             if (currentBeat in this.beat..(this.beat + this.width)) {
-                engine.activeTextBox = textbox.toActive()
+                engine.setActiveTextbox(textbox)
             }
         }
     }
 
     override fun onEnd(currentBeat: Float) {
         super.onEnd(currentBeat)
-        engine.activeTextBox = null
+        if (!textbox.requiresInput) {
+            engine.removeActiveTextbox(true)
+        }
     }
 }

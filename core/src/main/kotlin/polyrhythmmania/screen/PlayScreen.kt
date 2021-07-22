@@ -309,7 +309,6 @@ class PlayScreen(
             inputScore.weight
         } / nInputs) * 100))
         val score: Int = rawScore.roundToInt().coerceIn(0, 100)
-        val results = TemporaryResultsMenu.Results(nInputs, score, inputter.inputResults)
         
         val resultsText = container.resultsText
         val ranking = Ranking.getRanking(score)
@@ -359,7 +358,7 @@ class PlayScreen(
         engine.inputter.reset()
         renderer.resetAnimations()
         engine.musicOffsetMs = musicOffsetMs
-        engine.activeTextBox = null
+        engine.removeActiveTextbox(false)
         engine.resetEndSignal()
         
         timing.seconds = -1f
