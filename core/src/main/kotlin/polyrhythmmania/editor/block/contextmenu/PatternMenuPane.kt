@@ -21,7 +21,7 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.util.RodinSpecialChars
 
 
-class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, val clearType: CubeType)
+class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, val clearType: CubeType, beatIndexStart: Int)
     : Pane() {
 
     init {
@@ -94,7 +94,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
             pane.bounds.height.set(10f)
             
             for (b in 0 until (data.rowCount / 2)) {
-                pane += TextLabel("$b", font = editorPane.palette.musicDialogFontBold).apply { 
+                pane += TextLabel("${b + beatIndexStart}", font = editorPane.palette.musicDialogFontBold).apply { 
                     this.bounds.width.set(blockSize)
                     this.bounds.x.set((b * 2 + 1) * blockSize)
                     this.textAlign.set(TextAlign.LEFT)

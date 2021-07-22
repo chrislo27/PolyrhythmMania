@@ -112,6 +112,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
 
             if (ind == timings.size - 1 && anyNotNone && !disableTailEnd.getOrCompute()) {
                 when (cube) {
+                    CubeType.NO_CHANGE -> {}
                     CubeType.NONE -> {
                         val next = ind + 1
                         if (next < row.length) {
@@ -126,11 +127,14 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
                                     beat + b, affectThisIndexAndForward = true)
                         }
                     }
-                    CubeType.PISTON -> {
+                    CubeType.PISTON, CubeType.PISTON_OPEN -> {
                         val next = ind + 2
                         if (next < row.length) {
-                            events += EventRowBlockSpawn(engine, row, next, EntityPiston.Type.PLATFORM,
-                                    beat + next * 0.5f, affectThisIndexAndForward = true)
+                            events += EventRowBlockSpawn(
+                                engine, row, next, EntityPiston.Type.PLATFORM,
+                                beat + next * 0.5f, affectThisIndexAndForward = true,
+                                startPistonExtended = cube == CubeType.PISTON_OPEN
+                            )
                         }
                     }
                 }
@@ -144,7 +148,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
         return ContextMenu().also { ctxmenu ->
             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.spawnPattern"), editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(SeparatorMenuItem())
-            patternData.createMenuItems(editor, CubeType.NONE).forEach { ctxmenu.addMenuItem(it) }
+            patternData.createMenuItems(editor, CubeType.NONE, 0).forEach { ctxmenu.addMenuItem(it) }
             ctxmenu.addMenuItem(SeparatorMenuItem())
             ctxmenu.addMenuItem(CheckBoxMenuItem.create(disableTailEnd,
                     Localization.getValue("blockContextMenu.spawnPattern.deployTailEnd"),

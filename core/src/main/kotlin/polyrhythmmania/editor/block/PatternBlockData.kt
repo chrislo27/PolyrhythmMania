@@ -17,8 +17,8 @@ class PatternBlockData(val rowCount: Int, val allowedCubeTypes: List<CubeType>, 
         val SELECTIVE_SPAWN_CUBE_TYPES: List<CubeType> = listOf(CubeType.NO_CHANGE, CubeType.NONE, CubeType.PISTON,
                 CubeType.PLATFORM, CubeType.PISTON_OPEN)
         
-        fun readFromJson(obj: JsonObject, allowedCubeTypes: List<CubeType>): PatternBlockData? {
-            val patternDataObj = obj.get("patternData")
+        fun readFromJson(obj: JsonObject, allowedCubeTypes: List<CubeType>, objName: String = "patternData"): PatternBlockData? {
+            val patternDataObj = obj.get(objName)
             if (patternDataObj != null && patternDataObj.isObject) {
                 patternDataObj as JsonObject
                 val rowCount: Int = patternDataObj.getInt("rowCount", 0)
@@ -54,14 +54,14 @@ class PatternBlockData(val rowCount: Int, val allowedCubeTypes: List<CubeType>, 
     val rowATypes: Array<CubeType> = Array(rowCount) { starting }
     val rowDpadTypes: Array<CubeType> = Array(rowCount) { starting }
 
-    fun createMenuItems(editor: Editor, clearType: CubeType): List<MenuItem> {
+    fun createMenuItems(editor: Editor, clearType: CubeType, beatIndexStart: Int): List<MenuItem> {
         return listOf(
-                CustomMenuItem(PatternMenuPane(editor.editorPane, this, clearType)),
+                CustomMenuItem(PatternMenuPane(editor.editorPane, this, clearType, beatIndexStart)),
         )
     }
     
-    fun writeToJson(obj: JsonObject) {
-        obj.add("patternData", Json.`object`().also { o ->
+    fun writeToJson(obj: JsonObject, objName: String = "patternData") {
+        obj.add(objName, Json.`object`().also { o ->
             val patData = this
             o.add("rowCount", patData.rowCount)
             o.add("a", Json.array().also { a ->
