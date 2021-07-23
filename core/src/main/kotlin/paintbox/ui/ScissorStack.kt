@@ -22,6 +22,8 @@ object ScissorStack {
             if (scissor.width < 1 || scissor.height < 1) return false
             Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST)
         } else {
+            if ((scissor.x + scissor.y + scissor.width + scissor.height).isNaN()) return false
+            
             // Merge scissors
             val parent = stack.last()
             val minX = max(parent.x, scissor.x)
