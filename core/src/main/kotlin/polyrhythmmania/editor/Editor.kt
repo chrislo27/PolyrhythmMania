@@ -850,45 +850,46 @@ class Editor(val main: PRManiaGame)
             }
         }
         if (!contextMenuActive && !dialogActive) {
-            when (keycode) {
-                in MOVE_WINDOW_KEYCODES -> {
-                    pressedButtons += keycode
-                    inputConsumed = true
-                }
-                Input.Keys.DEL, Input.Keys.FORWARD_DEL -> { // BACKSPACE or DELETE: Delete selection
-                    if (currentClick == Click.None && state == PlayState.STOPPED) {
-                        val selected = selectedBlocks.keys.toList()
-                        if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
-                            this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
-                            forceUpdateStatus.invert()
-                        }
-                        inputConsumed = true
-                    }
-                }
-                Input.Keys.HOME -> { // HOME: Jump to beat 0
-                    cameraPan = CameraPan(0.25f, trackView.beat.get(), 0f)
-                    inputConsumed = true
-                }
-                Input.Keys.END -> { // END: Jump to stopping position
-                    if (this.blocks.isNotEmpty()) {
-                        cameraPan = CameraPan(0.25f, trackView.beat.get(), (container.stopPosition.get()).coerceAtLeast(0f))
-                    }
-                    inputConsumed = true
-                }
-                in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
-                    if (!ctrl && !alt && !shift && currentClick == Click.None) {
-                        val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
-                        if (number in 0 until Tool.VALUES.size) {
-                            changeTool(Tool.VALUES.getOrNull(number) ?: Tool.SELECTION)
+            if (keycode in MOVE_WINDOW_KEYCODES) {
+                pressedButtons += keycode
+                inputConsumed = true
+            } else if (!shift && !alt && !ctrl) {
+                when (keycode) {
+                    Input.Keys.DEL, Input.Keys.FORWARD_DEL -> { // BACKSPACE or DELETE: Delete selection
+                        if (currentClick == Click.None && state == PlayState.STOPPED) {
+                            val selected = selectedBlocks.keys.toList()
+                            if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
+                                this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
+                                forceUpdateStatus.invert()
+                            }
                             inputConsumed = true
                         }
                     }
-                }
-                Input.Keys.T -> {
-                    if (!shift && !alt && !ctrl && currentClick == Click.None) {
-                        val tapalongPane = editorPane.toolbar.tapalongPane
-                        if (tapalongPane.apparentVisibility.getOrCompute()) {
-                            tapalongPane.tap()
+                    Input.Keys.HOME -> { // HOME: Jump to beat 0
+                        cameraPan = CameraPan(0.25f, trackView.beat.get(), 0f)
+                        inputConsumed = true
+                    }
+                    Input.Keys.END -> { // END: Jump to stopping position
+                        if (this.blocks.isNotEmpty()) {
+                            cameraPan = CameraPan(0.25f, trackView.beat.get(), (container.stopPosition.get()).coerceAtLeast(0f))
+                        }
+                        inputConsumed = true
+                    }
+                    in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
+                        if (!ctrl && !alt && !shift && currentClick == Click.None) {
+                            val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
+                            if (number in 0 until Tool.VALUES.size) {
+                                changeTool(Tool.VALUES.getOrNull(number) ?: Tool.SELECTION)
+                                inputConsumed = true
+                            }
+                        }
+                    }
+                    Input.Keys.T -> {
+                        if (!shift && !alt && !ctrl && currentClick == Click.None) {
+                            val tapalongPane = editorPane.toolbar.tapalongPane
+                            if (tapalongPane.apparentVisibility.getOrCompute()) {
+                                tapalongPane.tap()
+                            }
                         }
                     }
                 }
