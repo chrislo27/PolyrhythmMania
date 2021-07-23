@@ -362,6 +362,8 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     
     fun prepareShow(): TilesetEditDialog {
         tilesetConfig.applyTo(objPreview.worldRenderer.tileset)
+        resetGroupMappingsToTileset()
+        updateColourPickerToMapping()
         return this
     }
 
