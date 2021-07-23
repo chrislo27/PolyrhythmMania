@@ -63,7 +63,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     val text: Var<String> = Var("")
     val emptyHintText: Var<String> = Var("")
 
-    var inputFilter: Var<(Char) -> Boolean> = Var(DEFAULT_INPUT_FILTER)
+    val inputFilter: Var<(Char) -> Boolean> = Var(DEFAULT_INPUT_FILTER)
     var enterPressedAction: () -> Unit = { requestUnfocus() }
     val characterLimit: Var<Int> = Var(Int.MAX_VALUE)
     val newlineWrapChar: Var<Char> = Var(DEFAULT_NEWLINE_WRAP)
