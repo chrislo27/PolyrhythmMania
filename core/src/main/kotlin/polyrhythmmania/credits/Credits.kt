@@ -11,10 +11,10 @@ object Credits {
                     "garbo", "snow krow",
             ),
             "credits.music" to abcSorted(
-                    "GenericArrangements"
+                    "GENERIC"
             ),
             "credits.qa" to abcSorted(
-                    "Lvl100Feraligatr", "Gosh", "GenericArrangements", "snow krow", "Kievit", "Chloe", "GrueKun",
+                    "Lvl100Feraligatr", "Gosh", "GENERIC", "snow krow", "Kievit", "Chloe", "GrueKun", "Huebird",
             ) + listOf("Tourneycord Discord\nserver"),
             "credits.resourcesAndTechnologies" to listOf(
                     "[font=rodin]リズム天国[] assets\nby Nintendo",
