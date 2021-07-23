@@ -14,6 +14,7 @@ import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
+import polyrhythmmania.ui.DecimalTextField
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.EventTextbox
 import java.util.*
@@ -93,39 +94,19 @@ class BlockTextbox(engine: Engine)
                             this.border.set(Insets(1f))
                             this.borderStyle.set(SolidBorder(Color.WHITE))
                             this.padding.set(Insets(2f))
-                            this += TextField(font = editor.editorPane.palette.musicDialogFont).apply {
+                            this += DecimalTextField(startingValue = duration, decimalFormat = DecimalFormats["0.0##"],
+                                    font = editor.editorPane.palette.musicDialogFont).apply {
+                                this.allowNegatives.set(false)
                                 this.textColor.set(Color(1f, 1f, 1f, 1f))
-                                this.text.set(durationToStr())
-                                this.inputFilter.set({ c -> c in '0'..'9' || c == '.' })
-                                this.text.addListener { t ->
-                                    if (hasFocus.getOrCompute()) {
-                                        try {
-                                            val newValue = t.getOrCompute().toFloatOrNull()
-                                            if (newValue != null) {
-                                                duration = newValue
-                                            }
-                                        } catch (ignored: Exception) {}
-                                    }
-                                }
-                                hasFocus.addListener { f ->
-                                    if (!f.getOrCompute()) {
-                                        this.text.set(durationToStr())
-                                    }
-                                }
-                                this.setOnRightClick {
-                                    text.set("")
-                                    requestFocus()
+
+                                this.value.addListener {
+                                    duration = it.getOrCompute()
                                 }
                             }
                         }
                     }
             ))
-            
         }
-    }
-    
-    private fun durationToStr(): String {
-        return DecimalFormats.format("0.0##", duration)
     }
 
     override fun copy(): BlockTextbox {
