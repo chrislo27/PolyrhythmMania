@@ -1200,6 +1200,7 @@ class Editor(val main: PRManiaGame)
 Click: ${click.javaClass.simpleName}${if (clickDebugString.isNotEmpty()) "\n$clickDebugString" else ""}
 engine.events: ${engine.events.size}
 autosave: ${DecimalFormats.format("0.0", timeUntilAutosave)}
+trackView: ${trackView.beat.get()} | ${trackView.renderScale.get()} @ (${trackView.pxPerBeat.get()} px/beat)
 path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
 cameraOffsetCurrent: ${cameraOffset.current}
 cameraOffsetTarget: ${cameraOffset.target}
