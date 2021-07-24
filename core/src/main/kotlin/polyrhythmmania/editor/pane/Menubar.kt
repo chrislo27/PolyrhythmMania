@@ -165,9 +165,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
             this.skinID.set(EditorSkins.BUTTON)
-            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["settings"])).apply { 
-                this.tint.bind { editorPane.palette.menubarIconTint.use() }
-            }
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["settings"]))
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.settings")))
             this.setOnAction {
                 editor.attemptOpenSettingsDialog()
