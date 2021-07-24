@@ -69,7 +69,7 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "sign_ta",
                 "sign_ta_shadow",
                 "xyz",
-        ).map { Packable(it, "textures/world/parts/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false,)))
+        ).map { Packable(it, "textures/world/parts/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 1024, duplicateBorder = false,)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "skill_star",
                 "skill_star_grey",

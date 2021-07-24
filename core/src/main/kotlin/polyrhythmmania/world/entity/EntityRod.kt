@@ -36,8 +36,8 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
 
         val renderW = renderWidth
         val renderH = renderHeight
-        val offsetX = -(1 / 32f)
-        val offsetY = 1f / 32f
+        val offsetX = -(1 / 32f) * 0
+        val offsetY = 1f / 32f * 0
         val regionBorder: TintedRegion = if (!isInAir) {
             tileset.rodGroundBorderAnimations[(animationAlpha * tileset.rodGroundFrameCount).toInt().coerceIn(0, tileset.rodGroundFrameCount - 1)]
         } else {

@@ -91,22 +91,22 @@ class Tileset(val packedSheet: PackedSheet) {
     private val rodFillSection: TextureRegion = packedSheet["rods_fill"]
     val rodGroundBorderAnimations: List<TintedRegion> by lazy {
         (0 until rodGroundFrameCount).map { i ->
-            TextureRegion(rodBordersSection, 0, 0 + 17 * i, 24, 16).toTinted(rodBorderColor)
+            TextureRegion(rodBordersSection, 0, 16 * i, 24, 16).toTinted(rodBorderColor)
         }
     }
     val rodGroundFillAnimations: List<TintedRegion> by lazy {
         (0 until rodGroundFrameCount).map { i ->
-            TextureRegion(rodFillSection, 0, 0 + 17 * i, 24, 16).toTinted(rodFillColor)
+            TextureRegion(rodFillSection, 0, 16 * i, 24, 16).toTinted(rodFillColor)
         }
     }
     val rodAerialBorderAnimations: List<TintedRegion> by lazy {
         (0 until rodAerialFrameCount).map { i ->
-            TextureRegion(rodFillSection, 26, 1 + 17 * i, 24, 16).toTinted(rodBorderColor)
+            TextureRegion(rodFillSection, 24, 16 * i, 24, 16).toTinted(rodBorderColor)
         }
     }
     val rodAerialFillAnimations: List<TintedRegion> by lazy {
         (0 until rodAerialFrameCount).map { i ->
-            TextureRegion(rodFillSection, 26, 1 + 17 * i, 24, 16).toTinted(rodFillColor)
+            TextureRegion(rodFillSection, 24, 16 * i, 24, 16).toTinted(rodFillColor)
         }
     }
 
