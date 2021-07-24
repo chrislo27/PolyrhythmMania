@@ -36,8 +36,8 @@ class EditorHelpDocControls : HelpDocument(
                 LayerParagraph("editorHelp.controls.pp1", 80f),
                 LayerParagraph("editorHelp.controls.heading.general", 20f),
                 LayerCol2(
-                        LayerParagraph("editorHelp.controls.keybinds.general.keys", 350f, renderAlign = Align.topRight),
-                        LayerParagraph("editorHelp.controls.keybinds.general.desc", 350f),
+                        LayerParagraph("editorHelp.controls.keybinds.general.keys", 380f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.general.desc", 380f),
                         leftProportion = 0.275f
                 ),
                 LayerParagraph("editorHelp.controls.heading.selectionTool", 20f),

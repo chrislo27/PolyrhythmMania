@@ -15,6 +15,7 @@ import polyrhythmmania.editor.*
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.editor.pane.EditorPane
 import kotlin.math.floor
+import kotlin.math.sign
 
 /**
  * The area where blocks are placed on tracks.
@@ -48,6 +49,9 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
 
     init {
         addInputEventListener { event ->
+            val control = Gdx.input.isControlDown()
+            val shift = Gdx.input.isShiftDown()
+            val alt = Gdx.input.isAltDown()
             when (event) {
                 is MouseMoved -> {
                     onMouseMovedOrDragged(event.x, event.y)
@@ -57,6 +61,25 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     onMouseMovedOrDragged(event.x, event.y)
                     true
                 }
+                is Scrolled -> {
+                    val trackView = editor.trackView
+                    if (control && !alt && !shift) {
+                        val renderScaleVar = trackView.renderScale
+                        val currentRenderScale = renderScaleVar.get()
+                        val futureRenderScale = (currentRenderScale - event.amountY * 0.2f).coerceIn(0.1f, 2f)
+                        if (futureRenderScale != currentRenderScale) {
+//                            renderScaleVar.set(futureRenderScale)
+                        }
+                        true
+                    } else {
+                        val horizontalAmt = (event.amountX + (if (!control && !alt && shift) event.amountY else 0f)).sign
+                        if (horizontalAmt != 0f) {
+                            val panSpeed = 10f / trackView.renderScale.get().coerceAtLeast(0.2f)
+                            trackView.beat.set((trackView.beat.get() + panSpeed * horizontalAmt).coerceAtLeast(0f))
+                        }
+                        false
+                    }
+                }
                 is TouchDown -> {
                     if (editor.allowedToEdit.getOrCompute()) {
                         onMouseMovedOrDragged(event.x, event.y)
@@ -64,9 +87,6 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                         val mouseBeat = getBeatFromRelative(relMouse.x)
                         val mouseTrack = getTrackFromRelative(relMouse.y)
                         val currentTool: Tool = editor.tool.getOrCompute()
-                        val control = Gdx.input.isControlDown()
-                        val shift = Gdx.input.isShiftDown()
-                        val alt = Gdx.input.isAltDown()
 
                         val blockClickedOn = editor.blocks.firstOrNull { block ->
                             tmpRect.set(block.beat, block.trackIndex.toFloat(), block.width, 1f).contains(mouseBeat, mouseTrack)
@@ -135,7 +155,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
             }
 
         }
-        editor.trackView.beat.addListener {
+        trackView.beat.addListener {
             onMouseMovedOrDragged(lastMouseAbsolute.x, lastMouseAbsolute.y)
         }
     }
