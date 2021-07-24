@@ -28,7 +28,7 @@ import kotlin.system.measureNanoTime
 class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     companion object {
-//        private val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("debugetc/Polyrhythm.ogg"))
+//        private val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("music/Polyrhythm.ogg"))
     }
 
     val world: World = World().apply { 
