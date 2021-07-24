@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.IntMap
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.music.EditorMusicData
@@ -63,7 +64,7 @@ class WaveformWindow(val editor: Editor) : Disposable {
         CacheBlock(i, x, y, texReg)
     }
     private val cacheByAge: MutableList<CacheBlock> = secondsCacheBlocks.toMutableList() // FIFO
-    private val cacheBySeconds: MutableMap<Int, CacheBlock> = mutableMapOf() // Seconds -> CacheBlock
+    private val cacheBySeconds: IntMap<CacheBlock> = IntMap() // Seconds -> CacheBlock
 
     init {
         listOf(overallBuffer, windowedBuffer, secondsBuffer).forEach { 
@@ -218,7 +219,7 @@ class WaveformWindow(val editor: Editor) : Disposable {
                 cacheBySeconds.remove(cacheBlock.secondPos)
                 cacheBlock.generatedAt = System.currentTimeMillis()
                 cacheBlock.secondPos = seconds
-                cacheBySeconds[seconds] = cacheBlock
+                cacheBySeconds.put(seconds, cacheBlock)
                 Gdx.app.postRunnable {
                     generateForCacheBlock(cacheBlock, musicData, waveform, seconds)
 //                    println("[WaveformWindow] Generated cache block for seconds $seconds")
