@@ -40,6 +40,8 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
         thumbColor.set(Color(0.31f, 0.31f, 0.31f, 1f))
         thumbHoveredColor.set(Color(0.41f, 0.41f, 0.41f, 1f))
         thumbPressedColor.set(Color(0.31f, 0.41f, 0.41f, 1f))
+        incrementColor.set(Color(0.31f, 0.31f, 0.31f, 1f))
+        disabledColor.set(Color(0.31f, 0.31f, 0.31f, 0.5f))
         
         listOf(element.increaseButton, element.decreaseButton).forEach { b ->
             b.padding.set(Insets(3f))
