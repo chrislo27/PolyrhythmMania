@@ -341,7 +341,22 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
             if (nextIndex in 0 until row.length) {
                 val next = row.rowBlocks[nextIndex]
                 val heightOfNext = next.collisionHeight
-                if (next.active && prevPosY in next.position.y..(next.position.y + heightOfNext - (1f / 32f))) {
+                var posYCheck = prevPosY
+                if (currentIndex in 0 until row.length) {
+                    val blockBelow: EntityRowBlock = row.rowBlocks[currentIndex]
+                    val floorBelow: Float = if (!blockBelow.active) row.startY.toFloat() else {
+                        blockBelow.position.y + blockBelow.collisionHeight
+                    }
+                    if (blockBelow.spawningState == EntityRowBlock.SpawningState.DESPAWNING && floorBelow + (2 / 32f) >= this.position.y) {
+                        posYCheck = floorBelow
+                    } else if (floorBelow >= posYCheck) {
+                        posYCheck = floorBelow
+                    } 
+                }
+                
+                if (next.active && posYCheck in next.position.y..(next.position.y + heightOfNext - (1f / 32f))) {
+//                    println("Collision: my Y ${prevPosY} ${posYCheck}   ${next.position.y}  ${next.position.y + heightOfNext}")
+                    
                     collision.collidedWithWall = true
 //                    println("$seconds Collided with wall: currentIndex = ${currentIndexFloat}  x = ${this.position.x}")
                     this.position.x = currentIndex + 0.7f + row.startX
@@ -374,7 +389,6 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
                 val posX = this.position.x
                 this.position.y = currentBounce.getYFromX(posX)
                 collision.velocityY = (this.position.y - prevPosY) / deltaSec
-                
             } else {
                 val floorBelow: Float = if (!blockBelow.active) row.startY.toFloat() else {
                     blockBelow.position.y + blockBelow.collisionHeight
