@@ -120,11 +120,11 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             }
         }
         playtestButton = Button("").apply {
-            this.padding.set(Insets(2f))
+            this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
             this.skinID.set(EditorSkins.BUTTON)
-            val open: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_clapboard_open"])
-            val shut: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_clapboard_shut"])
+            val open: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_playtest_open"])
+            val shut: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_playtest_shut"])
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
                     if (pressedState.use().pressed) shut else open
