@@ -13,6 +13,8 @@ import paintbox.util.gdxutils.set
 class Tileset(val packedSheet: PackedSheet) {
 
     companion object {
+        const val rodFrameCount: Int = 6
+        
         private fun TextureRegion.toTinted(): TintedRegion = TintedRegion(this)
         private fun TextureRegion.toTinted(initColor: Color): TintedRegion =
             TintedRegion(this, initColor)
@@ -23,6 +25,21 @@ class Tileset(val packedSheet: PackedSheet) {
         private fun TextureRegion.toEditableTinted(): EditableTintedRegion = EditableTintedRegion(this)
         private fun TextureRegion.toEditableTinted(initColor: Color): EditableTintedRegion =
             EditableTintedRegion(this, initColor)
+        
+        private fun mapRodTexture(tr: TextureRegion, count: Int, col: Int, color: ReadOnlyVar<Color>): List<TintedRegion> {
+            val suggestedColumns = 2
+            val suggestedRows = rodFrameCount
+            val texture = tr.texture
+            val regionWidthU = tr.u2 - tr.u
+            val regionHeightV = tr.v2 - tr.v
+            val partWidthU = regionWidthU / suggestedColumns
+            val partHeightV = regionHeightV / suggestedRows
+            return (0 until count).map { i ->
+                val u = tr.u + col * partWidthU
+                val v = tr.v + i * partHeightV
+                TextureRegion(texture, u, v, u + partWidthU, v + partHeightV).toTinted(color)
+            }
+        }
     }
 
     /**
@@ -85,30 +102,12 @@ class Tileset(val packedSheet: PackedSheet) {
 
     val rodBorderColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val rodFillColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
-    val rodGroundFrameCount: Int = 6
-    val rodAerialFrameCount: Int = 6
     private val rodBordersSection: TextureRegion = packedSheet["rods_borders"]
     private val rodFillSection: TextureRegion = packedSheet["rods_fill"]
-    val rodGroundBorderAnimations: List<TintedRegion> by lazy {
-        (0 until rodGroundFrameCount).map { i ->
-            TextureRegion(rodBordersSection, 0, 16 * i, 24, 16).toTinted(rodBorderColor)
-        }
-    }
-    val rodGroundFillAnimations: List<TintedRegion> by lazy {
-        (0 until rodGroundFrameCount).map { i ->
-            TextureRegion(rodFillSection, 0, 16 * i, 24, 16).toTinted(rodFillColor)
-        }
-    }
-    val rodAerialBorderAnimations: List<TintedRegion> by lazy {
-        (0 until rodAerialFrameCount).map { i ->
-            TextureRegion(rodFillSection, 24, 16 * i, 24, 16).toTinted(rodBorderColor)
-        }
-    }
-    val rodAerialFillAnimations: List<TintedRegion> by lazy {
-        (0 until rodAerialFrameCount).map { i ->
-            TextureRegion(rodFillSection, 24, 16 * i, 24, 16).toTinted(rodFillColor)
-        }
-    }
+    val rodGroundBorderAnimations: List<TintedRegion> = mapRodTexture(rodBordersSection, rodFrameCount, 0, rodBorderColor)
+    val rodGroundFillAnimations: List<TintedRegion> = mapRodTexture(rodFillSection, rodFrameCount, 0, rodFillColor)
+    val rodAerialBorderAnimations: List<TintedRegion> = mapRodTexture(rodBordersSection, rodFrameCount, 1, rodBorderColor)
+    val rodAerialFillAnimations: List<TintedRegion> = mapRodTexture(rodFillSection, rodFrameCount, 1, rodFillColor)
 
     val explosionFrameCount: Int = 4
     val explosionFrames: List<TintedRegion> by lazy {

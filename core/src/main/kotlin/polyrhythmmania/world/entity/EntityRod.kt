@@ -39,15 +39,15 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
         val offsetX = -(1 / 32f) * 0
         val offsetY = 1f / 32f * 0
         val regionBorder: TintedRegion = if (!isInAir) {
-            tileset.rodGroundBorderAnimations[(animationAlpha * tileset.rodGroundFrameCount).toInt().coerceIn(0, tileset.rodGroundFrameCount - 1)]
+            tileset.rodGroundBorderAnimations[(animationAlpha * Tileset.rodFrameCount).toInt().coerceIn(0, Tileset.rodFrameCount - 1)]
         } else {
-            tileset.rodAerialBorderAnimations[(animationAlpha * tileset.rodAerialFrameCount).toInt().coerceIn(0, tileset.rodAerialFrameCount - 1)]
+            tileset.rodAerialBorderAnimations[(animationAlpha * Tileset.rodFrameCount).toInt().coerceIn(0, Tileset.rodFrameCount - 1)]
         }
         drawTintedRegion(batch, vec, regionBorder, offsetX, offsetY, renderW, renderH)
         val regionFill: TintedRegion = if (!isInAir) {
-            tileset.rodGroundFillAnimations[(animationAlpha * tileset.rodGroundFrameCount).toInt().coerceIn(0, tileset.rodGroundFrameCount - 1)]
+            tileset.rodGroundFillAnimations[(animationAlpha * Tileset.rodFrameCount).toInt().coerceIn(0, Tileset.rodFrameCount - 1)]
         } else {
-            tileset.rodAerialFillAnimations[(animationAlpha * tileset.rodAerialFrameCount).toInt().coerceIn(0, tileset.rodAerialFrameCount - 1)]
+            tileset.rodAerialFillAnimations[(animationAlpha * Tileset.rodFrameCount).toInt().coerceIn(0, Tileset.rodFrameCount - 1)]
         }
         drawTintedRegion(batch, vec, regionFill, offsetX, offsetY, renderW, renderH)
 
