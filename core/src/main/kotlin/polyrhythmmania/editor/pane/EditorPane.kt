@@ -3,6 +3,7 @@ package polyrhythmmania.editor.pane
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.IntIntMap
 import paintbox.Paintbox
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
@@ -29,7 +30,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     val main: PRManiaGame = editor.main
     val palette: Palette = Palette(main)
     
-    private val measurePartCache: MutableMap<Int, Int> = mutableMapOf()
+    private val measurePartCache: IntIntMap = IntIntMap()
 
     val statusBarMsg: Var<String> = Var("")
 
@@ -122,7 +123,12 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     }
     
     fun getMeasurePart(beat: Int): Int {
-        return measurePartCache.getOrPut(beat) { editor.engine.timeSignatures.getMeasurePart(beat.toFloat()) }
+        val get = measurePartCache.get(beat, -999)
+        return if (get == -999) {
+            val mp = editor.engine.timeSignatures.getMeasurePart(beat.toFloat())
+            measurePartCache.put(beat, mp)
+            mp
+        } else get
     }
 
     fun createDefaultTooltip(binding: Var.Context.() -> String): Tooltip {
