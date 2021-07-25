@@ -31,37 +31,31 @@ class EntityDunkBasketBack(world: World) : SpriteEntity(world) {
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return tileset.dunkBasketBack
     }
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+        val xOff = -0.5f
+        vec.x += xOff
+        vec.y += xOff * 0.5f + -(0.5f)
+        for (i in 0 until numLayers) {
+            val tr = getTintedRegion(tileset, i)
+            drawTintedRegion(batch, vec, tr, (1f / 32f) * 0, 0f, renderWidth, renderHeight)
+        }
+    }
+}
+
+class EntityDunkBasketFront(world: World) : SpriteEntity(world) {
+    override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
+        return tileset.dunkBasketFront
+    }
+}
+class EntityDunkBasketRear(world: World) : SpriteEntity(world) {
+    override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
+        return tileset.dunkBasketRear
+    }
 }
 
 class EntityDunkBacking(world: World) : SpriteEntity(world) {
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return tileset.dunkBacking
-    }
-}
-
-class EntityDunkBasketFaceZ(world: World) : SpriteEntity(world) {
-    override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
-        return tileset.dunkBasketFaceZ
-    }
-
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
-        for (i in 0 until numLayers) {
-            val tr = getTintedRegion(tileset, i)
-            drawTintedRegion(batch, vec, tr, 0f, 0f, renderWidth, renderHeight)
-        }
-    }
-}
-
-class EntityDunkBasketFaceX(world: World) : SpriteEntity(world) {
-    override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
-        return tileset.dunkBasketFaceX
-    }
-
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
-        for (i in 0 until numLayers) {
-            val tr = getTintedRegion(tileset, i)
-            drawTintedRegion(batch, vec, tr, 0.5f, 0.25f, renderWidth, renderHeight)
-        }
     }
 }
 

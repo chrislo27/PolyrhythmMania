@@ -122,8 +122,8 @@ class Tileset(val packedSheet: PackedSheet) {
     val inputFeedbackEnd: TintedRegion = packedSheet.getIndexedRegions("input_feedback").getValue(2).toTinted()
     
     val dunkBasketBack: TintedRegion = packedSheet["basket_back"].toTinted()
-    val dunkBasketFaceX: TintedRegion = packedSheet["basket_face_x"].toTinted()
-    val dunkBasketFaceZ: TintedRegion = packedSheet["basket_face_z"].toTinted()
+    val dunkBasketFront: TintedRegion = packedSheet["basket_front"].toTinted()
+    val dunkBasketRear: TintedRegion = packedSheet["basket_rear"].toTinted()
     val dunkBacking: TintedRegion = packedSheet["hoop_back"].toTinted()
 }
 

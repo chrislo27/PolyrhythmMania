@@ -22,6 +22,8 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "basket_back",
                 "basket_face_x",
                 "basket_face_z",
+                "basket_front",
+                "basket_rear",
                 "cube_border",
                 "cube_border_platform",
                 "cube_border_z",

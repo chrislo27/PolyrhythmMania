@@ -254,17 +254,14 @@ class World {
         addEntity(EntityDunkBacking(this).apply { 
             this.position.set(9f, 6f, -1f)
         })
+        addEntity(EntityDunkBasketRear(this).apply {
+            this.position.set(8f + 1, 5f - 1, -1f - 1)
+        })
+        addEntity(EntityDunkBasketFront(this).apply {
+            this.position.set(8f - 1, 5f + 1, 0f)
+        })
         addEntity(EntityDunkBasketBack(this).apply { 
-            this.position.set(8f, 5f, -1f)
-        })
-        addEntity(EntityDunkBasketFaceX(this).apply { 
-            this.position.set(7f, 5f, -1f)
-        })
-        addEntity(EntityDunkBasketFaceZ(this).apply { 
-            this.position.set(8f, 5f, -1f)
-        })
-        addEntity(EntityDunkBasketFaceZ(this).apply { 
-            this.position.set(8f, 5f, -2f)
+            this.position.set(9f, 5f + 1, -1f)
         })
 
         // Button signs
