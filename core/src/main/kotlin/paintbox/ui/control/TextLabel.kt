@@ -191,7 +191,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
                     maxTextWidth,
                     element.textAlign.getOrCompute(), scaleX, scaleY)
         } else {
-            text.drawCompressed(batch, x + xOffset, (y - h + yOffset), 0f, element.textAlign.getOrCompute(), scaleX, scaleY)
+            text.draw(batch, x + xOffset, (y - h + yOffset), element.textAlign.getOrCompute(), scaleX, scaleY)
         }
         ColorStack.pop()
 

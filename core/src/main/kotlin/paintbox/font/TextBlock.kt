@@ -279,11 +279,12 @@ data class TextBlock(val runs: List<TextRun>) {
     }
 
     /**
-     * Draws this text block. The y value is the baseline value. Same as calling [drawCompressed] with maxWidth = 0.
+     * Draws this text block. The y value is the baseline value. Same as calling [drawCompressed] with compressText = false.
      */
     fun draw(batch: SpriteBatch, x: Float, y: Float, align: TextAlign = TextAlign.LEFT,
-             scaleX: Float = 1f, scaleY: Float = 1f) {
-        drawCompressed(batch, x, y, 0f, align, scaleX, scaleY)
+             scaleX: Float = 1f, scaleY: Float = 1f, alignAffectsRender: Boolean = false,) {
+        drawCompressed(batch, x, y, 0f, align, scaleX, scaleY, alignAffectsRender = alignAffectsRender,
+                compressText = false)
     }
 
     /**
@@ -291,17 +292,21 @@ data class TextBlock(val runs: List<TextRun>) {
      * The y value is the baseline value of the first line.
      * The [align] determines how each *line* of text is aligned horizontally.
      * The [batch]'s color is used to tint.
+     * 
+     * @param alignAffectsRender If true, the [align] param will also change the render alignment according to [maxWidth].
+     * For example, if [align] is [TextAlign.RIGHT], then the ENTIRE text block will be right-aligned according to 
+     * the [maxWidth]. If [alignAffectsRender] was false, then the entire block is rendered left-aligned.
      */
     fun drawCompressed(batch: SpriteBatch, x: Float, y: Float, maxWidth: Float,
                        align: TextAlign = TextAlign.LEFT, scaleX: Float = 1f, scaleY: Float = 1f,
-                       alignAffectsRender: Boolean = false) {
+                       alignAffectsRender: Boolean = false, compressText: Boolean = true) {
         if (isRunInfoInvalid()) {
             computeLayouts()
         }
         val runInfo = this.runInfo
         if (runInfo.isEmpty())
             return
-        if (maxWidth <= 0f)
+        if (compressText && maxWidth <= 0f)
             return
 
         val batchColor: Float = batch.packedColor
