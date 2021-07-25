@@ -320,7 +320,7 @@ class EngineInputter(val engine: Engine) {
         (inputResults as MutableList).addAll(validResults)
         
         if (noMiss) {
-            if (rod.exploded || (numExpected > validResults.size) || inputTracker.results.any { it.inputScore == InputScore.MISS }) {
+            if ((rod.exploded && numExpected > 0) || (numExpected > validResults.size) || inputTracker.results.any { it.inputScore == InputScore.MISS }) {
                 missed()
             }
         }
