@@ -44,25 +44,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> Practice): UIElement {
-                return createLongButton { Localization.getVar(name).use() }.apply {
-                    this.tooltipElement.set(createTooltip(Localization.getVar("${name}.tooltip")))
-                    this.setOnAction {
-                        menuCol.playMenuSound("sfx_menu_enter_game")
-                        mainMenu.transitionAway {
-                            val main = mainMenu.main
-                            Gdx.app.postRunnable {
-                                val practice: Practice = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-                                val playScreen = PlayScreen(main, practice.container, Challenges.NO_CHANGES, showResults = false)
-                                main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
-                                    this.onEntryEnd = {
-                                        practice.prepare()
-                                        playScreen.resetAndStartOver(false, false)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false, factory)
             }
             
             vbox += createPractice("mainMenu.practice.basic") { main, keymap ->

@@ -80,32 +80,9 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNextMenu(menuCol.practiceMenu)
                 }
             }
-
-            fun createSidemode(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
-                               factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
-                return createLongButton { Localization.getVar(name).use() }.apply {
-                    this.tooltipElement.set(createTooltip(tooltipVar))
-                    this.setOnAction {
-                        menuCol.playMenuSound("sfx_menu_enter_game")
-                        mainMenu.transitionAway {
-                            val main = mainMenu.main
-                            Gdx.app.postRunnable {
-                                val practice: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-                                val playScreen = PlayScreen(main, practice.container, Challenges.NO_CHANGES, showResults = false)
-                                main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
-                                    this.onEntryEnd = {
-                                        practice.prepare()
-                                        playScreen.resetAndStartOver(false, false)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             
             // Remember to update DataSettingsMenu to reset high scores
-            vbox += createSidemode("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip", Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
+            vbox += createSidemodeLongButton("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip", Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
             }
 //            vbox += createLongButton { Localization.getVar("mainMenu.play.toss").use() }.apply {

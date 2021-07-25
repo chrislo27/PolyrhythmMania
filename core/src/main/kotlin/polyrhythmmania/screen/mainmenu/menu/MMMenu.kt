@@ -1,5 +1,6 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
@@ -10,6 +11,8 @@ import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
+import paintbox.transition.FadeIn
+import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
@@ -18,8 +21,13 @@ import paintbox.ui.layout.VBox
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.SkinFactory
 import paintbox.util.gdxutils.grey
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.sidemodes.SideMode
 
 
 /**
@@ -212,6 +220,30 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         settingsOptionPane.content += cycle
 
         return settingsOptionPane to cycle
+    }
+    
+    protected fun createSidemodeLongButton(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
+                                           challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
+                       factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
+        return createLongButton { Localization.getVar(name).use() }.apply {
+            this.tooltipElement.set(createTooltip(tooltipVar))
+            this.setOnAction {
+                menuCol.playMenuSound("sfx_menu_enter_game")
+                mainMenu.transitionAway {
+                    val main = mainMenu.main
+                    Gdx.app.postRunnable {
+                        val sidemode: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
+                        val playScreen = PlayScreen(main, sidemode.container, challenges = challenges, showResults = showResults)
+                        main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                            this.onEntryEnd = {
+                                sidemode.prepare()
+                                playScreen.resetAndStartOver(false, false)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     open class SettingsOptionPane(labelText: Var.Context.() -> String, val font: PaintboxFont,
