@@ -123,6 +123,7 @@ class Tileset(val packedSheet: PackedSheet) {
     
     val dunkBasketBack: TintedRegion = packedSheet["basket_back"].toTinted()
     val dunkBasketFront: TintedRegion = packedSheet["basket_front"].toTinted()
+    val dunkBasketFrontFaceZ: TintedRegion = packedSheet["basket_front_face_z"].toTinted()
     val dunkBasketRear: TintedRegion = packedSheet["basket_rear"].toTinted()
     val dunkBacking: TintedRegion = packedSheet["hoop_back"].toTinted()
 }

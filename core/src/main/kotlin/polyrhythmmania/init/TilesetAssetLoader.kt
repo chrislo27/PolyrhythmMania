@@ -21,6 +21,7 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_parts", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "basket_back",
                 "basket_front",
+                "basket_front_face_z",
                 "basket_rear",
                 "cube_border",
                 "cube_border_platform",

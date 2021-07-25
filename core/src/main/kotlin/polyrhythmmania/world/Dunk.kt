@@ -34,7 +34,7 @@ class EntityDunkBasketBack(world: World) : SpriteEntity(world) {
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
         val xOff = -0.5f
         vec.x += xOff
-        vec.y += xOff * 0.5f + -(0.5f)
+        vec.y += xOff * 0.5f
         for (i in 0 until numLayers) {
             val tr = getTintedRegion(tileset, i)
             drawTintedRegion(batch, vec, tr, (1f / 32f) * 0, 0f, renderWidth, renderHeight)
@@ -45,6 +45,23 @@ class EntityDunkBasketBack(world: World) : SpriteEntity(world) {
 class EntityDunkBasketFront(world: World) : SpriteEntity(world) {
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return tileset.dunkBasketFront
+    }
+}
+
+class EntityDunkBasketFrontFaceZ(world: World) : SpriteEntity(world) {
+    override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
+        return tileset.dunkBasketFrontFaceZ
+    }
+
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine,
+                              vec: Vector3) {
+        val xOff = -0.5f
+        vec.x += xOff
+        vec.y += xOff * 0.5f + (0.5f)
+        for (i in 0 until numLayers) {
+            val tr = getTintedRegion(tileset, i)
+            drawTintedRegion(batch, vec, tr, (1f / 32f) * 0, 0f, renderWidth, renderHeight)
+        }
     }
 }
 class EntityDunkBasketRear(world: World) : SpriteEntity(world) {

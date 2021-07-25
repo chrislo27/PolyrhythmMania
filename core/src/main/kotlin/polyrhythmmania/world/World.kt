@@ -258,10 +258,13 @@ class World {
             this.position.set(8f + 1, 5f - 1, -1f - 1)
         })
         addEntity(EntityDunkBasketFront(this).apply {
-            this.position.set(8f - 1, 5f + 1, 0f)
+            this.position.set(8f, 5f, -1f)
+        })
+        addEntity(EntityDunkBasketFrontFaceZ(this).apply {
+            this.position.set(8f, 5f, 0f)
         })
         addEntity(EntityDunkBasketBack(this).apply { 
-            this.position.set(9f, 5f + 1, -1f)
+            this.position.set(9f, 5f, -1f)
         })
 
         // Button signs
