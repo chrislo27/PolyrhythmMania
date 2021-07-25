@@ -228,6 +228,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             val tmpColor = ColorStack.getAndPush()
             val trackView = editor.trackView
             val trackViewBeat = trackView.beat.get()
+            val trackViewScale = trackView.renderScale.get()
             val leftBeat = floor(trackViewBeat)
             val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.get()))
             val timeSignatures = editor.engine.timeSignatures
@@ -237,11 +238,14 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             val shortLineProportion = tallLineProportion * 0.75f
             for (b in leftBeat.toInt()..rightBeat.toInt()) {
                 val measurePart = getMeasurePart(b)
+                if (!editorPane.shouldDrawBeatLine(trackViewScale, b, measurePart, false)) continue
                 val mainRgb = if (measurePart > 0) 0.8f else 1f
                 val mainWidth = if (measurePart == 0) (lineWidth * 3) else lineWidth
                 tmpColor.set(mainRgb, mainRgb, mainRgb, 1f)
                 batch.color = tmpColor
                 batch.fillRect(x + trackView.translateBeatToX(b.toFloat()) - mainWidth / 2f, y - h, mainWidth, h * tallLineProportion)
+
+                if (!editorPane.shouldDrawBeatLine(trackViewScale, b, measurePart, true)) continue
                 tmpColor.set(0.7f, 0.7f, 0.7f, 1f)
                 batch.color = tmpColor
                 batch.fillRect(x + trackView.translateBeatToX(b.toFloat() + 0.5f) - lineWidth / 2f, y - h, lineWidth, h * shortLineProportion)
@@ -302,6 +306,8 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                         timeSignaturesToRender.add(timeSigAtBeat)
                     } else {
                         val measurePart = getMeasurePart(b)
+                        if (!editorPane.shouldDrawBeatNumber(trackViewScale, b, measurePart)) continue
+                        
                         if (measurePart > 0) {
                             tmpColor.set(1f, 0.95f, 0.78f, 1f)
                         } else {

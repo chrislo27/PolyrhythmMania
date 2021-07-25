@@ -33,6 +33,7 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         val editor = editorPane.editor
         val trackView = editor.trackView
         val trackViewBeat = trackView.beat.get()
+        val trackViewScale = trackView.renderScale.get()
         val leftBeat = floor(trackViewBeat)
         val rightBeat = ceil(trackViewBeat + (w / trackView.pxPerBeat.get()))
         val lineWidth = this.lineWidth.get()
@@ -44,6 +45,7 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         batch.color = tmpColor
         for (b in leftBeat.toInt()..rightBeat.toInt()) {
             val measurePart = editorPane.getMeasurePart(b)
+            if (!editorPane.shouldDrawBeatLine(trackViewScale, b, measurePart, false)) continue
             val width = if (measurePart == 0) (lineWidth * 3) else lineWidth
             batch.fillRect(x + trackView.translateBeatToX(b.toFloat()) - width / 2f, y - h, width, h)
         }

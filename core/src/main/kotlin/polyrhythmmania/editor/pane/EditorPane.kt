@@ -23,6 +23,7 @@ import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.pane.dialog.*
 import polyrhythmmania.editor.pane.track.AllTracksPane
 import polyrhythmmania.ui.DialogPane
+import kotlin.math.roundToInt
 
 
 class EditorPane(val editor: Editor) : Pane(), Disposable {
@@ -129,6 +130,44 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
             measurePartCache.put(beat, mp)
             mp
         } else get
+    }
+    
+    fun shouldDrawBeatLine(trackViewScale: Float, beat: Int, measurePart: Int, subbeat: Boolean): Boolean {
+        if (subbeat) {
+            if (trackViewScale <= 0.45f) return false
+        } else {
+            if (measurePart != 0 && trackViewScale <= 0.35f) {
+                if (measurePart > 0) {
+                    if (trackViewScale <= 0.25f) {
+                        if (measurePart % ((1f / trackViewScale).roundToInt()) != 0) return false
+                    } else {
+                        if (beat % 2 != 0) return false
+                    }
+                } else {
+                    if (trackViewScale <= 0.25f) {
+                        if (beat % 4 != 0) return false
+                    } else {
+                        if (beat % 2 != 0) return false
+                    }
+                }
+            }
+        }
+        return true
+    }
+
+    fun shouldDrawBeatNumber(trackViewScale: Float, beat: Int, measurePart: Int): Boolean {
+        if (measurePart != 0 && trackViewScale <= 0.45f) {
+            if (measurePart > 0) {
+                if (trackViewScale <= 0.25f) {
+                    return false
+                } else {
+                    if (measurePart % 2 != 0) return false
+                }
+            } else {
+                if (beat % 4 != 0) return false
+            }
+        }
+        return true
     }
 
     fun createDefaultTooltip(binding: Var.Context.() -> String): Tooltip {

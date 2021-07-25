@@ -66,9 +66,14 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     if (control && !alt && !shift) {
                         val renderScaleVar = trackView.renderScale
                         val currentRenderScale = renderScaleVar.get()
-                        val futureRenderScale = (currentRenderScale - event.amountY * 0.2f).coerceIn(0.1f, 2f)
+                        val futureRenderScale = (currentRenderScale - event.amountY * 0.1f).coerceIn(0.1f, 2f)
                         if (futureRenderScale != currentRenderScale) {
-//                            renderScaleVar.set(futureRenderScale)
+                            val currentWidth = beatWidth.get()
+                            val currentMiddleBeat = trackView.beat.get() + currentWidth / 2
+                            renderScaleVar.set(futureRenderScale)
+                            val newWidth = beatWidth.get()
+                            val futureMiddleBeat = currentMiddleBeat - newWidth / 2
+                            trackView.beat.set(futureMiddleBeat.coerceAtLeast(0f))
                         }
                         true
                     } else {
