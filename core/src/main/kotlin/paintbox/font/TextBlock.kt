@@ -301,6 +301,8 @@ data class TextBlock(val runs: List<TextRun>) {
         val runInfo = this.runInfo
         if (runInfo.isEmpty())
             return
+        if (maxWidth <= 0f)
+            return
 
         val batchColor: Float = batch.packedColor
 
