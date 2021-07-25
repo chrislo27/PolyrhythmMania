@@ -20,8 +20,6 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
 
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_parts", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "basket_back",
-                "basket_face_x",
-                "basket_face_z",
                 "basket_front",
                 "basket_rear",
                 "cube_border",
