@@ -156,7 +156,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     }
 
     fun shouldDrawBeatNumber(trackViewScale: Float, beat: Int, measurePart: Int): Boolean {
-        if (measurePart != 0 && trackViewScale <= 0.45f) {
+        if (measurePart != 0 && trackViewScale <= 0.55f) {
             if (measurePart > 0) {
                 if (trackViewScale <= 0.25f) {
                     return false
