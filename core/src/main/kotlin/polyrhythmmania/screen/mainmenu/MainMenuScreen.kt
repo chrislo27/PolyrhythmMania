@@ -22,6 +22,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabelSkin
 import paintbox.ui.layout.VBox
+import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.drawQuad
@@ -245,6 +246,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         }
         sceneRoot += bottomRight
+        val newVersionAvailable: ReadOnlyVar<Boolean> = Var {
+            val github = main.githubVersion.use()
+            github != Version.ZERO && github > PRMania.VERSION
+        }
         sceneRoot += Tooltip("${PRMania.VERSION}", font = main.fontMainMenuMain).apply {
             Anchor.BottomRight.configure(this)
             resizeBoundsToContent()
@@ -253,9 +258,16 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.textAlign.set(TextAlign.RIGHT)
             this.renderBackground.set(true)
             this.bgPadding.set(Insets(8f))
-            this.textColor.set(Color(1f, 1f, 1f, 1f))
+            this.textColor.bind {
+                if (newVersionAvailable.use()) Color.ORANGE.cpy() else Color(1f, 1f, 1f, 1f)
+            }
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
-            this.tooltipElement.set(Tooltip("${PRMania.TITLE} ${PRMania.VERSION}", font = main.fontMainMenuMain).apply {
+            this.tooltipElement.set(Tooltip(binding = {
+                val t = "${PRMania.TITLE} ${PRMania.VERSION}"
+                if (newVersionAvailable.use()) {
+                    "${Localization.getVar("mainMenu.newVersion", Var { listOf(main.githubVersion.use()) })}"
+                } else t
+            }, font = main.fontMainMenuMain).apply {
                 this.markup.set(markup)
             })
         }

@@ -6,6 +6,7 @@ data class Version(val major: Int, val minor: Int, val patch: Int, val suffix: S
     
     companion object {
         val REGEX: Regex = "v?(\\d+).(\\d+).(\\d+)(?:-(.+))?".toRegex()
+        val ZERO: Version = Version(0, 0, 0)
         
         fun parse(thing: String): Version? {
             val match: MatchResult = REGEX.matchEntire(thing) ?: return null

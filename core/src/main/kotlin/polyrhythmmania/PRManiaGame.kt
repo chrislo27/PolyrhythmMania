@@ -11,15 +11,20 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
+import com.eclipsesource.json.Json
+import javafx.application.Platform
 import org.lwjgl.glfw.GLFW
 import paintbox.Paintbox
 import paintbox.PaintboxGame
 import paintbox.PaintboxSettings
 import paintbox.ResizeAction
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
 import paintbox.font.*
 import paintbox.logging.Logger
 import paintbox.registry.AssetRegistry
 import paintbox.util.ResolutionSetting
+import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import polyrhythmmania.container.Container
@@ -34,6 +39,8 @@ import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.LelandSpecialChars
 import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.concurrent.thread
 
 
@@ -67,6 +74,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     // Permanent screens
     lateinit var mainMenuScreen: MainMenuScreen
         private set
+    
+    val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
 
     override fun getTitle(): String = "${PRMania.TITLE} ${PRMania.VERSION}"
 
@@ -134,6 +143,33 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 }
             }
         })
+        thread(isDaemon = true, name = "GitHub version checker", start = true) {
+            try {
+                val apiUrl = URL("https://api.github.com/repos/${PRMania.GITHUB.substringAfter("https://github.com/", "")}/releases/latest")
+                val con = apiUrl.openConnection() as HttpURLConnection
+                con.requestMethod = "GET"
+                val status = con.responseCode
+                if (status == 200) {
+                    val content = con.inputStream.bufferedReader().let {
+                        val text = it.readText()
+                        it.close()
+                        text
+                    }
+                    val parsed = Version.parse(Json.parse(content).asObject().getString("tag_name", ""))
+                    if (parsed != null) {
+                        Paintbox.LOGGER.info("Got version from server: $parsed")
+                        Gdx.app.postRunnable {
+                            (githubVersion as Var).set(parsed)
+                        }
+                    }
+                } else {
+                    Paintbox.LOGGER.warn("Failed to get version from server: status was $status for url $apiUrl")
+                }
+                con.disconnect()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     override fun dispose() {
