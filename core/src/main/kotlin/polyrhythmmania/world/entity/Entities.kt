@@ -16,9 +16,14 @@ import kotlin.math.roundToInt
 
 
 open class SimpleRenderedEntity(world: World) : Entity(world) {
+    
+    protected open fun getRenderVec(): Vector3 {
+        return this.position
+    }
+    
     override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
         val tmpVec = Vector3Stack.getAndPush()
-        val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(this.position))
+        val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor
         renderSimple(renderer, batch, tileset, engine, convertedVec)
         Vector3Stack.pop()
