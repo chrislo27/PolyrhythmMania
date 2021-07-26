@@ -60,8 +60,8 @@ class TilesetConfig {
     val rodBorder: ColorMapping = ColorMapping("rodBorder", { it.rodBorderColor })
     val rodFill: ColorMapping = ColorMapping("rodFill", { it.rodFillColor })
 
-    val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeBorderZ, cubeFaceX, cubeFaceY, cubeFaceZ,
-            pistonFaceX, pistonFaceZ, signShadow, rodBorder, rodFill)
+    val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeBorderZ, /*cubeFaceX,*/ cubeFaceY, cubeFaceZ,
+            pistonFaceX, pistonFaceZ, signShadow, rodBorder, rodFill) + listOf(cubeFaceX)
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
 
     fun copy(): TilesetConfig {

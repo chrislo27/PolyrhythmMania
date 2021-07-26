@@ -240,7 +240,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
             val toggleGroup = ToggleGroup()
             bottomHbox += VBox().apply { 
                 this.spacing.set(2f)
-                this.bounds.width.set(200f)
+                this.bounds.width.set(180f)
                 this += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.pr1").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
@@ -267,7 +267,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
             }
             bottomHbox += VBox().apply {
                 this.spacing.set(2f)
-                this.bounds.width.set(200f)
+                this.bounds.width.set(220f)
                 if (baseTileset != null) {
                     this += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.base").use() },
                             font = editorPane.palette.musicDialogFont).apply {
