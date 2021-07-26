@@ -5,11 +5,8 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
-import polyrhythmmania.world.EntityRowBlock
-import polyrhythmmania.world.Row
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.Tileset
 import polyrhythmmania.world.render.TintedRegion
@@ -91,7 +88,7 @@ abstract class EntityRod(world: World, val deployBeat: Float)
             return if (alpha <= 0.5f) {
                 MathUtils.lerp(startY, peakHeight, WaveUtils.getBounceWave(alpha))
             } else {
-                MathUtils.lerp(peakHeight, endY, 1f - WaveUtils.getBounceWave(alpha))
+                MathUtils.lerp(endY, peakHeight, WaveUtils.getBounceWave(alpha))
             }
 //            }
         }
@@ -103,13 +100,12 @@ abstract class EntityRod(world: World, val deployBeat: Float)
     
     protected var engineUpdateLastSec: Float = Float.MAX_VALUE
     protected var collisionUpdateLastBeat: Float = Float.MAX_VALUE
-    
+
     override fun getAnimationAlpha(): Float {
         val beatsFullAnimation = 60f / 128f
         val posX = this.position.x
         return ((((if (posX < 0f) (posX + floor(posX).absoluteValue) else posX) / xUnitsPerBeat) % beatsFullAnimation) / beatsFullAnimation)
     }
-
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         super.engineUpdate(engine, beat, seconds)

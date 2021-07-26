@@ -4,6 +4,7 @@ package polyrhythmmania.world
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputResult
@@ -192,6 +193,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
     var exploded: Boolean = false
         private set
 
+    private val visualPosition: Vector3 = Vector3().set(this.position)
     private var lastCurrentIndex: Float = -10000f
 
     val inputTracker: InputTracker = InputTracker(row.length)
@@ -202,8 +204,13 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
         this.position.x = getPosXFromBeat(0f)
         this.position.z = row.startZ.toFloat()
         this.position.y = row.startY.toFloat() + 1f
+        
+        this.visualPosition.set(this.position)
     }
 
+    override fun getRenderVec(): Vector3 {
+        return visualPosition
+    }
 
     fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
     fun getCurrentIndexFloor(posX: Float = this.position.x): Int = floor(getCurrentIndex(posX)).toInt()
@@ -291,6 +298,8 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         super.engineUpdate(engine, beat, seconds)
+
+        this.visualPosition.z = this.position.z
         
         if (seconds >= explodeAtSec && !exploded) {
             explode(engine)
@@ -318,6 +327,8 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
         
         val prevPosX = this.position.x
         val prevPosY = this.position.y
+        
+        val unswungBeat = engine.tempos.secondsToBeats(engine.tempos.beatsToSeconds(beat, disregardSwing = false), disregardSwing = true)
 
         // Do collision check. Only works on the EntityRowBlocks for the given row.
         // 1. Stops instantly if it hits a prematurely deployed piston
@@ -375,6 +386,9 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
         // If not already collided with a wall, move X
         if (!collision.collidedWithWall) {
             this.position.x = targetX
+            this.visualPosition.x = getPosXFromBeat(unswungBeat - deployBeat)
+        } else {
+            this.visualPosition.x = this.position.x
         }
 
         // Control the Y position
@@ -388,6 +402,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
             if (currentBounce != null) {
                 val posX = this.position.x
                 this.position.y = currentBounce.getYFromX(posX)
+                this.visualPosition.y = currentBounce.getYFromX(this.position.x)
                 collision.velocityY = (this.position.y - prevPosY) / deltaSec
             } else {
                 val floorBelow: Float = if (!blockBelow.active) row.startY.toFloat() else {
@@ -415,6 +430,8 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
                         }
                     }
                 }
+                
+                this.visualPosition.y = this.position.y
 
                 // Auto-inputs
                 val inputter = engine.inputter
@@ -446,6 +463,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
         } else {
             // Set to row height when not in the block area
             this.position.y = row.startY.toFloat() + 1
+            this.visualPosition.y = this.position.y
             this.collision.velocityY = 0f
         }
     }
