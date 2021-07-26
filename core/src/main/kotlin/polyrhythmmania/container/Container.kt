@@ -121,7 +121,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         val blocks = this.blocks.sortedBy { it.beat }
         val firstEndBlock: BlockEndState? = blocks.firstOrNull { it is BlockEndState } as? BlockEndState?
         lastBlockPosition.set(blocks.lastOrNull()?.beat ?: 0f)
-        endBlockPosition.set(firstEndBlock?.beat ?: 0f)
+        endBlockPosition.set(firstEndBlock?.beat ?: Float.POSITIVE_INFINITY)
     }
 
     fun addBlock(block: Block) {

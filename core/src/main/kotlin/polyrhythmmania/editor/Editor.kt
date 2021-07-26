@@ -1231,6 +1231,8 @@ cameraOffsetCurrent: ${cameraOffset.current}
 cameraOffsetTarget: ${cameraOffset.target}
 suggest: $suggestPanCameraDir
 musicSec: ${engine.musicData.getCorrectMusicPlayerPositionAt(engine.seconds) / 1000}
+lastBlockPos: ${container.lastBlockPosition.get()}
+endBlockPos: ${container.endBlockPosition.get()}
 """
         //path: ${sceneRoot.dialogLayer.lastHoveredElementPath.map { "${it::class.java.simpleName} [${it.bounds.x.getOrCompute()}, ${it.bounds.y.getOrCompute()}, ${it.bounds.width.getOrCompute()}, ${it.bounds.height.getOrCompute()}]" }}
     }
