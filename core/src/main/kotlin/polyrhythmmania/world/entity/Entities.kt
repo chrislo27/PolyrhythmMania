@@ -34,8 +34,30 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
     }
     
     protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tintedRegion: TintedRegion, offsetX: Float, offsetY: Float, renderWidth: Float, renderHeight: Float) {
+        if (renderWidth == 0f || renderHeight == 0f) return
+        
+        var offX = offsetX
+        var offY = offsetY
+        var drawWidth = renderWidth
+        var drawHeight = renderHeight
+        val spacingObj = tintedRegion.spacing
+        
+        if (spacingObj.spacing > 0 && spacingObj.normalWidth > 0 && spacingObj.normalHeight > 0) {
+            val spacing = spacingObj.spacing
+            val totalNormalWidth = spacingObj.normalWidth + spacing * 2
+            val totalNormalHeight = spacingObj.normalHeight + spacing * 2
+            val totalNormalWidthRatio = totalNormalWidth.toFloat() / spacingObj.normalWidth
+            val totalNormalHeightRatio = totalNormalHeight.toFloat() / spacingObj.normalHeight
+            
+            offX -= spacing.toFloat() / totalNormalWidth
+            offY -= spacing.toFloat() / totalNormalHeight
+            
+            drawWidth *= totalNormalWidthRatio
+            drawHeight *= totalNormalHeightRatio
+        }
+        
         batch.color = tintedRegion.color.getOrCompute()
-        batch.draw(tintedRegion.region, vec.x + offsetX, vec.y + offsetY, renderWidth, renderHeight)
+        batch.draw(tintedRegion.region, vec.x + offX, vec.y + offY, drawWidth, drawHeight)
     }
     
     protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tintedRegion: TintedRegion) {

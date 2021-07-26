@@ -15,16 +15,16 @@ class Tileset(val packedSheet: PackedSheet) {
     companion object {
         const val rodFrameCount: Int = 6
         
-        private fun TextureRegion.toTinted(): TintedRegion = TintedRegion(this)
-        private fun TextureRegion.toTinted(initColor: Color): TintedRegion =
-            TintedRegion(this, initColor)
+        private fun TextureRegion.toTinted(spacing: TintedRegion.Spacing = TintedRegion.Spacing.ZERO): TintedRegion = TintedRegion(this, spacing)
+        private fun TextureRegion.toTinted(initColor: Color, spacing: TintedRegion.Spacing = TintedRegion.Spacing.ZERO): TintedRegion =
+            TintedRegion(this, initColor, spacing)
 
-        private fun TextureRegion.toTinted(bindTo: ReadOnlyVar<Color>): TintedRegion =
-            TintedRegion(this, binding = { bindTo.use() })
+        private fun TextureRegion.toTinted(bindTo: ReadOnlyVar<Color>, spacing: TintedRegion.Spacing = TintedRegion.Spacing.ZERO): TintedRegion =
+            TintedRegion(this, binding = { bindTo.use() }, spacing = spacing)
 
-        private fun TextureRegion.toEditableTinted(): EditableTintedRegion = EditableTintedRegion(this)
-        private fun TextureRegion.toEditableTinted(initColor: Color): EditableTintedRegion =
-            EditableTintedRegion(this, initColor)
+        private fun TextureRegion.toEditableTinted(spacing: TintedRegion.Spacing = TintedRegion.Spacing.ZERO): EditableTintedRegion = EditableTintedRegion(this, spacing)
+        private fun TextureRegion.toEditableTinted(initColor: Color, spacing: TintedRegion.Spacing = TintedRegion.Spacing.ZERO): EditableTintedRegion =
+            EditableTintedRegion(this, initColor, spacing)
         
         private fun mapRodTexture(tr: TextureRegion, count: Int, col: Int, color: ReadOnlyVar<Color>): List<TintedRegion> {
             val suggestedColumns = 2
@@ -45,45 +45,45 @@ class Tileset(val packedSheet: PackedSheet) {
     /**
      * A white cube. Used as the platform for the rods.
      */
-    val platform: TintedRegion = packedSheet["platform"].toTinted()
+    val platform: TintedRegion = packedSheet["platform"].toTinted(TintedRegion.Spacing(1, 32, 32))
 
     /**
      * Like [platform] but with the red marking line on it.
      */
-    val platformWithLine: TintedRegion = packedSheet["platform_with_line"].toTinted()
+    val platformWithLine: TintedRegion = packedSheet["platform_with_line"].toTinted(spacing = TintedRegion.Spacing(1, 32, 32))
 
     /**
      * The red line to be drawn on top of [cubeBorder].
      */
-    val redLine: TintedRegion = packedSheet["red_line"].toTinted()
-    val cubeBorder: EditableTintedRegion = packedSheet["cube_border"].toEditableTinted()
+    val redLine: TintedRegion = packedSheet["red_line"].toTinted(spacing = TintedRegion.Spacing(1, 32, 32))
+    val cubeBorder: EditableTintedRegion = packedSheet["cube_border"].toEditableTinted(spacing = TintedRegion.Spacing(1, 32, 32))
     /**
      * Just the top -Z edge of [platform] is a black line.
      */
-    val cubeBorderPlatform: TintedRegion = packedSheet["cube_border_platform"].toTinted(cubeBorder.color)
-    val cubeBorderZ: EditableTintedRegion = packedSheet["cube_border_z"].toEditableTinted()
-    val cubeFaceX: EditableTintedRegion = packedSheet["cube_face_x"].toEditableTinted()
-    val cubeFaceY: EditableTintedRegion = packedSheet["cube_face_y"].toEditableTinted()
-    val cubeFaceZ: EditableTintedRegion = packedSheet["cube_face_z"].toEditableTinted()
+    val cubeBorderPlatform: TintedRegion = packedSheet["cube_border_platform"].toTinted(cubeBorder.color, spacing = TintedRegion.Spacing(1, 32, 32))
+    val cubeBorderZ: EditableTintedRegion = packedSheet["cube_border_z"].toEditableTinted(spacing = TintedRegion.Spacing(1, 32, 32))
+    val cubeFaceX: EditableTintedRegion = packedSheet["cube_face_x"].toEditableTinted(spacing = TintedRegion.Spacing(1, 32, 32))
+    val cubeFaceY: EditableTintedRegion = packedSheet["cube_face_y"].toEditableTinted(spacing = TintedRegion.Spacing(1, 32, 32))
+    val cubeFaceZ: EditableTintedRegion = packedSheet["cube_face_z"].toEditableTinted(spacing = TintedRegion.Spacing(1, 32, 32))
     
     val pistonFaceXColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val pistonFaceZColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     
-    val pistonARetracted: TintedRegion = packedSheet["piston_a"].toTinted()
-    val pistonAPartial: TintedRegion = packedSheet["piston_a_partial"].toTinted()
-    val pistonAPartialFaceX: TintedRegion = packedSheet["piston_a_partial_face_x"].toTinted(pistonFaceXColor)
-    val pistonAPartialFaceZ: TintedRegion = packedSheet["piston_a_partial_face_z"].toTinted(pistonFaceZColor)
-    val pistonAExtended: TintedRegion = packedSheet["piston_a_extended"].toTinted()
-    val pistonAExtendedFaceX: TintedRegion = packedSheet["piston_a_extended_face_x"].toTinted(pistonFaceXColor)
-    val pistonAExtendedFaceZ: TintedRegion = packedSheet["piston_a_extended_face_z"].toTinted(pistonFaceZColor)
+    val pistonARetracted: TintedRegion = packedSheet["piston_a"].toTinted(spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonAPartial: TintedRegion = packedSheet["piston_a_partial"].toTinted(spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonAPartialFaceX: TintedRegion = packedSheet["piston_a_partial_face_x"].toTinted(pistonFaceXColor, spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonAPartialFaceZ: TintedRegion = packedSheet["piston_a_partial_face_z"].toTinted(pistonFaceZColor, spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonAExtended: TintedRegion = packedSheet["piston_a_extended"].toTinted(spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonAExtendedFaceX: TintedRegion = packedSheet["piston_a_extended_face_x"].toTinted(pistonFaceXColor, spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonAExtendedFaceZ: TintedRegion = packedSheet["piston_a_extended_face_z"].toTinted(pistonFaceZColor, spacing = TintedRegion.Spacing(1, 32, 40))
     
-    val pistonDpadRetracted: TintedRegion = packedSheet["piston_dpad"].toTinted()
-    val pistonDpadPartial: TintedRegion = packedSheet["piston_dpad_partial"].toTinted()
-    val pistonDpadPartialFaceX: TintedRegion = packedSheet["piston_dpad_partial_face_x"].toTinted(pistonFaceXColor)
-    val pistonDpadPartialFaceZ: TintedRegion = packedSheet["piston_dpad_partial_face_z"].toTinted(pistonFaceZColor)
-    val pistonDpadExtended: TintedRegion = packedSheet["piston_dpad_extended"].toTinted()
-    val pistonDpadExtendedFaceX: TintedRegion = packedSheet["piston_dpad_extended_face_x"].toTinted(pistonFaceXColor)
-    val pistonDpadExtendedFaceZ: TintedRegion = packedSheet["piston_dpad_extended_face_z"].toTinted(pistonFaceZColor)
+    val pistonDpadRetracted: TintedRegion = packedSheet["piston_dpad"].toTinted(spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonDpadPartial: TintedRegion = packedSheet["piston_dpad_partial"].toTinted(spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonDpadPartialFaceX: TintedRegion = packedSheet["piston_dpad_partial_face_x"].toTinted(pistonFaceXColor, spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonDpadPartialFaceZ: TintedRegion = packedSheet["piston_dpad_partial_face_z"].toTinted(pistonFaceZColor, spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonDpadExtended: TintedRegion = packedSheet["piston_dpad_extended"].toTinted(spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonDpadExtendedFaceX: TintedRegion = packedSheet["piston_dpad_extended_face_x"].toTinted(pistonFaceXColor, spacing = TintedRegion.Spacing(1, 32, 40))
+    val pistonDpadExtendedFaceZ: TintedRegion = packedSheet["piston_dpad_extended_face_z"].toTinted(pistonFaceZColor, spacing = TintedRegion.Spacing(1, 32, 40))
     
     val indicatorA: TintedRegion = packedSheet["indicator_a"].toTinted()
     val indicatorDpad: TintedRegion = packedSheet["indicator_dpad"].toTinted()
@@ -126,27 +126,4 @@ class Tileset(val packedSheet: PackedSheet) {
     val dunkBasketFrontFaceZ: TintedRegion = packedSheet["basket_front_face_z"].toTinted()
     val dunkBasketRear: TintedRegion = packedSheet["basket_rear"].toTinted()
     val dunkBacking: TintedRegion = packedSheet["hoop_back"].toTinted()
-}
-
-open class TintedRegion(val region: TextureRegion) {
-    open val color: ReadOnlyVar<Color> = Var(Color(1f, 1f, 1f, 1f))
-    
-    constructor(region: TextureRegion, initColor: Color) : this(region) {
-        @Suppress("LeakingThis")
-        (color as Var).set(Color(1f, 1f, 1f, 1f).set(initColor))
-    }
-    constructor(region: TextureRegion, binding: Var.Context.() -> Color) : this(region) {
-        @Suppress("LeakingThis")
-        (color as Var).bind(binding)
-    }
-}
-
-class EditableTintedRegion(region: TextureRegion)
-    : TintedRegion(region) {
-    
-    override val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
-
-    constructor(region: TextureRegion, initColor: Color) : this(region) {
-        color.set(Color(1f, 1f, 1f, 1f).set(initColor))
-    }
 }

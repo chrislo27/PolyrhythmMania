@@ -173,14 +173,15 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                     this.position.set(x.toFloat(), 0f, z.toFloat())
                 })
             }
+            val y = 1f + MathUtils.FLOAT_ROUNDING_ERROR * 1
             if (x == 0) {
                 world.addEntity(EntityPiston(world).apply {
                     this.type = EntityPiston.Type.PISTON_A
-                    this.position.set(x.toFloat(), 1f + MathUtils.FLOAT_ROUNDING_ERROR, -1f)
+                    this.position.set(x.toFloat(), y, -1f)
                 })
             } else {
                 world.addEntity(EntityPlatform(world).apply {
-                    this.position.set(x.toFloat(), 1f + MathUtils.FLOAT_ROUNDING_ERROR, -1f)
+                    this.position.set(x.toFloat(), y, -1f)
                 })
             }
         }
