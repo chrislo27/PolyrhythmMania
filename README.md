@@ -16,7 +16,9 @@ Due to issues with spam and unwanted behaviour, the Issues tab has been disabled
 
 [Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)
 
-
+## Information about sharing videos/screenshots
+Due to the game being in an early state, please do not share videos or screenshots.
+You may build the game for your own personal use only with NO binary redistribution.
 
 ## Other information
 Rhythm Heaven is the intellectual property of Nintendo.
