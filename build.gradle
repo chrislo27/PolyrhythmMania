@@ -23,7 +23,7 @@ allprojects {
     ext {
         appName = "PolyrhythmMania"
         gdxVersion = '1.10.0'
-        gdxControllersVersion = '2.2.0'
+        gdxControllersVersion = '2.2.1'
     }
 
     repositories {
@@ -51,10 +51,10 @@ allprojects {
         
         implementation "com.eclipsesource.minimal-json:minimal-json:0.9.5"
         
-        implementation "com.beust:jcommander:1.80"
+        implementation 'com.beust:jcommander:1.81'
         
-        implementation "org.slf4j:slf4j-simple:1.7.30"
-        implementation "net.lingala.zip4j:zip4j:2.8.0"
+        implementation 'org.slf4j:slf4j-simple:1.7.31'
+        implementation 'net.lingala.zip4j:zip4j:2.9.0'
         
 //        implementation "de.sciss:jump3r:1.0.5"
 //        implementation "com.github.chrislo27:musique-barebones:3807b60"
@@ -65,7 +65,7 @@ allprojects {
         implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
         implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version"
         
-        implementation "space.earlygrey:shapedrawer:2.4.0"
+        implementation "space.earlygrey:shapedrawer:2.5.0"
         
 //        implementation "org.openjdk.jol:jol-core:0.15"
     }
