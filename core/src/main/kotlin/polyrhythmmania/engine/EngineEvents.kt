@@ -20,9 +20,12 @@ class EventCowbellSFX(engine: Engine, startBeat: Float, val useMeasures: Boolean
             val pitch = if (measurePart <= -1) 1f else if (measurePart == 0) Semitones.getALPitch(8) else Semitones.getALPitch(3)
             engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { player ->
                 player.pitch = pitch
+                player.gain = 0.65f
             }
         } else {
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell"))
+            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { player ->
+                player.gain = 0.65f
+            }
         }
     }
 }
