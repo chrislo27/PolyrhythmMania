@@ -39,7 +39,7 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
     val animations: AnimationHandler = AnimationHandler(this)
 
     val currentElementWithTooltip: ReadOnlyVar<HasTooltip?> = Var(null)
-    private val currentTooltipVar: Var<UIElement?> = Var(null)
+    val currentTooltipVar: ReadOnlyVar<UIElement?> = Var(null)
     private var currentTooltip: UIElement? = null
 
     private var rootContextMenu: ContextMenu? = null
@@ -211,7 +211,7 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
         val currentElementWithTooltip = currentElementWithTooltip as Var
         cancelTooltip()
         currentElementWithTooltip.set(element)
-        currentTooltipVar.bind {
+        (currentTooltipVar as Var).bind {
             tooltipVar.use()
         }
     }
@@ -221,7 +221,7 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
      */
     fun cancelTooltip() {
         val currentElementWithTooltip = currentElementWithTooltip as Var
-        currentTooltipVar.set(null)
+        (currentTooltipVar as Var).set(null)
         currentElementWithTooltip.set(null)
     }
 

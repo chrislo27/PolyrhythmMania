@@ -280,6 +280,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
         super.render(delta)
 
+        val currentTooltip: UIElement? = sceneRoot.currentTooltipVar.getOrCompute()
+        currentTooltip?.visible?.set(this.flipAnimation == null)
+
         // Draw active scene
         val boundFB: FrameBuffer = framebufferCurrent
         val camera = uiCamera
