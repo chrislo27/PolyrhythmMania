@@ -17,6 +17,13 @@ object Credits {
                     "Lvl100Feraligatr", "Gosh", "GENERIC", "snow krow", "Kievit", "Chloe", "GrueKun", "Huebird",
                     "RedCrowNose",
             ) + listOf("Tourneycord Discord\nserver"),
+            "credits.specialThanks" to abcSorted(
+                    "Lvl100Feraligatr",
+                    "GrueKun",
+                    "spoopster",
+                    "Kievit",
+                    "Turtike",
+            ),
             "credits.resourcesAndTechnologies" to listOf(
                     "[font=rodin]リズム天国[] assets\nby Nintendo",
                     "libGDX",
@@ -30,14 +37,10 @@ object Credits {
                     "SLF4J",
                     "zip4j",
                     "earlygrey/shapedrawer",
+                    "Roboto",
+                    "Rodin",
+                    "Kurokane",
                     "Pexels",
-            ),
-            "credits.specialThanks" to abcSorted(
-                    "Lvl100Feraligatr",
-                    "GrueKun",
-                    "spoopster",
-                    "Kievit",
-                    "Turtike",
             ),
     )
     
