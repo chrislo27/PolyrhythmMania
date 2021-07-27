@@ -17,10 +17,6 @@ Due to issues with spam and unwanted behaviour, the Issues tab has been disabled
 [Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)
 
 
-## Building from source
-This section concerns building the project from the source code. If you are looking for a pre-built download, there are none available yet (see Development status heading).
-
-This project is built using Gradle. You can build and run the game with `./gradlew :desktop:run`.
 
 ## Other information
 Rhythm Heaven is the intellectual property of Nintendo.
