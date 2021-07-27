@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.Json
-import javafx.application.Platform
 import org.lwjgl.glfw.GLFW
 import paintbox.Paintbox
 import paintbox.PaintboxGame
