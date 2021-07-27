@@ -1,9 +1,5 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
-import paintbox.transition.FadeIn
-import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
@@ -13,7 +9,9 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.sidemodes.practice.Polyrhythm1Practice
+import polyrhythmmania.sidemodes.practice.Polyrhythm2Practice
 import polyrhythmmania.sidemodes.practice.Practice
 import polyrhythmmania.sidemodes.practice.PracticeBasic
 
@@ -23,9 +21,9 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 //    private val settings: Settings = menuCol.main.settings
 
     init {
-        this.setSize(MMMenu.WIDTH_SMALL)
+        this.setSize(MMMenu.WIDTH_MID)
         this.titleText.bind { Localization.getVar("mainMenu.practice.title").use() }
-        this.contentPane.bounds.height.set(250f)
+        this.contentPane.bounds.height.set(280f)
 
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)
@@ -44,11 +42,21 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> Practice): UIElement {
-                return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false, factory)
+                return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false, factory = factory)
             }
             
             vbox += createPractice("mainMenu.practice.basic") { main, keymap ->
                 PracticeBasic(main, keymap)
+            }
+            vbox += createSidemodeLongButton("mainMenu.practice.polyrhythm1",
+                    Localization.getVar("mainMenu.practice.polyrhythm1.tooltip"),
+                    Challenges.NO_CHANGES, true) { main, _ ->
+                Polyrhythm1Practice(main)
+            }
+            vbox += createSidemodeLongButton("mainMenu.practice.polyrhythm2",
+                    Localization.getVar("mainMenu.practice.polyrhythm2.tooltip"),
+                    Challenges.NO_CHANGES, true) { main, _ ->
+                Polyrhythm2Practice(main)
             }
         }
 

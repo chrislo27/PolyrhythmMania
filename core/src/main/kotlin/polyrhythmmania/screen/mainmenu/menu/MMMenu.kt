@@ -166,6 +166,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         this.bounds.height.set(40f)
         this.textAlign.set(TextAlign.LEFT)
         this.renderAlign.set(Align.left)
+        this.markup.set(this@StandardMenu.markup)
         this.setOnHoverStart(blipSoundListener)
     }
 
@@ -224,7 +225,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     
     protected fun createSidemodeLongButton(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
                                            challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
-                       factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
+                                           factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
         return createLongButton { Localization.getVar(name).use() }.apply {
             this.tooltipElement.set(createTooltip(tooltipVar))
             this.setOnAction {

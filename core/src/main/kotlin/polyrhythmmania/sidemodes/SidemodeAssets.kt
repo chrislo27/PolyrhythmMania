@@ -12,10 +12,14 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 object SidemodeAssets : Disposable {
     
     val practiceTheme: BeadsMusic by lazy { GdxAudioReader.newMusic(Gdx.files.internal("music/practice.ogg"), null) }
+    val polyrhythmTheme: BeadsMusic by lazy { GdxAudioReader.newMusic(Gdx.files.internal("music/Polyrhythm.ogg"), null) }
 
     override fun dispose() {
         if ((this::practiceTheme.getDelegate() as Lazy<*>).isInitialized()) {
             StreamUtils.closeQuietly(practiceTheme.musicSample)
+        }
+        if ((this::polyrhythmTheme.getDelegate() as Lazy<*>).isInitialized()) {
+            StreamUtils.closeQuietly(polyrhythmTheme.musicSample)
         }
     }
 }
