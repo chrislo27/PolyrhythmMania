@@ -169,7 +169,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         // TODO move this out
         for (x in 0 until 7) {
             for (z in -2..0) {
-                world.addEntity(EntityCube(world, false).apply {
+                world.addEntity(EntityCube(world, withLine = false, withBorder = z == 0).apply {
                     this.position.set(x.toFloat(), 0f, z.toFloat())
                 })
             }
