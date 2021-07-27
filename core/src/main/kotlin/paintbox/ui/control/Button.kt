@@ -6,10 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
-import paintbox.font.PaintboxFont
-import paintbox.font.TextAlign
-import paintbox.font.TextBlock
-import paintbox.font.TextRun
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.skin.DefaultSkins
@@ -17,6 +13,7 @@ import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.font.*
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
 import java.util.*
@@ -35,11 +32,16 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
                 ButtonSkin(element)
             })
         }
-
+        
         fun createInternalTextBlockVar(button: Button): Var<TextBlock> {
             return Var {
-                TextRun(button.font.use(), button.text.use(), Color.WHITE,
-                        button.scaleX.useF(), button.scaleY.useF()).toTextBlock().also { textBlock ->
+                val markup: Markup? = button.markup.use()
+                if (markup != null) {
+                    markup.parse(button.text.use())
+                } else {
+                    TextRun(button.font.use(), button.text.use(), Color.WHITE,
+                            /*label.scaleX.use(), label.scaleY.use()*/ 1f, 1f).toTextBlock()
+                }.also { textBlock ->
                     if (button.doLineWrapping.use()) {
                         textBlock.lineWrapping = button.contentZone.width.useF()
                     }
@@ -57,6 +59,12 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
     val doXCompression: Var<Boolean> = Var(true)
     val doLineWrapping: Var<Boolean> = Var(false)
+    
+    /**
+     * The [Markup] object to use. If null, no markup parsing is done. If not null,
+     * then the markup determines the TextBlock (and other values like [textColor] are ignored).
+     */
+    val markup: Var<Markup?> = Var(null)
 
     /**
      * Defaults to an auto-generated [TextBlock] with the given [text].
