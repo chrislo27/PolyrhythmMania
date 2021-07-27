@@ -411,7 +411,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
                 if (floorBelow >= this.position.y) { // Push the rod up to the floor height and kill velocityY
                     collision.velocityY = 0f
                     this.position.y = floorBelow
-                } else if (blockBelow.spawningState == EntityRowBlock.SpawningState.DESPAWNING && floorBelow + (2 / 32f) >= this.position.y) {
+                } else if (blockBelow.spawningState == EntityRowBlock.SpawningState.DESPAWNING && floorBelow + (4 / 32f) >= this.position.y) {
                     // Magnetize the rod to the retracting block to prevent landing SFX from playing
                     collision.velocityY = 0f
                     this.position.y = floorBelow
@@ -423,7 +423,9 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
                         val futureY = this.position.y + veloY * deltaSec
                         if (futureY < floorBelow) {
                             this.position.y = floorBelow
-                            playSfxLand(engine)
+                            if (blockBelow.spawningState != EntityRowBlock.SpawningState.DESPAWNING) {
+                                playSfxLand(engine)
+                            }
                             collision.velocityY = 0f
                         } else {
                             this.position.y = futureY
