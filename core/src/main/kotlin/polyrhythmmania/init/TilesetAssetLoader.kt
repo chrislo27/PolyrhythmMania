@@ -19,10 +19,6 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
 //        AssetRegistry.loadAsset<Texture>("tileset_gba", "textures/world/gba_spritesheet.png")
 
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_parts", PackedSheetLoader.PackedSheetLoaderParam(listOf(
-                "basket_back",
-                "basket_front",
-                "basket_front_face_z",
-                "basket_rear",
                 "cube_border",
                 "cube_border_platform",
                 "cube_border_z",
@@ -33,7 +29,6 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "explosion_1",
                 "explosion_2",
                 "explosion_3",
-                "hoop_back",
                 "indicator_a",
                 "indicator_dpad",
                 "input_feedback_0",
@@ -56,7 +51,6 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "platform",
                 "platform_with_line",
                 "red_line",
-//                "rods",
                 "rods_borders",
                 "rods_fill",
                 "sign_a",
@@ -70,7 +64,13 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "sign_ta",
                 "sign_ta_shadow",
                 "xyz",
-        ).map { Packable(it, "textures/world/parts/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 1024, duplicateBorder = false,)))
+        ).map { Packable(it, "textures/world/parts/$it.png") } + listOf(
+                "basket_back",
+                "basket_front",
+                "basket_front_face_z",
+                "basket_rear",
+                "hoop_back",
+        ).map { Packable(it, "textures/world/dunk/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 1024, duplicateBorder = false,)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "skill_star",
                 "skill_star_grey",
