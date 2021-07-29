@@ -83,6 +83,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     val removeMusicButton: Button
     
     val loopingCheckbox: CheckBox
+    val rateSlider: Slider
 
     val markerPlaybackStart: Color = PRManiaColors.PLAYBACK_START.cpy()
     val markerFirstBeat: Color = PRManiaColors.MARKER_FIRST_BEAT.cpy()
@@ -404,6 +405,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
         
         var lCheckBox: CheckBox? = null
+        var rateSlider: Slider? = null
 
         val otherControlsPane = Pane().apply {
             this.bounds.height.set(44f)
@@ -469,7 +471,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         this.markup.set(editorPane.palette.markup)
                         this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.rate.tooltip")))
                     }
-                    this += Slider().apply {
+                    rateSlider = Slider().apply {
                         Anchor.BottomLeft.configure(this)
                         this.bindHeightToParent(multiplier = 0.5f)
                         this.padding.set(Insets(1f))
@@ -491,11 +493,13 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                             this.setValue(100f)
                         }
                     }
+                    this += rateSlider!!
                 })
             }
         }
         
-        loopingCheckbox = lCheckBox!!
+        this.loopingCheckbox = lCheckBox!!
+        this.rateSlider = rateSlider!!
 
         vbox.temporarilyDisableLayouts {
             vbox += title
@@ -526,15 +530,26 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     }
 
     fun prepareShow(): MusicDialog {
-        val currentMusic = editor.musicData.beadsMusic
+        val editorMusicData = editor.musicData
+        val currentMusic = editorMusicData.beadsMusic
         substate.set(if (currentMusic == null) Substate.NO_MUSIC else Substate.HAS_MUSIC)
         val load = loadingProgress
         load.bytesSoFar.set(0L)
         load.durationMs.set(currentMusic?.musicSample?.lengthMs?.toFloat() ?: 0f)
 
         // Copy over music details
-        this.window.firstBeat.set(editor.musicData.firstBeatSec.get())
-        val loopParams = editor.musicData.loopParams.getOrCompute()
+        setControlsToMusicDetails()
+
+        stopMusicPlayback()
+
+        return this
+    }
+    
+    private fun setControlsToMusicDetails() {
+        val editorMusicData = editor.musicData
+        // Copy over music details
+        this.window.firstBeat.set(editorMusicData.firstBeatSec.get())
+        val loopParams = editorMusicData.loopParams.getOrCompute()
         if (loopParams.loopType == SamplePlayer.LoopType.NO_LOOP_FORWARDS) {
             this.window.doLooping.set(false)
             this.window.loopStart.set(0f)
@@ -546,10 +561,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.window.loopEnd.set((loopParams.endPointMs / 1000).toFloat())
             loopingCheckbox.checkedState.set(true)
         }
-
-        stopMusicPlayback()
-
-        return this
+        rateSlider.setValue(editorMusicData.rate.get() * 100f)
     }
 
     fun stopMusicPlayback() {
@@ -650,6 +662,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         editor.musicData.waveform?.generateSummaries()
         Gdx.app.postRunnable {
             editor.updateForNewMusicData()
+            
+            setControlsToMusicDetails()
             substate.set(Substate.HAS_MUSIC)
         }
     }
