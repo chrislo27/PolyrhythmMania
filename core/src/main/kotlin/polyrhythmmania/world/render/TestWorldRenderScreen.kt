@@ -22,6 +22,8 @@ import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
+import polyrhythmmania.world.tileset.Tileset
+import polyrhythmmania.world.tileset.TilesetConfig
 import kotlin.system.measureNanoTime
 
 

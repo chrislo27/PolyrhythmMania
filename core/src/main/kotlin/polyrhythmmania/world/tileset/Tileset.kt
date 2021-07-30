@@ -1,13 +1,10 @@
-package polyrhythmmania.world.render
+package polyrhythmmania.world.tileset
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.eclipsesource.json.Json
-import com.eclipsesource.json.JsonObject
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
-import paintbox.util.gdxutils.set
 
 
 class Tileset(val packedSheet: PackedSheet) {

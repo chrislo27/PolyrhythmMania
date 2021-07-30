@@ -36,6 +36,7 @@ import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.render.bg.NoOpWorldBackground
 import polyrhythmmania.world.render.bg.WorldBackground
+import polyrhythmmania.world.tileset.Tileset
 
 
 class WorldRenderer(val world: World, val tileset: Tileset) {

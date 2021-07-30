@@ -5,23 +5,17 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.disposeQuietly
-import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.util.gdxutils.isKeyJustReleased
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.input.EventLockInputs
-import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
-import polyrhythmmania.soundsystem.sample.GdxAudioReader
-import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
-import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.*
+import polyrhythmmania.world.tileset.Tileset
+import polyrhythmmania.world.tileset.TilesetConfig
 import kotlin.system.measureNanoTime
 
 

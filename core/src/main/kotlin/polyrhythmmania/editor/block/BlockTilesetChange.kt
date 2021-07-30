@@ -18,7 +18,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.ui.DecimalTextField
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.EventTilesetChange
-import polyrhythmmania.world.render.TilesetConfig
+import polyrhythmmania.world.tileset.TilesetConfig
 import java.util.*
 
 

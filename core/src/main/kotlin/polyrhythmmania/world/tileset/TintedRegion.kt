@@ -1,4 +1,4 @@
-package polyrhythmmania.world.render
+package polyrhythmmania.world.tileset
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion

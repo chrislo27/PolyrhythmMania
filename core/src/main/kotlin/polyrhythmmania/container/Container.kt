@@ -32,7 +32,7 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldSettings
-import polyrhythmmania.world.render.Tileset
+import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
 import java.util.*

@@ -3,7 +3,6 @@ package polyrhythmmania.sidemodes.practice
 import com.eclipsesource.json.Json
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.container.Container
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.block.Instantiators
@@ -15,7 +14,7 @@ import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.WorldSettings
-import polyrhythmmania.world.render.TilesetConfig
+import polyrhythmmania.world.tileset.TilesetConfig
 
 
 class Polyrhythm1Practice(main: PRManiaGame)

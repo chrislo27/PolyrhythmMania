@@ -20,8 +20,8 @@ import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.entity.EntityRod.Companion.MIN_COLLISION_UPDATE_RATE
 import polyrhythmmania.world.entity.SpriteEntity
-import polyrhythmmania.world.render.Tileset
-import polyrhythmmania.world.render.TintedRegion
+import polyrhythmmania.world.tileset.Tileset
+import polyrhythmmania.world.tileset.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.render.bg.WorldBackground
 import kotlin.math.floor

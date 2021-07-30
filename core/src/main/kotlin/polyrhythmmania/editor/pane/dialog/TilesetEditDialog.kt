@@ -29,9 +29,9 @@ import polyrhythmmania.ui.ColourPicker
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.*
-import polyrhythmmania.world.render.ColorMapping
-import polyrhythmmania.world.render.Tileset
-import polyrhythmmania.world.render.TilesetConfig
+import polyrhythmmania.world.tileset.ColorMapping
+import polyrhythmmania.world.tileset.Tileset
+import polyrhythmmania.world.tileset.TilesetConfig
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.sign
 

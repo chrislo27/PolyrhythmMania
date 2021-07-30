@@ -6,7 +6,7 @@ import paintbox.util.MathHelper
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.entity.EntityCube
 import polyrhythmmania.world.World
-import polyrhythmmania.world.render.Tileset
+import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.render.WorldRenderer
 
 

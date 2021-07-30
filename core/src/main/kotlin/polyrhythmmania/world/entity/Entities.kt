@@ -7,8 +7,8 @@ import paintbox.util.ColorStack
 import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
-import polyrhythmmania.world.render.Tileset
-import polyrhythmmania.world.render.TintedRegion
+import polyrhythmmania.world.tileset.Tileset
+import polyrhythmmania.world.tileset.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.absoluteValue
 import kotlin.math.floor

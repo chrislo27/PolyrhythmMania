@@ -9,7 +9,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityPiston
-import polyrhythmmania.world.render.TilesetConfig
+import polyrhythmmania.world.tileset.TilesetConfig
 
 
 abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float,
