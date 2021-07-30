@@ -4,7 +4,7 @@ import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
 
 
-data class Track(val id: String, val allowedTypes: Set<BlockType>) {
+data class Track(val id: TrackID, val allowedTypes: Set<BlockType>) {
 
     fun acceptsBlock(block: Block): Boolean {
         val blocksTypes = block.blockTypes

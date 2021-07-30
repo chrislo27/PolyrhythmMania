@@ -14,10 +14,10 @@ import paintbox.registry.AssetRegistry
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
-import polyrhythmmania.editor.block.Block
-import polyrhythmmania.editor.block.BlockEndState
-import polyrhythmmania.editor.block.Instantiator
-import polyrhythmmania.editor.block.Instantiators
+import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.Track
+import polyrhythmmania.editor.TrackID
+import polyrhythmmania.editor.block.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.music.MusicVolume
@@ -54,9 +54,11 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     companion object {
         const val FILE_EXTENSION: String = "prmania"
-        const val CONTAINER_VERSION: Int = 6
+        const val CONTAINER_VERSION: Int = 7
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
+        
+        val DEFAULT_TRACKS_BEFORE_V7: List<String> = listOf("input_0", "input_1", "input_2", "fx_0", "fx_1") // Default tracks indexes for container version 6 and below
     }
 
     val world: World = World()
@@ -73,6 +75,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val blocks: List<Block> get() = _blocks
     
     var resultsText: ResultsText = ResultsText.DEFAULT
+    val trackIDs: List<TrackID> = Editor.DEFAULT_TRACKS.map { it.id }
 
     private val _resources: MutableMap<String, ExternalResource> = ConcurrentHashMap()
     val resources: Map<String, ExternalResource> get() = _resources
@@ -194,6 +197,13 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                         resObj.add("ext", res.file.extension)
                     })
                 }
+            })
+        })
+        jsonObj.add("editor", Json.`object`().also { editorObj ->
+            editorObj.add("trackIndexes", Json.`object`().also { trackIndexesObj ->
+                val trackIDs = this.trackIDs
+                trackIndexesObj.add("count", trackIDs.size)
+                trackIndexesObj.add("ids", Json.array(*trackIDs.map { it.id }.toTypedArray()))
             })
         })
         jsonObj.add("engine", Json.`object`().also { engineObj ->

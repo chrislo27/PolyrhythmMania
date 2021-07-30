@@ -72,12 +72,15 @@ class Editor(val main: PRManiaGame)
     : ActionHistory<Editor>(), InputProcessor, Disposable, Lwjgl3WindowListener {
 
     companion object {
-        const val TRACK_INPUT_0: String = "input_0"
-        const val TRACK_INPUT_1: String = "input_1"
-        const val TRACK_INPUT_2: String = "input_2"
-        const val TRACK_FX_0: String = "fx_0"
-        const val TRACK_FX_1: String = "fx_1"
-
+        val DEFAULT_TRACKS: List<Track> = listOf(
+                Track(TrackID.INPUT_0, EnumSet.of(BlockType.INPUT)),
+                Track(TrackID.INPUT_1, EnumSet.of(BlockType.INPUT)),
+                Track(TrackID.INPUT_2, EnumSet.of(BlockType.INPUT)),
+                Track(TrackID.FX_0, EnumSet.of(BlockType.FX)),
+                Track(TrackID.FX_1, EnumSet.of(BlockType.FX)),
+                Track(TrackID.FX_2, EnumSet.of(BlockType.FX)),
+        )
+        
         val MOVE_WINDOW_LEFT_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.A)
         val MOVE_WINDOW_RIGHT_KEYCODES: Set<Int> = setOf(Input.Keys.RIGHT, Input.Keys.D)
         val MOVE_WINDOW_KEYCODES: Set<Int> = (MOVE_WINDOW_LEFT_KEYCODES + MOVE_WINDOW_RIGHT_KEYCODES)
@@ -120,14 +123,8 @@ class Editor(val main: PRManiaGame)
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.mainFontBoldBordered, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
 
-    val tracks: List<Track> = listOf(
-            Track(TRACK_INPUT_0, EnumSet.of(BlockType.INPUT)),
-            Track(TRACK_INPUT_1, EnumSet.of(BlockType.INPUT)),
-            Track(TRACK_INPUT_2, EnumSet.of(BlockType.INPUT)),
-            Track(TRACK_FX_0, EnumSet.of(BlockType.FX)),
-            Track(TRACK_FX_1, EnumSet.of(BlockType.FX)),
-    )
-    val trackMap: Map<String, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
+    val tracks: List<Track> = DEFAULT_TRACKS
+    val trackMap: Map<TrackID, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 
     // Editor tooling states
     val playState: ReadOnlyVar<PlayState> = Var(PlayState.STOPPED)

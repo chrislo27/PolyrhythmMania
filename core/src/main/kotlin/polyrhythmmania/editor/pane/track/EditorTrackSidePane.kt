@@ -6,12 +6,13 @@ import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.Track
+import polyrhythmmania.editor.TrackID
 
 
 /**
  * An [EditorTrackSidePane] is a track pane that directly represents a [Track] in the editor.
  */
-class EditorTrackSidePane(val allTracksPane: AllTracksPane, val trackID: String)
+class EditorTrackSidePane(val allTracksPane: AllTracksPane, val trackID: TrackID)
     : Pane() {
 
     val editorPane: EditorPane = allTracksPane.editorPane
@@ -26,6 +27,6 @@ class EditorTrackSidePane(val allTracksPane: AllTracksPane, val trackID: String)
         this += sidePanel
         
         this.sidePanel.titleLabel.markup.set(editorPane.palette.markupBordered)
-        this.sidePanel.titleText.bind { Localization.getVar("editor.track.${trackID}").use() }
+        this.sidePanel.titleText.bind { Localization.getVar("editor.track.${trackID.id}").use() }
     }
 }
