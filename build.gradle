@@ -53,7 +53,7 @@ allprojects {
         
         implementation 'com.beust:jcommander:1.81'
         
-        implementation 'org.slf4j:slf4j-simple:1.7.31'
+        implementation 'org.slf4j:slf4j-simple:1.7.32'
         implementation 'net.lingala.zip4j:zip4j:2.9.0'
         
 //        implementation "de.sciss:jump3r:1.0.5"
