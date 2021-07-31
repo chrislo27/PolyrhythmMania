@@ -10,6 +10,7 @@ import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_DETAILED_MARKER_UNDO
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PANNING_DURING_PLAYBACK
+import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PLAYTEST_STARTS_PLAY
 import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
@@ -45,6 +46,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_editorAutosaveInterval: KeyValue<Int> = KeyValue(EDITORSETTINGS_AUTOSAVE_INTERVAL, Var(5))
     private val kv_editorMusicWaveformOpacity: KeyValue<Int> = KeyValue(EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY, Var(10))
     private val kv_editorHigherAccuracyPreview: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW, Var(true))
+    private val kv_editorPlaytestStartsPlay: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_PLAYTEST_STARTS_PLAY, Var(true))
     
     private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, Var(InputKeymapKeyboard()))
             
@@ -65,6 +67,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val editorAutosaveInterval: Var<Int> = kv_editorAutosaveInterval.value
     val editorMusicWaveformOpacity: Var<Int> = kv_editorMusicWaveformOpacity.value
     val editorHigherAccuracyPreview: Var<Boolean> = kv_editorHigherAccuracyPreview.value
+    val editorPlaytestStartsPlay: Var<Boolean> = kv_editorPlaytestStartsPlay.value
     
     val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
     
@@ -89,6 +92,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getIntCoerceIn(kv_editorAutosaveInterval, 0, Short.MAX_VALUE.toInt())
         prefs.getIntCoerceIn(kv_editorMusicWaveformOpacity, 0, 10)
         prefs.getBoolean(kv_editorHigherAccuracyPreview)
+        prefs.getBoolean(kv_editorPlaytestStartsPlay)
         
         prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
         
@@ -97,27 +101,28 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
     fun persist() {
         prefs
-            .putInt(kv_gameplayVolume)
-            .putInt(kv_menuMusicVolume)
-            .putInt(kv_menuSfxVolume)
-            .putWindowSize(kv_windowedResolution)
-            .putBoolean(kv_fullscreen)
-            .putBoolean(kv_showInputFeedbackBar)
-            .putBoolean(kv_showSkillStar)
-            .putInt(kv_musicOffsetMs)
+                .putInt(kv_gameplayVolume)
+                .putInt(kv_menuMusicVolume)
+                .putInt(kv_menuSfxVolume)
+                .putWindowSize(kv_windowedResolution)
+                .putBoolean(kv_fullscreen)
+                .putBoolean(kv_showInputFeedbackBar)
+                .putBoolean(kv_showSkillStar)
+                .putInt(kv_musicOffsetMs)
 
-            .putBoolean(kv_editorDetailedMarkerUndo)
-            .putBoolean(kv_editorCameraPanOnDragEdge)
-            .putEditorSetting(kv_editorPanningDuringPlayback)
-            .putInt(kv_editorAutosaveInterval)
-            .putInt(kv_editorMusicWaveformOpacity)
-            .putBoolean(kv_editorHigherAccuracyPreview)
+                .putBoolean(kv_editorDetailedMarkerUndo)
+                .putBoolean(kv_editorCameraPanOnDragEdge)
+                .putEditorSetting(kv_editorPanningDuringPlayback)
+                .putInt(kv_editorAutosaveInterval)
+                .putInt(kv_editorMusicWaveformOpacity)
+                .putBoolean(kv_editorHigherAccuracyPreview)
+                .putBoolean(kv_editorPlaytestStartsPlay)
 
-            .putInputKeymapKeyboard(kv_keymapKeyboard)
+                .putInputKeymapKeyboard(kv_keymapKeyboard)
 
-            .putInt(kv_endlessDunkHighScore)
+                .putInt(kv_endlessDunkHighScore)
 
-            .flush()
+                .flush()
     }
 
     private fun Preferences.getInt(kv: KeyValue<Int>) {

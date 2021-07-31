@@ -545,7 +545,7 @@ class Editor(val main: PRManiaGame)
     fun attemptStartPlaytest() {
         editorPane.openDialog(editorPane.playtestDialog)
         setPlaytestingEnabled(true)
-        if (playState.getOrCompute() == PlayState.STOPPED) {
+        if (playState.getOrCompute() == PlayState.STOPPED && settings.editorPlaytestStartsPlay.getOrCompute()) {
             changePlayState(PlayState.PLAYING)
         }
     }
