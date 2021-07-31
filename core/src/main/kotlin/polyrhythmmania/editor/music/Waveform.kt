@@ -54,7 +54,7 @@ class Waveform(val musicSample: MusicSample) {
             
             var consumed2k = buffer.size
             val startIndex2k = index2k
-            while (consumed2k > 0 && index2k < numSummaries256) {
+            while (consumed2k > 0 && index2k < numSummaries2k) {
                 val amt = consumed2k.coerceAtMost(2048)
                 for (ch in 0 until nChannels) {
                     val summary = createSummary(buffer, ch, (index2k - startIndex2k) * 2048, amt)
