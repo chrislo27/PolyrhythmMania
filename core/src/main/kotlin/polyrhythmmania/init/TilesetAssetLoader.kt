@@ -127,9 +127,8 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "sign_ta",
                 "sign_ta_shadow",
         ).map { Packable(it, "textures/world/hd/parts/$it.png") },
-                PackedSheet.Config(padding = 1,
-                        maxSize = 2048,
-                        duplicateBorder = false,)))
+                PackedSheet.Config(padding = 1, maxSize = 2048, duplicateBorder = false, atlasMipMaps = true,
+                        atlasMinFilter = Texture.TextureFilter.MipMapLinearLinear, atlasMagFilter = Texture.TextureFilter.Linear)))
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
