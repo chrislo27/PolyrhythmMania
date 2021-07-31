@@ -10,6 +10,7 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import net.lingala.zip4j.ZipFile
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
+import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
@@ -67,7 +68,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
     val engine: Engine = Engine(timing, world, soundSystem, this)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(AssetRegistry["tileset_parts"]).apply { 
+        WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_parts")).apply { 
             world.tilesetConfig.applyTo(this)
         })
     }

@@ -3,6 +3,7 @@ package polyrhythmmania.world.render
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
+import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.isKeyJustReleased
@@ -33,7 +34,7 @@ class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val timing: TimingProvider = soundSystem
     val engine: Engine = Engine(timing, world, soundSystem, null)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(AssetRegistry["tileset_parts"]).apply { 
+        WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_parts")).apply { 
             TilesetConfig.createGBA1TilesetConfig().applyTo(this)
         })
     }

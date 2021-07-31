@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.PixmapPacker
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
 import paintbox.Paintbox
@@ -21,7 +22,8 @@ import paintbox.util.gdxutils.disposeQuietly
 /**
  * Represents a set of textures that are packed at runtime and addressable via an ID.
  */
-class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : Disposable {
+class PackedSheet(val config: Config, initial: List<Packable> = emptyList())
+    : TextureRegionMap, Disposable {
 
     private class PackResult(val atlas: TextureAtlas, val originalPackables: List<Packable>, val timeTaken: Double)
         : Disposable {
@@ -108,17 +110,25 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
         }
     }
 
-    operator fun get(id: String): TextureAtlas.AtlasRegion {
+    override operator fun get(id: String): TextureAtlas.AtlasRegion {
+        return getOrNull(id) ?: error("No atlas region found with ID $id")
+    }
+
+    override fun getOrNull(id: String): TextureAtlas.AtlasRegion? {
         val atlas = this.atlas
         return if (atlas != null) {
-            atlas.regions[id] ?: error("No atlas region found with ID $id")
+            atlas.regions[id]
         } else error("Atlas was not loaded. Call pack() first")
     }
-    
-    fun getIndexedRegions(id: String): Map<Int, TextureAtlas.AtlasRegion> {
+
+    override fun getIndexedRegions(id: String): Map<Int, TextureAtlas.AtlasRegion> {
+        return getIndexedRegionsOrNull(id) ?: error("No indexed map of atlas regions found with ID $id")
+    }
+
+    override fun getIndexedRegionsOrNull(id: String): Map<Int, TextureAtlas.AtlasRegion>? {
         val atlas = this.atlas
         return if (atlas != null) {
-            atlas.indexedRegions[id] ?: error("No indexed map of atlas regions found with ID $id")
+            atlas.indexedRegions[id]
         } else error("Atlas was not loaded. Call pack() first")
     }
 
@@ -145,10 +155,16 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList()) : D
 interface Packable {
 
     companion object {
+        /**
+         * Creates a [Packable] with the given ID and file handle.
+         */
         operator fun invoke(id: String, fileHandle: FileHandle): Packable {
             return TemporaryPackableTex(id, fileHandle)
         }
 
+        /**
+         * Creates a [Packable] with the given ID and internal file path.
+         */
         operator fun invoke(id: String, internalPath: String): Packable {
             return TemporaryPackableTex(id, internalPath)
         }

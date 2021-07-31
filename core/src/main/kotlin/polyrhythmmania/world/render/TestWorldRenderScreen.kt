@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.disposeQuietly
 import net.beadsproject.beads.ugens.SamplePlayer
+import paintbox.packing.PackedSheet
 import paintbox.util.gdxutils.isKeyJustReleased
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
@@ -38,7 +39,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val timing: TimingProvider = soundSystem
     val engine: Engine = Engine(timing, world, soundSystem, null)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(AssetRegistry["tileset_parts"]).apply { 
+        WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_parts")).apply { 
             TilesetConfig.createGBA1TilesetConfig().applyTo(this)
         })
     }
