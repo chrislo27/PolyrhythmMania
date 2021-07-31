@@ -45,7 +45,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("toolbar_tapalong", "textures/ui/icon/toolbar/tapalong.png"),
                 Packable("toolbar_playtest_shut", "textures/ui/icon/toolbar/playtest_shut.png"),
                 Packable("toolbar_playtest_open", "textures/ui/icon/toolbar/playtest_open.png"),
-                Packable("toolbar_tileset", "textures/ui/icon/toolbar/tileset.png"),
+                Packable("toolbar_tileset_palette", "textures/ui/icon/toolbar/tileset_palette.png"),
                 Packable("toolbar_results", "textures/ui/icon/toolbar/results.png"),
                 Packable("toolbar_world_settings", "textures/ui/icon/toolbar/world_settings.png"),
                 Packable("menubar_new", "textures/ui/icon/menubar/new.png"),
