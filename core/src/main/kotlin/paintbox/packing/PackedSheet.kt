@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
 import paintbox.Paintbox
 import paintbox.util.gdxutils.disposeQuietly
+import java.io.File
 
 
 /**
@@ -94,15 +95,23 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList())
 
         val outputFile = config.debugOutputFile
         if (outputFile != null) {
-            val regions = newAtlas.regions
-            if (regions.size > 0) {
-                if (regions.size > 1) Paintbox.LOGGER.debug("Packed sheet output has ${regions.size} regions, only first one will be outputted to $outputFile")
-                val td = regions.first().texture.textureData
+            outputToFile(outputFile)
+        }
+    }
+    
+    fun outputToFile(outputFile: FileHandle) {
+        val newAtlas = this.atlas?.atlas ?: return
+        val textures = newAtlas.textures
+        if (textures.size > 0) {
+            val onlyOne = textures.size == 1
+            textures.forEachIndexed { index, texture ->
+                val file = if (onlyOne) outputFile else outputFile.sibling(outputFile.nameWithoutExtension() + ".${index}.png")
+                val td = texture.textureData
                 if (!td.isPrepared) {
                     td.prepare()
                 }
                 val pix = td.consumePixmap()
-                PixmapIO.writePNG(outputFile, pix)
+                PixmapIO.writePNG(file, pix)
                 if (td.disposePixmap()) {
                     pix.disposeQuietly()
                 }

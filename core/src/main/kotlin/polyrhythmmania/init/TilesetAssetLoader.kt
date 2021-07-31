@@ -77,7 +77,10 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "basket_front_face_z",
                 "basket_rear",
                 "hoop_back",
-        ).map { Packable(it, "textures/world/dunk/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 1024, duplicateBorder = false,)))
+        ).map { Packable(it, "textures/world/dunk/$it.png") },
+                PackedSheet.Config(padding = 1,
+                        maxSize = 512 /* Found to be the smallest Po2 size without splitting into more texs */,
+                        duplicateBorder = false,)))
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {

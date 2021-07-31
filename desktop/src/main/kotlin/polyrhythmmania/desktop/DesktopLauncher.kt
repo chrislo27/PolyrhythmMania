@@ -42,6 +42,10 @@ object DesktopLauncher {
         }
 
         val app = PRManiaGame(PRManiaGame.createPaintboxSettings(args.toList(), Logger(), PRMania.MAIN_FOLDER.resolve("logs/")))
+        
+        PRMania.logMissingLocalizations = arguments.logMissingLocalizations
+        PRMania.dumpPackedSheets = arguments.dumpPackedSheets
+        
         PaintboxDesktopLauncher(app, arguments).editConfig {
             this.setAutoIconify(true)
             val emulatedSize = app.paintboxSettings.emulatedSize

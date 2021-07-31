@@ -33,4 +33,8 @@ object PRMania {
     
     val enableEarlyAccessMessage: Boolean = true
     
+    // Command line arguments
+    var logMissingLocalizations: Boolean = false
+    var dumpPackedSheets: Boolean = false
+    
 }

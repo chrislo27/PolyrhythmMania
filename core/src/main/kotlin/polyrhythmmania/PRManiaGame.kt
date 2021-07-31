@@ -21,6 +21,7 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.*
 import paintbox.logging.Logger
+import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.util.ResolutionSetting
 import paintbox.util.Version
@@ -36,6 +37,7 @@ import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
 import java.io.File
 import java.net.HttpURLConnection
@@ -118,6 +120,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             }
             onAssetLoadingComplete = {
                 initializeScreens()
+                
+                if (PRMania.dumpPackedSheets) {
+                    val gdxArray = com.badlogic.gdx.utils.Array<PackedSheet>()
+                    AssetRegistry.manager.getAll(PackedSheet::class.java, gdxArray)
+                    DumpPackedSheets.dump(gdxArray.toList())
+                }
             }
             nextScreenProducer = {
 //                polyrhythmmania.world.render.TestWorldRenderScreen(this@PRManiaGame)
@@ -126,6 +134,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 mainMenuScreen.prepareShow(doFlipAnimation = true)
             }
         })
+        
+        if (PRMania.logMissingLocalizations) {
+            Localization.logMissingLocalizations()
+        }
         
         Runtime.getRuntime().addShutdownHook(thread(start = false, isDaemon = true, name = "Level Recovery Shutdown Hook") {
             val currentScreen = getScreen()
