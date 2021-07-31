@@ -15,7 +15,6 @@ import paintbox.ui.contextmenu.SeparatorMenuItem
 import paintbox.ui.control.Button
 import paintbox.ui.control.Slider
 import paintbox.ui.control.TextLabel
-import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.PlayState
@@ -31,7 +30,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
     val previewSection: Pane
     val mainSection: Pane
 
-    val tilesetButton: Button
+    val tilesetPaletteButton: Button
     val playtestButton: Button
 
     val tapalongPane: TapalongPane
@@ -109,16 +108,6 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         }
         previewSection += rightPreviewHbox
         
-        tilesetButton = Button("").apply {
-            this.padding.set(Insets.ZERO)
-            this.bounds.width.set(32f)
-            this.skinID.set(EditorSkins.BUTTON)
-            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tileset"]))
-            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.tileset")))
-            this.setOnAction {
-                editorPane.editor.attemptOpenTilesetEditDialog()
-            }
-        }
         playtestButton = Button("").apply {
             this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
@@ -136,7 +125,6 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             }
         }
         rightPreviewHbox.temporarilyDisableLayouts {
-            rightPreviewHbox += tilesetButton
             rightPreviewHbox += playtestButton
         }
         
@@ -259,17 +247,30 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         tapalongPane = TapalongPane(this).apply {
             this.bounds.width.set(300f)
         }
-        val leftControlPane = HBox().apply {
+        val leftControlHBox = HBox().apply {
             Anchor.TopLeft.configure(this)
             this.align.set(HBox.Align.LEFT)
             this.spacing.set(4f)
             this.bounds.width.set((32f + this.spacing.get()) * 3 + tapalongPane.bounds.width.get())
         }
-        mainSection += leftControlPane
+        mainSection += leftControlHBox
 
+        tilesetPaletteButton = Button("").apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f)
+            this.skinID.set(EditorSkins.BUTTON)
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tileset"]))
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.tileset")))
+            this.setOnAction {
+                editorPane.editor.attemptOpenTilesetEditDialog()
+            }
+        }
 
-        leftControlPane.temporarilyDisableLayouts {
-            leftControlPane.addChild(Button("").apply {
+        leftControlHBox.temporarilyDisableLayouts {
+            leftControlHBox += tilesetPaletteButton
+            leftControlHBox.addChild(separator())
+
+            leftControlHBox.addChild(Button("").apply {
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
                 this.padding.set(Insets.ZERO)
@@ -281,7 +282,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.results")))
             })
-            leftControlPane.addChild(Button("").apply {
+            leftControlHBox.addChild(Button("").apply {
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
                 this.padding.set(Insets.ZERO)
@@ -307,8 +308,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.worldSettings")))
             })
-            leftControlPane.addChild(separator())
-            leftControlPane.addChild(Button("").apply {
+            leftControlHBox.addChild(separator())
+            leftControlHBox.addChild(Button("").apply {
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
                 this.padding.set(Insets.ZERO)
@@ -320,7 +321,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.music")))
             })
-            leftControlPane.addChild(IndentedButton("").apply {
+            leftControlHBox.addChild(IndentedButton("").apply {
                 editorPane.styleIndentedButton(this)
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
@@ -338,7 +339,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     }
                 }
             })
-            leftControlPane.addChild(IndentedButton("").apply {
+            leftControlHBox.addChild(IndentedButton("").apply {
                 editorPane.styleIndentedButton(this)
                 this.bounds.width.set(32f)
                 this.skinID.set(EditorSkins.BUTTON)
@@ -368,7 +369,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tapalong"]))
             })
-            leftControlPane.addChild(tapalongPane)
+            leftControlHBox.addChild(tapalongPane)
         }
     }
     
