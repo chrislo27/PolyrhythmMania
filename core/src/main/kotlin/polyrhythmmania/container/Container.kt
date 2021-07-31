@@ -68,7 +68,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
     val engine: Engine = Engine(timing, world, soundSystem, this)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_parts")).apply { 
+        WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply { 
             world.tilesetConfig.applyTo(this)
         })
     }

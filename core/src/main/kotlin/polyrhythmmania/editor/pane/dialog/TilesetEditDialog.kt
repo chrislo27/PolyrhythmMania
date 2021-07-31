@@ -54,7 +54,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
             baseTileset?.let { ResetDefault(it) }
     )
     private var resetDefault: ResetDefault = availableResetDefaults.first()
-    private val tempTileset: Tileset = Tileset(AssetRegistry.get<PackedSheet>("tileset_parts")).apply {
+    private val tempTileset: Tileset = Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply {
         tilesetConfig.applyTo(this)
     }
 
@@ -177,7 +177,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                                 this.spacing.set(8f)
                                 this.bounds.height.set(64f)
                                 this.temporarilyDisableLayouts { 
-                                    this += ImageNode(AssetRegistry.get<PackedSheet>("tileset_parts")["xyz"]).apply { 
+                                    this += ImageNode(AssetRegistry.get<PackedSheet>("tileset_gba")["xyz"]).apply { 
                                         this.bounds.width.set(64f)
                                     }
                                     this += TextLabel("[b][color=#FF0000]X-[] [color=#00D815]Y+[] [color=#0000FF]Z+[][]").apply { 
@@ -381,7 +381,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     inner class ObjectPreview : UIElement() {
 
         val world: World = World()
-        val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_parts")).apply { 
+        val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply { 
             tilesetConfig.applyTo(this)
         })
         

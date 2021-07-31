@@ -25,7 +25,7 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
         ).map { Packable(it, "textures/world/ui/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false,
                 atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
 
-        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_parts", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_gba", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "cube_border",
                 "cube_border_platform",
                 "cube_border_z",
@@ -71,7 +71,7 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "sign_ta",
                 "sign_ta_shadow",
                 "xyz",
-        ).map { Packable(it, "textures/world/parts/$it.png") } + listOf(
+        ).map { Packable(it, "textures/world/gba/parts/$it.png") } + listOf(
                 "basket_back",
                 "basket_front",
                 "basket_front_face_z",
@@ -80,6 +80,55 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
         ).map { Packable(it, "textures/world/dunk/$it.png") },
                 PackedSheet.Config(padding = 1,
                         maxSize = 512 /* Found to be the smallest Po2 size without splitting into more texs */,
+                        duplicateBorder = false,)))
+        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_hd", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                "cube_border",
+                "cube_border_platform",
+                "cube_border_z",
+                "cube_face_x",
+                "cube_face_y",
+                "cube_face_z",
+                "explosion_0",
+                "explosion_1",
+                "explosion_2",
+                "explosion_3",
+                "indicator_a",
+                "indicator_dpad",
+                "input_feedback_0",
+                "input_feedback_1",
+                "input_feedback_2",
+                "piston_a",
+                "piston_a_extended",
+                "piston_a_extended_face_x",
+                "piston_a_extended_face_z",
+                "piston_a_partial",
+                "piston_a_partial_face_x",
+                "piston_a_partial_face_z",
+                "piston_dpad",
+                "piston_dpad_extended",
+                "piston_dpad_extended_face_x",
+                "piston_dpad_extended_face_z",
+                "piston_dpad_partial",
+                "piston_dpad_partial_face_x",
+                "piston_dpad_partial_face_z",
+                "platform",
+                "platform_with_line",
+                "red_line",
+                "rods_borders",
+                "rods_fill",
+                "sign_a",
+                "sign_a_shadow",
+                "sign_bo",
+                "sign_bo_shadow",
+                "sign_dpad",
+                "sign_dpad_shadow",
+                "sign_n",
+                "sign_n_shadow",
+                "sign_ta",
+                "sign_ta_shadow",
+        ).map { Packable(it, "textures/world/hd/parts/$it.png") },
+                PackedSheet.Config(padding = 1,
+                        maxSize = 2048,
                         duplicateBorder = false,)))
     }
 
