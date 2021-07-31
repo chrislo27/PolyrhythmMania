@@ -175,8 +175,8 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
 class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(world, deployBeat) {
 
     data class InputTracker(
-            val resultCount: Int,
-            val expected: MutableList<ExpectedInput> = MutableList(resultCount) { ExpectedInput.Unknown },
+            val totalResultCount: Int,
+            val expected: MutableList<ExpectedInput> = MutableList(totalResultCount) { ExpectedInput.Unknown },
             val results: MutableList<InputResult> = mutableListOf(),
     )
     
@@ -274,7 +274,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
      */
     fun updateInputTracking(beat: Float) {
         val currentIndexFloor: Int = floor(getCurrentIndex(getPosXFromBeat(beat - deployBeat))).toInt()
-        if (currentIndexFloor < 0 || currentIndexFloor >= inputTracker.resultCount)
+        if (currentIndexFloor < 0 || currentIndexFloor >= inputTracker.totalResultCount)
             return
         
         val currentExpected: ExpectedInput = inputTracker.expected[currentIndexFloor]
@@ -289,7 +289,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
             // Lookahead to where it should land.
             val lookahead = getLookaheadIndex(currentIndexFloor)
             inputTracker.expected[currentIndexFloor] = ExpectedInput.Expected(currentIndexFloor, lookahead)
-            for (i in currentIndexFloor + 1 until lookahead.coerceAtMost(inputTracker.resultCount - 1)) {
+            for (i in currentIndexFloor + 1 until lookahead.coerceAtMost(inputTracker.totalResultCount - 1)) {
                 if (inputTracker.expected[i] == ExpectedInput.Unknown)
                     inputTracker.expected[i] = ExpectedInput.InAir
             }

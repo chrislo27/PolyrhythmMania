@@ -71,7 +71,8 @@ class EventCondApplause(engine: Engine, startBeat: Float, val rowSetting: RowSet
     private fun doesValidRodExistOnRow(currentBeat: Float, row: Row): Boolean {
         val world = engine.world
         return world.entities.filterIsInstance<EntityRodPR>().any { 
-            it.row == row && it.acceptingInputs && it.inputTracker.results.none { it.inputScore == InputScore.MISS } && currentBeat - it.deployBeat >= 4.25f
+            val results = it.inputTracker.results
+            it.row == row && it.acceptingInputs && currentBeat - it.deployBeat >= 4.25f && results.size > 0 && results.none { it.inputScore == InputScore.MISS }
         }
     }
 

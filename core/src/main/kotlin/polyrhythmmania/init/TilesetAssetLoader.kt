@@ -16,7 +16,14 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
             this.minFilter = Texture.TextureFilter.Linear
         }
         
-//        AssetRegistry.loadAsset<Texture>("tileset_gba", "textures/world/gba_spritesheet.png")
+        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                "skill_star",
+                "skill_star_grey",
+                "perfect",
+                "perfect_failed",
+                "perfect_hit",
+        ).map { Packable(it, "textures/world/ui/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false,
+                atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
 
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_parts", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "cube_border",
@@ -71,14 +78,6 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "basket_rear",
                 "hoop_back",
         ).map { Packable(it, "textures/world/dunk/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 1024, duplicateBorder = false,)))
-        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
-                "skill_star",
-                "skill_star_grey",
-                "perfect",
-                "perfect_failed",
-                "perfect_hit",
-        ).map { Packable(it, "textures/world/ui/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false,
-                atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
