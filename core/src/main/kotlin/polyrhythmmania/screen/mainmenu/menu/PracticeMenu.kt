@@ -12,11 +12,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.practice.Polyrhythm1Practice
-import polyrhythmmania.sidemodes.practice.Polyrhythm2Practice
-import polyrhythmmania.sidemodes.practice.Practice
-import polyrhythmmania.sidemodes.practice.PracticeBasic
+import polyrhythmmania.sidemodes.practice.*
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -67,13 +63,16 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false, factory = factory)
             }
             
-            vbox += createPractice("mainMenu.practice.basic") { main, keymap ->
-                PracticeBasic(main, keymap)
+            vbox += createPractice("mainMenu.practice.tutorial1") { main, keymap ->
+                PracticeTutorial1(main, keymap)
             }
             vbox += createSidemodeLongButton("mainMenu.practice.polyrhythm1",
                     Localization.getVar("mainMenu.practice.polyrhythm1.tooltip"),
                     Challenges.NO_CHANGES, true) { main, _ ->
                 Polyrhythm1Practice(main)
+            }
+            vbox += createPractice("mainMenu.practice.tutorial2") { main, keymap ->
+                PracticeTutorial2(main, keymap)
             }
             vbox += createSidemodeLongButton("mainMenu.practice.polyrhythm2",
                     Localization.getVar("mainMenu.practice.polyrhythm2.tooltip"),

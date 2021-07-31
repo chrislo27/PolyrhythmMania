@@ -21,7 +21,7 @@ import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
 
 
-class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) : Practice(main) {
+class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) : Practice(main) {
     
     val practiceSection1: PracticeSection = PracticeSection(engine)
     val practiceSection2: PracticeSection = PracticeSection(engine)
@@ -66,37 +66,37 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 0f
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text1a")
+                this.text = Localization.getValue("practice.tutorial1.text1a")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 1f
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text1b")
+                this.text = Localization.getValue("practice.tutorial1.text1b")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 2f
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text1c")
+                this.text = Localization.getValue("practice.tutorial1.text1c")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 3f
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text1d")
+                this.text = Localization.getValue("practice.tutorial1.text1d")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 4f
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text1e")
+                this.text = Localization.getValue("practice.tutorial1.text1e")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 5f
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text1f")
+                this.text = Localization.getValue("practice.tutorial1.text1f")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 6f
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text2", keyboardKeymap.toDpadString())
+                this.text = Localization.getValue("practice.tutorial1.text2", keyboardKeymap.toDpadString())
             }.compileIntoEvents())
             engine.addEvents(practiceSection2.apply {
                 this.beat = startBeat + 4f + 8f
@@ -138,12 +138,12 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text3")
+                this.text = Localization.getValue("practice.tutorial1.text3")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text4")
+                this.text = Localization.getValue("practice.tutorial1.text4")
             }.compileIntoEvents())
             engine.addEvents(practiceSection3.apply {
                 this.beat = startBeat + 4f + 3
@@ -198,12 +198,12 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text5")
+                this.text = Localization.getValue("practice.tutorial1.text5")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text6")
+                this.text = Localization.getValue("practice.tutorial1.text6")
             }.compileIntoEvents())
             engine.addEvents(practiceSection4.apply {
                 this.beat = startBeat + 4f + 3
@@ -263,12 +263,12 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text7")
+                this.text = Localization.getValue("practice.tutorial1.text7")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
-                this.text = Localization.getValue("practice.basic.text8")
+                this.text = Localization.getValue("practice.tutorial1.text8")
             }.compileIntoEvents())
             engine.addEvent(EventEndState(engine, startBeat + 4f + 3))
         }
@@ -296,12 +296,12 @@ class PracticeBasic(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) 
         blocks += BlockTextbox(engine).apply { 
             this.beat = 0f
             this.requireInput.set(true)
-            this.text = Localization.getValue("practice.basic.text0", Input.Keys.toString(keyboardKeymap.buttonA))
+            this.text = Localization.getValue("practice.tutorial1.text0", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += BlockTextbox(engine).apply { 
             this.beat = 1f
             this.requireInput.set(true)
-            this.text = Localization.getValue("practice.basic.text1", Input.Keys.toString(keyboardKeymap.buttonA))
+            this.text = Localization.getValue("practice.tutorial1.text1", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += practiceSection1.apply { 
             this.beat = 3f
