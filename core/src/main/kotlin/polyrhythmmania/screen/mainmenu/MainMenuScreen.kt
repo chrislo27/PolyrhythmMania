@@ -132,7 +132,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val tilesWidth: Int = ceil(1280f / tileSize).toInt()
     val tilesHeight: Int = ceil(720f / tileSize).toInt()
     private val tiles: Array<Array<Tile>> = Array(tilesWidth) { x -> Array(tilesHeight) { y -> Tile(x, y) } }
-    var flipAnimation: TileFlip? = null
+    @Volatile var flipAnimation: TileFlip? = null
         set(value) {
             field = value
             resetTiles()
