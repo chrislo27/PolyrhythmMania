@@ -2,6 +2,7 @@ package polyrhythmmania.world.render
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.*
@@ -261,6 +262,10 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         camera.update()
         batch.projectionMatrix = camera.combined
         batch.begin()
+
+        // Blending for framebuffers w/ transparency in format. Assumes premultiplied
+//        batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA,
+//                GL20.GL_SRC_ALPHA, GL20.GL_ONE)
         
         // Background
         worldBackground.render(batch, engine, camera)
@@ -295,6 +300,8 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         if (renderUI) {
             renderUI(batch, engine)
         }
+        
+//        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         batch.end()
         batch.projectionMatrix = tmpMatrix

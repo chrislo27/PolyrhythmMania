@@ -381,6 +381,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     inner class ObjectPreview : UIElement() {
 
         val world: World = World()
+        // TODO the tileset (not the palette config) should be copied from the global settings for the level
         val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply { 
             tilesetConfig.applyTo(this)
         })
