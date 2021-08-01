@@ -174,7 +174,7 @@ class Editor(val main: PRManiaGame)
     }
 
     init {
-        previewFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
+        previewFrameBuffer = FrameBuffer(Pixmap.Format.RGB888, 1280, 720, true, true)
         previewTextureRegion = TextureRegion(previewFrameBuffer.colorBufferTexture).also { tr ->
             tr.flip(false, true)
         }

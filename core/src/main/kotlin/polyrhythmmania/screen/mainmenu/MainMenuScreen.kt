@@ -441,8 +441,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     private fun createFramebuffers(width: Int, height: Int, oldBuffers: Pair<FrameBuffer, FrameBuffer>?) {
         oldBuffers?.second?.disposeQuietly()
-        this.framebufferOld = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
-        this.framebufferCurrent = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
+        this.framebufferOld = FrameBuffer(Pixmap.Format.RGB888, width, height, true)
+        this.framebufferCurrent = FrameBuffer(Pixmap.Format.RGB888, width, height, true)
         this.framebufferSize = WindowSize(width, height)
         // Render old old FB into new old FB
         val oldoldFB = oldBuffers?.first
