@@ -126,7 +126,7 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "sign_n_shadow",
                 "sign_ta",
                 "sign_ta_shadow",
-        ).map { Packable(it, "textures/world/hd/parts/$it.png") },
+        ).map { Packable(it, "textures/world/hd/parts/$it.tga") },
                 PackedSheet.Config(padding = 2, maxSize = 2048, duplicateBorder = false, atlasMipMaps = true,
                         atlasMinFilter = Texture.TextureFilter.MipMapLinearLinear, atlasMagFilter = Texture.TextureFilter.Linear)))
     }
