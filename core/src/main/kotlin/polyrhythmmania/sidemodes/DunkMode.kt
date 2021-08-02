@@ -23,6 +23,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         container.world.worldMode = WorldMode.DUNK
         container.engine.inputter.endlessScore.maxLives.set(5)
         container.renderer.worldBackground = DunkWorldBackground
+        // TODO set tileset to explicitly be GBA only
     }
     
     override fun initialize() {

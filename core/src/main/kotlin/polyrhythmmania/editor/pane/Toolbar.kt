@@ -260,7 +260,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.bounds.width.set(32f)
             this.skinID.set(EditorSkins.BUTTON)
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tileset_palette"]))
-            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.tileset")))
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.tilesetPalette")))
             this.setOnAction {
                 editorPane.editor.attemptOpenTilesetEditDialog()
             }

@@ -38,7 +38,7 @@ import kotlin.math.sign
 
 class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig,
                         val baseTileset: TilesetConfig?,
-                        val titleLocalization: String = "editor.dialog.tileset.title",
+                        val titleLocalization: String = "editor.dialog.tilesetPalette.title",
 ) : EditorDialog(editorPane) {
 
     companion object {
@@ -113,7 +113,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
         listVbox.temporarilyDisableLayouts {
             val toggleGroup = ToggleGroup()
             allMappings.forEachIndexed { index, mapping ->
-                listVbox += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.object.${mapping.id}").use() },
+                listVbox += RadioButton(binding = { Localization.getVar("editor.dialog.tilesetPalette.object.${mapping.id}").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.textLabel.textColor.set(Color.WHITE.cpy())
                     this.textLabel.margin.set(Insets(0f, 0f, 8f, 8f))
@@ -156,7 +156,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                         v.bindWidthToParent(adjustBinding = { objPreview.bounds.width.useF() * -1 })
                         v.spacing.set(4f)
                         v.temporarilyDisableLayouts { 
-                            v += Button(binding = { Localization.getVar("editor.dialog.tileset.reset").use() },
+                            v += Button(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset").use() },
                                     font = editorPane.palette.musicDialogFont).apply {
                                 this.applyDialogStyleContent()
                                 this.bounds.height.set(40f)
@@ -193,7 +193,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                             v += HBox().apply { 
                                 this.bounds.height.set(32f)
                                 this.spacing.set(8f)
-                                this += TextLabel(binding = { Localization.getVar("editor.dialog.tileset.rotateRod").use() }).apply {
+                                this += TextLabel(binding = { Localization.getVar("editor.dialog.tilesetPalette.rotateRod").use() }).apply {
                                     this.markup.set(editorPane.palette.markup)
                                     this.textColor.set(Color.WHITE)
                                     this.bounds.width.set(100f)
@@ -228,7 +228,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
             this.bindWidthToParent(adjustBinding = { -(bounds.height.useF() + 4f) })
         }
         bottomHbox.temporarilyDisableLayouts {
-            bottomHbox += TextLabel(binding = { Localization.getVar("editor.dialog.tileset.resetLabel").use() },
+            bottomHbox += TextLabel(binding = { Localization.getVar("editor.dialog.tilesetPalette.resetLabel").use() },
                     font = editorPane.palette.musicDialogFont).apply {
                 this.markup.set(editorPane.palette.markup)
                 this.textColor.set(Color.WHITE.cpy())
@@ -241,7 +241,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
             bottomHbox += VBox().apply { 
                 this.spacing.set(2f)
                 this.bounds.width.set(185f)
-                this += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.pr1").use() },
+                this += RadioButton(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset.pr1").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
                     this.textLabel.textColor.set(Color.WHITE.cpy())
@@ -254,7 +254,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                     }
                     this.selectedState.set(true)
                 }
-                this += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.pr2").use() },
+                this += RadioButton(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset.pr2").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
                     this.textLabel.textColor.set(Color.WHITE.cpy())
@@ -271,7 +271,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                 this.spacing.set(2f)
                 this.bounds.width.set(215f)
                 if (baseTileset != null) {
-                    this += RadioButton(binding = { Localization.getVar("editor.dialog.tileset.reset.base").use() },
+                    this += RadioButton(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset.base").use() },
                             font = editorPane.palette.musicDialogFont).apply {
                         this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
                         this.textLabel.textColor.set(Color.WHITE.cpy())
@@ -284,7 +284,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                     }
                 }
             }
-            bottomHbox += Button(binding = { Localization.getVar("editor.dialog.tileset.resetAll").use() },
+            bottomHbox += Button(binding = { Localization.getVar("editor.dialog.tilesetPalette.resetAll").use() },
                     font = editorPane.palette.musicDialogFont).apply {
                 this.applyDialogStyleBottom()
                 this.bounds.width.set(325f)
@@ -305,7 +305,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                 this.bindWidthToSelfHeight()
                 this.padding.set(Insets(8f))
                 this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_copy")))
-                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.tileset.copyAll")))
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.tilesetPalette.copyAll")))
                 this.setOnAction { 
                     Gdx.app.clipboard.contents = tilesetConfig.toJson().toString(WriterConfig.MINIMAL)
                 }
@@ -315,7 +315,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                 this.bindWidthToSelfHeight()
                 this.padding.set(Insets(8f))
                 this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_paste")))
-                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.tileset.pasteAll")))
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.tilesetPalette.pasteAll")))
                 this.setOnAction { 
                     val clipboard = Gdx.app.clipboard
                     if (clipboard.hasContents()) {
