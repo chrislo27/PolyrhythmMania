@@ -31,22 +31,22 @@ import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.tileset.ColorMapping
 import polyrhythmmania.world.tileset.Tileset
-import polyrhythmmania.world.tileset.TilesetConfig
+import polyrhythmmania.world.tileset.TilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
 import kotlin.math.sign
 
 
-class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig,
-                        val baseTileset: TilesetConfig?,
+class TilesetEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalette,
+                        val baseTileset: TilesetPalette?,
                         val titleLocalization: String = "editor.dialog.tilesetPalette.title",
 ) : EditorDialog(editorPane) {
 
     companion object {
-        private val PR1_CONFIG: TilesetConfig = TilesetConfig.createGBA1TilesetConfig()
-        private val PR2_CONFIG: TilesetConfig = TilesetConfig.createGBA2TilesetConfig()
+        private val PR1_CONFIG: TilesetPalette = TilesetPalette.createGBA1TilesetPalette()
+        private val PR2_CONFIG: TilesetPalette = TilesetPalette.createGBA2TilesetPalette()
     }
     
-    data class ResetDefault(val baseConfig: TilesetConfig)
+    data class ResetDefault(val baseConfig: TilesetPalette)
     
     private val availableResetDefaults: List<ResetDefault> = listOfNotNull(
             ResetDefault(PR1_CONFIG),
@@ -55,13 +55,13 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     )
     private var resetDefault: ResetDefault = availableResetDefaults.first()
     private val tempTileset: Tileset = Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply {
-        tilesetConfig.applyTo(this)
+        tilesetPalette.applyTo(this)
     }
 
     val groupFaceYMapping: ColorMappingGroupedCubeFaceY = ColorMappingGroupedCubeFaceY("groupCubeFaceYMapping")
     val groupPistonFaceZMapping: ColorMappingGroupedPistonFaceZ = ColorMappingGroupedPistonFaceZ("groupPistonFaceZMapping")
     private val groupMappings: List<ColorMapping> = listOf(groupFaceYMapping, groupPistonFaceZMapping)
-    val allMappings: List<ColorMapping> = groupMappings + tilesetConfig.allMappings
+    val allMappings: List<ColorMapping> = groupMappings + tilesetPalette.allMappings
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
     val currentMapping: Var<ColorMapping> = Var(allMappings[0])
     
@@ -164,11 +164,11 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                                     val currentMapping = currentMapping.getOrCompute()
                                     val baseConfig = resetDefault.baseConfig
                                     baseConfig.allMappings.forEach { baseMapping ->
-                                        val m = tilesetConfig.allMappingsByID.getValue(baseMapping.id)
+                                        val m = tilesetPalette.allMappingsByID.getValue(baseMapping.id)
                                         val baseColor = baseMapping.color.getOrCompute()
                                         m.color.set(baseColor.cpy())
                                     }
-                                    tilesetConfig.applyTo(tempTileset)
+                                    tilesetPalette.applyTo(tempTileset)
                                     currentMapping.color.set(currentMapping.tilesetGetter(tempTileset).getOrCompute().cpy())
                                     updateColourPickerToMapping()
                                 }
@@ -291,11 +291,11 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                 this.setOnAction {
                     val baseConfig = resetDefault.baseConfig
                     baseConfig.allMappings.forEach { baseMapping ->
-                        val m = tilesetConfig.allMappingsByID.getValue(baseMapping.id)
+                        val m = tilesetPalette.allMappingsByID.getValue(baseMapping.id)
                         val baseColor = baseMapping.color.getOrCompute()
                         m.color.set(baseColor.cpy())
                     }
-                    tilesetConfig.applyTo(objPreview.worldRenderer.tileset)
+                    tilesetPalette.applyTo(objPreview.worldRenderer.tileset)
                     resetGroupMappingsToTileset()
                     updateColourPickerToMapping()
                 }
@@ -307,7 +307,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                 this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_copy")))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.tilesetPalette.copyAll")))
                 this.setOnAction { 
-                    Gdx.app.clipboard.contents = tilesetConfig.toJson().toString(WriterConfig.MINIMAL)
+                    Gdx.app.clipboard.contents = tilesetPalette.toJson().toString(WriterConfig.MINIMAL)
                 }
             }
             bottomHbox += Button("").apply {
@@ -322,8 +322,8 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
                         try {
                             val jsonValue = Json.parse(clipboard.contents)
                             if (jsonValue.isObject) {
-                                tilesetConfig.fromJson(jsonValue.asObject())
-                                tilesetConfig.applyTo(objPreview.worldRenderer.tileset)
+                                tilesetPalette.fromJson(jsonValue.asObject())
+                                tilesetPalette.applyTo(objPreview.worldRenderer.tileset)
 //                                applyCurrentMappingToPreview(currentMapping.getOrCompute().color.getOrCompute())
                                 resetGroupMappingsToTileset()
                                 shouldColorPickerUpdateUpdateTileset = false
@@ -363,7 +363,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
     }
     
     fun prepareShow(): TilesetEditDialog {
-        tilesetConfig.applyTo(objPreview.worldRenderer.tileset)
+        tilesetPalette.applyTo(objPreview.worldRenderer.tileset)
         resetGroupMappingsToTileset()
         updateColourPickerToMapping()
         return this
@@ -383,7 +383,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetConfig: TilesetConfig
         val world: World = World()
         // TODO the tileset (not the palette config) should be copied from the global settings for the level
         val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply { 
-            tilesetConfig.applyTo(this)
+            tilesetPalette.applyTo(this)
         })
         
         val rodEntity: EntityRodDecor

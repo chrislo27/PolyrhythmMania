@@ -19,7 +19,7 @@ import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
-import polyrhythmmania.world.tileset.TilesetConfig
+import polyrhythmmania.world.tileset.TilesetPalette
 
 
 class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) : Practice(main) {
@@ -30,8 +30,8 @@ class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
     val practiceSection4: PracticeSection = PracticeSection(engine)
     
     init {
-        TilesetConfig.createGBA2TilesetConfig().applyTo(container.renderer.tileset)
-        container.world.tilesetConfig.copyFrom(container.renderer.tileset)
+        TilesetPalette.createGBA2TilesetPalette().applyTo(container.renderer.tileset)
+        container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         
         practiceSection1.initBlock = PracticeInitBlock(8f, 3) { engine, startBeat ->
             val musicData = engine.musicData

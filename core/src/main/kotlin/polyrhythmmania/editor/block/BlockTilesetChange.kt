@@ -18,7 +18,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.ui.DecimalTextField
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.EventTilesetChange
-import polyrhythmmania.world.tileset.TilesetConfig
+import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.*
 
 
@@ -29,7 +29,7 @@ class BlockTilesetChange(engine: Engine)
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
     }
 
-    var tilesetConfig: TilesetConfig = engine.world.tilesetConfig.copy()
+    var tilesetPalette: TilesetPalette = engine.world.tilesetPalette.copy()
     var duration: Float = 0.5f
     var pulseMode: Var<Boolean> = Var(false)
     var reverse: Var<Boolean> = Var(false)
@@ -41,7 +41,7 @@ class BlockTilesetChange(engine: Engine)
     }
 
     override fun compileIntoEvents(): List<Event> {
-        return listOf(EventTilesetChange(engine, this.beat, this.duration.coerceAtLeast(0f), tilesetConfig.copy(),
+        return listOf(EventTilesetChange(engine, this.beat, this.duration.coerceAtLeast(0f), tilesetPalette.copy(),
                 pulseMode.getOrCompute(), reverse.getOrCompute()))
     }
 
@@ -52,8 +52,8 @@ class BlockTilesetChange(engine: Engine)
                     editor.editorPane.palette.markup).apply {
                 this.onAction = {
                     val editorPane = editor.editorPane
-                    editorPane.openDialog(TilesetEditDialog(editorPane, this@BlockTilesetChange.tilesetConfig,
-                            engine.world.tilesetConfig,
+                    editorPane.openDialog(TilesetEditDialog(editorPane, this@BlockTilesetChange.tilesetPalette,
+                            engine.world.tilesetPalette,
                             "editor.dialog.tilesetPalette.title.block").prepareShow())
                 }
             })
@@ -114,7 +114,7 @@ class BlockTilesetChange(engine: Engine)
     override fun copy(): BlockTilesetChange {
         return BlockTilesetChange(engine).also {
             this.copyBaseInfoTo(it)
-            it.tilesetConfig = this.tilesetConfig.copy()
+            it.tilesetPalette = this.tilesetPalette.copy()
             it.duration = this.duration
             it.pulseMode.set(this.pulseMode.getOrCompute())
             it.reverse.set(this.reverse.getOrCompute())
@@ -123,7 +123,7 @@ class BlockTilesetChange(engine: Engine)
 
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
-        obj.add("tileset", tilesetConfig.toJson())
+        obj.add("tileset", tilesetPalette.toJson())
         obj.add("duration", duration)
         obj.add("pulse", pulseMode.getOrCompute())
         obj.add("reverse", reverse.getOrCompute())
@@ -131,7 +131,7 @@ class BlockTilesetChange(engine: Engine)
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        tilesetConfig.fromJson(obj.get("tileset").asObject())
+        tilesetPalette.fromJson(obj.get("tileset").asObject())
         val durationVal = obj.get("duration")
         if (durationVal != null && durationVal.isNumber) {
             duration = durationVal.asFloat().coerceAtLeast(0f)

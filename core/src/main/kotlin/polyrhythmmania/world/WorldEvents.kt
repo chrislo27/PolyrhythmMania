@@ -9,7 +9,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityPiston
-import polyrhythmmania.world.tileset.TilesetConfig
+import polyrhythmmania.world.tileset.TilesetPalette
 
 
 abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float,
@@ -209,7 +209,7 @@ class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
 }
 
 class EventTilesetChange(engine: Engine, startBeat: Float, width: Float,
-                         val tilesetCopy: TilesetConfig, val pulseMode: Boolean, val reverse: Boolean)
+                         val tilesetCopy: TilesetPalette, val pulseMode: Boolean, val reverse: Boolean)
     : Event(engine) {
     
     private data class ColorTarget(val start: Color, val end: Color, val current: Color = start.cpy()) {

@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.LongMap
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.entity.*
-import polyrhythmmania.world.tileset.TilesetConfig
+import polyrhythmmania.world.tileset.TilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -15,7 +15,7 @@ class World {
         const val DEFAULT_ROW_LENGTH: Int = 16
     }
     
-    val tilesetConfig: TilesetConfig = TilesetConfig.createGBA1TilesetConfig()
+    val tilesetPalette: TilesetPalette = TilesetPalette.createGBA1TilesetPalette()
     var worldMode: WorldMode = WorldMode.POLYRHYTHM
     
     val entities: List<Entity> = CopyOnWriteArrayList()

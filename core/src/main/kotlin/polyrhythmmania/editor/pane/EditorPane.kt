@@ -112,7 +112,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         loadDialog = LoadDialog(this)
         newDialog = NewDialog(this)
         playtestDialog = PlaytestDialog(this)
-        tilesetEditDialog = TilesetEditDialog(this, editor.container.world.tilesetConfig, null)
+        tilesetEditDialog = TilesetEditDialog(this, editor.container.world.tilesetPalette, null)
     }
     
     fun resetHelpDialog() {

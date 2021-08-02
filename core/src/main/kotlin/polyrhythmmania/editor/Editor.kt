@@ -47,7 +47,6 @@ import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
@@ -662,7 +661,7 @@ class Editor(val main: PRManiaGame)
     }
     
     fun updateTilesetChangesState(currentBeat: Float = engine.beat) {
-        world.tilesetConfig.applyTo(renderer.tileset)
+        world.tilesetPalette.applyTo(renderer.tileset)
         
         val events = blocks.filterIsInstance<BlockTilesetChange>().flatMap { it.compileIntoEvents() }.sortedBy { it.beat }
         events.forEach { evt ->

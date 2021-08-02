@@ -7,13 +7,13 @@ import paintbox.util.gdxutils.set
 
 
 /**
- * Describes a particular configuration of the colours for [Tileset].
+ * Describes a particular palette configuration of the colours for [Tileset].
  */
-class TilesetConfig {
+class TilesetPalette {
     
     companion object {
-        fun createGBA1TilesetConfig(): TilesetConfig {
-            return TilesetConfig().apply {
+        fun createGBA1TilesetPalette(): TilesetPalette {
+            return TilesetPalette().apply {
                 rodBorder.color.getOrCompute().set(0, 0, 0)
                 rodFill.color.getOrCompute().set(255, 8, 0)
                 
@@ -30,8 +30,8 @@ class TilesetConfig {
             }
         }
 
-        fun createGBA2TilesetConfig(): TilesetConfig {
-            return TilesetConfig().apply {
+        fun createGBA2TilesetPalette(): TilesetPalette {
+            return TilesetPalette().apply {
                 rodBorder.color.getOrCompute().set(0, 0, 0)
                 rodFill.color.getOrCompute().set(255, 8, 0)
 
@@ -61,11 +61,11 @@ class TilesetConfig {
     val rodFill: ColorMapping = ColorMapping("rodFill", { it.rodFillColor })
 
     val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeBorderZ, /*cubeFaceX,*/ cubeFaceY, cubeFaceZ,
-            pistonFaceX, pistonFaceZ, signShadow, rodBorder, rodFill) + listOf(cubeFaceX)
+            pistonFaceX, pistonFaceZ, signShadow, rodBorder, rodFill) + listOf(cubeFaceX) /* Deprioritized. */
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
 
-    fun copy(): TilesetConfig {
-        return TilesetConfig().also { copy ->
+    fun copy(): TilesetPalette {
+        return TilesetPalette().also { copy ->
             val copyMap = copy.allMappings.associateBy { it.id }
             this.allMappings.forEach { m ->
                 copyMap.getValue(m.id).color.set(m.color.getOrCompute().cpy())
