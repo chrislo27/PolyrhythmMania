@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.block
 
 import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
 import polyrhythmmania.Localization
 import polyrhythmmania.engine.Engine
 import java.util.*
@@ -144,12 +143,12 @@ object Instantiators {
         })
         
         // FX instantiators
-        add(CATEGORY_FX, Instantiator("tilesetChange", BlockTilesetChange::class.java,
-                Localization.getVar("instantiator.tilesetChange.name"),
-                Localization.getVar("instantiator.tilesetChange.summary"),
-                Localization.getVar("instantiator.tilesetChange.desc"),
-                BlockTilesetChange.BLOCK_TYPES) { engine ->
-            BlockTilesetChange(engine)
+        add(CATEGORY_FX, Instantiator("paletteChange", BlockPaletteChange::class.java,
+                Localization.getVar("instantiator.paletteChange.name"),
+                Localization.getVar("instantiator.paletteChange.summary"),
+                Localization.getVar("instantiator.paletteChange.desc"),
+                BlockPaletteChange.BLOCK_TYPES, deprecatedIDs = setOf("tilesetChange")) { engine ->
+            BlockPaletteChange(engine)
         })
         add(CATEGORY_FX, Instantiator("textbox", BlockTextbox::class.java,
                 Localization.getVar("instantiator.textbox.name"),

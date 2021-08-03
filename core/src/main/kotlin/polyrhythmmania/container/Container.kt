@@ -8,15 +8,17 @@ import com.eclipsesource.json.JsonValue
 import com.eclipsesource.json.WriterConfig
 import net.beadsproject.beads.ugens.SamplePlayer
 import net.lingala.zip4j.ZipFile
+import paintbox.Paintbox
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
+import paintbox.binding.Var
+import paintbox.packing.CascadingRegionMap
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.Track
 import polyrhythmmania.editor.TrackID
 import polyrhythmmania.editor.block.*
 import polyrhythmmania.engine.Engine
@@ -35,6 +37,9 @@ import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldSettings
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.tileset.StockTexturePack
+import polyrhythmmania.world.tileset.StockTexturePacks
+import polyrhythmmania.world.tileset.TexturePack
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -55,7 +60,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     companion object {
         const val FILE_EXTENSION: String = "prmania"
-        const val CONTAINER_VERSION: Int = 7
+        const val CONTAINER_VERSION: Int = 8
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
         
@@ -67,11 +72,13 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val soundSystem: SoundSystem? = soundSystem
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
     val engine: Engine = Engine(timing, world, soundSystem, this)
+    val texturePack: Var<TexturePack> = Var(StockTexturePacks.gba)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_parts")).apply { 
-            world.tilesetConfig.applyTo(this)
+        WorldRenderer(world, Tileset(texturePack).apply { 
+            world.tilesetPalette.applyTo(this)
         })
     }
+    
     val _blocks: MutableList<Block> = CopyOnWriteArrayList()
     val blocks: List<Block> get() = _blocks
     
@@ -275,7 +282,16 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 blocksArray.add(o)
             }
         })
-        jsonObj.add("tilesetConfig", this.world.tilesetConfig.toJson())
+        
+        jsonObj.add("tilesetConfig", Json.`object`().also { tilesetConfigObj ->
+            tilesetConfigObj.add("palette", this.world.tilesetPalette.toJson())
+            tilesetConfigObj.add("texturePack", Json.`object`().also { texturePackObj ->
+                // TODO change source when not stock
+                texturePackObj.add("source", "stock")
+                texturePackObj.add("stockID", texturePack.getOrCompute().id)
+            })
+        })
+        
         val resultsText = this.resultsText
         if (resultsText != ResultsText.DEFAULT) {
             jsonObj.add("resultsText", resultsText.toJson())
@@ -289,7 +305,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         // Pack
         file.outputStream().use { fos ->
             ZipOutputStream(fos).use { zip ->
-                zip.setComment("Polyrhythm Mania save file - ${PRMania.VERSION}")
+                zip.setComment("Polyrhythm Mania level file - ${PRMania.VERSION}")
 
                 zip.putNextEntry(ZipEntry("manifest.json"))
                 val jsonWriter = zip.bufferedWriter()
@@ -389,7 +405,38 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         if (containerVersion >= 3) {
             val tilesetObj = json.get("tilesetConfig")?.asObject()
             if (tilesetObj != null) {
-                this.world.tilesetConfig.fromJson(tilesetObj)
+                if (containerVersion <= 7) {
+                    // Container version [3, 7]: tilesetConfig is the actual tilesetPalette object.
+                    this.world.tilesetPalette.fromJson(tilesetObj)
+                } else {
+                    // Container version [8, ): tilesetConfig is a larger obj. Palette is in own object "palette" now.
+                    val paletteObj = tilesetObj.get("palette")?.asObject()
+                    if (paletteObj != null) {
+                        this.world.tilesetPalette.fromJson(paletteObj)
+                    }
+                    val texturePackObj = tilesetObj.get("texturePack")?.asObject()
+                    if (texturePackObj != null) {
+                        when (val source: String = texturePackObj.getString("source", "")) {
+                            "stock" -> {
+                                val stockID: String = texturePackObj.getString("stockID", "")
+                                val pack = StockTexturePacks.allPacksByIDWithDeprecations[stockID]
+                                if (pack != null) {
+                                    texturePack.set(pack)
+                                } else {
+                                    Paintbox.LOGGER.warn("[Container] Unknown tilesetConfig.texturePack.stockID '${stockID}', skipping stock texture pack")
+                                    texturePack.set(StockTexturePacks.gba)
+                                }
+                            }
+                            "custom" -> {
+                                error("Custom texture packs are not supported yet")
+                            }
+                            else -> {
+                                // Ignore texture packs. Just use default GBA
+                                Paintbox.LOGGER.warn("[Container] Unknown tilesetConfig.texturePack.source '${source}', skipping")
+                            }
+                        }
+                    }
+                }
             }
         }
         if (containerVersion >= 4) {
@@ -410,8 +457,16 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         val blocks: MutableList<Block> = mutableListOf()
         for (value in blocksObj) {
             val obj = value.asObject()
+            val instID = obj.getString("inst", null)
+
             @Suppress("UNCHECKED_CAST")
-            val inst = (instantiators[obj.getString("inst", null)] as? Instantiator<Block>?) ?: continue
+            val inst = (instantiators[instID] as? Instantiator<Block>?)
+            if (inst == null) {
+                if (instID != null) {
+                    Paintbox.LOGGER.warn("[Container] Missing instantiator ID '$instID', skipping")
+                }
+                continue
+            }
             val block: Block = inst.factory.invoke(inst, engine)
             block.readFromJson(obj)
             blocks.add(block)

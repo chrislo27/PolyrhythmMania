@@ -1,42 +1,45 @@
 package polyrhythmmania.world.tileset
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 
 
+open class TintedRegion(val regionID: String) {
 
-open class TintedRegion(val region: TextureRegion, val spacing: Spacing = Spacing.ZERO) {
-    
-    data class Spacing(val spacing: Int, val normalWidth: Int, val normalHeight: Int) {
-        companion object {
-            val ZERO: Spacing = Spacing(0, 0, 0)
-        }
-    }
-    
     open val color: ReadOnlyVar<Color> = Var(Color(1f, 1f, 1f, 1f))
 
-    constructor(region: TextureRegion, initColor: Color, spacing: Spacing = Spacing.ZERO)
-            : this(region, spacing) {
+    constructor(regionID: String, initColor: Color)
+            : this(regionID) {
         @Suppress("LeakingThis")
         (color as? Var)?.set(Color(1f, 1f, 1f, 1f).set(initColor))
     }
-    
-    constructor(region: TextureRegion, spacing: Spacing = Spacing.ZERO, binding: Var.Context.() -> Color)
-            : this(region, spacing) {
+
+    constructor(regionID: String, binding: Var.Context.() -> Color)
+            : this(regionID) {
         @Suppress("LeakingThis")
         (color as? Var)?.bind(binding)
     }
+
+    constructor(regionID: String, toBindTo: ReadOnlyVar<Color>)
+            : this(regionID, binding = { toBindTo.use() })
+
 }
 
-class EditableTintedRegion(region: TextureRegion, spacing: Spacing = Spacing.ZERO)
-    : TintedRegion(region, spacing) {
+class EditableTintedRegion(regionID: String)
+    : TintedRegion(regionID) {
 
     override val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
 
-    constructor(region: TextureRegion, initColor: Color, spacing: Spacing = Spacing.ZERO)
-            : this(region, spacing) {
+    constructor(regionID: String, initColor: Color)
+            : this(regionID) {
         color.set(Color(1f, 1f, 1f, 1f).set(initColor))
     }
+}
+
+open class TintedSubregion(val parent: TintedRegion, val u: Float, val v: Float, val u2: Float, val v2: Float)
+    : TintedRegion(parent.regionID) {
+    
+    override val color: ReadOnlyVar<Color> = parent.color
+    
 }

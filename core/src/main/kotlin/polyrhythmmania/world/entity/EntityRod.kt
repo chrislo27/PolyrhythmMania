@@ -11,6 +11,7 @@ import polyrhythmmania.world.World
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.tileset.TexturePack
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
@@ -36,17 +37,17 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
         val offsetX = -(1 / 32f) * 0
         val offsetY = 1f / 32f * 0
         val regionBorder: TintedRegion = if (!isInAir) {
-            tileset.rodGroundBorderAnimations[(animationAlpha * Tileset.rodFrameCount).toInt().coerceIn(0, Tileset.rodFrameCount - 1)]
+            tileset.rodGroundBorderAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         } else {
-            tileset.rodAerialBorderAnimations[(animationAlpha * Tileset.rodFrameCount).toInt().coerceIn(0, Tileset.rodFrameCount - 1)]
+            tileset.rodAerialBorderAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         }
-        drawTintedRegion(batch, vec, regionBorder, offsetX, offsetY, renderW, renderH)
+        drawTintedRegion(batch, vec, tileset, regionBorder, offsetX, offsetY, renderW, renderH)
         val regionFill: TintedRegion = if (!isInAir) {
-            tileset.rodGroundFillAnimations[(animationAlpha * Tileset.rodFrameCount).toInt().coerceIn(0, Tileset.rodFrameCount - 1)]
+            tileset.rodGroundFillAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         } else {
-            tileset.rodAerialFillAnimations[(animationAlpha * Tileset.rodFrameCount).toInt().coerceIn(0, Tileset.rodFrameCount - 1)]
+            tileset.rodAerialFillAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         }
-        drawTintedRegion(batch, vec, regionFill, offsetX, offsetY, renderW, renderH)
+        drawTintedRegion(batch, vec, tileset, regionFill, offsetX, offsetY, renderW, renderH)
 
         batch.setColor(1f, 1f, 1f, 1f)
     }

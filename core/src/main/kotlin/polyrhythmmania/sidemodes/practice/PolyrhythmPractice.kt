@@ -14,7 +14,7 @@ import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.WorldSettings
-import polyrhythmmania.world.tileset.TilesetConfig
+import polyrhythmmania.world.tileset.TilesetPalette
 
 
 class Polyrhythm1Practice(main: PRManiaGame)
@@ -42,8 +42,8 @@ class Polyrhythm1Practice(main: PRManiaGame)
     }
     
     init {
-        TilesetConfig.createGBA1TilesetConfig().applyTo(container.renderer.tileset)
-        container.world.tilesetConfig.copyFrom(container.renderer.tileset)
+        TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
+        container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         
         container.world.worldSettings = WorldSettings(showInputIndicators = true)
     }
@@ -76,8 +76,8 @@ class Polyrhythm2Practice(main: PRManiaGame)
     }
 
     init {
-        TilesetConfig.createGBA2TilesetConfig().applyTo(container.renderer.tileset)
-        container.world.tilesetConfig.copyFrom(container.renderer.tileset)
+        TilesetPalette.createGBA2TilesetPalette().applyTo(container.renderer.tileset)
+        container.world.tilesetPalette.copyFrom(container.renderer.tileset)
     }
 
     override fun initialize() {

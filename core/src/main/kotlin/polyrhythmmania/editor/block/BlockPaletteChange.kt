@@ -12,53 +12,53 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.pane.dialog.TilesetEditDialog
+import polyrhythmmania.editor.pane.dialog.PaletteEditDialog
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.ui.DecimalTextField
 import polyrhythmmania.util.DecimalFormats
-import polyrhythmmania.world.EventTilesetChange
-import polyrhythmmania.world.tileset.TilesetConfig
+import polyrhythmmania.world.EventPaletteChange
+import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.*
 
 
-class BlockTilesetChange(engine: Engine)
-    : Block(engine, BlockTilesetChange.BLOCK_TYPES) {
+class BlockPaletteChange(engine: Engine)
+    : Block(engine, BlockPaletteChange.BLOCK_TYPES) {
     
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
     }
 
-    var tilesetConfig: TilesetConfig = engine.world.tilesetConfig.copy()
+    var tilesetPalette: TilesetPalette = engine.world.tilesetPalette.copy()
     var duration: Float = 0.5f
     var pulseMode: Var<Boolean> = Var(false)
     var reverse: Var<Boolean> = Var(false)
 
     init {
         this.width = 0.5f
-        val text = Localization.getVar("block.tilesetChange.name")
+        val text = Localization.getVar("block.paletteChange.name")
         this.defaultText.bind { text.use() }
     }
 
     override fun compileIntoEvents(): List<Event> {
-        return listOf(EventTilesetChange(engine, this.beat, this.duration.coerceAtLeast(0f), tilesetConfig.copy(),
+        return listOf(EventPaletteChange(engine, this.beat, this.duration.coerceAtLeast(0f), tilesetPalette.copy(),
                 pulseMode.getOrCompute(), reverse.getOrCompute()))
     }
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return ContextMenu().also { ctxmenu ->
             ctxmenu.defaultWidth.set(400f)
-            ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("blockContextMenu.tilesetChange.edit"),
+            ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("blockContextMenu.paletteChange.edit"),
                     editor.editorPane.palette.markup).apply {
                 this.onAction = {
                     val editorPane = editor.editorPane
-                    editorPane.openDialog(TilesetEditDialog(editorPane, this@BlockTilesetChange.tilesetConfig,
-                            engine.world.tilesetConfig,
-                            "editor.dialog.tileset.title.block").prepareShow())
+                    editorPane.openDialog(PaletteEditDialog(editorPane, this@BlockPaletteChange.tilesetPalette,
+                            engine.world.tilesetPalette,
+                            "editor.dialog.tilesetPalette.title.block").prepareShow())
                 }
             })
             ctxmenu.addMenuItem(SeparatorMenuItem())
-            ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.tilesetChange.transitionDuration"), editor.editorPane.palette.markup))
+            ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.paletteChange.transitionDuration"), editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(CustomMenuItem(
                     HBox().apply { 
                         this.bounds.height.set(32f)
@@ -93,15 +93,15 @@ class BlockTilesetChange(engine: Engine)
 
             ctxmenu.addMenuItem(SeparatorMenuItem())
             ctxmenu.addMenuItem(CheckBoxMenuItem.create(pulseMode,
-                    Localization.getValue("blockContextMenu.tilesetChange.pulseMode"), editor.editorPane.palette.markup).apply {
+                    Localization.getValue("blockContextMenu.paletteChange.pulseMode"), editor.editorPane.palette.markup).apply {
                 this.createTooltip = {
-                    it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.tilesetChange.pulseMode.tooltip")))
+                    it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.paletteChange.pulseMode.tooltip")))
                 }
             })
             ctxmenu.addMenuItem(CheckBoxMenuItem.create(reverse,
-                    Localization.getValue("blockContextMenu.tilesetChange.reverse"), editor.editorPane.palette.markup).apply {
+                    Localization.getValue("blockContextMenu.paletteChange.reverse"), editor.editorPane.palette.markup).apply {
                 this.createTooltip = {
-                    it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.tilesetChange.reverse.tooltip")))
+                    it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.paletteChange.reverse.tooltip")))
                 }
             })
         }
@@ -111,10 +111,10 @@ class BlockTilesetChange(engine: Engine)
         return DecimalFormats.format("0.0##", duration)
     }
 
-    override fun copy(): BlockTilesetChange {
-        return BlockTilesetChange(engine).also {
+    override fun copy(): BlockPaletteChange {
+        return BlockPaletteChange(engine).also {
             this.copyBaseInfoTo(it)
-            it.tilesetConfig = this.tilesetConfig.copy()
+            it.tilesetPalette = this.tilesetPalette.copy()
             it.duration = this.duration
             it.pulseMode.set(this.pulseMode.getOrCompute())
             it.reverse.set(this.reverse.getOrCompute())
@@ -123,7 +123,7 @@ class BlockTilesetChange(engine: Engine)
 
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
-        obj.add("tileset", tilesetConfig.toJson())
+        obj.add("tileset", tilesetPalette.toJson())
         obj.add("duration", duration)
         obj.add("pulse", pulseMode.getOrCompute())
         obj.add("reverse", reverse.getOrCompute())
@@ -131,7 +131,7 @@ class BlockTilesetChange(engine: Engine)
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        tilesetConfig.fromJson(obj.get("tileset").asObject())
+        tilesetPalette.fromJson(obj.get("tileset").asObject())
         val durationVal = obj.get("duration")
         if (durationVal != null && durationVal.isNumber) {
             duration = durationVal.asFloat().coerceAtLeast(0f)

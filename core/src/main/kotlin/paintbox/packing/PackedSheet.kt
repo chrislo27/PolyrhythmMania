@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.Texture
@@ -66,7 +67,9 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList())
 
         val nano = System.nanoTime()
         val size = config.maxSize
-        val packer = PixmapPacker(size, size, config.format, config.padding, config.duplicateBorder, config.packStrategy)
+        val packer = PixmapPacker(size, size, config.format, config.padding, config.duplicateBorder, config.packStrategy).also { packer ->
+            packer.transparentColor = config.transparentColor
+        }
         val packables = packables.values.toList()
         packables.forEach { p ->
             val tex = p.obtainTexture()
@@ -155,6 +158,7 @@ class PackedSheet(val config: Config, initial: List<Packable> = emptyList())
             val atlasMipMaps: Boolean = false,
             val atlasUseIndexing: Boolean = true,
             val debugOutputFile: FileHandle? = null,
+            val transparentColor: Color = Color(1f, 1f, 1f, 0f),
     )
 }
 

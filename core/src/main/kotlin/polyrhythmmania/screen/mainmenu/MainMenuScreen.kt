@@ -132,7 +132,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val tilesWidth: Int = ceil(1280f / tileSize).toInt()
     val tilesHeight: Int = ceil(720f / tileSize).toInt()
     private val tiles: Array<Array<Tile>> = Array(tilesWidth) { x -> Array(tilesHeight) { y -> Tile(x, y) } }
-    var flipAnimation: TileFlip? = null
+    @Volatile var flipAnimation: TileFlip? = null
         set(value) {
             field = value
             resetTiles()
@@ -441,8 +441,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     private fun createFramebuffers(width: Int, height: Int, oldBuffers: Pair<FrameBuffer, FrameBuffer>?) {
         oldBuffers?.second?.disposeQuietly()
-        this.framebufferOld = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
-        this.framebufferCurrent = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
+        this.framebufferOld = FrameBuffer(Pixmap.Format.RGB888, width, height, true)
+        this.framebufferCurrent = FrameBuffer(Pixmap.Format.RGB888, width, height, true)
         this.framebufferSize = WindowSize(width, height)
         // Render old old FB into new old FB
         val oldoldFB = oldBuffers?.first

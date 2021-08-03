@@ -42,7 +42,6 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.*
-import polyrhythmmania.screen.mainmenu.menu.TemporaryResultsMenu
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
@@ -432,7 +431,7 @@ class PlayScreen(
             engine.removeEvents(engine.events.toList())
             engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
             container.world.resetWorld()
-            container.world.tilesetConfig.applyTo(container.renderer.tileset)
+            container.world.tilesetPalette.applyTo(container.renderer.tileset)
             prepareGameStart()
             unpauseGame(false)
         }

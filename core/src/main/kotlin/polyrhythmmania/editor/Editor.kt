@@ -34,7 +34,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.block.Block
-import polyrhythmmania.editor.block.BlockTilesetChange
+import polyrhythmmania.editor.block.BlockPaletteChange
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.help.HelpDialog
@@ -47,7 +47,6 @@ import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
@@ -174,7 +173,7 @@ class Editor(val main: PRManiaGame)
     }
 
     init {
-        previewFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 1280, 720, true, true)
+        previewFrameBuffer = FrameBuffer(Pixmap.Format.RGB888, 1280, 720, true, true)
         previewTextureRegion = TextureRegion(previewFrameBuffer.colorBufferTexture).also { tr ->
             tr.flip(false, true)
         }
@@ -213,7 +212,7 @@ class Editor(val main: PRManiaGame)
             timing.seconds = newSeconds
             engine.seconds = newSeconds
             engineBeat.set(newBeat)
-            updateTilesetChangesState(newBeat)
+            updatePaletteChangesState(newBeat)
         }
     }
 
@@ -536,9 +535,16 @@ class Editor(val main: PRManiaGame)
         }
     }
     
-    fun attemptOpenTilesetEditDialog() {
+    fun attemptOpenPaletteEditDialog() {
         if (allowedToEdit.getOrCompute()) {
-            editorPane.openDialog(editorPane.tilesetEditDialog.prepareShow())
+            editorPane.openDialog(editorPane.paletteEditDialog.prepareShow())
+        }
+    }
+    
+    fun attemptOpenTexturePackDialog() {
+        if (allowedToEdit.getOrCompute()) {
+            // TODO
+            throw NotImplementedError("attemptOpenTexturePackDialog not implemented yet")
         }
     }
 
@@ -646,7 +652,7 @@ class Editor(val main: PRManiaGame)
             val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
             timing.seconds = newSeconds
             engine.seconds = newSeconds
-            updateTilesetChangesState()
+            updatePaletteChangesState()
             engine.soundInterface.clearAllNonMusicAudio()
         }
 
@@ -661,10 +667,10 @@ class Editor(val main: PRManiaGame)
         this.playState.set(newState)
     }
     
-    fun updateTilesetChangesState(currentBeat: Float = engine.beat) {
-        world.tilesetConfig.applyTo(renderer.tileset)
+    fun updatePaletteChangesState(currentBeat: Float = engine.beat) {
+        world.tilesetPalette.applyTo(renderer.tileset)
         
-        val events = blocks.filterIsInstance<BlockTilesetChange>().flatMap { it.compileIntoEvents() }.sortedBy { it.beat }
+        val events = blocks.filterIsInstance<BlockPaletteChange>().flatMap { it.compileIntoEvents() }.sortedBy { it.beat }
         events.forEach { evt ->
             engine.updateEvent(evt, currentBeat)
         }
