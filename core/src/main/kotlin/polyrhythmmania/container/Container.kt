@@ -10,13 +10,13 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import net.lingala.zip4j.ZipFile
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
+import paintbox.packing.CascadingRegionMap
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.Track
 import polyrhythmmania.editor.TrackID
 import polyrhythmmania.editor.block.*
 import polyrhythmmania.engine.Engine
@@ -35,6 +35,9 @@ import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldSettings
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.tileset.StockTexturePack
+import polyrhythmmania.world.tileset.StockTexturePacks
+import polyrhythmmania.world.tileset.TexturePack
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -68,8 +71,8 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
     val engine: Engine = Engine(timing, world, soundSystem, this)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply { 
-            world.tilesetConfig.applyTo(this)
+        WorldRenderer(world, Tileset(StockTexturePacks.gba).apply { 
+            world.tilesetPalette.applyTo(this)
         })
     }
     val _blocks: MutableList<Block> = CopyOnWriteArrayList()
@@ -275,7 +278,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 blocksArray.add(o)
             }
         })
-        jsonObj.add("tilesetConfig", this.world.tilesetConfig.toJson())
+        jsonObj.add("tilesetConfig", this.world.tilesetPalette.toJson())
         val resultsText = this.resultsText
         if (resultsText != ResultsText.DEFAULT) {
             jsonObj.add("resultsText", resultsText.toJson())
@@ -387,9 +390,10 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             }
         }
         if (containerVersion >= 3) {
+            // Legacy name: tilesetConfig is the TilesetPalette
             val tilesetObj = json.get("tilesetConfig")?.asObject()
             if (tilesetObj != null) {
-                this.world.tilesetConfig.fromJson(tilesetObj)
+                this.world.tilesetPalette.fromJson(tilesetObj)
             }
         }
         if (containerVersion >= 4) {

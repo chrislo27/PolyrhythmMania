@@ -15,6 +15,8 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.world.*
+import polyrhythmmania.world.tileset.StockTexturePack
+import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TilesetPalette
 import kotlin.system.measureNanoTime
@@ -34,7 +36,7 @@ class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val timing: TimingProvider = soundSystem
     val engine: Engine = Engine(timing, world, soundSystem, null)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply { 
+        WorldRenderer(world, Tileset(StockTexturePacks.gba).apply { 
             TilesetPalette.createGBA1TilesetPalette().applyTo(this)
         })
     }

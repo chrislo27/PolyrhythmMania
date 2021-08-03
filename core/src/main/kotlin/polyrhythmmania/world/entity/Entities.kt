@@ -2,14 +2,17 @@ package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.ColorStack
 import paintbox.util.Vector3Stack
+import paintbox.util.gdxutils.drawUV
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.tileset.TintedSubregion
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -33,14 +36,17 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
     protected open fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
     }
     
-    protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tintedRegion: TintedRegion, offsetX: Float, offsetY: Float, renderWidth: Float, renderHeight: Float) {
+    protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion,
+                                   offsetX: Float, offsetY: Float, renderWidth: Float, renderHeight: Float,
+                                   tintColor: Color? = null) {
         if (renderWidth == 0f || renderHeight == 0f) return
         
+        val tilesetRegion = tileset.getTilesetRegionForTinted(tintedRegion)
         var offX = offsetX
         var offY = offsetY
         var drawWidth = renderWidth
         var drawHeight = renderHeight
-        val spacingObj = tintedRegion.spacing
+        val spacingObj = tilesetRegion.spacing
         
         if (spacingObj.spacing > 0 && spacingObj.normalWidth > 0 && spacingObj.normalHeight > 0) {
             val spacing = spacingObj.spacing
@@ -56,12 +62,26 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
             drawHeight *= totalNormalHeightRatio
         }
         
-        batch.color = tintedRegion.color.getOrCompute()
-        batch.draw(tintedRegion.region, vec.x + offX, vec.y + offY, drawWidth, drawHeight)
+        batch.color = tintColor ?: tintedRegion.color.getOrCompute()
+        // Compute special UV regions for TintedSubregion
+        val texture = tilesetRegion.texture
+        var u = tilesetRegion.u
+        var v = tilesetRegion.v
+        var u2 = tilesetRegion.u2
+        var v2 = tilesetRegion.v2
+        if (tintedRegion is TintedSubregion) {
+            val uSpan = u2 - u
+            val vSpan = v2 - v
+            u = MathUtils.lerp(u, u2, tintedRegion.u)
+            v = MathUtils.lerp(v, v2, tintedRegion.v)
+            u2 = u + uSpan * tintedRegion.u2
+            v2 = v + vSpan * tintedRegion.v2
+        }
+        batch.drawUV(texture, vec.x + offX, vec.y + offY, drawWidth, drawHeight, u, v, u2, v2)
     }
     
-    protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tintedRegion: TintedRegion) {
-        drawTintedRegion(batch, vec, tintedRegion, 0f, 0f, renderWidth, renderHeight)
+    protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion) {
+        drawTintedRegion(batch, vec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight)
     }
 }
 
@@ -74,8 +94,9 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
         for (i in 0 until numLayers) {
             val tr = getTintedRegion(tileset, i)
-            if (tr != null)
-            drawTintedRegion(batch, vec, tr)
+            if (tr != null) {
+                drawTintedRegion(batch, vec, tileset, tr)
+            }
         }
     }
 }
@@ -134,18 +155,18 @@ open class EntityCube(world: World, val withLine: Boolean = false, val withBorde
 }
 
 class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Float)
-    : SimpleRenderedEntity(world), TemporaryEntity {
+    : SpriteEntity(world), TemporaryEntity {
 
     companion object {
         private val STATES: List<State> = listOf(
-                State(40f / 32f, 24f / 32f),
-                State(32f / 32f, 24f / 32f),
-                State(24f / 32f, 16f / 32f),
-                State(16f / 32f, 16f / 32f),
+                State(0, 40f / 32f, 24f / 32f),
+                State(1, 32f / 32f, 24f / 32f),
+                State(2, 24f / 32f, 16f / 32f),
+                State(3, 16f / 32f, 16f / 32f),
         )
     }
 
-    private data class State(val renderWidth: Float, val renderHeight: Float)
+    private data class State(val index: Int, val renderWidth: Float, val renderHeight: Float)
 
     private var state: State = STATES[0]
     private val duration: Float = 8 / 60f
@@ -154,6 +175,10 @@ class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Flo
         get() = state.renderWidth
     override val renderHeight: Float
         get() = state.renderHeight
+
+    override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
+        return tileset.explosionFrames[state.index]
+    }
 
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
         if (isKilled) return
@@ -164,11 +189,11 @@ class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Flo
         } else {
             val index = (percentage * STATES.size).toInt()
             state = STATES[index]
-            val texReg = tileset.explosionFrames[index]
-            val renderWidth = this.renderWidth
-            val renderHeight = this.renderHeight
-            batch.color = texReg.color.getOrCompute()
-            batch.draw(texReg.region, vec.x - renderWidth / 2f + rodWidth / 2f - (2f / 32f), vec.y + (3f / 32f), renderWidth, renderHeight)
+
+            val tr = getTintedRegion(tileset, 0)
+            if (tr != null) {
+                drawTintedRegion(batch, vec, tileset, tr, -renderWidth / 2f + rodWidth / 2f - (2f / 32f), (3f / 32f), renderWidth, renderHeight)
+            }
         }
     }
 }
@@ -230,8 +255,7 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val flashInd
         }
         val tmpColor = ColorStack.getAndPush().set(tintedRegion.color.getOrCompute())
         tmpColor.mul(this.color)
-        batch.color = tmpColor
-        batch.draw(tintedRegion.region, vec.x, vec.y, renderWidth, renderHeight)
+        drawTintedRegion(batch, vec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tmpColor)
         ColorStack.pop()
     }
 }
@@ -256,9 +280,7 @@ class EntityInputIndicator(world: World, var isDpad: Boolean)
         val normalizedBeat = if (beat < 0f) (beat + floor(beat).absoluteValue) else (beat)
         val bumpAmt = (1f - (normalizedBeat % 1f).coerceIn(0f, bumpTime) / bumpTime)//.coerceIn(0f, 1f)
 
-        batch.color = tintedRegion.color.getOrCompute()
-        batch.draw(tintedRegion.region, vec.x - renderWidth / 2f,
-                vec.y + (bumpAmt) * bumpHeight - (2f / 32f),
+        drawTintedRegion(batch, vec, tileset, tintedRegion, -renderWidth / 2f, (bumpAmt) * bumpHeight - (2f / 32f),
                 renderWidth, renderHeight)
     }
 }

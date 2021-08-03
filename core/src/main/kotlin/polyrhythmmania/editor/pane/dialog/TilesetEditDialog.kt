@@ -29,10 +29,8 @@ import polyrhythmmania.ui.ColourPicker
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.*
-import polyrhythmmania.world.tileset.ColorMapping
-import polyrhythmmania.world.tileset.Tileset
-import polyrhythmmania.world.tileset.TilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.tileset.*
 import kotlin.math.sign
 
 
@@ -54,7 +52,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
             baseTileset?.let { ResetDefault(it) }
     )
     private var resetDefault: ResetDefault = availableResetDefaults.first()
-    private val tempTileset: Tileset = Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply {
+    private val tempTileset: Tileset = Tileset(StockTexturePacks.gba /* This isn't used for rendering so any stock texture pack is fine */).apply {
         tilesetPalette.applyTo(this)
     }
 
@@ -366,6 +364,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
         tilesetPalette.applyTo(objPreview.worldRenderer.tileset)
         resetGroupMappingsToTileset()
         updateColourPickerToMapping()
+        objPreview.worldRenderer.tileset.texturePack = editor.container.renderer.tileset.texturePack
         return this
     }
 
@@ -379,10 +378,14 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     }
     
     inner class ObjectPreview : UIElement() {
-
+        
         val world: World = World()
         // TODO the tileset (not the palette config) should be copied from the global settings for the level
-        val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(AssetRegistry.get<PackedSheet>("tileset_gba")).apply { 
+        val worldRenderer: WorldRenderer = WorldRenderer(world, object : Tileset(StockTexturePacks.gba /* Placeholder, the var is overridden anyway */) {
+            override var texturePack: TexturePack
+                get() = editor.container.renderer.tileset.texturePack
+                set(_) { /* NO-OP */ }
+        }.apply { 
             tilesetPalette.applyTo(this)
         })
         

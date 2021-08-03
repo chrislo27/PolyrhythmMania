@@ -13,6 +13,7 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.DunkWorldBackground
 import polyrhythmmania.world.EntityRodDunk
 import polyrhythmmania.world.WorldMode
+import polyrhythmmania.world.tileset.StockTexturePacks
 import java.util.*
 
 
@@ -23,7 +24,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         container.world.worldMode = WorldMode.DUNK
         container.engine.inputter.endlessScore.maxLives.set(5)
         container.renderer.worldBackground = DunkWorldBackground
-        // TODO set tileset to explicitly be GBA only
+        container.renderer.tileset.texturePack = StockTexturePacks.gba
     }
     
     override fun initialize() {

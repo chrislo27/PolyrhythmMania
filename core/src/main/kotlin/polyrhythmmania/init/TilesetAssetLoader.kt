@@ -16,6 +16,8 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
             this.minFilter = Texture.TextureFilter.Linear
         }
         
+        AssetRegistry.loadAsset<Texture>("tileset_missing_tex", "textures/world/missing.png")
+        
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "skill_star",
                 "skill_star_grey",
