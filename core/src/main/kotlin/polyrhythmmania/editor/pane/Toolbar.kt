@@ -263,7 +263,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.skinID.set(EditorSkins.BUTTON)
 //                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tileset_palette"]))
                 this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex"))) // TODO replace with texture pack icon once added
-                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.changeTexturePack")))
+//                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.changeTexturePack")))
+                this.tooltipElement.set(editorPane.createDefaultTooltip(binding = { Localization.getVar("editor.button.changeTexturePack").use() + " (no icon yet — NOT A BUG)"}))
                 this.setOnAction {
                     // FIXME this is a temp solution until custom packs are added
                     val editor = editorPane.editor
