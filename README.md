@@ -14,7 +14,8 @@ This project is still in development. **There will be no releases until it is re
 
 Due to issues with spam and unwanted behaviour, the Issues tab has been disabled and moderation interaction settings are at a high level.
 
-[Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)
+[Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)  
+[Check out the August 2021 features trailer!](https://www.youtube.com/watch?v=k9PtPI1-tDo)
 
 ## Information about sharing videos/screenshots
 Due to the game being in an early state, please do not share videos or screenshots.
