@@ -8,6 +8,7 @@ import com.eclipsesource.json.JsonValue
 import com.eclipsesource.json.WriterConfig
 import net.beadsproject.beads.ugens.SamplePlayer
 import net.lingala.zip4j.ZipFile
+import paintbox.Paintbox
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
 import paintbox.packing.CascadingRegionMap
@@ -414,8 +415,16 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         val blocks: MutableList<Block> = mutableListOf()
         for (value in blocksObj) {
             val obj = value.asObject()
+            val instID = obj.getString("inst", null)
+
             @Suppress("UNCHECKED_CAST")
-            val inst = (instantiators[obj.getString("inst", null)] as? Instantiator<Block>?) ?: continue
+            val inst = (instantiators[instID] as? Instantiator<Block>?)
+            if (inst == null) {
+                if (instID != null) {
+                    Paintbox.LOGGER.info("Missing instantiator ID '$instID'")
+                }
+                continue
+            }
             val block: Block = inst.factory.invoke(inst, engine)
             block.readFromJson(obj)
             blocks.add(block)

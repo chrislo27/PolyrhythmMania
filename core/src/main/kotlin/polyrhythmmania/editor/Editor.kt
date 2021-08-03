@@ -34,7 +34,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.block.Block
-import polyrhythmmania.editor.block.BlockTilesetChange
+import polyrhythmmania.editor.block.BlockPaletteChange
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.help.HelpDialog
@@ -212,7 +212,7 @@ class Editor(val main: PRManiaGame)
             timing.seconds = newSeconds
             engine.seconds = newSeconds
             engineBeat.set(newBeat)
-            updateTilesetChangesState(newBeat)
+            updatePaletteChangesState(newBeat)
         }
     }
 
@@ -645,7 +645,7 @@ class Editor(val main: PRManiaGame)
             val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
             timing.seconds = newSeconds
             engine.seconds = newSeconds
-            updateTilesetChangesState()
+            updatePaletteChangesState()
             engine.soundInterface.clearAllNonMusicAudio()
         }
 
@@ -660,10 +660,10 @@ class Editor(val main: PRManiaGame)
         this.playState.set(newState)
     }
     
-    fun updateTilesetChangesState(currentBeat: Float = engine.beat) {
+    fun updatePaletteChangesState(currentBeat: Float = engine.beat) {
         world.tilesetPalette.applyTo(renderer.tileset)
         
-        val events = blocks.filterIsInstance<BlockTilesetChange>().flatMap { it.compileIntoEvents() }.sortedBy { it.beat }
+        val events = blocks.filterIsInstance<BlockPaletteChange>().flatMap { it.compileIntoEvents() }.sortedBy { it.beat }
         events.forEach { evt ->
             engine.updateEvent(evt, currentBeat)
         }

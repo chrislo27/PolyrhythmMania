@@ -208,7 +208,7 @@ class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
     }
 }
 
-class EventTilesetChange(engine: Engine, startBeat: Float, width: Float,
+class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
                          val tilesetCopy: TilesetPalette, val pulseMode: Boolean, val reverse: Boolean)
     : Event(engine) {
     
