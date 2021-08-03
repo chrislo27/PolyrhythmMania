@@ -319,7 +319,7 @@ data class TextBlock(val runs: List<TextRun>) {
         val globalScaleX: Float = scaleX * (if (maxWidth <= 0f || this.width <= 0f || this.width * scaleX < maxWidth) (1f) else (maxWidth / (this.width * scaleX)))
         val globalScaleY: Float = scaleY
 
-        if (globalScaleX <= MathUtils.FLOAT_ROUNDING_ERROR || globalScaleY <= MathUtils.FLOAT_ROUNDING_ERROR || globalScaleX.isNaN() || globalScaleY.isNaN()) {
+        if (globalScaleX <= MathUtils.FLOAT_ROUNDING_ERROR || globalScaleY <= MathUtils.FLOAT_ROUNDING_ERROR || !globalScaleX.isFinite() || !globalScaleY.isFinite()) {
             ColorStack.pop()
             return
         }
