@@ -919,6 +919,14 @@ class Editor(val main: PRManiaGame)
                                 }
                             }
                         }
+                        Input.Keys.R -> {
+                            if (!shift && !alt && !ctrl && currentClick == Click.None) {
+                                val tapalongPane = editorPane.toolbar.tapalongPane
+                                if (tapalongPane.apparentVisibility.getOrCompute()) {
+                                    tapalongPane.reset()
+                                }
+                            }
+                        }
                     }
                 }
             }
