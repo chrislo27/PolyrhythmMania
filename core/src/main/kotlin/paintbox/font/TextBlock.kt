@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
+import org.lwjgl.system.MathUtil
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.scaleMul
 
@@ -314,10 +316,10 @@ data class TextBlock(val runs: List<TextRun>) {
         val tint = ColorStack.getAndPush().set(batch.color)
         val requiresTinting = tint.r != 1f || tint.g != 1f || tint.b != 1f || tint.a != 1f
 
-        val globalScaleX: Float = scaleX * (if (maxWidth <= 0f || this.width <= 0f || this.width * scaleX < maxWidth) 1f else (maxWidth / (this.width * scaleX)))
+        val globalScaleX: Float = scaleX * (if (maxWidth <= 0f || this.width <= 0f || this.width * scaleX < maxWidth) (1f) else (maxWidth / (this.width * scaleX)))
         val globalScaleY: Float = scaleY
 
-        if (globalScaleX <= 0f || globalScaleY <= 0f) {
+        if (globalScaleX <= MathUtils.FLOAT_ROUNDING_ERROR || globalScaleY <= MathUtils.FLOAT_ROUNDING_ERROR || globalScaleX.isNaN() || globalScaleY.isNaN()) {
             ColorStack.pop()
             return
         }
