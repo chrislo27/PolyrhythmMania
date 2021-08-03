@@ -8,7 +8,7 @@ object Credits {
     val credits: Map<String, List<String>> = linkedMapOf(
             "credits.programming" to listOf("chrislo27", "[font=rodin](◉.◉)☂[]"),
             "credits.graphicDesign" to abcSorted(
-                    "garbo", "snow krow",
+                    "garbo", "snow krow", "GENERIC",
             ),
             "credits.music" to abcSorted(
                     "GENERIC"
