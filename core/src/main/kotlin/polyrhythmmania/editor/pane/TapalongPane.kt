@@ -20,7 +20,7 @@ import polyrhythmmania.util.DecimalFormats
 
 class TapalongPane(val toolbar: Toolbar) : Pane() {
     companion object {
-        const val AUTO_RESET_SEC: Int = 10
+        const val AUTO_RESET_SEC: Int = 5
         
         private const val FLASH_DURATION: Float = 0.25f
         private val TEXT_COLOR: Color = Color(1f, 1f, 1f, 1f)
