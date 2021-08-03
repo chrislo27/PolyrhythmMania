@@ -34,7 +34,7 @@ import polyrhythmmania.world.tileset.*
 import kotlin.math.sign
 
 
-class TilesetEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalette,
+class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalette,
                         val baseTileset: TilesetPalette?,
                         val titleLocalization: String = "editor.dialog.tilesetPalette.title",
 ) : EditorDialog(editorPane) {
@@ -360,11 +360,10 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
         colourPicker.setColor(mapping.color.getOrCompute(), true)
     }
     
-    fun prepareShow(): TilesetEditDialog {
+    fun prepareShow(): PaletteEditDialog {
         tilesetPalette.applyTo(objPreview.worldRenderer.tileset)
         resetGroupMappingsToTileset()
         updateColourPickerToMapping()
-        objPreview.worldRenderer.tileset.texturePack = editor.container.renderer.tileset.texturePack
         return this
     }
 
@@ -381,11 +380,7 @@ class TilesetEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
         
         val world: World = World()
         // TODO the tileset (not the palette config) should be copied from the global settings for the level
-        val worldRenderer: WorldRenderer = WorldRenderer(world, object : Tileset(StockTexturePacks.gba /* Placeholder, the var is overridden anyway */) {
-            override var texturePack: TexturePack
-                get() = editor.container.renderer.tileset.texturePack
-                set(_) { /* NO-OP */ }
-        }.apply { 
+        val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(editor.container.renderer.tileset.texturePack).apply { 
             tilesetPalette.applyTo(this)
         })
         

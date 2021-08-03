@@ -535,9 +535,16 @@ class Editor(val main: PRManiaGame)
         }
     }
     
-    fun attemptOpenTilesetEditDialog() {
+    fun attemptOpenPaletteEditDialog() {
         if (allowedToEdit.getOrCompute()) {
-            editorPane.openDialog(editorPane.tilesetEditDialog.prepareShow())
+            editorPane.openDialog(editorPane.paletteEditDialog.prepareShow())
+        }
+    }
+    
+    fun attemptOpenTexturePackDialog() {
+        if (allowedToEdit.getOrCompute()) {
+            // TODO
+            throw NotImplementedError("attemptOpenTexturePackDialog not implemented yet")
         }
     }
 

@@ -1,10 +1,7 @@
 package polyrhythmmania.world.tileset
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
-import paintbox.packing.TextureRegionMap
 
 
 /**
@@ -15,7 +12,7 @@ import paintbox.packing.TextureRegionMap
  * Colours presets are handled in containers called [TilesetPalette]s.
  * A [TilesetPalette] can be applied to a [Tileset].
  */
-open class Tileset(open var texturePack: TexturePack) {
+class Tileset(val texturePack: Var<TexturePack>) {
 
     companion object {
         private fun mapRodTexture(parent: TintedRegion, count: Int, col: Int): List<TintedSubregion> {
@@ -29,8 +26,10 @@ open class Tileset(open var texturePack: TexturePack) {
         }
     }
     
+    constructor(initialPack: TexturePack) : this(Var(initialPack))
+    
     fun getTilesetRegionForTinted(tinted: TintedRegion): TilesetRegion {
-        return texturePack[tinted.regionID]
+        return texturePack.getOrCompute()[tinted.regionID]
     }
 
     /**

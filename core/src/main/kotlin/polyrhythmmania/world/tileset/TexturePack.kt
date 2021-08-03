@@ -13,7 +13,7 @@ import paintbox.packing.TextureRegionMap
  * 
  * A texture pack does not handle the subregions in certain textures, for example the rod animations.
  */
-abstract class TexturePack(val id: String) {
+abstract class TexturePack(val id: String, val deprecatedIDs: Set<String>) {
     
     companion object {
         const val TEXTURE_PACK_VERSION: Int = 0
@@ -53,9 +53,9 @@ abstract class TexturePack(val id: String) {
     
 }
 
-class CascadingTexturePack(id: String, val priorityList: List<TexturePack>,
+class CascadingTexturePack(id: String, deprecatedIDs: Set<String>, val priorityList: List<TexturePack>,
                            val shouldThrowErrorOnMissing: Boolean = false)
-    : TexturePack(id) {
+    : TexturePack(id, deprecatedIDs) {
     
     override fun get(id: String): TilesetRegion {
         return getOrNull(id) ?: if (shouldThrowErrorOnMissing) {
@@ -74,7 +74,8 @@ class CascadingTexturePack(id: String, val priorityList: List<TexturePack>,
 /**
  * A [TexturePack] backed by a [TextureRegionMap].
  */
-open class StockTexturePack(id: String, val regionMap: TextureRegionMap) : TexturePack(id) {
+open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMap: TextureRegionMap)
+    : TexturePack(id, deprecatedIDs) {
     
     init {
         add(TilesetRegion.create("platform", regionMap.getOrNull("platform"), RegionSpacing(1, 32, 32)))

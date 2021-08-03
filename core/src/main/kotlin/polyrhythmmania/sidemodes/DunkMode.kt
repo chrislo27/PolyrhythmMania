@@ -24,7 +24,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         container.world.worldMode = WorldMode.DUNK
         container.engine.inputter.endlessScore.maxLives.set(5)
         container.renderer.worldBackground = DunkWorldBackground
-        container.renderer.tileset.texturePack = StockTexturePacks.gba
+        container.renderer.tileset.texturePack.set(StockTexturePacks.gba)
     }
     
     override fun initialize() {

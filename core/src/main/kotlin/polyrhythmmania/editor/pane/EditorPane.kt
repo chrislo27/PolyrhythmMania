@@ -46,12 +46,12 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     val exitConfirmDialog: ExitConfirmDialog
     val settingsDialog: SettingsDialog
     var helpDialog: HelpDialog
-        private set // TODO make this a val again, var is for fast-resetting for debugging
+        private set // var is for fast-resetting for debugging
     val saveDialog: SaveDialog
     val loadDialog: LoadDialog
     val newDialog: NewDialog
     val playtestDialog: PlaytestDialog
-    val tilesetEditDialog: TilesetEditDialog
+    val paletteEditDialog: PaletteEditDialog
 
     init {
         // Background
@@ -112,7 +112,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         loadDialog = LoadDialog(this)
         newDialog = NewDialog(this)
         playtestDialog = PlaytestDialog(this)
-        tilesetEditDialog = TilesetEditDialog(this, editor.container.world.tilesetPalette, null)
+        paletteEditDialog = PaletteEditDialog(this, editor.container.world.tilesetPalette, null)
     }
     
     fun resetHelpDialog() {

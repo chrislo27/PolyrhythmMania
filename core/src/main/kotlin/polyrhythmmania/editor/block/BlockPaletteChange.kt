@@ -12,7 +12,7 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.pane.dialog.TilesetEditDialog
+import polyrhythmmania.editor.pane.dialog.PaletteEditDialog
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.ui.DecimalTextField
@@ -52,7 +52,7 @@ class BlockPaletteChange(engine: Engine)
                     editor.editorPane.palette.markup).apply {
                 this.onAction = {
                     val editorPane = editor.editorPane
-                    editorPane.openDialog(TilesetEditDialog(editorPane, this@BlockPaletteChange.tilesetPalette,
+                    editorPane.openDialog(PaletteEditDialog(editorPane, this@BlockPaletteChange.tilesetPalette,
                             engine.world.tilesetPalette,
                             "editor.dialog.tilesetPalette.title.block").prepareShow())
                 }
