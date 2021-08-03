@@ -252,7 +252,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             Anchor.TopLeft.configure(this)
             this.align.set(HBox.Align.LEFT)
             this.spacing.set(4f)
-            this.bounds.width.set((32f + this.spacing.get()) * 3 + tapalongPane.bounds.width.get())
+            this.bounds.width.set((32f + this.spacing.get()) * 8 + tapalongPane.bounds.width.get())
         }
         mainSection += leftControlHBox
 
