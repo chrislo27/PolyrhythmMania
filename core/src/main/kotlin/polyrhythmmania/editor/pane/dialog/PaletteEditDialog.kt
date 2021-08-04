@@ -11,6 +11,7 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.WriterConfig
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
+import paintbox.binding.invert
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -19,10 +20,13 @@ import paintbox.ui.ImageNode
 import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.*
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.Matrix4Stack
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.ColourPicker
@@ -35,7 +39,7 @@ import kotlin.math.sign
 
 
 class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalette,
-                        val baseTileset: TilesetPalette?,
+                        val baseTileset: TilesetPalette?, val canChangeEnabledState: Boolean,
                         val titleLocalization: String = "editor.dialog.tilesetPalette.title",
 ) : EditorDialog(editorPane) {
 
@@ -67,6 +71,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     val colourPicker: ColourPicker = ColourPicker(false, font = editorPane.palette.musicDialogFont).apply { 
         this.setColor(currentMapping.getOrCompute().color.getOrCompute(), true)
     }
+    val enabledCheckbox: CheckBox = CheckBox(binding = { Localization.getVar("editor.dialog.tilesetPalette.enabled").use() })
 
     /**
      * When false, updating the color in [ColourPicker] will NOT apply that colour to the tileset.
@@ -116,6 +121,14 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                     this.textLabel.textColor.set(Color.WHITE.cpy())
                     this.textLabel.margin.set(Insets(0f, 0f, 8f, 8f))
                     this.textLabel.markup.set(editorPane.palette.markup)
+                    if (canChangeEnabledState) {
+                        this.textLabel.textColor.bind {
+                            val enabled = mapping.enabled.use()
+                            if (enabled) Color.WHITE else Color.GRAY
+                        }
+                    } else {
+                        this.textLabel.textColor.set(Color.WHITE.cpy())
+                    }
                     this.imageNode.tint.set(Color.WHITE.cpy())
                     this.imageNode.padding.set(Insets(4f))
                     toggleGroup.addToggle(this)
@@ -151,9 +164,58 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                         }
                     }
                     this += VBox().also { v -> 
-                        v.bindWidthToParent(adjustBinding = { objPreview.bounds.width.useF() * -1 })
+                        v.bindWidthToParent(adjustBinding = { objPreview.bounds.width.useF() * -1 + -5f })
                         v.spacing.set(4f)
                         v.temporarilyDisableLayouts { 
+                            v += HBox().apply {
+                                this.spacing.set(8f)
+                                this.bounds.height.set(64f)
+                                this.temporarilyDisableLayouts { 
+                                    this += RectElement(Color().grey(0.95f)).apply {
+                                        this.bounds.width.set(64f)
+                                        this.padding.set(Insets(2f))
+                                        this += ImageNode(AssetRegistry.get<PackedSheet>("tileset_gba")["platform"]).apply {
+                                            Anchor.Centre.configure(this)
+                                        }
+                                        this += ImageNode(AssetRegistry.get<PackedSheet>("tileset_gba")["xyz"]).apply { 
+                                            Anchor.Centre.configure(this)
+                                        }
+                                    }
+                                    this += TextLabel("[b][color=#FF0000]X-[] [color=#00D815]Y+[] [color=#0000FF]Z+[][]").apply { 
+                                        this.markup.set(editorPane.palette.markup)
+                                        this.bounds.width.set(100f)
+                                        this.textColor.set(Color.WHITE)
+                                        this.renderBackground.set(true)
+                                        this.bgPadding.set(Insets(8f))
+                                        (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color(1f, 1f, 1f, 01f))
+                                    }
+                                    this += VBox().apply {
+                                        this.padding.set(Insets(1f))
+                                        this.border.set(Insets(1f))
+                                        this.borderStyle.set(SolidBorder(Color.WHITE))
+                                        this.bounds.width.set(150f)
+                                        this.spacing.set(0f)
+                                        this += TextLabel(binding = { Localization.getVar("editor.dialog.tilesetPalette.rotateRod").use() }).apply {
+                                            this.padding.set(Insets(1f, 1f, 2f, 2f))
+                                            this.markup.set(editorPane.palette.markup)
+                                            this.textColor.set(Color.WHITE)
+                                            this.bounds.height.set(28f)
+                                            this.renderAlign.set(Align.left)
+                                        }
+                                        this += Pane().apply {
+                                            this.bounds.height.set(28f)
+                                            this.padding.set(Insets(2f, 2f, 1f, 1f))
+                                            this += Slider().apply slider@{
+                                                this.minimum.set(0f)
+                                                this.maximum.set(1f)
+                                                this.tickUnit.set(0f)
+                                                this.setValue(0f)
+                                                rodRotation.bind { this@slider.value.useF() * 2f }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             v += Button(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset").use() },
                                     font = editorPane.palette.musicDialogFont).apply {
                                 this.applyDialogStyleContent()
@@ -172,40 +234,52 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                                 }
                             }
                             v += HBox().apply {
-                                this.spacing.set(8f)
-                                this.bounds.height.set(64f)
-                                this.temporarilyDisableLayouts { 
-                                    this += ImageNode(AssetRegistry.get<PackedSheet>("tileset_gba")["xyz"]).apply { 
-                                        this.bounds.width.set(64f)
+                                this.visible.set(canChangeEnabledState)
+                                this.bounds.height.set(40f)
+                                this.spacing.set(4f)
+                                this.temporarilyDisableLayouts {
+                                    val checkbox = enabledCheckbox.apply {
+                                        this.bounds.width.set(150f)
+                                        this.textLabel.markup.set(editorPane.palette.markup)
+                                        this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.tilesetPalette.enabled.tooltip")))
+                                        this.textLabel.textColor.set(Color.WHITE)
+                                        this.imageNode.tint.set(Color.WHITE)
+                                        this.imageNode.padding.set(Insets(4f))
+                                        
+                                        this.setOnAction { // This overrides the default behaviour of CheckBox
+                                            val newState = checkedState.invert()
+                                            val currentMapping = currentMapping.getOrCompute()
+                                            if (currentMapping is ColorMappingGroup) {
+                                                currentMapping.affectsMappings.forEach { m ->
+                                                    m.enabled.set(newState)
+                                                }
+                                            } else {
+                                                currentMapping.enabled.set(newState)
+                                            }
+                                        }
                                     }
-                                    this += TextLabel("[b][color=#FF0000]X-[] [color=#00D815]Y+[] [color=#0000FF]Z+[][]").apply { 
-                                        this.markup.set(editorPane.palette.markup)
-                                        this.bindWidthToParent(adjust = -64f)
-                                        this.textColor.set(Color.WHITE)
-                                        this.renderBackground.set(true)
-                                        this.bgPadding.set(Insets(8f))
-                                        (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color(1f, 1f, 1f, 01f))
+                                    this += checkbox
+                                    this += Button(binding = { Localization.getVar("editor.dialog.tilesetPalette.enableAll").use() },
+                                            font = editorPane.palette.musicDialogFont).apply {
+                                        this.bounds.width.set(90f)
+                                        this.setScaleXY(0.8f)
+                                        this.setOnAction {
+                                            checkbox.checkedState.set(true)
+                                            tilesetPalette.allMappings.forEach { m ->
+                                                m.enabled.set(true)
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                            v += HBox().apply { 
-                                this.bounds.height.set(32f)
-                                this.spacing.set(8f)
-                                this += TextLabel(binding = { Localization.getVar("editor.dialog.tilesetPalette.rotateRod").use() }).apply {
-                                    this.markup.set(editorPane.palette.markup)
-                                    this.textColor.set(Color.WHITE)
-                                    this.bounds.width.set(100f)
-                                    this.renderAlign.set(Align.right)
-                                }
-                                this += Pane().apply {
-                                    this.padding.set(Insets(4f))
-                                    this += Slider().apply slider@{
-                                        this.bindWidthToParent(adjust = -100f)
-                                        this.minimum.set(0f)
-                                        this.maximum.set(1f)
-                                        this.tickUnit.set(0f)
-                                        this.setValue(0f)
-                                        rodRotation.bind { this@slider.value.useF() * 2f }
+                                    this += Button(binding = { Localization.getVar("editor.dialog.tilesetPalette.disableAll").use() },
+                                            font = editorPane.palette.musicDialogFont).apply {
+                                        this.bounds.width.set(90f)
+                                        this.setScaleXY(0.8f)
+                                        this.setOnAction {
+                                            checkbox.checkedState.set(false)
+                                            tilesetPalette.allMappings.forEach { m ->
+                                                m.enabled.set(false)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -358,6 +432,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     
     private fun updateColourPickerToMapping(mapping: ColorMapping = currentMapping.getOrCompute()) {
         colourPicker.setColor(mapping.color.getOrCompute(), true)
+        enabledCheckbox.checkedState.set(mapping.enabled.getOrCompute())
     }
     
     fun prepareShow(): PaletteEditDialog {
@@ -485,8 +560,26 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
         }
     }
 
+    open inner class ColorMappingGroup(id: String, val affectsMappings: List<ColorMapping>,
+                                       tilesetGetter: (Tileset) -> Var<Color>)
+        : ColorMapping(id, tilesetGetter) {
+        init {
+            this.enabled.bind {
+                var anyEnabled = false
+                affectsMappings.forEach { m ->
+                    // Intentionally iterating through all of them since they are all dependencies.
+                    // The order of the anyEnabled assignment is also intentional to prevent bad short-circuiting
+                    anyEnabled = m.enabled.use() || anyEnabled
+                }
+                anyEnabled
+            }
+        }
+    }
+
     inner class ColorMappingGroupedCubeFaceY(id: String)
-        : ColorMapping(id, { it.cubeFaceY.color }) {
+        : ColorMappingGroup(id,
+            listOf("cubeFaceY", "cubeBorder", "signShadow", "cubeBorderZ", "cubeFaceZ", "cubeFaceX").map { tilesetPalette.allMappingsByID.getValue(it) },
+            { it.cubeFaceY.color }) {
         
         private val hsv: FloatArray = FloatArray(3) { 0f }
 
@@ -528,7 +621,9 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     }
     
     inner class ColorMappingGroupedPistonFaceZ(id: String)
-        : ColorMapping(id, { it.pistonFaceZColor }) {
+        : ColorMappingGroup(id,
+            listOf("pistonFaceZ", "pistonFaceX").map { tilesetPalette.allMappingsByID.getValue(it) },
+            { it.pistonFaceZColor }) {
 
         private val hsv: FloatArray = FloatArray(3) { 0f }
 

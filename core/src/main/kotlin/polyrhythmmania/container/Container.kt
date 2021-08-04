@@ -407,12 +407,16 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             if (tilesetObj != null) {
                 if (containerVersion <= 7) {
                     // Container version [3, 7]: tilesetConfig is the actual tilesetPalette object.
-                    this.world.tilesetPalette.fromJson(tilesetObj)
+                    val tilesetPalette = this.world.tilesetPalette
+                    tilesetPalette.fromJson(tilesetObj)
+                    tilesetPalette.allMappings.forEach { it.enabled.set(true) }
                 } else {
                     // Container version [8, ): tilesetConfig is a larger obj. Palette is in own object "palette" now.
                     val paletteObj = tilesetObj.get("palette")?.asObject()
                     if (paletteObj != null) {
-                        this.world.tilesetPalette.fromJson(paletteObj)
+                        val tilesetPalette = this.world.tilesetPalette
+                        tilesetPalette.fromJson(paletteObj)
+                        tilesetPalette.allMappings.forEach { it.enabled.set(true) }
                     }
                     val texturePackObj = tilesetObj.get("texturePack")?.asObject()
                     if (texturePackObj != null) {
@@ -437,6 +441,8 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                         }
                     }
                 }
+                
+                world.tilesetPalette.applyTo(renderer.tileset)
             }
         }
         if (containerVersion >= 4) {

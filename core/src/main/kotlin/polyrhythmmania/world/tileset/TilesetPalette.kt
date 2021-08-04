@@ -68,7 +68,9 @@ class TilesetPalette {
         return TilesetPalette().also { copy ->
             val copyMap = copy.allMappings.associateBy { it.id }
             this.allMappings.forEach { m ->
-                copyMap.getValue(m.id).color.set(m.color.getOrCompute().cpy())
+                val copiedMapping = copyMap.getValue(m.id)
+                copiedMapping.color.set(m.color.getOrCompute().cpy())
+                copiedMapping.enabled.set(m.enabled.getOrCompute())
             }
         }
     }
@@ -90,6 +92,9 @@ class TilesetPalette {
             allMappings.forEach { m ->
                 add(m.id, m.color.getOrCompute().toString())
             }
+            add("_metadata", Json.`object`().also { metadataObj ->
+                metadataObj.add("enabled", Json.array(*allMappings.filter { it.enabled.getOrCompute() }.map { it.id }.toTypedArray()))
+            })
         }
     }
 
@@ -104,19 +109,53 @@ class TilesetPalette {
             }
         }
 
+        val mappingsWithoutValidJson = mutableSetOf<ColorMapping>()
         allMappings.forEach { m ->
             val c = attemptParse(m.id)
             if (c != null) {
                 m.color.set(c)
             } else {
+                var foundFallback = false
                 if (m.fallbackIDs.isNotEmpty()) {
                     for (fallback in m.fallbackIDs) {
                         val fallbackColor = attemptParse(fallback)
                         if (fallbackColor != null) {
                             m.color.set(fallbackColor)
+                            foundFallback = true
                             break
                         }
                     }
+                }
+                if (!foundFallback) {
+                    mappingsWithoutValidJson += m
+                }
+            }
+        }
+        
+        val metadataObj = obj.get("_metadata")?.asObject()
+        if (metadataObj != null) {
+            val enabledArr = metadataObj.get("enabled")?.asArray()
+            if (enabledArr != null) {
+                val set = enabledArr.map { it.asString() }.toSet()
+                val mappingsByID: Map<String, ColorMapping> = allMappingsByID
+                allMappings.forEach { m ->
+                    if (m in mappingsWithoutValidJson) {
+                        m.enabled.set(m.defaultEnabledStateIfWasOlderVersion)
+                    } else {
+                        m.enabled.set(false)
+                    }
+                }
+                set.forEach { id ->
+                    val m = mappingsByID[id]
+                    m?.enabled?.set(true)
+                }
+            }
+        } else {
+            allMappings.forEach { m ->
+                if (m in mappingsWithoutValidJson) {
+                    m.enabled.set(m.defaultEnabledStateIfWasOlderVersion)
+                } else {
+                    m.enabled.set(true)
                 }
             }
         }

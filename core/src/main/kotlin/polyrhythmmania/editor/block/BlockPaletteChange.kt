@@ -53,7 +53,7 @@ class BlockPaletteChange(engine: Engine)
                 this.onAction = {
                     val editorPane = editor.editorPane
                     editorPane.openDialog(PaletteEditDialog(editorPane, this@BlockPaletteChange.tilesetPalette,
-                            engine.world.tilesetPalette,
+                            engine.world.tilesetPalette, true,
                             "editor.dialog.tilesetPalette.title.block").prepareShow())
                 }
             })

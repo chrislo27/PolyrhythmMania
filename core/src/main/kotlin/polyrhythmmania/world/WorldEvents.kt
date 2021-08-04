@@ -232,9 +232,11 @@ class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
         super.onStartContainer(container, currentBeat)
         val tileset = container.renderer.tileset
         tilesetCopy.allMappings.forEach { m ->
-            val id = m.id
-            val target = colorTargets.getValue(id)
-            target.start.set(m.tilesetGetter.invoke(tileset).getOrCompute())
+            if (m.enabled.getOrCompute()) {
+                val id = m.id
+                val target = colorTargets.getValue(id)
+                target.start.set(m.tilesetGetter.invoke(tileset).getOrCompute())
+            }
         }
     }
 
@@ -246,21 +248,23 @@ class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
         }
         val tileset = container.renderer.tileset
         tilesetCopy.allMappings.forEach { m ->
-            val id = m.id
-            val target = colorTargets.getValue(id)
+            if (m.enabled.getOrCompute()) {
+                val id = m.id
+                val target = colorTargets.getValue(id)
 
-            if (!pulseMode) {
-                target.lerp(percentage)
-            } else {
-                if (percentage <= 0.5f) {
-                    target.lerp((percentage * 2).coerceIn(0f, 1f))
+                if (!pulseMode) {
+                    target.lerp(percentage)
                 } else {
-                    target.lerp(1f - ((percentage - 0.5f) * 2).coerceIn(0f, 1f))
+                    if (percentage <= 0.5f) {
+                        target.lerp((percentage * 2).coerceIn(0f, 1f))
+                    } else {
+                        target.lerp(1f - ((percentage - 0.5f) * 2).coerceIn(0f, 1f))
+                    }
                 }
+
+                val lerped: Color = target.current
+                m.tilesetGetter.invoke(tileset).set(lerped)
             }
-            
-            val lerped: Color = target.current
-            m.tilesetGetter.invoke(tileset).set(lerped)
         }
     }
 }

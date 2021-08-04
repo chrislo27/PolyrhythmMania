@@ -104,7 +104,11 @@ interface Var<T> : ReadOnlyVar<T> {
 
 /**
  * [Sets][Var.set] this [Boolean] [Var] to be the boolean not of its value from [Var.getOrCompute].
+ * 
+ * Returns the new state.
  */
-fun Var<Boolean>.invert() {
-    this.set(!this.getOrCompute())
+fun Var<Boolean>.invert(): Boolean {
+    val newState = !this.getOrCompute()
+    this.set(newState)
+    return newState
 }
