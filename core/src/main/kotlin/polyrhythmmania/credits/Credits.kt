@@ -37,6 +37,7 @@ object Credits {
                     "SLF4J",
                     "zip4j",
                     "earlygrey/shapedrawer",
+                    "java-discord-rpc",
                     "Roboto",
                     "Rodin",
                     "Kurokane",

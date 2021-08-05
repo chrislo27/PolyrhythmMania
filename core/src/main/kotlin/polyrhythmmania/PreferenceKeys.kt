@@ -18,6 +18,7 @@ object PreferenceKeys {
     val SETTINGS_SHOW_INPUT_FEEDBACK_BAR = "settings_showInputFeedbackBar"
     val SETTINGS_SHOW_SKILL_STAR = "settings_showSkillStar"
     val SETTINGS_MUSIC_OFFSET_MS = "settings_musicOffsetMs"
+    val SETTINGS_DISCORD_RPC = "settings_discord_rich_presence"
     
     val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
     val EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE = "editorsettings_camera_pan_on_drag_edge"

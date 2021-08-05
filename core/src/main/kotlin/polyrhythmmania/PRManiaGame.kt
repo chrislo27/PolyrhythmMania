@@ -28,6 +28,7 @@ import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import polyrhythmmania.container.Container
+import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
@@ -120,6 +121,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             }
             onAssetLoadingComplete = {
                 initializeScreens()
+                
+                DiscordHelper.init(settings.discordRichPresence.getOrCompute())
                 
                 if (PRMania.dumpPackedSheets) {
                     val gdxArray = com.badlogic.gdx.utils.Array<PackedSheet>()

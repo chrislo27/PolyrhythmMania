@@ -15,6 +15,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
+import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -96,6 +97,14 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += deleteRecoveryButton
             vbox += resetSideModeHighScoresButton
+            
+            val (drpcPane, drpcCheckbox) = createCheckboxOption({Localization.getVar("mainMenu.dataSettings.discordRichPresence").use()}, percentageContent = 0.1f)
+            drpcCheckbox.checkedState.set(settings.discordRichPresence.getOrCompute())
+            drpcCheckbox.onCheckChanged = { newState ->
+                settings.discordRichPresence.set(newState)
+                DiscordHelper.enabled = newState
+            }
+            vbox += drpcPane
         }
         
         vbox.sizeHeightToChildren(100f)

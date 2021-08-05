@@ -33,6 +33,8 @@ import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
+import polyrhythmmania.discordrpc.DefaultPresences
+import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
@@ -472,6 +474,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         main.inputMultiplexer.removeProcessor(processor)
         main.inputMultiplexer.addProcessor(processor)
         sceneRoot.cancelTooltip()
+        
+        DiscordHelper.updatePresence(DefaultPresences.Idle)
     }
 
     override fun hide() {

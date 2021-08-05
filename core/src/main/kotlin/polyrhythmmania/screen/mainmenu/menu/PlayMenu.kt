@@ -15,6 +15,8 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.discordrpc.DefaultPresences
+import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.PlayScreen
@@ -82,7 +84,9 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             
             // Remember to update DataSettingsMenu to reset high scores
-            vbox += createSidemodeLongButton("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip", Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
+            vbox += createSidemodeLongButton("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip",
+                    Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
+                DiscordHelper.updatePresence(DefaultPresences.PlayingDunk)
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
             }
 //            vbox += createLongButton { Localization.getVar("mainMenu.play.toss").use() }.apply {

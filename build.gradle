@@ -66,6 +66,7 @@ allprojects {
         implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version"
         
         implementation "space.earlygrey:shapedrawer:2.5.0"
+        implementation "club.minnced:java-discord-rpc:2.0.2"
         
 //        implementation "org.openjdk.jol:jol-core:0.15"
     }

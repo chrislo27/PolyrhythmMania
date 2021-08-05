@@ -10,6 +10,8 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.discordrpc.DefaultPresences
+import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.practice.*
@@ -60,7 +62,10 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> Practice): UIElement {
-                return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false, factory = factory)
+                return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false) { game, keymap ->
+                    DiscordHelper.updatePresence(DefaultPresences.PlayingPractice)
+                    factory.invoke(game, keymap)
+                }
             }
             
             vbox += createPractice("mainMenu.practice.tutorial1") { main, keymap ->

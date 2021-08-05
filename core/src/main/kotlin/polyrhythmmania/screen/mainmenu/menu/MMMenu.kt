@@ -201,7 +201,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     
     protected fun createCheckboxOption(labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
                                      percentageContent: Float = 0.5f): Pair<SettingsOptionPane, CheckBox> {
-        val settingsOptionPane = createSettingsOption(labelText, font, percentageContent)
+        val settingsOptionPane = createSettingsOption(labelText, font, percentageContent).apply { 
+            
+        }
         val checkBox = CheckBox("").apply { 
             Anchor.TopRight.configure(this)
             this.boxAlignment.set(CheckBox.BoxAlign.RIGHT)
@@ -263,7 +265,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
         init {
             val rect = RectElement(binding = { bgColorVar.use() }).apply {
-                this.padding.set(Insets(4f))
+//                this.padding.set(Insets(4f))
+                this.padding.set(Insets(4f, 4f, 12f, 4f))
             }
             addChild(rect)
             

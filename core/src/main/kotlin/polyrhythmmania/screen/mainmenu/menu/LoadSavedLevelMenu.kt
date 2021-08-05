@@ -23,6 +23,8 @@ import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
+import polyrhythmmania.discordrpc.DefaultPresences
+import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.editor.pane.dialog.LoadDialog
@@ -193,6 +195,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this.onEntryEnd = {
                                     playScreen.prepareGameStart()
                                     removeSelfFromMenuCol(false)
+                                    DiscordHelper.updatePresence(DefaultPresences.PlayingLevel)
                                 }
                             }
                         }
