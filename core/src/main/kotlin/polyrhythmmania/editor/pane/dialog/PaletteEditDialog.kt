@@ -46,6 +46,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     companion object {
         private val PR1_CONFIG: TilesetPalette = TilesetPalette.createGBA1TilesetPalette()
         private val PR2_CONFIG: TilesetPalette = TilesetPalette.createGBA2TilesetPalette()
+        private val COLOURLESS_CONFIG: TilesetPalette = TilesetPalette.createColourlessTilesetPalette()
     }
     
     data class ResetDefault(val baseConfig: TilesetPalette)
@@ -53,6 +54,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     private val availableResetDefaults: List<ResetDefault> = listOfNotNull(
             ResetDefault(PR1_CONFIG),
             ResetDefault(PR2_CONFIG),
+            ResetDefault(COLOURLESS_CONFIG),
             baseTileset?.let { ResetDefault(it) }
     )
     private var resetDefault: ResetDefault = availableResetDefaults.first()
@@ -342,6 +344,18 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
             bottomHbox += VBox().apply {
                 this.spacing.set(2f)
                 this.bounds.width.set(215f)
+                this += RadioButton(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset.colourless").use() },
+                        font = editorPane.palette.musicDialogFont).apply {
+                    this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
+                    this.textLabel.textColor.set(Color.WHITE.cpy())
+                    this.textLabel.markup.set(editorPane.palette.markup)
+                    this.imageNode.tint.set(Color.WHITE.cpy())
+                    this.imageNode.padding.set(Insets(1f))
+                    toggleGroup.addToggle(this)
+                    this.onSelected = {
+                        resetDefault = availableResetDefaults[2]
+                    }
+                }
                 if (baseTileset != null) {
                     this += RadioButton(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset.base").use() },
                             font = editorPane.palette.musicDialogFont).apply {
@@ -351,7 +365,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                         this.imageNode.padding.set(Insets(1f))
                         toggleGroup.addToggle(this)
                         this.onSelected = {
-                            resetDefault = availableResetDefaults[2]
+                            resetDefault = availableResetDefaults[3]
                         }
                     }
                 }

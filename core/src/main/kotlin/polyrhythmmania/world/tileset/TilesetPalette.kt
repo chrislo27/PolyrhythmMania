@@ -3,6 +3,7 @@ package polyrhythmmania.world.tileset
 import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
+import paintbox.util.gdxutils.grey
 import paintbox.util.gdxutils.set
 
 
@@ -12,6 +13,24 @@ import paintbox.util.gdxutils.set
 class TilesetPalette {
     
     companion object {
+        fun createColourlessTilesetPalette(): TilesetPalette {
+            return TilesetPalette().apply {
+                rodBorder.color.getOrCompute().grey(0f)
+                rodFill.color.getOrCompute().grey(1f)
+
+                cubeBorder.color.getOrCompute().grey(1f)
+                cubeBorderZ.color.getOrCompute().grey(1f)
+                cubeFaceX.color.getOrCompute().grey(1f)
+                cubeFaceY.color.getOrCompute().grey(1f)
+                cubeFaceZ.color.getOrCompute().grey(1f)
+
+                pistonFaceX.color.getOrCompute().grey(1f)
+                pistonFaceZ.color.getOrCompute().grey(1f)
+
+                signShadow.color.getOrCompute().grey(0f)
+            }
+        }
+        
         fun createGBA1TilesetPalette(): TilesetPalette {
             return TilesetPalette().apply {
                 rodBorder.color.getOrCompute().set(0, 0, 0)
