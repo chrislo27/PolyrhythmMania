@@ -42,6 +42,13 @@ import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.world.entity.EntityCube
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityPlatform
+import polyrhythmmania.world.tileset.CustomTexturePack
+import polyrhythmmania.world.tileset.StockTexturePacks
+import java.io.File
+import java.nio.file.Files
+import java.util.zip.ZipOutputStream
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.outputStream
 import kotlin.math.ceil
 
 
@@ -476,6 +483,22 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         sceneRoot.cancelTooltip()
         
         DiscordHelper.updatePresence(DefaultPresences.Idle)
+        
+        // TODO remove this
+//        CustomTexturePack("test", "gba").apply { 
+//            StockTexturePacks.hd.getAllTilesetRegions().forEach { tr ->
+//                this.add(tr)
+//            }
+//            val file = File.createTempFile("prmania", "testtexpack.zip").apply { 
+//                deleteOnExit()
+//            }
+//            file.outputStream().use { fos ->
+//                ZipOutputStream(fos).use { zip ->
+//                    this.writeToOutputStream(zip)
+//                }
+//            }
+//            println("Wrote test texture pack to ${file.absolutePath}")
+//        }
     }
 
     override fun hide() {

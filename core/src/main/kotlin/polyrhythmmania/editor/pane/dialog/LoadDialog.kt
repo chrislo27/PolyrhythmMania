@@ -223,6 +223,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                             Localization.getValue("editor.dialog.load.loadedInformation",
                                 loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
                         )
+                        loadMetadata.loadOnGLThread()
                         loaded = LoadData(newEditorScreen, loadMetadata)
 
                         if (!isRecovery) {

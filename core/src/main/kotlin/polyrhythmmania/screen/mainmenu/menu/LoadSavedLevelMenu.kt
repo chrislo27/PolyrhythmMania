@@ -285,6 +285,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 Gdx.app.postRunnable {
                     substate.set(Substate.LOADED)
                     descLabel.text.set(Localization.getValue("editor.dialog.load.loadedInformation", loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
+                    loadMetadata.loadOnGLThread()
                     loaded = LoadData(newContainer, loadMetadata)
 
                     val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile

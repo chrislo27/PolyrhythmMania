@@ -67,6 +67,7 @@ allprojects {
         
         implementation "space.earlygrey:shapedrawer:2.5.0"
         implementation "club.minnced:java-discord-rpc:2.0.2"
+        implementation "com.twelvemonkeys.imageio:imageio-tga:$twelvemonkeys_version"
         
 //        implementation "org.openjdk.jol:jol-core:0.15"
     }

@@ -12,9 +12,6 @@ import paintbox.Paintbox
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
 import paintbox.binding.Var
-import paintbox.packing.CascadingRegionMap
-import paintbox.packing.PackedSheet
-import paintbox.registry.AssetRegistry
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
@@ -35,15 +32,13 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldSettings
-import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.render.WorldRenderer
-import polyrhythmmania.world.tileset.StockTexturePack
-import polyrhythmmania.world.tileset.StockTexturePacks
-import polyrhythmmania.world.tileset.TexturePack
+import polyrhythmmania.world.tileset.*
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -73,6 +68,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
     val engine: Engine = Engine(timing, world, soundSystem, this)
     val texturePack: Var<TexturePack> = Var(StockTexturePacks.gba)
+    val customTexturePack: Var<CustomTexturePack?> = Var(null)
     val renderer: WorldRenderer by lazy {
         WorldRenderer(world, Tileset(texturePack).apply { 
             world.tilesetPalette.applyTo(this)
@@ -167,6 +163,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     override fun dispose() {
         soundSystem?.dispose()
+        (customTexturePack.getOrCompute() as? Disposable?)?.disposeQuietly()
         resources.values.toList().forEach { it.disposeQuietly() }
         _resources.clear()
     }
@@ -282,13 +279,17 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 blocksArray.add(o)
             }
         })
-        
+
+        val currentCustomTexturePack = customTexturePack.getOrCompute()
         jsonObj.add("tilesetConfig", Json.`object`().also { tilesetConfigObj ->
             tilesetConfigObj.add("palette", this.world.tilesetPalette.toJson())
             tilesetConfigObj.add("texturePack", Json.`object`().also { texturePackObj ->
-                // TODO change source when not stock
-                texturePackObj.add("source", "stock")
-                texturePackObj.add("stockID", texturePack.getOrCompute().id)
+                if (currentCustomTexturePack != null) {
+                    texturePackObj.add("source", "custom")
+                } else {
+                    texturePackObj.add("source", "stock")
+                    texturePackObj.add("stockID", texturePack.getOrCompute().id)
+                }
             })
         })
         
@@ -323,6 +324,24 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                         input.copyTo(zip)
                     }
                     zip.closeEntry()
+                }
+                
+                if (currentCustomTexturePack != null) {
+                    val tmp = File.createTempFile("prmania", "savingtexpack").also { 
+                        it.deleteOnExit()
+                    }
+                    tmp.outputStream().use { tmpOutputStream ->
+                        ZipOutputStream(tmpOutputStream).use { texPackZip ->
+                            texPackZip.setLevel(Deflater.NO_COMPRESSION)
+                            currentCustomTexturePack.writeToOutputStream(texPackZip)
+                        }
+                    }
+                    zip.putNextEntry(ZipEntry("${resDir}texture_pack.zip"))
+                    tmp.inputStream().use { input ->
+                        input.copyTo(zip)
+                    }
+                    zip.closeEntry()
+                    tmp.delete()
                 }
             }
         }
@@ -402,6 +421,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 engine.timeSignatures.add(TimeSignature(obj.getFloat("beat", 0f), obj.getInt("divisions", 4), obj.getInt("beatUnit", 4)))
             }
         }
+        var customTexturePackRead: CustomTexturePack.ReadResult? = null
         if (containerVersion >= 3) {
             val tilesetObj = json.get("tilesetConfig")?.asObject()
             if (tilesetObj != null) {
@@ -432,7 +452,15 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                                 }
                             }
                             "custom" -> {
-                                error("Custom texture packs are not supported yet")
+                                zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack.zip")).use { zipInputStream ->
+                                    val tempFile = TempFileUtils.createTempFile("extres", true, ".zip")
+                                    val out = tempFile.outputStream()
+                                    zipInputStream.copyTo(out)
+                                    val f = ZipFile(tempFile)
+                                    val readResult = CustomTexturePack.readFromStream(f)
+                                    customTexturePackRead = readResult
+                                    tempFile.delete()
+                                }
                             }
                             else -> {
                                 // Ignore texture packs. Just use default GBA
@@ -501,10 +529,24 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             engine.musicData.update()
         }
 
-        return LoadMetadata(containerVersion, programVersion)
+        return LoadMetadata(this, containerVersion, programVersion, customTexturePackRead)
     }
 
-    data class LoadMetadata(val containerVersion: Int, val programVersion: Version?) {
+    data class LoadMetadata(val container: Container, val containerVersion: Int, val programVersion: Version?,
+                            val customTexturePackRead: CustomTexturePack.ReadResult?) {
         val isFutureVersion: Boolean = (programVersion != null && programVersion > PRMania.VERSION) || (containerVersion > CONTAINER_VERSION)
+
+        /**
+         * Must be called on the GL thread.
+         */
+        fun loadOnGLThread() {
+            if (customTexturePackRead != null) {
+                val ctp = customTexturePackRead.createAndLoadTextures()
+                container.customTexturePack.set(ctp)
+                container.texturePack.set(CascadingTexturePack(ctp.id + "_cascading", emptySet(),
+                        listOf(ctp, StockTexturePacks.allPacksByIDWithDeprecations[ctp.fallbackID] ?: StockTexturePacks.gba),
+                        shouldThrowErrorOnMissing = false))
+            }
+        }
     }
 }

@@ -2,7 +2,9 @@ package polyrhythmmania.world.tileset
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.utils.Disposable
 import paintbox.packing.TextureRegionMap
+import paintbox.util.gdxutils.disposeQuietly
 
 
 /**
@@ -16,26 +18,28 @@ import paintbox.packing.TextureRegionMap
 abstract class TexturePack(val id: String, val deprecatedIDs: Set<String>) {
     
     companion object {
-        const val TEXTURE_PACK_VERSION: Int = 0
-        
         const val rodFrameCount: Int = 6
         const val explosionFrameCount: Int = 4
-        
-        init {
-            TextureRegion()
-        }
     }
     
     protected val allRegions: MutableList<TilesetRegion> = mutableListOf()
     protected val internalMap: MutableMap<String, TilesetRegion> = mutableMapOf()
     
-    protected fun add(region: TilesetRegion?) {
+    fun add(region: TilesetRegion?) {
         if (region == null) return
         allRegions += region
         internalMap[region.id] = region
     }
+    
+    fun remove(region: TilesetRegion?) {
+        if (region == null) return
+        allRegions -= region
+        internalMap.remove(region.id, region)
+    }
 
-    fun getAllUniqueTextures(): List<Texture> = allRegions.mapNotNull { it.texture }.distinct()
+    open fun getAllUniqueTextures(): List<Texture> = allRegions.mapNotNull { it.texture }.distinct()
+    
+    open fun getAllTilesetRegions(): List<TilesetRegion> = allRegions.toList()
 
     /**
      * Gets the specified region by its [id].
@@ -55,7 +59,7 @@ abstract class TexturePack(val id: String, val deprecatedIDs: Set<String>) {
 
 class CascadingTexturePack(id: String, deprecatedIDs: Set<String>, val priorityList: List<TexturePack>,
                            val shouldThrowErrorOnMissing: Boolean = false)
-    : TexturePack(id, deprecatedIDs) {
+    : TexturePack(id, deprecatedIDs), Disposable {
     
     override fun get(id: String): TilesetRegion {
         return getOrNull(id) ?: if (shouldThrowErrorOnMissing) {
@@ -67,6 +71,27 @@ class CascadingTexturePack(id: String, deprecatedIDs: Set<String>, val priorityL
 
     override fun getOrNull(id: String): TilesetRegion? {
         return priorityList.firstNotNullOfOrNull { it.getOrNull(id) }
+    }
+
+
+    override fun getAllUniqueTextures(): List<Texture> = (super.getAllUniqueTextures() + priorityList.flatMap { it.getAllUniqueTextures() }).distinct()
+
+    override fun getAllTilesetRegions(): List<TilesetRegion> {
+        val list = mutableListOf<TilesetRegion>()
+        val ids = mutableSetOf<String>()
+        (listOf(super.getAllTilesetRegions()) + priorityList.map { it.getAllTilesetRegions() }).forEach { l ->
+            l.forEach { region ->
+                if (region.id !in ids) {
+                    ids.add(region.id)
+                    list.add(region)
+                }
+            }
+        }
+        return list
+    }
+
+    override fun dispose() {
+        priorityList.forEach { (it as? Disposable)?.disposeQuietly() }
     }
 }
 
