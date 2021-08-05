@@ -259,13 +259,13 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
 
             vbox.temporarilyDisableLayouts {
-                val (feedbackPane, feedbackCheck) = createCheckboxOption({ Localization.getVar("mainMenu.inputSettings.feedback.bar").use() }, percentageContent = 0.25f)
+                val (feedbackPane, feedbackCheck) = createCheckboxOption({ Localization.getVar("mainMenu.inputSettings.feedback.bar").use() })
                 feedbackCheck.checkedState.set(settings.showInputFeedbackBar.getOrCompute())
                 feedbackCheck.onCheckChanged = { newState ->
                     settings.showInputFeedbackBar.set(newState)
                 }
                 vbox += feedbackPane
-                val (skillStarPane, skillStarCheck) = createCheckboxOption({ Localization.getVar("mainMenu.inputSettings.feedback.skillStar").use() }, percentageContent = 0.25f)
+                val (skillStarPane, skillStarCheck) = createCheckboxOption({ Localization.getVar("mainMenu.inputSettings.feedback.skillStar").use() })
                 skillStarCheck.checkedState.set(settings.showSkillStar.getOrCompute())
                 skillStarCheck.onCheckChanged = { newState ->
                     settings.showSkillStar.set(newState)

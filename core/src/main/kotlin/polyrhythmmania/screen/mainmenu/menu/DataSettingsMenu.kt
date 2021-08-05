@@ -98,7 +98,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += deleteRecoveryButton
             vbox += resetSideModeHighScoresButton
             
-            val (drpcPane, drpcCheckbox) = createCheckboxOption({Localization.getVar("mainMenu.dataSettings.discordRichPresence").use()}, percentageContent = 0.1f)
+            val (drpcPane, drpcCheckbox) = createCheckboxOption({Localization.getVar("mainMenu.dataSettings.discordRichPresence").use()})
             drpcCheckbox.checkedState.set(settings.discordRichPresence.getOrCompute())
             drpcCheckbox.onCheckChanged = { newState ->
                 settings.discordRichPresence.set(newState)

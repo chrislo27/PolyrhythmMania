@@ -41,7 +41,7 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         val resolutionsList = PRMania.commonResolutions.toList()
         val (resolutionPane, resolutionCycle) = createCycleOption(resolutionsList, resolutionsList[1],
-                { Localization.getVar("mainMenu.videoSettings.windowedResolution").use() }, percentageContent = 0.5f)
+                { Localization.getVar("mainMenu.videoSettings.windowedResolution").use() })
         this.resolutionCycle = resolutionCycle
 
         val (fullscreenPane, fullscreenCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.fullscreen").use() })
