@@ -468,7 +468,6 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     inner class ObjectPreview : UIElement() {
         
         val world: World = World()
-        // TODO the tileset (not the palette config) should be copied from the global settings for the level
         val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(editor.container.renderer.tileset.texturePack).apply { 
             tilesetPalette.applyTo(this)
         })

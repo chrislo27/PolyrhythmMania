@@ -266,25 +266,25 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
 //                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.changeTexturePack")))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(binding = { Localization.getVar("editor.button.changeTexturePack").use() + " (no icon yet — NOT A BUG)"}))
                 this.setOnAction {
-                    // FIXME this is a temp solution until custom packs are added
-                    val editor = editorPane.editor
-                    if (editor.allowedToEdit.getOrCompute()) {
-                        editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
-                            val useHDVar: Var<Boolean> = Var(editor.container.texturePack.getOrCompute().id == "hd").apply {
-                                addListener {
-                                    editor.container.texturePack.set(if (it.getOrCompute()) StockTexturePacks.hd else StockTexturePacks.gba)
-                                }
-                            }
-
-                            ctxmenu.defaultWidth.set(400f)
-                            ctxmenu.addMenuItem(LabelMenuItem.create("(Temporary) Change texture pack", editorPane.palette.markup))
-                            ctxmenu.addMenuItem(SeparatorMenuItem())
-                            ctxmenu.addMenuItem(CheckBoxMenuItem.create(useHDVar,
-                                    """Use "HD" texture pack instead of GBA""", editorPane.palette.markup))
-                        })
-                    }
+//                    // FIXME this is a temp solution until custom packs are added
+//                    val editor = editorPane.editor
+//                    if (editor.allowedToEdit.getOrCompute()) {
+//                        editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
+//                            val useHDVar: Var<Boolean> = Var(editor.container.texturePack.getOrCompute().id == "hd").apply {
+//                                addListener {
+//                                    editor.container.texturePack.set(if (it.getOrCompute()) StockTexturePacks.hd else StockTexturePacks.gba)
+//                                }
+//                            }
+//
+//                            ctxmenu.defaultWidth.set(400f)
+//                            ctxmenu.addMenuItem(LabelMenuItem.create("(Temporary) Change texture pack", editorPane.palette.markup))
+//                            ctxmenu.addMenuItem(SeparatorMenuItem())
+//                            ctxmenu.addMenuItem(CheckBoxMenuItem.create(useHDVar,
+//                                    """Use "HD" texture pack instead of GBA""", editorPane.palette.markup))
+//                        })
+//                    }
                     
-//                    editorPane.editor.attemptOpenTexturePackDialog()
+                    editorPane.editor.attemptOpenTexturePackDialog()
                 }
             }
             leftControlHBox += Button("").apply {

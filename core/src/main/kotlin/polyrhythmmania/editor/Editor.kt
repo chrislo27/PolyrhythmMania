@@ -543,8 +543,7 @@ class Editor(val main: PRManiaGame)
     
     fun attemptOpenTexturePackDialog() {
         if (allowedToEdit.getOrCompute()) {
-            // TODO
-            throw NotImplementedError("attemptOpenTexturePackDialog not implemented yet")
+            editorPane.openDialog(editorPane.texturePackEditDialog.prepareShow())
         }
     }
 

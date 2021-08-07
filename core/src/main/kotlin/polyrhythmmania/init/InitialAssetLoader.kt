@@ -31,7 +31,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("tempo_change", "textures/ui/icon/tool/tempo_change.png"),
                 Packable("music_volume", "textures/ui/icon/tool/music_volume.png"),
                 Packable("time_signature", "textures/ui/icon/tool/time_signature.png"),
-        ), PackedSheet.Config(padding = 0, maxSize = 128, duplicateBorder = false)))
+        ), PackedSheet.Config(padding = 1, maxSize = 128, duplicateBorder = false)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("toolbar_pause_color", "textures/ui/icon/toolbar/pause_color.png"),
                 Packable("toolbar_play_color", "textures/ui/icon/toolbar/play_color.png"),
@@ -54,6 +54,10 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("menubar_exit", "textures/ui/icon/menubar/exit.png"),
                 Packable("menubar_undo", "textures/ui/icon/menubar/undo.png"),
                 Packable("menubar_undo_white", "textures/ui/icon/menubar/undo_white.png"),
+                Packable("menubar_export", "textures/ui/icon/menubar/export.png"),
+                Packable("menubar_export_base", "textures/ui/icon/menubar/export_base.png"),
+                Packable("menubar_import", "textures/ui/icon/menubar/import.png"),
+                Packable("menubar_trash", "textures/ui/icon/menubar/trash.png"),
                 Packable("arrow_long", "textures/ui/icon/arrow/arrow_long.png"),
                 Packable("arrow_long_empty", "textures/ui/icon/arrow/arrow_long_empty.png"),
                 Packable("arrow_long_semi", "textures/ui/icon/arrow/arrow_long_semi.png"),
@@ -72,15 +76,15 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("settings", "textures/ui/icon/settings.png"),
                 Packable("help", "textures/ui/icon/help.png"),
                 Packable("allowed_tracks", "textures/ui/icon/allowed_tracks.png"),
-        ), PackedSheet.Config(padding = 0, maxSize = 256, duplicateBorder = false)))
+        ), PackedSheet.Config(padding = 1, maxSize = 256, duplicateBorder = false)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor_linear", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("x", "textures/ui/x.png"),
-        ), PackedSheet.Config(padding = 0, maxSize = 1024, duplicateBorder = false, 
+        ), PackedSheet.Config(padding = 1, maxSize = 1024, duplicateBorder = false, 
                 atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor_help", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("arrow_right", "textures/ui/icon/help/arrow_right.png"),
                 Packable("home", "textures/ui/icon/help/home.png"),
-        ), PackedSheet.Config(padding = 0, maxSize = 512, duplicateBorder = false, 
+        ), PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false, 
                 atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
         AssetRegistry.loadAsset<Texture>("ui_triangle_equilateral", "textures/ui/triangle_equilateral.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_triangle_right", "textures/ui/triangle_right.png", linearTexture())

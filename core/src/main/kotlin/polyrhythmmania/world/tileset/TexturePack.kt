@@ -103,6 +103,8 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
     : TexturePack(id, deprecatedIDs) {
     
     init {
+        // REMINDER: If a region is added that is user-editable, update CustomTexturePack's ALLOWED_LIST of IDs
+        
         add(TilesetRegion.create("platform", regionMap.getOrNull("platform"), RegionSpacing(1, 32, 32)))
 
         add(TilesetRegion.create("platform_with_line", regionMap.getOrNull("platform_with_line"), RegionSpacing(1, 32, 32)))
