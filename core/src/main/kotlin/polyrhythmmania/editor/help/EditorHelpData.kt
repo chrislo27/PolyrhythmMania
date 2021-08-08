@@ -8,8 +8,8 @@ object EditorHelpData {
     fun createHelpData(): HelpData {
         return HelpData(mapOf(
                 HelpData.ROOT_ID to EditorHelpDocRoot(),
-                "controls" to EditorHelpDocControls(),
                 "glossary" to EditorHelpDocGlossary(),
+                "controls" to EditorHelpDocControls(),
                 "music_sync" to EditorHelpDocMusicSync(),
         ))
     }
@@ -73,7 +73,7 @@ class EditorHelpDocGlossary : HelpDocument(
                 LayerParagraph("editorHelp.glossary.pp0", 50f),
                 LayerParagraph("editorHelp.glossary.track", 64f, renderAlign = Align.bottomLeft),
                 LayerImage("textures/help/glossary/track.png", 288f),
-                LayerParagraph("editorHelp.glossary.block", 64f, renderAlign = Align.bottomLeft),
+                LayerParagraph("editorHelp.glossary.block", 100f, renderAlign = Align.bottomLeft),
                 LayerImage("textures/help/glossary/blocks.png", 288f),
                 LayerParagraph("editorHelp.glossary.tempoChange", 64f, renderAlign = Align.bottomLeft),
                 LayerImage("textures/help/glossary/tempo_change.png", 92f),
