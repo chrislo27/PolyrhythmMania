@@ -22,8 +22,8 @@ class EditorHelpDocRoot : HelpDocument(
                 LayerTitle("editorHelp.root.title"),
                 LayerParagraph("editorHelp.root.pp0", 64f),
                 LayerCol3(
-                        LayerButton("editorHelp.controls.title", "controls", false),
                         LayerButton("editorHelp.glossary.title", "glossary", false),
+                        LayerButton("editorHelp.controls.title", "controls", false),
                         LayerButton("editorHelp.music_sync.title", "music_sync", false)
                 )
         )
