@@ -25,9 +25,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
 import paintbox.util.MathHelper
-import paintbox.util.gdxutils.drawCompressed
-import paintbox.util.gdxutils.intersects
-import paintbox.util.gdxutils.scaleMul
+import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
@@ -137,22 +135,22 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                         this.doXCompression.set(false)
                         this.renderAlign.set(Align.topLeft)
                         this.setScaleXY(0.4f)
-                        this.textColor.set(Color(1f, 69f / 255f, 13f / 255f, 1f))
+                        this.textColor.set(Color().grey(229f / 255f))
                     }
 
-                    val livesVar: ReadOnlyVar<String> = Localization.getVar("play.endless.lives", Var {
-                        val l = currentEndlessLives.use()
-                        listOf("[font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]")
-                    })
-                    val endlessModeLivesLabel = TextLabel(binding = { livesVar.use() }).apply {
-                        this.bounds.width.set(480f)
-                        Anchor.TopRight.configure(this)
-                        this.markup.set(baseMarkup)
-                        this.renderAlign.set(Align.left)
-                        this.textColor.set(Color(1f, 1f, 1f, 1f))
-                        this.setScaleXY(0.5f)
-                    }
-                    this += endlessModeLivesLabel
+//                    val livesVar: ReadOnlyVar<String> = Localization.getVar("play.endless.lives", Var {
+//                        val l = currentEndlessLives.use()
+//                        listOf("[font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]")
+//                    })
+//                    val endlessModeLivesLabel = TextLabel(binding = { livesVar.use() }).apply {
+//                        this.bounds.width.set(480f)
+//                        Anchor.TopRight.configure(this)
+//                        this.markup.set(baseMarkup)
+//                        this.renderAlign.set(Align.left)
+//                        this.textColor.set(Color(1f, 1f, 1f, 1f))
+//                        this.setScaleXY(0.5f)
+//                    }
+//                    this += endlessModeLivesLabel
                 }
 
                 val currentScoreVar = Localization.getVar("play.endless.score", Var { listOf(currentEndlessScore.use()) })
@@ -166,6 +164,19 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                     this.scaleY.bind { endlessModeScoreLabelScaleXY.useF() * scaleMul }
                 }
                 this += endlessModeScoreLabel
+
+                val endlessModeLivesLabel = TextLabel(binding = {
+                    val l = currentEndlessLives.use()
+                    " [font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]"
+                }).apply {
+                    this.bounds.height.set(40f)
+                    Anchor.TopRight.configure(this)
+                    this.markup.set(baseMarkup)
+                    this.renderAlign.set(Align.left)
+                    this.textColor.set(Color(1f, 1f, 1f, 1f))
+                    this.setScaleXY(0.333f)
+                }
+                this += endlessModeLivesLabel
 
             }
             this += vbox
