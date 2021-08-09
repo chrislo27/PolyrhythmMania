@@ -72,7 +72,8 @@ class EventCondApplause(engine: Engine, startBeat: Float, val rowSetting: RowSet
         val world = engine.world
         return world.entities.filterIsInstance<EntityRodPR>().any { 
             val results = it.inputTracker.results
-            it.row == row && it.acceptingInputs && currentBeat - it.deployBeat >= 4.25f && results.size > 0 && results.none { it.inputScore == InputScore.MISS }
+            it.row == row && it.acceptingInputs && currentBeat - it.deployBeat >= 4.25f && 
+                    (results.size > 0 || engine.autoInputs) && results.none { r -> r.inputScore == InputScore.MISS }
         }
     }
 
