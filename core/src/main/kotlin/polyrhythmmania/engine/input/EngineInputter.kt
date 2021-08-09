@@ -74,14 +74,15 @@ class EngineInputter(val engine: Engine) {
         val score: Var<Int> = Var(0)
         var highScore: Var<Int> = Var(0)
         val maxLives: Var<Int> = Var(0)
-        val lives: Var<Int> = Var(maxLives.getOrCompute())
+        val startingLives: Var<Int> = Var.bind { maxLives.use() }
+        val lives: Var<Int> = Var(startingLives.getOrCompute())
         
         val gameOverSeconds: FloatVar = FloatVar(Float.MAX_VALUE)
         val gameOverUIShown: Var<Boolean> = Var(false)
         
         fun reset() {
             score.set(0)
-            lives.set(maxLives.getOrCompute())
+            lives.set(startingLives.getOrCompute())
             gameOverSeconds.set(Float.MAX_VALUE)
             gameOverUIShown.set(false)
         }
