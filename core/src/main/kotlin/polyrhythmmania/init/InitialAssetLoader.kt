@@ -48,6 +48,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("toolbar_tileset_palette", "textures/ui/icon/toolbar/tileset_palette.png"),
                 Packable("toolbar_results", "textures/ui/icon/toolbar/results.png"),
                 Packable("toolbar_world_settings", "textures/ui/icon/toolbar/world_settings.png"),
+                Packable("toolbar_texture_pack", "textures/ui/icon/toolbar/texture_pack.png"),
                 Packable("menubar_new", "textures/ui/icon/menubar/new.png"),
                 Packable("menubar_open", "textures/ui/icon/menubar/open.png"),
                 Packable("menubar_save", "textures/ui/icon/menubar/save.png"),
@@ -91,8 +92,8 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_triangle_equilateral_bordered", "textures/ui/triangle_equilateral_bordered.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_triangle_right_bordered", "textures/ui/triangle_right_bordered.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_colour_picker_arrow", "textures/ui/colour_picker_arrow.png", linearTexture())
-        AssetRegistry.loadAsset<Texture>("ui_colour_picker_copy", "textures/ui/copy.png", linearTexture())
-        AssetRegistry.loadAsset<Texture>("ui_colour_picker_paste", "textures/ui/paste.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("ui_colour_picker_copy", "textures/ui/copy.png")
+        AssetRegistry.loadAsset<Texture>("ui_colour_picker_paste", "textures/ui/paste.png")
         AssetRegistry.loadAsset<Texture>("ui_icon_block_flat", "textures/ui/icon/block_flat.png")
         AssetRegistry.loadAsset<Texture>("ui_rounded_textbox", "textures/ui/textbox.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("results_score_bar", "textures/results/score_bar.png", linearTexture())
