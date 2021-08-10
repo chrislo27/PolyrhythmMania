@@ -37,6 +37,7 @@ object GdxAudioReader {
                 if (length <= 0) break
                 
                 byteBuffer.rewind()
+                byteBuffer.limit(length)
                 
                 synchronized(fileChannel) {
                     fileChannel.write(byteBuffer, currentLength)
