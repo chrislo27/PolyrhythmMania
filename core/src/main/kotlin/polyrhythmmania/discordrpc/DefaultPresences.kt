@@ -17,6 +17,12 @@ object DefaultPresences {
     object PlayingPractice
         : PresenceState("Playing a practice mode")
     
+    object PlayingEndlessMode
+        : PresenceState("Playing Endless Mode")
+    
+    object PlayingDailyChallenge
+        : PresenceState("Playing the Daily Challenge")
+    
     object PlayingDunk
         : PresenceState("Playing Polyrhythm DUNK!!")
 

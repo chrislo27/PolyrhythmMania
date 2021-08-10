@@ -115,6 +115,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this.onEntryEnd = {
                                     sidemode.prepare()
                                     playScreen.resetAndStartOver(false, false)
+                                    DiscordHelper.updatePresence(DefaultPresences.PlayingDailyChallenge)
                                 }
                             }
                         }
