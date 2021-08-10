@@ -1,5 +1,6 @@
 package polyrhythmmania.sidemodes.endlessmode
 
+import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
@@ -100,7 +101,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         return (random.nextGaussian().absoluteValue * stdDev + mean).toFloat()
     }
     
-    fun getStdDevFromDifficulty(): Float = 1 / 2f
+    fun getStdDevFromDifficulty(): Float = MathUtils.lerp(0.5f, 0.85f, (difficultyFactor.get() / 1.75f).coerceIn(0f, 1f))
     fun getMeanFromDifficulty(): Float = (difficultyFactor.get() / 2f).coerceIn(0f, 2.25f)
 
     override fun getDebugString(): String {
