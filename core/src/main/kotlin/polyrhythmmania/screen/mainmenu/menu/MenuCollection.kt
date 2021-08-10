@@ -126,7 +126,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
             
             RectangleStack.pop()
         }
-        menus.forEach { it.visible.set(false) }
+        menus.forEach { if (it !== menu) it.visible.set(false) }
         menu.visible.set(true)
         (activeMenu as Var).set(menu)
     }
