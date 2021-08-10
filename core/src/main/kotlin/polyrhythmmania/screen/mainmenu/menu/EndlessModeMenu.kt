@@ -1,0 +1,176 @@
+package polyrhythmmania.screen.mainmenu.menu
+
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.Align
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
+import paintbox.transition.FadeIn
+import paintbox.transition.TransitionScreen
+import paintbox.ui.Anchor
+import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
+import paintbox.ui.control.ScrollPane
+import paintbox.ui.control.ScrollPaneSkin
+import paintbox.ui.control.TextField
+import paintbox.ui.control.TextLabel
+import paintbox.ui.element.RectElement
+import paintbox.ui.layout.HBox
+import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.grey
+import polyrhythmmania.Localization
+import polyrhythmmania.discordrpc.DefaultPresences
+import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.sidemodes.EndlessModeScore
+import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
+import polyrhythmmania.ui.PRManiaSkins
+import java.util.*
+
+
+class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+
+//    private val settings: Settings = menuCol.main.settings
+
+    init {
+        this.setSize(MMMenu.WIDTH_MID)
+        this.titleText.bind { Localization.getVar("mainMenu.play.endless").use() }
+        this.contentPane.bounds.height.set(300f)
+
+        val scrollPane = ScrollPane().apply {
+            Anchor.TopLeft.configure(this)
+            this.bindHeightToParent(-40f)
+
+            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+
+            this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+
+            val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+            this.vBar.skinID.set(scrollBarSkinID)
+            this.hBar.skinID.set(scrollBarSkinID)
+
+            this.vBar.unitIncrement.set(10f)
+            this.vBar.blockIncrement.set(40f)
+        }
+        val hbox = HBox().apply {
+            Anchor.BottomLeft.configure(this)
+            this.spacing.set(8f)
+            this.padding.set(Insets(2f))
+            this.bounds.height.set(40f)
+        }
+
+        contentPane.addChild(scrollPane)
+        contentPane.addChild(hbox)
+
+
+        val vbox = VBox().apply {
+            Anchor.TopLeft.configure(this)
+            this.spacing.set(0f)
+            this.bindHeightToParent(-40f)
+        }
+
+        vbox.temporarilyDisableLayouts {
+            val seedText: Var<String> = Var("")
+            val playButtonText: ReadOnlyVar<String> = Var {
+                if (seedText.use().isEmpty()) Localization.getVar("mainMenu.play.endless.play.random").use() else Localization.getVar("mainMenu.play.endless.play").use()
+            }
+            vbox += createLongButton { playButtonText.use() }.apply {
+                this.setOnAction {
+                    menuCol.playMenuSound("sfx_menu_enter_game")
+                    mainMenu.transitionAway {
+                        val main = mainMenu.main
+                        Gdx.app.postRunnable {
+                            val seed: Long = try {
+                                seedText.getOrCompute().toUInt(16).toLong()
+                            } catch (e: Exception) {
+                                Random().nextInt().toUInt().toLong()
+                            }
+                            val sidemode: SideMode = EndlessPolyrhythm(main, EndlessModeScore(Var(Int.MAX_VALUE)), seed, null)
+                            val playScreen = PlayScreen(main, sidemode, sidemode.container, challenges = Challenges.NO_CHANGES, showResults = false)
+                            main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                                this.onEntryEnd = {
+                                    sidemode.prepare()
+                                    playScreen.resetAndStartOver(false, false)
+                                    DiscordHelper.updatePresence(DefaultPresences.PlayingEndlessMode)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            vbox += RectElement(Color().grey(90f / 255f, 0.8f)).apply { 
+                this.bounds.height.set(10f)
+                this.margin.set(Insets(4f, 4f, 12f, 12f))
+            }
+            
+            vbox += HBox().apply { 
+                this.spacing.set(8f)
+                this.bounds.height.set(48f)
+                this.margin.set(Insets(4f, 4f, 0f, 0f))
+                this += TextLabel(binding = {Localization.getVar("mainMenu.play.endless.settings.seed").use()}, font).apply { 
+                    this.renderAlign.set(Align.right)
+                    this.bounds.width.set(80f)
+                }
+                val textField = TextField(font = font).apply {
+                    this.characterLimit.set(8)
+                    this.inputFilter.set { c -> c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F' }
+                    this.textColor.set(Color(1f, 1f, 1f, 1f))
+                    this.setOnRightClick {
+                        text.set("")
+                        requestFocus()
+                    }
+                    this.text.addListener { t ->
+                        if (hasFocus.getOrCompute()) {
+                            val upper = t.getOrCompute().uppercase()
+                            seedText.set(upper)
+                            this.text.set(upper)
+                        }
+                    }
+                }
+                this += RectElement(Color.BLACK).apply { 
+                    this.bounds.width.set(150f)
+                    this.border.set(Insets(2f))
+                    this.borderStyle.set(SolidBorder(Color.WHITE))
+                    this.padding.set(Insets(4f))
+                    this += textField
+                }
+                
+                this += createSmallButton { Localization.getVar("mainMenu.play.endless.settings.clear").use() }.apply { 
+                    this.bounds.width.set(100f)
+                    this.setOnAction {
+                        textField.requestUnfocus()
+                        seedText.set("")
+                        textField.text.set("")
+                    }
+                }
+                this += createSmallButton { Localization.getVar("mainMenu.play.endless.settings.random").use() }.apply { 
+                    this.bounds.width.set(120f)
+                    this.setOnAction { 
+                        textField.requestUnfocus()
+                        val randomSeed = Random().nextInt().toUInt()
+                        val randomSeedStr = randomSeed.toString(16).padStart(8, '0').uppercase()
+                        seedText.set(randomSeedStr)
+                        textField.text.set(randomSeedStr)
+                    }
+                }
+            }
+            
+        }
+
+        vbox.sizeHeightToChildren(100f)
+        scrollPane.setContent(vbox)
+        
+        hbox.temporarilyDisableLayouts {
+            hbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
+                this.bounds.width.set(100f)
+                this.setOnAction {
+                    menuCol.popLastMenu()
+                }
+            }
+        }
+    }
+    
+}

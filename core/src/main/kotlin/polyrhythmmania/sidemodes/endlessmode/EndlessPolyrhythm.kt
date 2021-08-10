@@ -47,6 +47,10 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
             return hex.takeLast(8).toUInt(16).toLong() and 0x0_FFFF_FFFFL
         }
         
+        fun getSeedString(seed: UInt): String {
+            return seed.toString(16).uppercase().padStart(8, '0')
+        }
+        
         fun getSeedFromLocalDate(date: LocalDate): Long {
             return (date.dayOfYear and 0b111111111 /* 9 bits */).toLong() or (((date.year.toLong() % Year.MAX_VALUE) and 0xFFFF_FFFF) shl 9) or (1L shl 42) 
         }
@@ -65,6 +69,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         
         container.world.worldMode = WorldMode.POLYRHYTHM_ENDLESS
+        container.renderer.endlessModeSeed.set(getSeedString(seed.toUInt()))
         container.renderer.dailyChallengeDate.set(dailyChallenge)
         container.engine.inputter.endlessScore.maxLives.set(3)
     }

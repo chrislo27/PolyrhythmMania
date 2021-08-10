@@ -89,7 +89,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
             vbox += createLongButton { Localization.getVar("mainMenu.play.endless").use() }.apply {
                 this.setOnAction {
-//                    menuCol.pushNextMenu(menuCol.practiceMenu) // TODO
+                    menuCol.pushNextMenu(menuCol.endlessMenu)
                 }
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.endless.tooltip")))
             }

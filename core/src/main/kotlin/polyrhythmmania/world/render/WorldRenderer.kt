@@ -95,6 +95,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     val showEndlessModeScore: Var<Boolean> = Var(false)
     val prevHighScore: Var<Int> = Var(-1)
     val dailyChallengeDate: Var<LocalDate?> = Var(null)
+    val endlessModeSeed: Var<String?> = Var(null)
     private val currentEndlessScore: Var<Int> = Var(0)
     private val currentEndlessLives: Var<Int> = Var(0)
 
@@ -135,8 +136,11 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
                     val prevTextVar: ReadOnlyVar<String> = Var.bind { 
                         val date = dailyChallengeDate.use()
+                        val seed = endlessModeSeed.use()
                         if (date != null) {
                             Localization.getVar("play.endless.dailyChallenge", Var { listOf(date.format(DateTimeFormatter.ISO_DATE)) }).use()
+                        } else if (seed != null) {
+                            Localization.getVar("play.endless.seed", Var { listOf(seed) }).use()
                         } else {
                             Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) }).use()
                         }
