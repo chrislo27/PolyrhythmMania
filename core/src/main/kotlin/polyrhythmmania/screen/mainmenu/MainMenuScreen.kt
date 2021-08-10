@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.StreamUtils
-import net.beadsproject.beads.ugens.BiquadFilter
 import net.beadsproject.beads.ugens.CrossFade
 import net.beadsproject.beads.ugens.Gain
 import net.beadsproject.beads.ugens.SamplePlayer
@@ -43,11 +42,11 @@ import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
-import polyrhythmmania.screen.mainmenu.menu.PlayMenu
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.soundsystem.beads.ugen.Bandpass
 import polyrhythmmania.soundsystem.sample.DecodingMusicSample
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
@@ -207,10 +206,11 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val musicPlayer: MusicSamplePlayer = beadsMusic.createPlayer(soundSystem.audioContext).also { player ->
         player.pause(true)
     }
-    val highPassFilter: BiquadFilter = BiquadFilter(soundSystem.audioContext, musicPlayer.outs, BiquadFilter.Type.BESSEL_HP).setFrequency(1500f)
-    val lowPassFilter: BiquadFilter = BiquadFilter(soundSystem.audioContext, musicPlayer.outs, BiquadFilter.Type.BESSEL_LP).setFrequency(1000f)
-    val tmpDistortGain: Gain = Gain(soundSystem.audioContext, musicPlayer.outs, 2f)
-    val crossFade: CrossFade = CrossFade(soundSystem.audioContext, musicPlayer)
+//    private val highPassFilter: BiquadFilter = BiquadFilter(soundSystem.audioContext, musicPlayer.outs, BiquadFilter.Type.BESSEL_HP).setFrequency(1500f)
+//    private val lowPassFilter: BiquadFilter = BiquadFilter(soundSystem.audioContext, musicPlayer.outs, BiquadFilter.Type.BESSEL_LP).setFrequency(1000f)
+//    private val bandpass: Gain = Gain(soundSystem.audioContext, musicPlayer.outs, 2f)
+    private val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs, musicPlayer.outs)
+    private val crossFade: CrossFade = CrossFade(soundSystem.audioContext, musicPlayer)
 
     init {
         val startingWidth = Gdx.graphics.width
@@ -336,16 +336,21 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     init {
-
-        highPassFilter.addInput(musicPlayer)
-        lowPassFilter.addInput(highPassFilter)
-        tmpDistortGain.addInput(lowPassFilter)
+        bandpass.addInput(musicPlayer)
         
         soundSystem.audioContext.out.addInput(crossFade)
-
-
+        
         soundSystem.setPaused(true)
         soundSystem.startRealtime()
+        
+        menuCollection.uppermostMenu.visible.addListener { v ->
+            val target = if (v.getOrCompute()) musicPlayer else bandpass
+            crossFade.fadeTo(target, 1000f)
+        }
+        menuCollection.audioSettingsMenu.visible.addListener { v ->
+            val target = if (v.getOrCompute()) musicPlayer else bandpass
+            crossFade.fadeTo(target, 1000f)
+        }
     }
 
     override fun render(delta: Float) {
@@ -464,7 +469,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 //            crossFade.fadeTo(musicPlayer, 1000f)
 //        }
 //        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-//            crossFade.fadeTo(tmpDistortGain, 1000f)
+//            crossFade.fadeTo(bandpassGain, 1000f)
 //        }
         // DEBUG remove later 
 //        if (Paintbox.debugMode && Paintbox.stageOutlines != Paintbox.StageOutlineMode.NONE && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
@@ -561,6 +566,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         
         soundSystem.setPaused(false)
         musicPlayer.gain = 1f
+        musicPlayer.position = 0.0
+        crossFade.fadeTo(musicPlayer, 1f)
 
         DiscordHelper.updatePresence(DefaultPresences.Idle)
     }
