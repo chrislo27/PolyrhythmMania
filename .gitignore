@@ -68,5 +68,9 @@ build/
 ## OS Specific
 .DS_Store
 Thumbs.db
-/core/assets/logs/
-/core/assets/debugetc
+
+
+
+core/assets/logs/
+core/assets/debugetc
+core/assets/music/Title*.ogg
