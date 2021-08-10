@@ -191,7 +191,7 @@ distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficu
                     },
                     LoopingEvent(engine, 88f, { true }) { engine, startBeat ->
                         val currentSpeedIncrease = speedIncreaseSemitones.getOrCompute()
-                        val newSpeed = (currentSpeedIncrease + 1).coerceAtMost(12)
+                        val newSpeed = (currentSpeedIncrease + (if (currentSpeedIncrease >= 4) 1 else 2)).coerceAtMost(12)
                         speedIncreaseSemitones.set(newSpeed)
                         engine.playbackSpeed = Semitones.getALPitch(newSpeed)
                     }.also { e ->
