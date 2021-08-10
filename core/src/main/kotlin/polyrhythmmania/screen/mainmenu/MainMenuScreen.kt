@@ -11,8 +11,12 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.StreamUtils
+import net.beadsproject.beads.ugens.BiquadFilter
+import net.beadsproject.beads.ugens.CrossFade
+import net.beadsproject.beads.ugens.Gain
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
+import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
@@ -39,6 +43,7 @@ import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
+import polyrhythmmania.screen.mainmenu.menu.PlayMenu
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -49,14 +54,8 @@ import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.world.entity.EntityCube
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityPlatform
-import polyrhythmmania.world.tileset.CustomTexturePack
-import polyrhythmmania.world.tileset.StockTexturePacks
-import java.io.File
-import java.nio.file.Files
-import java.util.zip.ZipOutputStream
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.outputStream
 import kotlin.math.ceil
 
 
@@ -169,29 +168,49 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private lateinit var framebufferCurrent: FrameBuffer
 
     // Music related ----------------------------------------------------------------------------------------------
+    private val menuMusicVolume: FloatVar = FloatVar { 
+        main.settings.menuMusicVolume.use() / 100f
+    }
     private val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
-        this.audioContext.out.gain = main.settings.menuMusicVolume.getOrCompute() / 100f
+        this.audioContext.out.gain = menuMusicVolume.get()
     }
     private val musicSample: DecodingMusicSample
-    private val beadsMusic: BeadsMusic 
+    private val beadsMusic: BeadsMusic
 
     init {
-        val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg"))
+        menuMusicVolume.addListener {
+            soundSystem.audioContext.out.gain = it.getOrCompute()
+        }
+        val unpausedPlayer = AtomicBoolean(false)
+        val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg")) { _, _ ->
+            if (!unpausedPlayer.get()) {
+                unpausedPlayer.set(true)
+                Gdx.app.postRunnable { 
+                    musicPlayer.pause(false)
+                }
+            }
+        }
         musicSample = sample
         thread(start = true, isDaemon = true, name = "Main Menu music decoder", priority = 8) {
             Paintbox.LOGGER.debug("Starting main menu music decode")
             handler.decode()
             Paintbox.LOGGER.debug("Finished main menu music decode")
             Gdx.app.postRunnable { 
-//                musicPlayer.loopEndMs = sample.lengthMs.toFloat()
-//                println("loop end ms ${musicPlayer.loopEndMs}")
-//                musicPlayer.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
+                musicPlayer.loopStartMs = sample.samplesToMs(123_381.0).toFloat()
+                musicPlayer.loopEndMs = sample.samplesToMs(8_061_382.0).toFloat()
+                musicPlayer.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
             }
         }
         beadsMusic = BeadsMusic(musicSample)
     }
     
-    private val musicPlayer: MusicSamplePlayer = beadsMusic.createPlayer(soundSystem.audioContext)
+    private val musicPlayer: MusicSamplePlayer = beadsMusic.createPlayer(soundSystem.audioContext).also { player ->
+        player.pause(true)
+    }
+    val highPassFilter: BiquadFilter = BiquadFilter(soundSystem.audioContext, musicPlayer.outs, BiquadFilter.Type.BESSEL_HP).setFrequency(1500f)
+    val lowPassFilter: BiquadFilter = BiquadFilter(soundSystem.audioContext, musicPlayer.outs, BiquadFilter.Type.BESSEL_LP).setFrequency(1000f)
+    val tmpDistortGain: Gain = Gain(soundSystem.audioContext, musicPlayer.outs, 2f)
+    val crossFade: CrossFade = CrossFade(soundSystem.audioContext, musicPlayer)
 
     init {
         val startingWidth = Gdx.graphics.width
@@ -317,7 +336,14 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     init {
-        soundSystem.audioContext.out.addInput(musicPlayer)
+
+        highPassFilter.addInput(musicPlayer)
+        lowPassFilter.addInput(highPassFilter)
+        tmpDistortGain.addInput(lowPassFilter)
+        
+        soundSystem.audioContext.out.addInput(crossFade)
+
+
         soundSystem.setPaused(true)
         soundSystem.startRealtime()
     }
@@ -434,16 +460,28 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     override fun renderUpdate() {
         super.renderUpdate()
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+//            crossFade.fadeTo(musicPlayer, 1000f)
+//        }
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
+//            crossFade.fadeTo(tmpDistortGain, 1000f)
+//        }
         // DEBUG remove later 
-        if (Paintbox.debugMode && Paintbox.stageOutlines != Paintbox.StageOutlineMode.NONE && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            main.screen = MainMenuScreen(main)
-        }
+//        if (Paintbox.debugMode && Paintbox.stageOutlines != Paintbox.StageOutlineMode.NONE && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+//            main.screen = MainMenuScreen(main)
+//        }
     }
 
     fun transitionAway(action: () -> Unit) {
         flipAnimation = TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT)
         this.transitionAway = action
         main.inputMultiplexer.removeProcessor(processor)
+        Gdx.app.postRunnable { // FIXME this is hacky...
+            musicPlayer.gain = 0.5f
+            Gdx.app.postRunnable {
+                musicPlayer.gain = 0f
+            }
+        }
     }
 
     fun prepareShow(doFlipAnimation: Boolean = false): MainMenuScreen {
@@ -522,7 +560,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         sceneRoot.cancelTooltip()
         
         soundSystem.setPaused(false)
-        
+        musicPlayer.gain = 1f
+
         DiscordHelper.updatePresence(DefaultPresences.Idle)
     }
 
