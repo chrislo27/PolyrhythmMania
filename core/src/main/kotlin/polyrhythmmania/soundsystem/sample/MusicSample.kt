@@ -9,6 +9,7 @@ import java.nio.file.StandardOpenOption
 import kotlin.math.floor
 
 
+
 /**
  * A MusicSample is like a [net.beadsproject.beads.data.Sample], but only a certain section
  * is loaded into memory and the rest is fetched from a file as needed.
@@ -18,11 +19,11 @@ import kotlin.math.floor
  * This also allows for fast looping as the area around the loop point will be already in memory.
  *
  * The PCM data file shall have interleaved float information (ch0_0, ch1_0, ch0_1, ch1_1, ch0_2, ch1_2, etc for a 2-channel sample).
- * 
+ *
  * This [MusicSample] should be [close]d after it is no longer needed to free the FileChannel in use.
  */
-class MusicSample(val pcmDataFile: Path,
-                  val sampleRate: Float = 44_100f, val nChannels: Int = 2)
+abstract class MusicSample(val fileChannel: FileChannel,
+                           val sampleRate: Float = 44_100f, val nChannels: Int = 2)
     : Closeable {
 
     companion object {
@@ -33,30 +34,25 @@ class MusicSample(val pcmDataFile: Path,
     private val interpCurrent: FloatArray = FloatArray(nChannels)
     private val interpNext: FloatArray = FloatArray(nChannels)
 
-    private val fileChannel: FileChannel = FileChannel.open(pcmDataFile, StandardOpenOption.READ)
-    private val fileSize: Long = fileChannel.size()
-    
-    val lengthMs: Double = (fileSize / 2 /*2 bytes per float*/ / nChannels / sampleRate * 1000.0)
-    val nFrames: Long = msToSamples(lengthMs).toLong()
-    
-    private val startBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_START_BUFFER_MS).toInt()) }
-    private val playbackBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_PLAYBACK_BUFFER_MS).toInt()) }
-    
-    init {
-        startBuffer.populate(0)
-    }
-    
-    fun moveStartBuffer(toFrame: Int) {
+    protected open val fileSize: Long = synchronized(fileChannel) { fileChannel.size() }
+
+    open val lengthMs: Double get() = (fileSize / 2 /*2 bytes per float*/ / nChannels / sampleRate * 1000.0)
+    open val nFrames: Long get() = msToSamples(lengthMs).toLong()
+
+    protected val startBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_START_BUFFER_MS).toInt()) }
+    protected val playbackBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_PLAYBACK_BUFFER_MS).toInt()) }
+
+    open fun moveStartBuffer(toFrame: Int) {
         if (toFrame < 0 || toFrame >= nFrames || startBuffer.position == toFrame) {
             return
         }
         startBuffer.populate(toFrame)
     }
-
+    
     override fun close() {
         StreamUtils.closeQuietly(fileChannel)
     }
-    
+
     /**
      * Return a single frame.
      *
@@ -66,10 +62,11 @@ class MusicSample(val pcmDataFile: Path,
      * @param frameData
      * @see net.beadsproject.beads.data.Sample.getFrame
      */
-    fun getFrame(frame: Int, frameData: FloatArray) {
+    open fun getFrame(frame: Int, frameData: FloatArray) {
         if (frame < 0 || frame >= nFrames) {
             return
         }
+
         if (startBuffer.isSampleInBuffer(frame)) {
             for (i in 0 until nChannels) {
                 frameData[i] = startBuffer.data[i][frame - startBuffer.position]
@@ -77,7 +74,7 @@ class MusicSample(val pcmDataFile: Path,
         } else {
             if (!playbackBuffer.isSampleInBuffer(frame)) {
 //                val nano = measureNanoTime { 
-                    playbackBuffer.populate((frame - 4).coerceAtLeast(0))
+                playbackBuffer.populate((frame - 4).coerceAtLeast(0))
 //                }
 //                println("time to load block ${playbackBuffer.position} / ${playbackBuffer.size}: ${nano / 1_000_000f} ms")
             }
@@ -209,8 +206,6 @@ class MusicSample(val pcmDataFile: Path,
 //        }
 //    }
 
-    private fun samplesToBytes(samples: Long): Long = 4 * nChannels * samples
-
     /**
      * Converts from milliseconds to samples based on the sample rate.
      * @param msTime the time in milliseconds.
@@ -228,11 +223,10 @@ class MusicSample(val pcmDataFile: Path,
     fun samplesToMs(sampleTime: Double): Double {
         return sampleTime / sampleRate * 1000.0
     }
-    
+
     class Buffer(val musicSample: MusicSample, val samples: Int, val bytesPerSample: Int = 2) {
-        
+
         val nChannels: Int = musicSample.nChannels
-        private val fileChannel: FileChannel = musicSample.fileChannel
         val data: Array<FloatArray> = Array(nChannels) { FloatArray(samples) }
         var position: Int = 0
             private set
@@ -247,48 +241,51 @@ class MusicSample(val pcmDataFile: Path,
             // TODO support multiple bytes per sample not 2
             if (bytesPerSample != 2)
                 error("n != 2 bytes per sample is not supported yet (n = $bytesPerSample)")
-            
-            // Read a chunk of bytes at a time
-            // Convert the bytes to floats and map them to the correct channel/sample
-            // Repeat until this buffer's data is full or we hit EoF
-            // Set size and position properties accordingly
-            
-            val bytesPerSampleChannel = nChannels * bytesPerSample
-            val startBytePos: Long = 1L * startAtSample * bytesPerSampleChannel
-            var lastBytePos: Long = startBytePos
-            fileChannel.position(startBytePos)
-            
-            var samplesRead: Int = 0
-            tmpBuffer.rewind()
-            var bytesRead: Int = fileChannel.read(tmpBuffer)
-            while (bytesRead > 0) {
-                val samplesReadable = (bytesRead / bytesPerSampleChannel).coerceAtMost(samples - samplesRead)
-                if (samplesReadable == 0) break
-                
-                var tmpPtr: Int = 0
-                for (i in 0 until samplesReadable) {
-                    for (ch in 0 until nChannels) {
-                        data[ch][i + samplesRead] = ((tmpBuffer.get(tmpPtr).toInt() and 0xFF) or (tmpBuffer.get(tmpPtr + 1).toInt() shl 8)) / 32_768.0f
-                        tmpPtr += bytesPerSample
-                    }
-                }
-                
-                lastBytePos += samplesReadable * bytesPerSampleChannel
-                fileChannel.position(lastBytePos)
-                
-                samplesRead += samplesReadable
+
+            val fileChannel = musicSample.fileChannel
+            synchronized(fileChannel) {
+                // Read a chunk of bytes at a time
+                // Convert the bytes to floats and map them to the correct channel/sample
+                // Repeat until this buffer's data is full or we hit EoF
+                // Set size and position properties accordingly
+
+                val bytesPerSampleChannel = nChannels * bytesPerSample
+                val startBytePos: Long = 1L * startAtSample * bytesPerSampleChannel
+                var lastBytePos: Long = startBytePos
+                fileChannel.position(startBytePos)
+
+                var samplesRead: Int = 0
                 tmpBuffer.rewind()
-                bytesRead = fileChannel.read(tmpBuffer)
+                var bytesRead: Int = fileChannel.read(tmpBuffer)
+                while (bytesRead > 0) {
+                    val samplesReadable = (bytesRead / bytesPerSampleChannel).coerceAtMost(samples - samplesRead)
+                    if (samplesReadable == 0) break
+
+                    var tmpPtr: Int = 0
+                    for (i in 0 until samplesReadable) {
+                        for (ch in 0 until nChannels) {
+                            data[ch][i + samplesRead] = ((tmpBuffer.get(tmpPtr).toInt() and 0xFF) or (tmpBuffer.get(tmpPtr + 1).toInt() shl 8)) / 32_768.0f
+                            tmpPtr += bytesPerSample
+                        }
+                    }
+
+                    lastBytePos += samplesReadable * bytesPerSampleChannel
+                    fileChannel.position(lastBytePos)
+
+                    samplesRead += samplesReadable
+                    tmpBuffer.rewind()
+                    bytesRead = fileChannel.read(tmpBuffer)
+                }
+
+                position = startAtSample
+                size = samplesRead
             }
-            
-            position = startAtSample
-            size = samplesRead
         }
-        
+
         fun isSampleInBuffer(sample: Int): Boolean {
             return sample in position until (position + size)
         }
-        
+
     }
 
 }

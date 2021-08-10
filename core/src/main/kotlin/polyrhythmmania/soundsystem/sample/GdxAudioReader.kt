@@ -13,13 +13,42 @@ import polyrhythmmania.util.TempFileUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.RandomAccessFile
+import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
 
 
 object GdxAudioReader {
     
     fun interface AudioLoadListener {
         fun progress(bytesReadSoFar: Long, bytesReadThisChunk: Int)
-    } 
+    }
+    
+    class DecodingHandler(val music: OpenALMusic, val fileChannel: FileChannel, val bufferSize: Int, val listener: AudioLoadListener?) {
+        fun decode(): Long {
+            val audioBytes = ByteArray(bufferSize)
+            val byteBuffer = ByteBuffer.wrap(audioBytes)
+            var currentLength = 0L
+            
+            music.reset()
+            while (true) {
+                byteBuffer.rewind()
+                val length = music.read(audioBytes)
+                if (length <= 0) break
+                
+                byteBuffer.rewind()
+                
+                synchronized(fileChannel) {
+                    fileChannel.write(byteBuffer, currentLength)
+                }
+
+                currentLength += length
+                listener?.progress(currentLength, length)
+            }
+            
+            return currentLength
+        }
+    }
 
     private fun musicToPCMFile(music: OpenALMusic, file: File, bufferSize: Int = 4096 * 4, listener: AudioLoadListener? = null): Long {
         file.createNewFile()
@@ -40,6 +69,18 @@ object GdxAudioReader {
         StreamUtils.closeQuietly(fileOutStream)
 
         return currentLength
+    }
+
+    private fun newDecodingMusic(music: OpenALMusic, file: File, bufferSize: Int = 4096 * 4,
+                                 listener: AudioLoadListener? = null): Pair<DecodingMusicSample, DecodingHandler> {
+        file.createNewFile()
+
+        val randomAccessFile = RandomAccessFile(file, "rw")
+        val fileChannel = randomAccessFile.channel
+        val sample = DecodingMusicSample(randomAccessFile, fileChannel, music.rate.toFloat(), music.channels)
+        val handler = DecodingHandler(music, fileChannel, bufferSize, listener)
+
+        return sample to handler
     }
 
     fun newSound(handle: FileHandle, listener: AudioLoadListener? = null): BeadsSound {
@@ -89,8 +130,16 @@ object GdxAudioReader {
         music.reset()
         val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec", true)
         val bytesRead = musicToPCMFile(music, tempFile, listener = listener)
-        val musicSample = MusicSample(tempFile.toPath(), music.rate.toFloat(), music.channels)
+        val musicSample: MusicSample = FullMusicSample(tempFile.toPath(), music.rate.toFloat(), music.channels)
 
         return BeadsMusic(musicSample)
+    }
+
+    fun newDecodingMusicSample(handle: FileHandle, listener: AudioLoadListener? = null): Pair<DecodingMusicSample, DecodingHandler> {
+        val music = Gdx.audio.newMusic(handle) as OpenALMusic
+        music.reset()
+        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec", true)
+        
+        return newDecodingMusic(music, tempFile, listener = listener)
     }
 }

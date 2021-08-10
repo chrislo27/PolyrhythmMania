@@ -3,6 +3,7 @@ package polyrhythmmania
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Preferences
+import com.badlogic.gdx.Screen
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
@@ -13,10 +14,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.Json
 import org.lwjgl.glfw.GLFW
-import paintbox.Paintbox
-import paintbox.PaintboxGame
-import paintbox.PaintboxSettings
-import paintbox.ResizeAction
+import paintbox.*
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.*
@@ -76,6 +74,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     // Permanent screens
     lateinit var mainMenuScreen: MainMenuScreen
         private set
+    private val permanentScreens: MutableList<PaintboxScreen> = mutableListOf()
     
     val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
 
@@ -114,6 +113,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         
         fun initializeScreens() {
             mainMenuScreen = MainMenuScreen(this)
+            permanentScreens.add(mainMenuScreen)
         }
         setScreen(AssetRegistryLoadingScreen(this).apply {
             onStart = {
@@ -192,6 +192,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         colourPickerHueBar.disposeQuietly()
         colourPickerTransparencyGrid.disposeQuietly()
         SidemodeAssets.disposeQuietly()
+        permanentScreens.forEach { s ->
+            s.disposeQuietly()
+        }
         try {
             val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
             PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->

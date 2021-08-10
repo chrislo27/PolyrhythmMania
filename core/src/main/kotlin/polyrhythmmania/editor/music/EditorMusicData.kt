@@ -5,6 +5,7 @@ import paintbox.binding.Var
 import polyrhythmmania.container.ExternalResource
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.soundsystem.BeadsMusic
+import polyrhythmmania.soundsystem.sample.FullMusicSample
 import polyrhythmmania.soundsystem.sample.LoopParams
 import kotlin.io.path.deleteIfExists
 
@@ -39,7 +40,7 @@ class EditorMusicData(val editor: Editor) {
         val m = this.beadsMusic
         if (m != null) {
             m.musicSample.close()
-            m.musicSample.pcmDataFile.deleteIfExists()
+            (m.musicSample as? FullMusicSample)?.pcmDataFile?.deleteIfExists()
             this.beadsMusic = null
             editor.container.setCompressedMusic(null)
         }

@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.StreamUtils
+import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -38,7 +40,12 @@ import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
+import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SimpleTimingProvider
+import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.soundsystem.sample.DecodingMusicSample
+import polyrhythmmania.soundsystem.sample.GdxAudioReader
+import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.world.entity.EntityCube
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityPlatform
@@ -47,6 +54,7 @@ import polyrhythmmania.world.tileset.StockTexturePacks
 import java.io.File
 import java.nio.file.Files
 import java.util.zip.ZipOutputStream
+import kotlin.concurrent.thread
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.outputStream
 import kotlin.math.ceil
@@ -159,6 +167,31 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
      * The current framebuffer is what's drawn for this frame.
      */
     private lateinit var framebufferCurrent: FrameBuffer
+
+    // Music related ----------------------------------------------------------------------------------------------
+    private val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
+        this.audioContext.out.gain = main.settings.menuMusicVolume.getOrCompute() / 100f
+    }
+    private val musicSample: DecodingMusicSample
+    private val beadsMusic: BeadsMusic 
+
+    init {
+        val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg"))
+        musicSample = sample
+        thread(start = true, isDaemon = true, name = "Main Menu music decoder", priority = 8) {
+            Paintbox.LOGGER.debug("Starting main menu music decode")
+            handler.decode()
+            Paintbox.LOGGER.debug("Finished main menu music decode")
+            Gdx.app.postRunnable { 
+//                musicPlayer.loopEndMs = sample.lengthMs.toFloat()
+//                println("loop end ms ${musicPlayer.loopEndMs}")
+//                musicPlayer.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
+            }
+        }
+        beadsMusic = BeadsMusic(musicSample)
+    }
+    
+    private val musicPlayer: MusicSamplePlayer = beadsMusic.createPlayer(soundSystem.audioContext)
 
     init {
         val startingWidth = Gdx.graphics.width
@@ -281,6 +314,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 this.markup.set(markup)
             })
         }
+    }
+
+    init {
+        soundSystem.audioContext.out.addInput(musicPlayer)
+        soundSystem.setPaused(true)
+        soundSystem.startRealtime()
     }
 
     override fun render(delta: Float) {
@@ -482,28 +521,15 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         main.inputMultiplexer.addProcessor(processor)
         sceneRoot.cancelTooltip()
         
-        DiscordHelper.updatePresence(DefaultPresences.Idle)
+        soundSystem.setPaused(false)
         
-        // TODO remove this
-//        CustomTexturePack("test", "gba").apply { 
-//            StockTexturePacks.hd.getAllTilesetRegions().forEach { tr ->
-//                this.add(tr)
-//            }
-//            val file = File.createTempFile("prmania", "testtexpack.zip").apply { 
-//                deleteOnExit()
-//            }
-//            file.outputStream().use { fos ->
-//                ZipOutputStream(fos).use { zip ->
-//                    this.writeToOutputStream(zip)
-//                }
-//            }
-//            println("Wrote test texture pack to ${file.absolutePath}")
-//        }
+        DiscordHelper.updatePresence(DefaultPresences.Idle)
     }
 
     override fun hide() {
         super.hide()
         main.inputMultiplexer.removeProcessor(processor)
+        soundSystem.setPaused(true)
     }
 
     override fun resize(width: Int, height: Int) {
@@ -516,6 +542,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     override fun dispose() {
         framebufferOld.disposeQuietly()
         framebufferCurrent.disposeQuietly()
+        soundSystem.setPaused(true)
+        soundSystem.disposeQuietly()
+        StreamUtils.closeQuietly(musicSample)
     }
 
     override fun keyDown(keycode: Int): Boolean {
@@ -538,6 +567,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         return "" +
                 """path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
 currentMenu: ${menuCollection.activeMenu.getOrCompute()?.javaClass?.simpleName}
+soundSysPaused: ${soundSystem.isPaused}
+playerPos: ${musicPlayer.position}
 """
     }
 }
