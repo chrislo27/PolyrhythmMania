@@ -46,9 +46,15 @@ object EndlessPatterns {
   |P---P---""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
 """P--P--P--
   |P---P---""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""#P-P-P-P-
+  |##P---P---""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
 
 
 """PPP-PPP-""".parsePattern(Difficulty.HARD, flippable = true),
+"""PP--####
+  |##P--P--""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""PPP-PPP-
+  |##P-##P-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
             
     )
     

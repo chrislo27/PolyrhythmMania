@@ -100,7 +100,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         return (random.nextGaussian().absoluteValue * stdDev + mean).toFloat()
     }
     
-    fun getStdDevFromDifficulty(): Float = 1 / 3f
+    fun getStdDevFromDifficulty(): Float = 1 / 2f
     fun getMeanFromDifficulty(): Float = (difficultyFactor.get() / 2f).coerceIn(0f, 2.25f)
 
     override fun getDebugString(): String {
