@@ -318,7 +318,9 @@ class EngineInputter(val engine: Engine) {
         val validResults = inputTracker.results.filter { it.inputScore != InputScore.MISS }
         
         totalExpectedInputs += numExpected
-        (inputResults as MutableList).addAll(validResults)
+        if (!world.worldMode.showEndlessScore) {
+            (inputResults as MutableList).addAll(validResults)
+        }
         
         if (noMiss && !rod.registeredMiss) {
             if ((rod.exploded && numExpected > 0) || (numExpected > validResults.size) || inputTracker.results.any { it.inputScore == InputScore.MISS }) {
