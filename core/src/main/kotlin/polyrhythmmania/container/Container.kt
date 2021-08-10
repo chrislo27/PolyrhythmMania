@@ -24,6 +24,7 @@ import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.Swing
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.timesignature.TimeSignature
+import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider

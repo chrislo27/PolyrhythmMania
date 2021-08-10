@@ -43,4 +43,6 @@ abstract class SideMode(val main: PRManiaGame) : Disposable {
     override fun dispose() {
         container.disposeQuietly()
     }
+    
+    open fun getDebugString(): String = ""
 }

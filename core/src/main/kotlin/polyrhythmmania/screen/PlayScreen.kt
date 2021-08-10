@@ -43,6 +43,8 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.*
 import polyrhythmmania.screen.results.ResultsScreen
+import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -56,7 +58,7 @@ import kotlin.math.roundToLong
 
 
 class PlayScreen(
-        main: PRManiaGame, val container: Container, val challenges: Challenges,
+        main: PRManiaGame, val sideMode: SideMode?, val container: Container, val challenges: Challenges,
         val showResults: Boolean = true,
         val musicOffsetMs: Float = main.settings.musicOffsetMs.getOrCompute().toFloat(),
 ) : PRManiaScreen(main) {
@@ -85,6 +87,7 @@ class PlayScreen(
     private val resumeLabel: TextLabel
     private val startOverLabel: TextLabel
     private val quitLabel: TextLabel
+    private val optionLabels: List<TextLabel>
 
     private var isPaused: Boolean = false
     private var isFinished: Boolean = false
@@ -187,11 +190,12 @@ class PlayScreen(
 
         val selectedLabelColor = Color(0f, 1f, 1f, 1f)
         val unselectedLabelColor = Color(1f, 1f, 1f, 1f)
-        fun createTextLabelOption(localiz: String, index: Int): TextLabel {
+        fun createTextLabelOption(localiz: String, index: Int, enabled: Boolean): TextLabel {
             return TextLabel(binding = { Localization.getVar(localiz).use() }, font = main.fontMainMenuMain).apply {
                 Anchor.TopLeft.configure(this)
+                this.disabled.set(!enabled)
                 this.textColor.bind {
-                    if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
+                    if (disabled.use()) Color.GRAY else if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
                 }
                 this.bounds.height.set(48f)
                 this.bgPadding.set(Insets(2f, 2f, 12f, 12f))
@@ -206,9 +210,11 @@ class PlayScreen(
                 }
             }
         }
-        resumeLabel = createTextLabelOption("play.pause.resume", 0)
-        startOverLabel = createTextLabelOption("play.pause.startOver", 1)
-        quitLabel = createTextLabelOption("play.pause.quitToMainMenu", 2)
+        resumeLabel = createTextLabelOption("play.pause.resume", 0, true)
+        startOverLabel = createTextLabelOption("play.pause.startOver", 1, !(sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null))
+        quitLabel = createTextLabelOption("play.pause.quitToMainMenu", 2, true)
+        
+        optionLabels = listOf(resumeLabel, startOverLabel, quitLabel)
         optionsBg += VBox().apply {
             this.spacing.set(0f)
             this.temporarilyDisableLayouts {
@@ -331,7 +337,9 @@ class PlayScreen(
 //        menuCol.pushNextMenu(tmpResultsMenu, instant = true)
 //        transitionAway(mainMenu, false) {}
         
-        transitionAway(ResultsScreen(main, scoreObj, container, keyboardKeybinds), disposeContainer = false) {}
+        transitionAway(ResultsScreen(main, scoreObj, container, {
+            PlayScreen(main, sideMode, container, challenges, showResults, musicOffsetMs)
+        }, keyboardKeybinds), disposeContainer = false) {}
     }
 
     private inline fun transitionAway(nextScreen: Screen, disposeContainer: Boolean, action: () -> Unit) {
@@ -449,7 +457,9 @@ class PlayScreen(
     }
 
     private fun attemptPauseEntrySelection() {
-        when (selectionIndex.getOrCompute()) {
+        val index = selectionIndex.getOrCompute()
+        if (optionLabels[index].disabled.getOrCompute()) return
+        when (index) {
             0 -> { // Resume
                 unpauseGame(true)
             }
@@ -461,7 +471,7 @@ class PlayScreen(
             }
         }
     }
-    
+
     private fun quitToMainMenu(playSound: Boolean) {
         val main = this@PlayScreen.main
         val currentScreen = main.screen
@@ -485,11 +495,13 @@ class PlayScreen(
         }
     }
     
-    private fun changeSelectionTo(index: Int) {
-        if (selectionIndex.getOrCompute() != index) {
+    private fun changeSelectionTo(index: Int): Boolean {
+        if (selectionIndex.getOrCompute() != index && !optionLabels[index].disabled.getOrCompute()) {
             selectionIndex.set(index)
             playMenuSound("sfx_menu_blip")
+            return true
         }
+        return false
     }
 
     override fun keyDown(keycode: Int): Boolean {
@@ -501,15 +513,21 @@ class PlayScreen(
                         unpauseGame(true)
                         consumed = true
                     }
-                    keyboardKeybinds.buttonDpadUp -> {
-                        val nextIndex = (selectionIndex.getOrCompute() - 1 + maxSelectionSize) % maxSelectionSize
-                        changeSelectionTo(nextIndex)
-                        consumed = true
-                    }
-                    keyboardKeybinds.buttonDpadDown -> {
-                        val nextIndex = (selectionIndex.getOrCompute() + 1) % maxSelectionSize
-                        changeSelectionTo(nextIndex)
-                        consumed = true
+                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown -> {
+                        if (optionLabels.any { !it.disabled.getOrCompute() }) {
+                            val currentIndex = selectionIndex.getOrCompute()
+                            val incrementAmt = if (keycode == keyboardKeybinds.buttonDpadUp) -1 else 1
+                            var increment = incrementAmt
+                            var nextIndex: Int
+                            do {
+                                nextIndex = (selectionIndex.getOrCompute() + increment + maxSelectionSize) % maxSelectionSize
+                                if (changeSelectionTo(nextIndex)) {
+                                    consumed = true
+                                    break
+                                }
+                                increment += incrementAmt
+                            } while (nextIndex != currentIndex)
+                        }
                     }
                     keyboardKeybinds.buttonA -> {
                         attemptPauseEntrySelection()
@@ -598,6 +616,8 @@ TimingBead: ${soundSystem.seconds}
 ${engine.getDebugString()}
 ---
 ${renderer.getDebugString()}
+---
+SideMode: ${sideMode?.javaClass?.canonicalName}${if (sideMode != null) ("\n" + sideMode.getDebugString()) else ""}
 ---
 ${sceneRoot.mainLayer.lastHoveredElementPath.map { it.javaClass.simpleName }}
 """

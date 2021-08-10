@@ -30,9 +30,11 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.sidemodes.SideMode
 import kotlin.properties.Delegates
 
 class ResultsScreen(main: PRManiaGame, val score: Score, val container: Container,
+                    val startOverFactory: () -> PlayScreen,
                     val keyboardKeybinds: InputKeymapKeyboard)
     : PRManiaScreen(main) {
     
@@ -99,7 +101,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
                 }
                 this.setOnAction {
                     playSound(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                    val playScreen = PlayScreen(main, container, score.challenges)
+                    val playScreen: PlayScreen = startOverFactory()
                     Gdx.input.isCursorCatched = true
                     main.screen = TransitionScreen(main, main.screen, playScreen, FadeOut(0.5f, Color(0f, 0f, 0f, 1f)),
                             FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
@@ -168,7 +170,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
         }
         
         if (Paintbox.debugMode && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            main.screen = ResultsScreen(main, score.copy(), container, keyboardKeybinds)
+            main.screen = ResultsScreen(main, score.copy(), container, startOverFactory, keyboardKeybinds)
         }
     }
 

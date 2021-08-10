@@ -41,15 +41,19 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
         this.defaultText.bind { Localization.getVar("block.spawnPattern.name").use() }
     }
 
-    override fun compileIntoEvents(): List<Event> {
+    fun compileIntoEvents(rowDelayA: Float, rowDelayDpad: Float): List<Event> {
         val b = this.beat
         val events = mutableListOf<Event>()
 
         val world = engine.world
-        events += compileRow(b, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A)
-        events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD)
+        events += compileRow(b + rowDelayA, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A)
+        events += compileRow(b + rowDelayDpad, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD)
 
         return events
+    }
+
+    override fun compileIntoEvents(): List<Event> {
+        return compileIntoEvents(0f, 0f)
     }
 
     private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityPiston.Type): List<Event> {

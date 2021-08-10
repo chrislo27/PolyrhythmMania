@@ -9,6 +9,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.EventConditionalOnRods
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.PlayerLike
@@ -62,35 +63,8 @@ class BlockCondApplause(engine: Engine) : Block(engine, BlockCondApplause.BLOCK_
     }
 }
 
-class EventCondApplause(engine: Engine, startBeat: Float, val rowSetting: RowSetting) : Event(engine) {
-
-    init {
-        this.beat = startBeat
-    }
-    
-    private fun doesValidRodExistOnRow(currentBeat: Float, row: Row): Boolean {
-        val world = engine.world
-        return world.entities.filterIsInstance<EntityRodPR>().any { 
-            val results = it.inputTracker.results
-            it.row == row && it.acceptingInputs && currentBeat - it.deployBeat >= 4.25f && 
-                    (results.size > 0 || engine.autoInputs) && results.none { r -> r.inputScore == InputScore.MISS }
-        }
-    }
-
-    override fun onStart(currentBeat: Float) {
-        super.onStart(currentBeat)
-        
-        val rowA = engine.world.rowA
-        val rowDpad = engine.world.rowDpad
-        val shouldPlay: Boolean = when (rowSetting) {
-            RowSetting.ONLY_A -> doesValidRodExistOnRow(currentBeat, rowA)
-            RowSetting.ONLY_DPAD -> doesValidRodExistOnRow(currentBeat, rowDpad)
-            RowSetting.BOTH -> doesValidRodExistOnRow(currentBeat, rowA) && doesValidRodExistOnRow(currentBeat, rowDpad)
-        }
-        if (shouldPlay) {
-            val beadsSound = AssetRegistry.get<BeadsSound>("sfx_applause")
-            engine.soundInterface.playAudio(beadsSound)
-        }
-    }
-
-}
+class EventCondApplause(engine: Engine, startBeat: Float, rowSetting: RowSetting)
+    : EventConditionalOnRods(engine, startBeat, rowSetting, {
+    val beadsSound = AssetRegistry.get<BeadsSound>("sfx_applause")
+    engine.soundInterface.playAudio(beadsSound)
+})

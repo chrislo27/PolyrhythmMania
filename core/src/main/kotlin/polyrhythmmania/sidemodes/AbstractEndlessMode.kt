@@ -4,9 +4,11 @@ import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.world.tileset.StockTexturePacks
+import polyrhythmmania.world.tileset.TilesetPalette
 
 
-abstract class EndlessMode(main: PRManiaGame, val prevHighScore: EndlessModeScore)
+abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: EndlessModeScore)
     : SideMode(main) {
 
     init {
@@ -25,10 +27,13 @@ class EventIncrementEndlessScore(engine: Engine, val callback: (newScore: Int) -
     
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        val scoreVar = engine.inputter.endlessScore.score
-        val oldScore = scoreVar.getOrCompute()
-        val newScore = oldScore + 1
-        scoreVar.set(newScore)
-        callback.invoke(newScore)
+        val endlessScore = engine.inputter.endlessScore
+        if (endlessScore.lives.getOrCompute() > 0) {
+            val scoreVar = endlessScore.score
+            val oldScore = scoreVar.getOrCompute()
+            val newScore = oldScore + 1
+            scoreVar.set(newScore)
+            callback.invoke(newScore)
+        }
     }
 }

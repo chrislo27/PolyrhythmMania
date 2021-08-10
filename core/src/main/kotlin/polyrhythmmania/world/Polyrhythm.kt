@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.soundsystem.BeadsSound
@@ -195,6 +196,8 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
 
     private val visualPosition: Vector3 = Vector3().set(this.position)
     private var lastCurrentIndex: Float = -10000f
+    var registeredMiss: Boolean = false
+        private set
 
     val inputTracker: InputTracker = InputTracker(row.length)
     val acceptingInputs: Boolean
@@ -226,7 +229,10 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
             it.position.set(this.position)
         })
         playSfxExplosion(engine)
-        engine.inputter.missed()
+        registerMiss(engine.inputter)
+        if (world.worldMode == WorldMode.POLYRHYTHM_ENDLESS) {
+            engine.inputter.triggerLifeLost()
+        }
     }
 
     fun bounce(startIndex: Int, endIndex: Int) {
@@ -449,14 +455,14 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
                     // Check if NOT in air but current expected input is that it should be in the air
                     val currentExpectedInput: ExpectedInput? = inputTracker.expected.getOrNull(currentIndex)
                     if (currentExpectedInput == ExpectedInput.InAir) {
-                        inputter.missed()
+                        registerMiss(inputter)
                     } else {
                         // Edge case: only have to bounce one unit (check two units behind to give time for lates)
                         val lastIndex = currentIndex - 1
                         val last2ExpectedInput: ExpectedInput? = inputTracker.expected.getOrNull(lastIndex - 1)
                         if (last2ExpectedInput is ExpectedInput.Expected && last2ExpectedInput.nextJumpIndex == lastIndex) {
                             if (inputTracker.results.none { it.expectedIndex == last2ExpectedInput.thisIndex }) {
-                                inputter.missed()
+                                registerMiss(inputter)
                             }
                         }
                     }
@@ -477,5 +483,12 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
 
     override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
         if (!exploded) super.render(renderer, batch, tileset, engine)
+    }
+
+    private fun registerMiss(inputter: EngineInputter) {
+        if (!registeredMiss) {
+            registeredMiss = true
+            inputter.missed()
+        }
     }
 }

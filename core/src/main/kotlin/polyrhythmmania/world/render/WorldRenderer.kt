@@ -28,7 +28,9 @@ import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
@@ -36,6 +38,8 @@ import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.render.bg.NoOpWorldBackground
 import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.tileset.Tileset
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 class WorldRenderer(val world: World, val tileset: Tileset) {
@@ -90,6 +94,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
     val showEndlessModeScore: Var<Boolean> = Var(false)
     val prevHighScore: Var<Int> = Var(-1)
+    val dailyChallengeDate: Var<LocalDate?> = Var(null)
     private val currentEndlessScore: Var<Int> = Var(0)
     private val currentEndlessLives: Var<Int> = Var(0)
 
@@ -128,7 +133,14 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                 this += Pane().apply {
                     this.bounds.height.set(40f)
 
-                    val prevTextVar = Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) })
+                    val prevTextVar: ReadOnlyVar<String> = Var.bind { 
+                        val date = dailyChallengeDate.use()
+                        if (date != null) {
+                            Localization.getVar("play.endless.dailyChallenge", Var { listOf(date.format(DateTimeFormatter.ISO_DATE)) }).use()
+                        } else {
+                            Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) }).use()
+                        }
+                    }
                     this += TextLabel(binding = { prevTextVar.use() },
                             font = PRManiaGame.instance.fontGameMoreTimes).apply {
                         this.bindWidthToParent(multiplier = 0.4f)
@@ -167,7 +179,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
                 val endlessModeLivesLabel = TextLabel(binding = {
                     val l = currentEndlessLives.use()
-                    " [font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]"
+                    /* space at start is necessary -> */ " [font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]"
                 }).apply {
                     this.bounds.height.set(40f)
                     Anchor.TopRight.configure(this)

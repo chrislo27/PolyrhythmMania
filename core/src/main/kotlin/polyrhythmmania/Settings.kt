@@ -11,6 +11,7 @@ import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PANNING_DURING_PLAYBACK
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PLAYTEST_STARTS_PLAY
+import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE
 import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
@@ -25,6 +26,8 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
 import polyrhythmmania.engine.input.InputKeymapKeyboard
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 @Suppress("PrivatePropertyName")
@@ -53,6 +56,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, Var(InputKeymapKeyboard()))
             
     private val kv_endlessDunkHighScore: KeyValue<Int> = KeyValue(ENDLESS_DUNK_HIGHSCORE, Var(0))
+    private val kv_endlessDailyChallenge: KeyValue<Pair<LocalDate, Int>> = KeyValue(ENDLESS_DAILY_CHALLENGE, Var(LocalDate.MIN to 0))
 
     val gameplayVolume: Var<Int> = kv_gameplayVolume.value
     val menuMusicVolume: Var<Int> = kv_menuMusicVolume.value
@@ -75,6 +79,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
     
     val endlessDunkHighScore: Var<Int> = kv_endlessDunkHighScore.value
+    val endlessDailyChallenge: Var<Pair<LocalDate, Int>> = kv_endlessDailyChallenge.value
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
@@ -101,6 +106,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
         
         prefs.getInt(kv_endlessDunkHighScore)
+        prefs.getDailyChallenge(kv_endlessDailyChallenge)
     }
 
     fun persist() {
@@ -126,6 +132,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInputKeymapKeyboard(kv_keymapKeyboard)
 
                 .putInt(kv_endlessDunkHighScore)
+                .putDailyChallenge(kv_endlessDailyChallenge)
 
                 .flush()
     }
@@ -209,5 +216,45 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private fun Preferences.putEditorSetting(kv: KeyValue<out EditorSetting>): Preferences {
         val prefs: Preferences = this
         return prefs.putString(kv.key, kv.value.getOrCompute().persistValueID)
+    }
+
+    private fun Preferences.getLocalDate(kv: KeyValue<LocalDate>) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            val str = prefs.getString(kv.key)
+            try {
+                val localDate: LocalDate = LocalDate.parse(str, DateTimeFormatter.ISO_DATE)
+                kv.value.set(localDate)
+            } catch (ignored: Exception) {
+                kv.value.set(LocalDate.MIN)
+            }
+        }
+    }
+
+    private fun Preferences.putLocalDate(kv: KeyValue<LocalDate>): Preferences {
+        val prefs: Preferences = this
+        return prefs.putString(kv.key, kv.value.getOrCompute().format(DateTimeFormatter.ISO_DATE))
+    }
+
+    private fun Preferences.getDailyChallenge(kv: KeyValue<Pair<LocalDate, Int>>) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            val str = prefs.getString(kv.key)
+            try {
+                val delimited = str.split(';')
+                val scoreStr = delimited[0]
+                val dateStr = delimited[1]
+                val localDate: LocalDate = LocalDate.parse(dateStr, DateTimeFormatter.ISO_DATE)
+                kv.value.set(localDate to scoreStr.toInt())
+            } catch (ignored: Exception) {
+                kv.value.set(LocalDate.MIN to 0)
+            }
+        }
+    }
+
+    private fun Preferences.putDailyChallenge(kv: KeyValue<Pair<LocalDate, Int>>): Preferences {
+        val prefs: Preferences = this
+        val pair = kv.value.getOrCompute()
+        return prefs.putString(kv.key, "${pair.second};${pair.first.format(DateTimeFormatter.ISO_DATE)}")
     }
 }

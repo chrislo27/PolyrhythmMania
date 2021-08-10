@@ -3,10 +3,8 @@ package polyrhythmmania.sidemodes
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
-import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -14,11 +12,10 @@ import polyrhythmmania.world.DunkWorldBackground
 import polyrhythmmania.world.EntityRodDunk
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.tileset.StockTexturePacks
-import java.util.*
 
 
 class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
-    : EndlessMode(main, prevHighScore) {
+    : AbstractEndlessMode(main, prevHighScore) {
     
     init {
         container.world.worldMode = WorldMode.DUNK

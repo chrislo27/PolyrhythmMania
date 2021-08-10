@@ -1,9 +1,13 @@
 package polyrhythmmania.engine
 
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.editor.block.RowSetting
+import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.PlayerLike
 import polyrhythmmania.util.Semitones
+import polyrhythmmania.world.EntityRodPR
+import polyrhythmmania.world.Row
 
 
 class EventCowbellSFX(engine: Engine, startBeat: Float, val useMeasures: Boolean)
@@ -59,5 +63,37 @@ class EventChangePlaybackSpeed(engine: Engine, val newSpeed: Float)
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
         engine.playbackSpeed = newSpeed
+    }
+}
+
+open class EventConditionalOnRods(engine: Engine, startBeat: Float, val rowSetting: RowSetting, val onSuccess: () -> Unit)
+    : Event(engine) {
+
+    init {
+        this.beat = startBeat
+    }
+
+    private fun doesValidRodExistOnRow(currentBeat: Float, row: Row): Boolean {
+        val world = engine.world
+        return world.entities.filterIsInstance<EntityRodPR>().any {
+            val results = it.inputTracker.results
+            it.row == row && it.acceptingInputs && currentBeat - it.deployBeat >= 4.25f &&
+                    (results.size > 0 || engine.autoInputs) && results.none { r -> r.inputScore == InputScore.MISS }
+        }
+    }
+
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+
+        val rowA = engine.world.rowA
+        val rowDpad = engine.world.rowDpad
+        val shouldPlay: Boolean = when (rowSetting) {
+            RowSetting.ONLY_A -> doesValidRodExistOnRow(currentBeat, rowA)
+            RowSetting.ONLY_DPAD -> doesValidRodExistOnRow(currentBeat, rowDpad)
+            RowSetting.BOTH -> doesValidRodExistOnRow(currentBeat, rowA) && doesValidRodExistOnRow(currentBeat, rowDpad)
+        }
+        if (shouldPlay) {
+            onSuccess()
+        }
     }
 }
