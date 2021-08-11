@@ -160,7 +160,7 @@ class CustomTexturePack(id: String, var fallbackID: String)
                 pixmap.fill()
                 pixmap.drawPixmap(texturePixmap, 0, 0) // Force conversion to RGBA8888
                 if (textureData.disposePixmap()) {
-                    pixmap.disposeQuietly()
+                    texturePixmap.disposeQuietly()
                 }
 
                 val bufImg = BufferedImage(pixmap.width, pixmap.height, BufferedImage.TYPE_4BYTE_ABGR)
