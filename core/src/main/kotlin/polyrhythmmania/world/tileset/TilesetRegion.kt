@@ -8,7 +8,7 @@ import com.eclipsesource.json.JsonObject
  * A [TilesetRegion] is a [TextureRegion] with other metadata for [TexturePack].
  *
  */
-class TilesetRegion(val id: String, region: TextureRegion, val spacing: RegionSpacing = RegionSpacing.ZERO)
+class TilesetRegion(val id: String, region: TextureRegion, val spacing: RegionSpacing)
     : TextureRegion(region) {
 
     companion object {

@@ -11,7 +11,9 @@ import paintbox.registry.AssetRegistry
  */
 object StockTexturePacks {
 
-    val missingTilesetRegion: TilesetRegion by lazy { TilesetRegion("MISSING", TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex"))) }
+    val missingTilesetRegion: TilesetRegion by lazy {
+        TilesetRegion("MISSING", TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex")), RegionSpacing.ZERO)
+    }
 
     val gba: TexturePack by lazy { StockTexturePack("gba", emptySet(), AssetRegistry.get<PackedSheet>("tileset_gba")) }
     private val hdNoFallback: TexturePack by lazy { StockTexturePack("hdNoFallback", emptySet(), AssetRegistry.get<PackedSheet>("tileset_hd")) }

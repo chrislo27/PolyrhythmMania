@@ -4,11 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.binding.invert
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -17,15 +20,18 @@ import paintbox.ui.ImageNode
 import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
+import paintbox.ui.contextmenu.*
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.Matrix4Stack
 import paintbox.util.TinyFDWrapper
+import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
+import polyrhythmmania.container.Container
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.*
@@ -107,6 +113,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
     private val isMessageVisible: Var<Boolean> = Var(false)
     private val baseTexturePack: Var<TexturePack> = Var(StockTexturePacks.gba)
     private val customTexturePack: Var<CustomTexturePack> = Var(CustomTexturePack(UUID.randomUUID().toString(), baseTexturePack.getOrCompute().id))
+    private val onTexturePackUpdated: Var<Boolean> = Var(false)
     
     private val currentMsg: Var<String> = Var("")
     
@@ -210,8 +217,14 @@ class TexturePackEditDialog(editorPane: EditorPane,
                         }
                     }
                     is ListEntry.Region -> {
-                        RadioButton(binding = { Localization.getVar(listEntry.localizationKey).use() + "[color=LIGHT_GRAY scale=0.8f]\n${listEntry.id}[]" },
-                                font = editorPane.palette.musicDialogFont).apply {
+                        val textBinding: ReadOnlyVar<String> = Var.bind {
+                            onTexturePackUpdated.use()
+                            (if (customTexturePack.use().getOrNull(listEntry.id) != null)
+                                "[font=rodin color=CYAN]★[] " else "") +
+                                    Localization.getVar(listEntry.localizationKey).use() + 
+                                    "[color=LIGHT_GRAY scale=0.8f]\n${listEntry.id}[]"
+                        }
+                        RadioButton(binding = { textBinding.use() }, font = editorPane.palette.musicDialogFont).apply {
                             this.textLabel.textColor.set(Color.WHITE.cpy())
                             this.textLabel.margin.set(Insets(0f, 0f, 0f, 8f))
                             this.textLabel.markup.set(editorPane.palette.markup)
@@ -256,7 +269,21 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_new"]))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.new")))
                 this.setOnAction {
-                    // TODO
+                    editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
+                        ctxmenu.defaultWidth.set(300f)
+                        ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("editor.dialog.texturePack.button.new.confirm"), editorPane.palette.markup))
+                        ctxmenu.addMenuItem(SeparatorMenuItem())
+                        ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("editor.dialog.texturePack.button.new.confirm.yes"),
+                                editorPane.palette.markup).apply {
+                            this.onAction = {
+                                // TODO
+                            }
+                        })
+                        ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("editor.dialog.texturePack.button.new.confirm.no"),
+                                editorPane.palette.markup).apply {
+                            this.onAction = {}
+                        })
+                    })
                 }
             }
             bottomLeftHbox += Button("").apply {
@@ -323,7 +350,10 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_import"]))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.importTextures")))
                 this.setOnAction {
-                    // TODO
+                    fileChooserSelectTexturesForImport { files ->
+                        // Will be on the gdx thread
+                        importTextures(files)
+                    }
                 }
             }
             bottomLeftHbox += Button("").apply {
@@ -432,6 +462,52 @@ class TexturePackEditDialog(editorPane: EditorPane,
         currentMsg.set(msg)
     }
     
+    private fun importTextures(files: List<File>) {
+        val ctp = customTexturePack.getOrCompute()
+        val basePack = StockTexturePacks.allPacksByIDWithDeprecations[ctp.fallbackID] ?: StockTexturePacks.gba
+        val orderedFiles = files.sortedBy { it.name }
+        try {
+            val oldTextureSet = ctp.getAllUniqueTextures()
+            val acceptedFiles: MutableList<File> = mutableListOf()
+            val toApply = mutableListOf<TilesetRegion>()
+            for (regionID in CustomTexturePack.ALLOWED_LIST) {
+                val toImportFile = orderedFiles.firstOrNull { it.nameWithoutExtension == regionID } ?: continue
+
+                // Load in as a texture and tileset region.
+                val baseRegion: TilesetRegion = basePack[regionID]
+                val newTexture = Texture(FileHandle(toImportFile))
+                val newRegion = TilesetRegion(baseRegion.id, TextureRegion(newTexture), baseRegion.spacing)
+                toApply += newRegion
+
+                acceptedFiles += toImportFile
+            }
+            val numberImported = acceptedFiles.size
+            
+            toApply.forEach { newRegion ->
+                ctp.remove(ctp.getOrNull(newRegion.id))
+                ctp.add(newRegion)
+            }
+            
+            // Dispose the textures that have stopped being used
+            val texturesRemoved = ctp.getAllUniqueTextures() - oldTextureSet
+            if (texturesRemoved.isNotEmpty()) {
+                texturesRemoved.forEach { it.disposeQuietly() }
+            }
+
+            if (numberImported < files.size) {
+                pushMessage(Localization.getValue("editor.dialog.texturePack.message.importTextures.someIgnored",
+                        numberImported, files.size - numberImported,
+                        (files - acceptedFiles).joinToString(separator = ", ") { it.name }))
+            } else {
+                pushMessage(Localization.getValue("editor.dialog.texturePack.message.importTextures.success", numberImported))
+            }
+            onTexturePackUpdated.invert()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            pushMessage(Localization.getValue("editor.dialog.texturePack.message.importTextures.error", e.javaClass.name))
+        }
+    }
+    
     fun fileChooserSelectDirectory(title: String, action: (File) -> Unit) {
         isFileChooserOpen.set(true)
         editorPane.main.restoreForExternalDialog { completionCallback ->
@@ -444,8 +520,36 @@ class TexturePackEditDialog(editorPane: EditorPane,
                         Gdx.app.postRunnable {
                             action(file)
                         }
+                        main.persistDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_EXPORT_TO_DIR, file)
                     }
                     
+                    Gdx.app.postRunnable {
+                        isFileChooserOpen.set(false)
+                    }
+                }
+            }
+        }
+    }
+
+    fun fileChooserSelectTexturesForImport(action: (List<File>) -> Unit) {
+        isFileChooserOpen.set(true)
+        editorPane.main.restoreForExternalDialog { completionCallback ->
+            thread(isDaemon = true) {
+                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.texturePack.filter.textureFiles"),
+                        listOf("*.tga", "*.png")).copyWithExtensionsInDesc()
+                TinyFDWrapper.openMultipleFiles(Localization.getValue("fileChooser.texturePack.importCustomTextures"),
+                        main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_IMPORT_TEX_TO_DIR)
+                                ?: main.getDefaultDirectory(),
+                        filter) { files: List<File>? ->
+                    completionCallback()
+
+                    if (files != null && files.isNotEmpty()) {
+                        Gdx.app.postRunnable {
+                            action(files)
+                        }
+                        main.persistDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_IMPORT_TEX_TO_DIR, files.first().parentFile)
+                    }
+
                     Gdx.app.postRunnable {
                         isFileChooserOpen.set(false)
                     }
