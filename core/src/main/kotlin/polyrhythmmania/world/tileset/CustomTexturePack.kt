@@ -14,6 +14,7 @@ import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
+import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -22,6 +23,7 @@ import java.util.zip.ZipOutputStream
 import javax.imageio.IIOImage
 import javax.imageio.ImageIO
 import javax.imageio.ImageWriteParam
+import javax.imageio.ImageWriter
 
 
 class CustomTexturePack(id: String, var fallbackID: String)
@@ -136,6 +138,55 @@ class CustomTexturePack(id: String, var fallbackID: String)
             
             return ReadResult(id, fallbackID, formatVersion, programVersion, textureMetadata, regionMetadata)
         }
+        
+        fun writeTextureAsTGA(texture: Texture, outputStream: OutputStream, tgaWriter: ImageWriter) {
+            ImageIO.createImageOutputStream(outputStream)?.use { imageOutputStream ->
+                tgaWriter.output = imageOutputStream
+
+                val param: TGAImageWriteParam = (tgaWriter.defaultWriteParam as TGAImageWriteParam).apply {
+                    this.compressionMode = ImageWriteParam.MODE_EXPLICIT
+                    this.compressionType = "RLE"
+                }
+
+                val textureData = texture.textureData
+                if (!textureData.isPrepared) {
+                    textureData.prepare()
+                }
+
+                val texturePixmap = textureData.consumePixmap()
+                val pixmap = Pixmap(texturePixmap.width, texturePixmap.height, Pixmap.Format.RGBA8888)
+                pixmap.blending = Pixmap.Blending.None
+                pixmap.setColor(1f, 1f, 1f, 0f)
+                pixmap.fill()
+                pixmap.drawPixmap(texturePixmap, 0, 0) // Force conversion to RGBA8888
+                if (textureData.disposePixmap()) {
+                    pixmap.disposeQuietly()
+                }
+
+                val bufImg = BufferedImage(pixmap.width, pixmap.height, BufferedImage.TYPE_4BYTE_ABGR)
+                val array: ByteArray = (bufImg.raster.dataBuffer as DataBufferByte).data
+
+                val pixels: ByteBuffer = pixmap.pixels
+                val originalOrder = pixels.order()
+                pixels.order(ByteOrder.LITTLE_ENDIAN)
+                var arrayIndex = 0
+                while (pixels.remaining() >= 4 && arrayIndex < array.size) {
+                    val r = pixels.get()
+                    val g = pixels.get()
+                    val b = pixels.get()
+                    val a = pixels.get()
+
+                    array[arrayIndex++] = a
+                    array[arrayIndex++] = b
+                    array[arrayIndex++] = g
+                    array[arrayIndex++] = r
+                }
+                pixels.order(originalOrder)
+
+                pixmap.disposeQuietly()
+                tgaWriter.write(null, IIOImage(bufImg, null, null), param)
+            } ?: error("Failed to create ImageOutputStream")
+        }
     }
 
     class ReadResult(val id: String, val fallbackID: String, val formatVersion: Int, val programVersion: Version?,
@@ -169,6 +220,10 @@ class CustomTexturePack(id: String, var fallbackID: String)
         }
     }
 
+    fun isEmpty(): Boolean {
+        return getAllTilesetRegions().isEmpty()
+    }
+    
     override fun dispose() {
         getAllUniqueTextures().forEach { it.disposeQuietly() }
     }
@@ -243,52 +298,7 @@ class CustomTexturePack(id: String, var fallbackID: String)
                     zip.putNextEntry(ZipEntry("${resDir}${uuid}.tga"))
 
                     // Write as TGA, compressed where possible
-                    ImageIO.createImageOutputStream(zip)?.use { imageOutputStream ->
-                        tgaWriter.output = imageOutputStream
-                        
-                        val param: TGAImageWriteParam = (tgaWriter.defaultWriteParam as TGAImageWriteParam).apply { 
-                            this.compressionMode = ImageWriteParam.MODE_EXPLICIT
-                            this.compressionType = "RLE"
-                        }
-                        
-                        val textureData = tex.textureData
-                        if (!textureData.isPrepared) {
-                            textureData.prepare()
-                        }
-                        
-                        val texturePixmap = textureData.consumePixmap()
-                        val pixmap = Pixmap(texturePixmap.width, texturePixmap.height, Pixmap.Format.RGBA8888)
-                        pixmap.blending = Pixmap.Blending.None
-                        pixmap.setColor(1f, 1f, 1f, 0f)
-                        pixmap.fill()
-                        pixmap.drawPixmap(texturePixmap, 0, 0) // Force conversion to RGBA8888
-                        if (textureData.disposePixmap()) {
-                            pixmap.disposeQuietly()
-                        }
-
-                        val bufImg = BufferedImage(pixmap.width, pixmap.height, BufferedImage.TYPE_4BYTE_ABGR)
-                        val array: ByteArray = (bufImg.raster.dataBuffer as DataBufferByte).data
-                        
-                        val pixels: ByteBuffer = pixmap.pixels
-                        val originalOrder = pixels.order()
-                        pixels.order(ByteOrder.LITTLE_ENDIAN)
-                        var arrayIndex = 0
-                        while (pixels.remaining() >= 4 && arrayIndex < array.size) {
-                            val r = pixels.get()
-                            val g = pixels.get()
-                            val b = pixels.get()
-                            val a = pixels.get()
-                            
-                            array[arrayIndex++] = a
-                            array[arrayIndex++] = b
-                            array[arrayIndex++] = g
-                            array[arrayIndex++] = r
-                        }
-                        pixels.order(originalOrder)
-                        
-                        pixmap.disposeQuietly()
-                        tgaWriter.write(null, IIOImage(bufImg, null, null), param)
-                    } ?: error("Failed to create ImageOutputStream for a texture")
+                    writeTextureAsTGA(tex, zip, tgaWriter)
                     
                     zip.closeEntry()
                 }

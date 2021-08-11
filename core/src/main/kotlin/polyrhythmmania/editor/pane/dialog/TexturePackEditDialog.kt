@@ -1,6 +1,7 @@
 package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -8,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
+import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -20,14 +22,21 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.Matrix4Stack
+import paintbox.util.TinyFDWrapper
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.*
+import java.io.File
+import java.util.*
+import java.util.zip.ZipEntry
+import javax.imageio.ImageIO
+import kotlin.concurrent.thread
 
 
 class TexturePackEditDialog(editorPane: EditorPane, 
@@ -93,26 +102,35 @@ class TexturePackEditDialog(editorPane: EditorPane,
         class Category(val categoryID: String) : ListEntry("editor.dialog.texturePack.objectCategory.${categoryID}")
         class Region(val id: String) : ListEntry("editor.dialog.texturePack.object.${id}")
     }
-
     
     private val isFileChooserOpen: Var<Boolean> = Var(false)
+    private val isMessageVisible: Var<Boolean> = Var(false)
+    private val baseTexturePack: Var<TexturePack> = Var(StockTexturePacks.gba)
+    private val customTexturePack: Var<CustomTexturePack> = Var(CustomTexturePack(UUID.randomUUID().toString(), baseTexturePack.getOrCompute().id))
+    
+    private val currentMsg: Var<String> = Var("")
     
     val objPreview: ObjectPreview = ObjectPreview()
     
     private val rodRotation: FloatVar = FloatVar(0f)
 
     init {
-        resetGroupMappingsToTileset()
+        baseTexturePack.addListener { tp ->
+            customTexturePack.getOrCompute().fallbackID = tp.getOrCompute().id
+        }
         
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.texturePack.title").use() }
 
 
+        val hideMainContent = Var {
+            isFileChooserOpen.use() || isMessageVisible.use()
+        }
         val contentPaneContainer = Pane().apply {
-            this.visible.bind { !isFileChooserOpen.use() }
+            this.visible.bind { !hideMainContent.use() }
         }
         contentPane += contentPaneContainer
         val bottomPaneContainer = Pane().apply {
-            this.visible.bind { !isFileChooserOpen.use() }
+            this.visible.bind { !hideMainContent.use() }
         }
         bottomPane += bottomPaneContainer
         
@@ -128,6 +146,37 @@ class TexturePackEditDialog(editorPane: EditorPane,
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("common.close")))
         })
+        
+        // Close file chooser msg
+        contentPane += Pane().apply { 
+            this.visible.bind { isFileChooserOpen.use() }
+            this += TextLabel(binding = { Localization.getVar("common.closeFileChooser").use() }).apply {
+                this.markup.set(editorPane.palette.markup)
+                this.textColor.set(Color.WHITE.cpy())
+                this.renderAlign.set(Align.center)
+                this.textAlign.set(TextAlign.CENTRE)
+            }
+        }
+        // Generic msg
+        contentPane += Pane().apply { 
+            this.visible.bind { !isFileChooserOpen.use() && isMessageVisible.use() }
+            this += TextLabel(binding = { currentMsg.use() }).apply {
+                this.markup.set(editorPane.palette.markup)
+                this.textColor.set(Color.WHITE.cpy())
+                this.renderAlign.set(Align.center)
+                this.textAlign.set(TextAlign.CENTRE)
+                this.bindHeightToParent(adjust = -48f)
+            }
+            this += Button(binding = { Localization.getVar("common.ok").use() }, font = editorPane.palette.musicDialogFont).apply { 
+                this.bounds.height.set(40f)
+                this.bounds.width.set(150f)
+                Anchor.BottomCentre.configure(this)
+                this.applyDialogStyleContent()
+                this.setOnAction { 
+                    isMessageVisible.set(false)
+                }
+            }
+        }
 
         val scrollPaneWidthProportion = 0.4f
         val scrollPane: ScrollPane = ScrollPane().apply {
@@ -190,7 +239,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
             this.bindWidthToParent(multiplier = 0.6f, adjust = -8f)
             this.spacing.set(12f)
         }
-        contentPane.addChild(previewVbox)
+        contentPaneContainer.addChild(previewVbox)
         previewVbox.temporarilyDisableLayouts {
             
         }
@@ -230,6 +279,9 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     // TODO
                 }
             }
+            bottomLeftHbox += RectElement(Color().grey(0.31f)).apply {
+                this.bounds.width.set(2f)
+            }
             bottomLeftHbox += Button("").apply {
                 this.applyDialogStyleBottom()
                 this.bindWidthToSelfHeight()
@@ -237,7 +289,31 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_export"]))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.exportAllTextures")))
                 this.setOnAction {
-                    // TODO
+                    val ctp = customTexturePack.getOrCompute()
+                    if (ctp.isEmpty()) {
+                        pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedCustom.none"))
+                    } else {
+                        fileChooserSelectDirectory(Localization.getValue("fileChooser.texturePack.exportCustomTexturesToDir")) { file ->
+                            try {
+                                val tgaWriter = ImageIO.getImageWritersByFormatName("TGA").next()
+                                try {
+                                    ctp.getAllTilesetRegions().forEach { region ->
+                                        val outputFile = file.resolve("${region.id}.tga")
+                                        outputFile.createNewFile()
+                                        outputFile.outputStream().use { fos ->
+                                            CustomTexturePack.writeTextureAsTGA(region.texture, fos, tgaWriter)
+                                        }
+                                    }
+                                } finally {
+                                    tgaWriter.dispose()
+                                }
+                                pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedCustom.success"))
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedTextures.error", e.javaClass.name))
+                            }
+                        }
+                    }
                 }
             }
             bottomLeftHbox += Button("").apply {
@@ -257,7 +333,25 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_export_base"]))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.exportAllBaseTextures")))
                 this.setOnAction {
-                    // TODO
+                    fileChooserSelectDirectory(Localization.getValue("fileChooser.texturePack.exportBaseTexturesToDir")) { file ->
+                        val baseID = customTexturePack.getOrCompute().fallbackID
+                        val fileTypes = listOf("tga", "png")
+                        try {
+                            CustomTexturePack.ALLOWED_LIST.forEach { regionID ->
+                                for (fileType in fileTypes) {
+                                    val fh = Gdx.files.internal("textures/world/${baseID}/parts/${regionID}.${fileType}")
+                                    if (!fh.exists()) continue
+                                    val outputFile = file.resolve("${regionID}.${fileType}")
+                                    outputFile.createNewFile()
+                                    fh.copyTo(FileHandle(outputFile))
+                                }
+                            }
+                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedBase.success"))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedTextures.error", e.javaClass.name))
+                        }
+                    }
                 }
             }
         }
@@ -274,59 +368,53 @@ class TexturePackEditDialog(editorPane: EditorPane,
             this.bounds.x.bind { (parent.use()?.bounds?.width?.useF() ?: 0f) * 0.4f + 8f }
         }
         bottomRightHbox.temporarilyDisableLayouts {
-//            bottomRightHbox += Button("").apply {
-//                this.applyDialogStyleBottom()
-//                this.bindWidthToSelfHeight()
-//                this.padding.set(Insets(8f))
-//                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_trash"]))
-//                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.removeTexture")))
-//                this.setOnAction {
-//                    // TODO
-//                }
-//            }
-//            bottomRightHbox += Button("").apply {
-//                this.applyDialogStyleBottom()
-//                this.bindWidthToSelfHeight()
-//                this.padding.set(Insets(8f))
-//                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_import"]))
-//                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.importTexture")))
-//                this.setOnAction {
-//                    // TODO
-//                }
-//            }
-//            bottomRightHbox += Button("").apply {
-//                this.applyDialogStyleBottom()
-//                this.bindWidthToSelfHeight()
-//                this.padding.set(Insets(8f))
-//                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_export"]))
-//                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.exportTexture")))
-//                this.setOnAction {
-//                    // TODO
-//                }
-//            }
-//            bottomRightHbox += Button("").apply {
-//                this.applyDialogStyleBottom()
-//                this.bindWidthToSelfHeight()
-//                this.padding.set(Insets(8f))
-//                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_export_base"]))
-//                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.exportBaseTexture")))
-//                this.setOnAction {
-//                    // TODO
-//                }
-//            }
+            bottomRightHbox += TextLabel(binding = { Localization.getVar("editor.dialog.texturePack.stock").use() },
+                    font = editorPane.palette.musicDialogFont).apply {
+                this.markup.set(editorPane.palette.markup)
+                this.textColor.set(Color.WHITE.cpy())
+                this.renderAlign.set(Align.right)
+                this.textAlign.set(TextAlign.RIGHT)
+                this.doLineWrapping.set(true)
+                this.bounds.width.set(200f)
+            }
+            val toggleGroup = ToggleGroup()
+            bottomRightHbox += VBox().apply {
+                this.spacing.set(2f)
+                this.bounds.width.set(125f)
+                this += RadioButton(binding = { Localization.getVar("editor.dialog.texturePack.stock.gba").use() },
+                        font = editorPane.palette.musicDialogFont).apply {
+                    this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
+                    this.textLabel.textColor.set(Color.WHITE.cpy())
+                    this.textLabel.markup.set(editorPane.palette.markup)
+                    this.imageNode.tint.set(Color.WHITE.cpy())
+                    this.imageNode.padding.set(Insets(1f))
+                    toggleGroup.addToggle(this)
+                    this.onSelected = {
+                        baseTexturePack.set(StockTexturePacks.gba)
+                    }
+                    this.selectedState.set(baseTexturePack.getOrCompute() == StockTexturePacks.gba)
+                }
+                this += RadioButton(binding = { Localization.getVar("editor.dialog.texturePack.stock.hd").use() },
+                        font = editorPane.palette.musicDialogFont).apply {
+                    this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
+                    this.textLabel.textColor.set(Color.WHITE.cpy())
+                    this.textLabel.markup.set(editorPane.palette.markup)
+                    this.imageNode.tint.set(Color.WHITE.cpy())
+                    this.imageNode.padding.set(Insets(1f))
+                    toggleGroup.addToggle(this)
+                    this.onSelected = {
+                        baseTexturePack.set(StockTexturePacks.hd)
+                    }
+                    this.selectedState.set(baseTexturePack.getOrCompute() == StockTexturePacks.hd)
+                }
+            }
         }
         bottomPaneContainer.addChild(bottomRightHbox)
     }
     
-    private fun resetGroupMappingsToTileset() {
-//        groupMappings.forEach { m ->
-//            m.color.set(m.tilesetGetter(objPreview.worldRenderer.tileset).getOrCompute().cpy())
-//        }
-    }
     
     fun prepareShow(): TexturePackEditDialog {
 //        tilesetPalette.applyTo(objPreview.worldRenderer.tileset)
-        resetGroupMappingsToTileset()
 //        updateColourPickerToMapping()
         return this
     }
@@ -337,6 +425,33 @@ class TexturePackEditDialog(editorPane: EditorPane,
 
     override fun onCloseDialog() {
         super.onCloseDialog()
+    }
+    
+    fun pushMessage(msg: String) {
+        isMessageVisible.set(true)
+        currentMsg.set(msg)
+    }
+    
+    fun fileChooserSelectDirectory(title: String, action: (File) -> Unit) {
+        isFileChooserOpen.set(true)
+        editorPane.main.restoreForExternalDialog { completionCallback ->
+            thread(isDaemon = true) {
+                TinyFDWrapper.selectFolder(title, main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_EXPORT_TO_DIR)
+                        ?: main.getDefaultDirectory()) { file: File? ->
+                    completionCallback()
+                    
+                    if (file != null && file.isDirectory) {
+                        Gdx.app.postRunnable {
+                            action(file)
+                        }
+                    }
+                    
+                    Gdx.app.postRunnable {
+                        isFileChooserOpen.set(false)
+                    }
+                }
+            }
+        }
     }
     
     inner class ObjectPreview : UIElement() {
