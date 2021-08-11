@@ -462,6 +462,12 @@ class TexturePackEditDialog(editorPane: EditorPane,
         currentMsg.set(msg)
     }
     
+    fun syncThisCustomPackWithContainer() {
+        val container = editor.container
+        val ctp = customTexturePack.getOrCompute()
+        container.customTexturePack.set(ctp)
+    }
+    
     private fun importTextures(files: List<File>) {
         val ctp = customTexturePack.getOrCompute()
         val basePack = StockTexturePacks.allPacksByIDWithDeprecations[ctp.fallbackID] ?: StockTexturePacks.gba
@@ -489,7 +495,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
             }
             
             // Dispose the textures that have stopped being used
-            val texturesRemoved = ctp.getAllUniqueTextures() - oldTextureSet
+            val texturesRemoved = oldTextureSet - ctp.getAllUniqueTextures() 
             if (texturesRemoved.isNotEmpty()) {
                 texturesRemoved.forEach { it.disposeQuietly() }
             }
@@ -501,7 +507,9 @@ class TexturePackEditDialog(editorPane: EditorPane,
             } else {
                 pushMessage(Localization.getValue("editor.dialog.texturePack.message.importTextures.success", numberImported))
             }
-            onTexturePackUpdated.invert()
+            
+            onTexturePackUpdated.invert() // Updates the listing
+            syncThisCustomPackWithContainer()
         } catch (e: Exception) {
             e.printStackTrace()
             pushMessage(Localization.getValue("editor.dialog.texturePack.message.importTextures.error", e.javaClass.name))
