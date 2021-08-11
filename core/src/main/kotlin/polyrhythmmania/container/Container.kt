@@ -286,6 +286,10 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             tilesetConfigObj.add("palette", this.world.tilesetPalette.toJson())
             tilesetConfigObj.add("texturePack", Json.`object`().also { texturePackObj ->
                 if (currentCustomTexturePack != null) {
+                    texturePackObj.add("hasCustom", true)
+                }
+                
+                if (currentCustomTexturePack != null) { // TODO the correct source should be chosen
                     texturePackObj.add("source", "custom")
                 } else {
                     texturePackObj.add("source", "stock")
@@ -441,6 +445,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                     }
                     val texturePackObj = tilesetObj.get("texturePack")?.asObject()
                     if (texturePackObj != null) {
+                        var hasCustom: Boolean = texturePackObj.get("hasCustom")?.asBoolean() ?: false
                         when (val source: String = texturePackObj.getString("source", "")) {
                             "stock" -> {
                                 val stockID: String = texturePackObj.getString("stockID", "")
@@ -453,19 +458,23 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                                 }
                             }
                             "custom" -> {
-                                zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack.zip")).use { zipInputStream ->
-                                    val tempFile = TempFileUtils.createTempFile("extres", true, ".zip")
-                                    val out = tempFile.outputStream()
-                                    zipInputStream.copyTo(out)
-                                    val f = ZipFile(tempFile)
-                                    val readResult = CustomTexturePack.readFromStream(f)
-                                    customTexturePackRead = readResult
-                                    tempFile.delete()
-                                }
+                                hasCustom = true
                             }
                             else -> {
                                 // Ignore texture packs. Just use default GBA
                                 Paintbox.LOGGER.warn("[Container] Unknown tilesetConfig.texturePack.source '${source}', skipping")
+                            }
+                        }
+                        
+                        if (hasCustom) {
+                            zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack.zip")).use { zipInputStream ->
+                                val tempFile = TempFileUtils.createTempFile("extres", true, ".zip")
+                                val out = tempFile.outputStream()
+                                zipInputStream.copyTo(out)
+                                val f = ZipFile(tempFile)
+                                val readResult = CustomTexturePack.readFromStream(f)
+                                customTexturePackRead = readResult
+                                tempFile.delete()
                             }
                         }
                     }
