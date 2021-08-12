@@ -30,7 +30,7 @@ class CustomTexturePack(id: String, var fallbackID: String)
     : TexturePack(id, emptySet()), Disposable {
     
     companion object {
-        const val TEXTURE_PACK_VERSION: Int = 0
+        const val TEXTURE_PACK_VERSION: Int = 1
         
         // If this list is updated, update the categorical list in TexturePackEditDialog
         val ALLOWED_LIST: List<String> = listOf(
