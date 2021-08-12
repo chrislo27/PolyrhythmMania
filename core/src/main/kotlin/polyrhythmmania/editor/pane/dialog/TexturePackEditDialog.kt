@@ -320,6 +320,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                             }
                             
                             pushMessage(Localization.getValue("editor.dialog.texturePack.message.loadAll.success", readResult.formatVersion.toString()))
+                            onTexturePackUpdated.invert()
                         } catch (e: Exception) {
                             e.printStackTrace()
                             pushMessage(Localization.getValue("editor.dialog.texturePack.message.loadAll.error", e.javaClass.name))
