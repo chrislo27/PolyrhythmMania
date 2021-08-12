@@ -632,7 +632,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     completionCallback()
 
                     if (file != null) {
-                        val fileWithCorrectExt = if (!file.extension.equals(Container.FILE_EXTENSION, ignoreCase = true))
+                        val fileWithCorrectExt = if (!file.extension.equals("zip", ignoreCase = true))
                             (File(file.absolutePath + ".zip"))
                         else file
                         
