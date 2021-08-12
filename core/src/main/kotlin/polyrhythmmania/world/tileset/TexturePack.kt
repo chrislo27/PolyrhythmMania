@@ -164,11 +164,18 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
         add(TilesetRegion.create("background_middle", regionMap.getOrNull("background_middle")))
         add(TilesetRegion.create("background_fore", regionMap.getOrNull("background_fore")))
 
+        // DUNK
         add(TilesetRegion.create("basket_back", regionMap.getOrNull("basket_back")))
         add(TilesetRegion.create("basket_front", regionMap.getOrNull("basket_front")))
         add(TilesetRegion.create("basket_front_face_z", regionMap.getOrNull("basket_front_face_z")))
         add(TilesetRegion.create("basket_rear", regionMap.getOrNull("basket_rear")))
         add(TilesetRegion.create("hoop_back", regionMap.getOrNull("hoop_back")))
+        
+        // ASSEMBLE
+        add(TilesetRegion.create("asm_lane", regionMap.getOrNull("asm_lane")))
+        add(TilesetRegion.create("asm_centre_perp", regionMap.getOrNull("asm_centre_perp")))
+        add(TilesetRegion.create("asm_centre_perp_target", regionMap.getOrNull("asm_centre_perp_target")))
+        add(TilesetRegion.create("asm_cube", regionMap.getOrNull("asm_cube")))
     }
     
 }

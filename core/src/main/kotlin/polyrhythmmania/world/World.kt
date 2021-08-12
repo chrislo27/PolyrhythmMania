@@ -1,6 +1,8 @@
 package polyrhythmmania.world
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.LongMap
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.entity.*
@@ -109,6 +111,9 @@ class World {
             }
             WorldMode.DUNK -> {
                 populateDunkScene()
+            }
+            WorldMode.ASSEMBLE -> {
+                populateAssembleScene()
             }
             WorldMode.DASH -> TODO()
         }
@@ -315,5 +320,51 @@ class World {
             this.position.set(9f, 1f, 2f)
         })
 
+    }
+    
+    private fun populateAssembleScene() {
+        clearEntities()
+
+        // Main floor
+        for (x in 4..22) {
+            for (z in -7 until -4) {
+                for (y in 0 downTo -11) {
+                    if (y != 0 && z != -5) continue
+                    if (y <= -(x * 0.5f + 2)) continue
+//                    if (x < 18 && y <= -10) continue
+//                    if (x < 13 && y <= -7) continue
+                    val ent: Entity = if (x == 12) {
+                        EntityAsmPerp(this, isTarget = z == -6).apply { 
+                            this.tint = Color(1f, 1f, 1f, 1f)
+                        }
+                    } else if (z == -6) {
+                        EntityAsmLane(this)
+                    } else {
+                        EntityAsmCube(this, Color().grey((15 + y) * (1f / 15f)))
+                    }
+                    addEntity(ent.apply {
+                        this.position.set(x.toFloat(), y.toFloat() - 1, z.toFloat())
+                    })
+                }
+            }
+        }
+
+        addEntity(EntityPiston(this).apply {
+            this.type = EntityPiston.Type.PISTON_A
+            this.position.set(6f, 0f, -0f)
+        })
+        addEntity(EntityPiston(this).apply {
+            this.type = EntityPiston.Type.PISTON_A
+            this.position.set(8.5f, 0f, -0f)
+        })
+        addEntity(EntityPiston(this).apply {
+            this.type = EntityPiston.Type.PISTON_A
+            this.position.set(11f, 0f, -0f)
+            this.tint = Color(1f, 0.35f, 0.35f, 1f)
+        })
+        addEntity(EntityPiston(this).apply {
+            this.type = EntityPiston.Type.PISTON_A
+            this.position.set(13.5f, 0f, -0f)
+        })
     }
 }

@@ -82,7 +82,12 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 "basket_front_face_z",
                 "basket_rear",
                 "hoop_back",
-        ).map { Packable(it, "textures/world/dunk/$it.png") },
+        ).map { Packable(it, "textures/world/dunk/$it.png") } + listOf(
+                "asm_lane",
+                "asm_centre_perp",
+                "asm_centre_perp_target",
+                "asm_cube",
+        ).map { Packable(it, "textures/world/assemble/${it.substringAfter("asm_")}.png") },
                 PackedSheet.Config(padding = 1,
                         maxSize = 512 /* Found to be the smallest Po2 size without splitting into more texs */,
                         duplicateBorder = false,)))

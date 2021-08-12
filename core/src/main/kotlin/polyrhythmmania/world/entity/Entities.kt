@@ -9,9 +9,9 @@ import paintbox.util.Vector3Stack
 import paintbox.util.gdxutils.drawUV
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
+import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
-import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.TintedSubregion
 import kotlin.math.absoluteValue
 import kotlin.math.floor
@@ -81,24 +81,42 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
         batch.setColor(1f, 1f, 1f, 1f)
     }
     
-    protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion) {
-        drawTintedRegion(batch, vec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight)
+    protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion,
+                                   tintColor: Color? = null) {
+        drawTintedRegion(batch, vec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tintColor)
     }
 }
 
 abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
     
     open val numLayers: Int = 1
+    var tint: Color? = null
+    var tintIsMultiplied: Boolean = true
     
     abstract fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion?
 
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+        val tmpColor = ColorStack.getAndPush()
+        val tint = this.tint
         for (i in 0 until numLayers) {
             val tr = getTintedRegion(tileset, i)
             if (tr != null) {
-                drawTintedRegion(batch, vec, tileset, tr)
+                if (tintIsMultiplied) {
+                    tmpColor.set(tr.color.getOrCompute())
+                    if (tint != null) {
+                        tmpColor.r *= tint.r
+                        tmpColor.g *= tint.g
+                        tmpColor.b *= tint.b
+                        tmpColor.a *= tint.a
+                        // Intentionally don't clamp values.
+                    }
+                } else {
+                    if (tint != null) tmpColor.set(tint)
+                }
+                drawTintedRegion(batch, vec, tileset, tr, tmpColor)
             }
         }
+        ColorStack.pop()
     }
 }
 
