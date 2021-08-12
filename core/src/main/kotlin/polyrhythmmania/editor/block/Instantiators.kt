@@ -143,6 +143,13 @@ object Instantiators {
         })
         
         // FX instantiators
+        add(CATEGORY_FX, Instantiator("condApplause", BlockCondApplause::class.java,
+                Localization.getVar("instantiator.condApplause.name"),
+                Localization.getVar("instantiator.condApplause.summary"),
+                Localization.getVar("instantiator.condApplause.desc"),
+                BlockCondApplause.BLOCK_TYPES) { engine ->
+            BlockCondApplause(engine)
+        })
         add(CATEGORY_FX, Instantiator("paletteChange", BlockPaletteChange::class.java,
                 Localization.getVar("instantiator.paletteChange.name"),
                 Localization.getVar("instantiator.paletteChange.summary"),
@@ -150,19 +157,19 @@ object Instantiators {
                 BlockPaletteChange.BLOCK_TYPES, deprecatedIDs = setOf("tilesetChange")) { engine ->
             BlockPaletteChange(engine)
         })
+        add(CATEGORY_FX, Instantiator("texPackChange", BlockTexPackChange::class.java,
+                Localization.getVar("instantiator.texPackChange.name"),
+                Localization.getVar("instantiator.texPackChange.summary"),
+                Localization.getVar("instantiator.texPackChange.desc"),
+                BlockTexPackChange.BLOCK_TYPES) { engine ->
+            BlockTexPackChange(engine)
+        })
         add(CATEGORY_FX, Instantiator("textbox", BlockTextbox::class.java,
                 Localization.getVar("instantiator.textbox.name"),
                 Localization.getVar("instantiator.textbox.summary"),
                 Localization.getVar("instantiator.textbox.desc"),
                 BlockTextbox.BLOCK_TYPES) { engine ->
             BlockTextbox(engine)
-        })
-        add(CATEGORY_FX, Instantiator("condApplause", BlockCondApplause::class.java,
-                Localization.getVar("instantiator.condApplause.name"),
-                Localization.getVar("instantiator.condApplause.summary"),
-                Localization.getVar("instantiator.condApplause.desc"),
-                BlockCondApplause.BLOCK_TYPES) { engine ->
-            BlockCondApplause(engine)
         })
         
         // Advanced instantiators

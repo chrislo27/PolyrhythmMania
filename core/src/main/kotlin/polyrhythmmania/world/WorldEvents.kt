@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
@@ -295,5 +296,19 @@ class EventTextbox(engine: Engine, startBeat: Float, duration: Float, val textbo
         if (!textbox.requiresInput) {
             engine.removeActiveTextbox(true)
         }
+    }
+}
+
+class EventChangeTexturePack(engine: Engine, startBeat: Float, val newSource: TexturePackSource)
+    : Event(engine) {
+
+    init {
+        this.beat = startBeat
+        this.width = 0f
+    }
+
+    override fun onStartContainer(container: Container, currentBeat: Float) {
+        super.onStartContainer(container, currentBeat)
+        container.setTexturePackFromSource(newSource)
     }
 }

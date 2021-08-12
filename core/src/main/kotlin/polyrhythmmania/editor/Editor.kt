@@ -33,10 +33,7 @@ import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
-import polyrhythmmania.editor.block.Block
-import polyrhythmmania.editor.block.BlockPaletteChange
-import polyrhythmmania.editor.block.BlockType
-import polyrhythmmania.editor.block.Instantiator
+import polyrhythmmania.editor.block.*
 import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.music.EditorMusicData
 import polyrhythmmania.editor.pane.EditorPane
@@ -212,7 +209,7 @@ class Editor(val main: PRManiaGame)
             timing.seconds = newSeconds
             engine.seconds = newSeconds
             engineBeat.set(newBeat)
-            updatePaletteChangesState(newBeat)
+            updatePaletteAndTexPackChangesState(newBeat)
         }
     }
 
@@ -429,9 +426,7 @@ class Editor(val main: PRManiaGame)
         engineMusicData.rate = this.musicData.rate.get()
         engineMusicData.musicSyncPointBeat = this.musicFirstBeat.get()
         val player = engine.soundInterface.getCurrentMusicPlayer(engineMusicData.beadsMusic)
-        if (player != null) {
-            player.useLoopParams(engineMusicData.loopParams)
-        }
+        player?.useLoopParams(engineMusicData.loopParams)
     }
     
     fun compileEditorMusicVolumes() {
@@ -651,7 +646,7 @@ class Editor(val main: PRManiaGame)
             val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
             timing.seconds = newSeconds
             engine.seconds = newSeconds
-            updatePaletteChangesState()
+            updatePaletteAndTexPackChangesState()
             engine.soundInterface.clearAllNonMusicAudio()
         }
 
@@ -666,10 +661,12 @@ class Editor(val main: PRManiaGame)
         this.playState.set(newState)
     }
     
-    fun updatePaletteChangesState(currentBeat: Float = engine.beat) {
+    fun updatePaletteAndTexPackChangesState(currentBeat: Float = engine.beat) {
         world.tilesetPalette.applyTo(renderer.tileset)
+        container.setTexturePackFromSource()
         
-        val events = blocks.filterIsInstance<BlockPaletteChange>().flatMap { it.compileIntoEvents() }.sortedBy { it.beat }
+        val events = blocks.filter { it is BlockPaletteChange || it is BlockTexPackChange }
+                .flatMap { it.compileIntoEvents() }.sortedBy { it.beat }
         events.forEach { evt ->
             engine.updateEvent(evt, currentBeat)
         }

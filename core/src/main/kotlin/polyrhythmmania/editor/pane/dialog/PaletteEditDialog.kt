@@ -462,7 +462,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
 
     override fun onCloseDialog() {
         super.onCloseDialog()
-        editor.updatePaletteChangesState()
+        editor.updatePaletteAndTexPackChangesState()
     }
     
     inner class ObjectPreview : UIElement() {
