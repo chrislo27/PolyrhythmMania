@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
@@ -9,25 +8,25 @@ import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
-import paintbox.ui.contextmenu.CheckBoxMenuItem
-import paintbox.ui.contextmenu.ContextMenu
-import paintbox.ui.contextmenu.LabelMenuItem
-import paintbox.ui.contextmenu.SeparatorMenuItem
-import paintbox.ui.control.Button
-import paintbox.ui.control.Slider
-import paintbox.ui.control.TextLabel
+import paintbox.ui.contextmenu.*
+import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
+import polyrhythmmania.container.TexPackSrcSelectorMenuPane
+import polyrhythmmania.container.TexturePackSource
+import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
 import polyrhythmmania.util.DecimalFormats
+import polyrhythmmania.world.tileset.CascadingTexturePack
 import polyrhythmmania.world.tileset.StockTexturePacks
 
 
 class Toolbar(val upperPane: UpperPane) : Pane() {
 
     val editorPane: EditorPane = upperPane.editorPane
+    val editor: Editor = editorPane.editor
 
     val previewSection: Pane
     val mainSection: Pane
@@ -67,7 +66,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             leftPreviewHbox += Pane().apply {
                 this.bounds.width.set(150f)
                 val labelVar = Localization.getVar("editor.playbackSpeed", Var {
-                    listOf(DecimalFormats.format("0.0#", editorPane.editor.playbackSpeed.useF()))
+                    listOf(DecimalFormats.format("0.0#", editor.playbackSpeed.useF()))
                 })
                 this += TextLabel(binding = { labelVar.use() }, font = editorPane.palette.beatTimeFont).apply {
                     this.textColor.set(Color.WHITE)
@@ -92,7 +91,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     this.setValue(oneIndex.toFloat())
                     this.tickUnit.set(1f)
                     this.value.addListener { v ->
-                        editorPane.editor.playbackSpeed.set(setSpeeds.getOrNull(v.getOrCompute().toInt()) ?: 1f)
+                        editor.playbackSpeed.set(setSpeeds.getOrNull(v.getOrCompute().toInt()) ?: 1f)
                     }
                     this.setOnRightClick { 
                         this.setValue(oneIndex.toFloat())
@@ -122,7 +121,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.playtest")))
             this.setOnAction {
-                editorPane.editor.attemptStartPlaytest()
+                editor.attemptStartPlaytest()
             }
         }
         rightPreviewHbox.temporarilyDisableLayouts {
@@ -151,9 +150,9 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.pause")))
-            this.disabled.bind { editorPane.editor.playState.use() != PlayState.PLAYING }
+            this.disabled.bind { editor.playState.use() != PlayState.PLAYING }
             this.setOnAction {
-                editorPane.editor.changePlayState(PlayState.PAUSED)
+                editor.changePlayState(PlayState.PAUSED)
             }
         }
         val playButton = Button("").apply {
@@ -171,9 +170,9 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.play")))
-            this.disabled.bind { editorPane.editor.playState.use() == PlayState.PLAYING }
+            this.disabled.bind { editor.playState.use() == PlayState.PLAYING }
             this.setOnAction {
-                editorPane.editor.changePlayState(PlayState.PLAYING)
+                editor.changePlayState(PlayState.PLAYING)
             }
         }
         val stopButton = Button("").apply {
@@ -191,9 +190,9 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.stop")))
-            this.disabled.bind { editorPane.editor.playState.use() == PlayState.STOPPED }
+            this.disabled.bind { editor.playState.use() == PlayState.STOPPED }
             this.setOnAction {
-                editorPane.editor.changePlayState(PlayState.STOPPED)
+                editor.changePlayState(PlayState.STOPPED)
             }
         }
         playbackButtonPane.temporarilyDisableLayouts {
@@ -232,9 +231,9 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     this.padding.set(Insets.ZERO)
                     this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_tool")[thisTool.textureKey]))
                     editorPane.styleIndentedButton(this)
-                    this.selectedState.bind { editorPane.editor.tool.use() == thisTool }
+                    this.selectedState.bind { editor.tool.use() == thisTool }
                     this.setOnAction {
-                        editorPane.editor.changeTool(thisTool)
+                        editor.changeTool(thisTool)
                     }
                     val tooltipStr = Localization.getVar("tool.tooltip", Var.bind {
                         listOf(Localization.getVar(thisTool.localizationKey).use(), "${index + 1}")
@@ -264,7 +263,25 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_texture_pack"]))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.changeTexturePack")))
                 this.setOnAction {
-//                    // FIXME this is a temp solution until custom packs are added
+                    if (editor.allowedToEdit.getOrCompute()) {
+                        editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
+                            ctxmenu.defaultWidth.set(400f)
+                            ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("editor.button.changeTexturePack"), editorPane.main.mainFontBold))
+                            ctxmenu.addMenuItem(SeparatorMenuItem())
+                            ctxmenu.addMenuItem(CustomMenuItem(TexPackSrcSelectorMenuPane(editorPane,
+                                    editor.container.texturePackSource.getOrCompute()) { newSrc ->
+                                val container = editor.container
+                                container.texturePackSource.set(newSrc)
+                                container.setTexturePackFromSource()
+                            }))
+                            ctxmenu.addMenuItem(SeparatorMenuItem())
+                            ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("editor.button.changeTexturePack.edit"), editorPane.palette.markup).apply { 
+                                this.onAction = {
+                                    editor.attemptOpenTexturePackEditDialog()
+                                }
+                            })
+                        })
+                    }
 //                    val editor = editorPane.editor
 //                    if (editor.allowedToEdit.getOrCompute()) {
 //                        editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
@@ -281,8 +298,6 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
 //                                    """Use "HD" texture pack instead of GBA""", editorPane.palette.markup))
 //                        })
 //                    }
-                    
-                    editorPane.editor.attemptOpenTexturePackDialog()
                 }
             }
             leftControlHBox += Button("").apply {
@@ -292,7 +307,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_tileset_palette"]))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.tilesetPalette")))
                 this.setOnAction {
-                    editorPane.editor.attemptOpenPaletteEditDialog()
+                    editor.attemptOpenPaletteEditDialog()
                 }
             }
             leftControlHBox.addChild(separator())
@@ -303,7 +318,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.padding.set(Insets.ZERO)
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_results"]))
                 this.setOnAction {
-                    if (editorPane.editor.allowedToEdit.getOrCompute()) {
+                    if (editor.allowedToEdit.getOrCompute()) {
                         editorPane.openDialog(ResultsTextDialog(editorPane))
                     }
                 }
@@ -315,7 +330,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.padding.set(Insets.ZERO)
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_world_settings"]))
                 this.setOnAction {
-                    val editor = editorPane.editor
+                    val editor = editor
                     if (editor.allowedToEdit.getOrCompute()) {
                         editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
                             val currentWorldSettings = editor.world.worldSettings
@@ -342,7 +357,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.padding.set(Insets.ZERO)
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_music"]))
                 this.setOnAction {
-                    if (editorPane.editor.allowedToEdit.getOrCompute()) {
+                    if (editor.allowedToEdit.getOrCompute()) {
                         editorPane.openDialog(editorPane.musicDialog.prepareShow())
                     }
                 }
@@ -355,7 +370,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.padding.set(Insets.ZERO)
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.metronome")))
                 this.selectedState.addListener {
-                    editorPane.editor.metronomeEnabled.set(it.getOrCompute())
+                    editor.metronomeEnabled.set(it.getOrCompute())
                 }
                 val inactive = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_metronome"])
                 val active = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_metronome_active"])

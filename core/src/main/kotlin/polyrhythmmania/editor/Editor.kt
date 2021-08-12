@@ -541,7 +541,7 @@ class Editor(val main: PRManiaGame)
         }
     }
     
-    fun attemptOpenTexturePackDialog() {
+    fun attemptOpenTexturePackEditDialog() {
         if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.texturePackEditDialog.prepareShow())
         }

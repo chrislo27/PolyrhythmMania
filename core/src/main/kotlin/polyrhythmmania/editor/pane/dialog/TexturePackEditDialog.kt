@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import net.lingala.zip4j.ZipFile
+import paintbox.Paintbox
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -15,10 +17,7 @@ import paintbox.binding.invert
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.Pane
-import paintbox.ui.UIElement
+import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.contextmenu.*
 import paintbox.ui.control.*
@@ -30,6 +29,7 @@ import paintbox.util.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.pane.EditorPane
@@ -40,7 +40,7 @@ import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.*
 import java.io.File
 import java.util.*
-import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 
@@ -102,6 +102,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 ListEntry.Region("input_feedback_1"),
                 ListEntry.Region("input_feedback_2"),
         )
+        val DARK_GREY = Color().grey(0.31f)
     }
     
     sealed class ListEntry(val localizationKey: String) {
@@ -111,12 +112,15 @@ class TexturePackEditDialog(editorPane: EditorPane,
     
     private val isFileChooserOpen: Var<Boolean> = Var(false)
     private val isMessageVisible: Var<Boolean> = Var(false)
+    
     private val baseTexturePack: Var<TexturePack> = Var(StockTexturePacks.gba)
     private val customTexturePack: Var<CustomTexturePack> = Var(CustomTexturePack(UUID.randomUUID().toString(), baseTexturePack.getOrCompute().id))
     private val onTexturePackUpdated: Var<Boolean> = Var(false)
+    private val currentEntry: Var<ListEntry.Region> = Var(LIST_ENTRIES.first { it is ListEntry.Region } as ListEntry.Region)
     
     private val currentMsg: Var<String> = Var("")
     
+    private val previewPane: PreviewPane
     val objPreview: ObjectPreview = ObjectPreview()
     
     private val rodRotation: FloatVar = FloatVar(0f)
@@ -233,7 +237,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                             this.bounds.height.set(48f)
                             toggleGroup.addToggle(this)
                             this.onSelected = {
-                                
+                                currentEntry.set(listEntry)
                             }
                             if (firstRegionEntry) {
                                 firstRegionEntry = false
@@ -247,15 +251,12 @@ class TexturePackEditDialog(editorPane: EditorPane,
         listVbox.sizeHeightToChildren(300f)
         scrollPane.setContent(listVbox)
 
-        val previewVbox = VBox().apply {
+        previewPane = PreviewPane().apply {
             Anchor.TopRight.configure(this)
             this.bindWidthToParent(multiplier = 0.6f, adjust = -8f)
-            this.spacing.set(12f)
+            this.margin.set(Insets(0f, 0f, 10f, 0f))
         }
-        contentPaneContainer.addChild(previewVbox)
-        previewVbox.temporarilyDisableLayouts {
-            
-        }
+        contentPaneContainer.addChild(previewPane)
         
         val bottomLeftHbox = HBox().apply {
             this.spacing.set(8f)
@@ -276,7 +277,17 @@ class TexturePackEditDialog(editorPane: EditorPane,
                         ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("editor.dialog.texturePack.button.new.confirm.yes"),
                                 editorPane.palette.markup).apply {
                             this.onAction = {
-                                // TODO
+                                val old = customTexturePack.getOrCompute()
+                                val oldTextures = old.getAllUniqueTextures()
+                                
+                                customTexturePack.set(CustomTexturePack(UUID.randomUUID().toString(), baseTexturePack.getOrCompute().id))
+                                syncThisCustomPackWithContainer()
+                                
+                                Gdx.app.postRunnable { 
+                                    oldTextures.forEach { it.disposeQuietly() }
+                                }
+                                
+                                onTexturePackUpdated.invert()
                             }
                         })
                         ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("editor.dialog.texturePack.button.new.confirm.no"),
@@ -293,7 +304,29 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open"]))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.loadAll")))
                 this.setOnAction {
-                    // TODO
+                    fileChooserSelectLoadAllFile { file ->
+                        var zipFile: ZipFile? = null
+                        try {
+                            zipFile = ZipFile(file)
+                            val readResult = CustomTexturePack.readFromStream(zipFile)
+                            val newPack = readResult.createAndLoadTextures()
+                            
+                            val oldPack = customTexturePack.getOrCompute()
+                            val oldTextures = oldPack.getAllUniqueTextures()
+                            customTexturePack.set(newPack)
+                            syncThisCustomPackWithContainer()
+                            Gdx.app.postRunnable {
+                                oldTextures.forEach { it.disposeQuietly() }
+                            }
+                            
+                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.loadAll.success", readResult.formatVersion.toString()))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.loadAll.error", e.javaClass.name))
+                        } finally {
+                            zipFile?.close()
+                        }
+                    }
                 }
             }
             bottomLeftHbox += Button("").apply {
@@ -303,10 +336,23 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_save"]))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.saveAll")))
                 this.setOnAction {
-                    // TODO
+                    fileChooserSelectSaveAllFile { file ->
+                        try {
+                            file.createNewFile()
+                            file.outputStream().use { fos ->
+                                ZipOutputStream(fos).use { zip ->
+                                    customTexturePack.getOrCompute().writeToOutputStream(zip)
+                                }
+                            }
+                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.saveAll.success"))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.saveAll.error", e.javaClass.name))
+                        }
+                    }
                 }
             }
-            bottomLeftHbox += RectElement(Color().grey(0.31f)).apply {
+            bottomLeftHbox += RectElement(DARK_GREY).apply {
                 this.bounds.width.set(2f)
             }
             bottomLeftHbox += Button("").apply {
@@ -386,7 +432,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
             }
         }
         bottomPaneContainer.addChild(bottomLeftHbox)
-        bottomPaneContainer.addChild(RectElement(Color().grey(0.31f)).apply { 
+        bottomPaneContainer.addChild(RectElement(DARK_GREY).apply { 
             this.bounds.width.set(2f)
             this.bounds.x.bind { (parent.use()?.bounds?.width?.useF() ?: 0f) * scrollPaneWidthProportion - 8f }
         })
@@ -421,6 +467,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     toggleGroup.addToggle(this)
                     this.onSelected = {
                         baseTexturePack.set(StockTexturePacks.gba)
+                        onTexturePackUpdated.invert()
                     }
                     this.selectedState.set(baseTexturePack.getOrCompute() == StockTexturePacks.gba)
                 }
@@ -434,6 +481,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     toggleGroup.addToggle(this)
                     this.onSelected = {
                         baseTexturePack.set(StockTexturePacks.hd)
+                        onTexturePackUpdated.invert()
                     }
                     this.selectedState.set(baseTexturePack.getOrCompute() == StockTexturePacks.hd)
                 }
@@ -444,8 +492,11 @@ class TexturePackEditDialog(editorPane: EditorPane,
     
     
     fun prepareShow(): TexturePackEditDialog {
-//        tilesetPalette.applyTo(objPreview.worldRenderer.tileset)
-//        updateColourPickerToMapping()
+        val currentCustom = editor.container.customTexturePack.getOrCompute()
+        if (currentCustom != null) {
+            customTexturePack.set(currentCustom)
+            onTexturePackUpdated.invert()
+        }
         return this
     }
 
@@ -455,6 +506,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
 
     override fun onCloseDialog() {
         super.onCloseDialog()
+        syncThisCustomPackWithContainer()
     }
     
     fun pushMessage(msg: String) {
@@ -466,6 +518,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         val container = editor.container
         val ctp = customTexturePack.getOrCompute()
         container.customTexturePack.set(ctp)
+        container.setTexturePackFromSource()
     }
     
     private fun importTextures(files: List<File>) {
@@ -478,6 +531,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
             val toApply = mutableListOf<TilesetRegion>()
             for (regionID in CustomTexturePack.ALLOWED_LIST) {
                 val toImportFile = orderedFiles.firstOrNull { it.nameWithoutExtension == regionID } ?: continue
+                Paintbox.LOGGER.debug("Importing texture: ${toImportFile.name}")
 
                 // Load in as a texture and tileset region.
                 val baseRegion: TilesetRegion = basePack[regionID]
@@ -563,6 +617,296 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     }
                 }
             }
+        }
+    }
+
+    fun fileChooserSelectSaveAllFile(action: (File) -> Unit) {
+        isFileChooserOpen.set(true)
+        editorPane.main.restoreForExternalDialog { completionCallback ->
+            thread(isDaemon = true) {
+                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.texturePack.filter.texturePackFile"),
+                        listOf("*.zip")).copyWithExtensionsInDesc()
+                TinyFDWrapper.saveFile(Localization.getValue("fileChooser.texturePack.exportEntire"),
+                        (main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_ENTIRE)
+                                ?: main.getDefaultDirectory()).resolve("texturepack.zip"), filter) { file: File? ->
+                    completionCallback()
+
+                    if (file != null) {
+                        val fileWithCorrectExt = if (!file.extension.equals(Container.FILE_EXTENSION, ignoreCase = true))
+                            (File(file.absolutePath + ".zip"))
+                        else file
+                        
+                        Gdx.app.postRunnable {
+                            action(fileWithCorrectExt)
+                        }
+                        main.persistDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_ENTIRE, file.parentFile)
+                    }
+
+                    Gdx.app.postRunnable {
+                        isFileChooserOpen.set(false)
+                    }
+                }
+            }
+        }
+    }
+
+    fun fileChooserSelectLoadAllFile(action: (File) -> Unit) {
+        isFileChooserOpen.set(true)
+        editorPane.main.restoreForExternalDialog { completionCallback ->
+            thread(isDaemon = true) {
+                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.texturePack.filter.texturePackFile"),
+                        listOf("*.zip")).copyWithExtensionsInDesc()
+                TinyFDWrapper.openFile(Localization.getValue("fileChooser.texturePack.importEntire"),
+                        main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_ENTIRE)
+                                ?: main.getDefaultDirectory(), filter) { file: File? ->
+                    completionCallback()
+
+                    if (file != null) {
+                        Gdx.app.postRunnable {
+                            action(file)
+                        }
+                        main.persistDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_ENTIRE, file.parentFile)
+                    }
+
+                    Gdx.app.postRunnable {
+                        isFileChooserOpen.set(false)
+                    }
+                }
+            }
+        }
+    }
+    
+    inner class PreviewPane : Pane() {
+        private val updateVar: Var<Boolean> = Var(false)
+        val vbox: VBox = VBox().apply {
+            this.spacing.set(2f)
+        }
+
+        val title: TextLabel = TextLabel(binding = { Localization.getVar(currentEntry.use().localizationKey).use() }).apply {
+            this.markup.set(editorPane.palette.markupInstantiatorSummary)
+            this.textColor.set(Color(1f, 1f, 1f, 1f))
+            this.bounds.height.set(40f)
+        }
+        val filename: TextLabel
+        
+        val removeButton: Button
+        
+        init {
+            this += vbox
+
+            val filenameTextVar = Localization.getVar("editor.dialog.texturePack.preview.filename", Var { listOf(currentEntry.use().id) })
+            val filenameTextTooltipVar = Localization.getVar("editor.dialog.texturePack.preview.filename.tooltip", Var { listOf(currentEntry.use().id) })
+            filename = TextLabel(binding = { filenameTextVar.use() }).apply {
+                this.markup.set(editorPane.palette.markup)
+                this.textColor.set(Color.LIGHT_GRAY.cpy())
+                this.bounds.height.set(26f)
+                this.tooltipElement.set(editorPane.createDefaultTooltip(filenameTextTooltipVar))
+            }
+            
+            val buttonBar = HBox().apply {
+                this.spacing.set(8f)
+                this.bounds.height.set(36f)
+            }
+            
+            removeButton = Button("").apply {
+                this.applyDialogStyleContent()
+                this.bindWidthToSelfHeight()
+                this.padding.set(Insets(2f))
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_trash"])).also { img -> 
+                    img.tint.bind { 
+                        if (disabled.use()) Color(0.5f, 0.5f, 0.5f, 0.25f) else Color(1f, 1f, 1f, 1f)
+                    }
+                }
+                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.removeTexture")))
+                this.setOnAction {
+                    val ctp = customTexturePack.getOrCompute()
+                    val current = currentEntry.getOrCompute()
+                    val oldTextureSet = ctp.getAllUniqueTextures()
+                    
+                    ctp.remove(ctp.getOrNull(current.id))
+
+                    // Dispose the textures that have stopped being used
+                    val texturesRemoved = oldTextureSet - ctp.getAllUniqueTextures()
+                    if (texturesRemoved.isNotEmpty()) {
+                        texturesRemoved.forEach { it.disposeQuietly() }
+                    }
+                    
+                    onTexturePackUpdated.invert()
+                }
+            }
+            
+            buttonBar.temporarilyDisableLayouts {
+                fun separator(): RectElement {
+                    return RectElement(DARK_GREY).apply {
+                        this.bounds.width.set(6f)
+                        this.margin.set(Insets(0f, 0f, 2f, 2f))
+                    }
+                }
+                
+                buttonBar += removeButton
+                buttonBar += separator()
+                
+                val filterToggleGroup = ToggleGroup()
+                buttonBar += TextLabel(binding = {Localization.getVar("editor.dialog.texturePack.button.filtering").use()}).apply {
+                    this.markup.set(editorPane.palette.markup)
+                    this.renderAlign.set(Align.right)
+                    this.bounds.width.set(100f)
+                    this.textColor.set(Color.WHITE.cpy())
+                }
+
+                buttonBar += RadioButton(binding = { Localization.getVar("editor.dialog.texturePack.button.filtering.nearest").use() },
+                        font = editorPane.palette.musicDialogFont).apply {
+                    this.bounds.width.set(120f)
+                    this.textLabel.markup.set(editorPane.palette.markup)
+                    val tint: ReadOnlyVar<Color> = Var {
+                        if (disabled.use()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
+                    }
+                    this.textLabel.textColor.bind { tint.use() }
+                    this.imageNode.tint.bind { tint.use() }
+                    this.imageNode.padding.set(Insets(3f))
+                    filterToggleGroup.addToggle(this)
+                    this.disabled.bind {
+                        updateVar.use()
+                        val ctp = customTexturePack.use()
+                        val current = currentEntry.use()
+                        ctp.getOrNull(current.id) == null
+                    }
+                    this.setOnAction { 
+                        selectedState.set(true)
+                        val entry = currentEntry.getOrCompute()
+                        val filter = Texture.TextureFilter.Nearest
+                        customTexturePack.getOrCompute().getOrNull(entry.id)?.texture?.setFilter(filter, filter)
+                    }
+                    this.selectedState.set(true)
+                    updateVar.addListener {
+                        val entry = currentEntry.getOrCompute()
+                        val region = customTexturePack.getOrCompute().getOrNull(entry.id) ?: baseTexturePack.getOrCompute().getOrNull(entry.id)
+                        if (region != null) {
+                            this.selectedState.set(region.texture.magFilter == Texture.TextureFilter.Nearest)
+                        }
+                    }
+                }
+                buttonBar += RadioButton(binding = { Localization.getVar("editor.dialog.texturePack.button.filtering.linear").use() },
+                        font = editorPane.palette.musicDialogFont).apply {
+                    this.bounds.width.set(120f)
+                    this.textLabel.markup.set(editorPane.palette.markup)
+                    val tint: ReadOnlyVar<Color> = Var {
+                        if (disabled.use()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
+                    }
+                    this.textLabel.textColor.bind { tint.use() }
+                    this.imageNode.tint.bind { tint.use() }
+                    this.imageNode.padding.set(Insets(3f))
+                    filterToggleGroup.addToggle(this)
+                    this.disabled.bind {
+                        updateVar.use()
+                        val ctp = customTexturePack.use()
+                        val current = currentEntry.use()
+                        ctp.getOrNull(current.id) == null
+                    }
+                    this.setOnAction {
+                        selectedState.set(true)
+                        val entry = currentEntry.getOrCompute()
+                        val filter = Texture.TextureFilter.Linear
+                        customTexturePack.getOrCompute().getOrNull(entry.id)?.texture?.setFilter(filter, filter)
+                    }
+                    updateVar.addListener {
+                        val entry = currentEntry.getOrCompute()
+                        val region = customTexturePack.getOrCompute().getOrNull(entry.id) ?: baseTexturePack.getOrCompute().getOrNull(entry.id)
+                        if (region != null) {
+                            this.selectedState.set(region.texture.magFilter == Texture.TextureFilter.Linear)
+                        }
+                    }
+                }
+                buttonBar += Button(binding = { Localization.getVar("editor.dialog.texturePack.button.filtering.applyToAll").use() }).apply {
+                    this.applyDialogStyleContent()
+                    this.markup.set(editorPane.palette.markup)
+                    this.bounds.width.set(125f)
+                    this.padding.set(Insets(2f))
+                    this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.filtering.applyToAll.tooltip")))
+                    this.setOnAction {
+                        val entry = currentEntry.getOrCompute()
+                        val ctp = customTexturePack.getOrCompute()
+                        val currentFilter = ctp.getOrNull(entry.id)?.texture?.minFilter
+
+                        if (currentFilter != null) {
+                            ctp.getAllTilesetRegions().forEach { r ->
+                                r.texture.setFilter(currentFilter, currentFilter)
+                            }
+                        }
+
+                        onTexturePackUpdated.invert()
+                    }
+                    this.disabled.bind {
+                        updateVar.use()
+                        val ctp = customTexturePack.use()
+                        val current = currentEntry.use()
+                        ctp.getOrNull(current.id) == null
+                    }
+                }
+                
+            }
+            
+            val showBox = HBox().apply { 
+                Anchor.TopCentre.configure(this)
+                this.spacing.set(8f)
+                this.bounds.height.set(200f)
+            }
+            showBox.temporarilyDisableLayouts {
+                fun createTransparencyNode(): ImageNode {
+                    return ImageNode(null, ImageRenderingMode.FULL).also { im ->
+                        im.textureRegion.sideEffecting(TextureRegion(PRManiaGame.instance.colourPickerTransparencyGrid)) { tr ->
+                            tr?.setRegion(0, 0, im.bounds.width.useF().toInt(), im.bounds.height.useF().toInt())
+                            tr
+                        }
+                    }
+                }
+                
+                // Current texture (custom or not)
+                showBox += createTransparencyNode().apply { 
+                    this.bindWidthToSelfHeight()
+                    this += ImageNode(binding = { 
+                        updateVar.use()
+                        val entry = currentEntry.use()
+                        customTexturePack.use().getOrNull(entry.id) ?: baseTexturePack.use().getOrNull(entry.id)
+                                                }, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
+                }
+            }
+            showBox.sizeWidthToChildren(200f)
+
+
+            fun separator(): RectElement {
+                return RectElement(DARK_GREY).apply {
+                    this.bounds.height.set(6f)
+                    this.margin.set(Insets(2f, 2f, 0f, 0f))
+                }
+            }
+            vbox.temporarilyDisableLayouts {
+                vbox += title
+                vbox += filename
+                vbox += separator()
+                vbox += buttonBar
+                vbox += separator()
+                vbox += showBox
+            }
+        }
+        
+        init {
+            onTexturePackUpdated.addListener { updateVar.invert() }
+            currentEntry.addListener { updateVar.invert() }
+            
+            updateVar.addListener {
+                update()
+            }
+            Gdx.app.postRunnable {
+                update()
+            }
+        }
+        
+        fun update() {
+            val ctp = customTexturePack.getOrCompute()
+            val current = currentEntry.getOrCompute()
+            
+            removeButton.disabled.set(ctp.getOrNull(current.id) == null)
         }
     }
     
