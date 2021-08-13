@@ -19,8 +19,15 @@ class RandomBagIterator<T>(container: List<T>, val random: Random, val exhaustio
         SHUFFLE_EXCLUDE_LAST;
     }
 
+    private val originalOrder: List<T> = container.toList()
     private val items: MutableList<T> = container.toMutableList()
     private var currentIndex: Int = 0
+    
+    fun resetToOriginalOrder() {
+        currentIndex = 0
+        items.clear()
+        items.addAll(originalOrder)
+    }
 
     /**
      * Shuffles and resets the iterator.
