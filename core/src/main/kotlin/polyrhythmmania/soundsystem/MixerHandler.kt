@@ -1,61 +1,55 @@
 package polyrhythmmania.soundsystem
 
-import java.util.concurrent.ConcurrentHashMap
 import javax.sound.sampled.*
 
 
 /**
- * Tracks references for [Mixer]s to prevent issues with simultaneous closing/opening.
+ * Handles the list of mixers for a particular [AudioFormat].
  */
-object MixerHandler {
+class MixerHandler(val audioFormat: AudioFormat) {
     
-    private val datalineInfoMap: MutableMap<AudioFormat, DataLine.Info> = mutableMapOf()
-    private val trackedMixers: MutableMap<Mixer, Int> = ConcurrentHashMap()
-    
-    @Synchronized
-    fun getDataLineForFormat(audioFormat: AudioFormat): DataLine.Info = datalineInfoMap.getOrPut(audioFormat) { 
-        DataLine.Info(SourceDataLine::class.java, audioFormat) 
-    }
-    
-    fun getSupportedMixersForAudioFormat(audioFormat: AudioFormat): List<Mixer> {
-        val datalineInfo = getDataLineForFormat(audioFormat)
-        val supportedMixers: List<Mixer> = AudioSystem.getMixerInfo().map { AudioSystem.getMixer(it) }.filter { mixer ->
-            try {
-                // Attempt to get the line. If it is not supported it will throw an exception.
-                mixer.getLine(datalineInfo)
-//                    Paintbox.LOGGER.debug("Mixer ${mixer.mixerInfo} is compatible for outputting.")
-                true
-            } catch (e: Exception) {
-//                    Paintbox.LOGGER.debug("Mixer ${mixer.mixerInfo} is NOT compatible for outputting!")
-                false
-            }
-        }
-        return supportedMixers
-    }
+    companion object {
+        private val datalineInfoMap: MutableMap<AudioFormat, DataLine.Info> = mutableMapOf()
 
-    fun getDefaultMixer(list: List<Mixer>): Mixer {
-        val first = list.firstOrNull {
-            val name = it.mixerInfo.name
-            // TODO doesn't work in non-English locales
-            !name.startsWith("Port ") || name.contains("Primary Sound Driver")
+        @Synchronized
+        fun getDataLineForFormat(audioFormat: AudioFormat): DataLine.Info = datalineInfoMap.getOrPut(audioFormat) {
+            DataLine.Info(SourceDataLine::class.java, audioFormat)
         }
-        return first ?: list.first()
+
+        private fun getSupportedMixersForAudioFormat(audioFormat: AudioFormat): List<Mixer> {
+            val datalineInfo = getDataLineForFormat(audioFormat)
+            val supportedMixers: List<Mixer> = AudioSystem.getMixerInfo().map { AudioSystem.getMixer(it) }.filter { mixer ->
+                try {
+                    // Attempt to get the line. If it is not supported it will throw an exception.
+                    mixer.getLine(datalineInfo)
+//                    Paintbox.LOGGER.debug("Mixer ${mixer.mixerInfo} is compatible for outputting.")
+                    true
+                } catch (e: Exception) {
+//                    Paintbox.LOGGER.debug("Mixer ${mixer.mixerInfo} is NOT compatible for outputting!")
+                    false
+                }
+            }
+            val defaultMixer = AudioSystem.getMixer(null)
+            if (defaultMixer in supportedMixers && supportedMixers.first() != defaultMixer) {
+                return listOf(defaultMixer) + (supportedMixers - defaultMixer)
+            }
+            return supportedMixers
+        }
+        
+        private fun getDefaultMixerFromList(list: List<Mixer>): Mixer {
+//            val first = list.firstOrNull {
+//                val name = it.mixerInfo.name
+//                !name.startsWith("Port ") || name.contains("Primary Sound Driver")
+//            }
+//            return first ?: list.first()
+            return list.first() // The first mixer is usually the default one. Maybe...
+        }
     }
     
-    fun trackMixer(mixer: Mixer) {
-        val refs = trackedMixers[mixer] ?: 0
-        trackedMixers[mixer] = refs + 1
-    }
+    val supportedMixers: List<Mixer> = getSupportedMixersForAudioFormat(audioFormat)
+    val defaultMixer: Mixer = getDefaultMixerFromList(supportedMixers)
     
-    fun untrackMixer(mixer: Mixer) {
-        val refs = trackedMixers[mixer] ?: 1
-        val newRefs = refs - 1
-        if (newRefs <= 0) {
-            trackedMixers.remove(mixer)
-            mixer.close()
-        } else {
-            trackedMixers[mixer] = newRefs
-        }
-    }
+    @Volatile
+    var recommendedMixer: Mixer = defaultMixer
     
 }

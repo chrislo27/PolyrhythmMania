@@ -28,26 +28,17 @@ class SoundSystem(private val mixer: Mixer,
         val AUDIO_FORMAT_44100: IOAudioFormat = IOAudioFormat(44_100f, 16, 2, 2, true, true)
         val AUDIO_FORMAT_48000: IOAudioFormat = IOAudioFormat(48_000f, 16, 2, 2, true, true)
         val DEFAULT_AUDIO_FORMAT: IOAudioFormat = AUDIO_FORMAT_48000
+        
+        val defaultMixerHandler: MixerHandler by lazy { MixerHandler(DEFAULT_AUDIO_FORMAT.toJavaAudioFormat()) }
 
-        fun createDefaultSoundSystem(ioAudioFormat: IOAudioFormat = DEFAULT_AUDIO_FORMAT,
+        fun createDefaultSoundSystem(bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE): SoundSystem {
+            return createDefaultSoundSystem(defaultMixerHandler, bufferSize)
+        }
+        
+        fun createDefaultSoundSystem(mixerHandler: MixerHandler,
                                      bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE): SoundSystem {
-            val audioFormat: AudioFormat = ioAudioFormat.toJavaAudioFormat()
-            val datalineInfo: DataLine.Info = DataLine.Info(SourceDataLine::class.java, audioFormat)
-            val supportedMixers: List<Mixer> = AudioSystem.getMixerInfo().map { AudioSystem.getMixer(it) }.filter { mixer ->
-                try {
-                    // Attempt to get the line. If it is not supported it will throw an exception.
-                    mixer.getLine(datalineInfo)
-//                    Paintbox.LOGGER.debug("Mixer ${mixer.mixerInfo} is compatible for outputting.")
-                    true
-                } catch (e: Exception) {
-//                    Paintbox.LOGGER.debug("Mixer ${mixer.mixerInfo} is NOT compatible for outputting!")
-                    false
-                }
-            }
-
-            val mixer = MixerHandler.getDefaultMixer(supportedMixers)
-//            println("Picked mixer ${mixer.mixerInfo} ${mixer.sourceLineInfo}")
-            return SoundSystem(mixer, ioAudioFormat, bufferSize)
+            val mixer = mixerHandler.recommendedMixer
+            return SoundSystem(mixer, mixerHandler.audioFormat.toBeadsAudioFormat(), bufferSize)
         }
     }
 
@@ -101,6 +92,8 @@ class SoundSystem(private val mixer: Mixer,
         currentlyRealTime = false
         audioContext.runForNMillisecondsNonRealTime(msToRun)
     }
+    
+    fun isCurrentlyRealtime(): Boolean = currentlyRealTime
 
     override fun dispose() {
         isDisposed = true

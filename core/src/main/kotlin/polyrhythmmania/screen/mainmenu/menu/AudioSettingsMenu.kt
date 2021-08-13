@@ -8,6 +8,11 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
+import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.soundsystem.MixerHandler
+import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.soundsystem.beads.toJavaAudioFormat
+import javax.sound.sampled.Mixer
 
 
 class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -65,13 +70,22 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         contentPane.addChild(vbox)
         contentPane.addChild(hbox)
 
+        val mixerHandler = SoundSystem.defaultMixerHandler
+        val mixers: List<Mixer> = mixerHandler.supportedMixers
+
+        val (mixerPane, mixerControl) = createCycleOption(mixers, mixerHandler.recommendedMixer,
+                { Localization.getVar("mainMenu.audioSettings.mixer").use() },
+                percentageContent = 0.7f, itemToString = { it.mixerInfo.name })
+        mixerControl.currentItem.addListener { m ->
+            setSoundSystemMixer(m.getOrCompute())
+        }
+        
         vbox.temporarilyDisableLayouts {
-            vbox += createSliderPane(gameplayVolSlider) { Localization.getVar("mainMenu.audioSettings.gameplayVol").use() }.apply {
-            }
-            vbox += createSliderPane(menuMusicVolSlider) { Localization.getVar("mainMenu.audioSettings.menuMusicVol").use() }.apply {
-            }
-            vbox += createSliderPane(menuSfxVolSlider) { Localization.getVar("mainMenu.audioSettings.menuSfxVol").use() }.apply {
-            }
+            vbox += mixerPane
+            
+            vbox += createSliderPane(gameplayVolSlider) { Localization.getVar("mainMenu.audioSettings.gameplayVol").use() }
+            vbox += createSliderPane(menuMusicVolSlider) { Localization.getVar("mainMenu.audioSettings.menuMusicVol").use() }
+            vbox += createSliderPane(menuSfxVolSlider) { Localization.getVar("mainMenu.audioSettings.menuSfxVol").use() }
         }
 
         hbox.temporarilyDisableLayouts {
@@ -81,7 +95,37 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.popLastMenu()
                 }
             }
+            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.audioSettings.resetLevels").use() }).apply {
+                this.bounds.width.set(200f)
+                this.setOnAction {
+                    listOf(gameplayVolSlider, menuMusicVolSlider, menuSfxVolSlider).forEach { 
+                        it.setValue(50f)
+                    }
+                }
+            }
+            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.audioSettings.resetMixer").use() }).apply {
+                this.bounds.width.set(200f)
+                this.setOnAction {
+                    val def = mixerHandler.defaultMixer
+                    mixerControl.currentItem.set(def) // Listener will set accordingly.
+                }
+            }
         }
+    }
+    
+    fun setSoundSystemMixer(newMixer: Mixer) {
+        if (SoundSystem.defaultMixerHandler.recommendedMixer == newMixer) return
+        SoundSystem.defaultMixerHandler.recommendedMixer = newMixer
+        // Restart the main menu sound system.
+        synchronized(mainMenu) {
+            val oldMusicPos = mainMenu.soundSys.musicPlayer.position
+            mainMenu.soundSys.shutdown()
+            mainMenu.soundSys = mainMenu.SoundSys().apply { 
+                start()
+                musicPlayer.position = oldMusicPos
+            }
+        }
+        main.settings.mixer.set(newMixer.mixerInfo.name)
     }
 
 }

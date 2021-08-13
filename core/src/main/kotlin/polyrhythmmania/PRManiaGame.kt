@@ -35,6 +35,7 @@ import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
@@ -95,6 +96,23 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         PRManiaSkins
         settings = Settings(this, preferences).apply { 
             load()
+            val mixerHandler = SoundSystem.defaultMixerHandler
+            val mixerString = this.mixer.getOrCompute()
+            if (mixerString.isNotEmpty()) {
+                val found = mixerHandler.supportedMixers.find {
+                    it.mixerInfo.name == mixerString
+                }
+                if (found != null) {
+                    Paintbox.LOGGER.info("Attaching to mixer from settings: ${found.mixerInfo.name}")
+                    mixerHandler.recommendedMixer = found
+                } else {
+                    Paintbox.LOGGER.warn("Could not find mixer from settings: settings = $mixerString")
+                }
+            } else {
+                val mixerName = mixerHandler.recommendedMixer.mixerInfo.name
+                this.mixer.set(mixerName)
+                Paintbox.LOGGER.info("No saved mixer string, using $mixerName")
+            }
         }
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())

@@ -41,6 +41,8 @@ object JavaSoundUtils {
 data class MixerInfo(val mixer: Mixer, val canOutput: Boolean)
 
 fun IOAudioFormat.toJavaAudioFormat(): AudioFormat = AudioFormat(sampleRate, bitDepth, outputs, signed, bigEndian)
+fun AudioFormat.toBeadsAudioFormat(): IOAudioFormat = IOAudioFormat(sampleRate, sampleSizeInBits, channels, channels,
+        encoding != AudioFormat.Encoding.PCM_UNSIGNED, isBigEndian)
 
 fun JavaSoundAudioIO.selectMixer(mixer: Mixer) {
     val clazz = JavaSoundAudioIO::class.java

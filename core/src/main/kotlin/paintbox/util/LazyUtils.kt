@@ -20,25 +20,40 @@ interface SettableLazy<T> {
     }
 }
 
+
 private class SettableLazyImpl<T>(private val initBlock: () -> T) : SettableLazy<T> {
 
+    private val lock: Any = this
+    
+    @Volatile
     private var inited: Boolean = false
+    
+    @Volatile
     private var backing: T? = null
 
     override var value: T
         get() {
             if (!isInitialized()) {
-                init()
+                initFirstTime()
             }
-            return backing!!
+            
+            @Suppress("UNCHECKED_CAST")
+            return (backing as T)
         }
         set(value) {
-            backing = value
-            inited = true
+            synchronized(lock) {
+                backing = value
+                inited = true
+            }
         }
 
-    private fun init() {
-        backing = initBlock()
+    private fun initFirstTime() {
+        synchronized(lock) {
+            if (!inited) {
+                backing = initBlock()
+                inited = true
+            }
+        }
     }
 
     override fun isInitialized(): Boolean {

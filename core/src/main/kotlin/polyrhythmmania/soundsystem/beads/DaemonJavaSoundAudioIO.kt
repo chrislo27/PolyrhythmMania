@@ -6,6 +6,7 @@ import net.beadsproject.beads.core.AudioUtils
 import net.beadsproject.beads.core.UGen
 import net.beadsproject.beads.core.io.JavaSoundAudioIO
 import polyrhythmmania.soundsystem.MixerHandler
+import polyrhythmmania.soundsystem.MixerTracking
 import javax.sound.sampled.*
 import kotlin.concurrent.thread
 
@@ -52,7 +53,7 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
             val soundOutputBufferSize = systemBufferSizeInFrames * audioFormat.frameSize * 2
             sourceDataLine.open(audioFormat, soundOutputBufferSize)
         }
-        MixerHandler.trackMixer(mixer)
+        MixerTracking.trackMixer(mixer)
         return true
     }
     
@@ -128,7 +129,7 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
         }
         val mixer = this.mixer
         if (mixer != null) {
-            MixerHandler.untrackMixer(mixer)
+            MixerTracking.untrackMixer(mixer)
         }
         this.mixer = null
         return true
