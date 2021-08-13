@@ -1,5 +1,6 @@
 package polyrhythmmania.sidemodes.endlessmode
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.binding.FloatVar
@@ -18,10 +19,7 @@ import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.util.Semitones
-import polyrhythmmania.world.EventDeployRod
-import polyrhythmmania.world.EventRowBlockDespawn
-import polyrhythmmania.world.EventRowBlockRetract
-import polyrhythmmania.world.WorldMode
+import polyrhythmmania.world.*
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.time.LocalDate
@@ -38,6 +36,34 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
     : AbstractEndlessMode(main, prevHighScore) {
     
     companion object {
+        private const val COLOR_CHANGE_LIMIT: Int = 18
+        private val VALID_COLOR_CHANGE_MULTIPLIERS: List<Int> = listOf(5, 7, 11, 13)
+
+        private fun findPeriods(limit: Int) {
+            for (i in 3 until limit) {
+                if (limit % i == 0) continue
+                print("Testing $i\n  0  ")
+                val gotten = mutableSetOf<Int>(0)
+                var current = 0
+                var iter = 0
+                while (true) {
+                    current = (current + i) % limit
+                    print("$current  ")
+                    if (current in gotten) {
+                        println()
+                        if (gotten.size < limit) {
+                            println("   Failed at iteration $iter, ran into $current again.")
+                        } else {
+                            println("   SUCCESS!")
+                        }
+                        break
+                    }
+                    gotten += current
+                    iter++
+                }
+            }
+        }
+        
         fun getCurrentDailyChallengeDate(): LocalDate {
             return ZonedDateTime.now(ZoneOffset.UTC).toLocalDate()
         }
@@ -56,11 +82,13 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         }
     }
     
+    private val colorChangeMultiplier: Int = VALID_COLOR_CHANGE_MULTIPLIERS[seed.toInt().absoluteValue % VALID_COLOR_CHANGE_MULTIPLIERS.size]
     val random: Random = Random(seed)
     val difficultyBags: Map<Difficulty, RandomBagIterator<Pattern>> = EndlessPatterns.patternsByDifficulty.entries.associate { 
         it.key to RandomBagIterator(it.value, random, RandomBagIterator.ExhaustionBehaviour.SHUFFLE_EXCLUDE_LAST)
     }
     val difficultyFactor: FloatVar = FloatVar(0f)
+    val loopsCompleted: Var<Int> = Var(0)
     val speedIncreaseSemitones: Var<Int> = Var(0)
 
     init {
@@ -115,6 +143,22 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
 difficultyFactor: ${difficultyFactor.get()}
 distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficulty()}
 """.dropLast(1)
+    }
+    
+    private fun createTilesetPaletteIterated(iteration: Int, multiplier: Int, limit: Int): TilesetPalette {
+        val hueChange = (((iteration * multiplier) % limit) / limit.toFloat()) * 360f
+        val loops = iteration / limit
+        return TilesetPalette.createGBA1TilesetPalette().also { p ->
+            val hsv = FloatArray(3)
+            listOf(p.cubeBorder, p.cubeBorderZ, p.cubeFaceX, p.cubeFaceY,
+                    p.cubeFaceZ, p.pistonFaceX, p.pistonFaceZ, p.signShadow).forEach { colorMapping ->
+                val color = colorMapping.color.getOrCompute()
+                color.toHsv(hsv)
+                hsv[0] = (hsv[0] + hueChange) % 360f
+                hsv[0] += loops * 10f
+                colorMapping.color.set(Color(1f, 1f, 1f, 1f).fromHsv(hsv))
+            }
+        }
     }
 
     /**
@@ -187,6 +231,7 @@ distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficu
                                 it.shuffle()
                             }
                             difficultyFactor.set(0f)
+                            loopsCompleted.set(0)
                             speedIncreaseSemitones.set(0)
                             engine.playbackSpeed = 1f
                         }
@@ -201,13 +246,18 @@ distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficu
                     EventRowBlockDespawn(engine, world.rowDpad, 0, 7f, affectThisIndexAndForward = true),
                     
                     LoopingEvent(engine, 88f, { true }) { engine, startBeat ->
+                        loopsCompleted.set(loopsCompleted.getOrCompute() + 1)
                         val currentSpeedIncrease = speedIncreaseSemitones.getOrCompute()
                         val newSpeed = (currentSpeedIncrease + (if (currentSpeedIncrease >= 4) 1 else 2)).coerceAtMost(12)
                         speedIncreaseSemitones.set(newSpeed)
                         engine.playbackSpeed = Semitones.getALPitch(newSpeed)
+                        
+                        engine.addEvent(EventPaletteChange(engine, startBeat, 1f,
+                                createTilesetPaletteIterated(loopsCompleted.getOrCompute(), colorChangeMultiplier, COLOR_CHANGE_LIMIT), false, false))
                     }.also { e ->
                         e.beat = 88f
                     },
+                    
                     PatternGeneratorEvent(this.beat + 1, delay = 8f - 1),
             )
         }
