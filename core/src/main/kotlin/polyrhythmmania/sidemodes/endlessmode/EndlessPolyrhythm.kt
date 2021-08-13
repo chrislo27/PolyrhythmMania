@@ -9,7 +9,6 @@ import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.EventChangePlaybackSpeed
 import polyrhythmmania.engine.EventConditionalOnRods
 import polyrhythmmania.engine.EventPlaySFX
 import polyrhythmmania.engine.music.MusicVolume
@@ -21,6 +20,7 @@ import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.EventRowBlockDespawn
+import polyrhythmmania.world.EventRowBlockRetract
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
@@ -71,6 +71,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         container.world.worldMode = WorldMode.POLYRHYTHM_ENDLESS
         container.renderer.endlessModeSeed.set(getSeedString(seed.toUInt()))
         container.renderer.dailyChallengeDate.set(dailyChallenge)
+        container.renderer.flashHudRedWhenLifeLost.set(true)
         container.engine.inputter.endlessScore.maxLives.set(3)
     }
 
@@ -157,7 +158,7 @@ distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficu
             if (anyA || anyDpad) {
                 val awardScoreBeat = patternStart + patternDuration + 0.01f
                 engine.addEvent(EventConditionalOnRods(engine, awardScoreBeat,
-                        if (anyA && anyDpad) RowSetting.BOTH else if (anyA) RowSetting.ONLY_A else RowSetting.ONLY_DPAD) {
+                        if (anyA && anyDpad) RowSetting.BOTH else if (anyA) RowSetting.ONLY_A else RowSetting.ONLY_DPAD, true) {
                     engine.addEvent(EventIncrementEndlessScore(engine).also {
                         it.beat = awardScoreBeat
                     })
@@ -181,14 +182,24 @@ distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficu
                     object : Event(engine) {
                         override fun onStart(currentBeat: Float) {
                             random.setSeed(this@EndlessPolyrhythm.seed)
-                            difficultyBags.values.forEach { it.shuffle() }
+                            difficultyBags.values.forEach {
+                                it.resetToOriginalOrder()
+                                it.shuffle()
+                            }
                             difficultyFactor.set(0f)
                             speedIncreaseSemitones.set(0)
                             engine.playbackSpeed = 1f
                         }
                     }.also { e ->
-                        e.beat = this.beat
+//                        e.beat = this.beat
+                        e.beat = -10000f
                     },
+                    
+                    EventRowBlockRetract(engine, world.rowA, 0, 6f, affectThisIndexAndForward = true),
+                    EventRowBlockRetract(engine, world.rowDpad, 0, 6f, affectThisIndexAndForward = true),
+                    EventRowBlockDespawn(engine, world.rowA, 0, 7f, affectThisIndexAndForward = true),
+                    EventRowBlockDespawn(engine, world.rowDpad, 0, 7f, affectThisIndexAndForward = true),
+                    
                     LoopingEvent(engine, 88f, { true }) { engine, startBeat ->
                         val currentSpeedIncrease = speedIncreaseSemitones.getOrCompute()
                         val newSpeed = (currentSpeedIncrease + (if (currentSpeedIncrease >= 4) 1 else 2)).coerceAtMost(12)
