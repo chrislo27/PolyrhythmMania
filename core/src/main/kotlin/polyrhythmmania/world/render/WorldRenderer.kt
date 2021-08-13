@@ -2,8 +2,8 @@ package polyrhythmmania.world.render
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Align
@@ -28,9 +28,7 @@ import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
@@ -96,11 +94,13 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     val prevHighScore: Var<Int> = Var(-1)
     val dailyChallengeDate: Var<LocalDate?> = Var(null)
     val endlessModeSeed: Var<String?> = Var(null)
+    val flashHudRedWhenLifeLost: Var<Boolean> = Var(false)
     private val currentEndlessScore: Var<Int> = Var(0)
     private val currentEndlessLives: Var<Int> = Var(0)
 
     private var skillStarSpinAnimation: Float = 0f
     private var skillStarPulseAnimation: Float = 0f
+    private var hudRedFlash: Float = 0f
 
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val textBoxPane: TextboxPane = TextboxPane()
@@ -281,6 +281,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
     fun resetAnimations() {
         skillStarSpinAnimation = 0f
         skillStarPulseAnimation = 0f
+        hudRedFlash = 0f
     }
 
     fun render(batch: SpriteBatch, engine: Engine) {
@@ -407,6 +408,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         }
 
         val clearText = inputter.practice.clearText
+        val uiCam = this.uiCamera
         if (clearText > 0f) {
             val normalScale = 1f
             val transitionEnd = 0.15f
@@ -438,11 +440,10 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
             val paintboxFont = PRManiaGame.instance.fontGamePracticeClear
             paintboxFont.useFont { font ->
-                val camera = uiCamera
                 font.scaleMul(scale)
                 font.setColor(1f, 1f, MathUtils.lerp(0.125f, 1f, white), alpha)
                 font.drawCompressed(batch, Localization.getValue("practice.clear"),
-                        0f, camera.viewportHeight / 2f + font.capHeight / 2, camera.viewportWidth, Align.center)
+                        0f, uiCam.viewportHeight / 2f + font.capHeight / 2, uiCam.viewportWidth, Align.center)
                 font.scaleMul(1f / scale)
             }
 
@@ -452,7 +453,12 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
         if (showEndlessModeScore.getOrCompute()) {
             val endlessScore = engine.inputter.endlessScore
-            currentEndlessLives.set(endlessScore.lives.getOrCompute())
+            val oldLives = currentEndlessLives.getOrCompute()
+            val newLives = endlessScore.lives.getOrCompute()
+            currentEndlessLives.set(newLives)
+            if (newLives < oldLives && flashHudRedWhenLifeLost.getOrCompute()) {
+                hudRedFlash = 1f
+            }
             val oldScore = currentEndlessScore.getOrCompute()
             val newScore = endlessScore.score.getOrCompute()
             if (oldScore != newScore) {
@@ -472,6 +478,14 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         }
 
         uiSceneRoot.renderAsRoot(batch)
+        
+        if (hudRedFlash > 0f) {
+            batch.setColor(1f, 0f, 0f, hudRedFlash)
+            batch.draw(AssetRegistry.get<Texture>("hud_vignette"), 0f, 0f, uiCam.viewportWidth, uiCam.viewportHeight)
+            batch.setColor(1f, 1f, 1f, 1f)
+            
+            hudRedFlash = (hudRedFlash - (Gdx.graphics.deltaTime / 0.75f)).coerceAtLeast(0f)
+        }
     }
 
     fun getDebugString(): String {

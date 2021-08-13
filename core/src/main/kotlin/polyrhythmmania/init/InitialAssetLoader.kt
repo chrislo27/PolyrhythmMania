@@ -110,6 +110,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("pause_rod", "textures/pause/rod.png")
         AssetRegistry.loadAsset<Texture>("pause_square", "textures/pause/bg_square.png")
         AssetRegistry.loadAsset<Texture>("dunk_background", "textures/world/dunk/basketball_bg.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("hud_vignette", "textures/ui/hud/vignette.png", linearTexture())
         
         listOf("applause", "despawn", "explosion", "input_a", "input_d", "land", "retract", "side_collision",
                 "spawn_a", "spawn_d", "cowbell",).forEach {
