@@ -66,7 +66,9 @@ class EventChangePlaybackSpeed(engine: Engine, val newSpeed: Float)
     }
 }
 
-open class EventConditionalOnRods(engine: Engine, startBeat: Float, val rowSetting: RowSetting, val onSuccess: () -> Unit)
+open class EventConditionalOnRods(engine: Engine, startBeat: Float, val rowSetting: RowSetting,
+                                  val mustHitAllInputs: Boolean,
+                                  val onSuccess: () -> Unit)
     : Event(engine) {
 
     init {
@@ -75,10 +77,14 @@ open class EventConditionalOnRods(engine: Engine, startBeat: Float, val rowSetti
 
     private fun doesValidRodExistOnRow(currentBeat: Float, row: Row): Boolean {
         val world = engine.world
-        return world.entities.filterIsInstance<EntityRodPR>().any {
-            val results = it.inputTracker.results
-            it.row == row && it.acceptingInputs && currentBeat - it.deployBeat >= 4.25f &&
-                    (results.size > 0 || engine.autoInputs) && results.none { r -> r.inputScore == InputScore.MISS }
+        return world.entities.filterIsInstance<EntityRodPR>().any { rod ->
+            val inputTracker = rod.inputTracker
+            val numExpected = inputTracker.expected.count { it is EntityRodPR.ExpectedInput.Expected }
+            val validResults = inputTracker.results.filter { it.inputScore != InputScore.MISS }
+            val results = inputTracker.results
+            rod.row == row && rod.acceptingInputs && currentBeat - rod.deployBeat >= 4.25f &&
+                    (results.size > 0 || engine.autoInputs) && results.none { r -> r.inputScore == InputScore.MISS } &&
+                    (!mustHitAllInputs || (validResults.size == numExpected))
         }
     }
 

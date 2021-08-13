@@ -64,7 +64,7 @@ class BlockCondApplause(engine: Engine) : Block(engine, BlockCondApplause.BLOCK_
 }
 
 class EventCondApplause(engine: Engine, startBeat: Float, rowSetting: RowSetting)
-    : EventConditionalOnRods(engine, startBeat, rowSetting, {
+    : EventConditionalOnRods(engine, startBeat, rowSetting, false, {
     val beadsSound = AssetRegistry.get<BeadsSound>("sfx_applause")
     engine.soundInterface.playAudio(beadsSound)
 })
