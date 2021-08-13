@@ -29,14 +29,19 @@ object EndlessPatterns {
   |P-P-P-P-""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
 """P-P-P-P-
   |P---P---""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
-"""#P-P-P-P-""".parsePattern(Difficulty.EASY, flippable = true),
 """P---P---
   |##P---P---""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
+"""P--P--##
+  |P-PP--##""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
+"""#P-P-P-P-""".parsePattern(Difficulty.EASY, flippable = true),
+"""P--PP-P-#""".parsePattern(Difficulty.EASY, flippable = true),            
 
 
 """P-P-P-P-
   |###P--P--""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
 """P-P-P-P-
+  |P--P--P--""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""P-##P-P-
   |P--P--P--""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
 """P--P--
   |####P-""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
@@ -48,13 +53,37 @@ object EndlessPatterns {
   |P---P---""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
 """#P-P-P-P-
   |##P---P---""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""#P-##P-P-#
+  |##P-##P-##""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""P-P--P-#
+  |P--P-P-#""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""P-P-P-##
+  |#P-P-###""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""P-P-P-P-##
+  |#P-P-P-###""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
 
 
 """PPP-PPP-""".parsePattern(Difficulty.HARD, flippable = true),
 """PP--####
   |##P--P--""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""PP--####
+  |##P-P-P-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
 """PPP-PPP-
   |##P-##P-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""PPP-####
+  |####PPP-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""PP--PP--##
+  |##P---P---""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""P-P-PPP-##
+  |P-P-PPP-##""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""P-P--PP-#
+  |P--P--P--""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""P-P-PPP-#
+  |P-P-##P-#""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""P-P-PPP-#
+  |P-P-P-P-#""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""P-P-PPP-#
+  |#P-P--P-#""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
             
     )
     
