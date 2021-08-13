@@ -101,8 +101,9 @@ class World {
     // ------------------------------------------------------------------------------------------------------
     
     fun resetWorld() {
+        (entities as MutableList).removeIf { it is TemporaryEntity }
         when (worldMode) {
-            WorldMode.POLYRHYTHM -> {
+            WorldMode.POLYRHYTHM, WorldMode.POLYRHYTHM_ENDLESS -> {
                 populateRegularScene()
                 rows.forEach(Row::initWithWorld)
             }
