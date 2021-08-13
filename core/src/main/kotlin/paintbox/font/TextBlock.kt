@@ -63,7 +63,11 @@ data class TextBlock(val runs: List<TextRun>) {
 
     var lineWrapping: Float? = null
 
-    private var runInfo: List<TextRunInfo> = listOf()
+    /**
+     * Internally computed text run information
+     */
+    var runInfo: List<TextRunInfo> = listOf()
+        private set
     var lineInfo: List<LineInfo> = listOf()
         private set
 
@@ -159,7 +163,7 @@ data class TextBlock(val runs: List<TextRun>) {
             // Each GlyphRun inside the GlyphLayout inside TextRunInfo is relative to 0, 0
             // Adjust x/y of GlyphRunInfo inside TextRunInfo
             val yBeforeGlyphRuns = posY
-
+            
             // Offset by the TextRun offset
             posX += offX
             posY += offY
@@ -176,6 +180,8 @@ data class TextBlock(val runs: List<TextRun>) {
                 val glyphRun = glyphRunInfo.glyphRun
 
                 glyphRunInfo.lineIndex = currentLineIndex
+                
+                posX += glyphRun.glyphs.first().xoffset
 
                 // Update X/Y based on GlyphRun x/y
                 if (glyphRun.x < lastGlyphRunRightEdge
@@ -204,9 +210,20 @@ data class TextBlock(val runs: List<TextRun>) {
                 glyphRunInfo.posY = posY + capHeight
 
                 // Bump x forward by width of GlyphRun
-                posX += glyphRun.width
-                if (posX > maxPosX)
+//                posX += glyphRun.width
+                // We have to account for the xAdvance of the last glyph.
+                // GlyphLayout replaces it with the width of the last glyph instead. See GlyphLayout#adjustLastGlyph
+                val glyphRunXadv = glyphRun.xAdvances
+                var advanceWidth = 0f
+                for (i in 0 until glyphRun.glyphs.size) {
+                    advanceWidth += glyphRunXadv[i]
+                }
+                advanceWidth += glyphRun.glyphs.last().let { it.xadvance }
+                
+                posX += advanceWidth
+                if (posX > maxPosX) {
                     maxPosX = posX
+                }
 
                 lastGlyphRunRightEdge = glyphRun.x + glyphRun.width
                 lastGlyphRunY = glyphRun.y
@@ -253,9 +270,9 @@ data class TextBlock(val runs: List<TextRun>) {
             if (textRun.carryOverOffsetY) {
                 posY += offY
             }
-
+            
             currentLineWidth = posX
-
+            
             // Reset font scale
             resetFontForTextRun(font, textRun)
             paintboxFont.end()
