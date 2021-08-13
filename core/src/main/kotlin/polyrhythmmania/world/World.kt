@@ -331,8 +331,6 @@ class World {
                 for (y in 0 downTo -11) {
                     if (y != 0 && z != -5) continue
                     if (y <= -(x * 0.5f + 2)) continue
-//                    if (x < 18 && y <= -10) continue
-//                    if (x < 13 && y <= -7) continue
                     val ent: Entity = if (x == 12) {
                         EntityAsmPerp(this, isTarget = z == -6).apply { 
                             this.tint = Color(1f, 1f, 1f, 1f)
