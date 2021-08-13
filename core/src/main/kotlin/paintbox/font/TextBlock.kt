@@ -218,7 +218,7 @@ data class TextBlock(val runs: List<TextRun>) {
                 for (i in 0 until glyphRun.glyphs.size) {
                     advanceWidth += glyphRunXadv[i]
                 }
-                advanceWidth += glyphRun.glyphs.last().let { it.xadvance }
+                advanceWidth += glyphRun.glyphs.last().let { it.xadvance * font.data.scaleX }
                 
                 posX += advanceWidth
                 if (posX > maxPosX) {
