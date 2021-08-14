@@ -36,7 +36,9 @@ class World {
     val rowA: Row get() = rows[0]
     val rowDpad: Row get() = rows[1]
     // DUNK
-    val dunkPiston: EntityPistonDunk = EntityPistonDunk(this)
+    val dunkPiston: EntityPistonDunk by lazy { EntityPistonDunk(this) }
+    // ASSEMBLE
+    val asmPistons: List<EntityPistonAsm> by lazy { List(4) { EntityPistonAsm(this) } }
     
     
     init {
@@ -347,21 +349,22 @@ class World {
             }
         }
 
-        addEntity(EntityPiston(this).apply {
-            this.type = EntityPiston.Type.PISTON_A
+        
+        addEntity(asmPistons[0].apply {
+            this.type = EntityPiston.Type.PISTON_DPAD
             this.position.set(6f, 0f, -0f)
         })
-        addEntity(EntityPiston(this).apply {
-            this.type = EntityPiston.Type.PISTON_A
+        addEntity(asmPistons[1].apply {
+            this.type = EntityPiston.Type.PISTON_DPAD
             this.position.set(8.5f, 0f, -0f)
         })
-        addEntity(EntityPiston(this).apply {
+        addEntity(asmPistons[2].apply {
             this.type = EntityPiston.Type.PISTON_A
             this.position.set(11f, 0f, -0f)
-            this.tint = Color(1f, 0.35f, 0.35f, 1f)
+            this.tint = EntityPistonAsm.playerTint.cpy()
         })
-        addEntity(EntityPiston(this).apply {
-            this.type = EntityPiston.Type.PISTON_A
+        addEntity(asmPistons[3].apply {
+            this.type = EntityPiston.Type.PISTON_DPAD
             this.position.set(13.5f, 0f, -0f)
         })
     }

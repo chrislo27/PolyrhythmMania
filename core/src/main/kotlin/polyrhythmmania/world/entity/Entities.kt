@@ -92,6 +92,10 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
     open val numLayers: Int = 1
     var tint: Color? = null
     var tintIsMultiplied: Boolean = true
+
+
+    protected open val pxOffsetX: Float = 0f
+    protected open val pxOffsetY: Float = 0f
     
     abstract fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion?
 
@@ -113,7 +117,7 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
                 } else {
                     if (tint != null) tmpColor.set(tint)
                 }
-                drawTintedRegion(batch, vec, tileset, tr, tmpColor)
+                drawTintedRegion(batch, vec, tileset, tr, pxOffsetX, pxOffsetY, renderWidth, renderHeight, tmpColor)
             }
         }
         ColorStack.pop()
@@ -188,7 +192,7 @@ class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Flo
     private data class State(val index: Int, val renderWidth: Float, val renderHeight: Float)
 
     private var state: State = STATES[0]
-    private val duration: Float = 8 / 60f
+    var duration: Float = 8 / 60f
 
     override val renderWidth: Float
         get() = state.renderWidth

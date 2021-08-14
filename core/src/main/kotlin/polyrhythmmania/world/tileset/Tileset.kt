@@ -128,4 +128,7 @@ class Tileset(val texturePack: Var<TexturePack>) {
     val asmPistonA: TintedRegion = TintedRegion("asm_piston_a")
     val asmPistonAExtended: TintedRegion = TintedRegion("asm_piston_a_extended")
     val asmPistonAPartial: TintedRegion = TintedRegion("asm_piston_a_partial")
+    val asmWidgetComplete: TintedRegion = TintedRegion("asm_widget_complete")
+    val asmWidgetCompleteBlur: TintedRegion = TintedRegion("asm_widget_complete_blur")
+    val asmWidgetRoll: TintedRegion = TintedRegion("asm_widget_roll")
 }

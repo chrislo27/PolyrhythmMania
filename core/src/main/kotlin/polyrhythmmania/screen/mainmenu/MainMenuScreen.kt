@@ -195,7 +195,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             if (!unpausedPlayer.get()) {
                 unpausedPlayer.set(true)
                 Gdx.app.postRunnable { 
-                    this.soundSys.musicPlayer.pause(false)
+                    this.soundSys.soundSystem.setPaused(false)
                 }
             }
         }
@@ -307,6 +307,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     init {
         soundSys.start()
+        soundSys.soundSystem.setPaused(true)
 
         menuMusicVolume.addListener {
             this.soundSys.soundSystem.audioContext.out.gain = it.getOrCompute()

@@ -23,6 +23,9 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
     override val renderWidth: Float = 0.75f
     override val renderHeight: Float = 0.5f
     
+    protected open val offsetX: Float = -(1 / 32f) * 0
+    protected open val offsetY: Float = 1f / 32f * 0
+    
     constructor(world: World) : this(world, false)
     
     protected open fun getAnimationAlpha(): Float {
@@ -34,8 +37,8 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
 
         val renderW = renderWidth
         val renderH = renderHeight
-        val offsetX = -(1 / 32f) * 0
-        val offsetY = 1f / 32f * 0
+        val offsetX = this.offsetX
+        val offsetY = this.offsetY
         val regionBorder: TintedRegion = if (!isInAir) {
             tileset.rodGroundBorderAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         } else {
@@ -95,7 +98,7 @@ abstract class EntityRod(world: World, val deployBeat: Float)
         }
     }
 
-    protected val collision: CollisionData = CollisionData()
+    protected open val collision: CollisionData = CollisionData()
     override val isInAir: Boolean
         get() = collision.isInAir
     

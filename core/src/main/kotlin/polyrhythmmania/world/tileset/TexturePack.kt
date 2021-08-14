@@ -179,6 +179,9 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
         add(TilesetRegion.create("asm_piston_a", regionMap.getOrNull("asm_piston_a"), RegionSpacing(1, 32, 40)))
         add(TilesetRegion.create("asm_piston_a_extended", regionMap.getOrNull("asm_piston_a_extended"), RegionSpacing(1, 32, 40)))
         add(TilesetRegion.create("asm_piston_a_partial", regionMap.getOrNull("asm_piston_a_partial"), RegionSpacing(1, 32, 40)))
+        add(TilesetRegion.create("asm_widget_complete", regionMap.getOrNull("asm_widget_complete")))
+        add(TilesetRegion.create("asm_widget_complete_blur", regionMap.getOrNull("asm_widget_complete_blur")))
+        add(TilesetRegion.create("asm_widget_roll", regionMap.getOrNull("asm_widget_roll")))
     }
     
 }

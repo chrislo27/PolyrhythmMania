@@ -66,6 +66,13 @@ class TilesetPalette {
                 signShadow.color.getOrCompute().set(0, 16, 189)
             }
         }
+        
+        fun createAssembleTilesetPalette(): TilesetPalette {
+            return createGBA1TilesetPalette().apply {
+                pistonFaceX.color.getOrCompute().set(214, 181, 8)
+                pistonFaceZ.color.getOrCompute().set(255, 214, 16)
+            }
+        }
     }
 
     val cubeBorder: ColorMapping = ColorMapping("cubeBorder", { it.cubeBorder.color })
