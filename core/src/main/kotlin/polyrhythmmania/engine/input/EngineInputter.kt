@@ -304,6 +304,49 @@ class EngineInputter(val engine: Engine) {
                 }
             }
             world.dunkPiston.fullyExtend(engine, atBeat)
+        } else if (worldMode == WorldMode.ASSEMBLE && type == InputType.A) {
+            val asmPlayerPiston = world.asmPlayerPiston
+            var hit = false
+            if (asmPlayerPiston.pistonState == EntityPiston.PistonState.RETRACTED) {
+                for (entity in engine.world.entities) {
+                    if (entity !is EntityRodAsm || !entity.acceptingInputs) continue
+                    val rod: EntityRodAsm = entity
+
+                    // Compare timing
+                    val nextExpected = rod.expectedInputs.lastOrNull() ?: continue
+                    val perfectBeats = nextExpected.inputBeat
+                    val perfectSeconds = engine.tempos.beatsToSeconds(perfectBeats)
+
+                    val differenceSec = atSeconds - perfectSeconds
+                    val minSec = perfectSeconds - InputThresholds.MAX_OFFSET_SEC
+                    val maxSec = perfectSeconds + InputThresholds.MAX_OFFSET_SEC
+
+                    if (atSeconds !in minSec..maxSec) {
+                        continue
+                    }
+
+                    val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
+                    val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, 0)
+                    Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
+
+                    val inputFeedbackIndex: Int = getInputFeedbackIndex(inputResult.inputScore, inputResult.accuracySec < 0f)
+                    if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
+                        inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
+                    }
+
+                    // Bounce the rod
+                    if (inputResult.inputScore != InputScore.MISS) {
+                        rod.addInputResult(engine, inputResult)
+                        hit = true
+                    } else {
+                        // TODO play miss sound
+                    }
+                }
+
+                if (asmPlayerPiston.animation is EntityPistonAsm.Animation.Neutral) {
+                    asmPlayerPiston.fullyExtend(engine, atBeat, if (hit) 1f else 1.5f)
+                }
+            }
         }
     }
     

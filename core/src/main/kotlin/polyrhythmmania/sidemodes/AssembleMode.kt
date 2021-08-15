@@ -1,24 +1,19 @@
 package polyrhythmmania.sidemodes
 
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Vector3
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.EventPlaySFX
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.*
-import polyrhythmmania.world.entity.EntityExplosion
-import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
-import kotlin.math.sign
 
 
 class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
@@ -57,30 +52,89 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     }
 }
 
-class EventAsmPistonExtend(engine: Engine, val piston: EntityPistonAsm, startBeat: Float) : Event(engine) {
+// EVENTS ------------------------------------------------------------------------------------------------------
+
+abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float) : Event(engine) {
     
     init {
         this.beat = startBeat
     }
+    
+    abstract fun onStartRod(currentBeat: Float, rod: EntityRodAsm)
 
     override fun onStart(currentBeat: Float) {
-        super.onStart(currentBeat)
-        piston.fullyExtend(engine, currentBeat)
-        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d")) { 
-            it.pitch = 1.25f
+        engine.world.entities.forEach { e ->
+            if (e is EntityRodAsm && e.acceptingInputs) {
+                onStartRod(currentBeat, e)
+            }
         }
     }
 }
 
-class EventAsmPistonRetract(engine: Engine, val piston: EntityPistonAsm, startBeat: Float) : Event(engine) {
-    
-    init {
-        this.beat = startBeat
+/**
+ * The core event of Assemble mode.
+ * 
+ * If the [fromIndex] is out of bounds, a new rod is spawned and the bounce is applied only to it.
+ * If the [fromIndex] is in bounds and is NOT the player index, then the piston extend animation is also played.
+ * 
+ * If the [toIndex] is the player index, an expected input is scheduled for the next beat.
+ * If the [fromIndex] is the player index, then a conditional bounce is scheduled,
+ * requiring the previous input to be hit for the bounce to succeed.
+ */
+class EventAsmRodBounce(engine: Engine, startBeat: Float,
+                        val fromIndex: Int, val toIndex: Int, val nextInputIsFire: Boolean = false)
+    : AbstractEventAsmRod(engine, startBeat) {
+
+    override fun onStartRod(currentBeat: Float, rod: EntityRodAsm) {
+        bounceRod(rod)
     }
 
     override fun onStart(currentBeat: Float) {
-        super.onStart(currentBeat)
-        piston.retract()
+        val world = engine.world
+        if (fromIndex !in 0 until world.asmPistons.size) {
+            // Out of bounds. Spawn a new rod
+            val newRod = EntityRodAsm(world, this.beat)
+            world.addEntity(newRod)
+            bounceRod(newRod)
+        } else {
+            super.onStart(currentBeat)
+        }
+    }
+    
+    private fun bounceRod(rod: EntityRodAsm) {
+        val world = engine.world
+        val pistons = world.asmPistons
+        val playerIndex = pistons.indexOf(world.asmPlayerPiston)
+
+        val fromPos = rod.getPistonPosition(engine, fromIndex)
+        val toPos = rod.getPistonPosition(engine, toIndex)
+        val bounce = EntityRodAsm.BounceAsm(this.beat, 1f, toPos.y + 1f + 3.5f,
+                fromPos.x, fromPos.y + 1f, toPos.x, toPos.y + 1f, rod.bounce)
+        
+        if (fromIndex == playerIndex) {
+            // Have a conditional bounce. Bounce will only happen if the PREVIOUSLY hit input was at the same time and was successful
+            rod.expectedInputs.lastOrNull()?.addConditionalBounce(rod, bounce)
+        } else {
+            if (toIndex == playerIndex) {
+                // Schedule an expected input
+                val inputBeat = this.beat + 1
+                rod.addExpectedInput(EntityRodAsm.NextExpected(inputBeat, nextInputIsFire))
+                if (nextInputIsFire) {
+                    engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_asm_compress"))
+                }
+            }
+            
+            // Bounce the rod
+            rod.bounce = bounce
+            
+            if (fromIndex in 0 until world.asmPistons.size) {
+                // fromIndex won't be the player index. Play piston extend animation
+                world.asmPistons[fromIndex].fullyExtend(engine, this.beat, 1f)
+                engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d")) {
+                    it.pitch = 1.25f
+                }
+            }
+        }
     }
 }
 
@@ -98,8 +152,7 @@ class EventAsmPistonRetractAll(engine: Engine, startBeat: Float) : Event(engine)
     }
 }
 
-class EventAsmPistonSpringCompress(engine: Engine, val piston: EntityPistonAsm, startBeat: Float,
-                                   val fire: Boolean = false)
+class EventAsmPistonSpringCharge(engine: Engine, val piston: EntityPistonAsm, startBeat: Float)
     : Event(engine) {
 
     init {
@@ -108,43 +161,39 @@ class EventAsmPistonSpringCompress(engine: Engine, val piston: EntityPistonAsm, 
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        piston.spring(this.beat, !fire)
+        piston.chargeUp(currentBeat)
+        piston.retract()
     }
 }
 
-
-class EventAsmAssemble(engine: Engine, val combineBeat: Float)
+class EventAsmPistonSpringUncharge(engine: Engine, val piston: EntityPistonAsm, startBeat: Float)
     : Event(engine) {
 
     init {
-        this.beat = combineBeat
+        this.beat = startBeat
     }
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        
+        if (piston.animation is EntityPistonAsm.Animation.Charged) {
+            piston.uncharge(currentBeat)
+        }
+    }
+}
+
+class EventAsmSpawnWidgetHalves(engine: Engine, startBeat: Float, val combineBeat: Float, val beatsPerUnit: Float = 1f)
+    : Event(engine) {
+
+    init {
+        this.beat = startBeat
+    }
+
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+
         val world = engine.world
-        var any = false
-        world.entities.filter { 
-            it is EntityAsmWidgetHalf && MathUtils.isEqual(this.combineBeat, it.combineBeat, 0.001f)
-        }.forEach { 
-            it.kill()
-            any = true
-        }
-        world.entities.filter {
-            it is EntityRodAsm && MathUtils.isEqual(this.combineBeat, it.combineBeat, 0.001f)
-        }.forEach {
-            it.kill()
-        }
-        
-        if (any) {
-            // Spawn full widget.
-            val complete = EntityAsmWidgetComplete(world, combineBeat)
-            world.addEntity(complete)
-            world.addEntity(EntityAsmWidgetCompleteBlur(world, combineBeat).also { 
-                it.position.set(complete.position)
-            })
-        }
+        world.addEntity(EntityAsmWidgetHalf(world, true, combineBeat, 0f, beatsPerUnit))
+        world.addEntity(EntityAsmWidgetHalf(world, false, combineBeat, 0f, beatsPerUnit))
     }
 }
 
@@ -163,92 +212,32 @@ class EventAsmPrepareSfx(engine: Engine, startBeat: Float) : Event(engine) {
     }
 }
 
-
-class EventAsmRodBounce(engine: Engine, val rod: EntityRodAsm, startBeat: Float, val duration: Float, 
-                        val fromIndex: Int, val toIndex: Int, 
-                        val shouldAimInPit: Boolean = false,
-                        val shouldRetractAllFirst: Boolean = true, val extendPistonBelow: Boolean = true)
+class EventAsmAssemble(engine: Engine, val combineBeat: Float)
     : Event(engine) {
 
     init {
-        this.beat = startBeat
-    }
-    
-    fun getPistonPosition(index: Int): Vector3 {
-        val vec = Vector3(0f, 0f, 0f)
-        val pistons = engine.world.asmPistons
-        
-        if (index < 0) {
-            vec.set(pistons[0].position)
-            vec.x -= 4f
-        } else if (index >= pistons.size) {
-            vec.set(pistons[pistons.size - 1].position)
-            vec.x += 4f
-        } else {
-            vec.set(pistons[index].position)
-        }
-        
-        return vec
-    }
-
-    override fun onStart(currentBeat: Float) {
-        super.onStart(currentBeat)
-
-        if (shouldRetractAllFirst) {
-            engine.world.asmPistons.forEach { piston ->
-                piston.retract()
-            }
-        }
-        
-        val previousBounce = rod.bounce
-        val fromPos = getPistonPosition(fromIndex)
-        val toPos = getPistonPosition(toIndex)
-        val mainBounce = EntityRodAsm.BounceAsm(this.beat, duration, toPos.y + 1f + 3.5f,
-                fromPos.x, fromPos.y + 1f, toPos.x, toPos.y + 1f,
-                previousBounce)
-        if (shouldAimInPit) {
-            rod.bounce = EntityRodAsm.BounceAsm(this.beat + duration, duration, mainBounce.endY - 7f,
-                    mainBounce.endX, mainBounce.endY,
-                    mainBounce.endX - (mainBounce.endX - mainBounce.startBeat).sign * 1f, mainBounce.endY - 10f,
-                    mainBounce)
-            rod.killAtBeat = this.beat + duration * 2
-            rod.combineBeat = this.beat + duration
-        } else {
-            rod.bounce = mainBounce
-        }
-        
-        if (fromIndex in 0 until engine.world.asmPistons.size) {
-            if (extendPistonBelow) {
-                engine.world.asmPistons[fromIndex].fullyExtend(engine, currentBeat)
-                engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d")) {
-                    it.pitch = if (fromIndex == 2) 1.35f else 1.25f
-                }
-            }
-            
-            engine.world.addEntity(EntityExplosion(engine.world, engine.seconds, rod.renderWidth).apply {
-                this.duration = 4f / 60f
-                this.position.set(fromPos)
-                this.position.y += 1f
-                this.position.x += 0.75f
-                this.position.z -= 0.25f
-            })
-        }
-    }
-}
-
-
-class EventAsmSpawnWidgetHalves(engine: Engine, startBeat: Float, val combineBeat: Float, val beatsPerUnit: Float = 1f)
-    : Event(engine) {
-
-    init {
-        this.beat = startBeat
+        this.beat = combineBeat
     }
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
 
         val world = engine.world
-        world.addEntity(EntityAsmWidgetHalf(world, true, combineBeat, 0f, beatsPerUnit))
-        world.addEntity(EntityAsmWidgetHalf(world, false, combineBeat, 0f, beatsPerUnit))
+        var any = false
+        world.entities.filter {
+            it is EntityAsmWidgetHalf && MathUtils.isEqual(this.combineBeat, it.combineBeat, 0.001f)
+        }.forEach {
+            it.kill()
+            any = true
+        }
+
+        if (any) {
+            // Spawn full widget.
+            val complete = EntityAsmWidgetComplete(world, combineBeat)
+            world.addEntity(complete)
+            world.addEntity(EntityAsmWidgetCompleteBlur(world, combineBeat).also {
+                it.position.set(complete.position)
+            })
+        }
     }
 }

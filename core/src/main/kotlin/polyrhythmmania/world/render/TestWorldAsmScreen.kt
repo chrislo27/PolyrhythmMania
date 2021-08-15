@@ -44,84 +44,41 @@ class TestWorldAsmScreen(main: PRManiaGame) : PRManiaScreen(main) {
         })
     }
 
-    private val player: MusicSamplePlayer = SidemodeAssets.polyrhythmTheme.createPlayer(soundSystem.audioContext).apply {
-        this.gain = 0.75f
-//        this.loopStartMs = 3725f
-        this.loopEndMs = 40928f //33482f
-        this.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
-        this.prepareStartBuffer()
-    }
-    
-    private var robotMode: Boolean = true
+//    private val player: MusicSamplePlayer = SidemodeAssets.polyrhythmTheme.createPlayer(soundSystem.audioContext).apply {
+//        this.gain = 0.75f
+////        this.loopStartMs = 3725f
+//        this.loopEndMs = 40928f //33482f
+//        this.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
+//        this.prepareStartBuffer()
+//    }
 
     init {
-        soundSystem.audioContext.out.addInput(player)
+//        soundSystem.audioContext.out.addInput(player)
         soundSystem.startRealtime()
 
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
         
-        engine.autoInputs = true
+//        engine.autoInputs = true
+        engine.autoInputs = false
+        engine.inputter.areInputsLocked = false
         
         addEvents()
     }
     
     private fun addEvents() {
-        val playerPiston = world.asmPistons[2]
-        engine.addEvent(LoopingEvent(engine, 10f, { true }) { engine, startBeat ->
-            val rod = EntityRodAsm(world, 0f)
-            world.addEntity(rod)
-            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat, 1f, 999, 3))
-            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 1, 1f, 3, 2))
-            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 2, 1f, 2, 1))
-            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 3, 1f, 1, 0))
-            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 4, 1f, 0, 1))
-            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 5, 1f, 1, 2))
-            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 6, 1f, 2, 3))
-            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 7, 1f, 3, 2, shouldAimInPit = true))
-            
-            engine.addEvent(EventAsmSpawnWidgetHalves(engine, startBeat, startBeat + 8))
-            
-            engine.addEvent(EventAsmPrepareSfx(engine, startBeat + 8 - 2f))
-            engine.addEvent(EventAsmPistonRetractAll(engine, startBeat + 8))
-            engine.addEvent(EventAsmPistonSpringCompress(engine, playerPiston, startBeat + 8 - 1f))
-            engine.addEvent(EventAsmPistonSpringCompress(engine, playerPiston, startBeat + 8, fire = true))
-            
-            engine.addEvent(EventAsmAssemble(engine, startBeat + 8))
-        }.also { e ->
-            e.beat = 8f - 1
-        })
+        engine.addEvent(EventAsmSpawnWidgetHalves(engine, 0f, 8f))
+        engine.addEvent(EventAsmRodBounce(engine, 0f, 999, 3, false))
+        engine.addEvent(EventAsmRodBounce(engine, 1f, 3, 2, false))
+        engine.addEvent(EventAsmRodBounce(engine, 2f, 2, 1, false))
+        engine.addEvent(EventAsmRodBounce(engine, 3f, 1, 0, false))
+        engine.addEvent(EventAsmRodBounce(engine, 4f, 0, 1, false))
+        engine.addEvent(EventAsmRodBounce(engine, 5f, 1, 2, false))
+        engine.addEvent(EventAsmRodBounce(engine, 6f, 2, 3, false))
+        engine.addEvent(EventAsmRodBounce(engine, 7f, 3, 2, true))
         
-//        val rod = EntityRodAsm(world, 0f)
-//        world.addEntity(rod)
-//        
-//        world.addEntity(EntityAsmWidgetHalf(world, true, 9f, 0f))
-//        world.addEntity(EntityAsmWidgetHalf(world, false, 9f, 0f))
-//        
-//        engine.addEvent(EventAsmRodBounce(engine, rod, 0f, 1f, -1, 0))
-//        engine.addEvent(LoopingEvent(engine, 6f, { true }) { engine, startBeat ->
-//            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat, 1f, 0, 1))
-//            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 1, 1f, 1, 2))
-//            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 2, 1f, 2, 3))
-//            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 3, 1f, 3, 2))
-//            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 4, 1f, 2, 1))
-//            engine.addEvent(EventAsmRodBounce(engine, rod, startBeat + 5, 1f, 1, 0))
-//            
-//            engine.addEvent(EventAsmPistonRetractAll(engine, startBeat))
-//            engine.addEvent(EventAsmPistonRetractAll(engine, startBeat + 1))
-//            engine.addEvent(EventAsmPistonRetractAll(engine, startBeat + 2))
-//            engine.addEvent(EventAsmPistonRetractAll(engine, startBeat + 3))
-//            engine.addEvent(EventAsmPistonRetractAll(engine, startBeat + 4))
-//            engine.addEvent(EventAsmPistonRetractAll(engine, startBeat + 5))
-//            
-//            engine.addEvent(EventAsmPistonExtend(engine, world.asmPistons[0], startBeat))
-//            engine.addEvent(EventAsmPistonExtend(engine, world.asmPistons[1], startBeat + 1))
-//            engine.addEvent(EventAsmPistonExtend(engine, world.asmPistons[2], startBeat + 2))
-//            engine.addEvent(EventAsmPistonExtend(engine, world.asmPistons[3], startBeat + 3))
-//            engine.addEvent(EventAsmPistonExtend(engine, world.asmPistons[2], startBeat + 4))
-//            engine.addEvent(EventAsmPistonExtend(engine, world.asmPistons[1], startBeat + 5))
-//        }.also { e -> 
-//            e.beat = 1f
-//        })
+        engine.addEvent(EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, 7f))
+        engine.addEvent(EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, 8f))
+        engine.addEvent(EventAsmPrepareSfx(engine, 6f))
     }
 
     override fun render(delta: Float) {
@@ -187,7 +144,7 @@ class TestWorldAsmScreen(main: PRManiaGame) : PRManiaScreen(main) {
             engine.postRunnable {
                 engine.inputter.onAButtonPressed(false)
             }
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+        } else if (Gdx.input.isKeyJustReleased(Input.Keys.J)) {
             engine.postRunnable {
                 engine.inputter.onDpadButtonPressed(true)
             }
