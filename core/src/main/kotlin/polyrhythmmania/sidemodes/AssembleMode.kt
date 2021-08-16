@@ -14,6 +14,7 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.*
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
+import kotlin.math.sign
 
 
 class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
@@ -22,7 +23,7 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     init {
         container.world.worldMode = WorldMode.ASSEMBLE
         container.engine.inputter.endlessScore.maxLives.set(3)
-        container.renderer.worldBackground = DunkWorldBackground
+        container.renderer.worldBackground = AssembleWorldBackground
         container.renderer.tileset.texturePack.set(StockTexturePacks.gba)
         TilesetPalette.createAssembleTilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
@@ -37,6 +38,8 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         musicData.loopParams = LoopParams(SamplePlayer.LoopType.LOOP_FORWARDS, 0.0, music.musicSample.lengthMs)
         musicData.beadsMusic = music
         musicData.update()
+        
+        SidemodeAssets.assembleSfx // Call get to load
 
         addInitialBlocks()
     }
@@ -108,10 +111,16 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
 
         val fromPos = rod.getPistonPosition(engine, fromIndex)
         val toPos = rod.getPistonPosition(engine, toIndex)
-        val bounce = EntityRodAsm.BounceAsm(this.beat, 1f, toPos.y + 1f + 3.5f,
+        var bounce = EntityRodAsm.BounceAsm(this.beat, 1f, toPos.y + 1f + (if (nextInputIsFire) 4.5f else 3.5f),
                 fromPos.x, fromPos.y + 1f, toPos.x, toPos.y + 1f, rod.bounce)
         
-        if (fromIndex == playerIndex) {
+        if (nextInputIsFire) {
+            bounce = EntityRodAsm.BounceAsm(this.beat + bounce.duration, 1f, bounce.endY - 5f,
+                    bounce.endX, bounce.endY,
+                    bounce.endX + (bounce.endX - bounce.startX).sign * 3f, bounce.endY - 11f, bounce)
+        }
+        
+        if (fromIndex == playerIndex && !engine.autoInputs) {
             // Have a conditional bounce. Bounce will only happen if the PREVIOUSLY hit input was at the same time and was successful
             rod.expectedInputs.lastOrNull()?.addConditionalBounce(rod, bounce)
         } else {
@@ -120,7 +129,7 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
                 val inputBeat = this.beat + 1
                 rod.addExpectedInput(EntityRodAsm.NextExpected(inputBeat, nextInputIsFire))
                 if (nextInputIsFire) {
-                    engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_asm_compress"))
+                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_compress"))
                 }
             }
             
@@ -128,11 +137,15 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
             rod.bounce = bounce
             
             if (fromIndex in 0 until world.asmPistons.size) {
-                // fromIndex won't be the player index. Play piston extend animation
+                // Play piston extend animation
                 world.asmPistons[fromIndex].fullyExtend(engine, this.beat, 1f)
-                engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d")) {
-                    it.pitch = 1.25f
-                }
+                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue(when (fromIndex) {
+                    0 -> "sfx_asm_left"
+                    1 -> "sfx_asm_middle_left"
+                    2 -> "sfx_asm_middle_right"
+                    3 -> "sfx_asm_right"
+                    else -> "sfx_asm_left"
+                }))
             }
         }
     }
@@ -161,8 +174,10 @@ class EventAsmPistonSpringCharge(engine: Engine, val piston: EntityPistonAsm, st
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        piston.chargeUp(currentBeat)
-        piston.retract()
+        if (engine.world.entities.any { e -> e is EntityRodAsm && e.acceptingInputs }) {
+            piston.chargeUp(currentBeat)
+            piston.retract()
+        }
     }
 }
 
@@ -205,7 +220,7 @@ class EventAsmPrepareSfx(engine: Engine, startBeat: Float) : Event(engine) {
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        val beadsSound = AssetRegistry.get<BeadsSound>("sfx_asm_prepare")
+        val beadsSound = SidemodeAssets.assembleSfx.getValue("sfx_asm_prepare")
         engine.soundInterface.playAudio(beadsSound) { player ->
             player.pitch = engine.tempos.tempoAtBeat(currentBeat) / 98f
         }
@@ -225,7 +240,7 @@ class EventAsmAssemble(engine: Engine, val combineBeat: Float)
         val world = engine.world
         var any = false
         world.entities.filter {
-            it is EntityAsmWidgetHalf && MathUtils.isEqual(this.combineBeat, it.combineBeat, 0.001f)
+            it is EntityAsmWidgetHalf && MathUtils.isEqual(this.combineBeat, it.combineBeat, 0.01f)
         }.forEach {
             it.kill()
             any = true

@@ -1,26 +1,46 @@
 package polyrhythmmania.world
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import paintbox.util.ColorStack
+import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
+import polyrhythmmania.engine.input.InputThresholds
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.sidemodes.EventAsmAssemble
+import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.entity.SpriteEntity
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
 import kotlin.math.*
 
+
+
+object AssembleWorldBackground : WorldBackground() {
+
+    private val gradientStart: Color = Color.valueOf("1B6B17")
+    private val gradientEnd: Color = Color.BLACK.cpy()
+    
+    override fun render(batch: SpriteBatch, engine: Engine, camera: OrthographicCamera) {
+        batch.drawQuad(0f, camera.viewportHeight * 0.25f, gradientEnd, 
+                camera.viewportWidth, camera.viewportHeight * 0.25f, gradientEnd,
+                camera.viewportWidth, camera.viewportHeight, gradientStart,
+                0f, camera.viewportHeight, gradientStart)
+    }
+}
 
 open class EntityAsmCube(world: World)
     : SpriteEntity(world) {
@@ -84,6 +104,27 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
             }
         }
         class Fire(piston: EntityPistonAsm, val startBeat: Float) : Animation(piston) {
+            object FireInterpolation : Interpolation() {
+                private fun decay(a: Float): Float {
+                    return MathUtils.lerp(2.0.pow(10.0 * -a).toFloat(), 1f - a, 0.25f)
+                }
+
+                private fun sine(a: Float): Float {
+                    return MathUtils.sin((1f - a) * ((5 - 0.5f) * MathUtils.PI))
+                }
+
+                override fun apply(a: Float): Float {
+                    val holdAmt = 0.075f
+                    val holdMin = 0.9f
+                    val a = if (a < holdAmt) {
+                        return Interpolation.slowFast.apply(1f, holdMin, a / holdAmt)
+                    } else {
+                        Interpolation.fastSlow.apply((a - holdAmt) / (1f - holdAmt)) * holdMin
+                    }
+                    return decay(a) * sine(a)
+                }
+            }
+            
             override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
                 super.engineUpdate(engine, beat, seconds)
 
@@ -91,9 +132,12 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
                 val minZ = -3f
                 val alpha = ((beat - startBeat) / duration).coerceIn(0f, 1f)
                 piston.position.z = Interpolation.circleOut.apply(minZ, 0f, alpha)
+                piston.position.z = Interpolation.circleOut.apply(minZ, 0f, alpha) + ((Interpolation.ElasticOut(2f, 10f, 20, 1f).apply(alpha) - 1) * -1f)
+                piston.position.z = FireInterpolation.apply(0f, minZ, alpha)
                 
                 if (alpha >= 1f) {
                     piston.animation = Neutral(piston)
+                    piston.position.z = 0f
                 }
                 piston.tint?.set(playerTint)
             }
@@ -249,7 +293,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
             private set
 
         fun addInput(rod: EntityRodAsm, input: InputResult) {
-            if (input.inputScore == InputScore.MISS || !MathUtils.isEqual(input.perfectBeat, inputBeat, 0.001f)) return
+            if (input.inputScore == InputScore.MISS || !MathUtils.isEqual(input.perfectBeat, inputBeat, 0.01f)) return
             hitInput = input
             
             if (isFire) {
@@ -265,9 +309,9 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
         fun addConditionalBounce(rod: EntityRodAsm, bounce: BounceAsm) {
             val hit = this.hitInput
             val early = rod.earlyInputResult
-            if (hit != null && MathUtils.isEqual(hit.perfectBeat, bounce.startBeat, 0.001f)) {
+            if (hit != null && MathUtils.isEqual(hit.perfectBeat, bounce.startBeat, 0.00f)) {
                 rod.bounce = bounce
-            } else if (early != null && MathUtils.isEqual(early.perfectBeat, bounce.startBeat, 0.001f)) {
+            } else if (early != null && MathUtils.isEqual(early.perfectBeat, bounce.startBeat, 0.01f)) {
                 conditionalBounce = bounce
                 addInput(rod, early)
                 rod.earlyInputResult = null
@@ -290,9 +334,13 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
      * True when an input has missed
      */
     var failed: Boolean = false
+        private set
+    var failFallVeloY: Float = 0f
+    
+    var disableInputs: Boolean = false
 
     val acceptingInputs: Boolean
-        get() = !isKilled && !failed
+        get() = !isKilled && !failed && !disableInputs
 
     /**
      * If there is an expected input that [input] matches, then it is added to the expected input ([input] is late).
@@ -300,21 +348,19 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
      */
     fun addInputResult(engine: Engine, input: InputResult) {
         val matchingExpected = expectedInputs.lastOrNull {
-            MathUtils.isEqual(it.inputBeat, input.perfectBeat, 0.001f) && it.hitInput == null
+            MathUtils.isEqual(it.inputBeat, input.perfectBeat, 0.01f) && it.hitInput == null
         }
         
         if (matchingExpected != null) {
             matchingExpected.addInput(this, input)
-            if (matchingExpected.isFire) {
-                val piston = world.asmPlayerPiston
+            val piston = world.asmPlayerPiston
+            if (matchingExpected.isFire/* && piston.animation is EntityPistonAsm.Animation.Charged*/) {
                 piston.animation = EntityPistonAsm.Animation.Fire(piston, matchingExpected.inputBeat)
                 piston.retract()
-                engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_asm_shoot"))
+                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_shoot"))
                 engine.addEvent(EventAsmAssemble(engine, matchingExpected.inputBeat))
             } else {
-                engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d")) {
-                    it.pitch = 1.25f
-                }
+                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_middle_right"))
             }
         } else {
             earlyInputResult = input
@@ -330,7 +376,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
         val earlyInput = earlyInputResult
         
         if (earlyInput != null) {
-            if (MathUtils.isEqual(earlyInput.perfectBeat, expected.inputBeat, 0.001f)) {
+            if (MathUtils.isEqual(earlyInput.perfectBeat, expected.inputBeat, 0.01f)) {
                 expected.addInput(this, earlyInput)
             }
         }
@@ -364,11 +410,46 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
         if (currentBounce != null) {
             val endBeat = currentBounce.startBeat + currentBounce.duration
             this.position.x = currentBounce.getXFromBeat(beat) + ((1f / 32f) * 6)
-            this.position.y = currentBounce.getYFromBeat(beat)
+            if (!failed) this.position.y = currentBounce.getYFromBeat(beat)
 
             if (beat >= endBeat) {
                 this.bounce = null
             }
+        }
+
+
+        val expected = expectedInputs.lastOrNull()
+        
+        // Auto-inputs
+        if (engine.autoInputs && expected != null && expected.hitInput == null && beat > expected.inputBeat) {
+            this.addInputResult(engine, InputResult(expected.inputBeat, InputType.A, 0f, 0f, 0))
+
+            val asmPlayerPiston = world.asmPlayerPiston
+            if (asmPlayerPiston.animation is EntityPistonAsm.Animation.Neutral) {
+                asmPlayerPiston.fullyExtend(engine, expected.inputBeat, 1f)
+            }
+        }
+
+        // Check expected inputs. If missed, make the rod fall off/fall down depending on if input was fire
+        if (!failed && expected != null && (expected.hitInput == null || expected.hitInput?.inputScore == InputScore.MISS)) {
+            val expectedInputSec = engine.tempos.beatsToSeconds(expected.inputBeat)
+            if (seconds > expectedInputSec + InputThresholds.MAX_OFFSET_SEC) {
+                failed = true
+                killAtBeat = expected.inputBeat + 4f
+                if (expected.isFire) {
+                    // TODO
+                    failFallVeloY = GRAVITY
+                } else {
+                    bounce = BounceAsm(beat, 1f, this.position.y - 0.01f, this.position.x, this.position.y,
+                            this.position.x + MathUtils.random(1.25f, 2f) * MathUtils.randomSign(), this.position.y - 7f, null)
+                    failFallVeloY = 6f
+                }
+            }
+        }
+
+        if (failed) {
+            failFallVeloY += -64f * deltaSec
+            this.position.y += failFallVeloY * deltaSec
         }
     }
 
@@ -409,7 +490,7 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
         val beatPiece = 1f - ((beatsBeforeCombine + 1000f) % 1)
         val moveTime = 0.25f
         if (beatPiece < moveTime) {
-            x += movementSign * ((beatPiece / moveTime).coerceAtLeast(0.25f) - 1f)
+            x += (Interpolation.circleOut.apply((beatPiece / moveTime)) - 1f) * movementSign
         }
 
         return x
@@ -487,6 +568,8 @@ class EntityAsmWidgetCompleteBlur(world: World,
 
     override val pxOffsetX: Float = 24f / 32f
     override val pxOffsetY: Float = -16f / 32f
+    
+    private var frameCountdown: Int = 2
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return tileset.asmWidgetCompleteBlur
@@ -498,6 +581,9 @@ class EntityAsmWidgetCompleteBlur(world: World,
 
     override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
         super.render(renderer, batch, tileset, engine)
-        kill()
+        frameCountdown--
+        if (frameCountdown <= 0) {
+            kill()
+        }
     }
 }

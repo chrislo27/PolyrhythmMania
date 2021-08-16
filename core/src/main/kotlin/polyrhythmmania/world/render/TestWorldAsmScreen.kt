@@ -44,41 +44,89 @@ class TestWorldAsmScreen(main: PRManiaGame) : PRManiaScreen(main) {
         })
     }
 
-//    private val player: MusicSamplePlayer = SidemodeAssets.polyrhythmTheme.createPlayer(soundSystem.audioContext).apply {
-//        this.gain = 0.75f
-////        this.loopStartMs = 3725f
-//        this.loopEndMs = 40928f //33482f
-//        this.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
-//        this.prepareStartBuffer()
-//    }
+    private val player: MusicSamplePlayer = SidemodeAssets.assembleTheme.createPlayer(soundSystem.audioContext).apply {
+        this.gain = 1f
+        this.prepareStartBuffer()
+    }
 
     init {
-//        soundSystem.audioContext.out.addInput(player)
+        soundSystem.audioContext.out.addInput(player)
         soundSystem.startRealtime()
-
-        engine.tempos.addTempoChange(TempoChange(0f, 129f))
         
-//        engine.autoInputs = true
         engine.autoInputs = false
         engine.inputter.areInputsLocked = false
-        
+
+        renderer.worldBackground = AssembleWorldBackground
         addEvents()
     }
     
     private fun addEvents() {
-        engine.addEvent(EventAsmSpawnWidgetHalves(engine, 0f, 8f))
-        engine.addEvent(EventAsmRodBounce(engine, 0f, 999, 3, false))
-        engine.addEvent(EventAsmRodBounce(engine, 1f, 3, 2, false))
-        engine.addEvent(EventAsmRodBounce(engine, 2f, 2, 1, false))
-        engine.addEvent(EventAsmRodBounce(engine, 3f, 1, 0, false))
-        engine.addEvent(EventAsmRodBounce(engine, 4f, 0, 1, false))
-        engine.addEvent(EventAsmRodBounce(engine, 5f, 1, 2, false))
-        engine.addEvent(EventAsmRodBounce(engine, 6f, 2, 3, false))
-        engine.addEvent(EventAsmRodBounce(engine, 7f, 3, 2, true))
+        var tempoChangeBeat = 0f
+        engine.tempos.addTempoChangesBulk("""98.002 24.0
+104.001 12.0
+108.011 4.0
+111.993 12.0
+122.075 2.0
+128.068 2.0
+131.965 12.0
+120.0 2.0
+106.007 2.0
+97.999 12.0
+86.022 2.0
+70.012 2.0
+60.0 12.0
+96.0 2.0
+115.942 2.0
+132.013 12.0
+140.023 2.0
+150.0 2.0
+160.0 20.0""".lines().map {
+            val split = it.split(' ')
+            val newTempo = split[0].toFloat()
+            val dur = split[1].toFloat()
+            val tc = TempoChange(tempoChangeBeat, newTempo)
+            tempoChangeBeat += dur
+            tc
+        })
+
         
-        engine.addEvent(EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, 7f))
-        engine.addEvent(EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, 8f))
-        engine.addEvent(EventAsmPrepareSfx(engine, 6f))
+        fun patternA(startBeat: Float) {
+            engine.addEvent(EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 8f))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 0f, 999, 3, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 1f, 3, 2, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 2f, 2, 1, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 3f, 1, 0, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 4f, 0, 1, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 5f, 1, 2, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 6f, 2, 3, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 7f, 3, 2, true))
+
+            engine.addEvent(EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 7f))
+            engine.addEvent(EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 8f))
+            engine.addEvent(EventAsmPrepareSfx(engine, startBeat + 6f))
+        }
+        
+        fun patternB(startBeat: Float) {
+            engine.addEvent(EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 5f))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 0f, -1, 0, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 1f, 0, 1, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 2f, 1, 2, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 3f, 2, 3, false))
+            engine.addEvent(EventAsmRodBounce(engine, startBeat + 4f, 3, 2, true))
+
+            engine.addEvent(EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 4f))
+            engine.addEvent(EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 5f))
+            engine.addEvent(EventAsmPrepareSfx(engine, startBeat + 3f))
+        }
+        
+        fun patternBoth(startBeat: Float) {
+            patternA(startBeat)
+            patternB(startBeat + 8f)
+        }
+
+        repeat(8) { 
+            patternBoth(7f + it * 16f)
+        }
     }
 
     override fun render(delta: Float) {

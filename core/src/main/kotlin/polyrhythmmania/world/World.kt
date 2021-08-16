@@ -350,6 +350,20 @@ class World {
             }
         }
 
+
+        // Background
+        for (x in 8..22) {
+            for (y in -1 downTo -7) {
+                if (y <= -(x * 0.5f + 2)) continue
+                if (y >= -(x * 0.5f - 5)) continue
+                val ent: Entity = EntityAsmCube(this, Color().grey((11 + y) * (1f / 11f)))
+
+                addEntity(ent.apply {
+                    this.position.set(x.toFloat(), y.toFloat() + 4f, -10f)
+                })
+            }
+        }
+
         
         addEntity(asmPistons[0].apply {
             this.type = EntityPiston.Type.PISTON_DPAD

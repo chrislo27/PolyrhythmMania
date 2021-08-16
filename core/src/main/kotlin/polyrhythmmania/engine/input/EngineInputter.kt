@@ -14,6 +14,7 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.engine.music.MusicVolume
+import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
@@ -338,13 +339,30 @@ class EngineInputter(val engine: Engine) {
                     if (inputResult.inputScore != InputScore.MISS) {
                         rod.addInputResult(engine, inputResult)
                         hit = true
-                    } else {
-                        // TODO play miss sound
                     }
                 }
 
-                if (asmPlayerPiston.animation is EntityPistonAsm.Animation.Neutral) {
+                val animation = asmPlayerPiston.animation
+                if (animation is EntityPistonAsm.Animation.Neutral) {
                     asmPlayerPiston.fullyExtend(engine, atBeat, if (hit) 1f else 1.5f)
+                    if (!hit) {
+                        // TODO play miss sound
+                        
+                    }
+                } else if (animation is EntityPistonAsm.Animation.Charged && !hit) {
+                    // Release charge
+                    val piston = world.asmPlayerPiston
+                    piston.animation = EntityPistonAsm.Animation.Fire(piston, atBeat)
+                    piston.retract()
+                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_shoot"))
+
+                    for (entity in engine.world.entities) {
+                        if (entity !is EntityRodAsm || !entity.acceptingInputs) continue
+                        val nextExpected = entity.expectedInputs.lastOrNull() ?: continue
+                        if (nextExpected.isFire) {
+                            entity.disableInputs = true
+                        }
+                    }
                 }
             }
         }
