@@ -81,7 +81,9 @@ class AssetRegistryLoadingScreen(main: PRManiaGame)
                 onAssetLoadingComplete()
                 val nextScreenRes = nextScreenProducer.invoke()
                 Gdx.app.postRunnable {
-                    main.screen = nextScreenRes
+                    Gdx.app.postRunnable { // Delay by 2 frames
+                        main.screen = nextScreenRes
+                    }
                 }
             }
         }
