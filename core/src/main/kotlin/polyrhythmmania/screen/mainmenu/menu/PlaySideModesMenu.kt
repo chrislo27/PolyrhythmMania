@@ -13,6 +13,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.sidemodes.AssembleMode
 import polyrhythmmania.sidemodes.DunkMode
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.ui.PRManiaSkins
@@ -67,6 +68,11 @@ class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 DiscordHelper.updatePresence(DefaultPresences.PlayingDunk)
                 mainMenu.backgroundType = BgType.DUNK
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
+            }
+            vbox += createSidemodeLongButton("mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
+                    Var { listOf(main.settings.sidemodeAssembleHighScore.use()) }), showResults = true) { main, _ ->
+                DiscordHelper.updatePresence(DefaultPresences.PlayingAssemble)
+                AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))
             }
             
             vbox += createLongButton { """Trailer Video: [font=thin]Polyrhythm: Assemble[]""" }.apply {

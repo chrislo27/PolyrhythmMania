@@ -38,6 +38,7 @@ object PreferenceKeys {
     val ENDLESS_DUNK_HIGHSCORE = "endlessMode_dunk_highScore"
     val ENDLESS_DAILY_CHALLENGE = "endlessMode_dailyChallenge"
     val ENDLESS_HIGH_SCORE = "endlessMode_endless_highScore"
+    val SIDEMODE_ASSEMBLE_NORMAL = "sideMode_assemble_normal"
     
     
 }

@@ -5,15 +5,20 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
+import polyrhythmmania.editor.block.BlockEndState
+import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.tempo.TempoChange
+import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
+import java.util.*
 import kotlin.math.sign
 
 
@@ -21,21 +26,49 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     : AbstractEndlessMode(main, prevHighScore) {
 
     init {
-        container.world.worldMode = WorldMode.ASSEMBLE
-        container.engine.inputter.endlessScore.maxLives.set(3)
+        container.world.worldMode = WorldMode(WorldType.ASSEMBLE, false)
+        container.renderer.showEndlessModeScore.set(false)
+//        container.engine.inputter.endlessScore.maxLives.set(3)
         container.renderer.worldBackground = AssembleWorldBackground
         container.renderer.tileset.texturePack.set(StockTexturePacks.gba)
         TilesetPalette.createAssembleTilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
+        container.renderer.flashHudRedWhenLifeLost.set(true)
     }
 
     override fun initialize() {
-        engine.tempos.addTempoChange(TempoChange(0f, 129f))
+        var tempoChangeBeat = 0f
+        engine.tempos.addTempoChangesBulk("""98.002 24.0
+104.001 12.0
+108.011 4.0
+111.993 12.0
+122.075 2.0
+128.068 2.0
+131.965 12.0
+120.0 2.0
+106.007 2.0
+97.999 12.0
+86.022 2.0
+70.012 2.0
+60.0 12.0
+96.0 2.0
+115.942 2.0
+132.013 12.0
+140.023 2.0
+150.0 2.0
+160.0 20.0""".lines().map {
+            val split = it.split(' ')
+            val newTempo = split[0].toFloat()
+            val dur = split[1].toFloat()
+            val tc = TempoChange(tempoChangeBeat, newTempo)
+            tempoChangeBeat += dur
+            tc
+        })
 
-        val music: BeadsMusic = SidemodeAssets.practiceTheme
+        val music: BeadsMusic = SidemodeAssets.assembleTheme
         val musicData = engine.musicData
         musicData.musicSyncPointBeat = 0f
-        musicData.loopParams = LoopParams(SamplePlayer.LoopType.LOOP_FORWARDS, 0.0, music.musicSample.lengthMs)
+        musicData.loopParams = LoopParams(SamplePlayer.LoopType.NO_LOOP_FORWARDS, 0.0, music.musicSample.lengthMs)
         musicData.beadsMusic = music
         musicData.update()
         
@@ -49,9 +82,73 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         blocks += ResetMusicVolumeBlock(engine).apply {
             this.beat = 0f
         }
+        blocks += InitializationBlock().apply {
+            this.beat = 0f
+        }
         
+        blocks += BlockEndState(engine).apply { 
+            this.beat = 144f
+        }
 
         container.addBlocks(blocks)
+    }
+
+    inner class InitializationBlock : Block(engine, EnumSet.allOf(BlockType::class.java)) {
+        
+        override fun compileIntoEvents(): List<Event> {
+            fun patternA(startBeat: Float): List<Event> {
+                val list = mutableListOf<Event>()
+                list += EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 8f)
+                list += EventAsmRodBounce(engine, startBeat + 0f, 999, 3, false)
+                list += EventAsmRodBounce(engine, startBeat + 1f, 3, 2, false)
+                list += EventAsmRodBounce(engine, startBeat + 2f, 2, 1, false)
+                list += EventAsmRodBounce(engine, startBeat + 3f, 1, 0, false)
+                list += EventAsmRodBounce(engine, startBeat + 4f, 0, 1, false)
+                list += EventAsmRodBounce(engine, startBeat + 5f, 1, 2, false)
+                list += EventAsmRodBounce(engine, startBeat + 6f, 2, 3, false)
+                list += EventAsmRodBounce(engine, startBeat + 7f, 3, 2, true)
+
+                list += EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 7f)
+                list += EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 8f)
+                list += EventAsmPrepareSfx(engine, startBeat + 6f)
+                
+                return list
+            }
+
+            fun patternB(startBeat: Float): List<Event> {
+                val list = mutableListOf<Event>()
+                list += EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 5f)
+                list += EventAsmRodBounce(engine, startBeat + 0f, -1, 0, false)
+                list += EventAsmRodBounce(engine, startBeat + 1f, 0, 1, false)
+                list += EventAsmRodBounce(engine, startBeat + 2f, 1, 2, false)
+                list += EventAsmRodBounce(engine, startBeat + 3f, 2, 3, false)
+                list += EventAsmRodBounce(engine, startBeat + 4f, 3, 2, true)
+
+                list += EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 4f)
+                list += EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 5f)
+                list += EventAsmPrepareSfx(engine, startBeat + 3f)
+
+                return list
+            }
+
+            fun patternBoth(startBeat: Float): List<Event> {
+                return patternA(startBeat) + patternB(startBeat + 8f)
+            }
+
+            return listOf(
+                    object : Event(engine) {
+                        override fun onStart(currentBeat: Float) {
+                            engine.playbackSpeed = 1f
+                        }
+                    }.also { e ->
+                        e.beat = -10000f
+                    },
+
+                    EventAsmPistonRetractAll(engine, -10000f),
+                    ) + (0 until 8).flatMap { patternBoth(7f + it * 16f) }
+        }
+
+        override fun copy(): Block = throw NotImplementedError()
     }
 }
 
@@ -253,6 +350,8 @@ class EventAsmAssemble(engine: Engine, val combineBeat: Float)
             world.addEntity(EntityAsmWidgetCompleteBlur(world, combineBeat).also {
                 it.position.set(complete.position)
             })
+            val score = engine.inputter.endlessScore.score
+            score.set(score.getOrCompute() + 1)
         }
     }
 }

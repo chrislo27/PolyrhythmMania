@@ -153,8 +153,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 //                polyrhythmmania.world.render.TestWorldRenderScreen(this@PRManiaGame)
 //                EditorScreen(this@PRManiaGame, debugMode = true)
 //                polyrhythmmania.world.render.TestWorldDunkScreen(this@PRManiaGame)
-                polyrhythmmania.world.render.TestWorldAsmScreen(this@PRManiaGame)
-//                mainMenuScreen.prepareShow(doFlipAnimation = true)
+//                polyrhythmmania.world.render.TestWorldAsmScreen(this@PRManiaGame)
+                mainMenuScreen.prepareShow(doFlipAnimation = true)
             }
         })
         

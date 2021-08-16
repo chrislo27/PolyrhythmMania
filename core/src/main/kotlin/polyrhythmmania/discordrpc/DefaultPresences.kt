@@ -27,6 +27,9 @@ object DefaultPresences {
     
     object PlayingDunk
         : PresenceState("Playing Polyrhythm DUNK!!")
+    
+    object PlayingAssemble
+        : PresenceState("Playing Polyrhythm: Assemble")
 
 
     sealed class Elapsable(state: String, val duration: Float, smallIcon: String = "", smallIconText: String = state)

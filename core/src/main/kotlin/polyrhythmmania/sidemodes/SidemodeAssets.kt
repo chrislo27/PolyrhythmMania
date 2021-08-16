@@ -25,8 +25,8 @@ object SidemodeAssets : Disposable {
     
     val assembleTheme: BeadsMusic by lazy { GdxAudioReader.newMusic(Gdx.files.internal("music/assemble.ogg"), null) }
     val assembleSfx: Map<String, BeadsSound> by lazy {
-        listOf("prepare", "compress", "shoot", "left", "middle_left", "middle_right", "right").associate {
-            "sfx_asm$it" to GdxAudioReader.newSound(Gdx.files.internal("sounds/assemble/${it}.ogg"))
+        listOf("prepare", "compress", "shoot", "left", "middle_left", "middle_right", "right", "collide").associate {
+            "sfx_asm_$it" to GdxAudioReader.newSound(Gdx.files.internal("sounds/assemble/${it}.ogg"))
         }
     }
 

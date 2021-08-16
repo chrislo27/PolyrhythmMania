@@ -184,9 +184,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val beadsMusic: BeadsMusic
     private var shouldBeBandpass: Boolean = false
     var soundSys: SoundSys by settableLazy {
-        SoundSys().apply {
-            musicPlayer.pause(true)
-        }
+        SoundSys()
     }
 
     init {

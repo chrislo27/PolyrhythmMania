@@ -91,6 +91,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }.apply {
             this.setOnAction {
                 settings.endlessDunkHighScore.set(0)
+                settings.sidemodeAssembleHighScore.set(0)
                 settings.persist()
                 this.disabled.set(true)
             }

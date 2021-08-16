@@ -163,7 +163,7 @@ class EngineInputter(val engine: Engine) {
         val atBeat = engine.tempos.secondsToBeats(atSeconds)
         
         val worldMode = world.worldMode
-        if (worldMode == WorldMode.POLYRHYTHM || worldMode == WorldMode.POLYRHYTHM_ENDLESS) {
+        if (worldMode.type == WorldType.POLYRHYTHM) {
             val rowBlockType: EntityPiston.Type = when (type) {
                 InputType.A -> EntityPiston.Type.PISTON_A
                 InputType.DPAD -> EntityPiston.Type.PISTON_DPAD
@@ -217,7 +217,9 @@ class EngineInputter(val engine: Engine) {
                     val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
                     if (DEBUG_LOG_INPUTS) 
                         Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
-                    inputTracker.results += inputResult
+                    if (!worldMode.showEndlessScore) {
+                        inputTracker.results += inputResult
+                    }
 
                     if (practice.practiceModeEnabled && inputResult.inputScore != InputScore.MISS) {
                         val allWereHit = practice.requiredInputs.all { it.wasHit }
@@ -263,7 +265,7 @@ class EngineInputter(val engine: Engine) {
                 // Trigger this piston (will also call updateInputIndicators)
                 rowBlock.fullyExtend(engine, atBeat)
             }
-        } else if (worldMode == WorldMode.DUNK && type == InputType.A) {
+        } else if (worldMode.type == WorldType.DUNK && type == InputType.A) {
             for (entity in engine.world.entities) {
                 if (entity !is EntityRodDunk || !entity.acceptingInputs) continue
                 val rod: EntityRodDunk = entity
@@ -305,7 +307,7 @@ class EngineInputter(val engine: Engine) {
                 }
             }
             world.dunkPiston.fullyExtend(engine, atBeat)
-        } else if (worldMode == WorldMode.ASSEMBLE && type == InputType.A) {
+        } else if (worldMode.type == WorldType.ASSEMBLE && type == InputType.A) {
             val asmPlayerPiston = world.asmPlayerPiston
             var hit = false
             if (asmPlayerPiston.pistonState == EntityPiston.PistonState.RETRACTED) {
@@ -346,8 +348,9 @@ class EngineInputter(val engine: Engine) {
                 if (animation is EntityPistonAsm.Animation.Neutral) {
                     asmPlayerPiston.fullyExtend(engine, atBeat, if (hit) 1f else 1.5f)
                     if (!hit) {
-                        // TODO play miss sound
-                        
+                        engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_middle_right")) {
+                            it.pitch = 1.5f
+                        }
                     }
                 } else if (animation is EntityPistonAsm.Animation.Charged && !hit) {
                     // Release charge
@@ -408,8 +411,11 @@ class EngineInputter(val engine: Engine) {
         }
 
         val worldMode = world.worldMode
-        when (worldMode) {
-            WorldMode.DUNK -> {
+        when (worldMode.type) {
+            WorldType.DUNK -> {
+                triggerLifeLost()
+            }
+            WorldType.ASSEMBLE -> {
                 triggerLifeLost()
             }
             else -> {}

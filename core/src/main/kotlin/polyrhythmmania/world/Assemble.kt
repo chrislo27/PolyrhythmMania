@@ -430,19 +430,22 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
             }
         }
 
-        // Check expected inputs. If missed, make the rod fall off/fall down depending on if input was fire
+        // Check expected inputs. If missed, make the rod fall off/fall down depending on if input was fire or normal bounce
         if (!failed && expected != null && (expected.hitInput == null || expected.hitInput?.inputScore == InputScore.MISS)) {
             val expectedInputSec = engine.tempos.beatsToSeconds(expected.inputBeat)
             if (seconds > expectedInputSec + InputThresholds.MAX_OFFSET_SEC) {
                 failed = true
-                killAtBeat = expected.inputBeat + 4f
+                killAtBeat = expected.inputBeat + 2f
+                engine.inputter.missed()
                 if (expected.isFire) {
-                    // TODO
                     failFallVeloY = GRAVITY
                 } else {
                     bounce = BounceAsm(beat, 1f, this.position.y - 0.01f, this.position.x, this.position.y,
                             this.position.x + MathUtils.random(1.25f, 2f) * MathUtils.randomSign(), this.position.y - 7f, null)
                     failFallVeloY = 6f
+                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_collide")) {
+                        it.gain = 0.5f
+                    }
                 }
             }
         }
@@ -459,6 +462,10 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
         if (!isKilled && beat > killAtBeat) {
             kill()
         }
+    }
+
+    override fun onRemovedFromWorld(engine: Engine) {
+        super.onRemovedFromWorld(engine)
     }
 }
 

@@ -26,6 +26,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_MUSIC_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_SKILL_STAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
+import polyrhythmmania.PreferenceKeys.SIDEMODE_ASSEMBLE_NORMAL
 import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
 import polyrhythmmania.engine.input.InputKeymapKeyboard
@@ -67,6 +68,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_endlessDunkHighScore: KeyValue<Int> = KeyValue(ENDLESS_DUNK_HIGHSCORE, 0)
     private val kv_endlessDailyChallenge: KeyValue<DailyChallengeScore> = KeyValue(ENDLESS_DAILY_CHALLENGE, DailyChallengeScore.ZERO)
     private val kv_endlessHighScore: KeyValue<EndlessHighScore> = KeyValue(ENDLESS_HIGH_SCORE, EndlessHighScore.ZERO)
+    private val kv_assembleNormalHighScore: KeyValue<Int> = KeyValue(SIDEMODE_ASSEMBLE_NORMAL, Var(0))
 
     val gameplayVolume: Var<Int> = kv_gameplayVolume.value
     val menuMusicVolume: Var<Int> = kv_menuMusicVolume.value
@@ -91,6 +93,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
     
     val endlessDunkHighScore: Var<Int> = kv_endlessDunkHighScore.value
+    val sidemodeAssembleHighScore: Var<Int> = kv_assembleNormalHighScore.value
     val endlessDailyChallenge: Var<DailyChallengeScore> = kv_endlessDailyChallenge.value
     val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
 
@@ -121,6 +124,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
         
         prefs.getInt(kv_endlessDunkHighScore)
+        prefs.getInt(kv_assembleNormalHighScore)
         prefs.getDailyChallenge(kv_endlessDailyChallenge)
         prefs.getEndlessHighScore(kv_endlessHighScore)
     }
@@ -150,6 +154,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInputKeymapKeyboard(kv_keymapKeyboard)
 
                 .putInt(kv_endlessDunkHighScore)
+                .putInt(kv_assembleNormalHighScore)
                 .putDailyChallenge(kv_endlessDailyChallenge)
                 .putEndlessHighScore(kv_endlessHighScore)
 

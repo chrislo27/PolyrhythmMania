@@ -11,6 +11,7 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.world.DunkWorldBackground
 import polyrhythmmania.world.EntityRodDunk
 import polyrhythmmania.world.WorldMode
+import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.tileset.StockTexturePacks
 
 
@@ -18,7 +19,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     : AbstractEndlessMode(main, prevHighScore) {
     
     init {
-        container.world.worldMode = WorldMode.DUNK
+        container.world.worldMode = WorldMode(WorldType.DUNK, true)
         container.engine.inputter.endlessScore.maxLives.set(5)
         container.renderer.worldBackground = DunkWorldBackground
         container.renderer.tileset.texturePack.set(StockTexturePacks.gba)

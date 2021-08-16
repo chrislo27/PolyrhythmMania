@@ -96,7 +96,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         
-        container.world.worldMode = WorldMode.POLYRHYTHM_ENDLESS
+        container.world.worldMode = WorldMode(WorldType.POLYRHYTHM, true)
         container.renderer.endlessModeSeed.set(getSeedString(seed.toUInt()))
         container.renderer.dailyChallengeDate.set(dailyChallenge)
         container.renderer.flashHudRedWhenLifeLost.set(true)

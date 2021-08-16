@@ -230,7 +230,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
         })
         playSfxExplosion(engine)
         registerMiss(engine.inputter)
-        if (world.worldMode == WorldMode.POLYRHYTHM_ENDLESS) {
+        if (world.worldMode.showEndlessScore) {
             engine.inputter.triggerLifeLost()
         }
     }

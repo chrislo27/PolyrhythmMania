@@ -18,7 +18,7 @@ class World {
     }
     
     val tilesetPalette: TilesetPalette = TilesetPalette.createGBA1TilesetPalette()
-    var worldMode: WorldMode = WorldMode.POLYRHYTHM
+    var worldMode: WorldMode = WorldMode(WorldType.POLYRHYTHM, false)
     
     val entities: List<Entity> = CopyOnWriteArrayList()
     val cubeMap: LongMap<EntityCube> = LongMap(100)
@@ -80,7 +80,7 @@ class World {
             entity.engineUpdate(engine, beat, seconds)
         }
 
-        if (worldMode == WorldMode.DUNK) {
+        if (worldMode.type == WorldType.DUNK) {
             if (engine.inputter.endlessScore.lives.getOrCompute() <= 0) {
                 entities.forEach {
                     if (it is EntityRodDunk && !it.exploded) {
@@ -107,18 +107,17 @@ class World {
     
     fun resetWorld() {
         (entities as MutableList).removeIf { it is TemporaryEntity }
-        when (worldMode) {
-            WorldMode.POLYRHYTHM, WorldMode.POLYRHYTHM_ENDLESS -> {
+        when (worldMode.type) {
+            WorldType.POLYRHYTHM -> {
                 populateRegularScene()
                 rows.forEach(Row::initWithWorld)
             }
-            WorldMode.DUNK -> {
+            WorldType.DUNK -> {
                 populateDunkScene()
             }
-            WorldMode.ASSEMBLE -> {
+            WorldType.ASSEMBLE -> {
                 populateAssembleScene()
             }
-            WorldMode.DASH -> TODO()
         }
     }
 
