@@ -138,21 +138,11 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
 
             // Remember to update DataSettingsMenu to reset high scores
-            vbox += createSidemodeLongButton("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip",
-                    Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
-                DiscordHelper.updatePresence(DefaultPresences.PlayingDunk)
-                DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
+            vbox += createLongButton { Localization.getVar("mainMenu.play.sideModes").use() }.apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.sideModesMenu)
+                }
             }
-//            vbox += createLongButton { Localization.getVar("mainMenu.play.toss").use() }.apply {
-//                
-//            }
-//            vbox += createLongButton { Localization.getVar("mainMenu.play.dash").use() }.apply {
-//                
-//            }
-
-//            vbox += createLongButton { "...Other modes (possibly) coming soon!" }.apply {
-//                this.disabled.set(true)
-//            }
         }
         vbox.sizeHeightToChildren(100f)
         scrollPane.setContent(vbox)
