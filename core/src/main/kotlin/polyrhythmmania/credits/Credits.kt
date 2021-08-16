@@ -10,8 +10,8 @@ object Credits {
             "credits.graphicDesign" to abcSorted(
                     "garbo", "snow krow", "GENERIC",
             ),
-            "credits.music" to abcSorted(
-                    "GENERIC"
+            "credits.music" to listOf(
+                    "GENERIC", "Rhythm Heaven\nsoundtrack"
             ),
             "credits.qa" to abcSorted(
                     "Lvl100Feraligatr", "Gosh", "GENERIC", "snow krow", "Kievit", "Chloe", "GrueKun", "Huebird",
