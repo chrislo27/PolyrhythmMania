@@ -381,5 +381,29 @@ class World {
             this.type = EntityPiston.Type.PISTON_DPAD
             this.position.set(13.5f + 0.5f, 0f, -0f)
         })
+
+
+        if (showInputFeedback) {
+            val xOff = 4f
+            val yPos = -1f
+            val zPos = -9f
+            val tint = Color().grey(0.8f)
+            
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.BARELY_COLOUR.cpy().mul(tint), 0).apply {
+                this.position.set(7f + xOff, yPos, zPos)
+            })
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR.cpy().mul(tint), 1).apply {
+                this.position.set(8f + xOff, yPos, zPos)
+            })
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.ACE_COLOUR.cpy().mul(tint), 2).apply {
+                this.position.set(9f + xOff, yPos, zPos)
+            })
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR.cpy().mul(tint), 3).apply {
+                this.position.set(10f + xOff, yPos, zPos)
+            })
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.RIGHT, EntityInputFeedback.BARELY_COLOUR.cpy().mul(tint), 4).apply {
+                this.position.set(11f + xOff, yPos, zPos)
+            })
+        }
     }
 }
