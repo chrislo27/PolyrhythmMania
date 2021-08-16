@@ -746,7 +746,7 @@ class Editor(val main: PRManiaGame)
     fun removeBlocks(blocksToAdd: List<Block>) {
         container.removeBlocks(blocksToAdd)
         this.selectedBlocks as MutableMap
-        blocks.forEach { block ->
+        blocksToAdd.forEach { block ->
             this.selectedBlocks.remove(block)
             if (block.ownedContextMenu != null) {
                 if (sceneRoot.isContextMenuActive())
