@@ -129,7 +129,7 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
             override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
                 super.engineUpdate(engine, beat, seconds)
 
-                val duration = 0.75f
+                val duration = 1f
                 val minZ = -3f
                 val alpha = ((beat - startBeat) / duration).coerceIn(0f, 1f)
                 piston.position.z = Interpolation.circleOut.apply(minZ, 0f, alpha)
