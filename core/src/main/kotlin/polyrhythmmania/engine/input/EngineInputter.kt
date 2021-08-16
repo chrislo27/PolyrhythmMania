@@ -101,6 +101,7 @@ class EngineInputter(val engine: Engine) {
         private set
     var noMiss: Boolean = true
         private set
+    var minimumInputCount: Int = 0
     
     val skillStarGotten: Var<Boolean> = Var(false)
     val inputResults: List<InputResult> = mutableListOf()

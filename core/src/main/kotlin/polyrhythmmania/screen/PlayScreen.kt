@@ -53,6 +53,7 @@ import polyrhythmmania.world.render.WorldRenderer
 import space.earlygrey.shapedrawer.ShapeDrawer
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
@@ -309,7 +310,7 @@ class PlayScreen(
     private fun transitionToResults() {
         val inputter = engine.inputter
         val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
-        val nInputs = inputter.totalExpectedInputs
+        val nInputs = min(inputter.totalExpectedInputs, inputter.minimumInputCount)
         val rawScore: Float = (if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
             inputScore.weight
         } / nInputs) * 100))
