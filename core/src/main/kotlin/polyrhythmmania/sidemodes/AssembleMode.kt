@@ -87,7 +87,7 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         }
         
         blocks += BlockEndState(engine).apply { 
-            this.beat = 144f
+            this.beat = 142f
         }
 
         container.addBlocks(blocks)
@@ -135,7 +135,12 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
                 return patternA(startBeat) + patternB(startBeat + 8f)
             }
 
-            return listOf(
+            val patterns = (0 until 8).flatMap { patternBoth(7f + it * 16f) }
+            val playerPistonIndex = world.asmPistons.indexOf(world.asmPlayerPiston)
+            val minInputs = patterns.count { it is EventAsmRodBounce && it.toIndex == playerPistonIndex }
+            engine.inputter.minimumInputCount = minInputs
+            
+            val list = listOf(
                     object : Event(engine) {
                         override fun onStart(currentBeat: Float) {
                             engine.playbackSpeed = 1f
@@ -145,7 +150,10 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
                     },
 
                     EventAsmPistonRetractAll(engine, -10000f),
-                    ) + (0 until 8).flatMap { patternBoth(7f + it * 16f) }
+                    ) + patterns
+            
+            
+            return list
         }
 
         override fun copy(): Block = throw NotImplementedError()
