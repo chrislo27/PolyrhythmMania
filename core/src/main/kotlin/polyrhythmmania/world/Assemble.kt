@@ -114,15 +114,21 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
                     return MathUtils.sin((1f - a) * ((5 - 0.5f) * MathUtils.PI))
                 }
 
+                @Suppress("RemoveRedundantQualifierName")
                 override fun apply(a: Float): Float {
                     val holdAmt = 0.075f
                     val holdMin = 0.9f
-                    val a = if (a < holdAmt) {
+                    val returnAmt = 0.25f
+                    val alpha: Float = if (a < holdAmt) {
                         return Interpolation.slowFast.apply(1f, holdMin, a / holdAmt)
+                    } else if (a > 1f - returnAmt) {
+                        val beforeA = Interpolation.fastSlow.apply(((1f - returnAmt) - holdAmt) / (1f - holdAmt - returnAmt)) * holdMin
+                        val before = decay(beforeA) * sine(beforeA)
+                        return Interpolation.fastSlow.apply(before, 0f, (a - (1f - returnAmt)) / returnAmt)
                     } else {
-                        Interpolation.fastSlow.apply((a - holdAmt) / (1f - holdAmt)) * holdMin
+                        Interpolation.fastSlow.apply((a - holdAmt) / (1f - holdAmt - returnAmt)) * holdMin
                     }
-                    return decay(a) * sine(a)
+                    return decay(alpha) * sine(alpha)
                 }
             }
             
@@ -477,7 +483,7 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
                           val beatsPerUnit: Float = 1f)
     : SpriteEntity(world), TemporaryEntity {
 
-    private val combineX: Float = 12f
+    private val combineX: Float = 12f - 1 /* -1 due to positioning offset to fix floor clipping */
 
     init {
         this.position.y = 0f
@@ -488,7 +494,7 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
         this.position.z += 1f
         if (!goingRight) {
             this.position.y += 0.5f
-//            this.position.z += 1f
+            this.position.z += 0.5f
         }
     }
 
@@ -501,6 +507,10 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
         val moveTime = 0.25f * beatsPerUnit
         if (beatPiece < moveTime) {
             x += (Interpolation.circleOut.apply((beatPiece / moveTime)) - 1f) * movementSign
+        }
+        
+        if (!goingRight) {
+            x -= 0.5f
         }
 
         return x
@@ -522,12 +532,9 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
 
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine,
                               vec: Vector3) {
-        val xOff = -0.5f
+        val xOff = -0.5f * 0
         vec.x += xOff
         vec.y += xOff / 2
-        if (!goingRight) {
-            vec.y -= 0.25f
-        }
         super.renderSimple(renderer, batch, tileset, engine, vec)
     }
 }
