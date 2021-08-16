@@ -424,6 +424,8 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
         // Auto-inputs
         if (engine.autoInputs && expected != null && expected.hitInput == null && beat > expected.inputBeat) {
             this.addInputResult(engine, InputResult(expected.inputBeat, InputType.A, 0f, 0f, 0))
+            val inputter = engine.inputter
+            inputter.inputFeedbackFlashes[inputter.getInputFeedbackIndex(InputScore.ACE, false)] = seconds
 
             val asmPlayerPiston = world.asmPlayerPiston
             if (asmPlayerPiston.animation is EntityPistonAsm.Animation.Neutral) {
