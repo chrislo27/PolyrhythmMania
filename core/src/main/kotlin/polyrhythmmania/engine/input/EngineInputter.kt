@@ -217,9 +217,7 @@ class EngineInputter(val engine: Engine) {
                     val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
                     if (DEBUG_LOG_INPUTS) 
                         Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
-                    if (!worldMode.showEndlessScore) {
-                        inputTracker.results += inputResult
-                    }
+                    inputTracker.results += inputResult
 
                     if (practice.practiceModeEnabled && inputResult.inputScore != InputScore.MISS) {
                         val allWereHit = practice.requiredInputs.all { it.wasHit }
