@@ -310,6 +310,7 @@ class EngineInputter(val engine: Engine) {
         } else if (worldMode.type == WorldType.ASSEMBLE && type == InputType.A) {
             val asmPlayerPiston = world.asmPlayerPiston
             var hit = false
+            var hitDuration = 1.5f
             if (asmPlayerPiston.pistonState == EntityPiston.PistonState.RETRACTED) {
                 for (entity in engine.world.entities) {
                     if (entity !is EntityRodAsm || !entity.acceptingInputs) continue
@@ -345,12 +346,13 @@ class EngineInputter(val engine: Engine) {
                     if (inputResult.inputScore != InputScore.MISS) {
                         rod.addInputResult(engine, inputResult)
                         hit = true
+                        hitDuration = 1f
                     }
                 }
 
                 val animation = asmPlayerPiston.animation
                 if (animation is EntityPistonAsm.Animation.Neutral) {
-                    asmPlayerPiston.fullyExtend(engine, atBeat, if (hit) 1f else 1.5f)
+                    asmPlayerPiston.fullyExtend(engine, atBeat, hitDuration)
                     if (!hit) {
                         engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_middle_right")) {
                             it.pitch = 1.5f

@@ -3,12 +3,14 @@ package polyrhythmmania.sidemodes
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.BeadsMusic
@@ -34,6 +36,15 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         TilesetPalette.createAssembleTilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         container.renderer.flashHudRedWhenLifeLost.set(true)
+        
+        container.resultsText = ResultsText(
+                Localization.getValue("play.results.assemble.title"),
+                Localization.getValue("play.results.assemble.ok"),
+                Localization.getValue("play.results.assemble.tryAgain1"),
+                Localization.getValue("play.results.assemble.tryAgain2"),
+                Localization.getValue("play.results.assemble.superb1"),
+                Localization.getValue("play.results.assemble.superb2"),
+        )
     }
 
     override fun initialize() {
@@ -114,6 +125,54 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
                 
                 return list
             }
+            fun patternAHalf(startBeat: Float, halvesAreHalf: Boolean = true): List<Event> {
+                val list = mutableListOf<Event>()
+                list += EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 8f, beatsPerUnit = if (halvesAreHalf) 0.5f else 1f)
+                list += EventAsmRodBounce(engine, startBeat + 0f + 0.5f, -1, 0, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 1f, 0, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 1.5f, 1, 2, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 2f, 2, 3, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 2.5f, 3, 2, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 3f, 2, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 3.5f, 1, 0, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 4f, 0, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 4.5f, 1, 2, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 5f, 2, 3, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 5.5f, 3, 2, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 6f, 2, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 6.5f, 1, 0, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 7f, 0, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 7.5f, 1, 2, true, 0.5f)
+
+                list += EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 7f)
+                list += EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 8f)
+                list += EventAsmPrepareSfx(engine, startBeat + 6f)
+                
+                return list
+            }
+            fun patternAHalfSlow(startBeat: Float): List<Event> {
+                val list = mutableListOf<Event>()
+                list += EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 8f, beatsPerUnit = 1f)
+                list += EventAsmRodBounce(engine, startBeat + 0f + 0.5f, -1, 0, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 1f, 0, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 1.5f, 1, 2, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 2f, 2, 3, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 2.5f, 3, 2, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 3f, 2, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 3.5f, 1, 0, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 4f, 0, -1, false, 0.5f)
+
+                list += EventAsmRodBounce(engine, startBeat + 4f, -1, 0, false, 1f)
+                list += EventAsmRodBounce(engine, startBeat + 5f, 0, 1, false, 1f)
+                list += EventAsmRodBounce(engine, startBeat + 6f, 1, 3, false, 1f)
+                list += EventAsmRodBounce(engine, startBeat + 7f, 3, 2, true, 1f)
+
+                list += EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 7f)
+                list += EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 8f)
+                list += EventAsmPrepareSfx(engine, startBeat + 6f)
+                
+                return list
+            }
 
             fun patternB(startBeat: Float): List<Event> {
                 val list = mutableListOf<Event>()
@@ -130,12 +189,72 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
 
                 return list
             }
+            fun patternBHalf(startBeat: Float, halvesAreHalf: Boolean = true): List<Event> {
+                val list = mutableListOf<Event>()
+                list += EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 5f, beatsPerUnit = if (halvesAreHalf) 0.5f else 1f)
+                list += EventAsmRodBounce(engine, startBeat + 0.5f + 0f, -1, 0, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 0.5f + 0.5f, 0, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 0.5f + 1f, 1, 2, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 0.5f + 1.5f, 2, 3, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 0.5f + 2f, 3, 2, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 0.5f + 2.5f, 2, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 0.5f + 3f, 1, 0, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 0.5f + 3.5f, 0, 1, false, 0.5f)
+                list += EventAsmRodBounce(engine, startBeat + 0.5f + 4f, 1, 2, true, 0.5f)
+
+                list += EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 4f)
+                list += EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 5f)
+                list += EventAsmPrepareSfx(engine, startBeat + 3f)
+
+                return list
+            }
+
+            fun patternC(startBeat: Float): List<Event> {
+                val list = mutableListOf<Event>()
+                list += EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 3f)
+                list += EventAsmRodBounce(engine, startBeat + 0f, -1, 0, false)
+                list += EventAsmRodBounce(engine, startBeat + 1f, 0, 1, false)
+                list += EventAsmRodBounce(engine, startBeat + 2f, 1, 2, true)
+
+                list += EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 2f)
+                list += EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 3f)
+                list += EventAsmPrepareSfx(engine, startBeat + 1f)
+
+                return list
+            }
 
             fun patternBoth(startBeat: Float): List<Event> {
                 return patternA(startBeat) + patternB(startBeat + 8f)
             }
 
-            val patterns = (0 until 8).flatMap { patternBoth(7f + it * 16f) }
+            val patterns = listOf( // 98, 104, 112, 132, 98, 60, 132, 160
+                    patternBoth(7f + 0 * 16f), // 98 Normal
+
+                    patternBoth(7f + 1 * 16f), // 104 Normal + C
+                    patternC(7f + 1 * 16f + 13f),
+
+                    patternA(7f + 2 * 16f + 0.5f), // 112 Offbeat
+                    patternB(7f + 2 * 16f + 8f),
+
+                    patternA(7f + 3 * 16f + 0.5f), // 132 Offbeat + C
+                    patternB(7f + 3 * 16f + 8f),
+                    patternC(7f + 3 * 16f + 13f),
+
+                    patternA(7f + 4 * 16f), // 98 Introduce fast B
+                    patternBHalf(7f + 4 * 16f + 8f),
+
+                    patternAHalfSlow(7f + 5 * 16f), // 60 Introduce fast A 
+                    patternB(7f + 5 * 16f + 8f),
+
+                    patternA(7f + 6 * 16f), // 132 fast B + C
+                    patternBHalf(7f + 6 * 16f + 8f, halvesAreHalf = false),
+                    patternC(7f + 6 * 16f + 13f),
+
+                    patternAHalf(7f + 7 * 16f), // 160 Both fast + C
+                    patternBHalf(7f + 7 * 16f + 8f, halvesAreHalf = false),
+                    patternC(7f + 7 * 16f + 13f),
+
+                    ).flatten()
             val playerPistonIndex = world.asmPistons.indexOf(world.asmPlayerPiston)
             val minInputs = patterns.count { it is EventAsmRodBounce && it.toIndex == playerPistonIndex }
             engine.inputter.minimumInputCount = minInputs
@@ -144,6 +263,7 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
                     object : Event(engine) {
                         override fun onStart(currentBeat: Float) {
                             engine.playbackSpeed = 1f
+                            world.asmPistons.forEach { it.animation = EntityPistonAsm.Animation.Neutral(it) }
                         }
                     }.also { e ->
                         e.beat = -10000f
@@ -190,7 +310,8 @@ abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float) : Event(eng
  * requiring the previous input to be hit for the bounce to succeed.
  */
 class EventAsmRodBounce(engine: Engine, startBeat: Float,
-                        val fromIndex: Int, val toIndex: Int, val nextInputIsFire: Boolean = false)
+                        val fromIndex: Int, val toIndex: Int,
+                        val nextInputIsFire: Boolean = false, val timePerBounce: Float = 1f)
     : AbstractEventAsmRod(engine, startBeat) {
 
     override fun onStartRod(currentBeat: Float, rod: EntityRodAsm) {
@@ -216,10 +337,10 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
 
         val fromPos = rod.getPistonPosition(engine, fromIndex)
         val toPos = rod.getPistonPosition(engine, toIndex)
-        var bounce = EntityRodAsm.BounceAsm(this.beat, 1f, toPos.y + 1f + (if (nextInputIsFire) 4.5f else 3.5f),
+        var bounce = EntityRodAsm.BounceAsm(this.beat, timePerBounce, toPos.y + 1f + (if (nextInputIsFire) 4.5f else 3.5f),
                 fromPos.x, fromPos.y + 1f, toPos.x, toPos.y + 1f, rod.bounce)
         
-        if (nextInputIsFire) {
+        if (nextInputIsFire || toIndex !in 0 until pistons.size) {
             bounce = EntityRodAsm.BounceAsm(this.beat + bounce.duration, 1f, bounce.endY - 5f,
                     bounce.endX, bounce.endY,
                     bounce.endX + (bounce.endX - bounce.startX).sign * 3f, bounce.endY - 11f, bounce)
@@ -231,19 +352,22 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
         } else {
             if (toIndex == playerIndex) {
                 // Schedule an expected input
-                val inputBeat = this.beat + 1
+                val inputBeat = this.beat + timePerBounce
                 rod.addExpectedInput(EntityRodAsm.NextExpected(inputBeat, nextInputIsFire))
                 if (nextInputIsFire) {
                     engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_compress"))
                 }
+                world.asmPlayerPiston.retract()
+            } else if (toIndex !in 0 until pistons.size) {
+                rod.disableInputs = true
             }
             
             // Bounce the rod
             rod.bounce = bounce
             
-            if (fromIndex in 0 until world.asmPistons.size) {
+            if (fromIndex in 0 until pistons.size) {
                 // Play piston extend animation
-                world.asmPistons[fromIndex].fullyExtend(engine, this.beat, 1f)
+                world.asmPistons[fromIndex].fullyExtend(engine, this.beat, timePerBounce)
                 engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue(when (fromIndex) {
                     0 -> "sfx_asm_left"
                     1 -> "sfx_asm_middle_left"

@@ -45,6 +45,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.*
 import polyrhythmmania.screen.results.ResultsScreen
+import polyrhythmmania.sidemodes.AbstractEndlessMode
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -326,12 +327,23 @@ class PlayScreen(
         val badLeftGoodRight = leftResults.isNotEmpty() && rightResults.isNotEmpty()
                 && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
         val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
+        var isNewHighScore = false
+        if (sideMode != null && sideMode is AbstractEndlessMode) {
+            val endlessModeScore = sideMode.prevHighScore
+            val prevScore = endlessModeScore.highScore.getOrCompute()
+            if (score > prevScore) {
+                endlessModeScore.highScore.set(score)
+                PRManiaGame.instance.settings.persist()
+                isNewHighScore = true
+            }
+        }
+        
         val scoreObj = Score(score, rawScore, inputsHit, nInputs,
                 inputter.skillStarGotten.getOrCompute() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
                 challenges,
                 resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                 lines.first, lines.second,
-                ranking
+                ranking, isNewHighScore
         )
         
         transitionAway(ResultsScreen(main, scoreObj, container, {
@@ -437,6 +449,7 @@ class PlayScreen(
             engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
             container.world.resetWorld()
             container.world.tilesetPalette.applyTo(container.renderer.tileset)
+            engine.soundInterface.clearAllNonMusicAudio()
             prepareGameStart()
             unpauseGame(false)
         }

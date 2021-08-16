@@ -21,6 +21,7 @@ import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.entity.SpriteEntity
+import polyrhythmmania.world.entity.TemporaryEntity
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.tileset.Tileset
@@ -472,7 +473,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
 class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
                           val combineBeat: Float, val startBeatsBeforeCombine: Float,
                           val beatsPerUnit: Float = 1f)
-    : SpriteEntity(world) {
+    : SpriteEntity(world), TemporaryEntity {
 
     private val combineX: Float = 12f
 
@@ -491,11 +492,11 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
 
     fun getXFromBeat(beatsBeforeCombine: Float): Float {
         val movementSign = if (goingRight) 1 else -1
-        val offset = floor(beatsBeforeCombine * beatsPerUnit) + 0.25f
+        val offset = floor(beatsBeforeCombine / beatsPerUnit) + 0.25f
 
         var x = combineX - (offset * movementSign)
-        val beatPiece = 1f - ((beatsBeforeCombine + 1000f) % 1)
-        val moveTime = 0.25f
+        val beatPiece = 1f - (((beatsBeforeCombine / beatsPerUnit) + 1000f) % 1)
+        val moveTime = 0.25f * beatsPerUnit
         if (beatPiece < moveTime) {
             x += (Interpolation.circleOut.apply((beatPiece / moveTime)) - 1f) * movementSign
         }
@@ -531,7 +532,7 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
 
 class EntityAsmWidgetComplete(world: World,
                               val combineBeat: Float)
-    : SpriteEntity(world) {
+    : SpriteEntity(world), TemporaryEntity {
 
     private val combineX: Float = 12f - 1f
     private val combineY: Float = 0f + 1f
@@ -571,7 +572,7 @@ class EntityAsmWidgetComplete(world: World,
 
 class EntityAsmWidgetCompleteBlur(world: World,
                               val combineBeat: Float)
-    : SpriteEntity(world) {
+    : SpriteEntity(world), TemporaryEntity {
 
     override val pxOffsetX: Float = 24f / 32f
     override val pxOffsetY: Float = -16f / 32f
