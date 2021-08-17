@@ -595,12 +595,12 @@ playerPos: ${soundSys.musicPlayer.position}
         
         fun fadeToBandpass(durationMs: Float = 1000f) {
             shouldBeBandpass = true
-            crossFade.fadeTo(bandpass, durationMs)
+//            crossFade.fadeTo(bandpass, durationMs) // Reimplement bandpass when needed.
         }
         
         fun fadeToNormal(durationMs: Float = 1000f) {
             shouldBeBandpass = false
-            crossFade.fadeTo(musicPlayer, durationMs)
+//            crossFade.fadeTo(musicPlayer, durationMs) // Reimplement bandpass when needed.
         }
         
         fun resetMusic() {
@@ -610,7 +610,7 @@ playerPos: ${soundSys.musicPlayer.position}
         }
         
         fun fadeMusicToSilent() {
-            Gdx.app.postRunnable { // FIXME this is hacky...
+            Gdx.app.postRunnable {
                 musicPlayer.gain = 0.5f
                 Gdx.app.postRunnable {
                     musicPlayer.gain = 0f
