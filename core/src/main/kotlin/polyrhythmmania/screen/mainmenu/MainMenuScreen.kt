@@ -436,8 +436,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     fun prepareShow(doFlipAnimation: Boolean = false): MainMenuScreen {
         resetTiles()
-        menuCollection.changeActiveMenu(menuCollection.uppermostMenu, false, instant = true)
-        menuCollection.resetMenuStack()
+        // Uncomment 2 lines below to have it reset to the uppermostMenu each time
+//        menuCollection.changeActiveMenu(menuCollection.uppermostMenu, false, instant = true)
+//        menuCollection.resetMenuStack()
         if (doFlipAnimation) {
             // Black out old frame buffer
             lastProjMatrix.set(batch.projectionMatrix)
