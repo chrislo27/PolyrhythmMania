@@ -105,6 +105,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         ), PackedSheet.Config(padding = 4, maxSize = 512, duplicateBorder = false,
                 atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
         AssetRegistry.loadAsset<Texture>("github_mark", "textures/github_mark.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("support_donate", "textures/support.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("logo_2lines_en", "textures/logo/logo_2lines_en.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("logo_2lines_ja", "textures/logo/logo_2lines_ja.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("pause_rod", "textures/pause/rod.png")

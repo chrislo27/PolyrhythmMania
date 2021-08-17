@@ -277,13 +277,27 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.spacing.set(0f)
             this.align.set(VBox.Align.BOTTOM)
             this.bounds.width.set(64f)
-            this.bounds.height.set(64f)
+            this.bounds.height.set(64f * 2)
         }
         bottomRight.temporarilyDisableLayouts {
             bottomRight += Button("").apply {
                 Anchor.BottomRight.configure(this)
-                this.bounds.width.set(32f)
-                this.bounds.height.set(32f)
+                this.bounds.width.set(48f)
+                this.bounds.height.set(48f)
+                this.skinID.set(UppermostMenu.BUTTON_SKIN_ID)
+                this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("support_donate")))
+                this.setOnAction {
+                    Gdx.net.openURI(PRMania.GITHUB)
+                }
+                val loc: ReadOnlyVar<String> = Localization.getVar("mainMenu.support.tooltip", Var { listOf(PRMania.DONATE_LINK) })
+                this.tooltipElement.set(Tooltip(binding = { loc.use() }, font = main.fontMainMenuMain).apply { 
+                    this.markup.set(markup)
+                })
+            }
+            bottomRight += Button("").apply {
+                Anchor.BottomRight.configure(this)
+                this.bounds.width.set(48f)
+                this.bounds.height.set(48f)
                 this.skinID.set(UppermostMenu.BUTTON_SKIN_ID)
                 this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("github_mark")))
                 this.setOnAction {
