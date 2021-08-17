@@ -72,6 +72,7 @@ class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createSidemodeLongButton("mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
                     Var { listOf(main.settings.sidemodeAssembleHighScore.use()) }), showResults = true) { main, _ ->
                 DiscordHelper.updatePresence(DefaultPresences.PlayingAssemble)
+                mainMenu.backgroundType = BgType.ASSEMBLE
                 AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))
             }
             

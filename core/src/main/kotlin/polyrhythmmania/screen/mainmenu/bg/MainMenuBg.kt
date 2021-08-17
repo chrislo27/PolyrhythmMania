@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.container.Container
+import polyrhythmmania.screen.mainmenu.EntityAsmWidgetHovering
 import polyrhythmmania.screen.mainmenu.EntityCubeHovering
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -43,6 +44,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) {
             BgType.NORMAL, BgType.PRACTICE_NORMAL -> initializeNormal()
             BgType.DUNK -> initializeDunk()
             BgType.ENDLESS -> initializeEndless()
+            BgType.ASSEMBLE -> initializeAssemble()
         }
     }
     
@@ -168,6 +170,51 @@ class MainMenuBg(val mainMenu: MainMenuScreen) {
             this.position.set(-2f, 2f, -3f)
         })
         world.addEntity(EntityCubeHovering(world, withLine = true).apply {
+            this.position.set(2f, 2f, -4f)
+        })
+        world.addEntity(EntityCubeHovering(world).apply {
+            this.position.set(6f, 0f, -4f)
+        })
+        world.addEntity(EntityCubeHovering(world).apply {
+            this.position.set(-3.5f, 1f, 0f)
+        })
+        world.addEntity(EntityCubeHovering(world).apply {
+            this.position.set(0f, -2f, 1f)
+        })
+    }
+
+    private fun initializeAssemble() {
+        val world = this.world
+        world.clearEntities()
+
+        for (x in 0 until 7) {
+            for (z in -2..0) {
+                world.addEntity(EntityCube(world, withLine = false, withBorder = z == 0).apply {
+                    this.position.set(x.toFloat(), 0f, z.toFloat())
+                })
+            }
+            val y = 1f + MathUtils.FLOAT_ROUNDING_ERROR * 1
+            world.addEntity(when (x) {
+                2 -> EntityPistonAsm(world).apply {
+                    this.type = EntityPiston.Type.PISTON_A
+                    this.position.set(x.toFloat(), y, -1f)
+                    this.tint = EntityPistonAsm.playerTint.cpy()
+                }
+                in 0..3 -> EntityPistonAsm(world).apply {
+                    this.type = EntityPiston.Type.PISTON_DPAD
+                    this.position.set(x.toFloat(), y, -1f)
+                }
+                else -> EntityPlatform(world).apply {
+                    this.position.set(x.toFloat(), y, -1f)
+                }
+            })
+        }
+
+
+        world.addEntity(EntityAsmWidgetHovering(world).apply {
+            this.position.set(-2f, 2f, -3f)
+        })
+        world.addEntity(EntityCubeHovering(world).apply {
             this.position.set(2f, 2f, -4f)
         })
         world.addEntity(EntityCubeHovering(world).apply {

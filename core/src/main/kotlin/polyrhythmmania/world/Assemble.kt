@@ -539,8 +539,8 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
     }
 }
 
-class EntityAsmWidgetComplete(world: World,
-                              val combineBeat: Float)
+open class EntityAsmWidgetComplete(world: World,
+                                   val combineBeat: Float)
     : SpriteEntity(world), TemporaryEntity {
 
     private val combineX: Float = 12f - 1f

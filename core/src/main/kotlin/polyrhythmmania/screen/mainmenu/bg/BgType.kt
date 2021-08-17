@@ -7,5 +7,6 @@ enum class BgType {
     PRACTICE_NORMAL,
     DUNK,
     ENDLESS,
+    ASSEMBLE,
     
 }
