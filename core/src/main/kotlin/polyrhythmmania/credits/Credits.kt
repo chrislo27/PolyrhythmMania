@@ -15,7 +15,7 @@ object Credits {
             ),
             "credits.qa" to abcSorted(
                     "Lvl100Feraligatr", "Gosh", "GENERIC", "snow krow", "Kievit", "Chloe", "GrueKun", "Huebird",
-                    "RedCrowNose",
+                    "RedCrowNose", "J-D Thunder",
             ) + listOf("Tourneycord Discord\nserver"),
             "credits.specialThanks" to abcSorted(
                     "Lvl100Feraligatr",
