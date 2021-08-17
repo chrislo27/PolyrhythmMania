@@ -30,6 +30,7 @@ import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.editor.pane.dialog.LoadDialog
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import java.io.File
@@ -196,6 +197,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     playScreen.prepareGameStart()
                                     removeSelfFromMenuCol(false)
                                     DiscordHelper.updatePresence(DefaultPresences.PlayingLevel)
+                                    mainMenu.backgroundType = BgType.NORMAL
                                 }
                             }
                         }

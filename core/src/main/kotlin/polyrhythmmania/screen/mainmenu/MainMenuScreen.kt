@@ -42,6 +42,8 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
 import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.screen.mainmenu.bg.MainMenuBg
 import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
@@ -134,14 +136,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val batch: SpriteBatch = main.batch
     private val sceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val processor: InputProcessor = sceneRoot.inputSystem
-
-    private val container: Container = Container(null, SimpleTimingProvider { throw it })
+    
+    var backgroundType: BgType = BgType.NORMAL
+    private val background: MainMenuBg = MainMenuBg(this)
 
     private val menuPane: Pane = Pane()
     val menuCollection: MenuCollection = MenuCollection(this, sceneRoot, menuPane)
-
-    private val gradientStart: Color = Color(0f, 32f / 255f, 55f / 255f, 1f)
-    private val gradientEnd: Color = Color.BLACK.cpy()
 
     // Related to tile flip effect --------------------------------------------------------
 
@@ -207,49 +207,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             createFramebuffers(Gdx.graphics.width, Gdx.graphics.height, null)
         } else {
             createFramebuffers(PRMania.WIDTH, PRMania.HEIGHT, null)
-        }
-
-        val world = container.world
-        val renderer = container.renderer
-        world.clearEntities()
-        renderer.camera.position.x = -2f
-        renderer.camera.position.y = 0.5f
-
-        // TODO move this out
-        for (x in 0 until 7) {
-            for (z in -2..0) {
-                world.addEntity(EntityCube(world, withLine = false, withBorder = z == 0).apply {
-                    this.position.set(x.toFloat(), 0f, z.toFloat())
-                })
-            }
-            val y = 1f + MathUtils.FLOAT_ROUNDING_ERROR * 1
-            if (x == 0) {
-                world.addEntity(EntityPiston(world).apply {
-                    this.type = EntityPiston.Type.PISTON_A
-                    this.position.set(x.toFloat(), y, -1f)
-                })
-            } else {
-                world.addEntity(EntityPlatform(world).apply {
-                    this.position.set(x.toFloat(), y, -1f)
-                })
-            }
-        }
-        run {
-            world.addEntity(EntityCubeHovering(world).apply {
-                this.position.set(-2f, 2f, -3f)
-            })
-            world.addEntity(EntityCubeHovering(world, withLine = true).apply {
-                this.position.set(2f, 2f, -4f)
-            })
-            world.addEntity(EntityCubeHovering(world).apply {
-                this.position.set(6f, 0f, -4f)
-            })
-            world.addEntity(EntityCubeHovering(world).apply {
-                this.position.set(-3.5f, 1f, 0f)
-            })
-            world.addEntity(EntityCubeHovering(world).apply {
-                this.position.set(0f, -2f, 1f)
-            })
         }
     }
 
@@ -372,16 +329,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         // Render background
-        batch.projectionMatrix = camera.combined
-        batch.begin()
-
-        batch.drawQuad(-400f, 0f, gradientEnd, camera.viewportWidth, 0f, gradientEnd, camera.viewportWidth,
-                camera.viewportHeight, gradientStart, -400f, camera.viewportHeight + 400f, gradientStart)
-
-        batch.end()
-
-        // Render world
-        container.renderer.render(batch, container.engine)
+        background.render(batch, camera)
 
         // Render UI
         batch.projectionMatrix = camera.combined
@@ -565,6 +513,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         soundSys.resetMusic()
 
         DiscordHelper.updatePresence(DefaultPresences.Idle)
+        background.initializeFromType(this.backgroundType)
     }
 
     override fun hide() {
@@ -614,7 +563,7 @@ playerPos: ${soundSys.musicPlayer.position}
     }
     
     inner class SoundSys : Disposable {
-        val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
+        val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem(settings = SoundSystem.SoundSystemSettings(false)).apply {
             this.setPaused(true)
             this.audioContext.out.gain = menuMusicVolume.get()
         }

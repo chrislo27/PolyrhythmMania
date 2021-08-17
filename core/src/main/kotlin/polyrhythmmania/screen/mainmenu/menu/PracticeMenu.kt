@@ -1,6 +1,7 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.graphics.Color
+import paintbox.binding.ReadOnlyVar
 import paintbox.ui.Anchor
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
@@ -14,6 +15,8 @@ import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.practice.*
 import polyrhythmmania.ui.PRManiaSkins
 
@@ -64,6 +67,17 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> Practice): UIElement {
                 return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false) { game, keymap ->
                     DiscordHelper.updatePresence(DefaultPresences.PlayingPractice)
+                    mainMenu.backgroundType = BgType.PRACTICE_NORMAL
+                    factory.invoke(game, keymap)
+                }
+            }
+            
+            fun createSidemode(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
+                                         challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
+                                         factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
+                return createSidemodeLongButton(name, tooltipVar, challenges, showResults) { game, keymap ->
+                    DiscordHelper.updatePresence(DefaultPresences.PlayingPractice)
+                    mainMenu.backgroundType = BgType.PRACTICE_NORMAL
                     factory.invoke(game, keymap)
                 }
             }
@@ -71,7 +85,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createPractice("mainMenu.practice.tutorial1") { main, keymap ->
                 PracticeTutorial1(main, keymap)
             }
-            vbox += createSidemodeLongButton("mainMenu.practice.polyrhythm1",
+            vbox += createSidemode("mainMenu.practice.polyrhythm1",
                     Localization.getVar("mainMenu.practice.polyrhythm1.tooltip"),
                     Challenges.NO_CHANGES, true) { main, _ ->
                 Polyrhythm1Practice(main)
@@ -79,7 +93,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createPractice("mainMenu.practice.tutorial2") { main, keymap ->
                 PracticeTutorial2(main, keymap)
             }
-            vbox += createSidemodeLongButton("mainMenu.practice.polyrhythm2",
+            vbox += createSidemode("mainMenu.practice.polyrhythm2",
                     Localization.getVar("mainMenu.practice.polyrhythm2.tooltip"),
                     Challenges.NO_CHANGES, true) { main, _ ->
                 Polyrhythm2Practice(main)

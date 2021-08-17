@@ -23,6 +23,7 @@ import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
@@ -95,6 +96,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     sidemode.prepare()
                                     playScreen.resetAndStartOver(false, false)
                                     DiscordHelper.updatePresence(DefaultPresences.PlayingEndlessMode)
+                                    mainMenu.backgroundType = BgType.ENDLESS
                                 }
                             }
                         }

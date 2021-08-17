@@ -73,6 +73,7 @@ class EngineInputter(val engine: Engine) {
     class EndlessScore {
         val score: Var<Int> = Var(0)
         var highScore: Var<Int> = Var(0)
+        var showHighScore: Boolean = true
         val maxLives: Var<Int> = Var(0)
         val startingLives: Var<Int> = Var.bind { maxLives.use() }
         val lives: Var<Int> = Var(startingLives.getOrCompute())
@@ -376,14 +377,16 @@ class EngineInputter(val engine: Engine) {
             override fun onStart(currentBeat: Float) {
                 super.onStart(currentBeat)
                 
-                if (wasNewHighScore) {
+                if (wasNewHighScore && endlessScore.showHighScore) {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
                     engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true))
-                    endlessScore.highScore.set(score)
-                    PRManiaGame.instance.settings.persist()
                 } else {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
                     engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true))
+                }
+                if (wasNewHighScore) {
+                    endlessScore.highScore.set(score)
+                    PRManiaGame.instance.settings.persist()
                 }
                 endlessScore.gameOverUIShown.set(true)
             }

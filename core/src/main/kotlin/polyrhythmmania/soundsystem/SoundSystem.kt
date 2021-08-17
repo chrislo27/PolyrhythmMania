@@ -21,7 +21,8 @@ import kotlin.math.abs
  */
 class SoundSystem(private val mixer: Mixer,
                   val ioAudioFormat: IOAudioFormat = DEFAULT_AUDIO_FORMAT,
-                  bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE)
+                  bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+                  val settings: SoundSystemSettings = SoundSystemSettings())
     : Disposable, TimingProvider {
 
     companion object {
@@ -31,16 +32,20 @@ class SoundSystem(private val mixer: Mixer,
         
         val defaultMixerHandler: MixerHandler by lazy { MixerHandler(DEFAULT_AUDIO_FORMAT.toJavaAudioFormat()) }
 
-        fun createDefaultSoundSystem(bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE): SoundSystem {
-            return createDefaultSoundSystem(defaultMixerHandler, bufferSize)
+        fun createDefaultSoundSystem(bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+                                     settings: SoundSystemSettings = SoundSystemSettings()): SoundSystem {
+            return createDefaultSoundSystem(defaultMixerHandler, bufferSize, settings)
         }
         
         fun createDefaultSoundSystem(mixerHandler: MixerHandler,
-                                     bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE): SoundSystem {
+                                     bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+                                     settings: SoundSystemSettings = SoundSystemSettings()): SoundSystem {
             val mixer = mixerHandler.recommendedMixer
-            return SoundSystem(mixer, mixerHandler.audioFormat.toBeadsAudioFormat(), bufferSize)
+            return SoundSystem(mixer, mixerHandler.audioFormat.toBeadsAudioFormat(), bufferSize, settings)
         }
     }
+    
+    data class SoundSystemSettings(val reportAdaptiveSync: Boolean = true)
 
     val audioContext: AudioContext =
             AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat)
@@ -130,6 +135,8 @@ class SoundSystem(private val mixer: Mixer,
         val timingBead: TimingBead = TimingBead(audioContext)
         val realtimeThread: Thread
 
+        private val reportWhenDesynced: Boolean = settings.reportAdaptiveSync
+        
         init {
             timingBead.listeners += TimingListener { oldSeconds, newSeconds ->
                 try {
@@ -158,7 +165,9 @@ class SoundSystem(private val mixer: Mixer,
                             this.seconds += secondsDiff
                             
                             if (abs(this.seconds - timingBead.seconds) >= forceSyncThreshold) {
-                                Paintbox.LOGGER.debug("AdaptiveTimingProvider Force sync: this was ${this.seconds} and TimingBead was ${timingBead.seconds} (delta ${abs(this.seconds - timingBead.seconds)}, force sync threshold ${forceSyncThreshold})")
+                                if (reportWhenDesynced) {
+                                    Paintbox.LOGGER.debug("AdaptiveTimingProvider Force sync: this was ${this.seconds} and TimingBead was ${timingBead.seconds} (delta ${abs(this.seconds - timingBead.seconds)}, force sync threshold ${forceSyncThreshold})")
+                                }
                                 // Force sync with timing bead if off by too much
                                 this.seconds = timingBead.seconds
                             }

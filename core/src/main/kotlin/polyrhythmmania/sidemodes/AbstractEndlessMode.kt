@@ -4,8 +4,6 @@ import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.world.tileset.StockTexturePacks
-import polyrhythmmania.world.tileset.TilesetPalette
 
 
 abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: EndlessModeScore)
@@ -17,10 +15,11 @@ abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: Endless
         renderer.prevHighScore.set(prevHighScore.highScore.getOrCompute())
         
         engine.inputter.endlessScore.highScore = prevHighScore.highScore
+        engine.inputter.endlessScore.showHighScore = prevHighScore.showHighScore
     }
 }
 
-data class EndlessModeScore(val highScore: Var<Int>)
+data class EndlessModeScore(val highScore: Var<Int>, val showHighScore: Boolean = true)
 
 class EventIncrementEndlessScore(engine: Engine, val callback: (newScore: Int) -> Unit = {})
     : Event(engine) {
