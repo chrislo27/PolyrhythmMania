@@ -28,8 +28,11 @@ class EntityBackgroundImg(world: World, val layer: Layer)
         val camera = renderer.camera
         val camW = camera.viewportWidth
         val camH = camera.viewportHeight
+        
+        batch.color = tintedRegion.color.getOrCompute()
         batch.draw(tileset.getTilesetRegionForTinted(tintedRegion),
                 camera.position.x - camW / 2, camera.position.y - camH / 2, camW, camH)
+        batch.setColor(1f, 1f, 1f, 1f)
     }
 
 }

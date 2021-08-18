@@ -78,6 +78,7 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
             v2 = v + vSpan * tintedRegion.v2
         }
         batch.drawUV(texture, vec.x + offX, vec.y + offY, drawWidth, drawHeight, u, v, u2, v2)
+        batch.setColor(1f, 1f, 1f, 1f)
     }
     
     protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion) {
