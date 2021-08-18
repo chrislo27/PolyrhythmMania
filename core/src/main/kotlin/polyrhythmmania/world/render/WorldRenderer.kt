@@ -44,9 +44,16 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
 
     companion object {
         val comparatorRenderOrder: Comparator<Entity> = Comparator<Entity> { o1, o2 ->
-            val xyz1 = o1.position.x - o1.position.z - o1.position.y
-            val xyz2 = o2.position.x - o2.position.z - o2.position.y
-            -xyz1.compareTo(xyz2)
+            // Explicitly choose rows on the x-axis first, ordered by z value
+            if (o1.position.z < o2.position.z) {
+                -1
+            } else if (o1.position.z > o2.position.z) {
+                1
+            } else {
+                val xyz1 = o1.position.x - o1.position.z - o1.position.y
+                val xyz2 = o2.position.x - o2.position.z - o2.position.y
+                -xyz1.compareTo(xyz2)
+            }
         }
 
         fun convertWorldToScreen(vec3: Vector3): Vector3 {
