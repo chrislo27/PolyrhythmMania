@@ -109,6 +109,10 @@ class Tileset(val texturePack: Var<TexturePack>) {
     val inputFeedbackMiddle: TintedRegion = TintedRegion("input_feedback_1")
     val inputFeedbackEnd: TintedRegion = TintedRegion("input_feedback_2")
     
+    val backgroundBack: TintedRegion = TintedRegion("background_back")
+    val backgroundMiddle: TintedRegion = TintedRegion("background_middle")
+    val backgroundFore: TintedRegion = TintedRegion("background_fore")
+    
     val dunkBasketBack: TintedRegion = TintedRegion("basket_back")
     val dunkBasketFront: TintedRegion = TintedRegion("basket_front")
     val dunkBasketFrontFaceZ: TintedRegion = TintedRegion("basket_front_face_z")

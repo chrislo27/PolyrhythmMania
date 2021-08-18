@@ -192,6 +192,16 @@ class World {
             sign.position.z += (8 / 32f)
             addEntity(sign)
         }
+        
+        addEntity(EntityBackgroundImg(this, EntityBackgroundImg.Layer.FORE).apply { 
+            this.position.set(0f, 0f, 11f)
+        })
+        addEntity(EntityBackgroundImg(this, EntityBackgroundImg.Layer.MIDDLE).apply { 
+            this.position.set(0f, 0f, -1f)
+        })
+        addEntity(EntityBackgroundImg(this, EntityBackgroundImg.Layer.BACK).apply { 
+            this.position.set(0f, 0f, -4f)
+        })
 
 
         if (showInputFeedback) {

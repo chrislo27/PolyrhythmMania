@@ -101,6 +101,11 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 ListEntry.Region("input_feedback_0"),
                 ListEntry.Region("input_feedback_1"),
                 ListEntry.Region("input_feedback_2"),
+                
+                ListEntry.Category("backgrounds"),
+                ListEntry.Region("background_back"),
+                ListEntry.Region("background_middle"),
+                ListEntry.Region("background_fore"),
         )
         val DARK_GREY = Color().grey(0.31f)
     }

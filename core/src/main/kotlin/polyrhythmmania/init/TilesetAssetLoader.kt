@@ -28,6 +28,9 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
                 atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
 
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_gba", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                "background_back",
+                "background_middle",
+                "background_fore",
                 "cube_border",
                 "cube_border_platform",
                 "cube_border_z",

@@ -159,6 +159,10 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
         add(TilesetRegion.create("input_feedback_0", inputFeedbackRegions.getValue(0)))
         add(TilesetRegion.create("input_feedback_1", inputFeedbackRegions.getValue(1)))
         add(TilesetRegion.create("input_feedback_2", inputFeedbackRegions.getValue(2)))
+        
+        add(TilesetRegion.create("background_back", regionMap.getOrNull("background_back")))
+        add(TilesetRegion.create("background_middle", regionMap.getOrNull("background_middle")))
+        add(TilesetRegion.create("background_fore", regionMap.getOrNull("background_fore")))
 
         add(TilesetRegion.create("basket_back", regionMap.getOrNull("basket_back")))
         add(TilesetRegion.create("basket_front", regionMap.getOrNull("basket_front")))
