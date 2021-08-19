@@ -175,8 +175,9 @@ class PlayScreen(
             })
         }
         bottomPane += optionsBg
+        
         fun addArrowImageNode(index: Int): ArrowNode {
-            return ArrowNode(TextureRegion(/*AssetRegistry.get<Texture>("pause_rod")*/ AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_pointer_finger"])).apply {
+            return ArrowNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_pointer_finger"])).apply {
                 Anchor.CentreLeft.configure(this, offsetY = 4f)
 //                this.bindHeightToParent(multiplier = 1.5f)
                 this.bounds.height.set(64f)
@@ -208,7 +209,7 @@ class PlayScreen(
                 }
             }
         }
-        resumeLabel = createTextLabelOption("play.pause.resume", 0, true)
+        resumeLabel = createTextLabelOption(if (engine.autoInputs) "play.pause.resume.robotMode" else "play.pause.resume", 0, true)
         startOverLabel = createTextLabelOption("play.pause.startOver", 1, !(sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null))
         quitLabel = createTextLabelOption("play.pause.quitToMainMenu", 2, true)
         
@@ -327,13 +328,6 @@ class PlayScreen(
                 lines.first, lines.second,
                 ranking
         )
-
-//        val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
-//        val menuCol = mainMenu.menuCollection
-//        val tmpResultsMenu = TemporaryResultsMenu(menuCol, results, container)
-//        menuCol.addMenu(tmpResultsMenu)
-//        menuCol.pushNextMenu(tmpResultsMenu, instant = true)
-//        transitionAway(mainMenu, false) {}
         
         transitionAway(ResultsScreen(main, scoreObj, container, {
             PlayScreen(main, sideMode, container, challenges, showResults, musicOffsetMs)
@@ -359,7 +353,7 @@ class PlayScreen(
     }
 
     fun prepareGameStart() {
-        engine.inputter.areInputsLocked = false // FIXME may need better input locking mechanism later
+        engine.inputter.areInputsLocked = engine.autoInputs
         engine.inputter.reset()
         renderer.resetAnimations()
         engine.musicOffsetMs = musicOffsetMs

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.Var
+import paintbox.binding.invert
 import paintbox.font.TextAlign
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
@@ -19,7 +20,6 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
-import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
@@ -27,7 +27,6 @@ import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
-import polyrhythmmania.editor.pane.dialog.LoadDialog
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
@@ -50,6 +49,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     val descLabel: TextLabel
     val challengeSetting: Pane
     
+    val robotMode: Var<Boolean> = Var(false)
     val goForPerfect: Var<Boolean> = Var(false)
     val tempoUp: Var<Int> = Var(100)
 
@@ -93,15 +93,44 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         font = this@LoadSavedLevelMenu.font).apply {
                     this.bounds.height.set(32f)
                 }
-                this += CheckBox(binding = { Localization.getVar("mainMenu.play.challengeSettings.perfect").use() },
-                        font = this@LoadSavedLevelMenu.font).apply {
+                this += Pane().apply {
                     this.bounds.height.set(32f)
-                    this.checkedState.set(goForPerfect.getOrCompute())
-                    this.imageNode.tint.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
-                    this.textLabel.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
-                    this.textLabel.padding.set(Insets(0f, 0f, 4f, 0f))
-                    this.onCheckChanged = { newState ->
-                        goForPerfect.set(newState)
+                    val perfectCheckbox = CheckBox(binding = { Localization.getVar("mainMenu.play.challengeSettings.perfect").use() },
+                            font = this@LoadSavedLevelMenu.font).apply {
+                        this.bindWidthToParent(multiplier = 0.5f)
+                        this.checkedState.set(goForPerfect.getOrCompute())
+                        this.imageNode.tint.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.textLabel.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.textLabel.padding.set(Insets(0f, 0f, 4f, 0f))
+                        this.onCheckChanged = { newState ->
+                            goForPerfect.set(newState)
+                        }
+                        this.disabled.bind { robotMode.use() }
+                    }
+                    this += perfectCheckbox
+                    this += CheckBox(binding = { Localization.getVar("mainMenu.play.challengeSettings.robotMode").use() },
+                            font = this@LoadSavedLevelMenu.font).apply {
+                        this.bindWidthToParent(multiplier = 0.5f)
+                        Anchor.TopRight.configure(this)
+                        this.checkedState.set(robotMode.getOrCompute())
+                        this.imageNode.tint.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.textLabel.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.textLabel.padding.set(Insets(0f, 0f, 4f, 0f))
+                        this.onCheckChanged = { newState ->
+                            robotMode.set(newState)
+                            if (newState) {
+                                perfectCheckbox.checkedState.set(false)
+                            }
+                        }
+                        this.setOnAction {
+                            val newState = checkedState.invert()
+                            if (newState) {
+                                menuCol.playMenuSound("sfx_pause_robot_on")
+                            } else {
+                                menuCol.playMenuSound("sfx_pause_robot_off")
+                            }
+                        }
+                        this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.challengeSettings.robotMode.tooltip")))
                     }
                 }
                 this += HBox().apply {
@@ -176,7 +205,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     val loadedData = loaded
                     if (loadedData != null) {
                         val engine = loadedData.newContainer.engine
-                        val robotMode = Gdx.input.isShiftDown()
+                        val robotMode = this@LoadSavedLevelMenu.robotMode.getOrCompute()
                         menuCol.playMenuSound("sfx_menu_enter_game")
                         if (robotMode) {
                             menuCol.playMenuSound("sfx_pause_robot_on")
@@ -185,13 +214,13 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         
                         // Set challenge settings
                         val challenges: Challenges = if (!robotMode) {
-                            Challenges(tempoUp.getOrCompute(), goForPerfect.getOrCompute())
+                            Challenges(tempoUp.getOrCompute(), goForPerfect.getOrCompute() && !robotMode)
                         } else Challenges.NO_CHANGES
                         challenges.applyToEngine(engine)
                         
                         mainMenu.transitionAway {
                             val main = mainMenu.main
-                            val playScreen = PlayScreen(main, null, loadedData.newContainer, challenges)
+                            val playScreen = PlayScreen(main, null, loadedData.newContainer, challenges, showResults = !robotMode)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
                                     playScreen.prepareGameStart()
