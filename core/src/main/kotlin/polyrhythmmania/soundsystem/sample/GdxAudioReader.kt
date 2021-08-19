@@ -6,7 +6,6 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.StreamUtils
 import net.beadsproject.beads.core.AudioUtils
 import net.beadsproject.beads.data.Sample
-import polyrhythmmania.soundsystem.BeadsAudio
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.TempFileUtils
@@ -87,7 +86,7 @@ object GdxAudioReader {
     fun newSound(handle: FileHandle, listener: AudioLoadListener? = null): BeadsSound {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec", true)
+        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec")
         val bufferSize = 4096 * 4
         // TODO: Can we optimize this by immediately decoding and deinterleaving without writing to a tmp file first?
         val bytesRead = musicToPCMFile(music, tempFile, bufferSize, listener)
@@ -129,7 +128,7 @@ object GdxAudioReader {
     fun newMusic(handle: FileHandle, listener: AudioLoadListener? = null): BeadsMusic {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec", true)
+        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec")
         val bytesRead = musicToPCMFile(music, tempFile, listener = listener)
         val musicSample: MusicSample = FullMusicSample(tempFile.toPath(), music.rate.toFloat(), music.channels)
 
@@ -139,7 +138,7 @@ object GdxAudioReader {
     fun newDecodingMusicSample(handle: FileHandle, listener: AudioLoadListener? = null): Pair<DecodingMusicSample, DecodingHandler> {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec", true)
+        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec")
         
         return newDecodingMusic(music, tempFile, listener = listener)
     }

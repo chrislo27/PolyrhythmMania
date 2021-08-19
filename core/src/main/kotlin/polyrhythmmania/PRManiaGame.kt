@@ -3,7 +3,6 @@ package polyrhythmmania
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Preferences
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.Color
@@ -12,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.Disposable
 import com.eclipsesource.json.Json
 import org.lwjgl.glfw.GLFW
 import paintbox.*
@@ -39,6 +39,7 @@ import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
+import polyrhythmmania.util.TempFileUtils
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -213,6 +214,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         permanentScreens.forEach { s ->
             s.disposeQuietly()
         }
+        (screen as? Disposable)?.disposeQuietly()
         try {
             val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
             PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->
@@ -221,6 +223,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 it.delete()
                 Paintbox.LOGGER.info("Deleted old recovery file ${it.name}, lastModified() = ${it.lastModified()}, limit=$expiry")
             }
+            TempFileUtils.clearTempFolder()
         } catch (s: SecurityException) {
             s.printStackTrace()
         }

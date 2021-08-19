@@ -24,7 +24,6 @@ import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.Swing
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.timesignature.TimeSignature
-import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -359,9 +358,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 }
                 
                 if (currentCustomTexturePack != null) {
-                    val tmp = File.createTempFile("prmania", "savingtexpack").also { 
-                        it.deleteOnExit()
-                    }
+                    val tmp = TempFileUtils.createTempFile("savingtexpack")
                     tmp.outputStream().use { tmpOutputStream ->
                         ZipOutputStream(tmpOutputStream).use { texPackZip ->
                             texPackZip.setLevel(Deflater.NO_COMPRESSION)
@@ -503,7 +500,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                         
                         if (hasCustom) {
                             zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack.zip")).use { zipInputStream ->
-                                val tempFile = TempFileUtils.createTempFile("extres", true, ".zip")
+                                val tempFile = TempFileUtils.createTempFile("extres", ".zip")
                                 val out = tempFile.outputStream()
                                 zipInputStream.copyTo(out)
                                 val f = ZipFile(tempFile)
@@ -556,7 +553,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
         resourcesMap.forEach { (key, res) ->
             zipFile.getInputStream(zipFile.getFileHeader("res/${res.uuid}")).use { zipInputStream ->
-                val tempFile = TempFileUtils.createTempFile("extres", true, ".${res.ext}")
+                val tempFile = TempFileUtils.createTempFile("extres", ".${res.ext}")
                 val out = tempFile.outputStream()
                 zipInputStream.copyTo(out)
                 addResource(ExternalResource(key, tempFile, true))

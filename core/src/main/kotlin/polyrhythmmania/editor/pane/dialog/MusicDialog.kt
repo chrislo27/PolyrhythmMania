@@ -602,7 +602,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     substate.set(Substate.LOADING)
                 }
 
-                val tmp: File = TempFileUtils.createTempFile("music", deleteOnExit = true, suffix = ".${file.extension}")
+                val tmp: File = TempFileUtils.createTempFile("music", suffix = ".${file.extension}")
                 file.copyTo(tmp, overwrite = true)
 
                 loadMusic(tmp, true)
