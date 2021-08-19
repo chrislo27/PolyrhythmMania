@@ -624,7 +624,7 @@ ${sceneRoot.mainLayer.lastHoveredElementPath.map { it.javaClass.simpleName }}
         val triangleSlope: Float = 1 / 2f
         val topTriangleY: Float = 2 / 3f
         val botTriangleX: Float = 1 / 3f
-        private val topColor: Color = Color.valueOf("4048e0")
+        private val topColor: Color = Color.valueOf("232CDD")
         private val bottomColor: Color = Color.valueOf("d020a0")
 
         init {
