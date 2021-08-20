@@ -193,6 +193,11 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
         uiViewport.update(width, height)
     }
 
+    override fun showTransition() {
+        super.showTransition()
+        resize(Gdx.graphics.width, Gdx.graphics.height)
+    }
+
     override fun dispose() {
         if (soundsInited) {
             soundFirstLine.disposeQuietly()

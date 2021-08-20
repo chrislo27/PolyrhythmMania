@@ -82,6 +82,11 @@ class EditorScreen(main: PRManiaGame, val debugMode: Boolean = false) : PRManiaS
         (Gdx.graphics as Lwjgl3Graphics).window.windowListener = lastWindowListener
     }
 
+    override fun showTransition() {
+        super.showTransition()
+        resize(Gdx.graphics.width, Gdx.graphics.height)
+    }
+
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         editor.resize()

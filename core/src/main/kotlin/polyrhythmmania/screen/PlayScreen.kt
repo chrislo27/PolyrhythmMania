@@ -594,6 +594,11 @@ class PlayScreen(
         uiViewport.update(width, height)
     }
 
+    override fun showTransition() {
+        super.showTransition()
+        resize(Gdx.graphics.width, Gdx.graphics.height)
+    }
+
     override fun show() {
         super.show()
         unpauseGame(false)
