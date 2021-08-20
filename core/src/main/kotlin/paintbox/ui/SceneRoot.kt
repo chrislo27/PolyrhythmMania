@@ -11,8 +11,9 @@ import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.ui.animation.AnimationHandler
 import paintbox.ui.contextmenu.ContextMenu
-import paintbox.util.NoOpViewport
+import paintbox.util.viewport.NoOpViewport
 import paintbox.util.gdxutils.drawRect
+import paintbox.util.gdxutils.fillRect
 
 
 /**
@@ -21,8 +22,6 @@ import paintbox.util.gdxutils.drawRect
 class SceneRoot(val viewport: Viewport) : UIElement() {
 
     data class MousePosition(val x: FloatVar, val y: FloatVar)
-    
-    constructor(camera: OrthographicCamera) : this(NoOpViewport(camera))
     
     val camera: Camera = viewport.camera
 
@@ -44,6 +43,7 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
      */
     val frameUpdateTrigger: ReadOnlyVar<Boolean> = Var(false)
     val animations: AnimationHandler = AnimationHandler(this)
+    val applyViewport: Var<Boolean> = Var(true)
 
     val currentElementWithTooltip: ReadOnlyVar<HasTooltip?> = Var(null)
     val currentTooltipVar: ReadOnlyVar<UIElement?> = Var(null)
@@ -54,7 +54,11 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
 
     private val _currentFocused: Var<Focusable?> = Var(null)
     val currentFocusedElement: ReadOnlyVar<Focusable?> = _currentFocused
-
+    
+    constructor(camera: OrthographicCamera) : this(NoOpViewport(camera)) {
+        applyViewport.set(false)
+    }
+    
     init {
         (sceneRoot as Var).set(this)
 
@@ -97,6 +101,10 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
     }
 
     fun renderAsRoot(batch: SpriteBatch) {
+        if (applyViewport.getOrCompute()) {
+            viewport.apply()
+        }
+        
         (frameUpdateTrigger as Var).invert()
         updateMouseVector()
         updateTooltipPosition()
@@ -178,6 +186,7 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
     }
 
     fun resize() {
+        viewport.update(Gdx.graphics.width, Gdx.graphics.height)
         val camera = this.camera
         val zoom = (camera as? OrthographicCamera)?.zoom ?: 1f
         resize(camera.viewportWidth, camera.viewportHeight,
@@ -377,7 +386,7 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
         tmpVec3.set(vector, 0f)
         viewport.unproject(tmpVec3)
         vector.x = tmpVec3.x
-        vector.y = viewport.screenHeight - tmpVec3.y
+        vector.y = viewport.worldHeight - tmpVec3.y
         return vector
     }
 
@@ -391,7 +400,7 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
         tmpVec3.set(vector, 0f)
         viewport.project(tmpVec3)
         vector.x = tmpVec3.x
-        vector.y = viewport.screenHeight - tmpVec3.y
+        vector.y = viewport.worldHeight - tmpVec3.y
         return vector
     }
 

@@ -15,6 +15,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
@@ -72,7 +74,8 @@ class PlayScreen(
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
-    private val sceneRoot: SceneRoot = SceneRoot(uiCamera)
+    private val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
+    private val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val inputProcessor: InputProcessor = sceneRoot.inputSystem
     private val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
     private val pauseBg: PauseBackground by lazy { this.PauseBackground() }
@@ -233,6 +236,7 @@ class PlayScreen(
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         val batch = this.batch
+        uiViewport.apply()
         renderer.render(batch, engine)
 
         val camera = uiCamera
@@ -244,6 +248,7 @@ class PlayScreen(
             val height = camera.viewportHeight
             val shapeRenderer = main.shapeRenderer
             shapeRenderer.projectionMatrix = camera.combined
+            uiViewport.apply()
 
             batch.setColor(1f, 1f, 1f, 0.5f)
             batch.fillRect(0f, 0f, width, height)
@@ -582,6 +587,11 @@ class PlayScreen(
         val menuSFXVol = main.settings.menuSfxVolume.getOrCompute() / 100f
         val soundID = sound.play(menuSFXVol * volume, pitch, pan)
         return sound to soundID
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        uiViewport.update(width, height)
     }
 
     override fun show() {

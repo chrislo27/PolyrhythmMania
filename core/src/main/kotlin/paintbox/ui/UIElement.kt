@@ -207,7 +207,9 @@ open class UIElement : UIBounds() {
         val scissorH = (height / rootHeight) * camHeight
         val scissor = RectangleStack.getAndPush().set(scissorX, scissorY - scissorH, scissorW, scissorH)
 
-        val pushScissor = ScissorStack.pushScissor(scissor, viewport?.screenX ?: 0, viewport?.screenY ?: 0)
+        val pushScissor = if (root?.applyViewport?.getOrCompute() == true)
+            ScissorStack.pushScissor(scissor, viewport?.screenX ?: 0, viewport?.screenY ?: 0) 
+        else ScissorStack.pushScissor(scissor, 0,0)
         return pushScissor
     }
 

@@ -7,11 +7,13 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.StreamUtils
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 import net.beadsproject.beads.ugens.CrossFade
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
@@ -31,15 +33,14 @@ import paintbox.ui.layout.VBox
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.disposeQuietly
-import paintbox.util.gdxutils.drawQuad
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.grey
 import paintbox.util.settableLazy
+import paintbox.util.viewport.ExtendFixedRatioViewport
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
-import polyrhythmmania.container.Container
 import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.screen.mainmenu.bg.BgType
@@ -48,18 +49,15 @@ import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
 import polyrhythmmania.soundsystem.BeadsMusic
-import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.beads.ugen.Bandpass
 import polyrhythmmania.soundsystem.sample.DecodingMusicSample
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
-import polyrhythmmania.world.entity.EntityCube
-import polyrhythmmania.world.entity.EntityPiston
-import polyrhythmmania.world.entity.EntityPlatform
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 
 class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
@@ -126,15 +124,23 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
+    private val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
+
+    /**
+     * Used for frame buffer
+     */
     private val fullCamera: OrthographicCamera = OrthographicCamera().apply {
-        this.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
+    private val fullViewport: Viewport = ExtendFixedRatioViewport(1280f, 720f, fullCamera)
 
     val pendingKeyboardBinding: Var<InputSettingsMenu.PendingKeyboardBinding?> = Var(null)
 
     private val batch: SpriteBatch = main.batch
-    private val sceneRoot: SceneRoot = SceneRoot(uiCamera)
+    private val sceneRoot: SceneRoot = SceneRoot(uiViewport).apply { 
+        this.applyViewport.set(false)
+    }
     private val processor: InputProcessor = sceneRoot.inputSystem
     
     var backgroundType: BgType = BgType.NORMAL
@@ -329,12 +335,14 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         // Render background
+        HdpiUtils.glViewport(0, 0, boundFB.width, boundFB.height)
         background.render(batch, camera)
 
         // Render UI
         batch.projectionMatrix = camera.combined
         batch.begin()
 
+        HdpiUtils.glViewport(0, 0, boundFB.width, boundFB.height)
         sceneRoot.renderAsRoot(batch)
 
         if (this.transitionAway != null) {
@@ -347,6 +355,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         boundFB.end()
 
         // Tile flip effect
+        fullViewport.apply()
         batch.projectionMatrix = camera.combined
         batch.begin()
         batch.setColor(1f, 1f, 1f, 1f)
@@ -463,8 +472,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     private fun updateFramebuffers() {
         val cachedFramebufferSize = this.framebufferSize
-        val width = Gdx.graphics.width
-        val height = Gdx.graphics.height
+        val viewport = fullViewport
+        val width = viewport.worldWidth.roundToInt()
+        val height = viewport.worldHeight.roundToInt()
         if (width > 0 && height > 0 && (cachedFramebufferSize.width != width || cachedFramebufferSize.height != height)) {
             createFramebuffers(width, height, Pair(framebufferOld, framebufferCurrent))
         }
@@ -525,8 +535,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
-        fullCamera.setToOrtho(false, width.toFloat(), height.toFloat())
-        fullCamera.update()
+        fullViewport.update(width, height, true)
+        sceneRoot.resize()
         updateFramebuffers()
     }
 

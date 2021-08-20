@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
@@ -50,7 +52,8 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
-    private val sceneRoot: SceneRoot = SceneRoot(uiCamera)
+    private val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
+    private val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val inputProcessor: InputProcessor = sceneRoot.inputSystem
     private val resultsPane: ResultsPane
     private val controlsPane: Pane
@@ -134,7 +137,6 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
 
         sceneRoot.renderAsRoot(batch)
         
-        
         batch.end()
         batch.projectionMatrix = main.nativeCamera.combined
 
@@ -184,6 +186,11 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
         super.hide()
         main.inputMultiplexer.removeProcessor(inputProcessor)
         this.disposeQuietly()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        uiViewport.update(width, height)
     }
 
     override fun dispose() {

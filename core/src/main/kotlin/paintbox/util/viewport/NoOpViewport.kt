@@ -1,4 +1,4 @@
-package paintbox.util
+package paintbox.util.viewport
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
@@ -9,9 +9,8 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.Ray
 import com.badlogic.gdx.utils.viewport.Viewport
 
-
 /**
- * A [Viewport] that doesn't adjust the camera at all.
+ * A [Viewport] that doesn't adjust the camera nor glViewport at all.
  */
 class NoOpViewport(val camera: OrthographicCamera) : Viewport() {
     
