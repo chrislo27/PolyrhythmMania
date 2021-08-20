@@ -250,7 +250,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 this.skinID.set(UppermostMenu.BUTTON_SKIN_ID)
                 this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("support_donate")))
                 this.setOnAction {
-                    Gdx.net.openURI(PRMania.GITHUB)
+                    Gdx.net.openURI(PRMania.DONATE_LINK)
                 }
                 val loc: ReadOnlyVar<String> = Localization.getVar("mainMenu.support.tooltip", Var { listOf(PRMania.DONATE_LINK) })
                 this.tooltipElement.set(Tooltip(binding = { loc.use() }, font = main.fontMainMenuMain).apply { 
