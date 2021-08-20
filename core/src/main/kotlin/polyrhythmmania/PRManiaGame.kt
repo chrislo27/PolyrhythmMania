@@ -139,9 +139,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 InputThresholds.initInputClasses()
             }
             onAssetLoadingComplete = {
-                initializeScreens()
-                
                 DiscordHelper.init(settings.discordRichPresence.getOrCompute())
+                
+                initializeScreens()
                 
                 if (PRMania.dumpPackedSheets) {
                     val gdxArray = com.badlogic.gdx.utils.Array<PackedSheet>()
