@@ -2,12 +2,12 @@ package paintbox.font
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.utils.Disposable
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.copy
-import java.lang.Float.min
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * A wrapper around a [FreeTypeFontGenerator].
@@ -68,8 +68,9 @@ class PaintboxFontFreeType(params: PaintboxFontParams,
             val referenceSize = this.params.referenceSize
             val scaleX = (referenceSize.width / areaWidth)
             val scaleY = (referenceSize.height / areaHeight)
+            val scale = max(scaleX, scaleY)
             if (scaleX >= 0f && scaleY >= 0f && scaleX.isFinite() && scaleY.isFinite()) {
-                font.data.setScale(scaleX, scaleY)
+                font.data.setScale(scale, scale)
             }
         }
         
