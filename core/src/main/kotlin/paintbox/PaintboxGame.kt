@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
@@ -17,7 +18,6 @@ import paintbox.font.PaintboxFont
 import paintbox.font.PaintboxFontFreeType
 import paintbox.font.PaintboxFontParams
 import paintbox.i18n.LocalizationBase
-import paintbox.logging.Logger
 import paintbox.logging.SysOutPiper
 import paintbox.registry.AssetRegistry
 import paintbox.registry.ScreenRegistry
@@ -27,7 +27,6 @@ import paintbox.util.gdxutils.isShiftDown
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.drawCompressed
-import java.io.File
 import java.text.NumberFormat
 import kotlin.system.measureNanoTime
 
@@ -174,6 +173,10 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
             addProcessor(0, this@PaintboxGame)
         }
     }
+    
+    fun resetViewportToScreen() {
+        HdpiUtils.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
+    }
 
     /**
      * This function handles camera updates and screen clearing.
@@ -191,7 +194,7 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
     }
 
     /**
-     * This is called after the main [render] function is called.
+     * This is called after the main [render] function is called. Default implementation is to do nothing.
      */
     open fun postRender() {
 
@@ -206,10 +209,13 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
      */
     final override fun render() {
         try {
+            resetViewportToScreen()
+            
             preRender()
             super.render()
             postRender()
 
+            resetViewportToScreen()
             debugInfo.update(Gdx.graphics.deltaTime)
 
             if (Paintbox.debugMode) {
