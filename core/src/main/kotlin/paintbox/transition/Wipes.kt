@@ -12,11 +12,13 @@ open class WipeToColor(val color: Color, duration: Float, val slope: Float = 4f,
     override fun render(transitionScreen: TransitionScreen, screenRender: () -> Unit) {
         screenRender()
 
+        val camera = transitionScreen.main.nativeCamera
         val batch = transitionScreen.main.batch
+        transitionScreen.main.resetViewportToScreen()
+        batch.projectionMatrix = camera.combined
         batch.begin()
         batch.setColor(color.r, color.g, color.b, color.a)
 
-        val camera = transitionScreen.main.nativeCamera
         val slopePart = (if (slope == 0f) 0f else (camera.viewportWidth / slope.absoluteValue))
         val xOffset = interpolation.apply(camera.viewportWidth, -slopePart, transitionScreen.percentageCurrent)
 
@@ -43,11 +45,13 @@ open class WipeFromColor(val color: Color, duration: Float, val slope: Float = 4
     override fun render(transitionScreen: TransitionScreen, screenRender: () -> Unit) {
         screenRender()
 
+        val camera = transitionScreen.main.nativeCamera
         val batch = transitionScreen.main.batch
+        transitionScreen.main.resetViewportToScreen()
+        batch.projectionMatrix = camera.combined
         batch.begin()
         batch.setColor(color.r, color.g, color.b, color.a)
 
-        val camera = transitionScreen.main.nativeCamera
         val slopePart = (if (slope == 0f) 0f else (camera.viewportWidth / slope.absoluteValue))
         val xOffset = interpolation.apply(0f, -(camera.viewportWidth + slopePart), transitionScreen.percentageCurrent)
 
