@@ -1,23 +1,30 @@
 package paintbox.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.ui.animation.AnimationHandler
 import paintbox.ui.contextmenu.ContextMenu
+import paintbox.util.NoOpViewport
 import paintbox.util.gdxutils.drawRect
 
 
 /**
  * The [SceneRoot] element has the position 0, 0 and always has the width and height of the UI screen space.
  */
-class SceneRoot(val camera: OrthographicCamera) : UIElement() {
+class SceneRoot(val viewport: Viewport) : UIElement() {
 
     data class MousePosition(val x: FloatVar, val y: FloatVar)
+    
+    constructor(camera: OrthographicCamera) : this(NoOpViewport(camera))
+    
+    val camera: Camera = viewport.camera
 
     private val tmpVec3: Vector3 = Vector3()
     private val mouseVector: Vector2 = Vector2()
@@ -172,9 +179,10 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
 
     fun resize() {
         val camera = this.camera
+        val zoom = (camera as? OrthographicCamera)?.zoom ?: 1f
         resize(camera.viewportWidth, camera.viewportHeight,
-                camera.position.x - (camera.zoom * camera.viewportWidth / 2.0f),
-                camera.position.y - (camera.zoom * camera.viewportHeight / 2.0f))
+                camera.position.x - (zoom * camera.viewportWidth / 2.0f),
+                camera.position.y - (zoom * camera.viewportHeight / 2.0f))
     }
 
     fun <E> setFocusedElement(element: E?)
@@ -367,9 +375,9 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
      */
     fun screenToUI(vector: Vector2): Vector2 {
         tmpVec3.set(vector, 0f)
-        camera.unproject(tmpVec3)
+        viewport.unproject(tmpVec3)
         vector.x = tmpVec3.x
-        vector.y = camera.viewportHeight - tmpVec3.y
+        vector.y = viewport.screenHeight - tmpVec3.y
         return vector
     }
 
@@ -381,9 +389,9 @@ class SceneRoot(val camera: OrthographicCamera) : UIElement() {
      */
     fun uiToScreen(vector: Vector2): Vector2 {
         tmpVec3.set(vector, 0f)
-        camera.project(tmpVec3)
+        viewport.project(tmpVec3)
         vector.x = tmpVec3.x
-        vector.y = camera.viewportHeight - tmpVec3.y
+        vector.y = viewport.screenHeight - tmpVec3.y
         return vector
     }
 

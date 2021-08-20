@@ -193,12 +193,13 @@ open class UIElement : UIBounds() {
      */
     fun clipBegin(originX: Float, originY: Float, x: Float, y: Float, width: Float, height: Float): Boolean {
         val root = sceneRoot.getOrCompute()
+        val viewport = root?.viewport
         val rootBounds = root?.bounds
         val rootWidth: Float = rootBounds?.width?.get() ?: width
         val rootHeight: Float = rootBounds?.height?.get() ?: height
 
-        val camWidth = Gdx.graphics.width.toFloat() //sceneRoot.getOrCompute()?.bounds?.width?.get() ?: Gdx.graphics.width.toFloat()
-        val camHeight = Gdx.graphics.height.toFloat() //sceneRoot.getOrCompute()?.bounds?.height?.get() ?: Gdx.graphics.height.toFloat()
+        val camWidth = (viewport?.screenWidth ?: Gdx.graphics.width).toFloat() //sceneRoot.getOrCompute()?.bounds?.width?.get() ?: Gdx.graphics.width.toFloat()
+        val camHeight = (viewport?.screenHeight ?: Gdx.graphics.height).toFloat() //sceneRoot.getOrCompute()?.bounds?.height?.get() ?: Gdx.graphics.height.toFloat()
         
         val scissorX = (originX + x) / rootWidth * camWidth
         val scissorY = ((originY - y) / rootHeight) * camHeight
@@ -206,7 +207,7 @@ open class UIElement : UIBounds() {
         val scissorH = (height / rootHeight) * camHeight
         val scissor = RectangleStack.getAndPush().set(scissorX, scissorY - scissorH, scissorW, scissorH)
 
-        val pushScissor = ScissorStack.pushScissor(scissor)
+        val pushScissor = ScissorStack.pushScissor(scissor, viewport?.screenX ?: 0, viewport?.screenY ?: 0)
         return pushScissor
     }
 

@@ -16,13 +16,13 @@ object ScissorStack {
     /**
      * The scissor should be in screen coordinates with 0, 0 at the BOTTOM LEFT.
      */
-    fun pushScissor(scissor: Rectangle): Boolean {
+    fun pushScissor(scissor: Rectangle, screenX: Int, screenY: Int): Boolean {
         scissor.normalize()
         if (stack.isEmpty()) {
             if (scissor.width < 1 || scissor.height < 1) return false
             Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST)
         } else {
-            if ((scissor.x + scissor.y + scissor.width + scissor.height).isNaN()) return false
+            if (!(scissor.x + scissor.y + scissor.width + scissor.height).isFinite()) return false
             
             // Merge scissors
             val parent = stack.last()
@@ -40,7 +40,8 @@ object ScissorStack {
             scissor.height = max(1f, maxY - minY)
         }
         stack += scissor
-        HdpiUtils.glScissor(scissor.x.toInt(), scissor.y.toInt(), scissor.width.toInt(), scissor.height.toInt())
+        HdpiUtils.glScissor(scissor.x.toInt() + screenX, scissor.y.toInt() + screenY,
+                scissor.width.toInt(), scissor.height.toInt())
         return true
     }
     
