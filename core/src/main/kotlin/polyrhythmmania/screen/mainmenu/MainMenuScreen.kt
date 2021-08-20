@@ -139,7 +139,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     private val batch: SpriteBatch = main.batch
     private val sceneRoot: SceneRoot = SceneRoot(uiViewport).apply { 
-        this.applyViewport.set(false)
+        this.applyViewport.set(false) // Must be disabled due to being rendered to a framebuffer
     }
     private val processor: InputProcessor = sceneRoot.inputSystem
     
