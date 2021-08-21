@@ -120,6 +120,8 @@ object TinyFDWrapper {
     /**
      * Opens a select folder/directory chooser dialog.
      * [function] is called when the dialog is closed/a directory is selected.
+     * 
+     * Broken on Windows: returns the last directory if the user hits CANCEL, instead of returning null
      */
     fun selectFolder(title: String, defaultFolder: File, function: (File?) -> Unit) {
         selectFolder(title, defaultFolder.toProperPath()!!).let(function)

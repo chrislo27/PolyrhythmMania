@@ -19,7 +19,10 @@ import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
-import paintbox.ui.contextmenu.*
+import paintbox.ui.contextmenu.ContextMenu
+import paintbox.ui.contextmenu.LabelMenuItem
+import paintbox.ui.contextmenu.SeparatorMenuItem
+import paintbox.ui.contextmenu.SimpleMenuItem
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
@@ -28,13 +31,14 @@ import paintbox.util.Matrix4Stack
 import paintbox.util.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
+import paintbox.util.gdxutils.openFileExplorer
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PreferenceKeys
-import polyrhythmmania.container.Container
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins
-import polyrhythmmania.world.*
+import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.*
@@ -372,25 +376,33 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     if (ctp.isEmpty()) {
                         pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedCustom.none"))
                     } else {
-                        fileChooserSelectDirectory(Localization.getValue("fileChooser.texturePack.exportCustomTexturesToDir")) { file ->
-                            try {
-                                val tgaWriter = ImageIO.getImageWritersByFormatName("TGA").next()
-                                try {
-                                    ctp.getAllTilesetRegions().forEach { region ->
-                                        val outputFile = file.resolve("${region.id}.tga")
-                                        outputFile.createNewFile()
-                                        outputFile.outputStream().use { fos ->
-                                            CustomTexturePack.writeTextureAsTGA(region.texture, fos, tgaWriter)
-                                        }
-                                    }
-                                } finally {
-                                    tgaWriter.dispose()
-                                }
-                                pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedCustom.success"))
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedTextures.error", e.javaClass.name))
+                        try {
+                            val outputFolder: File = PRMania.MAIN_FOLDER.resolve("texpack_output/")
+                            outputFolder.deleteRecursively()
+                            if (!outputFolder.exists()) {
+                                outputFolder.mkdirs()
                             }
+
+                            val tgaWriter = ImageIO.getImageWritersByFormatName("TGA").next()
+                            try {
+                                ctp.getAllTilesetRegions().forEach { region ->
+                                    val outputFile = outputFolder.resolve("${region.id}.tga")
+                                    outputFile.createNewFile()
+                                    outputFile.outputStream().use { fos ->
+                                        CustomTexturePack.writeTextureAsTGA(region.texture, fos, tgaWriter)
+                                    }
+                                }
+                            } finally {
+                                tgaWriter.dispose()
+                            }
+
+                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedCustom.success", outputFolder.absolutePath.replace("\\", "\\\\")))
+                            Gdx.app.postRunnable {
+                                Gdx.net.openFileExplorer(outputFolder)
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedTextures.error", e.javaClass.name))
                         }
                     }
                 }
@@ -415,24 +427,32 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_export_base"]))
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.exportAllBaseTextures")))
                 this.setOnAction {
-                    fileChooserSelectDirectory(Localization.getValue("fileChooser.texturePack.exportBaseTexturesToDir")) { file ->
+                    try {
+                        val outputFolder: File = PRMania.MAIN_FOLDER.resolve("texpack_output/")
+                        outputFolder.deleteRecursively()
+                        if (!outputFolder.exists()) {
+                            outputFolder.mkdirs()
+                        }
+                        
                         val baseID = customTexturePack.getOrCompute().fallbackID
                         val fileTypes = listOf("tga", "png")
-                        try {
-                            CustomTexturePack.ALLOWED_LIST.forEach { regionID ->
-                                for (fileType in fileTypes) {
-                                    val fh = Gdx.files.internal("textures/world/${baseID}/parts/${regionID}.${fileType}")
-                                    if (!fh.exists()) continue
-                                    val outputFile = file.resolve("${regionID}.${fileType}")
-                                    outputFile.createNewFile()
-                                    fh.copyTo(FileHandle(outputFile))
-                                }
+                        CustomTexturePack.ALLOWED_LIST.forEach { regionID ->
+                            for (fileType in fileTypes) {
+                                val fh = Gdx.files.internal("textures/world/${baseID}/parts/${regionID}.${fileType}")
+                                if (!fh.exists()) continue
+                                val outputFile: File = outputFolder.resolve("${regionID}.${fileType}")
+                                outputFile.createNewFile()
+                                fh.copyTo(FileHandle(outputFile))
                             }
-                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedBase.success"))
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedTextures.error", e.javaClass.name))
                         }
+                        
+                        pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedBase.success", outputFolder.absolutePath.replace("\\", "\\\\")))
+                        Gdx.app.postRunnable { 
+                            Gdx.net.openFileExplorer(outputFolder)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        pushMessage(Localization.getValue("editor.dialog.texturePack.message.exportedTextures.error", e.javaClass.name))
                     }
                 }
             }
@@ -573,29 +593,6 @@ class TexturePackEditDialog(editorPane: EditorPane,
         } catch (e: Exception) {
             e.printStackTrace()
             pushMessage(Localization.getValue("editor.dialog.texturePack.message.importTextures.error", e.javaClass.name))
-        }
-    }
-    
-    fun fileChooserSelectDirectory(title: String, action: (File) -> Unit) {
-        isFileChooserOpen.set(true)
-        editorPane.main.restoreForExternalDialog { completionCallback ->
-            thread(isDaemon = true) {
-                TinyFDWrapper.selectFolder(title, main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_EXPORT_TO_DIR)
-                        ?: main.getDefaultDirectory()) { file: File? ->
-                    completionCallback()
-                    
-                    if (file != null && file.isDirectory) {
-                        Gdx.app.postRunnable {
-                            action(file)
-                        }
-                        main.persistDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_EXPORT_TO_DIR, file)
-                    }
-                    
-                    Gdx.app.postRunnable {
-                        isFileChooserOpen.set(false)
-                    }
-                }
-            }
         }
     }
 
