@@ -11,7 +11,7 @@ object PRMania {
     const val GITHUB = "https://github.com/chrislo27/PolyrhythmMania"
     const val HOMEPAGE = "https://polyrhythmmania.rhre.dev"
     const val DONATE_LINK = "https://www.paypal.com/donate/?hosted_button_id=9JLGHKZNWLLQ8"
-    val VERSION: Version = Version(0, 8, 0, "beta_20210817a")
+    val VERSION: Version = Version(0, 7, 1, "beta_20210821a")
     const val WIDTH: Int = 1280 //1080
     const val HEIGHT: Int = 720
     val DEFAULT_SIZE: WindowSize = WindowSize(WIDTH, HEIGHT)
