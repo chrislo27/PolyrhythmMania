@@ -1,0 +1,51 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please check every field carefully and provide as much detail as possible.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of Polyrhythm Mania were you running? You can find the version string on the main menu; it looks like "vX.Y.Z".
+      placeholder: "v1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: os_platform
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      placeholder: "e.g.: Windows 10, Ubuntu"
+      value: "Windows 10"
+    validations:
+      required: true
+  - type: textarea
+    id: problem-desc
+    attributes:
+      label: Problem Description
+      description: Describe the problem that occurs and why you think it is a bug.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to Reproduce Problem
+      description: "Describe, step by step, how to exactly recreate the problem you are seeing. Use as much detail as possible."
+      value: |
+      1.
+      2.
+      3.
+      ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: "Please copy and paste any relevant log output. You can find log files in the directory `<user home>/.polyrhythmmania/logs/`. This will be automatically formatted into code, so there's no need for backticks."
+      render: shell
