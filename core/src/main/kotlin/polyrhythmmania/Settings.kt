@@ -4,6 +4,7 @@ import com.badlogic.gdx.Preferences
 import com.eclipsesource.json.Json
 import paintbox.binding.Var
 import paintbox.util.WindowSize
+import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_ARROW_KEYS_LIKE_SCROLL
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_AUTOSAVE_INTERVAL
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_DETAILED_MARKER_UNDO
@@ -34,31 +35,34 @@ import java.time.format.DateTimeFormatter
 @Suppress("PrivatePropertyName")
 class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
-    data class KeyValue<T>(val key: String, val value: Var<T>)
+    data class KeyValue<T>(val key: String, val value: Var<T>, val defaultValue: T) {
+        constructor(key: String, defaultValue: T) : this(key, Var(defaultValue), defaultValue)
+    }
 
-    private val kv_gameplayVolume: KeyValue<Int> = KeyValue(SETTINGS_GAMEPLAY_VOLUME, Var(50))
-    private val kv_menuMusicVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_MUSIC_VOLUME, Var(50))
-    private val kv_menuSfxVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, Var(50))
-    private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, Var(PRMania.DEFAULT_SIZE))
-    private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, Var(false))
-    private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, Var(true))
-    private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, Var(true))
-    private val kv_musicOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_MUSIC_OFFSET_MS, Var(0))
-    private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, Var(true))
-    private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, Var(""))
+    private val kv_gameplayVolume: KeyValue<Int> = KeyValue(SETTINGS_GAMEPLAY_VOLUME, 50)
+    private val kv_menuMusicVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_MUSIC_VOLUME, 50)
+    private val kv_menuSfxVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, 50)
+    private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, PRMania.DEFAULT_SIZE)
+    private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, false)
+    private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
+    private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
+    private val kv_musicOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_MUSIC_OFFSET_MS, 0)
+    private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
+    private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, "")
 
-    private val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, Var(false))
-    private val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, Var(true))
-    private val kv_editorPanningDuringPlayback: KeyValue<CameraPanningSetting> = KeyValue(EDITORSETTINGS_PANNING_DURING_PLAYBACK, Var(CameraPanningSetting.PAN))
-    private val kv_editorAutosaveInterval: KeyValue<Int> = KeyValue(EDITORSETTINGS_AUTOSAVE_INTERVAL, Var(5))
-    private val kv_editorMusicWaveformOpacity: KeyValue<Int> = KeyValue(EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY, Var(10))
-    private val kv_editorHigherAccuracyPreview: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW, Var(true))
-    private val kv_editorPlaytestStartsPlay: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_PLAYTEST_STARTS_PLAY, Var(true))
+    private val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
+    private val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, true)
+    private val kv_editorPanningDuringPlayback: KeyValue<CameraPanningSetting> = KeyValue(EDITORSETTINGS_PANNING_DURING_PLAYBACK, CameraPanningSetting.PAN)
+    private val kv_editorAutosaveInterval: KeyValue<Int> = KeyValue(EDITORSETTINGS_AUTOSAVE_INTERVAL, 5)
+    private val kv_editorMusicWaveformOpacity: KeyValue<Int> = KeyValue(EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY, 10)
+    private val kv_editorHigherAccuracyPreview: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW, true)
+    private val kv_editorPlaytestStartsPlay: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_PLAYTEST_STARTS_PLAY, true)
+    private val kv_editorArrowKeysLikeScroll: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_ARROW_KEYS_LIKE_SCROLL, false)
     
-    private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, Var(InputKeymapKeyboard()))
+    private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, InputKeymapKeyboard())
             
-    private val kv_endlessDunkHighScore: KeyValue<Int> = KeyValue(ENDLESS_DUNK_HIGHSCORE, Var(0))
-    private val kv_endlessDailyChallenge: KeyValue<Pair<LocalDate, Int>> = KeyValue(ENDLESS_DAILY_CHALLENGE, Var(LocalDate.MIN to 0))
+    private val kv_endlessDunkHighScore: KeyValue<Int> = KeyValue(ENDLESS_DUNK_HIGHSCORE, 0)
+    private val kv_endlessDailyChallenge: KeyValue<Pair<LocalDate, Int>> = KeyValue(ENDLESS_DAILY_CHALLENGE, LocalDate.MIN to 0)
 
     val gameplayVolume: Var<Int> = kv_gameplayVolume.value
     val menuMusicVolume: Var<Int> = kv_menuMusicVolume.value
@@ -78,6 +82,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val editorMusicWaveformOpacity: Var<Int> = kv_editorMusicWaveformOpacity.value
     val editorHigherAccuracyPreview: Var<Boolean> = kv_editorHigherAccuracyPreview.value
     val editorPlaytestStartsPlay: Var<Boolean> = kv_editorPlaytestStartsPlay.value
+    val editorArrowKeysLikeScroll: Var<Boolean> = kv_editorArrowKeysLikeScroll.value
     
     val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
     
@@ -106,6 +111,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getIntCoerceIn(kv_editorMusicWaveformOpacity, 0, 10)
         prefs.getBoolean(kv_editorHigherAccuracyPreview)
         prefs.getBoolean(kv_editorPlaytestStartsPlay)
+        prefs.getBoolean(kv_editorArrowKeysLikeScroll)
         
         prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
         
@@ -133,6 +139,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_editorMusicWaveformOpacity)
                 .putBoolean(kv_editorHigherAccuracyPreview)
                 .putBoolean(kv_editorPlaytestStartsPlay)
+                .putBoolean(kv_editorArrowKeysLikeScroll)
 
                 .putInputKeymapKeyboard(kv_keymapKeyboard)
 

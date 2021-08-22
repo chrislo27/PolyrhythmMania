@@ -826,10 +826,20 @@ class Editor(val main: PRManiaGame)
         val shift = Gdx.input.isShiftDown()
         val currentClick = click.getOrCompute()
         val state = playState.getOrCompute()
+        
+        if (settings.editorArrowKeysLikeScroll.getOrCompute()) {
+            if (keycode == Input.Keys.UP) {
+                Gdx.input.inputProcessor.scrolled(0f, -1f)
+                inputConsumed = true
+            } else if (keycode == Input.Keys.DOWN) {
+                Gdx.input.inputProcessor.scrolled(0f, 1f)
+                inputConsumed = true
+            }
+        }
 
         val contextMenuActive = sceneRoot.isContextMenuActive()
         val dialogActive = sceneRoot.isDialogActive()
-        if (!contextMenuActive && (!dialogActive || sceneRoot.getCurrentRootDialog() == editorPane.playtestDialog)) {
+        if (!inputConsumed && !contextMenuActive && (!dialogActive || sceneRoot.getCurrentRootDialog() == editorPane.playtestDialog)) {
             if (keycode == Input.Keys.SPACE) { // SPACE: Play state (or in Playtest dialog)
                 if (!alt && !ctrl && currentClick == Click.None) {
                     if (state == PlayState.STOPPED) {
@@ -848,7 +858,7 @@ class Editor(val main: PRManiaGame)
                 }
             }
         }
-        if (!contextMenuActive && !dialogActive) {
+        if (!inputConsumed && !contextMenuActive && !dialogActive) {
             if (keycode in MOVE_WINDOW_KEYCODES) {
                 pressedButtons += keycode
                 inputConsumed = true

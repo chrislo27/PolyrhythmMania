@@ -124,6 +124,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             vbox += createCheckbox("editorSettings.cameraPanOnDragEdge", "editorSettings.cameraPanOnDragEdge.tooltip", settings.editorCameraPanOnDragEdge)
             vbox += createCheckbox("editorSettings.higherAccuracyPreview", "editorSettings.higherAccuracyPreview.tooltip", settings.editorHigherAccuracyPreview)
             vbox += createCheckbox("editorSettings.playtestStartsPlay", "editorSettings.playtestStartsPlay.tooltip", settings.editorPlaytestStartsPlay)
+            vbox += createCheckbox("editorSettings.arrowKeysLikeScroll", "editorSettings.arrowKeysLikeScroll.tooltip", settings.editorArrowKeysLikeScroll)
             vbox += createCycleOption("editorSettings.cameraPanningSetting", "editorSettings.cameraPanningSetting.tooltip",
                     settings.editorPanningDuringPlayback, CameraPanningSetting.VALUES,
                     itemToStringBinding = { Localization.getVar(it.localization).use() }).first

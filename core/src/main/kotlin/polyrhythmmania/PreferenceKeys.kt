@@ -31,6 +31,7 @@ object PreferenceKeys {
     val EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY = "editorsettings_music_waveform_opacity"
     val EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW = "editorsettings_higher_accuracy_preview"
     val EDITORSETTINGS_PLAYTEST_STARTS_PLAY = "editorsettings_playtest_starts_play"
+    val EDITORSETTINGS_ARROW_KEYS_LIKE_SCROLL = "editorsettings_arrow_keys_like_scroll"
     
     val KEYMAP_KEYBOARD = "keymap_keyboard"
     
