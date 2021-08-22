@@ -2,11 +2,7 @@ package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
-import paintbox.transition.FadeIn
-import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
@@ -16,16 +12,10 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
-import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.DunkMode
 import polyrhythmmania.sidemodes.EndlessModeScore
-import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
-import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.ui.PRManiaSkins
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -79,12 +69,16 @@ class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
             }
             
-//            vbox += createLongButton { Localization.getVar("mainMenu.play.toss").use() }.apply {
-//                
-//            }
-//            vbox += createLongButton { Localization.getVar("mainMenu.play.dash").use() }.apply {
-//                
-//            }
+            vbox += createLongButton { """Trailer Video: [font=thin]Polyrhythm: Assemble[]""" }.apply {
+                this.tooltipElement.set(createTooltip { "This side mode will be made available in a future update if sufficient\ndevelopment costs are recovered — please consider donating\nto help with development costs! Donation link (goes to PayPal):\n[color=prmania_tooltip_keystroke scale=1]https://donate-to-polyrhythmmania.rhre.dev[]" })
+                this.setOnAction { 
+                    Gdx.net.openURI("""https://www.youtube.com/watch?v=zsmNYD7X37Q""")
+                }
+            }
+            vbox += createLongButton { """[font=thin]Future Spot for Side Mode #3[]""" }.apply {
+                this.disabled.set(true)
+                this.tooltipElement.set(createTooltip { "This NEW side mode will be developed for a future update if sufficient\ndevelopment costs are recovered — please consider donating\nto help with development costs! Donation link (goes to PayPal):\n[color=prmania_tooltip_keystroke scale=1]https://donate-to-polyrhythmmania.rhre.dev[]" })
+            }
 
 //            vbox += createLongButton { "...Other modes (possibly) coming soon!" }.apply {
 //                this.disabled.set(true)
