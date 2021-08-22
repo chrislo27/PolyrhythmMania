@@ -15,13 +15,17 @@ body:
       placeholder: "v1.0.0"
     validations:
       required: true
-  - type: input
+  - type: dropdown
     id: os_platform
     attributes:
       label: Operating System
-      description: "What operating system are you using? (e.g.: Windows 10, Ubuntu)"
-      placeholder: "e.g.: Windows 10, Ubuntu"
-      value: "Windows 10"
+      description: "What operating system are you using?"
+      options:
+        - Windows 10
+        - Windows 8.1
+        - Windows 8
+        - Windows 7
+        - Linux
     validations:
       required: true
   - type: textarea
