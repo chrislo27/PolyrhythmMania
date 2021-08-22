@@ -23,6 +23,7 @@ object Credits {
                     "spoopster",
                     "Kievit",
                     "Turtike",
+                    "J-D Thunder",
             ) + listOf("Project donators"),
             "credits.resourcesAndTechnologies" to listOf(
                     "[font=rodin]リズム天国[] assets\nby Nintendo",
