@@ -4,8 +4,19 @@ built-in level editor.
 
 ![Polyrhythm Mania thumbnail](https://cdn.discordapp.com/attachments/306231796369195020/851931738271121428/6cf14200-c863-11eb-84d4-4778b68f36b9.png)
 
+[![Downloads](https://img.shields.io/github/downloads/chrislo27/PolyrhythmMania/total.svg)](https://github.com/chrislo27/PolyrhythmMania/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/chrislo27/PolyrhythmMania.svg)](https://github.com/chrislo27/PolyrhythmMania/blob/dev/LICENSE.txt)
 [![Donate to the project maintainer](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.com/donate?hosted_button_id=9JLGHKZNWLLQ8)
+
+## Features
+* Full recreation of the Polyrhythm minigame from Rhythm Tengoku
+* Save and load custom levels with a built-in and intuitive level editor
+* Level effects such as changing the colour palette, adding text boxes, putting Skill Stars, and more
+* Switch between classic GBA or modern HD textures, or add your own custom texture pack
+* Practice modes to improve your Polyrhythm skills with levels from the original GBA game
+* Endless Mode keeps you on your toes with never-ending procedurally generated patterns
+* Daily Challenge mode which has a series of patterns not seen in regular Endless Mode
+* Bonus Side Modes like _Polyrhythm: Dunk_ adds new twists on classic Polyrhythm
 
 [Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)  
 [Check out the August 2021 features trailer!](https://www.youtube.com/watch?v=k9PtPI1-tDo)
