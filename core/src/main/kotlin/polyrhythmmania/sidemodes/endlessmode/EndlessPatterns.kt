@@ -20,7 +20,10 @@ object EndlessPatterns {
 """P-P-P-P-""".parsePattern(Difficulty.VERY_EASY, flippable = true),
 """##P-P-P-""".parsePattern(Difficulty.VERY_EASY, flippable = true),
 """##P---P---""".parsePattern(Difficulty.VERY_EASY, flippable = true),
-            
+"""#P-P-P-P-""".parsePattern(Difficulty.VERY_EASY, flippable = true),
+
+
+"""P--PP-P-#""".parsePattern(Difficulty.EASY, flippable = true),
 """P-P-P-P-
   |######P-""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
 """P-P-P-P-
@@ -33,8 +36,18 @@ object EndlessPatterns {
   |##P---P---""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
 """P--P--##
   |P-PP--##""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
-"""#P-P-P-P-""".parsePattern(Difficulty.EASY, flippable = true),
-"""P--PP-P-#""".parsePattern(Difficulty.EASY, flippable = true),            
+"""####P--#
+  |P----P-#""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
+"""####P-##
+  |P-P---##""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
+"""#P---P-#
+  |#P-P---#""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
+"""##P--P-#
+  |##P--P-#""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
+"""#P---P-#
+  |#P-P---#""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
+"""#P-P-P-#
+  |P--P---#""".trimMargin("|").parsePattern(Difficulty.EASY, flippable = true),
 
 
 """P-P-P-P-
@@ -61,6 +74,20 @@ object EndlessPatterns {
   |#P-P-###""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
 """P-P-P-P-##
   |#P-P-P-###""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""P---P-P-
+  |##P--P--""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""P---P---
+  |P-P--P--""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""#P--PP-#
+  |PP--PP-#""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""P--PP--#
+  |##P--P-#""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""PP-P-PP-""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""PP---P--#
+  |##PP--P-#""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""#P---PP-
+  |P-PPP---""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
+"""PPPP-P-#""".trimMargin("|").parsePattern(Difficulty.MEDIUM, flippable = true),
 
 
 """PPP-PPP-""".parsePattern(Difficulty.HARD, flippable = true),
@@ -80,10 +107,22 @@ object EndlessPatterns {
   |P--P--P--""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
 """P-P-PPP-#
   |P-P-##P-#""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
-"""P-P-PPP-#
-  |P-P-P-P-#""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
-"""P-P-PPP-#
-  |#P-P--P-#""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""#P-PP----
+  |P-P--PP-#""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""#P---P--#
+  |P-PP--P-#""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""PP-P-PP-
+  |##P-P---""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""##P-P---
+  |PP-P-PP-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""PP-P-PP-
+  |##P-P-P-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""P--P-PP-
+  |#P---PP-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""PP--P-P-
+  |P-----P-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""P--P----
+  |P-PP--P-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
             
     )
     

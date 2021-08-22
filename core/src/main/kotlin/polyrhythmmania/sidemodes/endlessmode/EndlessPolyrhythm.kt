@@ -135,8 +135,8 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         return (random.nextGaussian().absoluteValue * stdDev + mean).toFloat()
     }
     
-    fun getStdDevFromDifficulty(): Float = MathUtils.lerp(0.5f, 0.85f, (difficultyFactor.get() / 1.75f).coerceIn(0f, 1f))
-    fun getMeanFromDifficulty(): Float = (difficultyFactor.get() / 2f).coerceIn(0f, 2.25f)
+    fun getMeanFromDifficulty(): Float = (difficultyFactor.get() / 2.5f).coerceIn(0.25f, 2.25f)
+    fun getStdDevFromDifficulty(): Float = MathUtils.lerp(0.5f, 0.85f, (difficultyFactor.get() / 2.5f).coerceIn(0f, 1f))
 
     override fun getDebugString(): String {
         return """seed: ${if (dailyChallenge != null) "daily challenge" else seed.toString(16).uppercase()}
