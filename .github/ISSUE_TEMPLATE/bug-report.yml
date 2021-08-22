@@ -11,7 +11,7 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of Polyrhythm Mania were you running? You can find the version string on the main menu; it looks like "vX.Y.Z".
+      description: What version of Polyrhythm Mania were you running? You can find the version string on the main menu; it looks like "vX.Y.Z", for example v1.2.3.
       placeholder: "v1.0.0"
     validations:
       required: true
@@ -19,7 +19,7 @@ body:
     id: os_platform
     attributes:
       label: Operating System
-      description: What operating system are you using?
+      description: "What operating system are you using? (e.g.: Windows 10, Ubuntu)"
       placeholder: "e.g.: Windows 10, Ubuntu"
       value: "Windows 10"
     validations:
@@ -48,3 +48,9 @@ body:
       label: Relevant log output
       description: "Please copy and paste any relevant log output. You can find log files in the directory `<user home>/.polyrhythmmania/logs/`. This will be automatically formatted into code, so there's no need for backticks."
       render: shell
+  - type: textarea
+    id: other-info
+    attributes:
+      label: (Optional) Other useful information
+      placeholder: If you have other information or have files you need to upload, you can do so here.
+      
