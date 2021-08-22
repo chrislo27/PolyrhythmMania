@@ -299,6 +299,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }, font = main.fontMainMenuMain).apply {
                 this.markup.set(markup)
             })
+            this.setOnAction { 
+                Gdx.net.openURI("${PRMania.GITHUB}/releases/latest")
+            }
         }
     }
 
