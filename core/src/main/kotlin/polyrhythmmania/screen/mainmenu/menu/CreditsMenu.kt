@@ -2,6 +2,7 @@ package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
@@ -13,7 +14,6 @@ import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.sumOfFloat
 import polyrhythmmania.Localization
 import polyrhythmmania.credits.Credits
 import polyrhythmmania.ui.PRManiaSkins
@@ -33,7 +33,8 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     init {
         this.setSize(0.64f)
         this.titleText.bind { Localization.getVar("mainMenu.credits.title").use() }
-        this.contentPane.bounds.height.set(300f)
+        this.contentPane.bounds.height.set(520f)
+        this.showLogo.set(false)
 
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
@@ -113,15 +114,14 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         scrollPane.hBar.setValue(0f)
     }
 
-    private fun createCreditRow(headingLoc: String, names: List<String>): Pane {
+    private fun createCreditRow(headingLoc: ReadOnlyVar<String>, names: List<ReadOnlyVar<String>>): Pane {
         fun getRowHeight(name: String): Float = name.count { it == '\n' } * 0.75f + 1
         fun getHeadingRowHeight(name: String): Float = name.count { it == '\n' } * 0.75f + 1f
 
         return Pane().apply {
             val numNameColumns = 2
 
-            val headingVar = Localization.getVar(headingLoc)
-            val headingLabel = TextLabel(binding = { headingVar.use() }, font = font).apply {
+            val headingLabel = TextLabel(binding = { headingLoc.use() }, font = font).apply {
                 Anchor.TopLeft.configure(this)
                 this.bounds.width.set(210f)
                 this.bounds.height.bind { ROW_HEIGHT * getHeadingRowHeight(text.use()) }
@@ -148,8 +148,8 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         currentRowHeight = 0f
                     }
 
-                    val rh = getRowHeight(str)
-                    addChild(TextLabel(str, font = font).apply {
+                    val rh = getRowHeight(str.getOrCompute()) // FIXME might be nice if the height was dynamic to the str var
+                    addChild(TextLabel(binding = { str.use() }, font = font).apply {
                         Anchor.TopLeft.configure(this)
                         this.bindWidthToParent(adjust = 0f, multiplier = 1f / numNameColumns)
                         this.bounds.x.bind { bounds.width.useF() * col }

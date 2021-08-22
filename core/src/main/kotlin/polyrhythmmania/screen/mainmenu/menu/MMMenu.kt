@@ -52,6 +52,8 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
 
     protected val root: SceneRoot get() = menuCol.sceneRoot
     protected val mainMenu: MainMenuScreen get() = menuCol.mainMenu
+    
+    val showLogo: Var<Boolean> = Var(true)
 
     protected fun setSize(percentage: Float, adjust: Float = 0f) {
         bounds.width.bind {

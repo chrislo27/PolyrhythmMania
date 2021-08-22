@@ -46,6 +46,7 @@ import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.mainmenu.bg.MainMenuBg
 import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
+import polyrhythmmania.screen.mainmenu.menu.MMMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
 import polyrhythmmania.soundsystem.BeadsMusic
@@ -146,6 +147,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     var backgroundType: BgType = BgType.NORMAL
     private val background: MainMenuBg = MainMenuBg(this)
 
+    private val logoImage: ImageNode
     private val menuPane: Pane = Pane()
     val menuCollection: MenuCollection = MenuCollection(this, sceneRoot, menuPane)
 
@@ -221,16 +223,16 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         val leftPane = Pane().apply {
             this.margin.set(Insets(64f))
         }
-        val logoImage = ImageNode(TextureRegion(AssetRegistry.get<Texture>("logo_2lines_en"))).apply {
+        logoImage = ImageNode(TextureRegion(AssetRegistry.get<Texture>("logo_2lines_en"))).apply {
             this.bounds.height.set(175f)
-//            this.margin.set(Insets(0f, 0f, 32f, 32f))
             this.bounds.y.set(24f)
             this.renderAlign.set(Align.topLeft)
+            this.visible.bind { (menuCollection.activeMenu.use() as? MMMenu)?.showLogo?.use() != false }
         }
         leftPane.addChild(logoImage)
         menuPane.apply {
             Anchor.BottomLeft.configure(this)
-            this.bindHeightToParent(-(logoImage.bounds.height.get() + logoImage.bounds.y.get() + 32f))
+//            this.bindHeightToParent(-(logoImage.bounds.height.get() + logoImage.bounds.y.get() + 32f))
         }
         leftPane.addChild(menuPane)
 
