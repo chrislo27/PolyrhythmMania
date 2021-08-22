@@ -36,11 +36,10 @@ body:
     attributes:
       label: Steps to Reproduce Problem
       description: "Describe, step by step, how to exactly recreate the problem you are seeing. Use as much detail as possible."
-      value: |
-      1.
+      value: "1.
       2.
       3.
-      ...
+      ..."
     validations:
       required: true
   - type: textarea
