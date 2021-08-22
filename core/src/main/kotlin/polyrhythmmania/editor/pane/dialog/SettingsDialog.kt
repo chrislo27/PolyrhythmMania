@@ -46,6 +46,18 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("common.close")))
         })
+        
+        val resetDefaultActions: MutableList<() -> Unit> = mutableListOf()
+        bottomPane.addChild(HBox().apply { 
+            this.spacing.set(8f)
+            this += Button(binding = { Localization.getVar("editor.dialog.settings.resetAllToDefault").use() }, font = editorPane.palette.musicDialogFont).apply { 
+                this.applyDialogStyleBottom()
+                this.bounds.width.set(350f)
+                this.setOnAction { 
+                    resetDefaultActions.forEach { it.invoke() }
+                }
+            }
+        })
 
         val scrollPane: ScrollPane = ScrollPane().apply {
             this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.ALWAYS)
@@ -65,7 +77,8 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         pane += vbox
         val blockHeight = 64f
 
-        fun createCheckbox(text: String, tooltip: String?, bindingVar: Var<Boolean>): CheckBox {
+        fun createCheckbox(text: String, tooltip: String?, keyValue: Settings.KeyValue<Boolean>): CheckBox {
+            val bindingVar = keyValue.value
             return CheckBox(binding = { Localization.getVar(text).use() }, font = editorPane.palette.musicDialogFont).apply {
                 this.textLabel.textColor.set(Color.WHITE)
                 this.imageNode.tint.set(Color.WHITE)
@@ -78,6 +91,10 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 this.checkedState.addListener {
                     bindingVar.set(it.getOrCompute())
                 }
+                @Suppress("MoveLambdaOutsideParentheses")
+                resetDefaultActions.add({
+                    this.checkedState.set(keyValue.defaultValue)
+                })
             }
         }
 
@@ -104,12 +121,17 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             }
         }
 
-        fun <T> createCycleOption(text: String, tooltip: String?, bindingVar: Var<T>,
+        fun <T> createCycleOption(text: String, tooltip: String?, keyValue: Settings.KeyValue<T>,
                                   items: List<T>,
                                   font: PaintboxFont = editorPane.palette.musicDialogFont,
                                   percentageContent: Float = 0.5f,
                                   itemToStringBinding: (Var.Context.(item: T) -> String)? = null): Pair<Pane, CycleControl<T>> {
+            val bindingVar: Var<T> = keyValue.value
             val cycle = CycleControl(items, bindingVar, itemToStringBinding)
+            @Suppress("MoveLambdaOutsideParentheses")
+            resetDefaultActions.add({
+                cycle.currentItem.set(keyValue.defaultValue)
+            })
             return createGenericPane(text, tooltip, cycle, font, percentageContent) to cycle
         }
 
@@ -120,16 +142,16 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
 
         vbox.temporarilyDisableLayouts {
-            vbox += createCheckbox("editorSettings.detailedMarkerUndo", "editorSettings.detailedMarkerUndo.tooltip", settings.editorDetailedMarkerUndo)
-            vbox += createCheckbox("editorSettings.cameraPanOnDragEdge", "editorSettings.cameraPanOnDragEdge.tooltip", settings.editorCameraPanOnDragEdge)
-            vbox += createCheckbox("editorSettings.higherAccuracyPreview", "editorSettings.higherAccuracyPreview.tooltip", settings.editorHigherAccuracyPreview)
-            vbox += createCheckbox("editorSettings.playtestStartsPlay", "editorSettings.playtestStartsPlay.tooltip", settings.editorPlaytestStartsPlay)
-            vbox += createCheckbox("editorSettings.arrowKeysLikeScroll", "editorSettings.arrowKeysLikeScroll.tooltip", settings.editorArrowKeysLikeScroll)
+            vbox += createCheckbox("editorSettings.detailedMarkerUndo", "editorSettings.detailedMarkerUndo.tooltip", settings.kv_editorDetailedMarkerUndo)
+            vbox += createCheckbox("editorSettings.cameraPanOnDragEdge", "editorSettings.cameraPanOnDragEdge.tooltip", settings.kv_editorCameraPanOnDragEdge)
+            vbox += createCheckbox("editorSettings.higherAccuracyPreview", "editorSettings.higherAccuracyPreview.tooltip", settings.kv_editorHigherAccuracyPreview)
+            vbox += createCheckbox("editorSettings.playtestStartsPlay", "editorSettings.playtestStartsPlay.tooltip", settings.kv_editorPlaytestStartsPlay)
+            vbox += createCheckbox("editorSettings.arrowKeysLikeScroll", "editorSettings.arrowKeysLikeScroll.tooltip", settings.kv_editorArrowKeysLikeScroll)
             vbox += createCycleOption("editorSettings.cameraPanningSetting", "editorSettings.cameraPanningSetting.tooltip",
-                    settings.editorPanningDuringPlayback, CameraPanningSetting.VALUES,
+                    settings.kv_editorPanningDuringPlayback, CameraPanningSetting.VALUES,
                     itemToStringBinding = { Localization.getVar(it.localization).use() }).first
             vbox += createCycleOption("editorSettings.autosaveInterval", "editorSettings.autosaveInterval.tooltip",
-                    settings.editorAutosaveInterval, Editor.AUTOSAVE_INTERVALS,
+                    settings.kv_editorAutosaveInterval, Editor.AUTOSAVE_INTERVALS,
                     itemToStringBinding = { item ->
                         Localization.getVar("editorSettings.autosaveInterval.minutes", Var {
                             listOf(item)
@@ -137,6 +159,9 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     }).first
             vbox += createGenericPane("editorSettings.musicWaveformOpacity", "editorSettings.musicWaveformOpacity.tooltip",
                     Pane().also { pane ->
+                        val keyValue = settings.kv_editorMusicWaveformOpacity
+                        val bindingVar = keyValue.value
+                        
                         val slider = Slider().also { slider ->
                             Anchor.CentreLeft.configure(slider)
                             slider.bindWidthToParent(adjust = -100f)
@@ -144,13 +169,18 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                             slider.minimum.set(0f)
                             slider.maximum.set(10f)
                             slider.tickUnit.set(1f)
-                            slider.setValue(settings.editorMusicWaveformOpacity.getOrCompute().toFloat())
-                            slider.value.addListener {
-                                settings.editorMusicWaveformOpacity.set(it.getOrCompute().toInt())
+                            slider.setValue(bindingVar.getOrCompute().toFloat())
+                            slider.value.addListener { sliderValue ->
+                                bindingVar.set(sliderValue.getOrCompute().toInt())
                             }
+                            
+                            @Suppress("MoveLambdaOutsideParentheses")
+                            resetDefaultActions.add({
+                                slider.setValue(keyValue.defaultValue.toFloat())
+                            })
                         }
                         pane += slider
-                        pane += TextLabel(binding = { "${settings.editorMusicWaveformOpacity.use() * 10}%" },
+                        pane += TextLabel(binding = { "${bindingVar.use() * 10}%" },
                                 font = editorPane.palette.musicDialogFont).apply {
                             Anchor.TopRight.configure(this)
                             this.bounds.width.set(100f)
@@ -166,14 +196,6 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             max(vbox.bounds.height.useF(), pane.parent.use()?.bounds?.height?.useF() ?: 300f)
         }
         scrollPane.setContent(pane)
-
-//        val hbox = HBox().apply {
-//            Anchor.BottomCentre.configure(this)
-//            this.align.set(HBox.Align.CENTRE)
-//            this.spacing.set(16f)
-//            this.bounds.width.set(700f)
-//        }
-//        bottomPane.addChild(hbox)
     }
 
     override fun canCloseDialog(): Boolean {
