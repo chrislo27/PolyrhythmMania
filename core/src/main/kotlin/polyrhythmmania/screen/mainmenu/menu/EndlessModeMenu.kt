@@ -27,6 +27,8 @@ import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
+import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.ui.PRManiaSkins
 import java.util.*
@@ -92,8 +94,15 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             } catch (e: Exception) {
                                 Random().nextInt().toUInt().toLong()
                             }
-                            val sidemode: SideMode = EndlessPolyrhythm(main, EndlessModeScore(Var(Int.MAX_VALUE)), seed,
-                                    dailyChallenge = null,
+                            val seedUInt = seed.toUInt()
+                            val endlessHighScore = main.settings.endlessHighScore
+                            val scoreVar = Var(endlessHighScore.getOrCompute().score)
+                            scoreVar.addListener {
+                                main.settings.endlessHighScore.set(EndlessHighScore(seedUInt, it.getOrCompute()))
+                            }
+                            val sidemode: SideMode = EndlessPolyrhythm(main,
+                                    EndlessModeScore(scoreVar, showHighScore = false),
+                                    seed, dailyChallenge = null,
                                     disableLifeRegen = disableRegen.getOrCompute(),
                                     maxLives = if (daredevilMode.getOrCompute()) 1 else -1)
                             val playScreen = PlayScreen(main, sidemode, sidemode.container, challenges = Challenges.NO_CHANGES, showResults = false)

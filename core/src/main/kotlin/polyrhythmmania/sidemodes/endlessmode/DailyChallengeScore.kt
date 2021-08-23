@@ -9,4 +9,8 @@ data class DailyChallengeScore(val date: LocalDate, val score: Int) {
     }
 }
 
-data class EndlessHighScore(val seed: UInt, val score: Int)
+data class EndlessHighScore(val seed: UInt, val score: Int) {
+    companion object {
+        val ZERO: EndlessHighScore = EndlessHighScore(0u, -1)
+    }
+}

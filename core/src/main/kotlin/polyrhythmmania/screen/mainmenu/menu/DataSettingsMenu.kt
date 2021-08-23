@@ -16,6 +16,7 @@ import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
 import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -76,6 +77,15 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
         }
+        val resetEndlessModeHighScoreButton: Button = createLongButton { 
+            Localization.getVar("mainMenu.dataSettings.resetEndlessModeHighScore").use() 
+        }.apply {
+            this.setOnAction {
+                settings.endlessHighScore.set(EndlessHighScore.ZERO)
+                settings.persist()
+                this.disabled.set(true)
+            }
+        }
         val resetSideModeHighScoresButton: Button = createLongButton { 
             Localization.getVar("mainMenu.dataSettings.resetSideModeHighScores").use() 
         }.apply {
@@ -96,6 +106,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             vbox += deleteRecoveryButton
+            vbox += resetEndlessModeHighScoreButton
             vbox += resetSideModeHighScoresButton
             
             val (drpcPane, drpcCheckbox) = createCheckboxOption({Localization.getVar("mainMenu.dataSettings.discordRichPresence").use()})
@@ -118,6 +129,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     Gdx.app.postRunnable { 
                         deleteRecoveryButton.disabled.set(false)
                         resetSideModeHighScoresButton.disabled.set(false)
+                        resetEndlessModeHighScoreButton.disabled.set(false)
                     }
                 }
             }

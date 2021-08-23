@@ -93,7 +93,19 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.endlessMenu)
                 }
-                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.endless.tooltip")))
+                val highScoreSubstitutionVar = Localization.getVar("mainMenu.play.endless.tooltip.highScore", Var {
+                    val endlessScore = main.settings.endlessHighScore.use()
+                    listOf(endlessScore.score, EndlessPolyrhythm.getSeedString(endlessScore.seed))
+                })
+                val noHighScoreSubstitutionVar = Localization.getVar("mainMenu.play.endless.tooltip.highScore.none")
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.endless.tooltip", Var {
+                    val endlessScore = main.settings.endlessHighScore.use()
+                    if (endlessScore.score > 0) {
+                        listOf(highScoreSubstitutionVar.use())
+                    } else {
+                        listOf(noHighScoreSubstitutionVar.use())
+                    }
+                })))
             }
             val dailyChallengeTitle: ReadOnlyVar<String> = Localization.getVar("mainMenu.play.endless.daily", Var {
                 listOf(dailyChallengeDate.use().format(DateTimeFormatter.ISO_DATE))

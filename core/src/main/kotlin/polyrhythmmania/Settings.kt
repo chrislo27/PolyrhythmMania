@@ -14,6 +14,7 @@ import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PANNING_DURING_PLAYBACK
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PLAYTEST_STARTS_PLAY
 import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE
 import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
+import polyrhythmmania.PreferenceKeys.ENDLESS_HIGH_SCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
@@ -29,6 +30,7 @@ import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
+import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -64,6 +66,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             
     private val kv_endlessDunkHighScore: KeyValue<Int> = KeyValue(ENDLESS_DUNK_HIGHSCORE, 0)
     private val kv_endlessDailyChallenge: KeyValue<DailyChallengeScore> = KeyValue(ENDLESS_DAILY_CHALLENGE, DailyChallengeScore.ZERO)
+    private val kv_endlessHighScore: KeyValue<EndlessHighScore> = KeyValue(ENDLESS_HIGH_SCORE, EndlessHighScore.ZERO)
 
     val gameplayVolume: Var<Int> = kv_gameplayVolume.value
     val menuMusicVolume: Var<Int> = kv_menuMusicVolume.value
@@ -89,6 +92,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     
     val endlessDunkHighScore: Var<Int> = kv_endlessDunkHighScore.value
     val endlessDailyChallenge: Var<DailyChallengeScore> = kv_endlessDailyChallenge.value
+    val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
@@ -118,6 +122,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         
         prefs.getInt(kv_endlessDunkHighScore)
         prefs.getDailyChallenge(kv_endlessDailyChallenge)
+        prefs.getEndlessHighScore(kv_endlessHighScore)
     }
 
     fun persist() {
@@ -146,6 +151,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
                 .putInt(kv_endlessDunkHighScore)
                 .putDailyChallenge(kv_endlessDailyChallenge)
+                .putEndlessHighScore(kv_endlessHighScore)
 
                 .flush()
     }
@@ -281,5 +287,27 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         val prefs: Preferences = this
         val pair = kv.value.getOrCompute()
         return prefs.putString(kv.key, "${pair.score};${pair.date.format(DateTimeFormatter.ISO_DATE)}")
+    }
+    
+    private fun Preferences.getEndlessHighScore(kv: KeyValue<EndlessHighScore>) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            val str = prefs.getString(kv.key)
+            try {
+                val delimited = str.split(';')
+                val scoreStr = delimited[0]
+                val seedStr = delimited[1]
+                val seed: UInt = seedStr.toUInt(16)
+                kv.value.set(EndlessHighScore(seed, scoreStr.toInt()))
+            } catch (ignored: Exception) {
+                kv.value.set(EndlessHighScore.ZERO)
+            }
+        }
+    }
+
+    private fun Preferences.putEndlessHighScore(kv: KeyValue<EndlessHighScore>): Preferences {
+        val prefs: Preferences = this
+        val pair = kv.value.getOrCompute()
+        return prefs.putString(kv.key, "${pair.score};${pair.seed.toString(16)}")
     }
 }
