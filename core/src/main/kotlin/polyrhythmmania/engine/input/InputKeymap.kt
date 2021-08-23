@@ -1,8 +1,6 @@
 package polyrhythmmania.engine.input
 
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.controllers.ControllerMapping
-import com.badlogic.gdx.controllers.ControllerPowerLevel
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import polyrhythmmania.util.RodinSpecialChars
