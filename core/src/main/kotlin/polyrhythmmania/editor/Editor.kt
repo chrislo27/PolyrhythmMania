@@ -218,7 +218,7 @@ class Editor(val main: PRManiaGame)
         frameBuffer.begin()
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        renderer.render(batch, engine)
+        renderer.render(batch)
         frameBuffer.end()
 
         val camera = uiCamera

@@ -192,6 +192,6 @@ class MainMenuBg(val mainMenu: MainMenuScreen) {
         batch.end()
 
         // Render world
-        container.renderer.render(batch, container.engine)
+        container.renderer.render(batch)
     }
 }

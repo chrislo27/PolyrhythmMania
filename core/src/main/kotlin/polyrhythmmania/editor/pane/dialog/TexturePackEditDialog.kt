@@ -918,7 +918,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         val world: World = World()
         val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(editor.container.renderer.tileset.texturePack).apply { 
 //            tilesetPalette.applyTo(this)
-        })
+        }, editor.engine)
         
         val rodEntity: EntityRodDecor
         
@@ -1010,7 +1010,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
             frameBuffer.begin()
             Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-            worldRenderer.render(batch, editor.engine)
+            worldRenderer.render(batch)
             frameBuffer.end()
             batch.projectionMatrix = prevMatrix
             batch.begin()

@@ -40,7 +40,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
-class WorldRenderer(val world: World, val tileset: Tileset) {
+class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) {
 
     companion object {
         val comparatorRenderOrder: Comparator<Entity> = Comparator<Entity> { o1, o2 ->
@@ -153,13 +153,19 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                         }
                     }
                     this += TextLabel(binding = { prevTextVar.use() },
-                            font = PRManiaGame.instance.fontGameMoreTimes).apply {
+                            font = PRManiaGame.instance.fontGameUIText).apply {
                         this.bindWidthToParent(multiplier = 0.4f)
                         this.doXCompression.set(false)
                         this.renderAlign.set(Align.topLeft)
-                        this.setScaleXY(0.4f)
                         val defaultTextColor = Color().grey(229f / 255f)
                         this.textColor.set(defaultTextColor)
+                        this.setScaleXY(0.6f)
+                        this.textColor.bind { 
+                            val maxLives = engine.inputter.endlessScore.maxLives.use()
+                            if (endlessModeSeed.use() != null && maxLives == 1) {
+                                Color(1f, 0.35f, 0.35f, 1f)
+                            } else defaultTextColor
+                        }
                     }
 
 //                    val livesVar: ReadOnlyVar<String> = Localization.getVar("play.endless.lives", Var {
@@ -237,18 +243,19 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                 this += perfectIconFailed
             }
             this += TextLabel(binding = { Localization.getVar("play.perfect").use() },
-                    font = PRManiaGame.instance.fontGameMoreTimes).apply {
+                    font = PRManiaGame.instance.fontGameUIText).apply {
                 Anchor.TopRight.configure(this)
                 this.textColor.set(Color.WHITE)
                 this.padding.set(Insets(0f, 0f, 5f, 0f))
                 this.bindWidthToParent(adjust = -64f)
                 this.renderAlign.set(Align.left)
-                this.setScaleXY(0.6f)
             }
         }
         
         endlessModeGameOverPane.apply {
-            this.visible.set(false)
+            this.visible.bind { 
+                engine.inputter.endlessScore.gameOverUIShown.use()
+            }
             this += RectElement(Color(0f, 0f, 0f, 0.5f))
         }
         uiSceneRoot += endlessModeGameOverPane
@@ -292,7 +299,9 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         hudRedFlash = 0f
     }
 
-    fun render(batch: SpriteBatch, engine: Engine) {
+    fun render(batch: SpriteBatch) {
+        val engine = this.engine
+        
         tmpMatrix.set(batch.projectionMatrix)
         val camera = this.camera
         camera.update()
@@ -334,7 +343,7 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         batch.projectionMatrix = uiCamera.combined
 
         if (renderUI) {
-            renderUI(batch, engine)
+            renderUI(batch)
         }
         
 //        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
@@ -343,7 +352,8 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
         batch.projectionMatrix = tmpMatrix
     }
 
-    private fun renderUI(batch: SpriteBatch, engine: Engine) {
+    private fun renderUI(batch: SpriteBatch) {
+        val engine = this.engine
         val inputter = engine.inputter
 
         moreTimesVar.set(inputter.practice.moreTimes.getOrCompute())
@@ -481,8 +491,6 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                     scaleVar.set(1f)
                 }
             }
-
-            endlessModeGameOverPane.visible.set(endlessScore.gameOverUIShown.getOrCompute())
         }
 
         uiSceneRoot.renderAsRoot(batch)

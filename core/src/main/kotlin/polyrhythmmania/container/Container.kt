@@ -73,7 +73,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val renderer: WorldRenderer by lazy {
         WorldRenderer(world, Tileset(texturePack).apply { 
             world.tilesetPalette.applyTo(this)
-        })
+        }, engine)
     }
     
     val _blocks: MutableList<Block> = CopyOnWriteArrayList()

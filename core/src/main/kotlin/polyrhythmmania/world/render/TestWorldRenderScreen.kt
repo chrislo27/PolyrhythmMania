@@ -3,10 +3,8 @@ package polyrhythmmania.world.render
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
-import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.disposeQuietly
 import net.beadsproject.beads.ugens.SamplePlayer
-import paintbox.packing.PackedSheet
 import paintbox.util.gdxutils.isKeyJustReleased
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
@@ -23,7 +21,6 @@ import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
-import polyrhythmmania.world.tileset.StockTexturePack
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TilesetPalette
@@ -43,7 +40,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val renderer: WorldRenderer by lazy {
         WorldRenderer(world, Tileset(StockTexturePacks.gba).apply { 
             TilesetPalette.createGBA1TilesetPalette().applyTo(this)
-        })
+        }, engine)
     }
 
     private val player: MusicSamplePlayer = music.createPlayer(soundSystem.audioContext).apply {
@@ -78,7 +75,7 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
         val batch = main.batch
 
-        renderer.render(batch, engine)
+        renderer.render(batch)
 
         super.render(delta)
     }

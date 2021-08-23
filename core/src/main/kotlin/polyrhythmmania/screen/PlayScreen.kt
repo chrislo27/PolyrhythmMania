@@ -237,7 +237,7 @@ class PlayScreen(
 
         val batch = this.batch
         uiViewport.apply()
-        renderer.render(batch, engine)
+        renderer.render(batch)
 
         val camera = uiCamera
         batch.projectionMatrix = camera.combined
