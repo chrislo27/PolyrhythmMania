@@ -188,8 +188,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     init {
         val unpausedPlayer = AtomicBoolean(false)
-        val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg")) { _, _ ->
-            if (!unpausedPlayer.get()) {
+        val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg")) { bytesReadSoFar, _ ->
+            if (bytesReadSoFar > 100_000L && !unpausedPlayer.get()) {
                 unpausedPlayer.set(true)
                 Gdx.app.postRunnable { 
                     this.soundSys.musicPlayer.pause(false)
