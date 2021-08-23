@@ -159,6 +159,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val tiles: Array<Array<Tile>> = Array(tilesWidth) { x -> Array(tilesHeight) { y -> Tile(x, y) } }
     var flipAnimation: TileFlip? = null
         private set
+    private var framebufferSwapRequested: Boolean = false
     private var transitionAway: (() -> Unit)? = null
     private var framebufferSize: WindowSize = WindowSize(0, 0)
 
@@ -327,6 +328,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
         val currentTooltip: UIElement? = sceneRoot.currentTooltipVar.getOrCompute()
         currentTooltip?.visible?.set(this.flipAnimation == null)
+        
+        if (framebufferSwapRequested) {
+            framebufferSwapRequested = false
+            val tmpBuffer = framebufferOld
+            framebufferOld = framebufferCurrent
+            framebufferCurrent = tmpBuffer
+        }
 
         // Draw active scene
         val boundFB: FrameBuffer = framebufferCurrent
@@ -435,7 +443,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     fun requestTileFlip(newFlip: TileFlip) {
         this.flipAnimation = newFlip
         resetTiles()
-        swapFramebuffers()
+        framebufferSwapRequested = true
     }
     
     fun transitionAway(action: () -> Unit) {
@@ -480,12 +488,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         if (width > 0 && height > 0 && (cachedFramebufferSize.width != width || cachedFramebufferSize.height != height)) {
             createFramebuffers(width, height, Pair(framebufferOld, framebufferCurrent))
         }
-    }
-
-    private fun swapFramebuffers() {
-        val tmpBuffer = framebufferOld
-        framebufferOld = framebufferCurrent
-        framebufferCurrent = tmpBuffer
     }
 
     private fun createFramebuffers(width: Int, height: Int, oldBuffers: Pair<FrameBuffer, FrameBuffer>?) {
