@@ -400,7 +400,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 afterLoadFunc: PaintboxFontFreeType.(BitmapFont) -> Unit = defaultAfterLoad,
         ) {
 
-            cache["${fontIDPrefix}"] = PaintboxFontFreeType(
+            cache[fontIDPrefix] = PaintboxFontFreeType(
                     PaintboxFontParams(Gdx.files.internal("fonts/${folder}/$normalFilename"), 1, 1f, scaleToReferenceSize, WindowSize(1280, 720)),
                     makeParam().apply {
                         if (hinting != null) {
