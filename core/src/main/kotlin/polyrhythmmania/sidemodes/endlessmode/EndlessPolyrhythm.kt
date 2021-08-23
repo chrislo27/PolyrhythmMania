@@ -190,12 +190,13 @@ distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficu
             engine.addEvents(pattern.toEvents(engine, patternStart))
             val anyA = pattern.rowA.row.isNotEmpty()
             val anyDpad = pattern.rowDpad.row.isNotEmpty()
+            val lifeLostVar = Var(false)
             if (anyA) {
-                engine.addEvent(EventDeployRod(engine, world.rowA, patternStart))
+                engine.addEvent(EventDeployRodEndless(engine, world.rowA, patternStart, lifeLostVar))
                 engine.addEvent(EventRowBlockDespawn(engine, world.rowA, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))
             }
             if (anyDpad) {
-                engine.addEvent(EventDeployRod(engine, world.rowDpad, patternStart))
+                engine.addEvent(EventDeployRodEndless(engine, world.rowDpad, patternStart, lifeLostVar))
                 engine.addEvent(EventRowBlockDespawn(engine, world.rowDpad, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))
             }
             
