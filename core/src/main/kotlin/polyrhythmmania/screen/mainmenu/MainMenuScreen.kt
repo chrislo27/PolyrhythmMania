@@ -153,16 +153,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     // Related to tile flip effect --------------------------------------------------------
 
-    val tileSize: Int = 48 //32
+    val tileSize: Int = 48
     val tilesWidth: Int = ceil(1280f / tileSize).toInt()
     val tilesHeight: Int = ceil(720f / tileSize).toInt()
     private val tiles: Array<Array<Tile>> = Array(tilesWidth) { x -> Array(tilesHeight) { y -> Tile(x, y) } }
-    @Volatile var flipAnimation: TileFlip? = null
-        set(value) {
-            field = value
-            resetTiles()
-            swapFramebuffers()
-        }
+    var flipAnimation: TileFlip? = null
+        private set
     private var transitionAway: (() -> Unit)? = null
     private var framebufferSize: WindowSize = WindowSize(0, 0)
 
@@ -420,11 +416,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
 
         batch.end()
-
-        // Swap the buffers around so that the "current" one is now old.
-        if (this.flipAnimation == null) {
-            swapFramebuffers()
-        }
     }
 
     override fun renderUpdate() {
@@ -441,8 +432,14 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 //        }
     }
 
+    fun requestTileFlip(newFlip: TileFlip) {
+        this.flipAnimation = newFlip
+        resetTiles()
+        swapFramebuffers()
+    }
+    
     fun transitionAway(action: () -> Unit) {
-        flipAnimation = TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT)
+        requestTileFlip(TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT))
         this.transitionAway = action
         main.inputMultiplexer.removeProcessor(processor)
         soundSys.fadeMusicToSilent()
@@ -454,7 +451,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 //        menuCollection.changeActiveMenu(menuCollection.uppermostMenu, false, instant = true)
 //        menuCollection.resetMenuStack()
         if (doFlipAnimation) {
-            // Black out old frame buffer
+            // Black out frame buffers
             lastProjMatrix.set(batch.projectionMatrix)
             val camera = fullCamera
             listOf(framebufferOld, framebufferCurrent).forEach { newFB ->
