@@ -41,7 +41,7 @@ class TestWorldAsmScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val renderer: WorldRenderer by lazy {
         WorldRenderer(world, Tileset(StockTexturePacks.gba).apply { 
             TilesetPalette.createAssembleTilesetPalette().applyTo(this)
-        })
+        }, engine)
     }
 
     private val player: MusicSamplePlayer = SidemodeAssets.assembleTheme.createPlayer(soundSystem.audioContext).apply {
@@ -135,7 +135,7 @@ class TestWorldAsmScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
         val batch = main.batch
 
-        renderer.render(batch, engine)
+        renderer.render(batch)
 
         super.render(delta)
     }
