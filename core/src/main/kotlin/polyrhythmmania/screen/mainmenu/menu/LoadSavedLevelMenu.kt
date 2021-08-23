@@ -58,7 +58,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     init {
         this.setSize(WIDTH_MID)
-        this.titleText.bind { Localization.getVar("mainMenu.play.playSavedLevel").use() }
+        this.titleText.bind { Localization.getVar("mainMenu.play.playSavedLevel.title").use() }
         this.contentPane.bounds.height.set(300f)
 
         val content = VBox().apply {
