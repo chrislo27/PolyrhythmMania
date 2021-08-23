@@ -203,10 +203,17 @@ distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficu
                 val awardScoreBeat = patternStart + patternDuration + 0.01f
                 engine.addEvent(EventConditionalOnRods(engine, awardScoreBeat,
                         if (anyA && anyDpad) RowSetting.BOTH else if (anyA) RowSetting.ONLY_A else RowSetting.ONLY_DPAD, true) {
-                    engine.addEvent(EventIncrementEndlessScore(engine).also {
+                    engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
+                        val endlessScore = engine.inputter.endlessScore
+                        if (newScore >= 20 && newScore % 10 == 0 && endlessScore.lives.getOrCompute() < endlessScore.maxLives.getOrCompute()) {
+                            engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_2"))
+                            endlessScore.lives.set(endlessScore.lives.getOrCompute() + 1)
+                        } else {
+                            engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_1"))
+                        }
+                    }.also {
                         it.beat = awardScoreBeat
                     })
-                    engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_1"))
                 })
             }
             
