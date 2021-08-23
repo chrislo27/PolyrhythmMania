@@ -76,12 +76,6 @@ class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))
             }
             
-            vbox += createLongButton { """Trailer Video: [font=thin]Polyrhythm: Assemble[]""" }.apply {
-                this.tooltipElement.set(createTooltip { "This side mode will be made available in a future update if sufficient\ndevelopment costs are recovered — please consider donating\nto help with development costs! Donation link (goes to PayPal):\n[color=prmania_tooltip_keystroke scale=1]https://donate-to-polyrhythmmania.rhre.dev[]" })
-                this.setOnAction { 
-                    Gdx.net.openURI("""https://www.youtube.com/watch?v=zsmNYD7X37Q""")
-                }
-            }
             vbox += createLongButton { """[font=thin]Future Spot for Side Mode #3[]""" }.apply {
                 this.disabled.set(true)
                 this.tooltipElement.set(createTooltip { "This NEW side mode will be developed for a future update if sufficient\ndevelopment costs are recovered — please consider donating\nto help with development costs! Donation link (goes to PayPal):\n[color=prmania_tooltip_keystroke scale=1]https://donate-to-polyrhythmmania.rhre.dev[]" })
