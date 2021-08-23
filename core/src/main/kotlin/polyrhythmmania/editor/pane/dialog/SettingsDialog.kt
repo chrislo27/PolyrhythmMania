@@ -50,6 +50,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val resetDefaultActions: MutableList<() -> Unit> = mutableListOf()
         bottomPane.addChild(HBox().apply { 
             this.spacing.set(8f)
+            this.bindWidthToParent(adjust = -100f)
             this += Button(binding = { Localization.getVar("editor.dialog.settings.resetAllToDefault").use() }, font = editorPane.palette.musicDialogFont).apply { 
                 this.applyDialogStyleBottom()
                 this.bounds.width.set(350f)
