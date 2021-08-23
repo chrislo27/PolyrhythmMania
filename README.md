@@ -1,4 +1,4 @@
-# Polyrhythm Mania (WIP)
+# Polyrhythm Mania
 A game that faithfully recreates the *Polyrhythm* minigame from Rhythm Tengoku (リズム天国), with a 
 built-in level editor.
 
