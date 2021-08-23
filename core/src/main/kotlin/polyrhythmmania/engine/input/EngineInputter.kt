@@ -215,8 +215,9 @@ class EngineInputter(val engine: Engine) {
 
                     val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
                     val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
-                    if (DEBUG_LOG_INPUTS) 
+                    if (DEBUG_LOG_INPUTS) {
                         Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
+                    }
                     inputTracker.results += inputResult
 
                     if (practice.practiceModeEnabled && inputResult.inputScore != InputScore.MISS) {
@@ -289,8 +290,9 @@ class EngineInputter(val engine: Engine) {
 
                 val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
                 val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
-                if (DEBUG_LOG_INPUTS)
+                if (DEBUG_LOG_INPUTS) {
                     Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
+                }
 
                 val inputFeedbackIndex: Int = getInputFeedbackIndex(inputResult.inputScore, inputResult.accuracySec < 0f)
                 if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
