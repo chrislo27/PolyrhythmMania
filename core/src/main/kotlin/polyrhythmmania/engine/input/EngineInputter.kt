@@ -9,7 +9,6 @@ import paintbox.lazysound.LazySound
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.engine.ActiveTextBox
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
@@ -74,7 +73,7 @@ class EngineInputter(val engine: Engine) {
     class EndlessScore {
         val score: Var<Int> = Var(0)
         var highScore: Var<Int> = Var(0)
-        var showHighScore: Boolean = true
+        var showHighScoreAtEnd: Boolean = true
         val maxLives: Var<Int> = Var(0)
         val startingLives: Var<Int> = Var.bind { maxLives.use() }
         val lives: Var<Int> = Var(startingLives.getOrCompute())
@@ -382,7 +381,7 @@ class EngineInputter(val engine: Engine) {
             override fun onStart(currentBeat: Float) {
                 super.onStart(currentBeat)
                 
-                if (wasNewHighScore && endlessScore.showHighScore) {
+                if (wasNewHighScore && endlessScore.showHighScoreAtEnd) {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
                     engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true))
                 } else {
