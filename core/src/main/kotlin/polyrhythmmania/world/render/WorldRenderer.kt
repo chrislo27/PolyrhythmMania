@@ -158,7 +158,8 @@ class WorldRenderer(val world: World, val tileset: Tileset) {
                         this.doXCompression.set(false)
                         this.renderAlign.set(Align.topLeft)
                         this.setScaleXY(0.4f)
-                        this.textColor.set(Color().grey(229f / 255f))
+                        val defaultTextColor = Color().grey(229f / 255f)
+                        this.textColor.set(defaultTextColor)
                     }
 
 //                    val livesVar: ReadOnlyVar<String> = Localization.getVar("play.endless.lives", Var {

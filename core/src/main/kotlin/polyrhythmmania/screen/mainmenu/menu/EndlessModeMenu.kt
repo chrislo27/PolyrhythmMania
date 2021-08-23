@@ -8,6 +8,7 @@ import paintbox.binding.Var
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.ScrollPane
@@ -75,6 +76,8 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             val seedText: Var<String> = Var("")
+            val disableRegen: Var<Boolean> = Var(false)
+            val daredevilMode: Var<Boolean> = Var(false)
             val playButtonText: ReadOnlyVar<String> = Var {
                 if (seedText.use().isEmpty()) Localization.getVar("mainMenu.play.endless.play.random").use() else Localization.getVar("mainMenu.play.endless.play").use()
             }
@@ -89,7 +92,10 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             } catch (e: Exception) {
                                 Random().nextInt().toUInt().toLong()
                             }
-                            val sidemode: SideMode = EndlessPolyrhythm(main, EndlessModeScore(Var(Int.MAX_VALUE)), seed, null)
+                            val sidemode: SideMode = EndlessPolyrhythm(main, EndlessModeScore(Var(Int.MAX_VALUE)), seed,
+                                    dailyChallenge = null,
+                                    disableLifeRegen = disableRegen.getOrCompute(),
+                                    maxLives = if (daredevilMode.getOrCompute()) 1 else -1)
                             val playScreen = PlayScreen(main, sidemode, sidemode.container, challenges = Challenges.NO_CHANGES, showResults = false)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                 this.onEntryEnd = {
@@ -103,10 +109,15 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
             }
-            vbox += RectElement(Color().grey(90f / 255f, 0.8f)).apply { 
-                this.bounds.height.set(10f)
-                this.margin.set(Insets(4f, 4f, 12f, 12f))
+            
+            fun separator(): UIElement {
+                return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
+                    this.bounds.height.set(10f)
+                    this.margin.set(Insets(4f, 4f, 12f, 12f))
+                }
             }
+            
+            vbox += separator()
             
             vbox += HBox().apply { 
                 this.spacing.set(8f)
@@ -159,6 +170,24 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
             }
+            
+            vbox += separator()
+            
+            val (disableRegenPane, disableRegenCheck) = createCheckboxOption({ Localization.getVar("mainMenu.play.endless.settings.disableRegen").use() })
+            val (daredevilPane, daredevilCheck) = createCheckboxOption({ Localization.getVar("mainMenu.play.endless.settings.daredevil").use() })
+            
+            disableRegenCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.endless.settings.disableRegen.tooltip")))
+            daredevilCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.endless.settings.daredevil.tooltip")))
+            
+            disableRegenCheck.onCheckChanged = { newState ->
+                disableRegen.set(newState)
+            }
+            daredevilCheck.onCheckChanged = { newState ->
+                daredevilMode.set(newState)
+            }
+            
+            vbox += disableRegenPane
+            vbox += daredevilPane
             
         }
 

@@ -110,7 +110,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             }
                             val sidemode: SideMode = EndlessPolyrhythm(main,
                                     EndlessModeScore(scoreVar, showHighScore = false),
-                                    EndlessPolyrhythm.getSeedFromLocalDate(date), date)
+                                    EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
                             val playScreen = PlayScreen(main, sidemode, sidemode.container, challenges = Challenges.NO_CHANGES, showResults = false)
                             main.settings.endlessDailyChallenge.set(date to 0)
                             main.settings.persist()

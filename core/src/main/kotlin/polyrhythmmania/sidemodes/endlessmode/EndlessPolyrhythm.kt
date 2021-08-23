@@ -32,7 +32,7 @@ import kotlin.math.roundToInt
 
 class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
                         /** A 48-bit seed. */ val seed: Long,
-                        val dailyChallenge: LocalDate?)
+                        val dailyChallenge: LocalDate?, val disableLifeRegen: Boolean, maxLives: Int = -1)
     : AbstractEndlessMode(main, prevHighScore) {
     
     companion object {
@@ -100,7 +100,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         container.renderer.endlessModeSeed.set(getSeedString(seed.toUInt()))
         container.renderer.dailyChallengeDate.set(dailyChallenge)
         container.renderer.flashHudRedWhenLifeLost.set(true)
-        container.engine.inputter.endlessScore.maxLives.set(3)
+        container.engine.inputter.endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
     }
 
     override fun initialize() {
@@ -205,7 +205,7 @@ distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficu
                         if (anyA && anyDpad) RowSetting.BOTH else if (anyA) RowSetting.ONLY_A else RowSetting.ONLY_DPAD, true) {
                     engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
                         val endlessScore = engine.inputter.endlessScore
-                        if (newScore >= 20 && newScore % 10 == 0 && endlessScore.lives.getOrCompute() < endlessScore.maxLives.getOrCompute()) {
+                        if (!disableLifeRegen && newScore >= 20 && newScore % 10 == 0 && endlessScore.lives.getOrCompute() < endlessScore.maxLives.getOrCompute()) {
                             engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_2"))
                             endlessScore.lives.set(endlessScore.lives.getOrCompute() + 1)
                         } else {
