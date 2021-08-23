@@ -2,7 +2,7 @@
 A game that faithfully recreates the *Polyrhythm* minigame from Rhythm Tengoku (リズム天国), with a 
 built-in level editor.
 
-![Polyrhythm Mania thumbnail](https://cdn.discordapp.com/attachments/306231796369195020/851931738271121428/6cf14200-c863-11eb-84d4-4778b68f36b9.png)
+![Polyrhythm Mania thumbnail](https://cdn.discordapp.com/attachments/306231796369195020/879243807206539264/unknown.png)
 
 ## NOTE: This project is still in development, so there are NO public compiled releases yet. Stay tuned!
 
