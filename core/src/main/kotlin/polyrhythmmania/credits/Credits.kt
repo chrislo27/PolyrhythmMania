@@ -29,6 +29,7 @@ object Credits {
                     "Kievit",
                     "Turtike",
                     "J-D Thunder",
+                    "RedCrowNose",
             ).toVars() + listOf("Project donators").toVars(),
             Localization.getVar("credits.resourcesAndTechnologies") to listOf(
                     Localization.getVar("credits.rhAssets"),
