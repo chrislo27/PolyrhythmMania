@@ -1,13 +1,14 @@
 package polyrhythmmania.editor.block
 
 
-enum class CubeType(val jsonId: Int, val character: Char) {
-    NONE(0, '-'),
-    PISTON(1, 'P'),
-    PLATFORM(2, '#'),
+enum class CubeType(val jsonId: Int, val character: Char, val localizationNameKey: String) {
     
-    NO_CHANGE(3, '_'),
-    PISTON_OPEN(4, 'O'),
+    NONE(0, '-', "blockContextMenu.spawnPattern.cubeType.none"),
+    PISTON(1, 'P', "blockContextMenu.spawnPattern.cubeType.piston"),
+    PLATFORM(2, '#', "blockContextMenu.spawnPattern.cubeType.platform"),
+    
+    NO_CHANGE(3, '_', "blockContextMenu.spawnPattern.cubeType.noChange"),
+    PISTON_OPEN(4, 'O', "blockContextMenu.spawnPattern.cubeType.pistonOpen"),
     ;
 
     companion object {

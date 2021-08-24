@@ -1,18 +1,19 @@
 package polyrhythmmania.editor.block.contextmenu
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.font.TextAlign
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.ImageRenderingMode
-import paintbox.ui.Pane
+import paintbox.packing.PackedSheet
+import paintbox.registry.AssetRegistry
+import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.TextLabel
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.block.CubeType
@@ -45,6 +46,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
                     label.renderAlign.set(Align.right)
                     label.textAlign.set(TextAlign.RIGHT)
                     label.textColor.set(Color.BLACK)
+                    label.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("blockContextMenu.spawnPattern.cycleHint")))
                 })
 
                 val buttons: MutableList<CubeButton> = mutableListOf()
@@ -157,6 +159,9 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
                 val currentIndex = values.indexOf(current)
                 this.cube.set(values[(currentIndex - 1 + values.size) % values.size])
             }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(binding = {
+                Localization.getValue(this@CubeButton.cube.use().localizationNameKey) // Could be getVar but not necessary in a context menu
+            }))
         }
     }
 }
