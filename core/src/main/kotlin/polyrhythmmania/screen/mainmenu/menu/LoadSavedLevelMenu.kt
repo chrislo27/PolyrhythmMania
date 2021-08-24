@@ -309,7 +309,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 Gdx.app.postRunnable {
                     substate.set(Substate.LOAD_ERROR)
                     descLabel.doLineWrapping.set(true)
-                    descLabel.text.set(Localization.getValue("editor.dialog.load.error.futureVersion", loadMetadata.programVersion.toString(), loadMetadata.containerVersion))
+                    descLabel.text.set(Localization.getValue("editor.dialog.load.error.futureVersion", loadMetadata.programVersion.toString(), "${loadMetadata.containerVersion}"))
                     newContainer.disposeQuietly()
                 }
             } else {
