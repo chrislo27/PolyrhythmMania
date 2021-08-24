@@ -414,13 +414,12 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
         val root: UIElement = rootElement
 
         fun resetHoveredElementPath() {
-            // FIXME may need improvemnets
             lastHoveredElementPath.clear()
             this@SceneRoot.cancelTooltip()
         }
 
         fun shouldEatTooltipAccess(): Boolean {
-            return exclusiveTooltipAccess && root.children.isNotEmpty()
+            return exclusiveTooltipAccess && lastHoveredElementPath.size >= 2
         }
     }
 
