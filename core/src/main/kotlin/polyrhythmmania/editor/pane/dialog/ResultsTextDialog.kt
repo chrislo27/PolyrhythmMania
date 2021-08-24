@@ -128,10 +128,10 @@ class ResultsTextDialog(editorPane: EditorPane)
                          copyFunc: (ResultsText, newText: String) -> ResultsText, ): HBox {
                 return HBox().apply {
                     this.bounds.height.set(32f)
-                    this.spacing.set(8f)
+                    this.spacing.set(0f)
                     this += TextLabel(binding = { Localization.getVar(labelText).use() }).apply {
                         this.markup.set(editorPane.palette.markup)
-                        this.bounds.width.set(150f)
+                        this.bounds.width.set(160f)
                         this.renderAlign.set(Align.right)
                         this.textColor.set(Color.WHITE)
                         this.padding.set(Insets(0f, 0f, 0f, 4f))
