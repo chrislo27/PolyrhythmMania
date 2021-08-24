@@ -34,6 +34,7 @@ class EditorHelpDocControls : HelpDocument(
         listOf(
                 LayerParagraph("editorHelp.controls.pp0", 50f),
                 LayerParagraph("editorHelp.controls.pp1", 80f),
+                LayerParagraph("editorHelp.controls.pp2", 60f),
                 LayerParagraph("editorHelp.controls.heading.general", 20f),
                 LayerCol2(
                         LayerParagraph("editorHelp.controls.keybinds.general.keys", 520f, renderAlign = Align.topRight),
