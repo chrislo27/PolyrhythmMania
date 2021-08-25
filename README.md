@@ -1,6 +1,6 @@
 # Polyrhythm Mania
 A game that faithfully recreates the *Polyrhythm* minigame from Rhythm Tengoku (リズム天国), with a 
-built-in level editor.
+built-in level editor and side modes.
 
 ![Polyrhythm Mania thumbnail](https://cdn.discordapp.com/attachments/306231796369195020/851931738271121428/6cf14200-c863-11eb-84d4-4778b68f36b9.png)
 
@@ -23,6 +23,8 @@ built-in level editor.
 
 ## Installation instructions
 **Supported operating systems:** Windows 7 or newer, Linux (x86 and ARM)
+
+These instructions are the same if you're downloading the game for the first time or upgrading to a new version.
 
 __Windows (64-bit only):__
 1. Navigate to the [latest release here](https://github.com/chrislo27/PolyrhythmMania/releases/latest).
