@@ -96,9 +96,7 @@ abstract class LocalizationBase(val baseHandle: FileHandle, val langDefFile: Fil
             field.isAccessible = true
             val map = (field.get(bundle) as ObjectMap<String, String>).associate { it.key to it.value }
 
-            tbundle to (keys.map { key ->
-                map.getOrDefault(key, "")
-            }.filter { it.isNotBlank() }).sorted()
+            tbundle to (keys.filter { key -> map.getOrDefault(key, "").isNotBlank() }).sorted()
         }
 
         missing.filter { it.second.isNotEmpty() }.forEach {

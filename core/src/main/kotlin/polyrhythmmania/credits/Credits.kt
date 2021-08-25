@@ -18,7 +18,7 @@ object Credits {
             ),
             Localization.getVar("credits.qa") to abcSorted(
                     "Lvl100Feraligatr", "Gosh", "GENERIC", "snow krow", "Kievit", "Chloe", "GrueKun", "Huebird",
-                    "RedCrowNose", "J-D Thunder",
+                    "RedCrowNose", "J-D Thunder", "garbo",
             ).toVars() + listOf(
                     Localization.getVar("credits.tourneycord"),
             ),
@@ -29,7 +29,8 @@ object Credits {
                     "Kievit",
                     "Turtike",
                     "J-D Thunder",
-            ).toVars() + listOf("Project donators").toVars(),
+                    "RedCrowNose",
+            ).toVars() + listOf(Localization.getVar("credits.projectDonators")),
             Localization.getVar("credits.resourcesAndTechnologies") to listOf(
                     Localization.getVar("credits.rhAssets"),
             ) + listOf(

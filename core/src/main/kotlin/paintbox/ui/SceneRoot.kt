@@ -31,7 +31,7 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
 
     val mainLayer: Layer = Layer("main", enableTooltips = true, exclusiveTooltipAccess = false, rootElement = this)
     val dialogLayer: Layer = Layer("dialog", enableTooltips = true, exclusiveTooltipAccess = true)
-    val contextMenuLayer: Layer = Layer("contextMenu", enableTooltips = true, exclusiveTooltipAccess = false)
+    val contextMenuLayer: Layer = Layer("contextMenu", enableTooltips = true, exclusiveTooltipAccess = true)
     val tooltipLayer: Layer = Layer("tooltip", enableTooltips = false, exclusiveTooltipAccess = false)
     val allLayers: List<Layer> = listOf(mainLayer, dialogLayer, contextMenuLayer, tooltipLayer)
     val allLayersReversed: List<Layer> = allLayers.asReversed()
@@ -414,13 +414,12 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
         val root: UIElement = rootElement
 
         fun resetHoveredElementPath() {
-            // FIXME may need improvemnets
             lastHoveredElementPath.clear()
             this@SceneRoot.cancelTooltip()
         }
 
         fun shouldEatTooltipAccess(): Boolean {
-            return exclusiveTooltipAccess && root.children.isNotEmpty()
+            return exclusiveTooltipAccess && lastHoveredElementPath.size >= 2
         }
     }
 

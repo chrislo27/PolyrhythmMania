@@ -153,16 +153,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     // Related to tile flip effect --------------------------------------------------------
 
-    val tileSize: Int = 48 //32
+    val tileSize: Int = 48
     val tilesWidth: Int = ceil(1280f / tileSize).toInt()
     val tilesHeight: Int = ceil(720f / tileSize).toInt()
     private val tiles: Array<Array<Tile>> = Array(tilesWidth) { x -> Array(tilesHeight) { y -> Tile(x, y) } }
-    @Volatile var flipAnimation: TileFlip? = null
-        set(value) {
-            field = value
-            resetTiles()
-            swapFramebuffers()
-        }
+    var flipAnimation: TileFlip? = null
+        private set
+    private var framebufferSwapRequested: Boolean = false
     private var transitionAway: (() -> Unit)? = null
     private var framebufferSize: WindowSize = WindowSize(0, 0)
 
@@ -189,8 +186,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     init {
         val unpausedPlayer = AtomicBoolean(false)
-        val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg")) { _, _ ->
-            if (!unpausedPlayer.get()) {
+        val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg")) { bytesReadSoFar, _ ->
+            if (bytesReadSoFar > 100_000L && !unpausedPlayer.get()) {
                 unpausedPlayer.set(true)
                 Gdx.app.postRunnable { 
                     this.soundSys.soundSystem.setPaused(false)
@@ -330,6 +327,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
         val currentTooltip: UIElement? = sceneRoot.currentTooltipVar.getOrCompute()
         currentTooltip?.visible?.set(this.flipAnimation == null)
+        
+        if (framebufferSwapRequested) {
+            framebufferSwapRequested = false
+            val tmpBuffer = framebufferOld
+            framebufferOld = framebufferCurrent
+            framebufferCurrent = tmpBuffer
+        }
 
         // Draw active scene
         val boundFB: FrameBuffer = framebufferCurrent
@@ -419,11 +423,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
 
         batch.end()
-
-        // Swap the buffers around so that the "current" one is now old.
-        if (this.flipAnimation == null) {
-            swapFramebuffers()
-        }
     }
 
     override fun renderUpdate() {
@@ -440,8 +439,14 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 //        }
     }
 
+    fun requestTileFlip(newFlip: TileFlip) {
+        this.flipAnimation = newFlip
+        resetTiles()
+        framebufferSwapRequested = true
+    }
+    
     fun transitionAway(action: () -> Unit) {
-        flipAnimation = TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT)
+        requestTileFlip(TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT))
         this.transitionAway = action
         main.inputMultiplexer.removeProcessor(processor)
         soundSys.fadeMusicToSilent()
@@ -453,7 +458,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 //        menuCollection.changeActiveMenu(menuCollection.uppermostMenu, false, instant = true)
 //        menuCollection.resetMenuStack()
         if (doFlipAnimation) {
-            // Black out old frame buffer
+            // Black out frame buffers
             lastProjMatrix.set(batch.projectionMatrix)
             val camera = fullCamera
             listOf(framebufferOld, framebufferCurrent).forEach { newFB ->
@@ -482,12 +487,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         if (width > 0 && height > 0 && (cachedFramebufferSize.width != width || cachedFramebufferSize.height != height)) {
             createFramebuffers(width, height, Pair(framebufferOld, framebufferCurrent))
         }
-    }
-
-    private fun swapFramebuffers() {
-        val tmpBuffer = framebufferOld
-        framebufferOld = framebufferCurrent
-        framebufferCurrent = tmpBuffer
     }
 
     private fun createFramebuffers(width: Int, height: Int, oldBuffers: Pair<FrameBuffer, FrameBuffer>?) {

@@ -71,7 +71,7 @@ object GdxAudioReader {
         return currentLength
     }
 
-    private fun newDecodingMusic(music: OpenALMusic, file: File, bufferSize: Int = 4096 * 4,
+    private fun newDecodingMusic(music: OpenALMusic, file: File, bufferSize: Int = 4096 * 8,
                                  listener: AudioLoadListener? = null): Pair<DecodingMusicSample, DecodingHandler> {
         file.createNewFile()
 

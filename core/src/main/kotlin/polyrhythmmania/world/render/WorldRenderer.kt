@@ -126,9 +126,16 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     private val endlessModeGameOverLabel: TextLabel
     
     init {
-        val baseMarkup = Markup(mapOf("prmania_icons" to PRManiaGame.instance.fontIcons,
-                "moretimes" to PRManiaGame.instance.fontGameMoreTimes),
-                TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
+        val baseMarkup = Markup(mapOf(
+                "prmania_icons" to PRManiaGame.instance.fontIcons,
+                "moretimes" to PRManiaGame.instance.fontGameMoreTimes,
+                "bordered" to PRManiaGame.instance.fontGameUIText,
+                "practiceclear" to PRManiaGame.instance.fontGamePracticeClear,
+                "mainmenu_main" to PRManiaGame.instance.fontMainMenuMain,
+                "mainmenu_thin" to PRManiaGame.instance.fontMainMenuThin,
+                "mainmenu_heading" to PRManiaGame.instance.fontMainMenuHeading,
+                "mainmenu_rodin" to PRManiaGame.instance.fontMainMenuRodin,
+        ), TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
 
         uiSceneRoot += endlessModeScorePane.apply {
             this.visible.bind { showEndlessModeScore.use() }

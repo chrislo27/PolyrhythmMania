@@ -2,6 +2,7 @@ package polyrhythmmania.world
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.TexturePackSource
@@ -193,6 +194,18 @@ class EventDeployRod(engine: Engine, val row: Row, startBeat: Float) : Event(eng
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
         engine.world.addEntity(EntityRodPR(engine.world, this.beat, row))
+    }
+}
+
+class EventDeployRodEndless(engine: Engine, val row: Row, startBeat: Float, val lifeLostVar: Var<Boolean>)
+    : Event(engine) {
+    init {
+        this.beat = startBeat
+    }
+
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+        engine.world.addEntity(EntityRodPR(engine.world, this.beat, row, lifeLost = lifeLostVar))
     }
 }
 

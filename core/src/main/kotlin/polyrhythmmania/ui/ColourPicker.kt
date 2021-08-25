@@ -25,6 +25,7 @@ import paintbox.ui.skin.SkinFactory
 import paintbox.util.ColorStack
 import paintbox.util.Vector2Stack
 import paintbox.util.gdxutils.drawQuad
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import java.util.*
 import kotlin.math.roundToInt
@@ -243,6 +244,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                     this.setOnAction {
                         Gdx.app.clipboard.contents = currentColor.getOrCompute().toStr()
                     }
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("ui.colourPicker.copyHex").use() }, font = font))
                 }
                 this += Button("").apply { 
                     Anchor.CentreRight.configure(this)
@@ -255,6 +257,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                         textField.attemptPaste()
                         textField.requestUnfocus()
                     }
+                    this.tooltipElement.set(Tooltip(binding = { Localization.getVar("ui.colourPicker.pasteHex").use() }, font = font))
                 }
             }
             parentCtr += Pane().apply {

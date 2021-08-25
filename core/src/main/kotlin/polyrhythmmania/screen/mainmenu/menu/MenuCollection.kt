@@ -123,10 +123,10 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
             val rootHeight = 720f
             val tileX = floor(changedBounds.x / rootWidth * mainMenu.tilesWidth).toInt()
             val tileY = floor(changedBounds.y / rootHeight * mainMenu.tilesHeight).toInt()
-            val tileW = (ceil(changedBounds.width / rootWidth * mainMenu.tilesWidth).toInt() + 1).coerceAtLeast(1)
-            val tileH = (ceil(changedBounds.height / rootHeight * mainMenu.tilesHeight).toInt() + 1).coerceAtLeast(1)
-            mainMenu.flipAnimation = MainMenuScreen.TileFlip(tileX, tileY, tileW, tileH,
-                    if (backOut) Corner.TOP_RIGHT else Corner.TOP_LEFT)
+            val tileW = (ceil(changedBounds.width / rootWidth * mainMenu.tilesWidth).toInt()).coerceAtLeast(1)
+            val tileH = (ceil(changedBounds.height / rootHeight * mainMenu.tilesHeight).toInt()).coerceAtLeast(1)
+            mainMenu.requestTileFlip(MainMenuScreen.TileFlip(tileX, tileY, tileW, tileH,
+                    if (backOut) Corner.TOP_RIGHT else Corner.TOP_LEFT))
             
             RectangleStack.pop()
         }

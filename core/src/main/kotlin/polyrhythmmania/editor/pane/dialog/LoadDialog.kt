@@ -188,7 +188,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 if (loadMetadata.isFutureVersion) {
                     Gdx.app.postRunnable {
                         substate.set(Substate.LOAD_ERROR)
-                        descLabel.text.set(Localization.getValue("editor.dialog.load.error.futureVersion", loadMetadata.programVersion.toString(), loadMetadata.containerVersion))
+                        descLabel.text.set(Localization.getValue("editor.dialog.load.error.futureVersion", loadMetadata.programVersion.toString(), "${loadMetadata.containerVersion}"))
                     }
                 } else {
                     Gdx.app.postRunnable {

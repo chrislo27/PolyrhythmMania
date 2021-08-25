@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
+import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.EngineInputter
@@ -173,7 +174,9 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
 
 }
 
-class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(world, deployBeat) {
+class EntityRodPR(world: World, deployBeat: Float, val row: Row,
+                  val lifeLost: Var<Boolean>? = null)
+    : EntityRod(world, deployBeat) {
 
     data class InputTracker(
             val totalResultCount: Int,
@@ -231,7 +234,13 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row) : EntityRod(wor
         playSfxExplosion(engine)
         registerMiss(engine.inputter)
         if (world.worldMode.showEndlessScore) {
-            engine.inputter.triggerLifeLost()
+            val lifeLostVar = this.lifeLost
+            if (lifeLostVar != null) {
+                if (!lifeLostVar.getOrCompute()) {
+                    lifeLostVar.set(true)
+                    engine.inputter.triggerLifeLost()
+                }
+            }
         }
     }
 
