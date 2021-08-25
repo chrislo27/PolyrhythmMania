@@ -22,7 +22,7 @@ built-in level editor.
 [Check out the August 2021 features trailer!](https://www.youtube.com/watch?v=k9PtPI1-tDo)
 
 ## Installation instructions
-**Supported operating systems:** Windows 7 or newer, Linux (x86 and Arm)
+**Supported operating systems:** Windows 7 or newer, Linux (x86 and ARM)
 
 __Windows (64-bit only):__
 1. Navigate to the [latest release here](https://github.com/chrislo27/PolyrhythmMania/releases/latest).
