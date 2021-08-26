@@ -2,19 +2,20 @@ package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
-import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
-import paintbox.ui.control.TextField
-import paintbox.ui.control.TextLabel
+import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
@@ -161,7 +162,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 
                 this += createSmallButton { Localization.getVar("mainMenu.play.endless.settings.clear").use() }.apply { 
-                    this.bounds.width.set(100f)
+                    this.bounds.width.set(80f)
                     this.setOnAction {
                         textField.requestUnfocus()
                         seedText.set("")
@@ -176,6 +177,21 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         val randomSeedStr = randomSeed.toString(16).padStart(8, '0').uppercase()
                         seedText.set(randomSeedStr)
                         textField.text.set(randomSeedStr)
+                    }
+                }
+                this += createSmallButton { "" }.apply copyButton@{
+                    this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_copy"))).also { img ->
+                        img.tint.bind { 
+                            when (this@copyButton.pressedState.use()) {
+                                PressedState.NONE, PressedState.HOVERED -> Color.WHITE
+                                PressedState.PRESSED, PressedState.PRESSED_AND_HOVERED -> Color.LIGHT_GRAY
+                            }
+                        }
+                    }
+                    this.bindWidthToSelfHeight()
+                    this.setOnAction { 
+                        val seed = seedText.getOrCompute()
+                        Gdx.app.clipboard?.contents = seed
                     }
                 }
             }

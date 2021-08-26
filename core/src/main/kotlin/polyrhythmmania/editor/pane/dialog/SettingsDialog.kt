@@ -81,8 +81,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         fun createCheckbox(text: String, tooltip: String?, keyValue: Settings.KeyValue<Boolean>): CheckBox {
             val bindingVar = keyValue.value
             return CheckBox(binding = { Localization.getVar(text).use() }, font = editorPane.palette.musicDialogFont).apply {
-                this.textLabel.textColor.set(Color.WHITE)
-                this.imageNode.tint.set(Color.WHITE)
+                this.color.set(Color.WHITE.cpy())
                 this.bounds.height.set(blockHeight)
                 if (tooltip != null) {
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar(tooltip)))

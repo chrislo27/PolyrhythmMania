@@ -99,8 +99,7 @@ class ResultsTextDialog(editorPane: EditorPane)
                     testScoreNoMiss.set(this.selectedState.getOrCompute())
                 }
                 this.imageNode.padding.set(Insets(0f, 0f, 0f, 6f))
-                this.imageNode.tint.set(Color.WHITE)
-                this.textLabel.textColor.set(Color.WHITE)
+                this.color.set(Color.WHITE.cpy())
             }
             leftVbox += CheckBox(binding = { Localization.getVar("editor.dialog.resultsText.skillStar").use() },
                     font = editorPane.palette.musicDialogFont).apply {
@@ -110,8 +109,7 @@ class ResultsTextDialog(editorPane: EditorPane)
                     testScoreSkillStar.set(this.selectedState.getOrCompute())
                 }
                 this.imageNode.padding.set(Insets(0f, 0f, 0f, 6f))
-                this.imageNode.tint.set(Color.WHITE)
-                this.textLabel.textColor.set(Color.WHITE)
+                this.color.set(Color.WHITE.cpy())
             }
         }
         contentPane += leftVbox

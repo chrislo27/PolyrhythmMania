@@ -42,6 +42,7 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
         LEFT, RIGHT;
     }
     
+    val color: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
     val textLabel: TextLabel = TextLabel(text, font)
     val imageNode: ImageNode = ImageNode(null, ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
 
@@ -71,10 +72,12 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
             getTextureRegionForType(type, state)
         }
         imageNode.margin.set(Insets(2f))
-        imageNode.tint.set(Color(0f, 0f, 0f, 1f))
         
         textLabel.renderAlign.bind { if (boxAlignment.use() == BoxAlign.LEFT) com.badlogic.gdx.utils.Align.left else com.badlogic.gdx.utils.Align.right }
         textLabel.textAlign.bind { if (boxAlignment.use() == BoxAlign.LEFT) TextAlign.LEFT else TextAlign.RIGHT }
+        
+        textLabel.textColor.bind { color.use() }
+        imageNode.tint.bind { color.use() }
         
         this.addChild(textLabel)
         this.addChild(imageNode)

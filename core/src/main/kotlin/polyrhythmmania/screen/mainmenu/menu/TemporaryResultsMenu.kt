@@ -63,7 +63,7 @@ class TemporaryResultsMenu(menuCol: MenuCollection, val results: Results, val co
                 this.markup.set(resultsMarkup)
                 this.bounds.height.set(80f)
                 this.padding.set(Insets(4f))
-                this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                this.textColor.set(LongButtonSkin.TEXT_COLOR)
                 this.renderAlign.set(Align.topLeft)
                 this.textAlign.set(TextAlign.LEFT)
                 this.doLineWrapping.set(true)
