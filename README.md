@@ -8,6 +8,8 @@ built-in level editor and side modes.
 [![GitHub license](https://img.shields.io/github/license/chrislo27/PolyrhythmMania.svg)](https://github.com/chrislo27/PolyrhythmMania/blob/dev/LICENSE.txt)
 [![Donate to the project maintainer](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.com/donate?hosted_button_id=9JLGHKZNWLLQ8)
 
+[Original Soundtrack on YouTube by GENERIC](https://www.youtube.com/playlist?list=PLt_3dgnFrUPwcA6SdTfi0RapEBdQV64v_)
+
 ## Features
 * Full recreation of the Polyrhythm minigame from Rhythm Tengoku
 * Save and load custom levels with a built-in and intuitive level editor
