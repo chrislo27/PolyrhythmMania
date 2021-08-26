@@ -19,7 +19,7 @@ allprojects {
     apply plugin: "java"
     apply plugin: "kotlin"
 
-    version = "0.1.0"
+    version = "1.0.0"
     ext {
         appName = "PolyrhythmMania"
         gdxVersion = '1.10.0'
