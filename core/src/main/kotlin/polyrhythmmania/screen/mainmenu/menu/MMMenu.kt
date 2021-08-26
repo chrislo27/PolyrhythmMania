@@ -82,25 +82,64 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    class LongButtonSkin(element: Button) : UppermostMenu.ButtonSkin(element) {
+    class LongButtonSkin(element: Button) : paintbox.ui.control.ButtonSkin(element) {
+        companion object {
+            val TEXT_COLOR: Color = Color().grey(90f / 255f, 1f)
+            val DISABLED_TEXT: Color = Color().grey(150f / 255f)
+            val HOVERED_TEXT: Color = Color().grey(1f)
+            val PRESSED_TEXT: Color = Color(0.4f, 1f, 1f, 1f)
+            val PRESSED_AND_HOVERED_TEXT: Color = Color(0.5f, 1f, 1f, 1f)
+
+            val BG_COLOR: Color = Color(1f, 1f, 1f, 0f)
+            val HOVERED_BG: Color = Color().grey(90f / 255f, 0.8f)
+            val DISABLED_BG: Color = BG_COLOR.cpy()
+            val PRESSED_BG: Color = HOVERED_BG.cpy()
+            val PRESSED_AND_HOVERED_BG: Color = HOVERED_BG.cpy()
+        }
+        
         init {
-            this.disabledTextColor.set(Color().grey(150f / 255f))
+            val grey = TEXT_COLOR
+            this.defaultTextColor.set(grey)
+            this.disabledTextColor.set(DISABLED_TEXT)
+            this.hoveredTextColor.set(HOVERED_TEXT)
+            this.pressedTextColor.set(PRESSED_TEXT)
+            this.pressedAndHoveredTextColor.set(PRESSED_AND_HOVERED_TEXT)
+            this.defaultBgColor.set(BG_COLOR)
+            this.hoveredBgColor.set(HOVERED_BG)
+            this.disabledBgColor.set(DISABLED_BG)
+            this.pressedBgColor.set(PRESSED_BG)
+            this.pressedAndHoveredBgColor.set(PRESSED_AND_HOVERED_BG)
+            this.roundedRadius.set(0)
         }
     }
 
     class SmallButtonSkin(element: Button) : paintbox.ui.control.ButtonSkin(element) {
-        init {
-            this.defaultTextColor.set(Color().grey(0f, 1f))
-            this.disabledTextColor.set(Color().grey(100f / 255f))
-            this.hoveredTextColor.set(Color().grey(30f / 255f))
-            this.pressedTextColor.set(Color(0.2f, 0.5f, 0.5f, 1f))
-            this.pressedAndHoveredTextColor.set(Color(0.3f, 0.5f, 0.5f, 1f))
+        companion object {
+            val TEXT_COLOR: Color = Color().grey(0f / 255f, 1f)
+            val DISABLED_TEXT: Color = Color().grey(100f / 255f, 1f)
+            val HOVERED_TEXT: Color = Color().grey(30f / 255f, 1f)
+            val PRESSED_TEXT: Color = Color(0.4f, 1f, 1f, 1f)
+            val PRESSED_AND_HOVERED_TEXT: Color = Color(0.3f, 0.5f, 0.5f, 1f)
 
-            this.defaultBgColor.set(Color().grey(145f / 255f, 1f))
-            this.hoveredBgColor.set(Color().grey(155f / 255f, 1f))
-            this.disabledBgColor.set(Color().grey(125f / 255f, 1f))
-            this.pressedBgColor.bind { hoveredBgColor.use() }
-            this.pressedAndHoveredBgColor.bind { hoveredBgColor.use() }
+            val BG_COLOR: Color = Color().grey(145f / 255f, 1f)
+            val HOVERED_BG: Color = Color().grey(155f / 255f, 1f)
+            val DISABLED_BG: Color = Color().grey(125f / 255f, 1f)
+            val PRESSED_BG: Color = HOVERED_BG.cpy()
+            val PRESSED_AND_HOVERED_BG: Color = HOVERED_BG.cpy()
+        }
+        
+        init {
+            this.defaultTextColor.set(TEXT_COLOR)
+            this.disabledTextColor.set(DISABLED_TEXT)
+            this.hoveredTextColor.set(HOVERED_TEXT)
+            this.pressedTextColor.set(PRESSED_TEXT)
+            this.pressedAndHoveredTextColor.set(PRESSED_AND_HOVERED_TEXT)
+
+            this.defaultBgColor.set(BG_COLOR)
+            this.hoveredBgColor.set(HOVERED_BG)
+            this.disabledBgColor.set(DISABLED_BG)
+            this.pressedBgColor.set(PRESSED_BG)
+            this.pressedAndHoveredBgColor.set(PRESSED_AND_HOVERED_BG)
 
             this.roundedRadius.set(1)
         }
@@ -257,10 +296,10 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         : Pane(), HasPressedState by HasPressedState.DefaultImpl() {
 
         val textColorVar: ReadOnlyVar<Color> = Var.bind {
-            if (isHoveredOver.use()) UppermostMenu.ButtonSkin.HOVERED_TEXT else UppermostMenu.ButtonSkin.TEXT_COLOR
+            if (isHoveredOver.use()) LongButtonSkin.HOVERED_TEXT else LongButtonSkin.TEXT_COLOR
         }
         val bgColorVar: ReadOnlyVar<Color> = Var.bind {
-            if (isHoveredOver.use()) UppermostMenu.ButtonSkin.HOVERED_BG else UppermostMenu.ButtonSkin.BG_COLOR
+            if (isHoveredOver.use()) LongButtonSkin.HOVERED_BG else LongButtonSkin.BG_COLOR
         }
 
         val label: TextLabel

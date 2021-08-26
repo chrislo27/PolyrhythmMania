@@ -77,7 +77,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.markup.set(this@LoadSavedLevelMenu.markup)
             this.padding.set(Insets(4f))
             this.bounds.height.set(96f)
-            this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+            this.textColor.set(LongButtonSkin.TEXT_COLOR)
             this.renderAlign.set(Align.center)
             this.textAlign.set(TextAlign.CENTRE)
         }
@@ -99,7 +99,12 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             font = this@LoadSavedLevelMenu.font).apply {
                         this.bindWidthToParent(multiplier = 0.5f)
                         this.checkedState.set(goForPerfect.getOrCompute())
-                        this.color.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.color.set(LongButtonSkin.TEXT_COLOR)
+                        this.color.bind {
+                            if (apparentDisabledState.use()) {
+                                LongButtonSkin.DISABLED_TEXT
+                            } else LongButtonSkin.TEXT_COLOR
+                        }
                         this.textLabel.padding.set(Insets(0f, 0f, 4f, 0f))
                         this.onCheckChanged = { newState ->
                             goForPerfect.set(newState)
@@ -112,7 +117,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         this.bindWidthToParent(multiplier = 0.5f)
                         Anchor.TopRight.configure(this)
                         this.checkedState.set(robotMode.getOrCompute())
-                        this.color.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.color.set(LongButtonSkin.TEXT_COLOR)
                         this.textLabel.padding.set(Insets(0f, 0f, 4f, 0f))
                         this.onCheckChanged = { newState ->
                             robotMode.set(newState)
@@ -137,7 +142,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this += TextLabel(binding = { Localization.getVar("mainMenu.play.challengeSettings.speed").use() },
                             font = this@LoadSavedLevelMenu.font).apply {
                         this.bounds.width.set(100f)
-                        this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.textColor.set(LongButtonSkin.TEXT_COLOR)
                         this.renderAlign.set(Align.right)
                     }
                     val slider = Slider().apply slider@{
@@ -164,7 +169,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this += TextLabel(binding = { percent.use() },
                             font = this@LoadSavedLevelMenu.font).apply {
                         this.bounds.width.set(75f)
-                        this.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.textColor.set(LongButtonSkin.TEXT_COLOR)
                         this.renderAlign.set(Align.left)
                         this.setScaleXY(0.9f)
                     }

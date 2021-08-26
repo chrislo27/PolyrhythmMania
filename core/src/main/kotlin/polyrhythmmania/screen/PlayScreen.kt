@@ -197,7 +197,7 @@ class PlayScreen(
                 Anchor.TopLeft.configure(this)
                 this.disabled.set(!enabled)
                 this.textColor.bind {
-                    if (disabled.use()) Color.GRAY else if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
+                    if (apparentDisabledState.use()) Color.GRAY else if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
                 }
                 this.bounds.height.set(48f)
                 this.bgPadding.set(Insets(2f, 2f, 12f, 12f))
@@ -455,7 +455,7 @@ class PlayScreen(
 
     private fun attemptPauseEntrySelection() {
         val index = selectionIndex.getOrCompute()
-        if (optionLabels[index].disabled.getOrCompute()) return
+        if (optionLabels[index].apparentDisabledState.getOrCompute()) return
         when (index) {
             0 -> { // Resume
                 unpauseGame(true)
@@ -511,7 +511,7 @@ class PlayScreen(
                         consumed = true
                     }
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown -> {
-                        if (optionLabels.any { !it.disabled.getOrCompute() }) {
+                        if (optionLabels.any { !it.apparentDisabledState.getOrCompute() }) {
                             val currentIndex = selectionIndex.getOrCompute()
                             val incrementAmt = if (keycode == keyboardKeybinds.buttonDpadUp) -1 else 1
                             var increment = incrementAmt
