@@ -35,8 +35,8 @@ __Windows (64-bit only):__
 6. If Windows Defender says "Windows Defender SmartScreen prevented an unrecognized app from starting", you can safely ignore it by clicking "More info" and then "Run anyway".
 
 __Other platforms (or for advanced users who already have Java installed)__
-1. Navigate to the [latest release here](https://github.com/chrislo27/PolyrhythmMania/releases/latest).
-2. Ensure you already have the Java Runtime Environment (JRE 8 or newer) installed and it is accessible in your path.
+1. **(Pre-requisite)** Ensure you already have the Java Runtime Environment (JRE 8 or newer) installed and it is accessible in your path.
+2. Navigate to the [latest release here](https://github.com/chrislo27/PolyrhythmMania/releases/latest).
 3. Download the correct version of the game in the Assets section named `PolyrhythmMania_VERSION.zip`, where VERSION is the release version name. Don't download the "Source code".
 4. Extract the zip file to a known location.
 5. Open the newly extracted directory and go into the `PolyrhythmMania_platform_agnostic` directory.
