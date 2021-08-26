@@ -213,9 +213,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         }
                         
                         // Set challenge settings
-                        val challenges: Challenges = if (!robotMode) {
-                            Challenges(tempoUp.getOrCompute(), goForPerfect.getOrCompute() && !robotMode)
-                        } else Challenges.NO_CHANGES
+                        val challenges: Challenges = Challenges(tempoUp.getOrCompute(), goForPerfect.getOrCompute() && !robotMode)
                         challenges.applyToEngine(engine)
                         
                         mainMenu.transitionAway {
