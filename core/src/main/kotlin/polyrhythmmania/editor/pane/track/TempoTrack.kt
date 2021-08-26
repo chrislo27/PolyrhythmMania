@@ -83,7 +83,9 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             this += Pane().apply {
                 this.bounds.x.set(56f)
                 this.bindWidthToParent(-this.bounds.x.get())
-                this += RectElement(Color().grey(0f, 0.5f))
+                this += RectElement(Color().grey(0f, 0.5f)).apply { 
+                    this.visible.bind { editor.tool.use() == Tool.TEMPO_CHANGE }
+                }
                 this += Pane().apply {
                     this.padding.set(Insets(2f))
 
@@ -109,6 +111,12 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                             if (tool == Tool.TEMPO_CHANGE && mouseOver)
                                 highlighted
                             else Color.WHITE
+                        }
+                        
+                        val tooltip = editorPane.createDefaultTooltip(Localization.getVar("editor.tempo.startingTempo.tooltip",
+                                Var { listOf("${Tool.values().indexOf(Tool.TEMPO_CHANGE) + 1}") }))
+                        this.tooltipElement.bind { 
+                            if (editor.tool.use() != Tool.TEMPO_CHANGE) tooltip else null
                         }
 
                         this.addInputEventListener(createInputListener { amt ->
