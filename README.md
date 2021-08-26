@@ -4,7 +4,7 @@ built-in level editor and side modes.
 
 ![Polyrhythm Mania thumbnail](https://cdn.discordapp.com/attachments/306231796369195020/879243807206539264/unknown.png)
 
-
+[![Downloads](https://img.shields.io/github/downloads/chrislo27/PolyrhythmMania/total.svg)](https://github.com/chrislo27/PolyrhythmMania/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/chrislo27/PolyrhythmMania.svg)](https://github.com/chrislo27/PolyrhythmMania/blob/dev/LICENSE.txt)
 [![Donate to the project maintainer](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.com/donate?hosted_button_id=9JLGHKZNWLLQ8)
 
