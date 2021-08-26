@@ -244,9 +244,8 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                                         this.bounds.width.set(150f)
                                         this.textLabel.markup.set(editorPane.palette.markup)
                                         this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.tilesetPalette.enabled.tooltip")))
-                                        this.textLabel.textColor.set(Color.WHITE)
-                                        this.imageNode.tint.set(Color.WHITE)
                                         this.imageNode.padding.set(Insets(4f))
+                                        this.color.set(Color.WHITE.cpy())
                                         
                                         this.setOnAction { // This overrides the default behaviour of CheckBox
                                             val newState = checkedState.invert()

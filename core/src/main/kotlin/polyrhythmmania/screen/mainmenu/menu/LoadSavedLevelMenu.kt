@@ -99,8 +99,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             font = this@LoadSavedLevelMenu.font).apply {
                         this.bindWidthToParent(multiplier = 0.5f)
                         this.checkedState.set(goForPerfect.getOrCompute())
-                        this.imageNode.tint.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
-                        this.textLabel.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.color.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
                         this.textLabel.padding.set(Insets(0f, 0f, 4f, 0f))
                         this.onCheckChanged = { newState ->
                             goForPerfect.set(newState)
@@ -113,8 +112,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         this.bindWidthToParent(multiplier = 0.5f)
                         Anchor.TopRight.configure(this)
                         this.checkedState.set(robotMode.getOrCompute())
-                        this.imageNode.tint.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
-                        this.textLabel.textColor.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
+                        this.color.set(UppermostMenu.ButtonSkin.TEXT_COLOR)
                         this.textLabel.padding.set(Insets(0f, 0f, 4f, 0f))
                         this.onCheckChanged = { newState ->
                             robotMode.set(newState)

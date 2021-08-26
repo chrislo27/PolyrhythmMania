@@ -207,8 +207,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         val checkBox = CheckBox(binding = labelText, font = font).apply { 
             Anchor.TopRight.configure(this)
             this.boxAlignment.set(CheckBox.BoxAlign.RIGHT)
-            this.imageNode.tint.bind { settingsOptionPane.textColorVar.use() }
-            this.textLabel.textColor.bind { settingsOptionPane.textColorVar.use() }
+            this.color.bind { settingsOptionPane.textColorVar.use() }
             this.textLabel.renderAlign.set(Align.left)
             this.textLabel.textAlign.set(TextAlign.LEFT)
             this.textLabel.margin.set(this.textLabel.margin.getOrCompute().copy(left = 0f))

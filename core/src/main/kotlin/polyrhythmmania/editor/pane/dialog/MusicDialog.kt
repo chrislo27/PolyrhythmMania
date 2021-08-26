@@ -423,9 +423,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.checkedState.addListener {
                         window.doLooping.set(it.getOrCompute())
                     }
-                    this.imageNode.tint.set(Color.WHITE.cpy())
                     this.imageNode.padding.set(Insets(4f))
-                    this.textLabel.textColor.set(Color.WHITE.cpy())
+                    this.color.set(Color.WHITE.cpy())
                     this.bounds.width.set(220f)
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.enableLooping.tooltip")))
                 }
