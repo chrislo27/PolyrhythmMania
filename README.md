@@ -31,7 +31,7 @@ These instructions are the same if you're downloading the game for the first tim
 __Windows (64-bit only):__
 1. Navigate to the [latest release here](https://github.com/chrislo27/PolyrhythmMania/releases/latest).
 2. Download the correct version of the game in the Assets section named `PolyrhythmMania_VERSION_win64.zip`, where VERSION is the release version name. **Note the "win64" in the file name.** Don't download the "Source code".
-3. Find the downloaded zip file in File Explorer. Extract the zip file by right clicking the downloaded zip file, click "Extract All...", and extract the contents to a folder.
+3. Find the downloaded zip file in File Explorer. Extract the zip file: right click the downloaded zip file, click "Extract All...", and extract the contents to a folder.
 4. Open the newly extracted folder and go into the `PolyrhythmMania_win64` folder.
 5. Double-click the `LaunchPolyrhythmMania.exe` executable to start the game! (You don't need the Java Runtime Environment already installed, the game comes with a copy.)
 6. If Windows Defender says "Windows Defender SmartScreen prevented an unrecognized app from starting", you can safely ignore it by clicking "More info" and then "Run anyway".
