@@ -221,9 +221,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
     
     protected fun createSettingsOption(labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
-                                       percentageContent: Float = 0.5f): SettingsOptionPane {
-        return SettingsOptionPane(labelText, font, percentageContent).apply {
-            this.bounds.height.set(36f)
+                                       percentageContent: Float = 0.5f, twoRowsTall: Boolean = false): SettingsOptionPane {
+        return SettingsOptionPane(labelText, font, percentageContent, twoRowsTall).apply {
+            this.bounds.height.set(36f * (if (twoRowsTall) 2 else 1))
             this.addInputEventListener {
                 if (it is MouseEntered) {
                     blipSoundListener(null)
@@ -258,9 +258,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
     protected fun <T> createCycleOption(items: List<T>, firstItem: T,
                                         labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
-                                        percentageContent: Float = 0.5f,
+                                        percentageContent: Float = 0.5f, twoRowsTall: Boolean = false,
                                         itemToString: (T) -> String = { it.toString() }): Pair<SettingsOptionPane, CycleControl<T>> {
-        val settingsOptionPane = createSettingsOption(labelText, font, percentageContent)
+        val settingsOptionPane = createSettingsOption(labelText, font, percentageContent, twoRowsTall = twoRowsTall)
         val cycle = CycleControl<T>(settingsOptionPane, items, firstItem, itemToString)
         settingsOptionPane.content += cycle
 
@@ -292,7 +292,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
 
     open class SettingsOptionPane(labelText: Var.Context.() -> String, val font: PaintboxFont,
-                                  percentageContent: Float = 0.5f)
+                                  percentageContent: Float = 0.5f, val twoRowsTall: Boolean = false)
         : Pane(), HasPressedState by HasPressedState.DefaultImpl() {
 
         val textColorVar: ReadOnlyVar<Color> = Var.bind {
@@ -314,7 +314,11 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             
             label = TextLabel(labelText, font).apply {
                 Anchor.TopLeft.configure(this)
-                this.bindWidthToParent(adjust = 0f, multiplier = 1f - percentageContent)
+                if (twoRowsTall) {
+                    this.bindHeightToParent(multiplier = 0.5f) // Half height
+                } else {
+                    this.bindWidthToParent(adjust = 0f, multiplier = 1f - percentageContent) // Share space w/ content
+                }
                 this.textColor.bind { textColorVar.use() }
                 this.renderAlign.set(Align.left)
                 this.textAlign.set(TextAlign.RIGHT)
@@ -322,7 +326,12 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             rect.addChild(label)
             
             content = Pane().apply {
-                Anchor.TopRight.configure(this)
+                if (twoRowsTall) {
+                    this.bindHeightToParent(multiplier = 0.5f)
+                    Anchor.BottomRight.configure(this)
+                } else {
+                    Anchor.TopRight.configure(this)
+                }
                 this.bindWidthToParent(adjust = 0f, multiplier = percentageContent)
             }
             rect.addChild(content)
