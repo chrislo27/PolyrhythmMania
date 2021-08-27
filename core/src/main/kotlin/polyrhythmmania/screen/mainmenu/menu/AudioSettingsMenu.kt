@@ -1,6 +1,8 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
+import paintbox.font.TextAlign
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Slider
@@ -75,7 +77,11 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         val (mixerPane, mixerControl) = createCycleOption(mixers, mixerHandler.recommendedMixer,
                 { Localization.getVar("mainMenu.audioSettings.mixer").use() },
-                percentageContent = 0.7f, itemToString = { it.mixerInfo.name })
+                percentageContent = 1f, twoRowsTall = true, itemToString = { it.mixerInfo.name })
+        mixerPane.label.textAlign.set(TextAlign.CENTRE)
+        mixerPane.label.renderAlign.set(Align.center)
+        mixerControl.label.font.set(main.fontMainMenuRodin)
+        mixerControl.label.setScaleXY(0.75f)
         mixerControl.currentItem.addListener { m ->
             setSoundSystemMixer(m.getOrCompute())
         }

@@ -26,7 +26,7 @@ object DefaultPresences {
         : PresenceState("Playing the Daily Challenge (${localDate.format(DateTimeFormatter.ISO_DATE)})")
     
     object PlayingDunk
-        : PresenceState("Playing Polyrhythm DUNK!!")
+        : PresenceState("Playing Polyrhythm: Dunk")
     
     object PlayingAssemble
         : PresenceState("Playing Polyrhythm: Assemble")

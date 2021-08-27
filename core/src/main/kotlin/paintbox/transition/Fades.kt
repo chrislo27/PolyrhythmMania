@@ -6,7 +6,7 @@ import paintbox.util.gdxutils.fillRect
 
 
 /**
- * Fades TO the specified colour to opaque.
+ * Fades TO the specified colour from transparent to opaque.
  */
 class FadeOut(duration: Float, val color: Color) : Transition(duration) {
 

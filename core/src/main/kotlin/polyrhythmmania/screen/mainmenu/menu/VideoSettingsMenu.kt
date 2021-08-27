@@ -50,6 +50,13 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         vbox.temporarilyDisableLayouts {
             vbox += resolutionPane
             vbox += fullscreenPane
+            
+            val (flipPane, flipCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.mainMenuFlipAnimation").use() })
+            flipCheck.selectedState.set(main.settings.mainMenuFlipAnimation.getOrCompute())
+            flipCheck.onCheckChanged = {
+                main.settings.mainMenuFlipAnimation.set(it)
+            }
+            vbox += flipPane
         }
 
         hbox.temporarilyDisableLayouts {
@@ -60,7 +67,7 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.videoSettings.applySettings").use() }).apply {
-                this.bounds.width.set(300f)
+                this.bounds.width.set(280f)
                 this.setOnAction {
                     val graphics = Gdx.graphics
                     val useFullscreen = fullscreenCheck.checkedState.getOrCompute()

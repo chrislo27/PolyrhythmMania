@@ -21,6 +21,9 @@ import paintbox.font.*
 import paintbox.logging.Logger
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
+import paintbox.transition.FadeIn
+import paintbox.transition.FadeOut
+import paintbox.transition.TransitionScreen
 import paintbox.util.ResolutionSetting
 import paintbox.util.Version
 import paintbox.util.WindowSize
@@ -154,7 +157,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 //                EditorScreen(this@PRManiaGame, debugMode = true)
 //                polyrhythmmania.world.render.TestWorldDunkScreen(this@PRManiaGame)
 //                polyrhythmmania.world.render.TestWorldAsmScreen(this@PRManiaGame)
-                mainMenuScreen.prepareShow(doFlipAnimation = true)
+                TransitionScreen(this@PRManiaGame, this@PRManiaGame.getScreen(), mainMenuScreen.prepareShow(doFlipAnimation = true),
+                        FadeOut(0.125f, Color(0f, 0f, 0f, 1f)), FadeIn(0.25f, Color(0f, 0f, 0f, 1f)))
             }
         })
         

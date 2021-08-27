@@ -21,6 +21,9 @@ object GdxAudioReader {
     
     fun interface AudioLoadListener {
         fun progress(bytesReadSoFar: Long, bytesReadThisChunk: Int)
+        
+        open fun onFinished(totalBytesRead: Long) {
+        }
     }
     
     class DecodingHandler(val music: OpenALMusic, val fileChannel: FileChannel, val bufferSize: Int, val listener: AudioLoadListener?) {
@@ -46,6 +49,8 @@ object GdxAudioReader {
                 listener?.progress(currentLength, length)
             }
             
+            listener?.onFinished(currentLength)
+            
             return currentLength
         }
     }
@@ -67,6 +72,7 @@ object GdxAudioReader {
             fileOutStream.write(audioBytes, 0, length)
         }
         StreamUtils.closeQuietly(fileOutStream)
+        listener?.onFinished(currentLength)
 
         return currentLength
     }
@@ -100,10 +106,13 @@ object GdxAudioReader {
 
         val bufStream = tempFile.inputStream()
         var currentFrame = 0
+        var currentLength = 0L
         while (true) {
             val len = bufStream.read(audioBytesBuffer)
             if (len <= 0)
                 break
+            
+            currentLength += len
 
             val framesOfDataRead = len / (2 * music.channels)
 
@@ -115,6 +124,7 @@ object GdxAudioReader {
             currentFrame += framesOfDataRead
         }
         StreamUtils.closeQuietly(bufStream)
+        listener?.onFinished(currentLength)
 
         try {
             tempFile.delete()

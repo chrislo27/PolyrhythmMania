@@ -87,7 +87,7 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
                     playSound(AssetRegistry.get<Sound>("sfx_pause_exit"))
                     val thisScreen = main.screen
                     main.screen = TransitionScreen(main, thisScreen, main.mainMenuScreen,
-                            WipeToColor(Color.BLACK.cpy(), 0.4f), null).apply {
+                            WipeToColor(Color.BLACK.cpy(), 0.4f), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                         onEntryEnd = {
                             container.disposeQuietly()
                             main.mainMenuScreen.prepareShow(doFlipAnimation = true)
