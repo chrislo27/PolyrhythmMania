@@ -196,16 +196,23 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val musicFinishedLoading: AtomicBoolean = AtomicBoolean(false)
 
     init {
-        val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg")) { bytesReadSoFar, _ ->
-            if (bytesReadSoFar > 100_000L && !enoughMusicLoaded.get()) {
-                enoughMusicLoaded.set(true)
-                Gdx.app.postRunnable { 
-                    val ss = this.soundSys
-                    ss.resetMusic()
-                    ss.musicPlayer.pause(false)
+        val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg"),
+                object : GdxAudioReader.AudioLoadListener {
+            override fun progress(bytesReadSoFar: Long, bytesReadThisChunk: Int) {
+                if (bytesReadSoFar > 100_000L && !enoughMusicLoaded.get()) {
+                    enoughMusicLoaded.set(true)
+                    Gdx.app.postRunnable {
+                        val ss = this@MainMenuScreen.soundSys
+                        ss.resetMusic()
+                        ss.musicPlayer.pause(false)
+                    }
                 }
             }
-        }
+
+            override fun onFinished(totalBytesRead: Long) {
+                musicFinishedLoading.set(true)
+            }
+        })
         musicSample = sample
         thread(start = true, isDaemon = true, name = "Main Menu music decoder", priority = 8) {
             Paintbox.LOGGER.debug("Starting main menu music decode")
@@ -630,7 +637,6 @@ playerPos: ${soundSys.musicPlayer.position}
         }
         
         fun resetMusic() {
-            println("music reset")
             musicPlayer.gain = 1f
             musicPlayer.position = 0.0
             fadeToNormal(1f)
