@@ -32,7 +32,7 @@ object PRMania {
             WindowSize(3840, 2160),
     ).sortedBy { it.width }
     
-    val enableEarlyAccessMessage: Boolean = false
+    val enableEarlyAccessMessage: Boolean = (VERSION.suffix.startsWith("dev") || VERSION.suffix.startsWith("beta"))
     
     // Command line arguments
     var logMissingLocalizations: Boolean = false
