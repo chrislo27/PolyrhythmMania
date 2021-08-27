@@ -194,6 +194,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
     private val enoughMusicLoaded: AtomicBoolean = AtomicBoolean(false)
     private val musicFinishedLoading: AtomicBoolean = AtomicBoolean(false)
+    private val firstShowing: AtomicBoolean = AtomicBoolean(true)
 
     init {
         val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg"),
@@ -471,11 +472,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     fun prepareShow(doFlipAnimation: Boolean = false): MainMenuScreen {
+        resize(Gdx.graphics.width, Gdx.graphics.height)
+        
         resetTiles()
         // Uncomment 2 lines below to have it reset to the uppermostMenu each time
 //        menuCollection.changeActiveMenu(menuCollection.uppermostMenu, false, instant = true)
 //        menuCollection.resetMenuStack()
-        if (doFlipAnimation) {
+        if (doFlipAnimation && flipAnimationEnabled.getOrCompute()) {
             // Black out frame buffers
             lastProjMatrix.set(batch.projectionMatrix)
             val camera = fullCamera
@@ -542,9 +545,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         sceneRoot.cancelTooltip()
         
         soundSys.soundSystem.setPaused(false)
-        if (enoughMusicLoaded.get() && musicFinishedLoading.get()) {
+        if (enoughMusicLoaded.get() && musicFinishedLoading.get() && !firstShowing.get()) {
             soundSys.resetMusic()
         }
+        firstShowing.set(false)
 
         DiscordHelper.updatePresence(DefaultPresences.Idle)
         background.initializeFromType(this.backgroundType)
