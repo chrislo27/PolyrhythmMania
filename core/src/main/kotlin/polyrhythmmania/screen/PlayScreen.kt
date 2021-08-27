@@ -437,6 +437,7 @@ class PlayScreen(
             engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
             container.world.resetWorld()
             container.world.tilesetPalette.applyTo(container.renderer.tileset)
+            container.setTexturePackFromSource()
             prepareGameStart()
             unpauseGame(false)
         }
