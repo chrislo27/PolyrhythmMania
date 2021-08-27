@@ -23,6 +23,7 @@ object PreferenceKeys {
     val SETTINGS_MUSIC_OFFSET_MS = "settings_musicOffsetMs"
     val SETTINGS_DISCORD_RPC = "settings_discord_rich_presence"
     val SETTINGS_MIXER = "settings_mixer"
+    val SETTINGS_MAINMENU_FLIP_ANIMATION = "settings_mainMenu_flipAnimation"
     
     val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
     val EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE = "editorsettings_camera_pan_on_drag_edge"

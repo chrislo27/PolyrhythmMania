@@ -25,6 +25,8 @@ import paintbox.font.Markup
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
 import paintbox.registry.AssetRegistry
+import paintbox.transition.FadeOut
+import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
@@ -85,6 +87,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
         fun update(delta: Float, mainMenu: MainMenuScreen) {
             if (isDone) return
+            if (!isDone && !mainMenu.flipAnimationEnabled.getOrCompute()) {
+                isDone = true
+                return
+            }
 
             val progressDelta = delta / FLIP_SEC_PER_TILE
 
@@ -153,6 +159,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     // Related to tile flip effect --------------------------------------------------------
 
+    private val flipAnimationEnabled: ReadOnlyVar<Boolean> = main.settings.mainMenuFlipAnimation
     val tileSize: Int = 48
     val tilesWidth: Int = ceil(1280f / tileSize).toInt()
     val tilesHeight: Int = ceil(720f / tileSize).toInt()
@@ -185,14 +192,17 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             musicPlayer.pause(true)
         }
     }
+    private val enoughMusicLoaded: AtomicBoolean = AtomicBoolean(false)
+    private val musicFinishedLoading: AtomicBoolean = AtomicBoolean(false)
 
     init {
-        val unpausedPlayer = AtomicBoolean(false)
         val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg")) { bytesReadSoFar, _ ->
-            if (bytesReadSoFar > 100_000L && !unpausedPlayer.get()) {
-                unpausedPlayer.set(true)
+            if (bytesReadSoFar > 100_000L && !enoughMusicLoaded.get()) {
+                enoughMusicLoaded.set(true)
                 Gdx.app.postRunnable { 
-                    this.soundSys.musicPlayer.pause(false)
+                    val ss = this.soundSys
+                    ss.resetMusic()
+                    ss.musicPlayer.pause(false)
                 }
             }
         }
@@ -525,7 +535,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         sceneRoot.cancelTooltip()
         
         soundSys.soundSystem.setPaused(false)
-        soundSys.resetMusic()
+        if (enoughMusicLoaded.get() && musicFinishedLoading.get()) {
+            soundSys.resetMusic()
+        }
 
         DiscordHelper.updatePresence(DefaultPresences.Idle)
         background.initializeFromType(this.backgroundType)
@@ -618,6 +630,7 @@ playerPos: ${soundSys.musicPlayer.position}
         }
         
         fun resetMusic() {
+            println("music reset")
             musicPlayer.gain = 1f
             musicPlayer.position = 0.0
             fadeToNormal(1f)

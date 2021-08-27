@@ -475,7 +475,7 @@ class PlayScreen(
         Gdx.app.postRunnable {
             val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
             main.screen = TransitionScreen(main, currentScreen, mainMenu,
-                    FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), null).apply {
+                    FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
                     if (currentScreen is PlayScreen) {
                         currentScreen.dispose()

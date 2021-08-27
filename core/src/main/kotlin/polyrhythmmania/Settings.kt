@@ -19,6 +19,7 @@ import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
+import polyrhythmmania.PreferenceKeys.SETTINGS_MAINMENU_FLIP_ANIMATION
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MIXER
@@ -52,6 +53,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_musicOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_MUSIC_OFFSET_MS, 0)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
     private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, "")
+    private val kv_mainMenuFlipAnimations: KeyValue<Boolean> = KeyValue(SETTINGS_MAINMENU_FLIP_ANIMATION, true)
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
     val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, true)
@@ -78,6 +80,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val musicOffsetMs: Var<Int> = kv_musicOffsetMs.value
     val discordRichPresence: Var<Boolean> = kv_discordRichPresence.value
     val mixer: Var<String> = kv_mixer.value
+    val mainMenuFlipAnimation: Var<Boolean> = kv_mainMenuFlipAnimations.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
@@ -107,6 +110,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getInt(kv_musicOffsetMs)
         prefs.getBoolean(kv_discordRichPresence)
         prefs.getString(kv_mixer, "")
+        prefs.getBoolean(kv_mainMenuFlipAnimations)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
@@ -137,6 +141,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_musicOffsetMs)
                 .putBoolean(kv_discordRichPresence)
                 .putString(kv_mixer)
+                .putBoolean(kv_mainMenuFlipAnimations)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)
@@ -159,14 +164,14 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private fun Preferences.getInt(kv: KeyValue<Int>) {
         val prefs: Preferences = this
         if (prefs.contains(kv.key)) {
-            kv.value.set(prefs.getInteger(kv.key))
+            kv.value.set(prefs.getInteger(kv.key, kv.defaultValue))
         }
     }
 
     private fun Preferences.getIntCoerceIn(kv: KeyValue<Int>, min: Int, max: Int) {
         val prefs: Preferences = this
         if (prefs.contains(kv.key)) {
-            kv.value.set(prefs.getInteger(kv.key).coerceIn(min, max))
+            kv.value.set(prefs.getInteger(kv.key, kv.defaultValue).coerceIn(min, max))
         }
     }
 
@@ -178,7 +183,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private fun Preferences.getBoolean(kv: KeyValue<Boolean>) {
         val prefs: Preferences = this
         if (prefs.contains(kv.key)) {
-            kv.value.set(prefs.getBoolean(kv.key))
+            kv.value.set(prefs.getBoolean(kv.key, kv.defaultValue))
         }
     }
 
