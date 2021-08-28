@@ -51,6 +51,7 @@ object Credits {
                     "Rodin",
                     "Kurokane",
                     "Pexels",
+                    "world-flags-sprite",
             ).toVars(),
     )
     
