@@ -84,7 +84,7 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
         active = clamped > 0f
         position.y = Interpolation.linear.apply(baseY - 1, baseY, clamped)
         row.updateInputIndicators()
-        spawningState = if (clamped <= 0f) SpawningState.NEUTRAL else SpawningState.SPAWNING
+        spawningState = if (clamped <= 0f || clamped >= 1f) SpawningState.NEUTRAL else SpawningState.SPAWNING
         spawnPercentage = clamped
     }
 
@@ -98,7 +98,7 @@ class EntityRowBlock(world: World, val baseY: Float, val row: Row, val rowIndex:
             active = clamped < 1f
             position.y = Interpolation.linear.apply(baseY, baseY - 1, clamped)
             row.updateInputIndicators()
-            spawningState = if (clamped < 1f) SpawningState.NEUTRAL else SpawningState.DESPAWNING
+            spawningState = if (clamped <= 0f || clamped >= 1f) SpawningState.NEUTRAL else SpawningState.DESPAWNING
             spawnPercentage = 1f - clamped
             return true
         }
