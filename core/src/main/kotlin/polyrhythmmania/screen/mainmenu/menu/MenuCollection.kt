@@ -41,6 +41,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val endlessMenu: EndlessModeMenu = EndlessModeMenu(this)
     val settingsMenu: SettingsMenu = SettingsMenu(this)
     val audioSettingsMenu: AudioSettingsMenu = AudioSettingsMenu(this)
+    val advancedAudioMenu: AdvAudioMenu = AdvAudioMenu(this)
     val videoSettingsMenu: VideoSettingsMenu = VideoSettingsMenu(this)
     val inputSettingsMenu: InputSettingsMenu = InputSettingsMenu(this)
     val dataSettingsMenu: DataSettingsMenu = DataSettingsMenu(this)
@@ -63,6 +64,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(settingsMenu)
         addMenu(videoSettingsMenu)
         addMenu(audioSettingsMenu)
+        addMenu(advancedAudioMenu)
         addMenu(inputSettingsMenu)
         addMenu(dataSettingsMenu)
     }

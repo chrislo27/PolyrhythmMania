@@ -450,6 +450,7 @@ class PlayScreen(
             container.world.resetWorld()
             container.world.tilesetPalette.applyTo(container.renderer.tileset)
             engine.soundInterface.clearAllNonMusicAudio()
+            container.setTexturePackFromSource()
             prepareGameStart()
             unpauseGame(false)
         }
