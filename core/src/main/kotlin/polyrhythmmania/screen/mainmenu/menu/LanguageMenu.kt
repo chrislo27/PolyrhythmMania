@@ -8,6 +8,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.control.TextLabel
+import paintbox.ui.control.ToggleGroup
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
@@ -64,28 +65,34 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)
                 this.setScaleXY(0.75f)
             }
-//            vbox += createLongButton { Localization.getVar("mainMenu.settings.audio").use() }.apply {
-//                this.setOnAction { 
-//                    menuCol.pushNextMenu(menuCol.audioSettingsMenu)
-//                }
-//            }
-//            vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {
-//                this.setOnAction {
-//                    val menu = menuCol.videoSettingsMenu
-//                    menu.prepareShow()
-//                    menuCol.pushNextMenu(menu)
-//                }
-//            }
-//            vbox += createLongButton { Localization.getVar("mainMenu.settings.input").use() }.apply {
-//                this.setOnAction {
-//                    menuCol.pushNextMenu(menuCol.inputSettingsMenu)
-//                }
-//            }
-//            vbox += createLongButton { Localization.getVar("mainMenu.settings.data").use() }.apply {
-//                this.setOnAction {
-//                    menuCol.pushNextMenu(menuCol.dataSettingsMenu)
-//                }
-//            }
+            
+            val toggleGroup = ToggleGroup()
+            Localization.bundles.getOrCompute().forEachIndexed { index, bundle ->
+                val name = bundle.locale.name
+                val locale = bundle.locale.locale
+                val (pane, button) = createRadioButtonOption({ name }, toggleGroup)
+                button.setOnAction { 
+                    button.checkedState.set(true)
+                    val currentBundles = Localization.bundles.getOrCompute()
+                    Localization.currentBundle.set(currentBundles.find { it.locale.locale == locale } ?: currentBundles.first())
+                    settings.locale.set("${locale.language}_${locale.country}_${locale.variant}")
+                }
+                vbox += pane
+                
+                if (bundle == Localization.currentBundle.getOrCompute() || index == 0) {
+                    button.selectedState.set(true)
+                }
+            }
+
+            // TODO remove me when another language is added
+            vbox += TextLabel("More languages (hopefully) coming soon!").apply {
+                this.markup.set(this@LanguageMenu.markup)
+                this.bounds.height.set(75f)
+                this.renderAlign.set(Align.left)
+                this.doLineWrapping.set(true)
+                this.textColor.set(LongButtonSkin.TEXT_COLOR)
+                this.setScaleXY(1f)
+            }
         }
         
         vbox.sizeHeightToChildren(100f)

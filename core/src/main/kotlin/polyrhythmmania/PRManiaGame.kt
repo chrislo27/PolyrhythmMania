@@ -46,6 +46,7 @@ import polyrhythmmania.util.TempFileUtils
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
 import kotlin.concurrent.thread
 
 
@@ -100,6 +101,32 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         PRManiaSkins
         settings = Settings(this, preferences).apply { 
             load()
+            
+            // Find correct locale or default back to first one
+            val localeStr = this.locale.getOrCompute()
+            if (localeStr != "") {
+                val split = localeStr.split('_')
+                val language = split.first()
+                val country = split.getOrNull(1)
+                val variant = split.getOrNull(2)
+                
+                val bundles = Localization.bundles.getOrCompute()
+                val correctLocaleBundle = bundles.find {
+                    it.locale.locale.language == language && it.locale.locale.country == country && it.locale.locale.variant == variant
+                } ?: bundles.find {
+                    it.locale.locale.language == language && it.locale.locale.country == country
+                } ?: bundles.find {
+                    it.locale.locale.language == language
+                }
+                
+                if (correctLocaleBundle == null) {
+                    this.locale.set("")
+                } else {
+                    Localization.currentBundle.set(correctLocaleBundle)
+                }
+            }
+            
+            // Set correct mixer
             val mixerHandler = SoundSystem.defaultMixerHandler
             val mixerString = this.mixer.getOrCompute()
             if (mixerString.isNotEmpty()) {

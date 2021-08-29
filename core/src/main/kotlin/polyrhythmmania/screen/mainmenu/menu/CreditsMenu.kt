@@ -91,17 +91,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.renderAlign.set(Align.topLeft)
                 this.textAlign.set(TextAlign.LEFT)
                 this.doLineWrapping.set(true)
-                val scale = 0.75f
-                val textBlock = Var {
-                    val label = this@apply
-                    TextRun(label.font.use(), label.text.use(), Color.WHITE,
-                            scale, scale).toTextBlock().also { textBlock ->
-                        if (label.doLineWrapping.use()) {
-                            textBlock.lineWrapping = label.contentZone.width.useF()
-                        }
-                    }
-                }
-                this.internalTextBlock.bind { textBlock.use() }
+                this.setScaleXY(0.75f)
             }
         }
         vbox.sizeHeightToChildren(100f)
