@@ -47,10 +47,7 @@ import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.mainmenu.bg.MainMenuBg
-import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu
-import polyrhythmmania.screen.mainmenu.menu.MMMenu
-import polyrhythmmania.screen.mainmenu.menu.MenuCollection
-import polyrhythmmania.screen.mainmenu.menu.UppermostMenu
+import polyrhythmmania.screen.mainmenu.menu.*
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.beads.ugen.Bandpass
@@ -294,7 +291,11 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             val github = main.githubVersion.use()
             github != Version.ZERO && github > PRMania.VERSION
         }
-        sceneRoot += Tooltip("${PRMania.VERSION}", font = main.fontMainMenuMain).apply {
+        sceneRoot += Tooltip(binding = {
+            if (PRMania.portableMode) Localization.getVar("mainMenu.portableModeVersion", Var {
+                listOf(PRMania.VERSION.toString())
+            }).use() else PRMania.VERSION.toString()
+        }, font = main.fontMainMenuMain).apply {
             Anchor.BottomRight.configure(this)
             resizeBoundsToContent()
             this.bounds.height.set(32f)
@@ -336,6 +337,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
         menuCollection.uppermostMenu.visible.addListener(visibleListener)
         menuCollection.audioSettingsMenu.visible.addListener(visibleListener)
+        
+        if (PRMania.possiblyNewPortableMode) {
+            val m = PortableModeWarningMenu(menuCollection)
+            menuCollection.addMenu(m)
+            menuCollection.pushNextMenu(m, playSound = false)
+        }
     }
 
     override fun render(delta: Float) {
