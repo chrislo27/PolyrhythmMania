@@ -45,6 +45,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val videoSettingsMenu: VideoSettingsMenu = VideoSettingsMenu(this)
     val inputSettingsMenu: InputSettingsMenu = InputSettingsMenu(this)
     val dataSettingsMenu: DataSettingsMenu = DataSettingsMenu(this)
+    val languageMenu: LanguageMenu = LanguageMenu(this)
     
     init {
         addStockMenus()
@@ -67,6 +68,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(advancedAudioMenu)
         addMenu(inputSettingsMenu)
         addMenu(dataSettingsMenu)
+        addMenu(languageMenu)
     }
     
     fun addMenu(menu: MMMenu) {
