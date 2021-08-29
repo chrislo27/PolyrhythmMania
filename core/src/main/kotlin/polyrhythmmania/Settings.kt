@@ -19,6 +19,7 @@ import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
+import polyrhythmmania.PreferenceKeys.SETTINGS_LOCALE
 import polyrhythmmania.PreferenceKeys.SETTINGS_MAINMENU_FLIP_ANIMATION
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
@@ -44,6 +45,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         constructor(key: String, defaultValue: T) : this(key, Var(defaultValue), defaultValue)
     }
 
+    private val kv_locale: KeyValue<String> = KeyValue(SETTINGS_LOCALE, "")
     private val kv_gameplayVolume: KeyValue<Int> = KeyValue(SETTINGS_GAMEPLAY_VOLUME, 50)
     private val kv_menuMusicVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_MUSIC_VOLUME, 50)
     private val kv_menuSfxVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, 50)
@@ -72,6 +74,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_endlessHighScore: KeyValue<EndlessHighScore> = KeyValue(ENDLESS_HIGH_SCORE, EndlessHighScore.ZERO)
     private val kv_assembleNormalHighScore: KeyValue<Int> = KeyValue(SIDEMODE_ASSEMBLE_NORMAL, 0)
 
+    val locale: Var<String> = kv_locale.value
     val gameplayVolume: Var<Int> = kv_gameplayVolume.value
     val menuMusicVolume: Var<Int> = kv_menuMusicVolume.value
     val menuSfxVolume: Var<Int> = kv_menuSfxVolume.value
@@ -114,6 +117,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_discordRichPresence)
         prefs.getString(kv_mixer, "")
         prefs.getBoolean(kv_mainMenuFlipAnimations)
+        prefs.getString(kv_locale, "")
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
@@ -146,6 +150,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_discordRichPresence)
                 .putString(kv_mixer)
                 .putBoolean(kv_mainMenuFlipAnimations)
+                .putString(kv_locale)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)

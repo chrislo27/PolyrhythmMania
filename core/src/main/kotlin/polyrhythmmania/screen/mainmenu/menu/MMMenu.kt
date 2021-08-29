@@ -256,6 +256,23 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         return settingsOptionPane to checkBox
     }
 
+    protected fun createRadioButtonOption(labelText: Var.Context.() -> String, toggleGroup: ToggleGroup,
+                                          font: PaintboxFont = this.font,
+                                          percentageContent: Float = 1f): Pair<SettingsOptionPane, RadioButton> {
+        val settingsOptionPane = createSettingsOption({ "" }, font, percentageContent)
+        val radioButton = RadioButton(binding = labelText, font = font).apply { 
+            Anchor.TopRight.configure(this)
+            toggleGroup.addToggle(this)
+            this.color.bind { settingsOptionPane.textColorVar.use() }
+            this.textLabel.renderAlign.set(Align.left)
+            this.textLabel.textAlign.set(TextAlign.LEFT)
+            this.imageNode.margin.set(this.imageNode.margin.getOrCompute().copy(left = 0f))
+        }
+        settingsOptionPane.content += radioButton
+        
+        return settingsOptionPane to radioButton
+    }
+
     protected fun <T> createCycleOption(items: List<T>, firstItem: T,
                                         labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
                                         percentageContent: Float = 0.5f, twoRowsTall: Boolean = false,

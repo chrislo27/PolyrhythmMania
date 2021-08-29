@@ -42,7 +42,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
                             /*label.scaleX.use(), label.scaleY.use()*/ 1f, 1f).toTextBlock()
                 }.also { textBlock ->
                     if (label.doLineWrapping.use()) {
-                        textBlock.lineWrapping = label.contentZone.width.useF()
+                        textBlock.lineWrapping = label.contentZone.width.useF() / (if (label.doesScaleXAffectWrapping.use()) label.scaleX.useF() else 1f)
                     }
                 }
             }
@@ -71,6 +71,8 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
      * Determines the y-scale the text is rendered at.
      */
     val scaleY: FloatVar = FloatVar(1f)
+    
+    val doesScaleXAffectWrapping: Var<Boolean> = Var(true)
 
     /**
      * If the alpha value is 0, the skin controls what background colour is used.

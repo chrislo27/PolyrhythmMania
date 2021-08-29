@@ -1,11 +1,14 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
+import paintbox.ui.control.TextLabel
+import paintbox.ui.control.ToggleGroup
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
@@ -13,15 +16,15 @@ import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
 
 
-class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     private val settings: Settings = menuCol.main.settings
     
     init {
-        this.setSize(MMMenu.WIDTH_EXTRA_SMALL)
-        this.titleText.bind { Localization.getVar("mainMenu.settings.title").use() }
+        this.setSize(MMMenu.WIDTH_SMALL)
+        this.titleText.bind { Localization.getVar("mainMenu.language.title").use() }
         this.contentPane.bounds.height.set(300f)
-        
+
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
             this.bindHeightToParent(-40f)
@@ -54,35 +57,44 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.bindHeightToParent(-40f)
         }
         vbox.temporarilyDisableLayouts {
-            vbox += createLongButton { Localization.getVar("mainMenu.settings.audio").use() }.apply {
-                this.setOnAction { 
-                    menuCol.pushNextMenu(menuCol.audioSettingsMenu)
+            vbox += TextLabel(binding = { Localization.getVar("mainMenu.language.inaccuracy").use() }).apply {
+                this.markup.set(this@LanguageMenu.markup)
+                this.bounds.height.set(55f)
+                this.renderAlign.set(Align.topLeft)
+                this.doLineWrapping.set(true)
+                this.textColor.set(LongButtonSkin.TEXT_COLOR)
+                this.setScaleXY(0.75f)
+            }
+            
+            val toggleGroup = ToggleGroup()
+            Localization.bundles.getOrCompute().forEachIndexed { index, bundle ->
+                val name = bundle.locale.name
+                val locale = bundle.locale.locale
+                val (pane, button) = createRadioButtonOption({ name }, toggleGroup)
+                button.setOnAction { 
+                    button.checkedState.set(true)
+                    val currentBundles = Localization.bundles.getOrCompute()
+                    Localization.currentBundle.set(currentBundles.find { it.locale.locale == locale } ?: currentBundles.first())
+                    settings.locale.set("${locale.language}_${locale.country}_${locale.variant}")
+                }
+                vbox += pane
+                
+                if (bundle == Localization.currentBundle.getOrCompute() || index == 0) {
+                    button.selectedState.set(true)
                 }
             }
-            vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {
-                this.setOnAction {
-                    val menu = menuCol.videoSettingsMenu
-                    menu.prepareShow()
-                    menuCol.pushNextMenu(menu)
-                }
-            }
-            vbox += createLongButton { Localization.getVar("mainMenu.settings.input").use() }.apply {
-                this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.inputSettingsMenu)
-                }
-            }
-            vbox += createLongButton { Localization.getVar("mainMenu.settings.data").use() }.apply {
-                this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.dataSettingsMenu)
-                }
-            }
-            vbox += createLongButton { Localization.getVar("mainMenu.settings.language").use() }.apply {
-                this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.languageMenu)
-                }
+
+            // TODO remove me when another language is added
+            vbox += TextLabel("More languages (hopefully) coming soon!").apply {
+                this.markup.set(this@LanguageMenu.markup)
+                this.bounds.height.set(75f)
+                this.renderAlign.set(Align.left)
+                this.doLineWrapping.set(true)
+                this.textColor.set(LongButtonSkin.TEXT_COLOR)
+                this.setScaleXY(1f)
             }
         }
-
+        
         vbox.sizeHeightToChildren(100f)
         scrollPane.setContent(vbox)
 
@@ -91,8 +103,6 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.bounds.width.set(100f)
                 this.setOnAction {
                     menuCol.popLastMenu()
-                    settings.persist()
-                    Paintbox.LOGGER.info("Settings persisted")
                 }
             }
         }

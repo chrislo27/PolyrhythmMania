@@ -83,7 +83,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.audioSettings.resetLevels").use() }).apply {
-                this.bounds.width.set(200f)
+                this.bounds.width.set(300f)
                 this.setOnAction {
                     listOf(gameplayVolSlider, menuMusicVolSlider, menuSfxVolSlider).forEach { 
                         it.setValue(50f)

@@ -354,10 +354,9 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.marker.firstBeat.tooltip")))
                     this.textLabel.text.bind { loc.use() }
                     this.textLabel.markup.set(editorPane.palette.markup)
-                    this.textLabel.textColor.set(white)
                     toggleGroup.addToggle(this)
-                    this.imageNode.tint.set(white)
                     this.imageNode.padding.set(Insets(4f))
+                    this.color.set(white)
                     this.bounds.width.set(radioWidth)
                     this.onSelected = {
                         currentMarker.set(MarkerType.FIRST_BEAT)
@@ -372,10 +371,9 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.marker.loopStart.tooltip")))
                     this.textLabel.text.bind { loc.use() }
                     this.textLabel.markup.set(editorPane.palette.markup)
-                    this.textLabel.textColor.set(white)
                     toggleGroup.addToggle(this)
-                    this.imageNode.tint.set(white)
                     this.imageNode.padding.set(Insets(4f))
+                    this.color.set(white)
                     this.bounds.width.set(radioWidth)
                     this.selectedState.addListener {
                         if (it.getOrCompute()) currentMarker.set(MarkerType.LOOP_START)
@@ -392,9 +390,8 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.marker.loopEnd.tooltip")))
                     this.textLabel.text.bind { loc.use() }
                     this.textLabel.markup.set(editorPane.palette.markup)
-                    this.textLabel.textColor.set(white)
                     toggleGroup.addToggle(this)
-                    this.imageNode.tint.set(white)
+                    this.color.set(white)
                     this.imageNode.padding.set(Insets(4f))
                     this.bounds.width.set(radioWidth)
                     this.onSelected = {

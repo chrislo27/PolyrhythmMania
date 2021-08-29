@@ -124,14 +124,13 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                     this.textLabel.margin.set(Insets(0f, 0f, 8f, 8f))
                     this.textLabel.markup.set(editorPane.palette.markup)
                     if (canChangeEnabledState) {
-                        this.textLabel.textColor.bind {
+                        this.color.bind {
                             val enabled = mapping.enabled.use()
                             if (enabled) Color.WHITE else Color.GRAY
                         }
                     } else {
-                        this.textLabel.textColor.set(Color.WHITE.cpy())
+                        this.color.set(Color.WHITE.cpy())
                     }
-                    this.imageNode.tint.set(Color.WHITE.cpy())
                     this.imageNode.padding.set(Insets(4f))
                     toggleGroup.addToggle(this)
                     this.bounds.height.set(48f)
@@ -317,10 +316,9 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                 this += RadioButton(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset.pr1").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
-                    this.textLabel.textColor.set(Color.WHITE.cpy())
                     this.textLabel.markup.set(editorPane.palette.markup)
-                    this.imageNode.tint.set(Color.WHITE.cpy())
                     this.imageNode.padding.set(Insets(1f))
+                    this.color.set(Color.WHITE.cpy())
                     toggleGroup.addToggle(this)
                     this.onSelected = {
                         resetDefault = availableResetDefaults[0]
@@ -330,9 +328,8 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                 this += RadioButton(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset.pr2").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
-                    this.textLabel.textColor.set(Color.WHITE.cpy())
                     this.textLabel.markup.set(editorPane.palette.markup)
-                    this.imageNode.tint.set(Color.WHITE.cpy())
+                    this.color.set(Color.WHITE.cpy())
                     this.imageNode.padding.set(Insets(1f))
                     toggleGroup.addToggle(this)
                     this.onSelected = {
@@ -348,7 +345,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                     this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
                     this.textLabel.textColor.set(Color.WHITE.cpy())
                     this.textLabel.markup.set(editorPane.palette.markup)
-                    this.imageNode.tint.set(Color.WHITE.cpy())
+                    this.color.set(Color.WHITE.cpy())
                     this.imageNode.padding.set(Insets(1f))
                     toggleGroup.addToggle(this)
                     this.onSelected = {
@@ -359,9 +356,8 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                     this += RadioButton(binding = { Localization.getVar("editor.dialog.tilesetPalette.reset.base").use() },
                             font = editorPane.palette.musicDialogFont).apply {
                         this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
-                        this.textLabel.textColor.set(Color.WHITE.cpy())
-                        this.imageNode.tint.set(Color.WHITE.cpy())
                         this.imageNode.padding.set(Insets(1f))
+                        this.color.set(Color.WHITE.cpy())
                         toggleGroup.addToggle(this)
                         this.onSelected = {
                             resetDefault = availableResetDefaults[3]
