@@ -42,6 +42,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private var firstShow: Boolean = true
     private val isFetching: Var<Boolean> = Var(false)
     private val leaderboardList: Var<List<DailyLeaderboardScore>?> = Var(null)
+    private var leaderboardDate: LocalDate = dailyChallengeDate.getOrCompute()
     private val scrollPaneContent: Var<Pane> = Var(Pane())
 
     init {
@@ -210,7 +211,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.refreshLeaderboard").use() }).apply {
                 this.bounds.width.set(250f)
                 this.setOnAction {
-                    DailyChallengeUtils.getLeaderboard(dailyChallengeDate.getOrCompute(), leaderboardList, isFetching)
+                    getLeaderboard()
                 }
                 this.disabled.bind { 
                     isFetching.use()
@@ -222,10 +223,16 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     fun prepareShow(): DailyChallengeMenu {
         if (firstShow) {
             firstShow = false
-            DailyChallengeUtils.getLeaderboard(dailyChallengeDate.getOrCompute(), leaderboardList, isFetching)
+            getLeaderboard()
         }
         
         return this
+    }
+    
+    private fun getLeaderboard() {
+        val date = dailyChallengeDate.getOrCompute()
+        leaderboardDate = date
+        DailyChallengeUtils.getLeaderboard(date, leaderboardList, isFetching)
     }
     
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
@@ -262,19 +269,27 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         this += TextLabel((this@createPane.name.takeUnless { it.isBlank() } ?: "..."), font = main.fontMainMenuThin).apply {
                             this.renderAlign.set(Align.left)
                             this.padding.set(Insets(0f, 0f, 4f, 4f))
-                            this.bounds.width.set(250f)
+                            this.bounds.width.set(300f)
                         }
                     }
 
                     this += TextLabel("${this@createPane.score}", font = main.fontMainMenuMain).apply {
                         Anchor.TopRight.configure(this)
                         this.renderAlign.set(Align.center)
-                        this.bounds.width.set(40f)
+                        this.bounds.width.set(64f)
                     }
                 }
             }
             
             this.temporarilyDisableLayouts { 
+                this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.header", Var { 
+                    listOf(leaderboardDate)
+                }).use() }, font = main.fontMainMenuMain).apply {
+                    this.renderAlign.set(Align.left)
+                    this.padding.set(Insets(0f, 0f, 4f, 4f))
+                    this.bounds.height.set(32f)
+                }
+                
                 var placeNumber = 1
                 var placeValue = -1
                 val sorted = list.sortedByDescending { it.score }
