@@ -238,11 +238,10 @@ class TexturePackEditDialog(editorPane: EditorPane,
                                     "[color=LIGHT_GRAY scale=0.8f]\n${listEntry.id}[]"
                         }
                         RadioButton(binding = { textBinding.use() }, font = editorPane.palette.musicDialogFont).apply {
-                            this.textLabel.textColor.set(Color.WHITE.cpy())
                             this.textLabel.margin.set(Insets(0f, 0f, 0f, 8f))
                             this.textLabel.markup.set(editorPane.palette.markup)
-                            this.imageNode.tint.set(Color.WHITE.cpy())
                             this.imageNode.padding.set(Insets(6f, 6f, 6f, 10f))
+                            this.color.set(Color.WHITE.cpy())
                             this.bounds.height.set(48f)
                             toggleGroup.addToggle(this)
                             this.onSelected = {
@@ -486,10 +485,9 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this += RadioButton(binding = { Localization.getVar("editor.dialog.texturePack.stock.gba").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
-                    this.textLabel.textColor.set(Color.WHITE.cpy())
                     this.textLabel.markup.set(editorPane.palette.markup)
-                    this.imageNode.tint.set(Color.WHITE.cpy())
                     this.imageNode.padding.set(Insets(1f))
+                    this.color.set(Color.WHITE.cpy())
                     toggleGroup.addToggle(this)
                     this.onSelected = {
                         baseTexturePack.set(StockTexturePacks.gba)
@@ -500,10 +498,9 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this += RadioButton(binding = { Localization.getVar("editor.dialog.texturePack.stock.hd").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
-                    this.textLabel.textColor.set(Color.WHITE.cpy())
                     this.textLabel.markup.set(editorPane.palette.markup)
-                    this.imageNode.tint.set(Color.WHITE.cpy())
                     this.imageNode.padding.set(Insets(1f))
+                    this.color.set(Color.WHITE.cpy())
                     toggleGroup.addToggle(this)
                     this.onSelected = {
                         baseTexturePack.set(StockTexturePacks.hd)
@@ -764,8 +761,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     val tint: ReadOnlyVar<Color> = Var {
                         if (apparentDisabledState.use()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
                     }
-                    this.textLabel.textColor.bind { tint.use() }
-                    this.imageNode.tint.bind { tint.use() }
+                    this.color.bind { tint.use() }
                     this.imageNode.padding.set(Insets(3f))
                     filterToggleGroup.addToggle(this)
                     this.disabled.bind {
@@ -796,8 +792,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     val tint: ReadOnlyVar<Color> = Var {
                         if (apparentDisabledState.use()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
                     }
-                    this.textLabel.textColor.bind { tint.use() }
-                    this.imageNode.tint.bind { tint.use() }
+                    this.color.bind { tint.use() }
                     this.imageNode.padding.set(Insets(3f))
                     filterToggleGroup.addToggle(this)
                     this.disabled.bind {

@@ -32,6 +32,7 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
         }
     }
 
+    val color: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
     val textLabel: TextLabel = TextLabel(text, font)
     val imageNode: ImageNode = ImageNode(null, ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
 
@@ -59,8 +60,10 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
             val state = checkedState.use()
             getTextureRegionForType(state)
         }
-        imageNode.tint.set(Color(0f, 0f, 0f, 1f))
         imageNode.margin.set(Insets(2f))
+
+        textLabel.textColor.bind { color.use() }
+        imageNode.tint.bind { color.use() }
 
         this.addChild(textLabel)
         this.addChild(imageNode)
