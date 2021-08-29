@@ -9,6 +9,7 @@ import paintbox.desktop.PaintboxDesktopLauncher
 import paintbox.logging.Logger
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
+import java.io.File
 
 object DesktopLauncher {
 
@@ -41,6 +42,14 @@ object DesktopLauncher {
             return
         }
 
+        val portableMode: Boolean = arguments.portableMode
+        PRMania.portableMode = portableMode // Has to be set before any calls to PRMania.MAIN_FOLDER!
+        if (portableMode) {
+            if (!File(".polyrhythmmania/").exists()) {
+                PRMania.possiblyNewPortableMode = true
+            }
+        }
+        
         val app = PRManiaGame(PRManiaGame.createPaintboxSettings(args.toList(), Logger(), PRMania.MAIN_FOLDER.resolve("logs/")))
         
         PRMania.logMissingLocalizations = arguments.logMissingLocalizations
@@ -57,7 +66,7 @@ object DesktopLauncher {
             this.setAudioConfig(100, 4096, 16)
             this.setHdpiMode(HdpiMode.Logical)
             this.setBackBufferConfig(8, 8, 8, 8, 16, 0, /* samples = */ 2)
-            this.setPreferencesConfig(".polyrhythmmania/prefs/", Files.FileType.External)
+            this.setPreferencesConfig(".polyrhythmmania/prefs/", if (portableMode) Files.FileType.Local else Files.FileType.External)
             
             val sizes: List<Int> = listOf(32, 24, 16)
             this.setWindowIcon(Files.FileType.Internal, *sizes.map { "icon/$it.png" }.toTypedArray())

@@ -11,4 +11,7 @@ class PRManiaArguments : PaintboxArguments() {
     @Parameter(names = ["--dump-packed-sheets"], description = "Dump a copy of every packed sheet to a temp folder.")
     var dumpPackedSheets: Boolean = false
     
+    @Parameter(names = ["--portable-mode"], description = "The .polyrhythmmania/ directory will be local to the game executable instead of the user home.")
+    var portableMode: Boolean = false
+    
 }
