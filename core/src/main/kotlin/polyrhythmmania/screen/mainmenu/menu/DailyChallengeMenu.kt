@@ -40,6 +40,8 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     val dailyChallengeDate: Var<LocalDate> = Var(EndlessPolyrhythm.getCurrentDailyChallengeDate())
     
     private val isFetching: Var<Boolean> = Var(false)
+    private val disableRefresh: Var<Boolean> = Var(false)
+    private var disableRefreshUntil: Long = 0L
     private val leaderboardList: Var<List<DailyLeaderboardScore>?> = Var(null)
     private var leaderboardDate: LocalDate = dailyChallengeDate.getOrCompute()
     private val scrollPaneContent: Var<Pane> = Var(Pane())
@@ -227,7 +229,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     getLeaderboard()
                 }
                 this.disabled.bind { 
-                    isFetching.use()
+                    isFetching.use() || disableRefresh.use()
                 }
             }
         }
@@ -242,6 +244,8 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val date = dailyChallengeDate.getOrCompute()
         leaderboardDate = date
         DailyChallengeUtils.getLeaderboard(date, leaderboardList, isFetching)
+        disableRefresh.set(true)
+        disableRefreshUntil = System.currentTimeMillis() + 10_000L
     }
     
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
@@ -256,6 +260,9 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
         scrollPaneContent.getOrCompute() // Forces refresh.
+        if (disableRefresh.getOrCompute() && System.currentTimeMillis() > disableRefreshUntil) {
+            disableRefresh.set(false)
+        }
     }
     
     private fun createTable(list: List<DailyLeaderboardScore>): Pane {
