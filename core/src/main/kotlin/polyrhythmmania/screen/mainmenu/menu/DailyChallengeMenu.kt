@@ -39,12 +39,13 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private var epochSeconds: Long = System.currentTimeMillis() / 1000
     val dailyChallengeDate: Var<LocalDate> = Var(EndlessPolyrhythm.getCurrentDailyChallengeDate())
     
-    private var firstShow: Boolean = true
     private val isFetching: Var<Boolean> = Var(false)
     private val leaderboardList: Var<List<DailyLeaderboardScore>?> = Var(null)
     private var leaderboardDate: LocalDate = dailyChallengeDate.getOrCompute()
     private val scrollPaneContent: Var<Pane> = Var(Pane())
 
+    private var showRefreshPrompt: Boolean = true
+    
     init {
         this.setSize(MMMenu.WIDTH_MID)
         this.titleText.bind { Localization.getVar("mainMenu.dailyChallenge.title").use() }
@@ -164,7 +165,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             
             val paneFetching = Pane().apply {
                 this.bounds.height.set(200f)
-                this += TextLabel(binding = {Localization.getVar("mainMenu.dailyChallenge.leaderboard.fetching").use()}).apply { 
+                this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.fetching").use() }).apply {
                     this.renderAlign.set(Align.center)
                     this.doLineWrapping.set(true)
                     this.markup.set(this@DailyChallengeMenu.markup)
@@ -172,7 +173,15 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             val paneNoData = Pane().apply {
                 this.bounds.height.set(200f)
-                this += TextLabel(binding = {Localization.getVar("mainMenu.dailyChallenge.leaderboard.noData").use()}).apply { 
+                this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.noData").use() }).apply {
+                    this.renderAlign.set(Align.center)
+                    this.doLineWrapping.set(true)
+                    this.markup.set(this@DailyChallengeMenu.markup)
+                }
+            }
+            val paneNeedsRefresh = Pane().apply {
+                this.bounds.height.set(200f)
+                this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.needsRefresh").use() }).apply {
                     this.renderAlign.set(Align.center)
                     this.doLineWrapping.set(true)
                     this.markup.set(this@DailyChallengeMenu.markup)
@@ -182,11 +191,15 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 if (isFetching.use()) {
                     paneFetching
                 } else {
-                    val list = leaderboardList.use()
-                    if (list == null || list.isEmpty()) {
-                        paneNoData
+                    if (showRefreshPrompt) {
+                        paneNeedsRefresh
                     } else {
-                        createTable(list)
+                        val list = leaderboardList.use()
+                        if (list == null || list.isEmpty()) {
+                            paneNoData
+                        } else {
+                            createTable(list)
+                        }
                     }
                 }
             }
@@ -221,15 +234,11 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
     
     fun prepareShow(): DailyChallengeMenu {
-        if (firstShow) {
-            firstShow = false
-            getLeaderboard()
-        }
-        
         return this
     }
     
     private fun getLeaderboard() {
+        showRefreshPrompt = false
         val date = dailyChallengeDate.getOrCompute()
         leaderboardDate = date
         DailyChallengeUtils.getLeaderboard(date, leaderboardList, isFetching)
