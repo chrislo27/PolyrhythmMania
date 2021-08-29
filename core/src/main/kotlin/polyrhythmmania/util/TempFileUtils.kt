@@ -1,12 +1,12 @@
 package polyrhythmmania.util
 
-import polyrhythmmania.PRMania
 import java.io.File
 
 
 object TempFileUtils {
 
-    val TEMP_FOLDER: File = PRMania.MAIN_FOLDER.resolve("tmp/").apply { 
+    // The temp folder is always relative to the user home, regardless of portable mode
+    val TEMP_FOLDER: File = File(System.getProperty("user.home") + "/.polyrhythmmania/tmp/").apply { 
         mkdirs()
     }
     const val PREFIX: String = "prmania"
