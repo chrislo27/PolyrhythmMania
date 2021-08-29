@@ -43,7 +43,6 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 //    private val settings: Settings = menuCol.main.settings
 
     private var epochSeconds: Long = System.currentTimeMillis() / 1000
-    val dailyChallengeDate: Var<LocalDate> = Var(EndlessPolyrhythm.getCurrentDailyChallengeDate())
 
     init {
         this.setSize(MMMenu.WIDTH_SMALL)
@@ -116,53 +115,13 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 })))
             }
+            val dailyChallengeDate = menuCol.dailyChallengeMenu.dailyChallengeDate
             val dailyChallengeTitle: ReadOnlyVar<String> = Localization.getVar("mainMenu.play.endless.daily", Var {
                 listOf(dailyChallengeDate.use().format(DateTimeFormatter.ISO_DATE))
             })
             vbox += createLongButton { dailyChallengeTitle.use() }.apply {
                 this.setOnAction {
-                    menuCol.playMenuSound("sfx_menu_enter_game")
-                    mainMenu.transitionAway {
-                        val main = mainMenu.main
-                        Gdx.app.postRunnable {
-                            val date = dailyChallengeDate.getOrCompute()
-                            val scoreVar = Var(0)
-                            scoreVar.addListener {
-                                main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
-                            }
-                            val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main,
-                                    EndlessModeScore(scoreVar, showHighScore = false),
-                                    EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
-                            val playScreen = PlayScreen(main, sidemode, sidemode.container, challenges = Challenges.NO_CHANGES, showResults = false)
-                            main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
-                            main.settings.persist()
-                            main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
-                                this.onEntryEnd = {
-                                    sidemode.prepare()
-                                    playScreen.resetAndStartOver(false, false)
-                                    DiscordHelper.updatePresence(DefaultPresences.PlayingDailyChallenge(date))
-                                    mainMenu.backgroundType = BgType.ENDLESS
-                                }
-                            }
-                            
-                            // Get UUID nonce from high score server
-                            DailyChallengeUtils.sendNonceRequest(date, sidemode.dailyChallengeUUIDNonce)
-                        }
-                    }
-                }
-                this.tooltipElement.set(createTooltip(binding = {
-                    val (date, hiScore) = main.settings.endlessDailyChallenge.use()
-                    if (date == dailyChallengeDate.use()) {
-                        Localization.getVar("mainMenu.play.endless.daily.tooltip.expired", Var {
-                            listOf(hiScore)
-                        })
-                    } else {
-                        Localization.getVar("mainMenu.play.endless.daily.tooltip.ready")
-                    }.use()
-                }))
-                this.disabled.bind {
-                    val (date, _) = main.settings.endlessDailyChallenge.use()
-                    date == dailyChallengeDate.use()
+                    menuCol.pushNextMenu(menuCol.dailyChallengeMenu)
                 }
             }
 
@@ -182,18 +141,6 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setOnAction {
                     menuCol.popLastMenu()
                 }
-            }
-        }
-    }
-
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-        super.renderSelf(originX, originY, batch)
-
-        val newEpochSeconds = System.currentTimeMillis() / 1000
-        if (newEpochSeconds != epochSeconds) {
-            val newLocalDate = EndlessPolyrhythm.getCurrentDailyChallengeDate()
-            if (newLocalDate != dailyChallengeDate.getOrCompute()) {
-                dailyChallengeDate.set(newLocalDate)
             }
         }
     }

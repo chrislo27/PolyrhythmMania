@@ -1,0 +1,193 @@
+package polyrhythmmania.screen.mainmenu.menu
+
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.utils.Align
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
+import paintbox.registry.AssetRegistry
+import paintbox.transition.FadeIn
+import paintbox.transition.TransitionScreen
+import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
+import paintbox.ui.UIElement
+import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
+import paintbox.ui.control.*
+import paintbox.ui.element.RectElement
+import paintbox.ui.layout.HBox
+import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.grey
+import polyrhythmmania.Localization
+import polyrhythmmania.discordrpc.DefaultPresences
+import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.sidemodes.EndlessModeScore
+import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.sidemodes.endlessmode.*
+import polyrhythmmania.ui.PRManiaSkins
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
+
+
+class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+
+    private var epochSeconds: Long = System.currentTimeMillis() / 1000
+    val dailyChallengeDate: Var<LocalDate> = Var(EndlessPolyrhythm.getCurrentDailyChallengeDate())
+    
+    private val leaderboardList: Var<List<DailyLeaderboardScore>?> = Var(null)
+
+    init {
+        this.setSize(MMMenu.WIDTH_MID)
+        this.titleText.bind { Localization.getVar("mainMenu.dailyChallenge.title").use() }
+        this.contentPane.bounds.height.set(520f)
+        this.showLogo.set(false)
+
+        val scrollPane = ScrollPane().apply {
+            Anchor.TopLeft.configure(this)
+            this.bindHeightToParent(-40f)
+
+            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+
+            this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+
+            val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+            this.vBar.skinID.set(scrollBarSkinID)
+            this.hBar.skinID.set(scrollBarSkinID)
+
+            this.vBar.unitIncrement.set(10f)
+            this.vBar.blockIncrement.set(40f)
+        }
+        val hbox = HBox().apply {
+            Anchor.BottomLeft.configure(this)
+            this.spacing.set(8f)
+            this.padding.set(Insets(2f))
+            this.bounds.height.set(40f)
+        }
+
+        contentPane.addChild(scrollPane)
+        contentPane.addChild(hbox)
+
+
+        val vbox = VBox().apply {
+            Anchor.TopLeft.configure(this)
+            this.spacing.set(0f)
+            this.bindHeightToParent(-40f)
+        }
+
+        vbox.temporarilyDisableLayouts {
+            val dailyChallengeTitle: ReadOnlyVar<String> = Localization.getVar("mainMenu.dailyChallenge.play", Var {
+                listOf(dailyChallengeDate.use().format(DateTimeFormatter.ISO_DATE))
+            })
+            vbox += createLongButton { dailyChallengeTitle.use() }.apply {
+                this.setOnAction {
+                    menuCol.playMenuSound("sfx_menu_enter_game")
+                    mainMenu.transitionAway {
+                        val main = mainMenu.main
+                        Gdx.app.postRunnable {
+                            val date = dailyChallengeDate.getOrCompute()
+                            val scoreVar = Var(0)
+                            scoreVar.addListener {
+                                main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
+                            }
+                            val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main,
+                                    EndlessModeScore(scoreVar, showHighScore = false),
+                                    EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
+                            val playScreen = PlayScreen(main, sidemode, sidemode.container, challenges = Challenges.NO_CHANGES, showResults = false)
+                            main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
+                            main.settings.persist()
+                            main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                                this.onEntryEnd = {
+                                    sidemode.prepare()
+                                    playScreen.resetAndStartOver(false, false)
+                                    DiscordHelper.updatePresence(DefaultPresences.PlayingDailyChallenge(date))
+                                    mainMenu.backgroundType = BgType.ENDLESS
+                                }
+                            }
+
+                            // Get UUID nonce from high score server
+                            DailyChallengeUtils.sendNonceRequest(date, sidemode.dailyChallengeUUIDNonce)
+                        }
+                    }
+                }
+                this.tooltipElement.set(createTooltip(binding = {
+                    val (date, hiScore) = main.settings.endlessDailyChallenge.use()
+                    if (date == dailyChallengeDate.use()) {
+                        Localization.getVar("mainMenu.dailyChallenge.play.tooltip.expired", Var {
+                            listOf(hiScore)
+                        })
+                    } else {
+                        Localization.getVar("mainMenu.dailyChallenge.play.tooltip.ready")
+                    }.use()
+                }))
+                this.disabled.bind {
+                    val (date, _) = main.settings.endlessDailyChallenge.use()
+                    date == dailyChallengeDate.use()
+                }
+            }
+            
+            
+            fun separator(): UIElement {
+                return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
+                    this.bounds.height.set(10f)
+                    this.margin.set(Insets(4f, 4f, 0f, 0f))
+                }
+            }
+            
+            vbox += separator()
+            
+            // TODO add leaderboard
+            val leaderboardScrollPane = ScrollPane().apply {
+                Anchor.TopLeft.configure(this)
+                this.bounds.height.set(190f)
+
+                (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+
+                this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+                this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+
+                val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+                this.vBar.skinID.set(scrollBarSkinID)
+                this.hBar.skinID.set(scrollBarSkinID)
+
+                this.vBar.unitIncrement.set(10f)
+                this.vBar.blockIncrement.set(40f)
+            }
+            
+            vbox += leaderboardScrollPane
+        }
+
+        vbox.sizeHeightToChildren(100f)
+        scrollPane.setContent(vbox)
+        
+        hbox.temporarilyDisableLayouts {
+            hbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
+                this.bounds.width.set(100f)
+                this.setOnAction {
+                    menuCol.popLastMenu()
+                }
+            }
+        }
+    }
+    
+    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        super.renderSelf(originX, originY, batch)
+
+        val newEpochSeconds = System.currentTimeMillis() / 1000
+        if (newEpochSeconds != epochSeconds) {
+            epochSeconds = newEpochSeconds
+            val newLocalDate = EndlessPolyrhythm.getCurrentDailyChallengeDate()
+            if (newLocalDate != dailyChallengeDate.getOrCompute()) {
+                dailyChallengeDate.set(newLocalDate)
+            }
+        }
+    }
+    
+}

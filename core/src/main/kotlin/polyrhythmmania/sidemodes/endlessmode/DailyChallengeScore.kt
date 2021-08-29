@@ -1,5 +1,9 @@
 package polyrhythmmania.sidemodes.endlessmode
 
+import com.badlogic.gdx.Gdx
+import com.eclipsesource.json.Json
+import com.eclipsesource.json.JsonObject
+import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.utils.URIBuilder
 import org.apache.http.util.EntityUtils
@@ -24,6 +28,8 @@ data class EndlessHighScore(val seed: UInt, val score: Int) {
         val ZERO: EndlessHighScore = EndlessHighScore(0u, -1)
     }
 }
+
+data class DailyLeaderboardScore(val countryCode: String, val score: Int, val name: String)
 
 object DailyChallengeUtils {
     
@@ -80,6 +86,41 @@ object DailyChallengeUtils {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+
+    fun getLeaderboard(date: LocalDate, listVar: Var<List<DailyLeaderboardScore>?>) {
+        thread(isDaemon = true, name = "Daily Challenge leaderboard GET", start = true) {
+            val uriBuilder = URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/top/${date.format(DateTimeFormatter.ISO_DATE)}")
+                    .setParameter("v", PRMania.VERSION.toString())
+
+            val get = HttpGet(uriBuilder.build())
+            var returnList: List<DailyLeaderboardScore>? = null
+            try {
+                val httpClient = PRManiaGame.instance.httpClient
+                httpClient.execute(get).use { response ->
+                    val status = response.statusLine.statusCode
+                    if (status != 200) {
+                        Paintbox.LOGGER.warn("Failed to get daily challenge leaderboard: status was $status for url ${get.uri} ${EntityUtils.toString(response.entity)}")
+                    } else {
+                        val content = EntityUtils.toString(response.entity)
+                        val jsonArray = Json.parse(content).asArray()
+                        val list = mutableListOf<DailyLeaderboardScore>()
+                        jsonArray.forEach { v ->
+                            v as JsonObject
+                            list += DailyLeaderboardScore(v.getString("countryCode", ""), v.getInt("score", 0), v.getString("name", ""))
+                        }
+                        returnList = list
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                returnList = null
+            }
+            
+            Gdx.app.postRunnable { 
+                listVar.set(returnList)
             }
         }
     }
