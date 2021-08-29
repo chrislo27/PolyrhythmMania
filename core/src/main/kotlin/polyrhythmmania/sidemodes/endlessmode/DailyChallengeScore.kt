@@ -90,8 +90,12 @@ object DailyChallengeUtils {
         }
     }
 
-    fun getLeaderboard(date: LocalDate, listVar: Var<List<DailyLeaderboardScore>?>) {
+    fun getLeaderboard(date: LocalDate, listVar: Var<List<DailyLeaderboardScore>?>, fetching: Var<Boolean>) {
         thread(isDaemon = true, name = "Daily Challenge leaderboard GET", start = true) {
+            Gdx.app.postRunnable { 
+                fetching.set(true)
+            }
+            
             val uriBuilder = URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/top/${date.format(DateTimeFormatter.ISO_DATE)}")
                     .setParameter("v", PRMania.VERSION.toString())
 
@@ -109,7 +113,8 @@ object DailyChallengeUtils {
                         val list = mutableListOf<DailyLeaderboardScore>()
                         jsonArray.forEach { v ->
                             v as JsonObject
-                            list += DailyLeaderboardScore(v.getString("countryCode", ""), v.getInt("score", 0), v.getString("name", ""))
+                            val countryCode = v["countryCode"]
+                            list += DailyLeaderboardScore(countryCode?.takeIf { it.isString }?.asString() ?: "unknown", v.getInt("score", 0), v.getString("name", ""))
                         }
                         returnList = list
                     }
@@ -120,6 +125,7 @@ object DailyChallengeUtils {
             }
             
             Gdx.app.postRunnable { 
+                fetching.set(false)
                 listVar.set(returnList)
             }
         }

@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -13,9 +12,9 @@ import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
+import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
-import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
@@ -28,12 +27,11 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.EndlessModeScore
-import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.*
 import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.util.flags.CountryFlags
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -41,7 +39,10 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private var epochSeconds: Long = System.currentTimeMillis() / 1000
     val dailyChallengeDate: Var<LocalDate> = Var(EndlessPolyrhythm.getCurrentDailyChallengeDate())
     
+    private var firstShow: Boolean = true
+    private val isFetching: Var<Boolean> = Var(false)
     private val leaderboardList: Var<List<DailyLeaderboardScore>?> = Var(null)
+    private val scrollPaneContent: Var<Pane> = Var(Pane())
 
     init {
         this.setSize(MMMenu.WIDTH_MID)
@@ -127,10 +128,10 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         Localization.getVar("mainMenu.dailyChallenge.play.tooltip.ready")
                     }.use()
                 }))
-                this.disabled.bind {
-                    val (date, _) = main.settings.endlessDailyChallenge.use()
-                    date == dailyChallengeDate.use()
-                }
+//                this.disabled.bind {
+//                    val (date, _) = main.settings.endlessDailyChallenge.use()
+//                    date == dailyChallengeDate.use()
+//                }
             }
             
             
@@ -143,10 +144,9 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             
             vbox += separator()
             
-            // TODO add leaderboard
             val leaderboardScrollPane = ScrollPane().apply {
                 Anchor.TopLeft.configure(this)
-                this.bounds.height.set(190f)
+                this.bounds.height.set(390f)
 
                 (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
 
@@ -159,6 +159,39 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
                 this.vBar.unitIncrement.set(10f)
                 this.vBar.blockIncrement.set(40f)
+            }
+            
+            val paneFetching = Pane().apply {
+                this.bounds.height.set(200f)
+                this += TextLabel(binding = {Localization.getVar("mainMenu.dailyChallenge.leaderboard.fetching").use()}).apply { 
+                    this.renderAlign.set(Align.center)
+                    this.doLineWrapping.set(true)
+                    this.markup.set(this@DailyChallengeMenu.markup)
+                }
+            }
+            val paneNoData = Pane().apply {
+                this.bounds.height.set(200f)
+                this += TextLabel(binding = {Localization.getVar("mainMenu.dailyChallenge.leaderboard.noData").use()}).apply { 
+                    this.renderAlign.set(Align.center)
+                    this.doLineWrapping.set(true)
+                    this.markup.set(this@DailyChallengeMenu.markup)
+                }
+            }
+            scrollPaneContent.bind { 
+                if (isFetching.use()) {
+                    paneFetching
+                } else {
+                    val list = leaderboardList.use()
+                    if (list == null || list.isEmpty()) {
+                        paneNoData
+                    } else {
+                        createTable(list)
+                    }
+                }
+            }
+            
+            scrollPaneContent.addListener {
+                leaderboardScrollPane.setContent(it.getOrCompute())
             }
             
             vbox += leaderboardScrollPane
@@ -174,7 +207,25 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.popLastMenu()
                 }
             }
+            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.refreshLeaderboard").use() }).apply {
+                this.bounds.width.set(250f)
+                this.setOnAction {
+                    DailyChallengeUtils.getLeaderboard(dailyChallengeDate.getOrCompute(), leaderboardList, isFetching)
+                }
+                this.disabled.bind { 
+                    isFetching.use()
+                }
+            }
         }
+    }
+    
+    fun prepareShow(): DailyChallengeMenu {
+        if (firstShow) {
+            firstShow = false
+            DailyChallengeUtils.getLeaderboard(dailyChallengeDate.getOrCompute(), leaderboardList, isFetching)
+        }
+        
+        return this
     }
     
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
@@ -187,6 +238,56 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             if (newLocalDate != dailyChallengeDate.getOrCompute()) {
                 dailyChallengeDate.set(newLocalDate)
             }
+        }
+        scrollPaneContent.getOrCompute() // Forces refresh.
+    }
+    
+    private fun createTable(list: List<DailyLeaderboardScore>): Pane {
+        return VBox().apply {
+            fun DailyLeaderboardScore.createPane(place: Int): Pane {
+                return Pane().apply {
+                    this.bounds.height.set(32f)
+                    this += HBox().apply {
+                        this.bindWidthToParent(adjust = -100f)
+                        this += TextLabel("${place}", font = main.fontMainMenuMain).apply {
+                            this.renderAlign.set(Align.right)
+                            this.padding.set(Insets(0f, 0f, 0f, 4f))
+                            this.bounds.width.set(52f)
+                        }
+                        val flag = CountryFlags.getFlagByCountryCode(this@createPane.countryCode)
+                        this += ImageNode(CountryFlags.getTextureRegionForFlag(flag,
+                                AssetRegistry.get<Texture>("country_flags"))).apply {
+                            this.bindWidthToSelfHeight()
+                        }
+                        this += TextLabel((this@createPane.name.takeUnless { it.isBlank() } ?: "..."), font = main.fontMainMenuThin).apply {
+                            this.renderAlign.set(Align.left)
+                            this.padding.set(Insets(0f, 0f, 4f, 4f))
+                            this.bounds.width.set(250f)
+                        }
+                    }
+
+                    this += TextLabel("${this@createPane.score}", font = main.fontMainMenuMain).apply {
+                        Anchor.TopRight.configure(this)
+                        this.renderAlign.set(Align.center)
+                        this.bounds.width.set(40f)
+                    }
+                }
+            }
+            
+            this.temporarilyDisableLayouts { 
+                var placeNumber = 1
+                var placeValue = -1
+                val sorted = list.sortedByDescending { it.score }
+                sorted.forEachIndexed { i, score ->
+                    if (score.score != placeValue) {
+                        placeValue = score.score
+                        placeNumber = i + 1
+                    }
+                    this += score.createPane(placeNumber)
+                }
+            }
+        }.apply { 
+            sizeHeightToChildren(100f)
         }
     }
     

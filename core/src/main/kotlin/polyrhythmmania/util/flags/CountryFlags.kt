@@ -26,12 +26,13 @@ object CountryFlags {
     val allFlagsByCodeLower: Map<String, Flag> by lazy { allFlags.associateBy { it.code.lowercase(Locale.ROOT) } }
     
     fun getFlagByCountryCode(countryCode: String): Flag {
-        return allFlagsByCodeLower.getOrDefault(countryCode.lowercase(Locale.ROOT), unknownFlag)
+        return allFlagsByCodeLower[countryCode.lowercase(Locale.ROOT)] ?: unknownFlag
     }
     
     fun getTextureRegionForFlag(flag: Flag, texture: Texture): TextureRegion {
-        val x = texture.height / ICON_SIZE
-        val y = texture.height % ICON_SIZE
-        return TextureRegion(texture, x, y, ICON_SIZE, ICON_SIZE)
+        val rows = texture.height / ICON_SIZE
+        val x = flag.index / rows
+        val y = flag.index % rows
+        return TextureRegion(texture, x * ICON_SIZE, y * ICON_SIZE, ICON_SIZE, ICON_SIZE)
     }
 }

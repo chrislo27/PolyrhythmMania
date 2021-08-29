@@ -121,7 +121,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             })
             vbox += createLongButton { dailyChallengeTitle.use() }.apply {
                 this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.dailyChallengeMenu)
+                    menuCol.pushNextMenu(menuCol.dailyChallengeMenu.prepareShow())
                 }
             }
 
