@@ -82,6 +82,8 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         }
     }
     
+    val dailyChallengeUUIDNonce: Var<UUID?> = Var(null)
+    
     private val colorChangeMultiplier: Int = VALID_COLOR_CHANGE_MULTIPLIERS[seed.toInt().absoluteValue % VALID_COLOR_CHANGE_MULTIPLIERS.size]
     val random: Random = Random(seed)
     val difficultyBags: Map<Difficulty, RandomBagIterator<Pattern>> = EndlessPatterns.patternsByDifficulty.entries.associate { 

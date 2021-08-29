@@ -44,9 +44,12 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.*
+import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
+import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.sidemodes.AbstractEndlessMode
 import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
@@ -107,7 +110,21 @@ class PlayScreen(
                 if (showResults) {
                     transitionToResults()
                 } else {
-                    quitToMainMenu(false)
+                    val sideMode = this.sideMode
+                    if (sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null) {
+                        val menuCol = main.mainMenuScreen.menuCollection
+                        val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
+                        val nonce = sideMode.dailyChallengeUUIDNonce.getOrCompute()
+                        if (score.score > 0) {
+                            val submitMenu = SubmitDailyChallengeScoreMenu(menuCol, sideMode.dailyChallenge, nonce, score)
+                            menuCol.addMenu(submitMenu)
+                            menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
+                        }
+
+                        quitToMainMenu(false)
+                    } else {
+                        quitToMainMenu(false)
+                    }
                 }
             }
         }

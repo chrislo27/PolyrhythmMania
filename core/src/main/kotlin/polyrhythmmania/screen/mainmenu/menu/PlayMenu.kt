@@ -3,6 +3,8 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.eclipsesource.json.Json
+import paintbox.Paintbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.transition.FadeIn
@@ -13,7 +15,9 @@ import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.Version
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.engine.input.Challenges
@@ -24,9 +28,14 @@ import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
+import polyrhythmmania.sidemodes.endlessmode.DailyChallengeUtils
 import polyrhythmmania.ui.PRManiaSkins
+import java.net.HttpURLConnection
+import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.concurrent.thread
 
 
 class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -121,7 +130,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             scoreVar.addListener {
                                 main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
                             }
-                            val sidemode: SideMode = EndlessPolyrhythm(main,
+                            val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main,
                                     EndlessModeScore(scoreVar, showHighScore = false),
                                     EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
                             val playScreen = PlayScreen(main, sidemode, sidemode.container, challenges = Challenges.NO_CHANGES, showResults = false)
@@ -135,6 +144,9 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     mainMenu.backgroundType = BgType.ENDLESS
                                 }
                             }
+                            
+                            // Get UUID nonce from high score server
+                            DailyChallengeUtils.sendNonceRequest(date, sidemode.dailyChallengeUUIDNonce)
                         }
                     }
                 }

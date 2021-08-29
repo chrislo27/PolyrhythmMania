@@ -13,6 +13,11 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.eclipsesource.json.Json
+import org.apache.http.client.HttpClient
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.http.impl.client.HttpClients
+import org.apache.http.util.EntityUtils
 import org.lwjgl.glfw.GLFW
 import paintbox.*
 import paintbox.binding.ReadOnlyVar
@@ -82,6 +87,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     private val permanentScreens: MutableList<PaintboxScreen> = mutableListOf()
     
     val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
+    
+    val httpClient: CloseableHttpClient by lazy { HttpClients.createMinimal() }
 
     override fun getTitle(): String = "${PRMania.TITLE} ${PRMania.VERSION}"
 
@@ -182,28 +189,23 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             }
         })
         thread(isDaemon = true, name = "GitHub version checker", start = true) {
+            val get = HttpGet("https://api.github.com/repos/${PRMania.GITHUB.substringAfter("https://github.com/", "")}/releases/latest")
             try {
-                val apiUrl = URL("https://api.github.com/repos/${PRMania.GITHUB.substringAfter("https://github.com/", "")}/releases/latest")
-                val con = apiUrl.openConnection() as HttpURLConnection
-                con.requestMethod = "GET"
-                val status = con.responseCode
-                if (status == 200) {
-                    val content = con.inputStream.bufferedReader().let {
-                        val text = it.readText()
-                        it.close()
-                        text
-                    }
-                    val parsed = Version.parse(Json.parse(content).asObject().getString("tag_name", ""))
-                    if (parsed != null) {
-                        Paintbox.LOGGER.info("Got version from server: $parsed")
-                        Gdx.app.postRunnable {
-                            (githubVersion as Var).set(parsed)
+                httpClient.execute(get).use { response ->
+                    val status = response.statusLine.statusCode
+                    if (status == 200) {
+                        val content = EntityUtils.toString(response.entity)
+                        val parsed = Version.parse(Json.parse(content).asObject().getString("tag_name", ""))
+                        if (parsed != null) {
+                            Paintbox.LOGGER.info("Got version from server: $parsed")
+                            Gdx.app.postRunnable {
+                                (githubVersion as Var).set(parsed)
+                            }
                         }
+                    } else {
+                        Paintbox.LOGGER.warn("Failed to get version from server: status was $status for url ${get.uri}")
                     }
-                } else {
-                    Paintbox.LOGGER.warn("Failed to get version from server: status was $status for url $apiUrl")
                 }
-                con.disconnect()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
