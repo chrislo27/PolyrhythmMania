@@ -26,6 +26,10 @@ built-in level editor and side modes.
 ## Installation instructions
 **Supported operating systems:** Windows 7 or newer, Linux (x86 and ARM)
 
+**System Specifications:** It is recommended to meet the 
+[same requirements as *Minecraft: Java Edition*](https://help.minecraft.net/hc/en-us/articles/360035131371-Minecraft-Java-Edition-system-requirements-)
+since the same underlying graphics library (GLFW) is used.
+
 These instructions are the same if you're downloading the game for the first time or upgrading to a new version.
 
 __Windows (64-bit only):__
