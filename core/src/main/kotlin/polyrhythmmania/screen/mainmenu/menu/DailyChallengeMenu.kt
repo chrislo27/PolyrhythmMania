@@ -128,10 +128,10 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         Localization.getVar("mainMenu.dailyChallenge.play.tooltip.ready")
                     }.use()
                 }))
-//                this.disabled.bind {
-//                    val (date, _) = main.settings.endlessDailyChallenge.use()
-//                    date == dailyChallengeDate.use()
-//                }
+                this.disabled.bind {
+                    val (date, _) = main.settings.endlessDailyChallenge.use()
+                    date == dailyChallengeDate.use()
+                }
             }
             
             

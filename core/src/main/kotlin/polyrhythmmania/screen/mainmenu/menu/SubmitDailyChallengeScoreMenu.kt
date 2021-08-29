@@ -71,7 +71,8 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
             this.bindHeightToParent(-40f)
         }
         
-        val nameText: Var<String> = Var(DiscordHelper.currentUser?.username ?: "")
+        val suggestedName = DiscordHelper.currentUser?.username ?: ""
+        val nameText: Var<String> = Var(suggestedName.takeUnless { it.any { c -> c !in DailyChallengeUtils.allowedNameChars } } ?: "")
         val hideCountry: Var<Boolean> = Var(false)
         
         vbox.temporarilyDisableLayouts {
@@ -121,6 +122,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
                     this.characterLimit.set(16)
                     this.textColor.set(Color(1f, 1f, 1f, 1f))
                     this.text.set(nameText.getOrCompute())
+                    this.inputFilter.set { it in DailyChallengeUtils.allowedNameChars }
                     this.setOnRightClick {
                         text.set("")
                         requestFocus()

@@ -33,6 +33,8 @@ data class DailyLeaderboardScore(val countryCode: String, val score: Int, val na
 
 object DailyChallengeUtils {
     
+    val allowedNameChars: Set<Char> = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_".toSet()
+    
     fun sendNonceRequest(date: LocalDate, nonceVar: Var<UUID?>) {
         thread(isDaemon = true, name = "Daily Challenge UUID getter", start = true) {
             val post = HttpPost(
