@@ -36,7 +36,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
     init {
         this.setSize(MMMenu.WIDTH_MID, adjust = 32f)
         this.titleText.bind { Localization.getVar("mainMenu.submitDailyChallenge.title").use() }
-        this.contentPane.bounds.height.set(300f)
+        this.contentPane.bounds.height.set(315f)
 
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
@@ -90,7 +90,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
             
             vbox += TextLabel(binding = { Localization.getVar("mainMenu.submitDailyChallenge.disclaimer").use() }).apply {
                 this.markup.set(this@SubmitDailyChallengeScoreMenu.markup)
-                this.bounds.height.set(50f)
+                this.bounds.height.set(64f)
                 this.renderAlign.set(Align.topLeft)
                 this.doLineWrapping.set(true)
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)
