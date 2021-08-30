@@ -9,6 +9,7 @@ import paintbox.util.BranchedOutputStream
 import paintbox.util.MemoryUtils
 import java.io.File
 import java.io.FileOutputStream
+import java.io.OutputStream
 import java.io.PrintStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -27,10 +28,10 @@ object SysOutPiper {
     lateinit var oldErr: PrintStream
         private set
 
-    private lateinit var newOut: BranchedOutputStream
-    private lateinit var newErr: BranchedOutputStream
+    private lateinit var newOut: OutputStream
+    private lateinit var newErr: OutputStream
 
-    private lateinit var stream: FileOutputStream
+    private lateinit var fileStream: FileOutputStream
 
     @Volatile
     private var piped: Boolean = false
@@ -53,9 +54,9 @@ object SysOutPiper {
         file.createNewFile()
         logFile = file
 
-        stream = FileOutputStream(file)
+        fileStream = FileOutputStream(file)
 
-        val ps = PrintStream(stream)
+        val ps = PrintStream(fileStream)
         ps.println("==============\nAUTO-GENERATED\n==============\n")
         val builder = StringBuilder()
         builder.append("Program Specifications:\n")
@@ -87,14 +88,14 @@ object SysOutPiper {
         ps.println("\n")
         ps.flush()
 
-        newOut = BranchedOutputStream(oldOut, stream)
-        newErr = BranchedOutputStream(oldErr, stream)
-
+        newOut = BranchedOutputStream(oldOut, fileStream)
+        newErr = BranchedOutputStream(oldErr, fileStream)
+        
         System.setOut(PrintStream(newOut))
         System.setErr(PrintStream(newErr))
-
+        
         Runtime.getRuntime().addShutdownHook(thread(start = false) {
-            StreamUtils.closeQuietly(stream)
+            StreamUtils.closeQuietly(fileStream)
         })
     }
 
