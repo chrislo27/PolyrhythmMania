@@ -271,11 +271,11 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 return Pane().apply {
                     this.bounds.height.set(32f)
                     this += HBox().apply {
-                        this.bindWidthToParent(adjust = -100f)
+                        this.bindWidthToParent(adjust = -70f)
                         this += TextLabel("${place}", font = main.fontMainMenuMain).apply {
                             this.renderAlign.set(Align.right)
-                            this.padding.set(Insets(0f, 0f, 0f, 4f))
-                            this.bounds.width.set(52f)
+                            this.padding.set(Insets(0f, 0f, 4f, 4f))
+                            this.bounds.width.set(48f)
                         }
                         val flag = CountryFlags.getFlagByCountryCode(this@createPane.countryCode)
                         this += ImageNode(CountryFlags.getTextureRegionForFlag(flag,
@@ -285,7 +285,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         this += TextLabel((this@createPane.name.takeUnless { it.isBlank() } ?: "..."), font = main.fontMainMenuThin).apply {
                             this.renderAlign.set(Align.left)
                             this.padding.set(Insets(0f, 0f, 4f, 4f))
-                            this.bounds.width.set(300f)
+                            this.bounds.width.set(350f)
                         }
                     }
 

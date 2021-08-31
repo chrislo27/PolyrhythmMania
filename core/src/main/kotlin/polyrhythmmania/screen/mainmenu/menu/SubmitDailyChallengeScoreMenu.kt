@@ -119,7 +119,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
                     this.bounds.width.set(100f)
                 }
                 val textField = TextField(font = font).apply {
-                    this.characterLimit.set(16)
+                    this.characterLimit.set(24)
                     this.textColor.set(Color(1f, 1f, 1f, 1f))
                     this.text.set(nameText.getOrCompute())
                     this.inputFilter.set { it in DailyChallengeUtils.allowedNameChars }
