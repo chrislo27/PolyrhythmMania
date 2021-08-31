@@ -102,12 +102,14 @@ object DiscordHelper {
 
     @Synchronized
     fun updatePresence(presence: DiscordRichPresence) {
+        if (!successfulInit) return
         queuedPresence = presence
         signalUpdate()
     }
 
     @Synchronized
     fun updatePresence(presenceState: PresenceState) {
+        if (!successfulInit) return
         updatePresence(RichPresence(presenceState))
     }
     

@@ -9,29 +9,29 @@ class BranchedOutputStream(out: OutputStream, val branch: OutputStream)
 
     override fun close() {
         try {
-            super.close()
+            out.close()
         } finally {
             branch.close()
         }
     }
 
     override fun flush() {
-        super.flush()
-        branch.close()
+        out.flush()
+        branch.flush()
     }
 
     @Synchronized override fun write(b: Int) {
-        super.write(b)
+        out.write(b)
         branch.write(b)
     }
 
     @Synchronized override fun write(b: ByteArray) {
-        super.write(b)
+        out.write(b)
         branch.write(b)
     }
 
     @Synchronized override fun write(b: ByteArray, off: Int, len: Int) {
-        super.write(b, off, len)
+        out.write(b, off, len)
         branch.write(b, off, len)
     }
 }
