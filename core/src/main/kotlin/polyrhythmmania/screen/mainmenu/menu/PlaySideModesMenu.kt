@@ -1,6 +1,5 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.Var
 import paintbox.ui.Anchor
@@ -10,8 +9,8 @@ import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
-import polyrhythmmania.discordrpc.DefaultPresences
-import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.discord.DefaultPresences
+import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.AssembleMode
 import polyrhythmmania.sidemodes.DunkMode
@@ -65,13 +64,13 @@ class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             // Remember to update DataSettingsMenu to reset high scores
             vbox += createSidemodeLongButton("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip",
                     Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
-                DiscordHelper.updatePresence(DefaultPresences.PlayingDunk)
+                DiscordCore.updateActivity(DefaultPresences.playingDunk())
                 mainMenu.backgroundType = BgType.DUNK
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
             }
             vbox += createSidemodeLongButton("mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
                     Var { listOf(main.settings.sidemodeAssembleHighScore.use()) }), showResults = true) { main, _ ->
-                DiscordHelper.updatePresence(DefaultPresences.PlayingAssemble)
+                DiscordCore.updateActivity(DefaultPresences.playingAssemble())
                 mainMenu.backgroundType = BgType.ASSEMBLE
                 AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))
             }

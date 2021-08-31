@@ -23,8 +23,8 @@ import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
-import polyrhythmmania.discordrpc.DefaultPresences
-import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.discord.DefaultPresences
+import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.input.Challenges
@@ -226,7 +226,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this.onEntryEnd = {
                                     playScreen.prepareGameStart()
                                     removeSelfFromMenuCol(false)
-                                    DiscordHelper.updatePresence(DefaultPresences.PlayingLevel)
+                                    DiscordCore.updateActivity(DefaultPresences.playingLevel())
                                     mainMenu.backgroundType = BgType.NORMAL
                                 }
                             }

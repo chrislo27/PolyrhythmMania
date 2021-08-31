@@ -15,8 +15,8 @@ import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.SkinFactory
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
-import polyrhythmmania.discordrpc.DefaultPresences
-import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.discord.DefaultPresences
+import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.EditorScreen
 
 /**
@@ -97,7 +97,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                         val main = mainMenu.main
                         val editorScreen = EditorScreen(main)
                         main.screen = TransitionScreen(main, main.screen, editorScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f)))
-                        DiscordHelper.updatePresence(DefaultPresences.InEditor)
+                        DiscordCore.updateActivity(DefaultPresences.inEditor())
                     }
                 }
             }

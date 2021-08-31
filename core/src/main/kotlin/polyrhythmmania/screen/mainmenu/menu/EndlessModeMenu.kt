@@ -21,14 +21,13 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
-import polyrhythmmania.discordrpc.DefaultPresences
-import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.discord.DefaultPresences
+import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.ui.PRManiaSkins
@@ -111,7 +110,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this.onEntryEnd = {
                                     sidemode.prepare()
                                     playScreen.resetAndStartOver(false, false)
-                                    DiscordHelper.updatePresence(DefaultPresences.PlayingEndlessMode)
+                                    DiscordCore.updateActivity(DefaultPresences.playingEndlessMode())
                                     mainMenu.backgroundType = BgType.ENDLESS
                                 }
                             }

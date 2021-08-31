@@ -15,7 +15,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
-import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.ui.PRManiaSkins
 
@@ -114,7 +114,6 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             drpcCheckbox.checkedState.set(settings.discordRichPresence.getOrCompute())
             drpcCheckbox.onCheckChanged = { newState ->
                 settings.discordRichPresence.set(newState)
-                DiscordHelper.enabled = newState
             }
             vbox += drpcPane
         }

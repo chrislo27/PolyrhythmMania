@@ -1,41 +1,18 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.eclipsesource.json.Json
-import paintbox.Paintbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
-import paintbox.transition.FadeIn
-import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.Version
 import polyrhythmmania.Localization
-import polyrhythmmania.PRMania
-import polyrhythmmania.discordrpc.DefaultPresences
-import polyrhythmmania.discordrpc.DiscordHelper
-import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.screen.PlayScreen
-import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.sidemodes.DunkMode
-import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
-import polyrhythmmania.sidemodes.endlessmode.DailyChallengeUtils
 import polyrhythmmania.ui.PRManiaSkins
-import java.net.HttpURLConnection
-import java.net.URL
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
-import kotlin.concurrent.thread
 
 
 class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {

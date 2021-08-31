@@ -25,8 +25,6 @@ import paintbox.font.Markup
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
 import paintbox.registry.AssetRegistry
-import paintbox.transition.FadeOut
-import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
@@ -43,8 +41,8 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
-import polyrhythmmania.discordrpc.DefaultPresences
-import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.discord.DefaultPresences
+import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.mainmenu.bg.MainMenuBg
 import polyrhythmmania.screen.mainmenu.menu.*
@@ -557,7 +555,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
         firstShowing.set(false)
 
-        DiscordHelper.updatePresence(DefaultPresences.Idle)
+        DiscordCore.updateActivity(DefaultPresences.idle())
         background.initializeFromType(this.backgroundType)
     }
 

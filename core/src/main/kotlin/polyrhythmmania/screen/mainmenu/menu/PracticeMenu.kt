@@ -11,8 +11,8 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.discordrpc.DefaultPresences
-import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.discord.DefaultPresences
+import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.mainmenu.bg.BgType
@@ -66,7 +66,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         vbox.temporarilyDisableLayouts {
             fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> Practice): UIElement {
                 return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false) { game, keymap ->
-                    DiscordHelper.updatePresence(DefaultPresences.PlayingPractice)
+                    DiscordCore.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL
                     factory.invoke(game, keymap)
                 }
@@ -76,7 +76,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                          challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
                                          factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
                 return createSidemodeLongButton(name, tooltipVar, challenges, showResults) { game, keymap ->
-                    DiscordHelper.updatePresence(DefaultPresences.PlayingPractice)
+                    DiscordCore.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL
                     factory.invoke(game, keymap)
                 }

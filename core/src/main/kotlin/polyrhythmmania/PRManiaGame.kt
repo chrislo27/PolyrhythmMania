@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.eclipsesource.json.Json
-import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
@@ -34,7 +33,7 @@ import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import polyrhythmmania.container.Container
-import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
@@ -49,9 +48,6 @@ import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
 import polyrhythmmania.util.TempFileUtils
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.*
 import kotlin.concurrent.thread
 
 
@@ -90,6 +86,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
     
     val httpClient: CloseableHttpClient by lazy { HttpClients.createMinimal() }
+    
+    private var discordCallbackDelta: Float = 0f
 
     override fun getTitle(): String = "${PRMania.TITLE} ${PRMania.VERSION}"
 
@@ -176,7 +174,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 InputThresholds.initInputClasses()
             }
             onAssetLoadingComplete = {
-                DiscordHelper.init(settings.discordRichPresence.getOrCompute())
+                DiscordCore // Initialize discord-gamesdk
+                DiscordCore.enableRichPresence.bind { settings.discordRichPresence.use() }
                 
                 initializeScreens()
                 
@@ -260,6 +259,17 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             TempFileUtils.clearTempFolder()
         } catch (s: SecurityException) {
             s.printStackTrace()
+        }
+        DiscordCore.disposeQuietly()
+    }
+
+    override fun preRender() {
+        super.preRender()
+        
+        discordCallbackDelta += Gdx.graphics.deltaTime
+        if (discordCallbackDelta >= 1 / 30f) {
+            discordCallbackDelta = 0f
+            DiscordCore.runCallbacks()
         }
     }
 

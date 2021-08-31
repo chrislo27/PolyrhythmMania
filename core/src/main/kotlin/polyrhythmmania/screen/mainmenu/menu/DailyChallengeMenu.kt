@@ -21,8 +21,8 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
-import polyrhythmmania.discordrpc.DefaultPresences
-import polyrhythmmania.discordrpc.DiscordHelper
+import polyrhythmmania.discord.DefaultPresences
+import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
@@ -112,7 +112,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this.onEntryEnd = {
                                     sidemode.prepare()
                                     playScreen.resetAndStartOver(false, false)
-                                    DiscordHelper.updatePresence(DefaultPresences.PlayingDailyChallenge(date))
+                                    DiscordCore.updateActivity(DefaultPresences.playingDailyChallenge(date))
                                     mainMenu.backgroundType = BgType.ENDLESS
                                 }
                             }
