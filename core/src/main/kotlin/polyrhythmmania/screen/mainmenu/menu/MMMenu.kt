@@ -295,7 +295,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     val main = mainMenu.main
                     Gdx.app.postRunnable {
                         val sidemode: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-                        val playScreen = PlayScreen(main, sidemode, sidemode.container, challenges = challenges, showResults = showResults)
+                        val playScreen = PlayScreen(main, sidemode, sidemode.container,
+                                inputCalibration = main.settings.inputCalibration.getOrCompute(),
+                                challenges = challenges, showResults = showResults)
                         main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                             this.onEntryEnd = {
                                 sidemode.prepare()

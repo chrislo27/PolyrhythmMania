@@ -221,7 +221,8 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         
                         mainMenu.transitionAway {
                             val main = mainMenu.main
-                            val playScreen = PlayScreen(main, null, loadedData.newContainer, challenges, showResults = !robotMode)
+                            val playScreen = PlayScreen(main, null, loadedData.newContainer, challenges,
+                                    inputCalibration = main.settings.inputCalibration.getOrCompute(), showResults = !robotMode)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
                                     playScreen.prepareGameStart()

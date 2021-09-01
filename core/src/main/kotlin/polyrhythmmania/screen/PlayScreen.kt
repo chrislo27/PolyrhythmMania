@@ -43,6 +43,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.*
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.sidemodes.SideMode
@@ -59,8 +60,8 @@ import kotlin.math.*
 
 class PlayScreen(
         main: PRManiaGame, val sideMode: SideMode?, val container: Container, val challenges: Challenges,
+        val inputCalibration: InputCalibration,
         val showResults: Boolean = true,
-        val musicOffsetMs: Float = main.settings.musicOffsetMs.getOrCompute().toFloat(),
 ) : PRManiaScreen(main) {
 
     val timing: TimingProvider get() = container.timing
@@ -335,7 +336,7 @@ class PlayScreen(
         )
         
         transitionAway(ResultsScreen(main, scoreObj, container, {
-            PlayScreen(main, sideMode, container, challenges, showResults, musicOffsetMs)
+            PlayScreen(main, sideMode, container, challenges, inputCalibration, showResults)
         }, keyboardKeybinds), disposeContainer = false) {}
     }
 
@@ -361,7 +362,7 @@ class PlayScreen(
         engine.inputter.areInputsLocked = engine.autoInputs
         engine.inputter.reset()
         renderer.resetAnimations()
-        engine.musicOffsetMs = musicOffsetMs
+        engine.inputCalibration = this.inputCalibration
         engine.removeActiveTextbox(false)
         engine.resetEndSignal()
         

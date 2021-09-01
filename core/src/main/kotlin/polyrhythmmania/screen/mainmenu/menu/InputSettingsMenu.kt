@@ -290,17 +290,16 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     inner class CalibrationMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         val manualOffsetSlider: Slider = Slider().apply {
-            this.bindWidthToParent(multiplier = 0.75f)
-            this.minimum.set(-100f)
-            this.maximum.set(100f)
+            this.minimum.set(-500f)
+            this.maximum.set(500f)
             this.tickUnit.set(1f)
-            this.setValue(settings.musicOffsetMs.getOrCompute().toFloat())
+            this.setValue(settings.calibrationAudioOffsetMs.getOrCompute().toFloat())
             this.value.addListener { v ->
-                settings.musicOffsetMs.set(v.getOrCompute().toInt())
+                settings.calibrationAudioOffsetMs.set(v.getOrCompute().toInt())
             }
         }
         init {
-            this.setSize(MMMenu.WIDTH_MID)
+            this.setSize(MMMenu.WIDTH_MEDIUM)
             this.titleText.bind { Localization.getVar("mainMenu.inputSettings.calibration").use() }
             this.contentPane.bounds.height.set(300f)
 
@@ -334,9 +333,9 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
             vbox.temporarilyDisableLayouts {
                 vbox += createSliderPane(manualOffsetSlider) { 
-                    Localization.getVar("mainMenu.inputSettings.calibration.musicOffset", Var.bind {listOf(manualOffsetSlider.value.useF().toInt())}).use()
+                    Localization.getVar("mainMenu.inputSettings.calibration.audioOffset", Var.bind {listOf(manualOffsetSlider.value.useF().toInt())}).use()
                 }.apply {
-                    this.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.inputSettings.calibration.musicOffset.tooltip")))
+                    this.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.inputSettings.calibration.audioOffset.tooltip")))
                 }
             }
             vbox.sizeHeightToChildren(100f)

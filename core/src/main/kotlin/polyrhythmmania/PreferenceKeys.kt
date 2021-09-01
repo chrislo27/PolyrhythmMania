@@ -20,7 +20,7 @@ object PreferenceKeys {
     val SETTINGS_FULLSCREEN = "settings_fullscreen"
     val SETTINGS_SHOW_INPUT_FEEDBACK_BAR = "settings_showInputFeedbackBar"
     val SETTINGS_SHOW_SKILL_STAR = "settings_showSkillStar"
-    val SETTINGS_MUSIC_OFFSET_MS = "settings_musicOffsetMs"
+    val SETTINGS_CALIBRATION_AUDIO_OFFSET_MS = "settings_calibration_audioOffsetMs"
     val SETTINGS_DISCORD_RPC = "settings_discord_rich_presence"
     val SETTINGS_MIXER = "settings_mixer"
     val SETTINGS_MAINMENU_FLIP_ANIMATION = "settings_mainMenu_flipAnimation"

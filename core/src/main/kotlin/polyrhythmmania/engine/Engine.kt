@@ -31,7 +31,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     
     var deleteEventsAfterCompletion: Boolean = true
     var autoInputs: Boolean = false
-    var musicOffsetMs: Float = 0f
+    var inputCalibration: InputCalibration = InputCalibration.NONE
     
     var activeTextBox: ActiveTextBox? = null
         private set

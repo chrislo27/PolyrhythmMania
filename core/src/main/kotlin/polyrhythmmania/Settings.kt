@@ -2,6 +2,7 @@ package polyrhythmmania
 
 import com.badlogic.gdx.Preferences
 import com.eclipsesource.json.Json
+import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.util.WindowSize
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_ARROW_KEYS_LIKE_SCROLL
@@ -16,6 +17,7 @@ import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE
 import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.ENDLESS_HIGH_SCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
+import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
@@ -24,12 +26,12 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_MAINMENU_FLIP_ANIMATION
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MIXER
-import polyrhythmmania.PreferenceKeys.SETTINGS_MUSIC_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_SKILL_STAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
+import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
@@ -52,7 +54,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, false)
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
     private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
-    private val kv_musicOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_MUSIC_OFFSET_MS, 0)
+    private val kv_audioOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_CALIBRATION_AUDIO_OFFSET_MS, 0)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
     private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, "")
     private val kv_mainMenuFlipAnimations: KeyValue<Boolean> = KeyValue(SETTINGS_MAINMENU_FLIP_ANIMATION, true)
@@ -80,7 +82,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val fullscreen: Var<Boolean> = kv_fullscreen.value
     val showInputFeedbackBar: Var<Boolean> = kv_showInputFeedbackBar.value
     val showSkillStar: Var<Boolean> = kv_showSkillStar.value
-    val musicOffsetMs: Var<Int> = kv_musicOffsetMs.value
+    val calibrationAudioOffsetMs: Var<Int> = kv_audioOffsetMs.value
     val discordRichPresence: Var<Boolean> = kv_discordRichPresence.value
     val mixer: Var<String> = kv_mixer.value
     val mainMenuFlipAnimation: Var<Boolean> = kv_mainMenuFlipAnimations.value
@@ -99,6 +101,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val endlessDunkHighScore: Var<Int> = kv_endlessDunkHighScore.value
     val endlessDailyChallenge: Var<DailyChallengeScore> = kv_endlessDailyChallenge.value
     val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
+    
+    val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind { 
+        InputCalibration(calibrationAudioOffsetMs.use().toFloat())
+    }
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
@@ -110,7 +116,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_fullscreen)
         prefs.getBoolean(kv_showInputFeedbackBar)
         prefs.getBoolean(kv_showSkillStar)
-        prefs.getInt(kv_musicOffsetMs)
+        prefs.getIntCoerceIn(kv_audioOffsetMs, -500, 500)
         prefs.getBoolean(kv_discordRichPresence)
         prefs.getString(kv_mixer, "")
         prefs.getBoolean(kv_mainMenuFlipAnimations)
@@ -142,7 +148,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_fullscreen)
                 .putBoolean(kv_showInputFeedbackBar)
                 .putBoolean(kv_showSkillStar)
-                .putInt(kv_musicOffsetMs)
+                .putInt(kv_audioOffsetMs)
                 .putBoolean(kv_discordRichPresence)
                 .putString(kv_mixer)
                 .putBoolean(kv_mainMenuFlipAnimations)

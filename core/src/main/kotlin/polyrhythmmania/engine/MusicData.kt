@@ -85,7 +85,7 @@ class MusicData(val engine: Engine) {
     
     fun computeMusicDelaySec(): Float {
         val rate = this.rate
-        return ((engine.tempos.beatsToSeconds(this.musicSyncPointBeat) * rate - this.firstBeatSec) / rate * 1000 + (engine.musicOffsetMs * rate) /* <- this is a user calibration setting */) / 1000
+        return ((engine.tempos.beatsToSeconds(this.musicSyncPointBeat) * rate - this.firstBeatSec) / rate * 1000 + (engine.inputCalibration.audioOffsetMs * rate) /* <- this is a user calibration setting */) / 1000
     }
 
 }

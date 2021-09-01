@@ -19,7 +19,6 @@ import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.sidemodes.DunkMode
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.sidemodes.SideMode
@@ -124,7 +123,9 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             val sidemode: SideMode = EndlessPolyrhythm(main,
                                     EndlessModeScore(scoreVar, showHighScore = false),
                                     EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
-                            val playScreen = PlayScreen(main, sidemode, sidemode.container, challenges = Challenges.NO_CHANGES, showResults = false)
+                            val playScreen = PlayScreen(main, sidemode, sidemode.container,
+                                    inputCalibration = main.settings.inputCalibration.getOrCompute(),
+                                    challenges = Challenges.NO_CHANGES, showResults = false)
                             main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
                             main.settings.persist()
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
