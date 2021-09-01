@@ -29,27 +29,27 @@ class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
     val practiceSection4: PracticeSection = PracticeSection(engine)
     
     init {
-        practiceSection1.initBlock = PracticeInitBlock(8f, 3) { engine, startBeat ->
+        practiceSection1.initBlock = PracticeInitBlock(8f + 2, 3) { engine, startBeat ->
             val musicData = engine.musicData
-            musicData.musicSyncPointBeat = startBeat + 4f
+            musicData.musicSyncPointBeat = startBeat + 2 + 4f
             musicData.update()
             musicData.setMusicPlayerPositionToCurrentSec()
             
             for (i in 0 until 4) {
-                engine.addEvent(EventCowbellSFX(engine, startBeat + i, false))
+                engine.addEvent(EventCowbellSFX(engine, startBeat + 2 + i, false))
             }
 
             val volumeMap = engine.musicData.volumeMap
             volumeMap.removeMusicVolumesBulk(volumeMap.getAllMusicVolumes().toList())
-            volumeMap.addMusicVolume(MusicVolume(startBeat, 0f, 100))
+            volumeMap.addMusicVolume(MusicVolume(startBeat + 2, 0f, 100))
             
-            engine.addEvent(EventLockInputs(engine, false, startBeat))
-            engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 4f))
+            engine.addEvent(EventLockInputs(engine, false, startBeat + 2))
+            engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 2 + 4f))
             
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityPiston.Type.PISTON_A, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityPiston.Type.PISTON_A, startBeat + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityPiston.Type.PISTON_A, startBeat + 2 + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityPiston.Type.PISTON_A, startBeat + 2 + 4f + 4 * 0.5f))
             
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityPiston.Type.PLATFORM, startBeat + 2 + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
         }
         practiceSection1.loopBlock = PracticeLoopBlock(4f) { engine, startBeat -> 
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat))
@@ -104,24 +104,24 @@ class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
         }
 
         
-        practiceSection2.initBlock = PracticeInitBlock(8f, 3) { engine, startBeat ->
+        practiceSection2.initBlock = PracticeInitBlock(8f + 2, 3) { engine, startBeat ->
             val musicData = engine.musicData
-            musicData.musicSyncPointBeat = startBeat + 4f
+            musicData.musicSyncPointBeat = startBeat + 2 + 4f
             musicData.update()
             musicData.setMusicPlayerPositionToCurrentSec()
 
             for (i in 0 until 4) {
-                engine.addEvent(EventCowbellSFX(engine, startBeat + i, false))
+                engine.addEvent(EventCowbellSFX(engine, startBeat + 2 + i, false))
             }
 
-            engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat, 0f, 100))
-            engine.addEvent(EventLockInputs(engine, false, startBeat))
-            engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat + 4f))
+            engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat + 2, 0f, 100))
+            engine.addEvent(EventLockInputs(engine, false, startBeat + 2))
+            engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat + 2 + 4f))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityPiston.Type.PISTON_DPAD, startBeat + 2 + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityPiston.Type.PISTON_DPAD, startBeat + 2 + 4f + 4 * 0.5f))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityPiston.Type.PLATFORM, startBeat + 2 + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
         }
         practiceSection2.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat))
@@ -151,28 +151,28 @@ class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
         }
         
         
-        practiceSection3.initBlock = PracticeInitBlock(8f, 3) { engine, startBeat ->
+        practiceSection3.initBlock = PracticeInitBlock(8f + 2, 3) { engine, startBeat ->
             val musicData = engine.musicData
-            musicData.musicSyncPointBeat = startBeat + 4f
+            musicData.musicSyncPointBeat = startBeat + 2 + 4f
             musicData.update()
             musicData.setMusicPlayerPositionToCurrentSec()
 
             for (i in 0 until 4) {
-                engine.addEvent(EventCowbellSFX(engine, startBeat + i, false))
+                engine.addEvent(EventCowbellSFX(engine, startBeat + 2 + i, false))
             }
 
-            engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat, 0f, 100))
-            engine.addEvent(EventLockInputs(engine, false, startBeat))
-            engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 4f))
-            engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat + 4f))
+            engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat + 2, 0f, 100))
+            engine.addEvent(EventLockInputs(engine, false, startBeat + 2))
+            engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 2 + 4f))
+            engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat + 2 + 4f))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityPiston.Type.PISTON_A, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityPiston.Type.PISTON_A, startBeat + 4f + 4 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityPiston.Type.PISTON_A, startBeat + 2 + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityPiston.Type.PISTON_A, startBeat + 2 + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityPiston.Type.PLATFORM, startBeat + 2 + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
             
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 4 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityPiston.Type.PISTON_DPAD, startBeat + 2 + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityPiston.Type.PISTON_DPAD, startBeat + 2 + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityPiston.Type.PLATFORM, startBeat + 2 + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
         }
         practiceSection3.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat))
@@ -212,32 +212,32 @@ class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
 
 
 
-        practiceSection4.initBlock = PracticeInitBlock(8f, 3) { engine, startBeat ->
+        practiceSection4.initBlock = PracticeInitBlock(8f + 2, 3) { engine, startBeat ->
             val musicData = engine.musicData
-            musicData.musicSyncPointBeat = startBeat + 4f
+            musicData.musicSyncPointBeat = startBeat + 2 + 4f
             musicData.update()
             musicData.setMusicPlayerPositionToCurrentSec()
 
             for (i in 0 until 4) {
-                engine.addEvent(EventCowbellSFX(engine, startBeat + i, false))
+                engine.addEvent(EventCowbellSFX(engine, startBeat + 2 + i, false))
             }
 
-            engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat, 0f, 100))
-            engine.addEvent(EventLockInputs(engine, false, startBeat))
-            engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 4f))
-            engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat + 4f))
+            engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat + 2, 0f, 100))
+            engine.addEvent(EventLockInputs(engine, false, startBeat + 2))
+            engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat + 2 + 4f))
+            engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat + 2 + 4f))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityPiston.Type.PISTON_A, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 2, EntityPiston.Type.PISTON_A, startBeat + 4f + 2 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityPiston.Type.PISTON_A, startBeat + 4f + 4 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 6, EntityPiston.Type.PISTON_A, startBeat + 4f + 6 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 0, EntityPiston.Type.PISTON_A, startBeat + 2 + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 2, EntityPiston.Type.PISTON_A, startBeat + 2 + 4f + 2 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 4, EntityPiston.Type.PISTON_A, startBeat + 2 + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 6, EntityPiston.Type.PISTON_A, startBeat + 2 + 4f + 6 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowA, 8, EntityPiston.Type.PLATFORM, startBeat + 2 + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
 
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 0 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 2, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 2 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 4 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 6, EntityPiston.Type.PISTON_DPAD, startBeat + 4f + 6 * 0.5f))
-            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityPiston.Type.PLATFORM, startBeat + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 0, EntityPiston.Type.PISTON_DPAD, startBeat + 2 + 4f + 0 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 2, EntityPiston.Type.PISTON_DPAD, startBeat + 2 + 4f + 2 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 4, EntityPiston.Type.PISTON_DPAD, startBeat + 2 + 4f + 4 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 6, EntityPiston.Type.PISTON_DPAD, startBeat + 2 + 4f + 6 * 0.5f))
+            engine.addEvent(EventRowBlockSpawn(engine, engine.world.rowDpad, 8, EntityPiston.Type.PLATFORM, startBeat + 2 + 4f + 8 * 0.5f, affectThisIndexAndForward = true))
         }
         practiceSection4.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat))
