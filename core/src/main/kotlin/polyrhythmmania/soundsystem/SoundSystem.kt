@@ -6,8 +6,10 @@ import paintbox.Paintbox
 import paintbox.util.Sync
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.IOAudioFormat
+import net.beadsproject.beads.ugens.Gain
 import javax.sound.sampled.*
 import polyrhythmmania.soundsystem.beads.*
+import polyrhythmmania.soundsystem.beads.ugen.Delay
 import polyrhythmmania.soundsystem.sample.PlayerLike
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -48,7 +50,17 @@ class SoundSystem(private val mixer: Mixer,
     data class SoundSystemSettings(val reportAdaptiveSync: Boolean = true)
 
     val audioContext: AudioContext =
-            AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat)
+//            AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat)
+            object : AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat) {
+                init {
+                    // FIXME remove after done testing delay
+                    run {
+                        val field = AudioContext::class.java.getDeclaredField("out")
+                        field.isAccessible = true
+                        field.set(this, Delay(this, this.out.outs, bufferSize * 10))
+                    }
+                }
+            }
 
     @Volatile
     private var currentlyRealTime: Boolean = true
