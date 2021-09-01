@@ -22,12 +22,12 @@ class EventCowbellSFX(engine: Engine, startBeat: Float, val useMeasures: Boolean
         if (useMeasures) {
             val measurePart = engine.timeSignatures.getMeasurePart(currentBeat)
             val pitch = if (measurePart <= -1) 1f else if (measurePart == 0) Semitones.getALPitch(8) else Semitones.getALPitch(3)
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { player ->
+            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell"), SoundInterface.SFXType.NORMAL) { player ->
                 player.pitch = pitch
                 player.gain = 0.65f
             }
         } else {
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { player ->
+            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell"), SoundInterface.SFXType.NORMAL) { player ->
                 player.gain = 0.65f
             }
         }
@@ -47,9 +47,9 @@ open class EventPlaySFX(engine: Engine, startBeat: Float,
         super.onStart(currentBeat)
         val beadsSound = AssetRegistry.get<BeadsSound>(id)
         if (allowOverlap) {
-            engine.soundInterface.playAudio(beadsSound, callback)
+            engine.soundInterface.playAudio(beadsSound, SoundInterface.SFXType.NORMAL, callback)
         } else {
-            engine.soundInterface.playAudioNoOverlap(beadsSound, callback)
+            engine.soundInterface.playAudioNoOverlap(beadsSound, SoundInterface.SFXType.NORMAL, callback)
         }
     }
 }

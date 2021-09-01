@@ -337,6 +337,14 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }.apply {
                     this.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.inputSettings.calibration.audioOffset.tooltip")))
                 }
+
+                val (disableInputSFXPane, disableInputSFXCheck) = createCheckboxOption({ Localization.getVar("mainMenu.inputSettings.calibration.disableInputSounds").use() })
+                disableInputSFXCheck.checkedState.set(settings.calibrationDisableInputSFX.getOrCompute())
+                disableInputSFXCheck.onCheckChanged = { newState ->
+                    settings.calibrationDisableInputSFX.set(newState)
+                }
+                disableInputSFXCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.inputSettings.calibration.disableInputSounds.tooltip")))
+                vbox += disableInputSFXPane
             }
             vbox.sizeHeightToChildren(100f)
             scrollPane.setContent(vbox)

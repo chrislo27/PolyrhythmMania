@@ -12,11 +12,15 @@ import polyrhythmmania.soundsystem.sample.PlayerLike
 
 sealed class SoundInterface {
     companion object {
-        fun createFromSoundSystem(soundSystem: SoundSystem?): SoundInterface =
-                if (soundSystem == null) NoOp else Impl(soundSystem)
+        fun createFromSoundSystem(soundSystem: SoundSystem?, engine: Engine): SoundInterface =
+                if (soundSystem == null) NoOp else Impl(soundSystem, engine)
     }
     
-    class Impl(val soundSystem: SoundSystem) : SoundInterface() {
+    enum class SFXType {
+        NORMAL, PLAYER_INPUT
+    }
+    
+    class Impl(val soundSystem: SoundSystem, val engine: Engine) : SoundInterface() {
         private var currentAudio: BeadsMusic? = null
         private var currentMusicPlayer: MusicSamplePlayer? = null
 
@@ -46,10 +50,14 @@ sealed class SoundInterface {
             return this.currentMusicPlayer
         }
 
-        override fun playAudio(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit): Long {
+        override fun playAudio(audio: BeadsAudio, type: SFXType, callback: (player: PlayerLike) -> Unit): Long {
             if (disableSounds) {
                 return -1L
             }
+            if (type == SFXType.PLAYER_INPUT && engine.inputCalibration.disableInputSounds) {
+                return -1L
+            }
+            
             return soundSystem.playAudio(audio, callback)
         }
 
@@ -88,7 +96,7 @@ sealed class SoundInterface {
             return null
         }
         
-        override fun playAudio(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit): Long {
+        override fun playAudio(audio: BeadsAudio, type: SFXType, callback: (player: PlayerLike) -> Unit): Long {
             return -1L
         }
 
@@ -113,7 +121,7 @@ sealed class SoundInterface {
      */
     abstract fun getCurrentMusicPlayer(audio: BeadsMusic?): MusicSamplePlayer?
     
-    abstract fun playAudio(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long
+    abstract fun playAudio(audio: BeadsAudio, type: SFXType, callback: (player: PlayerLike) -> Unit = {}): Long
     
     abstract fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float)
     
@@ -122,10 +130,10 @@ sealed class SoundInterface {
     fun playMenuSfx(sound: Sound, volume: Float) = playMenuSfx(sound, volume, 1f, 0f)
     fun playMenuSfx(sound: Sound) = playMenuSfx(sound, 1f, 1f, 0f)
 
-    fun playAudioNoOverlap(audio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long {
+    fun playAudioNoOverlap(audio: BeadsAudio, type: SFXType, callback: (player: PlayerLike) -> Unit = {}): Long {
         if (audio in audioPlayedLastFrame) return -1L
         audioPlayedLastFrame += audio
-        return playAudio(audio, callback)
+        return playAudio(audio, type, callback)
     }
     
     open fun update(delta: Float) {

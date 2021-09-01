@@ -10,6 +10,7 @@ import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.EventConditionalOnRods
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.PlayerLike
@@ -66,5 +67,5 @@ class BlockCondApplause(engine: Engine) : Block(engine, BlockCondApplause.BLOCK_
 class EventCondApplause(engine: Engine, startBeat: Float, rowSetting: RowSetting)
     : EventConditionalOnRods(engine, startBeat, rowSetting, false, {
     val beadsSound = AssetRegistry.get<BeadsSound>("sfx_applause")
-    engine.soundInterface.playAudio(beadsSound)
+    engine.soundInterface.playAudio(beadsSound, SoundInterface.SFXType.NORMAL)
 })

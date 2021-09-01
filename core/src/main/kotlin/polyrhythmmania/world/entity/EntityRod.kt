@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.World
@@ -151,15 +152,16 @@ abstract class EntityRod(world: World, val deployBeat: Float)
     }
 
     protected fun playSfxLand(engine: Engine) {
-        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_land"))
+        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_land"), SoundInterface.SFXType.NORMAL)
     }
 
     protected fun playSfxSideCollision(engine: Engine) {
-        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_side_collision"))
+        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_side_collision"), SoundInterface.SFXType.NORMAL)
     }
 
     protected fun playSfxExplosion(engine: Engine) {
-        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_explosion"))
+        // TODO needs to be offset
+        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_explosion"), SoundInterface.SFXType.NORMAL)
     }
 }
 

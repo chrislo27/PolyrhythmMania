@@ -8,6 +8,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityPiston
@@ -102,8 +103,8 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityP
             when (this.type) {
                 EntityPiston.Type.PLATFORM -> {
                 }
-                EntityPiston.Type.PISTON_A -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_a"))
-                EntityPiston.Type.PISTON_DPAD -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d"))
+                EntityPiston.Type.PISTON_A -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_a"), SoundInterface.SFXType.NORMAL)
+                EntityPiston.Type.PISTON_DPAD -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d"), SoundInterface.SFXType.NORMAL)
             }
         }
     }
@@ -142,7 +143,7 @@ class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Floa
         if (!oldAnyBlocksAffected && anyBlocksAffected) { // Condition fulfilled if entities were updated on the first update
             if (currentBeat < this.beat + this.width) {
                 if (row.rowBlocks.any { it.active }) {
-                    engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_despawn"))
+                    engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_despawn"), SoundInterface.SFXType.NORMAL)
                 }
             }
         }
@@ -163,7 +164,7 @@ class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Floa
         super.onStart(currentBeat)
 
         if (anyBlocksAffected && currentBeat < this.beat + 0.125f) {
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_retract"))
+            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_retract"), SoundInterface.SFXType.NORMAL)
         }
     }
 

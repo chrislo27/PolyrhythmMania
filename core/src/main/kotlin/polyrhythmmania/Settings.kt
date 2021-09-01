@@ -18,6 +18,7 @@ import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.ENDLESS_HIGH_SCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
+import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
@@ -54,10 +55,11 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, false)
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
     private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
-    private val kv_audioOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_CALIBRATION_AUDIO_OFFSET_MS, 0)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
     private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, "")
     private val kv_mainMenuFlipAnimations: KeyValue<Boolean> = KeyValue(SETTINGS_MAINMENU_FLIP_ANIMATION, true)
+    private val kv_calibrationAudioOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_CALIBRATION_AUDIO_OFFSET_MS, 0)
+    private val kv_calibrationDisableInputSFX: KeyValue<Boolean> = KeyValue(SETTINGS_CALIBRATION_DISABLE_INPUT_SFX, false)
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
     val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, true)
@@ -82,10 +84,11 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val fullscreen: Var<Boolean> = kv_fullscreen.value
     val showInputFeedbackBar: Var<Boolean> = kv_showInputFeedbackBar.value
     val showSkillStar: Var<Boolean> = kv_showSkillStar.value
-    val calibrationAudioOffsetMs: Var<Int> = kv_audioOffsetMs.value
     val discordRichPresence: Var<Boolean> = kv_discordRichPresence.value
     val mixer: Var<String> = kv_mixer.value
     val mainMenuFlipAnimation: Var<Boolean> = kv_mainMenuFlipAnimations.value
+    val calibrationAudioOffsetMs: Var<Int> = kv_calibrationAudioOffsetMs.value
+    val calibrationDisableInputSFX: Var<Boolean> = kv_calibrationDisableInputSFX.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
@@ -103,7 +106,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
     
     val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind { 
-        InputCalibration(calibrationAudioOffsetMs.use().toFloat())
+        InputCalibration(calibrationAudioOffsetMs.use().toFloat(), calibrationDisableInputSFX.use())
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -116,11 +119,12 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_fullscreen)
         prefs.getBoolean(kv_showInputFeedbackBar)
         prefs.getBoolean(kv_showSkillStar)
-        prefs.getIntCoerceIn(kv_audioOffsetMs, -500, 500)
         prefs.getBoolean(kv_discordRichPresence)
         prefs.getString(kv_mixer, "")
         prefs.getBoolean(kv_mainMenuFlipAnimations)
         prefs.getString(kv_locale, "")
+        prefs.getIntCoerceIn(kv_calibrationAudioOffsetMs, -500, 500)
+        prefs.getBoolean(kv_calibrationDisableInputSFX)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
@@ -148,11 +152,12 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_fullscreen)
                 .putBoolean(kv_showInputFeedbackBar)
                 .putBoolean(kv_showSkillStar)
-                .putInt(kv_audioOffsetMs)
                 .putBoolean(kv_discordRichPresence)
                 .putString(kv_mixer)
                 .putBoolean(kv_mainMenuFlipAnimations)
                 .putString(kv_locale)
+                .putInt(kv_calibrationAudioOffsetMs)
+                .putBoolean(kv_calibrationDisableInputSFX)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)

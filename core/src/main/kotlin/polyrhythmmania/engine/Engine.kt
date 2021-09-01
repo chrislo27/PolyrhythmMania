@@ -21,7 +21,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
     private val queuedRunnables: MutableList<Runnable> = CopyOnWriteArrayList()
     
     val inputter: EngineInputter = EngineInputter(this)
-    val soundInterface: SoundInterface = SoundInterface.createFromSoundSystem(soundSystem)
+    val soundInterface: SoundInterface = SoundInterface.createFromSoundSystem(soundSystem, this)
     private val _events: MutableList<Event> = CopyOnWriteArrayList()
     val events: List<Event> = _events
     val musicData: MusicData = MusicData(this)

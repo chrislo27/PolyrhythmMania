@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
-import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.EventChangePlaybackSpeed
-import polyrhythmmania.engine.EventPlaySFX
+import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.sidemodes.EventIncrementEndlessScore
@@ -181,7 +178,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         
         if (!isKilled && !playedDunkSfx && (beat - deployBeat) >= 2f) {
             playedDunkSfx = true
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_dunk_dunk"))
+            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_dunk_dunk"), SoundInterface.SFXType.NORMAL)
         }
 
         if (seconds >= explodeAtSec && !exploded) {
@@ -324,8 +321,8 @@ class EntityPistonDunk(world: World)
         when (type) {
             Type.PLATFORM -> {
             }
-            Type.PISTON_A -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_a"))
-            Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_d"))
+            Type.PISTON_A -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_a"), SoundInterface.SFXType.PLAYER_INPUT)
+            Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_d"), SoundInterface.SFXType.PLAYER_INPUT)
         }
     }
 

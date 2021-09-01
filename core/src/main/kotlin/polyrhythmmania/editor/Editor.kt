@@ -44,6 +44,7 @@ import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
@@ -262,7 +263,8 @@ class Editor(val main: PRManiaGame)
                 if (metronomeEnabled.getOrCompute()) {
                     val measurePart = engine.timeSignatures.getMeasurePart(floorBeat.toFloat())
                     val pitch = if (measurePart <= -1) 1f else if (measurePart == 0) Semitones.getALPitch(8) else Semitones.getALPitch(3)
-                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { player ->
+                    // TODO this may have to be offset when Playtesting
+                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_cowbell"), SoundInterface.SFXType.NORMAL) { player ->
                         player.pitch = pitch
                     }
                 }
