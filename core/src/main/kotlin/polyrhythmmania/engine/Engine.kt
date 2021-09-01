@@ -88,11 +88,11 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
         val eventWidth = event.width
         val eventEndBeat = eventBeat + eventWidth
         
-        if (event is AudioEvent) { // TODO
+        if (event is AudioEvent) {
             val msOffset = inputCalibration.audioOffsetMs
             val actualBeat = atBeat
             @Suppress("NAME_SHADOWING")
-            val atBeat = tempos.secondsToBeats(tempos.beatsToSeconds(atBeat) - (msOffset / 1000f))
+            val atBeat = tempos.secondsToBeats(tempos.beatsToSeconds(atBeat) - (msOffset / 1000f) * this.playbackSpeed)
             
             when (event.audioUpdateCompletion) {
                 Event.UpdateCompletion.PENDING -> {
