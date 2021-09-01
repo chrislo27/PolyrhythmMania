@@ -37,6 +37,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
         this.setSize(MMMenu.WIDTH_MID, adjust = 32f)
         this.titleText.bind { Localization.getVar("mainMenu.submitDailyChallenge.title").use() }
         this.contentPane.bounds.height.set(315f)
+        this.deleteWhenPopped.set(true)
 
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
@@ -167,7 +168,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.submitDailyChallenge.backToMainMenu").use() }).apply {
                 this.bounds.width.set(190f)
                 this.setOnAction {
-                    removeSelfFromMenuCol(true)
+                    menuCol.popLastMenu()
                 }
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.submitDailyChallenge.submitScore").use() }).apply {
@@ -189,11 +190,6 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
                 this.setScaleXY(0.9f)
             }
         }
-    }
-
-    fun removeSelfFromMenuCol(playSound: Boolean) {
-        menuCol.popLastMenu(playSound = playSound)
-        menuCol.removeMenu(this)
     }
     
     private fun submitScore(name: String, noCountry: Boolean) {

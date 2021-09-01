@@ -60,6 +60,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.setSize(WIDTH_MID)
         this.titleText.bind { Localization.getVar("mainMenu.play.playSavedLevel.title").use() }
         this.contentPane.bounds.height.set(300f)
+        this.deleteWhenPopped.set(true)
 
         val content = VBox().apply {
             Anchor.TopLeft.configure(this)
@@ -193,7 +194,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setOnAction {
                     loaded?.newContainer?.disposeQuietly()
                     loaded = null
-                    removeSelfFromMenuCol(true)
+                    menuCol.popLastMenu(playSound = true)
                 }
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.play.playAction").use() }).apply {
@@ -225,7 +226,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
                                     playScreen.prepareGameStart()
-                                    removeSelfFromMenuCol(false)
+                                    menuCol.popLastMenu(playSound = false)
                                     DiscordCore.updateActivity(DefaultPresences.playingLevel())
                                     mainMenu.backgroundType = BgType.NORMAL
                                 }
@@ -261,18 +262,13 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             loadFile(file)
                         } else { // Cancelled out
                             Gdx.app.postRunnable {
-                                removeSelfFromMenuCol(false)
+                                menuCol.popLastMenu(playSound = false)
                             }
                         }
                     }
                 }
             }
         }
-    }
-
-    fun removeSelfFromMenuCol(playSound: Boolean) {
-        menuCol.popLastMenu(playSound = playSound)
-        menuCol.removeMenu(this)
     }
 
     /**

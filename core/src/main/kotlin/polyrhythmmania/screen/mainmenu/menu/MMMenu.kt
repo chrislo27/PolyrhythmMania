@@ -55,6 +55,11 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
     
     val showLogo: Var<Boolean> = Var(true)
 
+    /**
+     * Removes the [MMMenu] from [menuCol] when popped [MenuCollection.popLastMenu]
+     */
+    val deleteWhenPopped: Var<Boolean> = Var(false)
+
     protected fun setSize(percentage: Float, adjust: Float = 0f) {
         bounds.width.bind {
             (this@MMMenu.parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * percentage + adjust

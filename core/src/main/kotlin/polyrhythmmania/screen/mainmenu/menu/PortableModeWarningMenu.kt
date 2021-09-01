@@ -25,6 +25,7 @@ class PortableModeWarningMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.setSize(MMMenu.WIDTH_MID)
         this.titleText.bind { Localization.getVar("mainMenu.portableModeWarning.title").use() }
         this.contentPane.bounds.height.set(300f)
+        this.deleteWhenPopped.set(true)
 
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
@@ -75,7 +76,6 @@ class PortableModeWarningMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.bounds.width.set(100f)
                 this.setOnAction {
                     menuCol.popLastMenu()
-                    menuCol.removeMenu(this@PortableModeWarningMenu)
                 }
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.portableModeWarning.openCurrent").use() }).apply {
