@@ -50,17 +50,16 @@ class SoundSystem(private val mixer: Mixer,
     data class SoundSystemSettings(val reportAdaptiveSync: Boolean = true)
 
     val audioContext: AudioContext =
-//            AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat)
-            object : AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat) {
-                init {
-                    // FIXME remove after done testing delay
-                    run {
-                        val field = AudioContext::class.java.getDeclaredField("out")
-                        field.isAccessible = true
-                        field.set(this, Delay(this, this.out.outs, bufferSize * 10))
-                    }
-                }
-            }
+            AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat)
+//            object : AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat) {
+//                init { // For testing delays
+//                    run {
+//                        val field = AudioContext::class.java.getDeclaredField("out")
+//                        field.isAccessible = true
+//                        field.set(this, Delay(this, this.out.outs, bufferSize * 10))
+//                    }
+//                }
+//            }
 
     @Volatile
     private var currentlyRealTime: Boolean = true
