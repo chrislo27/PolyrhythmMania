@@ -18,7 +18,6 @@ import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.TextRun
-import paintbox.registry.AssetRegistry
 import paintbox.ui.SceneRoot
 import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
@@ -44,7 +43,6 @@ import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
@@ -52,7 +50,6 @@ import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
 import polyrhythmmania.util.DecimalFormats
-import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
@@ -62,7 +59,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.concurrent.thread
-import kotlin.math.floor
+import kotlin.math.ceil
 
 
 class Editor(val main: PRManiaGame)
@@ -153,7 +150,7 @@ class Editor(val main: PRManiaGame)
     val musicData: EditorMusicData by lazy { EditorMusicData(this) }
     val metronomeEnabled: Var<Boolean> = Var(false)
     val timeSignatures: Var<List<TimeSignature>> = Var(listOf())
-    private var lastMetronomeBeat: Int = -1
+    private var lastPlacedMetronomeBeat: Int = -1
     private var timeUntilAutosave: Float = autosaveInterval.getOrCompute() * 60f
     val lastAutosaveTimeMs: Var<Long> = Var(0L)
     val playbackSpeed: FloatVar = FloatVar(1f)
@@ -181,6 +178,7 @@ class Editor(val main: PRManiaGame)
     }
 
     init {
+        engine.inputCalibration = main.settings.inputCalibration.getOrCompute()
         engine.autoInputs = true
         engine.endSignalReceived.addListener { endSignal ->
             if (endSignal.getOrCompute() && playState.getOrCompute() == PlayState.PLAYING) {
@@ -194,6 +192,12 @@ class Editor(val main: PRManiaGame)
         autosaveInterval.addListener(autosaveIntervalListener)
         playbackSpeed.addListener { 
             engine.playbackSpeed = it.getOrCompute()
+        }
+        metronomeEnabled.addListener { 
+            if (!it.getOrCompute()) {
+                engine.removeEvents(engine.events.filter { e -> e is EventEditorMetronome })
+            }
+            lastPlacedMetronomeBeat = -1
         }
     }
 
@@ -257,18 +261,8 @@ class Editor(val main: PRManiaGame)
 
             val currentEngineBeat = engine.beat
             engineBeat.set(currentEngineBeat)
-            val floorBeat = floor(engine.beat).toInt()
-            if (floorBeat > lastMetronomeBeat) {
-                lastMetronomeBeat = floorBeat
-                if (metronomeEnabled.getOrCompute()) {
-                    val measurePart = engine.timeSignatures.getMeasurePart(floorBeat.toFloat())
-                    val pitch = if (measurePart <= -1) 1f else if (measurePart == 0) Semitones.getALPitch(8) else Semitones.getALPitch(3)
-                    // TODO this may have to be offset when Playtesting
-                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_cowbell"), SoundInterface.SFXType.NORMAL) { player ->
-                        player.pitch = pitch
-                    }
-                }
-            }
+            
+            populateMetronomeTicks(engine.beat + 8)
 
             val currentPanSetting = panningDuringPlaybackSetting.getOrCompute()
             when (currentPanSetting) {
@@ -611,6 +605,7 @@ class Editor(val main: PRManiaGame)
             engine.soundInterface.disableSounds = true
             
             engine.removeEvents(engine.events.filter { it is EventDeployRod && it.beat + 4f + 5f < playbackStartBeats })
+            engine.removeEvents(engine.events.filter { it is EventEditorMetronome })
             
             // Simulate some time before the playback start depending on deploy rod events
             if (settings.editorHigherAccuracyPreview.getOrCompute()) {
@@ -641,8 +636,8 @@ class Editor(val main: PRManiaGame)
             engine.musicData.update()
             engine.soundInterface.disableSounds = wereSoundsDisabled
             
-            val engineBeatFloor = floor(engine.beat)
-            lastMetronomeBeat = if (engineBeatFloor == engine.beat) (engineBeatFloor.toInt() - 1) else engineBeatFloor.toInt()
+            lastPlacedMetronomeBeat = -1
+            populateMetronomeTicks(engine.beat + 8)
         } else if (newState == PlayState.STOPPED) {
             resetWorld()
             val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
@@ -661,6 +656,23 @@ class Editor(val main: PRManiaGame)
         }
 
         this.playState.set(newState)
+    }
+    
+    private fun populateMetronomeTicks(upUntilBeat: Float) {
+        val engineBeatCeil = ceil(engine.beat).toInt()
+        
+        if (metronomeEnabled.getOrCompute()) {
+            var beat: Int = engineBeatCeil
+            while (beat < upUntilBeat) {
+                if (beat > lastPlacedMetronomeBeat) {
+                    engine.addEvent(EventEditorMetronome(engine, (beat).toFloat()))
+                }
+                beat++
+            }
+            lastPlacedMetronomeBeat = beat - 1
+        } else {
+            lastPlacedMetronomeBeat = engineBeatCeil
+        }
     }
     
     fun updatePaletteAndTexPackChangesState(currentBeat: Float = engine.beat) {
