@@ -176,9 +176,15 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         super.engineUpdate(engine, beat, seconds)
         
-        if (!isKilled && !playedDunkSfx && (beat - deployBeat) >= 2f) {
+        if (!isKilled && !playedDunkSfx) {
             playedDunkSfx = true
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_dunk_dunk"), SoundInterface.SFXType.NORMAL)
+            engine.addEvent(object : EventPlaySFX(engine, deployBeat + 2f, "sfx_dunk_dunk") {
+                override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+                    if (!this@EntityRodDunk.isKilled) {
+                        super.onAudioStart(atBeat, actualBeat)
+                    }
+                }
+            })
         }
 
         if (seconds >= explodeAtSec && !exploded) {
