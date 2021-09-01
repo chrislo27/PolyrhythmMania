@@ -160,7 +160,6 @@ abstract class EntityRod(world: World, val deployBeat: Float)
     }
 
     protected fun playSfxExplosion(engine: Engine) {
-        // TODO needs to be offset
         engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_explosion"), SoundInterface.SFXType.NORMAL)
     }
 }

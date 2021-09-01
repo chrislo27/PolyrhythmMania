@@ -87,6 +87,39 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
         val eventBeat = event.beat
         val eventWidth = event.width
         val eventEndBeat = eventBeat + eventWidth
+        
+        if (event is AudioEvent) { // TODO
+            val msOffset = inputCalibration.audioOffsetMs
+            val actualBeat = atBeat
+            @Suppress("NAME_SHADOWING")
+            val atBeat = tempos.secondsToBeats(tempos.beatsToSeconds(atBeat) - (msOffset / 1000f))
+            
+            when (event.audioUpdateCompletion) {
+                Event.UpdateCompletion.PENDING -> {
+                    if (atBeat >= eventEndBeat) {
+                        // Do all three updates and jump to COMPLETED
+                        event.onAudioStart(atBeat, actualBeat)
+                        event.onAudioUpdate(atBeat, actualBeat)
+                        event.onAudioEnd(atBeat, actualBeat)
+                        event.audioUpdateCompletion = Event.UpdateCompletion.COMPLETED
+                    } else if (atBeat > eventBeat) {
+                        // Now inside the event. Call onStart and onUpdate
+                        event.onAudioStart(atBeat, actualBeat)
+                        event.onAudioUpdate(atBeat, actualBeat)
+                        event.audioUpdateCompletion = Event.UpdateCompletion.UPDATING
+                    }
+                }
+                Event.UpdateCompletion.UPDATING -> {
+                    event.onAudioUpdate(atBeat, actualBeat)
+                    if (atBeat >= eventEndBeat) {
+                        event.onAudioEnd(atBeat, actualBeat)
+                        event.audioUpdateCompletion = Event.UpdateCompletion.COMPLETED
+                    }
+                }
+                Event.UpdateCompletion.COMPLETED -> {}
+            }
+        }
+        
         when (event.updateCompletion) {
             Event.UpdateCompletion.PENDING -> {
                 if (atBeat >= eventEndBeat) {
@@ -120,7 +153,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
                     event.updateCompletion = Event.UpdateCompletion.COMPLETED
                 }
             }
-            Event.UpdateCompletion.COMPLETED -> return
+            Event.UpdateCompletion.COMPLETED -> {}
         }
     }
 
@@ -153,12 +186,12 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
         var anyToDelete = false
         events.forEach { event ->
             updateEvent(event, currentBeat)
-            if (!anyToDelete && event.updateCompletion == Event.UpdateCompletion.COMPLETED) {
+            if (!anyToDelete && event.readyToDelete()) {
                 anyToDelete = true
             }
         }
         if (anyToDelete && deleteEventsAfterCompletion) {
-            removeEvents(_events.filter { it.updateCompletion == Event.UpdateCompletion.COMPLETED })
+            removeEvents(_events.filter { it.readyToDelete() })
         }
         world.engineUpdate(this, currentBeat, currentSeconds)
         

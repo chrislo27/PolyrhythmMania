@@ -366,7 +366,7 @@ class PlayScreen(
         engine.removeActiveTextbox(false)
         engine.resetEndSignal()
         
-        timing.seconds = -1f
+        timing.seconds = min(-1f, -1f + this.inputCalibration.audioOffsetMs / 1000f)
         engine.seconds = timing.seconds
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
