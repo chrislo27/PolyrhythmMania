@@ -73,6 +73,11 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNextMenu(menuCol.advancedAudioMenu)
                 }
             }
+            vbox += createLongButton { Localization.getVar("mainMenu.audioSettings.goToCalibration").use() }.apply { 
+                this.setOnAction { 
+                    menuCol.pushNextMenu(menuCol.calibrationSettingsMenu)
+                }
+            }
         }
 
         hbox.temporarilyDisableLayouts {
