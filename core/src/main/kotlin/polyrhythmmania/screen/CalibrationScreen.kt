@@ -202,7 +202,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
         
         if (Gdx.input.isKeyJustPressed(aKeybind)) {
             pistonAnimation = 1f
-            val beatOffset = currentBeat - currentBeat.roundToInt()
+            val beatOffset = -(currentBeat - currentBeat.roundToInt())
             val secOffset = TempoUtils.beatsToSeconds(beatOffset, CALIBRATION_BPM)
             lastInputOffset.set(secOffset * 1000)
             if (secOffset.absoluteValue <= InputThresholds.MAX_OFFSET_SEC * 2) {
