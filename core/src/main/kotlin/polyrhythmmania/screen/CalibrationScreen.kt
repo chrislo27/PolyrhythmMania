@@ -67,7 +67,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     private val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()
     
     private lateinit var player: PlayerLike
-    private var lastCowbellBeat: Int = 1 // Intentionally 1
+    private var lastCowbellBeat: Int = -1
     private val summedOffsets: FloatVar = FloatVar(0f)
     private val lastInputOffset: FloatVar = FloatVar(0f)
     private val inputCount: Var<Int> = Var(0)
@@ -89,7 +89,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
         sceneRoot += upperVbox
         upperVbox += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
             Anchor.TopLeft.configure(this)
-            this.bounds.height.set(128f)
+            this.bounds.height.set(136f)
             this.padding.set(Insets(8f, 8f, 8f, 8f))
             
             this += VBox().apply {
@@ -98,7 +98,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
                     this += TextLabel(binding = { Localization.getVar("calibration.title").use() }, font = main.fontMainMenuHeading).apply { 
                         this.textColor.set(Color.WHITE)
                         this.renderAlign.set(Align.center)
-                        this.bounds.height.set(40f)
+                        this.bounds.height.set(48f)
                     }
                     this += TextLabel(binding = { Localization.getVar("calibration.instructions", Var {
                         listOf(Input.Keys.toString(aKeybind))
@@ -190,9 +190,13 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
         val currentBeat = TempoUtils.secondsToBeats((player.position / 1000).toFloat(), CALIBRATION_BPM)
         val currentBeatInt = currentBeat.toInt()
         if (currentBeatInt != lastCowbellBeat) {
-            lastCowbellBeat = currentBeatInt
-            soundSystem.playAudio(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { playerLike ->
-                playerLike.gain = 0.5f
+            if (lastCowbellBeat < 0) {
+                lastCowbellBeat++
+            } else {
+                lastCowbellBeat = currentBeatInt
+                soundSystem.playAudio(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { playerLike ->
+                    playerLike.gain = 0.5f
+                }
             }
         }
         
