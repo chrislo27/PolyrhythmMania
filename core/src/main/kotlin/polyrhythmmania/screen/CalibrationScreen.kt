@@ -223,10 +223,13 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
         val camera = uiCamera
         batch.projectionMatrix = camera.combined
         batch.begin()
+        
+        uiViewport.apply()
 
         batch.setColor(0.9f, 0.9f, 0.9f, 1f)
         batch.fillRect(0f, 0f, camera.viewportWidth, camera.viewportHeight)
         batch.setColor(1f, 1f, 1f, 1f)
+        batch.draw(AssetRegistry.get<Texture>("green_grid"), 0f, 0f, camera.viewportWidth, camera.viewportHeight)
         
         val animationIndex: Int = when (pistonAnimation) {
             in 0.95f..1.0f -> 2
