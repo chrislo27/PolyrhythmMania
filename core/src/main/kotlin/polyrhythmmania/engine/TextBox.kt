@@ -1,12 +1,16 @@
 package polyrhythmmania.engine
 
+import paintbox.font.TextAlign
+
 
 enum class TextBoxStyle {
     DIALOGUE, BLACK;
 }
 
 data class TextBox(val text: String, val requiresInput: Boolean,
-                   val secsBeforeCanInput: Float = 0.5f, val style: TextBoxStyle = TextBoxStyle.BLACK) {
+                   val secsBeforeCanInput: Float = 0.5f,
+                   val style: TextBoxStyle = TextBoxStyle.BLACK, 
+                   val align: TextAlign = TextAlign.LEFT) {
     fun toActive(): ActiveTextBox = ActiveTextBox(this)
 }
 

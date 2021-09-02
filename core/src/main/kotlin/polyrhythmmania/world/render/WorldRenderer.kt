@@ -418,6 +418,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
             textBoxDialoguePane.visible.set(style == TextBoxStyle.DIALOGUE)
             
             textBoxLabel.text.set(textBox.textBox.text)
+            textBoxLabel.textAlign.set(textBox.textBox.align)
             val textColor = if (style == TextBoxStyle.BLACK) Color.WHITE else Color.BLACK
             textBoxLabel.textColor.set(textColor)
             textBoxInputLabel.text.set(if (textBox.secondsTimer > 0f) "" else {
