@@ -6,7 +6,9 @@ import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
@@ -67,13 +69,25 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     private lateinit var player: PlayerLike
     private var lastCowbellBeat: Int = 1 // Intentionally 1
     private val summedOffsets: FloatVar = FloatVar(0f)
+    private val lastInputOffset: FloatVar = FloatVar(0f)
     private val inputCount: Var<Int> = Var(0)
     private val estimatedOffset: FloatVar = FloatVar {
         (summedOffsets.useF() / inputCount.use().coerceAtLeast(1)) * 1000
     }
+    
+    private val pistonAnimations: List<TextureRegion> = listOf(
+            TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 1, 35, 32, 40),
+            TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 133, 35, 32, 40),
+            TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 100, 35, 32, 40),
+    )
+    private var pistonAnimation: Float = 0f
 
     init {
-        sceneRoot += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+        val upperVbox = VBox().apply { 
+            this.bindHeightToParent(adjust = -64f)
+        }
+        sceneRoot += upperVbox
+        upperVbox += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
             Anchor.TopLeft.configure(this)
             this.bounds.height.set(128f)
             this.padding.set(Insets(8f, 8f, 8f, 8f))
@@ -98,10 +112,10 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
             }
         }
         
-        sceneRoot += RectElement(Color(0f, 0f, 0f, 0.75f * 0)).apply {
-            Anchor.Centre.configure(this, offsetY = -150f)
+        upperVbox += RectElement(Color(0f, 0f, 0f, 0.75f * 0)).apply {
+            Anchor.TopCentre.configure(this)
             this.bindWidthToParent(adjust = -500f)
-            this.bounds.height.set(72f)
+            this.bounds.height.set(128f)
             this.padding.set(Insets(8f, 8f, 8f, 8f))
 
             this += TextLabel(binding = { Localization.getVar("calibration.offset", Var {
@@ -116,14 +130,14 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
             }
         }
         
-        sceneRoot += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
-            Anchor.Centre.configure(this, offsetY = 0f)
+        upperVbox += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+            Anchor.TopCentre.configure(this)
             this.bindWidthToParent(adjust = -400f)
-            this.bounds.height.set(100f)
+            this.bounds.height.set(128f)
             this.padding.set(Insets(8f, 8f, 8f, 8f))
 
             this += TextLabel(binding = { Localization.getVar("calibration.offset.details", Var {
-                listOf(DecimalFormats.format("0.00", estimatedOffset.useF()), inputCount.use())
+                listOf(DecimalFormats.format("0.00", estimatedOffset.useF()), DecimalFormats.format("0.00", lastInputOffset.useF()), inputCount.use())
             }).use() }, font = main.fontMainMenuMain).apply {
                 this.textColor.set(Color.WHITE)
                 this.renderAlign.set(Align.center)
@@ -183,8 +197,10 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
         }
         
         if (Gdx.input.isKeyJustPressed(aKeybind)) {
+            pistonAnimation = 1f
             val beatOffset = currentBeat - currentBeat.roundToInt()
             val secOffset = TempoUtils.beatsToSeconds(beatOffset, CALIBRATION_BPM)
+            lastInputOffset.set(secOffset * 1000)
             if (secOffset.absoluteValue <= InputThresholds.MAX_OFFSET_SEC * 2) {
                 inputCount.set(inputCount.getOrCompute() + 1)
                 summedOffsets.set(summedOffsets.get() + secOffset)
@@ -195,6 +211,8 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     private fun resetCalibrationEstimate() {
         summedOffsets.set(0f)
         inputCount.set(0)
+        lastInputOffset.set(0f)
+        pistonAnimation = 0f
     }
 
     override fun render(delta: Float) {
@@ -209,6 +227,19 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
         batch.setColor(0.9f, 0.9f, 0.9f, 1f)
         batch.fillRect(0f, 0f, camera.viewportWidth, camera.viewportHeight)
         batch.setColor(1f, 1f, 1f, 1f)
+        
+        val animationIndex: Int = when (pistonAnimation) {
+            in 0.95f..1.0f -> 2
+            in 0.5f..0.95f -> 1
+            else -> 0
+        }
+        val tex = pistonAnimations[animationIndex]
+        val w = 32f * 4
+        val h = 40f * 4
+        batch.draw(tex, camera.viewportWidth / 2 - w / 2, 120f, w, h)
+        if (pistonAnimation > 0) {
+            pistonAnimation = (pistonAnimation - (Gdx.graphics.deltaTime / (60f / CALIBRATION_BPM))).coerceIn(0f, 1f)
+        }
         
         sceneRoot.renderAsRoot(batch)
         
