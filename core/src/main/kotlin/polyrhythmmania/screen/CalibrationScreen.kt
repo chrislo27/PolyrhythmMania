@@ -77,8 +77,8 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     
     private val pistonAnimations: List<TextureRegion> = listOf(
             TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 1, 35, 32, 40),
-            TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 133, 35, 32, 40),
-            TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 100, 35, 32, 40),
+            TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 67, 35, 32, 40),
+            TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 34, 35, 32, 40),
     )
     private var pistonAnimation: Float = 0f
 
