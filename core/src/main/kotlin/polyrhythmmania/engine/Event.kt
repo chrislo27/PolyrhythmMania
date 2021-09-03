@@ -50,6 +50,13 @@ open class Event(val engine: Engine) : Comparable<Event> {
         } else thisBeat.compareTo(otherBeat)
     }
 
+    /**
+     * Returns true if this event should be deleted because [updateCompletion] is [UpdateCompletion.COMPLETED].
+     */
+    open fun readyToDelete(): Boolean {
+        return this.updateCompletion == UpdateCompletion.COMPLETED
+    }
+
     enum class UpdateCompletion {
         PENDING,
         UPDATING,

@@ -11,23 +11,22 @@ import polyrhythmmania.world.Row
 
 
 class EventCowbellSFX(engine: Engine, startBeat: Float, val useMeasures: Boolean)
-    : Event(engine) {
+    : AudioEvent(engine) {
 
     init {
         this.beat = startBeat
     }
 
-    override fun onStart(currentBeat: Float) {
-        super.onStart(currentBeat)
+    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
         if (useMeasures) {
-            val measurePart = engine.timeSignatures.getMeasurePart(currentBeat)
+            val measurePart = engine.timeSignatures.getMeasurePart(this.beat)
             val pitch = if (measurePart <= -1) 1f else if (measurePart == 0) Semitones.getALPitch(8) else Semitones.getALPitch(3)
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { player ->
+            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell"), SoundInterface.SFXType.NORMAL) { player ->
                 player.pitch = pitch
                 player.gain = 0.65f
             }
         } else {
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell")) { player ->
+            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_cowbell"), SoundInterface.SFXType.NORMAL) { player ->
                 player.gain = 0.65f
             }
         }
@@ -37,25 +36,21 @@ class EventCowbellSFX(engine: Engine, startBeat: Float, val useMeasures: Boolean
 open class EventPlaySFX(engine: Engine, startBeat: Float,
                    val id: String, val allowOverlap: Boolean = false,
                    val callback: (PlayerLike) -> Unit = {})
-    : Event(engine) {
+    : AudioEvent(engine) {
 
     init {
         this.beat = startBeat
     }
 
-    override fun onStart(currentBeat: Float) {
-        super.onStart(currentBeat)
+    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
         val beadsSound = AssetRegistry.get<BeadsSound>(id)
         if (allowOverlap) {
-            engine.soundInterface.playAudio(beadsSound, callback)
+            engine.soundInterface.playAudio(beadsSound, SoundInterface.SFXType.NORMAL, callback)
         } else {
-            engine.soundInterface.playAudioNoOverlap(beadsSound, callback)
+            engine.soundInterface.playAudioNoOverlap(beadsSound, SoundInterface.SFXType.NORMAL, callback)
         }
     }
 }
-
-class EventApplauseSFX(engine: Engine, startBeat: Float)
-    : EventPlaySFX(engine, startBeat, "sfx_applause", allowOverlap = false)
 
 class EventChangePlaybackSpeed(engine: Engine, val newSpeed: Float)
     : Event(engine) {

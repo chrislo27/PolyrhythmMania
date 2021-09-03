@@ -17,10 +17,10 @@ import javax.sound.sampled.Mixer
 
 class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
-    private val settings: Settings = menuCol.main.settings
+//    private val settings: Settings = menuCol.main.settings
 
     init {
-        this.setSize(MMMenu.WIDTH_MID)
+        this.setSize(MMMenu.WIDTH_MEDIUM)
         this.titleText.bind { Localization.getVar("mainMenu.advancedAudio.title").use() }
         this.contentPane.bounds.height.set(300f)
 

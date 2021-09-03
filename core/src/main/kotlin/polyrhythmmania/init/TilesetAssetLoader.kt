@@ -17,6 +17,8 @@ class TilesetAssetLoader : AssetRegistry.IAssetLoader {
         }
         
         AssetRegistry.loadAsset<Texture>("tileset_missing_tex", "textures/world/missing.png")
+        AssetRegistry.loadAsset<Texture>("gba_spritesheet", "textures/world/gba_spritesheet.png")
+        AssetRegistry.loadAsset<Texture>("green_grid", "textures/world/green_grid.png", linearTexture())
         
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "skill_star",

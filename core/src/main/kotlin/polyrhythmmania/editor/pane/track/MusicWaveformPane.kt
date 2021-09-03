@@ -69,7 +69,7 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                 segmentsInRenderZone.add(tempos.beatsToSeconds(tc.beat, disregardSwing = false) * musicRate)
             }
 
-            val musicDelaySec = engineMusicData.computeMusicDelaySec()
+            val musicDelaySec = engineMusicData.computeMusicDelaySecNoCalibration()
             val loopParams = engineMusicData.loopParams
             if (loopParams.loopType == SamplePlayer.LoopType.LOOP_FORWARDS) {
                 val loopDur = loopParams.endPointMs - loopParams.startPointMs

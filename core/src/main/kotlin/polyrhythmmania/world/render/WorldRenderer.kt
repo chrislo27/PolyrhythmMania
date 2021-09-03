@@ -29,6 +29,7 @@ import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
@@ -110,7 +111,9 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     private var hudRedFlash: Float = 0f
 
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
-    private val textBoxPane: TextboxPane = TextboxPane()
+    private val textBoxSuperpane: Pane
+    private val textBoxDialoguePane: TextboxPane = TextboxPane()
+    private val textBoxBlackPane: RectElement = RectElement(Color(0f, 0f, 0f, 0.5f))
     private val textBoxLabel: TextLabel = TextLabel("")
     private val textBoxInputLabel: TextLabel = TextLabel(RodinSpecialChars.BORDERED_A, font = PRManiaGame.instance.fontGameTextbox)
     private val perfectPane: Pane = Pane()
@@ -276,12 +279,20 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         }
         endlessModeGameOverPane += endlessModeGameOverLabel
         
-        uiSceneRoot += textBoxPane.apply {
-            Anchor.TopCentre.configure(textBoxPane, offsetY = 64f)
-            this.bounds.width.set(1000f)
+        textBoxSuperpane = Pane().apply {
+            Anchor.TopCentre.configure(this, offsetY = 64f)
             this.bounds.height.set(150f)
-            this.padding.set(Insets(16f, 16f, 62f, 62f))
+        }
+        uiSceneRoot += textBoxSuperpane
+        textBoxSuperpane += textBoxBlackPane
+        
+        textBoxSuperpane += Pane().apply {
+            Anchor.TopCentre.configure(this)
+            this.bounds.width.set(1000f)
+            
+            this += textBoxDialoguePane
             this += textBoxLabel.apply {
+                Anchor.TopCentre.configure(this)
                 this.markup.set(baseMarkup)
                 this.renderAlign.set(Align.center)
                 this.textAlign.set(TextAlign.LEFT)
@@ -290,7 +301,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                 this.renderAlign.set(Align.right)
                 this.bounds.width.set(48f)
                 this.bounds.height.set(48f)
-                Anchor.BottomRight.configure(this, offsetX = 48f, offsetY = 10f)
+                Anchor.BottomRight.configure(this, offsetX = -10f, offsetY = -6f)
             }
         }
     }
@@ -400,13 +411,21 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         }
 
         val textBox = engine.activeTextBox
-        textBoxPane.visible.set(textBox != null)
+        textBoxSuperpane.visible.set(textBox != null)
         if (textBox != null) {
+            val style = textBox.textBox.style
+            textBoxBlackPane.visible.set(style == TextBoxStyle.BLACK)
+            textBoxDialoguePane.visible.set(style == TextBoxStyle.DIALOGUE)
+            
             textBoxLabel.text.set(textBox.textBox.text)
+            textBoxLabel.textAlign.set(textBox.textBox.align)
+            val textColor = if (style == TextBoxStyle.BLACK) Color.WHITE else Color.BLACK
+            textBoxLabel.textColor.set(textColor)
             textBoxInputLabel.text.set(if (textBox.secondsTimer > 0f) "" else {
                 if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f)
                     RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A
             })
+            textBoxInputLabel.textColor.set(textColor)
         }
 
         val challenge = inputter.challenge

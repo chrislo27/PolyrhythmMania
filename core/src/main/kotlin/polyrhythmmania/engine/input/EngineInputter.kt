@@ -11,6 +11,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.sidemodes.SidemodeAssets
@@ -232,10 +233,10 @@ class EngineInputter(val engine: Engine) {
                                 val newValue = (practice.moreTimes.getOrCompute() - 1).coerceAtLeast(0)
                                 practice.moreTimes.set(newValue)
                                 if (newValue == 0) {
-                                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_2"))
+                                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_2"), SoundInterface.SFXType.NORMAL)
                                     practice.clearText = 1f
                                 } else {
-                                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_1"))
+                                    engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_1"), SoundInterface.SFXType.NORMAL)
                                 }
                             }
                         }
@@ -411,7 +412,7 @@ class EngineInputter(val engine: Engine) {
             if (!challenge.failed) {
                 challenge.failed = true
                 challenge.hit = 1f
-                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail")) { player ->
+                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
                     player.gain = 0.45f
                 }
             }
@@ -488,7 +489,7 @@ class EngineInputter(val engine: Engine) {
     }
     
     fun onSkillStarHit() {
-        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_skill_star")) { player ->
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_skill_star"), SoundInterface.SFXType.PLAYER_INPUT) { player ->
             player.gain = 0.6f
         }
     }

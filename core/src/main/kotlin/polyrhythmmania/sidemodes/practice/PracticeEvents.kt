@@ -2,6 +2,7 @@ package polyrhythmmania.sidemodes.practice
 
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.EntityRowBlock
 import polyrhythmmania.world.EventRowBlock
@@ -30,7 +31,7 @@ class EventPracticeRetract(engine: Engine, row: Row, index: Int, startBeat: Floa
         super.onStart(currentBeat)
 
         if (anyBlocksAffected && currentBeat < this.beat + 0.125f) {
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_retract"))
+            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_retract"), SoundInterface.SFXType.NORMAL)
         }
     }
 

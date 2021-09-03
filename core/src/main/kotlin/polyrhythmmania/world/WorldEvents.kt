@@ -2,21 +2,22 @@ package polyrhythmmania.world
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Cursor
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.TexturePackSource
-import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.TextBox
+import polyrhythmmania.engine.*
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.tileset.TilesetPalette
+import kotlin.math.max
+import kotlin.math.min
 
 
 abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float,
                              val affectThisIndexAndForward: Boolean)
-    : Event(engine) {
+    : AudioEvent(engine) {
 
     init {
         this.beat = startBeat
@@ -89,7 +90,6 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityP
     }
 
     override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
-        val didChange = !entity.active || entity.type != type || entity.pistonState != EntityPiston.PistonState.RETRACTED
         entity.type = type
         entity.pistonState = EntityPiston.PistonState.RETRACTED
         if (startPistonExtended) {
@@ -97,13 +97,15 @@ class EventRowBlockSpawn(engine: Engine, row: Row, index: Int, val type: EntityP
         } else {
             entity.retract()
         }
+    }
 
-        if (currentBeat < this.beat + this.width && didChange) {
+    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+        if (min(actualBeat, atBeat) < this.beat + this.width) {
             when (this.type) {
                 EntityPiston.Type.PLATFORM -> {
                 }
-                EntityPiston.Type.PISTON_A -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_a"))
-                EntityPiston.Type.PISTON_DPAD -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d"))
+                EntityPiston.Type.PISTON_A -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_a"), SoundInterface.SFXType.NORMAL)
+                EntityPiston.Type.PISTON_DPAD -> engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_spawn_d"), SoundInterface.SFXType.NORMAL)
             }
         }
     }
@@ -117,33 +119,26 @@ class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Floa
                            affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
 
-    /**
-     * Holds the result of [EntityRowBlock.despawn] from [entityOnUpdate] for checking if the sound should play.
-     */
-    private var anyBlocksAffected: Boolean = false
+    private var shouldPlaySound: Boolean = false
     
     init {
         this.width = 0.125f
     }
-
+    
     override fun onStart(currentBeat: Float) {
-        this.anyBlocksAffected = false
+        shouldPlaySound = false
         super.onStart(currentBeat)
     }
-
+    
     override fun entityOnUpdate(entity: EntityRowBlock, currentBeat: Float, percentage: Float) {
-        val anyAffected = entity.despawn(percentage)
-        if (anyAffected) this.anyBlocksAffected = true
+        entity.despawn(percentage)
+        shouldPlaySound = true
     }
 
-    override fun onUpdate(currentBeat: Float) {
-        val oldAnyBlocksAffected = anyBlocksAffected
-        super.onUpdate(currentBeat)
-        if (!oldAnyBlocksAffected && anyBlocksAffected) { // Condition fulfilled if entities were updated on the first update
-            if (currentBeat < this.beat + this.width) {
-                if (row.rowBlocks.any { it.active }) {
-                    engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_despawn"))
-                }
+    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+        if (min(actualBeat, atBeat) < this.beat + this.width) {
+            if (row.rowBlocks.any { it.active } || shouldPlaySound) {
+                engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_despawn"), SoundInterface.SFXType.NORMAL)
             }
         }
     }
@@ -152,29 +147,32 @@ class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Floa
 class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Float,
                            affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
-    
-    /**
-     * Holds the result of [EntityRowBlock.retract] from [entityOnUpdate] for checking if the sound should play.
-     */
-    private var anyBlocksAffected: Boolean = false
+
+    private var shouldPlaySound: Boolean = false
     
     override fun onStart(currentBeat: Float) {
-        this.anyBlocksAffected = false
+        shouldPlaySound = false
         super.onStart(currentBeat)
-
-        if (anyBlocksAffected && currentBeat < this.beat + 0.125f) {
-            engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_retract"))
+    }
+    
+    override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
+        if (entity.retract()) {
+            shouldPlaySound = true
         }
     }
 
-    override fun entityOnStart(entity: EntityRowBlock, currentBeat: Float) {
-        val result = entity.retract()
-        if (result) {
-            anyBlocksAffected = true
+    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+        if (min(actualBeat, atBeat) < this.beat + 0.125f) {
+            if (row.rowBlocks.any { it.pistonState != EntityPiston.PistonState.RETRACTED } || shouldPlaySound) {
+                engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_retract"), SoundInterface.SFXType.NORMAL)
+            }
         }
     }
 }
 
+/**
+ * Used for debugging only.
+ */
 class EventRowBlockExtend(engine: Engine, row: Row, index: Int, startBeat: Float,
                           affectThisIndexAndForward: Boolean = false)
     : EventRowBlock(engine, row, index, startBeat, affectThisIndexAndForward) {
