@@ -146,15 +146,15 @@ object DiscordCore : Disposable {
         if (!isLoaded()) return
         this.loaded = false
         
-        try {
-            // TODO kill off Activity.java non-daemon thread until https://github.com/JnCrMx/discord-game-sdk4j/issues/33 is resolved
-            val field = Activity::class.java.getDeclaredField("QUEUE_THREAD")
-            field.isAccessible = true
-            val thread: Thread = field.get(null) as Thread
-            thread.stop()
-        } catch (t: Throwable) {
-            t.printStackTrace()
-        }
+//        try { // Removed with discord-game-sdk4j commit 2b5a903204
+//            // TODO kill off Activity.java non-daemon thread until https://github.com/JnCrMx/discord-game-sdk4j/issues/33 is resolved
+//            val field = Activity::class.java.getDeclaredField("QUEUE_THREAD")
+//            field.isAccessible = true
+//            val thread: Thread = field.get(null) as Thread
+//            thread.stop()
+//        } catch (t: Throwable) {
+//            t.printStackTrace()
+//        }
         
         this.core.close()
     }
