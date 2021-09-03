@@ -8,8 +8,10 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
+import polyrhythmmania.engine.AudioEvent
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
@@ -282,7 +284,7 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
 
 // EVENTS ------------------------------------------------------------------------------------------------------
 
-abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float) : Event(engine) {
+abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float) : AudioEvent(engine) {
     
     init {
         this.beat = startBeat
@@ -329,7 +331,36 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
             super.onStart(currentBeat)
         }
     }
-    
+
+    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+        val world = engine.world
+        val pistons = world.asmPistons
+        
+        if (fromIndex in pistons.indices && !engine.world.entities.any { e -> e is EntityRodAsm && e.acceptingInputs }) {
+            return
+        }
+        
+        val playerIndex = pistons.indexOf(world.asmPlayerPiston)
+        
+        if (fromIndex != playerIndex || engine.autoInputs) {
+            if (toIndex == playerIndex) {
+                if (nextInputIsFire) {
+                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_compress"), SoundInterface.SFXType.NORMAL)
+                }
+            }
+
+            if (fromIndex in (0 until pistons.size)) {
+                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue(when (fromIndex) {
+                    0 -> "sfx_asm_left"
+                    1 -> "sfx_asm_middle_left"
+                    2 -> "sfx_asm_middle_right"
+                    3 -> "sfx_asm_right"
+                    else -> "sfx_asm_left"
+                }), SoundInterface.SFXType.NORMAL)
+            }
+        }
+    }
+
     private fun bounceRod(rod: EntityRodAsm) {
         val world = engine.world
         val pistons = world.asmPistons
@@ -354,9 +385,7 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
                 // Schedule an expected input
                 val inputBeat = this.beat + timePerBounce
                 rod.addExpectedInput(EntityRodAsm.NextExpected(inputBeat, nextInputIsFire))
-                if (nextInputIsFire) {
-                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_compress"))
-                }
+                // SFX handled in onAudioStart
                 world.asmPlayerPiston.retract()
             } else if (toIndex !in 0 until pistons.size) {
                 rod.disableInputs = true
@@ -365,16 +394,10 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
             // Bounce the rod
             rod.bounce = bounce
             
-            if (fromIndex in 0 until pistons.size) {
+            if (fromIndex in pistons.indices) {
                 // Play piston extend animation
                 world.asmPistons[fromIndex].fullyExtend(engine, this.beat, timePerBounce)
-                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue(when (fromIndex) {
-                    0 -> "sfx_asm_left"
-                    1 -> "sfx_asm_middle_left"
-                    2 -> "sfx_asm_middle_right"
-                    3 -> "sfx_asm_right"
-                    else -> "sfx_asm_left"
-                }))
+                // SFX handled in onAudioStart
             }
         }
     }
@@ -441,17 +464,17 @@ class EventAsmSpawnWidgetHalves(engine: Engine, startBeat: Float, val combineBea
     }
 }
 
-class EventAsmPrepareSfx(engine: Engine, startBeat: Float) : Event(engine) {
+class EventAsmPrepareSfx(engine: Engine, startBeat: Float) : AudioEvent(engine) {
     
     init {
         this.beat = startBeat
     }
 
-    override fun onStart(currentBeat: Float) {
-        super.onStart(currentBeat)
+    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+        super.onAudioStart(atBeat, actualBeat)
         val beadsSound = SidemodeAssets.assembleSfx.getValue("sfx_asm_prepare")
-        engine.soundInterface.playAudio(beadsSound) { player ->
-            player.pitch = engine.tempos.tempoAtBeat(currentBeat) / 98f
+        engine.soundInterface.playAudio(beadsSound, SoundInterface.SFXType.NORMAL) { player ->
+            player.pitch = engine.tempos.tempoAtBeat(this.beat) / 98f
         }
     }
 }

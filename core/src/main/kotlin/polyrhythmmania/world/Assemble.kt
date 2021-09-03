@@ -10,6 +10,7 @@ import paintbox.registry.AssetRegistry
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.engine.input.InputThresholds
@@ -364,10 +365,10 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
             if (matchingExpected.isFire/* && piston.animation is EntityPistonAsm.Animation.Charged*/) {
                 piston.animation = EntityPistonAsm.Animation.Fire(piston, matchingExpected.inputBeat)
                 piston.retract()
-                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_shoot"))
+                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_shoot"), SoundInterface.SFXType.PLAYER_INPUT)
                 engine.addEvent(EventAsmAssemble(engine, matchingExpected.inputBeat))
             } else {
-                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_middle_right"))
+                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_middle_right"), SoundInterface.SFXType.PLAYER_INPUT)
             }
         } else {
             earlyInputResult = input
@@ -452,7 +453,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
                     bounce = BounceAsm(beat, 1f, this.position.y - 0.01f, this.position.x, this.position.y,
                             this.position.x + MathUtils.random(1.25f, 2f) * MathUtils.randomSign(), this.position.y - 7f, null)
                     failFallVeloY = 6f
-                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_collide")) {
+                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_collide"), SoundInterface.SFXType.NORMAL) {
                         it.gain = 0.5f
                     }
                 }

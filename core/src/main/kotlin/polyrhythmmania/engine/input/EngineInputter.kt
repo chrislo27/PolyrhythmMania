@@ -356,7 +356,7 @@ class EngineInputter(val engine: Engine) {
                 if (animation is EntityPistonAsm.Animation.Neutral) {
                     asmPlayerPiston.fullyExtend(engine, atBeat, hitDuration)
                     if (!hit) {
-                        engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_middle_right")) {
+                        engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_middle_right"), SoundInterface.SFXType.PLAYER_INPUT) {
                             it.pitch = 1.5f
                         }
                     }
@@ -365,7 +365,7 @@ class EngineInputter(val engine: Engine) {
                     val piston = world.asmPlayerPiston
                     piston.animation = EntityPistonAsm.Animation.Fire(piston, atBeat)
                     piston.retract()
-                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_shoot"))
+                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_shoot"), SoundInterface.SFXType.PLAYER_INPUT)
 
                     for (entity in engine.world.entities) {
                         if (entity !is EntityRodAsm || !entity.acceptingInputs) continue
