@@ -439,7 +439,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
                         val futureY = this.position.y + veloY * deltaSec
                         if (futureY < floorBelow) {
                             this.position.y = floorBelow
-                            if (blockBelow.spawningState != EntityRowBlock.SpawningState.DESPAWNING) {
+                            if (blockBelow.spawningState != EntityRowBlock.SpawningState.DESPAWNING && currentIndex <= 12) {
                                 playSfxLand(engine)
                             }
                             collision.velocityY = 0f
