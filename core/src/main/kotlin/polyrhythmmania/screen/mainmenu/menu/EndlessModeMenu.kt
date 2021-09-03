@@ -205,11 +205,18 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             disableRegenCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.endless.settings.disableRegen.tooltip")))
             daredevilCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.endless.settings.daredevil.tooltip")))
             
+            disableRegenCheck.disabled.bind { 
+                daredevilMode.use()
+            }
+            
             disableRegenCheck.onCheckChanged = { newState ->
                 disableRegen.set(newState)
             }
             daredevilCheck.onCheckChanged = { newState ->
                 daredevilMode.set(newState)
+                if (newState) {
+                    disableRegenCheck.checkedState.set(false)
+                }
             }
             
             vbox += disableRegenPane

@@ -462,14 +462,15 @@ class PlayScreen(
         val thisScreen: PlayScreen = this
         val resetAction: () -> Unit = {
             challenges.applyToEngine(engine)
-            val blocks = container.blocks.toList()
             engine.removeEvents(engine.events.toList())
-            engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
             container.world.resetWorld()
             container.world.tilesetPalette.applyTo(container.renderer.tileset)
             engine.soundInterface.clearAllNonMusicAudio()
             container.setTexturePackFromSource()
+            
             prepareGameStart()
+            val blocks = container.blocks.toList()
+            engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
             unpauseGame(false)
         }
         if (doWipeTransition) {

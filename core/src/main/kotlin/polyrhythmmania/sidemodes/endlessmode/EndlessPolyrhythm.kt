@@ -208,9 +208,11 @@ distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficu
                         if (anyA && anyDpad) RowSetting.BOTH else if (anyA) RowSetting.ONLY_A else RowSetting.ONLY_DPAD, true) {
                     engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
                         val endlessScore = engine.inputter.endlessScore
-                        if (!disableLifeRegen && newScore >= 20 && newScore % 10 == 0 && endlessScore.lives.getOrCompute() < endlessScore.maxLives.getOrCompute()) {
+                        val currentLives = endlessScore.lives.getOrCompute()
+                        val maxLives = endlessScore.maxLives.getOrCompute()
+                        if (!disableLifeRegen && newScore >= 20 && newScore % 10 == 0 && currentLives > 0 && currentLives < maxLives) {
                             engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_2"))
-                            endlessScore.lives.set(endlessScore.lives.getOrCompute() + 1)
+                            endlessScore.lives.set(currentLives + 1)
                         } else {
                             engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_1"))
                         }
