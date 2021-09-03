@@ -78,14 +78,6 @@ class CalibrationSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.inputSettings.calibration.audioOffset.tooltip")))
             }
 
-            val (disableInputSFXPane, disableInputSFXCheck) = createCheckboxOption({ Localization.getVar("mainMenu.inputSettings.calibration.disableInputSounds").use() })
-            disableInputSFXCheck.checkedState.set(settings.calibrationDisableInputSFX.getOrCompute())
-            disableInputSFXCheck.onCheckChanged = { newState ->
-                settings.calibrationDisableInputSFX.set(newState)
-            }
-            disableInputSFXCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.inputSettings.calibration.disableInputSounds.tooltip")))
-            vbox += disableInputSFXPane
-
             vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.calibration.test").use() }.apply {
                 this.setOnAction {
                     menuCol.playMenuSound("sfx_menu_select")
