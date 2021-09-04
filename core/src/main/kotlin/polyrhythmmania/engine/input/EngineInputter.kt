@@ -9,10 +9,7 @@ import paintbox.lazysound.LazySound
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.SoundInterface
-import polyrhythmmania.engine.TextBox
+import polyrhythmmania.engine.*
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.*
@@ -384,10 +381,10 @@ class EngineInputter(val engine: Engine) {
                 
                 if (wasNewHighScore && endlessScore.showHighScoreAtEnd) {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
-                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true))
+                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BLACK))
                 } else {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
-                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true))
+                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BLACK))
                 }
                 if (wasNewHighScore) {
                     endlessScore.highScore.set(score)
