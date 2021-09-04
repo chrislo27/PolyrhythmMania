@@ -18,4 +18,6 @@ data class ActiveTextBox(val textBox: TextBox) {
     var secondsTimer: Float = textBox.secsBeforeCanInput
     var isADown: Boolean = false
     var wasSoundInterfacePaused: Boolean = false
+    
+    var onComplete: (Engine) -> Unit = {}
 }

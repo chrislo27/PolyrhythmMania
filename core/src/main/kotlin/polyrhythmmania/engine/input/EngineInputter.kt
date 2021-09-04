@@ -379,23 +379,22 @@ class EngineInputter(val engine: Engine) {
             override fun onStart(currentBeat: Float) {
                 super.onStart(currentBeat)
                 
-                if (wasNewHighScore && endlessScore.showHighScoreAtEnd) {
+                val activeTextBox: ActiveTextBox = if (wasNewHighScore && endlessScore.showHighScoreAtEnd) {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
                     engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BLACK))
                 } else {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
                     engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BLACK))
                 }
+                activeTextBox.onComplete = { engine ->
+                    engine.addEvent(EventEndState(engine, currentBeat))
+                }
+                
                 if (wasNewHighScore) {
                     endlessScore.highScore.set(score)
                     PRManiaGame.instance.settings.persist()
                 }
                 endlessScore.gameOverUIShown.set(true)
-            }
-
-            override fun onEnd(currentBeat: Float) {
-                super.onEnd(currentBeat)
-                engine.addEvent(EventEndState(engine, currentBeat))
             }
         }.apply {
             this.beat = afterBeat
