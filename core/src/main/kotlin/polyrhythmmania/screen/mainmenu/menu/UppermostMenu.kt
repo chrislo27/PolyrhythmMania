@@ -1,5 +1,6 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
@@ -18,6 +19,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.discordrpc.DefaultPresences
 import polyrhythmmania.discordrpc.DiscordHelper
 import polyrhythmmania.editor.EditorScreen
+import polyrhythmmania.screen.mainmenu.bg.BgType
 
 /**
  * The very beginning of the main menu.
@@ -96,7 +98,13 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     mainMenu.transitionAway {
                         val main = mainMenu.main
                         val editorScreen = EditorScreen(main)
-                        main.screen = TransitionScreen(main, main.screen, editorScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f)))
+                        main.screen = TransitionScreen(main, main.screen, editorScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
+                            this.onDestEnd = {
+                                Gdx.app.postRunnable {
+                                    mainMenu.backgroundType = BgType.NORMAL
+                                }
+                            }
+                        }
                         DiscordHelper.updatePresence(DefaultPresences.InEditor)
                     }
                 }
