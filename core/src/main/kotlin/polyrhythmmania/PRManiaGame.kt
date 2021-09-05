@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
+import com.codahale.metrics.ConsoleReporter
 import com.eclipsesource.json.Json
 import org.lwjgl.glfw.GLFW
 import paintbox.*
@@ -47,6 +48,7 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
@@ -83,6 +85,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     private val permanentScreens: MutableList<PaintboxScreen> = mutableListOf()
     
     val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
+    
+    private val metricsReporter: ConsoleReporter by lazy {
+        ConsoleReporter.forRegistry(PRMania.metrics)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .build()
+    }
 
     override fun getTitle(): String = "${PRMania.TITLE} ${PRMania.VERSION}"
 
@@ -93,7 +102,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
 //        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
-
+        
+        if (PRMania.enableMetrics) {
+            metricsReporter.start(10L, TimeUnit.SECONDS)
+        }
+        
         preferences = Gdx.app.getPreferences("PolyrhythmMania")
 
         addFontsToCache(this.fontCache)
@@ -101,49 +114,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         PRManiaSkins
         settings = Settings(this, preferences).apply { 
             load()
-            
-            // Find correct locale or default back to first one
-            val localeStr = this.locale.getOrCompute()
-            if (localeStr != "") {
-                val split = localeStr.split('_')
-                val language = split.first()
-                val country = split.getOrNull(1)
-                val variant = split.getOrNull(2)
-                
-                val bundles = Localization.bundles.getOrCompute()
-                val correctLocaleBundle = bundles.find {
-                    it.locale.locale.language == language && it.locale.locale.country == country && it.locale.locale.variant == variant
-                } ?: bundles.find {
-                    it.locale.locale.language == language && it.locale.locale.country == country
-                } ?: bundles.find {
-                    it.locale.locale.language == language
-                }
-                
-                if (correctLocaleBundle == null) {
-                    this.locale.set("")
-                } else {
-                    Localization.currentBundle.set(correctLocaleBundle)
-                }
-            }
-            
-            // Set correct mixer
-            val mixerHandler = SoundSystem.defaultMixerHandler
-            val mixerString = this.mixer.getOrCompute()
-            if (mixerString.isNotEmpty()) {
-                val found = mixerHandler.supportedMixers.find {
-                    it.mixerInfo.name == mixerString
-                }
-                if (found != null) {
-                    Paintbox.LOGGER.info("Attaching to mixer from settings: ${found.mixerInfo.name}")
-                    mixerHandler.recommendedMixer = found
-                } else {
-                    Paintbox.LOGGER.warn("Could not find mixer from settings: settings = $mixerString")
-                }
-            } else {
-                val mixerName = mixerHandler.recommendedMixer.mixerInfo.name
-                this.mixer.set(mixerName)
-                Paintbox.LOGGER.info("No saved mixer string, using $mixerName")
-            }
+            setStartupSettings()
         }
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())
@@ -257,6 +228,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             TempFileUtils.clearTempFolder()
         } catch (s: SecurityException) {
             s.printStackTrace()
+        }
+        if (PRMania.enableMetrics) {
+            metricsReporter.report()
         }
     }
 

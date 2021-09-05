@@ -2,6 +2,7 @@ package polyrhythmmania
 
 import com.badlogic.gdx.Preferences
 import com.eclipsesource.json.Json
+import paintbox.Paintbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.util.WindowSize
@@ -36,6 +37,7 @@ import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
+import polyrhythmmania.soundsystem.SoundSystem
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -175,6 +177,51 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putEndlessHighScore(kv_endlessHighScore)
 
                 .flush()
+    }
+    
+    fun setStartupSettings() {
+        // Find correct locale or default back to first one
+        val localeStr = this.locale.getOrCompute()
+        if (localeStr != "") {
+            val split = localeStr.split('_')
+            val language = split.first()
+            val country = split.getOrNull(1)
+            val variant = split.getOrNull(2)
+
+            val bundles = Localization.bundles.getOrCompute()
+            val correctLocaleBundle = bundles.find {
+                it.locale.locale.language == language && it.locale.locale.country == country && it.locale.locale.variant == variant
+            } ?: bundles.find {
+                it.locale.locale.language == language && it.locale.locale.country == country
+            } ?: bundles.find {
+                it.locale.locale.language == language
+            }
+
+            if (correctLocaleBundle == null) {
+                this.locale.set("")
+            } else {
+                Localization.currentBundle.set(correctLocaleBundle)
+            }
+        }
+
+        // Set correct mixer
+        val mixerHandler = SoundSystem.defaultMixerHandler
+        val mixerString = this.mixer.getOrCompute()
+        if (mixerString.isNotEmpty()) {
+            val found = mixerHandler.supportedMixers.find {
+                it.mixerInfo.name == mixerString
+            }
+            if (found != null) {
+                Paintbox.LOGGER.info("Attaching to mixer from settings: ${found.mixerInfo.name}")
+                mixerHandler.recommendedMixer = found
+            } else {
+                Paintbox.LOGGER.warn("Could not find mixer from settings: settings = $mixerString")
+            }
+        } else {
+            val mixerName = mixerHandler.recommendedMixer.mixerInfo.name
+            this.mixer.set(mixerName)
+            Paintbox.LOGGER.info("No saved mixer string, using $mixerName")
+        }
     }
 
     private fun Preferences.getInt(kv: KeyValue<Int>) {

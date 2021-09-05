@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.StreamUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import com.codahale.metrics.MetricRegistry
 import net.beadsproject.beads.ugens.CrossFade
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
@@ -212,6 +213,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         })
         musicSample = sample
+        musicSample.metricsPopulateBuffer = PRMania.metrics.timer("mainMenu.musicSample.populateBuffer")
         thread(start = true, isDaemon = true, name = "Main Menu music decoder", priority = 8) {
             Paintbox.LOGGER.debug("Starting main menu music decode")
             handler.decode()

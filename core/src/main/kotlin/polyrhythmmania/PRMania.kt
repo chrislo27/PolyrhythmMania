@@ -1,5 +1,6 @@
 package polyrhythmmania
 
+import com.codahale.metrics.MetricRegistry
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import java.io.File
@@ -11,7 +12,7 @@ object PRMania {
     const val GITHUB = "https://github.com/chrislo27/PolyrhythmMania"
     const val HOMEPAGE = "https://polyrhythmmania.rhre.dev"
     const val DONATE_LINK = "https://www.paypal.com/donate/?hosted_button_id=9JLGHKZNWLLQ8"
-    val VERSION: Version = Version(1, 0, 2, "dev_20210902a")
+    val VERSION: Version = Version(1, 0, 2, "dev_20210904a")
     const val WIDTH: Int = 1280 //1080
     const val HEIGHT: Int = 720
     val DEFAULT_SIZE: WindowSize = WindowSize(WIDTH, HEIGHT)
@@ -41,9 +42,11 @@ object PRMania {
     ).sortedBy { it.width }
     
     val enableEarlyAccessMessage: Boolean = (VERSION.suffix.startsWith("dev") || VERSION.suffix.startsWith("beta"))
+    val metrics: MetricRegistry = MetricRegistry()
     
     // Command line arguments
     var logMissingLocalizations: Boolean = false
     var dumpPackedSheets: Boolean = false
+    var enableMetrics: Boolean = false
     
 }
