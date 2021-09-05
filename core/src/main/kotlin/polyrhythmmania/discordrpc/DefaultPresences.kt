@@ -19,14 +19,29 @@ object DefaultPresences {
     object PlayingPractice
         : PresenceState("Playing a practice mode")
     
-    object PlayingEndlessMode
-        : PresenceState("Playing Endless Mode")
+    class PlayingEndlessMode
+        : PresenceState("Playing Endless Mode") {
+        override fun modifyRichPresence(richPresence: RichPresence) {
+            super.modifyRichPresence(richPresence)
+            richPresence.startTimestamp = System.currentTimeMillis() / 1000L
+        }
+    }
     
     class PlayingDailyChallenge(val localDate: LocalDate)
-        : PresenceState("Playing the Daily Challenge (${localDate.format(DateTimeFormatter.ISO_DATE)})")
+        : PresenceState("Playing the Daily Challenge (${localDate.format(DateTimeFormatter.ISO_DATE)})") {
+        override fun modifyRichPresence(richPresence: RichPresence) {
+            super.modifyRichPresence(richPresence)
+            richPresence.startTimestamp = System.currentTimeMillis() / 1000L
+        }
+    }
     
-    object PlayingDunk
-        : PresenceState("Playing Polyrhythm: Dunk")
+    class PlayingDunk
+        : PresenceState("Playing Polyrhythm: Dunk") {
+        override fun modifyRichPresence(richPresence: RichPresence) {
+            super.modifyRichPresence(richPresence)
+            richPresence.startTimestamp = System.currentTimeMillis() / 1000L
+        }
+    }
 
 
     sealed class Elapsable(state: String, val duration: Float, smallIcon: String = "", smallIconText: String = state)

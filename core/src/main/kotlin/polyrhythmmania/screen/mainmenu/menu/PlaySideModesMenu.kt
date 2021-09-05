@@ -64,7 +64,7 @@ class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             // Remember to update DataSettingsMenu to reset high scores
             vbox += createSidemodeLongButton("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip",
                     Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
-                DiscordHelper.updatePresence(DefaultPresences.PlayingDunk)
+                DiscordHelper.updatePresence(DefaultPresences.PlayingDunk())
                 mainMenu.backgroundType = BgType.DUNK
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
             }
