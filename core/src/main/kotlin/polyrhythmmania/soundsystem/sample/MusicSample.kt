@@ -75,7 +75,7 @@ abstract class MusicSample(val fileChannel: FileChannel,
             }
         } else {
             if (!playbackBuffer.isSampleInBuffer(frame)) {
-                metricsPopulateBuffer?.timeInline {
+                metricsPopulateBuffer.timeInline {
                     playbackBuffer.populate((frame - 4).coerceAtLeast(0))
                 }
             }
