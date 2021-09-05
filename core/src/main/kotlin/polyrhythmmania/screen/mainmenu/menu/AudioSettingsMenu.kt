@@ -68,21 +68,14 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createSliderPane(gameplayVolSlider) { Localization.getVar("mainMenu.audioSettings.gameplayVol").use() }
             vbox += createSliderPane(menuMusicVolSlider) { Localization.getVar("mainMenu.audioSettings.menuMusicVol").use() }
             vbox += createSliderPane(menuSfxVolSlider) { Localization.getVar("mainMenu.audioSettings.menuSfxVol").use() }
-            val (disableInputSFXPane, disableInputSFXCheck) = createCheckboxOption({ Localization.getVar("mainMenu.inputSettings.calibration.disableInputSounds").use() })
-            disableInputSFXCheck.checkedState.set(settings.calibrationDisableInputSFX.getOrCompute())
-            disableInputSFXCheck.onCheckChanged = { newState ->
-                settings.calibrationDisableInputSFX.set(newState)
+            vbox += createLongButton { Localization.getVar("mainMenu.audioSettings.goToCalibration").use() }.apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.calibrationSettingsMenu)
+                }
             }
-            disableInputSFXCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.inputSettings.calibration.disableInputSounds.tooltip")))
-            vbox += disableInputSFXPane
             vbox += createLongButton { Localization.getVar("mainMenu.audioSettings.advancedAudioSettings").use() }.apply { 
                 this.setOnAction { 
                     menuCol.pushNextMenu(menuCol.advancedAudioMenu)
-                }
-            }
-            vbox += createLongButton { Localization.getVar("mainMenu.audioSettings.goToCalibration").use() }.apply { 
-                this.setOnAction { 
-                    menuCol.pushNextMenu(menuCol.calibrationSettingsMenu)
                 }
             }
         }
