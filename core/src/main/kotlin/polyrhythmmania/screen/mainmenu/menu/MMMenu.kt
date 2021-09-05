@@ -233,8 +233,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
     
-    protected fun createSliderPane(slider: Slider, labelText: Var.Context.() -> String): SettingsOptionPane {
-        return createSettingsOption(labelText).apply {
+    protected fun createSliderPane(slider: Slider, percentageContent: Float = 0.5f,
+                                   labelText: Var.Context.() -> String): SettingsOptionPane {
+        return createSettingsOption(labelText, percentageContent = percentageContent).apply {
             this.content.addChild(slider)
             Anchor.CentreRight.configure(slider)
         }
