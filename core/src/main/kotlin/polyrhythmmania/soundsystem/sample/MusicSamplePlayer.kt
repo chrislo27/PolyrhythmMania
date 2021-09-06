@@ -46,9 +46,8 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
     override fun calculateBuffer() {
         val currentGain = gain
         val loopType = this.loopType
-        if (loopType != SamplePlayer.LoopType.NO_LOOP_FORWARDS
-                && loopType != SamplePlayer.LoopType.LOOP_FORWARDS
-                && (loopType == SamplePlayer.LoopType.LOOP_FORWARDS && isLoopInvalid())) {
+        if ((loopType != SamplePlayer.LoopType.NO_LOOP_FORWARDS && loopType != SamplePlayer.LoopType.LOOP_FORWARDS)
+                || (loopType == SamplePlayer.LoopType.LOOP_FORWARDS && isLoopInvalid())) {
             for (out in 0 until outs) {
                 for (i in 0 until bufferSize) {
                     bufOut[out][i] = 0f
@@ -72,33 +71,25 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
                 for (out in 0 until outs) {
                     tmpFrame[out] = 0f
                 }
-            }
-//            else if (position > musicSample.lengthMs) {
-//                for (out in 0 until outs) {
-////                    for (j in i until bufferSize) {
-//                        bufOut[out][i] = 0f
-////                    }
-//                }
-//                continue
-//            }
-
-            when (interpType) {
-                SamplePlayer.InterpolationType.NONE -> {
-                    musicSample.getFrameNoInterp(position, tmpFrame)
-                }
-                SamplePlayer.InterpolationType.LINEAR -> {
-                    musicSample.getFrameLinear(position, tmpFrame)
-                }
-                SamplePlayer.InterpolationType.CUBIC -> {
-                    musicSample.getFrameCubic(position, tmpFrame)
-                }
-                SamplePlayer.InterpolationType.ADAPTIVE -> {
-                    if (pitchValue > SamplePlayer.ADAPTIVE_INTERP_HIGH_THRESH) {
+            } else {
+                when (interpType) {
+                    SamplePlayer.InterpolationType.NONE -> {
                         musicSample.getFrameNoInterp(position, tmpFrame)
-                    } else if (pitchValue > SamplePlayer.ADAPTIVE_INTERP_LOW_THRESH) {
+                    }
+                    SamplePlayer.InterpolationType.LINEAR -> {
                         musicSample.getFrameLinear(position, tmpFrame)
-                    } else {
+                    }
+                    SamplePlayer.InterpolationType.CUBIC -> {
                         musicSample.getFrameCubic(position, tmpFrame)
+                    }
+                    SamplePlayer.InterpolationType.ADAPTIVE -> {
+                        if (pitchValue > SamplePlayer.ADAPTIVE_INTERP_HIGH_THRESH) {
+                            musicSample.getFrameNoInterp(position, tmpFrame)
+                        } else if (pitchValue > SamplePlayer.ADAPTIVE_INTERP_LOW_THRESH) {
+                            musicSample.getFrameLinear(position, tmpFrame)
+                        } else {
+                            musicSample.getFrameCubic(position, tmpFrame)
+                        }
                     }
                 }
             }
