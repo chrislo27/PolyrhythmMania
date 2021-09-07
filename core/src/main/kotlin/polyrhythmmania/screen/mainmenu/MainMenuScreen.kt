@@ -49,8 +49,8 @@ import polyrhythmmania.screen.mainmenu.menu.*
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.beads.ugen.Bandpass
-import polyrhythmmania.soundsystem.sample.DecodingMusicSample
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
+import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
@@ -179,7 +179,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val menuMusicVolume: FloatVar = FloatVar { 
         main.settings.menuMusicVolume.use() / 100f
     }
-    private val musicSample: DecodingMusicSample
+    private val musicSample: MusicSample
     private val beadsMusic: BeadsMusic
     private var shouldBeBandpass: Boolean = false
     var soundSys: SoundSys by settableLazy {
@@ -210,6 +210,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         })
         musicSample = sample
+        musicSample.metricsPopulateBuffer = PRMania.metrics.timer("mainMenu.musicSample.populateBuffer")
         thread(start = true, isDaemon = true, name = "Main Menu music decoder", priority = 8) {
             Paintbox.LOGGER.debug("Starting main menu music decode")
             handler.decode()

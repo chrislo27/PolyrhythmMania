@@ -22,11 +22,12 @@ object GdxAudioReader {
     fun interface AudioLoadListener {
         fun progress(bytesReadSoFar: Long, bytesReadThisChunk: Int)
         
-        open fun onFinished(totalBytesRead: Long) {
+        fun onFinished(totalBytesRead: Long) {
         }
     }
     
-    class DecodingHandler(val music: OpenALMusic, val fileChannel: FileChannel, val bufferSize: Int, val listener: AudioLoadListener?) {
+    class DecodingHandler(val sample: DecodingMusicSample, val music: OpenALMusic, val fileChannel: FileChannel,
+                          val bufferSize: Int, val listener: AudioLoadListener?) {
         fun decode(): Long {
             val audioBytes = ByteArray(bufferSize)
             val byteBuffer = ByteBuffer.wrap(audioBytes)
@@ -43,9 +44,10 @@ object GdxAudioReader {
                 
                 synchronized(fileChannel) {
                     fileChannel.write(byteBuffer, currentLength)
+                    currentLength += length
+                    sample.updateFilesize(currentLength)
                 }
 
-                currentLength += length
                 listener?.progress(currentLength, length)
             }
             
@@ -84,7 +86,7 @@ object GdxAudioReader {
         val randomAccessFile = RandomAccessFile(file, "rw")
         val fileChannel = randomAccessFile.channel
         val sample = DecodingMusicSample(randomAccessFile, fileChannel, music.rate.toFloat(), music.channels)
-        val handler = DecodingHandler(music, fileChannel, bufferSize, listener)
+        val handler = DecodingHandler(sample, music, fileChannel, bufferSize, listener)
 
         return sample to handler
     }

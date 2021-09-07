@@ -1,11 +1,11 @@
 package polyrhythmmania.soundsystem.sample
 
 import com.badlogic.gdx.utils.StreamUtils
+import com.codahale.metrics.Timer
+import polyrhythmmania.util.metrics.timeInline
 import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
-import java.nio.file.Path
-import java.nio.file.StandardOpenOption
 import kotlin.math.floor
 
 
@@ -42,6 +42,8 @@ abstract class MusicSample(val fileChannel: FileChannel,
     protected val startBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_START_BUFFER_MS).toInt()) }
     protected val playbackBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_PLAYBACK_BUFFER_MS).toInt()) }
 
+    var metricsPopulateBuffer: Timer? = null
+    
     open fun moveStartBuffer(toFrame: Int) {
         if (toFrame < 0 || toFrame >= nFrames || startBuffer.position == toFrame) {
             return
@@ -73,10 +75,9 @@ abstract class MusicSample(val fileChannel: FileChannel,
             }
         } else {
             if (!playbackBuffer.isSampleInBuffer(frame)) {
-//                val nano = measureNanoTime { 
-                playbackBuffer.populate((frame - 4).coerceAtLeast(0))
-//                }
-//                println("time to load block ${playbackBuffer.position} / ${playbackBuffer.size}: ${nano / 1_000_000f} ms")
+                metricsPopulateBuffer.timeInline {
+                    playbackBuffer.populate((frame - 4).coerceAtLeast(0))
+                }
             }
             for (i in 0 until nChannels) {
                 frameData[i] = playbackBuffer.data[i][frame - playbackBuffer.position]

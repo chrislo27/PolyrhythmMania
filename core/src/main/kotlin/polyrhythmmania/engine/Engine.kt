@@ -64,14 +64,14 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
         this._events.removeAll(events)
     }
     
-    fun setActiveTextbox(newTextbox: TextBox) {
+    fun setActiveTextbox(newTextbox: TextBox): ActiveTextBox {
         val newActive = newTextbox.toActive()
-
         this.activeTextBox = newActive
         if (newActive.textBox.requiresInput) {
             newActive.wasSoundInterfacePaused = soundInterface.isPaused()
             soundInterface.setPaused(true)
         }
+        return newActive
     }
     
     fun removeActiveTextbox(unpauseSound: Boolean) {
@@ -80,6 +80,7 @@ class Engine(timingProvider: TimingProvider, val world: World, soundSystem: Soun
         if (unpauseSound && old != null && old.textBox.requiresInput && !old.wasSoundInterfacePaused) {
             soundInterface.setPaused(false)
         }
+        old?.onComplete?.invoke(this)
     }
     
     fun updateEvent(event: Event, atBeat: Float) {

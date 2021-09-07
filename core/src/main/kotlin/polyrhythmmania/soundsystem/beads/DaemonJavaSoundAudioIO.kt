@@ -1,12 +1,15 @@
 package polyrhythmmania.soundsystem.beads
 
+import com.codahale.metrics.MetricRegistry
+import com.codahale.metrics.Timer
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.AudioIO
 import net.beadsproject.beads.core.AudioUtils
 import net.beadsproject.beads.core.UGen
 import net.beadsproject.beads.core.io.JavaSoundAudioIO
-import polyrhythmmania.soundsystem.MixerHandler
+import polyrhythmmania.PRMania
 import polyrhythmmania.soundsystem.MixerTracking
+import polyrhythmmania.util.metrics.timeInline
 import javax.sound.sampled.*
 import kotlin.concurrent.thread
 
@@ -23,8 +26,11 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
 
         /** The number of prepared output buffers ready to go to AudioOutput  */
         const val NUM_OUTPUT_BUFFERS = 2
+        
+        private val metricsSourceWrite: Timer = PRMania.metrics.timer(MetricRegistry.name(this::class.java, "sourceDataLineWrite"))
+        private val metricsPrepareBuffer: Timer = PRMania.metrics.timer(MetricRegistry.name(this::class.java, "prepareBuffer"))
     }
-
+    
     /** The mixer.  */
     private var mixer: Mixer? = startingMixer
 
@@ -74,11 +80,11 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
         var buffersSent = 0
 
         // Prime the first output buffer
-        if (context.isRunning){
-//            for (i in 0 until NUM_OUTPUT_BUFFERS) {
+        if (context.isRunning) {
+            metricsPrepareBuffer.timeInline {
                 val currentBuffer = outputBuffers[0]
                 prepareLineBuffer(audioFormat, currentBuffer, interleavedOutput, bufferSizeInFrames, sampleBufferSize)
-//            }
+            }
         }
         
 //        val bufferSizeInMs = context.samplesToMs(bufferSizeInFrames.toDouble())
@@ -88,11 +94,15 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
         while (context.isRunning) {
             var currentBuffer = outputBuffers[buffersSent % NUM_OUTPUT_BUFFERS]
             buffersSent++
-            sourceDataLine.write(currentBuffer, 0, outputBufferLength)
+            metricsSourceWrite.timeInline {
+                sourceDataLine.write(currentBuffer, 0, outputBufferLength)
+            }
             
             // Prime next buffer
-            currentBuffer = outputBuffers[buffersSent % NUM_OUTPUT_BUFFERS]
-            prepareLineBuffer(audioFormat, currentBuffer, interleavedOutput, bufferSizeInFrames, sampleBufferSize)
+            metricsPrepareBuffer.timeInline {
+                currentBuffer = outputBuffers[buffersSent % NUM_OUTPUT_BUFFERS]
+                prepareLineBuffer(audioFormat, currentBuffer, interleavedOutput, bufferSizeInFrames, sampleBufferSize)
+            }
 //            sync.sync(syncFps)
         }
     }

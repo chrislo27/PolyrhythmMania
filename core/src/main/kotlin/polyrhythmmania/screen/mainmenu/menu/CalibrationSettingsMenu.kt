@@ -40,7 +40,7 @@ class CalibrationSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
     init {
         this.setSize(MMMenu.WIDTH_MEDIUM)
-        this.titleText.bind { Localization.getVar("mainMenu.inputSettings.calibration").use() }
+        this.titleText.bind { Localization.getVar("mainMenu.calibration").use() }
         this.contentPane.bounds.height.set(300f)
 
         val scrollPane = ScrollPane().apply {
@@ -72,13 +72,16 @@ class CalibrationSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         vbox.temporarilyDisableLayouts {
-            vbox += createSliderPane(manualOffsetSlider) {
-                Localization.getVar("mainMenu.inputSettings.calibration.audioOffset", Var.bind {listOf(manualOffsetSlider.value.useF().toInt())}).use()
-            }.apply {
-                this.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.inputSettings.calibration.audioOffset.tooltip")))
+            vbox += createSettingsOption({
+                Localization.getVar("mainMenu.calibration.audioOffset", Var.bind {listOf(manualOffsetSlider.value.useF().toInt())}).use()
+            }, percentageContent = 1f, twoRowsTall = true).apply {
+                val slider = manualOffsetSlider
+                this.content.addChild(slider)
+                Anchor.BottomCentre.configure(slider)
+                this.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.calibration.audioOffset.tooltip")))
             }
 
-            vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.calibration.test").use() }.apply {
+            vbox += createLongButton { Localization.getVar("mainMenu.calibration.test").use() }.apply {
                 this.setOnAction {
                     menuCol.playMenuSound("sfx_menu_select")
                     Gdx.app.postRunnable {
@@ -92,6 +95,14 @@ class CalibrationSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
             }
+
+            val (disableInputSFXPane, disableInputSFXCheck) = createCheckboxOption({ Localization.getVar("mainMenu.calibration.disableInputSounds").use() })
+            disableInputSFXCheck.checkedState.set(settings.calibrationDisableInputSFX.getOrCompute())
+            disableInputSFXCheck.onCheckChanged = { newState ->
+                settings.calibrationDisableInputSFX.set(newState)
+            }
+            disableInputSFXCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.calibration.disableInputSounds.tooltip")))
+            vbox += disableInputSFXPane
         }
         vbox.sizeHeightToChildren(100f)
         scrollPane.setContent(vbox)
@@ -103,7 +114,7 @@ class CalibrationSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.popLastMenu()
                 }
             }
-            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.inputSettings.calibration.reset").use() }).apply {
+            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.calibration.reset").use() }).apply {
                 this.bounds.width.set(250f)
                 this.setOnAction {
                     manualOffsetSlider.setValue(0f)
