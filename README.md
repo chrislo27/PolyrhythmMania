@@ -32,8 +32,8 @@ since the same underlying graphics library (GLFW) is used.
 
 These instructions are the same if you're downloading the game for the first time or upgrading to a new version.
 
-__Windows (64-bit only):__
-1. Navigate to the [latest release here](https://github.com/chrislo27/PolyrhythmMania/releases/latest).
+__Windows (64-bit only, no Java installation required):__
+1. Navigate to the [latest release here](https://github.com/chrislo27/PolyrhythmMania/releases/latest) in a new tab or window.
 2. Download the correct version of the game in the Assets section named `PolyrhythmMania_VERSION_win64.zip`, where VERSION is the release version name. **Note the "win64" in the file name.** Don't download the "Source code".
 3. Find the downloaded zip file in File Explorer. Extract the zip file: right click the downloaded zip file, click "Extract All...", and extract the contents to a folder.
 4. Open the newly extracted folder and go into the `PolyrhythmMania_win64` folder.
@@ -41,12 +41,13 @@ __Windows (64-bit only):__
 6. If Windows Defender says "Windows Defender SmartScreen prevented an unrecognized app from starting", you can safely ignore it by clicking "More info" and then "Run anyway".
 
 __Other platforms (or for advanced users who already have Java installed)__
-1. **(Pre-requisite)** Ensure you already have the Java Runtime Environment (JRE 8 or newer) installed and it is accessible in your path.
-2. Navigate to the [latest release here](https://github.com/chrislo27/PolyrhythmMania/releases/latest).
+1. **(Pre-requisite)** Ensure you already have the Java Runtime Environment (JRE 11 recommended, JRE 8 minimum) installed and it is accessible in your path as the `java` command. Starting with future version v1.1 and later, the minimum Java language version will be 11.
+2. Navigate to the [latest release here](https://github.com/chrislo27/PolyrhythmMania/releases/latest) in a new tab or window.
 3. Download the correct version of the game in the Assets section named `PolyrhythmMania_VERSION.zip`, where VERSION is the release version name. Don't download the "Source code".
 4. Extract the zip file to a known location.
 5. Open the newly extracted directory and go into the `PolyrhythmMania_platform_agnostic` directory.
-6. Double click the appropriate launch script: On Windows, it's `play_windows.bat`. On Linux, run the `play_linux.sh` file.
+6. Run the appropriate launch script: On Windows, double click `play_windows.bat`. On Linux, run the `play_linux.sh` file (you may have to `chmod +x play_linux.sh` first).
+7. If you prefer not to use a launch script, you can run `java -jar bin/PolyrhythmMania.jar` with your preferred settings.
 
 
 ## Other information

@@ -14,4 +14,7 @@ class PRManiaArguments : PaintboxArguments() {
     @Parameter(names = ["--portable-mode"], description = "The .polyrhythmmania/ directory will be local to the game executable instead of the user home.")
     var portableMode: Boolean = false
     
+    @Parameter(names = ["--enable-metrics"], description = "Enables recording of certain program metrics. Used for debugging.")
+    var enableMetrics: Boolean = false
+    
 }

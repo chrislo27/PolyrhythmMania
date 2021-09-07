@@ -1,5 +1,6 @@
 package polyrhythmmania
 
+import com.codahale.metrics.MetricRegistry
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import java.io.File
@@ -41,9 +42,11 @@ object PRMania {
     ).sortedBy { it.width }
     
     val enableEarlyAccessMessage: Boolean = (VERSION.suffix.startsWith("dev") || VERSION.suffix.startsWith("beta"))
+    val metrics: MetricRegistry = MetricRegistry()
     
     // Command line arguments
     var logMissingLocalizations: Boolean = false
     var dumpPackedSheets: Boolean = false
+    var enableMetrics: Boolean = false
     
 }

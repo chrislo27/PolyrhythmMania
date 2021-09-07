@@ -46,11 +46,6 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         contentPane.addChild(hbox)
 
         vbox.temporarilyDisableLayouts {
-            vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.calibration").use() }.apply {
-                this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.calibrationSettingsMenu)
-                }
-            }
             vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.feedback").use() }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(feedbackSettings)
@@ -61,9 +56,6 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNextMenu(keyboardSettings)
                 }
             }
-//            vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.controller").use() }.apply {
-//                this.disabled.set(true)
-//            }
         }
 
         hbox.temporarilyDisableLayouts {

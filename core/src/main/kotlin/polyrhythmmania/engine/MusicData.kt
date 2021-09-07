@@ -30,7 +30,7 @@ class MusicData(val engine: Engine) {
         val music = this.beadsMusic
         val player = engine.soundInterface.getCurrentMusicPlayer(music)
         if (player != null) {
-            val volume = volumeMap.volumeAtBeat(currentBeat)
+            val volume: Int = volumeMap.volumeAtBeat(currentBeat)
             player.gain = volume / 100f
             player.pitch = rate * engine.playbackSpeed
 

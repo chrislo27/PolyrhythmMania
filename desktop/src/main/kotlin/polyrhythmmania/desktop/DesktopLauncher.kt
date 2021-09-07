@@ -54,6 +54,7 @@ object DesktopLauncher {
         
         PRMania.logMissingLocalizations = arguments.logMissingLocalizations
         PRMania.dumpPackedSheets = arguments.dumpPackedSheets
+        PRMania.enableMetrics = arguments.enableMetrics
         
         PaintboxDesktopLauncher(app, arguments).editConfig {
             this.setAutoIconify(true)
