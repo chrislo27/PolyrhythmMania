@@ -1,12 +1,12 @@
 package polyrhythmmania.world
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
-import paintbox.registry.AssetRegistry
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.engine.Engine
@@ -17,7 +17,6 @@ import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.sidemodes.EventAsmAssemble
 import polyrhythmmania.sidemodes.SidemodeAssets
-import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityRod
@@ -156,14 +155,18 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
     
     var animation: Animation = Animation.Neutral(this)
     var retractAfterBeats: Float = Float.POSITIVE_INFINITY
+    private var extendWiggleAlpha: Float = 0f
     
     init {
         this.type = Type.PISTON_DPAD
     }
 
-    fun fullyExtend(engine: Engine, beat: Float, retractAfterBeats: Float) {
+    fun fullyExtend(engine: Engine, beat: Float, retractAfterBeats: Float, doWiggle: Boolean) {
         super.fullyExtend(engine, beat)
         this.retractAfterBeats = beat + retractAfterBeats
+        if (doWiggle) {
+            this.extendWiggleAlpha = 1f
+        }
     }
     
     fun chargeUp(beat: Float) {
@@ -191,6 +194,10 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
         if (animation is Animation.Charged) {
             vec.x += MathUtils.random() * MathUtils.randomSign() * 0.025f
             vec.y += MathUtils.random() * MathUtils.randomSign() * 0.025f
+        }
+        if (extendWiggleAlpha > 0) {
+            extendWiggleAlpha = (extendWiggleAlpha - Gdx.graphics.deltaTime / 0.125f).coerceAtLeast(0f)
+            vec.y += MathUtils.lerp(-1f, 0f, extendWiggleAlpha % 1f) * 0.25f * extendWiggleAlpha
         }
         
         val tmpColor = ColorStack.getAndPush()
@@ -436,7 +443,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
 
             val asmPlayerPiston = world.asmPlayerPiston
             if (asmPlayerPiston.animation is EntityPistonAsm.Animation.Neutral) {
-                asmPlayerPiston.fullyExtend(engine, expected.inputBeat, 1f)
+                asmPlayerPiston.fullyExtend(engine, expected.inputBeat, 1f, true)
             }
         }
 

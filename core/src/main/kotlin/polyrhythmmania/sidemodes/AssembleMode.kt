@@ -396,7 +396,7 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
             
             if (fromIndex in pistons.indices) {
                 // Play piston extend animation
-                world.asmPistons[fromIndex].fullyExtend(engine, this.beat, timePerBounce)
+                world.asmPistons[fromIndex].fullyExtend(engine, this.beat, timePerBounce, doWiggle = true)
                 // SFX handled in onAudioStart
             }
         }

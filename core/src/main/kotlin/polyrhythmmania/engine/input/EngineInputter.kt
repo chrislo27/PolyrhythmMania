@@ -351,7 +351,7 @@ class EngineInputter(val engine: Engine) {
 
                 val animation = asmPlayerPiston.animation
                 if (animation is EntityPistonAsm.Animation.Neutral) {
-                    asmPlayerPiston.fullyExtend(engine, atBeat, hitDuration)
+                    asmPlayerPiston.fullyExtend(engine, atBeat, hitDuration, doWiggle = hit)
                     if (!hit) {
                         engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_middle_right"), SoundInterface.SFXType.PLAYER_INPUT) {
                             it.pitch = 1.5f
