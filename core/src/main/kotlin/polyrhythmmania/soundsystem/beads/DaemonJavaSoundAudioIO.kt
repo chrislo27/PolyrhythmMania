@@ -9,10 +9,12 @@ import net.beadsproject.beads.core.UGen
 import net.beadsproject.beads.core.io.JavaSoundAudioIO
 import polyrhythmmania.PRMania
 import polyrhythmmania.soundsystem.MixerTracking
+import polyrhythmmania.util.OnSpinWaitJ8
 import polyrhythmmania.util.metrics.timeInline
 import javax.sound.sampled.*
 import kotlin.concurrent.thread
 import java.util.concurrent.TimeUnit
+import kotlin.math.min
 
 /**
  * This is a mostly-similar implementation of [JavaSoundAudioIO], but using a daemon audio thread.
@@ -80,26 +82,26 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
         var buffersSent = 0
         var bufferOffset = 0
 
-        fun primeBuffer(idx: Int) = metricsPrepareBuffer.timeInline {
-            val currentBuffer = outputBuffers[idx]
-            prepareLineBuffer(audioFormat, currentBuffer, interleavedOutput, bufferSizeInFrames, sampleBufferSize)
+        fun primeBuffer(idx: Int) {
+            metricsPrepareBuffer.timeInline {
+                val currentBuffer = outputBuffers[idx]
+                prepareLineBuffer(audioFormat, currentBuffer, interleavedOutput, bufferSizeInFrames, sampleBufferSize)
+            }
         }
 
         // Prime the first output buffer
-        if (context.isRunning) primeBuffer(0)
-        
-//        val bufferSizeInMs = context.samplesToMs(bufferSizeInFrames.toDouble())
-//        val sync = Sync()            
-//        val syncFps = (1000 / bufferSizeInMs).toInt()
+        if (context.isRunning) {
+            primeBuffer(0)
+        }
 
         var primed = 0
 
         while (context.isRunning) {
-            var currentBuffer = outputBuffers[buffersSent % NUM_OUTPUT_BUFFERS]
+            val currentBuffer = outputBuffers[buffersSent % NUM_OUTPUT_BUFFERS]
 
             val available = sourceDataLine.available()
             if (available > 0) {
-                val toWrite = Math.min(outputBufferLength - bufferOffset, available)
+                val toWrite = min(outputBufferLength - bufferOffset, available)
                 bufferOffset += sourceDataLine.write(currentBuffer, bufferOffset, toWrite)
                 if (outputBufferLength - bufferOffset <= 0) {
                     buffersSent++
@@ -107,11 +109,11 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
                 }
             }
             if (primed <= buffersSent) {
-                //we've started writing this buffer, so we can go ahead and get the next one primed
+                // we've started writing this buffer, so we can go ahead and get the next one primed
                 primeBuffer((buffersSent + 1) % NUM_OUTPUT_BUFFERS)
                 primed++
             } else {
-                Thread.onSpinWait()
+                OnSpinWaitJ8.onSpinWait()
             }
         }
     }
