@@ -12,6 +12,7 @@ import polyrhythmmania.soundsystem.MixerTracking
 import polyrhythmmania.util.metrics.timeInline
 import javax.sound.sampled.*
 import kotlin.concurrent.thread
+import java.util.concurrent.TimeUnit
 
 /**
  * This is a mostly-similar implementation of [JavaSoundAudioIO], but using a daemon audio thread.
@@ -27,7 +28,6 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
         /** The number of prepared output buffers ready to go to AudioOutput  */
         const val NUM_OUTPUT_BUFFERS = 2
         
-        private val metricsSourceWrite: Timer = PRMania.metrics.timer(MetricRegistry.name(this::class.java, "sourceDataLineWrite"))
         private val metricsPrepareBuffer: Timer = PRMania.metrics.timer(MetricRegistry.name(this::class.java, "prepareBuffer"))
     }
     
@@ -78,32 +78,41 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
         sourceDataLine.start()
 
         var buffersSent = 0
+        var bufferOffset = 0
+
+        fun primeBuffer(idx: Int) = metricsPrepareBuffer.timeInline {
+            val currentBuffer = outputBuffers[idx]
+            prepareLineBuffer(audioFormat, currentBuffer, interleavedOutput, bufferSizeInFrames, sampleBufferSize)
+        }
 
         // Prime the first output buffer
-        if (context.isRunning) {
-            metricsPrepareBuffer.timeInline {
-                val currentBuffer = outputBuffers[0]
-                prepareLineBuffer(audioFormat, currentBuffer, interleavedOutput, bufferSizeInFrames, sampleBufferSize)
-            }
-        }
+        if (context.isRunning) primeBuffer(0)
         
 //        val bufferSizeInMs = context.samplesToMs(bufferSizeInFrames.toDouble())
 //        val sync = Sync()            
 //        val syncFps = (1000 / bufferSizeInMs).toInt()
 
+        var primed = 0
+
         while (context.isRunning) {
             var currentBuffer = outputBuffers[buffersSent % NUM_OUTPUT_BUFFERS]
-            buffersSent++
-            metricsSourceWrite.timeInline {
-                sourceDataLine.write(currentBuffer, 0, outputBufferLength)
+
+            val available = sourceDataLine.available()
+            if (available > 0) {
+                val toWrite = Math.min(outputBufferLength - bufferOffset, available)
+                bufferOffset += sourceDataLine.write(currentBuffer, bufferOffset, toWrite)
+                if (outputBufferLength - bufferOffset <= 0) {
+                    buffersSent++
+                    bufferOffset = 0
+                }
             }
-            
-            // Prime next buffer
-            metricsPrepareBuffer.timeInline {
-                currentBuffer = outputBuffers[buffersSent % NUM_OUTPUT_BUFFERS]
-                prepareLineBuffer(audioFormat, currentBuffer, interleavedOutput, bufferSizeInFrames, sampleBufferSize)
+            if (primed <= buffersSent) {
+                //we've started writing this buffer, so we can go ahead and get the next one primed
+                primeBuffer((buffersSent + 1) % NUM_OUTPUT_BUFFERS)
+                primed++
+            } else {
+                Thread.onSpinWait()
             }
-//            sync.sync(syncFps)
         }
     }
     
