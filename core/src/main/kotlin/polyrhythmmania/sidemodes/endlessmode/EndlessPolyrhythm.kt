@@ -6,6 +6,7 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.RowSetting
@@ -92,7 +93,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
     val speedIncreaseSemitones: Var<Int> = Var(0)
 
     init {
-        container.texturePack.set(StockTexturePacks.hd)
+        container.texturePackSource.set(TexturePackSource.STOCK_HD)
         TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         
