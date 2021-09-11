@@ -11,6 +11,7 @@ object EditorHelpData {
                 "glossary" to EditorHelpDocGlossary(),
                 "controls" to EditorHelpDocControls(),
                 "music_sync" to EditorHelpDocMusicSync(),
+                "texture_packs" to EditorHelpDocTexturePacks(),
         ))
     }
     
@@ -25,7 +26,12 @@ class EditorHelpDocRoot : HelpDocument(
                         LayerButton("editorHelp.glossary.title", "glossary", false),
                         LayerButton("editorHelp.controls.title", "controls", false),
                         LayerButton("editorHelp.music_sync.title", "music_sync", false)
-                )
+                ),
+                LayerCol3(
+                        LayerButton("editorHelp.texture_packs.title", "texture_packs", false),
+                        null,
+                        null
+                ),
         )
 )
 
@@ -101,5 +107,16 @@ class EditorHelpDocMusicSync : HelpDocument(
                         LayerParagraph("editorHelp.music_sync.pp4b", 70f),
                         LayerParagraph("editorHelp.music_sync.pp5", 250f),
                 )), LayerImage("textures/help/music_sync/music_sync_marker.png", 350f), moreLeft = true),
+        )
+)
+
+class EditorHelpDocTexturePacks : HelpDocument(
+        "editorHelp.texture_packs.title",
+        listOf(
+                LayerParagraph("editorHelp.texture_packs.pp0", 80f),
+                LayerImage("textures/help/texture_packs/change_starting_texture_pack.png", 150f),
+                LayerParagraph("editorHelp.texture_packs.pp1", 40f),
+                LayerImage("textures/help/texture_packs/dialog.png", 500f),
+                LayerParagraph("editorHelp.texture_packs.pp2", 500f),
         )
 )
