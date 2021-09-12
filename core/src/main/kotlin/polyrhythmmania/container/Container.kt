@@ -187,6 +187,10 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     }
 
     override fun dispose() {
+        if (engine.metricsEnabled) {
+            engine.metricsReporter.report()
+        }
+        
         soundSystem?.dispose()
         (customTexturePack.getOrCompute() as? Disposable?)?.disposeQuietly()
         resources.values.toList().forEach { it.disposeQuietly() }
