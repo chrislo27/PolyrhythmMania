@@ -35,6 +35,9 @@ import polyrhythmmania.world.WorldSettings
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.*
 import java.io.File
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -55,11 +58,13 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     companion object {
         const val FILE_EXTENSION: String = "prmania"
-        const val CONTAINER_VERSION: Int = 8
+        const val CONTAINER_VERSION: Int = 9
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
         
         val DEFAULT_TRACKS_BEFORE_V7: List<String> = listOf("input_0", "input_1", "input_2", "fx_0", "fx_1") // Default tracks indexes for container version 6 and below
+        
+        const val VERSION_LEVEL_METADATA_ADDED: Int = 9
     }
 
     val world: World = World()
@@ -80,6 +85,9 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val blocks: List<Block> get() = _blocks
     
     var resultsText: ResultsText = ResultsText.DEFAULT
+    var levelMetadata: LevelMetadata = LevelMetadata.DEFAULT_METADATA.copy(initialCreationDate = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC))
+    var wasLevelMetadataLoaded: Boolean = false
+        private set
     val trackIDs: List<TrackID> = Editor.DEFAULT_TRACKS.map { it.id }
 
     private val _resources: MutableMap<String, ExternalResource> = ConcurrentHashMap()
@@ -332,6 +340,9 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         if (resultsText != ResultsText.DEFAULT) {
             jsonObj.add("resultsText", resultsText.toJson())
         }
+        
+        jsonObj.add("levelMetadata", levelMetadata.truncateWithLimits().toJson())
+        
         val worldSettings = this.world.worldSettings
         if (worldSettings != WorldSettings.DEFAULT) {
             jsonObj.add("worldSettings", worldSettings.toJson())
@@ -529,6 +540,16 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             val worldSettingsObj = json.get("worldSettings")?.asObject()
             if (worldSettingsObj != null) {
                 this.world.worldSettings = WorldSettings.fromJson(worldSettingsObj)
+            }
+        }
+        this.wasLevelMetadataLoaded = false
+        if (containerVersion >= VERSION_LEVEL_METADATA_ADDED) {
+            val metadataObj = json.get("levelMetadata")?.asObject()
+            if (metadataObj != null) {
+                this.levelMetadata = LevelMetadata.fromJson(metadataObj,
+                        LocalDateTime.ofInstant(Instant.ofEpochMilli(file.lastModified()), ZoneOffset.UTC))
+                        .truncateWithLimits()
+                this.wasLevelMetadataLoaded = true
             }
         }
 

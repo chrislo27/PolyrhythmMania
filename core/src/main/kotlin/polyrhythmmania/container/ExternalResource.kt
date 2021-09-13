@@ -7,7 +7,7 @@ import java.io.File
 /**
  * An [ExternalResource] is effectively a non-system file that has to be kept with a [Container].
  *
- * This could be things like the music used, tileset graphics, etc.
+ * This could be things such as the (compressed) music used.
  *
  * This class is [Disposable]. All open streams, file channels, etc should be closed.
  * The [shouldBeDeletedWhenDisposed] indicates if the file will also be deleted when disposed (for temp files).
