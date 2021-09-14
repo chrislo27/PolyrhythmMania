@@ -1,5 +1,7 @@
 package polyrhythmmania.engine.input
 
+import polyrhythmmania.screen.PlayScreen
+
 
 object InputThresholds {
     val MAX_OFFSET_SEC: Float = 7f / 60
@@ -15,5 +17,6 @@ object InputThresholds {
         InputScore.ACE
         Ranking.SUPERB
         Score(0, 0f, 0, 1, false, false, Challenges.NO_CHANGES, "", "")
+        PlayScreen
     }
 }

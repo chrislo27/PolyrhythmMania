@@ -67,6 +67,8 @@ class PlayScreen(
         val inputCalibration: InputCalibration,
         val showResults: Boolean = true,
 ) : PRManiaScreen(main) {
+    
+    companion object // Used for early init
 
     val timing: TimingProvider get() = container.timing
     val soundSystem: SoundSystem
@@ -83,7 +85,7 @@ class PlayScreen(
     private val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val inputProcessor: InputProcessor = sceneRoot.inputSystem
     private val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
-    private val pauseBg: PauseBackground by lazy { this.PauseBackground() }
+    private val pauseBg: PauseBackground = this.PauseBackground()
     private val maxSelectionSize: Int = 3
     private val selectionIndex: Var<Int> = Var(0)
     private val panelAnimationValue: FloatVar = FloatVar(0f)
