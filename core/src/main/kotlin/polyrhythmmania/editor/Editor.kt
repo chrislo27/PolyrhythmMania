@@ -322,7 +322,7 @@ class Editor(val main: PRManiaGame)
                                 getRecoveryFile(true)
                             }
                             try {
-                                container.writeToFile(file)
+                                container.writeToFile(file, true)
                                 Paintbox.LOGGER.debug("Autosave completed (interval: $autosaveIntervalMin min, filename: ${file.name})")
                                 Gdx.app.postRunnable {
                                     lastAutosaveTimeMs.set(System.currentTimeMillis())

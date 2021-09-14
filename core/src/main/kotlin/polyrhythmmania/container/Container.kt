@@ -58,7 +58,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
     companion object {
         const val FILE_EXTENSION: String = "prmania"
-        const val CONTAINER_VERSION: Int = 9
+        const val CONTAINER_VERSION: Int = 10
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
         
@@ -216,7 +216,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     /**
      * Writes the [Container] to a file.
      */
-    fun writeToFile(file: File) {
+    fun writeToFile(file: File, isAutosave: Boolean) {
         if (!file.exists()) {
             file.createNewFile()
         } else {
@@ -230,6 +230,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         val jsonObj: JsonObject = Json.`object`()
         jsonObj.add("containerVersion", CONTAINER_VERSION)
         jsonObj.add("programVersion", PRMania.VERSION.toString())
+        jsonObj.add("isAutosave", isAutosave)
         jsonObj.add("resources", Json.`object`().also { obj ->
             obj.add("list", Json.array().also { array ->
                 extResMap.forEach { (res, uuid) ->

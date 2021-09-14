@@ -145,8 +145,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 }
             }
             fun addYearField(labelText: String, 
-                             getter: (LevelMetadata) -> Int,
-                             copyFunc: (LevelMetadata, newText: String) -> LevelMetadata): HBox {
+                             getter: (LevelMetadata) -> Int): HBox {
                 return HBox().apply {
                     this.bounds.height.set(labelHeight)
                     this.spacing.set(0f)
@@ -192,28 +191,25 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 val datetime = it.initialCreationDate.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault())
                 DateTimeFormatter.RFC_1123_DATE_TIME.format(datetime)
             }
-            vbox += addTextField("levelMetadata.levelCreator", LevelMetadata.LIMIT_LEVEL_CREATOR, { it.levelCreator }) { t, newText ->
+            vbox += addTextField("levelMetadata.levelCreator", LevelMetadata.LIMIT_LEVEL_CREATOR, LevelMetadata::levelCreator) { t, newText ->
                 t.copy(levelCreator = newText)
             }
-            vbox += addTextField("levelMetadata.description", LevelMetadata.LIMIT_DESCRIPTION, { it.description },
+            vbox += addTextField("levelMetadata.description", LevelMetadata.LIMIT_DESCRIPTION, LevelMetadata::description,
                     allowNewlines = true) { t, newText ->
                 t.copy(description = newText)
             }
-            vbox += addTextField("levelMetadata.songName", LevelMetadata.LIMIT_SONG_NAME, { it.songName }) { t, newText ->
+            vbox += addTextField("levelMetadata.songName", LevelMetadata.LIMIT_SONG_NAME, LevelMetadata::songName) { t, newText ->
                 t.copy(songName = newText)
             }
-            vbox += addTextField("levelMetadata.songArtist", LevelMetadata.LIMIT_ARTIST_NAME, { it.songArtist }) { t, newText ->
+            vbox += addTextField("levelMetadata.songArtist", LevelMetadata.LIMIT_ARTIST_NAME, LevelMetadata::songArtist) { t, newText ->
                 t.copy(songArtist = newText)
             }
-            vbox += addTextField("levelMetadata.albumName", LevelMetadata.LIMIT_ALBUM_NAME, { it.albumName }) { t, newText ->
+            vbox += addTextField("levelMetadata.albumName", LevelMetadata.LIMIT_ALBUM_NAME, LevelMetadata::albumName) { t, newText ->
                 t.copy(albumName = newText)
             }
-            vbox += addYearField("levelMetadata.albumYear", { it.albumYear }) { t, newText ->
-                val newYear: Int? = newText.toIntOrNull()?.takeIf { it in LevelMetadata.LIMIT_YEAR }
-                t.copy(albumYear = newYear ?: 0) 
-            }
+            vbox += addYearField("levelMetadata.albumYear", LevelMetadata::albumYear)
             // TODO add combo box dropdown for common genres
-            vbox += addTextField("levelMetadata.genre", LevelMetadata.LIMIT_GENRE, { it.genre }) { t, newText ->
+            vbox += addTextField("levelMetadata.genre", LevelMetadata.LIMIT_GENRE, LevelMetadata::genre) { t, newText ->
                 t.copy(genre = newText)
             }
             

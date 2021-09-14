@@ -131,7 +131,7 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             
             editor.compileEditorIntermediates()
 
-            editor.container.writeToFile(newFile)
+            editor.container.writeToFile(newFile, false)
             lastSaveLoc = newFile
             firstTime = false
 

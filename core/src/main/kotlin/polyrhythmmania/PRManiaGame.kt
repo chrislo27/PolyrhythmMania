@@ -181,7 +181,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 val recoveryFile = editor.getRecoveryFile(overwrite = false)
                 val container = editor.container
                 try {
-                    container.writeToFile(recoveryFile)
+                    container.writeToFile(recoveryFile, true)
                     Paintbox.LOGGER.info("Shutdown hook recovery completed (filename: ${recoveryFile.name})")
                 } catch (e: Exception) {
                     Paintbox.LOGGER.warn("Shutdown hook recovery failed! filename: ${recoveryFile.name}")
@@ -346,7 +346,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 val recoveryFile = editor.getRecoveryFile(overwrite = false, midfix = "crash")
                 val container = editor.container
                 try {
-                    container.writeToFile(recoveryFile)
+                    container.writeToFile(recoveryFile, true)
                     Paintbox.LOGGER.info("Crash recovery completed (filename: ${recoveryFile.name})")
                 } catch (e: Exception) {
                     Paintbox.LOGGER.warn("Crash recovery failed! filename: ${recoveryFile.name}")
