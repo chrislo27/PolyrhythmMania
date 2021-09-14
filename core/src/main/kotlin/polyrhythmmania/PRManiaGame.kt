@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
@@ -152,6 +153,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 DiscordCore.enableRichPresence.bind { settings.discordRichPresence.use() }
                 
                 initializeScreens()
+                
+                // Preload certain large fonts (e.g. fontPauseMenuTitle)
+                fontPauseMenuTitle.useFont { font ->
+                    GlyphLayout(font, Localization.getValue("play.pause.title") + Localization.getValue("practice.clear"))
+                }
                 
                 if (PRMania.dumpPackedSheets) {
                     val gdxArray = com.badlogic.gdx.utils.Array<PackedSheet>()
