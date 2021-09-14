@@ -22,6 +22,8 @@ import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.pane.dialog.LevelMetadataDialog
+import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
 import kotlin.math.roundToInt
 
 
@@ -34,6 +36,8 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     val ioSave: Button
     val undoButton: Button
     val redoButton: Button
+    
+    val levelMetadataButton: Button
     
     val helpButton: Button
     val settingsButton: Button
@@ -51,7 +55,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
         val leftBox: HBox = HBox().apply { 
             this.spacing.set(4f)
             this.align.set(HBox.Align.LEFT)
-            this.bounds.width.set((32f + this.spacing.get()) * 6)
+            this.bounds.width.set((32f + this.spacing.get()) * 15)
         }
         this.addChild(leftBox)
         val rightBox: HBox = HBox().apply {
@@ -144,6 +148,17 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             }
         }
         
+        levelMetadataButton = Button(binding = { Localization.getVar("editor.dialog.levelMetadata.title").use() }, font = editorPane.palette.musicDialogFont).apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f * 8)
+            this.skinID.set(EditorSkins.BUTTON)
+            this.setOnAction {
+                if (editor.allowedToEdit.getOrCompute()) {
+                    editorPane.openDialog(LevelMetadataDialog(editorPane))
+                }
+            }
+        }
+        
         helpButton = Button("").apply {
             this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
@@ -189,6 +204,8 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             leftBox += separator()
             leftBox += undoButton
             leftBox += redoButton
+            leftBox += separator()
+            leftBox += levelMetadataButton
         }
         rightBox.temporarilyDisableLayouts { 
             rightBox += helpButton

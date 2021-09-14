@@ -21,7 +21,7 @@ data class LevelMetadata(
     
     companion object {
         const val LIMIT_LEVEL_CREATOR: Int = 100
-        const val LIMIT_DESCRIPTION: Int = 300
+        const val LIMIT_DESCRIPTION: Int = 256
         const val LIMIT_SONG_NAME: Int = 64
         const val LIMIT_ARTIST_NAME: Int = 64
         const val LIMIT_ALBUM_NAME: Int = 64
