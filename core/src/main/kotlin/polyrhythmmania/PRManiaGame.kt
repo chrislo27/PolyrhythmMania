@@ -154,11 +154,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 
                 initializeScreens()
                 
-                // Preload certain large fonts (e.g. fontPauseMenuTitle)
-                fontPauseMenuTitle.useFont { font ->
-                    GlyphLayout(font, Localization.getValue("play.pause.title") + Localization.getValue("practice.clear"))
-                }
-                
                 if (PRMania.dumpPackedSheets) {
                     val gdxArray = com.badlogic.gdx.utils.Array<PackedSheet>()
                     AssetRegistry.manager.getAll(PackedSheet::class.java, gdxArray)

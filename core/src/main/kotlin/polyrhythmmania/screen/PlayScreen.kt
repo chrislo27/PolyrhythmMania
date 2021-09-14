@@ -132,6 +132,8 @@ class PlayScreen(
             }
         }
     }
+    
+    private var firstRender: Boolean = true
 
     init {
         var nextLayer: UIElement = sceneRoot
@@ -257,6 +259,14 @@ class PlayScreen(
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         val batch = this.batch
+        
+        if (this.firstRender) {
+            this.firstRender = false
+            batch.begin()
+            sceneRoot.renderAsRoot(batch) // Optimization so there is less stutter when opening pause menu for the first time
+            batch.end()
+        }
+        
         uiViewport.apply()
         renderer.render(batch)
 
