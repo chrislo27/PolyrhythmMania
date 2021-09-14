@@ -13,6 +13,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
+import paintbox.ui.layout.VBox
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
@@ -48,6 +49,7 @@ open class ContextMenu : Control<ContextMenu>() {
     val childMenu: Var<ContextMenu?> = Var(null)
 
     val defaultWidth: FloatVar = FloatVar(200f)
+    val maxHeight: FloatVar = FloatVar(450f)
 
     var menuItems: List<MenuItem> = emptyList()
         private set
@@ -56,20 +58,33 @@ open class ContextMenu : Control<ContextMenu>() {
      * The list of [MenuItem]s that are currently displayed. Updated as part of [computeSize].
      */
     private var activeMenuItems: List<MenuItemMetadata> = emptyList()
+    protected open val sceneRootLayer: (SceneRoot) -> SceneRoot.Layer = SceneRoot::contextMenuLayer
 
     var onAddedToScene: (SceneRoot) -> Unit = {}
     var onRemovedFromScene: (SceneRoot) -> Unit = {}
 
-    val backgroundRect: RectElement
+    val backgroundRect: RectElement = RectElement(Color().grey(1f, 0.95f))
+    protected val scrollPaneParent: UIElement get() = backgroundRect
+    val scrollPane: ScrollPane
+    var isContentInScrollPane: Boolean = false
+        protected set
+    protected var contentContainer: UIElement? = null
     
     init {
         this.border.set(Insets(1f))
         this.borderStyle.set(SolidBorder(Color.BLACK))
         this.bounds.width.set(defaultWidth.get())
         this.bounds.height.set(defaultWidth.get())
-        backgroundRect = RectElement(Color().grey(1f, 0.95f))
-        addChild(backgroundRect)
 
+        addChild(backgroundRect)
+        
+        scrollPane = ScrollPane().apply {
+            this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+            this.vBar.unitIncrement.set(10f)
+            this.vBar.blockIncrement.set(40f)
+        }
+        
         this.addInputEventListener { event ->
             true // Accepts any input events so the context menu doesn't get closed
         }
@@ -170,7 +185,7 @@ open class ContextMenu : Control<ContextMenu>() {
                                 item.onAction.invoke()
                                 if (item.closeMenuAfterAction) {
                                     Gdx.app.postRunnable {
-                                        sceneRoot.hideRootContextMenu()
+                                        sceneRoot.hideContextMenuUnknownLayer(this@ContextMenu)
                                     }
                                 }
                             }
@@ -200,7 +215,7 @@ open class ContextMenu : Control<ContextMenu>() {
                                 item.onAction.invoke()
                                 if (item.closeMenuAfterAction) {
                                     Gdx.app.postRunnable {
-                                        sceneRoot.hideRootContextMenu()
+                                        sceneRoot.hideContextMenuUnknownLayer(this@ContextMenu)
                                     }
                                 }
                             }
@@ -211,25 +226,59 @@ open class ContextMenu : Control<ContextMenu>() {
             }
             MenuItemMetadata(item, basePane)
         }
-
-        activeMenuItems.forEach { old ->
-            backgroundRect.removeChild(old.element)
+        
+        val containingVbox = VBox().apply {
+            this.spacing.set(0f)
         }
 
-        var posY = 0f
-        for (it in metadata) {
-            val ele = it.element
-            ele.bounds.y.set(posY)
-            backgroundRect.addChild(ele)
-            posY += ele.bounds.height.get()
+        containingVbox.temporarilyDisableLayouts { 
+            metadata.forEach { 
+                containingVbox += it.element
+            }
         }
+        containingVbox.sizeHeightToChildren(10f)
         activeMenuItems = metadata
+        
+        val oldContainer = this.contentContainer
+        if (oldContainer != null) {
+            scrollPaneParent.removeChild(oldContainer)
+        }
+        
+        val computedHeight = containingVbox.bounds.height.get()
+        val maxH = maxHeight.get()
+        val realHeight = computedHeight.coerceAtMost(maxH)
+        if (computedHeight > maxH) {
+            isContentInScrollPane = true
+            scrollPane.setContent(containingVbox)
+            scrollPane.bounds.height.set(realHeight)
+            scrollPaneParent.addChild(scrollPane)
+        } else {
+            isContentInScrollPane = false
+            scrollPane.setContent(Pane())
+            scrollPaneParent.removeChild(scrollPane)
+            scrollPaneParent.addChild(containingVbox)
+        }
+        
+        contentContainer = containingVbox
 
         val thisBorder = this.border.getOrCompute()
-        this.bounds.width.set(width.get() + thisBorder.left + thisBorder.right)
-        this.bounds.height.set(posY + thisBorder.top + thisBorder.bottom)
+        this.bounds.width.set(width.get() + thisBorder.left + thisBorder.right
+                + (if (isContentInScrollPane) scrollPane.vBar.bounds.width.get() else 0f))
+        this.bounds.height.set(realHeight + thisBorder.top + thisBorder.bottom)
     }
 
+    fun scrollToItem(menuItem: MenuItem) {
+        if (!isContentInScrollPane) return
+        
+        val metadata = this.activeMenuItems.find { it.menuItem === menuItem }
+        if (metadata != null) {
+            val bottomEdge = metadata.element.bounds.y.get() + metadata.element.bounds.height.get()
+            val scrollPaneHeight = scrollPane.bounds.height.get()
+            val targetValue = bottomEdge - scrollPaneHeight
+            scrollPane.vBar.setValue(targetValue)
+        }
+    }
+    
     fun addMenuItem(child: MenuItem) {
         if (child !in menuItems) {
             menuItems = menuItems + child
@@ -251,7 +300,8 @@ open class ContextMenu : Control<ContextMenu>() {
         // The children will also NOT be added, they have to be added later using addChildMenu
         childMenu.set(child)
         child.parentMenu.set(this)
-        this.sceneRoot.getOrCompute()?.addContextMenuToScene(child)
+        val root = this.sceneRoot.getOrCompute()
+        root?.addContextMenuToScene(child, sceneRootLayer(root))
     }
 
     /**
@@ -262,7 +312,8 @@ open class ContextMenu : Control<ContextMenu>() {
         if (child != null) {
             // Order of relationship changes should be in this order exactly: sceneRoot, child.parentMenu, this.childMenu
             child.removeChildMenu()
-            this.sceneRoot.getOrCompute()?.removeContextMenuFromScene(child)
+            val root = this.sceneRoot.getOrCompute()
+            root?.removeContextMenuFromScene(child, sceneRootLayer(root))
             child.parentMenu.set(null)
             childMenu.set(null)
         }

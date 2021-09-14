@@ -27,6 +27,18 @@ import java.time.format.DateTimeFormatter
 
 class LevelMetadataDialog(editorPane: EditorPane) 
     : EditorDialog(editorPane) {
+    
+    data class Genre(val text: String) {
+        companion object {
+            val DEFAULT_GENRES: List<Genre> = listOf(
+"Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz", "Metal", "New Age", "Oldies", "Other", "Pop", "R&B", "Rap", "Reggae", "Rock", "Techno", "Industrial", "Alternative", "Ska", "Death Metal", "Pranks", "Soundtrack", "Euro-Techno", "Ambient", "Trip-Hop", "Vocal", "Jazz+Funk", "Fusion", "Trance", "Classical", "Instrumental", "Acid", "House", "Game", "Sound Clip", "Gospel", "Noise", "Alternative Rock", "Bass", "Soul", "Punk", "Space", "Meditative", "Instrumental Pop", "Instrumental Rock", "Ethnic", "Gothic", "Darkwave", "Techno-Industrial", "Electronic", "Pop-Folk", "Eurodance", "Dream", "Southern Rock", "Comedy", "Cult", "Gangsta", "Top 40", "Christian Rap", "Pop/Funk", "Jungle", "Native US", "Cabaret", "New Wave", "Psychadelic", "Rave", "Showtunes", "Trailer", "Lo-Fi", "Tribal", "Acid Punk", "Acid Jazz", "Polka", "Retro", "Musical", "Rock & Roll", "Hard Rock", "Folk", "Folk-Rock", "National Folk", "Swing", "Fast Fusion", "Bebob", "Latin", "Revival", "Celtic", "Bluegrass", "Avantgarde", "Gothic Rock", "Progressive Rock", "Psychedelic Rock", "Symphonic Rock", "Slow Rock", "Big Band", "Chorus", "Easy Listening", "Acoustic", "Humour", "Speech", "Chanson", "Opera", "Chamber Music", "Sonata", "Symphony", "Booty Bass", "Primus", "Porn Groove", "Satire", "Slow Jam", "Club", "Tango", "Samba", "Folklore", "Ballad", "Power Ballad", "Rhythmic Soul", "Freestyle", "Duet", "Punk Rock", "Drum Solo", "Acapella", "Euro-House", "Dance Hall", "Goa", "Drum & Bass", "Club - House", "Hardcore", "Terror", "Indie", "BritPop", "Negerpunk", "Polsk Punk", "Beat", "Christian Gangsta Rap", "Heavy Metal", "Black Metal", "Crossover", "Contemporary Christian", "Christian Rock", "Merengue", "Salsa", "Thrash Metal", "Anime", "JPop", "Synthpop", "Unknown",
+            ).map { Genre(it) }
+        }
+
+        override fun toString(): String {
+            return text
+        }
+    }
 
     private val levelMetadata: Var<LevelMetadata> = Var(editor.container.levelMetadata)
 
@@ -108,6 +120,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
             fun addTextField(labelText: String, charLimit: Int, 
                              getter: (LevelMetadata) -> String,
                              allowNewlines: Boolean = false,
+                             textFieldSizeAdjust: Float = 0f,
                              copyFunc: (LevelMetadata, newText: String) -> LevelMetadata, ): HBox {
                 return HBox().apply {
                     this.bounds.height.set(labelHeight)
@@ -120,7 +133,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                         this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.${labelText}.tooltip", Var { listOf(charLimit) })))
                     }
                     this += RectElement(Color.BLACK).apply {
-                        this.bindWidthToParent(adjust = -textLabelWidth)
+                        this.bindWidthToParent(adjust = -textLabelWidth + textFieldSizeAdjust)
                         this.padding.set(Insets(1f, 1f, 2f, 2f))
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
@@ -209,8 +222,15 @@ class LevelMetadataDialog(editorPane: EditorPane)
             }
             vbox += addYearField("levelMetadata.albumYear", LevelMetadata::albumYear)
             // TODO add combo box dropdown for common genres
-            vbox += addTextField("levelMetadata.genre", LevelMetadata.LIMIT_GENRE, LevelMetadata::genre) { t, newText ->
+            vbox += addTextField("levelMetadata.genre", LevelMetadata.LIMIT_GENRE, LevelMetadata::genre, textFieldSizeAdjust = -400f) { t, newText ->
                 t.copy(genre = newText)
+            }.also { hbox ->
+                hbox += Pane().apply { 
+                    this.bounds.width.set(16f)
+                }
+                hbox += ComboBox<Genre>(Genre.DEFAULT_GENRES, Genre.DEFAULT_GENRES.first(), font = editorPane.palette.musicDialogFont).apply { 
+                    this.bounds.width.set(300f)
+                }
             }
             
         }

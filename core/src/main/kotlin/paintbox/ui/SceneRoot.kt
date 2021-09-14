@@ -32,9 +32,11 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
     val mainLayer: Layer = Layer("main", enableTooltips = true, exclusiveTooltipAccess = false, rootElement = this)
     val dialogLayer: Layer = Layer("dialog", enableTooltips = true, exclusiveTooltipAccess = true)
     val contextMenuLayer: Layer = Layer("contextMenu", enableTooltips = true, exclusiveTooltipAccess = true)
+    val dropdownLayer: Layer = Layer("dropdown", enableTooltips = true, exclusiveTooltipAccess = true)
     val tooltipLayer: Layer = Layer("tooltip", enableTooltips = false, exclusiveTooltipAccess = false)
-    val allLayers: List<Layer> = listOf(mainLayer, dialogLayer, contextMenuLayer, tooltipLayer)
+    val allLayers: List<Layer> = listOf(mainLayer, dialogLayer, contextMenuLayer, dropdownLayer, tooltipLayer)
     val allLayersReversed: List<Layer> = allLayers.asReversed()
+    val contextMenuLikeLayers: List<Layer> = listOf(contextMenuLayer, dropdownLayer)
 
     val inputSystem: InputSystem = InputSystem(this)
 
@@ -50,6 +52,7 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
     private var currentTooltip: UIElement? = null
 
     private var rootContextMenu: ContextMenu? = null
+    private var dropdownContextMenu: ContextMenu? = null
     private var rootDialogElement: UIElement? = null
 
     private val _currentFocused: Var<Focusable?> = Var(null)
@@ -87,6 +90,16 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
             if (event is TouchDown) {
                 if (rootContextMenu != null) {
                     hideRootContextMenu()
+                    inputConsumed = true
+                }
+            }
+            inputConsumed
+        }
+        dropdownLayer.root.addInputEventListener { event ->
+            var inputConsumed = false
+            if (event is TouchDown) {
+                if (dropdownContextMenu != null) {
+                    hideDropdownContextMenu()
                     inputConsumed = true
                 }
             }
@@ -247,12 +260,9 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
      */
     fun showRootContextMenu(contextMenu: ContextMenu, suggestOffsetX: Float = 0f, suggestOffsetY: Float = 0f) {
         hideRootContextMenu()
-        addContextMenuToScene(contextMenu, suggestOffsetX, suggestOffsetY)
+        addContextMenuToScene(contextMenu, contextMenuLayer, suggestOffsetX, suggestOffsetY)
         rootContextMenu = contextMenu
         contextMenuLayer.resetHoveredElementPath()
-//        Gdx.app.postRunnable {
-//            contextMenuLayer.resetHoveredElementPath()
-//        }
     }
 
     /**
@@ -260,13 +270,48 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
      */
     fun hideRootContextMenu(): ContextMenu? {
         val currentRootMenu = rootContextMenu ?: return null
-        removeContextMenuFromScene(currentRootMenu)
+        hideDropdownContextMenu()
+        removeContextMenuFromScene(currentRootMenu, contextMenuLayer)
         rootContextMenu = null
         contextMenuLayer.resetHoveredElementPath()
-//        Gdx.app.postRunnable {
-//            contextMenuLayer.resetHoveredElementPath()
-//        }
         return currentRootMenu
+    }
+
+    /**
+     * Shows the [contextMenu] as a dropdown menu. This will hide the existing dropdown context menu if any.
+     */
+    fun showDropdownContextMenu(contextMenu: ContextMenu, suggestOffsetX: Float = 0f, suggestOffsetY: Float = 0f) {
+        hideDropdownContextMenu()
+        addContextMenuToScene(contextMenu, dropdownLayer, suggestOffsetX, suggestOffsetY)
+        dropdownContextMenu = contextMenu
+        dropdownLayer.resetHoveredElementPath()
+    }
+
+    /**
+     * Hides the dropdown context menu if any.
+     */
+    fun hideDropdownContextMenu(): ContextMenu? {
+        val currentRootMenu = dropdownContextMenu ?: return null
+        removeContextMenuFromScene(currentRootMenu, dropdownLayer)
+        dropdownContextMenu = null
+        dropdownLayer.resetHoveredElementPath()
+        return currentRootMenu
+    }
+
+
+    /**
+     * Hides the given context menu, searching top to bottom through the allowed layers.
+     */
+    fun hideContextMenuUnknownLayer(contextMenu: ContextMenu): Boolean {
+        if (contextMenu in dropdownLayer.root) {
+            hideDropdownContextMenu()
+            return true
+        }
+        if (contextMenu in contextMenuLayer.root) {
+            hideRootContextMenu()
+            return true
+        }
+        return false
     }
 
     /**
@@ -277,9 +322,6 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
         rootDialogElement = dialog
         dialogLayer.root.addChild(dialog)
         dialogLayer.resetHoveredElementPath()
-//        Gdx.app.postRunnable {
-//            dialogLayer.resetHoveredElementPath()
-//        }
         cancelTooltip()
     }
 
@@ -291,9 +333,6 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
         dialogLayer.root.removeChild(currentRootDialog)
         rootDialogElement = null
         dialogLayer.resetHoveredElementPath()
-//        Gdx.app.postRunnable {
-//            dialogLayer.resetHoveredElementPath()
-//        }
         cancelTooltip()
         return currentRootDialog
     }
@@ -309,11 +348,11 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
      * This does NOT connect the parent-child
      * relationship. One should call [ContextMenu.addChildMenu] for that.
      */
-    fun addContextMenuToScene(contextMenu: ContextMenu, suggestOffsetX: Float = 0f, suggestOffsetY: Float = 0f) {
-        // Add to the contextMenu layer scene
+    fun addContextMenuToScene(contextMenu: ContextMenu, layer: Layer, suggestOffsetX: Float = 0f, suggestOffsetY: Float = 0f) {
+        // Add to the provided layer scene
         // Compute the width/height layouts
         // Position the context menu according to its parent (if any)
-        val root = contextMenuLayer.root
+        val root = layer.root
         if (contextMenu !in root.children) {
             root.addChild(contextMenu)
 
@@ -355,9 +394,9 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
      * This does NOT disconnect the parent-child
      * relationship. One should call [ContextMenu.removeChildMenu] for that.
      */
-    fun removeContextMenuFromScene(contextMenu: ContextMenu) {
-        // Remove from the contextMenu layer scene
-        val root = contextMenuLayer.root
+    fun removeContextMenuFromScene(contextMenu: ContextMenu, layer: Layer) {
+        // Remove from the provided layer scene
+        val root = layer.root
         if (root.removeChild(contextMenu)) {
             contextMenu.onRemovedFromScene.invoke(this)
             cancelTooltip()
@@ -365,8 +404,9 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
     }
 
     fun isContextMenuActive(): Boolean = rootContextMenu != null
-    fun isDialogActive(): Boolean = rootDialogElement != null
     fun getCurrentRootContextMenu(): UIElement? = rootContextMenu
+    
+    fun isDialogActive(): Boolean = rootDialogElement != null
     fun getCurrentRootDialog(): UIElement? = rootDialogElement
 
     private fun updateMouseVector() {

@@ -171,6 +171,10 @@ open class UIElement : UIBounds() {
      */
     protected open fun onRemovedFromParent(oldParent: UIElement) {
     }
+    
+    operator fun contains(other: UIElement): Boolean {
+        return other in children
+    }
 
     fun addInputEventListener(listener: InputEventListener) {
         val current = inputListeners.getOrCompute()

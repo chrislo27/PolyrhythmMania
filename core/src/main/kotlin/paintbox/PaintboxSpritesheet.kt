@@ -24,6 +24,9 @@ class PaintboxSpritesheet(val texture: Texture) {
     val circleFilled: TextureRegion = TextureRegion(texture, 336, 35, 64, 64)
     val upArrow: TextureRegion = TextureRegion(texture, 51, 2, 30, 30)
     val upChevronArrow: TextureRegion = TextureRegion(texture, 83, 2, 30, 30)
+    val downChevronArrow: TextureRegion = TextureRegion(upChevronArrow).apply { 
+        flip(false, true)
+    }
     
     fun getRoundedCornerForRadius(rad: Int): TextureRegion {
         val radius = rad.absoluteValue
