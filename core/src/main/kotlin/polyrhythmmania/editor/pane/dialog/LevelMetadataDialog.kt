@@ -23,20 +23,44 @@ import polyrhythmmania.ui.PRManiaSkins
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 class LevelMetadataDialog(editorPane: EditorPane) 
     : EditorDialog(editorPane) {
     
-    data class Genre(val text: String) {
+    data class Genre(val genreName: String) {
         companion object {
             val DEFAULT_GENRES: List<Genre> = listOf(
-"Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz", "Metal", "New Age", "Oldies", "Other", "Pop", "R&B", "Rap", "Reggae", "Rock", "Techno", "Industrial", "Alternative", "Ska", "Death Metal", "Pranks", "Soundtrack", "Euro-Techno", "Ambient", "Trip-Hop", "Vocal", "Jazz+Funk", "Fusion", "Trance", "Classical", "Instrumental", "Acid", "House", "Game", "Sound Clip", "Gospel", "Noise", "Alternative Rock", "Bass", "Soul", "Punk", "Space", "Meditative", "Instrumental Pop", "Instrumental Rock", "Ethnic", "Gothic", "Darkwave", "Techno-Industrial", "Electronic", "Pop-Folk", "Eurodance", "Dream", "Southern Rock", "Comedy", "Cult", "Gangsta", "Top 40", "Christian Rap", "Pop/Funk", "Jungle", "Native US", "Cabaret", "New Wave", "Psychadelic", "Rave", "Showtunes", "Trailer", "Lo-Fi", "Tribal", "Acid Punk", "Acid Jazz", "Polka", "Retro", "Musical", "Rock & Roll", "Hard Rock", "Folk", "Folk-Rock", "National Folk", "Swing", "Fast Fusion", "Bebob", "Latin", "Revival", "Celtic", "Bluegrass", "Avantgarde", "Gothic Rock", "Progressive Rock", "Psychedelic Rock", "Symphonic Rock", "Slow Rock", "Big Band", "Chorus", "Easy Listening", "Acoustic", "Humour", "Speech", "Chanson", "Opera", "Chamber Music", "Sonata", "Symphony", "Booty Bass", "Primus", "Porn Groove", "Satire", "Slow Jam", "Club", "Tango", "Samba", "Folklore", "Ballad", "Power Ballad", "Rhythmic Soul", "Freestyle", "Duet", "Punk Rock", "Drum Solo", "Acapella", "Euro-House", "Dance Hall", "Goa", "Drum & Bass", "Club - House", "Hardcore", "Terror", "Indie", "BritPop", "Negerpunk", "Polsk Punk", "Beat", "Christian Gangsta Rap", "Heavy Metal", "Black Metal", "Crossover", "Contemporary Christian", "Christian Rock", "Merengue", "Salsa", "Thrash Metal", "Anime", "JPop", "Synthpop", "Unknown",
-            ).map { Genre(it) }
+                    "Blues",
+                    "Rock",
+                    "Country",
+                    "Dance",
+                    "Disco",
+                    "Funk",
+                    "Jazz",
+                    "Metal",
+                    "Pop",
+                    "Rap",
+                    "Reggae",
+                    "Techno",
+                    "Ska",
+                    "Eurobeat",
+                    "Classical",
+                    "Soul",
+                    "Ethnic",
+                    "Electronic",
+                    "EDM",
+                    "Rock 'n' Roll",
+                    "Retro",
+                    "Lo-Fi",
+                    "J-Pop",
+                    "K-Pop",
+            ).sortedBy { it.lowercase(Locale.ROOT) }.map { Genre(it) }
         }
 
         override fun toString(): String {
-            return text
+            return genreName
         }
     }
 
@@ -121,8 +145,25 @@ class LevelMetadataDialog(editorPane: EditorPane)
                              getter: (LevelMetadata) -> String,
                              allowNewlines: Boolean = false,
                              textFieldSizeAdjust: Float = 0f,
-                             copyFunc: (LevelMetadata, newText: String) -> LevelMetadata, ): HBox {
-                return HBox().apply {
+                             copyFunc: (LevelMetadata, newText: String) -> LevelMetadata, ): Pair<HBox, TextField> {
+                val textField = TextField(editorPane.palette.rodinDialogFont).apply {
+                    focusGroup.addFocusable(this)
+                    this.textColor.set(Color.WHITE)
+                    this.canInputNewlines.set(allowNewlines)
+                    this.characterLimit.set(charLimit)
+                    this.text.set(getter(levelMetadata.getOrCompute()))
+                    this.text.addListener { t ->
+                        val newText = t.getOrCompute()
+                        if (this.hasFocus.getOrCompute()) {
+                            levelMetadata.set(copyFunc(levelMetadata.getOrCompute(), newText))
+                        }
+                    }
+                    this.setOnRightClick {
+                        text.set("")
+                        requestFocus()
+                    }
+                }
+                val hbox = HBox().apply {
                     this.bounds.height.set(labelHeight)
                     this.spacing.set(0f)
                     this += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.mainFontBold).apply {
@@ -137,25 +178,11 @@ class LevelMetadataDialog(editorPane: EditorPane)
                         this.padding.set(Insets(1f, 1f, 2f, 2f))
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
-                        this += TextField(editorPane.palette.rodinDialogFont).apply {
-                            focusGroup.addFocusable(this)
-                            this.textColor.set(Color.WHITE)
-                            this.canInputNewlines.set(allowNewlines)
-                            this.characterLimit.set(charLimit)
-                            this.text.set(getter(levelMetadata.getOrCompute()))
-                            this.text.addListener { t ->
-                                val newText = t.getOrCompute()
-                                if (this.hasFocus.getOrCompute()) {
-                                    levelMetadata.set(copyFunc(levelMetadata.getOrCompute(), newText))
-                                }
-                            }
-                            this.setOnRightClick {
-                                text.set("")
-                                requestFocus()
-                            }
-                        }
+                        this += textField
                     }
                 }
+                
+                return hbox to textField
             }
             fun addYearField(labelText: String, 
                              getter: (LevelMetadata) -> Int): HBox {
@@ -206,32 +233,40 @@ class LevelMetadataDialog(editorPane: EditorPane)
             }
             vbox += addTextField("levelMetadata.levelCreator", LevelMetadata.LIMIT_LEVEL_CREATOR, LevelMetadata::levelCreator) { t, newText ->
                 t.copy(levelCreator = newText)
-            }
+            }.first
             vbox += addTextField("levelMetadata.description", LevelMetadata.LIMIT_DESCRIPTION, LevelMetadata::description,
                     allowNewlines = true) { t, newText ->
                 t.copy(description = newText)
-            }
+            }.first
             vbox += addTextField("levelMetadata.songName", LevelMetadata.LIMIT_SONG_NAME, LevelMetadata::songName) { t, newText ->
                 t.copy(songName = newText)
-            }
+            }.first
             vbox += addTextField("levelMetadata.songArtist", LevelMetadata.LIMIT_ARTIST_NAME, LevelMetadata::songArtist) { t, newText ->
                 t.copy(songArtist = newText)
-            }
+            }.first
             vbox += addTextField("levelMetadata.albumName", LevelMetadata.LIMIT_ALBUM_NAME, LevelMetadata::albumName) { t, newText ->
                 t.copy(albumName = newText)
-            }
+            }.first
             vbox += addYearField("levelMetadata.albumYear", LevelMetadata::albumYear)
-            // TODO add combo box dropdown for common genres
-            vbox += addTextField("levelMetadata.genre", LevelMetadata.LIMIT_GENRE, LevelMetadata::genre, textFieldSizeAdjust = -400f) { t, newText ->
+            vbox += addTextField("levelMetadata.genre", LevelMetadata.LIMIT_GENRE, LevelMetadata::genre, textFieldSizeAdjust = -600f) { t, newText ->
                 t.copy(genre = newText)
-            }.also { hbox ->
+            }.also { (hbox, textField) ->
                 hbox += Pane().apply { 
                     this.bounds.width.set(16f)
                 }
-                hbox += ComboBox<Genre>(Genre.DEFAULT_GENRES, Genre.DEFAULT_GENRES.first(), font = editorPane.palette.musicDialogFont).apply { 
-                    this.bounds.width.set(300f)
+                hbox += TextLabel(binding = { Localization.getVar("editor.dialog.levelMetadata.genrePreset").use() }, font = editorPane.palette.musicDialogFont).apply {
+                    this.bounds.width.set(200f)
+                    this.renderAlign.set(Align.right)
+                    this.textColor.set(Color.WHITE)
+                    this.padding.set(Insets(0f, 0f, 0f, 4f))
                 }
-            }
+                hbox += ComboBox<Genre>(Genre.DEFAULT_GENRES, Genre.DEFAULT_GENRES.first(), font = editorPane.palette.musicDialogFont).apply { 
+                    this.bounds.width.set(250f)
+                    this.selectedItem.addListener {
+                        textField.text.set(it.getOrCompute().genreName)
+                    }
+                }
+            }.first
             
         }
 
