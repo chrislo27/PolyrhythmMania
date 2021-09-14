@@ -144,7 +144,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
             fun addTextField(labelText: String, charLimit: Int, 
                              getter: (LevelMetadata) -> String,
                              allowNewlines: Boolean = false,
-                             textFieldSizeAdjust: Float = 0f,
+                             textFieldSizeAdjust: Float = 0f, textFieldSizeMultiplier: Float = 1f,
                              copyFunc: (LevelMetadata, newText: String) -> LevelMetadata, ): Pair<HBox, TextField> {
                 val textField = TextField(editorPane.palette.rodinDialogFont).apply {
                     focusGroup.addFocusable(this)
@@ -174,7 +174,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                         this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.${labelText}.tooltip", Var { listOf(charLimit) })))
                     }
                     this += RectElement(Color.BLACK).apply {
-                        this.bindWidthToParent(adjust = -textLabelWidth + textFieldSizeAdjust)
+                        this.bindWidthToParent(adjust = -textLabelWidth + textFieldSizeAdjust, multiplier = textFieldSizeMultiplier)
                         this.padding.set(Insets(1f, 1f, 2f, 2f))
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
@@ -231,24 +231,29 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 val datetime = it.initialCreationDate.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault())
                 DateTimeFormatter.RFC_1123_DATE_TIME.format(datetime)
             }
-            vbox += addTextField("levelMetadata.levelCreator", LevelMetadata.LIMIT_LEVEL_CREATOR, LevelMetadata::levelCreator) { t, newText ->
+            vbox += addTextField("levelMetadata.levelCreator", LevelMetadata.LIMIT_LEVEL_CREATOR,
+                    LevelMetadata::levelCreator, textFieldSizeMultiplier = 0.7f) { t, newText ->
                 t.copy(levelCreator = newText)
             }.first
-            vbox += addTextField("levelMetadata.description", LevelMetadata.LIMIT_DESCRIPTION, LevelMetadata::description,
-                    allowNewlines = true) { t, newText ->
+            vbox += addTextField("levelMetadata.description", LevelMetadata.LIMIT_DESCRIPTION,
+                    LevelMetadata::description, allowNewlines = true) { t, newText ->
                 t.copy(description = newText)
             }.first
-            vbox += addTextField("levelMetadata.songName", LevelMetadata.LIMIT_SONG_NAME, LevelMetadata::songName) { t, newText ->
+            vbox += addTextField("levelMetadata.songName", LevelMetadata.LIMIT_SONG_NAME,
+                    LevelMetadata::songName, textFieldSizeMultiplier = 0.6f) { t, newText ->
                 t.copy(songName = newText)
             }.first
-            vbox += addTextField("levelMetadata.songArtist", LevelMetadata.LIMIT_ARTIST_NAME, LevelMetadata::songArtist) { t, newText ->
+            vbox += addTextField("levelMetadata.songArtist", LevelMetadata.LIMIT_ARTIST_NAME,
+                    LevelMetadata::songArtist, textFieldSizeMultiplier = 0.6f) { t, newText ->
                 t.copy(songArtist = newText)
             }.first
-            vbox += addTextField("levelMetadata.albumName", LevelMetadata.LIMIT_ALBUM_NAME, LevelMetadata::albumName) { t, newText ->
+            vbox += addTextField("levelMetadata.albumName", LevelMetadata.LIMIT_ALBUM_NAME,
+                    LevelMetadata::albumName, textFieldSizeMultiplier = 0.6f) { t, newText ->
                 t.copy(albumName = newText)
             }.first
             vbox += addYearField("levelMetadata.albumYear", LevelMetadata::albumYear)
-            vbox += addTextField("levelMetadata.genre", LevelMetadata.LIMIT_GENRE, LevelMetadata::genre, textFieldSizeAdjust = -600f) { t, newText ->
+            vbox += addTextField("levelMetadata.genre", LevelMetadata.LIMIT_GENRE, LevelMetadata::genre,
+                    textFieldSizeAdjust = -600f) { t, newText ->
                 t.copy(genre = newText)
             }.also { (hbox, textField) ->
                 hbox += Pane().apply { 
