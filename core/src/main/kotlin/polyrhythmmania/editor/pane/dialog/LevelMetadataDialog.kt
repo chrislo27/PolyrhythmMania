@@ -82,6 +82,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
             
             val textLabelWidth = 250f
             val labelHeight = 32f
+            val focusGroup = FocusGroup()
 
             fun addInfoField(labelText: String, getter: (LevelMetadata) -> String): HBox {
                 return HBox().apply {
@@ -124,6 +125,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
                         this += TextField(editorPane.palette.rodinDialogFont).apply {
+                            focusGroup.addFocusable(this)
                             this.textColor.set(Color.WHITE)
                             this.canInputNewlines.set(allowNewlines)
                             this.characterLimit.set(charLimit)
@@ -161,6 +163,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
                         this += TextField(editorPane.palette.rodinDialogFont).apply {
+                            focusGroup.addFocusable(this)
                             this.textColor.set(Color.WHITE)
 //                            this.characterLimit.set(LevelMetadata.LIMIT_YEAR.last.toString().length)
                             this.characterLimit.set(4) // XXXX

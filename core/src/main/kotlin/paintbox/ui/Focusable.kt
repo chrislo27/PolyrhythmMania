@@ -1,6 +1,8 @@
 package paintbox.ui
 
 import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
+import paintbox.ui.control.FocusGroup
 
 
 /**
@@ -10,6 +12,13 @@ import paintbox.binding.ReadOnlyVar
 interface Focusable {
     
     val hasFocus: ReadOnlyVar<Boolean>
+    
+    /**
+     * The [FocusGroup] that this [Focusable] belongs to.
+     *
+     * This should not be set. In order to register a [Focusable] to a [FocusGroup], use [FocusGroup.addFocusable].
+     */
+    val focusGroup: Var<FocusGroup?>
     
     fun onFocusGained() {
     }

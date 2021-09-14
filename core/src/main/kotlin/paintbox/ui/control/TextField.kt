@@ -73,7 +73,8 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     val textScale: FloatVar = FloatVar(1f)
     val textColor: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
     val caretWidth: FloatVar = FloatVar(DEFAULT_CARET_WIDTH)
-
+    override val focusGroup: Var<FocusGroup?> = Var(null)
+    
     private val glyphLayout: ReadOnlyVar<GlyphLayout> = Var.sideEffecting(GlyphLayout()) { layout ->
         val paintboxFont = this@TextField.font.use()
         paintboxFont.currentFontNumberVar.use()
@@ -198,7 +199,16 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         val caret = caretPos.getOrCompute()
         
         when (character) {
-            TAB -> {}
+            TAB -> {
+                val focusGroup = this.focusGroup.getOrCompute()
+                if (focusGroup != null) {
+                    if (shift) {
+                        focusGroup.focusPrevious(this)
+                    } else {
+                        focusGroup.focusNext(this)
+                    }
+                }
+            }
             BACKSPACE -> {
                 if (currentText.isNotEmpty() && caret > 0) {
                     val newCaretPos = if (control && !alt && !shift) {
