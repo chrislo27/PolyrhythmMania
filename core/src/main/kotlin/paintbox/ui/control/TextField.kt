@@ -419,6 +419,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     override fun onFocusGained() {
         super.onFocusGained()
         (hasFocus as Var).set(true)
+        resetCaretBlinkTimer()
     }
 
     override fun onFocusLost() {
