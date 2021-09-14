@@ -260,7 +260,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         batch.setColor(1f, 1f, 1f, 1f)
 
         @Suppress("ConstantConditionIf")
-        if (PRMania.enableEarlyAccessMessage && false) {
+        if (PRMania.enableEarlyAccessMessage) {
             val paintboxFont = fontRodinFixedBordered
             paintboxFont.useFont { font ->
                 val isEditor = this.getScreen() is EditorScreen
