@@ -305,7 +305,7 @@ class EventTextbox(engine: Engine, startBeat: Float, duration: Float, val textbo
     override fun onEnd(currentBeat: Float) {
         super.onEnd(currentBeat)
         if (!textbox.requiresInput) {
-            engine.removeActiveTextbox(true)
+            engine.removeActiveTextbox(unpauseSoundInterface = true, runTextboxOnComplete = true)
         }
     }
 }

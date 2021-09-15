@@ -445,7 +445,7 @@ class Editor(val main: PRManiaGame)
             row.updateInputIndicators()
         }
         engine.inputter.reset()
-        engine.removeActiveTextbox(false)
+        engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
     }
 
     /**
@@ -622,7 +622,7 @@ class Editor(val main: PRManiaGame)
                         while (s < newSeconds) {
                             timing.seconds = s
                             engine.seconds = s
-                            engine.removeActiveTextbox(false)
+                            engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = true)
                             val last = s
                             s = (s + 1 / 60f).coerceAtMost(newSeconds)
                             if (s <= last) break
