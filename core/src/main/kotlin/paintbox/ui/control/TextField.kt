@@ -338,12 +338,18 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 }
             }
             Input.Keys.C -> {
-                if (control && !shift && !alt) {
+                if (doesSelectionExist() && control && !shift && !alt) {
                     attemptCopy()
                 }
             }
+            Input.Keys.X -> {
+                if (doesSelectionExist() && control && !shift && !alt) {
+                    attemptCopy()
+                    deleteSelectionIfAny()
+                }
+            }
             Input.Keys.INSERT -> {
-                if (control && !shift && !alt) {
+                if (doesSelectionExist() && control && !shift && !alt) {
                     attemptCopy()
                 } else if (!control && shift && !alt) {
                     attemptPaste()
