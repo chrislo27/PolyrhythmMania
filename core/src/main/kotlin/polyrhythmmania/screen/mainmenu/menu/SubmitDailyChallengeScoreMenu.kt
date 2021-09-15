@@ -125,8 +125,8 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
                     this.text.set(nameText.getOrCompute())
                     this.inputFilter.set { it in DailyChallengeUtils.allowedNameChars }
                     this.setOnRightClick {
-                        text.set("")
                         requestFocus()
+                        text.set("")
                     }
                     this.text.addListener { t ->
                         if (hasFocus.getOrCompute()) {

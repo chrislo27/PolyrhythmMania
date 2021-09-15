@@ -159,8 +159,8 @@ class LevelMetadataDialog(editorPane: EditorPane)
                         }
                     }
                     this.setOnRightClick {
-                        text.set("")
                         requestFocus()
+                        text.set("")
                     }
                 }
                 val hbox = HBox().apply {
@@ -219,8 +219,8 @@ class LevelMetadataDialog(editorPane: EditorPane)
                                 }
                             }
                             this.setOnRightClick {
-                                text.set("")
                                 requestFocus()
+                                text.set("")
                             }
                         }
                     }

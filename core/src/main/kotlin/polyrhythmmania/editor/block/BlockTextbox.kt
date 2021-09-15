@@ -76,8 +76,8 @@ class BlockTextbox(engine: Engine)
                                     }
                                 }
                                 this.setOnRightClick {
-                                    text.set("")
                                     requestFocus()
+                                    text.set("")
                                 }
                             }
                         }

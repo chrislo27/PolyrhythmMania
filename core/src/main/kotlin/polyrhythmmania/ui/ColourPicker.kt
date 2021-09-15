@@ -229,8 +229,8 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                             }
                         }
                         this.setOnRightClick { 
-                            text.set("")
                             requestFocus()
+                            text.set("")
                         }
                     }
                     this += textField

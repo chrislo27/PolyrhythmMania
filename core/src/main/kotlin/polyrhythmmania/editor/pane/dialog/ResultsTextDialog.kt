@@ -155,8 +155,8 @@ class ResultsTextDialog(editorPane: EditorPane)
                                 }
                             }
                             this.setOnRightClick {
-                                text.set("")
                                 requestFocus()
+                                text.set("")
                             }
                         }
                     }

@@ -143,8 +143,8 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this.inputFilter.set { c -> c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F' }
                     this.textColor.set(Color(1f, 1f, 1f, 1f))
                     this.setOnRightClick {
-                        text.set("")
                         requestFocus()
+                        text.set("")
                     }
                     this.text.addListener { t ->
                         if (hasFocus.getOrCompute()) {

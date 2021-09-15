@@ -46,8 +46,8 @@ class DecimalTextField(
             }
         }
         this.setOnRightClick {
-            text.set("")
             requestFocus()
+            text.set("")
         }
     }
 
