@@ -3,10 +3,11 @@ package paintbox.ui.skin
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.ui.ActionablePane
 import paintbox.ui.UIElement
 
 
-abstract class Skinnable<SELF : Skinnable<SELF>> : UIElement() {
+abstract class Skinnable<SELF : Skinnable<SELF>> : ActionablePane() {
 
     val skinID: Var<String> by lazy { Var(getDefaultSkinID()) }
     val skinFactory: Var<SkinFactory<Skin<SELF>, SELF>> by lazy {

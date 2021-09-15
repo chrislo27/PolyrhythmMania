@@ -101,7 +101,8 @@ open class ContextMenu : Control<ContextMenu>() {
         val metadata: List<MenuItemMetadata> = currentItems.map { item ->
             val useHovered = Var(true)
             val hovered = Var(false)
-            val basePane = Pane().also { pane ->
+            var forwardOnActionTo: Control<*>? = null
+            val basePane = ActionablePane().also { pane ->
                 pane.addInputEventListener { event ->
                     if (event is MouseEntered) {
                         hovered.set(true)
@@ -109,6 +110,17 @@ open class ContextMenu : Control<ContextMenu>() {
                         hovered.set(false)
                     }
                     false
+                }
+                pane.onAction = { 
+                    var consumed = false
+                    val forwardTarget = forwardOnActionTo
+                    if (forwardTarget != null) {
+                        if (!forwardTarget.isHoveredOver.getOrCompute()) {
+                            forwardTarget.triggerAction()
+                            consumed = true
+                        }
+                    }
+                    consumed
                 }
                 pane.addChild(RectElement(Color.WHITE).apply {
                     this.color.sideEffecting(Color(0.8f, 1f, 1f, 0f)) { existing ->
@@ -189,6 +201,7 @@ open class ContextMenu : Control<ContextMenu>() {
                                     }
                                 }
                             }
+                            forwardOnActionTo = this
                         })
                     }
                 }
@@ -219,6 +232,7 @@ open class ContextMenu : Control<ContextMenu>() {
                                     }
                                 }
                             }
+                            forwardOnActionTo = this
                         })
                     }
                 }
