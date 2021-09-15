@@ -8,6 +8,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
 import paintbox.ui.control.ComboBox
+import paintbox.ui.control.FocusGroup
 import paintbox.ui.control.TextField
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
@@ -52,6 +53,7 @@ class BlockTextbox(engine: Engine)
         return ContextMenu().also { ctxmenu ->
             ctxmenu.defaultWidth.set(350f)
             
+            val focusGroup = FocusGroup()
             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.textbox.title"), editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(CustomMenuItem(
                     HBox().apply { 
@@ -79,6 +81,7 @@ class BlockTextbox(engine: Engine)
                                     requestFocus()
                                     text.set("")
                                 }
+                                focusGroup.addFocusable(this)
                             }
                         }
                     }
@@ -131,6 +134,7 @@ class BlockTextbox(engine: Engine)
                                 this.value.addListener {
                                     duration = it.getOrCompute()
                                 }
+                                focusGroup.addFocusable(this)
                             }
                         }
                     }
