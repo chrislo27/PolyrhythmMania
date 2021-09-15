@@ -226,10 +226,18 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             TAB -> {
                 val focusGroup = this.focusGroup.getOrCompute()
                 if (focusGroup != null) {
-                    if (shift) {
+                    val nextFocusable: Focusable? = if (shift) {
                         focusGroup.focusPrevious(this)
                     } else {
                         focusGroup.focusNext(this)
+                    }
+                    
+                    if (nextFocusable is TextField) {
+                        val t = nextFocusable.text.getOrCompute()
+                        if (t.isNotEmpty()) {
+                            nextFocusable.setCaret(0)
+                            nextFocusable.setSelectionStart(t.length)
+                        }
                     }
                 }
             }
