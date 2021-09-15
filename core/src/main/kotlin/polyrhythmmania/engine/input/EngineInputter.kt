@@ -454,10 +454,10 @@ class EngineInputter(val engine: Engine) {
                 
                 val activeTextBox: ActiveTextBox = if (wasNewHighScore && endlessScore.showHighScoreAtEnd) {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
-                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BLACK))
+                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BANNER))
                 } else {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
-                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BLACK))
+                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BANNER))
                 }
                 activeTextBox.onComplete = { engine ->
                     engine.addEvent(EventEndState(engine, currentBeat))

@@ -1,12 +1,15 @@
 package polyrhythmmania.editor.block
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.Var
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
+import paintbox.ui.control.ComboBox
 import paintbox.ui.control.TextField
+import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
@@ -14,6 +17,7 @@ import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
+import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.ui.DecimalTextField
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.EventTextbox
@@ -25,11 +29,13 @@ class BlockTextbox(engine: Engine)
     
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
+        val DEFAULT_STYLE: TextBoxStyle = TextBoxStyle.DIALOGUE
     }
 
     var text: String = ""
     val requireInput: Var<Boolean> = Var(false)
     var duration: Float = 2f
+    var style: TextBoxStyle = DEFAULT_STYLE
 
     init {
         this.width = 0.5f
@@ -38,7 +44,8 @@ class BlockTextbox(engine: Engine)
     }
 
     override fun compileIntoEvents(): List<Event> {
-        return listOf(EventTextbox(engine, this.beat, duration, TextBox(text, requireInput.getOrCompute())))
+        return listOf(EventTextbox(engine, this.beat, duration,
+                TextBox(text, requireInput.getOrCompute(), style = this.style)))
     }
 
     override fun createContextMenu(editor: Editor): ContextMenu {
@@ -79,6 +86,28 @@ class BlockTextbox(engine: Engine)
 
             ctxmenu.addMenuItem(SeparatorMenuItem())
             
+            val combobox = ComboBox(TextBoxStyle.VALUES, style).also { combobox ->
+                combobox.markup.set(editor.editorPane.palette.markup)
+                combobox.itemStringConverter.set { 
+                    Localization.getValue("blockContextMenu.textbox.style.${it.name.lowercase(Locale.ROOT)}")
+                }
+                combobox.selectedItem.addListener {
+                    this.style = it.getOrCompute()
+                }
+            }
+            val comboboxPane = HBox().also { hbox ->
+                hbox.spacing.set(8f)
+                hbox.bounds.height.set(32f)
+                hbox += TextLabel(Localization.getValue("blockContextMenu.textbox.style")).apply {
+                    this.markup.set(editor.editorPane.palette.markup)
+                    this.renderAlign.set(Align.right)
+                    this.bounds.width.set(64f)
+                }
+                hbox += combobox.apply {
+                    this.bindWidthToParent(adjust = -72f)
+                }
+            }
+            ctxmenu.addMenuItem(CustomMenuItem(comboboxPane))
             ctxmenu.addMenuItem(CheckBoxMenuItem.create(requireInput,
                     Localization.getValue("blockContextMenu.textbox.requireInput"),
                     editor.editorPane.palette.markup))

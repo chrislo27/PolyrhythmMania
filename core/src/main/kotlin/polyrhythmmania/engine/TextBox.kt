@@ -3,8 +3,14 @@ package polyrhythmmania.engine
 import paintbox.font.TextAlign
 
 
-enum class TextBoxStyle {
-    DIALOGUE, BLACK;
+enum class TextBoxStyle(val jsonId: Int) {
+    DIALOGUE(0),
+    BANNER(1);
+    
+    companion object {
+        val VALUES: List<TextBoxStyle> = values().toList()
+        val JSON_MAPPING: Map<Int, TextBoxStyle> = VALUES.associate { it.jsonId to it }
+    }
 }
 
 data class TextBox(val text: String, val requiresInput: Boolean,
