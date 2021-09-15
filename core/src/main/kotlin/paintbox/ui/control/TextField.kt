@@ -337,6 +337,11 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                     attemptPaste()
                 }
             }
+            Input.Keys.C -> {
+                if (control && !shift && !alt) {
+                    attemptCopy()
+                }
+            }
             Input.Keys.INSERT -> {
                 if (control && !shift && !alt) {
                     attemptCopy()
