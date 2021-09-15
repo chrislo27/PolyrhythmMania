@@ -348,6 +348,18 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                     deleteSelectionIfAny()
                 }
             }
+            Input.Keys.A -> {
+                val t = text.getOrCompute()
+                if (t.isNotEmpty() && control && !shift && !alt) {
+                    if (caretPos.getOrCompute() == 0) {
+                        setCaret(0)
+                        setSelectionStart(t.length)
+                    } else {
+                        setCaret(t.length)
+                        setSelectionStart(0)
+                    }
+                }
+            }
             Input.Keys.INSERT -> {
                 if (doesSelectionExist() && control && !shift && !alt) {
                     attemptCopy()
