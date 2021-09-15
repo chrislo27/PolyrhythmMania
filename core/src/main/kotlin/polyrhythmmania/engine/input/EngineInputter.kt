@@ -139,7 +139,7 @@ class EngineInputter(val engine: Engine) {
             } else {
                 if (release) {
                     engine.soundInterface.playMenuSfx(AssetRegistry.get<Sound>("sfx_text_advance_2"))
-                    engine.removeActiveTextbox(true)
+                    engine.removeActiveTextbox(unpauseSoundInterface = true, runTextboxOnComplete = true)
                 }
             }
         } else {

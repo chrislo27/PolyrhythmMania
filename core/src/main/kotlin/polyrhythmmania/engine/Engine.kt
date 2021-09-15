@@ -97,13 +97,15 @@ class Engine(timingProvider: TimingProvider,
         return newActive
     }
     
-    fun removeActiveTextbox(unpauseSound: Boolean) {
+    fun removeActiveTextbox(unpauseSoundInterface: Boolean, runTextboxOnComplete: Boolean) {
         val old = activeTextBox
         activeTextBox = null
-        if (unpauseSound && old != null && old.textBox.requiresInput && !old.wasSoundInterfacePaused) {
+        if (unpauseSoundInterface && old != null && old.textBox.requiresInput && !old.wasSoundInterfacePaused) {
             soundInterface.setPaused(false)
         }
-        old?.onComplete?.invoke(this)
+        if (runTextboxOnComplete) {
+            old?.onComplete?.invoke(this)
+        }
     }
     
     fun updateEvent(event: Event, atBeat: Float) {
@@ -189,7 +191,7 @@ class Engine(timingProvider: TimingProvider,
             }
             if (activeTextBox.secondsTimer <= 0f) {
                 if (autoInputs) {
-                    removeActiveTextbox(true)
+                    removeActiveTextbox(unpauseSoundInterface = true, runTextboxOnComplete = true)
                 }
             }
         } else {

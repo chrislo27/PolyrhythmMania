@@ -404,7 +404,7 @@ class PlayScreen(
         engine.inputter.reset()
         renderer.resetAnimations()
         engine.inputCalibration = this.inputCalibration
-        engine.removeActiveTextbox(false)
+        engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
         engine.resetEndSignal()
         
         timing.seconds = min(-1f, -1f + this.inputCalibration.audioOffsetMs / 1000f)
