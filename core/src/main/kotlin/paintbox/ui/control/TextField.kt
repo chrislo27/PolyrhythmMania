@@ -323,10 +323,20 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             }
             Input.Keys.HOME -> {
                 keymode = KeyMode.NONE
+                if (shift) {
+                    if (selectionStart.getOrCompute() < 0) {
+                        setSelectionStart(caretPos.getOrCompute())
+                    }
+                }
                 setCaret(0)
             }
             Input.Keys.END -> {
                 keymode = KeyMode.NONE
+                if (shift) {
+                    if (selectionStart.getOrCompute() < 0) {
+                        setSelectionStart(caretPos.getOrCompute())
+                    }
+                }
                 setCaret(Int.MAX_VALUE)
             }
             Input.Keys.ESCAPE -> {
