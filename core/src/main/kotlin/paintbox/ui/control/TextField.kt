@@ -58,7 +58,11 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     private var keyRepeatTimer: Float = 0f
     private var keymode: KeyMode = KeyMode.NONE
     private val caretPos: Var<Int> = Var(0)
-
+    /**
+     * -1 if there is no selection.
+     */
+    private val selectionStart: Var<Int> = Var(-1)
+    
     val font: Var<PaintboxFont> = Var(font)
     val text: Var<String> = Var("")
     val emptyHintText: Var<String> = Var("")
@@ -72,7 +76,9 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     val canInputNewlines: Var<Boolean> = Var(false)
     val textScale: FloatVar = FloatVar(1f)
     val textColor: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
+    val selectionHighlightColor: Var<Color> = Var(Color(0f, 0.6f, 1f, 1f))
     val caretWidth: FloatVar = FloatVar(DEFAULT_CARET_WIDTH)
+    
     override val focusGroup: Var<FocusGroup?> = Var(null)
     
     private val glyphLayout: ReadOnlyVar<GlyphLayout> = Var.sideEffecting(GlyphLayout()) { layout ->
@@ -119,6 +125,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         this.text.addListener {
             val newLength = it.getOrCompute().length
             if (caretPos.getOrCompute() > newLength) setCaret(newLength)
+            if (selectionStart.getOrCompute() > newLength) setSelectionStart(newLength)
         }
 
         this.addInputEventListener { event ->
@@ -128,6 +135,16 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                     if (event.button == Input.Buttons.LEFT) {
                         onClickPressed(event)
                         consumed = true
+                    }
+                }
+                is ClickReleased -> {
+                    if (event.button == Input.Buttons.LEFT) {
+                        val selectionPos = selectionStart.getOrCompute()
+                        val caret = caretPos.getOrCompute()
+                        if (selectionPos >= 0 && selectionPos == caret) {
+                            setSelectionStart(-1)
+                            consumed = true
+                        }
                     }
                 }
                 is TouchDragged -> {
@@ -178,6 +195,12 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
 
         return clamped
     }
+    
+    fun setSelectionStart(position: Int): Int {
+        val clamped = position.coerceIn(-1, text.getOrCompute().length)
+        selectionStart.set(clamped)
+        return clamped
+    }
 
     fun resetCaretBlinkTimer() {
         caretBlinkTimer = 0f
@@ -195,7 +218,6 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         val control = Gdx.input.isControlDown()
         val alt = Gdx.input.isAltDown()
         val shift = Gdx.input.isShiftDown()
-        val currentText = text.getOrCompute()
         val caret = caretPos.getOrCompute()
         
         when (character) {
@@ -210,7 +232,10 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 }
             }
             BACKSPACE -> {
-                if (currentText.isNotEmpty() && caret > 0) {
+                val currentText = text.getOrCompute()
+                if (doesSelectionExist()) {
+                    deleteSelectionIfAny()
+                } else if (currentText.isNotEmpty() && caret > 0) {
                     val newCaretPos = if (control && !alt && !shift) {
                         getNextWordPosFromCaret(-1)
                     } else {
@@ -224,7 +249,10 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 }
             }
             DELETE -> {
-                if (currentText.isNotEmpty() && caret < currentText.length) {
+                val currentText = text.getOrCompute()
+                if (doesSelectionExist()) {
+                    deleteSelectionIfAny()
+                } else if (currentText.isNotEmpty() && caret < currentText.length) {
                     val cutIndex = if (control && !alt && !shift) {
                         getNextWordPosFromCaret(+1)
                     } else {
@@ -238,7 +266,12 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 }
             }
             ENTER_ANDROID, ENTER_DESKTOP -> {
-                if (canInputNewlines.getOrCompute() && shift && !alt && !control) {
+                if (canInputNewlines.getOrCompute() && shift && !alt && !control && inputFilter.getOrCompute().invoke('\n')) {
+                    deleteSelectionIfAny()
+                    val currentText = text.getOrCompute()
+                    val charLimit = characterLimit.getOrCompute()
+                    if ((charLimit > 0 && currentText.length >= charLimit))
+                        return
                     text.set(currentText.substring(0, caret) + "\n" + currentText.substring(caret))
                     setCaret(caret + 1)
                 } else {
@@ -248,6 +281,8 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             else -> {
                 if (character < 32.toChar()) return
                 val charLimit = characterLimit.getOrCompute()
+                deleteSelectionIfAny()
+                val currentText = text.getOrCompute()
                 if (!inputFilter.getOrCompute().invoke(character) || (charLimit > 0 && currentText.length >= charLimit))
                     return
 
@@ -295,9 +330,32 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         }
     }
     
+    fun doesSelectionExist(): Boolean {
+        val selection = selectionStart.getOrCompute()
+        val caret = caretPos.getOrCompute()
+        val currentText = text.getOrCompute()
+        return selection >= 0 && selection != caret && currentText.isNotEmpty()
+    }
+    
+    protected fun deleteSelectionIfAny() {
+        val selection = selectionStart.getOrCompute()
+        val caret = caretPos.getOrCompute()
+        val currentText = text.getOrCompute()
+        if (selection >= 0 && selection != caret && currentText.isNotEmpty()) {
+            if (caret < selection) {
+                // Delete the text, no need to move caret afterward
+                text.set(currentText.substring(0, caret) + currentText.substring(selection))
+            } else {
+                // Delete the text and then move the caret
+                text.set(currentText.substring(0, selection) + currentText.substring(caret))
+                setCaret(selection)
+            }
+            setSelectionStart(-1)
+        }
+    }
+    
     fun attemptPaste() {
         val charLimit = characterLimit.getOrCompute()
-        val currentText = text.getOrCompute()
         val caret = caretPos.getOrCompute()
         try {
             var data: String = Gdx.app.clipboard.contents?.replace("\r", "") ?: return
@@ -307,6 +365,10 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
 
             if (data.all(inputFilter.getOrCompute()) && canPasteText.getOrCompute()) {
                 var pasteText = data
+                
+                deleteSelectionIfAny()
+                val currentText = text.getOrCompute()
+                
                 val totalSize = pasteText.length + currentText.length
                 if (charLimit > 0 && totalSize > charLimit) {
                     pasteText = pasteText.substring(0, charLimit - currentText.length)
@@ -337,6 +399,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         requestFocus()
         resetCaretBlinkTimer()
         moveCaretFromMouse(event)
+        setSelectionStart(caretPos.getOrCompute())
     }
 
     protected fun moveCaretFromMouse(event: MouseInputEvent) {
@@ -386,7 +449,17 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     protected fun moveCaretFromKeypress() {
         val keymode = this.keymode
         val wordJump = Gdx.input.isControlDown()
+        val selectionKey = Gdx.input.isShiftDown()
         val currentCaret = caretPos.getOrCompute()
+        
+        if (selectionKey) {
+            if (selectionStart.getOrCompute() < 0) {
+                setSelectionStart(currentCaret)
+            }
+        } else {
+            setSelectionStart(-1)
+        }
+        
         if (keymode == KeyMode.MOVE_LEFT) {
             if (wordJump) {
                 setCaret(getNextWordPosFromCaret(-1))
@@ -425,6 +498,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     override fun onFocusLost() {
         super.onFocusLost()
         (hasFocus as Var).set(false)
+        setSelectionStart(-1)
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
@@ -460,11 +534,30 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             val overallOffsetX = element.xOffset.get()
             val hasFocusNow = element.hasFocus.getOrCompute()
             val textColor = element.textColor.getOrCompute()
+            val selectionPosition = element.selectionStart.getOrCompute()
+            
             paintboxFont.useFont { bitmapFont ->
                 bitmapFont.scaleMul(element.textScale.get())
+                
+                caretHeight = bitmapFont.data.lineHeight
+
+                if (selectionPosition >= 0) {
+                    val highlightColor = element.selectionHighlightColor.getOrCompute()
+                    tmpColor.set(highlightColor)
+                    tmpColor.a *= opacity
+                    batch.color = tmpColor
+                    val charPos = element.characterPositions.getOrCompute()
+                    val caretPos = element.caretPos.getOrCompute()
+                    val caretPosX = if (caretPos in 0 until charPos.size) charPos[caretPos] else 0f
+                    val selectionX = if (selectionPosition in 0 until charPos.size) charPos[selectionPosition] else 0f
+                    val x = rectX - overallOffsetX + selectionX
+                    batch.fillRect(x, rectY - (rectH + caretHeight) / 2f, caretPosX - selectionX, caretHeight)
+                }
+                
                 tmpColor.set(textColor)
                 tmpColor.a *= opacity
                 batch.color = tmpColor
+                bitmapFont.color = tmpColor
                 bitmapFont.draw(batch, layout, rectX - overallOffsetX, rectY - (rectH - layout.height) / 2f)
 
                 if (!hasFocusNow && element.text.getOrCompute().isEmpty()) {
@@ -474,8 +567,6 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                     bitmapFont.draw(batch, element.emptyHintText.getOrCompute(), rectX /* no offset */, rectY - (rectH - layout.height) / 2f)
                     bitmapFont.setColor(1f, 1f, 1f, 1f)
                 }
-
-                caretHeight = bitmapFont.data.lineHeight
             }
             // Draw caret
             if (hasFocusNow) {
