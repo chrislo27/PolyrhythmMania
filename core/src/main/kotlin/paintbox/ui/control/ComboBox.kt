@@ -27,6 +27,7 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
     companion object {
         const val COMBOBOX_SKIN_ID: String = "ComboBox"
         
+        val DEFAULT_STRING_CONVERTER: (Any?) -> String = { it.toString() }
         val DEFAULT_PADDING: Insets = Insets(2f, 2f, 4f, 4f)
         
         init {
@@ -36,15 +37,15 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
             })
         }
         
-        fun createInternalTextBlockVar(bomboBox: ComboBox<*>): Var<TextBlock> {
+        fun createInternalTextBlockVar(comboBox: ComboBox<Any?>): Var<TextBlock> {
             return Var {
-                val text = bomboBox.selectedItem.use().toString()
-                val markup: Markup? = bomboBox.markup.use()
+                val text = comboBox.itemStringConverter.use().invoke(comboBox.selectedItem.use())
+                val markup: Markup? = comboBox.markup.use()
                 if (markup != null) {
                     markup.parse(text)
                 } else {
-                    TextRun(bomboBox.font.use(), text, Color.WHITE,
-                            bomboBox.scaleX.useF(), bomboBox.scaleY.useF()).toTextBlock()
+                    TextRun(comboBox.font.use(), text, Color.WHITE,
+                            comboBox.scaleX.useF(), comboBox.scaleY.useF()).toTextBlock()
                 }
             }
         }
@@ -53,6 +54,7 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
     
     val items: Var<List<T>> = Var(startingList)
     val selectedItem: Var<T> = Var(selectedItem)
+    val itemStringConverter: Var<(T) -> String> = Var(DEFAULT_STRING_CONVERTER as ((T) -> String))
     
     val backgroundColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val contrastColor: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
@@ -76,7 +78,10 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
     /**
      * Defaults to an auto-generated [TextBlock] for the given toString representation of the selected item.
      */
-    val internalTextBlock: Var<TextBlock> by lazy { createInternalTextBlockVar(this) }
+    val internalTextBlock: Var<TextBlock> by lazy {
+        @Suppress("UNCHECKED_CAST")
+        createInternalTextBlockVar(this as ComboBox<Any?>)
+    }
     
     init {
         this.border.set(Insets(1f))
@@ -93,10 +98,11 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
                 ctxMenu.defaultWidth.set(this.bounds.width.get())
                 val thisMarkup = this.markup.getOrCompute()
                 val thisFont = this.font.getOrCompute()
+                val strConverter = this.itemStringConverter.getOrCompute()
                 val menuItems: List<Pair<T, MenuItem>> = itemList.map { item: T ->
                     item to (if (thisMarkup != null)
-                        SimpleMenuItem.create(item.toString(), thisMarkup)
-                    else SimpleMenuItem.create(item.toString(), thisFont)).also { smi ->
+                        SimpleMenuItem.create(strConverter.invoke(item), thisMarkup)
+                    else SimpleMenuItem.create(strConverter.invoke(item), thisFont)).also { smi ->
                         smi.closeMenuAfterAction = true
                         smi.onAction = {
                             this.selectedItem.set(item)
