@@ -148,6 +148,7 @@ class BlockTextbox(engine: Engine)
             it.text = this.text
             it.requireInput.set(this.requireInput.getOrCompute())
             it.duration = this.duration
+            it.style = this.style
         }
     }
 
@@ -156,6 +157,7 @@ class BlockTextbox(engine: Engine)
         obj.add("text", text)
         obj.add("requireInput", requireInput.getOrCompute())
         obj.add("duration", duration)
+        obj.add("style", style.jsonId)
     }
 
     override fun readFromJson(obj: JsonObject) {
@@ -163,5 +165,6 @@ class BlockTextbox(engine: Engine)
         this.text = obj.getString("text", "")
         this.requireInput.set(obj.getBoolean("requireInput", false))
         this.duration = obj.getFloat("duration", 2f)
+        this.style = TextBoxStyle.JSON_MAPPING[obj.getInt("style", 0)] ?: DEFAULT_STYLE
     }
 }
