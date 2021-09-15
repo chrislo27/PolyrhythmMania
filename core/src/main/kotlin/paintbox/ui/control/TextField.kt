@@ -405,6 +405,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     }
     
     fun attemptPaste() {
+        if (!canPasteText.getOrCompute()) return
         val charLimit = characterLimit.getOrCompute()
         val caret = caretPos.getOrCompute()
         try {
@@ -413,7 +414,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 data = data.replace("\n", "")
             }
 
-            if (data.all(inputFilter.getOrCompute()) && canPasteText.getOrCompute()) {
+            if (data.all(inputFilter.getOrCompute())) {
                 var pasteText = data
                 
                 deleteSelectionIfAny()
