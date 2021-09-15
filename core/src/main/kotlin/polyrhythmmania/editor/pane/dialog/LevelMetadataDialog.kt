@@ -265,10 +265,14 @@ class LevelMetadataDialog(editorPane: EditorPane)
                     this.textColor.set(Color.WHITE)
                     this.padding.set(Insets(0f, 0f, 0f, 4f))
                 }
-                hbox += ComboBox<Genre>(Genre.DEFAULT_GENRES, Genre.DEFAULT_GENRES.first(), font = editorPane.palette.musicDialogFont).apply { 
+                val identicalGenre: Genre? = Genre.DEFAULT_GENRES.find { it.genreName == textField.text.getOrCompute() }
+                hbox += ComboBox<Genre>(Genre.DEFAULT_GENRES, identicalGenre ?: Genre.DEFAULT_GENRES.first(),
+                        font = editorPane.palette.musicDialogFont).apply { 
                     this.bounds.width.set(250f)
                     this.selectedItem.addListener {
+                        textField.requestFocus()
                         textField.text.set(it.getOrCompute().genreName)
+                        textField.requestUnfocus()
                     }
                 }
             }.first
