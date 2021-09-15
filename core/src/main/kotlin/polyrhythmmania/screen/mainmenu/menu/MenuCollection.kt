@@ -54,6 +54,8 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         
         changeActiveMenu(uppermostMenu, false, instant = true)
         menuStack.push(uppermostMenu)
+        
+        playMenuSound("sfx_silence", volume = 0f) // Immediately load sound playing code. Initial lag causes a spike which sounds very loud and piercing on slower hardware
     }
     
     private fun addStockMenus() {
@@ -162,7 +164,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     fun playBlipSound(volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f) {
         val sound = AssetRegistry.get<Sound>("sfx_menu_blip")
         sound.stop()
-        main.playMenuSfx(sound)
+        main.playMenuSfx(sound, volume, pitch, pan)
     }
     
     fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {

@@ -140,6 +140,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         listOf("fail_music_hi", "fail_music_nohi").forEach {
             AssetRegistry.loadAsset<LazySound>("sfx_$it", "sounds/${it}.ogg")
         }
+        AssetRegistry.loadAsset<Sound>("sfx_silence", "sounds/silence.wav") // DEBUG
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
