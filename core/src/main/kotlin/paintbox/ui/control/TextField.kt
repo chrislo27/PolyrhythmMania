@@ -19,6 +19,8 @@ import paintbox.ui.skin.SkinFactory
 import paintbox.util.ColorStack
 import paintbox.util.Vector2Stack
 import paintbox.util.gdxutils.*
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * A single-line text field.
@@ -327,6 +329,11 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                     attemptPaste()
                 }
             }
+            Input.Keys.C -> {
+                if (control && !shift && !alt) {
+                    attemptCopy()
+                }
+            }
         }
     }
     
@@ -380,7 +387,20 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             }
         } catch (ignored: Exception) {
         }
-        
+    }
+    
+    fun attemptCopy() {
+        if (doesSelectionExist()) {
+            val selectionPos = selectionStart.getOrCompute()
+            val caret = caretPos.getOrCompute()
+            val left = min(selectionPos, caret)
+            val right = max(selectionPos, caret)
+            try {
+                val selectedText = text.getOrCompute().substring(left, right)
+                Gdx.app.clipboard.contents = selectedText
+            } catch (ignored: Exception) {
+            }
+        }
     }
 
     protected open fun onKeyUp(keycode: Int) {
