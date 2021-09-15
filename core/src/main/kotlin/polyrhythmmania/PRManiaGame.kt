@@ -505,7 +505,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
 
 
-//        addFontFamily("OpenSans")
         addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight)
 
         addFontFamily(fontIDPrefix = "editor_status", familyName = "Roboto", fontSize = 16,
