@@ -8,6 +8,7 @@ import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
+import paintbox.ui.control.FocusGroup
 import paintbox.ui.control.RadioButton
 import paintbox.ui.control.TextField
 import paintbox.ui.control.ToggleGroup
@@ -15,6 +16,7 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
@@ -23,11 +25,13 @@ import polyrhythmmania.ui.DecimalTextField
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
+import kotlin.math.min
 
 
 class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_TYPES) {
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
+        val MAX_CUSTOM_TEXT_LENGTH: Int = min(LevelMetadata.LIMIT_ARTIST_NAME, LevelMetadata.LIMIT_ALBUM_NAME)
     }
     
     enum class Field(val jsonId: Int) {
@@ -39,6 +43,7 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
     
     var duration: Float = 4f
     var field: Field = Field.SONG_TITLE
+    var customText: String = ""
     
     init {
         this.width = 1f
@@ -47,7 +52,8 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
     }
 
     override fun compileIntoEvents(): List<Event> {
-        return listOf(EventSongInfoCard(engine, this.field, this.duration).also {
+        return listOf(EventSongInfoCard(engine, this.field, this.duration,
+                customText = this.customText.takeUnless { it.isEmpty() }).also {
             it.beat = this.beat
         })
     }
@@ -92,6 +98,9 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
             ctxmenu.addMenuItem(CustomMenuItem(fieldPane))
             
             ctxmenu.addMenuItem(SeparatorMenuItem())
+            
+            val focusGroup = FocusGroup()
+            
             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.songInfoCard.duration"), editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(CustomMenuItem(
                     HBox().apply {
@@ -107,6 +116,7 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
                                 this.value.addListener {
                                     duration = it.getOrCompute()
                                 }
+                                focusGroup.addFocusable(this)
                             }
 
                             return RectElement(Color(0f, 0f, 0f, 1f)).apply {
@@ -124,6 +134,38 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
                         }
                     }
             ))
+            ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.songInfoCard.customText"), editor.editorPane.palette.markup))
+            ctxmenu.addMenuItem(CustomMenuItem(
+                    HBox().apply {
+                        this.bounds.height.set(32f)
+                        this.spacing.set(4f)
+                        this += RectElement(Color(0f, 0f, 0f, 1f)).apply {
+                            this.border.set(Insets(1f))
+                            this.borderStyle.set(SolidBorder(Color.WHITE))
+                            this.padding.set(Insets(2f))
+                            this += TextField(font = editor.main.fontRodinFixed).apply {
+                                this.textColor.set(Color(1f, 1f, 1f, 1f))
+                                this.text.set(this@BlockSongInfoCard.customText)
+                                this.canInputNewlines.set(true)
+                                this.text.addListener { t ->
+                                    if (hasFocus.getOrCompute()) {
+                                        this@BlockSongInfoCard.customText = t.getOrCompute()
+                                    }
+                                }
+                                hasFocus.addListener { f ->
+                                    if (!f.getOrCompute()) {
+                                        this.text.set(this@BlockSongInfoCard.customText)
+                                    }
+                                }
+                                this.setOnRightClick {
+                                    requestFocus()
+                                    text.set("")
+                                }
+                                focusGroup.addFocusable(this)
+                            }
+                        }
+                    }
+            ))
         }
     }
 
@@ -132,6 +174,7 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
             this.copyBaseInfoTo(it)
             it.duration = this.duration
             it.field = this.field
+            it.customText = this.customText
         }
     }
 
@@ -139,12 +182,14 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
         super.writeToJson(obj)
         obj.add("duration", duration)
         obj.add("field", field.jsonId)
+        obj.add("custom", customText)
     }
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
         duration = obj.getFloat("duration", 4f).coerceAtLeast(0f)
         field = Field.ID_MAPPING[obj.getInt("field", 0)] ?: Field.SONG_TITLE
+        customText = obj.getString("custom", "")
     }
 }
 
