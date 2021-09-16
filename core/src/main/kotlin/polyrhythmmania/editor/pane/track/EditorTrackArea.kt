@@ -201,21 +201,40 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         return x + (trackView.translateBeatToX(beat))
     }
 
-    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
-        super.renderSelfAfterChildren(originX, originY, batch)
+    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        super.renderSelf(originX, originY, batch)
 
         val renderBounds = this.contentZone
-//        val x = renderBounds.x.getOrCompute() + originX
-//        val y = originY - renderBounds.y.getOrCompute()
         val w = renderBounds.width.get()
-//        val h = renderBounds.height.getOrCompute()
-        val trackView = editor.trackView
         val click = editor.click.getOrCompute()
         val trackHeight = allTracksPane.editorTrackHeight
         val lastPackedColor = batch.packedColor
 
-        // FIXME refactor out?
+        // Darken disallowed tracks for placement
+        if (click is Click.DragSelection) {
+            val allowedTracks = click.tracksThatWillAccept
+            batch.setColor(0.1f, 0f, 0f, 0.5f)
+            val darkAreaX = originX + renderBounds.x.get()
+            editor.tracks.forEachIndexed { index, track ->
+                if (track !in allowedTracks) {
+                    batch.fillRect(darkAreaX, trackToRenderY(originY, index) - trackHeight, w, trackHeight)
+                }
+            }
+        }
+        
+        batch.packedColor = lastPackedColor
+    }
 
+    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+        super.renderSelfAfterChildren(originX, originY, batch)
+
+        val renderBounds = this.contentZone
+        val w = renderBounds.width.get()
+        val trackView = editor.trackView
+        val click = editor.click.getOrCompute()
+        val trackHeight = allTracksPane.editorTrackHeight
+        val lastPackedColor = batch.packedColor
+        
         // Render blocks
         val leftSide = beatToRenderX(originX, trackView.beat.get())
         val rightSide = leftSide + w

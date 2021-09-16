@@ -92,6 +92,7 @@ sealed class Click {
         val encompassingRegion: BlockRegion = run {
             BlockRegion(rightmost.beat + rightmost.width - leftmost.beat, bottommost.trackIndex - topmost.trackIndex + 1)
         }
+        val tracksThatWillAccept: Set<Track> = editor.tracks.filter { t -> blocks.any { b -> t.acceptsBlock(b) } }.toSet()
 
         private val editorBlocksCollidable: Map<Int, List<Block>> = (editor.blocks - blocks).groupBy { it.trackIndex }
 
