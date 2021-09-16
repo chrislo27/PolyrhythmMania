@@ -80,7 +80,7 @@ open class EventConditionalOnRods(engine: Engine, startBeat: Float, val rowSetti
             val results = inputTracker.results
             rod.row == row && rod.acceptingInputs && currentBeat - rod.deployBeat >= 4.25f &&
                     (results.size > 0 || engine.autoInputs) && results.none { r -> r.inputScore == InputScore.MISS } &&
-                    (!mustHitAllInputs || (validResults.size == numExpected))
+                    (!mustHitAllInputs || (validResults.size == numExpected || engine.autoInputs))
         }
     }
 
