@@ -15,6 +15,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.credits.Credits
 import polyrhythmmania.ui.PRManiaSkins
 import kotlin.math.max
@@ -99,6 +100,13 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.padding.set(Insets(6f, 24f, 6f, 6f))
                 this.markup.set(this@CreditsMenu.markup)
                 this.textColor.set(NAME_TEXT_COLOR)
+                this.renderAlign.set(Align.center)
+            }
+            vbox += TextLabel(PRMania.HOMEPAGE, font = font).apply {
+                this.bounds.height.set(32f)
+                this.padding.set(Insets(6f, 6f, 6f, 6f))
+                this.markup.set(this@CreditsMenu.markup)
+                this.textColor.set(HEADING_TEXT_COLOR)
                 this.renderAlign.set(Align.center)
             }
         }
