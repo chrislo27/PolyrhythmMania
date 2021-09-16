@@ -35,6 +35,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.titleText.bind { Localization.getVar("mainMenu.credits.title").use() }
         this.contentPane.bounds.height.set(520f)
         this.showLogo.set(false)
+        this.deleteWhenPopped.set(true)
 
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
@@ -80,7 +81,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Credits.credits.forEach { (header, names) ->
                 vbox += createCreditRow(header, names)
             }
-            vbox += TextLabel(binding = { Localization.getVar("credits.licenseInfo").use() }, font = font).apply {
+            vbox += TextLabel(Localization.getValue("credits.licenseInfo"), font = font).apply {
                 Anchor.TopLeft.configure(this)
                 this.bindWidthToParent(adjust = 0f, multiplier = 1f)
                 this.bounds.x.set(0f)
@@ -92,6 +93,13 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.textAlign.set(TextAlign.LEFT)
                 this.doLineWrapping.set(true)
                 this.setScaleXY(0.75f)
+            }
+            vbox += TextLabel(binding = { Localization.getVar("credits.thankYouForPlaying").use() }, font = font).apply {
+                this.bounds.height.set(64f)
+                this.padding.set(Insets(6f, 24f, 6f, 6f))
+                this.markup.set(this@CreditsMenu.markup)
+                this.textColor.set(NAME_TEXT_COLOR)
+                this.renderAlign.set(Align.center)
             }
         }
         vbox.sizeHeightToChildren(100f)
@@ -111,7 +119,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         return Pane().apply {
             val numNameColumns = 2
 
-            val headingLabel = TextLabel(binding = { headingLoc.use() }, font = font).apply {
+            val headingLabel = TextLabel(headingLoc.getOrCompute(), font = font).apply {
                 Anchor.TopLeft.configure(this)
                 this.bounds.width.set(210f)
                 this.bounds.height.bind { ROW_HEIGHT * getHeadingRowHeight(text.use()) }
@@ -138,8 +146,8 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         currentRowHeight = 0f
                     }
 
-                    val rh = getRowHeight(str.getOrCompute()) // FIXME might be nice if the height was dynamic to the str var
-                    addChild(TextLabel(binding = { str.use() }, font = font).apply {
+                    val rh = getRowHeight(str.getOrCompute())
+                    addChild(TextLabel(str.getOrCompute(), font = font).apply {
                         Anchor.TopLeft.configure(this)
                         this.bindWidthToParent(adjust = 0f, multiplier = 1f / numNameColumns)
                         this.bounds.x.bind { bounds.width.useF() * col }

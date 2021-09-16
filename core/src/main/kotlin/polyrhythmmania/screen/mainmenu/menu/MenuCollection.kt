@@ -34,7 +34,6 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     
     val uppermostMenu: UppermostMenu = UppermostMenu(this)
     val quitMenu: QuitMenu = QuitMenu(this)
-    val creditsMenu: CreditsMenu = CreditsMenu(this)
     val dailyChallengeMenu: DailyChallengeMenu = DailyChallengeMenu(this) // Must be inited before playMenu
     val playMenu: PlayMenu = PlayMenu(this)
     val practiceMenu: PracticeMenu = PracticeMenu(this)
@@ -61,7 +60,6 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     private fun addStockMenus() {
         addMenu(uppermostMenu)
         addMenu(quitMenu)
-        addMenu(creditsMenu)
         addMenu(dailyChallengeMenu)
         addMenu(playMenu)
         addMenu(practiceMenu)

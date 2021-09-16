@@ -116,9 +116,9 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.credits").use() }).apply {
                 this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.creditsMenu.apply { 
-                        resetScroll()
-                    })
+                    val next = CreditsMenu(menuCol)
+                    menuCol.addMenu(next)
+                    menuCol.pushNextMenu(next)
                 }
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.quit").use() }).apply {
