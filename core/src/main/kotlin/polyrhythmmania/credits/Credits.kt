@@ -18,11 +18,14 @@ object Credits {
             ),
             Localization.getVar("credits.qa") to abcSorted(
                     "Lvl100Feraligatr", "Gosh", "GENERIC", "snow krow", "Kievit", "Chloe", "GrueKun", "Huebird",
-                    "RedCrowNose", "J-D Thunder", "garbo", "user670", "thomasynthesis", "Dummatt", "Doggo",
+                    "RedCrowNose", "J-D Thunder", "garbo", "Doggo",
                     "The Eggo55",
             ).toVars() + listOf(
                     Localization.getVar("credits.tourneycord"),
             ),
+            Localization.getVar("credits.githubBugReporters") to abcSorted(
+                    "Dummatt", "thomasynthesis", "user670", "ZaptorZap",
+            ).toVars(),
             Localization.getVar("credits.specialThanks") to abcSorted(
                     "Lvl100Feraligatr",
                     "GrueKun",
@@ -31,7 +34,6 @@ object Credits {
                     "Turtike",
                     "J-D Thunder",
                     "RedCrowNose",
-                    "ZaptorZap",
             ).toVars() + listOf(Localization.getVar("credits.projectDonators")),
             Localization.getVar("credits.resourcesAndTechnologies") to listOf(
                     Localization.getVar("credits.rhAssets"),
@@ -47,14 +49,15 @@ object Credits {
                     "SLF4J",
                     "zip4j",
                     "earlygrey/shapedrawer",
-                    "java-discord-rpc",
+                    "discord-game-sdk4j",
                     "twelvemonkeys",
+                    "Pexels",
+                    "world-flags-sprite",
+            ).toVars() + listOf(
                     "Roboto",
                     "Rodin",
                     "Kurokane",
-                    "Pexels",
-                    "world-flags-sprite",
-            ).toVars(),
+            ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
     
     private fun abcSorted(vararg things: String): List<String> = things.sortedBy { it.lowercase(Locale.ROOT) }
