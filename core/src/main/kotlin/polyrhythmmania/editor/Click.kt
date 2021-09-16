@@ -92,7 +92,22 @@ sealed class Click {
         val encompassingRegion: BlockRegion = run {
             BlockRegion(rightmost.beat + rightmost.width - leftmost.beat, bottommost.trackIndex - topmost.trackIndex + 1)
         }
-        val tracksThatWillAccept: Set<Track> = editor.tracks.filter { t -> blocks.any { b -> t.acceptsBlock(b) } }.toSet()
+        val tracksThatWillAccept: Set<Track> = run {
+            val allowedTracks = BooleanArray(editor.tracks.size)
+            for (i in 0 until (editor.tracks.size - encompassingRegion.track + 1)) {
+                val targetTrackIndex: Int = (originBlock.trackIndex - topmost.trackIndex) + i
+                if (isPlacementValidForTargetTrack(targetTrackIndex)) {
+                    for (t in 0 until encompassingRegion.track) {
+                        allowedTracks[i + t] = true
+                    }
+                }
+            }
+            
+            allowedTracks.foldIndexed(mutableSetOf<Track>()) { i, set, item ->
+                if (item) set.add(editor.tracks[i])
+                set
+            }
+        }
 
         private val editorBlocksCollidable: Map<Int, List<Block>> = (editor.blocks - blocks).groupBy { it.trackIndex }
 
@@ -143,6 +158,13 @@ sealed class Click {
             }
             editor.container.updateLastPoints()
         }
+        
+        private fun isPlacementValidForTargetTrack(targetTrackIndex: Int): Boolean {
+            return blocks.all { b ->
+                val targetTrack: Track? = editor.tracks.getOrNull(targetTrackIndex + (b.trackIndex - originBlock.trackIndex))
+                targetTrack?.acceptsBlock(b) == true
+            }
+        }
 
         override fun onMouseMoved(beat: Float, trackIndex: Int, trackY: Float) {
             hasBeenUpdated = true
@@ -168,10 +190,7 @@ sealed class Click {
             originRegion.beat = originRegion.beat.coerceAtLeast(0f)
 
             val targetTrackIndex = (trackY /*- mouseOffset.y*/).toInt() // Target for originBlock
-            if (!placementInvalidDuplicates && blocks.all { b ->
-                        val targetTrack: Track? = editor.tracks.getOrNull(targetTrackIndex + (b.trackIndex - originBlock.trackIndex))
-                        targetTrack?.acceptsBlock(b) == true
-                    }) {
+            if (!placementInvalidDuplicates && isPlacementValidForTargetTrack(targetTrackIndex)) {
                 isPlacementInvalid.set(false)
             } else {
                 isPlacementInvalid.set(true)
