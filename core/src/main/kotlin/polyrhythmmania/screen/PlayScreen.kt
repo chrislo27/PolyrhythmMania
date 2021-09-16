@@ -118,7 +118,7 @@ class PlayScreen(
                         val menuCol = main.mainMenuScreen.menuCollection
                         val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
                         val nonce = sideMode.dailyChallengeUUIDNonce.getOrCompute()
-                        if (score.score > 0) {
+                        if (score.score > 0 && !engine.autoInputs) {
                             val submitMenu = SubmitDailyChallengeScoreMenu(menuCol, sideMode.dailyChallenge, nonce, score)
                             menuCol.addMenu(submitMenu)
                             menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)

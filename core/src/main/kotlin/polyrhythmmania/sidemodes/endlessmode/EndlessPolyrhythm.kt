@@ -145,6 +145,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         return """seed: ${if (dailyChallenge != null) "daily challenge" else seed.toString(16).uppercase()}
 difficultyFactor: ${difficultyFactor.get()}
 distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficulty()}
+loops: ${loopsCompleted.getOrCompute()} / speed: ${speedIncreaseSemitones.getOrCompute()} semitones
 """.dropLast(1)
     }
     

@@ -190,7 +190,7 @@ class Engine(timingProvider: TimingProvider,
                 activeTextBox.secondsTimer -= delta
             }
             if (activeTextBox.secondsTimer <= 0f) {
-                if (autoInputs) {
+                if (autoInputs && (!world.worldMode.showEndlessScore || inputter.endlessScore.lives.getOrCompute() > 0)) {
                     removeActiveTextbox(unpauseSoundInterface = true, runTextboxOnComplete = true)
                 }
             }
