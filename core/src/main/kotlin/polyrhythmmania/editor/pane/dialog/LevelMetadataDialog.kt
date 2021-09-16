@@ -148,7 +148,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                              copyFunc: (LevelMetadata, newText: String) -> LevelMetadata, ): Pair<HBox, TextField> {
                 val textField = TextField(editorPane.palette.rodinDialogFont).apply {
                     focusGroup.addFocusable(this)
-                    this.textColor.set(Color.WHITE)
+                    this.textColor.set(Color(1f, 1f, 1f, 1f))
                     this.canInputNewlines.set(allowNewlines)
                     this.characterLimit.set(charLimit)
                     this.text.set(getter(levelMetadata.getOrCompute()))
@@ -203,7 +203,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                         this.borderStyle.set(SolidBorder(Color.WHITE))
                         this += TextField(editorPane.palette.rodinDialogFont).apply {
                             focusGroup.addFocusable(this)
-                            this.textColor.set(Color.WHITE)
+                            this.textColor.set(Color(1f, 1f, 1f, 1f))
 //                            this.characterLimit.set(LevelMetadata.LIMIT_YEAR.last.toString().length)
                             this.characterLimit.set(4) // XXXX
                             this.inputFilter.set {

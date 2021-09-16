@@ -140,7 +140,7 @@ class ResultsTextDialog(editorPane: EditorPane)
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
                         this += TextField(editorPane.palette.rodinDialogFont).apply {
-                            this.textColor.set(Color.WHITE)
+                            this.textColor.set(Color(1f, 1f, 1f, 1f))
                             this.canInputNewlines.set(allowNewlines)
                             this.emptyHintText.bind { Localization.getVar(defaultText).use() }
                             this.text.set(getter(resultsText.getOrCompute()) ?: "")

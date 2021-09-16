@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Align
@@ -73,6 +74,24 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         private val tmpRect: Rectangle = Rectangle(0f, 0f, 0f, 0f)
         private val tmpRect2: Rectangle = Rectangle(0f, 0f, 0f, 0f)
     }
+    
+    data class SongInfoCard(var text: String = "", var secondsStart: Float = -10000f) {
+        companion object {
+            const val TRANSITION_TIME: Float = 0.5f
+        }
+        
+        var deployed: Boolean = false
+        
+        fun isVisible(currentSeconds: Float): Boolean {
+            return currentSeconds >= secondsStart && (deployed || (currentSeconds - secondsStart) <= TRANSITION_TIME)
+        }
+        
+        fun reset() {
+            deployed = false
+            text = ""
+            secondsStart = -10000f
+        }
+    }
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
 //        setToOrtho(false, 7.5f, 5f) // GBA aspect ratio
@@ -109,6 +128,8 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     private var skillStarSpinAnimation: Float = 0f
     private var skillStarPulseAnimation: Float = 0f
     private var hudRedFlash: Float = 0f
+    val songTitleCard: SongInfoCard = SongInfoCard()
+    val songArtistCard: SongInfoCard = SongInfoCard()
 
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val textBoxSuperpane: Pane
@@ -315,6 +336,8 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         skillStarSpinAnimation = 0f
         skillStarPulseAnimation = 0f
         hudRedFlash = 0f
+        songTitleCard.reset()
+        songArtistCard.reset()
     }
 
     fun render(batch: SpriteBatch) {
@@ -450,6 +473,13 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         } else {
             perfectPane.visible.set(false)
         }
+        
+        PRManiaGame.instance.fontGameTextbox.useFont { font ->
+            font.scaleMul(0.75f)
+            val sec = engine.seconds
+            renderSongInfoCard(batch, font, songTitleCard, false, sec)
+            renderSongInfoCard(batch, font, songArtistCard, true, sec)
+        }
 
         val clearText = inputter.practice.clearText
         val uiCam = this.uiCamera
@@ -529,7 +559,38 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
             hudRedFlash = (hudRedFlash - (Gdx.graphics.deltaTime / 0.75f)).coerceAtLeast(0f)
         }
     }
+    
+    private fun renderSongInfoCard(batch: SpriteBatch, font: BitmapFont,
+                                   card: SongInfoCard, bottomRight: Boolean, currentSeconds: Float) {
+        if (!card.isVisible(currentSeconds)) return
+        val lastPackedColor = batch.packedColor
+        val texture: Texture = AssetRegistry["hud_song_card"]
+        val height = 42f
+        val width = (height / texture.height.coerceAtLeast(1)) * texture.width
+        val baselineY = height * 2f
+        
+        var progress = Interpolation.circle.apply(((currentSeconds - card.secondsStart) / SongInfoCard.TRANSITION_TIME).coerceIn(0f, 1f))
+        if (!card.deployed) {
+            progress = 1f - progress
+        }
+        val x = if (!bottomRight) (width * MathUtils.lerp(-1f, 0f, progress)) else (1280f - width * MathUtils.lerp(0f, 1f, progress))
+        val y = baselineY + (if (bottomRight) (-height * 1.1f) else 0f)
+        
+        batch.setColor(0f, 0f, 0f, 1f)
+        batch.draw(texture, x, y, width, height, 0, 0, texture.width, texture.height, bottomRight, bottomRight)
+        batch.setColor(1f, 1f, 1f, 1f)
+        val textPadding = 12f
+        val textWidth = width * 0.75f - (height + textPadding) /* Triangle part */
+        font.setColor(1f, 1f, 1f, 1f)
+        font.drawCompressed(batch, card.text,
+                if (!bottomRight) (x + width - (height + textPadding) - textWidth) else (x + (height + textPadding)),
+                y + (font.capHeight) / 2f + height / 2f,
+                textWidth, if (bottomRight) Align.left else Align.right)
+            
+        batch.packedColor = lastPackedColor
+    }
 
+    @Suppress("RemoveCurlyBracesFromTemplate")
     fun getDebugString(): String {
         return """e: ${world.entities.size}  r: ${entitiesRenderedLastCall} (${(entityRenderTimeNano) / 1_000_000f} ms)
 """

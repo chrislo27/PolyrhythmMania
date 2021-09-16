@@ -1,6 +1,7 @@
 package polyrhythmmania.engine
 
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.editor.block.BlockSongInfoCard
 import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.soundsystem.BeadsSound

@@ -171,6 +171,13 @@ object Instantiators {
                 BlockTextbox.BLOCK_TYPES) { engine ->
             BlockTextbox(engine)
         })
+        add(CATEGORY_FX, Instantiator("songInfoCard", BlockSongInfoCard::class.java,
+                Localization.getVar("instantiator.songInfoCard.name"),
+                Localization.getVar("instantiator.songInfoCard.summary"),
+                Localization.getVar("instantiator.songInfoCard.desc"),
+                BlockSongInfoCard.BLOCK_TYPES) { engine ->
+            BlockSongInfoCard(engine)
+        })
         
         // Advanced instantiators
         add(CATEGORY_ADVANCED, Instantiator("selectiveSpawn", BlockSelectiveSpawnPattern::class.java,
