@@ -56,7 +56,12 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
         return ContextMenu().also { ctxmenu ->
             ctxmenu.defaultWidth.set(400f)
             
-            ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.songInfoCard.whichField"), editor.editorPane.palette.markup))
+            ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("blockContextMenu.songInfoCard.whichField"),
+                    editor.editorPane.palette.markup).also {
+                it.onAction = {
+                    editor.attemptOpenLevelMetadataDialog()
+                }
+            })
             
             val fieldPane = Pane().apply { 
                 this.bounds.height.set(32f)

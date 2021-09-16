@@ -153,9 +153,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.bounds.width.set(32f * 8)
             this.skinID.set(EditorSkins.BUTTON)
             this.setOnAction {
-                if (editor.allowedToEdit.getOrCompute()) {
-                    editorPane.openDialog(LevelMetadataDialog(editorPane))
-                }
+                editor.attemptOpenLevelMetadataDialog()
             }
         }
         
