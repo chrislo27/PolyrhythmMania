@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
@@ -90,7 +91,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             bitmapFont.scaleMul(textScale.useF())
             val originalText = text.use()
             val translated = translateTextToRenderable(originalText, isPassword.use(), newlineWrapChar.use())
-            layout.setText(bitmapFont, translated)
+            layout.setText(bitmapFont, translated, Color.WHITE, 0f, Align.left, false)
         }
         layout
     }
@@ -220,7 +221,6 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         val control = Gdx.input.isControlDown()
         val alt = Gdx.input.isAltDown()
         val shift = Gdx.input.isShiftDown()
-        val caret = caretPos.getOrCompute()
         
         when (character) {
             TAB -> {
@@ -243,6 +243,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             }
             BACKSPACE -> {
                 val currentText = text.getOrCompute()
+                val caret = caretPos.getOrCompute()
                 if (doesSelectionExist()) {
                     deleteSelectionIfAny()
                 } else if (currentText.isNotEmpty() && caret > 0) {
@@ -260,6 +261,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             }
             DELETE -> {
                 val currentText = text.getOrCompute()
+                val caret = caretPos.getOrCompute()
                 if (doesSelectionExist()) {
                     deleteSelectionIfAny()
                 } else if (currentText.isNotEmpty() && caret < currentText.length) {
@@ -282,6 +284,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                     val charLimit = characterLimit.getOrCompute()
                     if ((charLimit > 0 && currentText.length >= charLimit))
                         return
+                    val caret = caretPos.getOrCompute()
                     text.set(currentText.substring(0, caret) + "\n" + currentText.substring(caret))
                     setCaret(caret + 1)
                 } else {
@@ -296,6 +299,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 if (!inputFilter.getOrCompute().invoke(character) || (charLimit > 0 && currentText.length >= charLimit))
                     return
 
+                val caret = caretPos.getOrCompute()
                 val newText = currentText.substring(0, caret) + character + currentText.substring(caret)
                 text.set(newText)
                 setCaret(caret + 1)
@@ -407,7 +411,6 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     fun attemptPaste() {
         if (!canPasteText.getOrCompute()) return
         val charLimit = characterLimit.getOrCompute()
-        val caret = caretPos.getOrCompute()
         try {
             var data: String = Gdx.app.clipboard.contents?.replace("\r", "") ?: return
             if (!canInputNewlines.getOrCompute()) {
@@ -418,7 +421,9 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 var pasteText = data
                 
                 deleteSelectionIfAny()
+                
                 val currentText = text.getOrCompute()
+                val caret = caretPos.getOrCompute()
                 
                 val totalSize = pasteText.length + currentText.length
                 if (charLimit > 0 && totalSize > charLimit) {
@@ -624,11 +629,12 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 bitmapFont.color = tmpColor
                 bitmapFont.draw(batch, layout, rectX - overallOffsetX, rectY - (rectH - layout.height) / 2f)
 
-                if (!hasFocusNow && element.text.getOrCompute().isEmpty()) {
+                val emptyHintText = element.emptyHintText.getOrCompute()
+                if (!hasFocusNow && element.text.getOrCompute().isEmpty() && emptyHintText.isNotEmpty()) {
                     tmpColor.set(textColor)
                     tmpColor.a *= opacity * 0.5f
                     bitmapFont.color = tmpColor
-                    bitmapFont.draw(batch, element.emptyHintText.getOrCompute(), rectX /* no offset */, rectY - (rectH - layout.height) / 2f)
+                    bitmapFont.draw(batch, emptyHintText, rectX /* no offset */, rectY - (rectH - layout.height) / 2f)
                     bitmapFont.setColor(1f, 1f, 1f, 1f)
                 }
             }
