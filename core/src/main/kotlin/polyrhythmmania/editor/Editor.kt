@@ -359,7 +359,7 @@ class Editor(val main: PRManiaGame)
         val now = LocalDate.now()
         val date = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ROOT))
         fun file(num: Int): File {
-            return PRMania.RECOVERY_FOLDER.resolve("recovery_${date}${if (midfix.isNotEmpty()) "_${midfix}" else ""}${if (num > 0) "-$num" else ""}.${Container.FILE_EXTENSION}")
+            return PRMania.RECOVERY_FOLDER.resolve("recovery_${date}${if (midfix.isNotEmpty()) "_${midfix}" else ""}${if (num > 0) "_$num" else ""}.${Container.FILE_EXTENSION}")
         }
         var num = 0
         var lastFile = file(0)
