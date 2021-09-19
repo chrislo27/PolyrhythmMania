@@ -17,14 +17,24 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
     private val settings: Settings = menuCol.main.settings
     
+    val masterVolSlider: Slider = Slider().apply { 
+        this.bindWidthToParent(multiplier = 0.85f)
+        this.minimum.set(0f)
+        this.maximum.set(100f)
+        this.tickUnit.set(5f)
+        this.setValue(settings.masterVolumeSetting.getOrCompute().toFloat())
+        this.value.addListener { v ->
+            settings.masterVolumeSetting.set(v.getOrCompute().toInt())
+        }
+    }
     val gameplayVolSlider: Slider = Slider().apply { 
         this.bindWidthToParent(multiplier = 0.85f)
         this.minimum.set(0f)
         this.maximum.set(100f)
         this.tickUnit.set(5f)
-        this.setValue(settings.gameplayVolume.getOrCompute().toFloat())
+        this.setValue(settings.gameplayVolumeSetting.getOrCompute().toFloat())
         this.value.addListener { v ->
-            settings.gameplayVolume.set(v.getOrCompute().toInt())
+            settings.gameplayVolumeSetting.set(v.getOrCompute().toInt())
         }
     }
     val menuMusicVolSlider: Slider = Slider().apply { 
@@ -32,9 +42,9 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.minimum.set(0f)
         this.maximum.set(100f)
         this.tickUnit.set(5f)
-        this.setValue(settings.menuMusicVolume.getOrCompute().toFloat())
+        this.setValue(settings.menuMusicVolumeSetting.getOrCompute().toFloat())
         this.value.addListener { v ->
-            settings.menuMusicVolume.set(v.getOrCompute().toInt())
+            settings.menuMusicVolumeSetting.set(v.getOrCompute().toInt())
         }
     }
     val menuSfxVolSlider: Slider = Slider().apply { 
@@ -42,9 +52,9 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.minimum.set(0f)
         this.maximum.set(100f)
         this.tickUnit.set(5f)
-        this.setValue(settings.menuSfxVolume.getOrCompute().toFloat())
+        this.setValue(settings.menuSfxVolumeSetting.getOrCompute().toFloat())
         this.value.addListener { v ->
-            settings.menuSfxVolume.set(v.getOrCompute().toInt())
+            settings.menuSfxVolumeSetting.set(v.getOrCompute().toInt())
         }
     }
 
@@ -86,6 +96,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.bindHeightToParent(-40f)
         }
         vbox.temporarilyDisableLayouts {
+            vbox += createSliderPane(masterVolSlider, percentageContent = 0.6f) { Localization.getVar("mainMenu.audioSettings.masterVol").use() }
             vbox += createSliderPane(gameplayVolSlider, percentageContent = 0.6f) { Localization.getVar("mainMenu.audioSettings.gameplayVol").use() }
             vbox += createSliderPane(menuMusicVolSlider, percentageContent = 0.6f) { Localization.getVar("mainMenu.audioSettings.menuMusicVol").use() }
             vbox += createSliderPane(menuSfxVolSlider, percentageContent = 0.6f) { Localization.getVar("mainMenu.audioSettings.menuSfxVol").use() }
@@ -113,6 +124,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.audioSettings.resetLevels").use() }).apply {
                 this.bounds.width.set(300f)
                 this.setOnAction {
+                    masterVolSlider.setValue(100f)
                     listOf(gameplayVolSlider, menuMusicVolSlider, menuSfxVolSlider).forEach { 
                         it.setValue(50f)
                     }

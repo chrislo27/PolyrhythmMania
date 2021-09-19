@@ -13,6 +13,7 @@ object PreferenceKeys {
     val FILE_CHOOSER_TEXPACK_IMPORT_TEX_TO_DIR = "fileChooser_texpack_importTexturesToDirectory"
     val FILE_CHOOSER_TEXPACK_ENTIRE = "fileChooser_texpack_saveLoadEntire"
     
+    val SETTINGS_MASTER_VOLUME = "settings_master_volume"
     val SETTINGS_GAMEPLAY_VOLUME = "settings_gameplay_volume"
     val SETTINGS_MENU_MUSIC_VOLUME = "settings_menu_volume_music"
     val SETTINGS_MENU_SFX_VOLUME = "settings_menu_volume_sfx"

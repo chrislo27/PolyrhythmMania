@@ -25,6 +25,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_LOCALE
 import polyrhythmmania.PreferenceKeys.SETTINGS_MAINMENU_FLIP_ANIMATION
+import polyrhythmmania.PreferenceKeys.SETTINGS_MASTER_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MIXER
@@ -41,6 +42,7 @@ import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.soundsystem.SoundSystem
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.roundToInt
 
 
 @Suppress("PrivatePropertyName", "PropertyName")
@@ -51,9 +53,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     }
 
     private val kv_locale: KeyValue<String> = KeyValue(SETTINGS_LOCALE, "")
-    private val kv_gameplayVolume: KeyValue<Int> = KeyValue(SETTINGS_GAMEPLAY_VOLUME, 50)
-    private val kv_menuMusicVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_MUSIC_VOLUME, 50)
-    private val kv_menuSfxVolume: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, 50)
+    private val kv_masterVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MASTER_VOLUME, 100)
+    private val kv_gameplayVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_GAMEPLAY_VOLUME, 50)
+    private val kv_menuMusicVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_MUSIC_VOLUME, 50)
+    private val kv_menuSfxVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, 50)
     private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, PRMania.DEFAULT_SIZE)
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, false)
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
@@ -81,9 +84,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_assembleNormalHighScore: KeyValue<Int> = KeyValue(SIDEMODE_ASSEMBLE_NORMAL, 0)
 
     val locale: Var<String> = kv_locale.value
-    val gameplayVolume: Var<Int> = kv_gameplayVolume.value
-    val menuMusicVolume: Var<Int> = kv_menuMusicVolume.value
-    val menuSfxVolume: Var<Int> = kv_menuSfxVolume.value
+    val masterVolumeSetting: Var<Int> = kv_masterVolumeSetting.value
+    val gameplayVolumeSetting: Var<Int> = kv_gameplayVolumeSetting.value
+    val menuMusicVolumeSetting: Var<Int> = kv_menuMusicVolumeSetting.value
+    val menuSfxVolumeSetting: Var<Int> = kv_menuSfxVolumeSetting.value
     val windowedResolution: Var<WindowSize> = kv_windowedResolution.value
     val fullscreen: Var<Boolean> = kv_fullscreen.value
     val showInputFeedbackBar: Var<Boolean> = kv_showInputFeedbackBar.value
@@ -113,13 +117,17 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind { 
         InputCalibration(calibrationAudioOffsetMs.use().toFloat(), calibrationDisableInputSFX.use())
     }
+    val gameplayVolume: ReadOnlyVar<Int> = Var { (gameplayVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
+    val menuMusicVolume: ReadOnlyVar<Int> = Var { (menuMusicVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
+    val menuSfxVolume: ReadOnlyVar<Int> = Var { (menuSfxVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
         val prefs = this.prefs
-        prefs.getIntCoerceIn(kv_gameplayVolume, 0, 100)
-        prefs.getIntCoerceIn(kv_menuMusicVolume, 0, 100)
-        prefs.getIntCoerceIn(kv_menuSfxVolume, 0, 100)
+        prefs.getIntCoerceIn(kv_masterVolumeSetting, 0, 100)
+        prefs.getIntCoerceIn(kv_gameplayVolumeSetting, 0, 100)
+        prefs.getIntCoerceIn(kv_menuMusicVolumeSetting, 0, 100)
+        prefs.getIntCoerceIn(kv_menuSfxVolumeSetting, 0, 100)
         prefs.getWindowSize(kv_windowedResolution)
         prefs.getBoolean(kv_fullscreen)
         prefs.getBoolean(kv_showInputFeedbackBar)
@@ -151,9 +159,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
     fun persist() {
         prefs
-                .putInt(kv_gameplayVolume)
-                .putInt(kv_menuMusicVolume)
-                .putInt(kv_menuSfxVolume)
+                .putInt(kv_masterVolumeSetting)
+                .putInt(kv_gameplayVolumeSetting)
+                .putInt(kv_menuMusicVolumeSetting)
+                .putInt(kv_menuSfxVolumeSetting)
                 .putWindowSize(kv_windowedResolution)
                 .putBoolean(kv_fullscreen)
                 .putBoolean(kv_showInputFeedbackBar)
