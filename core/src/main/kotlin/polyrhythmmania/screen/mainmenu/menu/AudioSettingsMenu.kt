@@ -11,6 +11,7 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
+import kotlin.math.roundToInt
 
 
 class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -26,6 +27,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.value.addListener { v ->
             settings.masterVolumeSetting.set(v.getOrCompute().toInt())
         }
+        this.tooltipElement.set(createTooltip { "${value.useF().roundToInt()}" })
     }
     val gameplayVolSlider: Slider = Slider().apply { 
         this.bindWidthToParent(multiplier = 0.85f)
@@ -36,6 +38,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.value.addListener { v ->
             settings.gameplayVolumeSetting.set(v.getOrCompute().toInt())
         }
+        this.tooltipElement.set(createTooltip { "${value.useF().roundToInt()}" })
     }
     val menuMusicVolSlider: Slider = Slider().apply { 
         this.bindWidthToParent(multiplier = 0.85f)
@@ -46,6 +49,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.value.addListener { v ->
             settings.menuMusicVolumeSetting.set(v.getOrCompute().toInt())
         }
+        this.tooltipElement.set(createTooltip { "${value.useF().roundToInt()}" })
     }
     val menuSfxVolSlider: Slider = Slider().apply { 
         this.bindWidthToParent(multiplier = 0.85f)
@@ -56,6 +60,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.value.addListener { v ->
             settings.menuSfxVolumeSetting.set(v.getOrCompute().toInt())
         }
+        this.tooltipElement.set(createTooltip { "${value.useF().roundToInt()}" })
     }
 
     init {
