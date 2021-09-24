@@ -20,7 +20,7 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     init {
         this.setSize(MMMenu.WIDTH_EXTRA_SMALL)
         this.titleText.bind { Localization.getVar("mainMenu.settings.title").use() }
-        this.contentPane.bounds.height.set(300f)
+        this.contentPane.bounds.height.set(320f)
         
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
@@ -54,6 +54,11 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.bindHeightToParent(-40f)
         }
         vbox.temporarilyDisableLayouts {
+            vbox += createLongButton { Localization.getVar("mainMenu.settings.graphics").use() }.apply {
+                this.setOnAction { 
+                    menuCol.pushNextMenu(menuCol.graphicsSettingsMenu)
+                }
+            }
             vbox += createLongButton { Localization.getVar("mainMenu.settings.audio").use() }.apply {
                 this.setOnAction { 
                     menuCol.pushNextMenu(menuCol.audioSettingsMenu)

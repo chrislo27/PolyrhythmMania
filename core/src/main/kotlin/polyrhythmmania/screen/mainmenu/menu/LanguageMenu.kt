@@ -87,7 +87,7 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             // TODO remove me when another language is added
             vbox += TextLabel("More languages (hopefully) coming soon!").apply {
                 this.markup.set(this@LanguageMenu.markup)
-                this.bounds.height.set(75f)
+                this.bounds.height.set(70f)
                 this.renderAlign.set(Align.left)
                 this.doLineWrapping.set(true)
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)

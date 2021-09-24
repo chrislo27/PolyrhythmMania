@@ -111,13 +111,6 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 listOf(if (fps > maximumMaxFps) unlimitedFpsText.use() else "$fps")
             })
             vbox += createSliderPane(maxFramerateSlider, percentageContent = 0.6f) { maxFpsText.use() }
-            
-            val (flipPane, flipCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.mainMenuFlipAnimation").use() })
-            flipCheck.selectedState.set(main.settings.mainMenuFlipAnimation.getOrCompute())
-            flipCheck.onCheckChanged = {
-                main.settings.mainMenuFlipAnimation.set(it)
-            }
-            vbox += flipPane
         }
 
         hbox.temporarilyDisableLayouts {
