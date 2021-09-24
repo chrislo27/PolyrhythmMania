@@ -2,11 +2,13 @@ package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.CheckBox
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
+import paintbox.ui.control.Slider
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.WindowSize
@@ -14,6 +16,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
+import kotlin.math.roundToInt
 
 
 class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -22,6 +25,28 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     val resolutionCycle: CycleControl<WindowSize>
     val fullscreenCheck: CheckBox
+    private val minimumMaxFps: Int = 30
+    private val maximumMaxFps: Int = 360
+    private val stepMaxFps: Int = 10
+    private val unlimitedMaxFps: Int = maximumMaxFps + stepMaxFps
+    val maxFramerateSlider: Slider = Slider().apply {
+        this.bindWidthToParent(multiplier = 0.85f)
+        this.minimum.set(minimumMaxFps.toFloat())
+        this.maximum.set(unlimitedMaxFps.toFloat())
+        this.tickUnit.set(stepMaxFps.toFloat())
+        this.setValue((settings.maxFramerate.getOrCompute().takeUnless { it <= 0f }?.coerceAtMost(maximumMaxFps) ?: unlimitedMaxFps).toFloat())
+        this.value.addListener { v ->
+            val newValue = v.getOrCompute().toInt()
+            val maxFps = if (newValue > maximumMaxFps) 0 else newValue
+            settings.maxFramerate.set(newValue)
+            val gr = Gdx.graphics
+            gr.setForegroundFPS(maxFps)
+        }
+        this.tooltipElement.set(createTooltip {
+            val fps = value.useF().roundToInt()
+            if (fps > maximumMaxFps) Localization.getVar("mainMenu.videoSettings.maxFramerate.unlimited").use() else "$fps"
+        })
+    }
 
     init {
         this.setSize(MMMenu.WIDTH_MID)
@@ -80,6 +105,12 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 Gdx.graphics.setVSync(it)
             }
             vbox += vsyncPane
+            val unlimitedFpsText = Localization.getVar("mainMenu.videoSettings.maxFramerate.unlimited")
+            val maxFpsText = Localization.getVar("mainMenu.videoSettings.maxFramerate", Var { 
+                val fps = maxFramerateSlider.value.useF().roundToInt()
+                listOf(if (fps > maximumMaxFps) unlimitedFpsText.use() else "$fps")
+            })
+            vbox += createSliderPane(maxFramerateSlider, percentageContent = 0.6f) { maxFpsText.use() }
             
             val (flipPane, flipCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.mainMenuFlipAnimation").use() })
             flipCheck.selectedState.set(main.settings.mainMenuFlipAnimation.getOrCompute())

@@ -26,6 +26,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_LOCALE
 import polyrhythmmania.PreferenceKeys.SETTINGS_MAINMENU_FLIP_ANIMATION
 import polyrhythmmania.PreferenceKeys.SETTINGS_MASTER_VOLUME
+import polyrhythmmania.PreferenceKeys.SETTINGS_MAX_FPS
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MIXER
@@ -68,6 +69,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_calibrationAudioOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_CALIBRATION_AUDIO_OFFSET_MS, 0)
     private val kv_calibrationDisableInputSFX: KeyValue<Boolean> = KeyValue(SETTINGS_CALIBRATION_DISABLE_INPUT_SFX, false)
     private val kv_vsyncEnabled: KeyValue<Boolean> = KeyValue(SETTINGS_VSYNC, true)
+    private val kv_maxFramerate: KeyValue<Int> = KeyValue(SETTINGS_MAX_FPS, 60)
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
     val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, true)
@@ -100,6 +102,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val calibrationAudioOffsetMs: Var<Int> = kv_calibrationAudioOffsetMs.value
     val calibrationDisableInputSFX: Var<Boolean> = kv_calibrationDisableInputSFX.value
     val vsyncEnabled: Var<Boolean> = kv_vsyncEnabled.value
+    val maxFramerate: Var<Int> = kv_maxFramerate.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
@@ -142,6 +145,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getIntCoerceIn(kv_calibrationAudioOffsetMs, -500, 500)
         prefs.getBoolean(kv_calibrationDisableInputSFX)
         prefs.getBoolean(kv_vsyncEnabled)
+        prefs.getIntCoerceIn(kv_maxFramerate, 0, 1000)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
@@ -178,6 +182,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_calibrationAudioOffsetMs)
                 .putBoolean(kv_calibrationDisableInputSFX)
                 .putBoolean(kv_vsyncEnabled)
+                .putInt(kv_maxFramerate)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)
