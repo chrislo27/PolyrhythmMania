@@ -27,6 +27,8 @@ object PreferenceKeys {
     val SETTINGS_LOCALE = "settings_locale"
     val SETTINGS_CALIBRATION_AUDIO_OFFSET_MS = "settings_calibration_audioOffsetMs"
     val SETTINGS_CALIBRATION_DISABLE_INPUT_SFX = "settings_calibration_disableInputSFX"
+    val SETTINGS_VSYNC = "settings_vsync"
+    val SETTINGS_MAX_FPS = "settings_max_framerate"
     
     val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
     val EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE = "editorsettings_camera_pan_on_drag_edge"

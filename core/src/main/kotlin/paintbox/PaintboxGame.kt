@@ -50,6 +50,21 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
             private set
     }
 
+    /**
+     * Values are set by the `PaintboxDesktopLauncher`.
+     */
+    class LauncherSettings {
+        /**
+         * If not null, the FPS was manually set and is a value value (0 or larger).
+         */
+        var fps: Int? = null
+
+        /**
+         * If not null, the VSync setting was manually set.
+         */
+        var vsync: Boolean? = null
+    }
+
     inner class DebugInfo {
         val numberFormat: NumberFormat = NumberFormat.getIntegerInstance()
         var memoryDeltaTime: Float = 0f
@@ -72,11 +87,11 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
         @Suppress("RedundantCompanionReference")
         PaintboxGame.Companion.launchArguments = paintboxSettings.launchArguments
     }
-
+    
+    val startTimeMillis: Long = System.currentTimeMillis()
     val version: Version = paintboxSettings.version
     val versionString: String = version.toString()
-
-    val startTimeMillis: Long = System.currentTimeMillis()
+    val launcherSettings: LauncherSettings = LauncherSettings()
 
     protected val debugInfo: DebugInfo = DebugInfo()
     lateinit var originalResolution: WindowSize

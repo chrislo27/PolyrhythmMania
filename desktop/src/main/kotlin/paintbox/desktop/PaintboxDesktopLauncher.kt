@@ -2,6 +2,7 @@ package paintbox.desktop
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
+import paintbox.Paintbox
 import paintbox.PaintboxGame
 import paintbox.util.CloseListener
 
@@ -17,10 +18,17 @@ class PaintboxDesktopLauncher(val game: PaintboxGame, val arguments: PaintboxArg
     init {
         System.setProperty("file.encoding", "UTF-8")
 
-        val fps = arguments.fps.coerceAtLeast(0)
-        config.useVsync(arguments.vsync)
-        config.setForegroundFPS(fps)
-        config.setIdleFPS(if (fps == 0) 60 else fps)
+        val fps = arguments.fps
+        if (fps != null && fps < 0) {
+            config.setForegroundFPS(fps)
+            config.setIdleFPS(if (fps == 0 /* fps = 0 -> unbounded*/) 60 else fps)
+            game.launcherSettings.fps = fps
+        }
+        val vsync = arguments.vsync
+        if (vsync != null) { 
+            config.useVsync(vsync)
+            game.launcherSettings.vsync = vsync
+        }
     }
 
     inline fun editConfig(func: Lwjgl3ApplicationConfiguration.() -> Unit): PaintboxDesktopLauncher {

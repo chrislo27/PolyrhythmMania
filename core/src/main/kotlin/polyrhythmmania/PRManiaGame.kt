@@ -123,7 +123,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         PRManiaSkins
         settings = Settings(this, preferences).apply { 
             load()
-            setStartupSettings()
+            setStartupSettings(this@PRManiaGame)
         }
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())

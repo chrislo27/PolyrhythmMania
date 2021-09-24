@@ -31,6 +31,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MIXER
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_SKILL_STAR
+import polyrhythmmania.PreferenceKeys.SETTINGS_VSYNC
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.PreferenceKeys.SIDEMODE_ASSEMBLE_NORMAL
 import polyrhythmmania.editor.CameraPanningSetting
@@ -66,6 +67,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_mainMenuFlipAnimations: KeyValue<Boolean> = KeyValue(SETTINGS_MAINMENU_FLIP_ANIMATION, true)
     private val kv_calibrationAudioOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_CALIBRATION_AUDIO_OFFSET_MS, 0)
     private val kv_calibrationDisableInputSFX: KeyValue<Boolean> = KeyValue(SETTINGS_CALIBRATION_DISABLE_INPUT_SFX, false)
+    private val kv_vsyncEnabled: KeyValue<Boolean> = KeyValue(SETTINGS_VSYNC, true)
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
     val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, true)
@@ -97,6 +99,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val mainMenuFlipAnimation: Var<Boolean> = kv_mainMenuFlipAnimations.value
     val calibrationAudioOffsetMs: Var<Int> = kv_calibrationAudioOffsetMs.value
     val calibrationDisableInputSFX: Var<Boolean> = kv_calibrationDisableInputSFX.value
+    val vsyncEnabled: Var<Boolean> = kv_vsyncEnabled.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
@@ -138,6 +141,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getString(kv_locale, "")
         prefs.getIntCoerceIn(kv_calibrationAudioOffsetMs, -500, 500)
         prefs.getBoolean(kv_calibrationDisableInputSFX)
+        prefs.getBoolean(kv_vsyncEnabled)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
@@ -173,6 +177,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putString(kv_locale)
                 .putInt(kv_calibrationAudioOffsetMs)
                 .putBoolean(kv_calibrationDisableInputSFX)
+                .putBoolean(kv_vsyncEnabled)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)
@@ -193,7 +198,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .flush()
     }
     
-    fun setStartupSettings() {
+    fun setStartupSettings(game: PRManiaGame) {
         // Find correct locale or default back to first one
         val localeStr = this.locale.getOrCompute()
         if (localeStr != "") {
@@ -235,6 +240,16 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             val mixerName = mixerHandler.recommendedMixer.mixerInfo.name
             this.mixer.set(mixerName)
             Paintbox.LOGGER.info("No saved mixer string, using $mixerName")
+        }
+        
+        // LauncherSettings override properties
+        val fps = game.launcherSettings.fps
+        if (fps != null) {
+            // TODO
+        }
+        val vsync = game.launcherSettings.vsync
+        if (vsync != null) {
+            this.vsyncEnabled.set(vsync)
         }
     }
 

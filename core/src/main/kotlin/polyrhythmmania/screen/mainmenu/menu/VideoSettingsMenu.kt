@@ -1,15 +1,19 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.CheckBox
+import paintbox.ui.control.ScrollPane
+import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.WindowSize
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
+import polyrhythmmania.ui.PRManiaSkins
 
 
 class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -24,10 +28,21 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.titleText.bind { Localization.getVar("mainMenu.videoSettings.title").use() }
         this.contentPane.bounds.height.set(300f)
 
-        val vbox = VBox().apply {
+        val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
-            this.spacing.set(0f)
             this.bindHeightToParent(-40f)
+
+            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+
+            this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+
+            val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+            this.vBar.skinID.set(scrollBarSkinID)
+            this.hBar.skinID.set(scrollBarSkinID)
+
+            this.vBar.unitIncrement.set(10f)
+            this.vBar.blockIncrement.set(40f)
         }
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
@@ -36,8 +51,14 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.bounds.height.set(40f)
         }
 
-        contentPane.addChild(vbox)
+        contentPane.addChild(scrollPane)
         contentPane.addChild(hbox)
+        
+        val vbox = VBox().apply {
+            Anchor.TopLeft.configure(this)
+            this.spacing.set(0f)
+            this.bindHeightToParent(-40f)
+        }
 
         val resolutionsList = PRMania.commonResolutions.toList()
         val (resolutionPane, resolutionCycle) = createCycleOption(resolutionsList, resolutionsList[1],
@@ -46,10 +67,19 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         val (fullscreenPane, fullscreenCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.fullscreen").use() })
         this.fullscreenCheck = fullscreenCheck
+        
 
         vbox.temporarilyDisableLayouts {
             vbox += resolutionPane
             vbox += fullscreenPane
+            
+            val (vsyncPane, vsyncCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.vsync").use() })
+            vsyncCheck.selectedState.set(main.settings.vsyncEnabled.getOrCompute())
+            vsyncCheck.onCheckChanged = {
+                main.settings.vsyncEnabled.set(it)
+                Gdx.graphics.setVSync(it)
+            }
+            vbox += vsyncPane
             
             val (flipPane, flipCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.mainMenuFlipAnimation").use() })
             flipCheck.selectedState.set(main.settings.mainMenuFlipAnimation.getOrCompute())
@@ -83,6 +113,9 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
         }
+        vbox.sizeHeightToChildren(100f)
+        scrollPane.setContent(vbox)
+        
         hbox += createSmallButton(binding = { Localization.getVar("common.reset").use() }).apply {
             this.bounds.width.set(80f)
             this.setOnAction {
