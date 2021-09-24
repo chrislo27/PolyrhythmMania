@@ -2,6 +2,7 @@ package paintbox.font
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Colors
+import paintbox.Paintbox
 import java.lang.NumberFormatException
 
 
@@ -96,7 +97,15 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
     }
 
     val fontMapping: Map<String, PaintboxFont> = mapOf((DEFAULT_FONT_NAME to defaultTextRun.font)) + fontMapping
-
+    private val missingFontLog: MutableSet<String> = mutableSetOf()
+    
+    private fun logMissingFont(key: String) {
+        if (key !in missingFontLog) {
+            Paintbox.LOGGER.warn("[Markup] Font with key $key was not found in the fontMapping (${fontMapping.keys}).")
+            missingFontLog += key
+        }
+    }
+    
     fun parse(markup: String): TextBlock {
         return parse(parseSymbolsToTags(parseIntoSymbols(markup)))
     }
@@ -108,7 +117,12 @@ class Markup(fontMapping: Map<String, PaintboxFont>, val defaultTextRun: TextRun
 
         tags.forEach { tag ->
             val fontKey = tag.attrMap[TAG_FONT]?.valueAsString() ?: DEFAULT_FONT_NAME
-            var font = fontMapping[fontKey] ?: (if (lenientMode) defaultFont else error("Font with key $fontKey was not found in the fontMapping."))
+            var font = fontMapping[fontKey] ?: run {
+                if (!lenientMode) {
+                    logMissingFont(fontKey)
+                }
+                defaultFont
+            }
             val colorAttr = tag.attrMap[TAG_COLOR]?.value
             val color: Int = if (colorAttr is String) {
                 if (colorAttr.startsWith("#")) {
