@@ -44,7 +44,7 @@ object MathHelper {
     }
 
     fun getSawtoothWave(time: Long, seconds: Float): Float {
-        if (seconds == 0f) throw IllegalArgumentException("Seconds cannot be zero")
+        if (seconds == 0f) return 0f
         return time % (seconds * 1000).roundToInt() / (seconds * 1000f)
     }
 
@@ -69,7 +69,7 @@ object MathHelper {
      * Starts at 0.5. Note that the [seconds] argument indicates the period from centre to centre.
      */
     fun getSineWave(ms: Long, seconds: Float): Float {
-        if (seconds == 0f) throw IllegalArgumentException("Seconds cannot be zero")
+        if (seconds == 0f) return 0f
         return 0.5f * sin(Math.PI / seconds * (ms / 1000.0)).toFloat() + 0.5f
     }
 
@@ -82,7 +82,7 @@ object MathHelper {
      * Starts at 1. Note that the [seconds] argument indicates the period from peak to trough.
      */
     fun getCosineWave(ms: Long, seconds: Float): Float {
-        if (seconds == 0f) throw IllegalArgumentException("Seconds cannot be zero")
+        if (seconds == 0f) return 0f
         return 0.5f * cos(Math.PI / seconds * (ms / 1000.0)).toFloat() + 0.5f
     }
 
@@ -95,7 +95,7 @@ object MathHelper {
      * Starts at 0. Note that the [seconds] argument indicates the period from peak to trough.
      */
     fun getBaseCosineWave(ms: Long, seconds: Float): Float {
-        if (seconds == 0f) throw IllegalArgumentException("Seconds cannot be zero")
+        if (seconds == 0f) return 1f
         return -0.5f * cos(Math.PI / seconds * (ms / 1000.0)).toFloat() + 0.5f
     }
 

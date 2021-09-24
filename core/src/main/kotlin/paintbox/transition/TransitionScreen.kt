@@ -31,13 +31,6 @@ open class TransitionScreen(override val main: PaintboxGame,
     val entryTransition: Transition = entryTransition ?: Transition.EMPTY
     val destTransition: Transition = destTransition ?: Transition.EMPTY
 
-    init {
-        if (this.entryTransition.duration < 0f)
-            throw IllegalArgumentException("Duration of entry transition is negative: ${this.entryTransition.duration}")
-        if (this.destTransition.duration < 0f)
-            throw IllegalArgumentException("Duration of dest transition is negative: ${this.destTransition.duration}")
-    }
-
     val duration: Float = (this.entryTransition.duration + this.destTransition.duration).absoluteValue
     var timeElapsed: Float = 0f
         private set

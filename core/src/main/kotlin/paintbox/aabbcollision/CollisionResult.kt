@@ -46,11 +46,6 @@ class CollisionResult() : Pool.Poolable, Comparable<CollisionResult> {
     }
 
     override fun compareTo(other: CollisionResult): Int {
-        if (distance < 0)
-            error("This distance is negative ($distance)")
-        if (other.distance < 0)
-            error("The other result's distance is negative (${other.distance})")
-
         return if (distance < other.distance) {
             -1
         } else if (distance > other.distance) {
