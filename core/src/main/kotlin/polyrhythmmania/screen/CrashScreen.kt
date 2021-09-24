@@ -45,12 +45,12 @@ class CrashScreen(main: PRManiaGame, val throwable: Throwable, val lastScreen: S
             "prmania_icons" to main.fontIcons,
             "rodin" to main.fontMainMenuRodin,
             "thin" to main.fontMainMenuThin,
-    ), TextRun(font, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    ), TextRun(font, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     private val markupThin: Markup = Markup(mapOf(
             "prmania_icons" to main.fontIcons,
             "rodin" to main.fontMainMenuRodin,
-            "bold" to font,
-    ), TextRun(main.fontMainMenuThin, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+            Markup.FONT_NAME_BOLD to font,
+    ), TextRun(main.fontMainMenuThin, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     private val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
         this.update()

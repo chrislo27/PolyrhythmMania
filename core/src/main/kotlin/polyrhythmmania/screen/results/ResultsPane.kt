@@ -69,7 +69,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             val s = score.use()
             s.line1 + (if (s.line2.isNotEmpty()) "\n\n${s.line2}" else "")
         }, font = resultsFont).apply {
-            this.markup.set(Markup(mapOf(), TextRun(resultsFont, ""), Markup.FontStyles.ALL_DEFAULT, lenientMode = true))
+            this.markup.set(Markup(mapOf(), TextRun(resultsFont, ""), Markup.FontStyles.ALL_USING_DEFAULT_FONT, lenientMode = true))
             this.textColor.set(Color.WHITE)
             this.renderAlign.set(Align.top)
             this.textAlign.set(TextAlign.LEFT)

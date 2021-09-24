@@ -156,7 +156,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             "prmania_icons" to main.fontIcons,
             "rodin" to main.fontMainMenuRodin,
             "thin" to main.fontMainMenuThin
-    ), TextRun(font, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    ), TextRun(font, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     protected val titleHeight: Float = 64f
     protected val grey: Color = Color().grey(0.8f, 1f)
     protected val blipSoundListener: (MouseEntered?) -> Unit = {

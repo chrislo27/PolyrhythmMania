@@ -111,12 +111,12 @@ class Editor(val main: PRManiaGame)
 
     // Default markup used for blocks, bold is inverted
     val blockMarkup: Markup = Markup(mapOf(
-            "bold" to main.mainFontBordered,
-            "italic" to main.mainFontItalicBordered,
-            "bolditalic" to main.mainFontBoldItalicBordered,
+            Markup.FONT_NAME_BOLD to main.mainFontBordered,
+            Markup.FONT_NAME_ITALIC to main.mainFontItalicBordered,
+            Markup.FONT_NAME_BOLDITALIC to main.mainFontBoldItalicBordered,
             "rodin" to main.fontRodinFixedBordered,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.mainFontBoldBordered, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    ), TextRun(main.mainFontBoldBordered, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
 
     val tracks: List<Track> = DEFAULT_TRACKS
     val trackMap: Map<TrackID, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }

@@ -67,41 +67,41 @@ open class Palette(val main: PRManiaGame) {
 
     // Markup
     val markup: Markup = Markup(mapOf(
-            "bold" to main.mainFontBold,
-            "italic" to main.mainFontItalic,
-            "bolditalic" to main.mainFontBoldItalic,
+            Markup.FONT_NAME_BOLD to main.mainFontBold,
+            Markup.FONT_NAME_ITALIC to main.mainFontItalic,
+            Markup.FONT_NAME_BOLDITALIC to main.mainFontBoldItalic,
             "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.mainFont, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    ), TextRun(main.mainFont, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     val markupBordered: Markup = Markup(mapOf(
-            "bold" to main.mainFontBoldBordered,
-            "italic" to main.mainFontItalicBordered,
-            "bolditalic" to main.mainFontBoldItalicBordered,
+            Markup.FONT_NAME_BOLD to main.mainFontBoldBordered,
+            Markup.FONT_NAME_ITALIC to main.mainFontItalicBordered,
+            Markup.FONT_NAME_BOLDITALIC to main.mainFontBoldItalicBordered,
             "rodin" to main.fontRodinFixedBordered,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.mainFontBordered, ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    ), TextRun(main.mainFontBordered, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     val markupInstantiatorSummary: Markup = Markup(mapOf(
             "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(instantiatorSummaryFont, ""), Markup.FontStyles.ALL_DEFAULT)
+    ), TextRun(instantiatorSummaryFont, ""), Markup.FontStyles.ALL_USING_DEFAULT_FONT)
     val markupInstantiatorDesc: Markup = Markup(mapOf(
-            "bold" to main.fontCache["editor_instantiator_desc_BOLD"],
-            "italic" to main.fontCache["editor_instantiator_desc_ITALIC"],
-            "bolditalic" to main.fontCache["editor_instantiator_desc_BOLD_ITALIC"],
+            Markup.FONT_NAME_BOLD to main.fontCache["editor_instantiator_desc_BOLD"],
+            Markup.FONT_NAME_ITALIC to main.fontCache["editor_instantiator_desc_ITALIC"],
+            Markup.FONT_NAME_BOLDITALIC to main.fontCache["editor_instantiator_desc_BOLD_ITALIC"],
             "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.fontCache["editor_instantiator_desc"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    ), TextRun(main.fontCache["editor_instantiator_desc"], ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     val markupStatusBar: Markup = Markup(mapOf(
-            "bold" to main.fontCache["editor_status_BOLD"],
-            "italic" to main.fontCache["editor_status_ITALIC"],
-            "bolditalic" to main.fontCache["editor_status_BOLD_ITALIC"],
+            Markup.FONT_NAME_BOLD to main.fontCache["editor_status_BOLD"],
+            Markup.FONT_NAME_ITALIC to main.fontCache["editor_status_ITALIC"],
+            Markup.FONT_NAME_BOLDITALIC to main.fontCache["editor_status_BOLD_ITALIC"],
             "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.fontCache["editor_status"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))
+    ), TextRun(main.fontCache["editor_status"], ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     val markupHelp: Markup = markupInstantiatorDesc /*Markup(mapOf(
-            "bold" to main.fontCache["editor_help_BOLD"],
-            "italic" to main.fontCache["editor_help_ITALIC"],
-            "bolditalic" to main.fontCache["editor_help_BOLD_ITALIC"],
+            Markup.FONT_NAME_BOLD to main.fontCache["editor_help_BOLD"],
+            Markup.FONT_NAME_ITALIC to main.fontCache["editor_help_ITALIC"],
+            Markup.FONT_NAME_BOLDITALIC to main.fontCache["editor_help_BOLD_ITALIC"],
             "rodin" to main.fontRodinFixed,
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.fontCache["editor_help"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))*/
