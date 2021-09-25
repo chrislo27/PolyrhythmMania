@@ -235,7 +235,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         jsonObj.add("programVersion", PRMania.VERSION.toString())
         jsonObj.add("isAutosave", saveOptions.isAutosave)
         jsonObj.add("isProject", saveOptions.isProject)
-        if (saveOptions.isProject) {
+        if (!saveOptions.isProject) {
             jsonObj.add("levelUUID", UUID.randomUUID().toString())
         }
         jsonObj.add("resources", Json.`object`().also { obj ->
@@ -413,6 +413,8 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
         val containerVersion: Int = json.getInt("containerVersion", 0)
         val programVersion: Version? = Version.parse(json.getString("programVersion", null))
+        val isProject: Boolean = if (containerVersion >= 10) json.getBoolean("isProject", true) else false
+        val levelUUID: UUID? = if (containerVersion >= 10 && !isProject) (UUID.fromString(json.getString("levelUUID", ""))) else null
         
         val resourcesMap: Map<String, ResourceTag> = json.get("resources").asObject().get("list").asArray().associate { value ->
             value as JsonObject
@@ -602,11 +604,12 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             engine.musicData.update()
         }
 
-        return LoadMetadata(this, containerVersion, programVersion, customTexturePackRead)
+        return LoadMetadata(this, containerVersion, programVersion, customTexturePackRead, isProject, levelUUID)
     }
 
     data class LoadMetadata(val container: Container, val containerVersion: Int, val programVersion: Version?,
-                            val customTexturePackRead: CustomTexturePack.ReadResult?) {
+                            val customTexturePackRead: CustomTexturePack.ReadResult?,
+                            val isProject: Boolean, val levelUUID: UUID?) {
         val isFutureVersion: Boolean = (programVersion != null && programVersion > PRMania.VERSION) || (containerVersion > CONTAINER_VERSION)
 
         /**
