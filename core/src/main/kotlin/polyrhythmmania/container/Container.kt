@@ -234,6 +234,10 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         jsonObj.add("containerVersion", CONTAINER_VERSION)
         jsonObj.add("programVersion", PRMania.VERSION.toString())
         jsonObj.add("isAutosave", saveOptions.isAutosave)
+        jsonObj.add("isProject", saveOptions.isProject)
+        if (saveOptions.isProject) {
+            jsonObj.add("levelUUID", UUID.randomUUID().toString())
+        }
         jsonObj.add("resources", Json.`object`().also { obj ->
             obj.add("list", Json.array().also { array ->
                 extResMap.forEach { (res, uuid) ->
