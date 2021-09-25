@@ -19,12 +19,11 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.util.TempFileUtils
 import java.io.File
 import kotlin.concurrent.thread
 
 
-class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
+class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     enum class Substate {
         FILE_DIALOG_OPEN,
@@ -37,13 +36,8 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     val descLabel: TextLabel
 
-    @Volatile
-    private var lastSaveLoc: File? = null
-    @Volatile
-    private var firstTime: Boolean = true
-
     init {
-        this.titleLabel.text.bind { Localization.getVar("editor.dialog.save.title").use() }
+        this.titleLabel.text.bind { Localization.getVar("editor.dialog.exportLevel.title").use() }
         bottomPane.addChild(Button("").apply {
             Anchor.BottomRight.configure(this)
             this.bindWidthToSelfHeight()
@@ -69,60 +63,38 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         contentPane.addChild(descLabel)
     }
     
-    fun assignSaveLocation(file: File) {
-        lastSaveLoc = file
-    }
-    
-    fun getCurrentSaveLocation(): File? {
-        return lastSaveLoc
-    }
 
-    fun prepareShow(forceSaveAs: Boolean): SaveDialog {
-        descLabel.text.set("")
+    fun prepareShow(): ExportLevelDialog {
+        descLabel.text.set(Localization.getValue("common.closeFileChooser"))
 
-        val location: File? = lastSaveLoc
-        if (forceSaveAs || location == null || firstTime) {
-            descLabel.text.set(Localization.getValue("common.closeFileChooser"))
-            // Open file chooser
-
-            substate.set(Substate.FILE_DIALOG_OPEN)
-            editorPane.main.restoreForExternalDialog { completionCallback ->
-                thread(isDaemon = true) {
-                    val title = Localization.getValue("fileChooser.save.project.title")
-                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.save.project.filter"), listOf("*.${Container.PROJECT_FILE_EXTENSION}")).copyWithExtensionsInDesc()
-                    TinyFDWrapper.saveFile(title,
-                            lastSaveLoc
-                                    ?: (main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE)
-                                    ?: main.getDefaultDirectory()).resolve("level_project.${Container.PROJECT_FILE_EXTENSION}"), filter) { file: File? ->
-                        completionCallback()
-                        if (file != null) {
-                            val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
-                            val ext = file.extension
-                            val fileWithCorrectExt = if (ext.equals(Container.LEVEL_FILE_EXTENSION, ignoreCase = true)) {
-                                // Strip out .prmania file ext and replace with .prmproj for older files
-                                (File(file.absolutePath.substringBeforeLast(".${Container.LEVEL_FILE_EXTENSION}") + ".${Container.PROJECT_FILE_EXTENSION}"))
-                            } else if (!ext.equals(Container.PROJECT_FILE_EXTENSION, ignoreCase = true)) {
-                                (File(file.absolutePath + ".${Container.PROJECT_FILE_EXTENSION}"))
-                            } else {
-                                file
-                            }
-
-                            Gdx.app.postRunnable {
-                                main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE, newInitialDirectory)
-                            }
-                            save(fileWithCorrectExt)
+        substate.set(Substate.FILE_DIALOG_OPEN)
+        editorPane.main.restoreForExternalDialog { completionCallback ->
+            thread(isDaemon = true) {
+                val title = Localization.getValue("fileChooser.exportLevel.title")
+                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.exportLevel.filter"), listOf("*.${Container.LEVEL_FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                TinyFDWrapper.saveFile(title, (main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_EXPORT)
+                                        ?: main.getDefaultDirectory()).resolve("level.${Container.LEVEL_FILE_EXTENSION}"), filter) { file: File? ->
+                    completionCallback()
+                    if (file != null) {
+                        val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
+                        val ext = file.extension
+                        val fileWithCorrectExt = if (!ext.equals(Container.LEVEL_FILE_EXTENSION, ignoreCase = true)) {
+                            (File(file.absolutePath + ".${Container.LEVEL_FILE_EXTENSION}"))
                         } else {
-                            Gdx.app.postRunnable {
-                                substate.set(Substate.DONE)
-                                attemptClose()
-                            }
+                            file
+                        }
+
+                        Gdx.app.postRunnable {
+                            main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_EXPORT, newInitialDirectory)
+                        }
+                        save(fileWithCorrectExt)
+                    } else {
+                        Gdx.app.postRunnable {
+                            substate.set(Substate.DONE)
+                            attemptClose()
                         }
                     }
                 }
-            }
-        } else {
-            thread(isDaemon = true) {
-                save(location)
             }
         }
 
@@ -138,9 +110,7 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             
             editor.compileEditorIntermediates()
 
-            editor.container.writeToFile(newFile, SaveOptions.EDITOR_SAVE_AS_PROJECT)
-            lastSaveLoc = newFile
-            firstTime = false
+            editor.container.writeToFile(newFile, SaveOptions.EDITOR_EXPORT_AS_LEVEL)
 
             Gdx.app.postRunnable {
                 substate.set(Substate.DONE)

@@ -34,6 +34,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     val ioNew: Button
     val ioOpen: Button
     val ioSave: Button
+    val ioExport: Button
     val undoButton: Button
     val redoButton: Button
     
@@ -108,6 +109,16 @@ class Menubar(val editorPane: EditorPane) : Pane() {
                 val alt = Gdx.input.isAltDown()
                 val shift = Gdx.input.isShiftDown()
                 editor.attemptSave(forceSaveAs = !control && alt && !shift)
+            }
+        }
+        ioExport = Button("").apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f)
+            this.skinID.set(EditorSkins.BUTTON)
+            this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_save"]))
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.export")))
+            this.setOnAction { 
+                editor.attemptExport()
             }
         }
         undoButton = Button("").apply {
@@ -199,6 +210,8 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             leftBox += ioNew
             leftBox += ioOpen
             leftBox += ioSave
+            leftBox += separator()
+            leftBox += ioExport
             leftBox += separator()
             leftBox += undoButton
             leftBox += redoButton

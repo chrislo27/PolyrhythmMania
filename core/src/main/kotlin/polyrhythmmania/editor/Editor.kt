@@ -574,6 +574,12 @@ class Editor(val main: PRManiaGame)
         }
     }
 
+    fun attemptExport() {
+        if (allowedToEdit.getOrCompute()) {
+            editorPane.openDialog(editorPane.exportLevelDialog.prepareShow())
+        }
+    }
+
     fun attemptLoad(dropPath: String?) {
         if (allowedToEdit.getOrCompute()) {
             editorPane.openDialog(editorPane.loadDialog.prepareShow(dropPath))
@@ -988,6 +994,12 @@ class Editor(val main: PRManiaGame)
                     Input.Keys.S -> { // CTRL+S: Save // CTRL+ALT+S: Save As
                         if (ctrl && !shift) {
                             attemptSave(alt)
+                            inputConsumed = true
+                        }
+                    }
+                    Input.Keys.E -> { // CTRL+SHIFT+E: Export
+                        if (ctrl && shift && !alt) {
+                            attemptExport()
                             inputConsumed = true
                         }
                     }
