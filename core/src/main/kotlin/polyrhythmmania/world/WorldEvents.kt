@@ -10,6 +10,7 @@ import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.engine.*
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityPiston
+import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.tileset.TilesetPalette
 import kotlin.math.max
 import kotlin.math.min
@@ -322,6 +323,8 @@ class EventChangeTexturePack(engine: Engine, startBeat: Float, val newSource: Te
 
     override fun onStartContainer(container: Container, currentBeat: Float) {
         super.onStartContainer(container, currentBeat)
-        container.setTexturePackFromSource(newSource)
+        if (container.globalSettings.forceTexturePack == ForceTexturePack.NO_FORCE) {
+            container.setTexturePackFromSource(newSource)
+        }
     }
 }
