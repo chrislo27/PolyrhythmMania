@@ -10,7 +10,7 @@ project.ext.assetsDir = new File("../core/assets");
 compileKotlin {
     kotlinOptions {
         jvmTarget = "11"
-        freeCompilerArgs += "-Xuse-experimental=kotlin.ExperimentalUnsignedTypes"
+        freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
     }
 }
 

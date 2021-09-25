@@ -106,7 +106,7 @@ project(":desktop") {
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
         jvmTarget = "11"
-        freeCompilerArgs += "-Xuse-experimental=kotlin.ExperimentalUnsignedTypes"
+        freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
     }
 }
 
