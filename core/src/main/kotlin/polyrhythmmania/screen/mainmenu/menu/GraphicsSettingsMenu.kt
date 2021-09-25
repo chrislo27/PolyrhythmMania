@@ -19,7 +19,7 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     init {
         this.setSize(MMMenu.WIDTH_MEDIUM)
-        this.titleText.bind { Localization.getVar("mainMenu.videoSettings.title").use() }
+        this.titleText.bind { Localization.getVar("mainMenu.graphicsSettings.title").use() }
         this.contentPane.bounds.height.set(300f)
 
         val scrollPane = ScrollPane().apply {
