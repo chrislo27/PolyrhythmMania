@@ -20,6 +20,7 @@ import polyrhythmmania.PreferenceKeys.ENDLESS_HIGH_SCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
+import polyrhythmmania.PreferenceKeys.SETTINGS_ONLY_DEFAULT_PALETTE
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TEXTURE_PACK
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
@@ -73,6 +74,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_vsyncEnabled: KeyValue<Boolean> = KeyValue(SETTINGS_VSYNC, true)
     private val kv_maxFramerate: KeyValue<Int> = KeyValue(SETTINGS_MAX_FPS, 60)
     private val kv_forceTexturePack: KeyValue<ForceTexturePack> = KeyValue(SETTINGS_FORCE_TEXTURE_PACK, ForceTexturePack.NO_FORCE)
+    private val kv_onlyDefaultPalette: KeyValue<Boolean> = KeyValue(SETTINGS_ONLY_DEFAULT_PALETTE, false)
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
     val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, true)
@@ -107,6 +109,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val vsyncEnabled: Var<Boolean> = kv_vsyncEnabled.value
     val maxFramerate: Var<Int> = kv_maxFramerate.value
     val forceTexturePack: Var<ForceTexturePack> = kv_forceTexturePack.value
+    val onlyDefaultPalette: Var<Boolean> = kv_onlyDefaultPalette.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
@@ -151,6 +154,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_vsyncEnabled)
         prefs.getIntCoerceIn(kv_maxFramerate, 0, 1000)
         prefs.getForceTexturePack(kv_forceTexturePack)
+        prefs.getBoolean(kv_onlyDefaultPalette)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
@@ -189,6 +193,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_vsyncEnabled)
                 .putInt(kv_maxFramerate)
                 .putForceTexturePack(kv_forceTexturePack)
+                .putBoolean(kv_onlyDefaultPalette)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)

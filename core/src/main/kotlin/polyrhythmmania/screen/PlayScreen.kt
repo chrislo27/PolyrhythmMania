@@ -57,6 +57,7 @@ import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.tileset.TilesetPalette
 import space.earlygrey.shapedrawer.ShapeDrawer
 import java.util.*
 import kotlin.math.*
@@ -407,6 +408,10 @@ class PlayScreen(
         engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
         engine.resetEndSignal()
         
+        if (container.globalSettings.onlyDefaultPalette) {
+            TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
+        }
+        
         timing.seconds = min(-1f, -1f + this.inputCalibration.audioOffsetMs / 1000f)
         engine.seconds = timing.seconds
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
@@ -476,7 +481,11 @@ class PlayScreen(
             challenges.applyToEngine(engine)
             engine.removeEvents(engine.events.toList())
             container.world.resetWorld()
-            container.world.tilesetPalette.applyTo(container.renderer.tileset)
+            if (container.globalSettings.onlyDefaultPalette) {
+                TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
+            } else {
+                container.world.tilesetPalette.applyTo(container.renderer.tileset)
+            }
             engine.soundInterface.clearAllNonMusicAudio()
             container.setTexturePackFromSource()
             

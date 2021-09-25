@@ -105,7 +105,7 @@ class Editor(val main: PRManiaGame)
         true
     } //soundSystem
     val container: Container = Container(this.soundSystem, this.timing,
-            GlobalContainerSettings(forceTexturePack = ForceTexturePack.NO_FORCE))
+            GlobalContainerSettings(forceTexturePack = ForceTexturePack.NO_FORCE, onlyDefaultPalette = false))
 
     val world: World get() = container.world
     val engine: Engine get() = container.engine

@@ -29,7 +29,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     }
     
     override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA)
+        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, onlyDefaultPalette = false)
     }
     
     override fun initialize() {

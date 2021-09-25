@@ -1,6 +1,7 @@
 package polyrhythmmania.sidemodes.practice
 
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldSettings
@@ -13,5 +14,9 @@ abstract class Practice(main: PRManiaGame) : SideMode(main) {
         container.world.worldMode = WorldMode(WorldType.POLYRHYTHM, false)
         container.world.showInputFeedback = true // Overrides user settings
         container.world.worldSettings = WorldSettings(showInputIndicators = true)
+    }
+
+    override fun createGlobalContainerSettings(): GlobalContainerSettings {
+        return super.createGlobalContainerSettings().copy(onlyDefaultPalette = false)
     }
 }

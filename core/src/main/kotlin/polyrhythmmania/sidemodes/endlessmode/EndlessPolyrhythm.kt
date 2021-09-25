@@ -6,6 +6,7 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
@@ -21,6 +22,7 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
+import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.time.LocalDate
@@ -104,6 +106,10 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         container.renderer.dailyChallengeDate.set(dailyChallenge)
         container.renderer.flashHudRedWhenLifeLost.set(true)
         container.engine.inputter.endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
+    }
+    
+    override fun createGlobalContainerSettings(): GlobalContainerSettings {
+        return super.createGlobalContainerSettings().copy(onlyDefaultPalette = false)
     }
 
     override fun initialize() {

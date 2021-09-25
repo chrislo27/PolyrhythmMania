@@ -1,23 +1,16 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
-import paintbox.ui.control.CheckBox
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
-import paintbox.ui.control.Slider
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.WindowSize
 import polyrhythmmania.Localization
-import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.render.ForceTexturePack
-import kotlin.math.roundToInt
 
 
 class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -70,7 +63,7 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += flipPane
 
-            val (forceTPPane, forceTPCombobox) = createComboboxOption(ForceTexturePack.VALUES, main.settings.forceTexturePack.getOrCompute(),
+            val (forceTexPackPane, forceTexPackCombobox) = createComboboxOption(ForceTexturePack.VALUES, main.settings.forceTexturePack.getOrCompute(),
                     { Localization.getVar("mainMenu.graphicsSettings.forceTexturePack").use() },
                     percentageContent = 0.4f, itemToString = { choice ->
                 Localization.getValue("mainMenu.graphicsSettings.forceTexturePack.${
@@ -81,11 +74,19 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }")
             })
-            forceTPCombobox.selectedItem.addListener { 
+            forceTexPackCombobox.selectedItem.addListener { 
                 main.settings.forceTexturePack.set(it.getOrCompute())
             }
-            forceTPPane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceTexturePack.tooltip")))
-            vbox += forceTPPane
+            forceTexPackPane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceTexturePack.tooltip")))
+            vbox += forceTexPackPane
+            
+            val (onlyDefaultPalettePane, onlyDefaultPaletteCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.onlyDefaultPalette").use() })
+            onlyDefaultPaletteCheck.selectedState.set(main.settings.onlyDefaultPalette.getOrCompute())
+            onlyDefaultPaletteCheck.onCheckChanged = {
+                main.settings.onlyDefaultPalette.set(it)
+            }
+            onlyDefaultPaletteCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.onlyDefaultPalette.tooltip")))
+            vbox += onlyDefaultPalettePane
         }
 
         hbox.temporarilyDisableLayouts {

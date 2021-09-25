@@ -254,6 +254,8 @@ class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
 
     override fun onUpdateContainer(container: Container, currentBeat: Float) {
         super.onUpdateContainer(container, currentBeat)
+        if (container.globalSettings.onlyDefaultPalette) return
+        
         var percentage = getBeatPercentage(currentBeat).coerceIn(0f, 1f)
         if (reverse) {
             percentage = 1f - percentage

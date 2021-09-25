@@ -26,7 +26,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) {
     private val container: Container = Container(null, SimpleTimingProvider { 
         Gdx.app.postRunnable { throw it } 
         false
-    }, GlobalContainerSettings(ForceTexturePack.FORCE_GBA))
+    }, GlobalContainerSettings(ForceTexturePack.FORCE_GBA, onlyDefaultPalette = false))
     private val gradientStart: Color = Color(0f, 32f / 255f, 55f / 255f, 1f)
     private val gradientEnd: Color = Color.BLACK.cpy()
     
