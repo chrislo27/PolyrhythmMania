@@ -25,6 +25,10 @@ allprojects {
         gdxVersion = '1.10.0'
         gdxControllersVersion = '2.2.1'
     }
+    
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+    }
 
     repositories {
 //        mavenLocal()
