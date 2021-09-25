@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
+import paintbox.font.Markup
+import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -141,10 +143,12 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 }
             }
             
+            val fieldLabelMarkup = Markup(mapOf(), TextRun(editorPane.main.mainFontBold, ""), Markup.FontStyles.ALL_USING_DEFAULT_FONT)
             fun addTextField(labelText: String, charLimit: Int, 
                              getter: (LevelMetadata) -> String,
                              allowNewlines: Boolean = false,
                              textFieldSizeAdjust: Float = 0f, textFieldSizeMultiplier: Float = 1f,
+                             requiredField: Boolean = false,
                              copyFunc: (LevelMetadata, newText: String) -> LevelMetadata, ): Pair<HBox, TextField> {
                 val textField = TextField(editorPane.palette.rodinDialogFont).apply {
                     focusGroup.addFocusable(this)
@@ -166,8 +170,9 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 val hbox = HBox().apply {
                     this.bounds.height.set(labelHeight)
                     this.spacing.set(0f)
-                    this += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.mainFontBold).apply {
+                    this += TextLabel(binding = { "${if (requiredField) "[color=prmania_negative]* []" else ""}${Localization.getVar(labelText).use()}" }).apply {
                         this.bounds.width.set(textLabelWidth)
+                        this.markup.set(fieldLabelMarkup)
                         this.renderAlign.set(Align.right)
                         this.textColor.set(Color.WHITE)
                         this.padding.set(Insets(0f, 0f, 0f, 4f))
@@ -184,8 +189,8 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 
                 return hbox to textField
             }
-            fun addYearField(labelText: String, 
-                             getter: (LevelMetadata) -> Int): HBox {
+            
+            fun addYearField(labelText: String, getter: (LevelMetadata) -> Int): HBox {
                 return HBox().apply {
                     this.bounds.height.set(labelHeight)
                     this.spacing.set(0f)
@@ -232,7 +237,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 DateTimeFormatter.RFC_1123_DATE_TIME.format(datetime)
             }
             vbox += addTextField("levelMetadata.levelCreator", LevelMetadata.LIMIT_LEVEL_CREATOR,
-                    LevelMetadata::levelCreator, textFieldSizeMultiplier = 0.7f) { t, newText ->
+                    LevelMetadata::levelCreator, textFieldSizeMultiplier = 0.7f, requiredField = true) { t, newText ->
                 t.copy(levelCreator = newText)
             }.first
             vbox += addTextField("levelMetadata.description", LevelMetadata.LIMIT_DESCRIPTION,
@@ -240,11 +245,11 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 t.copy(description = newText)
             }.first
             vbox += addTextField("levelMetadata.songName", LevelMetadata.LIMIT_SONG_NAME,
-                    LevelMetadata::songName, textFieldSizeMultiplier = 0.6f) { t, newText ->
+                    LevelMetadata::songName, textFieldSizeMultiplier = 0.6f, requiredField = true) { t, newText ->
                 t.copy(songName = newText)
             }.first
             vbox += addTextField("levelMetadata.songArtist", LevelMetadata.LIMIT_ARTIST_NAME,
-                    LevelMetadata::songArtist, textFieldSizeMultiplier = 0.6f) { t, newText ->
+                    LevelMetadata::songArtist, textFieldSizeMultiplier = 0.6f, requiredField = true) { t, newText ->
                 t.copy(songArtist = newText)
             }.first
             vbox += addTextField("levelMetadata.albumName", LevelMetadata.LIMIT_ALBUM_NAME,
