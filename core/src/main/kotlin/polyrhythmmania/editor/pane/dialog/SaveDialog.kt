@@ -97,10 +97,16 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         completionCallback()
                         if (file != null) {
                             val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
-                            val fileWithCorrectExt = if (!file.extension.equals(Container.PROJECT_FILE_EXTENSION, ignoreCase = true))
-                                    (File(file.absolutePath + ".${Container.PROJECT_FILE_EXTENSION}"))
-                            else file
-                            
+                            val ext = file.extension
+                            val fileWithCorrectExt = if (ext.equals(Container.LEVEL_FILE_EXTENSION, ignoreCase = true)) {
+                                // Strip out .prmania file ext and replace with .prmproj for older files
+                                (File(file.absolutePath.substringBeforeLast(".${Container.LEVEL_FILE_EXTENSION}") + ".${Container.PROJECT_FILE_EXTENSION}"))
+                            } else if (!ext.equals(Container.PROJECT_FILE_EXTENSION, ignoreCase = true)) {
+                                (File(file.absolutePath + ".${Container.PROJECT_FILE_EXTENSION}"))
+                            } else {
+                                file
+                            }
+
                             Gdx.app.postRunnable {
                                 main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE, newInitialDirectory)
                             }

@@ -15,6 +15,7 @@ import paintbox.binding.Var
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
+import polyrhythmmania.container.manifest.LibraryRelevantData
 import polyrhythmmania.container.manifest.ResourceTag
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.Editor
@@ -223,7 +224,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         if (!file.exists()) {
             file.createNewFile()
         } else {
-            if (!file.isFile) error("File given was not a file: ${file.absolutePath}")
+            if (!file.isFile) throw ContainerException("File input given was not a file: ${file.absolutePath}")
         }
 
         val extRes: List<ExternalResource> = this.resources.values.toList()
@@ -231,13 +232,11 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
         // Create manifest
         val jsonObj: JsonObject = Json.`object`()
-        jsonObj.add("containerVersion", CONTAINER_VERSION)
-        jsonObj.add("programVersion", PRMania.VERSION.toString())
-        jsonObj.add("isAutosave", saveOptions.isAutosave)
-        jsonObj.add("isProject", saveOptions.isProject)
-        if (!saveOptions.isProject) {
-            jsonObj.add("levelUUID", UUID.randomUUID().toString())
-        }
+        val libraryRelevantData = LibraryRelevantData(CONTAINER_VERSION, PRMania.VERSION,
+                saveOptions.isAutosave, saveOptions.isProject, if (!saveOptions.isProject) UUID.randomUUID() else null,
+                levelMetadata.truncateWithLimits())
+        libraryRelevantData.writeToManifestJson(jsonObj)
+        
         jsonObj.add("resources", Json.`object`().also { obj ->
             obj.add("list", Json.array().also { array ->
                 extResMap.forEach { (res, uuid) ->
@@ -349,8 +348,6 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             jsonObj.add("resultsText", resultsText.toJson())
         }
         
-        jsonObj.add("levelMetadata", levelMetadata.truncateWithLimits().toJson())
-        
         val worldSettings = this.world.worldSettings
         if (worldSettings != WorldSettings.DEFAULT) {
             jsonObj.add("worldSettings", worldSettings.toJson())
@@ -411,10 +408,15 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             json = Json.parse(reader).asObject()
         }
 
-        val containerVersion: Int = json.getInt("containerVersion", 0)
-        val programVersion: Version? = Version.parse(json.getString("programVersion", null))
-        val isProject: Boolean = if (containerVersion >= 10) json.getBoolean("isProject", true) else false
-        val levelUUID: UUID? = if (containerVersion >= 10 && !isProject) (UUID.fromString(json.getString("levelUUID", ""))) else null
+        val libraryRelevantDataLoad = LibraryRelevantData.fromManifestJson(json, file.lastModified())
+        val libraryRelevantData: LibraryRelevantData = libraryRelevantDataLoad.first
+        
+        val containerVersion: Int = libraryRelevantData.containerVersion
+
+        this.wasLevelMetadataLoaded = libraryRelevantDataLoad.second.wasLevelMetadataLoaded
+        if (libraryRelevantData.levelMetadata != null) {
+            this.levelMetadata = libraryRelevantData.levelMetadata
+        }
         
         val resourcesMap: Map<String, ResourceTag> = json.get("resources").asObject().get("list").asArray().associate { value ->
             value as JsonObject
@@ -550,16 +552,6 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
                 this.world.worldSettings = WorldSettings.fromJson(worldSettingsObj)
             }
         }
-        this.wasLevelMetadataLoaded = false
-        if (containerVersion >= VERSION_LEVEL_METADATA_ADDED) {
-            val metadataObj = json.get("levelMetadata")?.asObject()
-            if (metadataObj != null) {
-                this.levelMetadata = LevelMetadata.fromJson(metadataObj,
-                        LocalDateTime.ofInstant(Instant.ofEpochMilli(file.lastModified()), ZoneOffset.UTC))
-                        .truncateWithLimits()
-                this.wasLevelMetadataLoaded = true
-            }
-        }
 
         val blocksObj = json.get("blocks").asArray()
         val instantiators = Instantiators.instantiatorMap
@@ -604,13 +596,15 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
             engine.musicData.update()
         }
 
-        return LoadMetadata(this, containerVersion, programVersion, customTexturePackRead, isProject, levelUUID)
+        return LoadMetadata(this, libraryRelevantData, customTexturePackRead)
     }
 
-    data class LoadMetadata(val container: Container, val containerVersion: Int, val programVersion: Version?,
-                            val customTexturePackRead: CustomTexturePack.ReadResult?,
-                            val isProject: Boolean, val levelUUID: UUID?) {
-        val isFutureVersion: Boolean = (programVersion != null && programVersion > PRMania.VERSION) || (containerVersion > CONTAINER_VERSION)
+    data class LoadMetadata(val container: Container, val libraryRelevantData: LibraryRelevantData,
+                            val customTexturePackRead: CustomTexturePack.ReadResult?) {
+        
+        val containerVersion: Int = libraryRelevantData.containerVersion
+        val programVersion: Version = libraryRelevantData.programVersion
+        val isFutureVersion: Boolean = (programVersion > PRMania.VERSION) || (containerVersion > CONTAINER_VERSION)
 
         /**
          * Must be called on the GL thread.

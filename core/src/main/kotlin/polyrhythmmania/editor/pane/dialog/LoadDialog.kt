@@ -159,7 +159,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     fun prepareShow(dropPath: String?): LoadDialog {
         if (dropPath == null) {
-            descLabel.text.set(Localization.getValue("editor.dialog.load.desc"))
+            descLabel.text.set(Localization.getValue("editor.dialog.load.desc", ".${Container.PROJECT_FILE_EXTENSION}", ".${Container.LEVEL_FILE_EXTENSION}"))
             substate.set(Substate.PICKING_OPTION)
         } else {
             val file = File(dropPath)
