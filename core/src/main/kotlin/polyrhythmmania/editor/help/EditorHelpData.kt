@@ -1,6 +1,7 @@
 package polyrhythmmania.editor.help
 
 import com.badlogic.gdx.utils.Align
+import paintbox.ui.area.Insets
 
 
 object EditorHelpData {
@@ -43,36 +44,40 @@ class EditorHelpDocControls : HelpDocument(
                 LayerParagraph("editorHelp.controls.pp2", 60f),
                 LayerParagraph("editorHelp.controls.heading.general", 20f),
                 LayerCol2(
-                        LayerParagraph("editorHelp.controls.keybinds.general.keys", 520f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.general.keys", 520f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
                         LayerParagraph("editorHelp.controls.keybinds.general.desc", 520f),
                         leftProportion = 0.275f
                 ),
                 LayerParagraph("editorHelp.controls.heading.selectionTool", 20f),
                 LayerCol2(
-                        LayerParagraph("editorHelp.controls.keybinds.selectionTool.keys", 220f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.selectionTool.keys", 220f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
                         LayerParagraph("editorHelp.controls.keybinds.selectionTool.desc", 220f),
                         leftProportion = 0.275f
                 ),
                 LayerParagraph("editorHelp.controls.heading.tempoChangeTool", 20f),
                 LayerCol2(
-                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.keys", 120f, renderAlign = Align.topRight),
-                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.desc", 120f),
+                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.keys", 140f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
+                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.desc", 140f),
                         leftProportion = 0.275f
                 ),
                 LayerParagraph("editorHelp.controls.heading.musicVolumeTool", 20f),
                 LayerCol2(
-                        LayerParagraph("editorHelp.controls.keybinds.musicVolumeTool.keys", 100f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.musicVolumeTool.keys", 100f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
                         LayerParagraph("editorHelp.controls.keybinds.musicVolumeTool.desc", 100f),
                         leftProportion = 0.275f
                 ),
                 LayerParagraph("editorHelp.controls.heading.timeSigTool", 20f),
                 LayerCol2(
-                        LayerParagraph("editorHelp.controls.keybinds.timeSigTool.keys", 100f, renderAlign = Align.topRight),
+                        LayerParagraph("editorHelp.controls.keybinds.timeSigTool.keys", 100f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
                         LayerParagraph("editorHelp.controls.keybinds.timeSigTool.desc", 100f),
                         leftProportion = 0.275f
                 ),
         )
-)
+) {
+    companion object {
+        private val keybindsKeysPadding: Insets = Insets(4f, 4f, 8f, 0f)
+    }
+}
 
 class EditorHelpDocGlossary : HelpDocument(
         "editorHelp.glossary.title",

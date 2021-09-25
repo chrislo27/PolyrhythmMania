@@ -2,6 +2,7 @@ package polyrhythmmania.editor.help
 
 import com.badlogic.gdx.utils.Align
 import paintbox.font.TextAlign
+import paintbox.ui.area.Insets
 
 
 /**
@@ -16,7 +17,8 @@ class LayerTitle(val text: String) : Layer(), LayerFixedHeight
 
 class LayerParagraph(val text: String, val allocatedHeight: Float,
                      val renderAlign: Int = Align.topLeft,
-                     val textAlign: TextAlign = TextAlign.fromInt(renderAlign))
+                     val textAlign: TextAlign = TextAlign.fromInt(renderAlign),
+                     val padding: Insets? = null)
     : Layer(), LayerFixedHeight
 
 class LayerVbox(val layers: List<Layer>) : Layer(), LayerSizesToChildren

@@ -224,7 +224,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                     this.textAlign.set(layer.textAlign)
                     this.textColor.set(Color.WHITE)
                     this.doLineWrapping.set(true)
-                    this.padding.set(Insets(4f, 4f, 8f, 8f))
+                    this.padding.set(layer.padding ?: Insets(4f, 4f, 8f, 8f))
                     this.bounds.height.set(layer.allocatedHeight)
                 }
             }
