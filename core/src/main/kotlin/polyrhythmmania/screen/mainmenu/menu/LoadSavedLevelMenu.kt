@@ -253,8 +253,9 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         Gdx.app.postRunnable {
             main.restoreForExternalDialog { completionCallback ->
                 thread(isDaemon = true) {
-                    val title = Localization.getValue("fileChooser.load.title")
-                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.filter"), listOf("*.${Container.FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                    val title = Localization.getValue("fileChooser.load.level.title")
+                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.level.filter"),
+                            listOf("*.${Container.LEVEL_FILE_EXTENSION}")).copyWithExtensionsInDesc()
                     TinyFDWrapper.openFile(title,
                             main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_PLAY_SAVED_LEVEL)
                                     ?: main.getDefaultDirectory(), filter) { file: File? ->

@@ -15,6 +15,8 @@ import paintbox.binding.Var
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
+import polyrhythmmania.container.manifest.ResourceTag
+import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackID
 import polyrhythmmania.editor.block.*
@@ -57,7 +59,8 @@ import java.util.zip.ZipOutputStream
 class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Disposable {
 
     companion object {
-        const val FILE_EXTENSION: String = "prmania"
+        const val LEVEL_FILE_EXTENSION: String = "prmania"
+        const val PROJECT_FILE_EXTENSION: String = "prmproj"
         const val CONTAINER_VERSION: Int = 10
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
@@ -216,7 +219,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     /**
      * Writes the [Container] to a file.
      */
-    fun writeToFile(file: File, isAutosave: Boolean) {
+    fun writeToFile(file: File, saveOptions: SaveOptions) {
         if (!file.exists()) {
             file.createNewFile()
         } else {
@@ -230,7 +233,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
         val jsonObj: JsonObject = Json.`object`()
         jsonObj.add("containerVersion", CONTAINER_VERSION)
         jsonObj.add("programVersion", PRMania.VERSION.toString())
-        jsonObj.add("isAutosave", isAutosave)
+        jsonObj.add("isAutosave", saveOptions.isAutosave)
         jsonObj.add("resources", Json.`object`().also { obj ->
             obj.add("list", Json.array().also { array ->
                 extResMap.forEach { (res, uuid) ->
@@ -406,12 +409,10 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
 
         val containerVersion: Int = json.getInt("containerVersion", 0)
         val programVersion: Version? = Version.parse(json.getString("programVersion", null))
-
-        data class Res(val key: String, val uuid: String, val ext: String)
         
-        val resourcesMap: Map<String, Res> = json.get("resources").asObject().get("list").asArray().associate { value ->
+        val resourcesMap: Map<String, ResourceTag> = json.get("resources").asObject().get("list").asArray().associate { value ->
             value as JsonObject
-            val res = Res(value.getString("key", null), value.getString("uuid", null)!!, value.getString("ext", "tmp"))
+            val res = ResourceTag(value.getString("key", null), value.getString("uuid", null)!!, value.getString("ext", "tmp"))
             Pair(res.key, res)
         }
         val engineObj = json.get("engine").asObject()

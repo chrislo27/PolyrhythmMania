@@ -32,6 +32,7 @@ import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.block.*
 import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.music.EditorMusicData
@@ -317,13 +318,13 @@ class Editor(val main: PRManiaGame)
                             val file: File = if (currentSaveLoc != null) {
                                 val suffix = ".autosave"
                                 val max = 64 // Doesn't include the container extension
-                                val newfilename = currentSaveLoc.nameWithoutExtension.take(max - suffix.length) + suffix + "." + Container.FILE_EXTENSION
+                                val newfilename = currentSaveLoc.nameWithoutExtension.take(max - suffix.length) + suffix + "." + Container.PROJECT_FILE_EXTENSION
                                 currentSaveLoc.resolveSibling(newfilename)
                             } else {
                                 getRecoveryFile(true)
                             }
                             try {
-                                container.writeToFile(file, true)
+                                container.writeToFile(file, SaveOptions.EDITOR_AUTOSAVE)
                                 Paintbox.LOGGER.debug("Autosave completed (interval: $autosaveIntervalMin min, filename: ${file.name})")
                                 Gdx.app.postRunnable {
                                     lastAutosaveTimeMs.set(System.currentTimeMillis())
@@ -359,7 +360,7 @@ class Editor(val main: PRManiaGame)
         val now = LocalDate.now()
         val date = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ROOT))
         fun file(num: Int): File {
-            return PRMania.RECOVERY_FOLDER.resolve("recovery_${date}${if (midfix.isNotEmpty()) "_${midfix}" else ""}${if (num > 0) "_$num" else ""}.${Container.FILE_EXTENSION}")
+            return PRMania.RECOVERY_FOLDER.resolve("recovery_${date}${if (midfix.isNotEmpty()) "_${midfix}" else ""}${if (num > 0) "_$num" else ""}.${Container.PROJECT_FILE_EXTENSION}")
         }
         var num = 0
         var lastFile = file(0)
@@ -1281,15 +1282,14 @@ endBlockPos: ${container.endBlockPosition.get()}
         if (files == null || files.isEmpty()) return
 
         val firstPath = files.first()
-        val currentDialog: UIElement? = sceneRoot.getCurrentRootDialog()
-        when (currentDialog) {
+        when (val currentDialog: UIElement? = sceneRoot.getCurrentRootDialog()) {
             is MusicDialog -> {
                 if (MusicDialog.SUPPORTED_MUSIC_EXTENSIONS.any { firstPath.endsWith(it.substring(1)) }) {
                     currentDialog.attemptSelectMusic(firstPath)
                 }
             }
             else -> {
-                if (firstPath.endsWith(".${Container.FILE_EXTENSION}")) {
+                if (firstPath.endsWith(".${Container.PROJECT_FILE_EXTENSION}") || firstPath.endsWith(".${Container.LEVEL_FILE_EXTENSION}")) {
                     attemptLoad(firstPath)
                 }
             }

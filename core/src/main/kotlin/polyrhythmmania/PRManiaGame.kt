@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
@@ -35,6 +34,7 @@ import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.engine.input.InputThresholds
@@ -44,15 +44,11 @@ import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.sidemodes.SidemodeAssets
-import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
 import polyrhythmmania.util.TempFileUtils
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
@@ -181,7 +177,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 val recoveryFile = editor.getRecoveryFile(overwrite = false)
                 val container = editor.container
                 try {
-                    container.writeToFile(recoveryFile, true)
+                    container.writeToFile(recoveryFile, SaveOptions.SHUTDOWN_RECOVERY)
                     Paintbox.LOGGER.info("Shutdown hook recovery completed (filename: ${recoveryFile.name})")
                 } catch (e: Exception) {
                     Paintbox.LOGGER.warn("Shutdown hook recovery failed! filename: ${recoveryFile.name}")
@@ -226,7 +222,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         try {
             val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
             PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->
-                f != null && f.isFile && f.extension == Container.FILE_EXTENSION && f.lastModified() < expiry
+                val ext = f.extension
+                f != null && f.isFile && (ext == Container.PROJECT_FILE_EXTENSION || ext == Container.LEVEL_FILE_EXTENSION) && f.lastModified() < expiry
             }?.forEach { 
                 it.delete()
                 Paintbox.LOGGER.info("Deleted old recovery file ${it.name}, lastModified() = ${it.lastModified()}, limit=$expiry")
@@ -346,7 +343,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 val recoveryFile = editor.getRecoveryFile(overwrite = false, midfix = "crash")
                 val container = editor.container
                 try {
-                    container.writeToFile(recoveryFile, true)
+                    container.writeToFile(recoveryFile, SaveOptions.CRASH_RECOVERY)
                     Paintbox.LOGGER.info("Crash recovery completed (filename: ${recoveryFile.name})")
                 } catch (e: Exception) {
                     Paintbox.LOGGER.warn("Crash recovery failed! filename: ${recoveryFile.name}")

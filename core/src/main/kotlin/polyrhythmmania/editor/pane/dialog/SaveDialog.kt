@@ -17,6 +17,7 @@ import paintbox.util.TinyFDWrapper
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.util.TempFileUtils
 import java.io.File
@@ -87,17 +88,17 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             substate.set(Substate.FILE_DIALOG_OPEN)
             editorPane.main.restoreForExternalDialog { completionCallback ->
                 thread(isDaemon = true) {
-                    val title = Localization.getValue("fileChooser.save.title")
-                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.save.filter"), listOf("*.${Container.FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                    val title = Localization.getValue("fileChooser.save.project.title")
+                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.save.project.filter"), listOf("*.${Container.PROJECT_FILE_EXTENSION}")).copyWithExtensionsInDesc()
                     TinyFDWrapper.saveFile(title,
                             lastSaveLoc
                                     ?: (main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE)
-                                    ?: main.getDefaultDirectory()).resolve("level.${Container.FILE_EXTENSION}"), filter) { file: File? ->
+                                    ?: main.getDefaultDirectory()).resolve("level.${Container.PROJECT_FILE_EXTENSION}"), filter) { file: File? ->
                         completionCallback()
                         if (file != null) {
                             val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
-                            val fileWithCorrectExt = if (!file.extension.equals(Container.FILE_EXTENSION, ignoreCase = true))
-                                    (File(file.absolutePath + ".${Container.FILE_EXTENSION}"))
+                            val fileWithCorrectExt = if (!file.extension.equals(Container.PROJECT_FILE_EXTENSION, ignoreCase = true))
+                                    (File(file.absolutePath + ".${Container.PROJECT_FILE_EXTENSION}"))
                             else file
                             
                             Gdx.app.postRunnable {
@@ -131,7 +132,7 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             
             editor.compileEditorIntermediates()
 
-            editor.container.writeToFile(newFile, false)
+            editor.container.writeToFile(newFile, SaveOptions.EDITOR_SAVE_AS_PROJECT)
             lastSaveLoc = newFile
             firstTime = false
 

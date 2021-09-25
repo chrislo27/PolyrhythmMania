@@ -138,8 +138,9 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         substate.set(Substate.FILE_DIALOG_OPEN)
         editorPane.main.restoreForExternalDialog { completionCallback ->
             thread(isDaemon = true) {
-                val title = Localization.getValue("fileChooser.load.title")
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.filter"), listOf("*.${Container.FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                val title = Localization.getValue("fileChooser.load.either.title")
+                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.either.filter"),
+                        listOf("*.${Container.PROJECT_FILE_EXTENSION}", "*.${Container.LEVEL_FILE_EXTENSION}")).copyWithExtensionsInDesc()
                 TinyFDWrapper.openFile(title, dir, filter) { file: File? ->
                     completionCallback()
                     if (file != null) {

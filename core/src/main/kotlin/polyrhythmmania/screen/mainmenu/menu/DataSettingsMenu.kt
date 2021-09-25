@@ -65,7 +65,8 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 Gdx.app.postRunnable {
                     try {
                         PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->
-                            f != null && f.isFile && f.extension == Container.FILE_EXTENSION
+                            val ext = f.extension
+                            f != null && f.isFile && (ext == Container.PROJECT_FILE_EXTENSION || ext == Container.LEVEL_FILE_EXTENSION)
                         }?.forEach {
                             it.delete()
                             Paintbox.LOGGER.info("Deleted recovery file ${it.name}, lastModified() = ${it.lastModified()}")
