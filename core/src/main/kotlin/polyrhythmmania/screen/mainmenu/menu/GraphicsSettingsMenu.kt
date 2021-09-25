@@ -16,6 +16,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.world.render.ForceTexturePack
 import kotlin.math.roundToInt
 
 
@@ -24,7 +25,7 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private val settings: Settings = menuCol.main.settings
 
     init {
-        this.setSize(MMMenu.WIDTH_MID)
+        this.setSize(MMMenu.WIDTH_MEDIUM)
         this.titleText.bind { Localization.getVar("mainMenu.videoSettings.title").use() }
         this.contentPane.bounds.height.set(300f)
 
@@ -62,12 +63,29 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         
 
         vbox.temporarilyDisableLayouts {
-            val (flipPane, flipCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.mainMenuFlipAnimation").use() })
+            val (flipPane, flipCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.mainMenuFlipAnimation").use() })
             flipCheck.selectedState.set(main.settings.mainMenuFlipAnimation.getOrCompute())
             flipCheck.onCheckChanged = {
                 main.settings.mainMenuFlipAnimation.set(it)
             }
             vbox += flipPane
+
+            val (forceTPPane, forceTPCombobox) = createComboboxOption(ForceTexturePack.VALUES, main.settings.forceTexturePack.getOrCompute(),
+                    { Localization.getVar("mainMenu.graphicsSettings.forceTexturePack").use() },
+                    percentageContent = 0.4f, itemToString = { choice ->
+                Localization.getValue("mainMenu.graphicsSettings.forceTexturePack.${
+                    when (choice) {
+                        ForceTexturePack.NO_FORCE -> "noForce"
+                        ForceTexturePack.FORCE_GBA -> "forceGBA"
+                        ForceTexturePack.FORCE_HD -> "forceHD"
+                    }
+                }")
+            })
+            forceTPCombobox.selectedItem.addListener { 
+                main.settings.forceTexturePack.set(it.getOrCompute())
+            }
+            forceTPPane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceTexturePack.tooltip")))
+            vbox += forceTPPane
         }
 
         hbox.temporarilyDisableLayouts {

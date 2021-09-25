@@ -295,6 +295,18 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
         return settingsOptionPane to cycle
     }
+
+    protected fun <T> createComboboxOption(items: List<T>, firstItem: T,
+                                           labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
+                                           percentageContent: Float = 0.5f, twoRowsTall: Boolean = false,
+                                           itemToString: (T) -> String = { it.toString() }): Pair<SettingsOptionPane, ComboBox<T>> {
+        val settingsOptionPane = createSettingsOption(labelText, font, percentageContent, twoRowsTall = twoRowsTall)
+        val combobox = ComboBox<T>(items, firstItem, font)
+        combobox.itemStringConverter.set(itemToString)
+        settingsOptionPane.content += combobox
+
+        return settingsOptionPane to combobox
+    }
     
     protected fun createSidemodeLongButton(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
                                            challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,

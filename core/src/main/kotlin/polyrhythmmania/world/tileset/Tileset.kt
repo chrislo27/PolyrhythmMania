@@ -1,6 +1,7 @@
 package polyrhythmmania.world.tileset
 
 import com.badlogic.gdx.graphics.Color
+import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 
 
@@ -12,7 +13,7 @@ import paintbox.binding.Var
  * Colours presets are handled in containers called [TilesetPalette]s.
  * A [TilesetPalette] can be applied to a [Tileset].
  */
-class Tileset(val texturePack: Var<TexturePack>) {
+class Tileset(val texturePack: ReadOnlyVar<TexturePack>) {
 
     companion object {
         private fun mapRodTexture(parent: TintedRegion, count: Int, col: Int): List<TintedSubregion> {

@@ -32,6 +32,7 @@ import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.block.*
 import polyrhythmmania.editor.help.HelpDialog
@@ -55,6 +56,7 @@ import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
+import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
 import java.time.LocalDate
@@ -102,7 +104,8 @@ class Editor(val main: PRManiaGame)
         Gdx.app.postRunnable { throw it }
         true
     } //soundSystem
-    val container: Container = Container(this.soundSystem, this.timing)
+    val container: Container = Container(this.soundSystem, this.timing,
+            GlobalContainerSettings(forceTexturePack = ForceTexturePack.NO_FORCE))
 
     val world: World get() = container.world
     val engine: Engine get() = container.engine

@@ -23,6 +23,7 @@ import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.block.BlockEndState
@@ -291,7 +292,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 throw it
             }
             true
-        })
+        }, GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute()))
 
         try {
             val loadMetadata = newContainer.readFromFile(newFile)

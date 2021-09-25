@@ -21,6 +21,7 @@ import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
+import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TEXTURE_PACK
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_LOCALE
@@ -42,6 +43,7 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.world.render.ForceTexturePack
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
@@ -70,6 +72,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_calibrationDisableInputSFX: KeyValue<Boolean> = KeyValue(SETTINGS_CALIBRATION_DISABLE_INPUT_SFX, false)
     private val kv_vsyncEnabled: KeyValue<Boolean> = KeyValue(SETTINGS_VSYNC, true)
     private val kv_maxFramerate: KeyValue<Int> = KeyValue(SETTINGS_MAX_FPS, 60)
+    private val kv_forceTexturePack: KeyValue<ForceTexturePack> = KeyValue(SETTINGS_FORCE_TEXTURE_PACK, ForceTexturePack.NO_FORCE)
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
     val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, true)
@@ -103,6 +106,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val calibrationDisableInputSFX: Var<Boolean> = kv_calibrationDisableInputSFX.value
     val vsyncEnabled: Var<Boolean> = kv_vsyncEnabled.value
     val maxFramerate: Var<Int> = kv_maxFramerate.value
+    val forceTexturePack: Var<ForceTexturePack> = kv_forceTexturePack.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
@@ -146,6 +150,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_calibrationDisableInputSFX)
         prefs.getBoolean(kv_vsyncEnabled)
         prefs.getIntCoerceIn(kv_maxFramerate, 0, 1000)
+        prefs.getForceTexturePack(kv_forceTexturePack)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
@@ -183,6 +188,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_calibrationDisableInputSFX)
                 .putBoolean(kv_vsyncEnabled)
                 .putInt(kv_maxFramerate)
+                .putForceTexturePack(kv_forceTexturePack)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)
@@ -367,6 +373,19 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private fun Preferences.putLocalDate(kv: KeyValue<LocalDate>): Preferences {
         val prefs: Preferences = this
         return prefs.putString(kv.key, kv.value.getOrCompute().format(DateTimeFormatter.ISO_DATE))
+    }
+    
+    private fun Preferences.getForceTexturePack(kv: KeyValue<ForceTexturePack>) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            val i = prefs.getInteger(kv.key, ForceTexturePack.NO_FORCE.jsonId)
+            kv.value.set(ForceTexturePack.JSON_MAP[i] ?: ForceTexturePack.NO_FORCE)
+        }
+    }
+
+    private fun Preferences.putForceTexturePack(kv: KeyValue<ForceTexturePack>): Preferences {
+        val prefs: Preferences = this
+        return prefs.putInteger(kv.key, kv.value.getOrCompute().jsonId)
     }
 
     private fun Preferences.getDailyChallenge(kv: KeyValue<DailyChallengeScore>) {

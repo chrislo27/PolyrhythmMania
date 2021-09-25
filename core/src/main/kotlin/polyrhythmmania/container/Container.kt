@@ -35,6 +35,7 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldSettings
+import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.*
 import java.io.File
@@ -57,7 +58,9 @@ import java.util.zip.ZipOutputStream
  *
  * There are also pre-defined external resources as a utility.
  */
-class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Disposable {
+class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
+                val globalSettings: GlobalContainerSettings)
+    : Disposable {
 
     companion object {
         const val LEVEL_FILE_EXTENSION: String = "prmania"
@@ -80,7 +83,11 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider) : Dis
     val customTexturePack: Var<CustomTexturePack?> = Var(null)
     val texturePackSource: Var<TexturePackSource> = Var(TexturePackSource.STOCK_GBA)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(texturePack).apply { 
+        WorldRenderer(world, Tileset(when (globalSettings.forceTexturePack) {
+            ForceTexturePack.NO_FORCE -> this.texturePack
+            ForceTexturePack.FORCE_GBA -> Var(StockTexturePacks.gba)
+            ForceTexturePack.FORCE_HD -> Var(StockTexturePacks.hd)
+        }).apply { 
             world.tilesetPalette.applyTo(this)
         }, engine)
     }

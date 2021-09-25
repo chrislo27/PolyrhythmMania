@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Disposable
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
@@ -23,7 +24,7 @@ abstract class SideMode(val main: PRManiaGame) : Disposable {
         }
         true
     }
-    val container: Container = Container(soundSystem, timingProvider)
+    val container: Container = Container(soundSystem, timingProvider, createGlobalContainerSettings())
 
     val engine: Engine = container.engine
     val world: World = engine.world
@@ -39,6 +40,10 @@ abstract class SideMode(val main: PRManiaGame) : Disposable {
      * Implementors should set up music and other long-load items here.
      */
     protected abstract fun initialize()
+
+    protected open fun createGlobalContainerSettings(): GlobalContainerSettings {
+        return GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute())
+    }
 
     override fun dispose() {
         container.disposeQuietly()

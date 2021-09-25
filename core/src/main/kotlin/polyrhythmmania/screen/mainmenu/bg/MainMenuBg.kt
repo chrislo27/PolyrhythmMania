@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.screen.mainmenu.EntityAsmWidgetHovering
 import polyrhythmmania.screen.mainmenu.EntityCubeHovering
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
@@ -16,6 +17,7 @@ import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.entity.EntityCube
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityPlatform
+import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.WorldRenderer
 
 
@@ -24,7 +26,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) {
     private val container: Container = Container(null, SimpleTimingProvider { 
         Gdx.app.postRunnable { throw it } 
         false
-    })
+    }, GlobalContainerSettings(ForceTexturePack.FORCE_GBA))
     private val gradientStart: Color = Color(0f, 32f / 255f, 55f / 255f, 1f)
     private val gradientEnd: Color = Color.BLACK.cpy()
     

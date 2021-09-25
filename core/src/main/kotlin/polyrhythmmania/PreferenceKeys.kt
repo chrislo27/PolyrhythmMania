@@ -29,6 +29,7 @@ object PreferenceKeys {
     val SETTINGS_CALIBRATION_DISABLE_INPUT_SFX = "settings_calibration_disableInputSFX"
     val SETTINGS_VSYNC = "settings_vsync"
     val SETTINGS_MAX_FPS = "settings_max_framerate"
+    val SETTINGS_FORCE_TEXTURE_PACK = "settings_forceTexturePack"
     
     val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
     val EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE = "editorsettings_camera_pan_on_drag_edge"

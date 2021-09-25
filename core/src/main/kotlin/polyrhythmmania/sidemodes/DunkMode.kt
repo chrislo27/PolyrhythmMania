@@ -2,6 +2,8 @@ package polyrhythmmania.sidemodes
 
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.GlobalContainerSettings
+import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
@@ -12,6 +14,7 @@ import polyrhythmmania.world.DunkWorldBackground
 import polyrhythmmania.world.EntityRodDunk
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldType
+import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.tileset.StockTexturePacks
 
 
@@ -22,7 +25,11 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         container.world.worldMode = WorldMode(WorldType.DUNK, true)
         container.engine.inputter.endlessScore.maxLives.set(5)
         container.renderer.worldBackground = DunkWorldBackground
-        container.renderer.tileset.texturePack.set(StockTexturePacks.gba)
+        container.texturePackSource.set(TexturePackSource.STOCK_GBA)
+    }
+    
+    override fun createGlobalContainerSettings(): GlobalContainerSettings {
+        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA)
     }
     
     override fun initialize() {

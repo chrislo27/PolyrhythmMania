@@ -5,6 +5,8 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.GlobalContainerSettings
+import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
@@ -20,6 +22,7 @@ import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
+import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.*
@@ -34,7 +37,7 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         container.renderer.showEndlessModeScore.set(false)
 //        container.engine.inputter.endlessScore.maxLives.set(3)
         container.renderer.worldBackground = AssembleWorldBackground
-        container.renderer.tileset.texturePack.set(StockTexturePacks.gba)
+        container.texturePackSource.set(TexturePackSource.STOCK_GBA)
         TilesetPalette.createAssembleTilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         container.renderer.flashHudRedWhenLifeLost.set(true)
@@ -47,6 +50,10 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
                 Localization.getValue("play.results.assemble.superb1"),
                 Localization.getValue("play.results.assemble.superb2"),
         )
+    }
+
+    override fun createGlobalContainerSettings(): GlobalContainerSettings {
+        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA)
     }
 
     override fun initialize() {
