@@ -146,7 +146,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
     private fun getScrollAmount(scrollDirection: Int, ctrl: Boolean, shift: Boolean, alt: Boolean): Float {
         if (scrollDirection == 0) return 0f
         if (alt) return 0f
-        return -scrollDirection.sign * (if (ctrl && shift) 0.05f else if (ctrl) 0.1f else if (shift) 5f else 1f)
+        return -scrollDirection.sign * (if (ctrl && shift) 0.05f else if (ctrl) 0.01f else if (shift) 5f else 1f)
     }
 
     private inline fun createInputListener(crossinline onScroll: (amt: Float) -> Unit): InputEventListener {
