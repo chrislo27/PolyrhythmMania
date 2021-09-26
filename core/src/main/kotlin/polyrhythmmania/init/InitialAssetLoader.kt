@@ -59,6 +59,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("menubar_export_base", "textures/ui/icon/menubar/export_base.png"),
                 Packable("menubar_import", "textures/ui/icon/menubar/import.png"),
                 Packable("menubar_trash", "textures/ui/icon/menubar/trash.png"),
+                Packable("menubar_export_as_level", "textures/ui/icon/menubar/export_as_level.png"),
                 Packable("arrow_long", "textures/ui/icon/arrow/arrow_long.png"),
                 Packable("arrow_long_empty", "textures/ui/icon/arrow/arrow_long_empty.png"),
                 Packable("arrow_long_semi", "textures/ui/icon/arrow/arrow_long_semi.png"),
