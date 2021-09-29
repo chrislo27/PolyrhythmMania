@@ -5,10 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
-import paintbox.ui.control.CheckBox
-import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
-import paintbox.ui.control.Slider
+import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.WindowSize
@@ -23,7 +20,7 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     private val settings: Settings = menuCol.main.settings
 
-    val resolutionCycle: CycleControl<WindowSize>
+    val resolutionCombobox: ComboBox<WindowSize>
     val fullscreenCheck: CheckBox
     private val minimumMaxFps: Int = 30
     private val maximumMaxFps: Int = 360
@@ -86,9 +83,9 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         val resolutionsList = PRMania.commonResolutions.toList()
-        val (resolutionPane, resolutionCycle) = createCycleOption(resolutionsList, resolutionsList[1],
+        val (resolutionPane, resolutionCombobox) = createComboboxOption(resolutionsList, resolutionsList[1],
                 { Localization.getVar("mainMenu.videoSettings.windowedResolution").use() })
-        this.resolutionCycle = resolutionCycle
+        this.resolutionCombobox = resolutionCombobox
 
         val (fullscreenPane, fullscreenCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.fullscreen").use() })
         this.fullscreenCheck = fullscreenCheck
@@ -125,7 +122,7 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setOnAction {
                     val graphics = Gdx.graphics
                     val useFullscreen = fullscreenCheck.checkedState.getOrCompute()
-                    val res = resolutionCycle.currentItem.getOrCompute()
+                    val res = resolutionCombobox.selectedItem.getOrCompute()
                     if (useFullscreen) {
                         graphics.setFullscreenMode(graphics.displayMode)
                     } else {
@@ -146,8 +143,8 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 val graphics = Gdx.graphics
                 val defaultWindowSize = PRMania.DEFAULT_SIZE
                 fullscreenCheck.checkedState.set(false)
-                val resList = resolutionCycle.list
-                resolutionCycle.currentItem.set(resList.first { it == defaultWindowSize })
+                val resList = resolutionCombobox.items.getOrCompute()
+                resolutionCombobox.selectedItem.set(resList.first { it == defaultWindowSize })
                 
                 graphics.setWindowedMode(defaultWindowSize.width, defaultWindowSize.height)
 
@@ -158,15 +155,15 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
 
     fun prepareShow() {
-        val resList = resolutionCycle.list
+        val resList = resolutionCombobox.items.getOrCompute()
         val savedWidth = settings.windowedResolution.getOrCompute().width
         val closestIndex = resList.binarySearch { it.width.compareTo(savedWidth) }
         if (closestIndex >= 0) {
             // Found exact match
-            resolutionCycle.currentItem.set(resList[closestIndex])
+            resolutionCombobox.selectedItem.set(resList[closestIndex])
         } else {
             // Closest index is "inverted insertion index" (-insertionPoint - 1)
-            resolutionCycle.currentItem.set(resList[(-(closestIndex + 1)).coerceIn(0, resList.size - 1)])
+            resolutionCombobox.selectedItem.set(resList[(-(closestIndex + 1)).coerceIn(0, resList.size - 1)])
         }
         fullscreenCheck.checkedState.set(Gdx.graphics.isFullscreen)
     }
