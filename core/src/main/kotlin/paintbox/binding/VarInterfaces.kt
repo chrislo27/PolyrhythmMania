@@ -1,7 +1,7 @@
 package paintbox.binding
 
 
-interface ReadOnlyVar<T> {
+interface ReadOnlyVar<out T> {
 
     /**
      * Gets (and computes if necessary) the value represented by this [ReadOnlyVar].
@@ -61,12 +61,11 @@ interface Var<T> : ReadOnlyVar<T> {
     }
 
     class Context {
-        val dependencies: MutableSet<ReadOnlyVar<Any>> = LinkedHashSet(2)
+        val dependencies: MutableSet<ReadOnlyVar<Any?>> = LinkedHashSet(2)
 
-        @Suppress("UNCHECKED_CAST")
         @JvmName("use")
         fun <R> use(varr: ReadOnlyVar<R>): R {
-            dependencies += (varr as ReadOnlyVar<Any>)
+            dependencies += varr
             return varr.getOrCompute()
         }
 
@@ -92,9 +91,8 @@ interface Var<T> : ReadOnlyVar<T> {
         }
         
         // The float specialization method. Returns a primitive float.
-        @Suppress("UNCHECKED_CAST")
         fun ReadOnlyFloatVar.useF(): Float {
-            dependencies += (this as ReadOnlyVar<Any>)
+            dependencies += this
             return this.get()
         }
     }

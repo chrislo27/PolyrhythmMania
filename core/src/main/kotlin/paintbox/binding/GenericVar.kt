@@ -12,11 +12,15 @@ class GenericVar<T> : Var<T> {
     private var binding: GenericBinding<T>
     private var invalidated: Boolean = true // Used for Compute and SideEffecting bindings
     private var currentValue: T? = null
-    private var dependencies: Set<ReadOnlyVar<Any>> = emptySet()
+    private var dependencies: Set<ReadOnlyVar<Any?>> = emptySet() // Cannot be generic since it can depend on any other Var
 
     private var listeners: Set<VarChangedListener<T>> = emptySet()
 
-    private val invalidationListener: VarChangedListener<Any> = InvalListener(this as GenericVar<Any>)
+    /**
+     * This is intentionally generic type Any? so further unchecked casts are avoided when it is used
+     */
+    @Suppress("UNCHECKED_CAST")
+    private val invalidationListener: VarChangedListener<Any?> = (InvalListener(this) as VarChangedListener<Any?>)
 
     @Suppress("UNCHECKED_CAST")
     constructor(item: T) {
@@ -82,7 +86,7 @@ class GenericVar<T> : Var<T> {
     override fun getOrCompute(): T {
         return when (val binding = this.binding) {
             is GenericBinding.Const ->
-                @Suppress("UNCHECKED_CAST") (currentValue as T)
+                @Suppress("UNCHECKED_CAST") (currentValue as T) // Cannot be currentValue!! since the actual type of T may be nullable
             is GenericBinding.Compute -> {
                 if (!invalidated) {
                     @Suppress("UNCHECKED_CAST") (currentValue as T)
@@ -139,10 +143,14 @@ class GenericVar<T> : Var<T> {
         return getOrCompute().toString()
     }
 
-    private class InvalListener(v: GenericVar<Any>) : VarChangedListener<Any> {
-        val weakRef: WeakReference<GenericVar<Any>> = WeakReference(v)
+    /**
+     * Cannot be inner for garbage collection reasons! We are avoiding an explicit strong reference to the parent Var
+     */
+    private class InvalListener<T>(v: GenericVar<T>) : VarChangedListener<T> {
+        val weakRef: WeakReference<GenericVar<T>> = WeakReference(v)
         var disposeMe: Boolean = false
-        override fun onChange(v: ReadOnlyVar<Any>) {
+        
+        override fun onChange(v: ReadOnlyVar<T>) {
             val parent = weakRef.get()
             if (!disposeMe && parent != null) {
                 if (!parent.invalidated) {

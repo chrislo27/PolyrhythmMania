@@ -36,11 +36,15 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
     private var binding: FloatBinding
     private var invalidated: Boolean = true // Used for Compute and SideEffecting bindings
     private var currentValue: Float = 0f
-    private var dependencies: Set<ReadOnlyVar<Any>> = emptySet()
+    private var dependencies: Set<ReadOnlyVar<Any?>> = emptySet() // Cannot be generic since it can depend on any other Var
 
     private var listeners: Set<VarChangedListener<Float>> = emptySet()
 
-    private val invalidationListener: VarChangedListener<Any> = InvalListener(this) as VarChangedListener<Any>
+    /**
+     * This is intentionally generic type Any? so further unchecked casts are avoided when it is used
+     */
+    @Suppress("UNCHECKED_CAST")
+    private val invalidationListener: VarChangedListener<Any?> = (InvalListener(this) as VarChangedListener<Any?>)
 
     constructor(item: Float) {
         binding = FloatBinding.Const
