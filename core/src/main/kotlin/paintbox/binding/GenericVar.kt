@@ -25,7 +25,7 @@ class GenericVar<T> : Var<T> {
     @Suppress("UNCHECKED_CAST")
     constructor(item: T) {
         currentValue = item
-        binding = GenericBinding.Const as GenericBinding<T>
+        binding = GenericBinding.Const
     }
 
     constructor(computation: Var.Context.() -> T) {
@@ -63,7 +63,7 @@ class GenericVar<T> : Var<T> {
         }
         reset()
         currentValue = item
-        binding = GenericBinding.Const as GenericBinding<T>
+        binding = GenericBinding.Const
         notifyListeners()
     }
 
@@ -163,8 +163,8 @@ class GenericVar<T> : Var<T> {
         }
     }
 
-    private sealed class GenericBinding<T> {
-        object Const : GenericBinding<Any>()
+    private sealed class GenericBinding<out T> {
+        object Const : GenericBinding<Nothing>()
 
         class Compute<T>(val computation: Var.Context.() -> T) : GenericBinding<T>()
 
