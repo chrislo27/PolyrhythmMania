@@ -19,8 +19,7 @@ class GenericVar<T> : Var<T> {
     /**
      * This is intentionally generic type Any? so further unchecked casts are avoided when it is used
      */
-    @Suppress("UNCHECKED_CAST")
-    private val invalidationListener: VarChangedListener<Any?> = (InvalListener(this) as VarChangedListener<Any?>)
+    private val invalidationListener: VarChangedListener<Any?> = InvalListener(this)
 
     @Suppress("UNCHECKED_CAST")
     constructor(item: T) {
@@ -46,12 +45,12 @@ class GenericVar<T> : Var<T> {
         var anyNeedToBeDisposed = false
         listeners.forEach {
             it.onChange(this)
-            if (it is InvalListener && it.disposeMe) {
+            if (it is InvalListener<*> && it.disposeMe) {
                 anyNeedToBeDisposed = true
             }
         }
         if (anyNeedToBeDisposed) {
-            listeners = listeners.filter { it is InvalListener && it.disposeMe }.toSet()
+            listeners = listeners.filter { it is InvalListener<*> && it.disposeMe }.toSet()
         }
     }
 
@@ -146,11 +145,11 @@ class GenericVar<T> : Var<T> {
     /**
      * Cannot be inner for garbage collection reasons! We are avoiding an explicit strong reference to the parent Var
      */
-    private class InvalListener<T>(v: GenericVar<T>) : VarChangedListener<T> {
+    private class InvalListener<T>(v: GenericVar<T>) : VarChangedListener<Any?> {
         val weakRef: WeakReference<GenericVar<T>> = WeakReference(v)
         var disposeMe: Boolean = false
         
-        override fun onChange(v: ReadOnlyVar<T>) {
+        override fun onChange(v: ReadOnlyVar<Any?>) {
             val parent = weakRef.get()
             if (!disposeMe && parent != null) {
                 if (!parent.invalidated) {

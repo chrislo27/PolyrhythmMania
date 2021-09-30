@@ -43,8 +43,7 @@ class BooleanVar : ReadOnlyBooleanVar, Var<Boolean> {
     /**
      * This is intentionally generic type Any? so further unchecked casts are avoided when it is used
      */
-    @Suppress("UNCHECKED_CAST")
-    private val invalidationListener: VarChangedListener<Any?> = (InvalListener(this) as VarChangedListener<Any?>)
+    private val invalidationListener: VarChangedListener<Any?> = InvalListener(this)
 
     constructor(item: Boolean) {
         binding = BooleanBinding.Const
@@ -186,12 +185,15 @@ class BooleanVar : ReadOnlyBooleanVar, Var<Boolean> {
         this.set(newState)
         return newState
     }
-    
-    private class InvalListener(v: BooleanVar) : VarChangedListener<Boolean> {
+
+    /**
+     * Cannot be inner for garbage collection reasons! We are avoiding an explicit strong reference to the parent Var
+     */
+    private class InvalListener(v: BooleanVar) : VarChangedListener<Any?> {
         val weakRef: WeakReference<BooleanVar> = WeakReference(v)
         var disposeMe: Boolean = false
 
-        override fun onChange(v: ReadOnlyVar<Boolean>) {
+        override fun onChange(v: ReadOnlyVar<Any?>) {
             val parent = weakRef.get()
             if (!disposeMe && parent != null) {
                 if (!parent.invalidated) {

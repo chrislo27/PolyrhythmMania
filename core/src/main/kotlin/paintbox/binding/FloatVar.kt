@@ -43,8 +43,7 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
     /**
      * This is intentionally generic type Any? so further unchecked casts are avoided when it is used
      */
-    @Suppress("UNCHECKED_CAST")
-    private val invalidationListener: VarChangedListener<Any?> = (InvalListener(this) as VarChangedListener<Any?>)
+    private val invalidationListener: VarChangedListener<Any?> = InvalListener(this)
 
     constructor(item: Float) {
         binding = FloatBinding.Const
@@ -176,11 +175,14 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
         return get().toString()
     }
 
-    private class InvalListener(v: FloatVar) : VarChangedListener<Float> {
+    /**
+     * Cannot be inner for garbage collection reasons! We are avoiding an explicit strong reference to the parent Var
+     */
+    private class InvalListener(v: FloatVar) : VarChangedListener<Any?> {
         val weakRef: WeakReference<FloatVar> = WeakReference(v)
         var disposeMe: Boolean = false
         
-        override fun onChange(v: ReadOnlyVar<Float>) {
+        override fun onChange(v: ReadOnlyVar<Any?>) {
             val parent = weakRef.get()
             if (!disposeMe && parent != null) {
                 if (!parent.invalidated) {

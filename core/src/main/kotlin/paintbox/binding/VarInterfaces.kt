@@ -64,13 +64,13 @@ interface Var<T> : ReadOnlyVar<T> {
         val dependencies: MutableSet<ReadOnlyVar<Any?>> = LinkedHashSet(2)
 
         @JvmName("use")
-        fun <R> use(varr: ReadOnlyVar<R>): R {
+        fun <R> use(varr: ReadOnlyVar<R>): R { // DON'T add specialized deprecations for this particular use function for generic compatibility
             dependencies += varr
             return varr.getOrCompute()
         }
 
         @JvmName("useAndGet")
-        fun <R> ReadOnlyVar<R>.use(): R {
+        fun <R> ReadOnlyVar<R>.use(): R { // Specialized deprecations may be added for this use function
             return use(this)
         }
         
