@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
@@ -78,8 +79,8 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             val seedText: Var<String> = Var("")
-            val disableRegen: Var<Boolean> = Var(false)
-            val daredevilMode: Var<Boolean> = Var(false)
+            val disableRegen = BooleanVar(false)
+            val daredevilMode = BooleanVar(false)
             val playButtonText: ReadOnlyVar<String> = Var {
                 if (seedText.use().isEmpty()) Localization.getVar("mainMenu.play.endless.play.random").use() else Localization.getVar("mainMenu.play.endless.play").use()
             }
@@ -103,8 +104,8 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             val sidemode: SideMode = EndlessPolyrhythm(main,
                                     EndlessModeScore(scoreVar, showHighScore = true),
                                     seed, dailyChallenge = null,
-                                    disableLifeRegen = disableRegen.getOrCompute(),
-                                    maxLives = if (daredevilMode.getOrCompute()) 1 else -1)
+                                    disableLifeRegen = disableRegen.get(),
+                                    maxLives = if (daredevilMode.get()) 1 else -1)
                             val playScreen = PlayScreen(main, sidemode, sidemode.container,
                                     challenges = Challenges.NO_CHANGES, showResults = false,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute())
@@ -147,7 +148,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         text.set("")
                     }
                     this.text.addListener { t ->
-                        if (hasFocus.getOrCompute()) {
+                        if (hasFocus.get()) {
                             val upper = t.getOrCompute().uppercase()
                             seedText.set(upper)
                             this.text.set(upper)
@@ -206,7 +207,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             daredevilCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.endless.settings.daredevil.tooltip")))
             
             disableRegenCheck.disabled.bind { 
-                daredevilMode.use()
+                daredevilMode.useB()
             }
             
             disableRegenCheck.onCheckChanged = { newState ->

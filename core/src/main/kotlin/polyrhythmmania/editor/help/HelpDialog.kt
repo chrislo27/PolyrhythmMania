@@ -128,7 +128,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 this.setOnAction {
                     helpData.backUp()
                 }
-                this.disabled.bind { !helpData.hasBack.use() }
+                this.disabled.bind { !helpData.hasBack.useB() }
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_help")["arrow_right"])).apply {
                     this.rotation.set(180f)
                     this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
@@ -141,7 +141,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 this.setOnAction {
                     helpData.forward()
                 }
-                this.disabled.bind { !helpData.hasForward.use() }
+                this.disabled.bind { !helpData.hasForward.useB() }
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_help")["arrow_right"])).apply {
                     this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
                 }

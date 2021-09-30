@@ -2,6 +2,7 @@ package polyrhythmmania.editor.pane.track
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.ui.Anchor
@@ -22,7 +23,7 @@ open class LongTrackPane(val allTracksPane: AllTracksPane, val hasContent: Boole
     val editor: Editor = editorPane.editor
     
     val contentBgColor: Var<Color> = Var(Color(0f, 0f, 0f, 0f))
-    val showContentBorder: Var<Boolean> = Var(false)
+    val showContentBorder: BooleanVar = BooleanVar(false)
     val contentSection: UIElement
     val sidePanel: SidePanel
     
@@ -42,7 +43,7 @@ open class LongTrackPane(val allTracksPane: AllTracksPane, val hasContent: Boole
             }
             this.doClipping.set(true)
             
-            this.border.bind { if (showContentBorder.use()) Insets(0f, 2f, 0f, 0f) else Insets.ZERO }
+            this.border.bind { if (showContentBorder.useB()) Insets(0f, 2f, 0f, 0f) else Insets.ZERO }
             this.borderStyle.set(SolidBorder().apply { this.color.bind { editorPane.palette.trackPaneBorder.use() }})
 
             this.color.bind { contentBgColor.use() }

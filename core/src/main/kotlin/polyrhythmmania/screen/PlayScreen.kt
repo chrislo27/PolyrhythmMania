@@ -221,7 +221,7 @@ class PlayScreen(
                 Anchor.TopLeft.configure(this)
                 this.disabled.set(!enabled)
                 this.textColor.bind {
-                    if (apparentDisabledState.use()) Color.GRAY else if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
+                    if (apparentDisabledState.useB()) Color.GRAY else if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
                 }
                 this.bounds.height.set(48f)
                 this.bgPadding.set(Insets(2f, 2f, 12f, 12f))
@@ -370,7 +370,7 @@ class PlayScreen(
         }
         
         val scoreObj = Score(score, rawScore, inputsHit, nInputs,
-                inputter.skillStarGotten.getOrCompute() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
+                inputter.skillStarGotten.get() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
                 challenges,
                 resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                 lines.first, lines.second,
@@ -509,7 +509,7 @@ class PlayScreen(
 
     private fun attemptPauseEntrySelection() {
         val index = selectionIndex.getOrCompute()
-        if (optionLabels[index].apparentDisabledState.getOrCompute()) return
+        if (optionLabels[index].apparentDisabledState.get()) return
         when (index) {
             0 -> { // Resume
                 unpauseGame(true)
@@ -547,7 +547,7 @@ class PlayScreen(
     }
     
     private fun changeSelectionTo(index: Int): Boolean {
-        if (selectionIndex.getOrCompute() != index && !optionLabels[index].disabled.getOrCompute()) {
+        if (selectionIndex.getOrCompute() != index && !optionLabels[index].disabled.get()) {
             selectionIndex.set(index)
             playMenuSound("sfx_menu_blip")
             return true
@@ -565,7 +565,7 @@ class PlayScreen(
                         consumed = true
                     }
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown -> {
-                        if (optionLabels.any { !it.apparentDisabledState.getOrCompute() }) {
+                        if (optionLabels.any { !it.apparentDisabledState.get() }) {
                             val currentIndex = selectionIndex.getOrCompute()
                             val incrementAmt = if (keycode == keyboardKeybinds.buttonDpadUp) -1 else 1
                             var increment = incrementAmt

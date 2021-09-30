@@ -2,9 +2,7 @@ package polyrhythmmania.editor
 
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.intersects
 import polyrhythmmania.editor.block.Block
@@ -116,9 +114,9 @@ sealed class Click {
             private set
         var beat: Float = 0f
         var track: Int = -1
-        val isPlacementInvalid: ReadOnlyVar<Boolean> = Var(true)
-        val wouldBeDeleted: ReadOnlyVar<Boolean> = Var(false)
-        val collidesWithOtherBlocks: ReadOnlyVar<Boolean> = Var(false)
+        val isPlacementInvalid: ReadOnlyBooleanVar = BooleanVar(true)
+        val wouldBeDeleted: ReadOnlyBooleanVar = BooleanVar(false)
+        val collidesWithOtherBlocks: ReadOnlyBooleanVar = BooleanVar(false)
         val placementInvalidDuplicates: Boolean = isNew && (blocks.mapNotNull { block ->
             val javaClass = block.javaClass
             (Instantiators.classMapping[javaClass] ?: return@mapNotNull null)
@@ -144,7 +142,7 @@ sealed class Click {
         }
 
         fun complete() {
-            if (!hasBeenUpdated || isPlacementInvalid.getOrCompute() || !didOriginBlockChange()) {
+            if (!hasBeenUpdated || isPlacementInvalid.get() || !didOriginBlockChange()) {
                 abortAction()
                 return
             }
@@ -171,9 +169,9 @@ sealed class Click {
             val beat = beat.coerceAtLeast(0f)
             this.beat = beat
             this.track = trackIndex
-            (this.isPlacementInvalid as Var).set(trackIndex !in 0 until editor.tracks.size)
+            (this.isPlacementInvalid as BooleanVar).set(trackIndex !in 0 until editor.tracks.size)
 //            (this.wouldBeDeleted as Var).set(trackIndex < 0)
-            (this.wouldBeDeleted as Var).set(trackIndex !in 0 until editor.tracks.size)
+            (this.wouldBeDeleted as BooleanVar).set(trackIndex !in 0 until editor.tracks.size)
 
             // Adjust block regions
             // Set origin block
@@ -212,10 +210,10 @@ sealed class Click {
             }
 
             if (anyBlocksWouldCollide()) {
-                (this.collidesWithOtherBlocks as Var).set(true)
+                (this.collidesWithOtherBlocks as BooleanVar).set(true)
                 this.isPlacementInvalid.set(true)
             } else {
-                (this.collidesWithOtherBlocks as Var).set(false)
+                (this.collidesWithOtherBlocks as BooleanVar).set(false)
             }
 
             val beatLines = editor.beatLines
@@ -286,7 +284,7 @@ sealed class Click {
         var lastValidTempoChangePos: TempoChange = tempoChange.copy(beat = lastValidPosition)
             private set
 
-        val isCurrentlyValid: Var<Boolean> = Var(false)
+        val isCurrentlyValid: BooleanVar = BooleanVar(false)
 
         fun didChange(): Boolean = newPosition != tempoChange.beat
 
@@ -336,7 +334,7 @@ sealed class Click {
 //        var lastValidMusicVolPos: MusicVolume = musicVol.copy(beat = lastValidPosition)
 //            private set
 
-        val isCurrentlyValid: Var<Boolean> = Var(false)
+        val isCurrentlyValid: BooleanVar = BooleanVar(false)
 
         fun normalizeWidth() {
             if (width < 0) {

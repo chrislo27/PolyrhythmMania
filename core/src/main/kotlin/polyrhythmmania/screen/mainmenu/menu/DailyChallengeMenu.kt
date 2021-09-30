@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
@@ -39,8 +40,8 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private var epochSeconds: Long = System.currentTimeMillis() / 1000
     val dailyChallengeDate: Var<LocalDate> = Var(EndlessPolyrhythm.getCurrentDailyChallengeDate())
     
-    private val isFetching: Var<Boolean> = Var(false)
-    private val disableRefresh: Var<Boolean> = Var(false)
+    private val isFetching: BooleanVar = BooleanVar(false)
+    private val disableRefresh: BooleanVar = BooleanVar(false)
     private var disableRefreshUntil: Long = 0L
     private val leaderboardList: Var<List<DailyLeaderboardScore>?> = Var(null)
     private var leaderboardDate: LocalDate = dailyChallengeDate.getOrCompute()
@@ -192,7 +193,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             scrollPaneContent.bind { 
-                if (isFetching.use()) {
+                if (isFetching.useB()) {
                     paneFetching
                 } else {
                     if (showRefreshPrompt) {
@@ -231,7 +232,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     getLeaderboard()
                 }
                 this.disabled.bind { 
-                    isFetching.use() || disableRefresh.use()
+                    isFetching.useB() || disableRefresh.useB()
                 }
             }
         }
@@ -262,7 +263,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
         scrollPaneContent.getOrCompute() // Forces refresh.
-        if (disableRefresh.getOrCompute() && System.currentTimeMillis() > disableRefreshUntil) {
+        if (disableRefresh.get() && System.currentTimeMillis() > disableRefreshUntil) {
             disableRefresh.set(false)
         }
     }

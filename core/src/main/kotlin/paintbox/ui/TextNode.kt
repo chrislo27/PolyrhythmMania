@@ -3,6 +3,7 @@ package paintbox.ui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.font.TextBlock
@@ -18,7 +19,7 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
     val textBlock: Var<TextBlock> = Var(textBlock)
     val renderAlign: Var<Int> = Var(Align.left)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
-    val doXCompression: Var<Boolean> = Var(true)
+    val doXCompression: BooleanVar = BooleanVar(true)
 
     constructor(font: PaintboxFont, text: String, color: Color = Color.WHITE, scaleX: Float = 1f, scaleY: Float = 1f)
             : this(TextBlock(listOf(TextRun(font, text, color, scaleX, scaleY))))
@@ -46,7 +47,7 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
             text.computeLayouts()
         }
 
-        val compressX = doXCompression.getOrCompute()
+        val compressX = doXCompression.get()
         val align = renderAlign.getOrCompute()
         val xOffset: Float = when {
             Align.isLeft(align) -> 0f

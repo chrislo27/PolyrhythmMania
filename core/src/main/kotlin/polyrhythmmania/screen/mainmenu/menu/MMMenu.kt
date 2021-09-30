@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
+import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
@@ -53,12 +54,12 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
     protected val root: SceneRoot get() = menuCol.sceneRoot
     protected val mainMenu: MainMenuScreen get() = menuCol.mainMenu
     
-    val showLogo: Var<Boolean> = Var(true)
+    val showLogo: BooleanVar = BooleanVar(true)
 
     /**
      * Removes the [MMMenu] from [menuCol] when popped [MenuCollection.popLastMenu]
      */
-    val deleteWhenPopped: Var<Boolean> = Var(false)
+    val deleteWhenPopped: BooleanVar = BooleanVar(false)
 
     protected fun setSize(percentage: Float, adjust: Float = 0f) {
         bounds.width.bind {
@@ -252,8 +253,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         val checkBox = CheckBox(binding = labelText, font = font).apply { 
             Anchor.TopRight.configure(this)
             this.boxAlignment.set(CheckBox.BoxAlign.RIGHT)
-            this.color.bind { 
-                if (apparentDisabledState.use()) {
+            this.color.bind {
+                if (apparentDisabledState.useB()) {
                     LongButtonSkin.DISABLED_TEXT
                 } else {
                     settingsOptionPane.textColorVar.use()
@@ -339,10 +340,10 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         : Pane(), HasPressedState by HasPressedState.DefaultImpl() {
 
         val textColorVar: ReadOnlyVar<Color> = Var.bind {
-            if (isHoveredOver.use()) LongButtonSkin.HOVERED_TEXT else LongButtonSkin.TEXT_COLOR
+            if (isHoveredOver.useB()) LongButtonSkin.HOVERED_TEXT else LongButtonSkin.TEXT_COLOR
         }
         val bgColorVar: ReadOnlyVar<Color> = Var.bind {
-            if (isHoveredOver.use()) LongButtonSkin.HOVERED_BG else LongButtonSkin.BG_COLOR
+            if (isHoveredOver.useB()) LongButtonSkin.HOVERED_BG else LongButtonSkin.BG_COLOR
         }
 
         val label: TextLabel

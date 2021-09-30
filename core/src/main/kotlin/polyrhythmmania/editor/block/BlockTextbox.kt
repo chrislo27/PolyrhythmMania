@@ -3,6 +3,7 @@ package polyrhythmmania.editor.block
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.JsonObject
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -34,7 +35,7 @@ class BlockTextbox(engine: Engine)
     }
 
     var text: String = ""
-    val requireInput: Var<Boolean> = Var(false)
+    val requireInput: BooleanVar = BooleanVar(false)
     var duration: Float = 2f
     var style: TextBoxStyle = DEFAULT_STYLE
 
@@ -46,7 +47,7 @@ class BlockTextbox(engine: Engine)
 
     override fun compileIntoEvents(): List<Event> {
         return listOf(EventTextbox(engine, this.beat, duration,
-                TextBox(text, requireInput.getOrCompute(), style = this.style)))
+                TextBox(text, requireInput.get(), style = this.style)))
     }
 
     override fun createContextMenu(editor: Editor): ContextMenu {
@@ -68,7 +69,7 @@ class BlockTextbox(engine: Engine)
                                 this.text.set(this@BlockTextbox.text)
                                 this.canInputNewlines.set(true)
                                 this.text.addListener { t ->
-                                    if (hasFocus.getOrCompute()) {
+                                    if (hasFocus.get()) {
                                         this@BlockTextbox.text = t.getOrCompute()
                                     }
                                 }
@@ -146,7 +147,7 @@ class BlockTextbox(engine: Engine)
         return BlockTextbox(engine).also {
             this.copyBaseInfoTo(it)
             it.text = this.text
-            it.requireInput.set(this.requireInput.getOrCompute())
+            it.requireInput.set(this.requireInput.get())
             it.duration = this.duration
             it.style = this.style
         }
@@ -155,7 +156,7 @@ class BlockTextbox(engine: Engine)
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
         obj.add("text", text)
-        obj.add("requireInput", requireInput.getOrCompute())
+        obj.add("requireInput", requireInput.get())
         obj.add("duration", duration)
         obj.add("style", style.jsonId)
     }

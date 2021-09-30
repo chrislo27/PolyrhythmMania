@@ -2,6 +2,7 @@ package polyrhythmmania.editor.block
 
 import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.JsonObject
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
@@ -31,8 +32,8 @@ class BlockPaletteChange(engine: Engine)
 
     var tilesetPalette: TilesetPalette = engine.world.tilesetPalette.copy()
     var duration: Float = 0.5f
-    var pulseMode: Var<Boolean> = Var(false)
-    var reverse: Var<Boolean> = Var(false)
+    var pulseMode: BooleanVar = BooleanVar(false)
+    var reverse: BooleanVar = BooleanVar(false)
 
     init {
         this.width = 0.5f
@@ -42,7 +43,7 @@ class BlockPaletteChange(engine: Engine)
 
     override fun compileIntoEvents(): List<Event> {
         return listOf(EventPaletteChange(engine, this.beat, this.duration.coerceAtLeast(0f), tilesetPalette.copy(),
-                pulseMode.getOrCompute(), reverse.getOrCompute()))
+                pulseMode.get(), reverse.get()))
     }
 
     override fun createContextMenu(editor: Editor): ContextMenu {
@@ -116,8 +117,8 @@ class BlockPaletteChange(engine: Engine)
             this.copyBaseInfoTo(it)
             it.tilesetPalette = this.tilesetPalette.copy()
             it.duration = this.duration
-            it.pulseMode.set(this.pulseMode.getOrCompute())
-            it.reverse.set(this.reverse.getOrCompute())
+            it.pulseMode.set(this.pulseMode.get())
+            it.reverse.set(this.reverse.get())
         }
     }
 
@@ -125,8 +126,8 @@ class BlockPaletteChange(engine: Engine)
         super.writeToJson(obj)
         obj.add("tileset", tilesetPalette.toJson())
         obj.add("duration", duration)
-        obj.add("pulse", pulseMode.getOrCompute())
-        obj.add("reverse", reverse.getOrCompute())
+        obj.add("pulse", pulseMode.get())
+        obj.add("reverse", reverse.get())
     }
 
     override fun readFromJson(obj: JsonObject) {

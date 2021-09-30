@@ -7,6 +7,8 @@ import de.jcm.discordgamesdk.*
 import de.jcm.discordgamesdk.activity.Activity
 import de.jcm.discordgamesdk.user.DiscordUser
 import paintbox.Paintbox
+import paintbox.binding.BooleanVar
+import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import polyrhythmmania.util.TempFileUtils
@@ -18,14 +20,14 @@ object DiscordCore : Disposable {
 
     const val DISCORD_APP_ID: Long = 869413093665558589L
 
-    private val _loaded: Var<Boolean> = Var(false)
-    val loaded: ReadOnlyVar<Boolean> = _loaded
+    private val _loaded: BooleanVar = BooleanVar(false)
+    val loaded: ReadOnlyBooleanVar = _loaded
     private val _lastCallbacksResult: Var<Result> = Var(Result.OK)
     val lastCallbacksResult: ReadOnlyVar<Result> = _lastCallbacksResult
 
     val initTime: Long = System.currentTimeMillis()
 
-    val enableRichPresence: Var<Boolean> = Var(true)
+    val enableRichPresence: BooleanVar = BooleanVar(true)
 
     val eventHandler: DiscordEventHandler = DiscordEventHandler()
     private lateinit var core: Core
@@ -42,7 +44,7 @@ object DiscordCore : Disposable {
         }
     }
 
-    private fun isLoaded(): Boolean = this.loaded.getOrCompute()
+    private fun isLoaded(): Boolean = this.loaded.get()
 
     private fun attemptLoadCore() {
         // Unpack the gamesdk libraries
@@ -136,7 +138,7 @@ object DiscordCore : Disposable {
 
     fun updateActivity(presence: Presence, callback: ((Result) -> Unit)? = null) {
         if (!isLoaded()) return
-        if (!enableRichPresence.getOrCompute()) return
+        if (!enableRichPresence.get()) return
         try {
             Activity().use { activity ->
 //                activity.details = presence.details

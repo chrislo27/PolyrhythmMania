@@ -113,7 +113,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         // offsets should be the absolute x/y of the parent of cursor
         while (cursor != null && (
                         !cursor.borderZone.containsPointLocal(x - offX, y - offY)
-                                || !cursor.apparentVisibility.getOrCompute()
+                                || !cursor.apparentVisibility.get()
                         )) {
             val removed = lastPath.removeLast()
             onMouseExited(removed, x, y)
@@ -136,7 +136,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
         var clipOffX = offX
         var clipOffY = offY
         while (clipCursor != null) {
-            if (clipCursor.doClipping.getOrCompute() && !clipCursor.borderZone.containsPointLocal(x - clipOffX, y - clipOffY)) {
+            if (clipCursor.doClipping.get() && !clipCursor.borderZone.containsPointLocal(x - clipOffX, y - clipOffY)) {
                 // Delete and trigger mouse exited for everything up to and including clipCursor
                 var lastRemoved: UIElement
                 do {
@@ -248,7 +248,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
                     val eventResult = element.fireEvent(ClickReleased(vec.x, vec.y, button,
                             element === previousClick.accepted?.second,
                             element in lastHoveredElementPath,
-                            element in layer.lastHoveredElementPath && element.apparentVisibility.getOrCompute())
+                            element in layer.lastHoveredElementPath && element.apparentVisibility.get())
                     )
                     if (eventResult) {
                         anyClick = true
@@ -278,7 +278,7 @@ class InputSystem(private val sceneRoot: SceneRoot) : InputProcessor {
                     val lastHoveredElementPath = previousClick.lastHoveredElementPathPerLayer.getValue(layer)
                     for (element in lastHoveredElementPath.asReversed()) {
                         val eventResult = element.fireEvent(TouchDragged(vec.x, vec.y, pointer,
-                                element in layer.lastHoveredElementPath && element.apparentVisibility.getOrCompute())
+                                element in layer.lastHoveredElementPath && element.apparentVisibility.get())
                         )
                         if (eventResult) {
                             anyClick = true

@@ -146,7 +146,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             }
             onAssetLoadingComplete = {
                 DiscordCore // Initialize discord-gamesdk
-                DiscordCore.enableRichPresence.bind { settings.discordRichPresence.use() }
+                DiscordCore.enableRichPresence.bind { use(settings.discordRichPresence) }
                 
                 initializeScreens()
                 

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -117,11 +118,11 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     var renderUI: Boolean = true
     var showSkillStarSetting: Boolean = PRManiaGame.instance.settings.showSkillStar.getOrCompute()
 
-    val showEndlessModeScore: Var<Boolean> = Var(false)
+    val showEndlessModeScore: BooleanVar = BooleanVar(false)
     val prevHighScore: Var<Int> = Var(-1)
     val dailyChallengeDate: Var<LocalDate?> = Var(null)
     val endlessModeSeed: Var<String?> = Var(null)
-    val flashHudRedWhenLifeLost: Var<Boolean> = Var(false)
+    val flashHudRedWhenLifeLost: BooleanVar = BooleanVar(false)
     private val currentEndlessScore: Var<Int> = Var(0)
     private val currentEndlessLives: Var<Int> = Var(0)
 
@@ -162,7 +163,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         ), TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
 
         uiSceneRoot += endlessModeScorePane.apply {
-            this.visible.bind { showEndlessModeScore.use() }
+            this.visible.bind { showEndlessModeScore.useB() }
             Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
 //            this.bounds.width.set(400f)
             this.bindWidthToParent(adjust = -64f)
@@ -285,7 +286,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         
         endlessModeGameOverPane.apply {
             this.visible.bind { 
-                engine.inputter.endlessScore.gameOverUIShown.use()
+                engine.inputter.endlessScore.gameOverUIShown.useB()
             }
             this += RectElement(Color(0f, 0f, 0f, 0.5f))
         }
@@ -429,7 +430,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
 
             val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
             val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
-            batch.draw(if (inputter.skillStarGotten.getOrCompute()) texColoured else texGrey,
+            batch.draw(if (inputter.skillStarGotten.get()) texColoured else texGrey,
                     1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
         }
 
@@ -525,12 +526,12 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
             inputter.practice.clearText = newValue
         }
 
-        if (showEndlessModeScore.getOrCompute()) {
+        if (showEndlessModeScore.get()) {
             val endlessScore = engine.inputter.endlessScore
             val oldLives = currentEndlessLives.getOrCompute()
             val newLives = endlessScore.lives.getOrCompute()
             currentEndlessLives.set(newLives)
-            if (newLives < oldLives && flashHudRedWhenLifeLost.getOrCompute()) {
+            if (newLives < oldLives && flashHudRedWhenLifeLost.get()) {
                 hudRedFlash = 1f
             }
             val oldScore = currentEndlessScore.getOrCompute()

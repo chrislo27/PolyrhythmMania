@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.binding.invert
@@ -99,8 +100,8 @@ open class ContextMenu : Control<ContextMenu>() {
         // TODO
         val width: FloatVar = FloatVar(defaultWidth.get())
         val metadata: List<MenuItemMetadata> = currentItems.map { item ->
-            val useHovered = Var(true)
-            val hovered = Var(false)
+            val useHovered = BooleanVar(true)
+            val hovered = BooleanVar(false)
             var forwardOnActionTo: Control<*>? = null
             val basePane = ActionablePane().also { pane ->
                 pane.addInputEventListener { event ->
@@ -115,7 +116,7 @@ open class ContextMenu : Control<ContextMenu>() {
                     var consumed = false
                     val forwardTarget = forwardOnActionTo
                     if (forwardTarget != null) {
-                        if (!forwardTarget.isHoveredOver.getOrCompute()) {
+                        if (!forwardTarget.isHoveredOver.get()) {
                             forwardTarget.triggerAction()
                             consumed = true
                         }
@@ -124,7 +125,7 @@ open class ContextMenu : Control<ContextMenu>() {
                 }
                 pane.addChild(RectElement(Color.WHITE).apply {
                     this.color.sideEffecting(Color(0.8f, 1f, 1f, 0f)) { existing ->
-                        existing.a = if (useHovered.use() && hovered.use()) 0.9f else 0f
+                        existing.a = if (useHovered.useB() && hovered.useB()) 0.9f else 0f
                         existing
                     }
                 })

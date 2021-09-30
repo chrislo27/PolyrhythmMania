@@ -125,7 +125,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                     this.textLabel.markup.set(editorPane.palette.markup)
                     if (canChangeEnabledState) {
                         this.color.bind {
-                            val enabled = mapping.enabled.use()
+                            val enabled = mapping.enabled.useB()
                             if (enabled) Color.WHITE else Color.GRAY
                         }
                     } else {
@@ -441,7 +441,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     
     private fun updateColourPickerToMapping(mapping: ColorMapping = currentMapping.getOrCompute()) {
         colourPicker.setColor(mapping.color.getOrCompute(), true)
-        enabledCheckbox.checkedState.set(mapping.enabled.getOrCompute())
+        enabledCheckbox.checkedState.set(mapping.enabled.get())
     }
     
     fun prepareShow(): PaletteEditDialog {
@@ -577,7 +577,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                 affectsMappings.forEach { m ->
                     // Intentionally iterating through all of them since they are all dependencies.
                     // The order of the anyEnabled assignment is also intentional to prevent bad short-circuiting
-                    anyEnabled = m.enabled.use() || anyEnabled
+                    anyEnabled = m.enabled.useB() || anyEnabled
                 }
                 anyEnabled
             }

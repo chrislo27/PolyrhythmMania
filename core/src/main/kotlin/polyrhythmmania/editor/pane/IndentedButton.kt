@@ -2,6 +2,7 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Color
 import paintbox.PaintboxGame
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.binding.invert
 import paintbox.font.PaintboxFont
@@ -15,7 +16,7 @@ import paintbox.ui.element.RectElement
 
 class IndentedButton : Button, Toggle {
 
-    override val selectedState: Var<Boolean> = Var(false)
+    override val selectedState: BooleanVar = BooleanVar(false)
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
     
     val indentedButtonBorder: Var<Insets> = Var(Insets(2f))
@@ -35,7 +36,7 @@ class IndentedButton : Button, Toggle {
                 }
             })
             this.border.bind {
-                if (selectedState.use()) indentedButtonBorder.use() else Insets.ZERO
+                if (selectedState.useB()) indentedButtonBorder.use() else Insets.ZERO
             }
         }
         

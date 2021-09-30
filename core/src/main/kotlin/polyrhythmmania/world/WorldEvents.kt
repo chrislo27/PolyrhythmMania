@@ -3,6 +3,7 @@ package polyrhythmmania.world
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Cursor
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
@@ -196,7 +197,7 @@ class EventDeployRod(engine: Engine, val row: Row, startBeat: Float) : Event(eng
     }
 }
 
-class EventDeployRodEndless(engine: Engine, val row: Row, startBeat: Float, val lifeLostVar: Var<Boolean>)
+class EventDeployRodEndless(engine: Engine, val row: Row, startBeat: Float, val lifeLostVar: BooleanVar)
     : Event(engine) {
     init {
         this.beat = startBeat
@@ -245,7 +246,7 @@ class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
         super.onStartContainer(container, currentBeat)
         val tileset = container.renderer.tileset
         tilesetCopy.allMappings.forEach { m ->
-            if (m.enabled.getOrCompute()) {
+            if (m.enabled.get()) {
                 val id = m.id
                 val target = colorTargets.getValue(id)
                 target.start.set(m.tilesetGetter.invoke(tileset).getOrCompute())
@@ -263,7 +264,7 @@ class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
         }
         val tileset = container.renderer.tileset
         tilesetCopy.allMappings.forEach { m ->
-            if (m.enabled.getOrCompute()) {
+            if (m.enabled.get()) {
                 val id = m.id
                 val target = colorTargets.getValue(id)
 

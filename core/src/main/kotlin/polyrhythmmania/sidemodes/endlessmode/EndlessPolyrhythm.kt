@@ -3,6 +3,7 @@ package polyrhythmmania.sidemodes.endlessmode
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
@@ -200,7 +201,7 @@ loops: ${loopsCompleted.getOrCompute()} / speed: ${speedIncreaseSemitones.getOrC
             engine.addEvents(pattern.toEvents(engine, patternStart))
             val anyA = pattern.rowA.row.isNotEmpty()
             val anyDpad = pattern.rowDpad.row.isNotEmpty()
-            val lifeLostVar = Var(false)
+            val lifeLostVar = BooleanVar(false)
             if (anyA) {
                 engine.addEvent(EventDeployRodEndless(engine, world.rowA, patternStart, lifeLostVar))
                 engine.addEvent(EventRowBlockDespawn(engine, world.rowA, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.util.ColorStack
 import paintbox.ui.skin.DefaultSkins
@@ -41,8 +42,8 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
                     TextRun(label.font.use(), label.text.use(), Color.WHITE,
                             /*label.scaleX.use(), label.scaleY.use()*/ 1f, 1f).toTextBlock()
                 }.also { textBlock ->
-                    if (label.doLineWrapping.use()) {
-                        textBlock.lineWrapping = label.contentZone.width.useF() / (if (label.doesScaleXAffectWrapping.use()) label.scaleX.useF() else 1f)
+                    if (label.doLineWrapping.useB()) {
+                        textBlock.lineWrapping = label.contentZone.width.useF() / (if (label.doesScaleXAffectWrapping.useB()) label.scaleX.useF() else 1f)
                     }
                 }
             }
@@ -72,20 +73,20 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
      */
     val scaleY: FloatVar = FloatVar(1f)
     
-    val doesScaleXAffectWrapping: Var<Boolean> = Var(true)
+    val doesScaleXAffectWrapping: BooleanVar = BooleanVar(true)
 
     /**
      * If the alpha value is 0, the skin controls what background colour is used.
      */
     val backgroundColor: Var<Color> = Var(Color(1f, 1f, 1f, 0f))
 
-    val renderBackground: Var<Boolean> = Var(false)
+    val renderBackground: BooleanVar = BooleanVar(false)
     val bgPadding: Var<Insets> = Var.bind { padding.use() }
 
     val renderAlign: Var<Int> = Var(Align.left)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
-    val doXCompression: Var<Boolean> = Var(true)
-    val doLineWrapping: Var<Boolean> = Var(false)
+    val doXCompression: BooleanVar = BooleanVar(true)
+    val doLineWrapping: BooleanVar = BooleanVar(false)
 
     /**
      * Defaults to an auto-generated [TextBlock] with the given [text].
@@ -105,7 +106,6 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
 
     @Suppress("RemoveRedundantQualifierName")
     override fun getDefaultSkinID(): String = TextLabel.TEXTLABEL_SKIN_ID
-
 }
 
 open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
@@ -153,7 +153,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
         }
 
         val bgPaddingInsets = element.bgPadding.getOrCompute()
-        val compressX = element.doXCompression.getOrCompute()
+        val compressX = element.doXCompression.get()
         val align = element.renderAlign.getOrCompute()
         val scaleX = element.scaleX.get()
         val scaleY = element.scaleY.get()
@@ -171,7 +171,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
             else -> ((h + textHeight) / 2 - firstCapHeight)
         }
 
-        if (element.renderBackground.getOrCompute()) {
+        if (element.renderBackground.get()) {
             // Draw a rectangle behind the text, only sizing to the text area.
             val bx = (x + xOffset) - bgPaddingInsets.left
             val by = (y - h + yOffset - textHeight + firstCapHeight) - bgPaddingInsets.top

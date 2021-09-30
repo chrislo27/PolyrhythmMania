@@ -1,6 +1,7 @@
 package polyrhythmmania.ui
 
 import paintbox.PaintboxGame
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
@@ -17,13 +18,13 @@ class DecimalTextField(
 
     val value: FloatVar = FloatVar(startingValue)
     val decimalFormat: Var<DecimalFormat> = Var(decimalFormat)
-    val allowNegatives: Var<Boolean> = Var(true)
+    val allowNegatives: BooleanVar = BooleanVar(true)
 
     init {
         this.text.set(decimalToStr())
         this.inputFilter.bind { 
             val df = this@DecimalTextField.decimalFormat.use()
-            val negatives = allowNegatives.use()
+            val negatives = allowNegatives.useB()
             val symbols = df.decimalFormatSymbols
             ;
             { c: Char ->
@@ -31,13 +32,14 @@ class DecimalTextField(
             }
         }
         this.text.addListener { t ->
-            if (hasFocus.getOrCompute()) {
+            if (hasFocus.get()) {
                 try {
                     val newValue = this.decimalFormat.getOrCompute().parse(t.getOrCompute())?.toFloat()
                     if (newValue != null) {
                         value.set(newValue)
                     }
-                } catch (ignored: Exception) {}
+                } catch (ignored: Exception) {
+                }
             }
         }
         hasFocus.addListener { f ->

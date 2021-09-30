@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.binding.invert
 import paintbox.font.TextAlign
@@ -50,8 +51,8 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     val descLabel: TextLabel
     val challengeSetting: Pane
     
-    val robotMode: Var<Boolean> = Var(false)
-    val goForPerfect: Var<Boolean> = Var(false)
+    val robotMode: BooleanVar = BooleanVar(false)
+    val goForPerfect: BooleanVar = BooleanVar(false)
     val tempoUp: Var<Int> = Var(100)
 
     @Volatile
@@ -100,10 +101,10 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     val perfectCheckbox = CheckBox(binding = { Localization.getVar("mainMenu.play.challengeSettings.perfect").use() },
                             font = this@LoadSavedLevelMenu.font).apply {
                         this.bindWidthToParent(multiplier = 0.5f)
-                        this.checkedState.set(goForPerfect.getOrCompute())
+                        this.checkedState.set(goForPerfect.get())
                         this.color.set(LongButtonSkin.TEXT_COLOR)
                         this.color.bind {
-                            if (apparentDisabledState.use()) {
+                            if (apparentDisabledState.useB()) {
                                 LongButtonSkin.DISABLED_TEXT
                             } else LongButtonSkin.TEXT_COLOR
                         }
@@ -111,14 +112,14 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         this.onCheckChanged = { newState ->
                             goForPerfect.set(newState)
                         }
-                        this.disabled.bind { robotMode.use() }
+                        this.disabled.bind { robotMode.useB() }
                     }
                     this += perfectCheckbox
                     this += CheckBox(binding = { Localization.getVar("mainMenu.play.challengeSettings.robotMode").use() },
                             font = this@LoadSavedLevelMenu.font).apply {
                         this.bindWidthToParent(multiplier = 0.5f)
                         Anchor.TopRight.configure(this)
-                        this.checkedState.set(robotMode.getOrCompute())
+                        this.checkedState.set(robotMode.get())
                         this.color.set(LongButtonSkin.TEXT_COLOR)
                         this.textLabel.padding.set(Insets(0f, 0f, 4f, 0f))
                         this.onCheckChanged = { newState ->
@@ -210,7 +211,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     val loadedData = loaded
                     if (loadedData != null) {
                         val engine = loadedData.newContainer.engine
-                        val robotMode = this@LoadSavedLevelMenu.robotMode.getOrCompute()
+                        val robotMode = this@LoadSavedLevelMenu.robotMode.get()
                         menuCol.playMenuSound("sfx_menu_enter_game")
                         if (robotMode) {
                             menuCol.playMenuSound("sfx_pause_robot_on")
@@ -218,7 +219,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         }
                         
                         // Set challenge settings
-                        val challenges: Challenges = Challenges(tempoUp.getOrCompute(), goForPerfect.getOrCompute() && !robotMode)
+                        val challenges: Challenges = Challenges(tempoUp.getOrCompute(), goForPerfect.get() && !robotMode)
                         challenges.applyToEngine(engine)
                         
                         mainMenu.transitionAway {

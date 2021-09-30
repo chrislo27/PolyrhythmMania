@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.pane.track
 
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.ui.Pane
 import paintbox.ui.control.ScrollBar
@@ -19,7 +20,7 @@ class ScrubTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
         val contentPane = Pane()
         scrollBar = ScrollBar(ScrollBar.Orientation.HORIZONTAL).apply { 
             this.skinID.set(PRManiaSkins.EDITOR_SCROLLBAR_SKIN)
-            val isDragging: Var<Boolean> = Var {
+            val isDragging = BooleanVar {
                 thumbPressedState.use().pressed
             }
             this.userChangedValueListener = { newValue ->
@@ -32,7 +33,7 @@ class ScrubTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                 editor.trackView.beat.set(newBeat)
             }
             fun updateOwnValue(newValue: Float) {
-                if (!isDragging.getOrCompute()) {
+                if (!isDragging.get()) {
                     val lastPos = editor.container.lastBlockPosition.get()
                     val pxPerBeat = editor.trackView.pxPerBeat.get()
                     val beatWidth = contentPane.bounds.width.get() / pxPerBeat

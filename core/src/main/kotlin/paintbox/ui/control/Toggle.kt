@@ -1,11 +1,12 @@
 package paintbox.ui.control
 
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 
 
 interface Toggle {
     
-    val selectedState: Var<Boolean>
+    val selectedState: BooleanVar
 
     /**
      * The [ToggleGroup] that this [Toggle] belongs to.

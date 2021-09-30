@@ -100,7 +100,7 @@ class TilesetPalette {
             this.allMappings.forEach { m ->
                 val copiedMapping = copyMap.getValue(m.id)
                 copiedMapping.color.set(m.color.getOrCompute().cpy())
-                copiedMapping.enabled.set(m.enabled.getOrCompute())
+                copiedMapping.enabled.set(m.enabled.get())
             }
         }
     }
@@ -123,7 +123,7 @@ class TilesetPalette {
                 add(m.id, m.color.getOrCompute().toString())
             }
             add("_metadata", Json.`object`().also { metadataObj ->
-                metadataObj.add("enabled", Json.array(*allMappings.filter { it.enabled.getOrCompute() }.map { it.id }.toTypedArray()))
+                metadataObj.add("enabled", Json.array(*allMappings.filter { it.enabled.get() }.map { it.id }.toTypedArray()))
             })
         }
     }

@@ -43,9 +43,9 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
     /**
      * A var that is always updated at the start of [renderAsRoot].
      */
-    val frameUpdateTrigger: ReadOnlyVar<Boolean> = Var(false)
+    val frameUpdateTrigger: ReadOnlyBooleanVar = BooleanVar(false)
     val animations: AnimationHandler = AnimationHandler(this)
-    val applyViewport: Var<Boolean> = Var(true)
+    val applyViewport: BooleanVar = BooleanVar(true)
 
     val currentElementWithTooltip: ReadOnlyVar<HasTooltip?> = Var(null)
     val currentTooltipVar: ReadOnlyVar<UIElement?> = Var(null)
@@ -114,11 +114,11 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
     }
 
     fun renderAsRoot(batch: SpriteBatch) {
-        if (applyViewport.getOrCompute()) {
+        if (applyViewport.get()) {
             viewport.apply()
         }
         
-        (frameUpdateTrigger as Var).invert()
+        (frameUpdateTrigger as BooleanVar).invert()
         updateMouseVector()
         updateTooltipPosition()
 
@@ -160,7 +160,7 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
         val y = originY - thisBounds.y.get()
         val w = thisBounds.width.get()
         val h = thisBounds.height.get()
-        if (onlyVisible && !this.apparentVisibility.getOrCompute()) return
+        if (onlyVisible && !this.apparentVisibility.get()) return
         batch.drawRect(x, y - h, w, h, 1f)
 
         val childOffsetX = originX + this.contentZone.x.get()

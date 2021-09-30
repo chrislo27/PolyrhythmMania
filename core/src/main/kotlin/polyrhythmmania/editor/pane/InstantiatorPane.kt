@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -141,13 +142,13 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
     val listPane: Pane
     val listView: ListView
     
-    val inCategories: Var<Boolean> = Var(true)
+    val inCategories: BooleanVar = BooleanVar(true)
     
     val currentList: Var<List<ObjectListable>> = Var(categories)
     val categoryIndex: IndexTween = IndexTween()
     val perCategoryIndex: Map<String, IndexTween> = perCategory.keys.associateWith { IndexTween() }
     val currentIndex: ReadOnlyVar<IndexTween> = Var {
-        if (inCategories.use()) categoryIndex else perCategoryIndex.getValue(categories[categoryIndex.index.use()].categoryID)
+        if (inCategories.useB()) categoryIndex else perCategoryIndex.getValue(categories[categoryIndex.index.use()].categoryID)
     }
     
     val currentItem: ReadOnlyVar<ObjectListable> = Var {
@@ -209,11 +210,11 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
             val tooltipCurrentBlock = Localization.getVar("editor.instantiators.currentBlock.tooltip")
             val tooltipCurrentCat = Localization.getVar("editor.instantiators.currentCategory.tooltip")
             this.tooltipElement.set(editorPane.createDefaultTooltip(binding = {
-                if (inCategories.use()) tooltipCurrentCat.use() else tooltipCurrentBlock.use()
+                if (inCategories.useB()) tooltipCurrentCat.use() else tooltipCurrentBlock.use()
             }))
             this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"]))
             this.setOnAction {
-                if (inCategories.getOrCompute()) {
+                if (inCategories.get()) {
                     changeToSpecific()
                 }
             }
@@ -228,7 +229,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
             this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"]).apply { 
                 flip(true, false)
             })
-            this.visible.bind { !inCategories.use() }
+            this.visible.bind { !inCategories.useB() }
             this.setOnAction {
                 changeToCategories()
             }
@@ -249,7 +250,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
                 is ClickPressed -> {
                     val item = currentItem.getOrCompute()
                     if (event.button == Input.Buttons.LEFT) {
-                        if (inCategories.getOrCompute()) {
+                        if (inCategories.get()) {
                             changeToSpecific()
                         } else {
                             @Suppress("UNCHECKED_CAST")
@@ -257,7 +258,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
                         }
                         true
                     } else if (event.button == Input.Buttons.RIGHT) {
-                        if (!inCategories.getOrCompute()) {
+                        if (!inCategories.get()) {
                             changeToCategories()
                         }
                         true

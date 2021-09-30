@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
@@ -69,7 +70,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
 
     private inline fun createInputListener(crossinline onScroll: (amt: Int) -> Unit): InputEventListener {
         return InputEventListener { event ->
-            if (editor.tool.getOrCompute() == Tool.MUSIC_VOLUME && editor.allowedToEdit.getOrCompute()) {
+            if (editor.tool.getOrCompute() == Tool.MUSIC_VOLUME && editor.allowedToEdit.get()) {
                 if (event is Scrolled) {
                     val scrollAmt = getScrollAmount(event.amountY.roundToInt(),
                             Gdx.input.isControlDown(), Gdx.input.isShiftDown(), Gdx.input.isAltDown())
@@ -85,7 +86,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
 
     inner class MusicVolMarkerPane : Pane() {
 
-        private val isMouseOver: Var<Boolean> = Var(false)
+        private val isMouseOver: BooleanVar = BooleanVar(false)
         private val currentHoveredMusicVol: Var<MusicVolume?> = Var(null)
 
         init {
@@ -165,7 +166,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
             }
             // Change volume
             addInputEventListener(createInputListener { amt ->
-                if (editor.allowedToEdit.getOrCompute()) {
+                if (editor.allowedToEdit.get()) {
                     val mv = currentHoveredMusicVol.getOrCompute()
                     if (mv != null) {
                         val originalVol = mv.newVolume
@@ -294,7 +295,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                     }
                 }
                 if (hoveredMusicVol != null) {
-                    if (currentClick is Click.DragMusicVolume && !currentClick.isCurrentlyValid.getOrCompute()) {
+                    if (currentClick is Click.DragMusicVolume && !currentClick.isCurrentlyValid.get()) {
                         musicVolColor.set(1f, 0f, 0f, 1f)
                     } else {
                         musicVolColor.set(1f, 1f, 1f, 1f)

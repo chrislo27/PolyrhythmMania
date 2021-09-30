@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
@@ -34,8 +35,8 @@ class ResultsTextDialog(editorPane: EditorPane)
     : EditorDialog(editorPane) {
 
     private val resultsText: Var<ResultsText> = Var(editor.container.resultsText)
-    private val testScoreNoMiss: Var<Boolean> = Var(true)
-    private val testScoreSkillStar: Var<Boolean> = Var(true)
+    private val testScoreNoMiss: BooleanVar = BooleanVar(true)
+    private val testScoreSkillStar: BooleanVar = BooleanVar(true)
     private val testScoreValue: FloatVar = FloatVar(0f)
     
     private val resultsPreview: ResultsPreview
@@ -94,9 +95,9 @@ class ResultsTextDialog(editorPane: EditorPane)
             leftVbox += CheckBox(binding = { Localization.getVar("editor.dialog.resultsText.noMiss").use() },
                     font = editorPane.palette.musicDialogFont).apply {
                 this.bounds.height.set(32f)
-                this.selectedState.set(testScoreNoMiss.getOrCompute())
+                this.selectedState.set(testScoreNoMiss.get())
                 this.onCheckChanged = {
-                    testScoreNoMiss.set(this.selectedState.getOrCompute())
+                    testScoreNoMiss.set(this.selectedState.get())
                 }
                 this.imageNode.padding.set(Insets(0f, 0f, 0f, 6f))
                 this.color.set(Color.WHITE.cpy())
@@ -104,9 +105,9 @@ class ResultsTextDialog(editorPane: EditorPane)
             leftVbox += CheckBox(binding = { Localization.getVar("editor.dialog.resultsText.skillStar").use() },
                     font = editorPane.palette.musicDialogFont).apply {
                 this.bounds.height.set(32f)
-                this.selectedState.set(testScoreSkillStar.getOrCompute())
+                this.selectedState.set(testScoreSkillStar.get())
                 this.onCheckChanged = {
-                    testScoreSkillStar.set(this.selectedState.getOrCompute())
+                    testScoreSkillStar.set(this.selectedState.get())
                 }
                 this.imageNode.padding.set(Insets(0f, 0f, 0f, 6f))
                 this.color.set(Color.WHITE.cpy())
@@ -146,7 +147,7 @@ class ResultsTextDialog(editorPane: EditorPane)
                             this.text.set(getter(resultsText.getOrCompute()) ?: "")
                             this.text.addListener { t ->
                                 val newText = t.getOrCompute().takeUnless { it.isEmpty() }
-                                if (this.hasFocus.getOrCompute()) {
+                                if (this.hasFocus.get()) {
                                     resultsText.set(copyFunc(resultsText.getOrCompute(), newText ?: ""))
                                 } else {
                                     if (newText == null) {
@@ -211,8 +212,8 @@ class ResultsTextDialog(editorPane: EditorPane)
             val resultsText = resultsText.use()
             val scoreInt = testScoreValue.useF().toInt()
             val lines: Pair<String, String> = resultsText.generateLinesOfText(scoreInt, false, false)
-            val noMiss = testScoreNoMiss.use()
-            val skillStar = testScoreSkillStar.use()
+            val noMiss = testScoreNoMiss.useB()
+            val skillStar = testScoreSkillStar.useB()
             Score(scoreInt, scoreInt.toFloat(), if (noMiss) 8 else 7, 8,
                     skillStar, noMiss,
                     Challenges.NO_CHANGES,

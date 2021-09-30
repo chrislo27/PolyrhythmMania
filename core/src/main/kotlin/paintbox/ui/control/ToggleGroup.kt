@@ -31,7 +31,7 @@ class ToggleGroup {
             toggle.selectedState.addListener(listener)
 
             val currentActive = activeToggle.getOrCompute()
-            if (toggle.selectedState.getOrCompute()) {
+            if (toggle.selectedState.get()) {
                 if (currentActive == null || currentActive !== toggle) {
                     _activeToggle.set(toggle)
                 }

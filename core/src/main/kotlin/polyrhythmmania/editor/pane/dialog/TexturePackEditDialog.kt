@@ -10,10 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import net.lingala.zip4j.ZipFile
 import paintbox.Paintbox
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
-import paintbox.binding.invert
+import paintbox.binding.*
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -119,12 +116,12 @@ class TexturePackEditDialog(editorPane: EditorPane,
         class Region(val id: String) : ListEntry("editor.dialog.texturePack.object.${id}")
     }
     
-    private val isFileChooserOpen: Var<Boolean> = Var(false)
-    private val isMessageVisible: Var<Boolean> = Var(false)
+    private val isFileChooserOpen: BooleanVar = BooleanVar(false)
+    private val isMessageVisible: BooleanVar = BooleanVar(false)
     
     private val baseTexturePack: Var<TexturePack> = Var(StockTexturePacks.gba)
     private val customTexturePack: Var<CustomTexturePack> = Var(CustomTexturePack(UUID.randomUUID().toString(), baseTexturePack.getOrCompute().id))
-    private val onTexturePackUpdated: Var<Boolean> = Var(false)
+    private val onTexturePackUpdated: BooleanVar = BooleanVar(false)
     private val currentEntry: Var<ListEntry.Region> = Var(LIST_ENTRIES.first { it is ListEntry.Region } as ListEntry.Region)
     
     private val currentMsg: Var<String> = Var("")
@@ -142,15 +139,15 @@ class TexturePackEditDialog(editorPane: EditorPane,
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.texturePack.title").use() }
 
 
-        val hideMainContent = Var {
-            isFileChooserOpen.use() || isMessageVisible.use()
+        val hideMainContent = BooleanVar {
+            isFileChooserOpen.useB() || isMessageVisible.useB()
         }
         val contentPaneContainer = Pane().apply {
-            this.visible.bind { !hideMainContent.use() }
+            this.visible.bind { !hideMainContent.useB() }
         }
         contentPane += contentPaneContainer
         val bottomPaneContainer = Pane().apply {
-            this.visible.bind { !hideMainContent.use() }
+            this.visible.bind { !hideMainContent.useB() }
         }
         bottomPane += bottomPaneContainer
         
@@ -169,7 +166,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         
         // Close file chooser msg
         contentPane += Pane().apply { 
-            this.visible.bind { isFileChooserOpen.use() }
+            this.visible.bind { isFileChooserOpen.useB() }
             this += TextLabel(binding = { Localization.getVar("common.closeFileChooser").use() }).apply {
                 this.markup.set(editorPane.palette.markup)
                 this.textColor.set(Color.WHITE.cpy())
@@ -179,7 +176,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         }
         // Generic msg
         contentPane += Pane().apply { 
-            this.visible.bind { !isFileChooserOpen.use() && isMessageVisible.use() }
+            this.visible.bind { !isFileChooserOpen.useB() && isMessageVisible.useB() }
             this += TextLabel(binding = { currentMsg.use() }).apply {
                 this.markup.set(editorPane.palette.markup)
                 this.textColor.set(Color.WHITE.cpy())
@@ -231,7 +228,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     }
                     is ListEntry.Region -> {
                         val textBinding: ReadOnlyVar<String> = Var.bind {
-                            onTexturePackUpdated.use()
+                            onTexturePackUpdated.useB()
                             (if (customTexturePack.use().getOrNull(listEntry.id) != null)
                                 "[font=rodin color=CYAN]★[] " else "") +
                                     Localization.getVar(listEntry.localizationKey).use() + 
@@ -524,7 +521,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
     }
 
     override fun canCloseDialog(): Boolean {
-        return !isFileChooserOpen.getOrCompute()
+        return !isFileChooserOpen.get()
     }
 
     override fun onCloseDialog() {
@@ -677,7 +674,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
     }
     
     inner class PreviewPane : Pane() {
-        private val updateVar: Var<Boolean> = Var(false)
+        private val updateVar: BooleanVar = BooleanVar(false)
         val vbox: VBox = VBox().apply {
             this.spacing.set(2f)
         }
@@ -713,8 +710,8 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this.bindWidthToSelfHeight()
                 this.padding.set(Insets(2f))
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_trash"])).also { img -> 
-                    img.tint.bind { 
-                        if (apparentDisabledState.use()) Color(0.5f, 0.5f, 0.5f, 0.25f) else Color(1f, 1f, 1f, 1f)
+                    img.tint.bind {
+                        if (apparentDisabledState.useB()) Color(0.5f, 0.5f, 0.5f, 0.25f) else Color(1f, 1f, 1f, 1f)
                     }
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.removeTexture")))
@@ -759,13 +756,13 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     this.bounds.width.set(120f)
                     this.textLabel.markup.set(editorPane.palette.markup)
                     val tint: ReadOnlyVar<Color> = Var {
-                        if (apparentDisabledState.use()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
+                        if (apparentDisabledState.useB()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
                     }
                     this.color.bind { tint.use() }
                     this.imageNode.padding.set(Insets(3f))
                     filterToggleGroup.addToggle(this)
                     this.disabled.bind {
-                        updateVar.use()
+                        updateVar.useB()
                         val ctp = customTexturePack.use()
                         val current = currentEntry.use()
                         ctp.getOrNull(current.id) == null
@@ -790,13 +787,13 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     this.bounds.width.set(120f)
                     this.textLabel.markup.set(editorPane.palette.markup)
                     val tint: ReadOnlyVar<Color> = Var {
-                        if (apparentDisabledState.use()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
+                        if (apparentDisabledState.useB()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
                     }
                     this.color.bind { tint.use() }
                     this.imageNode.padding.set(Insets(3f))
                     filterToggleGroup.addToggle(this)
                     this.disabled.bind {
-                        updateVar.use()
+                        updateVar.useB()
                         val ctp = customTexturePack.use()
                         val current = currentEntry.use()
                         ctp.getOrNull(current.id) == null
@@ -835,7 +832,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                         onTexturePackUpdated.invert()
                     }
                     this.disabled.bind {
-                        updateVar.use()
+                        updateVar.useB()
                         val ctp = customTexturePack.use()
                         val current = currentEntry.use()
                         ctp.getOrNull(current.id) == null
@@ -863,7 +860,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 showBox += createTransparencyNode().apply { 
                     this.bindWidthToSelfHeight()
                     this += ImageNode(binding = { 
-                        updateVar.use()
+                        updateVar.useB()
                         val entry = currentEntry.use()
                         customTexturePack.use().getOrNull(entry.id) ?: baseTexturePack.use().getOrNull(entry.id)
                                                 }, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)

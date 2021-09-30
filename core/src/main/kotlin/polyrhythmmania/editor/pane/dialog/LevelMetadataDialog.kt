@@ -158,7 +158,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                     this.text.set(getter(levelMetadata.getOrCompute()))
                     this.text.addListener { t ->
                         val newText = t.getOrCompute()
-                        if (this.hasFocus.getOrCompute()) {
+                        if (this.hasFocus.get()) {
                             levelMetadata.set(copyFunc(levelMetadata.getOrCompute(), newText))
                         }
                     }
@@ -217,8 +217,9 @@ class LevelMetadataDialog(editorPane: EditorPane)
                             this.text.set(getter(levelMetadata.getOrCompute()).takeUnless { it == 0 }?.toString() ?: "")
                             this.text.addListener { t ->
                                 val newText = t.getOrCompute()
-                                if (this.hasFocus.getOrCompute()) {
-                                    val newYear: Int = newText.toIntOrNull()?.takeIf { it in LevelMetadata.LIMIT_YEAR } ?: 0
+                                if (this.hasFocus.get()) {
+                                    val newYear: Int = newText.toIntOrNull()?.takeIf { it in LevelMetadata.LIMIT_YEAR }
+                                            ?: 0
                                     levelMetadata.set(levelMetadata.getOrCompute().copy(albumYear = newYear))
                                     this.text.set(newYear.takeUnless { it == 0 }?.toString() ?: "")
                                 }

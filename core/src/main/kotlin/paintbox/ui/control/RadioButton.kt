@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.PaintboxGame
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyFloatVar
-import paintbox.binding.Var
-import paintbox.binding.invert
+import paintbox.binding.*
 import paintbox.font.PaintboxFont
 import paintbox.ui.ImageNode
 import paintbox.ui.ImageRenderingMode
@@ -39,9 +36,9 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
     /**
      * If true, the radio button will act like a toggle and can be unselected. If false, it will only be able to be checked.
      */
-    val actAsToggle: Var<Boolean> = Var(false)
-    val checkedState: Var<Boolean> = Var(false)
-    override val selectedState: Var<Boolean> = checkedState
+    val actAsToggle: BooleanVar = BooleanVar(false)
+    val checkedState: BooleanVar = BooleanVar(false)
+    override val selectedState: BooleanVar = checkedState
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
 
     var onSelected: () -> Unit = DEFAULT_ACTION
@@ -57,7 +54,7 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
         imageNode.bounds.x.set(0f)
         imageNode.bounds.width.bind { height.useF() }
         imageNode.textureRegion.bind {
-            val state = checkedState.use()
+            val state = checkedState.useB()
             getTextureRegionForType(state)
         }
         imageNode.margin.set(Insets(2f))
@@ -71,7 +68,7 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
 
     init {
         setOnAction {
-            if (actAsToggle.getOrCompute()) {
+            if (actAsToggle.get()) {
                 checkedState.invert()
             } else {
                 checkedState.set(true)

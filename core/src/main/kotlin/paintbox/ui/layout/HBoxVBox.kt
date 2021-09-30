@@ -44,7 +44,7 @@ abstract class AbstractHVBox : Pane() {
      * A flag to disable layouts. When set to true, a layout will be forced.
      * This is useful for pausing layout computation until all children have been added.
      */
-    val disableLayouts: Var<Boolean> = Var(false)
+    val disableLayouts: BooleanVar = BooleanVar(false)
     
     protected val internalAlignment: Var<InternalAlignment> = Var(InternalAlignment.MIN)
 
@@ -88,7 +88,7 @@ abstract class AbstractHVBox : Pane() {
     }
 
     protected fun attemptLayout(index: Int) {
-        if (disableLayouts.getOrCompute() || index >= elementCache.size) return
+        if (disableLayouts.get() || index >= elementCache.size) return
         
         val cache = elementCache
         var acc = if (index > 0) (cache[index - 1].let { it.position + it.dimension + it.nextSpacing }) else 0f

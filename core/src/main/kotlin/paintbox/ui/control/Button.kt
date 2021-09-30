@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.ui.*
 import paintbox.ui.area.Insets
@@ -42,7 +43,7 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
                     TextRun(button.font.use(), button.text.use(), Color.WHITE,
                             button.scaleX.useF(), button.scaleY.useF()).toTextBlock()
                 }.also { textBlock ->
-                    if (button.doLineWrapping.use()) {
+                    if (button.doLineWrapping.useB()) {
                         textBlock.lineWrapping = button.contentZone.width.useF()
                     }
                 }
@@ -68,8 +69,8 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
 
     val renderAlign: Var<Int> = Var(Align.center)
     val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
-    val doXCompression: Var<Boolean> = Var(true)
-    val doLineWrapping: Var<Boolean> = Var(false)
+    val doXCompression: BooleanVar = BooleanVar(true)
+    val doLineWrapping: BooleanVar = BooleanVar(false)
     
     /**
      * The [Markup] object to use. If null, no markup parsing is done. If not null,
@@ -120,7 +121,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
 
     val textColorToUse: ReadOnlyVar<Color> = Var {
         val pressedState = element.pressedState.use()
-        if (element.apparentDisabledState.use()) {
+        if (element.apparentDisabledState.useB()) {
             disabledTextColor.use()
         } else {
             when (pressedState) {
@@ -133,7 +134,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
     }
     val bgColorToUse: ReadOnlyVar<Color> = Var {
         val pressedState = element.pressedState.use()
-        if (element.apparentDisabledState.use()) {
+        if (element.apparentDisabledState.useB()) {
             disabledBgColor.use()
         } else {
             when (pressedState) {
@@ -206,7 +207,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
                 text.computeLayouts()
             }
 
-            val compressX = element.doXCompression.getOrCompute()
+            val compressX = element.doXCompression.get()
             val align = element.renderAlign.getOrCompute()
             val xOffset: Float = when {
                 Align.isLeft(align) -> 0f

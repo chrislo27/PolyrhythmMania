@@ -17,10 +17,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import net.beadsproject.beads.ugens.CrossFade
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
-import paintbox.binding.VarChangedListener
+import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
@@ -240,7 +237,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.bounds.height.set(175f)
             this.bounds.y.set(24f)
             this.renderAlign.set(Align.topLeft)
-            this.visible.bind { (menuCollection.activeMenu.use() as? MMMenu)?.showLogo?.use() != false }
+            this.visible.bind { (menuCollection.activeMenu.use() as? MMMenu)?.showLogo?.useB() != false }
         }
         leftPane.addChild(logoImage)
         menuPane.apply {
@@ -288,7 +285,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         }
         sceneRoot += bottomRight
-        val newVersionAvailable: ReadOnlyVar<Boolean> = Var {
+        val newVersionAvailable: ReadOnlyBooleanVar = BooleanVar {
             val github = main.githubVersion.use()
             github != Version.ZERO && github > PRMania.VERSION
         }
@@ -305,12 +302,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.renderBackground.set(true)
             this.bgPadding.set(Insets(8f))
             this.textColor.bind {
-                if (newVersionAvailable.use()) Color.ORANGE.cpy() else Color(1f, 1f, 1f, 1f)
+                if (newVersionAvailable.useB()) Color.ORANGE.cpy() else Color(1f, 1f, 1f, 1f)
             }
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
             this.tooltipElement.set(Tooltip(binding = {
                 val t = "${PRMania.TITLE} ${PRMania.VERSION}"
-                if (newVersionAvailable.use()) {
+                if (newVersionAvailable.useB()) {
                     "${Localization.getVar("mainMenu.newVersion", Var { listOf(main.githubVersion.use()) })}"
                 } else t
             }, font = main.fontMainMenuMain).apply {
@@ -336,7 +333,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.renderBackground.set(true)
             this.bgPadding.set(Insets(8f))
             this.visible.bind { 
-                newVersionAvailable.use()
+                newVersionAvailable.useB()
             }
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
         }

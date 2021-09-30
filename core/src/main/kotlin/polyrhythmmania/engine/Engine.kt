@@ -1,6 +1,7 @@
 package polyrhythmmania.engine
 
 import com.codahale.metrics.*
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import polyrhythmmania.PRMania
 import polyrhythmmania.container.Container
@@ -42,7 +43,7 @@ class Engine(timingProvider: TimingProvider,
     val musicData: MusicData = MusicData(this)
     val timeSignatures: TimeSignatureMap = TimeSignatureMap()
     
-    var endSignalReceived: Var<Boolean> = Var(false)
+    var endSignalReceived: BooleanVar = BooleanVar(false)
     
     var deleteEventsAfterCompletion: Boolean = true
     var autoInputs: Boolean = false

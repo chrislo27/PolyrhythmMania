@@ -86,7 +86,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                     }
                 }
                 is TouchDown -> {
-                    if (editor.allowedToEdit.getOrCompute()) {
+                    if (editor.allowedToEdit.get()) {
                         onMouseMovedOrDragged(event.x, event.y)
                         val relMouse = lastMouseRelative
                         val mouseBeat = getBeatFromRelative(relMouse.x)
@@ -250,7 +250,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
 
         // Render drag selection outlines
         if (click is Click.DragSelection) {
-            if (click.isPlacementInvalid.getOrCompute()) {
+            if (click.isPlacementInvalid.get()) {
                 batch.setColor(1f, 0f, 0f, 1f)
             } else {
                 batch.setColor(1f, 1f, 0f, 1f) // yellow

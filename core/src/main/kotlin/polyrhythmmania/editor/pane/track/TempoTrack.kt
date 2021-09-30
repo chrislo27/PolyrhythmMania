@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
@@ -94,7 +95,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                         this.renderAlign.set(Align.center)
                         this.textAlign.set(TextAlign.CENTRE)
 
-                        val mousedOver = Var(false)
+                        val mousedOver = BooleanVar(false)
                         this.addInputEventListener { event ->
                             if (event is MouseEntered) {
                                 mousedOver.set(true)
@@ -107,7 +108,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                         val highlighted = Color(0.25f, 1f, 1f, 1f)
                         this.textColor.bind {
                             val tool = editor.tool.use()
-                            val mouseOver = mousedOver.use()
+                            val mouseOver = mousedOver.useB()
                             if (tool == Tool.TEMPO_CHANGE && mouseOver)
                                 highlighted
                             else Color.WHITE
@@ -151,7 +152,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
     private inline fun createInputListener(crossinline onScroll: (amt: Float) -> Unit): InputEventListener {
         return InputEventListener { event ->
-            if (editor.tool.getOrCompute() == Tool.TEMPO_CHANGE && editor.allowedToEdit.getOrCompute()) {
+            if (editor.tool.getOrCompute() == Tool.TEMPO_CHANGE && editor.allowedToEdit.get()) {
                 if (event is Scrolled) {
                     val scrollAmt = getScrollAmount(event.amountY.roundToInt(),
                             Gdx.input.isControlDown(), Gdx.input.isShiftDown(), Gdx.input.isAltDown())
@@ -168,7 +169,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
 
     inner class TempoMarkerPane : Pane() {
 
-        private val isMouseOver: Var<Boolean> = Var(false)
+        private val isMouseOver: BooleanVar = BooleanVar(false)
         private val currentHoveredTempoChange: Var<TempoChange?> = Var(null)
 
         init {
@@ -242,7 +243,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             }
             // Change tempo
             addInputEventListener(createInputListener { amt ->
-                if (editor.allowedToEdit.getOrCompute()) {
+                if (editor.allowedToEdit.get()) {
                     val tc = currentHoveredTempoChange.getOrCompute()
                     if (tc != null) {
                         val originalTempo = tc.newTempo

@@ -3,6 +3,7 @@ package polyrhythmmania.engine.input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.MathUtils
 import paintbox.Paintbox
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.lazysound.LazySound
@@ -78,7 +79,7 @@ class EngineInputter(val engine: Engine) {
         val lives: Var<Int> = Var(startingLives.getOrCompute())
         
         val gameOverSeconds: FloatVar = FloatVar(Float.MAX_VALUE)
-        val gameOverUIShown: Var<Boolean> = Var(false)
+        val gameOverUIShown: BooleanVar = BooleanVar(false)
         
         fun reset() {
             score.set(0)
@@ -103,7 +104,7 @@ class EngineInputter(val engine: Engine) {
         private set
     var minimumInputCount: Int = 0
     
-    val skillStarGotten: Var<Boolean> = Var(false)
+    val skillStarGotten: BooleanVar = BooleanVar(false)
     val inputResults: List<InputResult> = mutableListOf()
     
     
@@ -476,7 +477,7 @@ class EngineInputter(val engine: Engine) {
     }
 
     fun attemptSkillStar(beat: Float): Boolean {
-        if (!skillStarGotten.getOrCompute() && MathUtils.isEqual(skillStarBeat, beat, BEAT_EPSILON)) {
+        if (!skillStarGotten.get() && MathUtils.isEqual(skillStarBeat, beat, BEAT_EPSILON)) {
             skillStarGotten.set(true)
             onSkillStarHit()
             return true

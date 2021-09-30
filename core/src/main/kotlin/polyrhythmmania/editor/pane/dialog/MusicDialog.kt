@@ -23,6 +23,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.TinyFDWrapper
 import net.beadsproject.beads.ugens.SamplePlayer
+import paintbox.binding.BooleanVar
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PreferenceKeys
@@ -161,7 +162,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             })
             this.text.bind {
                 val load = loadingProgress
-                if (load.generatingWaveform.use()) {
+                if (load.generatingWaveform.useB()) {
                     localizationWaveform.use()
                 } else {
                     localizationDecoding.use()
@@ -416,7 +417,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
             hbox.temporarilyDisableLayouts {
                 lCheckBox = CheckBox(binding = { Localization.getVar("editor.dialog.music.settings.enableLooping").use() }, font = editorPane.palette.musicDialogFont).apply {
-                    this.checkedState.set(window.doLooping.getOrCompute())
+                    this.checkedState.set(window.doLooping.get())
                     this.checkedState.addListener {
                         window.doLooping.set(it.getOrCompute())
                     }
@@ -778,7 +779,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     data class LoadingIndicator(
             val bytesSoFar: Var<Long> = Var(0L),
-            val generatingWaveform: Var<Boolean> = Var(false),
+            val generatingWaveform: BooleanVar = BooleanVar(false),
             val durationMs: FloatVar = FloatVar(0f),
     ) {
 
@@ -793,7 +794,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             val x: FloatVar = FloatVar(0f),
             val widthSec: FloatVar = FloatVar(0f),
             val musicDurationSec: FloatVar = FloatVar(0f),
-            val doLooping: Var<Boolean> = Var(false),
+            val doLooping: BooleanVar = BooleanVar(false),
             val playbackStart: FloatVar = FloatVar(0f),
             val firstBeat: FloatVar = FloatVar(0f),
             val loopStart: FloatVar = FloatVar(0f),
@@ -819,7 +820,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
 
         fun createLoopParams(): LoopParams {
-            return LoopParams(if (doLooping.getOrCompute()) 
+            return LoopParams(if (doLooping.get()) 
                 SamplePlayer.LoopType.LOOP_FORWARDS 
             else SamplePlayer.LoopType.NO_LOOP_FORWARDS, 
                     loopStart.get() * 1000.0, loopEnd.get() * 1000.0)

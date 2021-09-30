@@ -2,6 +2,7 @@ package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.UIElement
@@ -28,10 +29,9 @@ import java.util.*
 class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
                                     val date: LocalDate, val nonce: UUID?, val score: DailyChallengeScore)
     : StandardMenu(menuCol) {
-
-
-    private val didSubmit: Var<Boolean> = Var(false)
-    private val canClickSubmit: Var<Boolean> = Var(false)
+    
+    private val didSubmit: BooleanVar = BooleanVar(false)
+    private val canClickSubmit: BooleanVar = BooleanVar(false)
     
     init {
         this.setSize(MMMenu.WIDTH_MID, adjust = 32f)
@@ -74,7 +74,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
         
         val suggestedName = DiscordCore.getCurrentUser()?.username ?: ""
         val nameText: Var<String> = Var(suggestedName.takeUnless { it.any { c -> c !in DailyChallengeUtils.allowedNameChars } } ?: "")
-        val hideCountry: Var<Boolean> = Var(false)
+        val hideCountry: BooleanVar = BooleanVar(false)
         
         vbox.temporarilyDisableLayouts {
             canClickSubmit.bind { 
@@ -129,7 +129,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
                         text.set("")
                     }
                     this.text.addListener { t ->
-                        if (hasFocus.getOrCompute()) {
+                        if (hasFocus.get()) {
                             nameText.set(t.getOrCompute())
                         }
                     }
@@ -173,11 +173,11 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.submitDailyChallenge.submitScore").use() }).apply {
                 this.bounds.width.set(190f)
-                this.disabled.bind { !canClickSubmit.use() || didSubmit.use() }
+                this.disabled.bind { !canClickSubmit.useB() || didSubmit.useB() }
                 this.setOnAction {
                     val name = nameText.getOrCompute()
-                    if (name.isNotBlank() && canClickSubmit.getOrCompute() && !didSubmit.getOrCompute()) {
-                        submitScore(name, hideCountry.getOrCompute())
+                    if (name.isNotBlank() && canClickSubmit.get() && !didSubmit.get()) {
+                        submitScore(name, hideCountry.get())
                     }
                 }
             }
@@ -185,7 +185,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
                 this.bounds.width.set(120f)
                 this.markup.set(this@SubmitDailyChallengeScoreMenu.markup)
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)
-                this.visible.bind { didSubmit.use() }
+                this.visible.bind { didSubmit.useB() }
                 this.renderAlign.set(Align.left)
                 this.setScaleXY(0.9f)
             }

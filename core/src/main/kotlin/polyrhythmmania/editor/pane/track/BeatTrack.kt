@@ -135,7 +135,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                 val thisPos = beatMarkerPane.getPosRelativeToRoot(lastMouseRelative)
                 lastMouseRelative.x = event.x - thisPos.x
                 lastMouseRelative.y = event.y - thisPos.y
-                if (editor.allowedToEdit.getOrCompute()) {
+                if (editor.allowedToEdit.get()) {
                     when (event) {
                         is TouchDown -> {
                             if (currentTool == Tool.SELECTION) {
@@ -177,7 +177,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                         }
                     }
                 }
-                
+
                 Vector2Stack.pop()
             } else if (event is Scrolled) {
                 if (currentTool == Tool.TIME_SIGNATURE && !control && !alt && !shift) {

@@ -9,9 +9,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import paintbox.font.PaintboxFont
 import paintbox.ui.*
 import paintbox.ui.skin.DefaultSkins
@@ -56,7 +54,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         NONE, MOVE_LEFT, MOVE_RIGHT, //BACKSPACE, DELETE
     }
 
-    override val hasFocus: ReadOnlyVar<Boolean> = Var(false)
+    override val hasFocus: ReadOnlyBooleanVar = BooleanVar(false)
     private var caretBlinkTimer: Float = 0f
     private var keyRepeatTimer: Float = 0f
     private var keymode: KeyMode = KeyMode.NONE
@@ -74,9 +72,9 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     var enterPressedAction: () -> Unit = { requestUnfocus() }
     val characterLimit: Var<Int> = Var(Int.MAX_VALUE)
     val newlineWrapChar: Var<Char> = Var(DEFAULT_NEWLINE_WRAP)
-    val isPassword: Var<Boolean> = Var(false)
-    val canPasteText: Var<Boolean> = Var(true)
-    val canInputNewlines: Var<Boolean> = Var(false)
+    val isPassword: BooleanVar = BooleanVar(false)
+    val canPasteText: BooleanVar = BooleanVar(true)
+    val canInputNewlines: BooleanVar = BooleanVar(false)
     val textScale: FloatVar = FloatVar(1f)
     val textColor: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
     val selectionHighlightColor: Var<Color> = Var(Color(0f, 0.6f, 1f, 1f))
@@ -90,7 +88,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         paintboxFont.useFont { bitmapFont ->
             bitmapFont.scaleMul(textScale.useF())
             val originalText = text.use()
-            val translated = translateTextToRenderable(originalText, isPassword.use(), newlineWrapChar.use())
+            val translated = translateTextToRenderable(originalText, isPassword.useB(), newlineWrapChar.use())
             layout.setText(bitmapFont, translated, Color.WHITE, 0f, Align.left, false)
         }
         layout
@@ -157,19 +155,19 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                     }
                 }
                 is KeyTyped -> {
-                    if (hasFocus.getOrCompute()) {
+                    if (hasFocus.get()) {
                         onKeyTyped(event.character)
                         consumed = true
                     }
                 }
                 is KeyDown -> {
-                    if (hasFocus.getOrCompute()) {
+                    if (hasFocus.get()) {
                         onKeyDown(event.keycode)
                         consumed = true
                     }
                 }
                 is KeyUp -> {
-                    if (hasFocus.getOrCompute()) {
+                    if (hasFocus.get()) {
                         onKeyUp(event.keycode)
                         consumed = true
                     }
@@ -278,7 +276,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                 }
             }
             ENTER_ANDROID, ENTER_DESKTOP -> {
-                if (canInputNewlines.getOrCompute() && shift && !alt && !control && inputFilter.getOrCompute().invoke('\n')) {
+                if (canInputNewlines.get() && shift && !alt && !control && inputFilter.getOrCompute().invoke('\n')) {
                     deleteSelectionIfAny()
                     val currentText = text.getOrCompute()
                     val charLimit = characterLimit.getOrCompute()
@@ -409,11 +407,11 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
     }
     
     fun attemptPaste() {
-        if (!canPasteText.getOrCompute()) return
+        if (!canPasteText.get()) return
         val charLimit = characterLimit.getOrCompute()
         try {
             var data: String = Gdx.app.clipboard.contents?.replace("\r", "") ?: return
-            if (!canInputNewlines.getOrCompute()) {
+            if (!canInputNewlines.get()) {
                 data = data.replace("\n", "")
             }
 
@@ -560,13 +558,13 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
 
     override fun onFocusGained() {
         super.onFocusGained()
-        (hasFocus as Var).set(true)
+        (hasFocus as BooleanVar).set(true)
         resetCaretBlinkTimer()
     }
 
     override fun onFocusLost() {
         super.onFocusLost()
-        (hasFocus as Var).set(false)
+        (hasFocus as BooleanVar).set(false)
         setSelectionStart(-1)
     }
 
@@ -601,13 +599,13 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             val paintboxFont = element.font.getOrCompute()
             var caretHeight = 1f
             val overallOffsetX = element.xOffset.get()
-            val hasFocusNow = element.hasFocus.getOrCompute()
+            val hasFocusNow = element.hasFocus.get()
             val textColor = element.textColor.getOrCompute()
             val selectionPosition = element.selectionStart.getOrCompute()
-            
+
             paintboxFont.useFont { bitmapFont ->
                 bitmapFont.scaleMul(element.textScale.get())
-                
+
                 caretHeight = bitmapFont.data.lineHeight
 
                 if (selectionPosition >= 0) {
@@ -622,7 +620,7 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
                     val x = rectX - overallOffsetX + selectionX
                     batch.fillRect(x, rectY - (rectH + caretHeight) / 2f, caretPosX - selectionX, caretHeight)
                 }
-                
+
                 tmpColor.set(textColor)
                 tmpColor.a *= opacity
                 batch.color = tmpColor

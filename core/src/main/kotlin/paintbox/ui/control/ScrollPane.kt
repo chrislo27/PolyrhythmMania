@@ -69,12 +69,12 @@ open class ScrollPane : Control<ScrollPane>() {
     init {
         hBar.bounds.height.bind { barSize.useF() }
         hBar.bindWidthToParent {
-            if (vBar.visible.use()) (-barSize.useF()) else 0f
+            if (vBar.visible.useB()) (-barSize.useF()) else 0f
         }
         Anchor.BottomLeft.configure(hBar)
         vBar.bounds.width.bind { barSize.useF() }
         vBar.bindHeightToParent {
-            if (hBar.visible.use()) (-barSize.useF()) else 0f
+            if (hBar.visible.useB()) (-barSize.useF()) else 0f
         }
         Anchor.TopRight.configure(vBar)
         Anchor.TopLeft.configure(contentPane)
@@ -133,10 +133,10 @@ open class ScrollPane : Control<ScrollPane>() {
                 val vBarAmount = if (shift) event.amountX else event.amountY
                 val hBarAmount = if (shift) event.amountY else event.amountX
 
-                if (vBarAmount != 0f && vBar.apparentVisibility.getOrCompute() && !vBar.apparentDisabledState.getOrCompute()) {
+                if (vBarAmount != 0f && vBar.apparentVisibility.get() && !vBar.apparentDisabledState.get()) {
                     if (vBarAmount > 0) vBar.incrementBlock() else vBar.decrementBlock()
                 }
-                if (hBarAmount != 0f && hBar.apparentVisibility.getOrCompute() && !hBar.apparentDisabledState.getOrCompute()) {
+                if (hBarAmount != 0f && hBar.apparentVisibility.get() && !hBar.apparentDisabledState.get()) {
                     if (hBarAmount > 0) hBar.incrementBlock() else hBar.decrementBlock()
                 }
             }

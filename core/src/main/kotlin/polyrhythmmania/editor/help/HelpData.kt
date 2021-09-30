@@ -1,5 +1,7 @@
 package polyrhythmmania.editor.help
 
+import paintbox.binding.BooleanVar
+import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import java.util.*
@@ -21,12 +23,12 @@ class HelpData(val documents: Map<String, HelpDocument>) {
     private val docStack: Deque<HelpDocument> = ArrayDeque()
     private val forwardStack: Deque<HelpDocument> = ArrayDeque()
     val currentDocument: Var<HelpDocument?> = Var(null)
-    val hasBack: ReadOnlyVar<Boolean> = Var(false)
-    val hasForward: ReadOnlyVar<Boolean> = Var(false)
+    val hasBack: ReadOnlyBooleanVar = BooleanVar(false)
+    val hasForward: ReadOnlyBooleanVar = BooleanVar(false)
     
     private fun resetBackForwardVars() {
-        (hasBack as Var).set(docStack.size > 1)
-        (hasForward as Var).set(forwardStack.isNotEmpty())
+        (hasBack as BooleanVar).set(docStack.size > 1)
+        (hasForward as BooleanVar).set(forwardStack.isNotEmpty())
     }
     
     fun goToDoc(document: HelpDocument) {

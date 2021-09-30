@@ -148,7 +148,7 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
                                 this.text.set(this@BlockSongInfoCard.customText)
                                 this.canInputNewlines.set(true)
                                 this.text.addListener { t ->
-                                    if (hasFocus.getOrCompute()) {
+                                    if (hasFocus.get()) {
                                         this@BlockSongInfoCard.customText = t.getOrCompute()
                                     }
                                 }

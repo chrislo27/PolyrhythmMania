@@ -130,7 +130,7 @@ class Editor(val main: PRManiaGame)
     val trackView: TrackView = TrackView()
     val tool: ReadOnlyVar<Tool> = Var(Tool.SELECTION)
     val click: Var<Click> = Var(Click.None)
-    val allowedToEdit: ReadOnlyVar<Boolean> = Var.bind { playState.use() == PlayState.STOPPED && click.use() == Click.None }
+    val allowedToEdit: ReadOnlyBooleanVar = BooleanVar { playState.use() == PlayState.STOPPED && click.use() == Click.None }
     val snapping: FloatVar = FloatVar(0.25f)
     val beatLines: BeatLines = BeatLines()
     var cameraPan: CameraPan? = null
@@ -153,7 +153,7 @@ class Editor(val main: PRManiaGame)
     val musicFirstBeat: FloatVar = markerMap.getValue(MarkerType.MUSIC_FIRST_BEAT).beat
     val musicVolumes: Var<List<MusicVolume>> = Var(listOf())
     val musicData: EditorMusicData by lazy { EditorMusicData(this) }
-    val metronomeEnabled: Var<Boolean> = Var(false)
+    val metronomeEnabled: BooleanVar = BooleanVar(false)
     val timeSignatures: Var<List<TimeSignature>> = Var(listOf())
     private var lastPlacedMetronomeBeat: Int = -1
     private var timeUntilAutosave: Float = autosaveInterval.getOrCompute() * 60f
@@ -165,7 +165,7 @@ class Editor(val main: PRManiaGame)
     /**
      * Call Var<Boolean>.invert() to force the status to be updated. Used when an undo or redo takes place.
      */
-    private val forceUpdateStatus: Var<Boolean> = Var(false)
+    private val forceUpdateStatus: BooleanVar = BooleanVar(false)
     val editorPane: EditorPane
     
     private val autosaveIntervalListener: VarChangedListener<Int> = VarChangedListener {
@@ -313,7 +313,7 @@ class Editor(val main: PRManiaGame)
         } else {
             if (currentPlayState == PlayState.STOPPED) {
                 if (autosaveIntervalMin > 0) {
-                    if (timeUntilAutosave <= 0f && allowedToEdit.getOrCompute() && click.getOrCompute() == Click.None) {
+                    if (timeUntilAutosave <= 0f && allowedToEdit.get() && click.getOrCompute() == Click.None) {
                         timeUntilAutosave = autosaveIntervalMin.coerceAtLeast(1) * 60f
                         thread(start = true, isDaemon = true, priority = Thread.MIN_PRIORITY, name = "Editor Autosave") {
                             val currentSaveLoc = editorPane.saveDialog.getCurrentSaveLocation()
@@ -468,7 +468,7 @@ class Editor(val main: PRManiaGame)
     }
 
     fun attemptInstantiatorDrag(instantiator: Instantiator<Block>) {
-        if (!allowedToEdit.getOrCompute()) return
+        if (!allowedToEdit.get()) return
         val currentTool = this.tool.getOrCompute()
         if (currentTool != Tool.SELECTION) {
             changeTool(Tool.SELECTION)
@@ -483,7 +483,7 @@ class Editor(val main: PRManiaGame)
     }
 
     fun attemptMarkerMove(markerType: MarkerType, mouseBeat: Float) {
-        if (!allowedToEdit.getOrCompute()) return
+        if (!allowedToEdit.get()) return
         val marker = this.markerMap.getValue(markerType)
         click.set(Click.MoveMarker(this, marker.beat, markerType).apply {
             this.onMouseMoved(mouseBeat, 0, 0f)
@@ -499,52 +499,52 @@ class Editor(val main: PRManiaGame)
     }
 
     fun attemptUndo() {
-        if (canUndo() && allowedToEdit.getOrCompute()) {
+        if (canUndo() && allowedToEdit.get()) {
             this.undo()
             forceUpdateStatus.invert()
         }
     }
 
     fun attemptRedo() {
-        if (canRedo() && allowedToEdit.getOrCompute()) {
+        if (canRedo() && allowedToEdit.get()) {
             this.redo()
             forceUpdateStatus.invert()
         }
     }
 
     fun attemptOpenSettingsDialog() {
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.settingsDialog)
         }
     }
 
     fun attemptOpenHelpDialog() {
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.helpDialog)
         }
     }
 
     fun attemptExitToTitle() {
         changePlayState(PlayState.STOPPED)
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.exitConfirmDialog)
         }
     }
     
     fun attemptOpenPaletteEditDialog() {
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.paletteEditDialog.prepareShow())
         }
     }
     
     fun attemptOpenTexturePackEditDialog() {
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.texturePackEditDialog.prepareShow())
         }
     }
     
     fun attemptOpenLevelMetadataDialog() {
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(LevelMetadataDialog(editorPane))
         }
     }
@@ -563,31 +563,31 @@ class Editor(val main: PRManiaGame)
     }
 
     fun attemptNewLevel() {
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.newDialog)
         }
     }
 
     fun attemptSave(forceSaveAs: Boolean) {
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.saveDialog.prepareShow(forceSaveAs))
         }
     }
 
     fun attemptExport() {
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.exportLevelDialog.prepareShow())
         }
     }
 
     fun attemptLoad(dropPath: String?) {
-        if (allowedToEdit.getOrCompute()) {
+        if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.loadDialog.prepareShow(dropPath))
         }
     }
 
     fun changeTool(tool: Tool) {
-        if (!allowedToEdit.getOrCompute()) return
+        if (!allowedToEdit.get()) return
         this.tool as Var
         this.tool.set(tool)
     }
@@ -678,7 +678,7 @@ class Editor(val main: PRManiaGame)
     private fun populateMetronomeTicks(upUntilBeat: Float) {
         val engineBeatCeil = ceil(engine.beat).toInt()
         
-        if (metronomeEnabled.getOrCompute()) {
+        if (metronomeEnabled.get()) {
             var beat: Int = engineBeatCeil
             while (beat < upUntilBeat) {
                 if (beat > lastPlacedMetronomeBeat) {
@@ -789,20 +789,20 @@ class Editor(val main: PRManiaGame)
 
     private fun bindStatusBar(msg: Var<String>) {
         msg.bind {
-            this@Editor.forceUpdateStatus.use()
+            this@Editor.forceUpdateStatus.useB()
             val tool = this@Editor.tool.use()
             val currentClick = this@Editor.click.use()
             when (currentClick) {
                 is Click.CreateSelection -> Localization.getVar("editor.status.creatingSelection").use()
                 is Click.DragSelection -> {
                     var res = Localization.getVar("editor.status.draggingSelection").use()
-                    if (currentClick.wouldBeDeleted.use() && !currentClick.isNew) {
+                    if (currentClick.wouldBeDeleted.useB() && !currentClick.isNew) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.willBeDeleted").use()
                     } else if (currentClick.placementInvalidDuplicates) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.noDuplicates").use()
-                    } else if (currentClick.collidesWithOtherBlocks.use()) {
+                    } else if (currentClick.collidesWithOtherBlocks.useB()) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.collides").use()
-                    } else if (currentClick.isPlacementInvalid.use()) {
+                    } else if (currentClick.isPlacementInvalid.useB()) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.invalidPlacement").use()
                     }
                     res
@@ -816,7 +816,7 @@ class Editor(val main: PRManiaGame)
                     }
                 }
                 is Click.MoveTempoChange -> {
-                    val valid = currentClick.isCurrentlyValid.use()
+                    val valid = currentClick.isCurrentlyValid.useB()
                     var res = Localization.getVar("editor.status.tempoChangeTool.dragging").use()
                     if (!valid) {
                         res += " " + Localization.getVar("editor.status.tempoChangeTool.dragging.invalidPlacement").use()
@@ -824,7 +824,7 @@ class Editor(val main: PRManiaGame)
                     res
                 }
                 is Click.DragMusicVolume -> {
-                    val valid = currentClick.isCurrentlyValid.use()
+                    val valid = currentClick.isCurrentlyValid.useB()
                     var res = Localization.getVar("editor.status.musicVolumeTool.dragging").use()
                     if (!valid) {
                         res += " " + Localization.getVar("editor.status.musicVolumeTool.dragging.invalidPlacement").use()
@@ -951,7 +951,7 @@ class Editor(val main: PRManiaGame)
                         Input.Keys.T -> {
                             if (!shift && !alt && !ctrl && currentClick == Click.None) {
                                 val tapalongPane = editorPane.toolbar.tapalongPane
-                                if (tapalongPane.apparentVisibility.getOrCompute()) {
+                                if (tapalongPane.apparentVisibility.get()) {
                                     tapalongPane.tap()
                                 }
                             }
@@ -959,7 +959,7 @@ class Editor(val main: PRManiaGame)
                         Input.Keys.R -> {
                             if (!shift && !alt && !ctrl && currentClick == Click.None) {
                                 val tapalongPane = editorPane.toolbar.tapalongPane
-                                if (tapalongPane.apparentVisibility.getOrCompute()) {
+                                if (tapalongPane.apparentVisibility.get()) {
                                     tapalongPane.reset()
                                 }
                             }
@@ -967,7 +967,7 @@ class Editor(val main: PRManiaGame)
                     }
                 }
             }
-            if (!inputConsumed && allowedToEdit.getOrCompute()) {
+            if (!inputConsumed && allowedToEdit.get()) {
                 when (keycode) {
                     Input.Keys.F1 -> { // F1: Open help menu
                         if (!ctrl && !alt && !shift) {
@@ -1104,11 +1104,11 @@ class Editor(val main: PRManiaGame)
             when (currentClick) {
                 is Click.DragSelection -> {
                     if (button == Input.Buttons.LEFT) {
-                        if (currentClick.wouldBeDeleted.getOrCompute() && !currentClick.isNew) {
+                        if (currentClick.wouldBeDeleted.get() && !currentClick.isNew) {
                             val prevSelection = this.selectedBlocks.keys.toList()
                             currentClick.abortAction()
                             this.mutate(DeletionAction(prevSelection))
-                        } else if (!currentClick.isPlacementInvalid.getOrCompute()) {
+                        } else if (!currentClick.isPlacementInvalid.get()) {
                             val prevSelection = this.selectedBlocks.keys.toList()
                             currentClick.complete()
                             if (currentClick.isNew) {

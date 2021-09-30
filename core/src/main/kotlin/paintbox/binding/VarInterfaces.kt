@@ -95,13 +95,33 @@ interface Var<T> : ReadOnlyVar<T> {
             dependencies += this
             return this.get()
         }
+
+        @Deprecated("Don't use ReadOnlyVar<Boolean>, use ReadOnlyBooleanVar.useB() instead to avoid explicit boxing",
+                replaceWith = ReplaceWith("(this as ReadOnlyBooleanVar).useB()"),
+                level = DeprecationLevel.ERROR)
+        fun ReadOnlyVar<Boolean>.use(): Boolean {
+            return use(this)
+        }
+
+        @Deprecated("Don't use the generic use() function, use ReadOnlyBooleanVar.useB() instead to avoid explicit boxing",
+                replaceWith = ReplaceWith("this.useB()"),
+                level = DeprecationLevel.ERROR)
+        fun ReadOnlyBooleanVar.use(): Boolean {
+            return this.useB()
+        }
+
+        // The boolean specialization method. Returns a primitive boolean.
+        fun ReadOnlyBooleanVar.useB(): Boolean {
+            dependencies += this
+            return this.get()
+        }
     }
 }
 
 // Useful extension functions
 
 /**
- * [Sets][Var.set] this [Boolean] [Var] to be the boolean not of its value from [Var.getOrCompute].
+ * [Sets][Var.set] this [Boolean] [Var] to be the negation of its value from [Var.getOrCompute].
  * 
  * Returns the new state.
  */

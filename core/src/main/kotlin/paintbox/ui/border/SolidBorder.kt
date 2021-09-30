@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.PaintboxGame
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.util.ColorStack
 import paintbox.ui.UIElement
@@ -16,7 +17,7 @@ import kotlin.math.roundToInt
 class SolidBorder(initColor: Color) : Border {
     
     val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f).set(initColor))
-    val roundedCorners: Var<Boolean> = Var(false)
+    val roundedCorners: BooleanVar = BooleanVar(false)
     
     constructor() : this(Color.WHITE)
 
@@ -38,7 +39,7 @@ class SolidBorder(initColor: Color) : Border {
         tmpColor.a *= opacity
         batch.color = tmpColor
 
-        if (roundedCorners.getOrCompute()) {
+        if (roundedCorners.get()) {
             val paintboxSpritesheet = PaintboxGame.paintboxSpritesheet
 //            batch.fillRect(rectX + roundedRad, rectY - rectH + roundedRad, rectW - roundedRad * 2, rectH - roundedRad * 2)
 //            batch.fillRect(rectX, rectY - rectH + roundedRad, (roundedRad).toFloat(), rectH - roundedRad * 2)

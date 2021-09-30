@@ -92,7 +92,7 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
 
         val pressedState = element.thumbArea.pressedState.getOrCompute()
         tmpColor.set((when {
-            element.apparentDisabledState.getOrCompute() -> disabledColor
+            element.apparentDisabledState.get() -> disabledColor
             pressedState.pressed -> thumbPressedColor
             pressedState.hovered -> thumbHoveredColor
             else -> thumbColor

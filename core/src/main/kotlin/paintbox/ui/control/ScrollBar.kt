@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import paintbox.PaintboxGame
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyFloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.skin.DefaultSkins
@@ -176,8 +173,8 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     class ThumbPane(val scrollBar: ScrollBar)
         : Pane(), HasPressedState {
 
-        override val isHoveredOver: ReadOnlyVar<Boolean> = Var(false)
-        override val isPressedDown: ReadOnlyVar<Boolean> = Var(false)
+        override val isHoveredOver: ReadOnlyBooleanVar = BooleanVar(false)
+        override val isPressedDown: ReadOnlyBooleanVar = BooleanVar(false)
         override val pressedState: ReadOnlyVar<PressedState> = HasPressedState.createDefaultPressedStateVar(isHoveredOver, isPressedDown)
         private val lastMouseRelativeToRoot = Vector2(0f, 0f)
         private val lastMouseInside: Vector2 = lastMouseRelativeToRoot
@@ -202,22 +199,22 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
                 val mousePercent = getMousePercentage()
                 when (event) {
                     is MouseExited -> {
-                        (isHoveredOver as Var).set(false)
+                        (isHoveredOver as BooleanVar).set(false)
                     }
                     is ClickReleased -> {
-                        if (event.button == Input.Buttons.LEFT && isPressedDown.getOrCompute()) {
-                            (isPressedDown as Var).set(false)
+                        if (event.button == Input.Buttons.LEFT && isPressedDown.get()) {
+                            (isPressedDown as BooleanVar).set(false)
                         }
                     }
                     is MouseMoved -> {
                         if (mousePercent in currentThumbPosPercent..(currentThumbPosPercent + currentThumbWidthPercent)) {
-                            (isHoveredOver as Var).set(true)
+                            (isHoveredOver as BooleanVar).set(true)
                         } else {
-                            (isHoveredOver as Var).set(false)
+                            (isHoveredOver as BooleanVar).set(false)
                         }
                     }
                 }
-                if (!scrollBar.apparentDisabledState.getOrCompute()) {
+                if (!scrollBar.apparentDisabledState.get()) {
                     when (event) {
                         is ClickPressed -> {
                             if (event.button == Input.Buttons.LEFT) {
@@ -226,7 +223,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
 
                                 if (mousePercent in currentThumbPosPercent..(currentThumbPosPercent + currentThumbWidthPercent)) {
                                     // Inside the thumb.
-                                    (isPressedDown as Var).set(true)
+                                    (isPressedDown as BooleanVar).set(true)
                                     pressedOrigin = mousePercent - currentThumbPosPercent
                                 } else { // Outside the thumb, do block increments.
                                     if (currentThumbPosPercent > mousePercent) {
@@ -246,8 +243,8 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
                             } else false
                         }
                         is ClickReleased -> {
-                            if (isPressedDown.getOrCompute()) {
-                                (isPressedDown as Var).set(false)
+                            if (isPressedDown.get()) {
+                                (isPressedDown as BooleanVar).set(false)
                                 true
                             } else false
                         }
@@ -323,7 +320,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
             // Apply certain properties to the ScrollBar's elements like the increment buttons
             listOf(element.increaseButton, element.decreaseButton).forEach { b ->
                 b.imageNode.tint.bind {
-                    if (b.apparentDisabledState.use()) disabledColor.use() else incrementColor.use()
+                    if (b.apparentDisabledState.useB()) disabledColor.use() else incrementColor.use()
                 }
             }
         }
@@ -346,7 +343,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
 
             val pressedState = element.thumbArea.pressedState.getOrCompute()
             tmpColor.set((when {
-                element.apparentDisabledState.getOrCompute() -> disabledColor
+                element.apparentDisabledState.get() -> disabledColor
                 pressedState.pressed -> thumbPressedColor
                 pressedState.hovered -> thumbHoveredColor
                 else -> thumbColor

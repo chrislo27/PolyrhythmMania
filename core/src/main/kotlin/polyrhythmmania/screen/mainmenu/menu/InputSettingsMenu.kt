@@ -3,6 +3,7 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
@@ -163,28 +164,28 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         private fun createKeyboardInput(labelText: Var.Context.() -> String, setter: (code: Int) -> Unit, getter: () -> Int): SettingsOptionPane {
             return createSettingsOption(labelText, font = main.fontMainMenuRodin, percentageContent = 0.65f).apply settingsOptionPane@{
-                val inwardArrows: Var<Boolean> = Var(false)
+                val inwardArrows: BooleanVar = BooleanVar(false)
                 pendingKeyboardBinding.addListener {
                     if (it.getOrCompute() == null) inwardArrows.set(false)
                 }
                 val pane = Pane().also { pane ->
-                    pane += TextLabel(binding = { if (inwardArrows.use()) ">" else "<" }, font = main.fontMainMenuMain).apply { 
+                    pane += TextLabel(binding = { if (inwardArrows.useB()) ">" else "<" }, font = main.fontMainMenuMain).apply { 
                         this.bindWidthToParent(multiplier = 0.2f)
                         Anchor.TopLeft.configure(this)
                         this.renderAlign.set(Align.center)
                         this.textColor.bind { this@settingsOptionPane.textColorVar.use() }
-                        this.visible.bind { inwardArrows.use() }
+                        this.visible.bind { inwardArrows.useB() }
                     }
-                    pane += TextLabel(binding = { if (inwardArrows.use()) "<" else ">" }, font = main.fontMainMenuMain).apply { 
+                    pane += TextLabel(binding = { if (inwardArrows.useB()) "<" else ">" }, font = main.fontMainMenuMain).apply { 
                         this.bindWidthToParent(multiplier = 0.2f)
                         Anchor.TopRight.configure(this)
                         this.renderAlign.set(Align.center)
                         this.textColor.bind { this@settingsOptionPane.textColorVar.use() }
-                        this.visible.bind { inwardArrows.use() }
+                        this.visible.bind { inwardArrows.useB() }
                     }
                     pane += Button(binding = {
                         settings.inputKeymapKeyboard.use()
-                        if (inwardArrows.use()) {
+                        if (inwardArrows.useB()) {
                             "..."
                         } else Input.Keys.toString(getter())
                     }, font = main.fontMainMenuRodin).apply {

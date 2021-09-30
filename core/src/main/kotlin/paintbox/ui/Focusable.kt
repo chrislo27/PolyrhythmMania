@@ -1,5 +1,6 @@
 package paintbox.ui
 
+import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.ui.control.FocusGroup
@@ -11,7 +12,7 @@ import paintbox.ui.control.FocusGroup
  */
 interface Focusable {
     
-    val hasFocus: ReadOnlyVar<Boolean>
+    val hasFocus: ReadOnlyBooleanVar
     
     /**
      * The [FocusGroup] that this [Focusable] belongs to.

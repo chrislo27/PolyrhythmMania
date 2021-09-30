@@ -118,7 +118,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                                 this.text.set("${v.getOrCompute()}")
                             }
                             this.text.addListener { t ->
-                                if (hasFocus.getOrCompute()) {
+                                if (hasFocus.get()) {
                                     val newValue = t.getOrCompute().toIntOrNull()
                                     if (newValue != null) {
                                         varr.set(newValue.coerceIn(movingArrow.minValue, movingArrow.maxValue))
@@ -207,16 +207,17 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                         this.inputFilter.set({ c -> c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F' })
                         this.textColor.bind { this@ColourPicker.textColor.use() }
                         currentColor.addListener { v ->
-                            if (!hasFocus.getOrCompute()) {
+                            if (!hasFocus.get()) {
                                 this.text.set(v.getOrCompute().toStr())
                             }
                         }
                         this.text.addListener { t ->
-                            if (hasFocus.getOrCompute()) {
+                            if (hasFocus.get()) {
                                 try {
                                     val newValue = Color.valueOf(t.getOrCompute())
                                     this@ColourPicker.setColor(newValue, false)
-                                } catch (ignored: Exception) {}
+                                } catch (ignored: Exception) {
+                                }
                             }
                         }
                         hasFocus.addListener { f ->

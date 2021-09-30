@@ -129,7 +129,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_undo_white"])
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.use()) inactive else active
+                    if (apparentDisabledState.useB()) inactive else active
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.undo")))
@@ -146,7 +146,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_undo_white"]).apply { flip(true, false) }
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.use()) inactive else active
+                    if (apparentDisabledState.useB()) inactive else active
                 }
 //                this.tint.bind {
 //                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE

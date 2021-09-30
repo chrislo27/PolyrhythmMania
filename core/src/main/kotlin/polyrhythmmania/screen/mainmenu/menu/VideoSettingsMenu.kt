@@ -121,7 +121,7 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.bounds.width.set(280f)
                 this.setOnAction {
                     val graphics = Gdx.graphics
-                    val useFullscreen = fullscreenCheck.checkedState.getOrCompute()
+                    val useFullscreen = fullscreenCheck.checkedState.get()
                     val res = resolutionCombobox.selectedItem.getOrCompute()
                     if (useFullscreen) {
                         graphics.setFullscreenMode(graphics.displayMode)

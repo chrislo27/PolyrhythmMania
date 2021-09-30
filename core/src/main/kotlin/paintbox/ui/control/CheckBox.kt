@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.PaintboxGame
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyFloatVar
-import paintbox.binding.Var
-import paintbox.binding.invert
+import paintbox.binding.*
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.ui.ImageNode
@@ -47,9 +44,9 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
     val imageNode: ImageNode = ImageNode(null, ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
 
     val checkType: Var<CheckType> = Var(CheckType.CHECKMARK)
-    val checkedState: Var<Boolean> = Var(false)
+    val checkedState: BooleanVar = BooleanVar(false)
     val boxAlignment: Var<BoxAlign> = Var(BoxAlign.LEFT)
-    override val selectedState: Var<Boolean> = checkedState
+    override val selectedState: BooleanVar = checkedState
     override val toggleGroup: Var<ToggleGroup?> = Var(null)
 
     var onSelected: () -> Unit = DEFAULT_ACTION
@@ -68,7 +65,7 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
         imageNode.bounds.width.bind { height.useF() }
         imageNode.textureRegion.bind { 
             val type = checkType.use()
-            val state = checkedState.use()
+            val state = checkedState.useB()
             getTextureRegionForType(type, state)
         }
         imageNode.margin.set(Insets(2f))

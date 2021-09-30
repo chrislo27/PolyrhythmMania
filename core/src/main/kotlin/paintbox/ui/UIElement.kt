@@ -3,11 +3,8 @@ package paintbox.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyFloatVar
+import paintbox.binding.*
 import paintbox.ui.area.ReadOnlyBounds
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
 import paintbox.ui.border.Border
 import paintbox.ui.border.NoBorder
 import paintbox.util.RectangleStack
@@ -32,23 +29,16 @@ open class UIElement : UIBounds() {
     /**
      * If false, this element and its children will not be rendered.
      */
-    val visible: Var<Boolean> = Var(true)
-    val apparentVisibility: ReadOnlyVar<Boolean> = Var.bind {
-        visible.use() && (parent.use()?.apparentVisibility?.use() ?: true)
+    val visible: BooleanVar = BooleanVar(true)
+    val apparentVisibility: ReadOnlyBooleanVar = BooleanVar {
+        visible.useB() && (parent.use()?.apparentVisibility?.useB() ?: true)
     }
 
 
     /**
      * If true, this element will render with [ScissorStack] clipping on its entire bounds.
      */
-    val doClipping: Var<Boolean> = Var(false)
-
-//    /**
-//     * True if this element has [doClipping] enabled, or if any other parent has [wasClipped] true.
-//     */
-//    val wasClipped: ReadOnlyVar<Boolean> = Var.bind {
-//        doClipping.use() || parent.use()?.wasClipped?.use() == true
-//    }
+    val doClipping: BooleanVar = BooleanVar(false)
 
     /**
      * The opacity of this [UIElement].
@@ -88,9 +78,9 @@ open class UIElement : UIBounds() {
 
     @Suppress("RedundantModalityModifier")
     final fun render(originX: Float, originY: Float, batch: SpriteBatch) {
-        if (!visible.getOrCompute()) return
+        if (!visible.get()) return
 
-        val clip = doClipping.getOrCompute()
+        val clip = doClipping.get()
         val childOriginBounds = this.contentZone
         val childOriginX = childOriginBounds.x.get()
         val childOriginY = childOriginBounds.y.get()
@@ -211,7 +201,7 @@ open class UIElement : UIBounds() {
         val scissorH = (height / rootHeight) * camHeight
         val scissor = RectangleStack.getAndPush().set(scissorX, scissorY - scissorH, scissorW, scissorH)
 
-        val pushScissor = if (root?.applyViewport?.getOrCompute() == true)
+        val pushScissor = if (root?.applyViewport?.get() == true)
             ScissorStack.pushScissor(scissor, viewport?.screenX ?: 0, viewport?.screenY ?: 0) 
         else ScissorStack.pushScissor(scissor, 0,0)
         return pushScissor
@@ -341,11 +331,11 @@ open class UIElement : UIBounds() {
             Clipping check:
             If current is clipped, then x and y MUST be within current to begin with!
              */
-            if (current.doClipping.getOrCompute()) {
+            if (current.doClipping.get()) {
                 if (!current.bounds.containsPointLocal(x, y)) break
             }
             val found = current.children.findLast { child ->
-                child.apparentVisibility.getOrCompute()
+                child.apparentVisibility.get()
                         && child.borderZone.containsPointLocal(x - xOffset, y - yOffset)
             } ?: break
 

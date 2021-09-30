@@ -155,7 +155,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         val popped = menuStack.pop()
         val menu = menuStack.peek()
         changeActiveMenu(menu, true, instant, playSound)
-        if (popped.deleteWhenPopped.getOrCompute()) {
+        if (popped.deleteWhenPopped.get()) {
             this.removeMenu(popped)
         }
         return popped

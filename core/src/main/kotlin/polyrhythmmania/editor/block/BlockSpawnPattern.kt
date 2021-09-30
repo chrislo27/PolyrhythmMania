@@ -1,6 +1,7 @@
 package polyrhythmmania.editor.block
 
 import com.eclipsesource.json.JsonObject
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.ui.contextmenu.CheckBoxMenuItem
 import paintbox.ui.contextmenu.ContextMenu
@@ -34,7 +35,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
         patternData.rowATypes[9] = CubeType.PLATFORM
     }
         private set
-    val disableTailEnd: Var<Boolean> = Var(false)
+    val disableTailEnd: BooleanVar = BooleanVar(false)
 
     init {
         this.width = 4f
@@ -114,7 +115,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
                         beat + b)
             }
 
-            if (ind == timings.size - 1 && anyNotNone && !disableTailEnd.getOrCompute()) {
+            if (ind == timings.size - 1 && anyNotNone && !disableTailEnd.get()) {
                 when (cube) {
                     CubeType.NO_CHANGE -> {}
                     CubeType.NONE -> {
@@ -167,14 +168,14 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }
-            it.disableTailEnd.set(this.disableTailEnd.getOrCompute())
+            it.disableTailEnd.set(this.disableTailEnd.get())
         }
     }
 
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
         patternData.writeToJson(obj)
-        if (disableTailEnd.getOrCompute()) {
+        if (disableTailEnd.get()) {
             obj.add("disableTailEnd", true)
         }
     }

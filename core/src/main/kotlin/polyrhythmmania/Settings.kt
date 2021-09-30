@@ -128,7 +128,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
     
     val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind { 
-        InputCalibration(calibrationAudioOffsetMs.use().toFloat(), calibrationDisableInputSFX.use())
+        InputCalibration(calibrationAudioOffsetMs.use().toFloat(), use(calibrationDisableInputSFX))
     }
     val gameplayVolume: ReadOnlyVar<Int> = Var { (gameplayVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
     val menuMusicVolume: ReadOnlyVar<Int> = Var { (menuMusicVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
