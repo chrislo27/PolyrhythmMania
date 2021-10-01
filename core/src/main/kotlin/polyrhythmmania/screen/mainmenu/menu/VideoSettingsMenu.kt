@@ -17,33 +17,23 @@ import kotlin.math.roundToInt
 
 
 class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+    
+    companion object {
+        val FRAMERATES: List<Int> = listOf(
+                30,
+                60,
+                75,
+                120,
+                144,
+                240,
+                0,
+        )
+    }
 
     private val settings: Settings = menuCol.main.settings
 
     val resolutionCombobox: ComboBox<WindowSize>
     val fullscreenCheck: CheckBox
-    private val minimumMaxFps: Int = 30
-    private val maximumMaxFps: Int = 360
-    private val stepMaxFps: Int = 10
-    private val unlimitedMaxFps: Int = maximumMaxFps + stepMaxFps
-    val maxFramerateSlider: Slider = Slider().apply {
-        this.bindWidthToParent(multiplier = 0.85f)
-        this.minimum.set(minimumMaxFps.toFloat())
-        this.maximum.set(unlimitedMaxFps.toFloat())
-        this.tickUnit.set(stepMaxFps.toFloat())
-        this.setValue((settings.maxFramerate.getOrCompute().takeUnless { it <= 0f }?.coerceAtMost(maximumMaxFps) ?: unlimitedMaxFps).toFloat())
-        this.value.addListener { v ->
-            val newValue = v.getOrCompute().toInt()
-            val maxFps = if (newValue > maximumMaxFps) 0 else newValue
-            settings.maxFramerate.set(newValue)
-            val gr = Gdx.graphics
-            gr.setForegroundFPS(maxFps)
-        }
-        this.tooltipElement.set(createTooltip {
-            val fps = value.useF().roundToInt()
-            if (fps > maximumMaxFps) Localization.getVar("mainMenu.videoSettings.maxFramerate.unlimited").use() else "$fps"
-        })
-    }
 
     init {
         this.setSize(MMMenu.WIDTH_MID)
@@ -102,12 +92,23 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 Gdx.graphics.setVSync(it)
             }
             vbox += vsyncPane
+            
             val unlimitedFpsText = Localization.getVar("mainMenu.videoSettings.maxFramerate.unlimited")
-            val maxFpsText = Localization.getVar("mainMenu.videoSettings.maxFramerate", Var { 
-                val fps = maxFramerateSlider.value.useF().roundToInt()
-                listOf(if (fps > maximumMaxFps) unlimitedFpsText.use() else "$fps")
-            })
-            vbox += createSliderPane(maxFramerateSlider, percentageContent = 0.6f) { maxFpsText.use() }
+            val (fpsPane, fpsCombobox) = createComboboxOption(FRAMERATES, settings.maxFramerate.getOrCompute(),
+                    { Localization.getVar("mainMenu.videoSettings.maxFramerate").use() })
+            vbox += fpsPane
+            fpsCombobox.itemStringConverter.bind {
+                return@bind { fps: Int ->
+                    if (fps <= 0) unlimitedFpsText.use() else "$fps"
+                }
+            }
+            fpsCombobox.selectedItem.addListener { v ->
+                val newValue = v.getOrCompute()
+                val maxFps = if (newValue <= 0) 0 else newValue
+                settings.maxFramerate.set(newValue)
+                val gr = Gdx.graphics
+                gr.setForegroundFPS(maxFps)
+            }
         }
 
         hbox.temporarilyDisableLayouts {
