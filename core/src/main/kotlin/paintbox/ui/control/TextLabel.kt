@@ -112,16 +112,24 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
         if (textBlock.isRunInfoInvalid()) {
             textBlock.computeLayouts()
         }
-        val textWidth = textBlock.width
-        val textHeight = textBlock.height
-        val bgPaddingInsets = this.bgPadding.getOrCompute()
+        if (!affectWidth && !affectHeight) return
+        
+        val textWidth = textBlock.width * scaleX.get()
+        val textHeight = textBlock.height * scaleY.get()
+        
+        val borderInsets = this.border.getOrCompute()
+        val marginInsets = this.margin.getOrCompute()
+        val paddingInsets = this.bgPadding.getOrCompute().maximize(this.padding.getOrCompute())
+        
+        fun Insets.leftright(): Float = this.left + this.right
+        fun Insets.topbottom(): Float = this.top + this.bottom
 
         if (affectWidth) {
-            val computedWidth = bgPaddingInsets.left + bgPaddingInsets.right + textWidth
+            val computedWidth = borderInsets.leftright() + marginInsets.leftright() + paddingInsets.leftright() + textWidth
             this.bounds.width.set(computedWidth)
         }
         if (affectHeight) {
-            val computedHeight = bgPaddingInsets.top + bgPaddingInsets.bottom + textHeight
+            val computedHeight = borderInsets.topbottom() + marginInsets.topbottom() + paddingInsets.topbottom() + textHeight
             this.bounds.height.set(computedHeight)
         }
     }
