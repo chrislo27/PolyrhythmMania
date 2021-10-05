@@ -62,19 +62,4 @@ open class Tooltip
     constructor(binding: Var.Context.() -> String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
             : super(binding, font)
 
-    fun resizeBoundsToContent() {
-        val textBlock: TextBlock = this.internalTextBlock.getOrCompute()
-        if (textBlock.isRunInfoInvalid()) {
-            textBlock.computeLayouts()
-        }
-        val textWidth = textBlock.width
-        val textHeight = textBlock.height
-        val bgPaddingInsets = this.bgPadding.getOrCompute()
-
-        val computedWidth = bgPaddingInsets.left + bgPaddingInsets.right + textWidth
-        val computedHeight = bgPaddingInsets.top + bgPaddingInsets.bottom + textHeight
-        this.bounds.width.set(computedWidth)
-        this.bounds.height.set(computedHeight)
-    }
-
 }

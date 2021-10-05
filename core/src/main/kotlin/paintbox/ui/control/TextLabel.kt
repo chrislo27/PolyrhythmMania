@@ -106,6 +106,25 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
 
     @Suppress("RemoveRedundantQualifierName")
     override fun getDefaultSkinID(): String = TextLabel.TEXTLABEL_SKIN_ID
+    
+    fun resizeBoundsToContent(affectWidth: Boolean = true, affectHeight: Boolean = true) {
+        val textBlock: TextBlock = this.internalTextBlock.getOrCompute()
+        if (textBlock.isRunInfoInvalid()) {
+            textBlock.computeLayouts()
+        }
+        val textWidth = textBlock.width
+        val textHeight = textBlock.height
+        val bgPaddingInsets = this.bgPadding.getOrCompute()
+
+        if (affectWidth) {
+            val computedWidth = bgPaddingInsets.left + bgPaddingInsets.right + textWidth
+            this.bounds.width.set(computedWidth)
+        }
+        if (affectHeight) {
+            val computedHeight = bgPaddingInsets.top + bgPaddingInsets.bottom + textHeight
+            this.bounds.height.set(computedHeight)
+        }
+    }
 }
 
 open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
