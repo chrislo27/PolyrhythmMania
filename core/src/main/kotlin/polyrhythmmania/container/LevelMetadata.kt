@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter
 
 data class LevelMetadata(
         /** UTC */ val initialCreationDate: LocalDateTime,
-        /** Not persisted, taken from file proeprty */ val lastModifiedDate: LocalDateTime,
+        /** Not persisted, taken from file property */ val lastModifiedDate: LocalDateTime,
         val levelCreator: String,
         val description: String,
         val songName: String,
@@ -51,6 +51,14 @@ data class LevelMetadata(
                     obj.getString("genre", DEFAULT_METADATA.genre),
             )
         }
+    }
+    
+    fun areRequiredFieldsNonempty(): Boolean {
+        return levelCreator.isNotBlank() && songName.isNotBlank() && songArtist.isNotBlank()
+    }
+    
+    fun anyFieldsBlank(): Boolean {
+        return albumYear == BLANK_YEAR || listOf(levelCreator, description, songName, songArtist, albumName, genre).any { it.isBlank() }
     }
     
     fun toJson(): JsonObject {

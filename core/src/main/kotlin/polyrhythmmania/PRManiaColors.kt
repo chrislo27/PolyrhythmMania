@@ -7,6 +7,7 @@ import polyrhythmmania.world.entity.EntityInputFeedback
 
 object PRManiaColors {
     
+    val POSITIVE: Color = Color.valueOf("#4CFF4C")
     val NEGATIVE: Color = Color.valueOf("#FF4C4C")
     val TEMPO: Color = Color(0.4f, 0.4f, 0.9f, 1f)
     val MUSIC_VOLUME: Color = Color(1f, 0.4f, 0f, 1f)
@@ -20,6 +21,7 @@ object PRManiaColors {
     init {
         fun put(key: String, color: Color) = Colors.put(key, color)
         
+        put("prmania_positive", POSITIVE.cpy())
         put("prmania_negative", NEGATIVE.cpy())
         put("prmania_keystroke", Color.CYAN.cpy())
         put("prmania_statushint", Color.LIGHT_GRAY.cpy())

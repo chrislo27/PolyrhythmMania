@@ -50,7 +50,6 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     val saveDialog: SaveDialog
     val loadDialog: LoadDialog
     val newDialog: NewDialog
-    val exportLevelDialog: ExportLevelDialog
     val playtestDialog: PlaytestDialog
     val paletteEditDialog: PaletteEditDialog
     val texturePackEditDialog: TexturePackEditDialog
@@ -116,7 +115,6 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         playtestDialog = PlaytestDialog(this)
         paletteEditDialog = PaletteEditDialog(this, editor.container.world.tilesetPalette, null, false)
         texturePackEditDialog = TexturePackEditDialog(this)
-        exportLevelDialog = ExportLevelDialog(this)
     }
     
     fun resetHelpDialog() {
