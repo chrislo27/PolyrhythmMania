@@ -1,5 +1,6 @@
 package polyrhythmmania
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import com.eclipsesource.json.Json
 import paintbox.Paintbox
@@ -261,11 +262,16 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         // LauncherSettings override properties
         val fps = game.launcherSettings.fps
         if (fps != null) {
-            // TODO
+            this.maxFramerate.set(fps.coerceAtLeast(0))
         }
         val vsync = game.launcherSettings.vsync
         if (vsync != null) {
             this.vsyncEnabled.set(vsync)
+        }
+        Gdx.app.postRunnable { 
+            val gr = Gdx.graphics
+            gr.setForegroundFPS(this.maxFramerate.getOrCompute())
+            gr.setVSync(this.vsyncEnabled.getOrCompute())
         }
     }
 
