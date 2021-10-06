@@ -17,6 +17,7 @@ data class LevelMetadata(
         val albumName: String,
         val albumYear: Int,
         val genre: String,
+        val difficulty: Int,
 ) {
     
     companion object {
@@ -27,13 +28,15 @@ data class LevelMetadata(
         const val LIMIT_ALBUM_NAME: Int = 64
         const val LIMIT_GENRE: Int = 32
         val LIMIT_YEAR: IntRange = 0..Year.MAX_VALUE
+        val LIMIT_DIFFICULTY: IntRange = 0..10
         
         val DEFAULT_DATE: LocalDateTime = LocalDateTime.of(2021, 8, 26, 0, 0, 0)
         const val BLANK_YEAR: Int = 0
         val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME
+        const val BLANK_DIFFICULTY: Int = 0
         
         val DEFAULT_METADATA: LevelMetadata = LevelMetadata(
-                DEFAULT_DATE, DEFAULT_DATE, "", "", "", "", "", BLANK_YEAR, "",
+                DEFAULT_DATE, DEFAULT_DATE, "", "", "", "", "", BLANK_YEAR, "", BLANK_DIFFICULTY,
         )
         
         fun fromJson(obj: JsonObject, lastModifiedDate: LocalDateTime): LevelMetadata {
@@ -49,6 +52,7 @@ data class LevelMetadata(
                     obj.getString("albumName", DEFAULT_METADATA.albumName),
                     obj.getInt("albumYear", DEFAULT_METADATA.albumYear),
                     obj.getString("genre", DEFAULT_METADATA.genre),
+                    obj.get("difficulty")?.asInt() ?: DEFAULT_METADATA.difficulty,
             )
         }
     }
@@ -58,7 +62,8 @@ data class LevelMetadata(
     }
     
     fun anyFieldsBlank(): Boolean {
-        return albumYear == BLANK_YEAR || listOf(levelCreator, description, songName, songArtist, albumName, genre).any { it.isBlank() }
+        return albumYear == BLANK_YEAR || difficulty == BLANK_DIFFICULTY ||
+                listOf(levelCreator, description, songName, songArtist, albumName, genre).any { it.isBlank() }
     }
     
     fun toJson(): JsonObject {
@@ -71,6 +76,7 @@ data class LevelMetadata(
         obj.set("albumName", albumName)
         obj.set("albumYear", albumYear)
         obj.set("genre", genre)
+        obj.set("difficulty", difficulty)
         return obj
     }
 
@@ -87,6 +93,7 @@ data class LevelMetadata(
                 albumName = this.albumName.take(LIMIT_ALBUM_NAME),
                 albumYear = this.albumYear.coerceIn(LIMIT_YEAR),
                 genre = this.genre.take(LIMIT_GENRE),
+                difficulty = this.difficulty.coerceIn(LIMIT_DIFFICULTY),
         )
     }
 }

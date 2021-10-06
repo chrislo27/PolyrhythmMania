@@ -125,7 +125,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
             fun addInfoField(labelText: String, getter: (LevelMetadata) -> String): HBox {
                 return HBox().apply {
                     this.bounds.height.set(labelHeight)
-                    this.spacing.set(2f)
+                    this.spacing.set(4f)
                     this += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.mainFontBold).apply {
                         this.bounds.width.set(textLabelWidth)
                         this.renderAlign.set(Align.right)
@@ -169,7 +169,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 }
                 val hbox = HBox().apply {
                     this.bounds.height.set(labelHeight)
-                    this.spacing.set(2f)
+                    this.spacing.set(4f)
                     this += TextLabel(binding = { "${if (requiredField) "[color=prmania_negative]* []" else ""}${Localization.getVar(labelText).use()}" }).apply {
                         this.bounds.width.set(textLabelWidth)
                         this.markup.set(fieldLabelMarkup)
@@ -189,11 +189,37 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 
                 return hbox to textField
             }
+            fun <T> addComboBox(labelText: String, list: List<T>,
+                                getter: (LevelMetadata) -> T,
+                                requiredField: Boolean = false,
+                                copyFunc: (LevelMetadata, newValue: T) -> LevelMetadata, ): Pair<HBox, ComboBox<T>> {
+                val combobox = ComboBox(list, getter(levelMetadata.getOrCompute()), editorPane.palette.musicDialogFont).apply {
+                    this.bounds.width.set(250f)
+                    this.selectedItem.addListener { item ->
+                        levelMetadata.set(copyFunc(levelMetadata.getOrCompute(), item.getOrCompute()))
+                    }
+                }
+                val hbox = HBox().apply {
+                    this.bounds.height.set(labelHeight)
+                    this.spacing.set(4f)
+                    this += TextLabel(binding = { "${if (requiredField) "[color=prmania_negative]* []" else ""}${Localization.getVar(labelText).use()}" }).apply {
+                        this.bounds.width.set(textLabelWidth)
+                        this.markup.set(fieldLabelMarkup)
+                        this.renderAlign.set(Align.right)
+                        this.textColor.set(Color.WHITE)
+                        this.padding.set(Insets(0f, 0f, 0f, 4f))
+                        this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.${labelText}.tooltip")))
+                    }
+                    this += combobox
+                }
+                
+                return hbox to combobox
+            }
 
             fun addYearField(hbox: HBox, labelText: String, getter: (LevelMetadata) -> Int) {
                 hbox += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.mainFontBold).apply {
                     this.padding.set(Insets(0f, 0f, 4f, 4f))
-                    this.margin.set(Insets(0f, 0f, 10f, 8f))
+                    this.margin.set(Insets(0f, 0f, 10f, 4f))
                     this.resizeBoundsToContent(affectWidth = true, affectHeight = false)
                     this.renderAlign.set(Align.right)
                     this.textColor.set(Color.WHITE)
@@ -278,6 +304,20 @@ class LevelMetadataDialog(editorPane: EditorPane)
                         textField.text.set(it.getOrCompute().genreName)
                         textField.requestUnfocus()
                     }
+                }
+            }.first
+            vbox += addComboBox("levelMetadata.difficulty", LevelMetadata.LIMIT_DIFFICULTY.toList(),
+                    LevelMetadata::difficulty) { lm, newValue ->
+                lm.copy(difficulty = newValue)
+            }.also { (hbox, combobox) ->
+                combobox.itemStringConverter.set { 
+                    if (it <= 0) Localization.getValue("editor.dialog.levelMetadata.noDifficulty") else "$it"
+                }
+                combobox.bounds.width.set(150f)
+                hbox += TextLabel(text = " / 10", font = editorPane.palette.musicDialogFont).apply {
+                    this.bounds.width.set(100f)
+                    this.renderAlign.set(Align.left)
+                    this.textColor.set(Color.WHITE)
                 }
             }.first
             
