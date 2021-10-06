@@ -268,10 +268,12 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
                     return Json.`object`().also { o ->
                         o.add("beat", this.beat)
                         o.add("tempo", this.newTempo)
-                        o.add("swing", Json.`object`().also { so ->
-                            so.add("ratio", this.newSwing.ratio)
-                            so.add("div", this.newSwing.division)
-                        })
+                        if (this.newSwing != Swing.STRAIGHT) {
+                            o.add("swing", Json.`object`().also { so ->
+                                so.add("ratio", this.newSwing.ratio)
+                                so.add("div", this.newSwing.division)
+                            })
+                        }
                     }
                 }
 
