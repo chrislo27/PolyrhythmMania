@@ -159,7 +159,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
     fun addResource(res: ExternalResource) {
         val key = res.key
         val existing = _resources[key]
-        existing?.dispose()
+        if (existing != res) existing?.dispose()
         _resources[key] = res
     }
 
