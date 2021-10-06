@@ -401,8 +401,10 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             }
             
             percentageSimulated.set(100)
+            val allTempoChanges = engine.tempos.getAllTempoChanges()
             val exportStatistics = ExportStatistics(endStateSec, engine.inputter.totalExpectedInputs,
-                    engine.tempos.computeAverageTempo(endBlockPosition))
+                    engine.tempos.computeAverageTempo(endBlockPosition),
+                    allTempoChanges.minOf { it.newTempo }, allTempoChanges.maxOf { it.newTempo })
             val finalSimResult = currentSimResult.copy(percentage = 100, exportStatistics = exportStatistics)
             currentSimResult = finalSimResult
             Gdx.app.postRunnable {
@@ -442,14 +444,19 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     private fun save(newFile: File, simulationResult: SimulationResult) {
         try {
             editor.compileEditorIntermediates()
-            
-            editor.container.writeToFile(newFile, SaveOptions.editorExportAsLevel(simulationResult.exportStatistics!!))
+
+            val exportStatistics: ExportStatistics = simulationResult.exportStatistics!!
+            editor.container.writeToFile(newFile, SaveOptions.editorExportAsLevel(exportStatistics))
 
             Gdx.app.postRunnable {
                 doneDescLabel.text.set(Localization.getValue("editor.dialog.exportLevel.done.desc",
-                        TimeUtils.convertMsToTimestamp((simulationResult.exportStatistics.durationSec) * 1000, noMs = true),
-                        simulationResult.exportStatistics.inputCount,
-                        DecimalFormats.format("0.0#", simulationResult.exportStatistics.averageBPM)))
+                        TimeUtils.convertMsToTimestamp((exportStatistics.durationSec) * 1000, noMs = true),
+                        exportStatistics.inputCount,
+                        DecimalFormats.format("0.0#", exportStatistics.minBPM),
+                        DecimalFormats.format("0.0#", exportStatistics.averageBPM),
+                        DecimalFormats.format("0.0#", exportStatistics.maxBPM),
+                        DecimalFormats.format("0.0", exportStatistics.averageInputsPerMinute),
+                ))
                 substate.set(Substate.DONE)
             }
         } catch (e: Exception) {
