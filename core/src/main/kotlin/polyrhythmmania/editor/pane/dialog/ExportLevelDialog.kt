@@ -9,6 +9,7 @@ import paintbox.Paintbox
 import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
+import paintbox.binding.VarChangedListener
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -31,12 +32,19 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.Click
+import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.util.DecimalFormats
 import java.io.File
+import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 import kotlin.math.max
+import kotlin.math.roundToInt
+import kotlin.system.measureNanoTime
 
 
 class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
@@ -49,21 +57,22 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
       -> Back to CHECKLIST if cancelled
       -> Go to SIMULATING
     SIMULATING will simulate the level
-      -> Once done, go to SAVING and save the level
-    SAVING
-      -> Go to SAVE_ERROR if an error occurs
-      -> Go to DONE if successful
-    SAVE_ERROR will show the simulation result, and will ask the user to either save to a different location or quit
+      -> If an exception occurs, go to DONE with an appropriate error msg
+      -> If there are no issues, save
+      -> If there are issues, go to SIMULATION_WARNINGS
+    SIMULATION_WARNINGS shows the warnings in the simulation
+      -> Yes/No confirmation to actually save or not.
+    SAVE_ERROR will ask the user to either save to a different location or quit
       -> Back to SAVING or quit the dialog
-    DONE is done and a confirmation of the simulation will appear
-      -> Exit dialog
+    DONE
+      -> Exit
     
      */
     enum class Substate {
         CHECKLIST,
         FILE_DIALOG_OPEN,
         SIMULATING,
-        SAVING,
+        SIMULATION_WARNINGS,
         SAVE_ERROR,
         DONE,
     }
@@ -74,16 +83,28 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         PARTIAL(Color.valueOf("#FF964C"));
     }
     
+    private data class SimulationResult(val percentage: Int = 0, val firstMiss: Float? = null,
+                                        val rodsExploded: Int = 0,
+                                        val inputsRecorded: Int = 0) {
+        
+        fun anyWarnings(): Boolean {
+            return firstMiss != null
+        }
+    }
+    
     companion object {
-        private val closableSubstates: Set<Substate> = setOf(Substate.CHECKLIST, Substate.SAVE_ERROR, Substate.DONE)
+        private val closableSubstates: Set<Substate> = EnumSet.complementOf(EnumSet.of(Substate.FILE_DIALOG_OPEN, Substate.SIMULATING))
     }
 
     private val substate: Var<Substate> = Var(Substate.CHECKLIST)
     private val checklistIncomplete: BooleanVar = BooleanVar(false)
+    private val simulationResult: Var<SimulationResult> = Var(SimulationResult())
+    private lateinit var levelFile: File
     
     private val checklistPane: Pane
-    
-    private val descLabel: TextLabel
+    private val doneDescLabel: TextLabel
+    private val saveErrorDescLabel: TextLabel
+    private val simWarningsDescLabel: TextLabel
 
     init {
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.exportLevel.title").use() }
@@ -202,6 +223,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.setOnAction { 
                 openFileDialog { file: File? ->
                     if (file != null) {
+                        levelFile = file
                         startSimulation(file)
                     } else {
                         substate.set(Substate.CHECKLIST)
@@ -217,12 +239,63 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.visible.bind { substate.use() == Substate.FILE_DIALOG_OPEN }
         }
         
-        descLabel = TextLabel("").apply {
+        contentPane += TextLabel(binding = {
+            Localization.getValue("editor.dialog.exportLevel.simulating.progress", simulationResult.use().percentage)
+        }).apply {
             this.markup.set(editorPane.palette.markup)
             this.textColor.set(Color.WHITE.cpy())
             this.renderAlign.set(Align.center)
-            this.textAlign.set(TextAlign.CENTRE)
+            this.visible.bind { substate.use() == Substate.SIMULATING }
         }
+        
+        doneDescLabel = TextLabel("").apply {
+            this.markup.set(editorPane.palette.markup)
+            this.textColor.set(Color.WHITE.cpy())
+            this.renderAlign.set(Align.center)
+            this.visible.bind { substate.use() == Substate.DONE }
+        }
+        contentPane += doneDescLabel
+        saveErrorDescLabel = TextLabel("").apply {
+            this.markup.set(editorPane.palette.markup)
+            this.textColor.set(Color.WHITE.cpy())
+            this.renderAlign.set(Align.center)
+            this.visible.bind { substate.use() == Substate.SAVE_ERROR }
+        }
+        contentPane += saveErrorDescLabel
+        simWarningsDescLabel = TextLabel("").apply {
+            this.markup.set(editorPane.palette.markup)
+            this.textColor.set(Color.WHITE.cpy())
+            this.renderAlign.set(Align.center)
+            this.visible.bind { substate.use() == Substate.SIMULATION_WARNINGS }
+        }
+        contentPane += simWarningsDescLabel
+        bottomPane.addChild(Button(binding = { Localization.getVar("editor.dialog.exportLevel.saveError.button").use() },
+                font = editorPane.palette.musicDialogFont).apply {
+            this.applyDialogStyleBottom()
+            this.bounds.width.set(500f)
+            Anchor.TopCentre.configure(this)
+            this.visible.bind { substate.use() == Substate.SAVE_ERROR }
+            this.setOnAction {
+                openFileDialog { file: File? ->
+                    if (file != null) {
+                        levelFile = file
+                        save(file, simulationResult.getOrCompute())
+                    } else {
+                        substate.set(Substate.SAVE_ERROR)
+                    }
+                }
+            }
+        })
+        bottomPane.addChild(Button(binding = { Localization.getVar("editor.dialog.exportLevel.simulationWarnings.button").use() },
+                font = editorPane.palette.musicDialogFont).apply {
+            this.applyDialogStyleBottom()
+            this.bounds.width.set(500f)
+            Anchor.TopCentre.configure(this)
+            this.visible.bind { substate.use() == Substate.SIMULATION_WARNINGS }
+            this.setOnAction {
+                save(levelFile, simulationResult.getOrCompute())
+            }
+        })
     }
 
     private fun openFileDialog(callback: (File?) -> Unit) {
@@ -259,32 +332,125 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     
     private fun startSimulation(levelFile: File) {
         substate.set(Substate.SIMULATING)
-        
+        thread(start = true, isDaemon = true) {
+            simulation(levelFile)
+        }
     }
-
-    private fun save(newFile: File) {
+    
+    private fun simulation(levelFile: File) {
+        val editor = this.editor
+        val container = editor.container
+        val engine = container.engine
+        val timing = engine.timingProvider
+        val endStateSec = engine.tempos.beatsToSeconds(container.endBlockPosition.get()).coerceAtLeast(0f)
+        engine.resetEndSignal()
+        val percentageSimulated = AtomicInteger(0)
+        val endSignalTriggered = AtomicBoolean(false)
+        val endListener: VarChangedListener<Boolean> = VarChangedListener {
+            if (it.getOrCompute()) {
+                endSignalTriggered.set(true)
+            }
+        }
+        engine.endSignalReceived.addListener(endListener)
+        
+        var currentSimResult = SimulationResult()
+        
         try {
-            Gdx.app.postRunnable {
-                descLabel.text.set(Localization.getValue("editor.dialog.save.saving"))
-                substate.set(Substate.SAVING)
+            engine.soundInterface.disableSounds = true
+            editor.setPlaytestingEnabled(false)
+            editor.compileEditorIntermediates()
+            timing.seconds = 0f
+            engine.seconds = 0f
+            editor.resetWorld()
+            engine.inputter.reset()
+            
+            var sec = 0f
+            val step = 1f / 60f
+            var lastUIUpdateMs = 0L
+            var missedYet = false
+            var rodsExploded = 0
+
+            while (sec <= endStateSec && !endSignalTriggered.get()) {
+                timing.seconds = sec
+                engine.seconds = sec
+                engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = true)
+                
+                if (engine.inputter.rodsExplodedPR > rodsExploded) {
+                    rodsExploded = engine.inputter.rodsExplodedPR
+                    currentSimResult = currentSimResult.copy(rodsExploded = rodsExploded)
+                    if (!missedYet && !engine.inputter.noMiss) {
+                        missedYet = true
+                        currentSimResult = currentSimResult.copy(firstMiss = sec)
+                    }
+                }
+                
+                sec += step
+                val percentageFloat = sec / (endStateSec.coerceAtLeast(0.01f))
+                percentageSimulated.set(if (!percentageFloat.isFinite()) 0 else (percentageFloat * 100).roundToInt().coerceIn(0, 99))
+                
+                if ((System.currentTimeMillis() - lastUIUpdateMs) >= 30L) {
+                    lastUIUpdateMs = System.currentTimeMillis()
+                    currentSimResult = currentSimResult.copy(percentage = percentageSimulated.get())
+                    Gdx.app.postRunnable { 
+                        simulationResult.set(currentSimResult)
+                    }
+                }
             }
             
-            editor.compileEditorIntermediates()
+            percentageSimulated.set(100)
+            val finalSimResult = currentSimResult.copy(percentage = 100, inputsRecorded = engine.inputter.totalExpectedInputs)
+            currentSimResult = finalSimResult
+            Gdx.app.postRunnable {
+                simulationResult.set(finalSimResult)
+            }
+            if (finalSimResult.anyWarnings()) {
+                Gdx.app.postRunnable {
+                    simWarningsDescLabel.text.set(Localization.getValue("editor.dialog.exportLevel.simulationWarnings",
+                            finalSimResult.rodsExploded, DecimalFormats.format("0.0#", finalSimResult.firstMiss ?: Float.NaN)))
+                    substate.set(Substate.SIMULATION_WARNINGS)
+                }
+                return
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val exClassName = e.javaClass.name
+            Gdx.app.postRunnable { 
+                doneDescLabel.text.set(Localization.getValue("editor.dialog.exportLevel.simulationError", exClassName))
+                substate.set(Substate.DONE)
+            }
+            return
+        } finally {
+            engine.soundInterface.disableSounds = false
+            engine.endSignalReceived.removeListener(endListener)
+            val originalSecs = editor.playbackStart.get()
+            timing.seconds = originalSecs
+            engine.seconds = originalSecs
+            editor.resetWorld()
+            editor.updatePaletteAndTexPackChangesState()
+            engine.soundInterface.clearAllNonMusicAudio()
+        }
+        
+        // Attempt to save
+        save(levelFile, currentSimResult)
+    }
 
+    private fun save(newFile: File, simulationResult: SimulationResult) {
+        try {
+            editor.compileEditorIntermediates()
+            // TODO use sim result
             editor.container.writeToFile(newFile, SaveOptions.EDITOR_EXPORT_AS_LEVEL)
 
             Gdx.app.postRunnable {
+                doneDescLabel.text.set(Localization.getValue("editor.dialog.exportLevel.done.desc", simulationResult.inputsRecorded))
                 substate.set(Substate.DONE)
-                attemptClose()
-                editorPane.menubar.triggerAutosaveIndicator(Localization.getValue("editor.button.save.saveMessage"))
             }
         } catch (e: Exception) {
-            Paintbox.LOGGER.warn("Error occurred while saving container:")
+            Paintbox.LOGGER.warn("Error occurred while saving container as level:")
             e.printStackTrace()
             val exClassName = e.javaClass.name
             Gdx.app.postRunnable {
                 substate.set(Substate.SAVE_ERROR)
-                descLabel.text.set(Localization.getValue("editor.dialog.save.saveError", exClassName))
+                saveErrorDescLabel.text.set(Localization.getValue("editor.dialog.exportLevel.saveError", exClassName))
             }
         }
     }

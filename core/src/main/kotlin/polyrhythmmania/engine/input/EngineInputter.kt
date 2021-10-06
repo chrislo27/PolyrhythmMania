@@ -102,6 +102,8 @@ class EngineInputter(val engine: Engine) {
         private set
     var noMiss: Boolean = true
         private set
+    var rodsExplodedPR: Int = 0
+        private set
     var minimumInputCount: Int = 0
     
     val skillStarGotten: BooleanVar = BooleanVar(false)
@@ -127,6 +129,7 @@ class EngineInputter(val engine: Engine) {
         practice.reset()
         challenge.reset()
         endlessScore.reset()
+        rodsExplodedPR = 0
     }
     
     fun onAButtonPressed(release: Boolean) {
@@ -397,7 +400,7 @@ class EngineInputter(val engine: Engine) {
             (inputResults as MutableList).addAll(validResults)
         }
         
-        if (noMiss && !rod.registeredMiss) {
+        if (!engine.autoInputs && noMiss && !rod.registeredMiss) {
             if ((rod.exploded && numExpected > 0) || (numExpected > validResults.size) || inputTracker.results.any { it.inputScore == InputScore.MISS }) {
                 missed()
             }
@@ -426,6 +429,10 @@ class EngineInputter(val engine: Engine) {
             }
             else -> {}
         }
+    }
+    
+    fun onRodPRExploded() {
+        rodsExplodedPR++
     }
     
     fun triggerLifeLost() {
