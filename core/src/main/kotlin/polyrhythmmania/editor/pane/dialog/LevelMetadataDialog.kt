@@ -125,7 +125,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
             fun addInfoField(labelText: String, getter: (LevelMetadata) -> String): HBox {
                 return HBox().apply {
                     this.bounds.height.set(labelHeight)
-                    this.spacing.set(0f)
+                    this.spacing.set(2f)
                     this += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.mainFontBold).apply {
                         this.bounds.width.set(textLabelWidth)
                         this.renderAlign.set(Align.right)
@@ -169,7 +169,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 }
                 val hbox = HBox().apply {
                     this.bounds.height.set(labelHeight)
-                    this.spacing.set(0f)
+                    this.spacing.set(2f)
                     this += TextLabel(binding = { "${if (requiredField) "[color=prmania_negative]* []" else ""}${Localization.getVar(labelText).use()}" }).apply {
                         this.bounds.width.set(textLabelWidth)
                         this.markup.set(fieldLabelMarkup)
@@ -189,45 +189,42 @@ class LevelMetadataDialog(editorPane: EditorPane)
                 
                 return hbox to textField
             }
-            
-            fun addYearField(labelText: String, getter: (LevelMetadata) -> Int): HBox {
-                return HBox().apply {
-                    this.bounds.height.set(labelHeight)
-                    this.spacing.set(0f)
-                    this += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.mainFontBold).apply {
-                        this.bounds.width.set(textLabelWidth)
-                        this.renderAlign.set(Align.right)
-                        this.textColor.set(Color.WHITE)
-                        this.padding.set(Insets(0f, 0f, 0f, 4f))
-                        this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.${labelText}.tooltip")))
-                    }
-                    this += RectElement(Color.BLACK).apply {
-                        this.bounds.width.set(75f)
-                        this.padding.set(Insets(1f, 1f, 2f, 2f))
-                        this.border.set(Insets(1f))
-                        this.borderStyle.set(SolidBorder(Color.WHITE))
-                        this += TextField(editorPane.palette.rodinDialogFont).apply {
-                            focusGroup.addFocusable(this)
-                            this.textColor.set(Color(1f, 1f, 1f, 1f))
+
+            fun addYearField(hbox: HBox, labelText: String, getter: (LevelMetadata) -> Int) {
+                hbox += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.mainFontBold).apply {
+                    this.padding.set(Insets(0f, 0f, 4f, 4f))
+                    this.margin.set(Insets(0f, 0f, 10f, 8f))
+                    this.resizeBoundsToContent(affectWidth = true, affectHeight = false)
+                    this.renderAlign.set(Align.right)
+                    this.textColor.set(Color.WHITE)
+                    this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.${labelText}.tooltip")))
+                }
+                hbox += RectElement(Color.BLACK).apply {
+                    this.bounds.width.set(75f)
+                    this.padding.set(Insets(1f, 1f, 2f, 2f))
+                    this.border.set(Insets(1f))
+                    this.borderStyle.set(SolidBorder(Color.WHITE))
+                    this += TextField(editorPane.palette.rodinDialogFont).apply {
+                        focusGroup.addFocusable(this)
+                        this.textColor.set(Color(1f, 1f, 1f, 1f))
 //                            this.characterLimit.set(LevelMetadata.LIMIT_YEAR.last.toString().length)
-                            this.characterLimit.set(4) // XXXX
-                            this.inputFilter.set {
-                                it in '0'..'9'
+                        this.characterLimit.set(4) // XXXX
+                        this.inputFilter.set {
+                            it in '0'..'9'
+                        }
+                        this.text.set(getter(levelMetadata.getOrCompute()).takeUnless { it == 0 }?.toString() ?: "")
+                        this.text.addListener { t ->
+                            val newText = t.getOrCompute()
+                            if (this.hasFocus.get()) {
+                                val newYear: Int = newText.toIntOrNull()?.takeIf { it in LevelMetadata.LIMIT_YEAR }
+                                        ?: 0
+                                levelMetadata.set(levelMetadata.getOrCompute().copy(albumYear = newYear))
+                                this.text.set(newYear.takeUnless { it == 0 }?.toString() ?: "")
                             }
-                            this.text.set(getter(levelMetadata.getOrCompute()).takeUnless { it == 0 }?.toString() ?: "")
-                            this.text.addListener { t ->
-                                val newText = t.getOrCompute()
-                                if (this.hasFocus.get()) {
-                                    val newYear: Int = newText.toIntOrNull()?.takeIf { it in LevelMetadata.LIMIT_YEAR }
-                                            ?: 0
-                                    levelMetadata.set(levelMetadata.getOrCompute().copy(albumYear = newYear))
-                                    this.text.set(newYear.takeUnless { it == 0 }?.toString() ?: "")
-                                }
-                            }
-                            this.setOnRightClick {
-                                requestFocus()
-                                text.set("")
-                            }
+                        }
+                        this.setOnRightClick {
+                            requestFocus()
+                            text.set("")
                         }
                     }
                 }
@@ -256,8 +253,9 @@ class LevelMetadataDialog(editorPane: EditorPane)
             vbox += addTextField("levelMetadata.albumName", LevelMetadata.LIMIT_ALBUM_NAME,
                     LevelMetadata::albumName, textFieldSizeMultiplier = 0.6f) { t, newText ->
                 t.copy(albumName = newText)
-            }.first
-            vbox += addYearField("levelMetadata.albumYear", LevelMetadata::albumYear)
+            }.first.also { hbox ->
+                addYearField(hbox, "levelMetadata.albumYear", LevelMetadata::albumYear)
+            }
             vbox += addTextField("levelMetadata.genre", LevelMetadata.LIMIT_GENRE, LevelMetadata::genre,
                     textFieldSizeAdjust = -600f) { t, newText ->
                 t.copy(genre = newText)
