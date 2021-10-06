@@ -30,6 +30,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
+import polyrhythmmania.container.manifest.ExportStatistics
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.Editor
@@ -37,6 +38,7 @@ import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DecimalFormats
+import polyrhythmmania.util.TimeUtils
 import java.io.File
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -85,7 +87,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     
     private data class SimulationResult(val percentage: Int = 0, val firstMiss: Float? = null,
                                         val rodsExploded: Int = 0,
-                                        val inputsRecorded: Int = 0) {
+                                        val exportStatistics: ExportStatistics? = null) {
         
         fun anyWarnings(): Boolean {
             return firstMiss != null
@@ -342,7 +344,8 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val container = editor.container
         val engine = container.engine
         val timing = engine.timingProvider
-        val endStateSec = engine.tempos.beatsToSeconds(container.endBlockPosition.get()).coerceAtLeast(0f)
+        val endBlockPosition = container.endBlockPosition.get()
+        val endStateSec = engine.tempos.beatsToSeconds(endBlockPosition).coerceAtLeast(0f)
         engine.resetEndSignal()
         val percentageSimulated = AtomicInteger(0)
         val endSignalTriggered = AtomicBoolean(false)
@@ -398,7 +401,9 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             }
             
             percentageSimulated.set(100)
-            val finalSimResult = currentSimResult.copy(percentage = 100, inputsRecorded = engine.inputter.totalExpectedInputs)
+            val exportStatistics = ExportStatistics(endStateSec, engine.inputter.totalExpectedInputs,
+                    engine.tempos.computeAverageTempo(endBlockPosition))
+            val finalSimResult = currentSimResult.copy(percentage = 100, exportStatistics = exportStatistics)
             currentSimResult = finalSimResult
             Gdx.app.postRunnable {
                 simulationResult.set(finalSimResult)
@@ -438,10 +443,13 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         try {
             editor.compileEditorIntermediates()
             // TODO use sim result
-            editor.container.writeToFile(newFile, SaveOptions.EDITOR_EXPORT_AS_LEVEL)
+            editor.container.writeToFile(newFile, SaveOptions.editorExportAsLevel(simulationResult.exportStatistics!!))
 
             Gdx.app.postRunnable {
-                doneDescLabel.text.set(Localization.getValue("editor.dialog.exportLevel.done.desc", simulationResult.inputsRecorded))
+                doneDescLabel.text.set(Localization.getValue("editor.dialog.exportLevel.done.desc",
+                        TimeUtils.convertMsToTimestamp((simulationResult.exportStatistics.durationSec) * 1000, noMs = true),
+                        simulationResult.exportStatistics.inputCount,
+                        DecimalFormats.format("0.0#", simulationResult.exportStatistics.averageBPM)))
                 substate.set(Substate.DONE)
             }
         } catch (e: Exception) {

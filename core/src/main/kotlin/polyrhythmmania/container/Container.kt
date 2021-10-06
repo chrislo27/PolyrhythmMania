@@ -240,7 +240,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
         // Create manifest
         val jsonObj: JsonObject = Json.`object`()
         val libraryRelevantData = LibraryRelevantData(CONTAINER_VERSION, PRMania.VERSION,
-                saveOptions.isAutosave, saveOptions.isProject, if (!saveOptions.isProject) UUID.randomUUID() else null,
+                saveOptions.isAutosave, saveOptions.exportStatistics, if (!saveOptions.isProject) UUID.randomUUID() else null,
                 levelMetadata.truncateWithLimits())
         libraryRelevantData.writeToManifestJson(jsonObj)
         

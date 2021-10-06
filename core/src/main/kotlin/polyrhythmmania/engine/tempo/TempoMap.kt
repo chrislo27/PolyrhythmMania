@@ -115,6 +115,25 @@ class TempoMap(startingGlobalTempo: Float = DEFAULT_STARTING_GLOBAL_TEMPO) {
         return secondsToBeats(tc, seconds, disregardSwing)
     }
 
+    /**
+     * Returns average tempo from beat 0 to [untilBeat].
+     */
+    fun computeAverageTempo(untilBeat: Float): Float {
+        if (untilBeat <= 0f) return globalTempo.newTempo
+        
+        var previousTempo: TempoChange = globalTempo
+        var sum = 0f
+        for ((index, tc) in allTempoChanges.withIndex()) {
+            if (index == 0) continue
+            if (tc.beat >= untilBeat) break
+            sum += previousTempo.newTempo * (tc.beat - previousTempo.beat)
+            previousTempo = tc
+        }
+        sum += previousTempo.newTempo * (untilBeat - previousTempo.beat)
+        
+        return sum / (untilBeat)
+    }
+
     private fun beatsToSeconds(tc: TempoChangeData, beats: Float, disregardSwing: Boolean = false): Float {
         if (beats < 0f) return beats
         val baseSeconds = tc.secondsStart

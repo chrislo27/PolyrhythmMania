@@ -19,7 +19,7 @@ import java.util.*
  */
 data class LibraryRelevantData(
         val containerVersion: Int, val programVersion: Version,
-        val isAutosave: Boolean, val isProject: Boolean,
+        val isAutosave: Boolean, val exportStatistics: ExportStatistics?,
         val levelUUID: UUID?, val levelMetadata: LevelMetadata?
 ) {
 
@@ -44,13 +44,24 @@ data class LibraryRelevantData(
                     wasLevelMetadataLoaded = true
                 }
             }
+            var wasExportStatsLoaded = false
+            var exportStatistics: ExportStatistics? = null
+            if (containerVersion >= 10 && !isProject) {
+                val metadataObj = manifestObj.get("exportStatistics")?.asObject()
+                if (metadataObj != null) {
+                    exportStatistics = ExportStatistics.fromJson(metadataObj)
+                    wasExportStatsLoaded = true
+                }
+            }
             
-            return Pair(LibraryRelevantData(containerVersion, programVersion, isAutosave, isProject, levelUUID,
-                    levelMetadata), LoadInfo(wasLevelMetadataLoaded))
+            return Pair(LibraryRelevantData(containerVersion, programVersion, isAutosave, exportStatistics, levelUUID,
+                    levelMetadata), LoadInfo(wasLevelMetadataLoaded, wasExportStatsLoaded))
         }
     }
     
-    data class LoadInfo(val wasLevelMetadataLoaded: Boolean)
+    data class LoadInfo(val wasLevelMetadataLoaded: Boolean, val wasExportStatisticsLoaded: Boolean)
+
+    val isProject: Boolean = exportStatistics == null
     
     fun writeToManifestJson(jsonObj: JsonObject) {
         jsonObj.add("containerVersion", this.containerVersion)
@@ -62,6 +73,11 @@ data class LibraryRelevantData(
         }
         if (this.levelMetadata != null) {
             jsonObj.add("levelMetadata", levelMetadata.truncateWithLimits().toJson())
+        }
+        if (this.exportStatistics != null) {
+            jsonObj.add("exportStatistics", Json.`object`().also { obj ->
+                this.exportStatistics.writeToJson(obj)
+            })
         }
     }
 }
