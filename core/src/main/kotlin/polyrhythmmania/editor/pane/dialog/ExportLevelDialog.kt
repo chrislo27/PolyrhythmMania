@@ -391,7 +391,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 val percentageFloat = sec / (endStateSec.coerceAtLeast(0.01f))
                 percentageSimulated.set(if (!percentageFloat.isFinite()) 0 else (percentageFloat * 100).roundToInt().coerceIn(0, 99))
                 
-                if ((System.currentTimeMillis() - lastUIUpdateMs) >= 30L) {
+                if ((System.currentTimeMillis() - lastUIUpdateMs) >= 50L) {
                     lastUIUpdateMs = System.currentTimeMillis()
                     currentSimResult = currentSimResult.copy(percentage = percentageSimulated.get())
                     Gdx.app.postRunnable { 
@@ -442,7 +442,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     private fun save(newFile: File, simulationResult: SimulationResult) {
         try {
             editor.compileEditorIntermediates()
-            // TODO use sim result
+            
             editor.container.writeToFile(newFile, SaveOptions.editorExportAsLevel(simulationResult.exportStatistics!!))
 
             Gdx.app.postRunnable {
