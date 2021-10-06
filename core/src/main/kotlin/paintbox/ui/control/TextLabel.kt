@@ -179,7 +179,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
             text.computeLayouts()
         }
 
-        val bgPaddingInsets = element.bgPadding.getOrCompute()
+        val bgPaddingInsets = if (element.renderBackground.get()) element.bgPadding.getOrCompute() else Insets.ZERO
         val compressX = element.doXCompression.get()
         val align = element.renderAlign.getOrCompute()
         val scaleX = element.scaleX.get()
