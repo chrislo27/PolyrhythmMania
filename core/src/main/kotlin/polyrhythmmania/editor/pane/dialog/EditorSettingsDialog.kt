@@ -27,7 +27,7 @@ import polyrhythmmania.ui.PRManiaSkins
 import kotlin.math.max
 
 
-class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
+class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     val settings: Settings = editorPane.main.settings
 
@@ -53,7 +53,7 @@ class SettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.bindWidthToParent(adjust = -100f)
             this += Button(binding = { Localization.getVar("editor.dialog.settings.resetAllToDefault").use() }, font = editorPane.palette.musicDialogFont).apply { 
                 this.applyDialogStyleBottom()
-                this.bounds.width.set(350f)
+                this.bounds.width.set(450f)
                 this.setOnAction { 
                     resetDefaultActions.forEach { it.invoke() }
                 }

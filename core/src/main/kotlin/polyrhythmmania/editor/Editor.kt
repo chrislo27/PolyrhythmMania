@@ -515,7 +515,7 @@ class Editor(val main: PRManiaGame)
 
     fun attemptOpenSettingsDialog() {
         if (allowedToEdit.get()) {
-            editorPane.openDialog(editorPane.settingsDialog)
+            editorPane.openDialog(editorPane.editorSettingsDialog)
         }
     }
 

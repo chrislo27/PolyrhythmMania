@@ -44,7 +44,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     val toolbar: Toolbar get() = upperPane.toolbar
     val musicDialog: MusicDialog
     val exitConfirmDialog: ExitConfirmDialog
-    val settingsDialog: SettingsDialog
+    val editorSettingsDialog: EditorSettingsDialog
     var helpDialog: HelpDialog
         private set // var is for fast-resetting for debugging
     val saveDialog: SaveDialog
@@ -107,7 +107,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     init {
         musicDialog = MusicDialog(this)
         exitConfirmDialog = ExitConfirmDialog(this)
-        settingsDialog = SettingsDialog(this)
+        editorSettingsDialog = EditorSettingsDialog(this)
         helpDialog = HelpDialog(this)
         saveDialog = SaveDialog(this)
         loadDialog = LoadDialog(this)
