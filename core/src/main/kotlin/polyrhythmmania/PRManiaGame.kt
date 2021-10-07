@@ -50,6 +50,7 @@ import polyrhythmmania.util.LelandSpecialChars
 import polyrhythmmania.util.TempFileUtils
 import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 
 
@@ -63,6 +64,15 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         fun createPaintboxSettings(launchArguments: List<String>, logger: Logger, logToFile: File?): PaintboxSettings =
                 PaintboxSettings(launchArguments, logger, logToFile, PRMania.VERSION, PRMania.DEFAULT_SIZE,
                         ResizeAction.ANY_SIZE, PRMania.MINIMUM_SIZE)
+        
+        init {
+            /*
+            Prevents an error when doing recovery saves triggered as part of a shutdown hook.
+            The file-based cache will try to add a shutdown hook to clean itself up, which is illegal
+            while the shutdown is occurring. The memory-based cache doesn't have this problem.
+             */
+            ImageIO.setUseCache(false)
+        }
     }
 
     private var lastWindowed: WindowSize = PRMania.DEFAULT_SIZE.copy()
