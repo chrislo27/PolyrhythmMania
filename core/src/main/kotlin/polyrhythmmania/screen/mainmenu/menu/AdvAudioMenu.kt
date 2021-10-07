@@ -45,15 +45,15 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Paintbox.LOGGER.info("Supported mixer: ${mixer.mixerInfo.name}")
         }
 
-        val (mixerPane, mixerControl) = createCycleOption(mixers, mixerHandler.recommendedMixer,
+        val (mixerPane, mixerCombobox) = createComboboxOption(mixers, mixerHandler.recommendedMixer,
                 { Localization.getVar("mainMenu.advancedAudio.mixer").use() },
                 percentageContent = 1f, twoRowsTall = true, itemToString = { it.mixerInfo.name })
         mixerPane.label.textAlign.set(TextAlign.CENTRE)
         mixerPane.label.renderAlign.set(Align.center)
         mixerPane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.advancedAudio.mixer.tooltip")))
-        mixerControl.label.font.set(main.fontMainMenuRodin)
-        mixerControl.label.setScaleXY(0.75f)
-        mixerControl.currentItem.addListener { m ->
+        mixerCombobox.font.set(main.fontMainMenuRodin)
+        mixerCombobox.setScaleXY(0.75f)
+        mixerCombobox.selectedItem.addListener { m ->
             setSoundSystemMixer(m.getOrCompute())
         }
 
@@ -79,7 +79,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.bounds.width.set(250f)
                 this.setOnAction {
                     val def = mixerHandler.defaultMixer
-                    mixerControl.currentItem.set(def) // Listener will set accordingly.
+                    mixerCombobox.selectedItem.set(def) // Listener will set accordingly.
                 }
             }
         }
