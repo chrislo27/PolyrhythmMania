@@ -41,10 +41,10 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
                     markup.parse(button.text.use())
                 } else {
                     TextRun(button.font.use(), button.text.use(), Color.WHITE,
-                            button.scaleX.useF(), button.scaleY.useF()).toTextBlock()
+                            /*button.scaleX.useF(), button.scaleY.useF()*/ 1f, 1f).toTextBlock()
                 }.also { textBlock ->
                     if (button.doLineWrapping.useB()) {
-                        textBlock.lineWrapping = button.contentZone.width.useF()
+                        textBlock.lineWrapping = button.contentZone.width.useF() / button.scaleX.useF()
                     }
                 }
             }
@@ -209,20 +209,25 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
 
             val compressX = element.doXCompression.get()
             val align = element.renderAlign.getOrCompute()
+            val scaleX = element.scaleX.get()
+            val scaleY = element.scaleY.get()
+            val textWidth = text.width * scaleX
+            val textHeight = text.height * scaleY
             val xOffset: Float = when {
                 Align.isLeft(align) -> 0f
-                Align.isRight(align) -> (textW - (if (compressX) min(text.width, textW) else text.width))
-                else -> (textW - (if (compressX) min(text.width, textW) else text.width)) / 2f
+                Align.isRight(align) -> (textW - ((if (compressX) (min(textWidth, textW)) else textWidth)))
+                else -> (textW - (if (compressX) min(textWidth, textW) else textWidth)) / 2f
             }
+            val firstCapHeight = text.firstCapHeight * scaleY
             val yOffset: Float = when {
-                Align.isTop(align) -> textH - text.firstCapHeight
-                Align.isBottom(align) -> 0f + (text.height - text.firstCapHeight)
-                else -> textH / 2 + text.height / 2 - text.firstCapHeight
+                Align.isTop(align) -> textH - firstCapHeight
+                Align.isBottom(align) -> 0f + (textHeight - firstCapHeight)
+                else -> ((textH + textHeight) / 2 - firstCapHeight)
             }
 
             batch.color = tmpColor // Sets the text colour and opacity
             text.drawCompressed(batch, textX + xOffset, textY - textH + yOffset,
-                    if (compressX) (textW) else 0f, element.textAlign.getOrCompute())
+                    if (compressX) (textW) else 0f, element.textAlign.getOrCompute(), scaleX, scaleY)
             ColorStack.pop()
         }
 
