@@ -49,6 +49,12 @@ class QuitMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         hbox.temporarilyDisableLayouts {
+            hbox += createSmallButton(binding = { Localization.getVar("common.cancel").use() }).apply {
+                this.bounds.width.set(100f)
+                this.setOnAction {
+                    menuCol.popLastMenu()
+                }
+            }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.quit.confirm").use() }).apply {
                 this.bounds.width.set(100f)
                 this.setOnAction {
@@ -57,12 +63,6 @@ class QuitMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         Thread.sleep(1000L)
                         exitProcess(0)
                     }
-                }
-            }
-            hbox += createSmallButton(binding = { Localization.getVar("common.cancel").use() }).apply {
-                this.bounds.width.set(100f)
-                this.setOnAction {
-                    menuCol.popLastMenu()
                 }
             }
         }

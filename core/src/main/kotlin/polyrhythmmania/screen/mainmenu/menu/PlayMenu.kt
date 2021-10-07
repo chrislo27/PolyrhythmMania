@@ -24,7 +24,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     init {
         this.setSize(MMMenu.WIDTH_SMALL)
         this.titleText.bind { Localization.getVar("mainMenu.play.title").use() }
-        this.contentPane.bounds.height.set(300f)
+        this.contentPane.bounds.height.set(320f)
 
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
