@@ -149,18 +149,26 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
     }
 
     fun setCompressedMusic(res: ExternalResource?) {
-        removeResource(RES_KEY_COMPRESSED_MUSIC)
-        if (res != null) {
-            addResource(res)
+        val oldCompressedMusic = this.compressedMusic
+        if (oldCompressedMusic != res) {
+            if (res != null) {
+                addResource(res)
+            } else {
+                if (oldCompressedMusic != null) {
+                    removeResource(oldCompressedMusic.key)
+                }
+            }
+            this.compressedMusic = res
         }
-        this.compressedMusic = res
     }
 
     fun addResource(res: ExternalResource) {
         val key = res.key
         val existing = _resources[key]
-        if (existing != res) existing?.dispose()
-        _resources[key] = res
+        if (existing != res) {
+            existing?.dispose()
+            _resources[key] = res
+        }
     }
 
     fun removeResource(key: String) {

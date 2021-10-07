@@ -1,7 +1,9 @@
 package polyrhythmmania.container
 
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.StreamUtils
 import java.io.File
+import java.io.InputStream
 
 
 /**
@@ -18,6 +20,7 @@ class ExternalResource(
         val shouldBeDeletedWhenDisposed: Boolean
 ) : Disposable {
 
+    private val reader: InputStream = file.inputStream()
     private val disposalListeners: MutableSet<DisposalListener> = mutableSetOf()
 
     fun addDisposalListener(listener: DisposalListener) {
@@ -34,6 +37,7 @@ class ExternalResource(
 
     override fun dispose() {
         disposalListeners.toList().forEach { it.dispose(this) }
+        StreamUtils.closeQuietly(reader)
         if (shouldBeDeletedWhenDisposed) {
             file.delete()
         }
