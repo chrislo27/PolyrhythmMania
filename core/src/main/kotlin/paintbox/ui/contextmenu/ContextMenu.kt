@@ -175,6 +175,7 @@ open class ContextMenu : Control<ContextMenu>() {
                         pane.addChild(TextLabel("").apply {
                             this.padding.set(Insets.ZERO)
                             this.internalTextBlock.set(item.textBlock)
+                            this.setScaleXY(item.scaleXY)
                             this.textAlign.set(item.textAlign)
                             this.renderAlign.set(item.renderAlign)
                         })
@@ -190,7 +191,8 @@ open class ContextMenu : Control<ContextMenu>() {
                     contentPane.also { pane ->
                         pane.addChild(Button("").apply {
                             this.padding.set(Insets.ZERO)
-                            this.internalTextBlock.set(item.textBlock)
+                            this.setScaleXY(item.scaleXY)
+                            this.internalTextBlock.set(item.textBlock.copy())
                             this.skinID.set(CONTEXT_MENU_BUTTON_SKIN_ID)
                             this.textAlign.set(TextAlign.LEFT)
                             this.renderAlign.set(Align.left)
@@ -217,6 +219,7 @@ open class ContextMenu : Control<ContextMenu>() {
                         pane.addChild(CheckBox("").apply {
                             this.padding.set(Insets.ZERO)
                             this.textLabel.internalTextBlock.set(item.textBlock)
+                            this.textLabel.setScaleXY(item.scaleXY)
                             this.textLabel.textAlign.set(TextAlign.LEFT)
                             this.textLabel.renderAlign.set(Align.left)
                             this.checkedState.set(item.checkState.getOrCompute())

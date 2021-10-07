@@ -101,9 +101,10 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
                 val thisFont = this.font.getOrCompute()
                 val strConverter = this.itemStringConverter.getOrCompute()
                 val menuItems: List<Pair<T, MenuItem>> = itemList.map { item: T ->
+                    val scaleXY: Float = min(scaleX.get(), scaleY.get())
                     item to (if (thisMarkup != null)
-                        SimpleMenuItem.create(strConverter.invoke(item), thisMarkup)
-                    else SimpleMenuItem.create(strConverter.invoke(item), thisFont)).also { smi ->
+                        SimpleMenuItem.create(strConverter.invoke(item), thisMarkup, scaleXY)
+                    else SimpleMenuItem.create(strConverter.invoke(item), thisFont, scaleXY)).also { smi ->
                         smi.closeMenuAfterAction = true
                         smi.onAction = {
                             this.selectedItem.set(item)
@@ -148,6 +149,11 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
     }
     
     override fun getDefaultSkinID(): String = COMBOBOX_SKIN_ID
+    
+    fun setScaleXY(scaleXY: Float) {
+        this.scaleX.set(scaleXY)
+        this.scaleY.set(scaleXY)
+    }
 }
 
 open class ComboBoxSkin(element: ComboBox<Any?>) : Skin<ComboBox<Any?>>(element) {

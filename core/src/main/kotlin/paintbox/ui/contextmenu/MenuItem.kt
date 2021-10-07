@@ -37,14 +37,14 @@ class SeparatorMenuItem() : MenuItem()
  */
 class CustomMenuItem(val element: UIElement) : MenuItem()
 
-class LabelMenuItem(val textBlock: TextBlock) : MenuItem() {
+class LabelMenuItem(val textBlock: TextBlock, val scaleXY: Float = 1f) : MenuItem() {
     companion object {
-        fun create(text: String, font: PaintboxFont): LabelMenuItem {
-            return LabelMenuItem(TextRun(font, text).toTextBlock())
+        fun create(text: String, font: PaintboxFont, scaleXY: Float = 1f): LabelMenuItem {
+            return LabelMenuItem(TextRun(font, text).toTextBlock(), scaleXY)
         }
 
-        fun create(text: String, markup: Markup): LabelMenuItem {
-            return LabelMenuItem(markup.parse(text))
+        fun create(text: String, markup: Markup, scaleXY: Float = 1f): LabelMenuItem {
+            return LabelMenuItem(markup.parse(text), scaleXY)
         }
     }
     
@@ -52,14 +52,14 @@ class LabelMenuItem(val textBlock: TextBlock) : MenuItem() {
     var renderAlign: Int = Align.left
 }
 
-class SimpleMenuItem(val textBlock: TextBlock) : MenuItem() {
+class SimpleMenuItem(val textBlock: TextBlock, val scaleXY: Float = 1f) : MenuItem() {
     companion object {
-        fun create(text: String, font: PaintboxFont): SimpleMenuItem {
-            return SimpleMenuItem(TextRun(font, text).toTextBlock())
+        fun create(text: String, font: PaintboxFont, scaleXY: Float = 1f): SimpleMenuItem {
+            return SimpleMenuItem(TextRun(font, text).toTextBlock(), scaleXY)
         }
 
-        fun create(text: String, markup: Markup): SimpleMenuItem {
-            return SimpleMenuItem(markup.parse(text))
+        fun create(text: String, markup: Markup, scaleXY: Float = 1f): SimpleMenuItem {
+            return SimpleMenuItem(markup.parse(text), scaleXY)
         }
     }
     
@@ -70,15 +70,15 @@ class SimpleMenuItem(val textBlock: TextBlock) : MenuItem() {
     }
 }
 
-class CheckBoxMenuItem(val checkState: Var<Boolean>, val textBlock: TextBlock) : MenuItem() {
+class CheckBoxMenuItem(val checkState: Var<Boolean>, val textBlock: TextBlock, val scaleXY: Float = 1f) : MenuItem() {
 
     companion object {
-        fun create(checkState: Var<Boolean>, text: String, font: PaintboxFont): CheckBoxMenuItem {
-            return CheckBoxMenuItem(checkState, TextRun(font, text).toTextBlock())
+        fun create(checkState: Var<Boolean>, text: String, font: PaintboxFont, scaleXY: Float = 1f): CheckBoxMenuItem {
+            return CheckBoxMenuItem(checkState, TextRun(font, text).toTextBlock(), scaleXY)
         }
 
-        fun create(checkState: Var<Boolean>, text: String, markup: Markup): CheckBoxMenuItem {
-            return CheckBoxMenuItem(checkState, markup.parse(text))
+        fun create(checkState: Var<Boolean>, text: String, markup: Markup, scaleXY: Float = 1f): CheckBoxMenuItem {
+            return CheckBoxMenuItem(checkState, markup.parse(text), scaleXY)
         }
     }
     
