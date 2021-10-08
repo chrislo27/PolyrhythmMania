@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
-import org.lwjgl.system.MathUtil
+import paintbox.binding.BooleanVar
+import paintbox.binding.FloatVar
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.scaleMul
 
@@ -60,8 +61,13 @@ data class TextBlock(val runs: List<TextRun>) {
             /*// Pair in order of (TextRun index, GlyphRunInfo index) 
                         val glyphIndexStart: Pair<Int, Int>, val glyphIndexEndEx: Pair<Int, Int>*/
     )
+    
+    private val layoutInfoNeedsRefresh: BooleanVar = BooleanVar(true)
 
-    var lineWrapping: Float? = null
+    /**
+     * If positive, [computeLayouts] will apply line wrapping.
+     */
+    val lineWrapping: FloatVar = FloatVar(0f)
 
     /**
      * Internally computed text run information
@@ -80,9 +86,15 @@ data class TextBlock(val runs: List<TextRun>) {
         private set
     var lastDescent: Float = 0f
         private set
-
+    
+    init {
+        lineWrapping.addListener {
+            layoutInfoNeedsRefresh.set(true)
+        }
+    }
+    
     constructor(runs: List<TextRun>, wrapWidth: Float) : this(runs) {
-        this.lineWrapping = wrapWidth
+        this.lineWrapping.set(wrapWidth)
     }
 
 
@@ -106,8 +118,8 @@ data class TextBlock(val runs: List<TextRun>) {
         var currentLineIndex = 0
         var currentLineStartY = 0f
 
-        val doLineWrapping: Boolean = this.lineWrapping != null
-        val lineWrapWidth: Float = this.lineWrapping ?: 0f
+        val lineWrapWidth: Float = this.lineWrapping.get()
+        val doLineWrapping: Boolean = lineWrapWidth > 0f
 
         val runInfo: List<TextRunInfo> = runs.mapIndexed { textRunIndex, textRun ->
             // Set font scales and metrics
@@ -289,10 +301,11 @@ data class TextBlock(val runs: List<TextRun>) {
         this.lineInfo = lineInfo
         this.width = maxPosX
         this.height = -posY + firstCapHeight
+        layoutInfoNeedsRefresh.set(false)
     }
 
     fun isRunInfoInvalid(): Boolean {
-        return (runInfo.isEmpty() && runs.isNotEmpty()) || runInfo.any { l ->
+        return (runInfo.isEmpty() && runs.isNotEmpty()) || layoutInfoNeedsRefresh.get() || runInfo.any { l ->
             l.run.font.currentFontNumber != l.currentFontNumber
         }
     }

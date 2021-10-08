@@ -37,29 +37,15 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
         fun createInternalTextBlockVar(button: Button): Var<TextBlock> {
             return Var {
                 val markup: Markup? = button.markup.use()
-                if (markup != null) {
-                    markup.parse(button.text.use())
-                } else {
-                    TextRun(button.font.use(), button.text.use(), Color.WHITE,
-                            /*button.scaleX.useF(), button.scaleY.useF()*/ 1f, 1f).toTextBlock()
-                }.also { textBlock ->
+                (markup?.parse(button.text.use())
+                        ?: TextRun(button.font.use(), button.text.use(), Color.WHITE,
+                                /*button.scaleX.useF(), button.scaleY.useF()*/ 1f, 1f).toTextBlock()).also { textBlock ->
                     if (button.doLineWrapping.useB()) {
-                        textBlock.lineWrapping = button.contentZone.width.useF() / button.scaleX.useF()
+                        textBlock.lineWrapping.set(button.contentZone.width.useF() / button.scaleX.useF())
                     }
                 }
             }
         }
-
-//        fun createInternalTextBlockVar(button: Button): Var<TextBlock> {
-//            return Var {
-//                TextRun(button.font.use(), button.text.use(), Color.WHITE,
-//                        button.scaleX.useF(), button.scaleY.useF()).toTextBlock().also { textBlock ->
-//                    if (button.doLineWrapping.use()) {
-//                        textBlock.lineWrapping = button.contentZone.width.useF()
-//                    }
-//                }
-//            }
-//        }
     }
 
     val text: Var<String> = Var(text)

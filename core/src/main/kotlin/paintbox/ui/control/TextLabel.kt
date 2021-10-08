@@ -36,14 +36,11 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
         fun createInternalTextBlockVar(label: TextLabel): Var<TextBlock> {
             return Var {
                 val markup: Markup? = label.markup.use()
-                if (markup != null) {
-                    markup.parse(label.text.use())
-                } else {
-                    TextRun(label.font.use(), label.text.use(), Color.WHITE,
-                            /*label.scaleX.use(), label.scaleY.use()*/ 1f, 1f).toTextBlock()
-                }.also { textBlock ->
+                (markup?.parse(label.text.use())
+                        ?: TextRun(label.font.use(), label.text.use(), Color.WHITE,
+                                /*label.scaleX.use(), label.scaleY.use()*/ 1f, 1f).toTextBlock()).also { textBlock ->
                     if (label.doLineWrapping.useB()) {
-                        textBlock.lineWrapping = label.contentZone.width.useF() / (if (label.doesScaleXAffectWrapping.useB()) label.scaleX.useF() else 1f)
+                        textBlock.lineWrapping.set(label.contentZone.width.useF() / (if (label.doesScaleXAffectWrapping.useB()) label.scaleX.useF() else 1f))
                     }
                 }
             }
@@ -106,8 +103,14 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
 
     @Suppress("RemoveRedundantQualifierName")
     override fun getDefaultSkinID(): String = TextLabel.TEXTLABEL_SKIN_ID
-    
-    fun resizeBoundsToContent(affectWidth: Boolean = true, affectHeight: Boolean = true) {
+
+    /**
+     * Resizes this element to fit the bounds of the [internalTextBlock].
+     * [limitWidth] and [limitHeight] will strictly limit the width/height if they are greater than zero.
+     * 
+     */
+    fun resizeBoundsToContent(affectWidth: Boolean = true, affectHeight: Boolean = true,
+                              limitWidth: Float = 0f, limitHeight: Float = 0f) {
         val textBlock: TextBlock = this.internalTextBlock.getOrCompute()
         if (textBlock.isRunInfoInvalid()) {
             textBlock.computeLayouts()
@@ -125,11 +128,17 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
         fun Insets.topbottom(): Float = this.top + this.bottom
 
         if (affectWidth) {
-            val computedWidth = borderInsets.leftright() + marginInsets.leftright() + paddingInsets.leftright() + textWidth
+            var computedWidth = borderInsets.leftright() + marginInsets.leftright() + paddingInsets.leftright() + textWidth
+            if (limitWidth > 0f) {
+                computedWidth = computedWidth.coerceAtMost(limitWidth)
+            }
             this.bounds.width.set(computedWidth)
         }
         if (affectHeight) {
-            val computedHeight = borderInsets.topbottom() + marginInsets.topbottom() + paddingInsets.topbottom() + textHeight
+            var computedHeight = borderInsets.topbottom() + marginInsets.topbottom() + paddingInsets.topbottom() + textHeight
+            if (limitHeight > 0f) {
+                computedHeight = computedHeight.coerceAtMost(limitHeight)
+            }
             this.bounds.height.set(computedHeight)
         }
     }
