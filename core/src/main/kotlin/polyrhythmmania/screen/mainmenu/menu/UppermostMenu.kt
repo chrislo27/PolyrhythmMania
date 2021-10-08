@@ -109,6 +109,12 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     }
                 }
             }
+            // Remember to update DataSettingsMenu to reset high scores
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.extras").use() }).apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.sideModesMenu)
+                }
+            }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.settings").use() }).apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.settingsMenu)

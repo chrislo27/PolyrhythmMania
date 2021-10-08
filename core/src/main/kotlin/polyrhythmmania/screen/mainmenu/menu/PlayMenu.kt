@@ -24,7 +24,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     init {
         this.setSize(MMMenu.WIDTH_SMALL)
         this.titleText.bind { Localization.getVar("mainMenu.play.title").use() }
-        this.contentPane.bounds.height.set(320f)
+        this.contentPane.bounds.height.set(300f)
 
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
@@ -99,13 +99,6 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createLongButton { dailyChallengeTitle.use() }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.dailyChallengeMenu.prepareShow())
-                }
-            }
-
-            // Remember to update DataSettingsMenu to reset high scores
-            vbox += createLongButton { Localization.getVar("mainMenu.play.sideModes").use() }.apply {
-                this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.sideModesMenu)
                 }
             }
         }
