@@ -1,13 +1,20 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.binding.Var
+import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
@@ -18,12 +25,11 @@ import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.ui.PRManiaSkins
 
 
-class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
-
+class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     init {
         this.setSize(MMMenu.WIDTH_SMALL)
-        this.titleText.bind { Localization.getVar("mainMenu.play.sideModes").use() }
+        this.titleText.bind { Localization.getVar("mainMenu.play.extras").use() }
         this.contentPane.bounds.height.set(300f)
 
         val scrollPane = ScrollPane().apply {
@@ -61,6 +67,13 @@ class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         vbox.temporarilyDisableLayouts {
+            fun separator(): UIElement {
+                return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
+                    this.bounds.height.set(10f)
+                    this.margin.set(Insets(4f, 4f, 12f, 12f))
+                }
+            }
+            
             // Remember to update DataSettingsMenu to reset high scores
             vbox += createSidemodeLongButton("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip",
                     Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
@@ -80,9 +93,21 @@ class PlaySideModesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.tooltipElement.set(createTooltip { "This NEW side mode will be developed for a future update if sufficient\ndevelopment costs are recovered — please consider donating\nto help with development costs! Donation link (goes to PayPal):\n[color=prmania_tooltip_keystroke scale=1]https://donate-to-polyrhythmmania.rhre.dev[]" })
             }
 
-//            vbox += createLongButton { "...Other modes (possibly) coming soon!" }.apply {
-//                this.disabled.set(true)
-//            }
+            vbox += separator()
+            vbox += createLongButtonWithIcon(TextureRegion(AssetRegistry.get<Texture>("mainmenu_rhre"))) { """Rhythm Heaven Remix Editor""" }.apply {
+                val rhreGithub = """https://github.com/chrislo27/RhythmHeavenRemixEditor"""
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.extras.rhre.tooltip", Var { listOf(rhreGithub) })))
+                this.setOnAction {
+                    Gdx.net.openURI(rhreGithub)
+                }
+            }
+            vbox += createLongButtonWithIcon(TextureRegion(AssetRegistry.get<Texture>("mainmenu_brm"))) { """Bouncy Road Mania""" }.apply {
+                val brmGithub = """https://github.com/chrislo27/BouncyRoadMania"""
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.extras.brm.tooltip", Var { listOf(brmGithub) })))
+                this.setOnAction {
+                    Gdx.net.openURI(brmGithub)
+                }
+            }
         }
         vbox.sizeHeightToChildren(100f)
         scrollPane.setContent(vbox)

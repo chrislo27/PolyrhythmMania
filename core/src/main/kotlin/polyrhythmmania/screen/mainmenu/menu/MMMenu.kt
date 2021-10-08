@@ -216,6 +216,18 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         this.markup.set(this@StandardMenu.markup)
         this.setOnHoverStart(blipSoundListener)
     }
+    
+    protected fun createLongButtonWithIcon(icon: TextureRegion, binding: Var.Context.() -> String): Button {
+        return createLongButton(binding).apply { 
+            val existingPadding = this.padding.getOrCompute()
+            this.padding.set(existingPadding.copy(left = existingPadding.left * 2 + 32f))
+            this.addChild(ImageIcon(icon, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply { 
+                this.bounds.x.set(-(32f + 4f * 2))
+                this.bounds.width.set(32f)
+                this.bounds.height.set(32f)
+            })
+        }
+    }
 
     protected fun createSmallButton(binding: Var.Context.() -> String): Button = Button(binding, font = font).apply {
         this.skinID.set(BUTTON_SMALL_SKIN_ID)
