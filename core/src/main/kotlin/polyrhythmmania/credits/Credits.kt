@@ -24,7 +24,7 @@ object Credits {
                     Localization.getVar("credits.tourneycord"),
             ),
             Localization.getVar("credits.githubBugReporters") to abcSorted(
-                    "thomasynthesis", "Dummatt", "user670", "ZaptorZap", "notpolyrhythmic",
+                    "thomasynthesis", "Dummatt", "user670", "ZaptorZap", "notpolyrhythmic", "Unnamedspaceuser",
             ).toVars(),
             Localization.getVar("credits.specialThanks") to abcSorted(
                     "Lvl100Feraligatr",
