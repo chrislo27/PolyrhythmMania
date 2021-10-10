@@ -116,6 +116,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             drpcCheckbox.onCheckChanged = { newState ->
                 settings.discordRichPresence.set(newState)
             }
+            drpcCheckbox.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.dataSettings.discordRichPresence.tooltip")))
             vbox += drpcPane
         }
         
