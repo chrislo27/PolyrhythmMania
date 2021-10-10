@@ -3,6 +3,7 @@ package polyrhythmmania.world
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.LongMap
 import paintbox.util.gdxutils.grey
+import paintbox.util.settableLazy
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.entity.*
@@ -38,7 +39,8 @@ class World {
     // DUNK
     val dunkPiston: EntityPistonDunk by lazy { EntityPistonDunk(this) }
     // ASSEMBLE
-    val asmPistons: List<EntityPistonAsm> by lazy { List(4) { EntityPistonAsm(this) } }
+    var asmPistons: List<EntityPistonAsm> by settableLazy { createAsmPistons() }
+        private set
     val asmPlayerPiston: EntityPistonAsm by lazy { asmPistons[2] }
     
     
@@ -363,7 +365,7 @@ class World {
             }
         }
 
-        
+        asmPistons = createAsmPistons()
         addEntity(asmPistons[0].apply {
             this.type = EntityPiston.Type.PISTON_DPAD
             this.position.set(6f + 0.5f, 0f, -0f)
@@ -405,5 +407,9 @@ class World {
                 this.position.set(11f + xOff, yPos, zPos)
             })
         }
+    }
+    
+    private fun createAsmPistons(): List<EntityPistonAsm> {
+        return List(4) { EntityPistonAsm(this) }
     }
 }
