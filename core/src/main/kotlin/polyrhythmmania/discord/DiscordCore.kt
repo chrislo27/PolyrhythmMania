@@ -141,8 +141,8 @@ object DiscordCore : Disposable {
         if (!enableRichPresence.get()) return
         try {
             Activity().use { activity ->
-//                activity.details = presence.details
-//                activity.state = presence.state
+                activity.details = presence.details
+                activity.state = presence.state
                 if (presence.startTimestamp > 0) {
                     activity.timestamps().start = Instant.ofEpochSecond(presence.startTimestamp)
                 }
