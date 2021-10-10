@@ -88,10 +88,10 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))
             }
             
-            vbox += createLongButton { """[font=thin]Future Spot for Side Mode #3[]""" }.apply {
-                this.disabled.set(true)
-                this.tooltipElement.set(createTooltip { "This NEW side mode will be developed for a future update if sufficient\ndevelopment costs are recovered — please consider donating\nto help with development costs! Donation link (goes to PayPal):\n[color=prmania_tooltip_keystroke scale=1]https://donate-to-polyrhythmmania.rhre.dev[]" })
-            }
+//            vbox += createLongButton { """[font=thin]Future Spot for Side Mode #3[]""" }.apply {
+//                this.disabled.set(true)
+//                this.tooltipElement.set(createTooltip { "This NEW side mode will be developed for a future update if sufficient\ndevelopment costs are recovered — please consider donating\nto help with development costs! Donation link (goes to PayPal):\n[color=prmania_tooltip_keystroke scale=1]https://donate-to-polyrhythmmania.rhre.dev[]" })
+//            }
 
             vbox += separator()
             vbox += createLongButtonWithIcon(TextureRegion(AssetRegistry.get<Texture>("mainmenu_rhre"))) { """Rhythm Heaven Remix Editor""" }.apply {
