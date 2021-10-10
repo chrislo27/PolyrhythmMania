@@ -257,9 +257,12 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     }
 
     fun prepareShow() {
+        soundSystem.startRealtime()
+        
         val theme = SidemodeAssets.practiceTheme
         soundSystem.playAudio(theme) { player ->
             player.useLoopParams(LoopParams(SamplePlayer.LoopType.LOOP_FORWARDS, 0.0, theme.musicSample.lengthMs))
+            
             this.player = player
         }
     }
@@ -267,7 +270,6 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     override fun show() {
         super.show()
         main.inputMultiplexer.addProcessor(inputProcessor)
-        soundSystem.startRealtime()
         soundSystem.setPaused(false)
     }
 
