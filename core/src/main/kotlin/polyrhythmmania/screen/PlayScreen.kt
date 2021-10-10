@@ -209,7 +209,7 @@ class PlayScreen(
 //                this.bindHeightToParent(multiplier = 1.5f)
                 this.bounds.height.set(64f)
                 this.bindWidthToSelfHeight()
-                this.bounds.x.bind { -(bounds.width.useF() + optionsBorderSize + 2f) }
+                this.bounds.x.bind { -(bounds.width.useF() + optionsBorderSize * 2 + 2f) }
                 this.visible.bind { selectionIndex.use() == index }
             }
         }
@@ -224,7 +224,7 @@ class PlayScreen(
                     if (apparentDisabledState.useB()) Color.GRAY else if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
                 }
                 this.bounds.height.set(48f)
-                this.bgPadding.set(Insets(2f, 2f, 12f, 12f))
+                this.padding.set(Insets(2f, 2f, 12f, 12f))
                 this.renderAlign.set(Align.left)
                 this.textAlign.set(TextAlign.LEFT)
                 this += addArrowImageNode(index)
