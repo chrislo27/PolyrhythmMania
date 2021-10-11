@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Preferences
 import com.eclipsesource.json.Json
 import paintbox.Paintbox
+import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.util.Version
 import paintbox.util.WindowSize
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_ARROW_KEYS_LIKE_SCROLL
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_AUTOSAVE_INTERVAL
@@ -19,6 +21,8 @@ import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE
 import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.ENDLESS_HIGH_SCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
+import polyrhythmmania.PreferenceKeys.LAST_VERSION
+import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_LIBRARY
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
 import polyrhythmmania.PreferenceKeys.SETTINGS_ONLY_DEFAULT_PALETTE
@@ -56,6 +60,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
     data class KeyValue<T>(val key: String, val value: Var<T>, val defaultValue: T) {
         constructor(key: String, defaultValue: T) : this(key, Var(defaultValue), defaultValue)
+    }
+    
+    class NewIndicator(val key: String, val newAsOf: Version, val newEvenIfFirstPlay: Boolean) {
+        val value: BooleanVar = BooleanVar(true)
     }
 
     private val kv_locale: KeyValue<String> = KeyValue(SETTINGS_LOCALE, "")
@@ -134,6 +142,9 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val gameplayVolume: ReadOnlyVar<Int> = Var { (gameplayVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
     val menuMusicVolume: ReadOnlyVar<Int> = Var { (menuMusicVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
     val menuSfxVolume: ReadOnlyVar<Int> = Var { (menuSfxVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
+    
+    val newIndicatorLibrary: NewIndicator = NewIndicator(NEW_INDICATOR_LIBRARY, Version(1, 1, 0), newEvenIfFirstPlay = false)
+    val allNewIndicators: List<NewIndicator> = listOf(newIndicatorLibrary)
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
@@ -173,6 +184,9 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getInt(kv_assembleNormalHighScore)
         prefs.getDailyChallenge(kv_endlessDailyChallenge)
         prefs.getEndlessHighScore(kv_endlessHighScore)
+        
+        val lastVersion: Version? = Version.parse(prefs.getString(LAST_VERSION) ?: "")
+        allNewIndicators.forEach { prefs.getNewIndicator(it, lastVersion) }
     }
 
     fun persist() {
@@ -212,7 +226,9 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putDailyChallenge(kv_endlessDailyChallenge)
                 .putEndlessHighScore(kv_endlessHighScore)
 
-                .flush()
+        allNewIndicators.forEach { prefs.putNewIndicator(it) }
+
+        prefs.flush()
     }
     
     fun setStartupSettings(game: PRManiaGame) {
@@ -273,6 +289,25 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             gr.setForegroundFPS(this.maxFramerate.getOrCompute())
             gr.setVSync(this.vsyncEnabled.getOrCompute())
         }
+    }
+    
+    private fun Preferences.getNewIndicator(newIndicator: NewIndicator, lastLoadedVersion: Version?) {
+        val containsKey = this.contains(newIndicator.key)
+        val defaultValue: Boolean = when {
+            lastLoadedVersion == null -> newIndicator.newEvenIfFirstPlay
+            lastLoadedVersion < newIndicator.newAsOf -> true
+            else -> false
+        }
+        if (containsKey) {
+            newIndicator.value.set(this.getBoolean(newIndicator.key, defaultValue))
+        } else {
+            newIndicator.value.set(defaultValue)
+            this.putBoolean(newIndicator.key, defaultValue)
+        }
+    }
+    
+    private fun Preferences.putNewIndicator(newIndicator: NewIndicator) {
+        this.putBoolean(newIndicator.key, newIndicator.value.get())
     }
 
     private fun Preferences.getInt(kv: KeyValue<Int>) {
