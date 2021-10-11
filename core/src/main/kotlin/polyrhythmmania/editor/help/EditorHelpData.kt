@@ -2,6 +2,7 @@ package polyrhythmmania.editor.help
 
 import com.badlogic.gdx.utils.Align
 import paintbox.ui.area.Insets
+import polyrhythmmania.PRManiaGame
 
 
 object EditorHelpData {
@@ -29,7 +30,7 @@ class EditorHelpDocRoot : HelpDocument(
                         LayerButton("editorHelp.music_sync.title", "music_sync", false)
                 ),
                 LayerCol3(
-                        LayerButton("editorHelp.texture_packs.title", "texture_packs", false),
+                        LayerButtonWithNewIndicator("editorHelp.texture_packs.title", "texture_packs", false, PRManiaGame.instance.settings.newIndicatorEditorHelpTexpack),
                         null,
                         null
                 ),

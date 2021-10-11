@@ -3,6 +3,7 @@ package polyrhythmmania.editor.help
 import com.badlogic.gdx.utils.Align
 import paintbox.font.TextAlign
 import paintbox.ui.area.Insets
+import polyrhythmmania.Settings
 
 
 /**
@@ -26,5 +27,8 @@ class LayerCol2(val left: Layer?, val right: Layer?, val leftProportion: Float =
 class LayerCol3(val left: Layer?, val mid: Layer?, val right: Layer?) : Layer(), LayerSizesToChildren
 class LayerCol3Asymmetric(val left: Layer?, val right: Layer?, val moreLeft: Boolean = true) : Layer(), LayerSizesToChildren
 
-class LayerButton(val text: String, val link: String, val external: Boolean) : Layer(), LayerFixedHeight
+open class LayerButton(val text: String, val link: String, val external: Boolean)
+    : Layer(), LayerFixedHeight
+class LayerButtonWithNewIndicator(text: String, link: String, external: Boolean, val newIndicator: Settings.NewIndicator)
+    : LayerButton(text, link, external)
 class LayerImage(val texturePath: String, val allocatedHeight: Float) : Layer(), LayerFixedHeight

@@ -7,6 +7,8 @@ object PreferenceKeys {
     val LAST_VERSION = "lastVersion"
     
     val NEW_INDICATOR_LIBRARY = "newIndicator_libraryView"
+    val NEW_INDICATOR_EDITORHELP_TEXPACK = "newIndicator_editorHelp_texturePack"
+    val NEW_INDICATOR_EDITORHELP_EXPORTING = "newIndicator_editorHelp_exporting"
     
     val FILE_CHOOSER_EDITOR_MUSIC = "fileChooser_editor_music"
     val FILE_CHOOSER_EDITOR_SAVE = "fileChooser_editor_save"

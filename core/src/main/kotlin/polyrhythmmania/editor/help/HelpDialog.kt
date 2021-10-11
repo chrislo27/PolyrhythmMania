@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import paintbox.Paintbox
+import paintbox.binding.Var
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
@@ -335,12 +336,26 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                 }
             }
             is LayerButton -> {
-                Button(binding = { Localization.getVar(layer.text).use() }, font = defaultFont).apply { 
+                val textBinding: Var.Context.() -> String = if (layer is LayerButtonWithNewIndicator) {
+                    {
+                        (if (layer.newIndicator.value.useB())
+                                (Localization.getVar("common.newIndicator").use() + " ")
+                        else "") + Localization.getVar(layer.text).use()
+                    }
+                } else {
+                    {
+                        Localization.getVar(layer.text).use()
+                    }
+                }
+                Button(binding = textBinding, font = defaultFont).apply {
                     with(dialog) {
                         this@apply.applyDialogStyleContent()
                     }
                     this.bounds.height.set(48f)
-                    this.setOnAction { 
+                    this.setOnAction {
+                        if (layer is LayerButtonWithNewIndicator) {
+                            layer.newIndicator.value.set(false)
+                        }
                         if (layer.external) {
                             Gdx.net.openURI(layer.link)
                         } else {
