@@ -44,8 +44,8 @@ class EditorHelpDocControls : HelpDocument(
                 LayerParagraph("editorHelp.controls.pp2", 60f),
                 LayerParagraph("editorHelp.controls.heading.general", 20f),
                 LayerCol2(
-                        LayerParagraph("editorHelp.controls.keybinds.general.keys", 520f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
-                        LayerParagraph("editorHelp.controls.keybinds.general.desc", 520f),
+                        LayerParagraph("editorHelp.controls.keybinds.general.keys", 540f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
+                        LayerParagraph("editorHelp.controls.keybinds.general.desc", 540f),
                         leftProportion = 0.275f
                 ),
                 LayerParagraph("editorHelp.controls.heading.selectionTool", 20f),
@@ -56,8 +56,8 @@ class EditorHelpDocControls : HelpDocument(
                 ),
                 LayerParagraph("editorHelp.controls.heading.tempoChangeTool", 20f),
                 LayerCol2(
-                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.keys", 140f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
-                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.desc", 140f),
+                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.keys", 130f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
+                        LayerParagraph("editorHelp.controls.keybinds.tempoChangeTool.desc", 130f),
                         leftProportion = 0.275f
                 ),
                 LayerParagraph("editorHelp.controls.heading.musicVolumeTool", 20f),
