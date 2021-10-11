@@ -24,6 +24,7 @@ import paintbox.ui.skin.SkinFactory
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.PlayScreen
@@ -207,14 +208,32 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    protected fun createLongButton(binding: Var.Context.() -> String): Button = Button(binding, font = font).apply {
-        this.skinID.set(BUTTON_LONG_SKIN_ID)
-        this.padding.set(Insets(4f, 4f, 12f, 12f))
-        this.bounds.height.set(40f)
-        this.textAlign.set(TextAlign.LEFT)
-        this.renderAlign.set(Align.left)
-        this.markup.set(this@StandardMenu.markup)
-        this.setOnHoverStart(blipSoundListener)
+    protected fun createLongButton(binding: Var.Context.() -> String): Button {
+        return Button(binding, font = font).apply {
+            this.skinID.set(BUTTON_LONG_SKIN_ID)
+            this.padding.set(Insets(4f, 4f, 12f, 12f))
+            this.bounds.height.set(40f)
+            this.textAlign.set(TextAlign.LEFT)
+            this.renderAlign.set(Align.left)
+            this.markup.set(this@StandardMenu.markup)
+            this.setOnHoverStart(blipSoundListener)
+        }
+    }
+
+    protected fun createLongButtonWithNewIndicator(newIndicator: Settings.NewIndicator, binding: Var.Context.() -> String): Button {
+        return Button(binding = {
+            (if (newIndicator.value.useB())
+                (Localization.getVar("common.newIndicator").use() + " ")
+            else "") + binding.invoke(this)
+        }, font = font).apply {
+            this.skinID.set(BUTTON_LONG_SKIN_ID)
+            this.padding.set(Insets(4f, 4f, 12f, 12f))
+            this.bounds.height.set(40f)
+            this.textAlign.set(TextAlign.LEFT)
+            this.renderAlign.set(Align.left)
+            this.markup.set(this@StandardMenu.markup)
+            this.setOnHoverStart(blipSoundListener)
+        }
     }
     
     protected fun createLongButtonWithIcon(icon: TextureRegion, binding: Var.Context.() -> String): Button {

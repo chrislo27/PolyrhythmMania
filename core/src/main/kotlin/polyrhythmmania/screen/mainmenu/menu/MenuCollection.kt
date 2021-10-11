@@ -36,6 +36,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val quitMenu: QuitMenu = QuitMenu(this)
     val dailyChallengeMenu: DailyChallengeMenu = DailyChallengeMenu(this) // Must be inited before playMenu
     val playMenu: PlayMenu = PlayMenu(this)
+    val libraryMenu: LibraryMenu = LibraryMenu(this)
     val practiceMenu: PracticeMenu = PracticeMenu(this)
     val sideModesMenu: ExtrasMenu = ExtrasMenu(this)
     val endlessMenu: EndlessModeMenu = EndlessModeMenu(this)
@@ -63,6 +64,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(quitMenu)
         addMenu(dailyChallengeMenu)
         addMenu(playMenu)
+        addMenu(libraryMenu)
         addMenu(practiceMenu)
         addMenu(sideModesMenu)
         addMenu(endlessMenu)

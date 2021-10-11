@@ -4,30 +4,24 @@ import com.badlogic.gdx.graphics.Color
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.ui.Anchor
-import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
-import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.ui.PRManiaSkins
 import java.time.format.DateTimeFormatter
 
 
-class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
-
-//    private val settings: Settings = menuCol.main.settings
-
-    private var epochSeconds: Long = System.currentTimeMillis() / 1000
+class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol)  {
 
     init {
-        this.setSize(MMMenu.WIDTH_SMALL)
+        this.setSize(MMMenu.WIDTH_MID)
         this.titleText.bind { Localization.getVar("mainMenu.play.title").use() }
-        this.contentPane.bounds.height.set(300f)
+        this.showLogo.set(false)
+        this.contentPane.bounds.height.set(520f)
 
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
@@ -64,25 +58,6 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         vbox.temporarilyDisableLayouts {
-            fun separator(): UIElement {
-                return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
-                    this.bounds.height.set(10f)
-                    this.margin.set(Insets(4f, 4f, 12f, 12f))
-                }
-            }
-            
-            vbox += createLongButtonWithNewIndicator(main.settings.newIndicatorLibrary) { Localization.getVar("mainMenu.play.library").use() }.apply {
-                this.setOnAction {
-                    main.settings.newIndicatorLibrary.value.set(false)
-                    menuCol.pushNextMenu(menuCol.libraryMenu)
-                }
-                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.library.tooltip")))
-            }
-            vbox += createLongButton { Localization.getVar("mainMenu.play.practice").use() }.apply {
-                this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.practiceMenu)
-                }
-            }
             vbox += createLongButton { Localization.getVar("mainMenu.play.playSavedLevel").use() }.apply {
                 this.setOnAction {
                     val loadMenu = LoadSavedLevelMenu(menuCol)
@@ -90,8 +65,11 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.pushNextMenu(loadMenu)
                 }
             }
-            
-            vbox += separator()
+            vbox += createLongButton { Localization.getVar("mainMenu.play.practice").use() }.apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.practiceMenu)
+                }
+            }
 
             vbox += createLongButton { Localization.getVar("mainMenu.play.endless").use() }.apply {
                 this.setOnAction {
