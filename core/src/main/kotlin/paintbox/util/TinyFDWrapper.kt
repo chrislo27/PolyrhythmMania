@@ -5,11 +5,19 @@ import org.lwjgl.PointerBuffer
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil.memAddress
 import org.lwjgl.util.tinyfd.TinyFileDialogs.*
+import java.awt.Component
+import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.ByteBuffer
+import java.util.*
+import javax.swing.JDialog
+import javax.swing.JFileChooser
+import javax.swing.UIManager
 
 
 object TinyFDWrapper {
+    
+    private val isWindows: Boolean = "windows" in (System.getProperty("os.name").lowercase(Locale.ROOT))
 
     /**
      * A file extension filter. The [extensions] should be strings in a format like `*.png`, `*.ogg`, etc.
@@ -113,8 +121,36 @@ object TinyFDWrapper {
     }
 
     private fun selectFolder(title: String, defaultFolder: String): File? {
-        val path = tinyfd_selectFolderDialog(title, defaultFolder) ?: return null
-        return File(path)
+        if (isWindows) {
+            // The Windows native folder select dialog doesn't behave well with respect to cancel,
+            // specifically it returns the last selected folder (???)
+            // So this version will use Swing and a JFileChooser.
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            val fileChooser = object : JFileChooser(defaultFolder) {
+                override fun createDialog(parent: Component?): JDialog {
+                    return super.createDialog(parent).apply { 
+                        setIconImage(BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB))
+                    }
+                }
+            }.apply { 
+                this.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+                this.dialogTitle = title
+            }
+            return when (fileChooser.showOpenDialog(null)) {
+                JFileChooser.APPROVE_OPTION -> {
+                    fileChooser.selectedFile
+                }
+                else -> null
+            }
+        } else {
+            val path = tinyfd_selectFolderDialog(title, defaultFolder) ?: return null
+            return File(path)
+            
+        }
     }
 
     /**
