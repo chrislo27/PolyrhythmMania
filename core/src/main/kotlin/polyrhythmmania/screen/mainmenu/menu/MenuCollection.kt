@@ -14,6 +14,7 @@ import paintbox.util.gdxutils.maxX
 import paintbox.util.gdxutils.maxY
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
+import polyrhythmmania.library.menu.LibraryMenu
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import java.lang.Float.max
 import java.lang.Float.min
