@@ -18,6 +18,7 @@ object PreferenceKeys {
     val FILE_CHOOSER_TEXPACK_IMPORT_TEX_TO_DIR = "fileChooser_texpack_importTexturesToDirectory"
     val FILE_CHOOSER_TEXPACK_ENTIRE = "fileChooser_texpack_saveLoadEntire"
     val FILE_CHOOSER_EDITOR_EXPORT = "fileChooser_editor_exportLevel"
+    val FILE_CHOOSER_LIBRARY_VIEW = "fileChooser_libraryView"
     
     val SETTINGS_MASTER_VOLUME = "settings_master_volume"
     val SETTINGS_GAMEPLAY_VOLUME = "settings_gameplay_volume"

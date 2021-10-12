@@ -1,5 +1,6 @@
 package polyrhythmmania.library.menu
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.packing.PackedSheet
@@ -12,7 +13,10 @@ import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.TinyFDWrapper
+import paintbox.util.gdxutils.openFileExplorer
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
+import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
@@ -93,8 +97,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol)  {
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.openLibraryLocation.tooltip")))
                 this.setOnAction {
-                    // TODO
-
+                    Gdx.net.openFileExplorer(main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_LIBRARY_VIEW) ?: run {
+                        PRMania.DEFAULT_LEVELS_FOLDER.also { it.mkdirs() }
+                    })
                 }
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.library.changeLibraryLocation").use() }).apply {
