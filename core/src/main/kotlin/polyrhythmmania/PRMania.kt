@@ -31,6 +31,11 @@ object PRMania {
             mkdirs()
         }
     }
+    val DEFAULT_LEVELS_FOLDER: File by lazy {
+        MAIN_FOLDER.resolve("Levels/").apply {
+            mkdirs()
+        }
+    }
     val commonResolutions: List<WindowSize> = listOf(
             WindowSize(1152, 648),
             WindowSize(1280, 720),
