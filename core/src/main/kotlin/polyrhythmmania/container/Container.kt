@@ -72,6 +72,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
         val DEFAULT_TRACKS_BEFORE_V7: List<String> = listOf("input_0", "input_1", "input_2", "fx_0", "fx_1") // Default tracks indexes for container version 6 and below
         
         const val VERSION_LEVEL_METADATA_ADDED: Int = 9
+        const val VERSION_EXPORT_STATISTICS_ADDED: Int = 10
     }
 
     val world: World = World()

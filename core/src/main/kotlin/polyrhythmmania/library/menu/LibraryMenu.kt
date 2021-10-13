@@ -3,20 +3,27 @@ package polyrhythmmania.library.menu
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import paintbox.PaintboxGame
+import paintbox.binding.Var
+import paintbox.font.PaintboxFont
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
 import paintbox.ui.area.Insets
+import paintbox.ui.control.Button
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.ui.skin.DefaultSkins
+import paintbox.ui.skin.SkinFactory
 import paintbox.util.TinyFDWrapper
 import paintbox.util.gdxutils.openFileExplorer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PreferenceKeys
+import polyrhythmmania.library.LevelEntry
 import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
@@ -26,7 +33,11 @@ import kotlin.concurrent.thread
 
 
 class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol)  {
-
+    
+    
+    private val currentList: Var<List<LevelEntry>> = Var(emptyList())
+    
+    
     init {
         this.setSize(WIDTH_MID)
         this.titleText.bind { Localization.getVar("mainMenu.library.title").use() }

@@ -1,4 +1,4 @@
-package polyrhythmmania.library
+package polyrhythmmania.library.score
 
 import com.badlogic.gdx.files.FileHandle
 import com.eclipsesource.json.Json

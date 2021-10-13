@@ -1,4 +1,4 @@
-package polyrhythmmania.library
+package polyrhythmmania.library.score
 
 import com.eclipsesource.json.JsonObject
 

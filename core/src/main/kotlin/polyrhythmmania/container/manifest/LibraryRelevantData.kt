@@ -46,7 +46,7 @@ data class LibraryRelevantData(
             }
             var wasExportStatsLoaded = false
             var exportStatistics: ExportStatistics? = null
-            if (containerVersion >= 10 && !isProject) {
+            if (containerVersion >= Container.VERSION_EXPORT_STATISTICS_ADDED && !isProject) {
                 val metadataObj = manifestObj.get("exportStatistics")?.asObject()
                 if (metadataObj != null) {
                     exportStatistics = ExportStatistics.fromJson(metadataObj)

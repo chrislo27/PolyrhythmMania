@@ -1,7 +1,6 @@
-package polyrhythmmania.library
+package polyrhythmmania.library.score
 
 import com.eclipsesource.json.Json
-import com.eclipsesource.json.JsonArray
 import com.eclipsesource.json.JsonObject
 import java.util.*
 
