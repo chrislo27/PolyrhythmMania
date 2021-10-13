@@ -39,6 +39,7 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.TimeUtils
+import polyrhythmmania.world.EntityRodPR
 import java.io.File
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -361,10 +362,9 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         try {
             engine.soundInterface.disableSounds = true
             editor.setPlaytestingEnabled(false)
-            editor.compileEditorIntermediates()
             timing.seconds = 0f
             engine.seconds = 0f
-            editor.resetWorld()
+            editor.compileEditorIntermediates()
             engine.inputter.reset()
             
             var sec = 0f
@@ -398,6 +398,11 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         simulationResult.set(currentSimResult)
                     }
                 }
+            }
+            
+            // TODO the results from this need to be integrated into the export stats
+            container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
+                engine.inputter.submitInputsFromRod(rod)
             }
             
             percentageSimulated.set(100)
