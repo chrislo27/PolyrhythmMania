@@ -190,7 +190,11 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
         object Unknown : ExpectedInput()
         object Skipped : ExpectedInput()
         object InAir : ExpectedInput()
-        class Expected(val thisIndex: Int, val nextJumpIndex: Int) : ExpectedInput()
+        class Expected(val thisIndex: Int, val nextJumpIndex: Int) : ExpectedInput() {
+            override fun toString(): String {
+                return "Expected(thisIndex=$thisIndex, nextJumpIndex=$nextJumpIndex)"
+            }
+        }
     }
 
     private val killAfterBeats: Float = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
@@ -455,9 +459,11 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
 
                 // Auto-inputs
                 val inputter = engine.inputter
+                val currentExpectedInput: ExpectedInput? = inputTracker.expected.getOrNull(currentIndex)
                 if (engine.autoInputs) {
                     if (collision.velocityY == 0f && blockBelow.active && blockBelow.type != EntityPiston.Type.PLATFORM
                             && blockBelow.pistonState == EntityPiston.PistonState.RETRACTED
+                            && (currentExpectedInput is ExpectedInput.Expected && currentExpectedInput.thisIndex == currentIndex)
                             && currentIndexFloat - currentIndex in 0.25f..0.65f) {
                         blockBelow.fullyExtend(engine, beat)
                         inputter.attemptSkillStar(currentIndex / this.xUnitsPerBeat + this.deployBeat + 4f)
@@ -465,7 +471,6 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
                     }
                 } else {
                     // Check if NOT in air but current expected input is that it should be in the air
-                    val currentExpectedInput: ExpectedInput? = inputTracker.expected.getOrNull(currentIndex)
                     if (currentExpectedInput == ExpectedInput.InAir) {
                         registerMiss(inputter)
                     } else {
