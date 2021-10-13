@@ -38,7 +38,8 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     val descLabel: TextLabel
 
     @Volatile
-    private var lastSaveLoc: File? = null
+    var lastSaveLoc: File? = null
+        private set
     @Volatile
     private var firstTime: Boolean = true
 

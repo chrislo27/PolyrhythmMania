@@ -305,9 +305,12 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         editorPane.main.restoreForExternalDialog { completionCallback ->
             thread(isDaemon = true) {
                 val title = Localization.getValue("fileChooser.exportLevel.title")
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.exportLevel.filter"), listOf("*.${Container.LEVEL_FILE_EXTENSION}")).copyWithExtensionsInDesc()
-                TinyFDWrapper.saveFile(title, (main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_EXPORT)
-                                        ?: main.getDefaultDirectory()).resolve("level.${Container.LEVEL_FILE_EXTENSION}"), filter) { file: File? ->
+                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.exportLevel.filter"),
+                        listOf("*.${Container.LEVEL_FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                val savedFileName: String? = editorPane.saveDialog.lastSaveLoc?.nameWithoutExtension
+                val defaultFile = (main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_EXPORT)
+                        ?: main.getDefaultDirectory()).resolve("${savedFileName ?: "level"}.${Container.LEVEL_FILE_EXTENSION}")
+                TinyFDWrapper.saveFile(title, defaultFile, filter) { file: File? ->
                     completionCallback()
                     if (file != null) {
                         val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
