@@ -7,7 +7,16 @@ import java.util.*
 
 data class NamedLocaleBundle(val locale: NamedLocale, val bundle: I18NBundle) {
 
+    /**
+     * Keys with missing information.
+     */
     val missingKeys: MutableSet<String> = mutableSetOf()
+
+    /**
+     * Keys with [IllegalArgumentException]s due to bad formatting.
+     * Future IAEs are suppressed.
+     */
+    val caughtIAEs: MutableSet<String> = mutableSetOf()
     
     fun getValue(key: String): String {
         if (checkMissing(key)) return key
@@ -16,7 +25,16 @@ data class NamedLocaleBundle(val locale: NamedLocale, val bundle: I18NBundle) {
 
     fun getValue(key: String, vararg args: Any?): String {
         if (checkMissing(key)) return key
-        return bundle.format(key, *args)
+        return try {
+            bundle.format(key, *args)
+        } catch (iae: IllegalArgumentException) {
+            if (key !in caughtIAEs) {
+                caughtIAEs += key
+                Paintbox.LOGGER.error("IllegalArgumentException thrown when calling getValue on key $key (args [${args.toList()}]). Future IAEs will be suppressed.")
+                iae.printStackTrace()
+            }
+            key
+        }
     }
     
     fun checkMissing(key: String): Boolean {
