@@ -79,6 +79,7 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         val (fullscreenPane, fullscreenCheck) = createCheckboxOption({ Localization.getVar("mainMenu.videoSettings.fullscreen").use() })
         this.fullscreenCheck = fullscreenCheck
+        this.fullscreenCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.videoSettings.fullscreen.tooltip")))
         
 
         vbox.temporarilyDisableLayouts {
