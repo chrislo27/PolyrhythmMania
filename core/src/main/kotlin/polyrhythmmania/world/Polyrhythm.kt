@@ -10,9 +10,7 @@ import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
-import polyrhythmmania.engine.input.EngineInputter
-import polyrhythmmania.engine.input.InputResult
-import polyrhythmmania.engine.input.InputScore
+import polyrhythmmania.engine.input.*
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.entity.EntityInputIndicator
@@ -190,9 +188,14 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
         object Unknown : ExpectedInput()
         object Skipped : ExpectedInput()
         object InAir : ExpectedInput()
-        class Expected(val thisIndex: Int, val nextJumpIndex: Int) : ExpectedInput() {
+        class Expected(val thisIndex: Int, val nextJumpIndex: Int,
+                       override val perfectBeat: Float, override val inputType: InputType)
+            : ExpectedInput(), InputResultLike {
+            
+            override val expectedIndex: Int get() = this.thisIndex
+            
             override fun toString(): String {
-                return "Expected(thisIndex=$thisIndex, nextJumpIndex=$nextJumpIndex)"
+                return "Expected(thisIndex=$thisIndex, nextJumpIndex=$nextJumpIndex, perfectBeat=$perfectBeat, inputType=$inputType)"
             }
         }
     }
@@ -229,6 +232,12 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
 
     fun getPosXFromBeat(beatsFromDeploy: Float): Float {
         return (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beatsFromDeploy) * xUnitsPerBeat - (6 / 32f)
+    }
+    
+    fun getThisInputType(): InputType = if (row == world.rowA) InputType.A else InputType.DPAD
+    
+    fun getBeatForIndex(index: Int): Float {
+        return index / this.xUnitsPerBeat + this.deployBeat + 4f
     }
 
     fun explode(engine: Engine) {
@@ -310,7 +319,8 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
         } else {
             // Lookahead to where it should land.
             val lookahead = getLookaheadIndex(currentIndexFloor)
-            inputTracker.expected[currentIndexFloor] = ExpectedInput.Expected(currentIndexFloor, lookahead)
+            inputTracker.expected[currentIndexFloor] = ExpectedInput.Expected(currentIndexFloor, lookahead,
+                    getBeatForIndex(currentIndexFloor), getThisInputType())
             for (i in currentIndexFloor + 1 until lookahead.coerceAtMost(inputTracker.totalResultCount - 1)) {
                 if (inputTracker.expected[i] == ExpectedInput.Unknown)
                     inputTracker.expected[i] = ExpectedInput.InAir
@@ -466,8 +476,11 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
                             && (currentExpectedInput is ExpectedInput.Expected && currentExpectedInput.thisIndex == currentIndex)
                             && currentIndexFloat - currentIndex in 0.25f..0.65f) {
                         blockBelow.fullyExtend(engine, beat)
-                        inputter.attemptSkillStar(currentIndex / this.xUnitsPerBeat + this.deployBeat + 4f)
+                        val perfectBeat = getBeatForIndex(currentIndex)
+                        inputter.attemptSkillStar(perfectBeat)
                         inputter.inputFeedbackFlashes[inputter.getInputFeedbackIndex(InputScore.ACE, false)] = seconds
+                        inputTracker.results += InputResult(perfectBeat, 
+                                getThisInputType(), 0f, 0f, currentExpectedInput.thisIndex)
                     }
                 } else {
                     // Check if NOT in air but current expected input is that it should be in the air

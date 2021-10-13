@@ -45,7 +45,6 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.*
-import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
 import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.sidemodes.AbstractEndlessMode
@@ -353,8 +352,8 @@ class PlayScreen(
         
         val resultsText = container.resultsText
         val ranking = Ranking.getRanking(score)
-        val leftResults = inputter.inputResults.filter { it.type == InputType.DPAD }
-        val rightResults = inputter.inputResults.filter { it.type == InputType.A }
+        val leftResults = inputter.inputResults.filter { it.inputType == InputType.DPAD }
+        val rightResults = inputter.inputResults.filter { it.inputType == InputType.A }
         val badLeftGoodRight = leftResults.isNotEmpty() && rightResults.isNotEmpty()
                 && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
         val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)

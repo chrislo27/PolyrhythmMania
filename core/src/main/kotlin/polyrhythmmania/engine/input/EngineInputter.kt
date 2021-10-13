@@ -108,7 +108,7 @@ class EngineInputter(val engine: Engine) {
     
     val skillStarGotten: BooleanVar = BooleanVar(false)
     val inputResults: List<InputResult> = mutableListOf()
-    
+    val expectedInputsPr: List<EntityRodPR.ExpectedInput.Expected> = mutableListOf()
     
     init {
         reset()
@@ -117,6 +117,7 @@ class EngineInputter(val engine: Engine) {
     fun clearInputs(beforeBeat: Float = Float.POSITIVE_INFINITY) {
         totalExpectedInputs = 0
         (inputResults as MutableList).removeIf { it.perfectBeat < beforeBeat }
+        (expectedInputsPr as MutableList).removeIf { it.perfectBeat < beforeBeat }
         practice.requiredInputs = emptyList()
     }
     
@@ -199,7 +200,7 @@ class EngineInputter(val engine: Engine) {
                     }
 
                     // Compare timing
-                    val perfectBeats = rod.deployBeat + 4f + nextBlockIndex / rod.xUnitsPerBeat
+                    val perfectBeats = rod.getBeatForIndex(nextBlockIndex)
                     val perfectSeconds = engine.tempos.beatsToSeconds(perfectBeats)
 
                     val differenceSec = atSeconds - perfectSeconds
@@ -398,6 +399,7 @@ class EngineInputter(val engine: Engine) {
         totalExpectedInputs += numExpected
         if (!world.worldMode.showEndlessScore) {
             (inputResults as MutableList).addAll(validResults)
+            (expectedInputsPr as MutableList).addAll(inputTracker.expected.filterIsInstance<EntityRodPR.ExpectedInput.Expected>())
         }
         
         if (!engine.autoInputs && noMiss && !rod.registeredMiss) {

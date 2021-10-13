@@ -2,15 +2,14 @@ package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.binding.VarChangedListener
-import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -32,10 +31,12 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.ExportStatistics
 import polyrhythmmania.container.manifest.SaveOptions
-import polyrhythmmania.editor.Click
-import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.pane.EditorPane
+import polyrhythmmania.engine.input.InputResult
+import polyrhythmmania.engine.input.InputResultLike
+import polyrhythmmania.engine.input.InputScore
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.TimeUtils
@@ -45,9 +46,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
-import kotlin.math.max
 import kotlin.math.roundToInt
-import kotlin.system.measureNanoTime
 
 
 class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
@@ -86,12 +85,12 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         PARTIAL(Color.valueOf("#FF964C"));
     }
     
-    private data class SimulationResult(val percentage: Int = 0, val firstMiss: Float? = null,
-                                        val rodsExploded: Int = 0,
+    private data class SimulationResult(val percentage: Int = 0, val firstMissBeat: Float? = null,
+                                        val inputsMissed: Int = 0, val totalInputs: Int = 0,
                                         val exportStatistics: ExportStatistics? = null) {
         
         fun anyWarnings(): Boolean {
-            return firstMiss != null
+            return inputsMissed > 0
         }
     }
     
@@ -360,32 +359,22 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         var currentSimResult = SimulationResult()
         
         try {
+            val inputter = engine.inputter
             engine.soundInterface.disableSounds = true
             editor.setPlaytestingEnabled(false)
             timing.seconds = 0f
             engine.seconds = 0f
             editor.compileEditorIntermediates()
-            engine.inputter.reset()
+            inputter.reset()
             
             var sec = 0f
             val step = 1f / 60f
             var lastUIUpdateMs = 0L
-            var missedYet = false
-            var rodsExploded = 0
 
             while (sec <= endStateSec && !endSignalTriggered.get()) {
                 timing.seconds = sec
                 engine.seconds = sec
                 engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = true)
-                
-                if (engine.inputter.rodsExplodedPR > rodsExploded) {
-                    rodsExploded = engine.inputter.rodsExplodedPR
-                    currentSimResult = currentSimResult.copy(rodsExploded = rodsExploded)
-                    if (!missedYet && !engine.inputter.noMiss) {
-                        missedYet = true
-                        currentSimResult = currentSimResult.copy(firstMiss = sec)
-                    }
-                }
                 
                 sec += step
                 val percentageFloat = sec / (endStateSec.coerceAtLeast(0.01f))
@@ -400,17 +389,35 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 }
             }
             
-            // TODO the results from this need to be integrated into the export stats
             container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
-                engine.inputter.submitInputsFromRod(rod)
+                inputter.submitInputsFromRod(rod)
             }
-            
             percentageSimulated.set(100)
+            
             val allTempoChanges = engine.tempos.getAllTempoChanges()
-            val exportStatistics = ExportStatistics(endStateSec, engine.inputter.totalExpectedInputs,
+            val exportStatistics = ExportStatistics(endStateSec, inputter.totalExpectedInputs,
                     engine.tempos.computeAverageTempo(endBlockPosition),
                     allTempoChanges.minOf { it.newTempo }, allTempoChanges.maxOf { it.newTempo })
-            val finalSimResult = currentSimResult.copy(percentage = 100, exportStatistics = exportStatistics)
+            
+            data class InputResultTuple(override val perfectBeat: Float, override val expectedIndex: Int,
+                                        override val inputType: InputType) : InputResultLike
+            
+            val expectedInputs: List<EntityRodPR.ExpectedInput.Expected> = inputter.expectedInputsPr
+            val hitInputs: List<InputResult> = inputter.inputResults.filter { it.inputScore != InputScore.MISS }
+            val hitInputsSet: Set<InputResultTuple> = hitInputs.map { 
+                InputResultTuple(it.perfectBeat, it.expectedIndex, it.inputType) 
+            }.toSet()
+            val unhitInputs: List<InputResultTuple> = expectedInputs.map {
+                InputResultTuple(it.perfectBeat, it.expectedIndex, it.inputType)
+            }.filter { ei ->
+                // We are directly comparing floats. Usually dangerous, but the auto inputter will generate the 
+                // same perfectBeat for a given index and EntityRodPR
+                ei !in hitInputsSet
+            }.sortedBy { it.perfectBeat }
+            
+            val finalSimResult = currentSimResult.copy(percentage = 100, exportStatistics = exportStatistics, 
+                    totalInputs = inputter.totalExpectedInputs, inputsMissed = unhitInputs.size,
+                    firstMissBeat = unhitInputs.firstOrNull()?.perfectBeat)
             currentSimResult = finalSimResult
             Gdx.app.postRunnable {
                 simulationResult.set(finalSimResult)
@@ -418,7 +425,8 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             if (finalSimResult.anyWarnings()) {
                 Gdx.app.postRunnable {
                     simWarningsDescLabel.text.set(Localization.getValue("editor.dialog.exportLevel.simulationWarnings",
-                            finalSimResult.rodsExploded, DecimalFormats.format("0.0#", finalSimResult.firstMiss ?: Float.NaN)))
+                            finalSimResult.inputsMissed, finalSimResult.totalInputs,
+                            DecimalFormats.format("0.0#", finalSimResult.firstMissBeat ?: Float.NaN)))
                     substate.set(Substate.SIMULATION_WARNINGS)
                 }
                 return
