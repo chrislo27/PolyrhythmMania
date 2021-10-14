@@ -19,7 +19,6 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.util.TempFileUtils
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -85,28 +84,34 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         if (forceSaveAs || location == null || firstTime) {
             descLabel.text.set(Localization.getValue("common.closeFileChooser"))
             // Open file chooser
+            
+            fun getFileWithCorrectExt(file: File): File {
+                val ext = file.extension
+                val fileWithCorrectExt = if (ext.equals(Container.LEVEL_FILE_EXTENSION, ignoreCase = true)) {
+                    // Strip out .prmania file ext and replace with .prmproj for older files
+                    (File(file.absolutePath.substringBeforeLast(".${Container.LEVEL_FILE_EXTENSION}") + ".${Container.PROJECT_FILE_EXTENSION}"))
+                } else if (!ext.equals(Container.PROJECT_FILE_EXTENSION, ignoreCase = true)) {
+                    (File(file.absolutePath + ".${Container.PROJECT_FILE_EXTENSION}"))
+                } else {
+                    file
+                }
+                return fileWithCorrectExt
+            }
 
             substate.set(Substate.FILE_DIALOG_OPEN)
             editorPane.main.restoreForExternalDialog { completionCallback ->
                 thread(isDaemon = true) {
                     val title = Localization.getValue("fileChooser.save.project.title")
                     val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.save.project.filter"), listOf("*.${Container.PROJECT_FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                    val correctFileLoc = if (location == null) null else getFileWithCorrectExt(location)
                     TinyFDWrapper.saveFile(title,
-                            lastSaveLoc
+                            correctFileLoc
                                     ?: (main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE)
                                     ?: main.getDefaultDirectory()).resolve("level_project.${Container.PROJECT_FILE_EXTENSION}"), filter) { file: File? ->
                         completionCallback()
                         if (file != null) {
                             val newInitialDirectory = if (!file.isDirectory) file.parentFile else file
-                            val ext = file.extension
-                            val fileWithCorrectExt = if (ext.equals(Container.LEVEL_FILE_EXTENSION, ignoreCase = true)) {
-                                // Strip out .prmania file ext and replace with .prmproj for older files
-                                (File(file.absolutePath.substringBeforeLast(".${Container.LEVEL_FILE_EXTENSION}") + ".${Container.PROJECT_FILE_EXTENSION}"))
-                            } else if (!ext.equals(Container.PROJECT_FILE_EXTENSION, ignoreCase = true)) {
-                                (File(file.absolutePath + ".${Container.PROJECT_FILE_EXTENSION}"))
-                            } else {
-                                file
-                            }
+                            val fileWithCorrectExt = getFileWithCorrectExt(file)
 
                             Gdx.app.postRunnable {
                                 main.persistDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_SAVE, newInitialDirectory)
