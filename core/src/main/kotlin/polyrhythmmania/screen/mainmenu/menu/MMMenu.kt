@@ -152,8 +152,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    protected val main: PRManiaGame get() = mainMenu.main
-    protected val font: PaintboxFont = main.fontMainMenuMain
+    val main: PRManiaGame get() = mainMenu.main
+    val font: PaintboxFont = main.fontMainMenuMain
     protected val markup: Markup = Markup(mapOf(
             "prmania_icons" to main.fontIcons,
             "rodin" to main.fontMainMenuRodin,
