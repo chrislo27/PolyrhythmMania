@@ -7,18 +7,19 @@ import paintbox.ui.ActionablePane
 import paintbox.ui.UIElement
 
 
-abstract class Skinnable<SELF : Skinnable<SELF>> : ActionablePane() {
+abstract class Skinnable<SELF> : ActionablePane() {
 
     val skinID: Var<String> by lazy { Var(getDefaultSkinID()) }
-    val skinFactory: Var<SkinFactory<Skin<SELF>, SELF>> by lazy {
+    val skinFactory: Var<SkinFactory<SELF, Skin<SELF>, Skinnable<SELF>>> by lazy {
         Var.bind {
             val skinID = skinID.use()
             val skinFactory = DefaultSkins[skinID] ?: error("No registered default skin for for skin ID $skinID")
-            skinFactory as SkinFactory<Skin<SELF>, SELF>
+            @Suppress("UNCHECKED_CAST")
+            skinFactory as SkinFactory<SELF, Skin<SELF>, Skinnable<SELF>>
         }
     }
     val skin: ReadOnlyVar<Skin<SELF>> by lazy { 
-        Var.bind { skinFactory.use().createSkin(this@Skinnable as SELF) }
+        Var.bind { skinFactory.use().createSkin(this@Skinnable) }
     }
 
     abstract fun getDefaultSkinID(): String

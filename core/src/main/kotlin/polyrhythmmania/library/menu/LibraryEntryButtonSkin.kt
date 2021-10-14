@@ -1,13 +1,11 @@
 package polyrhythmmania.library.menu
 
 import com.badlogic.gdx.graphics.Color
-import paintbox.ui.control.Button
 import paintbox.ui.control.ButtonSkin
-import paintbox.ui.skin.Skin
 import paintbox.util.gdxutils.grey
 
 
-class LibraryEntryButtonSkin(element: LibraryEntryButton) : ButtonSkin(element) {
+class LibraryEntryButtonSkin(override val element: LibraryEntryButton) : ButtonSkin(element) {
     
     companion object {
         val TEXT_COLOR: Color = Color().grey(90f / 255f, 1f)
