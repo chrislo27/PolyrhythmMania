@@ -418,6 +418,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             currentFlip.update(delta, this)
             if (currentFlip.isDone) {
                 this.flipAnimation = null
+                sceneRoot.cancelTooltip()
                 val transitionAway = this.transitionAway
                 if (transitionAway != null) {
                     this.transitionAway = null
