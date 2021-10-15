@@ -107,8 +107,10 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.popLastMenu()
                 }
             }
-            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.library.sortAndFilter").use() }).apply {
-                this.bounds.width.set(170f)
+            hbox += createSmallButton(binding = {""}).apply {
+                this.bindWidthToSelfHeight()
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["filter"]))
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.sortAndFilter")))
                 this.setOnAction {
                     // TODO
                 }
@@ -199,7 +201,6 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         
         val searchFolder = getLibraryFolder()
-        val threadReference = AtomicReference<Thread?>(null)
         val thread = thread(start = false, isDaemon = true, name = "Library search") {
             try {
                 val potentialFiles = searchFolder.listFiles { file: File ->
@@ -225,7 +226,6 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 e.printStackTrace()
             }
         }
-        threadReference.set(thread)
         synchronized(this) {
             this.workerThread = thread
         }
