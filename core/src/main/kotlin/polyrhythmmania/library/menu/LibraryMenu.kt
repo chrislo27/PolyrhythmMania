@@ -57,7 +57,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private val vbox: VBox
     
     init {
-        PRMania.DEFAULT_LEVELS_FOLDER
+        PRMania.DEFAULT_LEVELS_FOLDER // Invoke to mkdirs
         
         this.setSize(WIDTH_MID)
         this.titleText.bind { Localization.getVar("mainMenu.library.title").use() }
@@ -77,8 +77,8 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.vBar.skinID.set(scrollBarSkinID)
             this.hBar.skinID.set(scrollBarSkinID)
 
-            this.vBar.unitIncrement.set(10f)
-            this.vBar.blockIncrement.set(40f)
+            this.vBar.unitIncrement.set(16f)
+            this.vBar.blockIncrement.set(48f)
         }
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
@@ -109,6 +109,14 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             hbox += createSmallButton(binding = {""}).apply {
                 this.bindWidthToSelfHeight()
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["refresh"]))
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.refresh")))
+                this.setOnAction {
+                    startSearchThread()
+                }
+            }
+            hbox += createSmallButton(binding = {""}).apply {
+                this.bindWidthToSelfHeight()
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["filter"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.sortAndFilter")))
                 this.setOnAction {
@@ -120,25 +128,28 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.openLibraryLocation.tooltip")))
                 this.setOnAction {
-                    Gdx.net.openFileExplorer(main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_LIBRARY_VIEW) ?: run {
-                        PRMania.DEFAULT_LEVELS_FOLDER.also { it.mkdirs() }
-                    })
+                    Gdx.net.openFileExplorer(getLibraryFolder())
                 }
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.library.changeLibraryLocation").use() }).apply {
                 this.bounds.width.set(160f)
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.changeLibraryLocation.tooltip")))
                 this.setOnAction {
-                    // TODO
+                    val oldFolder = getLibraryFolder()
                     main.restoreForExternalDialog { completionCallback ->
                         thread(isDaemon = true) {
-                            TinyFDWrapper.selectFolder("title", File("~")) { file: File? ->
+                            TinyFDWrapper.selectFolder(Localization.getValue("fileChooser.libraryFolderChange.title"), oldFolder) { file: File? ->
                                 completionCallback()
-                                println("Selected: $file")
+                                if (file != null && file.isDirectory && file != oldFolder) {
+                                    main.persistDirectory(PreferenceKeys.FILE_CHOOSER_LIBRARY_VIEW, file)
+                                    startSearchThread()
+                                }
                             }
                         }
                     }
                 }
             }
+            
         }
     }
     
@@ -178,11 +189,16 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         updateLevelListVbox()
     }
     
-    private fun removeLevel(levelEntryData: LevelEntryData) {
-        levelList -= levelEntryData
+    private fun removeLevels(list: List<LevelEntryData>) {
+        levelList.removeAll(list)
+        list.forEach { toggleGroup.removeToggle(it.button) }
         
-        levelList.sortWith(LevelEntryData.comparator)
+        sortLevelList()
         updateLevelListVbox()
+    }
+    
+    private fun sortLevelList() {
+        levelList.sortWith(LevelEntryData.comparator)
     }
     
     private fun updateLevelListVbox() {
@@ -197,6 +213,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         try {
             synchronized(this) {
                 this.workerThread?.interrupt()
+                this.workerThread = null
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -205,6 +222,8 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
     private fun startSearchThread(): Thread {
         interruptSearchThread()
+        
+        removeLevels(levelList.toList())
         
         val searchFolder = getLibraryFolder()
         val thread = thread(start = false, isDaemon = true, name = "Library search") {
@@ -215,7 +234,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             && !lowerName.endsWith(".autosave.${Container.LEVEL_FILE_EXTENSION}")
                 }?.toList() ?: emptyList()
                 
-                var lastUIPushTime = System.currentTimeMillis()
+                var lastUIPushTime = 0L
                 val entriesToAdd = mutableListOf<LevelEntry>()
                 
                 fun pushEntriesToUI() {

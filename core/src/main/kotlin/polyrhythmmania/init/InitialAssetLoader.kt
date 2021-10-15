@@ -79,6 +79,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("help", "textures/ui/icon/help.png"),
                 Packable("allowed_tracks", "textures/ui/icon/allowed_tracks.png"),
                 Packable("filter", "textures/ui/icon/filter.png"),
+                Packable("refresh", "textures/ui/icon/refresh.png"),
         ), PackedSheet.Config(padding = 1, maxSize = 256, duplicateBorder = false)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor_linear", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("x", "textures/ui/x.png"),
