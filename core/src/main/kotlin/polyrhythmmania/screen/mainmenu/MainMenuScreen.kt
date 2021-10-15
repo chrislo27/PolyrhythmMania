@@ -73,6 +73,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             var cornerStart: Corner = Corner.TOP_LEFT,
             var flipWidth: Float = 3f,
     ) {
+        var lastTooltip: UIElement? = null
+        
         var diagonalProgress: Float = 0f
 
         var isDone: Boolean = false
@@ -418,7 +420,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             currentFlip.update(delta, this)
             if (currentFlip.isDone) {
                 this.flipAnimation = null
-                sceneRoot.cancelTooltip()
+                if (currentFlip.lastTooltip == sceneRoot.currentTooltipVar.getOrCompute()) { 
+                    sceneRoot.cancelTooltip()
+                }
                 val transitionAway = this.transitionAway
                 if (transitionAway != null) {
                     this.transitionAway = null
@@ -491,6 +495,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         this.flipAnimation = newFlip
         resetTiles()
         framebufferSwapRequested = true
+        newFlip.lastTooltip = sceneRoot.currentTooltipVar.getOrCompute()
     }
     
     fun transitionAway(action: () -> Unit) {
