@@ -13,6 +13,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
+import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
 import polyrhythmmania.discord.DiscordCore
@@ -97,6 +98,15 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.disabled.set(true)
             }
         }
+        val resetLibraryFolderButton: Button = createLongButton {
+            Localization.getVar("mainMenu.dataSettings.resetLibraryFolder").use()
+        }.apply {
+            this.setOnAction {
+                main.persistDirectory(PreferenceKeys.FILE_CHOOSER_LIBRARY_VIEW, PRMania.DEFAULT_LEVELS_FOLDER)
+                menuCol.libraryMenu.interruptSearchThread()
+                this.disabled.set(true)
+            }
+        }
         
         vbox.temporarilyDisableLayouts {
             vbox += createLongButton {
@@ -110,6 +120,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += deleteRecoveryButton
             vbox += resetEndlessModeHighScoreButton
             vbox += resetSideModeHighScoresButton
+            vbox += resetLibraryFolderButton
             
             val (drpcPane, drpcCheckbox) = createCheckboxOption({Localization.getVar("mainMenu.dataSettings.discordRichPresence").use()})
             drpcCheckbox.checkedState.set(settings.discordRichPresence.getOrCompute())
@@ -132,6 +143,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         deleteRecoveryButton.disabled.set(false)
                         resetSideModeHighScoresButton.disabled.set(false)
                         resetEndlessModeHighScoreButton.disabled.set(false)
+                        resetLibraryFolderButton.disabled.set(false)
                     }
                 }
             }

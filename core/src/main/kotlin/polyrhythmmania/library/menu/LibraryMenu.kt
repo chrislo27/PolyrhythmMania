@@ -159,18 +159,20 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
     }
     
-    private fun addLevel(levelEntry: LevelEntry) {
-        val button = LibraryEntryButton(this, levelEntry, this.toggleGroup).apply {
+    private fun createLibraryEntryButton(levelEntry: LevelEntry): LibraryEntryButton {
+        return LibraryEntryButton(this, levelEntry, this.toggleGroup).apply {
             this.padding.set(Insets(4f, 4f, 12f, 12f))
             this.bounds.height.set(48f)
             this.textAlign.set(TextAlign.LEFT)
             this.renderAlign.set(Align.left)
             this.setOnHoverStart(blipSoundListener)
         }
+    }
+    
+    private fun addLevels(list: List<LevelEntry>) {
+        val levelEntryData = list.map { LevelEntryData(it, createLibraryEntryButton(it)) }
         
-        val levelEntryData = LevelEntryData(levelEntry, button)
-        
-        levelList += levelEntryData
+        levelList.addAll(levelEntryData)
         
         levelList.sortWith(LevelEntryData.comparator)
         updateLevelListVbox()
@@ -191,7 +193,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         vbox.sizeHeightToChildren(100f)
     }
     
-    private fun startSearchThread(): Thread {
+    fun interruptSearchThread() {
         try {
             synchronized(this) {
                 this.workerThread?.interrupt()
@@ -199,6 +201,10 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+    
+    private fun startSearchThread(): Thread {
+        interruptSearchThread()
         
         val searchFolder = getLibraryFolder()
         val thread = thread(start = false, isDaemon = true, name = "Library search") {
@@ -209,17 +215,35 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             && !lowerName.endsWith(".autosave.${Container.LEVEL_FILE_EXTENSION}")
                 }?.toList() ?: emptyList()
                 
+                var lastUIPushTime = System.currentTimeMillis()
+                val entriesToAdd = mutableListOf<LevelEntry>()
+                
+                fun pushEntriesToUI() {
+                    if (entriesToAdd.isNotEmpty()) {
+                        val copy = entriesToAdd.toList()
+                        entriesToAdd.clear()
+                        Gdx.app.postRunnable { 
+                            addLevels(copy)
+                        }
+                        lastUIPushTime = System.currentTimeMillis()
+                    }
+                }
+                
                 for (file: File in potentialFiles) {
                     try {
                         val levelEntry: LevelEntry = loadLevelEntry(file)
-                        Gdx.app.postRunnable { 
-                            addLevel(levelEntry)
+                        entriesToAdd += levelEntry
+                        
+                        if (System.currentTimeMillis() - lastUIPushTime >= 100L) {
+                            pushEntriesToUI()
                         }
                     } catch (e: Exception) {
                         Paintbox.LOGGER.warn("Exception when scanning level in library: ${file.absolutePath}")
                         e.printStackTrace()
                     }
                 }
+                
+                pushEntriesToUI()
             } catch (ignored: InterruptedException) {
             } catch (e: Exception) {
                 Paintbox.LOGGER.error("Exception when searching for files in library directory ${searchFolder.absolutePath}")
