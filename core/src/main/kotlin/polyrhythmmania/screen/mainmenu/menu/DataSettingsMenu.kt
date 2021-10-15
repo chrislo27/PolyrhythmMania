@@ -5,12 +5,15 @@ import com.badlogic.gdx.graphics.Color
 import paintbox.Paintbox
 import paintbox.logging.SysOutPiper
 import paintbox.ui.Anchor
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PreferenceKeys
@@ -28,7 +31,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     init {
         this.setSize(MMMenu.WIDTH_MID)
         this.titleText.bind { Localization.getVar("mainMenu.dataSettings.title").use() }
-        this.contentPane.bounds.height.set(300f)
+        this.contentPane.bounds.height.set(320f)
 
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
@@ -109,6 +112,23 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         
         vbox.temporarilyDisableLayouts {
+            fun separator(): UIElement {
+                return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
+                    this.bounds.height.set(10f)
+                    this.margin.set(Insets(4f, 4f, 0f, 0f))
+                }
+            }
+
+            val (drpcPane, drpcCheckbox) = createCheckboxOption({Localization.getVar("mainMenu.dataSettings.discordRichPresence").use()})
+            drpcCheckbox.checkedState.set(settings.discordRichPresence.getOrCompute())
+            drpcCheckbox.onCheckChanged = { newState ->
+                settings.discordRichPresence.set(newState)
+            }
+            drpcCheckbox.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.dataSettings.discordRichPresence.tooltip")))
+            vbox += drpcPane
+            
+            vbox += separator()
+            
             vbox += createLongButton {
                 Localization.getVar("mainMenu.dataSettings.openLogsFolder").use()
             }.apply {
@@ -122,13 +142,6 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += resetSideModeHighScoresButton
             vbox += resetLibraryFolderButton
             
-            val (drpcPane, drpcCheckbox) = createCheckboxOption({Localization.getVar("mainMenu.dataSettings.discordRichPresence").use()})
-            drpcCheckbox.checkedState.set(settings.discordRichPresence.getOrCompute())
-            drpcCheckbox.onCheckChanged = { newState ->
-                settings.discordRichPresence.set(newState)
-            }
-            drpcCheckbox.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.dataSettings.discordRichPresence.tooltip")))
-            vbox += drpcPane
         }
         
         vbox.sizeHeightToChildren(100f)
