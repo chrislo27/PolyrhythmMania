@@ -11,9 +11,9 @@ import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.ui.animation.AnimationHandler
 import paintbox.ui.contextmenu.ContextMenu
+import paintbox.util.RectangleStack
 import paintbox.util.viewport.NoOpViewport
 import paintbox.util.gdxutils.drawRect
-import paintbox.util.gdxutils.fillRect
 
 
 /**
@@ -129,7 +129,10 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
             val layerBounds = layerRoot.bounds
             val originX = layerBounds.x.get()
             val originY = layerBounds.y.get() + layerBounds.height.get()
-            layerRoot.render(originX, originY, batch)
+            
+            val currentClipRect = RectangleStack.getAndPush().set(layerBounds.x.get(), layerBounds.y.get(), layerBounds.width.get(), layerBounds.height.get())
+            layerRoot.render(originX, originY, batch, currentClipRect, layerBounds.x.get(), layerBounds.y.get())
+            RectangleStack.pop()
         }
 
         val drawOutlines = Paintbox.stageOutlines

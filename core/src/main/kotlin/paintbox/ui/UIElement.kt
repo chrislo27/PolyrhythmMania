@@ -2,18 +2,23 @@ package paintbox.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import paintbox.binding.*
 import paintbox.ui.area.ReadOnlyBounds
 import paintbox.ui.border.Border
 import paintbox.ui.border.NoBorder
 import paintbox.util.RectangleStack
+import paintbox.util.gdxutils.intersects
+import kotlin.math.max
+import kotlin.math.min
 
 
 open class UIElement : UIBounds() {
 
     companion object {
         private val DEFAULT_MULTIPLIER_BINDING: Var.Context.() -> Float = { 1f }
+        private const val CLIP_RECT_BUFFER: Float = 16f
     }
 
     val parent: Var<UIElement?> = Var(null)
@@ -77,16 +82,43 @@ open class UIElement : UIBounds() {
     }
 
     @Suppress("RedundantModalityModifier")
-    final fun render(originX: Float, originY: Float, batch: SpriteBatch) {
+    final fun render(originX: Float, originY: Float, batch: SpriteBatch,
+                     currentClipRect: Rectangle, uiOriginX: Float, uiOriginY: Float) {
         if (!visible.get()) return
 
         val clip = doClipping.get()
         val childOriginBounds = this.contentZone
         val childOriginX = childOriginBounds.x.get()
         val childOriginY = childOriginBounds.y.get()
+        // uiOriginX/Y represent where the 0,0 point is for the children in UI coordinates
+        val newUIOriginX = uiOriginX + childOriginX
+        val newUIOriginY = uiOriginY + childOriginY
+        
         renderOptionallyWithClip(originX, originY, batch, clip) { _, _, _ ->
             this.renderSelf(originX, originY, batch)
-            this.renderChildren(originX + childOriginX, originY - childOriginY, batch)
+
+            if (clip) {
+                val suggestedClipX = newUIOriginX - this.contentOffsetX.get()
+                val suggestedClipY = newUIOriginY - this.contentOffsetY.get()
+                val suggestedClipWidth = childOriginBounds.width.get()
+                val suggestedClipHeight = childOriginBounds.height.get()
+                // Take the minimal area from the old clip and new rect
+                val minX = max(currentClipRect.x, suggestedClipX)
+                val minY = max(currentClipRect.y, suggestedClipY)
+                val maxX = min(currentClipRect.x + currentClipRect.width, suggestedClipX + suggestedClipWidth)
+                val maxY = min(currentClipRect.y + currentClipRect.height, suggestedClipY + suggestedClipHeight)
+                val newClipRect = RectangleStack.getAndPush().set(minX - CLIP_RECT_BUFFER, minY - CLIP_RECT_BUFFER,
+                        (maxX - minX) + CLIP_RECT_BUFFER * 2, (maxY - minY) + CLIP_RECT_BUFFER * 2)
+                
+                this.renderChildren(originX + childOriginX, originY - childOriginY, batch,
+                        newClipRect, newUIOriginX, newUIOriginY)
+                
+                RectangleStack.pop()
+            } else {
+                this.renderChildren(originX + childOriginX, originY - childOriginY, batch,
+                        currentClipRect, newUIOriginX, newUIOriginY)
+            }
+            
             this.renderSelfAfterChildren(originX, originY, batch)
 
             val borderStyle = this.borderStyle.getOrCompute()
@@ -97,10 +129,21 @@ open class UIElement : UIBounds() {
     protected open fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
     }
 
-    protected /*open*/ fun renderChildren(originX: Float, originY: Float, batch: SpriteBatch) {
-        children.forEach {
-            it.render(originX, originY, batch)
+    private fun renderChildren(originX: Float, originY: Float, batch: SpriteBatch,
+                               currentClipRect: Rectangle, uiOriginX: Float, uiOriginY: Float) {
+        if (children.isEmpty()) return
+        
+        val tmpRect = RectangleStack.getAndPush()
+        for (child in children) {
+            val childX = uiOriginX + child.bounds.x.get()
+            val childY = uiOriginY + child.bounds.y.get()
+            tmpRect.set(childX, childY, child.bounds.width.get(), child.bounds.height.get())
+            if (!tmpRect.intersects(currentClipRect)) {
+                continue
+            }
+            child.render(originX, originY, batch, currentClipRect, uiOriginX, uiOriginY)
         }
+        RectangleStack.pop()
     }
 
     protected open fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
