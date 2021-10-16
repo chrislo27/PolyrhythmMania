@@ -226,13 +226,15 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         removeLevels(levelList.toList())
         
         val searchFolder = getLibraryFolder()
-        val thread = thread(start = false, isDaemon = true, name = "Library search") {
+        val thread = thread(start = false, isDaemon = true, name = "Library Search") {
+            Paintbox.LOGGER.info("Starting Library search in ${searchFolder.absolutePath}")
             try {
                 val potentialFiles = searchFolder.listFiles { file: File ->
                     val lowerName = file.name.lowercase(Locale.ROOT)
                     file.extension.lowercase(Locale.ROOT) == Container.LEVEL_FILE_EXTENSION 
                             && !lowerName.endsWith(".autosave.${Container.LEVEL_FILE_EXTENSION}")
                 }?.toList() ?: emptyList()
+                Paintbox.LOGGER.info("[Library Search] Possible files found: ${potentialFiles.size}")
                 
                 var lastUIPushTime = 0L
                 val entriesToAdd = mutableListOf<LevelEntry>()
@@ -248,10 +250,12 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
                 
+                var levelsAdded = 0
                 for (file: File in potentialFiles) {
                     try {
-                        val levelEntry: LevelEntry = loadLevelEntry(file)
+                        val levelEntry: LevelEntry = loadLevelEntry(file) ?: continue
                         entriesToAdd += levelEntry
+                        levelsAdded++
                         
                         if (System.currentTimeMillis() - lastUIPushTime >= 100L) {
                             pushEntriesToUI()
@@ -261,6 +265,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         e.printStackTrace()
                     }
                 }
+                Paintbox.LOGGER.info("[Library Search] Levels loaded: $levelsAdded")
                 
                 pushEntriesToUI()
             } catch (ignored: InterruptedException) {
@@ -276,7 +281,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         return thread
     }
     
-    private fun loadLevelEntry(file: File): LevelEntry {
+    private fun loadLevelEntry(file: File): LevelEntry? {
         val zipFile = ZipFile(file)
         val json: JsonObject
         zipFile.getInputStream(zipFile.getFileHeader("manifest.json")).use { zipInputStream ->
@@ -294,6 +299,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val exportStatistics: ExportStatistics? = libraryRelevantData.exportStatistics
         
         return if (uuid != null && levelMetadata != null && exportStatistics != null) {
+            if (libraryRelevantData.isAutosave || libraryRelevantData.isProject) return null
             LevelEntry.Modern(libraryRelevantData.levelUUID, file, containerVersion, programVersion, levelMetadata, exportStatistics)
         } else {
             LevelEntry.Legacy(file, containerVersion, programVersion)
