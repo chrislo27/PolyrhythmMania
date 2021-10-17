@@ -52,8 +52,8 @@ class LibraryEntryButton(val libraryMenu: LibraryMenu, val levelEntry: LevelEntr
         
         this.borderStyle.set(SolidBorder(Color.DARK_GRAY))
         
-        this.setOnAction { 
-            selectedState.set(true)
+        this.setOnAction {
+            selectedState.invert()
             selectedTimeMs = System.currentTimeMillis()
         }
     }

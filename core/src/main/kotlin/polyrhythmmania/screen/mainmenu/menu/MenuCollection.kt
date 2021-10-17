@@ -107,8 +107,9 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
             }
             
             val changedBounds = RectangleStack.getAndPush().apply {
-                val currentBounds = menu.bounds
-                val relToRoot = menu.getPosRelativeToRoot(Vector2Stack.getAndPush())
+                val currentBoundsElement = menu.getTileFlipAnimationBounds()
+                val currentBounds = currentBoundsElement.bounds
+                val relToRoot = currentBoundsElement.getPosRelativeToRoot(Vector2Stack.getAndPush())
                 this.set(relToRoot.x, relToRoot.y,
                         currentBounds.width.get(), currentBounds.height.get())
                 Vector2Stack.pop()
@@ -117,8 +118,9 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
             val currentActive = activeMenu.getOrCompute()
             if (currentActive != null) {
                 val secondBounds = RectangleStack.getAndPush()
-                val curActiveBounds = currentActive.bounds
-                val relToRoot = currentActive.getPosRelativeToRoot(Vector2Stack.getAndPush())
+                val currentActiveElement = currentActive.getTileFlipAnimationBounds()
+                val curActiveBounds = currentActiveElement.bounds
+                val relToRoot = currentActiveElement.getPosRelativeToRoot(Vector2Stack.getAndPush())
                 secondBounds.set(relToRoot.x, relToRoot.y,
                         curActiveBounds.width.get(), curActiveBounds.height.get())
                 Vector2Stack.pop()

@@ -8,42 +8,39 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import net.lingala.zip4j.ZipFile
 import paintbox.Paintbox
-import paintbox.PaintboxGame
+import paintbox.binding.BooleanVar
+import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.Var
-import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
 import paintbox.ui.area.Insets
-import paintbox.ui.control.Button
+import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
+import paintbox.ui.control.TextLabel
 import paintbox.ui.control.ToggleGroup
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.ui.skin.DefaultSkins
-import paintbox.ui.skin.SkinFactory
 import paintbox.util.TinyFDWrapper
 import paintbox.util.Version
 import paintbox.util.gdxutils.openFileExplorer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
-import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.container.manifest.ExportStatistics
 import polyrhythmmania.container.manifest.LibraryRelevantData
 import polyrhythmmania.library.LevelEntry
-import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 import polyrhythmmania.ui.PRManiaSkins
 import java.io.File
 import java.util.*
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 
 
@@ -52,17 +49,39 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private var workerThread: Thread? = null
     
     private val toggleGroup: ToggleGroup = ToggleGroup()
-    private val levelList: MutableList<LevelEntryData> = mutableListOf()
+    private val levelList: Var<List<LevelEntryData>> = Var(emptyList())
+    private val activeLevelList: Var<List<LevelEntryData>> = Var(emptyList())
     
     private val vbox: VBox
+    private val contentPaneLeft: RectElement
+    private val contentPaneRight: RectElement
     
     init {
         PRMania.DEFAULT_LEVELS_FOLDER // Invoke to mkdirs
         
-        this.setSize(WIDTH_MID)
+        this.setSize(percentage = 0.975f)
         this.titleText.bind { Localization.getVar("mainMenu.library.title").use() }
         this.showLogo.set(false)
         this.contentPane.bounds.height.set(520f)
+        this.contentPane.padding.set(Insets.ZERO)
+        this.contentPane.color.set(Color(0f, 0f, 0f, 0f))
+        
+        contentPaneLeft = RectElement(grey).apply {
+            Anchor.TopLeft.configure(this)
+            contentPane += this
+            this.bindWidthToParent(multiplier = 0.5f, adjust = 64f)
+            this.padding.set(Insets(16f))
+        }
+        contentPaneRight = RectElement(grey).apply {
+            Anchor.TopRight.configure(this)
+            contentPane += this
+            this.bindWidthToParent(multiplier = 0.5f, adjust = -100f)
+            this.padding.set(Insets(0f))
+            this.border.set(Insets(16f))
+            this.borderStyle.set(SolidBorder(grey).also { border ->
+                border.roundedCorners.set(true)
+            })
+        }
 
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
@@ -77,8 +96,8 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.vBar.skinID.set(scrollBarSkinID)
             this.hBar.skinID.set(scrollBarSkinID)
 
-            this.vBar.unitIncrement.set(16f)
-            this.vBar.blockIncrement.set(48f)
+            this.vBar.unitIncrement.set(48f)
+            this.vBar.blockIncrement.set(48f * 4)
         }
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
@@ -88,9 +107,39 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
 
-        contentPane.addChild(scrollPane)
-        contentPane.addChild(hbox)
+        contentPaneLeft.addChild(scrollPane)
+        contentPaneLeft.addChild(hbox)
 
+        val noLevelsLabel = TextLabel(binding = {
+            val ll = levelList.use()
+            val active = activeLevelList.use()
+            if (ll.isEmpty()) {
+                Localization.getVar("mainMenu.library.noLevelsInFolder").use()
+            } else if (active.isEmpty()) {
+                Localization.getVar("mainMenu.library.noLevelsFiltered").use()
+            } else ""
+        }, font = main.fontMainMenuMain).apply { 
+            scrollPane.addChild(this) // Intentional, not part of content
+            Anchor.Centre.configure(this, offsetX = -(scrollPane.barSize.get()))
+            this.bindWidthToParent(adjust = -(64f + scrollPane.barSize.get()))
+            this.bindHeightToParent(adjust = -(64f))
+            this.doLineWrapping.set(true)
+            this.renderAlign.set(Align.center)
+            this.visible.bind {
+                activeLevelList.use().isEmpty()
+            }
+        }
+        val anyLevelSelected: ReadOnlyBooleanVar = BooleanVar {
+            this@LibraryMenu.toggleGroup.activeToggle.use()?.selectedState?.useB() != true
+        }
+        val selectFromLeftLabel = TextLabel(binding = { Localization.getVar("mainMenu.library.selectFromLeft").use() }, font = main.fontMainMenuMain).apply { 
+            contentPaneRight.addChild(this)
+            this.doLineWrapping.set(true)
+            this.renderAlign.set(Align.center)
+            this.visible.bind {
+                anyLevelSelected.useB()
+            }
+        }
 
         val vbox = VBox().apply {
             this.spacing.set(0f)
@@ -186,29 +235,37 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private fun addLevels(list: List<LevelEntry>) {
         val levelEntryData = list.map { LevelEntryData(it, createLibraryEntryButton(it)) }
         
-        levelList.addAll(levelEntryData)
+        val newLeveLList = levelList.getOrCompute() + levelEntryData
+        levelList.set(newLeveLList)
+        activeLevelList.set(newLeveLList.toList()) // TODO apply
         
-        levelList.sortWith(LevelEntryData.comparator)
+        filterAndSortLevelList()
         updateLevelListVbox()
     }
     
     private fun removeLevels(list: List<LevelEntryData>) {
-        levelList.removeAll(list)
+        levelList.set(levelList.getOrCompute() - list)
+        activeLevelList.set(activeLevelList.getOrCompute() - list)
         list.forEach { toggleGroup.removeToggle(it.button) }
         
-        sortLevelList()
+        filterAndSortLevelList()
         updateLevelListVbox()
     }
     
-    private fun sortLevelList() {
-        levelList.sortWith(LevelEntryData.comparator)
+    private fun filterAndSortLevelList() {
+        // TODO correct filtering
+        val filtered = levelList.getOrCompute().toMutableList()
+        
+        // TODO correct sorting
+        filtered.sortWith(LevelEntryData.comparator)
+        activeLevelList.set(filtered)
     }
     
     private fun updateLevelListVbox() {
         val buttonBorder = Insets(1f, 0f, 0f, 0f)
         vbox.temporarilyDisableLayouts {
             vbox.children.forEach { vbox.removeChild(it) }
-            levelList.forEachIndexed { index, it ->
+            activeLevelList.getOrCompute().forEachIndexed { index, it ->
                 val button = it.button
                 button.border.set(if (index == 0) Insets.ZERO else buttonBorder)
                 vbox.addChild(button)
@@ -231,11 +288,12 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private fun startSearchThread(): Thread {
         interruptSearchThread()
         
-        removeLevels(levelList.toList())
+        removeLevels(levelList.getOrCompute().toList())
         
         val searchFolder = getLibraryFolder()
         val thread = thread(start = false, isDaemon = true, name = "Library Search") {
             Paintbox.LOGGER.info("Starting Library search in ${searchFolder.absolutePath}")
+            val startNano = System.nanoTime()
             try {
                 val potentialFiles = searchFolder.listFiles { file: File ->
                     val lowerName = file.name.lowercase(Locale.ROOT)
@@ -273,9 +331,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         e.printStackTrace()
                     }
                 }
-                Paintbox.LOGGER.info("[Library Search] Levels loaded: $levelsAdded")
                 
                 pushEntriesToUI()
+                Paintbox.LOGGER.info("[Library Search] Levels read: $levelsAdded (took ${(System.nanoTime() - startNano) / 1_000_000f} ms)")
             } catch (ignored: InterruptedException) {
             } catch (e: Exception) {
                 Paintbox.LOGGER.error("Exception when searching for files in library directory ${searchFolder.absolutePath}")

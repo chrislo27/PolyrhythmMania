@@ -16,6 +16,7 @@ import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
+import paintbox.ui.area.ReadOnlyBounds
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
@@ -67,6 +68,8 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
             (this@MMMenu.parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * percentage + adjust
         }
     }
+    
+    open fun getTileFlipAnimationBounds(): UIElement = this
 }
 
 
@@ -167,7 +170,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
     protected val titleText: Var<String> = Var("")
     protected val titleLabel: TextLabel
-    protected val contentPane: UIElement = RectElement(grey).apply {
+    protected val contentPane: RectElement = RectElement(grey).apply {
         this.bounds.height.set(titleHeight * 2) // Default.
         this.padding.set(Insets(16f))
     }
