@@ -155,6 +155,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
     
     fun prepareShow(): LibraryMenu {
+        toggleGroup.activeToggle.getOrCompute()?.selectedState?.set(false)
         if (synchronized(this) { this.workerThread == null }) {
             startSearchThread()
         }
@@ -172,7 +173,8 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
     
     private fun createLibraryEntryButton(levelEntry: LevelEntry): LibraryEntryButton {
-        return LibraryEntryButton(this, levelEntry, this.toggleGroup).apply {
+        return LibraryEntryButton(this, levelEntry).apply {
+            this@LibraryMenu.toggleGroup.addToggle(this)
             this.padding.set(Insets(4f, 4f, 12f, 12f))
             this.bounds.height.set(48f)
             this.textAlign.set(TextAlign.LEFT)

@@ -16,7 +16,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.library.LevelEntry
 
-class LibraryEntryButton(val libraryMenu: LibraryMenu, val levelEntry: LevelEntry, toggleGroup: ToggleGroup)
+class LibraryEntryButton(val libraryMenu: LibraryMenu, val levelEntry: LevelEntry)
     : Button("", PRManiaGame.instance.fontMainMenuMain), Toggle {
 
     companion object {
@@ -30,7 +30,9 @@ class LibraryEntryButton(val libraryMenu: LibraryMenu, val levelEntry: LevelEntr
     }
 
     override val selectedState: BooleanVar = BooleanVar(false)
-    override val toggleGroup: Var<ToggleGroup?> = Var(toggleGroup)
+    override val toggleGroup: Var<ToggleGroup?> = Var(null)
+    var selectedTimeMs: Long = 0L
+        private set
     
     init {
         val main = libraryMenu.main
@@ -49,6 +51,11 @@ class LibraryEntryButton(val libraryMenu: LibraryMenu, val levelEntry: LevelEntr
         }
         
         this.borderStyle.set(SolidBorder(Color.DARK_GRAY))
+        
+        this.setOnAction { 
+            selectedState.set(true)
+            selectedTimeMs = System.currentTimeMillis()
+        }
     }
 
     override fun getDefaultSkinID(): String {
