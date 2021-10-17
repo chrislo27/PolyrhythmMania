@@ -1,14 +1,18 @@
 package polyrhythmmania.library.menu
 
+import com.badlogic.gdx.graphics.Color
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.font.TextBlock
 import paintbox.font.TextRun
+import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.control.Toggle
 import paintbox.ui.control.ToggleGroup
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.SkinFactory
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.library.LevelEntry
 
@@ -32,10 +36,19 @@ class LibraryEntryButton(val libraryMenu: LibraryMenu, val levelEntry: LevelEntr
         val main = libraryMenu.main
         val title = levelEntry.getTitle()
         val subtitle = levelEntry.getSubtitle()
-        this.internalTextBlock.set(TextBlock(listOf(
-                TextRun(main.fontMainMenuRodin, title, scaleX = 0.9f, scaleY = 0.9f),
-                TextRun(main.fontMainMenuRodin, if (subtitle.isBlank()) "" else "\n$subtitle", scaleX = 0.75f, scaleY = 0.75f),
-        )))
+        if (levelEntry is LevelEntry.Legacy) {
+            this.internalTextBlock.set(TextBlock(listOf(
+                    TextRun(main.fontMainMenuMain, Localization.getValue("mainMenu.library.legacyIndicator") + " ", scaleX = 0.9f, scaleY = 0.9f),
+                    TextRun(main.fontMainMenuThin, title, scaleX = 0.9f, scaleY = 0.9f),
+            )))
+        } else if (levelEntry is LevelEntry.Modern) {
+            this.internalTextBlock.set(TextBlock(listOf(
+                    TextRun(main.fontMainMenuRodin, title, scaleX = 0.9f, scaleY = 0.9f),
+                    TextRun(main.fontMainMenuRodin, if (subtitle.isBlank()) "" else "\n$subtitle", scaleX = 0.75f, scaleY = 0.75f),
+            )))
+        }
+        
+        this.borderStyle.set(SolidBorder(Color.DARK_GRAY))
     }
 
     override fun getDefaultSkinID(): String {

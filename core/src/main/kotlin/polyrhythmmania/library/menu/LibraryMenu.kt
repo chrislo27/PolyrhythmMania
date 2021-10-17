@@ -95,6 +95,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val vbox = VBox().apply {
             this.spacing.set(0f)
             this.bounds.height.set(100f)
+            this.margin.set(Insets(0f, 0f, 0f, 2f))
         }
         this.vbox = vbox
 
@@ -202,9 +203,14 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
     
     private fun updateLevelListVbox() {
+        val buttonBorder = Insets(1f, 0f, 0f, 0f)
         vbox.temporarilyDisableLayouts {
             vbox.children.forEach { vbox.removeChild(it) }
-            levelList.forEach { vbox.addChild(it.button) }
+            levelList.forEachIndexed { index, it ->
+                val button = it.button
+                button.border.set(if (index == 0) Insets.ZERO else buttonBorder)
+                vbox.addChild(button)
+            }
         }
         vbox.sizeHeightToChildren(100f)
     }
