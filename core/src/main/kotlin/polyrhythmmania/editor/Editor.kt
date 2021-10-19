@@ -38,10 +38,7 @@ import polyrhythmmania.editor.block.*
 import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.music.EditorMusicData
 import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.editor.pane.dialog.EditorDialog
-import polyrhythmmania.editor.pane.dialog.ExportLevelDialog
-import polyrhythmmania.editor.pane.dialog.LevelMetadataDialog
-import polyrhythmmania.editor.pane.dialog.MusicDialog
+import polyrhythmmania.editor.pane.dialog.*
 import polyrhythmmania.editor.undo.ActionGroup
 import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
@@ -547,6 +544,12 @@ class Editor(val main: PRManiaGame)
     fun attemptOpenLevelMetadataDialog() {
         if (allowedToEdit.get()) {
             editorPane.openDialog(LevelMetadataDialog(editorPane))
+        }
+    }
+    
+    fun attemptOpenBannerDialog() {
+        if (allowedToEdit.get()) {
+            editorPane.openDialog(BannerDialog(editorPane))
         }
     }
 

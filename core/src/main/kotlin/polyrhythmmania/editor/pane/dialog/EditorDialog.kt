@@ -14,6 +14,7 @@ abstract class EditorDialog(val editorPane: EditorPane, mergeTopAndContent: Bool
         if (canCloseDialog()) {
             onCloseDialog()
             editorPane.closeDialog()
+            afterDialogClosed()
         }
     }
 
@@ -26,6 +27,9 @@ abstract class EditorDialog(val editorPane: EditorPane, mergeTopAndContent: Bool
      * Overridden by subclasses to do close cleanup.
      */
     protected open fun onCloseDialog() {
+    }
+    
+    protected open fun afterDialogClosed() {
     }
     
     open fun canCloseWithEscKey(): Boolean = true

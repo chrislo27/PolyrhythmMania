@@ -5,7 +5,6 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.font.TextBlock
 import paintbox.font.TextRun
-import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.control.Toggle

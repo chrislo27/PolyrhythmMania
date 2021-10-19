@@ -1,6 +1,8 @@
 package polyrhythmmania.container
 
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.PixmapIO
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
@@ -13,7 +15,9 @@ import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
 import paintbox.binding.Var
 import paintbox.util.Version
+import paintbox.util.WindowSize
 import paintbox.util.gdxutils.disposeQuietly
+import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.container.manifest.LibraryRelevantData
 import polyrhythmmania.container.manifest.ResourceTag
@@ -21,6 +25,7 @@ import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackID
 import polyrhythmmania.editor.block.*
+import polyrhythmmania.editor.pane.dialog.BannerDialog
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.music.MusicVolume
@@ -73,6 +78,14 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
         
         const val VERSION_LEVEL_METADATA_ADDED: Int = 9
         const val VERSION_EXPORT_STATISTICS_ADDED: Int = 10
+        
+        val MIN_BANNER_SIZE: WindowSize = WindowSize(256, 80)
+        val MAX_BANNER_SIZE: WindowSize = WindowSize(512, 160)
+        
+        fun isBannerTextureWithinSize(tex: Texture): Boolean {
+            return tex.width in Container.MIN_BANNER_SIZE.width..Container.MAX_BANNER_SIZE.width
+                    && tex.height in Container.MIN_BANNER_SIZE.height..Container.MAX_BANNER_SIZE.height
+        }
     }
 
     val world: World = World()
@@ -106,6 +119,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
     val resources: Map<String, ExternalResource> get() = _resources
     var compressedMusic: ExternalResource? = null
         private set
+    var bannerTexture: Var<Texture?> = Var(null)
     
     var lastBlockPosition: FloatVar = FloatVar(0f) // Position of very last block
         private set
@@ -410,6 +424,31 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
                     zip.closeEntry()
                     tmp.delete()
                 }
+                val bannerTexture = this.bannerTexture.getOrCompute()
+                if (bannerTexture != null) {
+                    try {
+                        val tmp = TempFileUtils.createTempFile("savinglvlbanner")
+                        val texData = bannerTexture.textureData
+                        if (!texData.isPrepared) {
+                            texData.prepare()
+                        }
+                        val pixmap = bannerTexture.textureData.consumePixmap()
+                        PixmapIO.writePNG(FileHandle(tmp), pixmap)
+                        if (texData.disposePixmap()) {
+                            pixmap.disposeQuietly()
+                        }
+                        
+                        zip.putNextEntry(ZipEntry("banner.png"))
+                        tmp.inputStream().use { input ->
+                            input.copyTo(zip)
+                        }
+                        zip.closeEntry()
+                        tmp.delete()
+                    } catch (e: Exception) {
+                        Paintbox.LOGGER.error("Failed to save level banner!")
+                        e.printStackTrace()
+                    }
+                }
             }
         }
     }
@@ -613,12 +652,24 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
             engine.musicData.beadsMusic = newMusic
             engine.musicData.update()
         }
+        
+        var levelBannerFile: File? = null
+        val bannerHeader = zipFile.getFileHeader("banner.png")
+        if (bannerHeader != null) {
+            zipFile.getInputStream(bannerHeader).use { zipInputStream ->
+                val tempFile = TempFileUtils.createTempFile("banner", ".png")
+                val out = tempFile.outputStream()
+                zipInputStream.copyTo(out)
+                levelBannerFile = tempFile
+            }
+        }
 
-        return LoadMetadata(this, libraryRelevantData, customTexturePackRead)
+        return LoadMetadata(this, libraryRelevantData, customTexturePackRead, levelBannerFile)
     }
 
     data class LoadMetadata(val container: Container, val libraryRelevantData: LibraryRelevantData,
-                            val customTexturePackRead: CustomTexturePack.ReadResult?) {
+                            val customTexturePackRead: CustomTexturePack.ReadResult?, 
+                            val levelBannerFile: File?) {
         
         val containerVersion: Int = libraryRelevantData.containerVersion
         val programVersion: Version = libraryRelevantData.programVersion
@@ -633,6 +684,26 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
                 container.customTexturePack.set(ctp)
             }
             container.setTexturePackFromSource()
+            
+            if (levelBannerFile != null) {
+                try {
+                    val tex = Texture(FileHandle(levelBannerFile))
+                    tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+
+                    if (!isBannerTextureWithinSize(tex)) {
+                        Paintbox.LOGGER.warn("Ignoring banner texture because it is not the right size (${tex.width}x${tex.height})")
+                        tex.disposeQuietly()
+                    } else {
+                        val old = container.bannerTexture.getOrCompute()
+                        container.bannerTexture.set(null)
+                        old?.disposeQuietly()
+                        container.bannerTexture.set(null)
+                    }
+                } catch (e: Exception) {
+                    Paintbox.LOGGER.error("Failed to load banner texture!")
+                    e.printStackTrace()
+                }
+            }
         }
     }
 }

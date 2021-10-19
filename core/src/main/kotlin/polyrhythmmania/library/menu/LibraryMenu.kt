@@ -1,6 +1,7 @@
 package polyrhythmmania.library.menu
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -9,7 +10,6 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import net.lingala.zip4j.ZipFile
 import paintbox.Paintbox
-import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.ReadOnlyVar
@@ -32,6 +32,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.TinyFDWrapper
 import paintbox.util.Version
+import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.openFileExplorer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
@@ -44,6 +45,7 @@ import polyrhythmmania.library.LevelEntry
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.util.TempFileUtils
 import java.io.File
 import java.util.*
 import kotlin.concurrent.thread
@@ -52,7 +54,8 @@ import kotlin.concurrent.thread
 class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
     private var workerThread: Thread? = null
-    
+
+    private val currentBanner: Var<Texture?> = Var(null) // Note: A Texture will not be disposed unless it is swapped out.
     private val toggleGroup: ToggleGroup = ToggleGroup()
     private val selectedLevelEntry: ReadOnlyVar<LevelEntry?> = Var {
         val at = toggleGroup.activeToggle.use()
@@ -166,8 +169,10 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             val bannerRatio = 3.2f // 512 x 160
             val spacing = 4f
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("library_default_banner")),
-                    renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+            this += ImageNode(binding = {
+                val tex: Texture = currentBanner.use() ?: AssetRegistry["library_default_banner"]
+                TextureRegion(tex)
+            }, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
                 Anchor.TopLeft.configure(this)
                 this.bindHeightToSelfWidth(multiplier = 1f / bannerRatio)
             }
@@ -181,17 +186,12 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.spacing.set(spacing)
                 this.temporarilyDisableLayouts {
                     this += TextLabel(binding = {
-                        when (val level = selectedLevelEntry.use()) {
-                            is LevelEntry.Modern -> {
-                                val metadata = level.levelMetadata
-                                val exportStats = level.exportStatistics
-                                "Creator: ${metadata.levelCreator}\n${metadata.songName}${if (metadata.songArtist.isNotBlank()) " by ${metadata.songArtist}" else ""}\n${metadata.albumName} (${metadata.albumYear})\n${metadata.genre}\nDifficulty: ${metadata.difficulty} / 10"
-                            }
-                            is LevelEntry.Legacy -> {
-                                "[Legacy Level]\n${level.getTitle()}\nGame Version: ${level.programVersion}"
-                            }
-                            else -> ""
-                        }
+                        val level = levelEntry.use()
+                        if (level != null) {
+                            val metadata = level.levelMetadata
+                            val exportStats = level.exportStatistics
+                            "Creator: ${metadata.levelCreator}\n${metadata.songName}${if (metadata.songArtist.isNotBlank()) " by ${metadata.songArtist}" else ""}\n${metadata.albumName} (${metadata.albumYear})\n${metadata.genre}\nDifficulty: ${metadata.difficulty} / 10"
+                        } else ""
                     }, font = main.fontMainMenuThin).apply { 
                         this.renderAlign.set(Align.topLeft)
                     }
@@ -222,17 +222,10 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.spacing.set(spacing)
                 this.temporarilyDisableLayouts {
                     this += TextLabel(binding = {
-                        when (val level = selectedLevelEntry.use()) {
-                            is LevelEntry.Modern -> {
-                                val metadata = level.levelMetadata
-                                val exportStats = level.exportStatistics
-                                "Creator: ${metadata.levelCreator}\n${metadata.songName}${if (metadata.songArtist.isNotBlank()) " by ${metadata.songArtist}" else ""}\n${metadata.albumName} (${metadata.albumYear})\n${metadata.genre}\nDifficulty: ${metadata.difficulty} / 10"
-                            }
-                            is LevelEntry.Legacy -> {
-                                "[Legacy Level]\n${level.getTitle()}\nGame Version: ${level.programVersion}"
-                            }
-                            else -> ""
-                        }
+                        val level = levelEntry.use()
+                        if (level != null) {
+                            "[Legacy Level]\n${level.getTitle()}\nGame Version: ${level.programVersion}"
+                        } else ""
                     }, font = main.fontMainMenuThin).apply { 
                         this.renderAlign.set(Align.topLeft)
                     }
@@ -301,13 +294,50 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             
         }
+        
+        selectedLevelEntry.addListener {
+            val level = it.getOrCompute()
+            if (level is LevelEntry.Modern && level.file.exists()) {
+                Gdx.app.postRunnable {
+                    unloadBanner()
+                    try {
+                        val zipFile = ZipFile(level.file)
+                        val bannerHeader = zipFile.getFileHeader("banner.png")
+                        if (bannerHeader != null) {
+                            val tempFile = TempFileUtils.createTempFile("banner", ".png")
+                            zipFile.getInputStream(bannerHeader).use { zipInputStream ->
+                                val out = tempFile.outputStream()
+                                zipInputStream.copyTo(out)
+                            }
+
+                            val tex = Texture(FileHandle(tempFile))
+                            tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                            tempFile.delete()
+
+                            if (!Container.isBannerTextureWithinSize(tex)) {
+                                Paintbox.LOGGER.warn("Ignoring banner texture because it is not the right size (${tex.width}x${tex.height})")
+                                tex.disposeQuietly()
+                            } else {
+                                unloadBanner()
+                                this.currentBanner.set(tex)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Paintbox.LOGGER.warn("Failed to load level banner for ${level.file.absolutePath}")
+                        e.printStackTrace()
+                    }
+                }
+            } else {
+                Gdx.app.postRunnable {
+                    unloadBanner()
+                }
+            }
+        }
     }
-    
+
     fun prepareShow(): LibraryMenu {
         toggleGroup.activeToggle.getOrCompute()?.selectedState?.set(false)
-        if (synchronized(this) { this.workerThread == null }) {
-            startSearchThread()
-        }
+        startSearchThread()
         return this
     }
     
@@ -337,7 +367,6 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         
         val newLeveLList = levelList.getOrCompute() + levelEntryData
         levelList.set(newLeveLList)
-        activeLevelList.set(newLeveLList.toList()) // TODO apply
         
         filterAndSortLevelList()
         updateLevelListVbox()
@@ -445,6 +474,14 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         thread.start()
         return thread
+    }
+
+    private fun unloadBanner() {
+        val ct = this.currentBanner.getOrCompute()
+        if (ct != null) {
+            this.currentBanner.set(null)
+            ct.disposeQuietly()
+        }
     }
     
     private fun loadLevelEntry(file: File): LevelEntry? {

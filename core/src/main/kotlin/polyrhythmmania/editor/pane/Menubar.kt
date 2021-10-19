@@ -39,6 +39,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     val redoButton: Button
     
     val levelMetadataButton: Button
+//    val levelBannerButton: Button
     
     val helpButton: Button
     val settingsButton: Button
@@ -167,6 +168,14 @@ class Menubar(val editorPane: EditorPane) : Pane() {
                 editor.attemptOpenLevelMetadataDialog()
             }
         }
+//        levelBannerButton = Button(binding = { Localization.getVar("editor.dialog.banner.title").use() }, font = editorPane.palette.musicDialogFont).apply {
+//            this.padding.set(Insets.ZERO)
+//            this.bounds.width.set(32f * 6)
+//            this.skinID.set(EditorSkins.BUTTON)
+//            this.setOnAction {
+//                editor.attemptOpenBannerDialog()
+//            }
+//        }
         
         helpButton = Button("").apply {
             this.padding.set(Insets.ZERO)
@@ -217,6 +226,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             leftBox += redoButton
             leftBox += separator()
             leftBox += levelMetadataButton
+//            leftBox += levelBannerButton
         }
         rightBox.temporarilyDisableLayouts { 
             rightBox += helpButton
