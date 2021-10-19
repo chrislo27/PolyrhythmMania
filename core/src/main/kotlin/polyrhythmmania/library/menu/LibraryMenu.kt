@@ -8,14 +8,18 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import net.lingala.zip4j.ZipFile
 import paintbox.Paintbox
+import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyBooleanVar
+import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
+import paintbox.ui.ImageRenderingMode
+import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.ScrollPane
@@ -49,6 +53,12 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private var workerThread: Thread? = null
     
     private val toggleGroup: ToggleGroup = ToggleGroup()
+    private val selectedLevelEntry: ReadOnlyVar<LevelEntry?> = Var {
+        val at = toggleGroup.activeToggle.use()
+        if (at != null && at.selectedState.useB()) {
+            (at as? LibraryEntryButton)?.levelEntry
+        } else null
+    }
     private val levelList: Var<List<LevelEntryData>> = Var(emptyList())
     private val activeLevelList: Var<List<LevelEntryData>> = Var(emptyList())
     
@@ -110,7 +120,8 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         contentPaneLeft.addChild(scrollPane)
         contentPaneLeft.addChild(hbox)
 
-        val noLevelsLabel = TextLabel(binding = {
+        // No levels label
+        scrollPane.addChild(TextLabel(binding = {
             val ll = levelList.use()
             val active = activeLevelList.use()
             if (ll.isEmpty()) {
@@ -118,7 +129,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             } else if (active.isEmpty()) {
                 Localization.getVar("mainMenu.library.noLevelsFiltered").use()
             } else ""
-        }, font = main.fontMainMenuMain).apply { 
+        }, font = main.fontMainMenuMain).apply {
             scrollPane.addChild(this) // Intentional, not part of content
             Anchor.Centre.configure(this, offsetX = -(scrollPane.barSize.get()))
             this.bindWidthToParent(adjust = -(64f + scrollPane.barSize.get()))
@@ -128,18 +139,59 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.visible.bind {
                 activeLevelList.use().isEmpty()
             }
-        }
+        })
+        
         val anyLevelSelected: ReadOnlyBooleanVar = BooleanVar {
-            this@LibraryMenu.toggleGroup.activeToggle.use()?.selectedState?.useB() != true
+            selectedLevelEntry.use() != null
         }
-        val selectFromLeftLabel = TextLabel(binding = { Localization.getVar("mainMenu.library.selectFromLeft").use() }, font = main.fontMainMenuMain).apply { 
-            contentPaneRight.addChild(this)
+        // Select from the left! label
+        contentPaneRight.addChild(TextLabel(binding = { Localization.getVar("mainMenu.library.selectFromLeft").use() }, font = main.fontMainMenuMain).apply {
             this.doLineWrapping.set(true)
             this.renderAlign.set(Align.center)
             this.visible.bind {
-                anyLevelSelected.useB()
+                !anyLevelSelected.useB()
+            }
+        })
+        
+        // Level details pane
+        val levelDetailsPane = Pane().apply {
+            this.visible.bind {
+                selectedLevelEntry.use() != null
+            }
+            val bannerRatio = 3.2f // 512 x 160
+            val spacing = 4f
+            this += ImageNode(PaintboxGame.paintboxSpritesheet.logo128, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+                Anchor.TopLeft.configure(this)
+                this.bindHeightToSelfWidth(multiplier = 1f / bannerRatio)
+            }
+            this += VBox().apply {
+                Anchor.BottomLeft.configure(this)
+                val thisBounds = this.bounds
+                thisBounds.height.bind {
+                    @Suppress("SimpleRedundantLet")
+                    (parent.use()?.let { p -> p.contentZone.height.useF() } ?: 0f) - (thisBounds.width.useF() * (1f / bannerRatio) + spacing * 2)
+                }
+                this.spacing.set(spacing)
+                this.temporarilyDisableLayouts {
+                    this += TextLabel(binding = {
+                        when (val level = selectedLevelEntry.use()) {
+                            is LevelEntry.Modern -> {
+                                val metadata = level.levelMetadata
+                                val exportStats = level.exportStatistics
+                                "Creator: ${metadata.levelCreator}\n${metadata.songName}${if (metadata.songArtist.isNotBlank()) " by ${metadata.songArtist}" else ""}\n${metadata.albumName} (${metadata.albumYear})\n${metadata.genre}\nDifficulty: ${metadata.difficulty} / 10"
+                            }
+                            is LevelEntry.Legacy -> {
+                                "[Legacy Level]\n${level.getTitle()}\nGame Version: ${level.programVersion}"
+                            }
+                            else -> ""
+                        }
+                    }, font = main.fontMainMenuThin).apply { 
+                        this.renderAlign.set(Align.topLeft)
+                    }
+                }
             }
         }
+        contentPaneRight += levelDetailsPane
 
         val vbox = VBox().apply {
             this.spacing.set(0f)

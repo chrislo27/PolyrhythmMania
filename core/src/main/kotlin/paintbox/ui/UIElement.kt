@@ -263,6 +263,7 @@ open class UIElement : UIBounds() {
         }
     }
 
+    @Suppress("SimpleRedundantLet")
     fun bindWidthToParent(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
@@ -270,6 +271,7 @@ open class UIElement : UIBounds() {
         }
     }
 
+    @Suppress("SimpleRedundantLet")
     fun bindHeightToParent(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
@@ -277,6 +279,7 @@ open class UIElement : UIBounds() {
         }
     }
 
+    @Suppress("SimpleRedundantLet")
     fun bindWidthToParent(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
@@ -285,6 +288,7 @@ open class UIElement : UIBounds() {
         }
     }
 
+    @Suppress("SimpleRedundantLet")
     fun bindHeightToParent(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
