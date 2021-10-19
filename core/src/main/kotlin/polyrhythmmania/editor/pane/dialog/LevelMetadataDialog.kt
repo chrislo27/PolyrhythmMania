@@ -31,9 +31,10 @@ import java.util.*
 class LevelMetadataDialog(editorPane: EditorPane) 
     : EditorDialog(editorPane) {
     
-    data class Genre(val genreName: String) {
+    data class Genre(val genreName: String, val customToString: ((Genre) -> String)? = null) {
         companion object {
-            val DEFAULT_GENRES: List<Genre> = listOf(
+            val NO_GENRE: Genre = Genre("") { Localization.getValue("editor.dialog.levelMetadata.noPresetGenre") }
+            val DEFAULT_GENRES: List<Genre> = listOf(NO_GENRE) + listOf(
                     "Blues",
                     "Rock",
                     "Country",
@@ -62,7 +63,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
         }
 
         override fun toString(): String {
-            return genreName
+            return customToString?.invoke(this) ?: genreName
         }
     }
 
@@ -300,9 +301,12 @@ class LevelMetadataDialog(editorPane: EditorPane)
                         font = editorPane.palette.musicDialogFont).apply { 
                     this.bounds.width.set(250f)
                     this.selectedItem.addListener {
-                        textField.requestFocus()
-                        textField.text.set(it.getOrCompute().genreName)
-                        textField.requestUnfocus()
+                        val genreName = it.getOrCompute().genreName
+                        if (genreName.isNotEmpty()) {
+                            textField.requestFocus()
+                            textField.text.set(genreName)
+                            textField.requestUnfocus()
+                        }
                     }
                 }
             }.first
