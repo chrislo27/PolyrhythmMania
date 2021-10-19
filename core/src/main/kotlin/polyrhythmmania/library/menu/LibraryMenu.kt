@@ -2,6 +2,7 @@ package polyrhythmmania.library.menu
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.Json
@@ -83,8 +84,12 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.padding.set(Insets(16f))
         }
         contentPaneRight = RectElement(grey).apply {
-            Anchor.TopRight.configure(this)
+            Anchor.BottomRight.configure(this)
             contentPane += this
+            this.bounds.height.bind { 
+                // NOTE: the top part overflows its parent container, but the only element there is the level banner.
+                (parent.use()?.bounds?.height?.useF() ?: 0f) + titleLabel.bounds.height.useF()
+            }
             this.bindWidthToParent(multiplier = 0.5f, adjust = -100f)
             this.padding.set(Insets(0f))
             this.border.set(Insets(16f))
@@ -155,12 +160,14 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         
         // Level details pane
         val levelDetailsPane = Pane().apply {
+            val levelEntry: ReadOnlyVar<LevelEntry.Modern?> = Var.bind { selectedLevelEntry.use() as? LevelEntry.Modern }
             this.visible.bind {
-                selectedLevelEntry.use() != null
+                levelEntry.use() != null
             }
             val bannerRatio = 3.2f // 512 x 160
             val spacing = 4f
-            this += ImageNode(PaintboxGame.paintboxSpritesheet.logo128, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("library_default_banner")),
+                    renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
                 Anchor.TopLeft.configure(this)
                 this.bindHeightToSelfWidth(multiplier = 1f / bannerRatio)
             }
@@ -192,6 +199,47 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
         contentPaneRight += levelDetailsPane
+        // Level details pane (legacy)
+        val levelDetailsPaneLegacy = Pane().apply {
+            val levelEntry: ReadOnlyVar<LevelEntry.Legacy?> = Var.bind { selectedLevelEntry.use() as? LevelEntry.Legacy }
+            this.visible.bind {
+                levelEntry.use() != null
+            }
+            val bannerRatio = 3.2f // 512 x 160
+            val spacing = 4f
+            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("library_default_banner")),
+                    renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+                Anchor.TopLeft.configure(this)
+                this.bindHeightToSelfWidth(multiplier = 1f / bannerRatio)
+            }
+            this += VBox().apply {
+                Anchor.BottomLeft.configure(this)
+                val thisBounds = this.bounds
+                thisBounds.height.bind {
+                    @Suppress("SimpleRedundantLet")
+                    (parent.use()?.let { p -> p.contentZone.height.useF() } ?: 0f) - (thisBounds.width.useF() * (1f / bannerRatio) + spacing * 2)
+                }
+                this.spacing.set(spacing)
+                this.temporarilyDisableLayouts {
+                    this += TextLabel(binding = {
+                        when (val level = selectedLevelEntry.use()) {
+                            is LevelEntry.Modern -> {
+                                val metadata = level.levelMetadata
+                                val exportStats = level.exportStatistics
+                                "Creator: ${metadata.levelCreator}\n${metadata.songName}${if (metadata.songArtist.isNotBlank()) " by ${metadata.songArtist}" else ""}\n${metadata.albumName} (${metadata.albumYear})\n${metadata.genre}\nDifficulty: ${metadata.difficulty} / 10"
+                            }
+                            is LevelEntry.Legacy -> {
+                                "[Legacy Level]\n${level.getTitle()}\nGame Version: ${level.programVersion}"
+                            }
+                            else -> ""
+                        }
+                    }, font = main.fontMainMenuThin).apply { 
+                        this.renderAlign.set(Align.topLeft)
+                    }
+                }
+            }
+        }
+        contentPaneRight += levelDetailsPaneLegacy
 
         val vbox = VBox().apply {
             this.spacing.set(0f)
