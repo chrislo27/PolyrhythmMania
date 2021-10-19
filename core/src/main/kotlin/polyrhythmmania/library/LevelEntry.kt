@@ -52,7 +52,7 @@ sealed class LevelEntry(val uuid: UUID, val file: File, val containerVersion: In
         : LevelEntry(uuid, file, containerVersion, programVersion) {
         
         private val title: String = levelMetadata.songName.replace("\n", "")
-        private val subtitle: String = levelMetadata.songArtist.replace("\n", "")
+        private val subtitle: String = levelMetadata.albumName.replace("\n", "")
 
         override fun getTitle(): String = title
         override fun getSubtitle(): String = subtitle
