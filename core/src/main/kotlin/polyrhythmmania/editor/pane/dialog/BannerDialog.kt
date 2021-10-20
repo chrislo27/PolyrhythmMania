@@ -33,7 +33,7 @@ import java.io.File
 import kotlin.concurrent.thread
 
 
-class BannerDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
+class BannerDialog(editorPane: EditorPane, val afterDialogClosed: () -> Unit) : EditorDialog(editorPane) {
 
     enum class Substate {
         SUMMARY,
@@ -203,7 +203,7 @@ class BannerDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     }
 
     override fun afterDialogClosed() {
-        editor.attemptOpenLevelMetadataDialog()
+        this.afterDialogClosed.invoke()
     }
 
     override fun canCloseDialog(): Boolean {

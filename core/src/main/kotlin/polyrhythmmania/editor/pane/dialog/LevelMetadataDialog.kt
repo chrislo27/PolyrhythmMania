@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 
-class LevelMetadataDialog(editorPane: EditorPane) 
+class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> Unit) 
     : EditorDialog(editorPane) {
     
     data class Genre(val genreName: String, val customToString: ((Genre) -> String)? = null) {
@@ -274,7 +274,9 @@ class LevelMetadataDialog(editorPane: EditorPane)
                     this.bounds.width.set(350f)
                     this.applyDialogStyleContent()
                     this.setOnAction { 
-                        editor.attemptOpenBannerDialog()
+                        editor.attemptOpenBannerDialog {
+                            editor.attemptOpenLevelMetadataDialog(this@LevelMetadataDialog.afterDialogClosed)
+                        }
                     }
                 }
             }
@@ -359,7 +361,7 @@ class LevelMetadataDialog(editorPane: EditorPane)
         return true
     }
 
-    override fun onCloseDialog() {
-        super.onCloseDialog()
+    override fun afterDialogClosed() {
+        this.afterDialogClosed.invoke()
     }
 }

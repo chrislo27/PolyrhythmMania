@@ -204,7 +204,9 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         this.bounds.width.set(350f)
                         this.margin.set(Insets(4f))
                         this.setOnAction { 
-                            editor.attemptOpenLevelMetadataDialog()
+                            editor.attemptOpenLevelMetadataDialog {
+                                editor.attemptExport()
+                            }
                         }
                     }
                 }
@@ -216,7 +218,9 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         this.bounds.width.set(350f)
                         this.margin.set(Insets(4f))
                         this.setOnAction { 
-                            editor.attemptOpenBannerDialog()
+                            editor.attemptOpenBannerDialog {
+                                editor.attemptExport()
+                            }
                         }
                     }
                 }

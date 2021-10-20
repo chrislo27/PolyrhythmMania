@@ -541,15 +541,15 @@ class Editor(val main: PRManiaGame)
         }
     }
     
-    fun attemptOpenLevelMetadataDialog() {
+    fun attemptOpenLevelMetadataDialog(afterDialogClosed: () -> Unit = {}) {
         if (allowedToEdit.get()) {
-            editorPane.openDialog(LevelMetadataDialog(editorPane))
+            editorPane.openDialog(LevelMetadataDialog(editorPane, afterDialogClosed))
         }
     }
     
-    fun attemptOpenBannerDialog() {
+    fun attemptOpenBannerDialog(afterDialogClosed: () -> Unit) {
         if (allowedToEdit.get()) {
-            editorPane.openDialog(BannerDialog(editorPane))
+            editorPane.openDialog(BannerDialog(editorPane, afterDialogClosed))
         }
     }
 
