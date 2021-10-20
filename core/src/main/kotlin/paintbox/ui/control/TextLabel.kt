@@ -149,7 +149,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
     val defaultTextColor: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
     val defaultBgColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
 
-    private val textColorToUse: ReadOnlyVar<Color> = Var {
+    protected val textColorToUse: ReadOnlyVar<Color> = Var {
         val color = element.textColor.use()
         if (color.a <= 0f) {
             // Use the skin's default colour.
@@ -158,7 +158,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
             element.textColor.use()
         }
     }
-    private val bgColorToUse: ReadOnlyVar<Color> = Var {
+    protected val bgColorToUse: ReadOnlyVar<Color> = Var {
         val color = element.backgroundColor.use()
         if (color.a <= 0f) {
             // Use the skin's default colour.

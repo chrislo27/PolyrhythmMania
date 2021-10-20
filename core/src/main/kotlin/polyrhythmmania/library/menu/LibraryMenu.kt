@@ -194,6 +194,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         } else ""
                     }, font = main.fontMainMenuThin).apply { 
                         this.renderAlign.set(Align.topLeft)
+                        this.doClipping.set(true)
+                        this.doXCompression.set(false)
+                        this.skinID.set(PRManiaSkins.SCROLLING_TEXTLABEL)
                     }
                 }
             }

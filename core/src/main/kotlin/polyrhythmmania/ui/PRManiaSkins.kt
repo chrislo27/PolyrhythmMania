@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import paintbox.util.ColorStack
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollBar
+import paintbox.ui.control.TextLabel
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.SkinFactory
 import paintbox.util.gdxutils.fillRect
@@ -16,6 +17,7 @@ object PRManiaSkins {
     
     const val SCROLLBAR_SKIN: String = "PRMania_ScrollBar"
     const val EDITOR_SCROLLBAR_SKIN: String = "PRMania_ScrollBar_editor"
+    const val SCROLLING_TEXTLABEL: String = "PRMania_TextLabel_scrolling"
     
     init {
         DefaultSkins.register(SCROLLBAR_SKIN, SkinFactory { element: ScrollBar ->
@@ -30,6 +32,9 @@ object PRManiaSkins {
                 skin.thumbHoveredColor.set(Color(0.70f, 0.70f, 0.70f, 1f))
                 skin.thumbPressedColor.set(Color(0.50f, 0.64f, 0.64f, 1f))
             }
+        })
+        DefaultSkins.register(SCROLLING_TEXTLABEL, SkinFactory { element: TextLabel ->
+            ScrollingTextLabelSkin(element)
         })
     }
 }
