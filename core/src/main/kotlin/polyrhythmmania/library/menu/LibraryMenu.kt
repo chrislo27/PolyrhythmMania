@@ -70,6 +70,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             (at as? LibraryEntryButton)?.levelEntry
         } else null
     }
+    private val sortFilter: Var<LibrarySortFilter> = Var(LibrarySortFilter.DEFAULT)
     private val levelList: Var<List<LevelEntryData>> = Var(emptyList())
     private val activeLevelList: Var<List<LevelEntryData>> = Var(emptyList())
     
@@ -794,12 +795,8 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
     
     private fun filterAndSortLevelList() {
-        // TODO correct filtering
-        val filtered = levelList.getOrCompute().toMutableList()
-        
-        // TODO correct sorting
-        filtered.sortWith(LevelEntryData.comparator)
-        activeLevelList.set(filtered)
+        val sf = this.sortFilter.getOrCompute()
+        activeLevelList.set(sf.sortAndFilter(levelList.getOrCompute()))
     }
     
     private fun updateLevelListVbox() {
