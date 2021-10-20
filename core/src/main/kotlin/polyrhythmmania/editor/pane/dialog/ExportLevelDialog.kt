@@ -160,7 +160,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.setScaleXY(0.5f)
                 }
                 
-                fun createChecklistItem(text: String, completed: ChecklistState): HBox {
+                fun createChecklistItem(text: String, completed: ChecklistState, required: Boolean): HBox {
                     if (completed == ChecklistState.NONE) {
                         checklistIncomplete.set(true)
                     }
@@ -177,7 +177,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                             this.bounds.width.set(iconSize)
                             this.tint.set(completed.color)
                         }
-                        val label = TextLabel(binding = { Localization.getVar(text).use() }).apply {
+                        val label = TextLabel(binding = { (if (required) "[color=prmania_negative]* []" else "") + Localization.getVar(text).use() }).apply {
                             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("$text.tooltip")))
                             this.bounds.x.set(iconSize)
                             this.markup.set(editorPane.palette.markup)
@@ -193,11 +193,11 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
                 val container = editor.container
                 this += createChecklistItem("editor.dialog.exportLevel.checklist.item.endStateBlock",
-                        if (container.blocks.any { it is BlockEndState }) ChecklistState.COMPLETE else ChecklistState.NONE)
+                        if (container.blocks.any { it is BlockEndState }) ChecklistState.COMPLETE else ChecklistState.NONE, true)
                 this += createChecklistItem("editor.dialog.exportLevel.checklist.item.levelMetadata",
                         if (container.levelMetadata.areRequiredFieldsNonempty()) (
                                 if (container.levelMetadata.anyFieldsBlank()) ChecklistState.PARTIAL else ChecklistState.COMPLETE
-                                ) else ChecklistState.NONE).apply {
+                                ) else ChecklistState.NONE, true).apply {
                     this += Button(binding = { Localization.getVar("editor.dialog.exportLevel.checklist.item.levelMetadata.button").use() },
                             font = editorPane.palette.musicDialogFont).apply {
                         this.applyDialogStyleContent()
@@ -205,6 +205,18 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         this.margin.set(Insets(4f))
                         this.setOnAction { 
                             editor.attemptOpenLevelMetadataDialog()
+                        }
+                    }
+                }
+                this += createChecklistItem("editor.dialog.exportLevel.checklist.item.levelBanner",
+                        if (container.bannerTexture.getOrCompute() != null) ChecklistState.COMPLETE else ChecklistState.NONE, false).apply {
+                    this += Button(binding = { Localization.getVar("editor.dialog.exportLevel.checklist.item.levelBanner.button").use() },
+                            font = editorPane.palette.musicDialogFont).apply {
+                        this.applyDialogStyleContent()
+                        this.bounds.width.set(350f)
+                        this.margin.set(Insets(4f))
+                        this.setOnAction { 
+                            editor.attemptOpenBannerDialog()
                         }
                     }
                 }
