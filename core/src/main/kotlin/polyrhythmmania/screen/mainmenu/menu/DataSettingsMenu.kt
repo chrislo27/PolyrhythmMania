@@ -20,6 +20,7 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
 import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.ui.PRManiaSkins
 
@@ -91,6 +92,14 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.disabled.set(true)
             }
         }
+        val resetLibraryHighScoresButton: Button = createLongButton { 
+            Localization.getVar("mainMenu.dataSettings.resetLibraryHighScores").use() 
+        }.apply {
+            this.setOnAction {
+                GlobalScoreCache.clearAll()
+                this.disabled.set(true)
+            }
+        }
         val resetSideModeHighScoresButton: Button = createLongButton { 
             Localization.getVar("mainMenu.dataSettings.resetSideModeHighScores").use() 
         }.apply {
@@ -138,9 +147,10 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             vbox += deleteRecoveryButton
+            vbox += resetLibraryFolderButton
             vbox += resetEndlessModeHighScoreButton
             vbox += resetSideModeHighScoresButton
-            vbox += resetLibraryFolderButton
+            vbox += resetLibraryHighScoresButton
             
         }
         
@@ -156,6 +166,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         deleteRecoveryButton.disabled.set(false)
                         resetSideModeHighScoresButton.disabled.set(false)
                         resetEndlessModeHighScoreButton.disabled.set(false)
+                        resetLibraryHighScoresButton.disabled.set(false)
                         resetLibraryFolderButton.disabled.set(false)
                     }
                 }
