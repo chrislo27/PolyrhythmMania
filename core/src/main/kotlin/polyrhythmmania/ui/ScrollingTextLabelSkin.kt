@@ -71,7 +71,8 @@ class ScrollingTextLabelSkin(element: TextLabel) : TextLabelSkin(element) {
         val scaleY = element.scaleY.get()
         val textWidth = text.width * scaleX
         val textHeight = text.height * scaleY
-        val xOffset: Float = when {
+        val textWrapPoint = textWidth + gapBetween.get() * scaleX
+        val xOffset: Float = if (textWrapPoint > w) (0f + bgPaddingInsets.left) else when {
             Align.isLeft(align) -> 0f + bgPaddingInsets.left
             Align.isRight(align) -> (w - ((if (compressX) (min(textWidth, w)) else textWidth) + bgPaddingInsets.right))
             else -> (w - (if (compressX) min(textWidth, w) else textWidth)) / 2f
@@ -100,7 +101,6 @@ class ScrollingTextLabelSkin(element: TextLabel) : TextLabelSkin(element) {
 
         batch.color = tmpColor // Sets the opacity of the text
         val deltaTime = Gdx.graphics.deltaTime
-        val textWrapPoint = text.width + gapBetween.get()
         val scrollOffset: Float = if (textWrapPoint < w) 0f else if (pauseTimer > 0f) {
             pauseTimer = (pauseTimer - deltaTime).coerceAtLeast(0f)
             0f
