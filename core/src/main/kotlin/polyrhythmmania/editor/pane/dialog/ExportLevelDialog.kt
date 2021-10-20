@@ -416,7 +416,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             val allTempoChanges = engine.tempos.getAllTempoChanges()
             val exportStatistics = ExportStatistics(endStateSec, inputter.totalExpectedInputs,
                     engine.tempos.computeAverageTempo(endBlockPosition),
-                    allTempoChanges.minOf { it.newTempo }, allTempoChanges.maxOf { it.newTempo })
+                    allTempoChanges.minOf { it.newTempo }, allTempoChanges.maxOf { it.newTempo }, inputter.skillStarBeat.isFinite())
             
             data class InputResultTuple(override val perfectBeat: Float, override val expectedIndex: Int,
                                         override val inputType: InputType) : InputResultLike

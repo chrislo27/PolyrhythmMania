@@ -40,7 +40,7 @@ import java.util.function.Consumer
 import kotlin.concurrent.thread
 
 class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
-                         val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>? = null)
+                         val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>? = null, val previousHighScore: Int = -1)
     : StandardMenu(menuCol) {
 
     enum class Substate {
@@ -230,7 +230,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                             val main = mainMenu.main
                             val playScreen = PlayScreen(main, null, loadedData.newContainer, challenges,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    levelScoreAttemptConsumer = levelScoreAttemptConsumer,
+                                    levelScoreAttemptConsumer = levelScoreAttemptConsumer, previousHighScore = previousHighScore,
                                     showResults = !robotMode)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {

@@ -17,12 +17,14 @@ data class ExportStatistics(
         val averageBPM: Float,
         val minBPM: Float,
         val maxBPM: Float,
+        val hasSkillStar: Boolean,
 ) {
     
     companion object {
         fun fromJson(jsonObj: JsonObject): ExportStatistics {
             return ExportStatistics(jsonObj.getFloat("durationSec", 0f), jsonObj.getInt("inputCount", 0),
-                    jsonObj.getFloat("averageBPM", 120f), jsonObj.getFloat("minBPM", 120f), jsonObj.getFloat("maxBPM", 120f))
+                    jsonObj.getFloat("averageBPM", 120f), jsonObj.getFloat("minBPM", 120f), jsonObj.getFloat("maxBPM", 120f),
+                    jsonObj.getBoolean("hasSkillStar", false))
         }
     }
     
@@ -34,5 +36,6 @@ data class ExportStatistics(
         jsonObj.add("averageBPM", this.averageBPM)
         jsonObj.add("minBPM", this.minBPM)
         jsonObj.add("maxBPM", this.maxBPM)
+        jsonObj.add("hasSkillStar", this.hasSkillStar)
     }
 }

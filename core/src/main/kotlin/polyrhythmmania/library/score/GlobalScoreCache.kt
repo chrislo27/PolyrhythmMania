@@ -14,7 +14,7 @@ object GlobalScoreCache {
     
     val storageLoc: File by lazy { PRMania.MAIN_FOLDER.resolve("prefs/score_cache.json") }
     val scoreCache: ReadOnlyVar<ScoreCache> by lazy {
-        Var(ScoreCache(emptyMap()))
+        Var(ScoreCache.fromJsonFile(FileHandle(storageLoc)))
     }
     
     fun pushNewLevelScoreAttempt(levelUUID: UUID, lsa: LevelScoreAttempt) {

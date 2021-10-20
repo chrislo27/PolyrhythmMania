@@ -356,7 +356,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                         val sidemode: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
                         val playScreen = PlayScreen(main, sidemode, sidemode.container,
                                 inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                challenges = challenges, levelScoreAttemptConsumer = null, showResults = showResults)
+                                challenges = challenges, levelScoreAttemptConsumer = null, showResults = showResults,
+                                previousHighScore = -1)
                         main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                             this.onEntryEnd = {
                                 sidemode.prepare()

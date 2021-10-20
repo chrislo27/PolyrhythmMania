@@ -66,7 +66,8 @@ import kotlin.math.*
 
 class PlayScreen(
         main: PRManiaGame, val sideMode: SideMode?, val container: Container, val challenges: Challenges,
-        val inputCalibration: InputCalibration, val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>?,
+        val inputCalibration: InputCalibration, 
+        val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>?, /** -1 to disable */ val previousHighScore: Int,
         val showResults: Boolean = true,
 ) : PRManiaScreen(main) {
     
@@ -368,6 +369,10 @@ class PlayScreen(
                 PRManiaGame.instance.settings.persist()
                 isNewHighScore = true
             }
+        } else if (previousHighScore >= 0) {
+            if (score > previousHighScore) {
+                isNewHighScore = true
+            }
         }
         
         val scoreObj = Score(score, rawScore, inputsHit, nInputs,
@@ -384,7 +389,9 @@ class PlayScreen(
         }
         
         transitionAway(ResultsScreen(main, scoreObj, container, {
-            PlayScreen(main, sideMode, container, challenges, inputCalibration, levelScoreAttemptConsumer, showResults)
+            PlayScreen(main, sideMode, container, challenges, inputCalibration, levelScoreAttemptConsumer,
+                    if (scoreObj.newHighScore) scoreObj.scoreInt else previousHighScore,
+                    showResults)
         }, keyboardKeybinds), disposeContainer = false) {}
     }
 

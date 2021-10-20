@@ -109,7 +109,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             val playScreen = PlayScreen(main, sidemode, sidemode.container,
                                     challenges = Challenges.NO_CHANGES, showResults = false,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    levelScoreAttemptConsumer = null)
+                                    levelScoreAttemptConsumer = null, previousHighScore = -1)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                 this.onEntryEnd = {
                                     sidemode.prepare()

@@ -36,8 +36,11 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.container.manifest.ExportStatistics
 import polyrhythmmania.container.manifest.LibraryRelevantData
+import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.library.LevelEntry
 import polyrhythmmania.library.score.GlobalScoreCache
+import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
@@ -47,6 +50,10 @@ import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.util.TimeUtils
 import java.io.File
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -199,7 +206,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             if (!l.file.exists()) {
                                 startSearchThread() // Re-search the list. The level was deleted but this should be a very rare case.
                             } else {
-                                val loadMenu = LoadSavedLevelMenu(menuCol, l.file, GlobalScoreCache.createConsumer(l.uuid))
+                                val previousHighScore = GlobalScoreCache.scoreCache.getOrCompute().map[l.uuid]?.attempts?.maxOrNull()?.score ?: 0
+                                val loadMenu = LoadSavedLevelMenu(menuCol, l.file, GlobalScoreCache.createConsumer(l.uuid),
+                                        previousHighScore)
                                 menuCol.addMenu(loadMenu)
                                 menuCol.pushNextMenu(loadMenu)
                             }
@@ -485,32 +494,152 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.textColor.set(labelColor)
                         }
                     }
-                    this += ScrollPane().apply {
-                        this.bounds.height.set(95f - labelHeight)
-                        this.visible.bind {
-                            descExists.useB() && showDesc.useB()
-                        }
-                        
-                        (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
-                        this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
-                        this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
-                        val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
-                        this.vBar.skinID.set(scrollBarSkinID)
-                        this.hBar.skinID.set(scrollBarSkinID)
-                        this.vBar.unitIncrement.set(24f)
-                        this.vBar.blockIncrement.set(24f)
+                    this += Pane().apply {
+                        this.bounds.height.set(96f - labelHeight)
 
-                        this.setContent(TextLabel(binding = {
-                            levelEntryModern.use()?.levelMetadata?.description ?: ""
-                        }, font = main.fontMainMenuRodin).apply {
-                            this.setScaleXY(0.85f)
-                            this.textColor.set(Color().grey(0.25f))
-                            this.doXCompression.set(false)
-                            this.doLineWrapping.set(true)
-                            this.internalTextBlock.addListener {
-                                this.resizeBoundsToContent(affectWidth = false)
+                        // Description
+                        val descScrollPane = ScrollPane().apply {
+                            this.visible.bind {
+                                descExists.useB() && showDesc.useB()
                             }
-                        })
+
+                            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+                            this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+                            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+                            val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+                            this.vBar.skinID.set(scrollBarSkinID)
+                            this.hBar.skinID.set(scrollBarSkinID)
+                            this.vBar.unitIncrement.set(24f)
+                            this.vBar.blockIncrement.set(24f)
+
+                            this.setContent(TextLabel(binding = {
+                                levelEntryModern.use()?.levelMetadata?.description ?: ""
+                            }, font = main.fontMainMenuRodin).apply {
+                                this.setScaleXY(0.85f)
+                                this.textColor.set(Color().grey(0.25f))
+                                this.doXCompression.set(false)
+                                this.doLineWrapping.set(true)
+                                this.internalTextBlock.addListener {
+                                    this.resizeBoundsToContent(affectWidth = false)
+                                }
+                            })
+                        }
+                        this += descScrollPane
+                        
+                        // High scores
+                        this += ScrollPane().apply ScrollPane@{
+                            this.visible.bind {
+                                !descScrollPane.visible.useB()
+                            }
+
+                            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+                            this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+                            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+                            val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+                            this.vBar.skinID.set(scrollBarSkinID)
+                            this.hBar.skinID.set(scrollBarSkinID)
+                            this.vBar.unitIncrement.set(24f)
+                            this.vBar.blockIncrement.set(24f)
+
+                            val noHighScoresLabel = TextLabel(binding = {
+                                Localization.getVar("mainMenu.library.noHighScores").use()
+                            }, font = main.fontMainMenuThin).apply {
+                                this.textColor.set(Color().grey(0.25f))
+                                this.bounds.height.set(60f)
+                                this.renderAlign.set(Align.center)
+                            }
+                            val vbox = VBox().apply {
+                                this.bounds.height.set(10f)
+                            }
+                            val highScoresListener: (levelEntry: LevelEntry?) -> Unit = { l ->
+                                vbox.children.toList().forEach { c -> vbox.removeChild(c) }
+                                if (l != null) {
+                                    val scoreCache = GlobalScoreCache.scoreCache.getOrCompute()
+                                    val levelScore = scoreCache.map[l.uuid]
+                                    val attempts: List<LevelScoreAttempt>? = levelScore?.attempts?.sortedDescending()
+                                    if (attempts == null || attempts.isEmpty()) {
+                                        vbox += noHighScoresLabel
+                                    } else {
+                                        vbox.disableLayouts.set(true)
+                                        val anySkillStar: Boolean = (l is LevelEntry.Modern && l.exportStatistics.hasSkillStar) || (attempts.any { it.skillStar })
+                                        attempts.forEachIndexed { index, attempt ->
+                                            vbox += HBox().apply {
+                                                this.bounds.height.set(24f)
+                                                this.spacing.set(4f)
+                                                this.temporarilyDisableLayouts {
+                                                    this += TextLabel(text = "${index + 1}.", font = main.fontMainMenuMain).apply {
+                                                        this.bounds.width.set(36f)
+                                                        this.margin.set(Insets(0f, 0f, 0f, 4f))
+                                                        this.setScaleXY(0.85f)
+                                                        this.textColor.set(Color().grey(0.25f))
+                                                        this.renderAlign.set(Align.right)
+                                                        this.tooltipElement.set(createTooltip {
+                                                            val datetime = Instant.ofEpochMilli(attempt.playTime).atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault())
+                                                            DateTimeFormatter.RFC_1123_DATE_TIME.format(datetime)
+                                                        })
+                                                    }
+                                                    this += TextLabel(text = "${attempt.score}", font = main.fontMainMenuRodin).apply {
+                                                        this.bounds.width.set(54f)
+                                                        this.margin.set(Insets(0f, 0f, 0f, 4f))
+                                                        this.textColor.set(Color().grey(0.25f))
+                                                        this.renderAlign.set(Align.center)
+                                                    }
+                                                    this += ImageNode(AssetRegistry.get<PackedSheet>("results_ranking")[Ranking.getRanking(attempt.score).rankingIconID]).apply {
+                                                        this.bounds.width.set(90f)
+                                                    }
+                                                    if (anySkillStar) {
+                                                        this += ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")[if (attempt.skillStar) "skill_star" else "skill_star_grey"]).apply {
+                                                            this.bindWidthToSelfHeight()
+                                                        }
+                                                    }
+                                                    this += ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")[if (attempt.noMiss) "perfect" else "perfect_failed"]).apply {
+                                                        this.bindWidthToSelfHeight()
+                                                        this.visible.set(attempt.challenges.goingForPerfect)
+                                                    }
+                                                    if (attempt.challenges.tempoUp != 100) {
+                                                        this += TextLabel(text = Localization.getValue(
+                                                                if (attempt.challenges.tempoUp >= 100) "play.results.tempoUp"
+                                                                else "play.results.tempoDown", "${attempt.challenges.tempoUp}"
+                                                        ), font = main.fontMainMenuThin).apply {
+                                                            this.bounds.width.set(146f)
+                                                            this.setScaleXY(0.85f)
+                                                            this.margin.set(Insets(0f, 0f, 0f, 4f))
+                                                            this.textColor.set((if (attempt.challenges.tempoUp >= 100) Challenges.TEMPO_UP_COLOR else Challenges.TEMPO_DOWN_COLOR).cpy())
+                                                            this.renderAlign.set(Align.left)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        vbox += TextLabel(binding = { Localization.getVar("mainMenu.library.playCount", Var {
+                                            val playCount = GlobalScoreCache.scoreCache.use().map[l.uuid]?.playCount ?: 0
+                                            listOf(playCount)
+                                        }).use() }, font = main.fontMainMenuThin).apply {
+                                            this.bounds.height.set(24f)
+                                            this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.playCount.tooltip")))
+                                            this.textColor.set(Color().grey(0.25f))
+                                            this.setScaleXY(0.9f)
+                                            this.renderAlign.set(Align.center)
+                                        }
+                                        vbox.disableLayouts.set(false)
+                                    }
+                                }
+                                vbox.sizeHeightToChildren(10f)
+                                this@ScrollPane.vBar.setValue(0f)
+                                this@ScrollPane.setContent(vbox) // Forces refresh of bounds inside scroll pane
+                            }
+                            selectedLevelEntry.addListener {
+                                Gdx.app.postRunnable {
+                                    highScoresListener.invoke(it.getOrCompute())
+                                }
+                            }
+                            GlobalScoreCache.scoreCache.addListener {
+                                Gdx.app.postRunnable {
+                                    highScoresListener.invoke(selectedLevelEntry.getOrCompute())
+                                }
+                            }
+                            this.setContent(vbox)
+                        }
                     }
                 }
             }
