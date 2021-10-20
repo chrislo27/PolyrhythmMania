@@ -30,14 +30,17 @@ import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import java.io.File
+import java.util.function.Consumer
 import kotlin.concurrent.thread
 
-class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?)
+class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
+                         val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>? = null)
     : StandardMenu(menuCol) {
 
     enum class Substate {
@@ -226,7 +229,9 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?)
                         mainMenu.transitionAway {
                             val main = mainMenu.main
                             val playScreen = PlayScreen(main, null, loadedData.newContainer, challenges,
-                                    inputCalibration = main.settings.inputCalibration.getOrCompute(), showResults = !robotMode)
+                                    inputCalibration = main.settings.inputCalibration.getOrCompute(),
+                                    levelScoreAttemptConsumer = levelScoreAttemptConsumer,
+                                    showResults = !robotMode)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
                                     playScreen.prepareGameStart()

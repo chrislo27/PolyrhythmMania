@@ -37,6 +37,7 @@ import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.container.manifest.ExportStatistics
 import polyrhythmmania.container.manifest.LibraryRelevantData
 import polyrhythmmania.library.LevelEntry
+import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
@@ -198,7 +199,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             if (!l.file.exists()) {
                                 startSearchThread() // Re-search the list. The level was deleted but this should be a very rare case.
                             } else {
-                                val loadMenu = LoadSavedLevelMenu(menuCol, l.file)
+                                val loadMenu = LoadSavedLevelMenu(menuCol, l.file, GlobalScoreCache.createConsumer(l.uuid))
                                 menuCol.addMenu(loadMenu)
                                 menuCol.pushNextMenu(loadMenu)
                             }

@@ -108,7 +108,8 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
                             val playScreen = PlayScreen(main, sidemode, sidemode.container,
                                     challenges = Challenges.NO_CHANGES, showResults = false,
-                                    inputCalibration = main.settings.inputCalibration.getOrCompute())
+                                    inputCalibration = main.settings.inputCalibration.getOrCompute(),
+                                    levelScoreAttemptConsumer = null)
                             main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
                             main.settings.persist()
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {

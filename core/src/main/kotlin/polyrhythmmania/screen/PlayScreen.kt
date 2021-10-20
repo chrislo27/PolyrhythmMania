@@ -45,6 +45,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.*
+import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.sidemodes.AbstractEndlessMode
@@ -59,12 +60,13 @@ import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.TilesetPalette
 import space.earlygrey.shapedrawer.ShapeDrawer
 import java.util.*
+import java.util.function.Consumer
 import kotlin.math.*
 
 
 class PlayScreen(
         main: PRManiaGame, val sideMode: SideMode?, val container: Container, val challenges: Challenges,
-        val inputCalibration: InputCalibration,
+        val inputCalibration: InputCalibration, val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>?,
         val showResults: Boolean = true,
 ) : PRManiaScreen(main) {
     
@@ -376,8 +378,13 @@ class PlayScreen(
                 ranking, isNewHighScore
         )
         
+        if (levelScoreAttemptConsumer != null && !engine.autoInputs) {
+            levelScoreAttemptConsumer.accept(LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt,
+                    scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges))
+        }
+        
         transitionAway(ResultsScreen(main, scoreObj, container, {
-            PlayScreen(main, sideMode, container, challenges, inputCalibration, showResults)
+            PlayScreen(main, sideMode, container, challenges, inputCalibration, levelScoreAttemptConsumer, showResults)
         }, keyboardKeybinds), disposeContainer = false) {}
     }
 

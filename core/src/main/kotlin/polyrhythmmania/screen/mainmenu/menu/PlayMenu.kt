@@ -84,6 +84,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             vbox += createLongButton { Localization.getVar("mainMenu.play.playSavedLevel").use() }.apply {
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.playSavedLevel.tooltip")))
                 this.setOnAction {
                     val loadMenu = LoadSavedLevelMenu(menuCol, null)
                     menuCol.addMenu(loadMenu)
