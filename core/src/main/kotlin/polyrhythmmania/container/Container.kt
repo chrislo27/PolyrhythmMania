@@ -655,7 +655,6 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
         
         var levelBannerFile: File? = null
         val bannerHeader = zipFile.getFileHeader("banner.png")
-        println(bannerHeader)
         if (bannerHeader != null) {
             zipFile.getInputStream(bannerHeader).use { zipInputStream ->
                 val tempFile = TempFileUtils.createTempFile("banner", ".png")
@@ -686,7 +685,6 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
             }
             container.setTexturePackFromSource()
             
-            println("lbf: $levelBannerFile")
             if (levelBannerFile != null) {
                 try {
                     val tex = Texture(FileHandle(levelBannerFile))
