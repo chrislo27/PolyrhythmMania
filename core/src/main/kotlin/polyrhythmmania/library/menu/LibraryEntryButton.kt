@@ -1,10 +1,12 @@
 package polyrhythmmania.library.menu
 
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.font.TextBlock
 import paintbox.font.TextRun
+import paintbox.registry.AssetRegistry
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.control.Toggle
@@ -52,8 +54,9 @@ class LibraryEntryButton(val libraryMenu: LibraryMenu, val levelEntry: LevelEntr
         this.borderStyle.set(SolidBorder(Color.DARK_GRAY))
         
         this.setOnAction {
-            selectedState.invert()
+            val newState = selectedState.invert()
             selectedTimeMs = System.currentTimeMillis()
+            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_${if (!newState) "deselect" else "select"}"))
         }
     }
 

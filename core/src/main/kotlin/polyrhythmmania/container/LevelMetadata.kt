@@ -66,6 +66,19 @@ data class LevelMetadata(
                 listOf(levelCreator, description, songName, songArtist, albumName, genre).any { it.isBlank() }
     }
     
+    fun getFullAlbumInfo(): String {
+        var s = ""
+        if (albumName.isNotBlank()) {
+            s += albumName
+            if (albumYear > 0) {
+                s += " (${albumYear})"
+            }
+        } else if (albumYear > 0) {
+            s += albumYear.toString()
+        }
+        return s
+    }
+    
     fun toJson(): JsonObject {
         val obj = Json.`object`()
         obj.set("initialCreationDate", initialCreationDate.format(DATE_FORMATTER))

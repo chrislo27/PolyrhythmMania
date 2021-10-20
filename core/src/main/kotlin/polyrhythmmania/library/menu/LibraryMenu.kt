@@ -17,22 +17,17 @@ import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.ImageRenderingMode
-import paintbox.ui.Pane
+import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
-import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
-import paintbox.ui.control.TextLabel
-import paintbox.ui.control.ToggleGroup
+import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.TinyFDWrapper
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
+import paintbox.util.gdxutils.grey
 import paintbox.util.gdxutils.openFileExplorer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
@@ -45,7 +40,10 @@ import polyrhythmmania.library.LevelEntry
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.ui.ScrollingTextLabelSkin
+import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.TempFileUtils
+import polyrhythmmania.util.TimeUtils
 import java.io.File
 import java.util.*
 import kotlin.concurrent.thread
@@ -163,12 +161,15 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         
         // Level details pane
         val levelDetailsPane = Pane().apply {
-            val levelEntry: ReadOnlyVar<LevelEntry.Modern?> = Var.bind { selectedLevelEntry.use() as? LevelEntry.Modern }
+            val levelEntryModern: ReadOnlyVar<LevelEntry.Modern?> = Var.bind { selectedLevelEntry.use() as? LevelEntry.Modern }
+            val levelEntryLegacy: ReadOnlyVar<LevelEntry.Legacy?> = Var.bind { selectedLevelEntry.use() as? LevelEntry.Legacy }
             this.visible.bind {
-                levelEntry.use() != null
+                selectedLevelEntry.use() != null
             }
+            this.doClipping.set(true)
+            
             val bannerRatio = 3.2f // 512 x 160
-            val spacing = 4f
+            val spacing = 2f
             this += ImageNode(binding = {
                 val tex: Texture = currentBanner.use() ?: AssetRegistry["library_default_banner"]
                 TextureRegion(tex)
@@ -185,57 +186,296 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 this.spacing.set(spacing)
                 this.temporarilyDisableLayouts {
+                    fun createRodinTooltip(binding: Var.Context.() -> String): Tooltip {
+                        return Tooltip(binding = binding, font = main.fontMainMenuRodin).apply { 
+                            setScaleXY(0.9f)
+                        }
+                    }
+                    
+                    // Song name/filename label
                     this += TextLabel(binding = {
-                        val level = levelEntry.use()
-                        if (level != null) {
-                            val metadata = level.levelMetadata
-                            val exportStats = level.exportStatistics
-                            "Creator: ${metadata.levelCreator}\n${metadata.songName}${if (metadata.songArtist.isNotBlank()) " by ${metadata.songArtist}" else ""}\n${metadata.albumName} (${metadata.albumYear})\n${metadata.genre}\nDifficulty: ${metadata.difficulty} / 10"
-                        } else ""
-                    }, font = main.fontMainMenuThin).apply { 
-                        this.renderAlign.set(Align.topLeft)
-                        this.doClipping.set(true)
+                        selectedLevelEntry.use()?.getTitle() ?: ""
+                    }, font = main.fontMainMenuRodin).apply { 
+                        this.renderAlign.set(Align.center)
                         this.doXCompression.set(false)
                         this.skinID.set(PRManiaSkins.SCROLLING_TEXTLABEL)
+                        this.bounds.height.set(34f)
+                        this.margin.set(Insets(0f, 2f, 0f, 0f))
+                        this.tooltipElement.set(createRodinTooltip { 
+                            text.use()
+                        })
+                    }
+                    // Level creator or [Legacy Level]
+                    this += TextLabel(binding = {
+                        levelEntryModern.use()?.levelMetadata?.levelCreator ?: Localization.getVar("mainMenu.library.legacyIndicator").use()
+                    }, font = main.fontMainMenuRodin).apply { 
+                        this.renderAlign.set(Align.center)
+                        this.doXCompression.set(false)
+                        this.skinID.set(PRManiaSkins.SCROLLING_TEXTLABEL)
+                        this.bounds.height.set(30f)
+                        this.margin.set(Insets(0f, 2f, 0f, 0f))
+                        setScaleXY(0.9f)
+                        this.tooltipElement.set(createRodinTooltip {
+                            val t = text.use()
+                            Localization.getVar("mainMenu.library.levelCreator", Var { listOf(t) }).use()
+                        })
+                    }
+                    
+                    val leftRatio = 0.6f
+                    val rightRatio = 1f - leftRatio
+                    val labelHeight = 24f
+                    val dataHeight = 24f
+                    val labelColor = Color().grey(0.2f, 1f)
+                    // Left: Song Artist; Right: Duration 
+                    this += Pane().apply {
+                        this.bounds.height.set(labelHeight + dataHeight + 2f)
+                        this.margin.set(Insets(0f, 2f, 0f, 0f))
+//                        this.visible.bind { selectedLevelEntry.use() is LevelEntry.Modern }
+                        
+                        this += TextLabel(binding = { Localization.getVar("levelMetadata.songArtist").use() }, font = main.fontMainMenuThin).apply { 
+                            Anchor.TopLeft.configure(this)
+                            this.bounds.height.set(labelHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.5f)
+                            this.renderAlign.set(Align.left)
+                            this.textColor.set(labelColor)
+                        }
+                        this += TextLabel(binding = { Localization.getVar("mainMenu.library.duration").use() }, font = main.fontMainMenuThin).apply { 
+                            Anchor.TopRight.configure(this)
+                            this.bounds.height.set(labelHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.5f)
+                            this.renderAlign.set(Align.right)
+                            this.textColor.set(labelColor)
+                        }
+                        
+                        this += TextLabel(binding = {
+                            levelEntryModern.use()?.levelMetadata?.songArtist ?: Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                        }, font = main.fontMainMenuRodin).apply {
+                            Anchor.BottomLeft.configure(this)
+                            this.bounds.height.set(dataHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(multiplier = leftRatio, adjust = -4f)
+                            this.renderAlign.set(Align.left)
+                        }
+                        this += TextLabel(binding = {
+                            val l = levelEntryModern.use()
+                            if (l != null) {
+                                TimeUtils.convertMsToTimestamp(l.exportStatistics.durationSec * 1000, noMs = true)
+                            } else Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                        }, font = main.fontMainMenuRodin).apply {
+                            Anchor.BottomRight.configure(this)
+                            this.bounds.height.set(dataHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(multiplier = rightRatio, adjust = -4f)
+                            this.renderAlign.set(Align.right)
+                        }
+                    }
+                    // Left: Album Name / Album Year / Album Name (Album Year); Right: BPM
+                    this += Pane().apply {
+                        this.bounds.height.set(labelHeight + dataHeight + 2f)
+                        this.margin.set(Insets(0f, 2f, 0f, 0f))
+                        this += TextLabel(binding = { Localization.getVar("levelMetadata.albumName.short").use() }, font = main.fontMainMenuThin).apply {
+                            Anchor.TopLeft.configure(this)
+                            this.bounds.height.set(labelHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.5f)
+                            this.renderAlign.set(Align.left)
+                            this.textColor.set(labelColor)
+                        }
+                        this += TextLabel(binding = { Localization.getVar("mainMenu.library.averageTempo").use() }, font = main.fontMainMenuThin).apply {
+                            Anchor.TopRight.configure(this)
+                            this.bounds.height.set(labelHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.5f)
+                            this.renderAlign.set(Align.right)
+                            this.textColor.set(labelColor)
+                        }
+                        
+                        this += TextLabel(binding = {
+                            levelEntryModern.use()?.levelMetadata?.getFullAlbumInfo()?.takeUnless { it.isBlank() } ?: Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                        }, font = main.fontMainMenuRodin).apply {
+                            Anchor.BottomLeft.configure(this)
+                            this.bounds.height.set(dataHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(multiplier = leftRatio, adjust = -4f)
+                            this.renderAlign.set(Align.left)
+                            
+                            // Special case: this one scrolls.
+                            this.skinID.set(PRManiaSkins.SCROLLING_TEXTLABEL)
+                            this.doClipping.set(true)
+                            this.doXCompression.set(false)
+                            (this.skin.getOrCompute() as ScrollingTextLabelSkin).gapBetween.set(24f)
+                        }
+                        this += TextLabel(binding = {
+                            val l = levelEntryModern.use()
+                            if (l != null) {
+                                Localization.getVar("editor.bpm", Var { 
+                                    listOf(DecimalFormats["0.#"].format(l.exportStatistics.averageBPM))
+                                }).use()
+                            } else Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                        }, font = main.fontMainMenuRodin).apply {
+                            Anchor.BottomRight.configure(this)
+                            this.bounds.height.set(dataHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(multiplier = rightRatio, adjust = -4f)
+                            this.renderAlign.set(Align.right)
+                        }
+                    }
+                    // Left: Genre (may be blank); Right: Difficulty (may be blank)
+                    this += Pane().apply {
+                        this.bounds.height.set(labelHeight + dataHeight + 2f)
+                        this.margin.set(Insets(0f, 2f, 0f, 0f))
+                        this += TextLabel(binding = { Localization.getVar("levelMetadata.genre").use() }, font = main.fontMainMenuThin).apply {
+                            Anchor.TopLeft.configure(this)
+                            this.bounds.height.set(labelHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.5f)
+                            this.renderAlign.set(Align.left)
+                            this.textColor.set(labelColor)
+                        }
+                        this += TextLabel(binding = { Localization.getVar("levelMetadata.difficulty").use() }, font = main.fontMainMenuThin).apply {
+                            Anchor.TopRight.configure(this)
+                            this.bounds.height.set(labelHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.5f)
+                            this.renderAlign.set(Align.right)
+                            this.textColor.set(labelColor)
+                        }
+                        
+                        this += TextLabel(binding = {
+                            levelEntryModern.use()?.levelMetadata?.genre?.takeUnless { it.isBlank() } ?: Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                        }, font = main.fontMainMenuRodin).apply {
+                            Anchor.BottomLeft.configure(this)
+                            this.bounds.height.set(dataHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(multiplier = leftRatio, adjust = -4f)
+                            this.renderAlign.set(Align.left)
+                        }
+                        this += TextLabel(binding = {
+                            val l = levelEntryModern.use()
+                            if (l != null && l.levelMetadata.difficulty > 0) {
+                                "${l.levelMetadata.difficulty} / ${LevelMetadata.LIMIT_DIFFICULTY.last}"
+                            } else Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                        }, font = main.fontMainMenuRodin).apply {
+                            Anchor.BottomRight.configure(this)
+                            this.bounds.height.set(dataHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(multiplier = rightRatio, adjust = -4f)
+                            this.renderAlign.set(Align.right)
+                        }
+                    }
+                    // Left: Genre (may be blank); Right: Difficulty (may be blank)
+                    this += Pane().apply {
+                        this.bounds.height.set(labelHeight + dataHeight + 2f)
+                        this.margin.set(Insets(0f, 2f, 0f, 0f))
+                        this += TextLabel(binding = { Localization.getVar("mainMenu.library.inputs").use() }, font = main.fontMainMenuThin).apply {
+                            Anchor.TopLeft.configure(this)
+                            this.bounds.height.set(labelHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.5f)
+                            this.renderAlign.set(Align.left)
+                            this.textColor.set(labelColor)
+                        }
+                        this += TextLabel(binding = { Localization.getVar("mainMenu.library.averageInputs").use() }, font = main.fontMainMenuThin).apply {
+                            Anchor.TopRight.configure(this)
+                            this.bounds.height.set(labelHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.5f)
+                            this.renderAlign.set(Align.right)
+                            this.textColor.set(labelColor)
+                        }
+                        
+                        this += TextLabel(binding = {
+                            val inputCount = levelEntryModern.use()?.exportStatistics?.inputCount
+                            if (inputCount != null) DecimalFormats["0"].format(inputCount)
+                            else Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                        }, font = main.fontMainMenuRodin).apply {
+                            Anchor.BottomLeft.configure(this)
+                            this.bounds.height.set(dataHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(multiplier = leftRatio, adjust = -4f)
+                            this.renderAlign.set(Align.left)
+                        }
+                        this += TextLabel(binding = {
+                            val inputsPerMin = levelEntryModern.use()?.exportStatistics?.averageInputsPerMinute
+                            if (inputsPerMin != null)
+                                Localization.getVar("mainMenu.library.averageInputs.value", Var {
+                                    listOf(DecimalFormats.format("0.0", inputsPerMin))
+                                }).use()
+                            else Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                        }, font = main.fontMainMenuRodin).apply {
+                            Anchor.BottomRight.configure(this)
+                            this.bounds.height.set(dataHeight)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(multiplier = rightRatio, adjust = -4f)
+                            this.renderAlign.set(Align.right)
+                        }
+                    }
+                    
+                    // Description scroll pane / high scores
+                    val descExists = BooleanVar {
+                        levelEntryModern.use()?.levelMetadata?.description?.takeUnless { it.isBlank() } != null
+                    }
+                    val showDesc = BooleanVar(true)
+                    this += Pane().apply {
+                        this.bounds.height.set(labelHeight)
+
+                        this += Button(binding = {
+                            Localization.getVar(if (showDesc.useB()) "mainMenu.library.switchToHighScores" else "mainMenu.library.switchToDesc").use()
+                        }, font = main.fontMainMenuThin).apply {
+                            Anchor.TopRight.configure(this)
+                            this.setScaleXY(0.75f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.55f)
+                            this.setOnAction {
+                                showDesc.invert()
+                            }
+                            this.visible.bind {
+                                descExists.useB()
+                            }
+                        }
+                        this += TextLabel(binding = {
+                            Localization.getVar(if (descExists.useB() && showDesc.useB())
+                                "levelMetadata.description" else "mainMenu.library.highScores").use()
+                        }, font = main.fontMainMenuThin).apply {
+                            Anchor.TopLeft.configure(this)
+                            this.setScaleXY(0.8f)
+                            this.bindWidthToParent(adjust = -4f, multiplier = 0.45f)
+                            this.renderAlign.set(Align.left)
+                            this.textColor.set(labelColor)
+                        }
+                    }
+                    this += ScrollPane().apply {
+                        this.bounds.height.set(130f - labelHeight)
+                        this.visible.bind {
+                            descExists.useB() && showDesc.useB()
+                        }
+                        
+                        (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+                        this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+                        this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+                        val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+                        this.vBar.skinID.set(scrollBarSkinID)
+                        this.hBar.skinID.set(scrollBarSkinID)
+                        this.vBar.unitIncrement.set(10f)
+                        this.vBar.blockIncrement.set(40f)
+
+                        this.setContent(TextLabel(binding = {
+                            levelEntryModern.use()?.levelMetadata?.description ?: ""
+                        }, font = main.fontMainMenuRodin).apply {
+                            this.setScaleXY(0.85f)
+                            this.textColor.set(Color().grey(0.25f))
+                            this.doXCompression.set(false)
+                            this.doLineWrapping.set(true)
+                            this.internalTextBlock.addListener {
+                                this.resizeBoundsToContent(affectWidth = false)
+                            }
+                        })
                     }
                 }
             }
         }
         contentPaneRight += levelDetailsPane
-        // Level details pane (legacy)
-        val levelDetailsPaneLegacy = Pane().apply {
-            val levelEntry: ReadOnlyVar<LevelEntry.Legacy?> = Var.bind { selectedLevelEntry.use() as? LevelEntry.Legacy }
-            this.visible.bind {
-                levelEntry.use() != null
-            }
-            val bannerRatio = 3.2f // 512 x 160
-            val spacing = 4f
-            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("library_default_banner")),
-                    renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
-                Anchor.TopLeft.configure(this)
-                this.bindHeightToSelfWidth(multiplier = 1f / bannerRatio)
-            }
-            this += VBox().apply {
-                Anchor.BottomLeft.configure(this)
-                val thisBounds = this.bounds
-                thisBounds.height.bind {
-                    @Suppress("SimpleRedundantLet")
-                    (parent.use()?.let { p -> p.contentZone.height.useF() } ?: 0f) - (thisBounds.width.useF() * (1f / bannerRatio) + spacing * 2)
-                }
-                this.spacing.set(spacing)
-                this.temporarilyDisableLayouts {
-                    this += TextLabel(binding = {
-                        val level = levelEntry.use()
-                        if (level != null) {
-                            "[Legacy Level]\n${level.getTitle()}\nGame Version: ${level.programVersion}"
-                        } else ""
-                    }, font = main.fontMainMenuThin).apply { 
-                        this.renderAlign.set(Align.topLeft)
-                    }
-                }
-            }
-        }
-        contentPaneRight += levelDetailsPaneLegacy
 
         val vbox = VBox().apply {
             this.spacing.set(0f)
