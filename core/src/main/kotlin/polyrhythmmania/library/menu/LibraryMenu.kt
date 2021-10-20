@@ -37,6 +37,7 @@ import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.container.manifest.ExportStatistics
 import polyrhythmmania.container.manifest.LibraryRelevantData
 import polyrhythmmania.library.LevelEntry
+import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 import polyrhythmmania.ui.PRManiaSkins
@@ -115,7 +116,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.vBar.unitIncrement.set(48f)
             this.vBar.blockIncrement.set(48f * 4)
         }
-        val hbox = HBox().apply {
+        val leftBottomHbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
             this.spacing.set(8f)
             this.padding.set(Insets(2f))
@@ -124,7 +125,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
 
         contentPaneLeft.addChild(scrollPane)
-        contentPaneLeft.addChild(hbox)
+        contentPaneLeft.addChild(leftBottomHbox)
 
         // No levels label
         scrollPane.addChild(TextLabel(binding = {
@@ -177,12 +178,41 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 Anchor.TopLeft.configure(this)
                 this.bindHeightToSelfWidth(multiplier = 1f / bannerRatio)
             }
-            this += VBox().apply {
+            val bottomBarSize = 40f
+            // Bottom bar
+            this += Pane().apply {
                 Anchor.BottomLeft.configure(this)
+                this.bounds.height.set(bottomBarSize)
+                val hbox = HBox().apply {
+                    Anchor.BottomLeft.configure(this)
+                    this.spacing.set(8f)
+                    this.padding.set(Insets(2f))
+                    this.align.set(HBox.Align.CENTRE)
+                }
+                this += hbox
+                hbox += createSmallButton(binding = { Localization.getVar("mainMenu.play.playAction").use() }).apply {
+                    this.bounds.width.set(150f)
+                    this.setOnAction {
+                        val l = selectedLevelEntry.getOrCompute()
+                        if (l != null) {
+                            if (!l.file.exists()) {
+                                startSearchThread() // Re-search the list. The level was deleted but this should be a very rare case.
+                            } else {
+                                val loadMenu = LoadSavedLevelMenu(menuCol, l.file)
+                                menuCol.addMenu(loadMenu)
+                                menuCol.pushNextMenu(loadMenu)
+                            }
+                        }
+                    }
+                }
+            }
+            // Main content area
+            this += VBox().apply {
+                Anchor.BottomLeft.configure(this, offsetY = -bottomBarSize)
                 val thisBounds = this.bounds
                 thisBounds.height.bind {
                     @Suppress("SimpleRedundantLet")
-                    (parent.use()?.let { p -> p.contentZone.height.useF() } ?: 0f) - (thisBounds.width.useF() * (1f / bannerRatio) + spacing * 2)
+                    (parent.use()?.let { p -> p.contentZone.height.useF() } ?: 0f) - (thisBounds.width.useF() * (1f / bannerRatio) + spacing * 2) - bottomBarSize
                 }
                 this.spacing.set(spacing)
                 this.temporarilyDisableLayouts {
@@ -455,7 +485,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         }
                     }
                     this += ScrollPane().apply {
-                        this.bounds.height.set(130f - labelHeight)
+                        this.bounds.height.set(95f - labelHeight)
                         this.visible.bind {
                             descExists.useB() && showDesc.useB()
                         }
@@ -466,8 +496,8 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
                         this.vBar.skinID.set(scrollBarSkinID)
                         this.hBar.skinID.set(scrollBarSkinID)
-                        this.vBar.unitIncrement.set(10f)
-                        this.vBar.blockIncrement.set(40f)
+                        this.vBar.unitIncrement.set(24f)
+                        this.vBar.blockIncrement.set(24f)
 
                         this.setContent(TextLabel(binding = {
                             levelEntryModern.use()?.levelMetadata?.description ?: ""
@@ -495,14 +525,14 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         scrollPane.setContent(vbox)
 
-        hbox.temporarilyDisableLayouts {
-            hbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
+        leftBottomHbox.temporarilyDisableLayouts {
+            leftBottomHbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
                 this.bounds.width.set(100f)
                 this.setOnAction {
                     menuCol.popLastMenu()
                 }
             }
-            hbox += createSmallButton(binding = {""}).apply {
+            leftBottomHbox += createSmallButton(binding = {""}).apply {
                 this.bindWidthToSelfHeight()
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["refresh"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.refresh")))
@@ -510,7 +540,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     startSearchThread()
                 }
             }
-            hbox += createSmallButton(binding = {""}).apply {
+            leftBottomHbox += createSmallButton(binding = {""}).apply {
                 this.bindWidthToSelfHeight()
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["filter"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.sortAndFilter")))
@@ -518,7 +548,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     // TODO
                 }
             }
-            hbox += createSmallButton(binding = {""}).apply {
+            leftBottomHbox += createSmallButton(binding = {""}).apply {
                 this.bindWidthToSelfHeight()
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.openLibraryLocation.tooltip")))
@@ -526,7 +556,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     Gdx.net.openFileExplorer(getLibraryFolder())
                 }
             }
-            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.library.changeLibraryLocation").use() }).apply {
+            leftBottomHbox += createSmallButton(binding = { Localization.getVar("mainMenu.library.changeLibraryLocation").use() }).apply {
                 this.bounds.width.set(160f)
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.changeLibraryLocation.tooltip")))
                 this.setOnAction {

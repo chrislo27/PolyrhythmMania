@@ -37,7 +37,8 @@ import polyrhythmmania.soundsystem.SoundSystem
 import java.io.File
 import kotlin.concurrent.thread
 
-class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?)
+    : StandardMenu(menuCol) {
 
     enum class Substate {
         FILE_DIALOG_OPEN,
@@ -46,7 +47,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         LOAD_ERROR,
     }
 
-    val substate: Var<Substate> = Var(Substate.FILE_DIALOG_OPEN)
+    val substate: Var<Substate> = Var(if (immediateLoad == null) Substate.FILE_DIALOG_OPEN else Substate.LOADING)
 
     val descLabel: TextLabel
     val challengeSetting: Pane
@@ -252,21 +253,41 @@ class LoadSavedLevelMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
 
     init { // This init block should be LAST
-        Gdx.app.postRunnable {
-            main.restoreForExternalDialog { completionCallback ->
+        if (immediateLoad != null) {
+            Gdx.app.postRunnable {
                 thread(isDaemon = true) {
-                    val title = Localization.getValue("fileChooser.load.level.title")
-                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.level.filter"),
-                            listOf("*.${Container.LEVEL_FILE_EXTENSION}")).copyWithExtensionsInDesc()
-                    TinyFDWrapper.openFile(title,
-                            main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_PLAY_SAVED_LEVEL)
-                                    ?: main.getDefaultDirectory(), filter) { file: File? ->
-                        completionCallback()
-                        if (file != null) {
-                            loadFile(file)
-                        } else { // Cancelled out
-                            Gdx.app.postRunnable {
-                                menuCol.popLastMenu(playSound = false)
+                    try {
+                        loadFile(immediateLoad)
+                    } catch (e: Exception) {
+                        Gdx.app.postRunnable { 
+                            throw e
+                        }
+                    }
+                }
+            }
+        } else {
+            Gdx.app.postRunnable {
+                main.restoreForExternalDialog { completionCallback ->
+                    thread(isDaemon = true) {
+                        val title = Localization.getValue("fileChooser.load.level.title")
+                        val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.level.filter"),
+                                listOf("*.${Container.LEVEL_FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                        TinyFDWrapper.openFile(title,
+                                main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_PLAY_SAVED_LEVEL)
+                                        ?: main.getDefaultDirectory(), filter) { file: File? ->
+                            completionCallback()
+                            if (file != null) {
+                                try {
+                                    loadFile(file)
+                                } catch (e: Exception) {
+                                    Gdx.app.postRunnable {
+                                        throw e
+                                    }
+                                }
+                            } else { // Cancelled out
+                                Gdx.app.postRunnable {
+                                    menuCol.popLastMenu(playSound = false)
+                                }
                             }
                         }
                     }
