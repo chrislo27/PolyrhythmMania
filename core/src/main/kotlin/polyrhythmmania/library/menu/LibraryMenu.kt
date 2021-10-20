@@ -257,6 +257,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.setScaleXY(0.8f)
                             this.bindWidthToParent(multiplier = leftRatio, adjust = -4f)
                             this.renderAlign.set(Align.left)
+                            this.tooltipElement.set(createRodinTooltip {
+                                text.use()
+                            })
                         }
                         this += TextLabel(binding = {
                             val l = levelEntryModern.use()
@@ -300,6 +303,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.setScaleXY(0.8f)
                             this.bindWidthToParent(multiplier = leftRatio, adjust = -4f)
                             this.renderAlign.set(Align.left)
+                            this.tooltipElement.set(createRodinTooltip {
+                                text.use()
+                            })
                             
                             // Special case: this one scrolls.
                             this.skinID.set(PRManiaSkins.SCROLLING_TEXTLABEL)
@@ -351,6 +357,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.setScaleXY(0.8f)
                             this.bindWidthToParent(multiplier = leftRatio, adjust = -4f)
                             this.renderAlign.set(Align.left)
+                            this.tooltipElement.set(createRodinTooltip {
+                                text.use()
+                            })
                         }
                         this += TextLabel(binding = {
                             val l = levelEntryModern.use()
