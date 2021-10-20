@@ -28,6 +28,6 @@ data class LevelScore(val uuid: UUID, val playCount: Int, val attempts: List<Lev
     }
     
     fun keepXBestAttempts(limit: Int = 10): LevelScore {
-        return this.copy(attempts = this.attempts.sorted().take(limit))
+        return this.copy(attempts = this.attempts.sorted().asReversed().take(limit))
     }
 }
