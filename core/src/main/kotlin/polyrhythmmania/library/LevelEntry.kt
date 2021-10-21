@@ -11,6 +11,11 @@ import kotlin.Comparator
 sealed class LevelEntry(val uuid: UUID, val file: File, val containerVersion: Int, val programVersion: Version) {
 
     companion object {
+        val legacyModernComparator: Comparator<LevelEntry> = Comparator { first, second ->
+            if (first is Modern && second is Legacy) -1
+            else if (first is Legacy && second is Modern) 1
+            else 0
+        }
         val comparator: Comparator<LevelEntry> = Comparator { first, second ->
             if (first is Modern && second is Legacy) -1
             else if (first is Legacy && second is Modern) 1

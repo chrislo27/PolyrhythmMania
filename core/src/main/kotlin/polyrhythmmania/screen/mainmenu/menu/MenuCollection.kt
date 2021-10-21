@@ -100,12 +100,11 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         menuStack.push(uppermostMenu)
     }
     
-    fun changeActiveMenu(menu: MMMenu, backOut: Boolean, instant: Boolean = false, playSound: Boolean = true) {
+    fun changeActiveMenu(menu: MMMenu, backOut: Boolean, instant: Boolean = false, playSound: Boolean = !instant) {
+        if (playSound) {
+            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_${if (backOut) "deselect" else "select"}"))
+        }
         if (!instant) {
-            if (playSound) {
-                main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_${if (backOut) "deselect" else "select"}"))
-            }
-            
             val changedBounds = RectangleStack.getAndPush().apply {
                 val currentBoundsElement = menu.getTileFlipAnimationBounds()
                 val currentBounds = currentBoundsElement.bounds
@@ -155,11 +154,11 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         menuStack.push(menu)
     }
 
-    fun popLastMenu(instant: Boolean = false, playSound: Boolean = true): MMMenu {
+    fun popLastMenu(instant: Boolean = false, playSound: Boolean = !instant, backOut: Boolean = true): MMMenu {
         if (menuStack.size <= 1) return menuStack.peek()
         val popped = menuStack.pop()
         val menu = menuStack.peek()
-        changeActiveMenu(menu, true, instant, playSound)
+        changeActiveMenu(menu, backOut, instant, playSound)
         if (popped.deleteWhenPopped.get()) {
             this.removeMenu(popped)
         }

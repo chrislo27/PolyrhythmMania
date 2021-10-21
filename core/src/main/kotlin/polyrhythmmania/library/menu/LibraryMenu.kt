@@ -70,7 +70,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             (at as? LibraryEntryButton)?.levelEntry
         } else null
     }
-    private val sortFilter: Var<LibrarySortFilter> = Var(LibrarySortFilter.DEFAULT)
+    val sortFilter: Var<LibrarySortFilter> = Var(LibrarySortFilter.DEFAULT)
     private val levelList: Var<List<LevelEntryData>> = Var(emptyList())
     private val activeLevelList: Var<List<LevelEntryData>> = Var(emptyList())
     
@@ -255,11 +255,19 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         this.skinID.set(PRManiaSkins.SCROLLING_TEXTLABEL)
                         this.bounds.height.set(30f)
                         this.margin.set(Insets(0f, 2f, 0f, 0f))
-                        setScaleXY(0.9f)
-                        this.tooltipElement.set(createRodinTooltip {
-                            val t = text.use()
-                            Localization.getVar("mainMenu.library.levelCreator", Var { listOf(t) }).use()
-                        })
+                        this.setScaleXY(0.9f)
+                        val tooltip = createRodinTooltip {
+                            val m = levelEntryModern.use()
+                            if (m != null) {
+                                val datetime = m.levelMetadata.initialCreationDate.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault())
+                                Localization.getVar("mainMenu.library.levelCreator", Var {
+                                    listOf(m.levelMetadata.levelCreator, DateTimeFormatter.RFC_1123_DATE_TIME.format(datetime))
+                                }).use()
+                            } else Localization.getVar("mainMenu.library.legacyIndicator.tooltip").use()
+                        }
+                        this.tooltipElement.bind { 
+                            tooltip
+                        }
                     }
                     
                     val leftRatio = 0.6f
@@ -319,7 +327,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this += Pane().apply {
                         this.bounds.height.set(labelHeight + dataHeight + 2f)
                         this.margin.set(Insets(0f, 2f, 0f, 0f))
-                        this += TextLabel(binding = { Localization.getVar("levelMetadata.albumName.short").use() }, font = main.fontMainMenuThin).apply {
+                        this += TextLabel(binding = { Localization.getVar("mainMenu.library.album").use() }, font = main.fontMainMenuThin).apply {
                             Anchor.TopLeft.configure(this)
                             this.bounds.height.set(labelHeight)
                             this.setScaleXY(0.8f)
@@ -676,7 +684,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["filter"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.sortAndFilter")))
                 this.setOnAction {
-                    // TODO
+                    val m = LibrarySortFilterMenu(menuCol, this@LibraryMenu)
+                    menuCol.addMenu(m)
+                    menuCol.pushNextMenu(m, instant = true, playSound = true)
                 }
             }
             leftBottomHbox += createSmallButton(binding = {""}).apply {
@@ -794,9 +804,10 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         updateLevelListVbox()
     }
     
-    private fun filterAndSortLevelList() {
+    fun filterAndSortLevelList() {
         val sf = this.sortFilter.getOrCompute()
         activeLevelList.set(sf.sortAndFilter(levelList.getOrCompute()))
+        updateLevelListVbox()
     }
     
     private fun updateLevelListVbox() {
