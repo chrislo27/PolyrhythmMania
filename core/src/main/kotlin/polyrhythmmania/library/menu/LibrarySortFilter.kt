@@ -1,7 +1,7 @@
 package polyrhythmmania.library.menu
 
 import polyrhythmmania.library.LevelEntry
-import java.time.LocalDateTime
+import java.util.*
 
 
 data class LibrarySortFilter(
@@ -26,22 +26,22 @@ data class LibrarySortFilter(
                 (it.levelEntry as LevelEntry.Modern).levelMetadata.initialCreationDate
             }
             Sortable.LEVEL_CREATOR -> Comparator.comparing {
-                (it.levelEntry as LevelEntry.Modern).levelMetadata.levelCreator
+                (it.levelEntry as LevelEntry.Modern).levelMetadata.levelCreator.lowercase(Locale.ROOT)
             }
             Sortable.SONG_NAME ->Comparator.comparing {
-                (it.levelEntry as LevelEntry.Modern).levelMetadata.songName
+                (it.levelEntry as LevelEntry.Modern).levelMetadata.songName.lowercase(Locale.ROOT)
             }
             Sortable.SONG_ARTIST -> Comparator.comparing {
-                (it.levelEntry as LevelEntry.Modern).levelMetadata.songArtist
+                (it.levelEntry as LevelEntry.Modern).levelMetadata.songArtist.lowercase(Locale.ROOT)
             }
             Sortable.ALBUM_NAME -> Comparator.comparing {
-                (it.levelEntry as LevelEntry.Modern).levelMetadata.albumName
+                (it.levelEntry as LevelEntry.Modern).levelMetadata.albumName.lowercase(Locale.ROOT)
             }
             Sortable.ALBUM_YEAR -> Comparator.comparing {
                 (it.levelEntry as LevelEntry.Modern).levelMetadata.albumYear
             }
             Sortable.GENRE -> Comparator.comparing {
-                (it.levelEntry as LevelEntry.Modern).levelMetadata.genre
+                (it.levelEntry as LevelEntry.Modern).levelMetadata.genre.lowercase(Locale.ROOT)
             }
             Sortable.DIFFICULTY -> Comparator.comparing {
                 (it.levelEntry as LevelEntry.Modern).levelMetadata.difficulty

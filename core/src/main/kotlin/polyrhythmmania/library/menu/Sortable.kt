@@ -19,4 +19,10 @@ enum class Sortable(val nameKey: String) {
     AVERAGE_BPM("mainMenu.librarySortFilter.sort.averageBpm"),
     MIN_BPM("mainMenu.librarySortFilter.sort.minBpm"),
     MAX_BPM("mainMenu.librarySortFilter.sort.maxBpm"),
+    
+    ;
+    
+    companion object {
+        val VALUES: List<Sortable> = values().toList()
+    }
 }

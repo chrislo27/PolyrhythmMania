@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.ui.Anchor
+import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
@@ -55,60 +56,97 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu)
         contentPane += leftBottomHbox
 
         val vbox = VBox().apply {
-            this.spacing.set(2f)
+            this.spacing.set(4f)
             this.bounds.height.set(100f)
             this.margin.set(Insets(0f, 0f, 0f, 2f))
         }
         
         vbox.temporarilyDisableLayouts {
             vbox += TextLabel(binding = { Localization.getVar("mainMenu.librarySortFilter.desc").use() }, font = main.fontMainMenuThin).apply {
-                this.bounds.height.set(64f)
+                this.bounds.height.set(72f)
+                this.margin.set(Insets(2f, 2f, 0f, 0f))
                 this.renderAlign.set(Align.topLeft)
                 this.doLineWrapping.set(true)
             }
+            
+            // Sort half
             vbox += HBox().apply {
                 this.bounds.height.set(64f)
+                this.spacing.set(4f)
                 this += TextLabel(binding = { Localization.getVar("mainMenu.librarySortFilter.sort").use() }, font = main.fontMainMenuHeading).apply {
                     this.bindWidthToParent(multiplier = 0.25f)
                 }
-                this += TextLabel(binding = { Localization.getVar("mainMenu.librarySortFilter.sort.sortOrder").use() }, font = main.fontMainMenuThin).apply {
-                    this.bindWidthToParent(multiplier = 0.2f)
+                this += TextLabel(binding = { Localization.getVar("mainMenu.librarySortFilter.sort.sortOrder").use() }, font = main.fontMainMenuMain).apply {
+                    this.bindWidthToParent(multiplier = 0.15f)
                     this.renderAlign.set(Align.right)
-                    this.margin.set(Insets(0f, 0f, 0f, 8f))
+                    this.margin.set(Insets(0f, 0f, 16f, 8f))
                 }
                 val sortToggleGroup = ToggleGroup()
-                this += RadioButton(binding = { Localization.getVar("mainMenu.librarySortFilter.sort.sortAscending").use() }, font = main.fontMainMenuMain).apply {
-                    Anchor.CentreLeft.configure(this)
-                    sortToggleGroup.addToggle(this)
+                this += Pane().apply {
                     this.bindWidthToParent(multiplier = 0.25f)
-                    this.bindHeightToParent(multiplier = 0.5f)
-                    this.onSelected = {
-                        currentSettings.set(currentSettings.getOrCompute().copy(sortDescending = false))
+                    this += RadioButton(binding = { Localization.getVar("mainMenu.librarySortFilter.sort.sortAscending").use() }, font = main.fontMainMenuThin).apply {
+                        Anchor.TopLeft.configure(this)
+                        sortToggleGroup.addToggle(this)
+                        this.bindHeightToParent(multiplier = 0.5f)
+                        this.onSelected = {
+                            currentSettings.set(currentSettings.getOrCompute().copy(sortDescending = false))
+                        }
+                        if (!oldSettings.sortDescending) {
+                            this.selectedState.set(true)
+                        }
                     }
-                    if (!oldSettings.sortDescending) {
-                        this.selectedState.set(true)
+                    this += RadioButton(binding = { Localization.getVar("mainMenu.librarySortFilter.sort.sortDescending").use() }, font = main.fontMainMenuThin).apply {
+                        Anchor.BottomLeft.configure(this)
+                        sortToggleGroup.addToggle(this)
+                        this.bindHeightToParent(multiplier = 0.5f)
+                        this.onSelected = {
+                            currentSettings.set(currentSettings.getOrCompute().copy(sortDescending = true))
+                        }
+                        if (oldSettings.sortDescending) {
+                            this.selectedState.set(true)
+                        }
                     }
                 }
-                this += RadioButton(binding = { Localization.getVar("mainMenu.librarySortFilter.sort.sortDescending").use() }, font = main.fontMainMenuMain).apply {
+                this += CheckBox(binding = { Localization.getVar("mainMenu.librarySortFilter.sort.legacyOnTop").use() }, font = main.fontMainMenuThin).apply {
                     Anchor.CentreLeft.configure(this)
-                    sortToggleGroup.addToggle(this)
-                    this.bindWidthToParent(multiplier = 0.25f)
-                    this.bindHeightToParent(multiplier = 0.5f)
-                    this.onSelected = {
-                        currentSettings.set(currentSettings.getOrCompute().copy(sortDescending = true))
-                    }
-                    if (oldSettings.sortDescending) {
-                        this.selectedState.set(true)
+                    this.bounds.height.set(32f)
+                    this.bindWidthToParent(multiplier = 0.325f)
+                    this.selectedState.set(oldSettings.legacyOnTop)
+                    this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.librarySortFilter.sort.legacyOnTop.tooltip")))
+                    this.onCheckChanged = {
+                        currentSettings.set(currentSettings.getOrCompute().copy(legacyOnTop = it))
                     }
                 }
             }
-            vbox += CheckBox(binding = { Localization.getVar("mainMenu.librarySortFilter.sort.legacyOnTop").use() }, font = main.fontMainMenuMain).apply { 
-                this.bounds.height.set(32f)
-                this.bounds.width.set(450f)
-                this.selectedState.set(oldSettings.legacyOnTop)
-                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.librarySortFilter.sort.legacyOnTop.tooltip")))
-                this.onCheckChanged = {
-                    currentSettings.set(currentSettings.getOrCompute().copy(legacyOnTop = it))
+            val sortables = Sortable.VALUES
+            vbox += Pane().apply {
+                this.bounds.height.set(32f * (sortables.size / 3 + 1))
+                val toggleGroup = ToggleGroup()
+                sortables.forEachIndexed { index, sortable -> 
+                    this += RadioButton(binding = {Localization.getVar(sortable.nameKey).use()}, font = main.fontMainMenuThin).apply { 
+                        this.bounds.height.set(32f)
+                        this.bindWidthToParent(multiplier = 0.333f, adjust = -4f)
+                        this.bounds.x.bind { (parent.use()?.bounds?.width?.useF() ?: 0f) * ((index % 3) / 3f) }
+                        this.bounds.y.set(32f * (index / 3))
+                        this.margin.set(Insets(0f, 0f, 0f, 4f))
+                        toggleGroup.addToggle(this)
+                        if (oldSettings.sortOn == sortable) {
+                            this.selectedState.set(true)
+                        }
+                        this.onSelected = {
+                            currentSettings.set(currentSettings.getOrCompute().copy(sortOn = sortable))
+                        }
+                    }
+                }
+            }
+
+            // Filter half
+            vbox += HBox().apply {
+                this.bounds.height.set(64f + 8f)
+                this.spacing.set(4f)
+                this.margin.set(Insets(8f, 0f, 0f, 0f))
+                this += TextLabel(binding = { Localization.getVar("mainMenu.librarySortFilter.filter").use() }, font = main.fontMainMenuHeading).apply {
+                    this.bindWidthToParent(multiplier = 0.3f)
                 }
             }
         }
