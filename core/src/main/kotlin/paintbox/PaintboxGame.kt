@@ -245,7 +245,7 @@ abstract class PaintboxGame(val paintboxSettings: PaintboxSettings)
                 val string =
                         """FPS: $fps
 Debug mode: ${Paintbox.DEBUG_KEY_NAME} + I - Reload I18N | S(+Shift) - UI outlines: ${Paintbox.stageOutlines} | G - gc
-Version: $versionString
+Version: $versionString | L: ${Gdx.graphics.width}x${Gdx.graphics.height} | P: ${Gdx.graphics.backBufferWidth}x${Gdx.graphics.backBufferHeight} ${Gdx.graphics.backBufferScale}
 Memory: ${numberFormat.format(Gdx.app.nativeHeap / 1024)} / ${numberFormat.format(MemoryUtils.maxMemoryKiB)} KiB (${numberFormat.format(debugInfo.memoryDelta / 1024)} KiB/s)
 Screen: ${screen?.javaClass?.canonicalName}
 ${getDebugString()}
