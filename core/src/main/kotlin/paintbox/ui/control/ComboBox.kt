@@ -83,6 +83,11 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
         @Suppress("UNCHECKED_CAST")
         createInternalTextBlockVar(this as ComboBox<Any?>)
     }
+
+    /**
+     * Fired whenever an item was selected, even if it was already selected previously.
+     */
+    var onItemSelected: (T) -> Unit = {}
     
     init {
         this.border.set(Insets(1f))
@@ -108,6 +113,7 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
                         smi.closeMenuAfterAction = true
                         smi.onAction = {
                             this.selectedItem.set(item)
+                            onItemSelected.invoke(item)
                         }
                     }
                 }

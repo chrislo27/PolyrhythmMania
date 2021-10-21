@@ -33,8 +33,7 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
     
     data class Genre(val genreName: String, val customToString: ((Genre) -> String)? = null) {
         companion object {
-            val NO_GENRE: Genre = Genre("") { Localization.getValue("editor.dialog.levelMetadata.noPresetGenre") }
-            val DEFAULT_GENRES: List<Genre> = listOf(NO_GENRE) + listOf(
+            val DEFAULT_GENRES: List<Genre> = listOf(
                     "Blues",
                     "Rock",
                     "Country",
@@ -319,8 +318,8 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
                 hbox += ComboBox<Genre>(Genre.DEFAULT_GENRES, identicalGenre ?: Genre.DEFAULT_GENRES.first(),
                         font = editorPane.palette.musicDialogFont).apply { 
                     this.bounds.width.set(250f)
-                    this.selectedItem.addListener {
-                        val genreName = it.getOrCompute().genreName
+                    this.onItemSelected = { g ->
+                        val genreName = g.genreName
                         if (genreName.isNotEmpty()) {
                             textField.requestFocus()
                             textField.text.set(genreName)
