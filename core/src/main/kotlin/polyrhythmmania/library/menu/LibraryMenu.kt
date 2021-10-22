@@ -45,7 +45,6 @@ import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 import polyrhythmmania.ui.PRManiaSkins
-import polyrhythmmania.ui.ScrollingTextLabelSkin
 import polyrhythmmania.util.DecimalFormats
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.util.TimeUtils
@@ -241,7 +240,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }, font = main.fontMainMenuRodin).apply { 
                         this.renderAlign.set(Align.center)
                         this.doXCompression.set(false)
-                        this.skinID.set(PRManiaSkins.SCROLLING_TEXTLABEL)
+                        this.skinID.set(TextLabel.SCROLLING_TEXTLABEL_SKIN_ID)
                         this.bounds.height.set(34f)
                         this.margin.set(Insets(0f, 2f, 0f, 0f))
                         this.tooltipElement.set(createRodinTooltip { 
@@ -254,7 +253,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }, font = main.fontMainMenuRodin).apply { 
                         this.renderAlign.set(Align.center)
                         this.doXCompression.set(false)
-                        this.skinID.set(PRManiaSkins.SCROLLING_TEXTLABEL)
+                        this.skinID.set(TextLabel.SCROLLING_TEXTLABEL_SKIN_ID)
                         this.bounds.height.set(30f)
                         this.margin.set(Insets(0f, 2f, 0f, 0f))
                         this.setScaleXY(0.9f)
@@ -359,7 +358,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             })
                             
                             // Special case: this one scrolls.
-                            this.skinID.set(PRManiaSkins.SCROLLING_TEXTLABEL)
+                            this.skinID.set(TextLabel.SCROLLING_TEXTLABEL_SKIN_ID)
                             this.doClipping.set(true)
                             this.doXCompression.set(false)
                             (this.skin.getOrCompute() as ScrollingTextLabelSkin).gapBetween.set(24f)
