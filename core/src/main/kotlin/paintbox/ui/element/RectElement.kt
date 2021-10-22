@@ -8,7 +8,7 @@ import paintbox.binding.Var
 import paintbox.util.gdxutils.fillRect
 
 
-class RectElement(initColor: Color) : UIElement() {
+open class RectElement(initColor: Color) : UIElement() {
     
     val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f).set(initColor))
     
