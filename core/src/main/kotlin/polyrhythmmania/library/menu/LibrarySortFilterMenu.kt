@@ -139,6 +139,8 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu)
                     }
                 }
             }
+            
+            // ----------------------------------------------------------------------------------------------------
 
             // Filter half
             vbox += HBox().apply {

@@ -1,20 +1,10 @@
 package polyrhythmmania.library.menu
 
+import polyrhythmmania.library.LevelEntry
+
 
 abstract class Filter(val filterable: Filterable) {
     
-    abstract fun filter(levelEntryData: LevelEntryData): Boolean
+    abstract fun filter(levelEntry: LevelEntry.Modern): Boolean
     
-}
-
-class SimpleFilter(filterable: Filterable) : Filter(filterable) {
-    override fun filter(levelEntryData: LevelEntryData): Boolean {
-        TODO()
-    }
-}
-
-class DifficultyFilter : Filter(Filterable.DIFFICULTY) {
-    override fun filter(levelEntryData: LevelEntryData): Boolean {
-        TODO()
-    }
 }
