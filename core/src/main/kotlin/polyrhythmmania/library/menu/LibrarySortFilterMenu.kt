@@ -151,6 +151,9 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu)
                     this.bindWidthToParent(multiplier = 0.3f)
                 }
             }
+            vbox += TextLabel(text = "(not implemented yet)", font = main.fontMainMenuThin).apply {
+                this.bounds.height.set(32f)
+            }
         }
         vbox.sizeHeightToChildren(100f)
         scrollPane.setContent(vbox)
