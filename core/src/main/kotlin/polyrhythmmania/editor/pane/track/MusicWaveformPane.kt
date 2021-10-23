@@ -54,7 +54,7 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
         like tempo changes (converted to sec) and loop points.
          */
         
-        val printDebugStuff = Gdx.input.isKeyJustPressed(Input.Keys.Y)
+        val printDebugStuff = Paintbox.debugMode && Gdx.input.isKeyJustPressed(Input.Keys.Y)
         if (printDebugStuff) println()
         
         batch.setColor(1f, 1f, 1f, 1f * apparentOpacity.get())

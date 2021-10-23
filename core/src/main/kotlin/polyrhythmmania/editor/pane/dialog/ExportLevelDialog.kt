@@ -161,7 +161,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 }
                 
                 fun createChecklistItem(text: String, completed: ChecklistState, required: Boolean): HBox {
-                    if (completed == ChecklistState.NONE) {
+                    if (completed == ChecklistState.NONE && required) {
                         checklistIncomplete.set(true)
                     }
                     return HBox().apply {
