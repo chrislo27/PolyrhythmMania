@@ -8,16 +8,43 @@ data class LibrarySortFilter(
         val sortDescending: Boolean,
         val sortOn: Sortable,
         val legacyOnTop: Boolean,
-        val filters: List<Filter>,
+        
+        val filterLevelCreator: FilterOnStringList,
+        val filterSongName: FilterOnStringList,
+        val filterSongArtist: FilterOnStringList,
+        val filterAlbumName: FilterOnStringList,
+        val filterAlbumYear: FilterInteger,
+        val filterGenre: FilterOnStringList,
+        val filterDifficulty: FilterInteger,
 ) {
 
     companion object {
-        val DEFAULT: LibrarySortFilter = LibrarySortFilter(false, Sortable.SONG_NAME, false, emptyList())
+        val DEFAULT: LibrarySortFilter = LibrarySortFilter(false, Sortable.SONG_NAME, false,
+                FilterOnStringList(false, Filterable.LEVEL_CREATOR, "", listOf("")),
+                FilterOnStringList(false, Filterable.SONG_NAME, "", listOf("")),
+                FilterOnStringList(false, Filterable.SONG_ARTIST, "", listOf("")),
+                FilterOnStringList(false, Filterable.ALBUM_NAME, "", listOf("")),
+                FilterInteger(false, Filterable.ALBUM_YEAR, FilterInteger.Op.EQ, 0, true),
+                FilterOnStringList(false, Filterable.GENRE, "", listOf("")),
+                FilterInteger(false, Filterable.DIFFICULTY, FilterInteger.Op.EQ, 0, true),
+        )
     }
+
+    val filters: List<Filter> = listOf(filterLevelCreator, filterSongName, filterSongArtist, filterAlbumName, filterAlbumYear, filterGenre, filterDifficulty)
+    val enabledFilters: List<Filter> = filters.filter { it.enabled }
+    val anyFiltersEnabled: Boolean = enabledFilters.isNotEmpty()
     
     private fun filterFunc(item: LevelEntryData): Boolean {
-        // TODO
-        return true
+        if (anyFiltersEnabled) {
+            if (item.levelEntry is LevelEntry.Legacy) return false
+
+            val levelEntry = item.levelEntry as LevelEntry.Modern
+            return enabledFilters.all { filter ->
+                filter.filter(levelEntry)
+            }
+        } else {
+            return true
+        }
     }
     
     private fun sortingComparatorModern(): Comparator<LevelEntryData> {

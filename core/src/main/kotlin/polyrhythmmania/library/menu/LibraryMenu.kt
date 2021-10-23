@@ -82,7 +82,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         
         this.setSize(percentage = 0.975f)
         this.titleText.bind {
-            Localization.getVar(if (sortFilter.use().filters.isEmpty()) "mainMenu.library.title" else "mainMenu.library.title.filtered").use()
+            Localization.getVar(if (sortFilter.use() == LibrarySortFilter.DEFAULT) "mainMenu.library.title" else "mainMenu.library.title.filtered").use()
         }
         this.showLogo.set(false)
         this.contentPane.bounds.height.set(520f)
@@ -685,7 +685,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["filter"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.sortAndFilter")))
                 this.setOnAction {
-                    val m = LibrarySortFilterMenu(menuCol, this@LibraryMenu)
+                    val m = LibrarySortFilterMenu(menuCol, this@LibraryMenu, levelList.getOrCompute().toList())
                     menuCol.addMenu(m)
                     menuCol.pushNextMenu(m, instant = true, playSound = true)
                 }
