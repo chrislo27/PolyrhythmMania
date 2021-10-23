@@ -186,7 +186,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                     fun UIElement.createFilterPane(filter: T) {
                         when (filter) {
                             is FilterOnStringList -> @Suppress("UNCHECKED_CAST") {
-                                val modernList = fullLevelList.filterIsInstance<LevelEntry.Modern>()
+                                val modernList = fullLevelList.map { it.levelEntry }.filterIsInstance<LevelEntry.Modern>()
                                 val list: List<String> = listOf("") + (when (filter.filterable) {
                                     Filterable.LEVEL_CREATOR -> modernList.map { it.levelMetadata.levelCreator }
                                     Filterable.SONG_NAME -> modernList.map { it.levelMetadata.songName }
@@ -208,6 +208,9 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                                         val lsf = currentSettings.getOrCompute()
                                         val newFilter = getter(lsf) as FilterOnStringList
                                         currentSettings.set(setter(lsf, newFilter.copy(filterOn = item) as T))
+                                        if (!checkbox.checkedState.get()) {
+                                            checkbox.checkedState.set(true)
+                                        }
                                     }
                                 }
                             }
@@ -226,6 +229,10 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                                             val lsf = currentSettings.getOrCompute()
                                             val newFilter = getter(lsf) as FilterInteger
                                             currentSettings.set(setter(lsf, newFilter.copy(op = item) as T))
+                                            
+                                            if (!checkbox.checkedState.get()) {
+                                                checkbox.checkedState.set(true)
+                                            }
                                         }
                                     }
                                     if (filter.filterable == Filterable.DIFFICULTY) {
@@ -241,6 +248,10 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                                                 val lsf = currentSettings.getOrCompute()
                                                 val newFilter = getter(lsf) as FilterInteger
                                                 currentSettings.set(setter(lsf, newFilter.copy(right = item) as T))
+                                                
+                                                if (!checkbox.checkedState.get()) {
+                                                    checkbox.checkedState.set(true)
+                                                }
                                             }
                                         }
                                     } else if (filter.filterable == Filterable.ALBUM_YEAR) {
@@ -267,6 +278,10 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                                                         currentSettings.set(setter(lsf, newFilter.copy(right = newYear) as T))
                                                         
                                                         this.text.set(newYear.takeUnless { it == 0 }?.toString() ?: "")
+                                                        
+                                                        if (!checkbox.checkedState.get()) {
+                                                            checkbox.checkedState.set(true)
+                                                        }
                                                     }
                                                 }
                                                 this.setOnRightClick {
