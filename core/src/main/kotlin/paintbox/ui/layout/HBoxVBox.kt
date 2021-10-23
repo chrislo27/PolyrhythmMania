@@ -4,6 +4,7 @@ import paintbox.binding.*
 import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Bounds
+import paintbox.ui.area.Insets
 
 
 /**
@@ -201,6 +202,14 @@ open class HBox : AbstractHVBox() {
         if (last != null) {
             width = last.bounds.x.get() + last.bounds.width.get()
         }
+        
+        val borderInsets = this.border.getOrCompute()
+        val marginInsets = this.margin.getOrCompute()
+        val paddingInsets = this.padding.getOrCompute()
+        fun Insets.leftright(): Float = this.left + this.right
+
+        width += borderInsets.leftright() + marginInsets.leftright() + paddingInsets.leftright()
+
 
         this.bounds.width.set(width.coerceAtLeast(minimumWidth))
     }
@@ -245,6 +254,13 @@ open class VBox : AbstractHVBox() {
         if (last != null) {
             height = last.bounds.y.get() + last.bounds.height.get()
         }
+
+        val borderInsets = this.border.getOrCompute()
+        val marginInsets = this.margin.getOrCompute()
+        val paddingInsets = this.padding.getOrCompute()
+        fun Insets.topbottom(): Float = this.top + this.bottom
+        
+        height += borderInsets.topbottom() + marginInsets.topbottom() + paddingInsets.topbottom()
         
         this.bounds.height.set(height.coerceAtLeast(minimumHeight))
     }
