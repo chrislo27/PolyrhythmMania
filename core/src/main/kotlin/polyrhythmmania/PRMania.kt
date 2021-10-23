@@ -1,8 +1,10 @@
 package polyrhythmmania
 
 import com.codahale.metrics.MetricRegistry
+import paintbox.Paintbox
 import paintbox.util.Version
 import paintbox.util.WindowSize
+import polyrhythmmania.container.Container
 import java.io.File
 
 
@@ -33,7 +35,28 @@ object PRMania {
     }
     val DEFAULT_LEVELS_FOLDER: File by lazy {
         MAIN_FOLDER.resolve("Levels/").apply {
-            mkdirs()
+            if (!this.exists()) {
+                mkdirs()
+                try {
+                    val exampleLevelFolder = File("example_levels/Level/")
+                    if (exampleLevelFolder.exists() && exampleLevelFolder.isDirectory) {
+                        Paintbox.LOGGER.info("Copying example levels to default levels folder")
+                        exampleLevelFolder.listFiles { f: File -> f.isFile && f.extension == Container.LEVEL_FILE_EXTENSION }?.forEach { file ->
+                            try {
+                                val target = this.resolve(file.name)
+                                if (!target.exists()) {
+                                    file.copyTo(target, overwrite = false)
+                                }
+                            } catch (ignored: FileAlreadyExistsException) {
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
     }
     val commonResolutions: List<WindowSize> = listOf(
