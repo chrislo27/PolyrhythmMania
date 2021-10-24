@@ -109,6 +109,14 @@ class SceneRoot(val viewport: Viewport) : UIElement() {
         dialogLayer.root.addInputEventListener { _ ->
             rootDialogElement != null // Dialog layer eats all input when active
         }
+        
+        // Remove dropdowns if scrolled
+        addInputEventListener { e ->
+            if (e is Scrolled && dropdownContextMenu != null) {
+                hideDropdownContextMenu()
+            }
+            false
+        }
 
         (allLayers - mainLayer).forEach { l -> (l.root.sceneRoot as Var).set(this) }
     }
