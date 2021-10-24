@@ -221,10 +221,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     init {
-        val startingWidth = Gdx.graphics.width
-        val startingHeight = Gdx.graphics.height
+        val startingWidth = Gdx.graphics.backBufferWidth
+        val startingHeight = Gdx.graphics.backBufferHeight
         if (startingWidth > 0 && startingHeight > 0) {
-            createFramebuffers(Gdx.graphics.width, Gdx.graphics.height, null)
+            createFramebuffers(startingWidth, startingHeight, null)
         } else {
             createFramebuffers(PRMania.WIDTH, PRMania.HEIGHT, null)
         }
