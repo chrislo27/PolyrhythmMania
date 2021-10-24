@@ -17,6 +17,7 @@ import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_MUSIC_WAVEFORM_OPACITY
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PANNING_DURING_PLAYBACK
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PLAYTEST_STARTS_PLAY
+import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_UI_SCALE
 import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE
 import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.ENDLESS_HIGH_SCORE
@@ -95,6 +96,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val kv_editorHigherAccuracyPreview: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_HIGHER_ACCURACY_PREVIEW, true)
     val kv_editorPlaytestStartsPlay: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_PLAYTEST_STARTS_PLAY, true)
     val kv_editorArrowKeysLikeScroll: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_ARROW_KEYS_LIKE_SCROLL, true)
+    val kv_editorUIScale: KeyValue<Int> = KeyValue(EDITORSETTINGS_UI_SCALE, 1)
     
     private val kv_keymapKeyboard: KeyValue<InputKeymapKeyboard> = KeyValue(KEYMAP_KEYBOARD, InputKeymapKeyboard())
             
@@ -130,6 +132,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val editorHigherAccuracyPreview: Var<Boolean> = kv_editorHigherAccuracyPreview.value
     val editorPlaytestStartsPlay: Var<Boolean> = kv_editorPlaytestStartsPlay.value
     val editorArrowKeysLikeScroll: Var<Boolean> = kv_editorArrowKeysLikeScroll.value
+    val editorUIScale: Var<Int> = kv_editorUIScale.value
     
     val inputKeymapKeyboard: Var<InputKeymapKeyboard> = kv_keymapKeyboard.value
     

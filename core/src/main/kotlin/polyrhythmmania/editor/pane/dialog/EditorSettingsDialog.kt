@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.pane.dialog
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
@@ -189,6 +190,15 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                             this.renderAlign.set(Align.center)
                         }
                     }, percentageContent = 0.5f)
+            val (uiScalePane, uiScaleControl) = createCycleOption("editorSettings.uiScale", "editorSettings.uiScale.tooltip",
+                    settings.kv_editorUIScale, listOf(1, 2, 3, 4),
+                    itemToStringBinding = { if (it == 1) Localization.getValue("editorSettings.uiScale.native") else "$it" })
+            uiScaleControl.currentItem.addListener {
+                Gdx.app.postRunnable { 
+                    editor.resize()
+                }
+            }
+            vbox += uiScalePane
         }
         vbox.sizeHeightToChildren(300f)
 

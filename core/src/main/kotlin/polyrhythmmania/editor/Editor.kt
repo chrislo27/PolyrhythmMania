@@ -737,7 +737,8 @@ class Editor(val main: PRManiaGame)
         var width = Gdx.graphics.width.toFloat()
         var height = Gdx.graphics.height.toFloat()
         // UI scale
-        val uiScale = 1f //(width / 1280f).coerceAtLeast(0f)
+        // 1 = native (1x larger), 2 = 1.5x larger, 3 = 2x larger, 4 = 2.5x larger
+        val uiScale = ((settings.editorUIScale.getOrCompute().coerceAtLeast(1) + 1) / 2f).coerceAtLeast(1f) //(width / 1280f).coerceAtLeast(0f)
         width /= uiScale
         height /= uiScale
         if (width < 1280f || height < 720f) {
