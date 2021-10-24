@@ -34,7 +34,7 @@ import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.grey
 import paintbox.util.settableLazy
-import paintbox.util.viewport.ExtendFixedRatioViewport
+import paintbox.util.viewport.ExtendNoOversizeViewport
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
@@ -135,7 +135,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
-    private val fullViewport: Viewport = ExtendFixedRatioViewport(1280f, 720f, fullCamera)
+    private val fullViewport: Viewport = ExtendNoOversizeViewport(1280f, 720f, fullCamera)
 
     val pendingKeyboardBinding: Var<InputSettingsMenu.PendingKeyboardBinding?> = Var(null)
 
