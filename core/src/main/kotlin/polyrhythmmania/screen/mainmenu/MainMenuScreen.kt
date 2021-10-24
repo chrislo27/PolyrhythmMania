@@ -221,8 +221,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     init {
-        val startingWidth = Gdx.graphics.backBufferWidth
-        val startingHeight = Gdx.graphics.backBufferHeight
+        val startingWidth = Gdx.graphics.width
+        val startingHeight = Gdx.graphics.height
         if (startingWidth > 0 && startingHeight > 0) {
             createFramebuffers(startingWidth, startingHeight, null)
         } else {
@@ -389,7 +389,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         // Render background
-        HdpiUtils.glViewport(0, 0, boundFB.width, boundFB.height)
+        Gdx.gl.glViewport(0, 0, boundFB.width, boundFB.height) // Don't use HdpiUtils because we're drawing directly to a framebuffer
         background.render(batch, camera)
 
         // Render UI
@@ -546,9 +546,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     private fun createFramebuffers(width: Int, height: Int, oldBuffers: Pair<FrameBuffer, FrameBuffer>?) {
         oldBuffers?.second?.disposeQuietly()
-        this.framebufferOld = FrameBuffer(Pixmap.Format.RGB888, width, height, true)
-        this.framebufferCurrent = FrameBuffer(Pixmap.Format.RGB888, width, height, true)
-        this.framebufferSize = WindowSize(width, height)
+        val newFbWidth = HdpiUtils.toBackBufferX(width)
+        val newFbHeight = HdpiUtils.toBackBufferX(height)
+        this.framebufferOld = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
+        this.framebufferCurrent = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
+        this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
+        Paintbox.LOGGER.debug("Updated main menu framebuffers to be backbuffer ${newFbWidth}x${newFbHeight} (logical ${width}x${height})")
         // Render old old FB into new old FB
         val oldoldFB = oldBuffers?.first
         if (oldoldFB != null) {
