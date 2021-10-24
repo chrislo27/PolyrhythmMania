@@ -547,7 +547,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private fun createFramebuffers(width: Int, height: Int, oldBuffers: Pair<FrameBuffer, FrameBuffer>?) {
         oldBuffers?.second?.disposeQuietly()
         val newFbWidth = HdpiUtils.toBackBufferX(width)
-        val newFbHeight = HdpiUtils.toBackBufferX(height)
+        val newFbHeight = HdpiUtils.toBackBufferY(height)
         this.framebufferOld = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
         this.framebufferCurrent = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
         this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
