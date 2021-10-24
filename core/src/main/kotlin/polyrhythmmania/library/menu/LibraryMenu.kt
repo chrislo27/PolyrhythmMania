@@ -257,6 +257,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         this.bounds.height.set(30f)
                         this.margin.set(Insets(0f, 2f, 0f, 0f))
                         this.setScaleXY(0.9f)
+                        this.textColor.set(Color().grey(0.15f))
                         val tooltip = createRodinTooltip {
                             val m = levelEntryModern.use()
                             if (m != null) {
@@ -310,6 +311,12 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.tooltipElement.set(createRodinTooltip {
                                 text.use()
                             })
+
+                            // Special case: this one scrolls.
+                            this.skinID.set(TextLabel.SCROLLING_TEXTLABEL_SKIN_ID)
+                            this.doClipping.set(true)
+                            this.doXCompression.set(false)
+                            (this.skin.getOrCompute() as ScrollingTextLabelSkin).gapBetween.set(32f)
                         }
                         this += TextLabel(binding = {
                             val l = levelEntryModern.use()
@@ -361,7 +368,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.skinID.set(TextLabel.SCROLLING_TEXTLABEL_SKIN_ID)
                             this.doClipping.set(true)
                             this.doXCompression.set(false)
-                            (this.skin.getOrCompute() as ScrollingTextLabelSkin).gapBetween.set(24f)
+                            (this.skin.getOrCompute() as ScrollingTextLabelSkin).gapBetween.set(32f)
                         }
                         this += TextLabel(binding = {
                             val l = levelEntryModern.use()
@@ -376,6 +383,25 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.setScaleXY(0.8f)
                             this.bindWidthToParent(multiplier = rightRatio, adjust = -4f)
                             this.renderAlign.set(Align.right)
+                            this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.averageTempo.tooltip", Var {
+                                val l = levelEntryModern.use()
+                                if (l != null) {
+                                    listOf(
+                                            Localization.getVar("editor.bpm", Var {
+                                                listOf(DecimalFormats["0.#"].format(l.exportStatistics.averageBPM))
+                                            }).use(),
+                                            Localization.getVar("editor.bpm", Var {
+                                                listOf(DecimalFormats["0.#"].format(l.exportStatistics.minBPM))
+                                            }).use(),
+                                            Localization.getVar("editor.bpm", Var {
+                                                listOf(DecimalFormats["0.#"].format(l.exportStatistics.maxBPM))
+                                            }).use(),
+                                    )
+                                } else {
+                                    val na = Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                                    listOf(na, na, na)
+                                }
+                            })))
                         }
                     }
                     // Left: Genre (may be blank); Right: Difficulty (may be blank)
@@ -410,6 +436,12 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.tooltipElement.set(createRodinTooltip {
                                 text.use()
                             })
+
+                            // Special case: this one scrolls.
+                            this.skinID.set(TextLabel.SCROLLING_TEXTLABEL_SKIN_ID)
+                            this.doClipping.set(true)
+                            this.doXCompression.set(false)
+                            (this.skin.getOrCompute() as ScrollingTextLabelSkin).gapBetween.set(32f)
                         }
                         this += TextLabel(binding = {
                             val l = levelEntryModern.use()
@@ -529,6 +561,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this.textColor.set(Color().grey(0.25f))
                                 this.doXCompression.set(false)
                                 this.doLineWrapping.set(true)
+                                this.padding.set(Insets(1f, 0f, 0f, 0f))
                                 this.internalTextBlock.addListener {
                                     this.resizeBoundsToContent(affectWidth = false)
                                 }
@@ -560,6 +593,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             }
                             val vbox = VBox().apply {
                                 this.bounds.height.set(10f)
+                                this.padding.set(Insets(1f, 0f, 0f, 0f))
                             }
                             val highScoresListener: (levelEntry: LevelEntry?) -> Unit = { l ->
                                 vbox.children.toList().forEach { c -> vbox.removeChild(c) }
