@@ -396,7 +396,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         batch.projectionMatrix = camera.combined
         batch.begin()
 
-        HdpiUtils.glViewport(0, 0, boundFB.width, boundFB.height)
+        Gdx.gl.glViewport(0, 0, boundFB.width, boundFB.height) // Don't use HdpiUtils because we're drawing directly to a framebuffer
         sceneRoot.renderAsRoot(batch)
 
         if (this.transitionAway != null) {
