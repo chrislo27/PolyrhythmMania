@@ -14,6 +14,8 @@ object EditorHelpData {
                 "controls" to EditorHelpDocControls(),
                 "music_sync" to EditorHelpDocMusicSync(),
                 "texture_packs" to EditorHelpDocTexturePacks(),
+                "exporting" to EditorHelpDocExporting(),
+                "prmproj" to EditorHelpDocPrmproj(),
         ))
     }
     
@@ -23,16 +25,16 @@ class EditorHelpDocRoot : HelpDocument(
         "editor.dialog.help.title",
         listOf(
                 LayerTitle("editorHelp.root.title"),
-                LayerParagraph("editorHelp.root.pp0", 64f),
+                LayerParagraph("editorHelp.root.pp0", 48f),
                 LayerCol3(
                         LayerButton("editorHelp.glossary.title", "glossary", false),
                         LayerButton("editorHelp.controls.title", "controls", false),
-                        LayerButton("editorHelp.music_sync.title", "music_sync", false)
+                        LayerButtonWithNewIndicator("editorHelp.prmproj.title", "prmproj", false, PRManiaGame.instance.settings.newIndicatorEditorHelpPrmproj),
                 ),
                 LayerCol3(
+                        LayerButton("editorHelp.music_sync.title", "music_sync", false),
+                        LayerButtonWithNewIndicator("editorHelp.exporting.title", "exporting", false, PRManiaGame.instance.settings.newIndicatorEditorHelpExporting),
                         LayerButtonWithNewIndicator("editorHelp.texture_packs.title", "texture_packs", false, PRManiaGame.instance.settings.newIndicatorEditorHelpTexpack),
-                        null,
-                        null
                 ),
         )
 )
@@ -124,5 +126,36 @@ class EditorHelpDocTexturePacks : HelpDocument(
                 LayerParagraph("editorHelp.texture_packs.pp1", 40f),
                 LayerImage("textures/help/texture_packs/dialog.png", 500f),
                 LayerParagraph("editorHelp.texture_packs.pp2", 500f),
+        )
+)
+
+class EditorHelpDocExporting : HelpDocument(
+        "editorHelp.exporting.title",
+        listOf(
+                LayerParagraph("editorHelp.exporting.pp0", 65f),
+                LayerCol3(
+                        null,
+                        LayerButtonWithNewIndicator("editorHelp.prmproj.title", "prmproj", false, PRManiaGame.instance.settings.newIndicatorEditorHelpPrmproj),
+                        null
+                ),
+                LayerParagraph("editorHelp.exporting.pp1", 110f, padding = Insets(4f + 10f, 4f, 8f, 8f)),
+                LayerParagraph("editorHelp.exporting.pp2", 32f),
+                LayerImage("textures/help/exporting/export_button.png", 42f),
+                LayerParagraph("editorHelp.exporting.pp3", 160f),
+                LayerImage("textures/help/exporting/level_metadata.png", 370f),
+                LayerParagraph("editorHelp.exporting.pp4", 32f),
+                LayerImage("textures/help/exporting/example.png", 400f),
+        )
+)
+
+class EditorHelpDocPrmproj : HelpDocument(
+        "editorHelp.prmproj.title",
+        listOf(
+                LayerParagraph("editorHelp.prmproj.pp0", 250f),
+                LayerCol3(
+                        null,
+                        LayerButton("editorHelp.exporting.title", "exporting", false),
+                        null
+                ),
         )
 )
