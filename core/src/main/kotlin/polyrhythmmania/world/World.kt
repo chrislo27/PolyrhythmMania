@@ -41,7 +41,7 @@ class World {
     // ASSEMBLE
     var asmPistons: List<EntityPistonAsm> by settableLazy { createAsmPistons() }
         private set
-    val asmPlayerPiston: EntityPistonAsm by lazy { asmPistons[2] }
+    val asmPlayerPiston: EntityPistonAsm get() = asmPistons[2]
     
     
     init {
