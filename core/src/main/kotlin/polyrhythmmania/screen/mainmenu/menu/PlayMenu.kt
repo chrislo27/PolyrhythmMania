@@ -74,6 +74,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createLongButtonWithNewIndicator(main.settings.newIndicatorLibrary) { Localization.getVar("mainMenu.play.library").use() }.apply {
                 this.setOnAction {
                     main.settings.newIndicatorLibrary.value.set(false)
+                    main.settings.persist()
                     menuCol.pushNextMenu(menuCol.libraryMenu.prepareShow())
                 }
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.library.tooltip")))

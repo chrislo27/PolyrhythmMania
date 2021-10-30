@@ -82,7 +82,8 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
             }
             vbox += createSidemodeLongButton("mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
-                    Var { listOf(main.settings.sidemodeAssembleHighScore.use()) }), showResults = true) { main, _ ->
+                    Var { listOf(main.settings.sidemodeAssembleHighScore.use()) }), showResults = true,
+                    newIndicator = main.settings.newIndicatorExtrasAssemble) { main, _ ->
                 DiscordCore.updateActivity(DefaultPresences.playingAssemble())
                 mainMenu.backgroundType = BgType.ASSEMBLE
                 AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))

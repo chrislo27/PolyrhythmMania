@@ -26,6 +26,7 @@ import polyrhythmmania.PreferenceKeys.LAST_VERSION
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_EXPORTING
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_PRMPROJ
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_TEXPACK
+import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_ASM
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_LIBRARY
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
@@ -153,7 +154,9 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val newIndicatorEditorHelpTexpack: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_TEXPACK, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorEditorHelpExporting: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_EXPORTING, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorEditorHelpPrmproj: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_PRMPROJ, Version(1, 1, 0), newEvenIfFirstPlay = false)
-    val allNewIndicators: List<NewIndicator> = listOf(newIndicatorLibrary, newIndicatorEditorHelpTexpack, newIndicatorEditorHelpExporting)
+    val newIndicatorExtrasAssemble: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_ASM, Version(1, 1, 0), newEvenIfFirstPlay = false)
+    val allNewIndicators: List<NewIndicator> = listOf(newIndicatorLibrary, newIndicatorEditorHelpTexpack,
+            newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorExtrasAssemble)
 
     @Suppress("UNCHECKED_CAST")
     fun load() {

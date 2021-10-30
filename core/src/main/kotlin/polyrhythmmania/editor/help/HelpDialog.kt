@@ -355,6 +355,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                     this.setOnAction {
                         if (layer is LayerButtonWithNewIndicator) {
                             layer.newIndicator.value.set(false)
+                            main.settings.persist()
                         }
                         if (layer.external) {
                             Gdx.net.openURI(layer.link)

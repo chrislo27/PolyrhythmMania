@@ -345,13 +345,20 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     
     protected fun createSidemodeLongButton(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
                                            challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
+                                           newIndicator: Settings.NewIndicator? = null,
                                            factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
-        return createLongButton { Localization.getVar(name).use() }.apply {
+        return (if (newIndicator == null)
+                (createLongButton { Localization.getVar(name).use() })
+        else (createLongButtonWithNewIndicator(newIndicator) { Localization.getVar(name).use() })).apply {
             this.tooltipElement.set(createTooltip(tooltipVar))
             this.setOnAction {
                 menuCol.playMenuSound("sfx_menu_enter_game")
                 mainMenu.transitionAway {
                     val main = mainMenu.main
+                    if (newIndicator != null) {
+                        newIndicator.value.set(false)
+                        main.settings.persist()
+                    }
                     Gdx.app.postRunnable {
                         val sidemode: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
                         val playScreen = PlayScreen(main, sidemode, sidemode.container,
