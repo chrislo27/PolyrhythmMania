@@ -358,10 +358,15 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         menuCollection.uppermostMenu.visible.addListener(visibleListener)
         menuCollection.audioSettingsMenu.visible.addListener(visibleListener)
         
+        // Show update notes if needed
+        if (main.settings.lastUpdateNotes.getOrCompute() != UpdateNotesMenu.latestUpdate) {
+            menuCollection.pushNextMenu(menuCollection.updateNotesMenu, playSound = false, instant = true)
+        }
+        
         if (PRMania.possiblyNewPortableMode) {
             val m = PortableModeWarningMenu(menuCollection)
             menuCollection.addMenu(m)
-            menuCollection.pushNextMenu(m, playSound = false)
+            menuCollection.pushNextMenu(m, playSound = false, instant = true)
         }
     }
 

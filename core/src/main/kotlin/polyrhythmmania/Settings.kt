@@ -22,6 +22,7 @@ import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE
 import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.ENDLESS_HIGH_SCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
+import polyrhythmmania.PreferenceKeys.LAST_UPDATE_NOTES
 import polyrhythmmania.PreferenceKeys.LAST_VERSION
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_EXPORTING
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_PRMPROJ
@@ -89,6 +90,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_maxFramerate: KeyValue<Int> = KeyValue(SETTINGS_MAX_FPS, 60)
     private val kv_forceTexturePack: KeyValue<ForceTexturePack> = KeyValue(SETTINGS_FORCE_TEXTURE_PACK, ForceTexturePack.NO_FORCE)
     private val kv_onlyDefaultPalette: KeyValue<Boolean> = KeyValue(SETTINGS_ONLY_DEFAULT_PALETTE, false)
+    private val kv_lastUpdateNotes: KeyValue<String> = KeyValue(LAST_UPDATE_NOTES, "")
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
     val kv_editorCameraPanOnDragEdge: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE, true)
@@ -125,6 +127,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val maxFramerate: Var<Int> = kv_maxFramerate.value
     val forceTexturePack: Var<ForceTexturePack> = kv_forceTexturePack.value
     val onlyDefaultPalette: Var<Boolean> = kv_onlyDefaultPalette.value
+    val lastUpdateNotes: Var<String> = kv_lastUpdateNotes.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
     val editorCameraPanOnDragEdge: Var<Boolean> = kv_editorCameraPanOnDragEdge.value
@@ -170,15 +173,16 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_showInputFeedbackBar)
         prefs.getBoolean(kv_showSkillStar)
         prefs.getBoolean(kv_discordRichPresence)
-        prefs.getString(kv_mixer, "")
+        prefs.getString(kv_mixer)
         prefs.getBoolean(kv_mainMenuFlipAnimations)
-        prefs.getString(kv_locale, "")
+        prefs.getString(kv_locale)
         prefs.getIntCoerceIn(kv_calibrationAudioOffsetMs, -500, 500)
         prefs.getBoolean(kv_calibrationDisableInputSFX)
         prefs.getBoolean(kv_vsyncEnabled)
         prefs.getIntCoerceIn(kv_maxFramerate, 0, 1000)
         prefs.getForceTexturePack(kv_forceTexturePack)
         prefs.getBoolean(kv_onlyDefaultPalette)
+        prefs.getString(kv_lastUpdateNotes)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
         prefs.getBoolean(kv_editorCameraPanOnDragEdge)
@@ -221,6 +225,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_maxFramerate)
                 .putForceTexturePack(kv_forceTexturePack)
                 .putBoolean(kv_onlyDefaultPalette)
+                .putString(kv_lastUpdateNotes)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)
                 .putBoolean(kv_editorCameraPanOnDragEdge)
@@ -353,7 +358,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         return prefs.putBoolean(kv.key, kv.value.getOrCompute())
     }
 
-    private fun Preferences.getString(kv: KeyValue<String>, defaultValue: String) {
+    private fun Preferences.getString(kv: KeyValue<String>, defaultValue: String = kv.defaultValue) {
         val prefs: Preferences = this
         if (prefs.contains(kv.key)) {
             kv.value.set(prefs.getString(kv.key, defaultValue))

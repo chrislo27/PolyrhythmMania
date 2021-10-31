@@ -5,6 +5,7 @@ package polyrhythmmania
 object PreferenceKeys {
     
     val LAST_VERSION = "lastVersion"
+    val LAST_UPDATE_NOTES = "lastUpdateNotes"
     
     val NEW_INDICATOR_LIBRARY = "newIndicator_libraryView"
     val NEW_INDICATOR_EDITORHELP_TEXPACK = "newIndicator_editorHelp_texturePack"
