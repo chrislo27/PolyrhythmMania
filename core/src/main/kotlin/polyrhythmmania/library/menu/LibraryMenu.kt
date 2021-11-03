@@ -833,15 +833,27 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private fun removeLevels(list: List<LevelEntryData>) {
         levelList.set(levelList.getOrCompute() - list)
         activeLevelList.set(activeLevelList.getOrCompute() - list)
-        list.forEach { toggleGroup.removeToggle(it.button) }
+        list.forEach { 
+            it.button.selectedState.set(false)
+            toggleGroup.removeToggle(it.button)
+        }
         
         filterAndSortLevelList()
         updateLevelListVbox()
     }
     
     fun filterAndSortLevelList() {
+        val sle = selectedLevelEntry.getOrCompute()
         val sf = this.sortFilter.getOrCompute()
-        activeLevelList.set(sf.sortAndFilter(levelList.getOrCompute()))
+        val newActiveList = sf.sortAndFilter(levelList.getOrCompute())
+        if (sle != null) {
+            val matching = levelList.getOrCompute().firstOrNull { it.levelEntry == sle }
+            if (matching != null && matching !in newActiveList) {
+                matching.button.selectedState.set(false)
+            }
+        }
+        
+        activeLevelList.set(newActiveList)
         updateLevelListVbox()
     }
     
