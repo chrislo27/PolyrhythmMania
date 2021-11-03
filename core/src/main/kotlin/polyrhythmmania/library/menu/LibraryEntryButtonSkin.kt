@@ -32,8 +32,10 @@ class LibraryEntryButtonSkin(override val element: LibraryEntryButton) : ButtonS
     }
     
     
-    private val selectedBgColor: Color = SELECTED_BG_FROM.cpy()
+    private val selectedBgColor: Color = SELECTED_BG_FROM.cpy() // This gets mutated on render
     private val selectedTextColor: Var<Color> = Var(SELECTED_TEXT)
+    
+    private val tmpTextColor: Color = Color().set(selectedTextColor.getOrCompute())
 
     init {
         val grey = TEXT_COLOR
@@ -51,10 +53,17 @@ class LibraryEntryButtonSkin(override val element: LibraryEntryButton) : ButtonS
         
         (textColorToUse as Var).bind {
             val selectedState = element.selectedState.useB()
+            val pressedState = element.pressedState.use()
             if (selectedState) {
-                selectedTextColor.use()
+                tmpTextColor.set(selectedTextColor.use())
+                if (pressedState.hovered) {
+                    tmpTextColor.mul(1.25f, 1.25f, 1.25f, 1f)
+                }
+                if (pressedState.pressed) {
+                    tmpTextColor.mul(0.5f, 0.5f, 0.5f, 1f)
+                }
+                tmpTextColor
             } else {
-                val pressedState = element.pressedState.use()
                 if (element.apparentDisabledState.useB()) {
                     disabledTextColor.use()
                 } else {
