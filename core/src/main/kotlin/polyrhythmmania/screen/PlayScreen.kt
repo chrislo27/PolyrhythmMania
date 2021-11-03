@@ -509,7 +509,7 @@ class PlayScreen(
         }
         if (doWipeTransition) {
             main.screen = TransitionScreen(main, thisScreen, thisScreen,
-                    WipeToColor(Color.BLACK.cpy(), 0.4f), WipeFromColor(Color.BLACK.cpy(), 0.4f)).apply {
+                    WipeTransitionHead(Color.BLACK.cpy(), 0.4f), WipeTransitionTail(Color.BLACK.cpy(), 0.4f)).apply {
                 onEntryEnd = resetAction
                 onStart = {
                     Gdx.input.isCursorCatched = true
