@@ -312,7 +312,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         val containsKey = this.contains(newIndicator.key)
         val defaultValue: Boolean = when {
             lastLoadedVersion == null -> newIndicator.newEvenIfFirstPlay
-            lastLoadedVersion < newIndicator.newAsOf -> true
+            lastLoadedVersion <= newIndicator.newAsOf -> true
             else -> false
         }
         if (containsKey) {
