@@ -360,7 +360,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         
         // Show update notes if needed
         if (main.settings.lastUpdateNotes.getOrCompute() != UpdateNotesMenu.latestUpdate) {
-            menuCollection.pushNextMenu(menuCollection.updateNotesMenu, playSound = false, instant = true)
+            menuCollection.pushNextMenu(menuCollection.updateNotesMenu.prepareShow(), playSound = false, instant = true)
         }
         
         if (PRMania.possiblyNewPortableMode) {

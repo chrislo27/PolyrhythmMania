@@ -27,6 +27,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private val settings: Settings get() = main.settings
     private val viewingUpdate: Var<String> = Var(latestUpdate)
     
+    private val descLabel: TextLabel
     private val scrollPane: ScrollPane
 
     init {
@@ -64,6 +65,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.bounds.width.set(320f)
                 this.textLabel.setScaleXY(0.75f)
                 this.imageNode.padding.set(Insets(4f, 4f, 4f, 0f))
+                this.checkedState.set(settings.lastUpdateNotes.getOrCompute() != "")
                 this.onCheckChanged = {
                     settings.lastUpdateNotes.set(if (it) latestUpdate else "")
                     settings.persist()
@@ -103,9 +105,10 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             val u = viewingUpdate.use()
             Localization.getVar("updateNotes.${u}.desc").use()
         }
-        val descLabel = TextLabel(text = "" /* Bound later */, font = font).apply {
+        descLabel = TextLabel(text = "" /* Bound later */, font = font).apply {
             this.text.addListener {
                 this.resizeBoundsToContent(affectWidth = false)
+                scrollPane.setContent(this)
             }
             Anchor.TopLeft.configure(this)
             this.bindWidthToParent(adjust = 0f, multiplier = 1f)
@@ -124,4 +127,9 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         scrollPane.setContent(descLabel)
     }
 
+    fun prepareShow(): UpdateNotesMenu {
+        descLabel.resizeBoundsToContent(affectWidth = false)
+        scrollPane.setContent(descLabel)
+        return this
+    }
 }

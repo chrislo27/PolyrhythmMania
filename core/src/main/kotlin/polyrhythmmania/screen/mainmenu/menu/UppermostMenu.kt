@@ -120,6 +120,11 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     menuCol.pushNextMenu(menuCol.settingsMenu)
                 }
             }
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.updateNotes").use() }).apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.updateNotesMenu.prepareShow())
+                }
+            }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.credits").use() }).apply {
                 this.setOnAction {
                     val next = CreditsMenu(menuCol)
