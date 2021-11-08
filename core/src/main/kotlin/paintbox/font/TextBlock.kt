@@ -137,7 +137,7 @@ data class TextBlock(val runs: List<TextRun>) {
                         val gl = GlyphLayout()
                         // Don't wrap text here, we need to find the first line of runs
                         gl.setText(font, text, color, (lineWrapWidth).coerceAtLeast(0f), Align.left, false)
-                        if (continuationLineWidth < lineWrapWidth && gl.runs.size > 0) {
+                        if (continuationLineWidth < lineWrapWidth && gl.runs.size > 0 && !textRun.text.startsWith("\n")) {
                             // The continuation line width is smaller, so find the wrap point there.
                             // But we need to verify that the line break is where it ought to be, and NOT
                             // a consequence of the (temp) smaller max width.   

@@ -121,7 +121,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.doLineWrapping.set(true)
             this.setScaleXY(0.75f)
             this.text.bind {
-                descVar.use()
+                descVar.use() + "\n"
             }
         }
         scrollPane.setContent(descLabel)
