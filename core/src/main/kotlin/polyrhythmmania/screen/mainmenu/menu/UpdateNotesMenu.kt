@@ -57,15 +57,18 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.padding.set(Insets(0f, 0f, 4f, 0f))
                 this.setScaleXY(0.75f)
             }
-            hbox += ComboBox(updates, latestUpdate, font = font).apply { 
+            hbox += ComboBox(updates.asReversed(), latestUpdate, font = font).apply { 
                 this.bounds.width.set(100f)
                 this.setScaleXY(0.85f)
+                this.onItemSelected = { newItem ->
+                    viewingUpdate.set(newItem)
+                }
             }
             hbox += CheckBox(binding = { Localization.getVar("mainMenu.updateNotes.dontShowAgain").use() }, font = font).apply {
                 this.bounds.width.set(320f)
                 this.textLabel.setScaleXY(0.75f)
                 this.imageNode.padding.set(Insets(4f, 4f, 4f, 0f))
-                this.checkedState.set(settings.lastUpdateNotes.getOrCompute() != "")
+                this.checkedState.set(settings.lastUpdateNotes.getOrCompute() == latestUpdate)
                 this.onCheckChanged = {
                     settings.lastUpdateNotes.set(if (it) latestUpdate else "")
                     settings.persist()
