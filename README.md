@@ -3,6 +3,7 @@ A game that faithfully recreates the *Polyrhythm* minigame from Rhythm Tengoku (
 built-in level editor and side modes.
 
 ![Polyrhythm Mania thumbnail](https://cdn.discordapp.com/attachments/306231796369195020/879243807206539264/unknown.png)
+![Polyrhythm: Assemble side mode thumbnail](https://user-images.githubusercontent.com/6299069/140859874-0552bb9a-c6dc-460b-a4a2-e35f99648ea9.png)
 
 [![Downloads](https://img.shields.io/github/downloads/chrislo27/PolyrhythmMania/total.svg)](https://github.com/chrislo27/PolyrhythmMania/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/chrislo27/PolyrhythmMania.svg)](https://github.com/chrislo27/PolyrhythmMania/blob/dev/LICENSE.txt)
@@ -11,13 +12,13 @@ built-in level editor and side modes.
 [Original Soundtrack on YouTube by GENERIC](https://www.youtube.com/playlist?list=PLt_3dgnFrUPwcA6SdTfi0RapEBdQV64v_)
 
 ## Features
-* Full recreation of the Polyrhythm minigame from Rhythm Tengoku
+* Full re-creation of the Polyrhythm minigame from Rhythm Tengoku
 * Save and load custom levels with a built-in and intuitive level editor
 * Level effects such as changing the colour palette, adding text boxes, putting Skill Stars, and more
 * Switch between classic GBA or modern HD textures, or add your own custom texture pack
 * Practice modes to improve your Polyrhythm skills with levels from the original GBA game
 * Endless Mode keeps you on your toes with never-ending procedurally generated patterns
-* Daily Challenge mode which has a series of patterns not seen in regular Endless Mode
+* Daily Challenge mode which has a series of patterns not seen in regular Endless Mode, with online leaderboards
 * Bonus Side Modes like _Polyrhythm: Dunk_ adds new twists on classic Polyrhythm
 
 [Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)  
