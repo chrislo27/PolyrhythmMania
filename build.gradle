@@ -70,7 +70,7 @@ allprojects {
 //        implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
         implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version"
         
-        implementation "space.earlygrey:shapedrawer:2.5.0"
+        implementation "space.earlygrey:shapedrawer:v2.5.0"
         implementation "com.github.JnCrMx:discord-game-sdk4j:2b5a903204"
         implementation "com.twelvemonkeys.imageio:imageio-tga:$twelvemonkeys_version"
         
