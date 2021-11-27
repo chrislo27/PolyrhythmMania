@@ -72,8 +72,8 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
             this.bindHeightToParent(-40f)
         }
         
-        val suggestedName = DiscordCore.getCurrentUser()?.username ?: ""
-        val nameText: Var<String> = Var(suggestedName.takeUnless { it.any { c -> c !in DailyChallengeUtils.allowedNameChars } } ?: "")
+        val suggestedName = DiscordCore.takeIf { DiscordCore.enableRichPresence.get() }?.getCurrentUser()?.username?.takeUnless { it.any { c -> c !in DailyChallengeUtils.allowedNameChars } } ?: ""
+        val nameText: Var<String> = Var("")
         val hideCountry: BooleanVar = BooleanVar(false)
         
         vbox.temporarilyDisableLayouts {
@@ -148,6 +148,18 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
                         textField.requestUnfocus()
                         nameText.set("")
                         textField.text.set("")
+                    }
+                }
+                
+                if (suggestedName.isNotEmpty()) {
+                    this += createSmallButton { Localization.getVar("mainMenu.submitDailyChallenge.autoSuggestName").use() }.apply {
+                        this.bounds.width.set(90f)
+                        this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.submitDailyChallenge.autoSuggestName.tooltip")))
+                        this.setOnAction {
+                            textField.requestUnfocus()
+                            nameText.set(suggestedName)
+                            textField.text.set(suggestedName)
+                        }
                     }
                 }
             }
