@@ -102,6 +102,7 @@ object DailyChallengeUtils {
             
             val uriBuilder = URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/top/${date.format(DateTimeFormatter.ISO_DATE)}")
                     .setParameter("v", PRMania.VERSION.toString())
+                    .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
 
             val get = HttpGet(uriBuilder.build())
             var returnList: List<DailyLeaderboardScore>? = null
