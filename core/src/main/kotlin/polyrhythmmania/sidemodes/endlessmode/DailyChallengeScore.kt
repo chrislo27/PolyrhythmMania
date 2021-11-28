@@ -40,6 +40,7 @@ object DailyChallengeUtils {
             val post = HttpPost(
                     URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/start/${date.format(DateTimeFormatter.ISO_DATE)}")
                             .setParameter("v", PRMania.VERSION.toString())
+                            .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
                             .build()
             )
             try {
@@ -70,6 +71,7 @@ object DailyChallengeUtils {
         thread(isDaemon = true, name = "Daily Challenge high score submission", start = true) {
             val uriBuilder = URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/submit/${date.format(DateTimeFormatter.ISO_DATE)}")
                     .setParameter("v", PRMania.VERSION.toString())
+                    .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
                     .setParameter("uuid", nonce.toString())
                     .setParameter("score", score.toString())
                     .setParameter("name", name)

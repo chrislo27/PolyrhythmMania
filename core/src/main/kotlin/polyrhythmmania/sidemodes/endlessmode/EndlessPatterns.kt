@@ -3,6 +3,8 @@ package polyrhythmmania.sidemodes.endlessmode
 import polyrhythmmania.editor.block.CubeType
 
 object EndlessPatterns {
+    
+    const val ENDLESS_PATTERNS_VERSION: Int = 1
 
     /*
     From CubeType.kt:
