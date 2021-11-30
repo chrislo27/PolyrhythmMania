@@ -86,7 +86,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_mainMenuFlipAnimations: KeyValue<Boolean> = KeyValue(SETTINGS_MAINMENU_FLIP_ANIMATION, true)
     private val kv_calibrationAudioOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_CALIBRATION_AUDIO_OFFSET_MS, 0)
     private val kv_calibrationDisableInputSFX: KeyValue<Boolean> = KeyValue(SETTINGS_CALIBRATION_DISABLE_INPUT_SFX, false)
-    private val kv_vsyncEnabled: KeyValue<Boolean> = KeyValue(SETTINGS_VSYNC, true)
+    private val kv_vsyncEnabled: KeyValue<Boolean> = KeyValue(SETTINGS_VSYNC, false)
     private val kv_maxFramerate: KeyValue<Int> = KeyValue(SETTINGS_MAX_FPS, 60)
     private val kv_forceTexturePack: KeyValue<ForceTexturePack> = KeyValue(SETTINGS_FORCE_TEXTURE_PACK, ForceTexturePack.NO_FORCE)
     private val kv_onlyDefaultPalette: KeyValue<Boolean> = KeyValue(SETTINGS_ONLY_DEFAULT_PALETTE, false)
