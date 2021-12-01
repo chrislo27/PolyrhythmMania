@@ -35,11 +35,11 @@ allprojects {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven { url 'https://jitpack.io/' }
         maven { url "https://jcenter.bintray.com/" }
-        maven { url "https://kotlin.bintray.com/kotlinx/" }
-        maven { url 'https://jitpack.io' }
         maven { url 'https://repo.eclipse.org/content/groups/releases/' }
         maven { url "https://clojars.org/repo" }
+        maven { url "https://kotlin.bintray.com/kotlinx/" }
     }
     
     dependencies {
