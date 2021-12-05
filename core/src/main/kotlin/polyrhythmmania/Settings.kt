@@ -90,7 +90,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_menuMusicVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_MUSIC_VOLUME, 50)
     private val kv_menuSfxVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, 50)
     private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, PRMania.DEFAULT_SIZE)
-    private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, false)
+    private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, true)
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
     private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
