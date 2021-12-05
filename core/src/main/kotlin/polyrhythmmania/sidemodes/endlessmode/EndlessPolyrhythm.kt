@@ -108,10 +108,6 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         container.renderer.flashHudRedWhenLifeLost.set(true)
         container.engine.inputter.endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
     }
-    
-    override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(onlyDefaultPalette = false)
-    }
 
     override fun initialize() {
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
