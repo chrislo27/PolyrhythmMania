@@ -3,7 +3,6 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.PaintboxGame
@@ -38,7 +37,7 @@ import polyrhythmmania.engine.input.InputResultLike
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.ui.PRManiaSkins
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import polyrhythmmania.util.TimeUtils
 import polyrhythmmania.world.EntityRodPR
 import java.io.File

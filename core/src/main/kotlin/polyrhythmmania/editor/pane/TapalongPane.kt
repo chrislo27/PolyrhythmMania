@@ -16,7 +16,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 
 
 class TapalongPane(val toolbar: Toolbar) : Pane() {

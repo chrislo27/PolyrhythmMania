@@ -20,9 +20,8 @@ import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.input.EventSkillStar
 import polyrhythmmania.ui.DecimalTextField
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
 import kotlin.math.min

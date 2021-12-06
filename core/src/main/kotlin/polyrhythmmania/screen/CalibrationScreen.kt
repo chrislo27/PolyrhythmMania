@@ -43,7 +43,7 @@ import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.soundsystem.sample.PlayerLike
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 

@@ -6,14 +6,14 @@ import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
 import paintbox.ui.control.TextField
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import java.text.DecimalFormat
 
 
 class DecimalTextField(
-    startingValue: Float,
-    decimalFormat: DecimalFormat = DecimalFormats["0.0##"],
-    font: PaintboxFont = PaintboxGame.gameInstance.debugFont
+        startingValue: Float,
+        decimalFormat: DecimalFormat = DecimalFormats["0.0##"],
+        font: PaintboxFont = PaintboxGame.gameInstance.debugFont
 ) : TextField(font) {
 
     val value: FloatVar = FloatVar(startingValue)

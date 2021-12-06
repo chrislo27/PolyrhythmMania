@@ -1,4 +1,4 @@
-package polyrhythmmania.util
+package paintbox.util
 
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols

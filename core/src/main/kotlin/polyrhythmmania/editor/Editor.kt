@@ -50,7 +50,7 @@ import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity

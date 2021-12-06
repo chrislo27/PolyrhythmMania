@@ -31,7 +31,7 @@ import polyrhythmmania.editor.undo.impl.ChangeStartingTempoAction
 import polyrhythmmania.editor.undo.impl.ChangeTempoChangeAction
 import polyrhythmmania.editor.undo.impl.DeleteTempoChangeAction
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt

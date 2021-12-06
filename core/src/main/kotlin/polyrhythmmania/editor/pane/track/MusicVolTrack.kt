@@ -26,7 +26,7 @@ import polyrhythmmania.editor.undo.impl.AddMusicVolumeAction
 import polyrhythmmania.editor.undo.impl.ChangeMusicVolumeAction
 import polyrhythmmania.editor.undo.impl.DeleteMusicVolumeAction
 import polyrhythmmania.engine.music.MusicVolume
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt

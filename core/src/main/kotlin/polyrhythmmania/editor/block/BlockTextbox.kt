@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.BooleanVar
-import paintbox.binding.Var
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
@@ -21,7 +20,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.ui.DecimalTextField
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import polyrhythmmania.world.EventTextbox
 import java.util.*
 

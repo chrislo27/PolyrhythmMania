@@ -2,14 +2,13 @@ package polyrhythmmania.engine
 
 import com.codahale.metrics.*
 import paintbox.binding.BooleanVar
-import paintbox.binding.Var
 import polyrhythmmania.PRMania
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.timesignature.TimeSignatureMap
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import polyrhythmmania.util.metrics.timeInline
 import polyrhythmmania.world.World
 import java.util.concurrent.CopyOnWriteArrayList

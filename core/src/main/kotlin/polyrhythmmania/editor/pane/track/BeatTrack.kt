@@ -22,7 +22,7 @@ import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.timesignature.TimeSignature
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 import polyrhythmmania.util.LelandSpecialChars
 import polyrhythmmania.util.TimeUtils
 import kotlin.math.ceil

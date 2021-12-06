@@ -1,5 +1,6 @@
 package polyrhythmmania.util
 
+import paintbox.util.DecimalFormats
 import java.text.DecimalFormatSymbols
 import kotlin.math.abs
 

@@ -18,7 +18,7 @@ import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 
 
 class Toolbar(val upperPane: UpperPane) : Pane() {

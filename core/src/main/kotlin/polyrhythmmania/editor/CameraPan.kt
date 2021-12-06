@@ -1,7 +1,7 @@
 package polyrhythmmania.editor
 
 import com.badlogic.gdx.math.Interpolation
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 
 class CameraPan(val duration: Float,
                 val startBeat: Float, val endBeat: Float,

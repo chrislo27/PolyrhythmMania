@@ -4,17 +4,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
 import paintbox.PaintboxScreen
 import paintbox.font.TextAlign
 import paintbox.font.TextBlock
 import paintbox.font.TextRun
-import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -25,7 +20,7 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.isControlDown
-import polyrhythmmania.util.DecimalFormats
+import paintbox.util.DecimalFormats
 
 internal class UIAnchorTestEditorScreen(override val main: NewUITestGame) : PaintboxScreen() {
 
