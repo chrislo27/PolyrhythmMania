@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
+import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.binding.VarChangedListener
 import paintbox.font.TextAlign
@@ -90,7 +91,7 @@ class PlayScreen(
     private val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
     private val pauseBg: PauseBackground = this.PauseBackground()
     private val maxSelectionSize: Int = 3
-    private val selectionIndex: Var<Int> = Var(0)
+    private val selectionIndex: IntVar = IntVar(0)
     private val panelAnimationValue: FloatVar = FloatVar(0f)
     private var activePanelAnimation: Animation? = null
     private val topPane: Pane
@@ -212,7 +213,7 @@ class PlayScreen(
                 this.bounds.height.set(64f)
                 this.bindWidthToSelfHeight()
                 this.bounds.x.bind { -(bounds.width.useF() + optionsBorderSize * 2 + 2f) }
-                this.visible.bind { selectionIndex.use() == index }
+                this.visible.bind { selectionIndex.useI() == index }
             }
         }
 
@@ -223,7 +224,7 @@ class PlayScreen(
                 Anchor.TopLeft.configure(this)
                 this.disabled.set(!enabled)
                 this.textColor.bind {
-                    if (apparentDisabledState.useB()) Color.GRAY else if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
+                    if (apparentDisabledState.useB()) Color.GRAY else if (selectionIndex.useI() == index) selectedLabelColor else unselectedLabelColor
                 }
                 this.bounds.height.set(48f)
                 this.padding.set(Insets(2f, 2f, 12f, 12f))
@@ -521,7 +522,7 @@ class PlayScreen(
     }
 
     private fun attemptPauseEntrySelection() {
-        val index = selectionIndex.getOrCompute()
+        val index = selectionIndex.get()
         if (optionLabels[index].apparentDisabledState.get()) return
         when (index) {
             0 -> { // Resume
@@ -560,7 +561,7 @@ class PlayScreen(
     }
     
     private fun changeSelectionTo(index: Int): Boolean {
-        if (selectionIndex.getOrCompute() != index && !optionLabels[index].disabled.get()) {
+        if (selectionIndex.get() != index && !optionLabels[index].disabled.get()) {
             selectionIndex.set(index)
             playMenuSound("sfx_menu_blip")
             return true
@@ -579,12 +580,12 @@ class PlayScreen(
                     }
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown -> {
                         if (optionLabels.any { !it.apparentDisabledState.get() }) {
-                            val currentIndex = selectionIndex.getOrCompute()
+                            val currentIndex = selectionIndex.get()
                             val incrementAmt = if (keycode == keyboardKeybinds.buttonDpadUp) -1 else 1
                             var increment = incrementAmt
                             var nextIndex: Int
                             do {
-                                nextIndex = (selectionIndex.getOrCompute() + increment + maxSelectionSize) % maxSelectionSize
+                                nextIndex = (selectionIndex.get() + increment + maxSelectionSize) % maxSelectionSize
                                 if (changeSelectionTo(nextIndex)) {
                                     consumed = true
                                     break

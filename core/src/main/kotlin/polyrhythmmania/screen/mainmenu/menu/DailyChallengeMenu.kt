@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
+import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
@@ -99,7 +100,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         val main = mainMenu.main
                         Gdx.app.postRunnable {
                             val date = dailyChallengeDate.getOrCompute()
-                            val scoreVar = Var(0)
+                            val scoreVar = IntVar(0)
                             scoreVar.addListener {
                                 main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
                             }

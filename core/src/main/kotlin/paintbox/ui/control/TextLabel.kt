@@ -5,14 +5,11 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
-import paintbox.binding.BooleanVar
-import paintbox.binding.FloatVar
+import paintbox.binding.*
 import paintbox.util.ColorStack
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
 import paintbox.font.*
 import paintbox.ui.area.Insets
 import paintbox.util.gdxutils.fillRect
@@ -85,8 +82,8 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     val renderBackground: BooleanVar = BooleanVar(false)
     val bgPadding: Var<Insets> = Var.bind { padding.use() }
 
-    val renderAlign: Var<Int> = Var(Align.left)
-    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
+    val renderAlign: IntVar = IntVar(Align.left)
+    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.useI()) }
     val doXCompression: BooleanVar = BooleanVar(true)
     val doLineWrapping: BooleanVar = BooleanVar(false)
 
@@ -195,7 +192,7 @@ open class TextLabelSkin(element: TextLabel) : Skin<TextLabel>(element) {
 
         val bgPaddingInsets = if (element.renderBackground.get()) element.bgPadding.getOrCompute() else Insets.ZERO
         val compressX = element.doXCompression.get()
-        val align = element.renderAlign.getOrCompute()
+        val align = element.renderAlign.get()
         val scaleX = element.scaleX.get()
         val scaleY = element.scaleY.get()
         val textWidth = text.width * scaleX
@@ -301,7 +298,7 @@ class ScrollingTextLabelSkin(element: TextLabel) : TextLabelSkin(element) {
 
         val bgPaddingInsets = if (element.renderBackground.get()) element.bgPadding.getOrCompute() else Insets.ZERO
         val compressX = element.doXCompression.get()
-        val align = element.renderAlign.getOrCompute()
+        val align = element.renderAlign.get()
         val scaleX = element.scaleX.get()
         val scaleY = element.scaleY.get()
         val textWidth = text.width * scaleX

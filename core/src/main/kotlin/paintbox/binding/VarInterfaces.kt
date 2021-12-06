@@ -32,7 +32,20 @@ interface Var<T> : ReadOnlyVar<T> {
         fun <T> bind(computation: Context.() -> T): GenericVar<T> = GenericVar(computation)
         operator fun <T> invoke(computation: Context.() -> T): GenericVar<T> = GenericVar(computation)
         fun <T> sideEffecting(item: T, sideEffecting: Context.(existing: T) -> T): GenericVar<T> = GenericVar(item, sideEffecting)
-        
+
+        // Warnings for specialized versions of plain invoke
+        @Deprecated("Prefer using the FloatVar constructor to avoid confusion with generic versions",
+                replaceWith = ReplaceWith("FloatVar"),
+                level = DeprecationLevel.ERROR)
+        operator fun invoke(item: Float): FloatVar = FloatVar(item)
+        @Deprecated("Prefer using the BooleanVar constructor to avoid confusion with generic versions",
+                replaceWith = ReplaceWith("BooleanVar"),
+                level = DeprecationLevel.ERROR)
+        operator fun invoke(item: Boolean): BooleanVar = BooleanVar(item)
+        @Deprecated("Prefer using the IntVar constructor to avoid confusion with generic versions",
+                replaceWith = ReplaceWith("IntVar"),
+                level = DeprecationLevel.ERROR)
+        operator fun invoke(item: Int): IntVar = IntVar(item)
     }
 
     /**
@@ -74,6 +87,7 @@ interface Var<T> : ReadOnlyVar<T> {
             return use(this)
         }
         
+        
         // Specialization methods below
 
         @Deprecated("Don't use ReadOnlyVar<Float>, use ReadOnlyFloatVar.useF() instead to avoid explicit boxing",
@@ -95,6 +109,7 @@ interface Var<T> : ReadOnlyVar<T> {
             dependencies += this
             return this.get()
         }
+        
 
         @Deprecated("Don't use ReadOnlyVar<Boolean>, use ReadOnlyBooleanVar.useB() instead to avoid explicit boxing",
                 replaceWith = ReplaceWith("(this as ReadOnlyBooleanVar).useB()"),
@@ -115,18 +130,26 @@ interface Var<T> : ReadOnlyVar<T> {
             dependencies += this
             return this.get()
         }
+        
+
+        @Deprecated("Don't use ReadOnlyVar<Int>, use ReadOnlyIntVar.useI() instead to avoid explicit boxing",
+                replaceWith = ReplaceWith("(this as ReadOnlyIntVar).useI()"),
+                level = DeprecationLevel.ERROR)
+        fun ReadOnlyVar<Int>.use(): Int {
+            return use(this)
+        }
+
+        @Deprecated("Don't use the generic use() function, use ReadOnlyIntVar.useB() instead to avoid explicit boxing",
+                replaceWith = ReplaceWith("this.useI()"),
+                level = DeprecationLevel.ERROR)
+        fun ReadOnlyIntVar.use(): Int {
+            return this.useI()
+        }
+
+        // The int specialization method. Returns a primitive int.
+        fun ReadOnlyIntVar.useI(): Int {
+            dependencies += this
+            return this.get()
+        }
     }
-}
-
-// Useful extension functions
-
-/**
- * [Sets][Var.set] this [Boolean] [Var] to be the negation of its value from [Var.getOrCompute].
- * 
- * Returns the new state.
- */
-fun Var<Boolean>.invert(): Boolean {
-    val newState = !this.getOrCompute()
-    this.set(newState)
-    return newState
 }

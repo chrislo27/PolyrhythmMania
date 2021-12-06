@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
+import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
@@ -97,7 +98,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             }
                             val seedUInt = seed.toUInt()
                             val endlessHighScore = main.settings.endlessHighScore
-                            val scoreVar = Var(endlessHighScore.getOrCompute().score)
+                            val scoreVar = IntVar(endlessHighScore.getOrCompute().score)
                             scoreVar.addListener {
                                 main.settings.endlessHighScore.set(EndlessHighScore(seedUInt, it.getOrCompute()))
                             }

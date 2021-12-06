@@ -1,5 +1,7 @@
 package polyrhythmmania.editor.undo
 
+import paintbox.binding.IntVar
+import paintbox.binding.ReadOnlyIntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import java.util.*
@@ -19,8 +21,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
     private val undos: Deque<ReversibleAction<SELF>> by lazy { createDeque() }
     private val redos: Deque<ReversibleAction<SELF>> by lazy { createDeque() }
     
-    val undoStackSize: ReadOnlyVar<Int> = Var(0)
-    val redoStackSize: ReadOnlyVar<Int> = Var(0)
+    val undoStackSize: ReadOnlyIntVar = IntVar(0)
+    val redoStackSize: ReadOnlyIntVar = IntVar(0)
 
     /**
      * Mutate this object, adding the action on the undo stack, and clears all redos.
@@ -39,8 +41,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
         redos.clear()
         undos.push(action)
         ensureCapacity()
-        (undoStackSize as Var).set(undos.size)
-        (redoStackSize as Var).set(redos.size)
+        (undoStackSize as IntVar).set(undos.size)
+        (redoStackSize as IntVar).set(redos.size)
     }
 
     fun ensureCapacity() {
@@ -62,8 +64,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
 
         redos.push(action)
         ensureCapacity()
-        (undoStackSize as Var).set(undos.size)
-        (redoStackSize as Var).set(redos.size)
+        (undoStackSize as IntVar).set(undos.size)
+        (redoStackSize as IntVar).set(redos.size)
 
         return true
     }
@@ -76,8 +78,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
 
         undos.push(action)
         ensureCapacity()
-        (undoStackSize as Var).set(undos.size)
-        (redoStackSize as Var).set(redos.size)
+        (undoStackSize as IntVar).set(undos.size)
+        (redoStackSize as IntVar).set(redos.size)
 
         return true
     }
@@ -89,8 +91,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
     fun clear() {
         undos.clear()
         redos.clear()
-        (undoStackSize as Var).set(0)
-        (redoStackSize as Var).set(0)
+        (undoStackSize as IntVar).set(0)
+        (redoStackSize as IntVar).set(0)
     }
     
     fun peekAtUndoStack(): ReversibleAction<SELF>? = undos.peekFirst()

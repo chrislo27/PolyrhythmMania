@@ -3,6 +3,7 @@ package polyrhythmmania.ui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Pane
@@ -13,7 +14,7 @@ import kotlin.math.min
 
 class TextboxPane : Pane() {
     
-    val cornerSize: Var<Int> = Var(32)
+    val cornerSize: IntVar = IntVar(32)
     var textureToUse: () -> Texture = { AssetRegistry["ui_rounded_textbox"] }
     val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     
@@ -29,7 +30,7 @@ class TextboxPane : Pane() {
         val tmpColor = ColorStack.getAndPush().set(color.getOrCompute())
         tmpColor.a *= opacity
         batch.color = tmpColor
-        val cornerSize = this.cornerSize.getOrCompute().toFloat()
+        val cornerSize = this.cornerSize.get().toFloat()
         val cornerHeight = min(cornerSize, h / 2)
         val cornerWidth = min(cornerSize, w / 2)
         val innerHeight = h - cornerHeight * 2

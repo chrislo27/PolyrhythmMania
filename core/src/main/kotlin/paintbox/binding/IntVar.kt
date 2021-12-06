@@ -3,65 +3,65 @@ package paintbox.binding
 import java.lang.ref.WeakReference
 
 /**
- * The [Boolean] specialization of [ReadOnlyVar].
+ * The [Int] specialization of [ReadOnlyVar].
  *
- * Provides the [get] method which is a primitive-type boolean.
+ * Provides the [get] method which is a primitive-type int.
  */
-interface ReadOnlyBooleanVar : ReadOnlyVar<Boolean> {
+interface ReadOnlyIntVar : ReadOnlyVar<Int> {
 
     /**
-     * Gets (and computes if necessary) the value represented by this [ReadOnlyBooleanVar].
-     * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return a primitive boolean value.
+     * Gets (and computes if necessary) the value represented by this [ReadOnlyIntVar].
+     * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return an `int` value.
      *
-     * If using this [ReadOnlyBooleanVar] in a binding, use [Var.Context] to do dependency tracking,
-     * and use the boolean specialization specific functions ([Var.Context.useB]).
+     * If using this [ReadOnlyIntVar] in a binding, use [Var.Context] to do dependency tracking,
+     * and use the boolean specialization specific functions ([Var.Context.useI]).
      */
-    fun get(): Boolean
+    fun get(): Int
 
     @Deprecated("Use ReadOnlyBooleanVar.get() instead to avoid explicit boxing",
             replaceWith = ReplaceWith("this.get()"),
             level = DeprecationLevel.ERROR)
-    override fun getOrCompute(): Boolean {
+    override fun getOrCompute(): Int {
         return get() // WILL BE BOXED!
     }
 }
 
 /**
- * The [Boolean] specialization of [Var].
+ * The [Int] specialization of [Var].
  *
- * Provides the [get] method which is a primitive-type boolean.
+ * Provides the [get] method which is a primitive-type int.
  */
-class BooleanVar : ReadOnlyBooleanVar, Var<Boolean> {
+class IntVar : ReadOnlyIntVar, Var<Int> {
 
-    private var binding: BooleanBinding
+    private var binding: IntBinding
     private var invalidated: Boolean = true // Used for Compute and SideEffecting bindings
-    private var currentValue: Boolean = false
+    private var currentValue: Int = 0
     private var dependencies: Set<ReadOnlyVar<Any?>> = emptySet() // Cannot be generic since it can depend on any other Var
 
-    private var listeners: Set<VarChangedListener<Boolean>> = emptySet()
+    private var listeners: Set<VarChangedListener<Int>> = emptySet()
 
     /**
      * This is intentionally generic type Any? so further unchecked casts are avoided when it is used
      */
     private val invalidationListener: VarChangedListener<Any?> = InvalListener(this)
 
-    constructor(item: Boolean) {
-        binding = BooleanBinding.Const
+    constructor(item: Int) {
+        binding = IntBinding.Const
         currentValue = item
     }
 
-    constructor(computation: Var.Context.() -> Boolean) {
-        binding = BooleanBinding.Compute(computation)
+    constructor(computation: Var.Context.() -> Int) {
+        binding = IntBinding.Compute(computation)
     }
 
-    constructor(item: Boolean, sideEffecting: Var.Context.(existing: Boolean) -> Boolean) {
-        binding = BooleanBinding.SideEffecting(item, sideEffecting)
+    constructor(item: Int, sideEffecting: Var.Context.(existing: Int) -> Int) {
+        binding = IntBinding.SideEffecting(item, sideEffecting)
     }
 
     private fun reset() {
         dependencies = emptySet()
         invalidated = true
-        currentValue = false
+        currentValue = 0
     }
 
     private fun notifyListeners() {
@@ -77,40 +77,40 @@ class BooleanVar : ReadOnlyBooleanVar, Var<Boolean> {
         }
     }
 
-    override fun set(item: Boolean) {
+    override fun set(item: Int) {
         val existingBinding = binding
-        if (existingBinding is BooleanBinding.Const && currentValue == item) {
+        if (existingBinding is IntBinding.Const && currentValue == item) {
             return
         }
         reset()
         currentValue = item
-        binding = BooleanBinding.Const
+        binding = IntBinding.Const
         notifyListeners()
     }
 
-    override fun bind(computation: Var.Context.() -> Boolean) {
+    override fun bind(computation: Var.Context.() -> Int) {
         reset()
-        binding = BooleanBinding.Compute(computation)
+        binding = IntBinding.Compute(computation)
         notifyListeners()
     }
 
-    override fun sideEffecting(item: Boolean, sideEffecting: Var.Context.(existing: Boolean) -> Boolean) {
+    override fun sideEffecting(item: Int, sideEffecting: Var.Context.(existing: Int) -> Int) {
         reset()
-        binding = BooleanBinding.SideEffecting(item, sideEffecting)
+        binding = IntBinding.SideEffecting(item, sideEffecting)
         notifyListeners()
     }
 
-    override fun sideEffecting(sideEffecting: Var.Context.(existing: Boolean) -> Boolean) {
+    override fun sideEffecting(sideEffecting: Var.Context.(existing: Int) -> Int) {
         sideEffecting(get(), sideEffecting)
     }
 
     /**
      * The implementation of [getOrCompute] but returns a boolean primitive.
      */
-    override fun get(): Boolean {
-        val result: Boolean = when (val binding = this.binding) {
-            is BooleanBinding.Const -> this.currentValue
-            is BooleanBinding.Compute -> {
+    override fun get(): Int {
+        val result: Int = when (val binding = this.binding) {
+            is IntBinding.Const -> this.currentValue
+            is IntBinding.Compute -> {
                 if (!invalidated) {
                     currentValue
                 } else {
@@ -129,7 +129,7 @@ class BooleanVar : ReadOnlyBooleanVar, Var<Boolean> {
                     result
                 }
             }
-            is BooleanBinding.SideEffecting -> {
+            is IntBinding.SideEffecting -> {
                 if (invalidated) {
                     val oldCurrentValue = currentValue
                     val ctx = Var.Context()
@@ -152,20 +152,20 @@ class BooleanVar : ReadOnlyBooleanVar, Var<Boolean> {
     }
 
 
-    @Deprecated("Use BooleanVar.get() instead to avoid explicit boxing",
+    @Deprecated("Use IntVar.get() instead to avoid explicit boxing",
             replaceWith = ReplaceWith("this.get()"),
             level = DeprecationLevel.ERROR)
-    override fun getOrCompute(): Boolean {
+    override fun getOrCompute(): Int {
         return get() // WILL BE BOXED!
     }
 
-    override fun addListener(listener: VarChangedListener<Boolean>) {
+    override fun addListener(listener: VarChangedListener<Int>) {
         if (listener !in listeners) {
             listeners = listeners + listener
         }
     }
 
-    override fun removeListener(listener: VarChangedListener<Boolean>) {
+    override fun removeListener(listener: VarChangedListener<Int>) {
         if (listener in listeners) {
             listeners = listeners - listener
         }
@@ -176,12 +176,12 @@ class BooleanVar : ReadOnlyBooleanVar, Var<Boolean> {
     }
 
     /**
-     * [Sets][set] this [BooleanVar] to be the negation of its value from [BooleanVar.get].
+     * [Sets][set] this [IntVar] to be the negation of its value from [IntVar.get].
      *
      * Returns the new state.
      */
-    fun invert(): Boolean {
-        val newState = !this.get()
+    fun negate(): Int {
+        val newState = -this.get()
         this.set(newState)
         return newState
     }
@@ -189,8 +189,8 @@ class BooleanVar : ReadOnlyBooleanVar, Var<Boolean> {
     /**
      * Cannot be inner for garbage collection reasons! We are avoiding an explicit strong reference to the parent Var
      */
-    private class InvalListener(v: BooleanVar) : VarChangedListener<Any?> {
-        val weakRef: WeakReference<BooleanVar> = WeakReference(v)
+    private class InvalListener(v: IntVar) : VarChangedListener<Any?> {
+        val weakRef: WeakReference<IntVar> = WeakReference(v)
         var disposeMe: Boolean = false
 
         override fun onChange(v: ReadOnlyVar<Any?>) {
@@ -206,25 +206,25 @@ class BooleanVar : ReadOnlyBooleanVar, Var<Boolean> {
         }
     }
 
-    private sealed class BooleanBinding {
+    private sealed class IntBinding {
         /**
-         * Represents a constant value. The value is actually stored in [BooleanVar.currentValue].
+         * Represents a constant value. The value is actually stored in [IntVar.currentValue].
          */
-        object Const : BooleanBinding()
+        object Const : IntBinding()
 
-        class Compute(val computation: Var.Context.() -> Boolean) : BooleanBinding()
+        class Compute(val computation: Var.Context.() -> Int) : IntBinding()
 
-        class SideEffecting(var item: Boolean, val sideEffectingComputation: Var.Context.(existing: Boolean) -> Boolean) : BooleanBinding()
+        class SideEffecting(var item: Int, val sideEffectingComputation: Var.Context.(existing: Int) -> Int) : IntBinding()
     }
 }
 
 /**
- * [Sets][Var.set] this [Boolean] [Var] to be the negation of its value from [Var.getOrCompute].
+ * [Sets][Var.set] this [Int] [Var] to be the negation of its value from [Var.getOrCompute].
  *
  * Returns the new state.
  */
-fun Var<Boolean>.invert(): Boolean {
-    val newState = !this.getOrCompute()
+fun Var<Int>.invert(): Int {
+    val newState = -this.getOrCompute()
     this.set(newState)
     return newState
 }

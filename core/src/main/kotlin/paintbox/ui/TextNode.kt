@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
+import paintbox.binding.IntVar
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.font.TextBlock
@@ -17,8 +18,8 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
 
     val textColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val textBlock: Var<TextBlock> = Var(textBlock)
-    val renderAlign: Var<Int> = Var(Align.left)
-    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
+    val renderAlign: IntVar = IntVar(Align.left)
+    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.useI()) }
     val doXCompression: BooleanVar = BooleanVar(true)
 
     constructor(font: PaintboxFont, text: String, color: Color = Color.WHITE, scaleX: Float = 1f, scaleY: Float = 1f)
@@ -48,7 +49,7 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
         }
 
         val compressX = doXCompression.get()
-        val align = renderAlign.getOrCompute()
+        val align = renderAlign.get()
         val xOffset: Float = when {
             Align.isLeft(align) -> 0f
             Align.isRight(align) -> (w - (if (compressX) min(text.width, w) else text.width))

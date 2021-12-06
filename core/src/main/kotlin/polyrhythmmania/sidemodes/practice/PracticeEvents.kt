@@ -26,7 +26,7 @@ class EventPracticeRetract(engine: Engine, row: Row, index: Int, startBeat: Floa
     override fun onStart(currentBeat: Float) {
         this.anyBlocksAffected = false
         val practice = engine.inputter.practice
-        if (practice.practiceModeEnabled && practice.moreTimes.getOrCompute() <= 0) return
+        if (practice.practiceModeEnabled && practice.moreTimes.get() <= 0) return
         
         super.onStart(currentBeat)
 

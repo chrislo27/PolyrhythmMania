@@ -3,9 +3,7 @@ package polyrhythmmania.engine.input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.MathUtils
 import paintbox.Paintbox
-import paintbox.binding.BooleanVar
-import paintbox.binding.FloatVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import paintbox.lazysound.LazySound
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
@@ -49,7 +47,7 @@ class EngineInputter(val engine: Engine) {
     }
     
     data class PracticeData(var practiceModeEnabled: Boolean = false,
-                            val moreTimes: Var<Int> = Var(0), var requiredInputs: List<RequiredInput> = emptyList()) {
+                            val moreTimes: IntVar = IntVar(0), var requiredInputs: List<RequiredInput> = emptyList()) {
         var clearText: Float = 0f
         
         fun reset() {
@@ -71,19 +69,19 @@ class EngineInputter(val engine: Engine) {
     }
     
     class EndlessScore {
-        val score: Var<Int> = Var(0)
-        var highScore: Var<Int> = Var(0)
+        val score: IntVar = IntVar(0)
+        var highScore: Var<Int> = GenericVar(0)
         var showHighScoreAtEnd: Boolean = true
-        val maxLives: Var<Int> = Var(0)
-        val startingLives: Var<Int> = Var.bind { maxLives.use() }
-        val lives: Var<Int> = Var(startingLives.getOrCompute())
+        val maxLives: IntVar = IntVar(0)
+        val startingLives: IntVar = IntVar { maxLives.useI() }
+        val lives: IntVar = IntVar(startingLives.get())
         
         val gameOverSeconds: FloatVar = FloatVar(Float.MAX_VALUE)
         val gameOverUIShown: BooleanVar = BooleanVar(false)
         
         fun reset() {
             score.set(0)
-            lives.set(startingLives.getOrCompute())
+            lives.set(startingLives.get())
             gameOverSeconds.set(Float.MAX_VALUE)
             gameOverUIShown.set(false)
         }
@@ -232,7 +230,7 @@ class EngineInputter(val engine: Engine) {
                                 }
                             }
                             if (practice.requiredInputs.all { it.wasHit }) {
-                                val newValue = (practice.moreTimes.getOrCompute() - 1).coerceAtLeast(0)
+                                val newValue = (practice.moreTimes.get() - 1).coerceAtLeast(0)
                                 practice.moreTimes.set(newValue)
                                 if (newValue == 0) {
                                     engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_2"), SoundInterface.SFXType.NORMAL)
@@ -439,8 +437,8 @@ class EngineInputter(val engine: Engine) {
     
     fun triggerLifeLost() {
         val endlessScore = this.endlessScore
-        val oldScore = endlessScore.lives.getOrCompute()
-        val newScore = (oldScore - 1).coerceIn(0, endlessScore.maxLives.getOrCompute())
+        val oldScore = endlessScore.lives.get()
+        val newScore = (oldScore - 1).coerceIn(0, endlessScore.maxLives.get())
         endlessScore.lives.set(newScore)
         if (oldScore > 0 && newScore == 0) {
             onGameOver()
@@ -452,7 +450,7 @@ class EngineInputter(val engine: Engine) {
         val currentSeconds = engine.seconds
         val currentBeat = engine.beat
         endlessScore.gameOverSeconds.set(currentSeconds)
-        val score = endlessScore.score.getOrCompute()
+        val score = endlessScore.score.get()
         val wasNewHighScore = score > endlessScore.highScore.getOrCompute()
         val afterBeat = engine.tempos.secondsToBeats(currentSeconds + 2f)
         

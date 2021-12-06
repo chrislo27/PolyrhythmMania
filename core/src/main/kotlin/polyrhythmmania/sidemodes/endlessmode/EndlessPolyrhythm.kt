@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
+import paintbox.binding.IntVar
 import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
@@ -94,8 +95,8 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         it.key to RandomBagIterator(it.value, random, RandomBagIterator.ExhaustionBehaviour.SHUFFLE_EXCLUDE_LAST)
     }
     val difficultyFactor: FloatVar = FloatVar(0f)
-    val loopsCompleted: Var<Int> = Var(0)
-    val speedIncreaseSemitones: Var<Int> = Var(0)
+    val loopsCompleted: IntVar = IntVar(0)
+    val speedIncreaseSemitones: IntVar = IntVar(0)
 
     init {
         container.texturePackSource.set(TexturePackSource.STOCK_HD)
@@ -148,7 +149,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         return """seed: ${if (dailyChallenge != null) "daily challenge" else seed.toString(16).uppercase()}
 difficultyFactor: ${difficultyFactor.get()}
 distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficulty()}
-loops: ${loopsCompleted.getOrCompute()} / speed: ${speedIncreaseSemitones.getOrCompute()} semitones
+loops: ${loopsCompleted.get()} / speed: ${speedIncreaseSemitones.get()} semitones
 """.dropLast(1)
     }
     
@@ -213,8 +214,8 @@ loops: ${loopsCompleted.getOrCompute()} / speed: ${speedIncreaseSemitones.getOrC
                         if (anyA && anyDpad) RowSetting.BOTH else if (anyA) RowSetting.ONLY_A else RowSetting.ONLY_DPAD, true) {
                     engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
                         val endlessScore = engine.inputter.endlessScore
-                        val currentLives = endlessScore.lives.getOrCompute()
-                        val maxLives = endlessScore.maxLives.getOrCompute()
+                        val currentLives = endlessScore.lives.get()
+                        val maxLives = endlessScore.maxLives.get()
                         if (!disableLifeRegen && newScore >= 20 && newScore % 10 == 0 && currentLives > 0 && currentLives < maxLives) {
                             engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_2"))
                             endlessScore.lives.set(currentLives + 1)
@@ -263,14 +264,14 @@ loops: ${loopsCompleted.getOrCompute()} / speed: ${speedIncreaseSemitones.getOrC
                     EventRowBlockDespawn(engine, world.rowDpad, 0, 7f, affectThisIndexAndForward = true),
                     
                     LoopingEvent(engine, 88f, { true }) { engine, startBeat ->
-                        loopsCompleted.set(loopsCompleted.getOrCompute() + 1)
-                        val currentSpeedIncrease = speedIncreaseSemitones.getOrCompute()
+                        loopsCompleted.set(loopsCompleted.get() + 1)
+                        val currentSpeedIncrease = speedIncreaseSemitones.get()
                         val newSpeed = (currentSpeedIncrease + (if (currentSpeedIncrease >= 4) 1 else 2)).coerceAtMost(12)
                         speedIncreaseSemitones.set(newSpeed)
                         engine.playbackSpeed = Semitones.getALPitch(newSpeed)
                         
                         engine.addEvent(EventPaletteChange(engine, startBeat, 1f,
-                                createTilesetPaletteIterated(loopsCompleted.getOrCompute(), colorChangeMultiplier, COLOR_CHANGE_LIMIT), false, false))
+                                createTilesetPaletteIterated(loopsCompleted.get(), colorChangeMultiplier, COLOR_CHANGE_LIMIT), false, false))
                     }.also { e ->
                         e.beat = 88f
                     },

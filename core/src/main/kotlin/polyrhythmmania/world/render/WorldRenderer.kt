@@ -8,10 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Align
-import paintbox.binding.BooleanVar
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
@@ -119,12 +116,12 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     var showSkillStarSetting: Boolean = PRManiaGame.instance.settings.showSkillStar.getOrCompute()
 
     val showEndlessModeScore: BooleanVar = BooleanVar(false)
-    val prevHighScore: Var<Int> = Var(-1)
+    val prevHighScore: IntVar = IntVar(-1)
     val dailyChallengeDate: Var<LocalDate?> = Var(null)
     val endlessModeSeed: Var<String?> = Var(null)
     val flashHudRedWhenLifeLost: BooleanVar = BooleanVar(false)
-    private val currentEndlessScore: Var<Int> = Var(0)
-    private val currentEndlessLives: Var<Int> = Var(0)
+    private val currentEndlessScore: IntVar = IntVar(0)
+    private val currentEndlessLives: IntVar = IntVar(0)
 
     private var skillStarSpinAnimation: Float = 0f
     private var skillStarPulseAnimation: Float = 0f
@@ -143,7 +140,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     private val perfectIconFlash: ImageNode
     private val perfectIconFailed: ImageNode
     private val moreTimesLabel: TextLabel = TextLabel("")
-    private val moreTimesVar: Var<Int> = Var(0)
+    private val moreTimesVar: IntVar = IntVar(0)
     private val endlessModeScorePane: Pane = Pane()
     private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
     private val endlessModeScoreLabel: TextLabel
@@ -181,7 +178,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                         } else if (seed != null) {
                             Localization.getVar("play.endless.seed", Var { listOf(seed) }).use()
                         } else {
-                            Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) }).use()
+                            Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.useI()) }).use()
                         }
                     }
                     this += TextLabel(binding = { prevTextVar.use() },
@@ -193,7 +190,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                         this.textColor.set(defaultTextColor)
                         this.setScaleXY(0.6f)
                         this.textColor.bind { 
-                            val maxLives = engine.inputter.endlessScore.maxLives.use()
+                            val maxLives = engine.inputter.endlessScore.maxLives.useI()
                             if (endlessModeSeed.use() != null && maxLives == 1) {
                                 Color(1f, 0.35f, 0.35f, 1f)
                             } else defaultTextColor
@@ -215,7 +212,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
 //                    this += endlessModeLivesLabel
                 }
 
-                val currentScoreVar = Localization.getVar("play.endless.score", Var { listOf(currentEndlessScore.use()) })
+                val currentScoreVar = Localization.getVar("play.endless.score", Var { listOf(currentEndlessScore.useI()) })
                 endlessModeScoreLabel = TextLabel(binding = { currentScoreVar.use() },
                         font = PRManiaGame.instance.fontPauseMenuTitle).apply {
                     this.bounds.height.set(100f)
@@ -228,7 +225,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                 this += endlessModeScoreLabel
 
                 val endlessModeLivesLabel = TextLabel(binding = {
-                    val l = currentEndlessLives.use()
+                    val l = currentEndlessLives.useI()
                     /* space at start is necessary -> */ " [font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]"
                 }).apply {
                     this.bounds.height.set(40f)
@@ -246,7 +243,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         
         uiSceneRoot += moreTimesLabel.apply {
             Anchor.BottomRight.configure(this)
-            val locVar = Localization.getVar("practice.moreTimes.times", Var { listOf(moreTimesVar.use()) })
+            val locVar = Localization.getVar("practice.moreTimes.times", Var { listOf(moreTimesVar.useI()) })
             this.text.bind { locVar.use() }
             this.renderAlign.set(Align.right)
             this.margin.set(Insets(0f, 16f, 0f, 16f))
@@ -254,7 +251,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
             this.bounds.width.set(510f)
             this.bounds.height.set(86f)
             this.textColor.set(Color.WHITE)
-            this.visible.bind { moreTimesVar.use() > 0 }
+            this.visible.bind { moreTimesVar.useI() > 0 }
         }
         perfectIcon = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect"])
         perfectIconFailed = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_failed"]).apply {
@@ -398,7 +395,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         val engine = this.engine
         val inputter = engine.inputter
 
-        moreTimesVar.set(inputter.practice.moreTimes.getOrCompute())
+        moreTimesVar.set(inputter.practice.moreTimes.get())
         val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
 
         // Skill star
@@ -528,14 +525,14 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
 
         if (showEndlessModeScore.get()) {
             val endlessScore = engine.inputter.endlessScore
-            val oldLives = currentEndlessLives.getOrCompute()
-            val newLives = endlessScore.lives.getOrCompute()
+            val oldLives = currentEndlessLives.get()
+            val newLives = endlessScore.lives.get()
             currentEndlessLives.set(newLives)
             if (newLives < oldLives && flashHudRedWhenLifeLost.get()) {
                 hudRedFlash = 1f
             }
-            val oldScore = currentEndlessScore.getOrCompute()
-            val newScore = endlessScore.score.getOrCompute()
+            val oldScore = currentEndlessScore.get()
+            val newScore = endlessScore.score.get()
             if (oldScore != newScore) {
                 currentEndlessScore.set(newScore)
                 val scaleVar = endlessModeScoreLabelScaleXY

@@ -182,7 +182,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     // Music related ----------------------------------------------------------------------------------------------
     private val menuMusicVolume: FloatVar = FloatVar { 
-        main.settings.menuMusicVolume.use() / 100f
+        use(main.settings.menuMusicVolume) / 100f
     }
     private val musicSample: MusicSample
     private val beadsMusic: BeadsMusic

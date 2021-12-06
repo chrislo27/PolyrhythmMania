@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.binding.FloatVar
+import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
@@ -70,9 +71,9 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     private var lastCowbellBeat: Int = -1
     private val summedOffsets: FloatVar = FloatVar(0f)
     private val lastInputOffset: FloatVar = FloatVar(0f)
-    private val inputCount: Var<Int> = Var(0)
+    private val inputCount: IntVar = IntVar(0)
     private val estimatedOffset: FloatVar = FloatVar {
-        (summedOffsets.useF() / inputCount.use().coerceAtLeast(1)) * 1000
+        (summedOffsets.useF() / inputCount.useI().coerceAtLeast(1)) * 1000
     }
     
     private val pistonAnimations: List<TextureRegion> = listOf(
@@ -137,7 +138,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
             this.padding.set(Insets(8f, 8f, 8f, 8f))
 
             this += TextLabel(binding = { Localization.getVar("calibration.offset.details", Var {
-                listOf(DecimalFormats.format("0.00", estimatedOffset.useF()), DecimalFormats.format("0.00", lastInputOffset.useF()), inputCount.use())
+                listOf(DecimalFormats.format("0.00", estimatedOffset.useF()), DecimalFormats.format("0.00", lastInputOffset.useF()), inputCount.useI())
             }).use() }, font = main.fontMainMenuMain).apply {
                 this.textColor.set(Color.WHITE)
                 this.renderAlign.set(Align.center)
@@ -206,7 +207,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
             val secOffset = TempoUtils.beatsToSeconds(beatOffset, CALIBRATION_BPM)
             lastInputOffset.set(secOffset * 1000)
             if (secOffset.absoluteValue <= InputThresholds.MAX_OFFSET_SEC * 2) {
-                inputCount.set(inputCount.getOrCompute() + 1)
+                inputCount.set(inputCount.get() + 1)
                 summedOffsets.set(summedOffsets.get() + secOffset)
             }
         }

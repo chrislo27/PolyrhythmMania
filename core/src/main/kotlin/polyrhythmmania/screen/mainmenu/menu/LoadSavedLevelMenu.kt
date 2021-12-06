@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.BooleanVar
+import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.binding.invert
 import paintbox.font.TextAlign
@@ -57,7 +58,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
     
     val robotMode: BooleanVar = BooleanVar(false)
     val goForPerfect: BooleanVar = BooleanVar(false)
-    val tempoUp: Var<Int> = Var(100)
+    val tempoUp: IntVar = IntVar(100)
 
     @Volatile
     private var loaded: LoadData? = null
@@ -154,7 +155,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                     }
                     val slider = Slider().apply slider@{
                         this.bounds.width.set(200f)
-                        this.setValue(tempoUp.getOrCompute().toFloat())
+                        this.setValue(tempoUp.get().toFloat())
                         this.minimum.set(10f)
                         this.maximum.set(250f)
                         this.tickUnit.set(5f)
@@ -223,7 +224,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                         }
                         
                         // Set challenge settings
-                        val challenges: Challenges = Challenges(tempoUp.getOrCompute(), goForPerfect.get() && !robotMode)
+                        val challenges: Challenges = Challenges(tempoUp.get(), goForPerfect.get() && !robotMode)
                         challenges.applyToEngine(engine)
                         
                         mainMenu.transitionAway {

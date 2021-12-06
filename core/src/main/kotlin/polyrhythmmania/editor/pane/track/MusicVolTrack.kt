@@ -53,8 +53,8 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
         this.showContentBorder.set(true)
 
         this.contentSection += MusicWaveformPane(editorPane).apply { 
-            this.opacity.bind { (editor.settings.editorMusicWaveformOpacity.use() / 10f).coerceIn(0f, 1f) }
-            this.visible.bind { editor.settings.editorMusicWaveformOpacity.use() > 0 }
+            this.opacity.bind { (use(editor.settings.editorMusicWaveformOpacity) / 10f).coerceIn(0f, 1f) }
+            this.visible.bind { use(editor.settings.editorMusicWaveformOpacity) > 0 }
         }
         this.contentSection += VerticalBeatLinesPane(editorPane)
 

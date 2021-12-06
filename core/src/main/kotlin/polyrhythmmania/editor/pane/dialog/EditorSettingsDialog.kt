@@ -181,7 +181,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                             })
                         }
                         pane += slider
-                        pane += TextLabel(binding = { "${bindingVar.use() * 10}%" },
+                        pane += TextLabel(binding = { "${use(bindingVar) * 10}%" },
                                 font = editorPane.palette.musicDialogFont).apply {
                             Anchor.TopRight.configure(this)
                             this.bounds.width.set(100f)

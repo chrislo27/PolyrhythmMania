@@ -76,13 +76,13 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             
             // Remember to update DataSettingsMenu to reset high scores
             vbox += createSidemodeLongButton("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip",
-                    Var { listOf(main.settings.endlessDunkHighScore.use()) })) { main, _ ->
+                    Var { listOf(use(main.settings.endlessDunkHighScore)) })) { main, _ ->
                 DiscordCore.updateActivity(DefaultPresences.playingDunk())
                 mainMenu.backgroundType = BgType.DUNK
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
             }
             vbox += createSidemodeLongButton("mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
-                    Var { listOf(main.settings.sidemodeAssembleHighScore.use()) }), showResults = true,
+                    Var { listOf(use(main.settings.sidemodeAssembleHighScore)) }), showResults = true,
                     newIndicator = main.settings.newIndicatorExtrasAssemble) { main, _ ->
                 DiscordCore.updateActivity(DefaultPresences.playingAssemble())
                 mainMenu.backgroundType = BgType.ASSEMBLE

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
+import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
@@ -44,12 +45,12 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
         }
     }
 
-    data class HSVA(val hue: Var<Int> = Var(0), val saturation: Var<Int> = Var(0), val value: Var<Int> = Var(100), val alpha: Var<Int> = Var(255))
+    data class HSVA(val hue: IntVar = IntVar(0), val saturation: IntVar = IntVar(0), val value: IntVar = IntVar(100), val alpha: IntVar = IntVar(255))
 
     private val hsv: HSVA = HSVA()
     val currentColor: ReadOnlyVar<Color> = Var.sideEffecting(Color(1f, 1f, 1f, 1f)) { c ->
-        c.fromHsv(hsv.hue.use() % 360f, (hsv.saturation.use() / 100f).coerceIn(0f, 1f), (hsv.value.use() / 100f).coerceIn(0f, 1f))
-        c.a = (hsv.alpha.use() / 255f).coerceIn(0f, 1f)
+        c.fromHsv(hsv.hue.useI() % 360f, (hsv.saturation.useI() / 100f).coerceIn(0f, 1f), (hsv.value.useI() / 100f).coerceIn(0f, 1f))
+        c.a = (hsv.alpha.useI() / 255f).coerceIn(0f, 1f)
         c
     }
     
@@ -80,7 +81,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
             }
         }
         
-        fun createPropertyPane(varr: Var<Int>, label: String, arrowBgPane: UIElement, movingArrow: MovingArrow): Pane {
+        fun createPropertyPane(varr: IntVar, label: String, arrowBgPane: UIElement, movingArrow: MovingArrow): Pane {
             return Pane().apply {
                 this.bindHeightToParent(multiplier = rowHeightMultiplier)
                 this += TextLabel(label, font).apply {
@@ -111,7 +112,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                         this.borderStyle.set(SolidBorder(Color.WHITE))
                         this.padding.set(Insets(1f))
                         this += TextField(font = font).apply {
-                            this.text.set("${varr.getOrCompute()}")
+                            this.text.set("${varr.get()}")
                             this.inputFilter.set({ c -> c in '0'..'9' })
                             this.textColor.bind { this@ColourPicker.textColor.use() }
                             varr.addListener { v ->
@@ -127,7 +128,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                             }
                             hasFocus.addListener { f ->
                                 if (!f.getOrCompute()) {
-                                    this.text.set("${varr.getOrCompute()}")
+                                    this.text.set("${varr.get()}")
                                 }
                             }
                         }
@@ -141,19 +142,19 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
         val satPane = createPropertyPane(hsv.saturation, "S: ",
                 Gradient().also { grad ->
                     grad.leftColor.sideEffecting { c -> 
-                        c.fromHsv(hsv.hue.use().toFloat(), 0f, hsv.value.use() / 100f)
+                        c.fromHsv(hsv.hue.useI().toFloat(), 0f, hsv.value.useI() / 100f)
                     }
                     grad.rightColor.sideEffecting { c ->
-                        c.fromHsv(hsv.hue.use().toFloat(), 1f, hsv.value.use() / 100f)
+                        c.fromHsv(hsv.hue.useI().toFloat(), 1f, hsv.value.useI() / 100f)
                     }
                 }, satArrow)
         val valuePane = createPropertyPane(hsv.value, "V: ",
                 Gradient().also { grad ->
                     grad.leftColor.sideEffecting { c -> 
-                        c.fromHsv(hsv.hue.use().toFloat(), hsv.saturation.use() / 100f, 0f)
+                        c.fromHsv(hsv.hue.useI().toFloat(), hsv.saturation.useI() / 100f, 0f)
                     }
                     grad.rightColor.sideEffecting { c ->
-                        c.fromHsv(hsv.hue.use().toFloat(), hsv.saturation.use() / 100f, 1f)
+                        c.fromHsv(hsv.hue.useI().toFloat(), hsv.saturation.useI() / 100f, 1f)
                     }
                 }, valueArrow)
         val alphaPane = createPropertyPane(hsv.alpha, "A: ",
@@ -333,10 +334,10 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
         }
     }
     
-    private class MovingArrow(val minValue: Int, val maxValue: Int, valueVar: Var<Int>? = null)
+    private class MovingArrow(val minValue: Int, val maxValue: Int, valueVar: IntVar? = null)
         : UIElement(), HasTooltip by HasTooltip.DefaultImpl(), HasPressedState by HasPressedState.DefaultImpl() {
         
-        val value: Var<Int> = valueVar ?: Var(minValue)
+        val value: IntVar = valueVar ?: IntVar(minValue)
         
         init {
             HasPressedState.DefaultImpl.addDefaultPressedStateInputListener(this)
@@ -356,7 +357,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                         true
                     } else false
                 } else if (event is Scrolled) {
-                    value.set((value.getOrCompute() - event.amountY.sign.toInt()).coerceIn(minValue, maxValue))
+                    value.set((value.get() - event.amountY.sign.toInt()).coerceIn(minValue, maxValue))
                     true
                 } else false
             }
@@ -370,7 +371,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
             val h = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
 
-            val percentage = (value.getOrCompute() - minValue) / (maxValue - minValue).toFloat()
+            val percentage = (value.get() - minValue) / (maxValue - minValue).toFloat()
             val opacity: Float = this.apparentOpacity.get()
             val tmpColor: Color = ColorStack.getAndPush().set(1f, 1f, 1f, 1f)
             tmpColor.a *= opacity

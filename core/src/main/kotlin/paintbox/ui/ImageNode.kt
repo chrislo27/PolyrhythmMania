@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
+import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawUV
@@ -43,7 +44,7 @@ open class ImageNode(tex: TextureRegion? = null,
     val rotation: FloatVar = FloatVar(0f)
     val rotationPointX: FloatVar = FloatVar(0.5f)
     val rotationPointY: FloatVar = FloatVar(0.5f)
-    val renderAlign: Var<Int> = Var(Align.center)
+    val renderAlign: IntVar = IntVar(Align.center)
 
     constructor(binding: Var.Context.() -> TextureRegion?,
                 renderingMode: ImageRenderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
@@ -86,7 +87,7 @@ open class ImageNode(tex: TextureRegion? = null,
 
                     val rw: Float = tex.regionWidth * aspectRatio
                     val rh: Float = tex.regionHeight * aspectRatio
-                    val align = this.renderAlign.getOrCompute()
+                    val align = this.renderAlign.get()
                     val xOffset: Float = when {
                         Align.isLeft(align) -> 0f
                         Align.isRight(align) -> w - rw

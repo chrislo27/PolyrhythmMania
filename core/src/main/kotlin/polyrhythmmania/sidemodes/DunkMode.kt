@@ -51,7 +51,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
             this.beat = 0f
         }
         val loop = LoopingEventBlock(engine, 4f, { engine ->
-            engine.inputter.endlessScore.lives.getOrCompute() > 0
+            engine.inputter.endlessScore.lives.get() > 0
         }) { engine, startBeat ->
             engine.addEvent(EventDeployRodDunk(engine, startBeat))
         }

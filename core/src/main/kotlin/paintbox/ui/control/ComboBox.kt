@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
+import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.font.*
 import paintbox.ui.area.Insets
@@ -65,8 +66,8 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
     val font: Var<PaintboxFont> = Var(font)
     val scaleX: FloatVar = FloatVar(1f)
     val scaleY: FloatVar = FloatVar(1f)
-    val renderAlign: Var<Int> = Var(Align.left)
-    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
+    val renderAlign: IntVar = IntVar(Align.left)
+    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.useI()) }
     val doXCompression: BooleanVar = BooleanVar(true)
     val doLineWrapping: BooleanVar = BooleanVar(false)
 
@@ -213,7 +214,7 @@ open class ComboBoxSkin(element: ComboBox<Any?>) : Skin<ComboBox<Any?>>(element)
             }
 
             val compressX = element.doXCompression.get()
-            val align = element.renderAlign.getOrCompute()
+            val align = element.renderAlign.get()
             val xOffset: Float = when {
                 Align.isLeft(align) -> 0f
                 Align.isRight(align) -> (textW - (if (compressX) min(text.width, textW) else text.width))

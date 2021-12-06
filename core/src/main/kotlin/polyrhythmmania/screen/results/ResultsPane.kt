@@ -4,9 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
@@ -33,7 +31,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
     val linesLabel: TextLabel
     val scoreLabel: TextLabel
     val scoreValueFloat: FloatVar = FloatVar { score.use().scoreInt.toFloat() }
-    val scoreValue: ReadOnlyVar<Int> = Var.bind { scoreValueFloat.useF().toInt() }
+    val scoreValue: ReadOnlyIntVar = IntVar { scoreValueFloat.useF().toInt() }
     val rankingPane: Pane
     val bonusStatsPane: Pane
     private val rankingImage: ImageNode
@@ -80,7 +78,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
         
         val scorePane = Pane().apply {
             this.bounds.height.set(90f)
-            this.visible.bind { scoreValue.use() >= 0 }
+            this.visible.bind { scoreValue.useI() >= 0 }
         }
         vbox += scorePane
         
@@ -93,11 +91,11 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
         scorePane += ImageNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar_border")))
         
         scoreLabel = TextLabel(binding = {
-            val s = scoreValue.use()
+            val s = scoreValue.useI()
             if (s < 0) "" else "$s"
         }, font = scoreTextFont).apply {
             this.textColor.sideEffecting(Color()) { existing ->
-                val sc = scoreValue.use()
+                val sc = scoreValue.useI()
                 val ranking = Ranking.getRanking(sc)
                 existing.set(ranking.color)
                 existing

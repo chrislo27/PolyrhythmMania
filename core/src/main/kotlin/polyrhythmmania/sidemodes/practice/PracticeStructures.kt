@@ -79,7 +79,7 @@ class PracticeSection(engine: Engine) : Block(engine, EnumSet.allOf(BlockType::c
             super.onStart(currentBeat)
             val practice = engine.inputter.practice
             engine.inputter.clearInputs(beforeBeat = this.beat)
-            if (practice.moreTimes.getOrCompute() > 0) {
+            if (practice.moreTimes.get() > 0) {
                 val inputBeats = loopBlock.block.invoke(engine, this.beat)
                 practice.requiredInputs = inputBeats
                 // Check existing recorded inputs

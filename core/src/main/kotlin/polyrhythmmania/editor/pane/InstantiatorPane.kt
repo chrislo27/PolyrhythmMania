@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
-import paintbox.binding.BooleanVar
-import paintbox.binding.FloatVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -128,9 +125,9 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
                        )
     : Pane() {
     
-    data class IndexTween(val index: Var<Int> = Var(0), val tween: FloatVar = FloatVar(0f)) {
+    data class IndexTween(val index: IntVar = IntVar(0), val tween: FloatVar = FloatVar(0f)) {
         fun instantUpdateTween() {
-            tween.set(index.getOrCompute().toFloat())
+            tween.set(index.get().toFloat())
         }
     }
 
@@ -148,14 +145,14 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
     val categoryIndex: IndexTween = IndexTween()
     val perCategoryIndex: Map<String, IndexTween> = perCategory.keys.associateWith { IndexTween() }
     val currentIndex: ReadOnlyVar<IndexTween> = Var {
-        if (inCategories.useB()) categoryIndex else perCategoryIndex.getValue(categories[categoryIndex.index.use()].categoryID)
+        if (inCategories.useB()) categoryIndex else perCategoryIndex.getValue(categories[categoryIndex.index.useI()].categoryID)
     }
     
     val currentItem: ReadOnlyVar<ObjectListable> = Var {
-        currentList.use()[currentIndex.use().index.use()]
+        currentList.use()[currentIndex.use().index.useI()]
     }
     val currentCategory: ReadOnlyVar<ListCategory> = Var {
-        categories[categoryIndex.index.use()]
+        categories[categoryIndex.index.useI()]
     }
 
     init {
@@ -179,7 +176,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
                 scroll(-1)
             }
             this.disabled.bind {
-                currentIndex.use().index.use() <= 0
+                currentIndex.use().index.useI() <= 0
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.up.tooltip")))
         }
@@ -197,7 +194,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
                 scroll(+1)
             }
             this.disabled.bind {
-                currentIndex.use().index.use() >= (currentList.use().size - 1)
+                currentIndex.use().index.useI() >= (currentList.use().size - 1)
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.down.tooltip")))
         }
@@ -283,7 +280,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
         inCategories.set(true)
     }
     
-    private fun changeToSpecific(category: ListCategory = categories[categoryIndex.index.getOrCompute()]) {
+    private fun changeToSpecific(category: ListCategory = categories[categoryIndex.index.get()]) {
         currentList.set(perCategory.getValue(category.categoryID))
         inCategories.set(false)
     }
@@ -306,7 +303,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
         if (down == 0) return
         val current = currentList.getOrCompute()
         val index = currentIndex.getOrCompute()
-        val future = (index.index.getOrCompute() + down).coerceIn(current.indices)
+        val future = (index.index.get() + down).coerceIn(current.indices)
         index.index.set(future)
     }
 
@@ -318,7 +315,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
 
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val currentIndexTween = currentIndex.getOrCompute()
-            val currentIndex = currentIndexTween.index.getOrCompute()
+            val currentIndex = currentIndexTween.index.get()
             var indexTween = currentIndexTween.tween.get()
             val indexAsFloat = currentIndex.toFloat()
             if (indexTween != indexAsFloat) {

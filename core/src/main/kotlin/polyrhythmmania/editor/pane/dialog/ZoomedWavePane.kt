@@ -2,6 +2,7 @@ package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.util.ColorStack
 import kotlin.system.measureNanoTime
@@ -16,7 +17,7 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
      * A listener to the window values. NEVER change what it is set/bound to!
      * It should only be getOrCompute'd from the GL thread.
      */
-    private val zoomedRefreshIndicator: Var<Int> = Var(0)
+    private val zoomedRefreshIndicator: IntVar = IntVar(0)
 
     init {
         this.isFullWidth = false
@@ -58,7 +59,7 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
             val overallTex = editor.waveformWindow.overallBuffer.colorBufferTexture
             batch.draw(overallTex, x, y - h, w, h, windowX, 0f, windowX + windowW, 1f)
         } else {
-            zoomedRefreshIndicator.getOrCompute() // Trigger a refresh if necessary
+            zoomedRefreshIndicator.get() // Trigger a refresh if necessary
 
             batch.setColor(1f, 1f, 1f, 1f)
             val tex = editor.waveformWindow.windowedBuffer.colorBufferTexture

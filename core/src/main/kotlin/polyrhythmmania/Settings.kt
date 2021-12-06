@@ -162,11 +162,11 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
     
     val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind { 
-        InputCalibration(calibrationAudioOffsetMs.use().toFloat(), use(calibrationDisableInputSFX))
+        InputCalibration(use(calibrationAudioOffsetMs).toFloat(), use(calibrationDisableInputSFX))
     }
-    val gameplayVolume: ReadOnlyVar<Int> = Var { (gameplayVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
-    val menuMusicVolume: ReadOnlyVar<Int> = Var { (menuMusicVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
-    val menuSfxVolume: ReadOnlyVar<Int> = Var { (menuSfxVolumeSetting.use() * (masterVolumeSetting.use() / 100f)).roundToInt().coerceIn(0, 100) }
+    val gameplayVolume: ReadOnlyVar<Int> = Var { (use(gameplayVolumeSetting) * (use(masterVolumeSetting) / 100f)).roundToInt().coerceIn(0, 100) }
+    val menuMusicVolume: ReadOnlyVar<Int> = Var { (use(menuMusicVolumeSetting) * (use(masterVolumeSetting) / 100f)).roundToInt().coerceIn(0, 100) }
+    val menuSfxVolume: ReadOnlyVar<Int> = Var { (use(menuSfxVolumeSetting) * (use(masterVolumeSetting) / 100f)).roundToInt().coerceIn(0, 100) }
     
     val newIndicatorLibrary: NewIndicator = NewIndicator(NEW_INDICATOR_LIBRARY, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorEditorHelpTexpack: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_TEXPACK, Version(1, 1, 0), newEvenIfFirstPlay = false)

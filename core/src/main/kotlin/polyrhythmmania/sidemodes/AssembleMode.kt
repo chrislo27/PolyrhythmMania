@@ -513,7 +513,7 @@ class EventAsmAssemble(engine: Engine, val combineBeat: Float)
                 it.position.set(complete.position)
             })
             val score = engine.inputter.endlessScore.score
-            score.set(score.getOrCompute() + 1)
+            score.set(score.get() + 1)
         }
     }
 }

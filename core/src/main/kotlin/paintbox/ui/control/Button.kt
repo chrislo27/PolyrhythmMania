@@ -5,15 +5,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
-import paintbox.binding.BooleanVar
-import paintbox.binding.FloatVar
+import paintbox.binding.*
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
 import paintbox.font.*
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
@@ -53,8 +50,8 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     val scaleX: FloatVar = FloatVar(1f)
     val scaleY: FloatVar = FloatVar(1f)
 
-    val renderAlign: Var<Int> = Var(Align.center)
-    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
+    val renderAlign: IntVar = IntVar(Align.center)
+    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.useI()) }
     val doXCompression: BooleanVar = BooleanVar(true)
     val doLineWrapping: BooleanVar = BooleanVar(false)
     
@@ -90,7 +87,7 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
 
 open class ButtonSkin(element: Button) : Skin<Button>(element) {
 
-    val roundedRadius: Var<Int> = Var(2)
+    val roundedRadius: IntVar = IntVar(2)
 
     val defaultTextColor: Var<Color> = Var(Color(0f, 0f, 0f, 1f))
     val defaultBgColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
@@ -145,7 +142,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
         rectColor.set(bgColorToUse.getOrCompute())
         rectColor.a *= opacity
         batch.color = rectColor
-        var roundedRad = roundedRadius.getOrCompute()
+        var roundedRad = roundedRadius.get()
         val paintboxSpritesheet = PaintboxGame.paintboxSpritesheet
         val spritesheetFill: TextureRegion = paintboxSpritesheet.fill
         if (roundedRad > rectW / 2f) {
@@ -194,7 +191,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
             }
 
             val compressX = element.doXCompression.get()
-            val align = element.renderAlign.getOrCompute()
+            val align = element.renderAlign.get()
             val scaleX = element.scaleX.get()
             val scaleY = element.scaleY.get()
             val textWidth = text.width * scaleX
