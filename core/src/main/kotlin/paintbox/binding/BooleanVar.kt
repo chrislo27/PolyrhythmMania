@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference
  *
  * Provides the [get] method which is a primitive-type boolean.
  */
-interface ReadOnlyBooleanVar : ReadOnlyVar<Boolean> {
+sealed interface ReadOnlyBooleanVar : ReadOnlyVar<Boolean> {
 
     /**
      * Gets (and computes if necessary) the value represented by this [ReadOnlyBooleanVar].
