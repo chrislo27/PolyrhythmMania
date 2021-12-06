@@ -48,21 +48,14 @@ allprojects {
 
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
         implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-//        implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC"
-        
-//        implementation "org.asynchttpclient:async-http-client:2.12.1"
-//        implementation "com.sun.activation:javax.activation:1.2.0" // Required for AHC Java 9+
         
         implementation "com.eclipsesource.minimal-json:minimal-json:0.9.5"
         
         implementation 'com.beust:jcommander:1.81'
         
         implementation 'org.slf4j:slf4j-simple:1.7.32'
-        implementation 'net.lingala.zip4j:zip4j:2.9.0'
+        implementation 'net.lingala.zip4j:zip4j:2.9.1'
         implementation 'org.apache.httpcomponents:httpclient:4.5.13'
-        
-//        implementation "de.sciss:jump3r:1.0.5"
-//        implementation "com.github.chrislo27:musique-barebones:3807b60"
         
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
@@ -72,10 +65,10 @@ allprojects {
         
         implementation "space.earlygrey:shapedrawer:v2.5.0"
         implementation "com.github.JnCrMx:discord-game-sdk4j:2b5a903204"
-        implementation "com.twelvemonkeys.imageio:imageio-tga:$twelvemonkeys_version"
+        implementation "com.twelvemonkeys.imageio:imageio-tga:$imageio_tga_version"
         
 //        implementation "org.openjdk.jol:jol-core:0.15"
-        implementation "io.dropwizard.metrics:metrics-core:4.2.3"
+        implementation "io.dropwizard.metrics:metrics-core:4.2.4"
     }
 }
 
