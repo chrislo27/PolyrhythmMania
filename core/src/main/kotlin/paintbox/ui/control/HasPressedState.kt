@@ -25,8 +25,8 @@ interface HasPressedState {
         fun createDefaultPressedStateVar(isHoveredOver: ReadOnlyBooleanVar,
                                          isPressedDown: ReadOnlyBooleanVar): ReadOnlyVar<PressedState> {
             return Var {
-                val hovered = isHoveredOver.useB()
-                val pressed = isPressedDown.useB()
+                val hovered = isHoveredOver.use()
+                val pressed = isPressedDown.use()
                 if (hovered && pressed) {
                     PressedState.PRESSED_AND_HOVERED
                 } else if (hovered) {

@@ -33,19 +33,24 @@ interface Var<T> : ReadOnlyVar<T> {
         operator fun <T> invoke(computation: Context.() -> T): GenericVar<T> = GenericVar(computation)
         fun <T> sideEffecting(item: T, sideEffecting: Context.(existing: T) -> T): GenericVar<T> = GenericVar(item, sideEffecting)
 
-        // Warnings for specialized versions of plain invoke
+        
+        // Warnings for specialized versions of plain invoke -----------------------------------------------------------
+        
         @Deprecated("Prefer using the FloatVar constructor to avoid confusion with generic versions",
                 replaceWith = ReplaceWith("FloatVar"),
                 level = DeprecationLevel.ERROR)
         operator fun invoke(item: Float): FloatVar = FloatVar(item)
+        
         @Deprecated("Prefer using the BooleanVar constructor to avoid confusion with generic versions",
                 replaceWith = ReplaceWith("BooleanVar"),
                 level = DeprecationLevel.ERROR)
         operator fun invoke(item: Boolean): BooleanVar = BooleanVar(item)
+        
         @Deprecated("Prefer using the IntVar constructor to avoid confusion with generic versions",
                 replaceWith = ReplaceWith("IntVar"),
                 level = DeprecationLevel.ERROR)
         operator fun invoke(item: Int): IntVar = IntVar(item)
+        
     }
 
     /**
@@ -74,80 +79,77 @@ interface Var<T> : ReadOnlyVar<T> {
     }
 
     class Context {
+        
         val dependencies: MutableSet<ReadOnlyVar<Any?>> = LinkedHashSet(2)
 
+
+        /**
+         * Adds the [varr] as a dependency and returns the var's value.
+         * 
+         * This function can be used on any [ReadOnlyVar], even specialized ones.
+         */
         @JvmName("use")
         fun <R> use(varr: ReadOnlyVar<R>): R { // DON'T add specialized deprecations for this particular use function for generic compatibility
             dependencies += varr
             return varr.getOrCompute()
         }
 
+        /**
+         * Adds the receiver [var][R] as a dependency and returns the var's value.
+         * 
+         * Note that if there are specializations available, the specialized `use` function should be used instead.
+         */
         @JvmName("useAndGet")
         fun <R> ReadOnlyVar<R>.use(): R { // Specialized deprecations may be added for this use function
             return use(this)
         }
         
         
-        // Specialization methods below
+        // Specialization methods below --------------------------------------------------------------------------------
 
-        @Deprecated("Don't use ReadOnlyVar<Float>, use ReadOnlyFloatVar.useF() instead to avoid explicit boxing",
-                replaceWith = ReplaceWith("(this as ReadOnlyFloatVar).useF()"),
+        @Deprecated("Don't use ReadOnlyVar<Float>, use ReadOnlyFloatVar.use() instead to avoid explicit boxing",
+                replaceWith = ReplaceWith("(this as ReadOnlyFloatVar).use()"),
                 level = DeprecationLevel.ERROR)
         fun ReadOnlyVar<Float>.use(): Float {
             return use(this)
         }
 
-        @Deprecated("Don't use the generic use() function, use ReadOnlyFloatVar.useF() instead to avoid explicit boxing",
-                replaceWith = ReplaceWith("this.useF()"),
-                level = DeprecationLevel.ERROR)
+        /**
+         * The float specialization method. Adds the receiver as a dependency and returns a primitive float.
+         */
         fun ReadOnlyFloatVar.use(): Float {
-            return this.useF()
-        }
-        
-        // The float specialization method. Returns a primitive float.
-        fun ReadOnlyFloatVar.useF(): Float {
             dependencies += this
             return this.get()
         }
         
 
-        @Deprecated("Don't use ReadOnlyVar<Boolean>, use ReadOnlyBooleanVar.useB() instead to avoid explicit boxing",
-                replaceWith = ReplaceWith("(this as ReadOnlyBooleanVar).useB()"),
+        @Deprecated("Don't use ReadOnlyVar<Boolean>, use ReadOnlyBooleanVar.use() instead to avoid explicit boxing",
+                replaceWith = ReplaceWith("(this as ReadOnlyBooleanVar).use()"),
                 level = DeprecationLevel.ERROR)
         fun ReadOnlyVar<Boolean>.use(): Boolean {
             return use(this)
         }
 
-        @Deprecated("Don't use the generic use() function, use ReadOnlyBooleanVar.useB() instead to avoid explicit boxing",
-                replaceWith = ReplaceWith("this.useB()"),
-                level = DeprecationLevel.ERROR)
+        /**
+         * The boolean specialization method. Adds the receiver as a dependency and returns a primitive boolean.
+         */
         fun ReadOnlyBooleanVar.use(): Boolean {
-            return this.useB()
-        }
-
-        // The boolean specialization method. Returns a primitive boolean.
-        fun ReadOnlyBooleanVar.useB(): Boolean {
             dependencies += this
             return this.get()
         }
         
 
-        @Deprecated("Don't use ReadOnlyVar<Int>, use ReadOnlyIntVar.useI() instead to avoid explicit boxing",
-                replaceWith = ReplaceWith("(this as ReadOnlyIntVar).useI()"),
+        @Deprecated("Don't use ReadOnlyVar<Int>, use ReadOnlyIntVar.use() instead to avoid explicit boxing",
+                replaceWith = ReplaceWith("(this as ReadOnlyIntVar).use()"),
                 level = DeprecationLevel.ERROR)
         fun ReadOnlyVar<Int>.use(): Int {
             return use(this)
         }
 
-        @Deprecated("Don't use the generic use() function, use ReadOnlyIntVar.useB() instead to avoid explicit boxing",
-                replaceWith = ReplaceWith("this.useI()"),
-                level = DeprecationLevel.ERROR)
+        /**
+         * The int specialization method. Adds the receiver as a dependency and returns a primitive int.
+         */
         fun ReadOnlyIntVar.use(): Int {
-            return this.useI()
-        }
-
-        // The int specialization method. Returns a primitive int.
-        fun ReadOnlyIntVar.useI(): Int {
             dependencies += this
             return this.get()
         }

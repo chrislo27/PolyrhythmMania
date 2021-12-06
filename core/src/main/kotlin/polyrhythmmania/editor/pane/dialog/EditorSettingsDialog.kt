@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.PaintboxGame
-import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
@@ -203,7 +202,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         vbox.sizeHeightToChildren(300f)
 
         pane.bounds.height.bind {
-            max(vbox.bounds.height.useF(), pane.parent.use()?.bounds?.height?.useF() ?: 300f)
+            max(vbox.bounds.height.use(), pane.parent.use()?.bounds?.height?.use() ?: 300f)
         }
         scrollPane.setContent(pane)
     }
@@ -269,7 +268,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             }
             label = TextLabel(binding = { itemToString.use() }, font = editorPane.palette.musicDialogFont).apply {
                 Anchor.Centre.configure(this)
-                this.bindWidthToParent { -(bounds.height.useF() * 2) }
+                this.bindWidthToParent { -(bounds.height.use() * 2) }
                 this.textColor.set(Color.WHITE)
                 this.textAlign.set(TextAlign.CENTRE)
                 this.renderAlign.set(Align.center)

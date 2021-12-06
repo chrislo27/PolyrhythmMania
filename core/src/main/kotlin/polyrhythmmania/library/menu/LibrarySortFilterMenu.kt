@@ -133,7 +133,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                     this += RadioButton(binding = {Localization.getVar(sortable.nameKey).use()}, font = main.fontMainMenuThin).apply { 
                         this.bounds.height.set(32f)
                         this.bindWidthToParent(multiplier = 0.333f, adjust = -4f)
-                        this.bounds.x.bind { (parent.use()?.bounds?.width?.useF() ?: 0f) * ((index % 3) / 3f) }
+                        this.bounds.x.bind { (parent.use()?.bounds?.width?.use() ?: 0f) * ((index % 3) / 3f) }
                         this.bounds.y.set(32f * (index / 3))
                         this.margin.set(Insets(0f, 0f, 0f, 4f))
                         toggleGroup.addToggle(this)
@@ -169,10 +169,10 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                         this.bindWidthToParent(multiplier = 0.45f)
                         this.selectedState.set(oldFilter.enabled)
                         this.color.bind { 
-                            if (checkedState.useB()) Color(0f, 0.5f, 0f, 1f) else Color.DARK_GRAY.cpy()
+                            if (checkedState.use()) Color(0f, 0.5f, 0f, 1f) else Color.DARK_GRAY.cpy()
                         }
                         this.textLabel.font.bind {
-                            if (checkedState.useB()) main.fontMainMenuMain else main.fontMainMenuThin
+                            if (checkedState.use()) main.fontMainMenuMain else main.fontMainMenuThin
                         }
                         
                         this.onCheckChanged = { 

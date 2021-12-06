@@ -31,7 +31,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
     val linesLabel: TextLabel
     val scoreLabel: TextLabel
     val scoreValueFloat: FloatVar = FloatVar { score.use().scoreInt.toFloat() }
-    val scoreValue: ReadOnlyIntVar = IntVar { scoreValueFloat.useF().toInt() }
+    val scoreValue: ReadOnlyIntVar = IntVar { scoreValueFloat.use().toInt() }
     val rankingPane: Pane
     val bonusStatsPane: Pane
     private val rankingImage: ImageNode
@@ -78,24 +78,24 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
         
         val scorePane = Pane().apply {
             this.bounds.height.set(90f)
-            this.visible.bind { scoreValue.useI() >= 0 }
+            this.visible.bind { scoreValue.use() >= 0 }
         }
         vbox += scorePane
         
         scorePane += Pane().apply { 
             this += ImageWindowNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar"))).apply {
                 Anchor.TopLeft.configure(this)
-                this.windowU2.bind { (scoreValueFloat.useF() / 100f).coerceIn(0f, 1f) }
+                this.windowU2.bind { (scoreValueFloat.use() / 100f).coerceIn(0f, 1f) }
             }
         }
         scorePane += ImageNode(TextureRegion(AssetRegistry.get<Texture>("results_score_bar_border")))
         
         scoreLabel = TextLabel(binding = {
-            val s = scoreValue.useI()
+            val s = scoreValue.use()
             if (s < 0) "" else "$s"
         }, font = scoreTextFont).apply {
             this.textColor.sideEffecting(Color()) { existing ->
-                val sc = scoreValue.useI()
+                val sc = scoreValue.use()
                 val ranking = Ranking.getRanking(sc)
                 existing.set(ranking.color)
                 existing
@@ -140,7 +140,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             this.bounds.width.set(48f)
             this.bindHeightToSelfWidth()
             this.bounds.y.set(-12f)
-            this.bounds.x.bind { -(bounds.width.useF() - 32f + 8f) }
+            this.bounds.x.bind { -(bounds.width.use() - 32f + 8f) }
             this.padding.set(Insets(0f, 0f, 0f, 0f))
         }
         bonusStatsPane += TextLabel(binding = {
@@ -156,7 +156,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             this.bounds.width.set(200f)
             this.bounds.height.set(48f)
             this.bounds.y.set(-12f)
-            this.bounds.x.bind { -(bounds.width.useF() - 32f + 48f + 8f) }
+            this.bounds.x.bind { -(bounds.width.use() - 32f + 48f + 8f) }
             this.padding.set(Insets(0f, 0f, 0f, 2f))
             this.renderAlign.set(Align.right)
             this.setScaleXY(0.5f)

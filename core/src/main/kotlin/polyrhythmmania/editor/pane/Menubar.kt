@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
@@ -15,15 +14,12 @@ import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
-import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.pane.dialog.LevelMetadataDialog
-import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
 import kotlin.math.roundToInt
 
 
@@ -130,7 +126,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_undo_white"])
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.useB()) inactive else active
+                    if (apparentDisabledState.use()) inactive else active
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.undo")))
@@ -147,7 +143,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_undo_white"]).apply { flip(true, false) }
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.useB()) inactive else active
+                    if (apparentDisabledState.use()) inactive else active
                 }
 //                this.tint.bind {
 //                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
@@ -236,7 +232,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
         }
         
         autosavePane = Pane().apply {
-            this.bounds.y.bind { parent.use()?.bounds?.height?.useF() ?: 0f }
+            this.bounds.y.bind { parent.use()?.bounds?.height?.use() ?: 0f }
             this.doClipping.set(true)
         }
         autosaveIndicator = editorPane.createDefaultTooltip("").apply { 

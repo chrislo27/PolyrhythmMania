@@ -36,7 +36,7 @@ open class UIElement : UIBounds() {
      */
     val visible: BooleanVar = BooleanVar(true)
     val apparentVisibility: ReadOnlyBooleanVar = BooleanVar {
-        visible.useB() && (parent.use()?.apparentVisibility?.useB() ?: true)
+        visible.use() && (parent.use()?.apparentVisibility?.use() ?: true)
     }
 
 
@@ -54,7 +54,7 @@ open class UIElement : UIBounds() {
      * The [apparentOpacity] level of the [parent], if there is no parent then 1.0 is used.
      */
     val parentOpacity: ReadOnlyFloatVar = FloatVar {
-        parent.use()?.apparentOpacity?.useF() ?: 1f
+        parent.use()?.apparentOpacity?.use() ?: 1f
     }
 
     /**
@@ -64,7 +64,7 @@ open class UIElement : UIBounds() {
      * This is to be used by the rendering implementation.
      */
     val apparentOpacity: ReadOnlyFloatVar = FloatVar {
-        parentOpacity.useF() * opacity.useF()
+        parentOpacity.use() * opacity.use()
     }
 
     val borderStyle: Var<Border> = Var(NoBorder)
@@ -267,7 +267,7 @@ open class UIElement : UIBounds() {
     fun bindWidthToParent(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * multiplier + adjust
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * multiplier + adjust
         }
     }
 
@@ -275,7 +275,7 @@ open class UIElement : UIBounds() {
     fun bindHeightToParent(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.useF() } ?: 0f) * multiplier + adjust
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) * multiplier + adjust
         }
     }
 
@@ -283,7 +283,7 @@ open class UIElement : UIBounds() {
     fun bindWidthToParent(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.useF() }
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.width.use() }
                     ?: 0f) * multiplierBinding() + adjustBinding()
         }
     }
@@ -292,7 +292,7 @@ open class UIElement : UIBounds() {
     fun bindHeightToParent(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.useF() }
+            (this@UIElement.parent.use()?.let { p -> p.contentZone.height.use() }
                     ?: 0f) * multiplierBinding() + adjustBinding()
         }
     }
@@ -300,28 +300,28 @@ open class UIElement : UIBounds() {
     fun bindWidthToSelfHeight(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
-            thisBounds.height.useF() * multiplier + adjust
+            thisBounds.height.use() * multiplier + adjust
         }
     }
 
     fun bindHeightToSelfWidth(adjust: Float = 0f, multiplier: Float = 1f) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            thisBounds.width.useF() * multiplier + adjust
+            thisBounds.width.use() * multiplier + adjust
         }
     }
 
     fun bindWidthToSelfHeight(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.width.bind {
-            thisBounds.height.useF() * multiplierBinding() + adjustBinding()
+            thisBounds.height.use() * multiplierBinding() + adjustBinding()
         }
     }
 
     fun bindHeightToSelfWidth(multiplierBinding: Var.Context.() -> Float = DEFAULT_MULTIPLIER_BINDING, adjustBinding: Var.Context.() -> Float) {
         val thisBounds = this.bounds
         thisBounds.height.bind {
-            thisBounds.width.useF() * multiplierBinding() + adjustBinding()
+            thisBounds.width.use() * multiplierBinding() + adjustBinding()
         }
     }
 

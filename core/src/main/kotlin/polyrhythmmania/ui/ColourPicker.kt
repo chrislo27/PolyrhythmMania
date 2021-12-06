@@ -49,8 +49,8 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
 
     private val hsv: HSVA = HSVA()
     val currentColor: ReadOnlyVar<Color> = Var.sideEffecting(Color(1f, 1f, 1f, 1f)) { c ->
-        c.fromHsv(hsv.hue.useI() % 360f, (hsv.saturation.useI() / 100f).coerceIn(0f, 1f), (hsv.value.useI() / 100f).coerceIn(0f, 1f))
-        c.a = (hsv.alpha.useI() / 255f).coerceIn(0f, 1f)
+        c.fromHsv(hsv.hue.use() % 360f, (hsv.saturation.use() / 100f).coerceIn(0f, 1f), (hsv.value.use() / 100f).coerceIn(0f, 1f))
+        c.a = (hsv.alpha.use() / 255f).coerceIn(0f, 1f)
         c
     }
     
@@ -75,7 +75,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
         fun createTransparencyNode(): ImageNode {
             return ImageNode(null, ImageRenderingMode.FULL).also { im ->
                 im.textureRegion.sideEffecting(TextureRegion(PRManiaGame.instance.colourPickerTransparencyGrid)) { tr ->
-                    tr?.setRegion(0, 0, im.bounds.width.useF().toInt(), im.bounds.height.useF().toInt())
+                    tr?.setRegion(0, 0, im.bounds.width.use().toInt(), im.bounds.height.use().toInt())
                     tr
                 }
             }
@@ -142,19 +142,19 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
         val satPane = createPropertyPane(hsv.saturation, "S: ",
                 Gradient().also { grad ->
                     grad.leftColor.sideEffecting { c -> 
-                        c.fromHsv(hsv.hue.useI().toFloat(), 0f, hsv.value.useI() / 100f)
+                        c.fromHsv(hsv.hue.use().toFloat(), 0f, hsv.value.use() / 100f)
                     }
                     grad.rightColor.sideEffecting { c ->
-                        c.fromHsv(hsv.hue.useI().toFloat(), 1f, hsv.value.useI() / 100f)
+                        c.fromHsv(hsv.hue.use().toFloat(), 1f, hsv.value.use() / 100f)
                     }
                 }, satArrow)
         val valuePane = createPropertyPane(hsv.value, "V: ",
                 Gradient().also { grad ->
                     grad.leftColor.sideEffecting { c -> 
-                        c.fromHsv(hsv.hue.useI().toFloat(), hsv.saturation.useI() / 100f, 0f)
+                        c.fromHsv(hsv.hue.use().toFloat(), hsv.saturation.use() / 100f, 0f)
                     }
                     grad.rightColor.sideEffecting { c ->
-                        c.fromHsv(hsv.hue.useI().toFloat(), hsv.saturation.useI() / 100f, 1f)
+                        c.fromHsv(hsv.hue.use().toFloat(), hsv.saturation.use() / 100f, 1f)
                     }
                 }, valueArrow)
         val alphaPane = createPropertyPane(hsv.alpha, "A: ",
@@ -198,7 +198,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
 
                 val textField: TextField
                 this += RectElement(Color(0f, 0f, 0f, 0.9f)).apply {
-                    this.bindWidthToParent(adjustBinding = { (bounds.height.useF() + 4f) * 2f * -1 })
+                    this.bindWidthToParent(adjustBinding = { (bounds.height.use() + 4f) * 2f * -1 })
                     this.border.set(Insets(1f))
                     this.borderStyle.set(SolidBorder(Color.WHITE))
                     this.padding.set(Insets(1f))
@@ -239,7 +239,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                 }
                 rgbTextField = textField
                 this += Button("").apply {
-                    Anchor.CentreRight.configure(this, offsetX = { -(bounds.width.useF() + 4f) })
+                    Anchor.CentreRight.configure(this, offsetX = { -(bounds.width.use() + 4f) })
                     this.bindWidthToSelfHeight()
                     this.padding.set(Insets(6f))
                     this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_colour_picker_copy")))

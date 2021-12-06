@@ -61,7 +61,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
                 val b = trackPane.contentSection.bounds
                 editorTrackArea.bounds.x.set(b.x.get())
                 editorTrackArea.bounds.width.bind {
-                    (trackPane.contentZone.width.useF()) - sidebarWidth.useF()
+                    (trackPane.contentZone.width.use()) - sidebarWidth.use()
                 }
             }
         }
@@ -83,7 +83,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         var sidesTotalHeight = 0f
         for (editorTrackPane in editorTrackSides) {
             editorTrackPane.bounds.height.set(editorTrackHeight)
-            editorTrackPane.bounds.width.bind { sidebarWidth.useF() }
+            editorTrackPane.bounds.width.bind { sidebarWidth.use() }
             editorTrackPane.bounds.y.set(sidesTotalHeight)
             val h = editorTrackPane.bounds.height.get()
             sidesTotalHeight += h
@@ -108,7 +108,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
                 val b = trackPane.contentSection.bounds
                 editorTrackArea.bounds.x.set(b.x.get())
                 editorTrackArea.bounds.width.bind {
-                    (trackPane.contentZone.width.useF()) - sidebarWidth.useF()
+                    (trackPane.contentZone.width.use()) - sidebarWidth.use()
                 }
             }
         }
@@ -124,16 +124,16 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
             val offY = -(bottomTotalHeight - h - bottomTotalHeight2)
             val currentH = bottomTotalHeight2
             trackPane.bounds.y.bind {
-                val anchoredBottom = (tpParent.use()?.contentZone?.height?.useF() ?: 0f) - (trackPane.bounds.height.useF()) + offY
+                val anchoredBottom = (tpParent.use()?.contentZone?.height?.use() ?: 0f) - (trackPane.bounds.height.use()) + offY
                 
-                (anchoredBottom).coerceAtMost(trackAreaScrollPane.bounds.y.useF() + trackAreaScrollPane.bounds.height.useF() + currentH)
+                (anchoredBottom).coerceAtMost(trackAreaScrollPane.bounds.y.use() + trackAreaScrollPane.bounds.height.use() + currentH)
             }
             
             bottomTotalHeight2 += h
         }
 
         trackAreaScrollPane.bounds.height.bind {
-            val parentHeight = (trackAreaScrollPane.parent.use()?.bounds?.height?.useF() ?: 1f)
+            val parentHeight = (trackAreaScrollPane.parent.use()?.bounds?.height?.use() ?: 1f)
             (parentHeight - trackAreaStart - bottomTotalHeight).coerceAtMost(suggestedMidHeight)
         }
     }

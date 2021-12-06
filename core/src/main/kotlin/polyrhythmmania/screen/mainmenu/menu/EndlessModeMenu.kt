@@ -209,7 +209,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             daredevilCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.endless.settings.daredevil.tooltip")))
             
             disableRegenCheck.disabled.bind { 
-                daredevilMode.useB()
+                daredevilMode.use()
             }
             
             disableRegenCheck.onCheckChanged = { newState ->

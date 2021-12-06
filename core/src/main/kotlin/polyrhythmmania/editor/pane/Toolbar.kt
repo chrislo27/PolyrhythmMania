@@ -14,14 +14,11 @@ import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.container.TexPackSrcSelectorMenuPane
-import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
 import polyrhythmmania.util.DecimalFormats
-import polyrhythmmania.world.tileset.CascadingTexturePack
-import polyrhythmmania.world.tileset.StockTexturePacks
 
 
 class Toolbar(val upperPane: UpperPane) : Pane() {
@@ -48,7 +45,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         // Preview section
         previewSection = Pane().apply {
             Anchor.TopLeft.configure(this)
-            this.bounds.width.bind { upperPane.previewPane.contentZone.width.useF() - 2f }
+            this.bounds.width.bind { upperPane.previewPane.contentZone.width.use() - 2f }
             this.border.set(Insets(0f, 0f, 0f, 2f))
             this.borderStyle.set(SolidBorder().apply { this.color.bind { editorPane.palette.previewPaneSeparator.use() } })
             this.padding.set(Insets(0f, 0f, 2f, 4f))
@@ -67,7 +64,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             leftPreviewHbox += Pane().apply {
                 this.bounds.width.set(150f)
                 val labelVar = Localization.getVar("editor.playbackSpeed", Var {
-                    listOf(DecimalFormats.format("0.0#", editor.playbackSpeed.useF()))
+                    listOf(DecimalFormats.format("0.0#", editor.playbackSpeed.use()))
                 })
                 this += TextLabel(binding = { labelVar.use() }, font = editorPane.palette.beatTimeFont).apply {
                     this.textColor.set(Color.WHITE)
@@ -144,10 +141,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_pause_white"])
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.useB()) inactive else active
+                    if (apparentDisabledState.use()) inactive else active
                 }
                 this.tint.bind {
-                    if (apparentDisabledState.useB()) Color.GRAY else Color.WHITE
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.pause")))
@@ -164,10 +161,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_play_white"])
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.useB()) inactive else active
+                    if (apparentDisabledState.use()) inactive else active
                 }
                 this.tint.bind {
-                    if (apparentDisabledState.useB()) Color.GRAY else Color.WHITE
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.play")))
@@ -184,10 +181,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_stop_white"])
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.useB()) inactive else active
+                    if (apparentDisabledState.use()) inactive else active
                 }
                 this.tint.bind {
-                    if (apparentDisabledState.useB()) Color.GRAY else Color.WHITE
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.stop")))
@@ -210,7 +207,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         mainSection = Pane().apply {
             Anchor.TopRight.configure(this)
             this.bounds.width.bind {
-                (parent.use()?.contentZone?.width?.useF() ?: 0f) - previewSection.bounds.width.useF()
+                (parent.use()?.contentZone?.width?.use() ?: 0f) - previewSection.bounds.width.use()
             }
             this.margin.set(Insets(0f, 0f, 4f, 4f))
         }
@@ -377,7 +374,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 val active = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_metronome_active"])
                 this += ImageNode(null).apply {
                     this.textureRegion.bind {
-                        val isActive = selectedState.useB()
+                        val isActive = selectedState.use()
                         if (isActive) active else inactive
                     }
                 }
@@ -390,7 +387,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 val inactiveTooltip = Localization.getVar("editor.button.tapalong")
                 val activeTooltip = Localization.getVar("editor.button.tapalong.active")
                 this.tooltipElement.set(editorPane.createDefaultTooltip {
-                    if (this@apply.selectedState.useB()) activeTooltip.use() else inactiveTooltip.use()
+                    if (this@apply.selectedState.use()) activeTooltip.use() else inactiveTooltip.use()
                 })
                 tapalongPane.visible.set(this.selectedState.get())
                 selectedState.addListener {
@@ -430,10 +427,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_pause_white"])
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.useB()) inactive else active
+                    if (apparentDisabledState.use()) inactive else active
                 }
                 this.tint.bind {
-                    if (apparentDisabledState.useB()) Color.GRAY else Color.WHITE
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.pause")))
@@ -450,10 +447,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_play_white"])
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.useB()) inactive else active
+                    if (apparentDisabledState.use()) inactive else active
                 }
                 this.tint.bind {
-                    if (apparentDisabledState.useB()) Color.GRAY else Color.WHITE
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.play")))
@@ -470,10 +467,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             val inactive: TextureRegion = TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_stop_white"])
             this += ImageNode(null).apply {
                 this.textureRegion.bind {
-                    if (apparentDisabledState.useB()) inactive else active
+                    if (apparentDisabledState.use()) inactive else active
                 }
                 this.tint.bind {
-                    if (apparentDisabledState.useB()) Color.GRAY else Color.WHITE
+                    if (apparentDisabledState.use()) Color.GRAY else Color.WHITE
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.stop")))

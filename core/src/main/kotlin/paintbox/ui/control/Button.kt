@@ -37,8 +37,8 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
                 (markup?.parse(button.text.use())
                         ?: TextRun(button.font.use(), button.text.use(), Color.WHITE,
                                 /*button.scaleX.useF(), button.scaleY.useF()*/ 1f, 1f).toTextBlock()).also { textBlock ->
-                    if (button.doLineWrapping.useB()) {
-                        textBlock.lineWrapping.set(button.contentZone.width.useF() / button.scaleX.useF())
+                    if (button.doLineWrapping.use()) {
+                        textBlock.lineWrapping.set(button.contentZone.width.use() / button.scaleX.use())
                     }
                 }
             }
@@ -51,7 +51,7 @@ open class Button(text: String, font: PaintboxFont = PaintboxGame.gameInstance.d
     val scaleY: FloatVar = FloatVar(1f)
 
     val renderAlign: IntVar = IntVar(Align.center)
-    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.useI()) }
+    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
     val doXCompression: BooleanVar = BooleanVar(true)
     val doLineWrapping: BooleanVar = BooleanVar(false)
     
@@ -104,7 +104,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
 
     val textColorToUse: ReadOnlyVar<Color> = Var {
         val pressedState = element.pressedState.use()
-        if (element.apparentDisabledState.useB()) {
+        if (element.apparentDisabledState.use()) {
             disabledTextColor.use()
         } else {
             when (pressedState) {
@@ -117,7 +117,7 @@ open class ButtonSkin(element: Button) : Skin<Button>(element) {
     }
     val bgColorToUse: ReadOnlyVar<Color> = Var {
         val pressedState = element.pressedState.use()
-        if (element.apparentDisabledState.useB()) {
+        if (element.apparentDisabledState.use()) {
             disabledBgColor.use()
         } else {
             when (pressedState) {

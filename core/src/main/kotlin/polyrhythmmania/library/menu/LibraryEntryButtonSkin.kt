@@ -2,7 +2,6 @@ package polyrhythmmania.library.menu
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.PressedState
@@ -52,7 +51,7 @@ class LibraryEntryButtonSkin(override val element: LibraryEntryButton) : ButtonS
         this.roundedRadius.set(0)
         
         (textColorToUse as Var).bind {
-            val selectedState = element.selectedState.useB()
+            val selectedState = element.selectedState.use()
             val pressedState = element.pressedState.use()
             if (selectedState) {
                 tmpTextColor.set(selectedTextColor.use())
@@ -64,7 +63,7 @@ class LibraryEntryButtonSkin(override val element: LibraryEntryButton) : ButtonS
                 }
                 tmpTextColor
             } else {
-                if (element.apparentDisabledState.useB()) {
+                if (element.apparentDisabledState.use()) {
                     disabledTextColor.use()
                 } else {
                     when (pressedState) {
@@ -77,12 +76,12 @@ class LibraryEntryButtonSkin(override val element: LibraryEntryButton) : ButtonS
             }
         }
         (bgColorToUse as Var).bind {
-            val selectedState = element.selectedState.useB()
+            val selectedState = element.selectedState.use()
             if (selectedState) {
                 selectedBgColor
             } else {
                 val pressedState = element.pressedState.use()
-                if (element.apparentDisabledState.useB()) {
+                if (element.apparentDisabledState.use()) {
                     disabledBgColor.use()
                 } else {
                     when (pressedState) {

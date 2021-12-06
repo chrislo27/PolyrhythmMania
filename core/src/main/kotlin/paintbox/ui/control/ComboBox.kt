@@ -47,7 +47,7 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
                     markup.parse(text)
                 } else {
                     TextRun(comboBox.font.use(), text, Color.WHITE,
-                            comboBox.scaleX.useF(), comboBox.scaleY.useF()).toTextBlock()
+                            comboBox.scaleX.use(), comboBox.scaleY.use()).toTextBlock()
                 }
             }
         }
@@ -67,7 +67,7 @@ open class ComboBox<T>(startingList: List<T>, selectedItem: T,
     val scaleX: FloatVar = FloatVar(1f)
     val scaleY: FloatVar = FloatVar(1f)
     val renderAlign: IntVar = IntVar(Align.left)
-    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.useI()) }
+    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
     val doXCompression: BooleanVar = BooleanVar(true)
     val doLineWrapping: BooleanVar = BooleanVar(false)
 

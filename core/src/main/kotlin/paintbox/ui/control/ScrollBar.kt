@@ -53,9 +53,9 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
     val visibleAmount: FloatVar = FloatVar(VISIBLE_AMOUNT_DEFAULT)
     private val _value: FloatVar = FloatVar(MIN_DEFAULT)
     val value: ReadOnlyFloatVar = FloatVar {
-        val min = minimum.useF()
-        val max = maximum.useF()
-        _value.useF().coerceIn(min, max)
+        val min = minimum.use()
+        val max = maximum.use()
+        _value.use().coerceIn(min, max)
     }
     val thumbPressedState: ReadOnlyVar<PressedState> get() = thumbArea.pressedState
 
@@ -73,7 +73,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
                 Orientation.HORIZONTAL -> this.bindWidthToSelfHeight()
             }
             this.skinID.set(ScrollBar.SCROLLBAR_INC_BUTTON_SKIN_ID)
-            this.disabled.bind { value.useF() <= minimum.useF() }
+            this.disabled.bind { value.use() <= minimum.use() }
             this.setOnAction {
                 decrement()
             }
@@ -85,7 +85,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
                 Orientation.HORIZONTAL -> this.bindWidthToSelfHeight()
             }
             this.skinID.set(ScrollBar.SCROLLBAR_INC_BUTTON_SKIN_ID)
-            this.disabled.bind { value.useF() >= maximum.useF() }
+            this.disabled.bind { value.use() >= maximum.use() }
             this.setOnAction {
                 increment()
             }
@@ -94,10 +94,10 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
             Anchor.Centre.configure(this)
             when (orientation) {
                 Orientation.VERTICAL -> {
-                    this.bindHeightToParent { -(bounds.width.useF() * 2) }
+                    this.bindHeightToParent { -(bounds.width.use() * 2) }
                 }
                 Orientation.HORIZONTAL -> {
-                    this.bindWidthToParent { -(bounds.height.useF() * 2) }
+                    this.bindWidthToParent { -(bounds.height.use() * 2) }
                 }
             }
         }
@@ -320,7 +320,7 @@ open class ScrollBar(val orientation: Orientation) : Control<ScrollBar>() {
             // Apply certain properties to the ScrollBar's elements like the increment buttons
             listOf(element.increaseButton, element.decreaseButton).forEach { b ->
                 b.imageNode.tint.bind {
-                    if (b.apparentDisabledState.useB()) disabledColor.use() else incrementColor.use()
+                    if (b.apparentDisabledState.use()) disabledColor.use() else incrementColor.use()
                 }
             }
         }

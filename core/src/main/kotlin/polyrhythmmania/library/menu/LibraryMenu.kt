@@ -65,7 +65,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private val toggleGroup: ToggleGroup = ToggleGroup()
     private val selectedLevelEntry: ReadOnlyVar<LevelEntry?> = Var {
         val at = toggleGroup.activeToggle.use()
-        if (at != null && at.selectedState.useB()) {
+        if (at != null && at.selectedState.use()) {
             (at as? LibraryEntryButton)?.levelEntry
         } else null
     }
@@ -100,7 +100,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             contentPane += this
             this.bounds.height.bind { 
                 // NOTE: the top part overflows its parent container, but the only element there is the level banner.
-                (parent.use()?.bounds?.height?.useF() ?: 0f) + titleLabel.bounds.height.useF()
+                (parent.use()?.bounds?.height?.use() ?: 0f) + titleLabel.bounds.height.use()
             }
             this.bindWidthToParent(multiplier = 0.5f, adjust = -100f)
             this.padding.set(Insets(0f))
@@ -166,7 +166,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.doLineWrapping.set(true)
             this.renderAlign.set(Align.center)
             this.visible.bind {
-                !anyLevelSelected.useB()
+                !anyLevelSelected.use()
             }
         })
         
@@ -224,7 +224,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 val thisBounds = this.bounds
                 thisBounds.height.bind {
                     @Suppress("SimpleRedundantLet")
-                    (parent.use()?.let { p -> p.contentZone.height.useF() } ?: 0f) - (thisBounds.width.useF() * (1f / bannerRatio) + spacing * 2) - bottomBarSize
+                    (parent.use()?.let { p -> p.contentZone.height.use() } ?: 0f) - (thisBounds.width.use() * (1f / bannerRatio) + spacing * 2) - bottomBarSize
                 }
                 this.spacing.set(spacing)
                 this.temporarilyDisableLayouts {
@@ -513,7 +513,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         this.bounds.height.set(labelHeight)
 
                         this += Button(binding = {
-                            Localization.getVar(if (showDesc.useB()) "mainMenu.library.switchToHighScores" else "mainMenu.library.switchToDesc").use()
+                            Localization.getVar(if (showDesc.use()) "mainMenu.library.switchToHighScores" else "mainMenu.library.switchToDesc").use()
                         }, font = main.fontMainMenuThin).apply {
                             Anchor.TopRight.configure(this)
                             this.setScaleXY(0.75f)
@@ -522,11 +522,11 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 showDesc.invert()
                             }
                             this.visible.bind {
-                                descExists.useB()
+                                descExists.use()
                             }
                         }
                         this += TextLabel(binding = {
-                            Localization.getVar(if (descExists.useB() && showDesc.useB())
+                            Localization.getVar(if (descExists.use() && showDesc.use())
                                 "levelMetadata.description" else "mainMenu.library.highScores").use()
                         }, font = main.fontMainMenuThin).apply {
                             Anchor.TopLeft.configure(this)
@@ -542,7 +542,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         // Description
                         val descScrollPane = ScrollPane().apply {
                             this.visible.bind {
-                                descExists.useB() && showDesc.useB()
+                                descExists.use() && showDesc.use()
                             }
 
                             (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
@@ -572,7 +572,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         // High scores
                         this += ScrollPane().apply ScrollPane@{
                             this.visible.bind {
-                                !descScrollPane.visible.useB()
+                                !descScrollPane.visible.use()
                             }
 
                             (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))

@@ -14,7 +14,7 @@ interface ReadOnlyFloatVar : ReadOnlyVar<Float> {
      * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return a primitive float value.
      *
      * If using this [ReadOnlyFloatVar] in a binding, use [Var.Context] to do dependency tracking,
-     * and use the float specialization specific functions ([Var.Context.useF]).
+     * and use the float specialization specific functions ([Var.Context.use]).
      */
     fun get(): Float
 

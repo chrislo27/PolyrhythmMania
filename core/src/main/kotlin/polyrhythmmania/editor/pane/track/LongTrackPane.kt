@@ -1,16 +1,13 @@
 package polyrhythmmania.editor.pane.track
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
-import paintbox.font.TextAlign
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
-import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
@@ -30,20 +27,20 @@ open class LongTrackPane(val allTracksPane: AllTracksPane, val hasContent: Boole
     init {
         val sidebarSection = Pane().apply {
             Anchor.TopLeft.configure(this)
-            this.bounds.width.bind { allTracksPane.sidebarWidth.useF() }
+            this.bounds.width.bind { allTracksPane.sidebarWidth.use() }
         }
         addChild(sidebarSection)
         sidePanel = SidePanel(editorPane)
         sidebarSection += sidePanel
         contentSection = RectElement().apply {
             Anchor.TopLeft.configure(this)
-            this.bounds.x.bind { sidebarSection.bounds.x.useF() + sidebarSection.bounds.width.useF() }
+            this.bounds.x.bind { sidebarSection.bounds.x.use() + sidebarSection.bounds.width.use() }
             this.bounds.width.bind {
-                (parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) - allTracksPane.sidebarWidth.useF()
+                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) - allTracksPane.sidebarWidth.use()
             }
             this.doClipping.set(true)
             
-            this.border.bind { if (showContentBorder.useB()) Insets(0f, 2f, 0f, 0f) else Insets.ZERO }
+            this.border.bind { if (showContentBorder.use()) Insets(0f, 2f, 0f, 0f) else Insets.ZERO }
             this.borderStyle.set(SolidBorder().apply { this.color.bind { editorPane.palette.trackPaneBorder.use() }})
 
             this.color.bind { contentBgColor.use() }

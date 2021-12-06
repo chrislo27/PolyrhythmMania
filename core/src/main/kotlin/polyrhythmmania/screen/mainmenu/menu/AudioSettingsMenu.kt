@@ -27,7 +27,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.value.addListener { v ->
             settings.masterVolumeSetting.set(v.getOrCompute().toInt())
         }
-        this.tooltipElement.set(createTooltip { "${value.useF().roundToInt()}" })
+        this.tooltipElement.set(createTooltip { "${value.use().roundToInt()}" })
     }
     val gameplayVolSlider: Slider = Slider().apply { 
         this.bindWidthToParent(multiplier = 0.85f)
@@ -38,7 +38,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.value.addListener { v ->
             settings.gameplayVolumeSetting.set(v.getOrCompute().toInt())
         }
-        this.tooltipElement.set(createTooltip { "${value.useF().roundToInt()}" })
+        this.tooltipElement.set(createTooltip { "${value.use().roundToInt()}" })
     }
     val menuMusicVolSlider: Slider = Slider().apply { 
         this.bindWidthToParent(multiplier = 0.85f)
@@ -49,7 +49,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.value.addListener { v ->
             settings.menuMusicVolumeSetting.set(v.getOrCompute().toInt())
         }
-        this.tooltipElement.set(createTooltip { "${value.useF().roundToInt()}" })
+        this.tooltipElement.set(createTooltip { "${value.use().roundToInt()}" })
     }
     val menuSfxVolSlider: Slider = Slider().apply { 
         this.bindWidthToParent(multiplier = 0.85f)
@@ -60,7 +60,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.value.addListener { v ->
             settings.menuSfxVolumeSetting.set(v.getOrCompute().toInt())
         }
-        this.tooltipElement.set(createTooltip { "${value.useF().roundToInt()}" })
+        this.tooltipElement.set(createTooltip { "${value.use().roundToInt()}" })
     }
 
     init {

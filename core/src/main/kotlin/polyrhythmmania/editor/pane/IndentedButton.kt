@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
-import paintbox.binding.invert
 import paintbox.font.PaintboxFont
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -36,7 +35,7 @@ class IndentedButton : Button, Toggle {
                 }
             })
             this.border.bind {
-                if (selectedState.useB()) indentedButtonBorder.use() else Insets.ZERO
+                if (selectedState.use()) indentedButtonBorder.use() else Insets.ZERO
             }
         }
         

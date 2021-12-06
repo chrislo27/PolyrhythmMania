@@ -7,7 +7,6 @@ import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
-import paintbox.ui.ImageRenderingMode
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
@@ -48,7 +47,7 @@ class PlaytestDialog(editorPane: EditorPane) : EditorDialog(editorPane, mergeTop
                 Anchor.TopCentre.configure(this)
                 val borderSize = 2f
                 this.bindHeightToParent(multiplier = 0.9f, adjust = borderSize * 2)
-                this.bounds.width.bind { (bounds.height.useF() - borderSize * 2) * 16f / 9f + borderSize * 2 }
+                this.bounds.width.bind { (bounds.height.use() - borderSize * 2) * 16f / 9f + borderSize * 2 }
                 this.border.set(Insets(borderSize))
                 this.borderStyle.set(SolidBorder(Color.WHITE).apply {
                     this.roundedCorners.set(true)

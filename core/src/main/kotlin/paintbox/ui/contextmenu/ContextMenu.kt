@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
-import paintbox.binding.invert
 import paintbox.font.TextAlign
 import paintbox.ui.*
 import paintbox.ui.area.Insets
@@ -125,7 +124,7 @@ open class ContextMenu : Control<ContextMenu>() {
                 }
                 pane.addChild(RectElement(Color.WHITE).apply {
                     this.color.sideEffecting(Color(0.8f, 1f, 1f, 0f)) { existing ->
-                        existing.a = if (useHovered.useB() && hovered.useB()) 0.9f else 0f
+                        existing.a = if (useHovered.use() && hovered.use()) 0.9f else 0f
                         existing
                     }
                 })
@@ -141,7 +140,7 @@ open class ContextMenu : Control<ContextMenu>() {
             when (item) {
                 is CustomMenuItem -> {
                     useHovered.set(false)
-                    basePane.bounds.width.bind { width.useF() }
+                    basePane.bounds.width.bind { width.use() }
                     val contentPadding = contentPane.padding.getOrCompute()
                     val w = item.element.bounds.width.get() + contentPadding.left + contentPadding.right
                     if (width.get() < w) {
@@ -156,7 +155,7 @@ open class ContextMenu : Control<ContextMenu>() {
                     useHovered.set(false)
                     val panePadding = Insets(4f, 4f, 2f, 2f)
                     basePane.bounds.height.set(panePadding.top + panePadding.bottom + 1f)
-                    basePane.bounds.width.bind { width.useF() }
+                    basePane.bounds.width.bind { width.use() }
 
                     contentPane.also { pane ->
                         pane.padding.set(panePadding)
@@ -169,7 +168,7 @@ open class ContextMenu : Control<ContextMenu>() {
                     val panePadding = contentPane.padding.getOrCompute()
                     item.textBlock.computeLayouts()
                     basePane.bounds.height.set(panePadding.top + panePadding.bottom + padding * 2 + item.textBlock.height)
-                    basePane.bounds.width.bind { width.useF() }
+                    basePane.bounds.width.bind { width.use() }
 
                     contentPane.also { pane ->
                         pane.addChild(TextLabel("").apply {
@@ -186,7 +185,7 @@ open class ContextMenu : Control<ContextMenu>() {
                     val panePadding = contentPane.padding.getOrCompute()
                     item.textBlock.computeLayouts()
                     basePane.bounds.height.set(panePadding.top + panePadding.bottom + padding * 2 + item.textBlock.height)
-                    basePane.bounds.width.bind { width.useF() }
+                    basePane.bounds.width.bind { width.use() }
 
                     contentPane.also { pane ->
                         pane.addChild(Button("").apply {
@@ -213,7 +212,7 @@ open class ContextMenu : Control<ContextMenu>() {
                     val panePadding = contentPane.padding.getOrCompute()
                     item.textBlock.computeLayouts()
                     basePane.bounds.height.set(panePadding.top + panePadding.bottom + padding * 2 + item.textBlock.height)
-                    basePane.bounds.width.bind { width.useF() }
+                    basePane.bounds.width.bind { width.use() }
 
                     contentPane.also { pane ->
                         pane.addChild(CheckBox("").apply {

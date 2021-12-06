@@ -169,23 +169,23 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     if (it.getOrCompute() == null) inwardArrows.set(false)
                 }
                 val pane = Pane().also { pane ->
-                    pane += TextLabel(binding = { if (inwardArrows.useB()) ">" else "<" }, font = main.fontMainMenuMain).apply { 
+                    pane += TextLabel(binding = { if (inwardArrows.use()) ">" else "<" }, font = main.fontMainMenuMain).apply { 
                         this.bindWidthToParent(multiplier = 0.2f)
                         Anchor.TopLeft.configure(this)
                         this.renderAlign.set(Align.center)
                         this.textColor.bind { this@settingsOptionPane.textColorVar.use() }
-                        this.visible.bind { inwardArrows.useB() }
+                        this.visible.bind { inwardArrows.use() }
                     }
-                    pane += TextLabel(binding = { if (inwardArrows.useB()) "<" else ">" }, font = main.fontMainMenuMain).apply { 
+                    pane += TextLabel(binding = { if (inwardArrows.use()) "<" else ">" }, font = main.fontMainMenuMain).apply { 
                         this.bindWidthToParent(multiplier = 0.2f)
                         Anchor.TopRight.configure(this)
                         this.renderAlign.set(Align.center)
                         this.textColor.bind { this@settingsOptionPane.textColorVar.use() }
-                        this.visible.bind { inwardArrows.useB() }
+                        this.visible.bind { inwardArrows.use() }
                     }
                     pane += Button(binding = {
                         settings.inputKeymapKeyboard.use()
-                        if (inwardArrows.useB()) {
+                        if (inwardArrows.use()) {
                             "..."
                         } else Input.Keys.toString(getter())
                     }, font = main.fontMainMenuRodin).apply {

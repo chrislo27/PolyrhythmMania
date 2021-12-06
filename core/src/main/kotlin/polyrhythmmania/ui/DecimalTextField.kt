@@ -24,7 +24,7 @@ class DecimalTextField(
         this.text.set(decimalToStr())
         this.inputFilter.bind { 
             val df = this@DecimalTextField.decimalFormat.use()
-            val negatives = allowNegatives.useB()
+            val negatives = allowNegatives.use()
             val symbols = df.decimalFormatSymbols
             ;
             { c: Char ->

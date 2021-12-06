@@ -86,9 +86,9 @@ open class TextField(font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
         val paintboxFont = this@TextField.font.use()
         paintboxFont.currentFontNumberVar.use()
         paintboxFont.useFont { bitmapFont ->
-            bitmapFont.scaleMul(textScale.useF())
+            bitmapFont.scaleMul(textScale.use())
             val originalText = text.use()
-            val translated = translateTextToRenderable(originalText, isPassword.useB(), newlineWrapChar.use())
+            val translated = translateTextToRenderable(originalText, isPassword.use(), newlineWrapChar.use())
             layout.setText(bitmapFont, translated, Color.WHITE, 0f, Align.left, false)
         }
         layout

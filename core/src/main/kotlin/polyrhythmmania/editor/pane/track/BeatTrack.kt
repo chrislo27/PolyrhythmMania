@@ -53,17 +53,17 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
         this.sidePanel.sidebarSection += vbox
 
         val timeTextVar = Localization.getVar("editor.currentTime", Var.bind {
-            listOf(DecimalFormats.format("0.000", editor.engineBeat.useF()))
+            listOf(DecimalFormats.format("0.000", editor.engineBeat.use()))
         })
         val secondsTextVar = Var {
-            editor.engineBeat.useF()
+            editor.engineBeat.use()
             TimeUtils.convertMsToTimestamp(editor.engine.seconds * 1000)
         }
         val bpmVar = FloatVar {
-            editor.engine.tempos.tempoAtBeat(editor.engineBeat.useF())
+            editor.engine.tempos.tempoAtBeat(editor.engineBeat.use())
         }
         val bpmTextVar = Var {
-            "♩=${DecimalFormats.format("0.0", bpmVar.useF())}"
+            "♩=${DecimalFormats.format("0.0", bpmVar.use())}"
         }
         beatTimeLabel = TextLabel(binding = {
             timeTextVar.use()
@@ -75,7 +75,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.height.set(28f)
             val tooltipVar = Localization.getVar("editor.track.beat.tooltip.currentBeat", Var {
-                listOf(DecimalFormats.format("0.000", editor.playbackStart.useF()), DecimalFormats.format("0.000", editor.musicFirstBeat.useF()))
+                listOf(DecimalFormats.format("0.000", editor.playbackStart.use()), DecimalFormats.format("0.000", editor.musicFirstBeat.use()))
             })
             this.tooltipElement.set(editorPane.createDefaultTooltip(tooltipVar))
         }
@@ -92,7 +92,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.bgPadding.set(Insets.ZERO)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.width.bind {
-                (parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * 0.5f
+                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.5f
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.track.beat.tooltip.currentTime")))
         }
@@ -107,7 +107,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             this.bgPadding.set(Insets.ZERO)
             this.padding.set(Insets(0f, 0f, 4f, 4f))
             this.bounds.width.bind {
-                (parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * 0.35f
+                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * 0.35f
             }
             this.setScaleXY(0.75f)
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.track.beat.tooltip.currentBPM")))

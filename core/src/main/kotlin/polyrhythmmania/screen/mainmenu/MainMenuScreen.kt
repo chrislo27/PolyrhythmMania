@@ -50,7 +50,6 @@ import polyrhythmmania.soundsystem.beads.ugen.Bandpass
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
-import java.io.RandomAccessFile
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.math.ceil
@@ -240,12 +239,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.margin.set(Insets(64f))
         }
         logoImage = ImageNode(binding = {
-            TextureRegion(AssetRegistry.get<Texture>(if (secretLogo.useB()) "logo_pome" else "logo_2lines_en"))
+            TextureRegion(AssetRegistry.get<Texture>(if (secretLogo.use()) "logo_pome" else "logo_2lines_en"))
         }).apply {
             this.bounds.height.set(175f)
             this.bounds.y.set(24f)
             this.renderAlign.set(Align.topLeft)
-            this.visible.bind { (menuCollection.activeMenu.use() as? MMMenu)?.showLogo?.useB() != false }
+            this.visible.bind { (menuCollection.activeMenu.use() as? MMMenu)?.showLogo?.use() != false }
         }
         leftPane.addChild(logoImage)
         menuPane.apply {
@@ -310,12 +309,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.renderBackground.set(true)
             this.bgPadding.set(Insets(8f))
             this.textColor.bind {
-                if (newVersionAvailable.useB()) Color.ORANGE.cpy() else Color(1f, 1f, 1f, 1f)
+                if (newVersionAvailable.use()) Color.ORANGE.cpy() else Color(1f, 1f, 1f, 1f)
             }
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
             this.tooltipElement.set(Tooltip(binding = {
                 val t = "${PRMania.TITLE} ${PRMania.VERSION}"
-                if (newVersionAvailable.useB()) {
+                if (newVersionAvailable.use()) {
                     "${Localization.getVar("mainMenu.newVersion", Var { listOf(main.githubVersion.use()) })}"
                 } else t
             }, font = main.fontMainMenuMain).apply {
@@ -329,10 +328,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         sceneRoot += Tooltip(binding = { Localization.getVar("mainMenu.newVersionFloater").use() }, font = main.fontMainMenuMain).apply {
             Anchor.BottomRight.configure(this)
             val leftSide = FloatVar {
-                versionTooltip.bounds.x.useF() - bounds.width.useF()
+                versionTooltip.bounds.x.use() - bounds.width.use()
             }
             this.bounds.x.bind { 
-                leftSide.useF() - (newVersionFloaterAnimation.useF() * 20f)
+                leftSide.use() - (newVersionFloaterAnimation.use() * 20f)
             }
             resizeBoundsToContent()
             this.bounds.height.set(32f)
@@ -341,7 +340,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.renderBackground.set(true)
             this.bgPadding.set(Insets(8f))
             this.visible.bind { 
-                newVersionAvailable.useB()
+                newVersionAvailable.use()
             }
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
         }

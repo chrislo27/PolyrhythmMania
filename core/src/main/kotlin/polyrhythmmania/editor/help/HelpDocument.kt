@@ -32,7 +32,7 @@ abstract class DocumentRenderer : Disposable {
                 vbox.sizeHeightToChildren(10f)
             }
             this += vbox
-            this.bounds.height.bind { vbox.bounds.height.useF() }
+            this.bounds.height.bind { vbox.bounds.height.use() }
         }
     }
     

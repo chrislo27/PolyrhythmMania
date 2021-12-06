@@ -140,14 +140,14 @@ class TexturePackEditDialog(editorPane: EditorPane,
 
 
         val hideMainContent = BooleanVar {
-            isFileChooserOpen.useB() || isMessageVisible.useB()
+            isFileChooserOpen.use() || isMessageVisible.use()
         }
         val contentPaneContainer = Pane().apply {
-            this.visible.bind { !hideMainContent.useB() }
+            this.visible.bind { !hideMainContent.use() }
         }
         contentPane += contentPaneContainer
         val bottomPaneContainer = Pane().apply {
-            this.visible.bind { !hideMainContent.useB() }
+            this.visible.bind { !hideMainContent.use() }
         }
         bottomPane += bottomPaneContainer
         
@@ -166,7 +166,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         
         // Close file chooser msg
         contentPane += Pane().apply { 
-            this.visible.bind { isFileChooserOpen.useB() }
+            this.visible.bind { isFileChooserOpen.use() }
             this += TextLabel(binding = { Localization.getVar("common.closeFileChooser").use() }).apply {
                 this.markup.set(editorPane.palette.markup)
                 this.textColor.set(Color.WHITE.cpy())
@@ -176,7 +176,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         }
         // Generic msg
         contentPane += Pane().apply { 
-            this.visible.bind { !isFileChooserOpen.useB() && isMessageVisible.useB() }
+            this.visible.bind { !isFileChooserOpen.use() && isMessageVisible.use() }
             this += TextLabel(binding = { currentMsg.use() }).apply {
                 this.markup.set(editorPane.palette.markup)
                 this.textColor.set(Color.WHITE.cpy())
@@ -228,7 +228,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     }
                     is ListEntry.Region -> {
                         val textBinding: ReadOnlyVar<String> = Var.bind {
-                            onTexturePackUpdated.useB()
+                            onTexturePackUpdated.use()
                             (if (customTexturePack.use().getOrNull(listEntry.id) != null)
                                 "[font=rodin color=CYAN]★[] " else "") +
                                     Localization.getVar(listEntry.localizationKey).use() + 
@@ -456,14 +456,14 @@ class TexturePackEditDialog(editorPane: EditorPane,
         bottomPaneContainer.addChild(bottomLeftHbox)
         bottomPaneContainer.addChild(RectElement(DARK_GREY).apply { 
             this.bounds.width.set(2f)
-            this.bounds.x.bind { (parent.use()?.bounds?.width?.useF() ?: 0f) * scrollPaneWidthProportion - 8f }
+            this.bounds.x.bind { (parent.use()?.bounds?.width?.use() ?: 0f) * scrollPaneWidthProportion - 8f }
         })
 
 
         val bottomRightHbox = HBox().apply {
             this.spacing.set(8f)
-            this.bindWidthToParent(multiplierBinding = { 1f - scrollPaneWidthProportion }, adjustBinding = { -8f * 2 - bounds.height.useF() })
-            this.bounds.x.bind { (parent.use()?.bounds?.width?.useF() ?: 0f) * 0.4f + 8f }
+            this.bindWidthToParent(multiplierBinding = { 1f - scrollPaneWidthProportion }, adjustBinding = { -8f * 2 - bounds.height.use() })
+            this.bounds.x.bind { (parent.use()?.bounds?.width?.use() ?: 0f) * 0.4f + 8f }
         }
         bottomRightHbox.temporarilyDisableLayouts {
             bottomRightHbox += TextLabel(binding = { Localization.getVar("editor.dialog.texturePack.stock").use() },
@@ -711,7 +711,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this.padding.set(Insets(2f))
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_trash"])).also { img -> 
                     img.tint.bind {
-                        if (apparentDisabledState.useB()) Color(0.5f, 0.5f, 0.5f, 0.25f) else Color(1f, 1f, 1f, 1f)
+                        if (apparentDisabledState.use()) Color(0.5f, 0.5f, 0.5f, 0.25f) else Color(1f, 1f, 1f, 1f)
                     }
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.texturePack.button.removeTexture")))
@@ -756,13 +756,13 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     this.bounds.width.set(120f)
                     this.textLabel.markup.set(editorPane.palette.markup)
                     val tint: ReadOnlyVar<Color> = Var {
-                        if (apparentDisabledState.useB()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
+                        if (apparentDisabledState.use()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
                     }
                     this.color.bind { tint.use() }
                     this.imageNode.padding.set(Insets(3f))
                     filterToggleGroup.addToggle(this)
                     this.disabled.bind {
-                        updateVar.useB()
+                        updateVar.use()
                         val ctp = customTexturePack.use()
                         val current = currentEntry.use()
                         ctp.getOrNull(current.id) == null
@@ -787,13 +787,13 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     this.bounds.width.set(120f)
                     this.textLabel.markup.set(editorPane.palette.markup)
                     val tint: ReadOnlyVar<Color> = Var {
-                        if (apparentDisabledState.useB()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
+                        if (apparentDisabledState.use()) Color.DARK_GRAY.cpy() else Color.WHITE.cpy()
                     }
                     this.color.bind { tint.use() }
                     this.imageNode.padding.set(Insets(3f))
                     filterToggleGroup.addToggle(this)
                     this.disabled.bind {
-                        updateVar.useB()
+                        updateVar.use()
                         val ctp = customTexturePack.use()
                         val current = currentEntry.use()
                         ctp.getOrNull(current.id) == null
@@ -832,7 +832,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                         onTexturePackUpdated.invert()
                     }
                     this.disabled.bind {
-                        updateVar.useB()
+                        updateVar.use()
                         val ctp = customTexturePack.use()
                         val current = currentEntry.use()
                         ctp.getOrNull(current.id) == null
@@ -850,7 +850,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 fun createTransparencyNode(): ImageNode {
                     return ImageNode(null, ImageRenderingMode.FULL).also { im ->
                         im.textureRegion.sideEffecting(TextureRegion(PRManiaGame.instance.colourPickerTransparencyGrid)) { tr ->
-                            tr?.setRegion(0, 0, im.bounds.width.useF().toInt(), im.bounds.height.useF().toInt())
+                            tr?.setRegion(0, 0, im.bounds.width.use().toInt(), im.bounds.height.use().toInt())
                             tr
                         }
                     }
@@ -860,7 +860,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 showBox += createTransparencyNode().apply { 
                     this.bindWidthToSelfHeight()
                     this += ImageNode(binding = { 
-                        updateVar.useB()
+                        updateVar.use()
                         val entry = currentEntry.use()
                         customTexturePack.use().getOrNull(entry.id) ?: baseTexturePack.use().getOrNull(entry.id)
                                                 }, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)

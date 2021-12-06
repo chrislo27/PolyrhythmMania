@@ -794,20 +794,20 @@ class Editor(val main: PRManiaGame)
 
     private fun bindStatusBar(msg: Var<String>) {
         msg.bind {
-            this@Editor.forceUpdateStatus.useB()
+            this@Editor.forceUpdateStatus.use()
             val tool = this@Editor.tool.use()
             val currentClick = this@Editor.click.use()
             when (currentClick) {
                 is Click.CreateSelection -> Localization.getVar("editor.status.creatingSelection").use()
                 is Click.DragSelection -> {
                     var res = Localization.getVar("editor.status.draggingSelection").use()
-                    if (currentClick.wouldBeDeleted.useB() && !currentClick.isNew) {
+                    if (currentClick.wouldBeDeleted.use() && !currentClick.isNew) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.willBeDeleted").use()
                     } else if (currentClick.placementInvalidDuplicates) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.noDuplicates").use()
-                    } else if (currentClick.collidesWithOtherBlocks.useB()) {
+                    } else if (currentClick.collidesWithOtherBlocks.use()) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.collides").use()
-                    } else if (currentClick.isPlacementInvalid.useB()) {
+                    } else if (currentClick.isPlacementInvalid.use()) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.invalidPlacement").use()
                     }
                     res
@@ -821,7 +821,7 @@ class Editor(val main: PRManiaGame)
                     }
                 }
                 is Click.MoveTempoChange -> {
-                    val valid = currentClick.isCurrentlyValid.useB()
+                    val valid = currentClick.isCurrentlyValid.use()
                     var res = Localization.getVar("editor.status.tempoChangeTool.dragging").use()
                     if (!valid) {
                         res += " " + Localization.getVar("editor.status.tempoChangeTool.dragging.invalidPlacement").use()
@@ -829,7 +829,7 @@ class Editor(val main: PRManiaGame)
                     res
                 }
                 is Click.DragMusicVolume -> {
-                    val valid = currentClick.isCurrentlyValid.useB()
+                    val valid = currentClick.isCurrentlyValid.use()
                     var res = Localization.getVar("editor.status.musicVolumeTool.dragging").use()
                     if (!valid) {
                         res += " " + Localization.getVar("editor.status.musicVolumeTool.dragging.invalidPlacement").use()

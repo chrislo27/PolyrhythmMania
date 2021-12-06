@@ -55,17 +55,17 @@ open class CheckBox(text: String, font: PaintboxFont = PaintboxGame.gameInstance
     
     init {
         val height: ReadOnlyFloatVar = FloatVar {
-            contentZone.height.useF()
+            contentZone.height.use()
         }
-        textLabel.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) height.useF() else 0f }
-        textLabel.bindWidthToParent { -height.useF() }
+        textLabel.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) height.use() else 0f }
+        textLabel.bindWidthToParent { -height.use() }
         textLabel.margin.set(Insets(2f))
-        imageNode.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) 0f else ((imageNode.parent.use()?.bounds?.width?.useF()
-                ?: 0f) - height.useF()) }
-        imageNode.bounds.width.bind { height.useF() }
+        imageNode.bounds.x.bind { if (boxAlignment.use() == BoxAlign.LEFT) 0f else ((imageNode.parent.use()?.bounds?.width?.use()
+                ?: 0f) - height.use()) }
+        imageNode.bounds.width.bind { height.use() }
         imageNode.textureRegion.bind { 
             val type = checkType.use()
-            val state = checkedState.useB()
+            val state = checkedState.use()
             getTextureRegionForType(type, state)
         }
         imageNode.margin.set(Insets(2f))

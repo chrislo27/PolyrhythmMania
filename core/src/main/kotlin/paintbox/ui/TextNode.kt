@@ -19,7 +19,7 @@ open class TextNode(textBlock: TextBlock = TextBlock(emptyList())) : UIElement()
     val textColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     val textBlock: Var<TextBlock> = Var(textBlock)
     val renderAlign: IntVar = IntVar(Align.left)
-    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.useI()) }
+    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
     val doXCompression: BooleanVar = BooleanVar(true)
 
     constructor(font: PaintboxFont, text: String, color: Color = Color.WHITE, scaleX: Float = 1f, scaleY: Float = 1f)

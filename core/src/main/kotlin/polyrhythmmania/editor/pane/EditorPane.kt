@@ -83,9 +83,9 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         parent += statusBar
 
         upperPane = UpperPane(this).apply {
-            Anchor.TopLeft.configure(this, offsetY = { menubarBacking.bounds.height.useF() })
+            Anchor.TopLeft.configure(this, offsetY = { menubarBacking.bounds.height.use() })
             this.bounds.height.bind {
-                (300 * ((sceneRoot.use()?.bounds?.height?.useF() ?: 720f) / 720f)).coerceAtLeast(300f)
+                (300 * ((sceneRoot.use()?.bounds?.height?.use() ?: 720f) / 720f)).coerceAtLeast(300f)
             }
         }
         parent += upperPane
@@ -95,10 +95,10 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         allTracksPane = AllTracksPane(this).apply {
             Anchor.TopLeft.configure(this)
             this.bounds.y.bind {
-                upperPane.bounds.y.useF() + upperPane.bounds.height.useF()
+                upperPane.bounds.y.use() + upperPane.bounds.height.use()
             }
             this.bounds.height.bind {
-                statusBar.bounds.y.useF() - bounds.y.useF()
+                statusBar.bounds.y.use() - bounds.y.use()
             }
         }
         parent += allTracksPane

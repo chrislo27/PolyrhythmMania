@@ -44,15 +44,15 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
         this += middleDivider
 
         val scrollSelector = Pane().apply {
-            this.bounds.width.bind { middleDivider.bounds.x.useF() }
+            this.bounds.width.bind { middleDivider.bounds.x.use() }
         }
         this += scrollSelector
 
         val descPane = Pane().apply {
             Anchor.TopRight.configure(this)
             this.bounds.width.bind {
-                (parent.use()?.contentZone?.width?.useF()
-                        ?: 0f) - (middleDivider.bounds.x.useF() + middleDivider.bounds.width.useF())
+                (parent.use()?.contentZone?.width?.use()
+                        ?: 0f) - (middleDivider.bounds.x.use() + middleDivider.bounds.width.use())
             }
             this.padding.set(Insets(2f))
         }
@@ -145,14 +145,14 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
     val categoryIndex: IndexTween = IndexTween()
     val perCategoryIndex: Map<String, IndexTween> = perCategory.keys.associateWith { IndexTween() }
     val currentIndex: ReadOnlyVar<IndexTween> = Var {
-        if (inCategories.useB()) categoryIndex else perCategoryIndex.getValue(categories[categoryIndex.index.useI()].categoryID)
+        if (inCategories.use()) categoryIndex else perCategoryIndex.getValue(categories[categoryIndex.index.use()].categoryID)
     }
     
     val currentItem: ReadOnlyVar<ObjectListable> = Var {
-        currentList.use()[currentIndex.use().index.useI()]
+        currentList.use()[currentIndex.use().index.use()]
     }
     val currentCategory: ReadOnlyVar<ListCategory> = Var {
-        categories[categoryIndex.index.useI()]
+        categories[categoryIndex.index.use()]
     }
 
     init {
@@ -176,7 +176,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
                 scroll(-1)
             }
             this.disabled.bind {
-                currentIndex.use().index.useI() <= 0
+                currentIndex.use().index.use() <= 0
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.up.tooltip")))
         }
@@ -194,7 +194,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
                 scroll(+1)
             }
             this.disabled.bind {
-                currentIndex.use().index.useI() >= (currentList.use().size - 1)
+                currentIndex.use().index.use() >= (currentList.use().size - 1)
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.instantiators.down.tooltip")))
         }
@@ -207,7 +207,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
             val tooltipCurrentBlock = Localization.getVar("editor.instantiators.currentBlock.tooltip")
             val tooltipCurrentCat = Localization.getVar("editor.instantiators.currentCategory.tooltip")
             this.tooltipElement.set(editorPane.createDefaultTooltip(binding = {
-                if (inCategories.useB()) tooltipCurrentCat.use() else tooltipCurrentBlock.use()
+                if (inCategories.use()) tooltipCurrentCat.use() else tooltipCurrentBlock.use()
             }))
             this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"]))
             this.setOnAction {
@@ -226,7 +226,7 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
             this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_instantiator_right"]).apply { 
                 flip(true, false)
             })
-            this.visible.bind { !inCategories.useB() }
+            this.visible.bind { !inCategories.use() }
             this.setOnAction {
                 changeToCategories()
             }

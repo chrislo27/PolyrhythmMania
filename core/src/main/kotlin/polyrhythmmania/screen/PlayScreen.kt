@@ -20,7 +20,6 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.PaintboxGame
 import paintbox.binding.FloatVar
 import paintbox.binding.IntVar
-import paintbox.binding.Var
 import paintbox.binding.VarChangedListener
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
@@ -149,8 +148,8 @@ class PlayScreen(
         
         topPane = Pane().apply { 
             Anchor.TopLeft.configure(this, offsetY = {
-                val h = bounds.height.useF()
-                -h + panelAnimationValue.useF() * h
+                val h = bounds.height.use()
+                -h + panelAnimationValue.use() * h
             })
             this.bindHeightToParent(multiplier = 0.3333f)
             this.bindWidthToSelfHeight(multiplier = 1f / pauseBg.triangleSlope)
@@ -159,8 +158,8 @@ class PlayScreen(
         nextLayer += topPane
         bottomPane = Pane().apply { 
             Anchor.BottomRight.configure(this, offsetY = {
-                val h = bounds.height.useF()
-                h + panelAnimationValue.useF() * -h
+                val h = bounds.height.use()
+                h + panelAnimationValue.use() * -h
             })
             this.bindWidthToParent(multiplier = 0.6666f)
             this.bindHeightToSelfWidth(multiplier = pauseBg.triangleSlope)
@@ -212,8 +211,8 @@ class PlayScreen(
 //                this.bindHeightToParent(multiplier = 1.5f)
                 this.bounds.height.set(64f)
                 this.bindWidthToSelfHeight()
-                this.bounds.x.bind { -(bounds.width.useF() + optionsBorderSize * 2 + 2f) }
-                this.visible.bind { selectionIndex.useI() == index }
+                this.bounds.x.bind { -(bounds.width.use() + optionsBorderSize * 2 + 2f) }
+                this.visible.bind { selectionIndex.use() == index }
             }
         }
 
@@ -224,7 +223,7 @@ class PlayScreen(
                 Anchor.TopLeft.configure(this)
                 this.disabled.set(!enabled)
                 this.textColor.bind {
-                    if (apparentDisabledState.useB()) Color.GRAY else if (selectionIndex.useI() == index) selectedLabelColor else unselectedLabelColor
+                    if (apparentDisabledState.use()) Color.GRAY else if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
                 }
                 this.bounds.height.set(48f)
                 this.padding.set(Insets(2f, 2f, 12f, 12f))

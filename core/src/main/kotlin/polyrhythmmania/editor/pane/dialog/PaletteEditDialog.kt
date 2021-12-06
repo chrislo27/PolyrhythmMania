@@ -11,7 +11,6 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.WriterConfig
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
-import paintbox.binding.invert
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -125,7 +124,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                     this.textLabel.markup.set(editorPane.palette.markup)
                     if (canChangeEnabledState) {
                         this.color.bind {
-                            val enabled = mapping.enabled.useB()
+                            val enabled = mapping.enabled.use()
                             if (enabled) Color.WHITE else Color.GRAY
                         }
                     } else {
@@ -161,11 +160,11 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                 this.temporarilyDisableLayouts {
                     this += objPreview.apply {
                         this.bounds.width.bind { 
-                            bounds.height.useF() * (16f / 9f)
+                            bounds.height.use() * (16f / 9f)
                         }
                     }
                     this += VBox().also { v -> 
-                        v.bindWidthToParent(adjustBinding = { objPreview.bounds.width.useF() * -1 + -5f })
+                        v.bindWidthToParent(adjustBinding = { objPreview.bounds.width.use() * -1 + -5f })
                         v.spacing.set(4f)
                         v.temporarilyDisableLayouts { 
                             v += HBox().apply {
@@ -211,7 +210,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                                                 this.maximum.set(1f)
                                                 this.tickUnit.set(0f)
                                                 this.setValue(0f)
-                                                rodRotation.bind { this@slider.value.useF() * 2f }
+                                                rodRotation.bind { this@slider.value.use() * 2f }
                                             }
                                         }
                                     }
@@ -297,7 +296,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
         
         val bottomHbox = HBox().apply {
             this.spacing.set(8f)
-            this.bindWidthToParent(adjustBinding = { -(bounds.height.useF() + 4f) })
+            this.bindWidthToParent(adjustBinding = { -(bounds.height.use() + 4f) })
         }
         bottomHbox.temporarilyDisableLayouts {
             bottomHbox += TextLabel(binding = { Localization.getVar("editor.dialog.tilesetPalette.resetLabel").use() },
@@ -577,7 +576,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                 affectsMappings.forEach { m ->
                     // Intentionally iterating through all of them since they are all dependencies.
                     // The order of the anyEnabled assignment is also intentional to prevent bad short-circuiting
-                    anyEnabled = m.enabled.useB() || anyEnabled
+                    anyEnabled = m.enabled.use() || anyEnabled
                 }
                 anyEnabled
             }

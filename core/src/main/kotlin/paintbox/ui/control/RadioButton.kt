@@ -46,15 +46,15 @@ open class RadioButton(text: String, font: PaintboxFont = PaintboxGame.gameInsta
 
     init {
         val height: ReadOnlyFloatVar = FloatVar {
-            contentZone.height.useF()
+            contentZone.height.use()
         }
-        textLabel.bounds.x.bind { height.useF() }
-        textLabel.bindWidthToParent { -height.useF() }
+        textLabel.bounds.x.bind { height.use() }
+        textLabel.bindWidthToParent { -height.use() }
         textLabel.margin.set(Insets(2f))
         imageNode.bounds.x.set(0f)
-        imageNode.bounds.width.bind { height.useF() }
+        imageNode.bounds.width.bind { height.use() }
         imageNode.textureRegion.bind {
-            val state = checkedState.useB()
+            val state = checkedState.use()
             getTextureRegionForType(state)
         }
         imageNode.margin.set(Insets(2f))

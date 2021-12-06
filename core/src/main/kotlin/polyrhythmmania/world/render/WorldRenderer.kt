@@ -160,7 +160,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         ), TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
 
         uiSceneRoot += endlessModeScorePane.apply {
-            this.visible.bind { showEndlessModeScore.useB() }
+            this.visible.bind { showEndlessModeScore.use() }
             Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
 //            this.bounds.width.set(400f)
             this.bindWidthToParent(adjust = -64f)
@@ -178,7 +178,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                         } else if (seed != null) {
                             Localization.getVar("play.endless.seed", Var { listOf(seed) }).use()
                         } else {
-                            Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.useI()) }).use()
+                            Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) }).use()
                         }
                     }
                     this += TextLabel(binding = { prevTextVar.use() },
@@ -190,7 +190,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                         this.textColor.set(defaultTextColor)
                         this.setScaleXY(0.6f)
                         this.textColor.bind { 
-                            val maxLives = engine.inputter.endlessScore.maxLives.useI()
+                            val maxLives = engine.inputter.endlessScore.maxLives.use()
                             if (endlessModeSeed.use() != null && maxLives == 1) {
                                 Color(1f, 0.35f, 0.35f, 1f)
                             } else defaultTextColor
@@ -212,20 +212,20 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
 //                    this += endlessModeLivesLabel
                 }
 
-                val currentScoreVar = Localization.getVar("play.endless.score", Var { listOf(currentEndlessScore.useI()) })
+                val currentScoreVar = Localization.getVar("play.endless.score", Var { listOf(currentEndlessScore.use()) })
                 endlessModeScoreLabel = TextLabel(binding = { currentScoreVar.use() },
                         font = PRManiaGame.instance.fontPauseMenuTitle).apply {
                     this.bounds.height.set(100f)
                     this.renderAlign.set(Align.topLeft)
                     this.textColor.set(Color(1f, 1f, 1f, 1f))
                     val scaleMul = 1f / 1.25f
-                    this.scaleX.bind { endlessModeScoreLabelScaleXY.useF() * scaleMul }
-                    this.scaleY.bind { endlessModeScoreLabelScaleXY.useF() * scaleMul }
+                    this.scaleX.bind { endlessModeScoreLabelScaleXY.use() * scaleMul }
+                    this.scaleY.bind { endlessModeScoreLabelScaleXY.use() * scaleMul }
                 }
                 this += endlessModeScoreLabel
 
                 val endlessModeLivesLabel = TextLabel(binding = {
-                    val l = currentEndlessLives.useI()
+                    val l = currentEndlessLives.use()
                     /* space at start is necessary -> */ " [font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]"
                 }).apply {
                     this.bounds.height.set(40f)
@@ -243,7 +243,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         
         uiSceneRoot += moreTimesLabel.apply {
             Anchor.BottomRight.configure(this)
-            val locVar = Localization.getVar("practice.moreTimes.times", Var { listOf(moreTimesVar.useI()) })
+            val locVar = Localization.getVar("practice.moreTimes.times", Var { listOf(moreTimesVar.use()) })
             this.text.bind { locVar.use() }
             this.renderAlign.set(Align.right)
             this.margin.set(Insets(0f, 16f, 0f, 16f))
@@ -251,7 +251,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
             this.bounds.width.set(510f)
             this.bounds.height.set(86f)
             this.textColor.set(Color.WHITE)
-            this.visible.bind { moreTimesVar.useI() > 0 }
+            this.visible.bind { moreTimesVar.use() > 0 }
         }
         perfectIcon = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect"])
         perfectIconFailed = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_failed"]).apply {
@@ -283,7 +283,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         
         endlessModeGameOverPane.apply {
             this.visible.bind { 
-                engine.inputter.endlessScore.gameOverUIShown.useB()
+                engine.inputter.endlessScore.gameOverUIShown.use()
             }
             this += RectElement(Color(0f, 0f, 0f, 0.5f))
         }

@@ -195,7 +195,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             scrollPaneContent.bind { 
-                if (isFetching.useB()) {
+                if (isFetching.use()) {
                     paneFetching
                 } else {
                     if (showRefreshPrompt) {
@@ -234,7 +234,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     getLeaderboard()
                 }
                 this.disabled.bind { 
-                    isFetching.useB() || disableRefresh.useB()
+                    isFetching.use() || disableRefresh.use()
                 }
             }
         }

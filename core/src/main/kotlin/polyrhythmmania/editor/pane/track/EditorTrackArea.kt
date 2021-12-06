@@ -34,7 +34,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
     private val tmpRect: Rectangle = Rectangle()
     
     val beatWidth: FloatVar = FloatVar {
-        this@EditorTrackArea.bounds.width.useF() / trackView.pxPerBeat.useF()
+        this@EditorTrackArea.bounds.width.use() / trackView.pxPerBeat.use()
     }
 
     init {

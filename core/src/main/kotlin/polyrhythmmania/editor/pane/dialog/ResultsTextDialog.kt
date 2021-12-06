@@ -89,7 +89,7 @@ class ResultsTextDialog(editorPane: EditorPane)
                     this.maximum.set(100f)
                     this.tickUnit.set(1f)
                     this.setValue(0f)
-                    testScoreValue.bind { this@slider.value.useF().coerceIn(0f, 100f) }
+                    testScoreValue.bind { this@slider.value.use().coerceIn(0f, 100f) }
                 }
             }
             leftVbox += CheckBox(binding = { Localization.getVar("editor.dialog.resultsText.noMiss").use() },
@@ -210,10 +210,10 @@ class ResultsTextDialog(editorPane: EditorPane)
         private val innerSceneRoot: SceneRoot = SceneRoot(camera)
         private val scoreObj: Var<Score> = Var {
             val resultsText = resultsText.use()
-            val scoreInt = testScoreValue.useF().toInt()
+            val scoreInt = testScoreValue.use().toInt()
             val lines: Pair<String, String> = resultsText.generateLinesOfText(scoreInt, false, false)
-            val noMiss = testScoreNoMiss.useB()
-            val skillStar = testScoreSkillStar.useB()
+            val noMiss = testScoreNoMiss.use()
+            val skillStar = testScoreSkillStar.use()
             Score(scoreInt, scoreInt.toFloat(), if (noMiss) 8 else 7, 8,
                     skillStar, noMiss,
                     Challenges.NO_CHANGES,

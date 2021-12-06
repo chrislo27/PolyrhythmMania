@@ -41,8 +41,8 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
                 (markup?.parse(label.text.use())
                         ?: TextRun(label.font.use(), label.text.use(), Color.WHITE,
                                 /*label.scaleX.use(), label.scaleY.use()*/ 1f, 1f).toTextBlock()).also { textBlock ->
-                    if (label.doLineWrapping.useB()) {
-                        textBlock.lineWrapping.set(label.contentZone.width.useF() / (if (label.doesScaleXAffectWrapping.useB()) label.scaleX.useF() else 1f))
+                    if (label.doLineWrapping.use()) {
+                        textBlock.lineWrapping.set(label.contentZone.width.use() / (if (label.doesScaleXAffectWrapping.use()) label.scaleX.use() else 1f))
                     }
                 }
             }
@@ -83,7 +83,7 @@ open class TextLabel(text: String, font: PaintboxFont = PaintboxGame.gameInstanc
     val bgPadding: Var<Insets> = Var.bind { padding.use() }
 
     val renderAlign: IntVar = IntVar(Align.left)
-    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.useI()) }
+    val textAlign: Var<TextAlign> = Var { TextAlign.fromInt(renderAlign.use()) }
     val doXCompression: BooleanVar = BooleanVar(true)
     val doLineWrapping: BooleanVar = BooleanVar(false)
 
@@ -252,7 +252,7 @@ class ScrollingTextLabelSkin(element: TextLabel) : TextLabelSkin(element) {
 
     val scrollRate: FloatVar = FloatVar(64f)
     val wrapAroundPauseSec: FloatVar = FloatVar(2f)
-    val gapBetween: FloatVar = FloatVar { scrollRate.useF() }
+    val gapBetween: FloatVar = FloatVar { scrollRate.use() }
 
     /**
      * The offset is positive.

@@ -28,9 +28,9 @@ abstract class Control<SELF : Control<SELF>>
      * This takes into account the parent's [apparentDisabledState].
      */
     val apparentDisabledState: ReadOnlyBooleanVar = BooleanVar {
-        disabled.useB() || (parent.use()?.let { parent ->
+        disabled.use() || (parent.use()?.let { parent ->
             if (parent is Control<*>) {
-                parent.apparentDisabledState.useB()
+                parent.apparentDisabledState.use()
             } else false
         } ?: false)
     }

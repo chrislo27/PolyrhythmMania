@@ -90,7 +90,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                 this += Pane().apply {
                     this.padding.set(Insets(2f))
 
-                    this += TextLabel(binding = { DecimalFormats.format("0.0#", editor.startingTempo.useF()) },
+                    this += TextLabel(binding = { DecimalFormats.format("0.0#", editor.startingTempo.use()) },
                             font = editorPane.palette.sidePanelFont).apply {
                         this.renderAlign.set(Align.center)
                         this.textAlign.set(TextAlign.CENTRE)
@@ -108,7 +108,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                         val highlighted = Color(0.25f, 1f, 1f, 1f)
                         this.textColor.bind {
                             val tool = editor.tool.use()
-                            val mouseOver = mousedOver.useB()
+                            val mouseOver = mousedOver.use()
                             if (tool == Tool.TEMPO_CHANGE && mouseOver)
                                 highlighted
                             else Color.WHITE

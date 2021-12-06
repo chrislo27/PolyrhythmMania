@@ -71,7 +71,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 this.setOnAction {
                     scrollPane.vBar.setValue(0f)
                 }
-                this.disabled.bind { scrollPane.vBar.value.useF() <= 0f }
+                this.disabled.bind { scrollPane.vBar.value.use() <= 0f }
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_help")["arrow_right"])).apply {
                     this.rotation.set(90f)
                     this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
@@ -129,7 +129,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 this.setOnAction {
                     helpData.backUp()
                 }
-                this.disabled.bind { !helpData.hasBack.useB() }
+                this.disabled.bind { !helpData.hasBack.use() }
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_help")["arrow_right"])).apply {
                     this.rotation.set(180f)
                     this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
@@ -142,7 +142,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 this.setOnAction {
                     helpData.forward()
                 }
-                this.disabled.bind { !helpData.hasForward.useB() }
+                this.disabled.bind { !helpData.hasForward.use() }
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_help")["arrow_right"])).apply {
                     this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
                 }
@@ -338,7 +338,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
             is LayerButton -> {
                 val textBinding: Var.Context.() -> String = if (layer is LayerButtonWithNewIndicator) {
                     {
-                        (if (layer.newIndicator.value.useB())
+                        (if (layer.newIndicator.value.use())
                                 (Localization.getVar("common.newIndicator").use() + " ")
                         else "") + Localization.getVar(layer.text).use()
                     }

@@ -53,7 +53,7 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
 
         hbox.temporarilyDisableLayouts {
             val flashTextColor: Var<Color> = Var.sideEffecting(TEXT_COLOR.cpy()) { c ->
-                val alpha = flashAnimation.useF()
+                val alpha = flashAnimation.use()
                 c.set(TEXT_COLOR).lerp(FLASH_TEXT_COLOR, alpha)
                 c
             }
@@ -65,11 +65,11 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("tapalong.bpmLabel")))
             })
             hbox.addChild(TextLabel(binding = {
-                val count = count.useI()
+                val count = count.use()
                 if (count == 1)
                     Localization.getValue("tapalong.first")
                 else
-                    DecimalFormats.format("0.0", averageBpm.useF())
+                    DecimalFormats.format("0.0", averageBpm.use())
             }, font = editorPane.main.mainFontBold).apply {
                 this.bounds.width.set(64f)
                 this.renderAlign.set(Align.left)
@@ -84,7 +84,7 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
                 this.textColor.set(Color.WHITE)
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("tapalong.countLabel")))
             })
-            hbox.addChild(TextLabel(binding = { "${count.useI()}" }, font = editorPane.main.mainFontBold).apply {
+            hbox.addChild(TextLabel(binding = { "${count.use()}" }, font = editorPane.main.mainFontBold).apply {
                 this.bounds.width.set(40f)
                 this.renderAlign.set(Align.left)
                 this.textAlign.set(TextAlign.LEFT)

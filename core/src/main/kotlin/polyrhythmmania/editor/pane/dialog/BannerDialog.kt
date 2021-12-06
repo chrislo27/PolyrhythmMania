@@ -13,7 +13,6 @@ import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
 import paintbox.ui.ImageRenderingMode
-import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
@@ -25,7 +24,6 @@ import paintbox.util.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
-import polyrhythmmania.PRMania
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.pane.EditorPane
@@ -80,7 +78,7 @@ class BannerDialog(editorPane: EditorPane, val afterDialogClosed: () -> Unit) : 
         val vbox = VBox().apply { 
             this.spacing.set(4f)
             this.visible.bind { 
-                !descLabel.visible.useB()
+                !descLabel.visible.use()
             }
         }
         contentPane += vbox
@@ -94,7 +92,7 @@ class BannerDialog(editorPane: EditorPane, val afterDialogClosed: () -> Unit) : 
             })
             this.bounds.height.set(160f + border.top + border.bottom)
             this.bounds.width.bind { 
-                (bounds.height.useF() - border.top - border.bottom) * 3.2f + (border.left + border.right)
+                (bounds.height.use() - border.top - border.bottom) * 3.2f + (border.left + border.right)
             }
             this += ImageNode(binding = {
                 val tex: Texture = customTexture.use() ?: AssetRegistry["library_default_banner"]

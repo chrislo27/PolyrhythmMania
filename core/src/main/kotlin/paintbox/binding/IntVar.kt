@@ -14,7 +14,7 @@ interface ReadOnlyIntVar : ReadOnlyVar<Int> {
      * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return an `int` value.
      *
      * If using this [ReadOnlyIntVar] in a binding, use [Var.Context] to do dependency tracking,
-     * and use the boolean specialization specific functions ([Var.Context.useI]).
+     * and use the boolean specialization specific functions ([Var.Context.use]).
      */
     fun get(): Int
 
@@ -223,7 +223,7 @@ class IntVar : ReadOnlyIntVar, Var<Int> {
  *
  * Returns the new state.
  */
-fun Var<Int>.invert(): Int {
+fun Var<Int>.negate(): Int {
     val newState = -this.getOrCompute()
     this.set(newState)
     return newState

@@ -73,7 +73,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     private val lastInputOffset: FloatVar = FloatVar(0f)
     private val inputCount: IntVar = IntVar(0)
     private val estimatedOffset: FloatVar = FloatVar {
-        (summedOffsets.useF() / inputCount.useI().coerceAtLeast(1)) * 1000
+        (summedOffsets.use() / inputCount.use().coerceAtLeast(1)) * 1000
     }
     
     private val pistonAnimations: List<TextureRegion> = listOf(
@@ -120,7 +120,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
             this.padding.set(Insets(8f, 8f, 8f, 8f))
 
             this += TextLabel(binding = { Localization.getVar("calibration.offset", Var {
-                listOf(settings.inputCalibration.use().audioOffsetMs.roundToInt(), estimatedOffset.useF().roundToInt())
+                listOf(settings.inputCalibration.use().audioOffsetMs.roundToInt(), estimatedOffset.use().roundToInt())
             }).use() }, font = main.fontMainMenuMain).apply {
                 this.textColor.set(Color.WHITE)
                 this.renderAlign.set(Align.center)
@@ -138,7 +138,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
             this.padding.set(Insets(8f, 8f, 8f, 8f))
 
             this += TextLabel(binding = { Localization.getVar("calibration.offset.details", Var {
-                listOf(DecimalFormats.format("0.00", estimatedOffset.useF()), DecimalFormats.format("0.00", lastInputOffset.useF()), inputCount.useI())
+                listOf(DecimalFormats.format("0.00", estimatedOffset.use()), DecimalFormats.format("0.00", lastInputOffset.use()), inputCount.use())
             }).use() }, font = main.fontMainMenuMain).apply {
                 this.textColor.set(Color.WHITE)
                 this.renderAlign.set(Align.center)

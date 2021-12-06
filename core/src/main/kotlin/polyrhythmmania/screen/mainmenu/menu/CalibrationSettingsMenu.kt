@@ -1,10 +1,8 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.Var
-import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
 import paintbox.transition.FadeOut
 import paintbox.transition.TransitionScreen
@@ -18,9 +16,6 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.screen.CalibrationScreen
-import polyrhythmmania.screen.PlayScreen
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -73,7 +68,7 @@ class CalibrationSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             vbox += createSettingsOption({
-                Localization.getVar("mainMenu.calibration.audioOffset", Var.bind {listOf(manualOffsetSlider.value.useF().toInt())}).use()
+                Localization.getVar("mainMenu.calibration.audioOffset", Var.bind {listOf(manualOffsetSlider.value.use().toInt())}).use()
             }, percentageContent = 1f, twoRowsTall = true).apply {
                 val slider = manualOffsetSlider
                 this.content.addChild(slider)

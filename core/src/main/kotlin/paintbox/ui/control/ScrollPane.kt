@@ -48,33 +48,33 @@ open class ScrollPane : Control<ScrollPane>() {
 
     // Used for updating internal state
     private val currentW: FloatVar = FloatVar {
-        currentContent.use()?.bounds?.width?.useF() ?: 0f
+        currentContent.use()?.bounds?.width?.use() ?: 0f
     }
     private val currentH: FloatVar = FloatVar {
-        currentContent.use()?.bounds?.height?.useF() ?: 0f
+        currentContent.use()?.bounds?.height?.use() ?: 0f
     }
     private val contentPaneWidth: FloatVar = FloatVar {
-        contentPane.contentZone.width.useF()
+        contentPane.contentZone.width.use()
     }
     private val contentPaneHeight: FloatVar = FloatVar {
-        contentPane.contentZone.height.useF()
+        contentPane.contentZone.height.use()
     }
     private val contentWidthDiff: FloatVar = FloatVar {
-        currentW.useF() - contentPaneWidth.useF()
+        currentW.use() - contentPaneWidth.use()
     }
     private val contentHeightDiff: FloatVar = FloatVar {
-        currentH.useF() - contentPaneHeight.useF()
+        currentH.use() - contentPaneHeight.use()
     }
 
     init {
-        hBar.bounds.height.bind { barSize.useF() }
+        hBar.bounds.height.bind { barSize.use() }
         hBar.bindWidthToParent {
-            if (vBar.visible.useB()) (-barSize.useF()) else 0f
+            if (vBar.visible.use()) (-barSize.use()) else 0f
         }
         Anchor.BottomLeft.configure(hBar)
-        vBar.bounds.width.bind { barSize.useF() }
+        vBar.bounds.width.bind { barSize.use() }
         vBar.bindHeightToParent {
-            if (hBar.visible.useB()) (-barSize.useF()) else 0f
+            if (hBar.visible.use()) (-barSize.use()) else 0f
         }
         Anchor.TopRight.configure(vBar)
         Anchor.TopLeft.configure(contentPane)
@@ -82,45 +82,45 @@ open class ScrollPane : Control<ScrollPane>() {
             // When the scrollbar policy is AS_NEEDED, there is an inf loop due to depending on visibility which depends on contentPane bounds
 //            if (vBar.apparentVisibility.use()) (-barSize.use()) else 0f
             val policy = vBarPolicy.use()
-            if (policy == ScrollBarPolicy.NEVER) 0f else (-barSize.useF())
+            if (policy == ScrollBarPolicy.NEVER) 0f else (-barSize.use())
         }
         contentPane.bindHeightToParent {
 //            if (hBar.apparentVisibility.use()) (-barSize.use()) else 0f
             val policy = hBarPolicy.use()
-            if (policy == ScrollBarPolicy.NEVER) 0f else (-barSize.useF())
+            if (policy == ScrollBarPolicy.NEVER) 0f else (-barSize.use())
         }
-        contentPane.contentOffsetX.bind { -hBar.value.useF() }
-        contentPane.contentOffsetY.bind { -vBar.value.useF() }
+        contentPane.contentOffsetX.bind { -hBar.value.use() }
+        contentPane.contentOffsetY.bind { -vBar.value.use() }
 
         hBar.visible.bind {
             when (hBarPolicy.getOrCompute()) {
                 ScrollBarPolicy.NEVER -> false
                 ScrollBarPolicy.ALWAYS -> true
-                ScrollBarPolicy.AS_NEEDED -> contentWidthDiff.useF() > 0f
+                ScrollBarPolicy.AS_NEEDED -> contentWidthDiff.use() > 0f
             }
         }
         vBar.visible.bind {
             when (vBarPolicy.getOrCompute()) {
                 ScrollBarPolicy.NEVER -> false
                 ScrollBarPolicy.ALWAYS -> true
-                ScrollBarPolicy.AS_NEEDED -> contentHeightDiff.useF() > 0f
+                ScrollBarPolicy.AS_NEEDED -> contentHeightDiff.use() > 0f
             }
         }
         hBar.minimum.set(0f)
         vBar.minimum.set(0f)
-        hBar.maximum.bind { contentWidthDiff.useF().coerceAtLeast(0f) }
-        vBar.maximum.bind { contentHeightDiff.useF().coerceAtLeast(0f) }
+        hBar.maximum.bind { contentWidthDiff.use().coerceAtLeast(0f) }
+        vBar.maximum.bind { contentHeightDiff.use().coerceAtLeast(0f) }
         hBar.visibleAmount.bind {
-            val barMax = hBar.maximum.useF()
-            ((contentPaneWidth.useF() / currentW.useF()) * barMax)
+            val barMax = hBar.maximum.use()
+            ((contentPaneWidth.use() / currentW.use()) * barMax)
                     .coerceAtMost(barMax)
-                    .coerceAtLeast(minThumbSize.useF())
+                    .coerceAtLeast(minThumbSize.use())
         }
         vBar.visibleAmount.bind {
-            val barMax = vBar.maximum.useF()
-            ((contentPaneHeight.useF() / currentH.useF()) * barMax)
+            val barMax = vBar.maximum.use()
+            ((contentPaneHeight.use() / currentH.use()) * barMax)
                     .coerceAtMost(barMax)
-                    .coerceAtLeast(minThumbSize.useF())
+                    .coerceAtLeast(minThumbSize.use())
         }
 
         addChild(contentPane)

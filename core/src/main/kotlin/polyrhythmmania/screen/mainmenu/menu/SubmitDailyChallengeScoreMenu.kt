@@ -185,7 +185,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
             }
             hbox += createSmallButton(binding = { Localization.getVar("mainMenu.submitDailyChallenge.submitScore").use() }).apply {
                 this.bounds.width.set(190f)
-                this.disabled.bind { !canClickSubmit.useB() || didSubmit.useB() }
+                this.disabled.bind { !canClickSubmit.use() || didSubmit.use() }
                 this.setOnAction {
                     val name = nameText.getOrCompute()
                     if (name.isNotBlank() && canClickSubmit.get() && !didSubmit.get()) {
@@ -197,7 +197,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
                 this.bounds.width.set(120f)
                 this.markup.set(this@SubmitDailyChallengeScoreMenu.markup)
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)
-                this.visible.bind { didSubmit.useB() }
+                this.visible.bind { didSubmit.use() }
                 this.renderAlign.set(Align.left)
                 this.setScaleXY(0.9f)
             }

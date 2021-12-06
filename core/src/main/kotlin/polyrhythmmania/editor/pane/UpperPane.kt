@@ -26,7 +26,7 @@ class UpperPane(val editorPane: EditorPane) : Pane() {
         val mainSection: UIElement = Pane().apply {
             Anchor.TopLeft.configure(this)
             this.bounds.height.bind {
-                (parent.use()?.bounds?.height?.useF() ?: 0f) - toolbarBacking.bounds.height.useF()
+                (parent.use()?.bounds?.height?.use() ?: 0f) - toolbarBacking.bounds.height.use()
             }
         }
         this += mainSection
@@ -34,7 +34,7 @@ class UpperPane(val editorPane: EditorPane) : Pane() {
         previewPane = PreviewPane(this).apply {
 //            Anchor.TopCentre.configure(this)
             Anchor.TopLeft.configure(this)
-            this.bounds.width.bind { this@apply.bounds.height.useF() * (16f / 9f) }
+            this.bounds.width.bind { this@apply.bounds.height.use() * (16f / 9f) }
         }
         mainSection += previewPane
         
@@ -42,7 +42,7 @@ class UpperPane(val editorPane: EditorPane) : Pane() {
             Anchor.TopRight.configure(this)
             this.bindHeightToParent()
             this.bounds.width.bind {
-                (parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) - previewPane.bounds.width.useF()
+                (parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) - previewPane.bounds.width.use()
             }
             this.padding.set(Insets(2f))
         }

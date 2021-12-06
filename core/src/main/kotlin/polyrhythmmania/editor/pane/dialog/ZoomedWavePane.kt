@@ -3,7 +3,6 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import paintbox.binding.IntVar
-import paintbox.binding.Var
 import paintbox.util.ColorStack
 import kotlin.system.measureNanoTime
 
@@ -23,9 +22,9 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
         this.isFullWidth = false
         zoomedRefreshIndicator.sideEffecting(0) { existing ->
             val window = musicDialog.window
-            window.x.useF()
-            window.widthSec.useF()
-            window.musicDurationSec.useF()
+            window.x.use()
+            window.widthSec.use()
+            window.musicDurationSec.use()
 
             val nano = measureNanoTime {
                 editor.waveformWindow.generateZoomed(window)

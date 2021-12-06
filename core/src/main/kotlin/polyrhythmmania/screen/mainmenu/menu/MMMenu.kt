@@ -16,7 +16,6 @@ import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
-import paintbox.ui.area.ReadOnlyBounds
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
@@ -65,7 +64,7 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
 
     protected fun setSize(percentage: Float, adjust: Float = 0f) {
         bounds.width.bind {
-            (this@MMMenu.parent.use()?.let { p -> p.contentZone.width.useF() } ?: 0f) * percentage + adjust
+            (this@MMMenu.parent.use()?.let { p -> p.contentZone.width.use() } ?: 0f) * percentage + adjust
         }
     }
     
@@ -193,9 +192,9 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             vbox += contentPane
         }
         addChild(vbox)
-        vbox.bounds.height.bind { contentPane.bounds.height.useF() + titleLabel.bounds.height.useF() }
+        vbox.bounds.height.bind { contentPane.bounds.height.use() + titleLabel.bounds.height.use() }
 
-        this.bounds.height.bind { vbox.bounds.height.useF() }
+        this.bounds.height.bind { vbox.bounds.height.use() }
         this.setSize(MMMenu.WIDTH_MEDIUM) // Default size
     }
     
@@ -225,7 +224,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
     protected fun createLongButtonWithNewIndicator(newIndicator: Settings.NewIndicator, binding: Var.Context.() -> String): Button {
         return Button(binding = {
-            (if (newIndicator.value.useB())
+            (if (newIndicator.value.use())
                 (Localization.getVar("common.newIndicator").use() + " ")
             else "") + binding.invoke(this)
         }, font = font).apply {
@@ -288,7 +287,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             Anchor.TopRight.configure(this)
             this.boxAlignment.set(CheckBox.BoxAlign.RIGHT)
             this.color.bind {
-                if (apparentDisabledState.useB()) {
+                if (apparentDisabledState.use()) {
                     LongButtonSkin.DISABLED_TEXT
                 } else {
                     settingsOptionPane.textColorVar.use()
@@ -382,10 +381,10 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         : Pane(), HasPressedState by HasPressedState.DefaultImpl() {
 
         val textColorVar: ReadOnlyVar<Color> = Var.bind {
-            if (isHoveredOver.useB()) LongButtonSkin.HOVERED_TEXT else LongButtonSkin.TEXT_COLOR
+            if (isHoveredOver.use()) LongButtonSkin.HOVERED_TEXT else LongButtonSkin.TEXT_COLOR
         }
         val bgColorVar: ReadOnlyVar<Color> = Var.bind {
-            if (isHoveredOver.useB()) LongButtonSkin.HOVERED_BG else LongButtonSkin.BG_COLOR
+            if (isHoveredOver.use()) LongButtonSkin.HOVERED_BG else LongButtonSkin.BG_COLOR
         }
 
         val label: TextLabel
@@ -470,7 +469,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
             label = TextLabel(binding = { itemToString(currentItem.use()) }, font = settingsOptionPane.font).apply {
                 Anchor.Centre.configure(this)
-                this.bindWidthToParent { -(bounds.height.useF() * 2) }
+                this.bindWidthToParent { -(bounds.height.use() * 2) }
                 this.textColor.bind { settingsOptionPane.textColorVar.use() }
                 this.textAlign.set(TextAlign.CENTRE)
                 this.renderAlign.set(Align.center)

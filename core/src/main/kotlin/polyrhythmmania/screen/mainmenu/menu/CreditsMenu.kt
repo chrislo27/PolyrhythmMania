@@ -3,9 +3,7 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
 import paintbox.font.TextAlign
-import paintbox.font.TextRun
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.area.Insets
@@ -141,7 +139,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             var currentRowHeight = 0f
             addChild(Pane().apply {
                 Anchor.TopRight.configure(this)
-                this.bindWidthToParent(adjustBinding = { -headingLabel.bounds.width.useF() })
+                this.bindWidthToParent(adjustBinding = { -headingLabel.bounds.width.use() })
 
                 var currentRow = -1
                 names.forEachIndexed { index, str ->
@@ -158,7 +156,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     addChild(TextLabel(str.getOrCompute(), font = font).apply {
                         Anchor.TopLeft.configure(this)
                         this.bindWidthToParent(adjust = 0f, multiplier = 1f / numNameColumns)
-                        this.bounds.x.bind { bounds.width.useF() * col }
+                        this.bounds.x.bind { bounds.width.use() * col }
                         this.bounds.height.set(rh * ROW_HEIGHT)
                         this.bounds.y.set(currentRowY)
                         this.padding.set(Insets(12f, 2f, 6f, 2f))
@@ -174,7 +172,7 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             val bottomMargin = ROW_HEIGHT * 0.25f
             this.margin.set(Insets(0f, bottomMargin, 0f, 0f))
             this.bounds.height.bind {
-                max((headingLabel.bounds.height.useF()), (currentRowY + currentRowHeight)) + bottomMargin
+                max((headingLabel.bounds.height.use()), (currentRowY + currentRowHeight)) + bottomMargin
             }
         }
     }

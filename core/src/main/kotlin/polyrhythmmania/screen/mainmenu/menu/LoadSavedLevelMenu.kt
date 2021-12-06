@@ -8,7 +8,6 @@ import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.binding.IntVar
 import paintbox.binding.Var
-import paintbox.binding.invert
 import paintbox.font.TextAlign
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
@@ -109,7 +108,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                         this.checkedState.set(goForPerfect.get())
                         this.color.set(LongButtonSkin.TEXT_COLOR)
                         this.color.bind {
-                            if (apparentDisabledState.useB()) {
+                            if (apparentDisabledState.use()) {
                                 LongButtonSkin.DISABLED_TEXT
                             } else LongButtonSkin.TEXT_COLOR
                         }
@@ -117,7 +116,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                         this.onCheckChanged = { newState ->
                             goForPerfect.set(newState)
                         }
-                        this.disabled.bind { robotMode.useB() }
+                        this.disabled.bind { robotMode.use() }
                     }
                     this += perfectCheckbox
                     this += CheckBox(binding = { Localization.getVar("mainMenu.play.challengeSettings.robotMode").use() },
@@ -165,14 +164,14 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                         (this.skin.getOrCompute() as Slider.SliderSkin).also { skin ->
                             val filledColors = listOf(Challenges.TEMPO_DOWN_COLOR, Color(0.24f, 0.74f, 0.94f, 1f), Challenges.TEMPO_UP_COLOR)
                             skin.filledColor.sideEffecting { existing -> 
-                                val tempo = this@slider.value.useF().toInt()
+                                val tempo = this@slider.value.use().toInt()
                                 existing.set(filledColors[if (tempo < 100) 0 else if (tempo > 100) 2 else 1])
                             }
                         }
                     }
                     this += slider
                     val percent = Localization.getVar("mainMenu.play.challengeSettings.speed.percent", Var {
-                        listOf(slider.value.useF().toInt())
+                        listOf(slider.value.use().toInt())
                     })
                     this += TextLabel(binding = { percent.use() },
                             font = this@LoadSavedLevelMenu.font).apply {

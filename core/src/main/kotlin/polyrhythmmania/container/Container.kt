@@ -17,7 +17,6 @@ import paintbox.binding.Var
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.disposeQuietly
-import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.container.manifest.LibraryRelevantData
 import polyrhythmmania.container.manifest.ResourceTag
@@ -25,7 +24,6 @@ import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackID
 import polyrhythmmania.editor.block.*
-import polyrhythmmania.editor.pane.dialog.BannerDialog
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.music.MusicVolume
@@ -127,8 +125,8 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
         private set
     val stopPosition: ReadOnlyFloatVar = FloatVar {
         // endPosition if < Infinity, otherwise lastBlockPosition
-        val endBlockPos = endBlockPosition.useF()
-        if (endBlockPos < Float.POSITIVE_INFINITY) endBlockPos else lastBlockPosition.useF()
+        val endBlockPos = endBlockPosition.use()
+        if (endBlockPos < Float.POSITIVE_INFINITY) endBlockPos else lastBlockPosition.use()
     }
     
     init {
