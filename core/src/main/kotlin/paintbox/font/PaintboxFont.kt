@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.utils.Disposable
 import paintbox.PaintboxGame
+import paintbox.binding.ReadOnlyLongVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.util.WindowSize
 
@@ -77,7 +78,7 @@ abstract class PaintboxFont(val params: PaintboxFontParams)
      * Used by [TextBlock] to determine when text layouts expire.
      */
     abstract val currentFontNumber: Long
-    abstract val currentFontNumberVar: ReadOnlyVar<Long>
+    abstract val currentFontNumberVar: ReadOnlyLongVar
 
     /**
      * Called by [PaintboxGame] whenever the window gets resized.

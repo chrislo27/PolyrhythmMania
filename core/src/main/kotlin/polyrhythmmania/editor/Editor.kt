@@ -155,7 +155,7 @@ class Editor(val main: PRManiaGame)
     val timeSignatures: Var<List<TimeSignature>> = Var(listOf())
     private var lastPlacedMetronomeBeat: Int = -1
     private var timeUntilAutosave: Float = autosaveInterval.getOrCompute() * 60f
-    val lastAutosaveTimeMs: Var<Long> = Var(0L)
+    val lastAutosaveTimeMs: LongVar = LongVar(0L)
     val playbackSpeed: FloatVar = FloatVar(1f)
 
     val engineBeat: FloatVar = FloatVar(engine.beat)

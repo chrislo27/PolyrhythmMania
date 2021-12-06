@@ -11,14 +11,14 @@ sealed interface ReadOnlyIntVar : ReadOnlyVar<Int> {
 
     /**
      * Gets (and computes if necessary) the value represented by this [ReadOnlyIntVar].
-     * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return an `int` value.
+     * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return a primitive `int` value.
      *
      * If using this [ReadOnlyIntVar] in a binding, use [Var.Context] to do dependency tracking,
-     * and use the boolean specialization specific functions ([Var.Context.use]).
+     * and use the `int` specialization specific functions ([Var.Context.use]).
      */
     fun get(): Int
 
-    @Deprecated("Use ReadOnlyBooleanVar.get() instead to avoid explicit boxing",
+    @Deprecated("Use ReadOnlyIntVar.get() instead to avoid explicit boxing",
             replaceWith = ReplaceWith("this.get()"),
             level = DeprecationLevel.ERROR)
     override fun getOrCompute(): Int {
@@ -105,7 +105,7 @@ class IntVar : ReadOnlyIntVar, Var<Int> {
     }
 
     /**
-     * The implementation of [getOrCompute] but returns a boolean primitive.
+     * The implementation of [getOrCompute] but returns a int primitive.
      */
     override fun get(): Int {
         val result: Int = when (val binding = this.binding) {

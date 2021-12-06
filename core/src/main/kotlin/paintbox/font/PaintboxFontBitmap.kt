@@ -1,6 +1,8 @@
 package paintbox.font
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import paintbox.binding.LongVar
+import paintbox.binding.ReadOnlyLongVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 
@@ -15,7 +17,7 @@ class PaintboxFontBitmap(params: PaintboxFontParams,
     
     private var isInBegin: Boolean = false
     override val currentFontNumber: Long = 0L // Backing font never changes
-    override val currentFontNumberVar: ReadOnlyVar<Long> = Var(currentFontNumber)
+    override val currentFontNumberVar: ReadOnlyLongVar = LongVar(currentFontNumber)
 
     init {
         this.font.data.setScale(1f)

@@ -2,6 +2,8 @@ package paintbox.font
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import paintbox.binding.LongVar
+import paintbox.binding.ReadOnlyLongVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.util.WindowSize
@@ -29,7 +31,7 @@ class PaintboxFontFreeType(params: PaintboxFontParams,
     
     private var currentFontNum: Long = Long.MIN_VALUE + 1
     override val currentFontNumber: Long get() = currentFontNum
-    override val currentFontNumberVar: ReadOnlyVar<Long> = Var(currentFontNum)
+    override val currentFontNumberVar: ReadOnlyLongVar = LongVar(currentFontNum)
     private var lastWindowSize: WindowSize = WindowSize(1280, 720)
     private var upscaledFactor: Float = -1f // 
     private var generator: FreeTypeFontGenerator? = null
@@ -41,7 +43,7 @@ class PaintboxFontFreeType(params: PaintboxFontParams,
         set(value) {
             if (value !== field) {
                 currentFontNum++
-                (currentFontNumberVar as Var).set(currentFontNum)
+                (currentFontNumberVar as LongVar).set(currentFontNum)
                 
 //                val current = field
 //                if (current != null) {

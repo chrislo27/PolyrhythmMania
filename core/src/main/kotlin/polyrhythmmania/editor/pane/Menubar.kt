@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
+import paintbox.binding.LongVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
@@ -43,7 +44,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     
     private val autosavePane: Pane
     private val autosaveIndicator: Tooltip
-    private val currentTimeSec: Var<Long> = Var(-1L)
+    private val currentTimeSec: LongVar = LongVar(-1L)
     
     init {
         fun separator(): UIElement {

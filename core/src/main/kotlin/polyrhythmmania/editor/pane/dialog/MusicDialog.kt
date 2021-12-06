@@ -24,6 +24,7 @@ import paintbox.ui.layout.VBox
 import paintbox.util.TinyFDWrapper
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.binding.BooleanVar
+import paintbox.binding.LongVar
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PreferenceKeys
@@ -778,7 +779,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     }
 
     data class LoadingIndicator(
-            val bytesSoFar: Var<Long> = Var(0L),
+            val bytesSoFar: LongVar = LongVar(0L),
             val generatingWaveform: BooleanVar = BooleanVar(false),
             val durationMs: FloatVar = FloatVar(0f),
     ) {

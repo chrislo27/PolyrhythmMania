@@ -3,65 +3,65 @@ package paintbox.binding
 import java.lang.ref.WeakReference
 
 /**
- * The [Float] specialization of [ReadOnlyVar].
- * 
- * Provides the [get] method which is a primitive-type float.
+ * The [Long] specialization of [ReadOnlyVar].
+ *
+ * Provides the [get] method which is a primitive-type long.
  */
-sealed interface ReadOnlyFloatVar : ReadOnlyVar<Float> {
+sealed interface ReadOnlyLongVar : ReadOnlyVar<Long> {
 
     /**
-     * Gets (and computes if necessary) the value represented by this [ReadOnlyFloatVar].
-     * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return a primitive float value.
+     * Gets (and computes if necessary) the value represented by this [ReadOnlyLongVar].
+     * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return a primitive `long` value.
      *
-     * If using this [ReadOnlyFloatVar] in a binding, use [Var.Context] to do dependency tracking,
-     * and use the `float` specialization specific functions ([Var.Context.use]).
+     * If using this [ReadOnlyLongVar] in a binding, use [Var.Context] to do dependency tracking,
+     * and use the `long` specialization specific functions ([Var.Context.use]).
      */
-    fun get(): Float
+    fun get(): Long
 
-    @Deprecated("Use ReadOnlyFloatVar.get() instead to avoid explicit boxing",
+    @Deprecated("Use ReadOnlyLongVar.get() instead to avoid explicit boxing",
             replaceWith = ReplaceWith("this.get()"),
             level = DeprecationLevel.ERROR)
-    override fun getOrCompute(): Float {
+    override fun getOrCompute(): Long {
         return get() // WILL BE BOXED!
     }
 }
 
 /**
- * The [Float] specialization of [Var].
+ * The [Long] specialization of [Var].
  *
- * Provides the [get] method which is a primitive-type float.
+ * Provides the [get] method which is a primitive-type long.
  */
-class FloatVar : ReadOnlyFloatVar, Var<Float> {
-    
-    private var binding: FloatBinding
+class LongVar : ReadOnlyLongVar, Var<Long> {
+
+    private var binding: LongBinding
     private var invalidated: Boolean = true // Used for Compute and SideEffecting bindings
-    private var currentValue: Float = 0f
+    private var currentValue: Long = 0L
     private var dependencies: Set<ReadOnlyVar<Any?>> = emptySet() // Cannot be generic since it can depend on any other Var
 
-    private var listeners: Set<VarChangedListener<Float>> = emptySet()
+    private var listeners: Set<VarChangedListener<Long>> = emptySet()
 
     /**
      * This is intentionally generic type Any? so further unchecked casts are avoided when it is used
      */
     private val invalidationListener: VarChangedListener<Any?> = InvalListener(this)
 
-    constructor(item: Float) {
-        binding = FloatBinding.Const
+    constructor(item: Long) {
+        binding = LongBinding.Const
         currentValue = item
     }
 
-    constructor(computation: Var.Context.() -> Float) {
-        binding = FloatBinding.Compute(computation)
+    constructor(computation: Var.Context.() -> Long) {
+        binding = LongBinding.Compute(computation)
     }
 
-    constructor(item: Float, sideEffecting: Var.Context.(existing: Float) -> Float) {
-        binding = FloatBinding.SideEffecting(item, sideEffecting)
+    constructor(item: Long, sideEffecting: Var.Context.(existing: Long) -> Long) {
+        binding = LongBinding.SideEffecting(item, sideEffecting)
     }
 
     private fun reset() {
         dependencies = emptySet()
         invalidated = true
-        currentValue = 0f
+        currentValue = 0L
     }
 
     private fun notifyListeners() {
@@ -77,40 +77,40 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
         }
     }
 
-    override fun set(item: Float) {
+    override fun set(item: Long) {
         val existingBinding = binding
-        if (existingBinding is FloatBinding.Const && currentValue == item) {
+        if (existingBinding is LongBinding.Const && currentValue == item) {
             return
         }
         reset()
         currentValue = item
-        binding = FloatBinding.Const
+        binding = LongBinding.Const
         notifyListeners()
     }
 
-    override fun bind(computation: Var.Context.() -> Float) {
+    override fun bind(computation: Var.Context.() -> Long) {
         reset()
-        binding = FloatBinding.Compute(computation)
+        binding = LongBinding.Compute(computation)
         notifyListeners()
     }
 
-    override fun sideEffecting(item: Float, sideEffecting: Var.Context.(existing: Float) -> Float) {
+    override fun sideEffecting(item: Long, sideEffecting: Var.Context.(existing: Long) -> Long) {
         reset()
-        binding = FloatBinding.SideEffecting(item, sideEffecting)
+        binding = LongBinding.SideEffecting(item, sideEffecting)
         notifyListeners()
     }
 
-    override fun sideEffecting(sideEffecting: Var.Context.(existing: Float) -> Float) {
+    override fun sideEffecting(sideEffecting: Var.Context.(existing: Long) -> Long) {
         sideEffecting(get(), sideEffecting)
     }
 
     /**
-     * The implementation of [getOrCompute] but returns a float primitive.
+     * The implementation of [getOrCompute] but returns a long primitive.
      */
-    override fun get(): Float {
-        val result: Float = when (val binding = this.binding) {
-            is FloatBinding.Const -> this.currentValue
-            is FloatBinding.Compute -> {
+    override fun get(): Long {
+        val result: Long = when (val binding = this.binding) {
+            is LongBinding.Const -> this.currentValue
+            is LongBinding.Compute -> {
                 if (!invalidated) {
                     currentValue
                 } else {
@@ -129,7 +129,7 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
                     result
                 }
             }
-            is FloatBinding.SideEffecting -> {
+            is LongBinding.SideEffecting -> {
                 if (invalidated) {
                     val oldCurrentValue = currentValue
                     val ctx = Var.Context()
@@ -152,20 +152,20 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
     }
 
 
-    @Deprecated("Use FloatVar.get() instead to avoid explicit boxing",
+    @Deprecated("Use LongVar.get() instead to avoid explicit boxing",
             replaceWith = ReplaceWith("this.get()"),
             level = DeprecationLevel.ERROR)
-    override fun getOrCompute(): Float {
+    override fun getOrCompute(): Long {
         return get() // WILL BE BOXED!
     }
 
-    override fun addListener(listener: VarChangedListener<Float>) {
+    override fun addListener(listener: VarChangedListener<Long>) {
         if (listener !in listeners) {
             listeners = listeners + listener
         }
     }
 
-    override fun removeListener(listener: VarChangedListener<Float>) {
+    override fun removeListener(listener: VarChangedListener<Long>) {
         if (listener in listeners) {
             listeners = listeners - listener
         }
@@ -176,12 +176,23 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
     }
 
     /**
+     * [Sets][set] this [IntVar] to be the negation of its value from [IntVar.get].
+     *
+     * Returns the new state.
+     */
+    fun negate(): Long {
+        val newState = -this.get()
+        this.set(newState)
+        return newState
+    }
+
+    /**
      * Cannot be inner for garbage collection reasons! We are avoiding an explicit strong reference to the parent Var
      */
-    private class InvalListener(v: FloatVar) : VarChangedListener<Any?> {
-        val weakRef: WeakReference<FloatVar> = WeakReference(v)
+    private class InvalListener(v: LongVar) : VarChangedListener<Any?> {
+        val weakRef: WeakReference<LongVar> = WeakReference(v)
         var disposeMe: Boolean = false
-        
+
         override fun onChange(v: ReadOnlyVar<Any?>) {
             val parent = weakRef.get()
             if (!disposeMe && parent != null) {
@@ -195,14 +206,25 @@ class FloatVar : ReadOnlyFloatVar, Var<Float> {
         }
     }
 
-    private sealed class FloatBinding {
+    private sealed class LongBinding {
         /**
-         * Represents a constant value. The value is actually stored in [FloatVar.currentValue].
+         * Represents a constant value. The value is actually stored in [LongVar.currentValue].
          */
-        object Const : FloatBinding()
+        object Const : LongBinding()
 
-        class Compute(val computation: Var.Context.() -> Float) : FloatBinding()
+        class Compute(val computation: Var.Context.() -> Long) : LongBinding()
 
-        class SideEffecting(var item: Float, val sideEffectingComputation: Var.Context.(existing: Float) -> Float) : FloatBinding()
+        class SideEffecting(var item: Long, val sideEffectingComputation: Var.Context.(existing: Long) -> Long) : LongBinding()
     }
+}
+
+/**
+ * [Sets][Var.set] this [Long] [Var] to be the negation of its value from [Var.getOrCompute].
+ *
+ * Returns the new state.
+ */
+fun Var<Long>.negate(): Long {
+    val newState = -this.getOrCompute()
+    this.set(newState)
+    return newState
 }

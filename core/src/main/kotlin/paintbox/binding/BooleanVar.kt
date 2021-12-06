@@ -14,7 +14,7 @@ sealed interface ReadOnlyBooleanVar : ReadOnlyVar<Boolean> {
      * Unlike the [ReadOnlyVar.getOrCompute] function, this will always return a primitive boolean value.
      *
      * If using this [ReadOnlyBooleanVar] in a binding, use [Var.Context] to do dependency tracking,
-     * and use the boolean specialization specific functions ([Var.Context.use]).
+     * and use the `boolean` specialization specific functions ([Var.Context.use]).
      */
     fun get(): Boolean
 
