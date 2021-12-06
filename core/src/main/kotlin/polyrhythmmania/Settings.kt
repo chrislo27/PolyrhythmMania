@@ -83,6 +83,9 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     class NewIndicator(val key: String, val newAsOf: Version, val newEvenIfFirstPlay: Boolean) {
         val value: BooleanVar = BooleanVar(true)
     }
+    
+    var lastVersion: Version? = null
+        private set
 
     private val kv_locale: KeyValue<String> = KeyValue(SETTINGS_LOCALE, "")
     private val kv_masterVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MASTER_VOLUME, 100)
@@ -214,6 +217,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getEndlessHighScore(kv_endlessHighScore)
         
         val lastVersion: Version? = Version.parse(prefs.getString(LAST_VERSION) ?: "")
+        this.lastVersion = lastVersion
         allNewIndicators.forEach { prefs.getNewIndicator(it, lastVersion) }
     }
 

@@ -113,6 +113,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("mainmenu_brm", "textures/mainmenu/brm.png")
         AssetRegistry.loadAsset<Texture>("logo_2lines_en", "textures/logo/logo_2lines_en.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("logo_2lines_ja", "textures/logo/logo_2lines_ja.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("logo_pome", "textures/logo/logo_pome.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("pause_rod", "textures/pause/rod.png")
         AssetRegistry.loadAsset<Texture>("pause_square", "textures/pause/bg_square.png")
         AssetRegistry.loadAsset<Texture>("dunk_background", "textures/world/dunk/basketball_bg.png", linearTexture())

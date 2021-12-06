@@ -50,16 +50,19 @@ import polyrhythmmania.soundsystem.beads.ugen.Bandpass
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
+import java.io.RandomAccessFile
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.math.ceil
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 
 class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     companion object {
         const val FLIP_SEC_PER_TILE: Float = 1f / 15f / 2
+        private val random: Random = Random(System.nanoTime())
     }
 
     private class Tile(var x: Int, var y: Int, var flipAmt: Float = 0f) {
@@ -120,7 +123,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         }
     }
-
+    
     private val lastProjMatrix: Matrix4 = Matrix4()
     private val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
@@ -152,6 +155,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val menuPane: Pane = Pane()
     val menuCollection: MenuCollection = MenuCollection(this, sceneRoot, menuPane)
     private val newVersionFloaterAnimation: FloatVar = FloatVar(0f)
+    private val secretLogo: BooleanVar = BooleanVar(false)
 
     // Related to tile flip effect --------------------------------------------------------
 
@@ -235,7 +239,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         val leftPane = Pane().apply {
             this.margin.set(Insets(64f))
         }
-        logoImage = ImageNode(TextureRegion(AssetRegistry.get<Texture>("logo_2lines_en"))).apply {
+        logoImage = ImageNode(binding = {
+            TextureRegion(AssetRegistry.get<Texture>(if (secretLogo.useB()) "logo_pome" else "logo_2lines_en"))
+        }).apply {
             this.bounds.height.set(175f)
             this.bounds.y.set(24f)
             this.renderAlign.set(Align.topLeft)
@@ -594,6 +600,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
         DiscordCore.updateActivity(DefaultPresences.idle())
         background.initializeFromType(this.backgroundType)
+        
+        if (main.settings.lastVersion != null) {
+            secretLogo.set(random.nextInt(1024) == 0)
+        }
     }
 
     override fun hide() {
