@@ -312,16 +312,17 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 if (newVersionAvailable.use()) Color.ORANGE.cpy() else Color(1f, 1f, 1f, 1f)
             }
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
+            val latestReleasesURL = "${PRMania.GITHUB}/releases/latest"
             this.tooltipElement.set(Tooltip(binding = {
                 val t = "${PRMania.TITLE} ${PRMania.VERSION}"
                 if (newVersionAvailable.use()) {
-                    "${Localization.getVar("mainMenu.newVersion", Var { listOf(main.githubVersion.use()) })}"
-                } else t
+                    Localization.getVar("mainMenu.newVersion", Var { listOf(main.githubVersion.use(), latestReleasesURL) }).use()
+                } else Localization.getVar("mainMenu.newVersion.none", Var { listOf(t, latestReleasesURL) }).use()
             }, font = main.fontMainMenuMain).apply {
                 this.markup.set(markup)
             })
             this.setOnAction { 
-                Gdx.net.openURI("${PRMania.GITHUB}/releases/latest")
+                Gdx.net.openURI(latestReleasesURL)
             }
         }
         sceneRoot += versionTooltip
@@ -341,6 +342,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.bgPadding.set(Insets(8f))
             this.visible.bind { 
                 newVersionAvailable.use()
+                true
             }
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
         }
