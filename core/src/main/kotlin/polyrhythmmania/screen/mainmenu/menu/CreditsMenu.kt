@@ -80,11 +80,11 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Credits.credits.forEach { (header, names) ->
                 vbox += createCreditRow(header, names)
             }
-            vbox += TextLabel(Localization.getValue("credits.licenseInfo"), font = font).apply {
+            vbox += TextLabel(Localization.getValue("credits.licenseInfo", PRMania.GITHUB), font = font).apply {
                 Anchor.TopLeft.configure(this)
                 this.bindWidthToParent(adjust = 0f, multiplier = 1f)
                 this.bounds.x.set(0f)
-                this.bounds.height.set(100f)
+                this.bounds.height.set(128f)
                 this.padding.set(Insets(12f, 8f, 6f, 6f))
                 this.markup.set(this@CreditsMenu.markup)
                 this.textColor.set(NAME_TEXT_COLOR)
