@@ -342,7 +342,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.bgPadding.set(Insets(8f))
             this.visible.bind { 
                 newVersionAvailable.use()
-                true
             }
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
         }

@@ -1,5 +1,6 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.ReadOnlyVar
@@ -50,6 +51,22 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.popLastMenu()
                 }
             }
+            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.credits.goToHomepage").use() }).apply {
+                this.bounds.width.set(200f)
+                val link = PRMania.GITHUB
+                this.tooltipElement.set(createTooltip { Localization.getValue("mainMenu.credits.openToBrowser.tooltip", link) })
+                this.setOnAction {
+                    Gdx.net.openURI(link)
+                }
+            }
+            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.credits.goToLicense").use() }).apply {
+                this.bounds.width.set(120f)
+                val link = """https://github.com/chrislo27/PolyrhythmMania/blob/master/LICENSE"""
+                this.tooltipElement.set(createTooltip { Localization.getValue("mainMenu.credits.openToBrowser.tooltip", link) })
+                this.setOnAction {
+                    Gdx.net.openURI(link)
+                }
+            }
         }
 
         scrollPane = ScrollPane().apply {
@@ -87,18 +104,18 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.bounds.height.set(128f)
                 this.padding.set(Insets(12f, 8f, 6f, 6f))
                 this.markup.set(this@CreditsMenu.markup)
-                this.textColor.set(NAME_TEXT_COLOR)
+                this.textColor.set(Color.DARK_GRAY)
                 this.renderAlign.set(Align.topLeft)
                 this.textAlign.set(TextAlign.LEFT)
                 this.doLineWrapping.set(true)
                 this.setScaleXY(0.75f)
             }
-            vbox += TextLabel(binding = { Localization.getVar("credits.thankYouForPlaying").use() }, font = font).apply {
+            vbox += TextLabel(binding = { Localization.getVar("credits.thankYouForPlaying").use() }, font = main.fontMainMenuHeading).apply {
                 this.bounds.height.set(64f)
                 this.padding.set(Insets(6f, 24f, 6f, 6f))
-                this.markup.set(this@CreditsMenu.markup)
                 this.textColor.set(NAME_TEXT_COLOR)
                 this.renderAlign.set(Align.center)
+                this.setScaleXY(0.75f)
             }
             vbox += TextLabel(PRMania.HOMEPAGE, font = font).apply {
                 this.bounds.height.set(32f)
@@ -106,6 +123,9 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.markup.set(this@CreditsMenu.markup)
                 this.textColor.set(HEADING_TEXT_COLOR)
                 this.renderAlign.set(Align.center)
+            }
+            vbox += Pane().apply { 
+                this.bounds.height.set(32f)
             }
         }
         vbox.sizeHeightToChildren(100f)
