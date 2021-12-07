@@ -2,7 +2,7 @@
 A game that faithfully recreates the *Polyrhythm* minigame from Rhythm Tengoku (リズム天国), with a 
 built-in level editor and side modes.
 
-![Polyrhythm Mania thumbnail](https://cdn.discordapp.com/attachments/306231796369195020/879243807206539264/unknown.png)
+![Polyrhythm Mania thumbnail](https://user-images.githubusercontent.com/6299069/144956042-654ff2b3-aeba-4486-810e-f26aa1b33bff.png)
 ![Polyrhythm: Assemble side mode thumbnail](https://user-images.githubusercontent.com/6299069/140859874-0552bb9a-c6dc-460b-a4a2-e35f99648ea9.png)
 
 [![Downloads](https://img.shields.io/github/downloads/chrislo27/PolyrhythmMania/total.svg)](https://github.com/chrislo27/PolyrhythmMania/releases/latest)
