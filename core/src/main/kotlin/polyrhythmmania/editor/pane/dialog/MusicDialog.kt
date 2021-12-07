@@ -232,7 +232,6 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.setOnAction {
                 substate.set(Substate.NO_MUSIC)
             }
-            this.tooltipElement.set(editorPane.createDefaultTooltip("Test tooltip."))
         })
     }
 
