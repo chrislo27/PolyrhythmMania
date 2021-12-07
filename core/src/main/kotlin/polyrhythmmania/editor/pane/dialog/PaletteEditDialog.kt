@@ -222,13 +222,19 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                                 this.bounds.height.set(40f)
                                 this.setOnAction {
                                     val currentMapping = currentMapping.getOrCompute()
+                                    val affectedMappings: Set<ColorMapping> = if (currentMapping is ColorMappingGroup) {
+                                        currentMapping.affectsMappings.toSet()
+                                    } else setOf(currentMapping)
                                     val baseConfig = resetDefault.baseConfig
-                                    baseConfig.allMappings.forEach { baseMapping ->
-                                        val m = tilesetPalette.allMappingsByID.getValue(baseMapping.id)
-                                        val baseColor = baseMapping.color.getOrCompute()
-                                        m.color.set(baseColor.cpy())
+                                    affectedMappings.forEach { cm ->
+                                        val id = cm.id
+                                        val baseConfigMapping = baseConfig.allMappingsByID.getValue(id)
+                                        val tilesetPaletteMapping = tilesetPalette.allMappingsByID.getValue(id)
+                                        tilesetPaletteMapping.color.set(baseConfigMapping.color.getOrCompute().cpy())
                                     }
+                                    
                                     tilesetPalette.applyTo(tempTileset)
+                                    
                                     currentMapping.color.set(currentMapping.tilesetGetter(tempTileset).getOrCompute().cpy())
                                     updateColourPickerToMapping()
                                 }
