@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
+import paintbox.binding.BooleanVar
 import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -35,6 +36,7 @@ import kotlin.math.sign
 
 open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame.gameInstance.debugFont, scale: Float = 1f)
     : Control<ColourPicker>() {
+    
     companion object {
         const val COLOUR_PICKER_SKIN_ID: String = "ColourPicker"
         
@@ -55,12 +57,15 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
     }
     
     val textColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
+    val showAlphaPane: BooleanVar = BooleanVar(true)
     
+    private val rgbTextCharLimit: IntVar = IntVar { if (hasAlpha && showAlphaPane.use()) 8 else 6 }
     private val hueArrow: MovingArrow = MovingArrow(0, 360, hsv.hue)
     private val satArrow: MovingArrow = MovingArrow(0, 100, hsv.saturation)
     private val valueArrow: MovingArrow = MovingArrow(0, 100, hsv.value)
     private val alphaArrow: MovingArrow = MovingArrow(0, 255, hsv.alpha)
     private val rgbTextField: TextField
+    private val alphaPane: Pane
     
     init {
         val rows = if (hasAlpha) 5 else 4
@@ -172,6 +177,9 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                         }
                     }
                 }, alphaArrow)
+        this.alphaPane = alphaPane.apply { 
+            this.visible.bind { showAlphaPane.use() }
+        }
         val detailPane = Pane().apply {
             this.bindHeightToParent(multiplier = rowHeightMultiplier)
             this += TextLabel("#", font).apply {
@@ -192,9 +200,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                 this.bindWidthToParent(multiplier = 0.75f)
                 this.margin.set(Insets(2f, 2f, 4f, 4f))
                 
-                val charLimit = if (hasAlpha) 8 else 6
-                
-                fun Color.toStr(): String = this.toString().uppercase(Locale.ROOT).take(charLimit)
+                fun Color.toStr(): String = this.toString().uppercase(Locale.ROOT).take(rgbTextCharLimit.get())
 
                 val textField: TextField
                 this += RectElement(Color(0f, 0f, 0f, 0.9f)).apply {
@@ -203,13 +209,21 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                     this.borderStyle.set(SolidBorder(Color.WHITE))
                     this.padding.set(Insets(1f))
                     textField = TextField(font = font).apply {
-                        this.characterLimit.set(charLimit)
+                        this.characterLimit.bind { rgbTextCharLimit.use() }
                         this.text.set(currentColor.getOrCompute().toStr())
                         this.inputFilter.set({ c -> c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F' })
                         this.textColor.bind { this@ColourPicker.textColor.use() }
                         currentColor.addListener { v ->
                             if (!hasFocus.get()) {
-                                this.text.set(v.getOrCompute().toStr())
+                                val t = v.getOrCompute().toStr()
+                                this.text.set(t)
+                            }
+                        }
+                        if (hasAlpha) {
+                            showAlphaPane.addListener {
+                                if (!hasFocus.get()) {
+                                    this.text.set(currentColor.getOrCompute().toStr())
+                                }
                             }
                         }
                         this.text.addListener { t ->
@@ -296,10 +310,14 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
         hsv.saturation.set((h[1] * 100).roundToInt().coerceIn(0, 100))
         hsv.value.set((h[2] * 100).roundToInt().coerceIn(0, 100))
         if (hasAlpha) {
-            hsv.alpha.set((newValue.a * 255).roundToInt().coerceIn(0, 255))
+            if (showAlphaPane.get()) {
+                hsv.alpha.set((newValue.a * 255).roundToInt().coerceIn(0, 255))
+            } else {
+                hsv.alpha.set(255)
+            }
         }
         if (setRgbTextField) {
-            rgbTextField.text.set(newValue.toString().uppercase(Locale.ROOT).take(if (hasAlpha) 8 else 6))
+            rgbTextField.text.set(newValue.toString().uppercase(Locale.ROOT).take(rgbTextCharLimit.get()))
         }
     }
 
