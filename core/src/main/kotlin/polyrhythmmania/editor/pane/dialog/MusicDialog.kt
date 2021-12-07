@@ -65,27 +65,27 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     }
 
     val substate: Var<Substate> = Var(Substate.NO_MUSIC)
-    val loadingProgress: LoadingIndicator = LoadingIndicator()
+    private val loadingProgress: LoadingIndicator = LoadingIndicator()
     val window: Window = Window()
     val currentMarker: Var<MarkerType> = Var(MarkerType.FIRST_BEAT)
     val currentMusicPosition: FloatVar = FloatVar(-1f)
 
-    val noMusicPane: Pane
-    val musicSettingsPane: Pane
-    val fileDialogOpenPane: Pane
-    val loadingPane: Pane
-    val errorPane: Pane
+    private val noMusicPane: Pane
+    private val musicSettingsPane: Pane
+    private val fileDialogOpenPane: Pane
+    private val loadingPane: Pane
+    private val errorPane: Pane
 
-    val errorLabel: TextLabel
+    private val errorLabel: TextLabel
 
-    val selectMusicBottomPane: Pane
-    val loadMusicErrorBottomPane: Pane
+    private val selectMusicBottomPane: Pane
+    private val loadMusicErrorBottomPane: Pane
 
-    val selectMusicButton: Button
-    val removeMusicButton: Button
+    private val selectMusicButton: Button
+    private val removeMusicButton: Button
     
-    val loopingCheckbox: CheckBox
-    val rateSlider: Slider
+    private val loopingCheckbox: CheckBox
+    private val rateSlider: Slider
 
     val markerPlaybackStart: Color = PRManiaColors.PLAYBACK_START.cpy()
     val markerFirstBeat: Color = PRManiaColors.MARKER_FIRST_BEAT.cpy()
@@ -562,7 +562,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         rateSlider.setValue(editorMusicData.rate.get() * 100f)
     }
 
-    fun stopMusicPlayback() {
+    private fun stopMusicPlayback() {
         val engine = editor.engine
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
@@ -571,7 +571,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
 
-    fun startMusicPlayback() {
+    private fun startMusicPlayback() {
         val engine = editor.engine
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
@@ -605,12 +605,13 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
                 loadMusic(tmp, true)
             } catch (e: Exception) {
-                Paintbox.LOGGER.warn("Error occurred while loading music:")
+                val wasMp3 = file.extension.equals("mp3", ignoreCase = true)
+                Paintbox.LOGGER.warn("Error occurred while loading music (was mp3? $wasMp3):")
                 e.printStackTrace()
                 Gdx.app.postRunnable {
                     substate.set(Substate.LOAD_ERROR)
                     val exClassName = e.javaClass.name
-                    errorLabel.text.set(Localization.getValue("editor.dialog.music.loadError", exClassName))
+                    errorLabel.text.set(Localization.getValue(if (wasMp3) "editor.dialog.music.loadError.mp3" else "editor.dialog.music.loadError", exClassName))
                 }
             }
         }
@@ -714,7 +715,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
 
-    fun findZeroCrossing(startSec: Float): Float {
+    private fun findZeroCrossing(startSec: Float): Float {
         // Code adapted from Audacity. https://github.com/audacity/audacity/blob/cf666c9bfc1cdae95e325f372c13489f797c18a0/src/menus/SelectMenus.cpp#L55
         val sample = editor.musicData.beadsMusic?.musicSample ?: return startSec
         val sampleRate = sample.sampleRate
@@ -766,7 +767,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         return startSec + ((minIndex - windowSize / 2) / sampleRate)
     }
 
-    fun findStartOfNonSilence(): Float {
+    private fun findStartOfNonSilence(): Float {
         val sample = editor.musicData.beadsMusic?.musicSample ?: return -1f
         val array = FloatArray(sample.nChannels) { 0f }
         for (i in 0 until sample.nFrames) {
