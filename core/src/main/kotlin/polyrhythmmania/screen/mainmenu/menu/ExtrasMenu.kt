@@ -95,6 +95,13 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 //            }
 
             vbox += separator()
+            vbox += createLongButton { Localization.getVar("mainMenu.extras.ost").use() }.apply {
+                val link = """https://www.youtube.com/playlist?list=PLt_3dgnFrUPwcA6SdTfi0RapEBdQV64v_"""
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.extras.ost.tooltip", Var { listOf(link) })))
+                this.setOnAction {
+                    Gdx.net.openURI(link)
+                }
+            }
             vbox += createLongButtonWithIcon(TextureRegion(AssetRegistry.get<Texture>("mainmenu_rhre"))) { """Rhythm Heaven Remix Editor""" }.apply {
                 val rhreGithub = """https://github.com/chrislo27/RhythmHeavenRemixEditor"""
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.extras.rhre.tooltip", Var { listOf(rhreGithub) })))
