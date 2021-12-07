@@ -85,9 +85,9 @@ class TilesetPalette {
     val signShadow: ColorMapping = ColorMapping("signShadow", { it.signShadowColor })
     val rodBorder: ColorMapping = ColorMapping("rodBorder", { it.rodBorderColor })
     val rodFill: ColorMapping = ColorMapping("rodFill", { it.rodFillColor })
-    val backgroundBack: ColorMapping = ColorMapping("backgroundBack", { it.backgroundBack.color })
-    val backgroundMiddle: ColorMapping = ColorMapping("backgroundMiddle", { it.backgroundMiddle.color })
-    val backgroundFore: ColorMapping = ColorMapping("backgroundFore", { it.backgroundFore.color })
+    val backgroundBack: ColorMapping = ColorMapping("backgroundBack", { it.backgroundBack.color }, canAdjustAlpha = true)
+    val backgroundMiddle: ColorMapping = ColorMapping("backgroundMiddle", { it.backgroundMiddle.color }, canAdjustAlpha = true)
+    val backgroundFore: ColorMapping = ColorMapping("backgroundFore", { it.backgroundFore.color }, canAdjustAlpha = true)
 
     val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeBorderZ, /*cubeFaceX,*/ cubeFaceY, cubeFaceZ,
             pistonFaceX, pistonFaceZ, signShadow, rodBorder, rodFill,

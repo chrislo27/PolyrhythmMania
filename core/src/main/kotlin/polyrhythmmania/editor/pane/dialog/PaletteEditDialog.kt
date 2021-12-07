@@ -69,8 +69,9 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     val currentMapping: Var<ColorMapping> = Var(allMappings[0])
     
     val objPreview: ObjectPreview = ObjectPreview()
-    val colourPicker: ColourPicker = ColourPicker(false, font = editorPane.palette.musicDialogFont).apply { 
+    val colourPicker: ColourPicker = ColourPicker(hasAlpha = true, font = editorPane.palette.musicDialogFont).apply { 
         this.setColor(currentMapping.getOrCompute().color.getOrCompute(), true)
+        this.showAlphaPane.set(false)
     }
     val enabledCheckbox: CheckBox = CheckBox(binding = { Localization.getVar("editor.dialog.tilesetPalette.enabled").use() })
 
@@ -445,6 +446,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     }
     
     private fun updateColourPickerToMapping(mapping: ColorMapping = currentMapping.getOrCompute()) {
+        colourPicker.showAlphaPane.set(mapping.canAdjustAlpha)
         colourPicker.setColor(mapping.color.getOrCompute(), true)
         enabledCheckbox.checkedState.set(mapping.enabled.get())
     }
@@ -621,13 +623,13 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
             thisColor.toHsv(hsv)
             hsv[1] = (hsv[1] + 0.08f * hsv[1].sign)
             hsv[2] = (hsv[2] - 0.10f)
-            val faceZColor = Color(1f, 1f, 1f, 1f).fromHsv(hsv)
+            val faceZColor = Color(1f, 1f, 1f, thisColor.a).fromHsv(hsv)
             tileset.cubeFaceZ.color.set(faceZColor.cpy())
             allMappingsByID.getValue("cubeFaceZ").color.set(faceZColor.cpy())
             thisColor.toHsv(hsv)
             hsv[1] = (hsv[1] + 0.11f * hsv[1].sign)
             hsv[2] = (hsv[2] - 0.13f)
-            val faceXColor = Color(1f, 1f, 1f, 1f).fromHsv(hsv)
+            val faceXColor = Color(1f, 1f, 1f, thisColor.a).fromHsv(hsv)
             tileset.cubeFaceX.color.set(faceXColor.cpy())
             allMappingsByID.getValue("cubeFaceX").color.set(faceXColor.cpy())
         }
