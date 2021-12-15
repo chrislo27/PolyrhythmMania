@@ -10,9 +10,6 @@ buildscript {
     }
 }
 
-apply plugin: 'kotlin'
-
-//buildScan { termsOfServiceUrl = "https://gradle.com/terms-of-service"; termsOfServiceAgree = "yes" }
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
@@ -22,8 +19,9 @@ allprojects {
     version = "1.1.1"
     ext {
         appName = "PolyrhythmMania"
-        gdxVersion = '1.10.0'
-        gdxControllersVersion = '2.2.1'
+        
+        paintboxVersion = "0.1.1"
+        useLocalPaintbox = false
     }
     
     java {
@@ -31,44 +29,32 @@ allprojects {
     }
 
     repositories {
-//        mavenLocal()
         mavenCentral()
+        mavenLocal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven { url 'https://jitpack.io/' }
         maven { url "https://jcenter.bintray.com/" }
         maven { url 'https://repo.eclipse.org/content/groups/releases/' }
         maven { url "https://clojars.org/repo" }
+        maven { url 'https://jitpack.io/' }
         maven { url "https://kotlin.bintray.com/kotlinx/" }
     }
     
     dependencies {
         implementation fileTree(dir: 'libs', includes: ['/**/*.jar'])
-        
 
-        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-        implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+        if (useLocalPaintbox) {
+            implementation "com.github.chrislo27:paintbox-core:${paintboxVersion}"
+        } else {
+            implementation "com.github.chrislo27.paintbox:paintbox-core:${paintboxVersion}"
+        }
         
-        implementation "com.eclipsesource.minimal-json:minimal-json:0.9.5"
-        
-        implementation 'com.beust:jcommander:1.81'
-        
-        implementation 'org.slf4j:slf4j-simple:1.7.32'
         implementation 'net.lingala.zip4j:zip4j:2.9.1'
         implementation 'org.apache.httpcomponents:httpclient:4.5.13'
-        
-        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-//        implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version"
-        
         implementation "space.earlygrey:shapedrawer:v2.5.0"
         implementation "com.github.JnCrMx:discord-game-sdk4j:2b5a903204"
         implementation "com.twelvemonkeys.imageio:imageio-tga:$imageio_tga_version"
         
-//        implementation "org.openjdk.jol:jol-core:0.15"
-        implementation "io.dropwizard.metrics:metrics-core:4.2.4"
     }
 }
 
@@ -87,16 +73,11 @@ project(":desktop") {
     dependencies {
         implementation project(":core")
 
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-windows-x86"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux-arm64"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-linux-arm32"
-        implementation "org.lwjgl:lwjgl-tinyfd:$lwjgl_tinyfd_version:natives-macos"
-
-        implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-//        implementation "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxControllersVersion"
+        if (useLocalPaintbox) {
+            implementation "com.github.chrislo27:paintbox-desktop:${paintboxVersion}"
+        } else {
+            implementation "com.github.chrislo27.paintbox:paintbox-desktop:${paintboxVersion}"
+        }
     }
 }
 
@@ -105,14 +86,4 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         jvmTarget = "11"
         freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
     }
-}
-
-repositories {
-    mavenCentral()
-}
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-}
-sourceSets {
-    main.java.srcDirs += 'src/main/kotlin'
 }
