@@ -26,6 +26,8 @@ allprojects {
     
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+        withSourcesJar()
+        withJavadocJar()
     }
 
     repositories {
@@ -54,7 +56,13 @@ allprojects {
         implementation "space.earlygrey:shapedrawer:v2.5.0"
         implementation "com.github.JnCrMx:discord-game-sdk4j:2b5a903204"
         implementation "com.twelvemonkeys.imageio:imageio-tga:$imageio_tga_version"
-        
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "11"
+            freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
+        }
     }
 }
 
@@ -78,12 +86,5 @@ project(":desktop") {
         } else {
             implementation "com.github.chrislo27.paintbox:paintbox-desktop:${paintboxVersion}"
         }
-    }
-}
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
     }
 }

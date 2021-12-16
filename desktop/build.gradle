@@ -5,18 +5,8 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceSets.main.java.srcDirs = [ "src/main/kotlin/" ]
 
 project.ext.mainClassName = "polyrhythmmania.desktop.DesktopLauncher"
-project.ext.assetsDir = new File("../core/assets");
+project.ext.assetsDir = new File("../core/assets")
 
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
-    }
-}
-
-repositories {
-    mavenCentral()
-}
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
@@ -39,22 +29,6 @@ shadowJar {
     archiveBaseName = "PolyrhythmMania"
     classifier = "distribution"
     archiveVersion = this.version
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives shadowJar
-    archives sourcesJar
-    archives javadocJar
 }
 
 jar {

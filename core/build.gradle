@@ -5,14 +5,3 @@ apply plugin: 'kotlin'
 
 sourceSets.main.java.srcDirs = [ "src/main/kotlin", "src/main/java" ]
 sourceSets.main.resources.srcDir("assets/")
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
-    }
-}
-
-repositories {
-    mavenCentral()
-}
