@@ -362,6 +362,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val container = editor.container
         val engine = container.engine
         val timing = engine.timingProvider
+        val previousPlaybackSpeed = engine.playbackSpeed
         val endBlockPosition = container.endBlockPosition.get()
         val endStateSec = engine.tempos.beatsToSeconds(endBlockPosition).coerceAtLeast(0f)
         engine.resetEndSignal()
@@ -382,6 +383,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             editor.setPlaytestingEnabled(false)
             timing.seconds = 0f
             engine.seconds = 0f
+            engine.playbackSpeed = 1f
             editor.compileEditorIntermediates()
             inputter.reset()
             
@@ -466,6 +468,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             editor.resetWorld()
             editor.updatePaletteAndTexPackChangesState()
             engine.soundInterface.clearAllNonMusicAudio()
+            engine.playbackSpeed = previousPlaybackSpeed
         }
         
         // Attempt to save
