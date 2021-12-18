@@ -20,7 +20,7 @@ import kotlin.math.min
  * This is a mostly-similar implementation of [JavaSoundAudioIO], but using a daemon audio thread.
  * It also has other implementation changes for better behaviour.
  */
-class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames: Int = DEFAULT_SYSTEM_BUFFER_SIZE)
+class DaemonJavaSoundAudioIO(startingMixer: Mixer, val systemBufferSizeInFrames: Int = DEFAULT_SYSTEM_BUFFER_SIZE)
     : AudioIO() {
     
     companion object {
@@ -34,7 +34,7 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
     }
     
     /** The mixer.  */
-    private var mixer: Mixer? = startingMixer
+    private var mixer: Mixer = startingMixer
 
     /** The source data line.  */
     private var sourceDataLine: SourceDataLine? = null
@@ -50,7 +50,7 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
         val ioAudioFormat = getContext().audioFormat
         val audioFormat = AudioFormat(ioAudioFormat.sampleRate, ioAudioFormat.bitDepth, ioAudioFormat.outputs,
                 ioAudioFormat.signed, ioAudioFormat.bigEndian)
-        val mixer = this.mixer ?: return false
+        val mixer = this.mixer
         val info = DataLine.Info(SourceDataLine::class.java, audioFormat)
         val systemBufferSizeInFrames = this.systemBufferSizeInFrames
         val sourceDataLine = mixer.getLine(info) as SourceDataLine
@@ -158,10 +158,7 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer?, val systemBufferSizeInFrames
             this.sourceDataLine = null
         }
         val mixer = this.mixer
-        if (mixer != null) {
-            MixerTracking.untrackMixer(mixer)
-        }
-        this.mixer = null
+        MixerTracking.untrackMixer(mixer)
         return true
     }
 
