@@ -30,7 +30,10 @@ class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
         resetWorld()
     }
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()
-    val timing: TimingProvider = soundSystem
+    val timing: TimingProvider = SimpleTimingProvider {
+        Gdx.app.postRunnable { throw it }
+        true
+    }
     val engine: Engine = Engine(timing, world, soundSystem, null)
     val renderer: WorldRenderer by lazy {
         WorldRenderer(world, Tileset(StockTexturePacks.gba).apply { 

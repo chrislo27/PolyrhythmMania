@@ -25,7 +25,7 @@ class SoundSystem(private val mixer: Mixer,
                   val ioAudioFormat: IOAudioFormat = DEFAULT_AUDIO_FORMAT,
                   bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
                   val settings: SoundSystemSettings = SoundSystemSettings())
-    : Disposable, TimingProvider {
+    : Disposable {
 
     companion object {
         val AUDIO_FORMAT_44100: IOAudioFormat = IOAudioFormat(44_100f, 16, 2, 2, true, true)
@@ -70,28 +70,16 @@ class SoundSystem(private val mixer: Mixer,
     
     @Volatile
     private var isDisposed: Boolean = false
-    private val timingProvider: AdaptiveTimingProvider = this.AdaptiveTimingProvider()
-
-    override var seconds: Float
-        get() = timingProvider.seconds
-        set(value) {
-            timingProvider.seconds = value
-        }
-    override val listeners: MutableList<TimingListener> by timingProvider::listeners
 
     val isPaused: Boolean
         get() = audioContext.out.isPaused
 
     init {
         audioContext.out.pause(true)
-        audioContext.out.addDependent(timingProvider.timingBead)
     }
 
     fun setPaused(paused: Boolean) {
         audioContext.out.pause(paused)
-        if (paused) {
-            timingProvider.forceSyncWithBead()
-        }
     }
 
     fun startRealtime() {
@@ -116,10 +104,6 @@ class SoundSystem(private val mixer: Mixer,
         stopRealtime()
         audioContext.out.clearInputConnections()
         audioContext.out.clearDependents()
-    }
-
-    override fun exceptionHandler(throwable: Throwable): Boolean {
-        return timingProvider.exceptionHandler(throwable)
     }
 
     private fun obtainSoundID(): Long = ++currentSoundID

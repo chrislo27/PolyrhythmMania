@@ -685,7 +685,6 @@ class PlayScreen(
 
     override fun getDebugString(): String {
         return """SoundSystem: paused=${soundSystem.isPaused}
-TimingBead: ${soundSystem.seconds}
 ---
 ${engine.getDebugString()}
 ---
