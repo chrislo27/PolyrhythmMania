@@ -397,7 +397,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
                     } 
                 }
                 
-                if (next.active && posYCheck in next.position.y..(next.position.y + heightOfNext - (1f / 32f)) && row == world.rowA) {
+                if (next.active && posYCheck in next.position.y..(next.position.y + heightOfNext - (1f / 32f))) {
 //                    println("Collision: my Y ${prevPosY} ${posYCheck}   ${next.position.y}  ${next.position.y + heightOfNext}  ${next.type}  ${next.pistonState}")
 
                     collision.collidedWithWall = true
