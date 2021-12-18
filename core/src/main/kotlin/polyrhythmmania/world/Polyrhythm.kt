@@ -378,7 +378,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
         }
 
         // Check for wall stop
-        if (!collision.collidedWithWall && (currentIndexFloat - currentIndex) >= 0.80f && currentIndex >= -1 &&
+        if (!collision.collidedWithWall && (currentIndexFloat - currentIndex) >= 0.81f && currentIndex >= -1 &&
                 collision.bounce == null /* non-null Bounce indicates that the EngineInputter accepted it */) {
             val nextIndex = currentIndex + 1
             if (nextIndex in 0 until row.length) {
@@ -397,22 +397,19 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
                     } 
                 }
                 
-                if (next.active && posYCheck in next.position.y..(next.position.y + heightOfNext - (1f / 32f))) {
-                    // Exclude the lip of pistons if they are NOT fully extended
-                    if (!(next.type != EntityPiston.Type.PLATFORM && next.pistonState == EntityPiston.PistonState.PARTIALLY_EXTENDED && (posYCheck >= next.position.y + 1f && posYCheck <= next.position.y + heightOfNext))) {
-//                        println("Collision: my Y ${prevPosY} ${posYCheck}   ${next.position.y}  ${next.position.y + heightOfNext}  ${next.type}  ${next.pistonState}")
+                if (next.active && posYCheck in next.position.y..(next.position.y + heightOfNext - (1f / 32f)) && row == world.rowA) {
+//                    println("Collision: my Y ${prevPosY} ${posYCheck}   ${next.position.y}  ${next.position.y + heightOfNext}  ${next.type}  ${next.pistonState}")
 
-                        collision.collidedWithWall = true
-//                        println("$seconds Collided with wall: currentIndex = ${currentIndexFloat}  x = ${this.position.x}  y = ${this.position.y}")
-                        this.position.x = currentIndex + 0.7f + row.startX
-//                        println("$seconds After setting X: currentIndex would be ${this.position.x - row.startX}   x = ${this.position.x}")
+                    collision.collidedWithWall = true
+//                    println("$seconds Collided with wall: currentIndex = ${currentIndexFloat}  diff = ${currentIndexFloat - currentIndex}  x = ${this.position.x}  y = ${this.position.y}")
+                    this.position.x = currentIndex + 0.7f + row.startX
+//                    println("$seconds After setting X: currentIndex would be ${this.position.x - row.startX}   x = ${this.position.x}")
 
-                        playSfxSideCollision(engine)
+                    playSfxSideCollision(engine)
 
-                        // Standard collision detection will not take effect before index = -1
-                        if (explodeAtSec == Float.MAX_VALUE) {
-                            explodeAtSec = seconds + EXPLODE_DELAY_SEC
-                        }
+                    // Standard collision detection will not take effect before index = -1
+                    if (explodeAtSec == Float.MAX_VALUE) {
+                        explodeAtSec = seconds + EXPLODE_DELAY_SEC
                     }
                 }
             }
