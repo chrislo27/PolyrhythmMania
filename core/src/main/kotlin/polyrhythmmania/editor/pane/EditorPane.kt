@@ -218,6 +218,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         if (root != null) {
             root.hideRootContextMenu()
             root.hideRootDialog()
+            root.hideDropdownContextMenu()
         }
     }
 
