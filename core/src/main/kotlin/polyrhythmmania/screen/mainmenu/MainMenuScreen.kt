@@ -50,6 +50,7 @@ import polyrhythmmania.soundsystem.beads.ugen.Bandpass
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
+import polyrhythmmania.statistics.GlobalStats
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.math.ceil
@@ -604,6 +605,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         if (main.settings.lastVersion != null) {
             secretLogo.set(random.nextInt(1024) == 0)
         }
+        
+        // Persist statistics semi-regularly; the main menu screen opens frequently
+        GlobalStats.persist()
     }
 
     override fun hide() {

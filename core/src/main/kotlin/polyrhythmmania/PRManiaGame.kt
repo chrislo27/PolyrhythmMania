@@ -45,6 +45,7 @@ import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
@@ -132,6 +133,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             load()
             setStartupSettings(this@PRManiaGame)
         }
+        GlobalStats.load()
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())
         AssetRegistry.addAssetLoader(TilesetAssetLoader())
@@ -222,8 +224,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     override fun dispose() {
         super.dispose()
+        
         preferences.putString(PreferenceKeys.LAST_VERSION, PRMania.VERSION.toString()).flush()
         settings.persist()
+        GlobalStats.persist()
+        
         colourPickerHueBar.disposeQuietly()
         colourPickerTransparencyGrid.disposeQuietly()
         SidemodeAssets.disposeQuietly()
@@ -231,6 +236,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             s.disposeQuietly()
         }
         (screen as? Disposable)?.disposeQuietly()
+        
         try {
             val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
             PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->
@@ -247,6 +253,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         if (PRMania.enableMetrics) {
             metricsReporter.report()
         }
+        
         DiscordCore.disposeQuietly()
     }
 
