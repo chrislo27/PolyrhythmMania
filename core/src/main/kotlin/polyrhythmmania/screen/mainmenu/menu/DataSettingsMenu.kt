@@ -60,6 +60,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Anchor.TopLeft.configure(this)
             this.bounds.height.set(300f)
             this.spacing.set(0f)
+            this.margin.set(Insets(0f, 0f, 0f, 4f))
         }
 
         val deleteRecoveryButton: Button = createLongButton { 

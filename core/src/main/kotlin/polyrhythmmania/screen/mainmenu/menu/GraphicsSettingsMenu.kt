@@ -53,6 +53,7 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Anchor.TopLeft.configure(this)
             this.spacing.set(0f)
             this.bindHeightToParent(-40f)
+            this.margin.set(Insets(0f, 0f, 0f, 4f))
         }
         
 
