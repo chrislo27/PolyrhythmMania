@@ -17,11 +17,12 @@ import polyrhythmmania.sidemodes.ResetMusicVolumeBlock
 import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
 
 
-class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) : Practice(main) {
+class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) : Practice(main, PlayTimeType.REGULAR) {
     
     val practiceSection1: PracticeSection = PracticeSection(engine)
     val practiceSection2: PracticeSection = PracticeSection(engine)

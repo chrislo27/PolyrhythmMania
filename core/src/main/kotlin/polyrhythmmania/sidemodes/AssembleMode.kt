@@ -20,6 +20,7 @@ import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
 import polyrhythmmania.world.render.ForceTexturePack
@@ -31,7 +32,7 @@ import kotlin.math.sign
 
 
 class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
-    : AbstractEndlessMode(main, prevHighScore) {
+    : AbstractEndlessMode(main, prevHighScore, PlayTimeType.ASSEMBLE) {
 
     init {
         container.world.worldMode = WorldMode(WorldType.ASSEMBLE, false)

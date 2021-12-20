@@ -54,6 +54,8 @@ class EditorScreen(main: PRManiaGame, val debugMode: Boolean = false) : PRManiaS
                 main.screen = EditorScreen(main, debugMode = true)
             }
         }
+        
+        GlobalStats.updateEditorPlayTime()
     }
     
     private fun countChildren(element: UIElement): Int {

@@ -360,7 +360,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     }
                     Gdx.app.postRunnable {
                         val sidemode: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-                        val playScreen = PlayScreen(main, sidemode, sidemode.container,
+                        val playScreen = PlayScreen(main, sidemode, sidemode.playTimeType, sidemode.container,
                                 inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                 challenges = challenges, levelScoreAttemptConsumer = null, showResults = showResults,
                                 previousHighScore = -1)

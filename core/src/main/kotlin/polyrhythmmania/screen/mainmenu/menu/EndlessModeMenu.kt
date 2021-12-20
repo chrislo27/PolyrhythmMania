@@ -32,6 +32,7 @@ import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.ui.PRManiaSkins
 import java.util.*
 
@@ -107,7 +108,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     seed, dailyChallenge = null,
                                     disableLifeRegen = disableRegen.get(),
                                     maxLives = if (daredevilMode.get()) 1 else -1)
-                            val playScreen = PlayScreen(main, sidemode, sidemode.container,
+                            val playScreen = PlayScreen(main, sidemode, PlayTimeType.ENDLESS, sidemode.container,
                                     challenges = Challenges.NO_CHANGES, showResults = false,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                     levelScoreAttemptConsumer = null, previousHighScore = -1)

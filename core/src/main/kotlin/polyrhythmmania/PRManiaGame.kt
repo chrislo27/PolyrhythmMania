@@ -265,6 +265,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             discordCallbackDelta = 0f
             DiscordCore.runCallbacks()
         }
+        
+        GlobalStats.updateTotalPlayTime()
     }
 
     override fun postRender() {

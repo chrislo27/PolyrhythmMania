@@ -14,12 +14,13 @@ import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.WorldSettings
 import polyrhythmmania.world.tileset.TilesetPalette
 
 
 abstract class AbstractPolyrhythmPractice(main: PRManiaGame)
-    : SideMode(main) {
+    : SideMode(main, PlayTimeType.REGULAR) {
     
     companion object {
         fun parseBlocksJson(json: String, engine: Engine): List<Block> {

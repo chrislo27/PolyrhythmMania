@@ -21,6 +21,7 @@ import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.sidemodes.*
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
@@ -38,7 +39,7 @@ import kotlin.math.roundToInt
 class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
                         /** A 48-bit seed. */ val seed: Long,
                         val dailyChallenge: LocalDate?, val disableLifeRegen: Boolean, maxLives: Int = -1)
-    : AbstractEndlessMode(main, prevHighScore) {
+    : AbstractEndlessMode(main, prevHighScore, PlayTimeType.ENDLESS) {
     
     companion object {
         private const val COLOR_CHANGE_LIMIT: Int = 18

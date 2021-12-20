@@ -35,6 +35,7 @@ import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.statistics.PlayTimeType
 import java.io.File
 import java.util.function.Consumer
 import kotlin.concurrent.thread
@@ -228,7 +229,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                         
                         mainMenu.transitionAway {
                             val main = mainMenu.main
-                            val playScreen = PlayScreen(main, null, loadedData.newContainer, challenges,
+                            val playScreen = PlayScreen(main, null, PlayTimeType.REGULAR, loadedData.newContainer, challenges,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                     levelScoreAttemptConsumer = levelScoreAttemptConsumer, previousHighScore = previousHighScore,
                                     showResults = !robotMode)

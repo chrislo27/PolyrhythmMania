@@ -55,6 +55,8 @@ import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
+import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
@@ -66,7 +68,8 @@ import kotlin.math.*
 
 
 class PlayScreen(
-        main: PRManiaGame, val sideMode: SideMode?, val container: Container, val challenges: Challenges,
+        main: PRManiaGame, val sideMode: SideMode?, val playTimeType: PlayTimeType,
+        val container: Container, val challenges: Challenges,
         val inputCalibration: InputCalibration, 
         val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>?, /** -1 to disable */ val previousHighScore: Int,
         val showResults: Boolean = true,
@@ -342,6 +345,7 @@ class PlayScreen(
 
         if (!isPaused && timing is SimpleTimingProvider) {
             timing.seconds += Gdx.graphics.deltaTime
+            GlobalStats.updateModePlayTime(playTimeType)
         }
     }
 
@@ -390,7 +394,7 @@ class PlayScreen(
         }
         
         transitionAway(ResultsScreen(main, scoreObj, container, {
-            PlayScreen(main, sideMode, container, challenges, inputCalibration, levelScoreAttemptConsumer,
+            PlayScreen(main, sideMode, playTimeType, container, challenges, inputCalibration, levelScoreAttemptConsumer,
                     if (scoreObj.newHighScore) scoreObj.scoreInt else previousHighScore,
                     showResults)
         }, keyboardKeybinds), disposeContainer = false) {}

@@ -5,10 +5,11 @@ import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.statistics.PlayTimeType
 
 
-abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: EndlessModeScore)
-    : SideMode(main) {
+abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: EndlessModeScore, playTimeType: PlayTimeType)
+    : SideMode(main, playTimeType) {
 
     init {
         val renderer = container.renderer

@@ -30,6 +30,7 @@ import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.endlessmode.*
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.flags.CountryFlags
 import java.time.LocalDate
@@ -107,7 +108,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main,
                                     EndlessModeScore(scoreVar, showHighScore = false),
                                     EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
-                            val playScreen = PlayScreen(main, sidemode, sidemode.container,
+                            val playScreen = PlayScreen(main, sidemode, PlayTimeType.DAILY_CHALLENGE, sidemode.container,
                                     challenges = Challenges.NO_CHANGES, showResults = false,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                     levelScoreAttemptConsumer = null, previousHighScore = -1)
