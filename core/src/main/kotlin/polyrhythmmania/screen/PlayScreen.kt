@@ -422,6 +422,8 @@ class PlayScreen(
                 TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
             ForceTilesetPalette.FORCE_PR2 ->
                 TilesetPalette.createGBA2TilesetPalette().applyTo(container.renderer.tileset)
+            ForceTilesetPalette.ORANGE_BLUE ->
+                TilesetPalette.createOrangeBlueTilesetPalette().applyTo(container.renderer.tileset)
         }
     }
 

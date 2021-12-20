@@ -73,6 +73,25 @@ class TilesetPalette {
                 pistonFaceZ.color.getOrCompute().set(255, 214, 16)
             }
         }
+
+        fun createOrangeBlueTilesetPalette(): TilesetPalette {
+            // https://jfly.uni-koeln.de/color/#pallet
+            return TilesetPalette().apply {
+                rodBorder.color.getOrCompute().set(0, 0, 0)
+                rodFill.color.getOrCompute().set(213, 94, 0)
+
+                cubeBorder.color.getOrCompute().set(0, 0x4C, 0x87)
+                cubeBorderZ.color.getOrCompute().set(0, 0x38, 0x65)
+                cubeFaceX.color.getOrCompute().set(0, 0x56, 0x91)
+                cubeFaceY.color.getOrCompute().set(0, 0x71, 0xB2)
+                cubeFaceZ.color.getOrCompute().set(0, 0x5C, 0x98)
+
+                pistonFaceX.color.getOrCompute().set(188, 179, 50)
+                pistonFaceZ.color.getOrCompute().set(0xEF, 0xE4, 0x40)
+
+                signShadow.color.getOrCompute().set(0, 0x4C, 0x87)
+            }
+        }
     }
 
     val cubeBorder: ColorMapping = ColorMapping("cubeBorder", { it.cubeBorder.color })

@@ -87,9 +87,10 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     percentageContent = 0.4f, itemToString = { choice ->
                 Localization.getValue("mainMenu.graphicsSettings.forceTilesetPalette.${
                     when (choice) {
-                        ForceTilesetPalette.NO_FORCE ->  "noForce"
+                        ForceTilesetPalette.NO_FORCE -> "noForce"
                         ForceTilesetPalette.FORCE_PR1 -> "redGreen"
-                        ForceTilesetPalette.FORCE_PR2 ->  "redBlue"
+                        ForceTilesetPalette.FORCE_PR2 -> "redBlue"
+                        ForceTilesetPalette.ORANGE_BLUE -> "orangeBlue"
                     }
                 }")
             })
