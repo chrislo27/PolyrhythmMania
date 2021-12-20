@@ -113,7 +113,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun create() {
         super.create()
         PRManiaGame.instance = this
-        this.localizationInstance = Localization
+        this.reloadableLocalizationInstances = listOf(Localization)
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
 //        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
