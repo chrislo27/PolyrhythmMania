@@ -206,8 +206,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             if (!l.file.exists()) {
                                 startSearchThread() // Re-search the list. The level was deleted but this should be a very rare case.
                             } else {
-                                val previousHighScore = GlobalScoreCache.scoreCache.getOrCompute().map[l.uuid]?.attempts?.maxOrNull()?.score ?: 0
-                                val loadMenu = LoadSavedLevelMenu(menuCol, l.file, GlobalScoreCache.createConsumer(l.uuid),
+                                val previousHighScore = GlobalScoreCache.scoreCache.getOrCompute().map[l.uuid]?.attempts?.maxOrNull()?.score ?: (if (l.isPersistable) 0 else -1)
+                                val loadMenu = LoadSavedLevelMenu(menuCol, l.file,
+                                        if (l.isPersistable) GlobalScoreCache.createConsumer(l.uuid) else null,
                                         previousHighScore)
                                 menuCol.addMenu(loadMenu)
                                 menuCol.pushNextMenu(loadMenu)
@@ -600,11 +601,14 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.vBar.blockIncrement.set(24f)
 
                             val noHighScoresLabel = TextLabel(binding = {
-                                Localization.getVar("mainMenu.library.noHighScores").use()
+                                if (selectedLevelEntry.use() is LevelEntry.Legacy) {
+                                    Localization.getVar("mainMenu.library.noHighScores.legacy").use()
+                                } else Localization.getVar("mainMenu.library.noHighScores").use()
                             }, font = main.fontMainMenuThin).apply {
                                 this.textColor.set(Color().grey(0.25f))
                                 this.bounds.height.set(60f)
                                 this.renderAlign.set(Align.center)
+                                this.doLineWrapping.set(true)
                             }
                             val vbox = VBox().apply {
                                 this.bounds.height.set(10f)
@@ -616,7 +620,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     val scoreCache = GlobalScoreCache.scoreCache.getOrCompute()
                                     val levelScore = scoreCache.map[l.uuid]
                                     val attempts: List<LevelScoreAttempt>? = levelScore?.attempts?.sortedDescending()
-                                    if (attempts == null || attempts.isEmpty()) {
+                                    if (attempts == null || attempts.isEmpty() || l is LevelEntry.Legacy) {
                                         vbox += noHighScoresLabel
                                     } else {
                                         vbox.disableLayouts.set(true)

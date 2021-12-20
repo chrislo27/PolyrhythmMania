@@ -43,6 +43,8 @@ sealed class LevelEntry(val uuid: UUID, val file: File, val containerVersion: In
     class Legacy(file: File, containerVersion: Int, programVersion: Version)
         : LevelEntry(UUID.randomUUID(), file, containerVersion, programVersion) {
 
+        override val isPersistable: Boolean = true
+        
         private val title: String = file.nameWithoutExtension
 
         override fun getTitle(): String {
@@ -55,6 +57,8 @@ sealed class LevelEntry(val uuid: UUID, val file: File, val containerVersion: In
     class Modern(uuid: UUID, file: File, containerVersion: Int, programVersion: Version,
                  val levelMetadata: LevelMetadata, val exportStatistics: ExportStatistics)
         : LevelEntry(uuid, file, containerVersion, programVersion) {
+
+        override val isPersistable: Boolean = false
         
         private val title: String = levelMetadata.songName.replace("\n", "")
         private val subtitle: String = levelMetadata.getFullAlbumInfo().replace("\n", "")
@@ -62,6 +66,8 @@ sealed class LevelEntry(val uuid: UUID, val file: File, val containerVersion: In
         override fun getTitle(): String = title
         override fun getSubtitle(): String = subtitle
     }
+
+    abstract val isPersistable: Boolean
 
     abstract fun getTitle(): String
     abstract fun getSubtitle(): String
