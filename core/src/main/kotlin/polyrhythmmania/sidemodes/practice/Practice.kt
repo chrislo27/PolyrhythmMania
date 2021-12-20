@@ -16,7 +16,4 @@ abstract class Practice(main: PRManiaGame) : SideMode(main) {
         container.world.worldSettings = WorldSettings(showInputIndicators = true)
     }
 
-    override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(onlyDefaultPalette = false)
-    }
 }

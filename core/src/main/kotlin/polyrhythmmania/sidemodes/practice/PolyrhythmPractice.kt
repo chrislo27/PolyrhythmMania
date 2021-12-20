@@ -38,10 +38,6 @@ abstract class AbstractPolyrhythmPractice(main: PRManiaGame)
             return blocks
         }
     }
-
-    override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(onlyDefaultPalette = false)
-    }
 }
 
 class Polyrhythm1Practice(main: PRManiaGame)
