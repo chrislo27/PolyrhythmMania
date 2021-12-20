@@ -78,7 +78,7 @@ class TilesetPalette {
             // https://jfly.uni-koeln.de/color/#pallet
             return TilesetPalette().apply {
                 rodBorder.color.getOrCompute().set(0, 0, 0)
-                rodFill.color.getOrCompute().set(213, 94, 0)
+                rodFill.color.getOrCompute().set(255, 0x6E, 0)
 
                 cubeBorder.color.getOrCompute().set(0, 0x4C, 0x87)
                 cubeBorderZ.color.getOrCompute().set(0, 0x38, 0x65)
