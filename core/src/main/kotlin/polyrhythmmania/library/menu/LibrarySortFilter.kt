@@ -1,6 +1,7 @@
 package polyrhythmmania.library.menu
 
 import polyrhythmmania.library.LevelEntry
+import polyrhythmmania.library.score.GlobalScoreCache
 import java.util.*
 
 
@@ -91,6 +92,11 @@ data class LibrarySortFilter(
             Sortable.MAX_BPM -> Comparator.comparing {
                 (it.levelEntry as LevelEntry.Modern).exportStatistics.maxBPM
             }
+            Sortable.LAST_PLAYED -> {
+                Comparator.comparing<LevelEntryData?, Long?> {
+                    GlobalScoreCache.scoreCache.getOrCompute().map[it.levelEntry.uuid]?.lastPlayed?.epochSecond ?: -1L
+                }.reversed()
+            }
         }
         cmp = cmp.thenComparing { led: LevelEntryData ->
             led.levelEntry.uuid
@@ -102,7 +108,15 @@ data class LibrarySortFilter(
     }
     
     private fun sortingComparatorLegacy(): Comparator<LevelEntryData> {
-        var cmp = LevelEntryData.comparator.thenComparing { led: LevelEntryData ->
+        var cmp: Comparator<LevelEntryData> = when (sortOn) {
+            Sortable.LAST_PLAYED -> {
+                Comparator.comparing<LevelEntryData?, Long?> {
+                    GlobalScoreCache.scoreCache.getOrCompute().map[it.levelEntry.uuid]?.lastPlayed?.epochSecond ?: -1L
+                }.reversed()
+            }
+            else -> LevelEntryData.comparator
+        }
+        cmp = cmp.thenComparing { led: LevelEntryData ->
             led.levelEntry.uuid
         }
         if (sortDescending) {

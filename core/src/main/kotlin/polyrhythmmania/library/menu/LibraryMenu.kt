@@ -49,9 +49,7 @@ import paintbox.util.DecimalFormats
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.util.TimeUtils
 import java.io.File
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZoneOffset
+import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.concurrent.thread
@@ -468,7 +466,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.renderAlign.set(Align.left)
                             this.textColor.set(labelColor)
                         }
-                        this += TextLabel(binding = { Localization.getVar("mainMenu.library.averageInputs").use() }, font = main.fontMainMenuThin).apply {
+                        this += TextLabel(binding = { Localization.getVar("mainMenu.library.lastPlayed").use() }, font = main.fontMainMenuThin).apply {
                             Anchor.TopRight.configure(this)
                             this.bounds.height.set(labelHeight)
                             this.setScaleXY(0.8f)
@@ -478,8 +476,17 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         }
                         
                         this += TextLabel(binding = {
-                            val inputCount = levelEntryModern.use()?.exportStatistics?.inputCount
-                            if (inputCount != null) DecimalFormats["0"].format(inputCount)
+                            val exportStatistics = levelEntryModern.use()?.exportStatistics
+                            val inputCount = exportStatistics?.inputCount
+                            if (inputCount != null) {
+                                val inputsPerMin = exportStatistics.averageInputsPerMinute
+                                Localization.getVar("mainMenu.library.inputs.averageRate", Var { 
+                                    listOf(
+                                            DecimalFormats["0"].format(inputCount),
+                                            DecimalFormats.format("0.0", inputsPerMin)
+                                    )
+                                }).use()
+                            }
                             else Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
                         }, font = main.fontMainMenuRodin).apply {
                             Anchor.BottomLeft.configure(this)
@@ -489,18 +496,26 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             this.renderAlign.set(Align.left)
                         }
                         this += TextLabel(binding = {
-                            val inputsPerMin = levelEntryModern.use()?.exportStatistics?.averageInputsPerMinute
-                            if (inputsPerMin != null)
-                                Localization.getVar("mainMenu.library.averageInputs.value", Var {
-                                    listOf(DecimalFormats.format("0.0", inputsPerMin))
-                                }).use()
-                            else Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                            val instant: Instant? = GlobalScoreCache.scoreCache.use().map[selectedLevelEntry.use()?.uuid]?.lastPlayed
+                            if (instant == null || instant.epochSecond < 1L) {
+                                Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                            } else {
+                                LocalDate.ofInstant(instant, ZoneId.systemDefault()).format(DateTimeFormatter.ISO_LOCAL_DATE)
+                            }
                         }, font = main.fontMainMenuRodin).apply {
                             Anchor.BottomRight.configure(this)
                             this.bounds.height.set(dataHeight)
                             this.setScaleXY(0.8f)
                             this.bindWidthToParent(multiplier = rightRatio, adjust = -4f)
                             this.renderAlign.set(Align.right)
+                            this.tooltipElement.set(createRodinTooltip {
+                                val instant: Instant? = GlobalScoreCache.scoreCache.use().map[selectedLevelEntry.use()?.uuid]?.lastPlayed
+                                if (instant == null || instant.epochSecond < 1L) {
+                                    Localization.getVar("mainMenu.library.levelMetadataNotAvailable").use()
+                                } else {
+                                    ZonedDateTime.ofInstant(instant, ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME)
+                                }
+                            })
                         }
                     }
                     

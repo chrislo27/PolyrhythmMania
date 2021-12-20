@@ -6,6 +6,7 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import polyrhythmmania.PRMania
 import java.io.File
+import java.time.Instant
 import java.util.*
 import java.util.function.Consumer
 
@@ -20,8 +21,8 @@ object GlobalScoreCache {
     fun pushNewLevelScoreAttempt(levelUUID: UUID, lsa: LevelScoreAttempt) {
         val oldCache = scoreCache.getOrCompute()
         
-        val levelScore = oldCache.map[levelUUID] ?: LevelScore(levelUUID, 0, emptyList())
-        val newLevelScore = levelScore.copy(playCount = levelScore.playCount + 1, attempts = levelScore.attempts + lsa).keepXBestAttempts()
+        val levelScore = oldCache.map[levelUUID] ?: LevelScore(levelUUID, 0, emptyList(), Instant.now())
+        val newLevelScore = levelScore.copy(playCount = levelScore.playCount + 1, attempts = levelScore.attempts + lsa, lastPlayed = Instant.now()).keepXBestAttempts()
         
         val newScoreCache = oldCache.copy(map = oldCache.map + Pair(newLevelScore.uuid, newLevelScore))
         

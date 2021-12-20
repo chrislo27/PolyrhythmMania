@@ -20,6 +20,8 @@ enum class Sortable(val nameKey: String) {
     MIN_BPM("mainMenu.librarySortFilter.sort.minBpm"),
     MAX_BPM("mainMenu.librarySortFilter.sort.maxBpm"),
     
+    // Other/ScoreCache
+    LAST_PLAYED("mainMenu.librarySortFilter.sort.lastPlayed"),
     ;
     
     companion object {
