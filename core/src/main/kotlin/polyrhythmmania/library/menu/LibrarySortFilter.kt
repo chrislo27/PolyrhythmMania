@@ -97,6 +97,11 @@ data class LibrarySortFilter(
                     GlobalScoreCache.scoreCache.getOrCompute().map[it.levelEntry.uuid]?.lastPlayed?.epochSecond ?: -1L
                 }.reversed()
             }
+            Sortable.PLAY_COUNT -> {
+                Comparator.comparing<LevelEntryData?, Int?> {
+                    GlobalScoreCache.scoreCache.getOrCompute().map[it.levelEntry.uuid]?.playCount ?: 0
+                }
+            }
         }
         cmp = cmp.thenComparing { led: LevelEntryData ->
             led.levelEntry.uuid
@@ -108,15 +113,7 @@ data class LibrarySortFilter(
     }
     
     private fun sortingComparatorLegacy(): Comparator<LevelEntryData> {
-        var cmp: Comparator<LevelEntryData> = when (sortOn) {
-            Sortable.LAST_PLAYED -> {
-                Comparator.comparing<LevelEntryData?, Long?> {
-                    GlobalScoreCache.scoreCache.getOrCompute().map[it.levelEntry.uuid]?.lastPlayed?.epochSecond ?: -1L
-                }.reversed()
-            }
-            else -> LevelEntryData.comparator
-        }
-        cmp = cmp.thenComparing { led: LevelEntryData ->
+        var cmp: Comparator<LevelEntryData> = LevelEntryData.comparator.thenComparing { led: LevelEntryData ->
             led.levelEntry.uuid
         }
         if (sortDescending) {
