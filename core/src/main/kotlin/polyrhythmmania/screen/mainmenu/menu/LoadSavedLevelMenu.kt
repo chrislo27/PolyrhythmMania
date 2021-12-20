@@ -319,7 +319,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                 throw it
             }
             true
-        }, GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.onlyDefaultPalette.getOrCompute()))
+        }, GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.forceTilesetPalette.getOrCompute()))
 
         try {
             val loadMetadata = newContainer.readFromFile(newFile)

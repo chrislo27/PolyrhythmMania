@@ -12,6 +12,7 @@ import polyrhythmmania.engine.*
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.render.ForceTexturePack
+import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.tileset.TilesetPalette
 import kotlin.math.max
 import kotlin.math.min
@@ -256,7 +257,7 @@ class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
 
     override fun onUpdateContainer(container: Container, currentBeat: Float) {
         super.onUpdateContainer(container, currentBeat)
-        if (container.globalSettings.onlyDefaultPalette) return
+        if (container.globalSettings.forceTilesetPalette != ForceTilesetPalette.NO_FORCE) return
         
         var percentage = getBeatPercentage(currentBeat).coerceIn(0f, 1f)
         if (reverse) {

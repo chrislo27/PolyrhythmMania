@@ -15,6 +15,7 @@ import polyrhythmmania.world.EntityRodDunk
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.render.ForceTexturePack
+import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.tileset.StockTexturePacks
 
 
@@ -29,7 +30,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     }
     
     override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, onlyDefaultPalette = false)
+        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, forceTilesetPalette = ForceTilesetPalette.FORCE_PR1)
     }
     
     override fun initialize() {

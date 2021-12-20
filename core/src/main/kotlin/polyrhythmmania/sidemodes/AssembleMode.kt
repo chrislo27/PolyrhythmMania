@@ -23,6 +23,7 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
 import polyrhythmmania.world.render.ForceTexturePack
+import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.*
@@ -53,7 +54,7 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     }
 
     override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, onlyDefaultPalette = false)
+        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, forceTilesetPalette = ForceTilesetPalette.FORCE_PR1)
     }
 
     override fun initialize() {

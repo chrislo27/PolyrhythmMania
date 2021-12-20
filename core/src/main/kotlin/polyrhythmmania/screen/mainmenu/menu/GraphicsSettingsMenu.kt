@@ -11,6 +11,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.render.ForceTexturePack
+import polyrhythmmania.world.render.ForceTilesetPalette
 
 
 class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -74,19 +75,30 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }")
             })
+            forceTexPackCombobox.setScaleXY(0.75f)
             forceTexPackCombobox.selectedItem.addListener { 
                 main.settings.forceTexturePack.set(it.getOrCompute())
             }
             forceTexPackPane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceTexturePack.tooltip")))
             vbox += forceTexPackPane
-            
-            val (onlyDefaultPalettePane, onlyDefaultPaletteCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.onlyDefaultPalette").use() })
-            onlyDefaultPaletteCheck.selectedState.set(main.settings.onlyDefaultPalette.getOrCompute())
-            onlyDefaultPaletteCheck.onCheckChanged = {
-                main.settings.onlyDefaultPalette.set(it)
+
+            val (forcePalettePane, forcePaletteCombobox) = createComboboxOption(ForceTilesetPalette.VALUES, main.settings.forceTilesetPalette.getOrCompute(),
+                    { Localization.getVar("mainMenu.graphicsSettings.forceTilesetPalette").use() },
+                    percentageContent = 0.4f, itemToString = { choice ->
+                Localization.getValue("mainMenu.graphicsSettings.forceTilesetPalette.${
+                    when (choice) {
+                        ForceTilesetPalette.NO_FORCE ->  "noForce"
+                        ForceTilesetPalette.FORCE_PR1 -> "redGreen"
+                        ForceTilesetPalette.FORCE_PR2 ->  "redBlue"
+                    }
+                }")
+            })
+            forcePaletteCombobox.setScaleXY(0.75f)
+            forcePaletteCombobox.selectedItem.addListener { 
+                main.settings.forceTilesetPalette.set(it.getOrCompute())
             }
-            onlyDefaultPaletteCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.onlyDefaultPalette.tooltip")))
-            vbox += onlyDefaultPalettePane
+            forcePalettePane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceTilesetPalette.tooltip")))
+            vbox += forcePalettePane
         }
 
         hbox.temporarilyDisableLayouts {

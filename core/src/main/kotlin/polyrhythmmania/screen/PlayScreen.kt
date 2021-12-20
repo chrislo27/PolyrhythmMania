@@ -56,6 +56,7 @@ import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.world.EntityRodPR
+import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.TilesetPalette
 import space.earlygrey.shapedrawer.ShapeDrawer
@@ -412,6 +413,17 @@ class PlayScreen(
             }
         }
     }
+    
+    private fun applyForceTilesetPaletteSettings() {
+        when (container.globalSettings.forceTilesetPalette) {
+            ForceTilesetPalette.NO_FORCE ->
+                container.world.tilesetPalette.applyTo(container.renderer.tileset)
+            ForceTilesetPalette.FORCE_PR1 ->
+                TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
+            ForceTilesetPalette.FORCE_PR2 ->
+                TilesetPalette.createGBA2TilesetPalette().applyTo(container.renderer.tileset)
+        }
+    }
 
     fun prepareGameStart() {
         engine.inputter.areInputsLocked = engine.autoInputs
@@ -421,9 +433,7 @@ class PlayScreen(
         engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
         engine.resetEndSignal()
         
-        if (container.globalSettings.onlyDefaultPalette) {
-            TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
-        }
+        applyForceTilesetPaletteSettings()
         
         timing.seconds = min(-1f, -1f + this.inputCalibration.audioOffsetMs / 1000f)
         engine.seconds = timing.seconds
@@ -494,11 +504,7 @@ class PlayScreen(
             challenges.applyToEngine(engine)
             engine.removeEvents(engine.events.toList())
             container.world.resetWorld()
-            if (container.globalSettings.onlyDefaultPalette) {
-                TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
-            } else {
-                container.world.tilesetPalette.applyTo(container.renderer.tileset)
-            }
+            applyForceTilesetPaletteSettings()
             engine.soundInterface.clearAllNonMusicAudio()
             container.setTexturePackFromSource()
             

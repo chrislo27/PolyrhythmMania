@@ -31,9 +31,9 @@ import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_ASM
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_LIBRARY
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
-import polyrhythmmania.PreferenceKeys.SETTINGS_ONLY_DEFAULT_PALETTE
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TEXTURE_PACK
+import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TILESET_PALETTE
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_LOCALE
@@ -43,6 +43,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_MAX_FPS
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MIXER
+import polyrhythmmania.PreferenceKeys.SETTINGS_ONLY_DEFAULT_PALETTE_OLD
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_SKILL_STAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_VSYNC
@@ -56,6 +57,7 @@ import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.world.render.ForceTexturePack
+import polyrhythmmania.world.render.ForceTilesetPalette
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
@@ -104,7 +106,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_vsyncEnabled: KeyValue<Boolean> = KeyValue(SETTINGS_VSYNC, false)
     private val kv_maxFramerate: KeyValue<Int> = KeyValue(SETTINGS_MAX_FPS, determineMaxRefreshRate())
     private val kv_forceTexturePack: KeyValue<ForceTexturePack> = KeyValue(SETTINGS_FORCE_TEXTURE_PACK, ForceTexturePack.NO_FORCE)
-    private val kv_onlyDefaultPalette: KeyValue<Boolean> = KeyValue(SETTINGS_ONLY_DEFAULT_PALETTE, false)
+    private val kv_forceTilesetPalette: KeyValue<ForceTilesetPalette> = KeyValue(SETTINGS_FORCE_TILESET_PALETTE, ForceTilesetPalette.NO_FORCE)
     private val kv_lastUpdateNotes: KeyValue<String> = KeyValue(LAST_UPDATE_NOTES, "")
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
@@ -141,7 +143,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val vsyncEnabled: Var<Boolean> = kv_vsyncEnabled.value
     val maxFramerate: Var<Int> = kv_maxFramerate.value
     val forceTexturePack: Var<ForceTexturePack> = kv_forceTexturePack.value
-    val onlyDefaultPalette: Var<Boolean> = kv_onlyDefaultPalette.value
+    val forceTilesetPalette: Var<ForceTilesetPalette> = kv_forceTilesetPalette.value
     val lastUpdateNotes: Var<String> = kv_lastUpdateNotes.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
@@ -196,7 +198,15 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_vsyncEnabled)
         prefs.getIntCoerceIn(kv_maxFramerate, 0, 1000)
         prefs.getForceTexturePack(kv_forceTexturePack)
-        prefs.getBoolean(kv_onlyDefaultPalette)
+        if (prefs.contains(SETTINGS_ONLY_DEFAULT_PALETTE_OLD)) {
+            // Legacy setting that is migrated
+            val oldSetting = prefs.getBoolean(SETTINGS_ONLY_DEFAULT_PALETTE_OLD)
+            kv_forceTilesetPalette.value.set(if (oldSetting) ForceTilesetPalette.FORCE_PR1 else ForceTilesetPalette.NO_FORCE)
+            prefs.remove(SETTINGS_ONLY_DEFAULT_PALETTE_OLD)
+            Paintbox.LOGGER.info("[Settings] Migrated old setting $SETTINGS_ONLY_DEFAULT_PALETTE_OLD, previously was $oldSetting")
+        } else {
+            prefs.getForceTilesetPalette(kv_forceTilesetPalette)
+        }
         prefs.getString(kv_lastUpdateNotes)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
@@ -240,7 +250,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_vsyncEnabled)
                 .putInt(kv_maxFramerate)
                 .putForceTexturePack(kv_forceTexturePack)
-                .putBoolean(kv_onlyDefaultPalette)
+                .putForceTilesetPalette(kv_forceTilesetPalette)
                 .putString(kv_lastUpdateNotes)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)
@@ -463,6 +473,19 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     }
 
     private fun Preferences.putForceTexturePack(kv: KeyValue<ForceTexturePack>): Preferences {
+        val prefs: Preferences = this
+        return prefs.putInteger(kv.key, kv.value.getOrCompute().jsonId)
+    }
+    
+    private fun Preferences.getForceTilesetPalette(kv: KeyValue<ForceTilesetPalette>) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            val i = prefs.getInteger(kv.key, ForceTexturePack.NO_FORCE.jsonId)
+            kv.value.set(ForceTilesetPalette.JSON_MAP[i] ?: ForceTilesetPalette.NO_FORCE)
+        }
+    }
+
+    private fun Preferences.putForceTilesetPalette(kv: KeyValue<ForceTilesetPalette>): Preferences {
         val prefs: Preferences = this
         return prefs.putInteger(kv.key, kv.value.getOrCompute().jsonId)
     }

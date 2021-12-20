@@ -42,7 +42,7 @@ abstract class SideMode(val main: PRManiaGame) : Disposable {
     protected abstract fun initialize()
 
     protected open fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.onlyDefaultPalette.getOrCompute())
+        return GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.forceTilesetPalette.getOrCompute())
     }
 
     override fun dispose() {

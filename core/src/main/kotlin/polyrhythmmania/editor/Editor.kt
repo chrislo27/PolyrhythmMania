@@ -55,6 +55,7 @@ import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
 import polyrhythmmania.world.render.ForceTexturePack
+import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
 import java.io.File
 import java.time.LocalDate
@@ -103,7 +104,7 @@ class Editor(val main: PRManiaGame)
         true
     } //soundSystem
     val container: Container = Container(this.soundSystem, this.timing,
-            GlobalContainerSettings(forceTexturePack = ForceTexturePack.NO_FORCE, onlyDefaultPalette = false))
+            GlobalContainerSettings(forceTexturePack = ForceTexturePack.NO_FORCE, forceTilesetPalette = ForceTilesetPalette.NO_FORCE))
 
     val world: World get() = container.world
     val engine: Engine get() = container.engine
