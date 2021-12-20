@@ -37,6 +37,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.EditorScreen
+import polyrhythmmania.editor.help.EditorHelpLocalization
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.init.AssetRegistryLoadingScreen
 import polyrhythmmania.init.InitialAssetLoader
@@ -113,7 +114,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun create() {
         super.create()
         PRManiaGame.instance = this
-        this.reloadableLocalizationInstances = listOf(Localization)
+        this.reloadableLocalizationInstances = listOf(Localization, EditorHelpLocalization)
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
 //        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)

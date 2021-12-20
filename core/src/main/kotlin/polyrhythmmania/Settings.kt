@@ -285,11 +285,11 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
 
             val bundles = Localization.bundles.getOrCompute()
             val correctLocaleBundle = bundles.find {
-                it.locale.locale.language == language && it.locale.locale.country == country && it.locale.locale.variant == variant
+                it.namedLocale.locale.language == language && it.namedLocale.locale.country == country && it.namedLocale.locale.variant == variant
             } ?: bundles.find {
-                it.locale.locale.language == language && it.locale.locale.country == country
+                it.namedLocale.locale.language == language && it.namedLocale.locale.country == country
             } ?: bundles.find {
-                it.locale.locale.language == language
+                it.namedLocale.locale.language == language
             }
 
             if (correctLocaleBundle == null) {

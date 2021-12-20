@@ -22,7 +22,7 @@ object EditorHelpData {
 }
 
 class EditorHelpDocRoot : HelpDocument(
-        "editor.dialog.help.title",
+        "editorHelp.root.title",
         listOf(
                 LayerTitle("editorHelp.root.title"),
                 LayerParagraph("editorHelp.root.pp0", 48f),

@@ -68,13 +68,13 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             
             val toggleGroup = ToggleGroup()
             Localization.bundles.getOrCompute().forEachIndexed { index, bundle ->
-                val name = bundle.locale.name
-                val locale = bundle.locale.locale
+                val name = bundle.namedLocale.name
+                val locale = bundle.namedLocale.locale
                 val (pane, button) = createRadioButtonOption({ name }, toggleGroup)
                 button.setOnAction { 
                     button.checkedState.set(true)
                     val currentBundles = Localization.bundles.getOrCompute()
-                    Localization.currentBundle.set(currentBundles.find { it.locale.locale == locale } ?: currentBundles.first())
+                    Localization.currentBundle.set(currentBundles.find { it.namedLocale.locale == locale } ?: currentBundles.first())
                     settings.locale.set("${locale.language}_${locale.country}_${locale.variant}")
                 }
                 vbox += pane
