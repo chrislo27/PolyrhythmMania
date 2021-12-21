@@ -235,7 +235,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     init {
-        val markup = Markup(mapOf(), TextRun(main.fontMainMenuMain, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
+        val markup = Markup(mapOf(
+                Markup.FONT_NAME_ITALIC to main.fontMainMenuItalic,
+                Markup.FONT_NAME_BOLDITALIC to main.fontMainMenuItalic,
+        ), TextRun(main.fontMainMenuMain, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
         val leftPane = Pane().apply {
             this.margin.set(Insets(64f))
         }

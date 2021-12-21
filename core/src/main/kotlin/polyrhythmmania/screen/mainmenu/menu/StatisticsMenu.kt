@@ -51,7 +51,7 @@ class StatisticsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Anchor.TopLeft.configure(this)
             this.bounds.height.set(300f)
             this.spacing.set(0f)
-            this.margin.set(Insets(0f, 0f, 0f, 8f))
+            this.margin.set(Insets(0f, 0f, 0f, 16f))
         }
 
 
@@ -65,7 +65,8 @@ class StatisticsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     val textColor = if (index % 2 == 0) evenColor else oddColor
                     pane += TextLabel(binding = { Localization.getVar(stat.getLocalizationID()).use() }, font = font).apply { 
                         Anchor.TopLeft.configure(this)
-                        this.bindWidthToParent(adjust = -4f, multiplier = 0.7f)
+                        this.markup.set(this@StatisticsMenu.markup)
+                        this.bindWidthToParent(adjust = -6f, multiplier = 0.75f)
                         this.textAlign.set(TextAlign.LEFT)
                         this.textColor.set(textColor)
                         this.setScaleXY(0.85f)
@@ -73,7 +74,8 @@ class StatisticsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                     pane += TextLabel(binding = { stat.formatter.format(stat.value).use() }, font = font).apply { 
                         Anchor.TopRight.configure(this)
-                        this.bindWidthToParent(adjust = -4f, multiplier = 0.3f)
+                        this.markup.set(this@StatisticsMenu.markup)
+                        this.bindWidthToParent(adjust = -6f, multiplier = 0.25f)
                         this.renderAlign.set(Align.right)
                         this.textColor.set(textColor)
                     }

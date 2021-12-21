@@ -57,6 +57,8 @@ object GlobalStats : Stats() {
      */
     val assemblePlayTime: Stat = register(Stat("assemblePlayTime", DurationStatFormatter.DEFAULT))
 
+    
+    
     // Counters for entering modes (times played) ----------------------------------------------------------------------
     
     /**
@@ -67,93 +69,160 @@ object GlobalStats : Stats() {
     /**
      * Total number of times any custom level was played (library or direct loading).
      */
-    val timesPlayedCustomLevel: Stat = register(Stat("timesPlayedCustomLevel", LocalizedStatFormatter.DEFAULT))
+    val timesPlayedCustomLevel: Stat = register(Stat("timesPlayedCustomLevel", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of times a non-legacy custom level was played for the first time (library or direct loading).
+     * Level's UUID is checked and this stat is incremented ONLY IF it ISN'T in the score cache.
+     */
+    val timesPlayedUniqueCustomLevel: Stat = register(Stat("timesPlayedUniqueCustomLevel", LocalizedStatFormatter.DEFAULT)) // TODO implement
     
     /**
      * Total number of times any tutorial was played.
      */
-    val timesPlayedTutorial: Stat = register(Stat("timesPlayedTutorial", LocalizedStatFormatter.DEFAULT))
+    val timesPlayedTutorial: Stat = register(Stat("timesPlayedTutorial", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
-     * Total number of times Polyrhythm 1 was played.
+     * Total number of times the Polyrhythm 1 practice was played.
      */
-    val timesPlayedPolyrhythm1: Stat = register(Stat("timesPlayedPolyrhythm1", LocalizedStatFormatter.DEFAULT))
+    val timesPlayedPracticePolyrhythm1: Stat = register(Stat("timesPlayedPracticePolyrhythm1", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
-     * Total number of times Polyrhythm 2 was played.
+     * Total number of times the Polyrhythm 2 practice was played.
      */
-    val timesPlayedPolyrhythm2: Stat = register(Stat("timesPlayedPolyrhythm2", LocalizedStatFormatter.DEFAULT))
+    val timesPlayedPracticePolyrhythm2: Stat = register(Stat("timesPlayedPracticePolyrhythm2", LocalizedStatFormatter.DEFAULT)) // TODO implement
     
     /**
      * Total number of times Endless Mode was played.
      */
-    val timesPlayedEndlessMode: Stat = register(Stat("timesPlayedEndlessMode", LocalizedStatFormatter.DEFAULT))
+    val timesPlayedEndlessMode: Stat = register(Stat("timesPlayedEndlessMode", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
      * Total number of times Daily Challenge was played.
      */
-    val timesPlayedDailyChallenge: Stat = register(Stat("timesPlayedDailyChallenge", LocalizedStatFormatter.DEFAULT))
+    val timesPlayedDailyChallenge: Stat = register(Stat("timesPlayedDailyChallenge", LocalizedStatFormatter.DEFAULT)) // TODO implement
     
     /**
      * Total number of times Dunk was played.
      */
-    val timesPlayedDunk: Stat = register(Stat("timesPlayedDunk", LocalizedStatFormatter.DEFAULT))
+    val timesPlayedDunk: Stat = register(Stat("timesPlayedDunk", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
      * Total number of times Assemble was played.
      */
-    val timesPlayedAssemble: Stat = register(Stat("timesPlayedAssemble", LocalizedStatFormatter.DEFAULT))
+    val timesPlayedAssemble: Stat = register(Stat("timesPlayedAssemble", LocalizedStatFormatter.DEFAULT)) // TODO implement
    
+    
+    
+    // Inputs and scoring ----------------------------------------------------------------------------------------------
+
+    /**
+     * Total number of Try Agains gotten.
+     */
+    val rankingTryAgain: Stat = register(Stat("rankingTryAgain", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of OKs gotten.
+     */
+    val rankingOK: Stat = register(Stat("rankingOK", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of Superbs gotten.
+     */
+    val rankingSuperb: Stat = register(Stat("rankingSuperb", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of Skill Stars earned.
+     */
+    val skillStarsEarned: Stat = register(Stat("skillStarsEarned", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of No Misses earned.
+     */
+    val noMissesGotten: Stat = register(Stat("noMissesGotten", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of Perfects earned.
+     */
+    val perfectsEarned: Stat = register(Stat("perfectsEarned", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of Perfects lost.
+     */
+    val perfectsLost: Stat = register(Stat("perfectsLost", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of inputs that were not misses.
+     */
+    val inputsGottenTotal: Stat = register(Stat("inputsGottenTotal", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of inputs that were misses or weren't registered.
+     */
+    val inputsMissed: Stat = register(Stat("inputsMissed", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of inputs that were Aces.
+     */
+    val inputsGottenAce: Stat = register(Stat("inputsGottenAce", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of inputs that were Good.
+     */
+    val inputsGottenGood: Stat = register(Stat("inputsGottenGood", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of inputs that were Barely.
+     */
+    val inputsGottenBarely: Stat = register(Stat("inputsGottenBarely", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of non-Ace inputs that were early.
+     */
+    val inputsGottenEarly: Stat = register(Stat("inputsGottenEarly", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of non-Ace inputs that were late.
+     */
+    val inputsGottenLate: Stat = register(Stat("inputsGottenLate", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    
+    
     
     // World entities --------------------------------------------------------------------------------------------------
     
     /**
      * Total number of rods deployed across all modes.
      */
-    val rodsDeployed: Stat = register(Stat("rodsDeployed", LocalizedStatFormatter.DEFAULT))
+    val rodsDeployed: Stat = register(Stat("rodsDeployed", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
      * Total number of rods exploded across all modes.
      */
-    val rodsExploded: Stat = register(Stat("rodsExploded", LocalizedStatFormatter.DEFAULT))
-
-
+    val rodsExploded: Stat = register(Stat("rodsExploded", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    
     /**
      * Total number of rods deployed in regular Polyrhythm.
      */
-    val rodsDeployedPolyrhythm: Stat = register(Stat("rodsDeployedPolyrhythm", LocalizedStatFormatter.DEFAULT))
+    val rodsDeployedPolyrhythm: Stat = register(Stat("rodsDeployedPolyrhythm", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
      * Total number of rods ferried in regular Polyrhythm.
      */
-    val rodsFerriedPolyrhythm: Stat = register(Stat("rodsFerriedPolyrhythm", LocalizedStatFormatter.DEFAULT))
+    val rodsFerriedPolyrhythm: Stat = register(Stat("rodsFerriedPolyrhythm", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
      * Total number of rods exploded in regular Polyrhythm.
      */
-    val rodsExplodedPolyrhythm: Stat = register(Stat("rodsExplodedPolyrhythm", LocalizedStatFormatter.DEFAULT))
+    val rodsExplodedPolyrhythm: Stat = register(Stat("rodsExplodedPolyrhythm", LocalizedStatFormatter.DEFAULT)) // TODO implement
     
     /**
      * Total number of rods deployed in dunk.
      */
-    val rodsDeployedDunk: Stat = register(Stat("rodsDeployedDunk", LocalizedStatFormatter.DEFAULT))
+    val rodsDeployedDunk: Stat = register(Stat("rodsDeployedDunk", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
      * Total number of rods dunked in dunk.
      */
-    val rodsDunkedDunk: Stat = register(Stat("rodsDunkedDunk", LocalizedStatFormatter.DEFAULT))
+    val rodsDunkedDunk: Stat = register(Stat("rodsDunkedDunk", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
      * Total number of rods missed/exploded in dunk.
      */
-    val rodsMissedDunk: Stat = register(Stat("rodsMissedDunk", LocalizedStatFormatter.DEFAULT))
+    val rodsMissedDunk: Stat = register(Stat("rodsMissedDunk", LocalizedStatFormatter.DEFAULT)) // TODO implement
     
     /**
      * Total number of rods deployed in assemble.
      */
-    val rodsDeployedAssemble: Stat = register(Stat("rodsDeployedAssemble", LocalizedStatFormatter.DEFAULT))
-    /**
-     * Total number of rods dropped/missed in assemble.
-     */
-    val rodsDroppedAssemble: Stat = register(Stat("rodsDroppedAssemble", LocalizedStatFormatter.DEFAULT))
+    val rodsDeployedAssemble: Stat = register(Stat("rodsDeployedAssemble", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
      * Total number of widgets assembled in assemble.
      */
-    val widgetsAssembledAssemble: Stat = register(Stat("widgetsAssembledAssemble", LocalizedStatFormatter.DEFAULT))
+    val widgetsAssembledAssemble: Stat = register(Stat("widgetsAssembledAssemble", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    /**
+     * Total number of rods dropped/missed in assemble.
+     */
+    val rodsDroppedAssemble: Stat = register(Stat("rodsDroppedAssemble", LocalizedStatFormatter.DEFAULT)) // TODO implement
     
     
     // Accumulators for play time --------------------------------------------------------------------------------------
+    
     private val totalPlayTimeAccumulator: TimeAccumulator = TimeAccumulator(totalPlayTime)
     private val editorTimeAccumulator: TimeAccumulator = TimeAccumulator(editorTime)
     private val regularModePlayTimeAccumulator: TimeAccumulator = TimeAccumulator(regularModePlayTime)
@@ -163,13 +232,13 @@ object GlobalStats : Stats() {
     private val assemblePlayTimeAccumulator: TimeAccumulator = TimeAccumulator(assemblePlayTime)
 
     // -----------------------------------------------------------------------------------------------------------------
-
+    
     fun load() {
         this.fromJsonFile(storageLoc)
     }
 
     fun persist() {
-        Paintbox.LOGGER.debug("GlobalStats saved", "Statistics")
+        Paintbox.LOGGER.debug("Statistics saved", "GlobalStats")
         this.toJsonFile(storageLoc)
     }
 
