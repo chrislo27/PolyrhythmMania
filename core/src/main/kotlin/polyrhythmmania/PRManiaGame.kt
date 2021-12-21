@@ -134,6 +134,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             setStartupSettings(this@PRManiaGame)
         }
         GlobalStats.load()
+        GlobalStats.timesGameStarted.increment()
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())
         AssetRegistry.addAssetLoader(TilesetAssetLoader())

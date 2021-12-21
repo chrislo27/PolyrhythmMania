@@ -1,6 +1,6 @@
 package polyrhythmmania.statistics
 
-import paintbox.binding.IntVar
+import paintbox.binding.ReadOnlyIntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.i18n.LocalizationBase
@@ -16,7 +16,7 @@ class DurationStatFormatter(
         val DEFAULT: DurationStatFormatter = DurationStatFormatter("statistics.formatter.playTime", Localization)
     }
 
-    override fun format(value: IntVar): ReadOnlyVar<String> {
+    override fun format(value: ReadOnlyIntVar): ReadOnlyVar<String> {
         return localizationBase.getVar(localizationKey, Var { 
             val totalSeconds = value.use()
             val hours = totalSeconds / 3600

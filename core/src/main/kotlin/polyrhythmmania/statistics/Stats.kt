@@ -20,25 +20,31 @@ open class Stats {
         return stat
     }
     
-    fun clear() {
+    fun resetToInitialValues() {
         statMap.values.forEach { stat ->
-            stat.value.set(0)
+            stat.setValue(stat.initialValue)
+        }
+    }
+    
+    fun resetToResetValues() {
+        statMap.values.forEach { stat ->
+            stat.setValue(stat.resetValue)
         }
     }
     
     fun fromJson(rootObj: JsonObject) {
-        clear()
+        resetToInitialValues()
         
         val statsObj = rootObj["stats"].asObject()
         for (stat in statMap.values) {
             try {
-                stat.value.set(statsObj.getInt(stat.id, 0))
+                stat.setValue(statsObj.getInt(stat.id, stat.initialValue))
             } catch (ignored: Exception) {}
         }
     }
 
     fun fromJsonFile(file: FileHandle) {
-        clear()
+        resetToInitialValues()
         if (!file.exists() || file.isDirectory) return
         
         return try {

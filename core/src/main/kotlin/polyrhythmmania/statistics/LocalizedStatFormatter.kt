@@ -1,6 +1,6 @@
 package polyrhythmmania.statistics
 
-import paintbox.binding.IntVar
+import paintbox.binding.ReadOnlyIntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.i18n.LocalizationBase
@@ -15,7 +15,7 @@ open class LocalizedStatFormatter(
         val DEFAULT: LocalizedStatFormatter = LocalizedStatFormatter("statistics.formatter.default", Localization)
     }
 
-    override fun format(value: IntVar): ReadOnlyVar<String> {
+    override fun format(value: ReadOnlyIntVar): ReadOnlyVar<String> {
         return localizationBase.getVar(localizationKey, Var { listOf(value.use()) })
     }
 }

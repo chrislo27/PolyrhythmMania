@@ -1,23 +1,17 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
-import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.font.TextAlign
 import paintbox.lazysound.LazySound
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
-import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
-import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
-import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.statistics.GlobalStats
 import kotlin.math.ceil
@@ -77,7 +71,7 @@ class ConfirmResettingAchievementsMenu(menuCol: MenuCollection) : StandardMenu(m
                 this.bounds.width.set(300f)
                 this.setOnAction {
                     // TODO reset achievements
-                    GlobalStats.clear()
+                    GlobalStats.resetToResetValues()
                     GlobalStats.persist()
                     
                     menuCol.playMenuSound(AssetRegistry.get<LazySound>("sfx_reset_achievements").sound)
