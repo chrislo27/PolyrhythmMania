@@ -148,6 +148,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         listOf("fail_music_hi", "fail_music_nohi").forEach {
             AssetRegistry.loadAsset<LazySound>("sfx_$it", "sounds/${it}.ogg")
         }
+        AssetRegistry.loadAsset<LazySound>("sfx_reset_achievements", "sounds/menu/reset_achievements.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_silence", "sounds/silence.wav") // DEBUG
     }
 

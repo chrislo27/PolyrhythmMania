@@ -120,6 +120,11 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.disabled.set(true)
             }
         }
+        val confirmResettingAchievementsButton: Button = createLongButton { Localization.getVar("mainMenu.achievementsStatsFork.delete").use() }.apply {
+            this.setOnAction {
+                menuCol.pushNextMenu(ConfirmResettingAchievementsMenu(menuCol).also { menuCol.addMenu(it) })
+            }
+        }
         
         vbox.temporarilyDisableLayouts {
             fun separator(): UIElement {
@@ -152,6 +157,7 @@ class DataSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += resetEndlessModeHighScoreButton
             vbox += resetSideModeHighScoresButton
             vbox += resetLibraryHighScoresButton
+            vbox += confirmResettingAchievementsButton
             
         }
         

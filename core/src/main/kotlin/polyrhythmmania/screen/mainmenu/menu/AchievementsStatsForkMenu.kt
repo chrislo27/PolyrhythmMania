@@ -50,14 +50,14 @@ class AchievementsStatsForkMenu(menuCol: MenuCollection) : StandardMenu(menuCol)
                 this.setOnAction {
                     
                 }
+                this.disabled.set(true)
             }
             
             vbox += separator()
             
             vbox += createLongButton { Localization.getVar("mainMenu.achievementsStatsFork.delete").use() }.apply {
-                // TODO add equivalent button in Data settings that jumps to the confirmation menu
                 this.setOnAction {
-
+                    menuCol.pushNextMenu(ConfirmResettingAchievementsMenu(menuCol).also { menuCol.addMenu(it) })
                 }
             }
         }

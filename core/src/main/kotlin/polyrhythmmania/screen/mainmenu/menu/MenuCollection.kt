@@ -175,8 +175,12 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         main.playMenuSfx(sound, volume, pitch, pan)
     }
     
-    fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
-        val sound: Sound = AssetRegistry[id]
+    fun playMenuSound(sound: Sound, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
         return sound to main.playMenuSfx(sound, volume, pitch, pan)
     }
+    
+    fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
+        return playMenuSound(AssetRegistry.get<Sound>(id), volume, pitch, pan)
+    }
+    
 }
