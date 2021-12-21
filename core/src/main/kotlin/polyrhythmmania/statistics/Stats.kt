@@ -59,7 +59,10 @@ open class Stats {
         rootObj.add("version", SAVE_VERSION)
         rootObj.add("stats", Json.`object`().also { obj ->
             statMap.values.forEach { stat ->
-                obj.add(stat.id, stat.value.get())
+                val value = stat.value.get()
+                if (value != stat.initialValue) {
+                    obj.add(stat.id, value)
+                }
             }
         })
     }
