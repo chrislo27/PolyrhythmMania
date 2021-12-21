@@ -47,6 +47,7 @@ class Engine(timingProvider: TimingProvider,
     var deleteEventsAfterCompletion: Boolean = true
     var autoInputs: Boolean = false
     var inputCalibration: InputCalibration = InputCalibration.NONE
+    var statisticsMode: StatisticsMode = StatisticsMode.REGULAR
     
     var activeTextBox: ActiveTextBox? = null
         private set
