@@ -168,10 +168,6 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
                 currentStage.doneOverride = true
             }
         }
-        
-        if (Paintbox.debugMode && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            main.screen = ResultsScreen(main, score.copy(), container, startOverFactory, keyboardKeybinds)
-        }
     }
 
     override fun show() {
