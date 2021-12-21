@@ -30,6 +30,7 @@ import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.endlessmode.*
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.flags.CountryFlags
@@ -111,7 +112,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             val playScreen = PlayScreen(main, sidemode, PlayTimeType.DAILY_CHALLENGE, sidemode.container,
                                     challenges = Challenges.NO_CHANGES, showResults = false,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    levelScoreAttemptConsumer = null, previousHighScore = -1)
+                                    onRankingRevealed = null, previousHighScore = -1)
                             main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
                             main.settings.persist()
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
@@ -120,6 +121,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     playScreen.resetAndStartOver(false, false)
                                     DiscordCore.updateActivity(DefaultPresences.playingDailyChallenge(date))
                                     mainMenu.backgroundType = BgType.ENDLESS
+                                    GlobalStats.timesPlayedDailyChallenge.increment()
                                 }
                             }
 

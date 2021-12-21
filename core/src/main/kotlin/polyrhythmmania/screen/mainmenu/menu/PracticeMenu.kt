@@ -18,6 +18,7 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.practice.*
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -68,6 +69,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false) { game, keymap ->
                     DiscordCore.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL
+                    GlobalStats.timesPlayedTutorial.increment()
                     factory.invoke(game, keymap)
                 }
             }
@@ -88,6 +90,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createSidemode("mainMenu.practice.polyrhythm1",
                     Localization.getVar("mainMenu.practice.polyrhythm1.tooltip"),
                     Challenges.NO_CHANGES, true) { main, _ ->
+                GlobalStats.timesPlayedPracticePolyrhythm1.increment()
                 Polyrhythm1Practice(main)
             }
             vbox += createPractice("mainMenu.practice.tutorial2") { main, keymap ->
@@ -96,6 +99,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createSidemode("mainMenu.practice.polyrhythm2",
                     Localization.getVar("mainMenu.practice.polyrhythm2.tooltip"),
                     Challenges.NO_CHANGES, true) { main, _ ->
+                GlobalStats.timesPlayedPracticePolyrhythm2.increment()
                 Polyrhythm2Practice(main)
             }
         }

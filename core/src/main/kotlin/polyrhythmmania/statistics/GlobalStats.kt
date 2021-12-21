@@ -71,8 +71,8 @@ object GlobalStats : Stats() {
      */
     val timesPlayedCustomLevel: Stat = register(Stat("timesPlayedCustomLevel", LocalizedStatFormatter.DEFAULT)) // TODO implement
     /**
-     * Total number of times a non-legacy custom level was played for the first time (library or direct loading).
-     * Level's UUID is checked and this stat is incremented ONLY IF it ISN'T in the score cache.
+     * Total number of times a NON-LEGACY custom level was played for the first time (library or direct loading).
+     * Level's UUID is checked and this stat is incremented ONLY IF its lastPlayed timestamp is null.
      */
     val timesPlayedUniqueCustomLevel: Stat = register(Stat("timesPlayedUniqueCustomLevel", LocalizedStatFormatter.DEFAULT)) // TODO implement
     

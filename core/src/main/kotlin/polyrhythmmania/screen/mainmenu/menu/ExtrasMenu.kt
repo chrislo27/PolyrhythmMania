@@ -22,6 +22,7 @@ import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.AssembleMode
 import polyrhythmmania.sidemodes.DunkMode
 import polyrhythmmania.sidemodes.EndlessModeScore
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -79,6 +80,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     Var { listOf(use(main.settings.endlessDunkHighScore)) })) { main, _ ->
                 DiscordCore.updateActivity(DefaultPresences.playingDunk())
                 mainMenu.backgroundType = BgType.DUNK
+                GlobalStats.timesPlayedDunk.increment()
                 DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
             }
             vbox += createSidemodeLongButton("mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
@@ -86,6 +88,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     newIndicator = main.settings.newIndicatorExtrasAssemble) { main, _ ->
                 DiscordCore.updateActivity(DefaultPresences.playingAssemble())
                 mainMenu.backgroundType = BgType.ASSEMBLE
+                GlobalStats.timesPlayedAssemble.increment()
                 AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))
             }
             

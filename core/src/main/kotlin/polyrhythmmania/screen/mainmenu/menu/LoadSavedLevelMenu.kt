@@ -30,18 +30,20 @@ import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.library.score.LevelScoreAttempt
+import polyrhythmmania.library.score.GlobalScoreCache
+import polyrhythmmania.library.score.LevelScore
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import java.io.File
-import java.util.function.Consumer
+import java.util.*
 import kotlin.concurrent.thread
 
 class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
-                         val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>? = null, val previousHighScore: Int = -1)
+                         val previousHighScore: Int = -1)
     : StandardMenu(menuCol) {
 
     enum class Substate {
@@ -229,10 +231,22 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                         
                         mainMenu.transitionAway {
                             val main = mainMenu.main
+                            val uuid = loadedData.modernLevelUUID
+                            val onRankingRevealed = PlayScreen.OnRankingRevealed { lsa, score ->
+                                GlobalStats.timesPlayedCustomLevel.increment()
+                                if (uuid != null) {
+                                    val levelScore: LevelScore? = GlobalScoreCache.scoreCache.getOrCompute().map[uuid] 
+                                    if (levelScore?.lastPlayed == null) {
+                                        GlobalStats.timesPlayedUniqueCustomLevel.increment()
+                                    }
+                                    
+                                    GlobalScoreCache.pushNewLevelScoreAttempt(uuid, lsa)
+                                }
+                            }
                             val playScreen = PlayScreen(main, null, PlayTimeType.REGULAR, loadedData.newContainer, challenges,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    levelScoreAttemptConsumer = levelScoreAttemptConsumer, previousHighScore = previousHighScore,
-                                    showResults = !robotMode)
+                                    onRankingRevealed = onRankingRevealed,
+                                    previousHighScore = previousHighScore, showResults = !robotMode)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
                                     playScreen.prepareGameStart()
@@ -345,7 +359,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                     substate.set(Substate.LOADED)
                     descLabel.text.set(Localization.getValue("editor.dialog.load.loadedInformation", loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
                     loadMetadata.loadOnGLThread()
-                    loaded = LoadData(newContainer, loadMetadata)
+                    loaded = LoadData(newContainer, loadMetadata, loadMetadata.libraryRelevantData.levelUUID)
 
                     val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
                     main.persistDirectory(PreferenceKeys.FILE_CHOOSER_PLAY_SAVED_LEVEL, newInitialDirectory)
@@ -366,5 +380,5 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
         }
     }
 
-    data class LoadData(val newContainer: Container, val loadMetadata: Container.LoadMetadata)
+    data class LoadData(val newContainer: Container, val loadMetadata: Container.LoadMetadata, val modernLevelUUID: UUID?)
 }

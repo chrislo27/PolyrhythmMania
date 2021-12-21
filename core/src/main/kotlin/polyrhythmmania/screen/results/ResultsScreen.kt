@@ -28,14 +28,18 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Score
+import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.sidemodes.SideMode
 import kotlin.properties.Delegates
 
-class ResultsScreen(main: PRManiaGame, val score: Score, val container: Container,
-                    val startOverFactory: () -> PlayScreen,
-                    val keyboardKeybinds: InputKeymapKeyboard)
-    : PRManiaScreen(main) {
+class ResultsScreen(
+        main: PRManiaGame, val score: Score, val container: Container,
+        val startOverFactory: () -> PlayScreen,
+        val keyboardKeybinds: InputKeymapKeyboard,
+        val levelScoreAttempt: LevelScoreAttempt,
+        val onRankingRevealed: PlayScreen.OnRankingRevealed?,
+) : PRManiaScreen(main) {
     
     private lateinit var soundFirstLine: Sound
     private lateinit var soundMiddleLine: Sound
@@ -383,6 +387,9 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
             controlsPane.visible.set(true)
             controlsPane.opacity.set(0f)
             sceneRoot.animations.enqueueAnimation(Animation(Interpolation.smooth2, 0.25f, 0f, 1f, delay = 0.75f), controlsPane.opacity)
+            Gdx.app.postRunnable { 
+                onRankingRevealed?.onRankingRevealed(levelScoreAttempt, score)
+            }
         }
 
         override fun nextStage(): ResultsStage? {

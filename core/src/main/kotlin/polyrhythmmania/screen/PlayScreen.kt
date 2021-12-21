@@ -70,12 +70,17 @@ import kotlin.math.*
 class PlayScreen(
         main: PRManiaGame, val sideMode: SideMode?, val playTimeType: PlayTimeType,
         val container: Container, val challenges: Challenges,
-        val inputCalibration: InputCalibration, 
-        val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>?, /** -1 to disable */ val previousHighScore: Int,
+        val inputCalibration: InputCalibration,
+        val onRankingRevealed: OnRankingRevealed?,
+        /** -1 to disable */ val previousHighScore: Int,
         val showResults: Boolean = true,
 ) : PRManiaScreen(main) {
     
     companion object // Used for early init
+    
+    fun interface OnRankingRevealed {
+        fun onRankingRevealed(lsa: LevelScoreAttempt, score: Score)
+    }
 
     val timing: TimingProvider get() = container.timing
     val soundSystem: SoundSystem
@@ -388,16 +393,12 @@ class PlayScreen(
                 ranking, isNewHighScore
         )
         
-        if (levelScoreAttemptConsumer != null && !engine.autoInputs) {
-            levelScoreAttemptConsumer.accept(LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt,
-                    scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges))
-        }
-        
         transitionAway(ResultsScreen(main, scoreObj, container, {
-            PlayScreen(main, sideMode, playTimeType, container, challenges, inputCalibration, levelScoreAttemptConsumer,
-                    if (scoreObj.newHighScore) scoreObj.scoreInt else previousHighScore,
-                    showResults)
-        }, keyboardKeybinds), disposeContainer = false) {}
+            PlayScreen(main, sideMode, playTimeType, container, challenges, inputCalibration, onRankingRevealed, 
+                    if (scoreObj.newHighScore) scoreObj.scoreInt else previousHighScore, showResults)
+        }, keyboardKeybinds,
+                LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges),
+                onRankingRevealed), disposeContainer = false) {}
     }
 
     private inline fun transitionAway(nextScreen: Screen, disposeContainer: Boolean, action: () -> Unit) {

@@ -32,6 +32,7 @@ import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.ui.PRManiaSkins
 import java.util.*
@@ -111,13 +112,14 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             val playScreen = PlayScreen(main, sidemode, PlayTimeType.ENDLESS, sidemode.container,
                                     challenges = Challenges.NO_CHANGES, showResults = false,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    levelScoreAttemptConsumer = null, previousHighScore = -1)
+                                    onRankingRevealed = null, previousHighScore = -1)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                 this.onEntryEnd = {
                                     sidemode.prepare()
                                     playScreen.resetAndStartOver(false, false)
                                     DiscordCore.updateActivity(DefaultPresences.playingEndlessMode())
                                     mainMenu.backgroundType = BgType.ENDLESS
+                                    GlobalStats.timesPlayedEndlessMode.increment()
                                 }
                             }
                         }
