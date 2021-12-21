@@ -51,6 +51,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val languageMenu: LanguageMenu = LanguageMenu(this)
     val calibrationSettingsMenu: CalibrationSettingsMenu = CalibrationSettingsMenu(this)
     val updateNotesMenu: UpdateNotesMenu = UpdateNotesMenu(this)
+    val achievementsStatsForkMenu: AchievementsStatsForkMenu = AchievementsStatsForkMenu(this)
     
     init {
         addStockMenus()
@@ -80,6 +81,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(languageMenu)
         addMenu(calibrationSettingsMenu)
         addMenu(updateNotesMenu)
+        addMenu(achievementsStatsForkMenu)
     }
     
     fun addMenu(menu: MMMenu) {
