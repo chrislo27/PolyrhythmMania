@@ -11,7 +11,7 @@ open class Stats {
         const val SAVE_VERSION: Int = 1
     }
     
-    private val _statMap: MutableMap<String, Stat> = mutableMapOf()
+    private val _statMap: MutableMap<String, Stat> = linkedMapOf()
     val statMap: Map<String, Stat> = _statMap
     
     
