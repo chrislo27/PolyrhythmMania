@@ -12,6 +12,7 @@ import polyrhythmmania.engine.*
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
 
@@ -416,6 +417,7 @@ class EngineInputter(val engine: Engine) {
                 engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
                     player.gain = 0.45f
                 }
+                GlobalStats.perfectsLost.increment()
             }
         }
 
@@ -496,6 +498,7 @@ class EngineInputter(val engine: Engine) {
         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_skill_star"), SoundInterface.SFXType.PLAYER_INPUT) { player ->
             player.gain = 0.6f
         }
+        GlobalStats.skillStarsEarned.increment()
     }
     
 }

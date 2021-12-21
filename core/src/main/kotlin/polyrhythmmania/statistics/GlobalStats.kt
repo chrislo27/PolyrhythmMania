@@ -69,76 +69,76 @@ object GlobalStats : Stats() {
     /**
      * Total number of times any custom level was played (library or direct loading).
      */
-    val timesPlayedCustomLevel: Stat = register(Stat("timesPlayedCustomLevel", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val timesPlayedCustomLevel: Stat = register(Stat("timesPlayedCustomLevel", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of times a NON-LEGACY custom level was played for the first time (library or direct loading).
      * Level's UUID is checked and this stat is incremented ONLY IF its lastPlayed timestamp is null.
      */
-    val timesPlayedUniqueCustomLevel: Stat = register(Stat("timesPlayedUniqueCustomLevel", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val timesPlayedUniqueCustomLevel: Stat = register(Stat("timesPlayedUniqueCustomLevel", LocalizedStatFormatter.DEFAULT))
     
     /**
      * Total number of times any tutorial was played.
      */
-    val timesPlayedTutorial: Stat = register(Stat("timesPlayedTutorial", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val timesPlayedTutorial: Stat = register(Stat("timesPlayedTutorial", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of times the Polyrhythm 1 practice was played.
      */
-    val timesPlayedPracticePolyrhythm1: Stat = register(Stat("timesPlayedPracticePolyrhythm1", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val timesPlayedPracticePolyrhythm1: Stat = register(Stat("timesPlayedPracticePolyrhythm1", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of times the Polyrhythm 2 practice was played.
      */
-    val timesPlayedPracticePolyrhythm2: Stat = register(Stat("timesPlayedPracticePolyrhythm2", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val timesPlayedPracticePolyrhythm2: Stat = register(Stat("timesPlayedPracticePolyrhythm2", LocalizedStatFormatter.DEFAULT))
     
     /**
      * Total number of times Endless Mode was played.
      */
-    val timesPlayedEndlessMode: Stat = register(Stat("timesPlayedEndlessMode", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val timesPlayedEndlessMode: Stat = register(Stat("timesPlayedEndlessMode", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of times Daily Challenge was played.
      */
-    val timesPlayedDailyChallenge: Stat = register(Stat("timesPlayedDailyChallenge", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val timesPlayedDailyChallenge: Stat = register(Stat("timesPlayedDailyChallenge", LocalizedStatFormatter.DEFAULT))
     
     /**
      * Total number of times Dunk was played.
      */
-    val timesPlayedDunk: Stat = register(Stat("timesPlayedDunk", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val timesPlayedDunk: Stat = register(Stat("timesPlayedDunk", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of times Assemble was played.
      */
-    val timesPlayedAssemble: Stat = register(Stat("timesPlayedAssemble", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val timesPlayedAssemble: Stat = register(Stat("timesPlayedAssemble", LocalizedStatFormatter.DEFAULT))
    
     
     
     // Inputs and scoring ----------------------------------------------------------------------------------------------
 
     /**
-     * Total number of Try Agains gotten.
+     * Total number of Try Agains gotten. Incremented at results screen.
      */
-    val rankingTryAgain: Stat = register(Stat("rankingTryAgain", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rankingTryAgain: Stat = register(Stat("rankingTryAgain", LocalizedStatFormatter.DEFAULT))
     /**
-     * Total number of OKs gotten.
+     * Total number of OKs gotten. Incremented at results screen.
      */
-    val rankingOK: Stat = register(Stat("rankingOK", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rankingOK: Stat = register(Stat("rankingOK", LocalizedStatFormatter.DEFAULT))
     /**
-     * Total number of Superbs gotten.
+     * Total number of Superbs gotten. Incremented at results screen.
      */
-    val rankingSuperb: Stat = register(Stat("rankingSuperb", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rankingSuperb: Stat = register(Stat("rankingSuperb", LocalizedStatFormatter.DEFAULT))
     /**
-     * Total number of Skill Stars earned.
+     * Total number of Skill Stars earned. Incremented immediately when it happens.
      */
-    val skillStarsEarned: Stat = register(Stat("skillStarsEarned", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val skillStarsEarned: Stat = register(Stat("skillStarsEarned", LocalizedStatFormatter.DEFAULT))
     /**
-     * Total number of No Misses earned.
+     * Total number of No Misses earned. Incremented at results screen.
      */
-    val noMissesGotten: Stat = register(Stat("noMissesGotten", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val noMissesGotten: Stat = register(Stat("noMissesGotten", LocalizedStatFormatter.DEFAULT))
     /**
-     * Total number of Perfects earned.
+     * Total number of Perfects earned. Incremented at results screen.
      */
-    val perfectsEarned: Stat = register(Stat("perfectsEarned", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val perfectsEarned: Stat = register(Stat("perfectsEarned", LocalizedStatFormatter.DEFAULT)) 
     /**
-     * Total number of Perfects lost.
+     * Total number of Perfects lost. Incremented immediately when it happens.
      */
-    val perfectsLost: Stat = register(Stat("perfectsLost", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val perfectsLost: Stat = register(Stat("perfectsLost", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were not misses.
      */

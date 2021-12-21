@@ -27,10 +27,13 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
+import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.statistics.GlobalStats
 import kotlin.properties.Delegates
 
 class ResultsScreen(
@@ -389,6 +392,22 @@ class ResultsScreen(
             sceneRoot.animations.enqueueAnimation(Animation(Interpolation.smooth2, 0.25f, 0f, 1f, delay = 0.75f), controlsPane.opacity)
             Gdx.app.postRunnable { 
                 onRankingRevealed?.onRankingRevealed(levelScoreAttempt, score)
+                
+                // Statistics-related
+                when (score.ranking) {
+                    Ranking.TRY_AGAIN -> GlobalStats.rankingTryAgain
+                    Ranking.OK -> GlobalStats.rankingOK
+                    Ranking.SUPERB -> GlobalStats.rankingSuperb
+                }.increment()
+                val challenges = score.challenges
+                if (score.noMiss) {
+                    GlobalStats.noMissesGotten.increment()
+                }
+                if (challenges.goingForPerfect) {
+                    if (score.noMiss) {
+                        GlobalStats.perfectsEarned.increment()
+                    }
+                }
             }
         }
 
