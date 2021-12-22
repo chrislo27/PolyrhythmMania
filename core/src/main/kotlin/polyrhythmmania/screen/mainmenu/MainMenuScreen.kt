@@ -51,6 +51,8 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.world.entity.EntityExplosion
+import polyrhythmmania.world.tileset.TintedRegion
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.math.ceil
@@ -195,6 +197,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val enoughMusicLoaded: AtomicBoolean = AtomicBoolean(false)
     private val musicFinishedLoading: AtomicBoolean = AtomicBoolean(false)
     private val firstShowing: AtomicBoolean = AtomicBoolean(true)
+    
+    var resetExplosionEffect: Float = 0f
 
     init {
         val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg"),
@@ -485,7 +489,25 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 batch.setColor(1f, 1f, 1f, 1f)
             }
         }
+        
+        if (resetExplosionEffect > 0f) {
+            val percentage = (1f - (resetExplosionEffect / EntityExplosion.EXPLOSION_DURATION)).coerceIn(0f, 1f)
+            val index = (percentage * EntityExplosion.STATES.size).toInt()
+            val state = EntityExplosion.STATES.getOrNull(index)
+            if (state != null) {
+                val renderWidth = state.renderWidth
+                val renderHeight = state.renderHeight
 
+                val tileset = background.renderer.tileset
+                val tintedRegion: TintedRegion = tileset.explosionFrames[state.index]
+                val tilesetRegion = tileset.getTilesetRegionForTinted(tintedRegion)
+                val maxWidth = 300f
+                val maxHeight = 300f
+                batch.draw(tilesetRegion, 325f - (maxWidth * renderWidth) / 2, 128f, maxWidth * renderWidth, maxHeight * renderHeight)
+            }
+            
+            resetExplosionEffect = (resetExplosionEffect - Gdx.graphics.deltaTime).coerceAtLeast(0f)
+        }
         batch.end()
     }
 

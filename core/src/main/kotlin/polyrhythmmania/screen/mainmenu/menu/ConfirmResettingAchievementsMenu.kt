@@ -14,6 +14,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.world.entity.EntityExplosion
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -74,6 +75,7 @@ class ConfirmResettingAchievementsMenu(menuCol: MenuCollection) : StandardMenu(m
                     GlobalStats.resetToResetValues()
                     GlobalStats.persist()
                     
+                    menuCol.mainMenu.resetExplosionEffect = EntityExplosion.EXPLOSION_DURATION
                     menuCol.playMenuSound(AssetRegistry.get<LazySound>("sfx_reset_achievements").sound)
                     menuCol.popLastMenu()
                 }
