@@ -501,13 +501,14 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 val tileset = background.renderer.tileset
                 val tintedRegion: TintedRegion = tileset.explosionFrames[state.index]
                 val tilesetRegion = tileset.getTilesetRegionForTinted(tintedRegion)
-                val maxWidth = 300f
-                val maxHeight = 300f
-                batch.draw(tilesetRegion, 325f - (maxWidth * renderWidth) / 2, 128f, maxWidth * renderWidth, maxHeight * renderHeight)
+                val maxWidth = 512f
+                val maxHeight = 512f
+                batch.draw(tilesetRegion, 350f - (maxWidth * renderWidth) / 2, 128f, maxWidth * renderWidth, maxHeight * renderHeight)
             }
             
             resetExplosionEffect = (resetExplosionEffect - Gdx.graphics.deltaTime).coerceAtLeast(0f)
         }
+
         batch.end()
     }
 
