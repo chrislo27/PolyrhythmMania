@@ -424,10 +424,13 @@ class EngineInputter(val engine: Engine) {
         if (!world.worldMode.showEndlessScore) {
             (inputResults as MutableList).addAll(validResults)
             (expectedInputsPr as MutableList).addAll(inputTracker.expected.filterIsInstance<EntityRodPR.ExpectedInput.Expected>())
+            if (engine.areStatisticsEnabled && !rod.exploded && numExpected > 0 && validResults.size == numExpected) {
+                GlobalStats.rodsFerriedPolyrhythm.increment()
+            }
         } else {
             // Special case when in endless mode
             // Inputs don't count when lives = 0
-            if (endlessScore.lives.get() > 0) {
+            if (engine.areStatisticsEnabled && endlessScore.lives.get() > 0) {
                 inputCountStats.total += numExpected
                 inputCountStats.missed += (numExpected - validResults.size).coerceAtLeast(0)
                 inputCountStats.aces += validResults.count { it.inputScore == InputScore.ACE }
@@ -454,7 +457,7 @@ class EngineInputter(val engine: Engine) {
                 engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
                     player.gain = 0.45f
                 }
-                if (engine.statisticsMode == StatisticsMode.REGULAR) {
+                if (engine.areStatisticsEnabled) {
                     GlobalStats.perfectsLost.increment()
                 }
             }
@@ -474,6 +477,10 @@ class EngineInputter(val engine: Engine) {
     
     fun onRodPRExploded() {
         rodsExplodedPR++
+        if (engine.areStatisticsEnabled) {
+            GlobalStats.rodsExploded.increment()
+            GlobalStats.rodsExplodedPolyrhythm.increment()
+        }
     }
     
     fun triggerEndlessLifeLost() {
@@ -518,7 +525,7 @@ class EngineInputter(val engine: Engine) {
                 }
                 endlessScore.gameOverUIShown.set(true)
 
-                if (engine.statisticsMode == StatisticsMode.REGULAR) {
+                if (engine.areStatisticsEnabled) {
                     when (world.worldMode.type) {
                         WorldType.POLYRHYTHM, WorldType.DUNK -> {
                             GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
@@ -554,13 +561,13 @@ class EngineInputter(val engine: Engine) {
         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_skill_star"), SoundInterface.SFXType.PLAYER_INPUT) { player ->
             player.gain = 0.6f
         }
-        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+        if (engine.areStatisticsEnabled) {
             GlobalStats.skillStarsEarned.increment()
         }
     }
     
     fun addNonEndlessInputStats() {
-        if (engine.statisticsMode != StatisticsMode.REGULAR) return
+        if (!engine.areStatisticsEnabled) return
         if (world.worldMode.showEndlessScore) return
         
         when (world.worldMode.type) {

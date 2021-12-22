@@ -114,9 +114,9 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
             playSfxExplosion(engine)
         }
         engine.inputter.missed()
-        engine.inputter.inputCountStats.total++
-        engine.inputter.inputCountStats.missed++
-        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+        if (engine.areStatisticsEnabled) {
+            engine.inputter.inputCountStats.total++
+            engine.inputter.inputCountStats.missed++
             GlobalStats.rodsExploded.increment()
             GlobalStats.rodsMissedDunk.increment()
         }
@@ -141,9 +141,9 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         if (ace) {
             this.aceWasHit = true
             engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
-                engine.inputter.inputCountStats.total++
-                engine.inputter.inputCountStats.aces++
-                if (engine.statisticsMode == StatisticsMode.REGULAR) {
+                if (engine.areStatisticsEnabled) {
+                    engine.inputter.inputCountStats.total++
+                    engine.inputter.inputCountStats.aces++
                     GlobalStats.rodsDunkedDunk.increment()
                 }
                 

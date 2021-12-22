@@ -29,6 +29,7 @@ import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
+import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.library.score.LevelScore

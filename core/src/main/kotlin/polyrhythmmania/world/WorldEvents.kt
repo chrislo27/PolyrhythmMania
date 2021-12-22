@@ -197,7 +197,7 @@ class EventDeployRod(engine: Engine, val row: Row, startBeat: Float) : Event(eng
         super.onStart(currentBeat)
         engine.world.addEntity(EntityRodPR(engine.world, this.beat, row))
         
-        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+        if (engine.areStatisticsEnabled) {
             GlobalStats.rodsDeployed.increment()
             GlobalStats.rodsDeployedPolyrhythm.increment()
         }
@@ -214,7 +214,7 @@ class EventDeployRodEndless(engine: Engine, val row: Row, startBeat: Float, val 
         super.onStart(currentBeat)
         engine.world.addEntity(EntityRodPR(engine.world, this.beat, row, lifeLost = lifeLostVar))
 
-        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+        if (engine.areStatisticsEnabled) {
             GlobalStats.rodsDeployed.increment()
             GlobalStats.rodsDeployedPolyrhythm.increment()
         }

@@ -467,7 +467,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
                     }
                 }
 
-                if (engine.statisticsMode == StatisticsMode.REGULAR) {
+                if (engine.areStatisticsEnabled) {
                     GlobalStats.rodsDroppedAssemble.increment()
                 }
             }

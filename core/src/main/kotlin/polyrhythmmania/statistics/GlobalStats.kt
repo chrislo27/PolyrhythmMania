@@ -216,12 +216,13 @@ object GlobalStats : Stats() {
     val rodsDeployedPolyrhythm: Stat = register(Stat("rodsDeployedPolyrhythm", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of rods ferried in regular Polyrhythm.
+     * Only counts if there was at least one expected input for the rod.
      */
-    val rodsFerriedPolyrhythm: Stat = register(Stat("rodsFerriedPolyrhythm", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsFerriedPolyrhythm: Stat = register(Stat("rodsFerriedPolyrhythm", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of rods exploded in regular Polyrhythm.
      */
-    val rodsExplodedPolyrhythm: Stat = register(Stat("rodsExplodedPolyrhythm", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsExplodedPolyrhythm: Stat = register(Stat("rodsExplodedPolyrhythm", LocalizedStatFormatter.DEFAULT))
     
     /**
      * Total number of rods deployed in dunk.

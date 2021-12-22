@@ -49,6 +49,9 @@ class Engine(timingProvider: TimingProvider,
     var inputCalibration: InputCalibration = InputCalibration.NONE
     var statisticsMode: StatisticsMode = StatisticsMode.REGULAR
     
+    val areStatisticsEnabled: Boolean
+        get() = statisticsMode == StatisticsMode.REGULAR && !autoInputs
+    
     var activeTextBox: ActiveTextBox? = null
         private set
     

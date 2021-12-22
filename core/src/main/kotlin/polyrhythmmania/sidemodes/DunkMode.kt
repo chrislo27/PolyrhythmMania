@@ -80,7 +80,7 @@ class EventDeployRodDunk(engine: Engine, startBeat: Float) : Event(engine) {
         super.onStart(currentBeat)
         engine.world.addEntity(EntityRodDunk(engine.world, this.beat))
 
-        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+        if (engine.areStatisticsEnabled) {
             GlobalStats.rodsDeployed.increment()
             GlobalStats.rodsDeployedDunk.increment()
         }

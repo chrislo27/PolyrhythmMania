@@ -335,7 +335,7 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
             world.addEntity(newRod)
             bounceRod(newRod)
 
-            if (engine.statisticsMode == StatisticsMode.REGULAR) {
+            if (engine.areStatisticsEnabled) {
                 GlobalStats.rodsDeployed.increment()
                 GlobalStats.rodsDeployedAssemble.increment()
             }
@@ -520,7 +520,7 @@ class EventAsmAssemble(engine: Engine, val combineBeat: Float)
             val score = engine.inputter.endlessScore.score
             score.set(score.get() + 1)
             
-            if (engine.statisticsMode == StatisticsMode.REGULAR) {
+            if (engine.areStatisticsEnabled) {
                 GlobalStats.widgetsAssembledAssemble.increment()
             }
         }
