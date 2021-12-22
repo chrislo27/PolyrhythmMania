@@ -33,6 +33,7 @@ import paintbox.util.ResolutionSetting
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
+import polyrhythmmania.achievements.AchievementsL10N
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.discord.DiscordCore
@@ -115,7 +116,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun create() {
         super.create()
         PRManiaGame.instance = this
-        this.reloadableLocalizationInstances = listOf(Localization, EditorHelpLocalization)
+        this.reloadableLocalizationInstances = listOf(Localization, EditorHelpLocalization, AchievementsL10N)
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
 //        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
