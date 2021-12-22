@@ -144,7 +144,7 @@ object GlobalStats : Stats() {
      * Polyrhythm (non-endless): TODO
      * Endless: TODO
      * Assemble: TODO
-     * Dunk: TODO
+     * Dunk: Increments when a Dunk rod explodes OR when the score is incremented
      */
     val inputsGottenTotal: Stat = register(Stat("inputsGottenTotal", LocalizedStatFormatter.DEFAULT))
     /**
@@ -152,7 +152,7 @@ object GlobalStats : Stats() {
      * Polyrhythm (non-endless): TODO
      * Endless: TODO
      * Assemble: TODO
-     * Dunk: TODO
+     * Dunk: Incremented when a Dunk rod explodes
      */
     val inputsMissed: Stat = register(Stat("inputsMissed", LocalizedStatFormatter.DEFAULT))
     /**
@@ -160,7 +160,7 @@ object GlobalStats : Stats() {
      * Polyrhythm (non-endless): TODO
      * Endless: TODO
      * Assemble: TODO
-     * Dunk: TODO
+     * Dunk: Incremented when the score is incremented
      */
     val inputsGottenAce: Stat = register(Stat("inputsGottenAce", LocalizedStatFormatter.DEFAULT))
     /**
@@ -168,7 +168,7 @@ object GlobalStats : Stats() {
      * Polyrhythm (non-endless): TODO
      * Endless: TODO
      * Assemble: TODO
-     * Dunk: N/A
+     * Dunk: N/A (no goods in Dunk)
      */
     val inputsGottenGood: Stat = register(Stat("inputsGottenGood", LocalizedStatFormatter.DEFAULT))
     /**
@@ -176,7 +176,7 @@ object GlobalStats : Stats() {
      * Polyrhythm (non-endless): TODO
      * Endless: TODO
      * Assemble: TODO
-     * Dunk: N/A
+     * Dunk: N/A (no barelies in Dunk)
      */
     val inputsGottenBarely: Stat = register(Stat("inputsGottenBarely", LocalizedStatFormatter.DEFAULT))
     /**
@@ -184,7 +184,7 @@ object GlobalStats : Stats() {
      * Polyrhythm (non-endless): TODO
      * Endless: TODO
      * Assemble: TODO
-     * Dunk: N/A
+     * Dunk: Incremented when a non-miss non-ace input is received
      */
     val inputsGottenEarly: Stat = register(Stat("inputsGottenEarly", LocalizedStatFormatter.DEFAULT))
     /**
@@ -192,7 +192,7 @@ object GlobalStats : Stats() {
      * Polyrhythm (non-endless): TODO
      * Endless: TODO
      * Assemble: TODO
-     * Dunk: N/A
+     * Dunk: Incremented during the event that triggers an explosion when a non-miss non-ace input is received
      */
     val inputsGottenLate: Stat = register(Stat("inputsGottenLate", LocalizedStatFormatter.DEFAULT))
     

@@ -113,6 +113,8 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
             playSfxExplosion(engine)
         }
         engine.inputter.missed()
+        engine.inputter.inputCountStats.total++
+        engine.inputter.inputCountStats.missed++
     }
 
     fun bounce(engine: Engine, inputResult: InputResult) {
@@ -134,6 +136,9 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         if (ace) {
             this.aceWasHit = true
             engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
+                engine.inputter.inputCountStats.total++
+                engine.inputter.inputCountStats.aces++
+                
                 val increaseLivesEvery = 4
                 val increaseSpeedEvery = 8
 
@@ -164,6 +169,11 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
 
                 override fun onStart(currentBeat: Float) {
                     super.onStart(currentBeat)
+                    if (inputResult.accuracyPercent < 0f) {
+                        engine.inputter.inputCountStats.early++
+                    } else {
+                        engine.inputter.inputCountStats.late++
+                    }
                     explode(engine, true)
                 }
             })

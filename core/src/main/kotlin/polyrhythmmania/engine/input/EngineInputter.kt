@@ -88,7 +88,7 @@ class EngineInputter(val engine: Engine) {
         }
     }
     
-    private class InputCountStats {
+    class InputCountStats {
         var total: Int = 0
         var missed: Int = 0
         var aces: Int = 0
@@ -106,21 +106,11 @@ class EngineInputter(val engine: Engine) {
             early = 0
             late = 0
         }
-        
-        fun addToStats() {
-            GlobalStats.inputsGottenTotal.increment(total)
-            GlobalStats.inputsMissed.increment(missed)
-            GlobalStats.inputsGottenAce.increment(aces)
-            GlobalStats.inputsGottenGood.increment(goods)
-            GlobalStats.inputsGottenBarely.increment(barelies)
-            GlobalStats.inputsGottenEarly.increment(early)
-            GlobalStats.inputsGottenLate.increment(late)
-        }
     }
 
     private val world: World = engine.world
 
-    private val inputCountStats: InputCountStats = InputCountStats()
+    val inputCountStats: InputCountStats = InputCountStats()
     var areInputsLocked: Boolean = true
     var skillStarBeat: Float = Float.POSITIVE_INFINITY
     val practice: PracticeData = PracticeData()
@@ -536,7 +526,15 @@ class EngineInputter(val engine: Engine) {
     }
     
     fun addInputStats() {
-        inputCountStats.addToStats()
+        with(inputCountStats) {
+            GlobalStats.inputsGottenTotal.increment(total)
+            GlobalStats.inputsMissed.increment(missed)
+            GlobalStats.inputsGottenAce.increment(aces)
+            GlobalStats.inputsGottenGood.increment(goods)
+            GlobalStats.inputsGottenBarely.increment(barelies)
+            GlobalStats.inputsGottenEarly.increment(early)
+            GlobalStats.inputsGottenLate.increment(late)
+        }
     }
     
 }
