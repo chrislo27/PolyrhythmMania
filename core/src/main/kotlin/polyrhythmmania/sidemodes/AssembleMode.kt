@@ -10,16 +10,14 @@ import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
-import polyrhythmmania.engine.AudioEvent
-import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.SoundInterface
+import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
@@ -336,6 +334,11 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
             val newRod = EntityRodAsm(world, this.beat)
             world.addEntity(newRod)
             bounceRod(newRod)
+
+            if (engine.statisticsMode == StatisticsMode.REGULAR) {
+                GlobalStats.rodsDeployed.increment()
+                GlobalStats.rodsDeployedAssemble.increment()
+            }
         } else {
             super.onStart(currentBeat)
         }

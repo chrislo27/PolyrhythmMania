@@ -7,9 +7,11 @@ import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.DunkWorldBackground
 import polyrhythmmania.world.EntityRodDunk
@@ -77,5 +79,10 @@ class EventDeployRodDunk(engine: Engine, startBeat: Float) : Event(engine) {
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
         engine.world.addEntity(EntityRodDunk(engine.world, this.beat))
+
+        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+            GlobalStats.rodsDeployed.increment()
+            GlobalStats.rodsDeployedDunk.increment()
+        }
     }
 }

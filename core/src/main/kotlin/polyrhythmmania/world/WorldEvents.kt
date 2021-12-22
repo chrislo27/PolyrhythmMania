@@ -10,6 +10,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.engine.*
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
@@ -195,6 +196,11 @@ class EventDeployRod(engine: Engine, val row: Row, startBeat: Float) : Event(eng
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
         engine.world.addEntity(EntityRodPR(engine.world, this.beat, row))
+        
+        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+            GlobalStats.rodsDeployed.increment()
+            GlobalStats.rodsDeployedPolyrhythm.increment()
+        }
     }
 }
 
@@ -207,6 +213,11 @@ class EventDeployRodEndless(engine: Engine, val row: Row, startBeat: Float, val 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
         engine.world.addEntity(EntityRodPR(engine.world, this.beat, row, lifeLost = lifeLostVar))
+
+        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+            GlobalStats.rodsDeployed.increment()
+            GlobalStats.rodsDeployedPolyrhythm.increment()
+        }
     }
 }
 

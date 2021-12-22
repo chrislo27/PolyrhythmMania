@@ -204,7 +204,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of rods deployed across all modes.
      */
-    val rodsDeployed: Stat = register(Stat("rodsDeployed", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsDeployed: Stat = register(Stat("rodsDeployed", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of rods exploded across all modes.
      */
@@ -213,7 +213,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of rods deployed in regular Polyrhythm.
      */
-    val rodsDeployedPolyrhythm: Stat = register(Stat("rodsDeployedPolyrhythm", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsDeployedPolyrhythm: Stat = register(Stat("rodsDeployedPolyrhythm", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of rods ferried in regular Polyrhythm.
      */
@@ -226,7 +226,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of rods deployed in dunk.
      */
-    val rodsDeployedDunk: Stat = register(Stat("rodsDeployedDunk", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsDeployedDunk: Stat = register(Stat("rodsDeployedDunk", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of rods dunked in dunk.
      */
@@ -239,7 +239,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of rods deployed in assemble.
      */
-    val rodsDeployedAssemble: Stat = register(Stat("rodsDeployedAssemble", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsDeployedAssemble: Stat = register(Stat("rodsDeployedAssemble", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of widgets assembled in assemble.
      */
