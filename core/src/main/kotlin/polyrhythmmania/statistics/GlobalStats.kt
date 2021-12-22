@@ -143,7 +143,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of inputs that were not misses.
      * Polyrhythm (non-endless): Incremented at end based on input results.
-     * Endless: TODO
+     * Endless: Incremented in [EngineInputter.submitInputsFromRod] when lives > 0.
      * Assemble: Incremented at end based on input results.
      * Dunk: Increments when a Dunk rod explodes OR when the score is incremented
      */
@@ -151,7 +151,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of inputs that were misses or weren't registered.
      * Polyrhythm (non-endless): Incremented at end based on input results.
-     * Endless: TODO
+     * Endless: Incremented in [EngineInputter.submitInputsFromRod] when lives > 0.
      * Assemble: Incremented at end based on input results.
      * Dunk: Incremented when a Dunk rod explodes
      */
@@ -159,7 +159,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of inputs that were Aces.
      * Polyrhythm (non-endless): Incremented at end based on input results.
-     * Endless: TODO
+     * Endless: Incremented in [EngineInputter.submitInputsFromRod] when lives > 0.
      * Assemble: Incremented at end based on input results.
      * Dunk: Incremented when the score is incremented
      */
@@ -167,7 +167,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of inputs that were Good.
      * Polyrhythm (non-endless): Incremented at end based on input results.
-     * Endless: TODO
+     * Endless: Incremented in [EngineInputter.submitInputsFromRod] when lives > 0.
      * Assemble: Incremented at end based on input results.
      * Dunk: N/A (no goods in Dunk)
      */
@@ -175,7 +175,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of inputs that were Barely.
      * Polyrhythm (non-endless): Incremented at end based on input results.
-     * Endless: TODO
+     * Endless: Incremented in [EngineInputter.submitInputsFromRod] when lives > 0.
      * Assemble: Incremented at end based on input results.
      * Dunk: N/A (no barelies in Dunk)
      */
@@ -183,7 +183,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of non-Ace inputs that were early.
      * Polyrhythm (non-endless): Incremented at end based on input results.
-     * Endless: TODO
+     * Endless: Incremented in [EngineInputter.submitInputsFromRod] when lives > 0.
      * Assemble: Incremented at end based on input results.
      * Dunk: Incremented when a non-miss non-ace input is received
      */
@@ -191,7 +191,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of non-Ace inputs that were late.
      * Polyrhythm (non-endless): Incremented at end based on input results.
-     * Endless: TODO
+     * Endless: Incremented in [EngineInputter.submitInputsFromRod] when lives > 0.
      * Assemble: Incremented at end based on input results.
      * Dunk: Incremented during the event that triggers an explosion when a non-miss non-ace input is received
      */
