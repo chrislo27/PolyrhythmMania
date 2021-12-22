@@ -454,7 +454,9 @@ class EngineInputter(val engine: Engine) {
                 engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
                     player.gain = 0.45f
                 }
-                GlobalStats.perfectsLost.increment()
+                if (engine.statisticsMode == StatisticsMode.REGULAR) {
+                    GlobalStats.perfectsLost.increment()
+                }
             }
         }
 
@@ -516,18 +518,20 @@ class EngineInputter(val engine: Engine) {
                 }
                 endlessScore.gameOverUIShown.set(true)
 
-                when (world.worldMode.type) {
-                    WorldType.POLYRHYTHM, WorldType.DUNK -> {
-                        GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
-                        GlobalStats.inputsMissed.increment(inputCountStats.missed)
-                        GlobalStats.inputsGottenAce.increment(inputCountStats.aces)
-                        GlobalStats.inputsGottenGood.increment(inputCountStats.goods)
-                        GlobalStats.inputsGottenBarely.increment(inputCountStats.barelies)
-                        GlobalStats.inputsGottenEarly.increment(inputCountStats.early)
-                        GlobalStats.inputsGottenLate.increment(inputCountStats.late)
-                    }
-                    WorldType.ASSEMBLE -> {
-                        // NO-OP
+                if (engine.statisticsMode == StatisticsMode.REGULAR) {
+                    when (world.worldMode.type) {
+                        WorldType.POLYRHYTHM, WorldType.DUNK -> {
+                            GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
+                            GlobalStats.inputsMissed.increment(inputCountStats.missed)
+                            GlobalStats.inputsGottenAce.increment(inputCountStats.aces)
+                            GlobalStats.inputsGottenGood.increment(inputCountStats.goods)
+                            GlobalStats.inputsGottenBarely.increment(inputCountStats.barelies)
+                            GlobalStats.inputsGottenEarly.increment(inputCountStats.early)
+                            GlobalStats.inputsGottenLate.increment(inputCountStats.late)
+                        }
+                        WorldType.ASSEMBLE -> {
+                            // NO-OP
+                        }
                     }
                 }
             }
@@ -550,10 +554,13 @@ class EngineInputter(val engine: Engine) {
         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_skill_star"), SoundInterface.SFXType.PLAYER_INPUT) { player ->
             player.gain = 0.6f
         }
-        GlobalStats.skillStarsEarned.increment()
+        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+            GlobalStats.skillStarsEarned.increment()
+        }
     }
     
     fun addNonEndlessInputStats() {
+        if (engine.statisticsMode != StatisticsMode.REGULAR) return
         if (world.worldMode.showEndlessScore) return
         
         when (world.worldMode.type) {

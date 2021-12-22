@@ -11,6 +11,7 @@ import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.sidemodes.EventIncrementEndlessScore
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.entity.EntityPiston
@@ -115,6 +116,10 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         engine.inputter.missed()
         engine.inputter.inputCountStats.total++
         engine.inputter.inputCountStats.missed++
+        if (engine.statisticsMode == StatisticsMode.REGULAR) {
+            GlobalStats.rodsExploded.increment()
+            GlobalStats.rodsMissedDunk.increment()
+        }
     }
 
     fun bounce(engine: Engine, inputResult: InputResult) {
@@ -138,6 +143,9 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
             engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
                 engine.inputter.inputCountStats.total++
                 engine.inputter.inputCountStats.aces++
+                if (engine.statisticsMode == StatisticsMode.REGULAR) {
+                    GlobalStats.rodsDunkedDunk.increment()
+                }
                 
                 val increaseLivesEvery = 4
                 val increaseSpeedEvery = 8

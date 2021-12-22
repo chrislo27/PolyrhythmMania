@@ -208,7 +208,7 @@ object GlobalStats : Stats() {
     /**
      * Total number of rods exploded across all modes.
      */
-    val rodsExploded: Stat = register(Stat("rodsExploded", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsExploded: Stat = register(Stat("rodsExploded", LocalizedStatFormatter.DEFAULT))
     
     /**
      * Total number of rods deployed in regular Polyrhythm.
@@ -230,11 +230,11 @@ object GlobalStats : Stats() {
     /**
      * Total number of rods dunked in dunk.
      */
-    val rodsDunkedDunk: Stat = register(Stat("rodsDunkedDunk", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsDunkedDunk: Stat = register(Stat("rodsDunkedDunk", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of rods missed/exploded in dunk.
      */
-    val rodsMissedDunk: Stat = register(Stat("rodsMissedDunk", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsMissedDunk: Stat = register(Stat("rodsMissedDunk", LocalizedStatFormatter.DEFAULT))
     
     /**
      * Total number of rods deployed in assemble.
