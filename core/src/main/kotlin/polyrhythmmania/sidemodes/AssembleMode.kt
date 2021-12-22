@@ -55,7 +55,7 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     }
 
     override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, forceTilesetPalette = ForceTilesetPalette.FORCE_PR1)
+        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, forceTilesetPalette = ForceTilesetPalette.NO_FORCE)
     }
 
     override fun initialize() {

@@ -18,6 +18,7 @@ import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.tileset.StockTexturePacks
+import polyrhythmmania.world.tileset.TilesetPalette
 
 
 class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
@@ -28,10 +29,11 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         container.engine.inputter.endlessScore.maxLives.set(5)
         container.renderer.worldBackground = DunkWorldBackground
         container.texturePackSource.set(TexturePackSource.STOCK_GBA)
+        TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
     }
     
     override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, forceTilesetPalette = ForceTilesetPalette.FORCE_PR1)
+        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, forceTilesetPalette = ForceTilesetPalette.NO_FORCE)
     }
     
     override fun initialize() {
