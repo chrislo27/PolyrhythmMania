@@ -141,32 +141,60 @@ object GlobalStats : Stats() {
     val perfectsLost: Stat = register(Stat("perfectsLost", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were not misses.
+     * Polyrhythm (non-endless): TODO
+     * Endless: TODO
+     * Assemble: TODO
+     * Dunk: TODO
      */
-    val inputsGottenTotal: Stat = register(Stat("inputsGottenTotal", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val inputsGottenTotal: Stat = register(Stat("inputsGottenTotal", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were misses or weren't registered.
+     * Polyrhythm (non-endless): TODO
+     * Endless: TODO
+     * Assemble: TODO
+     * Dunk: TODO
      */
-    val inputsMissed: Stat = register(Stat("inputsMissed", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val inputsMissed: Stat = register(Stat("inputsMissed", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were Aces.
+     * Polyrhythm (non-endless): TODO
+     * Endless: TODO
+     * Assemble: TODO
+     * Dunk: TODO
      */
-    val inputsGottenAce: Stat = register(Stat("inputsGottenAce", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val inputsGottenAce: Stat = register(Stat("inputsGottenAce", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were Good.
+     * Polyrhythm (non-endless): TODO
+     * Endless: TODO
+     * Assemble: TODO
+     * Dunk: N/A
      */
-    val inputsGottenGood: Stat = register(Stat("inputsGottenGood", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val inputsGottenGood: Stat = register(Stat("inputsGottenGood", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were Barely.
+     * Polyrhythm (non-endless): TODO
+     * Endless: TODO
+     * Assemble: TODO
+     * Dunk: N/A
      */
-    val inputsGottenBarely: Stat = register(Stat("inputsGottenBarely", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val inputsGottenBarely: Stat = register(Stat("inputsGottenBarely", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of non-Ace inputs that were early.
+     * Polyrhythm (non-endless): TODO
+     * Endless: TODO
+     * Assemble: TODO
+     * Dunk: N/A
      */
-    val inputsGottenEarly: Stat = register(Stat("inputsGottenEarly", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val inputsGottenEarly: Stat = register(Stat("inputsGottenEarly", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of non-Ace inputs that were late.
+     * Polyrhythm (non-endless): TODO
+     * Endless: TODO
+     * Assemble: TODO
+     * Dunk: N/A
      */
-    val inputsGottenLate: Stat = register(Stat("inputsGottenLate", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val inputsGottenLate: Stat = register(Stat("inputsGottenLate", LocalizedStatFormatter.DEFAULT))
     
     
     

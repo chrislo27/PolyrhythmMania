@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
 import paintbox.transition.*
 import paintbox.ui.Anchor
@@ -29,10 +28,8 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
-import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.PlayScreen
-import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.statistics.GlobalStats
 import kotlin.properties.Delegates
 
@@ -394,6 +391,7 @@ class ResultsScreen(
                 onRankingRevealed?.onRankingRevealed(levelScoreAttempt, score)
                 
                 // Statistics-related
+                container.engine.inputter.addInputStats()
                 when (score.ranking) {
                     Ranking.TRY_AGAIN -> GlobalStats.rankingTryAgain
                     Ranking.OK -> GlobalStats.rankingOK

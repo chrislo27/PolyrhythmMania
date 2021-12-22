@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.binding.BooleanVar
-import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
@@ -254,7 +253,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
             if (lifeLostVar != null) {
                 if (!lifeLostVar.get()) {
                     lifeLostVar.set(true)
-                    engine.inputter.triggerLifeLost()
+                    engine.inputter.triggerEndlessLifeLost()
                 }
             }
         }

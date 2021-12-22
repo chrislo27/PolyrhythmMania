@@ -87,9 +87,40 @@ class EngineInputter(val engine: Engine) {
             gameOverUIShown.set(false)
         }
     }
+    
+    private class InputCountStats {
+        var total: Int = 0
+        var missed: Int = 0
+        var aces: Int = 0
+        var goods: Int = 0
+        var barelies: Int = 0
+        var early: Int = 0
+        var late: Int = 0
+        
+        fun reset() {
+            total = 0
+            missed = 0
+            aces = 0
+            goods = 0
+            barelies = 0
+            early = 0
+            late = 0
+        }
+        
+        fun addToStats() {
+            GlobalStats.inputsGottenTotal.increment(total)
+            GlobalStats.inputsMissed.increment(missed)
+            GlobalStats.inputsGottenAce.increment(aces)
+            GlobalStats.inputsGottenGood.increment(goods)
+            GlobalStats.inputsGottenBarely.increment(barelies)
+            GlobalStats.inputsGottenEarly.increment(early)
+            GlobalStats.inputsGottenLate.increment(late)
+        }
+    }
 
     private val world: World = engine.world
-    
+
+    private val inputCountStats: InputCountStats = InputCountStats()
     var areInputsLocked: Boolean = true
     var skillStarBeat: Float = Float.POSITIVE_INFINITY
     val practice: PracticeData = PracticeData()
@@ -130,6 +161,7 @@ class EngineInputter(val engine: Engine) {
         challenge.reset()
         endlessScore.reset()
         rodsExplodedPR = 0
+        inputCountStats.reset()
     }
     
     fun onAButtonPressed(release: Boolean) {
@@ -424,10 +456,10 @@ class EngineInputter(val engine: Engine) {
         val worldMode = world.worldMode
         when (worldMode.type) {
             WorldType.DUNK -> {
-                triggerLifeLost()
+                triggerEndlessLifeLost()
             }
             WorldType.ASSEMBLE -> {
-                triggerLifeLost()
+                triggerEndlessLifeLost()
             }
             else -> {}
         }
@@ -437,17 +469,17 @@ class EngineInputter(val engine: Engine) {
         rodsExplodedPR++
     }
     
-    fun triggerLifeLost() {
+    fun triggerEndlessLifeLost() {
         val endlessScore = this.endlessScore
-        val oldScore = endlessScore.lives.get()
-        val newScore = (oldScore - 1).coerceIn(0, endlessScore.maxLives.get())
-        endlessScore.lives.set(newScore)
-        if (oldScore > 0 && newScore == 0) {
-            onGameOver()
+        val oldLives = endlessScore.lives.get()
+        val newLives = (oldLives - 1).coerceIn(0, endlessScore.maxLives.get())
+        endlessScore.lives.set(newLives)
+        if (oldLives > 0 && newLives == 0) {
+            onEndlessGameOver()
         }
     }
     
-    fun onGameOver() {
+    fun onEndlessGameOver() {
         engine.playbackSpeed = 1f
         val currentSeconds = engine.seconds
         val currentBeat = engine.beat
@@ -478,6 +510,8 @@ class EngineInputter(val engine: Engine) {
                     PRManiaGame.instance.settings.persist()
                 }
                 endlessScore.gameOverUIShown.set(true)
+                
+                addInputStats()
             }
         }.apply {
             this.beat = afterBeat
@@ -499,6 +533,10 @@ class EngineInputter(val engine: Engine) {
             player.gain = 0.6f
         }
         GlobalStats.skillStarsEarned.increment()
+    }
+    
+    fun addInputStats() {
+        inputCountStats.addToStats()
     }
     
 }
