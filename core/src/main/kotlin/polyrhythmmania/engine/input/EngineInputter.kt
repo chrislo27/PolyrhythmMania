@@ -424,6 +424,18 @@ class EngineInputter(val engine: Engine) {
         if (!world.worldMode.showEndlessScore) {
             (inputResults as MutableList).addAll(validResults)
             (expectedInputsPr as MutableList).addAll(inputTracker.expected.filterIsInstance<EntityRodPR.ExpectedInput.Expected>())
+        } else {
+            // Special case when in endless mode
+            // Inputs don't count when lives = 0
+            if (endlessScore.lives.get() > 0) {
+                inputCountStats.total += numExpected
+                inputCountStats.missed += (numExpected - validResults.size).coerceAtLeast(0)
+                inputCountStats.aces += validResults.count { it.inputScore == InputScore.ACE }
+                inputCountStats.goods += validResults.count { it.inputScore == InputScore.GOOD }
+                inputCountStats.barelies += validResults.count { it.inputScore == InputScore.BARELY }
+                inputCountStats.early += validResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent < 0f }
+                inputCountStats.late += validResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent > 0f }
+            }
         }
         
         if (!engine.autoInputs && noMiss && !rod.registeredMiss) {
@@ -505,10 +517,7 @@ class EngineInputter(val engine: Engine) {
                 endlessScore.gameOverUIShown.set(true)
 
                 when (world.worldMode.type) {
-                    WorldType.POLYRHYTHM -> {
-                        TODO()
-                    }
-                    WorldType.DUNK -> {
+                    WorldType.POLYRHYTHM, WorldType.DUNK -> {
                         GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
                         GlobalStats.inputsMissed.increment(inputCountStats.missed)
                         GlobalStats.inputsGottenAce.increment(inputCountStats.aces)
