@@ -5,7 +5,7 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 
 
-open class Stats {
+abstract class Stats {
     
     companion object {
         const val SAVE_VERSION: Int = 1
