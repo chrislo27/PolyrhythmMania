@@ -142,7 +142,7 @@ object GlobalStats : Stats() {
     val perfectsLost: Stat = register(Stat("perfectsLost", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were not misses.
-     * Polyrhythm (non-endless): TODO
+     * Polyrhythm (non-endless): Incremented at end based on input results.
      * Endless: TODO
      * Assemble: Incremented at end based on input results.
      * Dunk: Increments when a Dunk rod explodes OR when the score is incremented
@@ -150,7 +150,7 @@ object GlobalStats : Stats() {
     val inputsGottenTotal: Stat = register(Stat("inputsGottenTotal", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were misses or weren't registered.
-     * Polyrhythm (non-endless): TODO
+     * Polyrhythm (non-endless): Incremented at end based on input results.
      * Endless: TODO
      * Assemble: Incremented at end based on input results.
      * Dunk: Incremented when a Dunk rod explodes
@@ -158,7 +158,7 @@ object GlobalStats : Stats() {
     val inputsMissed: Stat = register(Stat("inputsMissed", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were Aces.
-     * Polyrhythm (non-endless): TODO
+     * Polyrhythm (non-endless): Incremented at end based on input results.
      * Endless: TODO
      * Assemble: Incremented at end based on input results.
      * Dunk: Incremented when the score is incremented
@@ -166,7 +166,7 @@ object GlobalStats : Stats() {
     val inputsGottenAce: Stat = register(Stat("inputsGottenAce", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were Good.
-     * Polyrhythm (non-endless): TODO
+     * Polyrhythm (non-endless): Incremented at end based on input results.
      * Endless: TODO
      * Assemble: Incremented at end based on input results.
      * Dunk: N/A (no goods in Dunk)
@@ -174,7 +174,7 @@ object GlobalStats : Stats() {
     val inputsGottenGood: Stat = register(Stat("inputsGottenGood", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of inputs that were Barely.
-     * Polyrhythm (non-endless): TODO
+     * Polyrhythm (non-endless): Incremented at end based on input results.
      * Endless: TODO
      * Assemble: Incremented at end based on input results.
      * Dunk: N/A (no barelies in Dunk)
@@ -182,7 +182,7 @@ object GlobalStats : Stats() {
     val inputsGottenBarely: Stat = register(Stat("inputsGottenBarely", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of non-Ace inputs that were early.
-     * Polyrhythm (non-endless): TODO
+     * Polyrhythm (non-endless): Incremented at end based on input results.
      * Endless: TODO
      * Assemble: Incremented at end based on input results.
      * Dunk: Incremented when a non-miss non-ace input is received
@@ -190,7 +190,7 @@ object GlobalStats : Stats() {
     val inputsGottenEarly: Stat = register(Stat("inputsGottenEarly", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of non-Ace inputs that were late.
-     * Polyrhythm (non-endless): TODO
+     * Polyrhythm (non-endless): Incremented at end based on input results.
      * Endless: TODO
      * Assemble: Incremented at end based on input results.
      * Dunk: Incremented during the event that triggers an explosion when a non-miss non-ace input is received
