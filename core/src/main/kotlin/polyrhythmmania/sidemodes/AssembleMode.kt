@@ -519,6 +519,10 @@ class EventAsmAssemble(engine: Engine, val combineBeat: Float)
             })
             val score = engine.inputter.endlessScore.score
             score.set(score.get() + 1)
+            
+            if (engine.statisticsMode == StatisticsMode.REGULAR) {
+                GlobalStats.widgetsAssembledAssemble.increment()
+            }
         }
     }
 }

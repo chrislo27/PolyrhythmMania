@@ -243,11 +243,11 @@ object GlobalStats : Stats() {
     /**
      * Total number of widgets assembled in assemble.
      */
-    val widgetsAssembledAssemble: Stat = register(Stat("widgetsAssembledAssemble", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val widgetsAssembledAssemble: Stat = register(Stat("widgetsAssembledAssemble", LocalizedStatFormatter.DEFAULT))
     /**
      * Total number of rods dropped/missed in assemble.
      */
-    val rodsDroppedAssemble: Stat = register(Stat("rodsDroppedAssemble", LocalizedStatFormatter.DEFAULT)) // TODO implement
+    val rodsDroppedAssemble: Stat = register(Stat("rodsDroppedAssemble", LocalizedStatFormatter.DEFAULT))
     
     
     // Accumulators for play time --------------------------------------------------------------------------------------
