@@ -391,7 +391,7 @@ class ResultsScreen(
                 onRankingRevealed?.onRankingRevealed(levelScoreAttempt, score)
                 
                 // Statistics-related
-                container.engine.inputter.addInputStats()
+                container.engine.inputter.addNonEndlessInputStats()
                 when (score.ranking) {
                     Ranking.TRY_AGAIN -> GlobalStats.rankingTryAgain
                     Ranking.OK -> GlobalStats.rankingOK

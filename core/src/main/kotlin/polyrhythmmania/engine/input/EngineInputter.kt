@@ -15,6 +15,7 @@ import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
+import kotlin.math.max
 
 
 /**
@@ -269,6 +270,8 @@ class EngineInputter(val engine: Engine) {
                     if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
                         inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                     }
+                    
+                    // TODO register to InputCountStats
 
                     // Bounce the rod
                     if (inputResult.inputScore != InputScore.MISS) {
@@ -500,8 +503,24 @@ class EngineInputter(val engine: Engine) {
                     PRManiaGame.instance.settings.persist()
                 }
                 endlessScore.gameOverUIShown.set(true)
-                
-                addInputStats()
+
+                when (world.worldMode.type) {
+                    WorldType.POLYRHYTHM -> {
+                        TODO()
+                    }
+                    WorldType.DUNK -> {
+                        GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
+                        GlobalStats.inputsMissed.increment(inputCountStats.missed)
+                        GlobalStats.inputsGottenAce.increment(inputCountStats.aces)
+                        GlobalStats.inputsGottenGood.increment(inputCountStats.goods)
+                        GlobalStats.inputsGottenBarely.increment(inputCountStats.barelies)
+                        GlobalStats.inputsGottenEarly.increment(inputCountStats.early)
+                        GlobalStats.inputsGottenLate.increment(inputCountStats.late)
+                    }
+                    WorldType.ASSEMBLE -> {
+                        // NO-OP
+                    }
+                }
             }
         }.apply {
             this.beat = afterBeat
@@ -525,15 +544,32 @@ class EngineInputter(val engine: Engine) {
         GlobalStats.skillStarsEarned.increment()
     }
     
-    fun addInputStats() {
-        with(inputCountStats) {
-            GlobalStats.inputsGottenTotal.increment(total)
-            GlobalStats.inputsMissed.increment(missed)
-            GlobalStats.inputsGottenAce.increment(aces)
-            GlobalStats.inputsGottenGood.increment(goods)
-            GlobalStats.inputsGottenBarely.increment(barelies)
-            GlobalStats.inputsGottenEarly.increment(early)
-            GlobalStats.inputsGottenLate.increment(late)
+    fun addNonEndlessInputStats() {
+        if (world.worldMode.showEndlessScore) return
+        
+        when (world.worldMode.type) {
+            WorldType.POLYRHYTHM, WorldType.ASSEMBLE -> {
+                val results = this.inputResults
+                val nInputs = max(results.size, max(totalExpectedInputs, minimumInputCount))
+                val nonMissResults = results.filter { it.inputScore != InputScore.MISS }
+                val missed = nInputs - nonMissResults.size
+                val aces = results.count { it.inputScore == InputScore.ACE }
+                val goods = results.count { it.inputScore == InputScore.GOOD }
+                val barelies = results.count { it.inputScore == InputScore.BARELY }
+                val earlies = nonMissResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent < 0f }
+                val lates = nonMissResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent > 0f }
+
+                GlobalStats.inputsGottenTotal.increment(nInputs)
+                GlobalStats.inputsMissed.increment(missed)
+                GlobalStats.inputsGottenAce.increment(aces)
+                GlobalStats.inputsGottenGood.increment(goods)
+                GlobalStats.inputsGottenBarely.increment(barelies)
+                GlobalStats.inputsGottenEarly.increment(earlies)
+                GlobalStats.inputsGottenLate.increment(lates)
+            }
+            WorldType.DUNK -> {
+                // NO-OP
+            }
         }
     }
     
