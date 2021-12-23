@@ -99,6 +99,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         private set
     private val permanentScreens: MutableList<PaintboxScreen> = mutableListOf()
     private lateinit var achievementsUI: AchievementsUI
+    private var enableAchievementsUI: Boolean = false
     
     val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
     
@@ -167,6 +168,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 DiscordCore.enableRichPresence.bind { use(settings.discordRichPresence) }
                 
                 initializeScreens()
+                
+                enableAchievementsUI = true
                 
                 if (PRMania.dumpPackedSheets) {
                     val gdxArray = com.badlogic.gdx.utils.Array<PackedSheet>()
@@ -282,14 +285,16 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         batch.begin()
         batch.setColor(1f, 1f, 1f, 1f)
         
-        achievementsUI.render(batch)
-        resetViewportToScreen()
-        
-        batch.projectionMatrix = cam.combined
-        batch.setColor(1f, 1f, 1f, 1f)
+        if (enableAchievementsUI) {
+            achievementsUI.render(batch)
+            resetViewportToScreen()
+            batch.projectionMatrix = cam.combined
+            batch.setColor(1f, 1f, 1f, 1f)
+        }
 
         @Suppress("ConstantConditionIf")
         if (PRMania.enableEarlyAccessMessage) {
+            batch.setColor(1f, 1f, 1f, 1f)
             val paintboxFont = fontRodinFixedBordered
             paintboxFont.useFont { font ->
                 val isEditor = this.getScreen() is EditorScreen
