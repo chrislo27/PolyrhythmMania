@@ -34,6 +34,7 @@ import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import polyrhythmmania.achievements.AchievementsL10N
+import polyrhythmmania.achievements.ui.AchievementsUI
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.discord.DiscordCore
@@ -97,6 +98,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     lateinit var mainMenuScreen: MainMenuScreen
         private set
     private val permanentScreens: MutableList<PaintboxScreen> = mutableListOf()
+    private lateinit var achievementsUI: AchievementsUI
     
     val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
     
@@ -150,6 +152,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
 
         generateColourPickerTextures()
+        achievementsUI = AchievementsUI(this)
         
         fun initializeScreens() {
             mainMenuScreen = MainMenuScreen(this)
@@ -277,7 +280,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         val cam = nativeCamera
         batch.projectionMatrix = cam.combined
         batch.begin()
+        batch.setColor(1f, 1f, 1f, 1f)
         
+        achievementsUI.render(batch)
+        resetViewportToScreen()
+        
+        batch.projectionMatrix = cam.combined
         batch.setColor(1f, 1f, 1f, 1f)
 
         @Suppress("ConstantConditionIf")
@@ -299,6 +307,15 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         batch.end()
         
         super.postRender()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        achievementsUI.resize(width, height)
+    }
+
+    override fun getDebugString(): String {
+        return super.getDebugString() + "\n${achievementsUI.getDebugString()}"
     }
 
     private val userHomeFile: File = File(System.getProperty("user.home"))
