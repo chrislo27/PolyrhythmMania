@@ -5,8 +5,6 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import paintbox.Paintbox
 import polyrhythmmania.PRMania
-import polyrhythmmania.statistics.GlobalStats
-import polyrhythmmania.statistics.Stat
 import polyrhythmmania.statistics.StatTrigger
 import java.time.Instant
 
@@ -29,7 +27,9 @@ object Achievements {
     
     val fulfillmentListeners: MutableList<FulfillmentListener> = mutableListOf()
     
-    // -----------------------------------------------------------------------------------------------------------------
+    // ACHIEVEMENT METADATA (tracking other sub-stats) -----------------------------------------------------------------
+    
+    // ACHIEVEMENT LIST ------------------------------------------------------------------------------------------------
 
     
     
@@ -41,7 +41,7 @@ object Achievements {
             // Add stat trigger for fulfillment
             ach.stat.triggers += StatTrigger { stat, oldValue, newValue ->
                 if (newValue >= ach.threshold) {
-                    fulfillAchievement(ach)
+                    awardAchievement(ach)
                 }
             }
         }
@@ -57,7 +57,7 @@ object Achievements {
     /**
      * Marks the [achievement] as fulfilled.
      */
-    fun fulfillAchievement(achievement: Achievement) {
+    fun awardAchievement(achievement: Achievement) {
         if (achievement !in _achFulfillmentMap) {
             _achFulfillmentMap[achievement] = Fulfillment(Instant.now())
             fulfillmentListeners.forEach { it.onFulfilled(achievement) }
@@ -72,7 +72,7 @@ object Achievements {
             if (ach is Achievement.StatTriggered) {
                 val newValue = ach.stat.value.get()
                 if (newValue >= ach.threshold) {
-                    fulfillAchievement(ach)
+                    awardAchievement(ach)
                 }
             }
         }

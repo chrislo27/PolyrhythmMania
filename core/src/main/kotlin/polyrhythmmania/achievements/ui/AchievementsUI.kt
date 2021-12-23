@@ -46,8 +46,6 @@ class AchievementsUI {
         
         fun frameUpdate(list: List<ActiveToast>, thisIndex: Int) {
             val heightsBefore = if (thisIndex == 0) 0f else (list[thisIndex - 1].containingPane.let { it.bounds.y.get() + it.bounds.height.get() })
-            val thisHeight = toast.bounds.height.get()
-//            containingPane.bounds.y.set(heightsBefore - ((1f - showPercentage.get()) * thisHeight))
             containingPane.bounds.y.set(heightsBefore)
         }
     }

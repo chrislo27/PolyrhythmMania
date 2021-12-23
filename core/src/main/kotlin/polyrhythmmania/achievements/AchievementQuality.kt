@@ -1,6 +1,8 @@
 package polyrhythmmania.achievements
 
 
-enum class AchievementQuality {
-    ACHIEVEMENT, CHALLENGE
+enum class AchievementQuality(val id: String) {
+    ACHIEVEMENT("achievement"), 
+    CHALLENGE("challenge"),
+    ;
 }
