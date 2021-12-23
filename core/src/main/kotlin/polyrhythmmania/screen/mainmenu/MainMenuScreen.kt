@@ -39,6 +39,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.screen.mainmenu.bg.BgType
@@ -634,6 +635,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         
         // Persist statistics semi-regularly; the main menu screen opens frequently
         GlobalStats.persist()
+        Achievements.persist()
     }
 
     override fun hide() {

@@ -13,6 +13,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.entity.EntityExplosion
 import kotlin.math.ceil
@@ -71,7 +72,8 @@ class ConfirmResettingAchievementsMenu(menuCol: MenuCollection) : StandardMenu(m
             }).apply {
                 this.bounds.width.set(300f)
                 this.setOnAction {
-                    // TODO reset achievements
+                    Achievements.clearAllFulfilledAchievements()
+                    Achievements.persist()
                     GlobalStats.resetToResetValues()
                     GlobalStats.persist()
                     

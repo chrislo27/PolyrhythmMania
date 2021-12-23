@@ -17,10 +17,13 @@ import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
 import paintbox.ui.animation.Animation
 import paintbox.util.gdxutils.isShiftDown
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.achievements.Achievements
+import polyrhythmmania.achievements.AchievementsL10N
 
 
-class AchievementsUI(val main: PRManiaGame) {
+class AchievementsUI {
     
     companion object {
         private const val MAX_TOASTS_ON_SCREEN: Int = 3
@@ -61,6 +64,16 @@ class AchievementsUI(val main: PRManiaGame) {
     private val activeToasts: MutableList<ActiveToast> = mutableListOf()
     private val activeToastsReversed: List<ActiveToast> = activeToasts.asReversed()
     
+    init {
+        Achievements.fulfillmentListeners += Achievements.FulfillmentListener { ach ->
+            // TODO
+            enqueueToast(Toast().apply {
+                this.nameLabel.text.set(AchievementsL10N.getValue("achievement.name.${ach.id}"))
+                this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex")))
+            })
+        }
+    }
+    
     fun debugReloadToast() {
         enqueueToast(Toast().apply {
             this.nameLabel.text.set(System.currentTimeMillis().toString())
@@ -68,7 +81,7 @@ class AchievementsUI(val main: PRManiaGame) {
         })
     }
     
-    fun render(batch: SpriteBatch) {
+    fun render(main: PRManiaGame, batch: SpriteBatch) {
         tmpMatrix.set(batch.projectionMatrix)
         batch.projectionMatrix = uiCamera.combined
         sceneRoot.renderAsRoot(batch)
@@ -123,11 +136,5 @@ class AchievementsUI(val main: PRManiaGame) {
     
     fun enqueueToast(toast: Toast) {
         queue += toast
-    }
-    
-    fun getDebugString(): String {
-        return """enqueuedToasts: ${queue.size}
-activeToasts: [${activeToasts.joinToString(separator = ", ") { "${it.toast.bounds.y.get()}" }}]
-"""
     }
 }

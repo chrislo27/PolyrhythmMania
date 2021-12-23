@@ -15,6 +15,7 @@ import paintbox.ui.UIElement
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.statistics.GlobalStats
 
 
@@ -70,6 +71,7 @@ class EditorScreen(main: PRManiaGame, val debugMode: Boolean = false) : PRManiaS
 
         // Persist statistics semi-regularly; the editor screen opens each time it is cleared/a level is loaded
         GlobalStats.persist()
+        Achievements.persist()
     }
 
     override fun hide() {

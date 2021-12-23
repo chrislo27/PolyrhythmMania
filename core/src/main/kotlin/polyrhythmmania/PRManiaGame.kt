@@ -33,6 +33,7 @@ import paintbox.util.ResolutionSetting
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.achievements.AchievementsL10N
 import polyrhythmmania.achievements.ui.AchievementsUI
 import polyrhythmmania.container.Container
@@ -138,7 +139,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             setStartupSettings(this@PRManiaGame)
         }
         GlobalStats.load()
+        Achievements.load()
+        achievementsUI = AchievementsUI()
         GlobalStats.timesGameStarted.increment()
+        
 
         AssetRegistry.addAssetLoader(InitialAssetLoader())
         AssetRegistry.addAssetLoader(TilesetAssetLoader())
@@ -153,7 +157,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
 
         generateColourPickerTextures()
-        achievementsUI = AchievementsUI(this)
         
         fun initializeScreens() {
             mainMenuScreen = MainMenuScreen(this)
@@ -170,6 +173,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 initializeScreens()
                 
                 enableAchievementsUI = true
+                Achievements.checkAllStatTriggeredAchievements()
                 
                 if (PRMania.dumpPackedSheets) {
                     val gdxArray = com.badlogic.gdx.utils.Array<PackedSheet>()
@@ -236,6 +240,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         preferences.putString(PreferenceKeys.LAST_VERSION, PRMania.VERSION.toString()).flush()
         settings.persist()
         GlobalStats.persist()
+        Achievements.persist()
         
         colourPickerHueBar.disposeQuietly()
         colourPickerTransparencyGrid.disposeQuietly()
@@ -286,7 +291,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         batch.setColor(1f, 1f, 1f, 1f)
         
         if (enableAchievementsUI) {
-            achievementsUI.render(batch)
+            achievementsUI.render(this, batch)
             resetViewportToScreen()
             batch.projectionMatrix = cam.combined
             batch.setColor(1f, 1f, 1f, 1f)
@@ -317,10 +322,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         achievementsUI.resize(width, height)
-    }
-
-    override fun getDebugString(): String {
-        return super.getDebugString() + "\n${achievementsUI.getDebugString()}"
     }
 
     private val userHomeFile: File = File(System.getProperty("user.home"))

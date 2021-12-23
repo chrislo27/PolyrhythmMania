@@ -264,6 +264,7 @@ object GlobalStats : Stats() {
     // -----------------------------------------------------------------------------------------------------------------
     
     fun load() {
+        Paintbox.LOGGER.debug("Statistics loaded", "GlobalStats")
         this.fromJsonFile(storageLoc)
     }
 
