@@ -163,11 +163,10 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             })
                         } else Var("")
                         this += TextLabel(binding = {
-                            if (achievement.isHidden && !achievementEarned.use()) {
-                                "[i color=#9f9f9f]${AchievementsL10N.getVar("achievement.hidden.name").use()}[]"
-                            } else {
-                                "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgress.use()}[]\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}[]"
-                            }
+                            val desc = if (achievement.isHidden && !achievementEarned.use()) { 
+                                "[i]${AchievementsL10N.getVar("achievement.hidden.desc").use()}[]"
+                            } else "${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}"
+                            "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgress.use()}[]\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
                         }).apply {
                             Anchor.TopLeft.configure(this)
                             this.setScaleXY(1f)

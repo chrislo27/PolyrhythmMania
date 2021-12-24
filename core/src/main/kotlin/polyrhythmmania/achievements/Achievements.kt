@@ -198,7 +198,7 @@ object Achievements {
     /**
      * Triggered in the editor when a rod is launched with no other platforms raised afterward.
      */
-    val rodToSpace = register(Ordinary("rod_to_space", OBJECTIVE, EDITOR, false))
+    val rodToSpace = register(Ordinary("rod_to_space", OBJECTIVE, EDITOR, isHidden = true))
     /**
      * Triggered in Endless Mode when paused in between a pattern and the point is still awarded at score 50 or greater.
      * NB: This will also trigger if the new score is 50.
