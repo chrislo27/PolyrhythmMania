@@ -29,6 +29,10 @@ import polyrhythmmania.achievements.AchievementCategory
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.achievements.AchievementsL10N
 import polyrhythmmania.ui.PRManiaSkins
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
 
@@ -129,6 +133,9 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             Anchor.TopRight.configure(this)
                             this.bindWidthToSelfHeight()
                             this.visible.bind { achievementEarned.use() }
+                            this.tooltipElement.set(createTooltip(AchievementsL10N.getVar("achievement.unlockedTooltip", Var {
+                                listOf(ZonedDateTime.ofInstant(Achievements.fulfillmentMap.use()[achievement]?.gotAt ?: Instant.EPOCH, ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                            })))
                         }
                         this += Pane().apply {
                             Anchor.TopCentre.configure(this)
