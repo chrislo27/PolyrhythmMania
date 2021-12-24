@@ -50,6 +50,7 @@ import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.sidemodes.AbstractEndlessMode
+import polyrhythmmania.sidemodes.DunkMode
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
@@ -64,6 +65,7 @@ import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.TilesetPalette
 import space.earlygrey.shapedrawer.ShapeDrawer
+import java.time.*
 import java.util.*
 import java.util.function.Consumer
 import kotlin.math.*
@@ -84,6 +86,7 @@ class PlayScreen(
         fun onRankingRevealed(lsa: LevelScoreAttempt, score: Score)
     }
 
+    private val startTimestamp: Instant = Instant.now()
     val timing: TimingProvider get() = container.timing
     val soundSystem: SoundSystem
         get() = container.soundSystem ?: error("PlayScreen requires a non-null SoundSystem in the Container")
@@ -140,6 +143,12 @@ class PlayScreen(
 
                         quitToMainMenu(false)
                     } else {
+                        if (sideMode is DunkMode) {
+                            val localDateTime = LocalDateTime.ofInstant(startTimestamp, ZoneId.systemDefault())
+                            if (localDateTime.dayOfWeek == DayOfWeek.FRIDAY && localDateTime.toLocalTime() >= LocalTime.of(17, 0)) {
+                                Achievements.awardAchievement(Achievements.dunkFridayNight)
+                            }
+                        }
                         quitToMainMenu(false)
                     }
                 }
@@ -273,7 +282,6 @@ class PlayScreen(
                 val newScore = scoreVar.getOrCompute()
                 when (engine.world.worldMode.type) {
                     WorldType.POLYRHYTHM -> {
-                        // TODO separate endless and daily
                         if (sideMode is EndlessPolyrhythm) {
                             if (sideMode.dailyChallenge != null) {
                                 listOf(Achievements.dailyScore25, Achievements.dailyScore50,

@@ -111,7 +111,7 @@ object Achievements {
      */
     val dunkPlayFirstTime = register(StatTriggered("dunk_play_first_time", STATISTICAL, EXTRAS, false, GlobalStats.timesPlayedDunk, 1, showProgress = false))
     /**
-     * Triggered when Dunk is played on a (local time) Friday between 5:00pm and 11:59pm. TODO
+     * Triggered when Dunk is played on a (local time) Friday between 5:00pm and 11:59pm.
      */
     val dunkFridayNight = register(Ordinary("dunk_friday_night", OBJECTIVE, EXTRAS, false))
     /**
