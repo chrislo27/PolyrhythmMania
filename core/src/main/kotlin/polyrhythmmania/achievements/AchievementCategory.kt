@@ -14,4 +14,6 @@ enum class AchievementCategory(val id: String) {
         val VALUES: List<AchievementCategory> = values().toList()
     }
     
+    fun toLocalizationID(): String = "achievement.category.$id"
+    
 }

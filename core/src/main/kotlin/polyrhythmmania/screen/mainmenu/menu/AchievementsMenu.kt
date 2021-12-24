@@ -117,7 +117,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         val numGotten = map.keys.count { it.category == category }
                         val numTotal = achievementsInCategory.size
                         val percentageWhole = (100f * numGotten / numTotal).coerceIn(0f, 100f)
-                        listOf(AchievementsL10N.getVar("achievement.category.${category.id}").use(), percentFormat.format(percentageWhole), numGotten, numTotal)
+                        listOf(AchievementsL10N.getVar(category.toLocalizationID()).use(), percentFormat.format(percentageWhole), numGotten, numTotal)
                     }).use() 
                 }).apply { 
                     this.textColor.set(Color().grey(0.35f))

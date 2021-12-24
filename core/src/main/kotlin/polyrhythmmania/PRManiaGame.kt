@@ -20,6 +20,7 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
 import org.lwjgl.glfw.GLFW
 import paintbox.*
+import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.*
@@ -33,6 +34,8 @@ import paintbox.util.ResolutionSetting
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
+import polyrhythmmania.achievements.AchievementCategory
+import polyrhythmmania.achievements.AchievementRank
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.achievements.AchievementsL10N
 import polyrhythmmania.achievements.ui.AchievementsUIOverlay
@@ -47,6 +50,7 @@ import polyrhythmmania.init.InitialAssetLoader
 import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.screen.mainmenu.menu.StatisticsMenu
 import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
@@ -193,6 +197,26 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         
         if (PRMania.logMissingLocalizations) {
             Localization.logMissingLocalizations()
+            EditorHelpLocalization.logMissingLocalizations()
+            AchievementsL10N.logMissingLocalizations()
+            
+            // Check for missing localizations in statistics and achievement names/descs
+            val testInt = IntVar(42)
+            GlobalStats.statMap.values.forEach { stat ->
+                Localization.getValue(stat.getLocalizationID())
+                stat.formatter.format(testInt).getOrCompute()
+            }
+            Achievements.achievementIDMap.values.forEach { ach ->
+                ach.getLocalizedName().getOrCompute()
+                ach.getLocalizedDesc().getOrCompute()
+            }
+            AchievementCategory.VALUES.forEach { cat ->
+                AchievementsL10N.getValue(cat.toLocalizationID())
+            }
+            AchievementRank.values().forEach { rank ->
+                AchievementsL10N.getValue(rank.toLocalizationID(false))
+                AchievementsL10N.getValue(rank.toLocalizationID(true))
+            }
         }
         
         Runtime.getRuntime().addShutdownHook(thread(start = false, isDaemon = true, name = "Level Recovery Shutdown Hook") {

@@ -10,4 +10,6 @@ enum class AchievementRank(val id: String, val color: Color) {
     CHALLENGE("challenge", Color.GOLD),
     ;
     
+    fun toLocalizationID(hidden: Boolean): String = "achievement.toast.rank.$id${if (hidden) ".hidden" else ""}"
+    
 }
