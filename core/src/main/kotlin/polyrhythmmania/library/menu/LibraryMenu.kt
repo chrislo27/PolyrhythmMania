@@ -46,6 +46,7 @@ import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 import polyrhythmmania.ui.PRManiaSkins
 import paintbox.util.DecimalFormats
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.util.TimeUtils
 import java.io.File
@@ -947,6 +948,10 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 
                 pushEntriesToUI()
                 Paintbox.LOGGER.info("[Library Search] Levels read: $levelsAdded (took ${(System.nanoTime() - startNano) / 1_000_000f} ms)")
+                
+                Gdx.app.postRunnable { 
+                    Achievements.attemptAwardThresholdAchievement(Achievements.libraryCollection15, levelsAdded)
+                }
             } catch (ignored: InterruptedException) {
             } catch (e: Exception) {
                 Paintbox.LOGGER.error("Exception when searching for files in library directory ${searchFolder.absolutePath}")

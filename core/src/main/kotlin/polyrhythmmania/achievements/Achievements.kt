@@ -157,9 +157,9 @@ object Achievements {
      */
     val perfectFirstTime = register(NumericalThreshold("perfect_first_time", OBJECTIVE, GENERAL, false, 40))
     /**
-     * Triggered when at least 10 unique levels are in the Library. TODO
+     * Triggered when at least 15 unique levels are in the Library. TODO
      */
-    val libraryCollection10 = register(NumericalThreshold("library_collection_10", OBJECTIVE, GENERAL, false, 10))
+    val libraryCollection15 = register(NumericalThreshold("library_collection_15", OBJECTIVE, GENERAL, false, 15))
     
     
     /**
@@ -209,7 +209,7 @@ object Achievements {
      */
     val playAllTutorials = register(Ordinary("play_all_tutorials", OBJECTIVE, GENERAL, false))
     /**
-     * Triggered after every Practice (PR1 + 2) has been completed. TODO
+     * Triggered after every Practice (PR1 + 2) has been completed with an OK or better. TODO
      */
     val playAllPractices = register(Ordinary("play_all_practices", OBJECTIVE, GENERAL, false))
     /**
