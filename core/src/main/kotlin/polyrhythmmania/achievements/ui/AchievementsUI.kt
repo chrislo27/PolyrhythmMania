@@ -19,8 +19,8 @@ import paintbox.ui.animation.Animation
 import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.achievements.Achievements
-import polyrhythmmania.achievements.AchievementsL10N
+import polyrhythmmania.achievements.*
+import java.time.Instant
 
 
 class AchievementsUI {
@@ -63,20 +63,13 @@ class AchievementsUI {
     private val activeToastsReversed: List<ActiveToast> = activeToasts.asReversed()
     
     init {
-        Achievements.fulfillmentListeners += Achievements.FulfillmentListener { ach ->
-            // TODO
-            enqueueToast(Toast().apply {
-                this.nameLabel.text.set(AchievementsL10N.getValue("achievement.name.${ach.id}"))
-                this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex")))
-            })
+        Achievements.fulfillmentListeners += Achievements.FulfillmentListener { ach, ful ->
+            enqueueToast(Toast(ach, ful))
         }
     }
     
     fun debugReloadToast() {
-        enqueueToast(Toast().apply {
-            this.nameLabel.text.set(System.currentTimeMillis().toString())
-            this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex")))
-        })
+        enqueueToast(Toast(Achievement.Ordinary("test", AchievementQuality.NORMAL, AchievementCategory.GENERAL, false), Fulfillment(Instant.now())))
     }
     
     fun render(main: PRManiaGame, batch: SpriteBatch) {

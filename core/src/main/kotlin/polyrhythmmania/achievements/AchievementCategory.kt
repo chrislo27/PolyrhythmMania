@@ -2,14 +2,12 @@ package polyrhythmmania.achievements
 
 
 enum class AchievementCategory(val id: String) {
-    
-    STATISTICS_BASED("statsBased"),
+
+    GENERAL("general"),
     ENDLESS_MODE("endlessMode"),
     DAILY("daily"),
     EDITOR("editor"),
-    DUNK("dunk"),
-    ASSEMBLE("assemble"),
-    MISC("misc"),
+    EXTRAS("extras"),
     ;
     
 }

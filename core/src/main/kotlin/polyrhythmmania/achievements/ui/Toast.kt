@@ -1,7 +1,9 @@
 package polyrhythmmania.achievements.ui
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
@@ -11,10 +13,13 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.achievements.Achievement
+import polyrhythmmania.achievements.AchievementsL10N
+import polyrhythmmania.achievements.Fulfillment
 import polyrhythmmania.ui.TextboxPane
 
 
-class Toast : UIElement() {
+class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElement() {
     
     val imageIcon: ImageIcon = ImageIcon(null, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
     val titleLabel: TextLabel
@@ -83,6 +88,14 @@ class Toast : UIElement() {
             this += nameLabel
         }
         innermostRect += pane
+    }
+    
+    init {
+        this.titleLabel.text.set(AchievementsL10N.getValue("achievement.toast.quality.${achievement.category.id}"))
+        this.titleLabel.textColor.set(achievement.quality.color.cpy())
+        this.nameLabel.text.set(achievement.getLocalizedName().getOrCompute())
+        // TODO
+        this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex"))) // FIXME
     }
 
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
