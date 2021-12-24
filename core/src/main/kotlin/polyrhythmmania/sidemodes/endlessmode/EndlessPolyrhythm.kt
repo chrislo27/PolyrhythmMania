@@ -8,6 +8,7 @@ import paintbox.binding.FloatVar
 import paintbox.binding.IntVar
 import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
@@ -25,6 +26,7 @@ import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
+import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
@@ -98,6 +100,11 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
     val difficultyFactor: FloatVar = FloatVar(0f)
     val loopsCompleted: IntVar = IntVar(0)
     val speedIncreaseSemitones: IntVar = IntVar(0)
+    
+    // For pausing in between pattern achievement.
+    // pauseTime is sent by PlayScreen, and accepted only if currently in pattern
+    private var currentlyInPattern: Boolean = false
+    private var pauseTime: Float = 0f
 
     init {
         container.texturePackSource.set(TexturePackSource.STOCK_HD)
@@ -109,6 +116,12 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
         container.renderer.dailyChallengeDate.set(dailyChallenge)
         container.renderer.flashHudRedWhenLifeLost.set(true)
         container.engine.inputter.endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
+    }
+    
+    fun submitPauseTime(pauseTime: Float) {
+        if (currentlyInPattern) {
+            this.pauseTime = pauseTime
+        }
     }
 
     override fun initialize() {
@@ -151,6 +164,7 @@ class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
 difficultyFactor: ${difficultyFactor.get()}
 distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficulty()}
 loops: ${loopsCompleted.get()} / speed: ${speedIncreaseSemitones.get()} semitones
+currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
 """.dropLast(1)
     }
     
@@ -166,6 +180,20 @@ loops: ${loopsCompleted.get()} / speed: ${speedIncreaseSemitones.get()} semitone
                 hsv[0] = (hsv[0] + hueChange) % 360f
                 hsv[0] += loops * 10f
                 colorMapping.color.set(Color(1f, 1f, 1f, 1f).fromHsv(hsv))
+            }
+        }
+    }
+    
+    inner class ChangeInPatternFlagEvent(startBeat: Float, val newValue: Boolean) : Event(engine) {
+        init {
+            this.beat = startBeat
+        }
+        
+        override fun onStart(currentBeat: Float) {
+            super.onStart(currentBeat)
+            currentlyInPattern = newValue
+            if (newValue) {
+                pauseTime = 0f
             }
         }
     }
@@ -195,8 +223,31 @@ loops: ${loopsCompleted.get()} / speed: ${speedIncreaseSemitones.get()} semitone
             
             val patternDuration: Int = 4 + 4 /* 4 beats setup, 4 beats pattern and teardown in one */
             val patternStart: Float = this.beat + delay
+
+            val patternEvents = pattern.toEvents(engine, patternStart)
+            engine.addEvents(patternEvents)
+
+            // For pausing in middle achievement
+            if (patternEvents.isNotEmpty()) {
+                var earliest = Float.POSITIVE_INFINITY
+                var latest = Float.NEGATIVE_INFINITY
+                for (evt in patternEvents) {
+                    if (evt is EventRowBlockSpawn && evt.type != EntityPiston.Type.PLATFORM) {
+                        val b = evt.beat
+                        if (b < earliest) {
+                            earliest = b
+                        }
+                        if (b > latest) {
+                            latest = b
+                        }
+                    }
+                }
+                if (earliest.isFinite() && latest.isFinite()) {
+                    engine.addEvent(ChangeInPatternFlagEvent(4f + earliest, true))
+                    engine.addEvent(ChangeInPatternFlagEvent(4f + latest, false))
+                }
+            }
             
-            engine.addEvents(pattern.toEvents(engine, patternStart))
             val anyA = pattern.rowA.row.isNotEmpty()
             val anyDpad = pattern.rowDpad.row.isNotEmpty()
             val lifeLostVar = BooleanVar(false)
@@ -208,6 +259,7 @@ loops: ${loopsCompleted.get()} / speed: ${speedIncreaseSemitones.get()} semitone
                 engine.addEvent(EventDeployRodEndless(engine, world.rowDpad, patternStart, lifeLostVar))
                 engine.addEvent(EventRowBlockDespawn(engine, world.rowDpad, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))
             }
+            
             
             if (anyA || anyDpad) {
                 val awardScoreBeat = patternStart + patternDuration + 0.01f
@@ -223,6 +275,13 @@ loops: ${loopsCompleted.get()} / speed: ${speedIncreaseSemitones.get()} semitone
                         } else {
                             engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_1"))
                         }
+
+                        // For pausing in middle achievement
+                        if (pauseTime >= 0.5f) {
+                            Achievements.attemptAwardScoreAchievement(Achievements.endlessPauseBetweenInputs, newScore)
+                        }
+                        pauseTime = 0f
+                        currentlyInPattern = false
                     }.also {
                         it.beat = awardScoreBeat
                     })
@@ -253,6 +312,8 @@ loops: ${loopsCompleted.get()} / speed: ${speedIncreaseSemitones.get()} semitone
                             loopsCompleted.set(0)
                             speedIncreaseSemitones.set(0)
                             engine.playbackSpeed = 1f
+                            currentlyInPattern = false
+                            pauseTime = 0f
                         }
                     }.also { e ->
 //                        e.beat = this.beat

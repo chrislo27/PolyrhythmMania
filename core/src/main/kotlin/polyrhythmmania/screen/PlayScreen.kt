@@ -119,6 +119,8 @@ class PlayScreen(
     private val keyboardKeybinds: InputKeymapKeyboard by lazy { main.settings.inputKeymapKeyboard.getOrCompute() }
     private val bgSquareTexReg: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("pause_square"))
     
+    private var pauseTime: Float = 0f
+    
     private val endSignalListener: VarChangedListener<Boolean> = VarChangedListener {
         if (it.getOrCompute()) {
             Gdx.app.postRunnable {
@@ -393,6 +395,8 @@ class PlayScreen(
             shapeRenderer.projectionMatrix = main.nativeCamera.combined
 
             sceneRoot.renderAsRoot(batch)
+            
+            pauseTime += Gdx.graphics.deltaTime
         }
 
         batch.end()
@@ -518,6 +522,7 @@ class PlayScreen(
 //        }
         
         isPaused = true
+        pauseTime = 0f
         soundSystem.setPaused(true)
         Gdx.input.isCursorCatched = false
         main.inputMultiplexer.removeProcessor(inputProcessor)
@@ -555,6 +560,10 @@ class PlayScreen(
         panelAnimationValue.set(0f)
         if (playSound) {
             playMenuSound("sfx_pause_exit")
+        }
+        
+        if (sideMode != null && sideMode is EndlessPolyrhythm) {
+            sideMode.submitPauseTime(this.pauseTime)
         }
     }
 
@@ -761,7 +770,6 @@ ${renderer.getDebugString()}
 ---
 SideMode: ${sideMode?.javaClass?.canonicalName}${if (sideMode != null) ("\n" + sideMode.getDebugString()) else ""}
 ---
-${sceneRoot.mainLayer.lastHoveredElementPath.map { it.javaClass.simpleName }}
 """
     }
 

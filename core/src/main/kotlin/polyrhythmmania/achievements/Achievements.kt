@@ -196,13 +196,14 @@ object Achievements {
 
     
     /**
-     * Triggered in the editor when a rod is launched with no other platforms raised afterward. TODO
+     * Triggered in the editor when a rod is launched with no other platforms raised afterward.
      */
     val rodToSpace = register(Ordinary("rod_to_space", OBJECTIVE, EDITOR, false))
     /**
-     * Triggered in Endless Mode when paused in between a pattern and the point is still awarded at score 50 or greater. TODO
+     * Triggered in Endless Mode when paused in between a pattern and the point is still awarded at score 50 or greater.
+     * NB: This will also trigger if the new score is 50.
      */
-    val endlessPauseBetweenInputs = register(NumericalThreshold("endless_pause_between_inputs", OBJECTIVE, ENDLESS_MODE, false, 50))
+    val endlessPauseBetweenInputs = register(ScoreThreshold("endless_pause_between_inputs", OBJECTIVE, ENDLESS_MODE, false, 50))
     /**
      * Triggered in Endless Mode when getting a score of at least 50 while the master volume is 0.
      */
