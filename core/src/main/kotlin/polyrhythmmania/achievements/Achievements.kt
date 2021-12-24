@@ -81,7 +81,7 @@ object Achievements {
      */
     val dailyTwiceInOneSession = register(Ordinary("daily_twice_in_one_session", OBJECTIVE, DAILY, false))
     /**
-     * Triggered when Daily Challenge is played 7 days in a row. TODO
+     * Triggered when Daily Challenge is played 7 days in a row.
      */
     val dailyWeekStreak = register(Ordinary("daily_week_streak", OBJECTIVE, DAILY, false))
     /**

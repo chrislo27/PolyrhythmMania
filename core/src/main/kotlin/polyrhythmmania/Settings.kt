@@ -19,6 +19,7 @@ import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PANNING_DURING_PLAYBACK
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PLAYTEST_STARTS_PLAY
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_UI_SCALE
 import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE
+import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE_STREAK
 import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.ENDLESS_HIGH_SCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
@@ -123,6 +124,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             
     private val kv_endlessDunkHighScore: KeyValue<Int> = KeyValue(ENDLESS_DUNK_HIGHSCORE, 0)
     private val kv_endlessDailyChallenge: KeyValue<DailyChallengeScore> = KeyValue(ENDLESS_DAILY_CHALLENGE, DailyChallengeScore.ZERO)
+    private val kv_endlessDailyChallengeStreak: KeyValue<Int> = KeyValue(ENDLESS_DAILY_CHALLENGE_STREAK, 0)
     private val kv_endlessHighScore: KeyValue<EndlessHighScore> = KeyValue(ENDLESS_HIGH_SCORE, EndlessHighScore.ZERO)
     private val kv_assembleNormalHighScore: KeyValue<Int> = KeyValue(SIDEMODE_ASSEMBLE_NORMAL, 0)
 
@@ -161,6 +163,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val endlessDunkHighScore: Var<Int> = kv_endlessDunkHighScore.value
     val sidemodeAssembleHighScore: Var<Int> = kv_assembleNormalHighScore.value
     val endlessDailyChallenge: Var<DailyChallengeScore> = kv_endlessDailyChallenge.value
+    val dailyChallengeStreak: Var<Int> = kv_endlessDailyChallengeStreak.value
     val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
     
     val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind { 
@@ -225,6 +228,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getInt(kv_assembleNormalHighScore)
         prefs.getDailyChallenge(kv_endlessDailyChallenge)
         prefs.getEndlessHighScore(kv_endlessHighScore)
+        prefs.getInt(kv_endlessDailyChallengeStreak)
         
         val lastVersion: Version? = Version.parse(prefs.getString(LAST_VERSION) ?: "")
         this.lastVersion = lastVersion
@@ -268,6 +272,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_assembleNormalHighScore)
                 .putDailyChallenge(kv_endlessDailyChallenge)
                 .putEndlessHighScore(kv_endlessHighScore)
+                .putInt(kv_endlessDailyChallengeStreak)
 
         allNewIndicators.forEach { prefs.putNewIndicator(it) }
 

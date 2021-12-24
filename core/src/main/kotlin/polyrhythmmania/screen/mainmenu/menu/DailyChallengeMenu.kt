@@ -5,10 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
-import paintbox.binding.BooleanVar
-import paintbox.binding.IntVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
@@ -103,8 +100,25 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.playMenuSound("sfx_menu_enter_game")
                     mainMenu.transitionAway {
                         val main = mainMenu.main
+                        val date = dailyChallengeDate.getOrCompute()
+                        
+                        // Daily challenge streak calculation
+                        val lastScore = main.settings.endlessDailyChallenge.getOrCompute()
+                        if (lastScore.date == date.plusDays(-1L)) {
+                            val newStreak = main.settings.dailyChallengeStreak.incrementAndGet()
+                            if (newStreak >= 7) {
+                                Achievements.awardAchievement(Achievements.dailyWeekStreak)
+                            }
+                        } else {
+                            main.settings.dailyChallengeStreak.set(1)
+                        }
+
+                        numTimesPlayedThisSession++
+                        if (numTimesPlayedThisSession >= 2) {
+                            Achievements.awardAchievement(Achievements.dailyTwiceInOneSession)
+                        }
+                        
                         Gdx.app.postRunnable {
-                            val date = dailyChallengeDate.getOrCompute()
                             val scoreVar = IntVar(0)
                             scoreVar.addListener {
                                 main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
@@ -126,11 +140,6 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     mainMenu.backgroundType = BgType.ENDLESS
                                     GlobalStats.timesPlayedDailyChallenge.increment()
                                 }
-                            }
-                            
-                            numTimesPlayedThisSession++
-                            if (numTimesPlayedThisSession >= 2) {
-                                Achievements.awardAchievement(Achievements.dailyTwiceInOneSession)
                             }
 
                             // Get UUID nonce from high score server
