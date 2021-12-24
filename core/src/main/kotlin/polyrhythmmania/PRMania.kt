@@ -72,7 +72,9 @@ object PRMania {
             WindowSize(3840, 2160),
     ).sortedBy { it.width }
     
-    val enableEarlyAccessMessage: Boolean = (VERSION.suffix.startsWith("dev") || VERSION.suffix.startsWith("beta") || VERSION.suffix.startsWith("RC"))
+    val isDevVersion: Boolean = VERSION.suffix.startsWith("dev")
+    val isPrereleaseVersion: Boolean = VERSION.suffix.startsWith("beta") || VERSION.suffix.startsWith("RC")
+    val enableEarlyAccessMessage: Boolean = (isDevVersion || isPrereleaseVersion)
     val metrics: MetricRegistry = MetricRegistry()
     
     // Command line arguments

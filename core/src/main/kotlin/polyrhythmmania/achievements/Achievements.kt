@@ -40,6 +40,56 @@ object Achievements {
     
     // ACHIEVEMENT LIST ------------------------------------------------------------------------------------------------
 
+
+    // Category GENERAL
+    /**
+     * Triggered after every Tutorial (I + II) has been completed.
+     */
+    val playAllTutorials = register(Ordinary("play_all_tutorials", OBJECTIVE, GENERAL, false))
+    /**
+     * Triggered after every Practice (PR1 + 2) has been completed with an OK or better.
+     */
+    val playAllPractices = register(Ordinary("play_all_practices", OBJECTIVE, GENERAL, false))
+    /**
+     * Triggered when a Perfect is earned in a level with at least 40 inputs.
+     */
+    val perfectFirstTime = register(NumericalThreshold("perfect_first_time", OBJECTIVE, GENERAL, false, 40))
+    /**
+     * Triggered when at least 15 unique levels are in the Library.
+     */
+    val libraryCollection15 = register(NumericalThreshold("library_collection_15", STATISTICAL, GENERAL, false, 15))
+    
+    /**
+     * Triggered when X successful inputs are gotten.
+     */
+    val successfulInputs1000 = register(StatTriggered("successful_inputs_1000", STATISTICAL, GENERAL, false, GlobalStats.inputsGottenTotal, 1000))
+    /**
+     * Triggered when X ace inputs are gotten.
+     */
+    val aceInputs1000 = register(StatTriggered("ace_inputs_1000", STATISTICAL, GENERAL, false, GlobalStats.inputsGottenAce, 1000))
+    /**
+     * Triggered when X rods have exploded.
+     */
+    val rodsExploded10000 = register(StatTriggered("rods_exploded_10000", STATISTICAL, GENERAL, false, GlobalStats.rodsExploded, 10000))
+    /**
+     * Triggered when a Skill Star is earned for the 5th time.
+     */
+    val skillStar5 = register(StatTriggered("skill_star_5", STATISTICAL, GENERAL, false, GlobalStats.skillStarsEarned, 5))
+    /**
+     * Triggered when a Skill Star is earned for the 100th time.
+     */
+    val skillStar100 = register(StatTriggered("skill_star_100", STATISTICAL, GENERAL, false, GlobalStats.skillStarsEarned, 100))
+    /**
+     * Triggered when 30 unique levels have been played.
+     */
+    val uniqueLevelsPlayed30 = register(StatTriggered("unique_levels_played_30", STATISTICAL, GENERAL, false, GlobalStats.timesPlayedUniqueCustomLevel, 30))
+    /**
+     * Triggered when 10 hours of total playtime have been reached.
+     */
+    val playtimeHours10 = register(StatTriggered("playtime_hours_10", STATISTICAL, GENERAL, false, GlobalStats.totalPlayTime, 10 * 60 * 60))
+
+    
+    // Category ENDLESS_MODE
     /**
      * Triggered when Endless Mode is played for the first time.
      */
@@ -74,7 +124,18 @@ object Achievements {
      */
     val endlessDaredevil100 = register(ScoreThreshold("endless_daredevil_100", CHALLENGE, ENDLESS_MODE, false, 100))
 
+    /**
+     * Triggered in Endless Mode when paused in between a pattern and the point is still awarded at score 50 or greater.
+     * NB: This will also trigger if the new score is 50.
+     */
+    val endlessPauseBetweenInputs = register(ScoreThreshold("endless_pause_between_inputs", CHALLENGE, ENDLESS_MODE, false, 50))
+    /**
+     * Triggered in Endless Mode when getting a score of at least 50 while the master volume is 0.
+     */
+    val endlessSilent50 = register(ScoreThreshold("endless_silent_50", CHALLENGE, ENDLESS_MODE, false, 50))
 
+
+    // Category DAILY
     /**
      * Triggered when Daily Challenge is played for the first time.
      */
@@ -107,8 +168,24 @@ object Achievements {
      * Triggered when getting a score of at least 125 in Daily Challenge.
      */
     val dailyScore125 = register(ScoreThreshold("daily_score_125", OBJECTIVE, DAILY, false, 125))
+
+    
+    // Category EDITOR
+    /**
+     * Triggered when the editor is opened for the first time.
+     */
+    val editorOpenFirstTime = register(StatTriggered("editor_open_first_time", OBJECTIVE, EDITOR, false, GlobalStats.editorTime, 1, showProgress = false))
+    /**
+     * Triggered when a level with at least 20 inputs is exported successfully.
+     */
+    val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", OBJECTIVE, EDITOR, false, 20))
+    /**
+     * Triggered in the editor when a rod is launched with no other platforms raised afterward.
+     */
+    val rodToSpace = register(Ordinary("rod_to_space", OBJECTIVE, EDITOR, isHidden = true))
     
     
+    // Category EXTRAS
     /**
      * Triggered when Dunk is played for the first time.
      */
@@ -133,8 +210,7 @@ object Achievements {
      * Triggered when getting a score of at least 50 in Dunk.
      */
     val dunkScore50 = register(ScoreThreshold("dunk_score_50", OBJECTIVE, EXTRAS, false, 50))
-
-
+    
     /**
      * Triggered when Assemble is played for the first time.
      */
@@ -144,83 +220,12 @@ object Achievements {
      */
     val assembleNoMiss = register(Ordinary("assemble_no_miss", OBJECTIVE, EXTRAS, false))
 
-
-    /**
-     * Triggered when the editor is opened for the first time.
-     */
-    val editorOpenFirstTime = register(StatTriggered("editor_open_first_time", OBJECTIVE, EDITOR, false, GlobalStats.editorTime, 1, showProgress = false))
-    /**
-     * Triggered when a level with at least 20 inputs is exported successfully.
-     */
-    val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", OBJECTIVE, EDITOR, false, 20))
-
-
-    /**
-     * Triggered when a Perfect is earned in a level with at least 40 inputs.
-     */
-    val perfectFirstTime = register(NumericalThreshold("perfect_first_time", OBJECTIVE, GENERAL, false, 40))
-    /**
-     * Triggered when at least 15 unique levels are in the Library.
-     */
-    val libraryCollection15 = register(NumericalThreshold("library_collection_15", STATISTICAL, GENERAL, false, 15))
     
-    
-    /**
-     * Triggered when X successful inputs are gotten.
-     */
-    val successfulInputs1000 = register(StatTriggered("successful_inputs_1000", STATISTICAL, GENERAL, false, GlobalStats.inputsGottenTotal, 1000))
-    /**
-     * Triggered when X ace inputs are gotten.
-     */
-    val aceInputs1000 = register(StatTriggered("ace_inputs_1000", STATISTICAL, GENERAL, false, GlobalStats.inputsGottenAce, 1000))
-    /**
-     * Triggered when X rods have exploded.
-     */
-    val rodsExploded10000 = register(StatTriggered("rods_exploded_10000", STATISTICAL, GENERAL, false, GlobalStats.rodsExploded, 10000))
-    /**
-     * Triggered when a Skill Star is earned for the 5th time.
-     */
-    val skillStar5 = register(StatTriggered("skill_star_5", STATISTICAL, GENERAL, false, GlobalStats.skillStarsEarned, 5))
-    /**
-     * Triggered when a Skill Star is earned for the 100th time.
-     */
-    val skillStar100 = register(StatTriggered("skill_star_100", STATISTICAL, GENERAL, false, GlobalStats.skillStarsEarned, 100))
-    /**
-     * Triggered when 30 unique levels have been played.
-     */
-    val uniqueLevelsPlayed30 = register(StatTriggered("unique_levels_played_30", STATISTICAL, GENERAL, false, GlobalStats.timesPlayedUniqueCustomLevel, 30))
-    /**
-     * Triggered when 10 hours of total playtime have been reached.
-     */
-    val playtimeHours10 = register(StatTriggered("playtime_hours_10", STATISTICAL, GENERAL, false, GlobalStats.totalPlayTime, 10 * 60 * 60))
-
-    
-    /**
-     * Triggered in the editor when a rod is launched with no other platforms raised afterward.
-     */
-    val rodToSpace = register(Ordinary("rod_to_space", OBJECTIVE, EDITOR, isHidden = true))
-    /**
-     * Triggered in Endless Mode when paused in between a pattern and the point is still awarded at score 50 or greater.
-     * NB: This will also trigger if the new score is 50.
-     */
-    val endlessPauseBetweenInputs = register(ScoreThreshold("endless_pause_between_inputs", CHALLENGE, ENDLESS_MODE, false, 50))
-    /**
-     * Triggered in Endless Mode when getting a score of at least 50 while the master volume is 0.
-     */
-    val endlessSilent50 = register(ScoreThreshold("endless_silent_50", CHALLENGE, ENDLESS_MODE, false, 50))
-    /**
-     * Triggered after every Tutorial (I + II) has been completed.
-     */
-    val playAllTutorials = register(Ordinary("play_all_tutorials", OBJECTIVE, GENERAL, false))
-    /**
-     * Triggered after every Practice (PR1 + 2) has been completed with an OK or better.
-     */
-    val playAllPractices = register(Ordinary("play_all_practices", OBJECTIVE, GENERAL, false))
+    // End of Category GENERAL
     /**
      * Triggered after scrolling to the end of the credits list.
      */
-    val seeAllCredits = register(Ordinary("see_all_credits", OBJECTIVE, GENERAL, false))
-
+    val seeAllCredits = register(Ordinary("see_all_credits", OBJECTIVE, GENERAL, isHidden = true))
     
     /**
      * Triggered when all other achievements are awarded.

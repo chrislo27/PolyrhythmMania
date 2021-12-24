@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
@@ -23,6 +24,7 @@ import paintbox.ui.layout.VBox
 import paintbox.util.DecimalFormats
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.achievements.Achievement
 import polyrhythmmania.achievements.AchievementCategory
 import polyrhythmmania.achievements.Achievements
@@ -35,6 +37,10 @@ import java.time.format.DateTimeFormatter
 
 
 class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+    
+    companion object {
+        private val SHOW_IDS_WHEN_DEBUG: Boolean = PRMania.isDevVersion
+    }
 
     private val totalProgressLabel: TextLabel
     private val panePerCategory: Map<AchievementCategory, UIElement>
@@ -166,7 +172,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             val desc = if (achievement.isHidden && !achievementEarned.use()) { 
                                 "[i]${AchievementsL10N.getVar("achievement.hidden.desc").use()}[]"
                             } else "${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}"
-                            "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgress.use()}[]\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
+                            "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgress.use()}[] ${if (SHOW_IDS_WHEN_DEBUG && Paintbox.debugMode.use()) "[color=LIGHT_GRAY scale=0.75]${achievement.id}[]" else ""}\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
                         }).apply {
                             Anchor.TopLeft.configure(this)
                             this.setScaleXY(1f)
