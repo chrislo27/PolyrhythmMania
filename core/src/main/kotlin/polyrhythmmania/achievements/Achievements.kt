@@ -7,6 +7,7 @@ import com.eclipsesource.json.JsonObject
 import paintbox.Paintbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.binding.VarChangedListener
 import polyrhythmmania.PRMania
 import polyrhythmmania.statistics.StatTrigger
 import polyrhythmmania.achievements.Achievement.*
@@ -113,7 +114,7 @@ object Achievements {
     /**
      * Triggered when getting a score of at least 125 in Endless Mode, any settings.
      */
-    val endlessScore125 = register(ScoreThreshold("endless_score_125", OBJECTIVE, ENDLESS_MODE, false, 125))
+    val endlessScore125 = register(ScoreThreshold("endless_score_125", CHALLENGE, ENDLESS_MODE, false, 125))
     
     /**
      * Triggered when getting a score of at least 100 in Endless Mode with life regen disabled.
@@ -132,7 +133,7 @@ object Achievements {
     /**
      * Triggered in Endless Mode when getting a score of at least 50 while the master volume is 0.
      */
-    val endlessSilent50 = register(ScoreThreshold("endless_silent_50", CHALLENGE, ENDLESS_MODE, false, 50))
+    val endlessSilent50 = register(ScoreThreshold("endless_silent_50", CHALLENGE, ENDLESS_MODE, !false, 50))
 
 
     // Category DAILY
@@ -167,7 +168,7 @@ object Achievements {
     /**
      * Triggered when getting a score of at least 125 in Daily Challenge.
      */
-    val dailyScore125 = register(ScoreThreshold("daily_score_125", OBJECTIVE, DAILY, false, 125))
+    val dailyScore125 = register(ScoreThreshold("daily_score_125", CHALLENGE, DAILY, false, 125))
 
     
     // Category EDITOR
@@ -234,18 +235,22 @@ object Achievements {
     
     
     // -----------------------------------------------------------------------------------------------------------------
-    
-    init {
-        // Polyrhythm Maniac achievement awarding
-        val allOtherAchievements = achievementIDMap.values - polyrhythmManiac
-        _achFulfillmentMap.addListener { mapVar ->
-            val map = mapVar.getOrCompute()
-            if (polyrhythmManiac !in map) {
-                if (map.keys.containsAll(allOtherAchievements)) {
-                    Gdx.app.postRunnable { awardAchievement(polyrhythmManiac) }
+
+    // Polyrhythm Maniac achievement awarding
+    private val allOtherAchievements = achievementIDMap.values - polyrhythmManiac
+    private val maniacListener = VarChangedListener<Map<Achievement, Fulfillment>> { mapVar ->
+        val map = mapVar.getOrCompute()
+        if (polyrhythmManiac !in map) {
+            if (map.keys.containsAll(allOtherAchievements)) {
+                Gdx.app.postRunnable {
+                    awardAchievement(polyrhythmManiac)
                 }
             }
         }
+    }
+    
+    init {
+        _achFulfillmentMap.addListener(maniacListener)
     }
     
 //    init {
