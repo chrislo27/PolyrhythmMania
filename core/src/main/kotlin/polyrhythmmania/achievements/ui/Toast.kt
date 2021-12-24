@@ -62,7 +62,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
             this.bindWidthToSelfHeight()
         }
         val main = PRManiaGame.instance
-        titleLabel = TextLabel("Test Title Label", font = main.fontMainMenuMain).apply { 
+        titleLabel = TextLabel("", font = main.fontMainMenuMain).apply { 
             Anchor.TopLeft.configure(this)
             this.bindHeightToParent(multiplier = 0.5f, adjust = -2f)
             this.setScaleXY(0.8f)
@@ -70,7 +70,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
             this.padding.set(Insets.ZERO)
             this.textColor.set(Color.GOLD)
         }
-        nameLabel = TextLabel("Test Name Label", font = main.fontMainMenuMain).apply { 
+        nameLabel = TextLabel("", font = main.fontMainMenuMain).apply { 
             Anchor.BottomLeft.configure(this)
             this.bindHeightToParent(multiplier = 0.5f, adjust = -2f)
             this.setScaleXY(0.8f)
@@ -91,7 +91,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
     }
     
     init {
-        this.titleLabel.text.set(AchievementsL10N.getValue("achievement.toast.quality.${achievement.category.id}"))
+        this.titleLabel.text.set(AchievementsL10N.getValue("achievement.toast.quality.${achievement.category.id}${if (achievement.isHidden) ".hidden" else ""}"))
         this.titleLabel.textColor.set(achievement.quality.color.cpy())
         this.nameLabel.text.set(achievement.getLocalizedName().getOrCompute())
         // TODO

@@ -149,17 +149,17 @@ object Achievements {
     /**
      * Triggered when a level with at least 10 inputs is exported successfully. TODO
      */
-    val editorFirstGoodExport = register(Ordinary("editor_first_good_export", NORMAL, EDITOR, false))
+    val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", NORMAL, EDITOR, false, 10))
 
 
     /**
      * Triggered when a Perfect is earned in a level with at least 40 inputs. TODO
      */
-    val perfectFirstTime = register(Ordinary("perfect_first_time", NORMAL, GENERAL, false))
+    val perfectFirstTime = register(NumericalThreshold("perfect_first_time", NORMAL, GENERAL, false, 40))
     /**
      * Triggered when at least 10 unique levels are in the Library. TODO
      */
-    val libraryCollection10 = register(Ordinary("library_collection_10", NORMAL, GENERAL, false))
+    val libraryCollection10 = register(NumericalThreshold("library_collection_10", NORMAL, GENERAL, false, 10))
     
     
     /**
@@ -197,9 +197,9 @@ object Achievements {
      */
     val rodToSpace = register(Ordinary("rod_to_space", NORMAL, EDITOR, false))
     /**
-     * Triggered in Endless Mode when paused in between a pattern and the point is still awarded. TODO
+     * Triggered in Endless Mode when paused in between a pattern and the point is still awarded at score 50 or greater. TODO
      */
-    val endlessPauseBetweenInputs = register(Ordinary("endless_pause_between_inputs", NORMAL, ENDLESS_MODE, false))
+    val endlessPauseBetweenInputs = register(NumericalThreshold("endless_pause_between_inputs", NORMAL, ENDLESS_MODE, false, 50))
     /**
      * Triggered in Endless Mode when getting a score of at least 50 while the master volume is 0. TODO
      */
@@ -237,6 +237,16 @@ object Achievements {
                 }
             }
         }
+    }
+    
+    init {
+//        println(achievementIDMap.size)
+//        achievementIDMap.values.forEach { 
+//            println("Achievement." + it)
+//        }
+//        achievementIDMap.values.forEach { 
+//            println(it.id)
+//        }
     }
     
     private fun <A : Achievement> register(ach: A): A {
