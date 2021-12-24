@@ -35,6 +35,9 @@ object Achievements {
     
     // ACHIEVEMENT METADATA (tracking other sub-stats) -----------------------------------------------------------------
     
+    var tutorialFlag: Int = 0 // LSB = I, next is II
+    var practiceFlag: Int = 0 // LSB = PR1, next is PR2
+    
     // ACHIEVEMENT LIST ------------------------------------------------------------------------------------------------
 
     /**
@@ -205,7 +208,7 @@ object Achievements {
      */
     val endlessSilentEndless = register(Ordinary("endless_silent_endless", OBJECTIVE, ENDLESS_MODE, false))
     /**
-     * Triggered after every Tutorial (I + II) has been completed. TODO
+     * Triggered after every Tutorial (I + II) has been completed.
      */
     val playAllTutorials = register(Ordinary("play_all_tutorials", OBJECTIVE, GENERAL, false))
     /**
@@ -314,6 +317,15 @@ object Achievements {
             } catch (ignored: Exception) {}
         }
         this._achFulfillmentMap.set(newMap)
+        
+        tutorialFlag = 0
+        try {
+            tutorialFlag = rootObj.getInt("tutorialFlag", 0)
+        } catch (ignored: Exception) {}
+        practiceFlag = 0
+        try {
+            practiceFlag = rootObj.getInt("practiceFlag", 0)
+        } catch (ignored: Exception) {}
     }
 
     fun fromJsonFile(file: FileHandle) {
@@ -337,6 +349,8 @@ object Achievements {
                 })
             }
         })
+        rootObj.add("tutorialFlag", tutorialFlag)
+        rootObj.add("practiceFlag", practiceFlag)
     }
 
     fun toJsonFile(file: FileHandle) {
@@ -350,12 +364,12 @@ object Achievements {
     }
 
     fun load() {
-        Paintbox.LOGGER.debug("Achievements loaded", "Achievements")
         this.fromJsonFile(storageLoc)
+        Paintbox.LOGGER.debug("Achievements loaded", "Achievements")
     }
 
     fun persist() {
-        Paintbox.LOGGER.debug("Achievements saved", "Achievements")
         this.toJsonFile(storageLoc)
+        Paintbox.LOGGER.debug("Achievements saved", "Achievements")
     }
 }

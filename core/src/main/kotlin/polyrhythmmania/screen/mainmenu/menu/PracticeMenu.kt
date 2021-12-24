@@ -65,7 +65,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         vbox.temporarilyDisableLayouts {
-            fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> Practice): UIElement {
+            fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> AbstractPracticeTutorial): UIElement {
                 return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false) { game, keymap ->
                     DiscordCore.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL

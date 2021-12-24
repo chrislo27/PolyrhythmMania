@@ -23,7 +23,8 @@ import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.tileset.TilesetPalette
 
 
-class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard) : Practice(main, PlayTimeType.REGULAR) {
+class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboard)
+    : AbstractPracticeTutorial(main, PlayTimeType.REGULAR, 0b0010) {
     
     val practiceSection1: PracticeSection = PracticeSection(engine)
     val practiceSection2: PracticeSection = PracticeSection(engine)
