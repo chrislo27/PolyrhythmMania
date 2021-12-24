@@ -22,6 +22,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.DecimalFormats
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.achievements.Achievement
@@ -75,13 +76,15 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
 
         vbox.temporarilyDisableLayouts {
+            val percentFormat = DecimalFormats["#0.#"]
+            
             vbox += TextLabel(binding = { 
                 AchievementsL10N.getVar("achievement.progress", Var {
                     val map = Achievements.fulfillmentMap.use()
                     val numGotten = map.size
                     val numTotal = Achievements.achievementIDMap.size
-                    val percentageWhole = (100f * numGotten / numTotal).roundToInt().coerceIn(0, 100)
-                    listOf(percentageWhole, numGotten, numTotal)
+                    val percentageWhole = (100f * numGotten / numTotal).coerceIn(0f, 100f)
+                    listOf(percentFormat.format(percentageWhole), numGotten, numTotal)
                 }).use()
                                         }, font = main.fontMainMenuHeading).apply {
                 this.textColor.set(CreditsMenu.HEADING_TEXT_COLOR)
@@ -109,8 +112,8 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         val map = Achievements.fulfillmentMap.use()
                         val numGotten = map.keys.count { it.category == category }
                         val numTotal = achievementsInCategory.size
-                        val percentageWhole = (100f * numGotten / numTotal).roundToInt().coerceIn(0, 100)
-                        listOf(AchievementsL10N.getVar("achievement.category.${category.id}").use(), percentageWhole, numGotten, numTotal)
+                        val percentageWhole = (100f * numGotten / numTotal).coerceIn(0f, 100f)
+                        listOf(AchievementsL10N.getVar("achievement.category.${category.id}").use(), percentFormat.format(percentageWhole), numGotten, numTotal)
                     }).use() 
                 }).apply { 
                     this.textColor.set(Color().grey(0.35f))
