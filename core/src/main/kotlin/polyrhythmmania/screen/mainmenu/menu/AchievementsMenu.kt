@@ -34,7 +34,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.roundToInt
 
 
 class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -57,6 +56,11 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
             this.vBar.skinID.set(scrollBarSkinID)
             this.hBar.skinID.set(scrollBarSkinID)
+            
+            // Give vbar a min length
+            this.minThumbSize.set(50f)
+            this.vBar.unitIncrement.set(30f)
+            this.vBar.blockIncrement.set(75f)
         }
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
@@ -158,7 +162,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 if (achievement.isHidden && !achievementEarned.use()) {
                                     "[i color=#9f9f9f]${AchievementsL10N.getVar("achievement.hidden.name").use()}[]"
                                 } else {
-                                    "[color=#${achievement.quality.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgress.use()}[]\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}[]"
+                                    "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgress.use()}[]\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}[]"
                                 }
                             }).apply {
                                 Anchor.TopLeft.configure(this)
