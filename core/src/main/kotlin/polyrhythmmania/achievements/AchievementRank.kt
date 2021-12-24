@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.Color
 
 enum class AchievementRank(val id: String, val color: Color) {
     
-    STATISTICAL("statistical", Color.GOLD), 
-    OBJECTIVE("objective", Color.GOLD), 
-    CHALLENGE("challenge", Color.GOLD),
+    STATISTICAL("statistical", Color.valueOf("1BCC12")), 
+    OBJECTIVE("objective", Color.valueOf("497AFF")), 
+    CHALLENGE("challenge", Color.valueOf("FF0800")),
     ;
     
     fun toLocalizationID(hidden: Boolean): String = "achievement.toast.rank.$id${if (hidden) ".hidden" else ""}"
