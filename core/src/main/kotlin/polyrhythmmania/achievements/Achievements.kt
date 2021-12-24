@@ -59,19 +59,31 @@ object Achievements {
      * Triggered when at least 15 unique levels are in the Library.
      */
     val libraryCollection15 = register(NumericalThreshold("library_collection_15", STATISTICAL, GENERAL, false, 15))
+    /**
+     * Triggered when 30 unique levels have been played.
+     */
+    val uniqueLevelsPlayed30 = register(StatTriggered("unique_levels_played_30", STATISTICAL, GENERAL, false, GlobalStats.timesPlayedUniqueCustomLevel, 30))
     
     /**
      * Triggered when X successful inputs are gotten.
      */
     val successfulInputs1000 = register(StatTriggered("successful_inputs_1000", STATISTICAL, GENERAL, false, GlobalStats.inputsGottenTotal, 1000))
     /**
+     * Triggered when X successful inputs are gotten.
+     */
+    val successfulInputs5000 = register(StatTriggered("successful_inputs_5000", STATISTICAL, GENERAL, false, GlobalStats.inputsGottenTotal, 5000))
+    /**
+     * Triggered when X successful inputs are gotten.
+     */
+    val successfulInputs10000 = register(StatTriggered("successful_inputs_10000", OBJECTIVE, GENERAL, false, GlobalStats.inputsGottenTotal, 10000))
+    /**
      * Triggered when X ace inputs are gotten.
      */
     val aceInputs1000 = register(StatTriggered("ace_inputs_1000", STATISTICAL, GENERAL, false, GlobalStats.inputsGottenAce, 1000))
     /**
-     * Triggered when X rods have exploded.
+     * Triggered when X ace inputs are gotten.
      */
-    val rodsExploded10000 = register(StatTriggered("rods_exploded_10000", STATISTICAL, GENERAL, false, GlobalStats.rodsExploded, 10000))
+    val aceInputs5000 = register(StatTriggered("ace_inputs_5000", OBJECTIVE, GENERAL, false, GlobalStats.inputsGottenAce, 5000))
     /**
      * Triggered when a Skill Star is earned for the 5th time.
      */
@@ -79,15 +91,15 @@ object Achievements {
     /**
      * Triggered when a Skill Star is earned for the 100th time.
      */
-    val skillStar100 = register(StatTriggered("skill_star_100", STATISTICAL, GENERAL, false, GlobalStats.skillStarsEarned, 100))
+    val skillStar100 = register(StatTriggered("skill_star_100", OBJECTIVE, GENERAL, false, GlobalStats.skillStarsEarned, 100))
     /**
-     * Triggered when 30 unique levels have been played.
+     * Triggered when X rods have exploded.
      */
-    val uniqueLevelsPlayed30 = register(StatTriggered("unique_levels_played_30", STATISTICAL, GENERAL, false, GlobalStats.timesPlayedUniqueCustomLevel, 30))
+    val rodsExploded10000 = register(StatTriggered("rods_exploded_10000", STATISTICAL, GENERAL, false, GlobalStats.rodsExploded, 10000))
     /**
      * Triggered when 10 hours of total playtime have been reached.
      */
-    val playtimeHours10 = register(StatTriggered("playtime_hours_10", STATISTICAL, GENERAL, false, GlobalStats.totalPlayTime, 10 * 60 * 60))
+    val playtimeHours10 = register(StatTriggered("playtime_hours_10", STATISTICAL, GENERAL, false, GlobalStats.totalPlayTime, 10 * (60 * 60)))
 
     
     // Category ENDLESS_MODE
@@ -133,7 +145,7 @@ object Achievements {
     /**
      * Triggered in Endless Mode when getting a score of at least 50 while the master volume is 0.
      */
-    val endlessSilent50 = register(ScoreThreshold("endless_silent_50", CHALLENGE, ENDLESS_MODE, !false, 50))
+    val endlessSilent50 = register(ScoreThreshold("endless_silent_50", CHALLENGE, ENDLESS_MODE, false, 50))
 
 
     // Category DAILY
@@ -215,7 +227,7 @@ object Achievements {
     /**
      * Triggered when Assemble is played for the first time.
      */
-    val assemblePlayFirstTime = register(StatTriggered("assemble_play_first_time", OBJECTIVE, EXTRAS, false, GlobalStats.timesPlayedAssemble, 1, showProgress = false))
+    val assemblePlayFirstTime = register(StatTriggered("assemble_play_first_time", STATISTICAL, EXTRAS, false, GlobalStats.timesPlayedAssemble, 1, showProgress = false))
     /**
      * Triggered when a No Miss is achieved in Assemble.
      */
