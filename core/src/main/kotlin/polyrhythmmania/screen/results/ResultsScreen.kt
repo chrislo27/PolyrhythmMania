@@ -31,12 +31,14 @@ import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.sidemodes.practice.AbstractPolyrhythmPractice
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.WorldType
 import kotlin.properties.Delegates
 
 class ResultsScreen(
-        main: PRManiaGame, val score: Score, val container: Container,
+        main: PRManiaGame, val score: Score, val container: Container, val sideMode: SideMode?,
         val startOverFactory: () -> PlayScreen,
         val keyboardKeybinds: InputKeymapKeyboard,
         val levelScoreAttempt: LevelScoreAttempt,
@@ -410,6 +412,15 @@ class ResultsScreen(
                     if (score.noMiss) {
                         GlobalStats.perfectsEarned.increment()
                         Achievements.attemptAwardThresholdAchievement(Achievements.perfectFirstTime, score.nInputs)
+                    }
+                }
+                if (sideMode != null && sideMode is AbstractPolyrhythmPractice) {
+                    if (score.ranking != Ranking.TRY_AGAIN) {
+                        Achievements.practiceFlag = Achievements.practiceFlag or sideMode.flagBit
+                        if (Achievements.practiceFlag == 0b0011) {
+                            Achievements.awardAchievement(Achievements.playAllPractices)
+                        }
+                        Achievements.persist()
                     }
                 }
             }

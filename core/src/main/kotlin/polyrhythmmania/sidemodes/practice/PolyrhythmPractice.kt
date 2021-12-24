@@ -19,7 +19,7 @@ import polyrhythmmania.world.WorldSettings
 import polyrhythmmania.world.tileset.TilesetPalette
 
 
-abstract class AbstractPolyrhythmPractice(main: PRManiaGame)
+abstract class AbstractPolyrhythmPractice(main: PRManiaGame, val flagBit: Int)
     : SideMode(main, PlayTimeType.REGULAR) {
     
     companion object {
@@ -42,7 +42,7 @@ abstract class AbstractPolyrhythmPractice(main: PRManiaGame)
 }
 
 class Polyrhythm1Practice(main: PRManiaGame)
-    : AbstractPolyrhythmPractice(main) {
+    : AbstractPolyrhythmPractice(main, 0b0001) {
     
     companion object {
         // Container version 6
@@ -76,7 +76,7 @@ class Polyrhythm1Practice(main: PRManiaGame)
 }
 
 class Polyrhythm2Practice(main: PRManiaGame)
-    : AbstractPolyrhythmPractice(main) {
+    : AbstractPolyrhythmPractice(main, 0b0010) {
 
     companion object {
         // Container version 6

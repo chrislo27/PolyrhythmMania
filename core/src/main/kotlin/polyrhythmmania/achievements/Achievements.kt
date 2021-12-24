@@ -212,7 +212,7 @@ object Achievements {
      */
     val playAllTutorials = register(Ordinary("play_all_tutorials", OBJECTIVE, GENERAL, false))
     /**
-     * Triggered after every Practice (PR1 + 2) has been completed with an OK or better. TODO
+     * Triggered after every Practice (PR1 + 2) has been completed with an OK or better.
      */
     val playAllPractices = register(Ordinary("play_all_practices", OBJECTIVE, GENERAL, false))
     /**

@@ -447,7 +447,7 @@ class PlayScreen(
                 ranking, isNewHighScore
         )
         
-        transitionAway(ResultsScreen(main, scoreObj, container, {
+        transitionAway(ResultsScreen(main, scoreObj, container, sideMode, {
             PlayScreen(main, sideMode, playTimeType, container, challenges, inputCalibration, onRankingRevealed, 
                     if (scoreObj.newHighScore) scoreObj.scoreInt else previousHighScore, showResults)
         }, keyboardKeybinds,
