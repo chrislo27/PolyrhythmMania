@@ -38,6 +38,7 @@ import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.ui.PRManiaSkins
 import paintbox.util.DecimalFormats
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.util.TimeUtils
 import polyrhythmmania.world.EntityRodPR
 import java.io.File
@@ -492,6 +493,8 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         DecimalFormats.format("0.0", exportStatistics.averageInputsPerMinute),
                 ))
                 substate.set(Substate.DONE)
+                
+                Achievements.attemptAwardThresholdAchievement(Achievements.editorFirstGoodExport, simulationResult.totalInputs)
             }
         } catch (e: Exception) {
             Paintbox.LOGGER.warn("Error occurred while saving container as level:")

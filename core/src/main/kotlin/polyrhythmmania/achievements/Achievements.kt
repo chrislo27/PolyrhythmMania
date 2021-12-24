@@ -147,7 +147,7 @@ object Achievements {
      */
     val editorOpenFirstTime = register(StatTriggered("editor_open_first_time", OBJECTIVE, EDITOR, false, GlobalStats.editorTime, 1, showProgress = false))
     /**
-     * Triggered when a level with at least 20 inputs is exported successfully. TODO
+     * Triggered when a level with at least 20 inputs is exported successfully.
      */
     val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", OBJECTIVE, EDITOR, false, 20))
 
