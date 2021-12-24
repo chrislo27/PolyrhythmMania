@@ -67,7 +67,6 @@ import polyrhythmmania.world.tileset.TilesetPalette
 import space.earlygrey.shapedrawer.ShapeDrawer
 import java.time.*
 import java.util.*
-import java.util.function.Consumer
 import kotlin.math.*
 
 
@@ -301,6 +300,9 @@ class PlayScreen(
                                     if (engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil
                                         Achievements.attemptAwardScoreAchievement(Achievements.endlessDaredevil100, newScore)
                                     }
+                                }
+                                if (main.settings.masterVolumeSetting.getOrCompute() == 0) {
+                                    Achievements.attemptAwardScoreAchievement(Achievements.endlessSilent50, newScore)
                                 }
                             }
                         }

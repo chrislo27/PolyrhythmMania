@@ -204,9 +204,9 @@ object Achievements {
      */
     val endlessPauseBetweenInputs = register(NumericalThreshold("endless_pause_between_inputs", OBJECTIVE, ENDLESS_MODE, false, 50))
     /**
-     * Triggered in Endless Mode when getting a score of at least 50 while the master volume is 0. TODO
+     * Triggered in Endless Mode when getting a score of at least 50 while the master volume is 0.
      */
-    val endlessSilentEndless = register(Ordinary("endless_silent_endless", OBJECTIVE, ENDLESS_MODE, false))
+    val endlessSilent50 = register(ScoreThreshold("endless_silent_50", OBJECTIVE, ENDLESS_MODE, false, 50))
     /**
      * Triggered after every Tutorial (I + II) has been completed.
      */
