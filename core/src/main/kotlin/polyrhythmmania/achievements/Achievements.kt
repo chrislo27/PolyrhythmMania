@@ -42,32 +42,32 @@ object Achievements {
      */
     val endlessPlayFirstTime = register(StatTriggered("endless_play_first_time", STATISTICAL, ENDLESS_MODE, false, GlobalStats.timesPlayedEndlessMode, 1, showProgress = false))
     /**
-     * Triggered when getting a score of at least 25 in Endless Mode, any settings. TODO
+     * Triggered when getting a score of at least 25 in Endless Mode, any settings.
      */
     val endlessScore25 = register(ScoreThreshold("endless_score_25", STATISTICAL, ENDLESS_MODE, false, 25))
     /**
-     * Triggered when getting a score of at least 50 in Endless Mode, any settings. TODO
+     * Triggered when getting a score of at least 50 in Endless Mode, any settings.
      */
     val endlessScore50 = register(ScoreThreshold("endless_score_50", STATISTICAL, ENDLESS_MODE, false, 50))
     /**
-     * Triggered when getting a score of at least 75 in Endless Mode, any settings. TODO
+     * Triggered when getting a score of at least 75 in Endless Mode, any settings.
      */
     val endlessScore75 = register(ScoreThreshold("endless_score_75", STATISTICAL, ENDLESS_MODE, false, 75))
     /**
-     * Triggered when getting a score of at least 100 in Endless Mode, any settings. TODO
+     * Triggered when getting a score of at least 100 in Endless Mode, any settings.
      */
     val endlessScore100 = register(ScoreThreshold("endless_score_100", STATISTICAL, ENDLESS_MODE, false, 100))
     /**
-     * Triggered when getting a score of at least 125 in Endless Mode, any settings. TODO
+     * Triggered when getting a score of at least 125 in Endless Mode, any settings.
      */
     val endlessScore125 = register(ScoreThreshold("endless_score_125", STATISTICAL, ENDLESS_MODE, false, 125))
     
     /**
-     * Triggered when getting a score of at least 100 in Endless Mode with life regen disabled. TODO
+     * Triggered when getting a score of at least 100 in Endless Mode with life regen disabled.
      */
     val endlessNoLifeRegen100 = register(ScoreThreshold("endless_no_regen_100", STATISTICAL, ENDLESS_MODE, false, 100))
     /**
-     * Triggered when getting a score of at least 100 in Endless Mode in daredevil mode. TODO
+     * Triggered when getting a score of at least 100 in Endless Mode in daredevil mode.
      */
     val endlessDaredevil100 = register(ScoreThreshold("endless_daredevil_100", STATISTICAL, ENDLESS_MODE, false, 100))
 
@@ -85,23 +85,23 @@ object Achievements {
      */
     val dailyWeekStreak = register(Ordinary("daily_week_streak", OBJECTIVE, DAILY, false))
     /**
-     * Triggered when getting a score of at least 25 in Daily Challenge. TODO
+     * Triggered when getting a score of at least 25 in Daily Challenge.
      */
     val dailyScore25 = register(ScoreThreshold("daily_score_25", STATISTICAL, DAILY, false, 25))
     /**
-     * Triggered when getting a score of at least 50 in Daily Challenge. TODO
+     * Triggered when getting a score of at least 50 in Daily Challenge.
      */
     val dailyScore50 = register(ScoreThreshold("daily_score_50", STATISTICAL, DAILY, false, 50))
     /**
-     * Triggered when getting a score of at least 75 in Daily Challenge. TODO
+     * Triggered when getting a score of at least 75 in Daily Challenge.
      */
     val dailyScore75 = register(ScoreThreshold("daily_score_75", STATISTICAL, DAILY, false, 75))
     /**
-     * Triggered when getting a score of at least 100 in Daily Challenge. TODO
+     * Triggered when getting a score of at least 100 in Daily Challenge.
      */
     val dailyScore100 = register(ScoreThreshold("daily_score_100", STATISTICAL, DAILY, false, 100))
     /**
-     * Triggered when getting a score of at least 125 in Daily Challenge. TODO
+     * Triggered when getting a score of at least 125 in Daily Challenge.
      */
     val dailyScore125 = register(ScoreThreshold("daily_score_125", STATISTICAL, DAILY, false, 125))
     
@@ -115,19 +115,19 @@ object Achievements {
      */
     val dunkFridayNight = register(Ordinary("dunk_friday_night", OBJECTIVE, EXTRAS, false))
     /**
-     * Triggered when getting a score of at least 10 in Dunk. TODO
+     * Triggered when getting a score of at least 10 in Dunk.
      */
     val dunkScore10 = register(ScoreThreshold("dunk_score_10", STATISTICAL, EXTRAS, false, 10))
     /**
-     * Triggered when getting a score of at least 20 in Dunk. TODO
+     * Triggered when getting a score of at least 20 in Dunk.
      */
     val dunkScore20 = register(ScoreThreshold("dunk_score_20", STATISTICAL, EXTRAS, false, 20))
     /**
-     * Triggered when getting a score of at least 30 in Dunk. TODO
+     * Triggered when getting a score of at least 30 in Dunk.
      */
     val dunkScore30 = register(ScoreThreshold("dunk_score_30", STATISTICAL, EXTRAS, false, 30))
     /**
-     * Triggered when getting a score of at least 50 in Dunk. TODO
+     * Triggered when getting a score of at least 50 in Dunk.
      */
     val dunkScore50 = register(ScoreThreshold("dunk_score_50", STATISTICAL, EXTRAS, false, 50))
 

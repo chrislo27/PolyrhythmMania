@@ -41,6 +41,7 @@ import paintbox.util.sumOfFloat
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.InputCalibration
@@ -58,6 +59,7 @@ import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.EntityRodPR
+import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.TilesetPalette
@@ -264,6 +266,50 @@ class PlayScreen(
 
     init {
         engine.endSignalReceived.addListener(endSignalListener)
+
+        // Score achievements for endless-type modes
+        engine.inputter.endlessScore.score.addListener { scoreVar ->
+            if (engine.world.worldMode.showEndlessScore && engine.areStatisticsEnabled) {
+                val newScore = scoreVar.getOrCompute()
+                when (engine.world.worldMode.type) {
+                    WorldType.POLYRHYTHM -> {
+                        // TODO separate endless and daily
+                        if (sideMode is EndlessPolyrhythm) {
+                            if (sideMode.dailyChallenge != null) {
+                                listOf(Achievements.dailyScore25, Achievements.dailyScore50,
+                                        Achievements.dailyScore75, Achievements.dailyScore100,
+                                        Achievements.dailyScore125).forEach {
+                                    Achievements.attemptAwardScoreAchievement(it, newScore)
+                                }
+                            } else {
+                                listOf(Achievements.endlessScore25, Achievements.endlessScore50,
+                                        Achievements.endlessScore75, Achievements.endlessScore100,
+                                        Achievements.endlessScore125).forEach {
+                                    Achievements.attemptAwardScoreAchievement(it, newScore)
+                                }
+                                
+                                if (sideMode.disableLifeRegen) {
+                                    Achievements.attemptAwardScoreAchievement(Achievements.endlessNoLifeRegen100, newScore)
+                                    if (engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil
+                                        Achievements.attemptAwardScoreAchievement(Achievements.endlessDaredevil100, newScore)
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                    WorldType.DUNK -> {
+                        listOf(Achievements.dunkScore10, Achievements.dunkScore20, Achievements.dunkScore30,
+                                Achievements.dunkScore50).forEach {
+                            Achievements.attemptAwardScoreAchievement(it, newScore)
+                        }
+                    }
+                    WorldType.ASSEMBLE -> {
+                        // NO-OP
+                    }
+                }
+            }
+        }
     }
 
     override fun render(delta: Float) {

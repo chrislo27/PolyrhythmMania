@@ -8,6 +8,7 @@ import paintbox.lazysound.LazySound
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.sidemodes.SidemodeAssets
@@ -270,8 +271,6 @@ class EngineInputter(val engine: Engine) {
                     if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
                         inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                     }
-                    
-                    // TODO register to InputCountStats
 
                     // Bounce the rod
                     if (inputResult.inputScore != InputScore.MISS) {
@@ -526,7 +525,8 @@ class EngineInputter(val engine: Engine) {
                 endlessScore.gameOverUIShown.set(true)
 
                 if (engine.areStatisticsEnabled) {
-                    when (world.worldMode.type) {
+                    val worldType = world.worldMode.type
+                    when (worldType) {
                         WorldType.POLYRHYTHM, WorldType.DUNK -> {
                             GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
                             GlobalStats.inputsMissed.increment(inputCountStats.missed)
