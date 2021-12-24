@@ -23,6 +23,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.engine.input.Challenges
@@ -39,6 +40,8 @@ import java.time.format.DateTimeFormatter
 
 
 class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+    
+    private var numTimesPlayedThisSession: Int = 0
 
     private var epochSeconds: Long = System.currentTimeMillis() / 1000
     val dailyChallengeDate: Var<LocalDate> = Var(EndlessPolyrhythm.getCurrentDailyChallengeDate())
@@ -123,6 +126,11 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     mainMenu.backgroundType = BgType.ENDLESS
                                     GlobalStats.timesPlayedDailyChallenge.increment()
                                 }
+                            }
+                            
+                            numTimesPlayedThisSession++
+                            if (numTimesPlayedThisSession >= 2) {
+                                Achievements.awardAchievement(Achievements.dailyTwiceInOneSession)
                             }
 
                             // Get UUID nonce from high score server

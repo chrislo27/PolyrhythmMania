@@ -77,7 +77,7 @@ object Achievements {
      */
     val dailyPlayFirstTime = register(StatTriggered("daily_play_first_time", STATISTICAL, DAILY, false, GlobalStats.timesPlayedDailyChallenge, 1, showProgress = false))
     /**
-     * Triggered when Daily Challenge is played twice in the same play session. TODO
+     * Triggered when Daily Challenge is played twice in the same play session.
      */
     val dailyTwiceInOneSession = register(Ordinary("daily_twice_in_one_session", OBJECTIVE, DAILY, false))
     /**
