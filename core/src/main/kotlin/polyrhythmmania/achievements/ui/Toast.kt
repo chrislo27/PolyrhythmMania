@@ -16,7 +16,6 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievement
 import polyrhythmmania.achievements.AchievementsL10N
 import polyrhythmmania.achievements.Fulfillment
-import polyrhythmmania.ui.TextboxPane
 
 
 class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElement() {
@@ -68,7 +67,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
             this.setScaleXY(0.8f)
             this.renderAlign.set(Align.left)
             this.padding.set(Insets.ZERO)
-            this.textColor.set(achievement.quality.color.cpy())
+            this.textColor.set(achievement.rank.color.cpy())
         }
         nameLabel = TextLabel("", font = main.fontMainMenuMain).apply { 
             Anchor.BottomLeft.configure(this)

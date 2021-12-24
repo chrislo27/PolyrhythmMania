@@ -3,21 +3,17 @@ package polyrhythmmania.achievements.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.binding.FloatVar
-import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
 import paintbox.ui.animation.Animation
 import paintbox.util.gdxutils.isShiftDown
-import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.*
 import java.time.Instant
@@ -69,7 +65,7 @@ class AchievementsUIOverlay {
     }
     
     fun debugReloadToast() {
-        enqueueToast(Toast(Achievement.Ordinary("test", AchievementQuality.NORMAL, AchievementCategory.GENERAL, false), Fulfillment(Instant.now())))
+        enqueueToast(Toast(Achievement.Ordinary("test", AchievementRank.NORMAL, AchievementCategory.GENERAL, false), Fulfillment(Instant.now())))
     }
     
     fun render(main: PRManiaGame, batch: SpriteBatch) {

@@ -11,7 +11,7 @@ import polyrhythmmania.PRMania
 import polyrhythmmania.statistics.StatTrigger
 import polyrhythmmania.achievements.Achievement.*
 import polyrhythmmania.achievements.AchievementCategory.*
-import polyrhythmmania.achievements.AchievementQuality.*
+import polyrhythmmania.achievements.AchievementRank.*
 import polyrhythmmania.statistics.GlobalStats
 import java.time.Instant
 
