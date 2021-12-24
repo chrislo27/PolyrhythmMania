@@ -186,7 +186,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
                 editor.attemptOpenHelpDialog()
             }
             this.setOnRightClick { // DEBUG
-                if (Paintbox.debugMode) {
+                if (Paintbox.debugMode.get()) {
                     editorPane.resetHelpDialog()
                 }
             }

@@ -213,7 +213,7 @@ object Achievements {
      */
     val playAllPractices = register(Ordinary("play_all_practices", OBJECTIVE, GENERAL, false))
     /**
-     * Triggered after scrolling to the end of the credits list. TODO
+     * Triggered after scrolling to the end of the credits list.
      */
     val seeAllCredits = register(Ordinary("see_all_credits", OBJECTIVE, GENERAL, false))
 
