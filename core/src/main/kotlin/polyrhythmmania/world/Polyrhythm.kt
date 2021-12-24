@@ -7,8 +7,10 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.binding.BooleanVar
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
+import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.input.*
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.entity.EntityExplosion
@@ -214,6 +216,8 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
     val acceptingInputs: Boolean
         get() = !collision.collidedWithWall && !exploded
     
+    private var bouncedToOutOfBounds: Int = 0 // 0 = false, 1 = true, 2 = checked already
+    
     init {
         this.position.x = getPosXFromBeat(0f)
         this.position.z = row.startZ.toFloat()
@@ -275,7 +279,11 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
 
     fun bounce(startIndex: Int) {
         if (startIndex in 0 until row.length) {
-            bounce(startIndex, getLookaheadIndex(startIndex))
+            val lookahead = getLookaheadIndex(startIndex)
+            bounce(startIndex, lookahead)
+            if (lookahead >= row.rowBlocks.size - 1) {
+                bouncedToOutOfBounds = 1
+            }
         }
     }
 
@@ -341,6 +349,11 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
         updateInputTracking(beat)
         
         lastCurrentIndex = getCurrentIndex(this.position.x)
+        
+        if (engine.statisticsMode == StatisticsMode.IN_EDITOR && bouncedToOutOfBounds == 1) {
+            bouncedToOutOfBounds = 2
+            Achievements.awardAchievement(Achievements.rodToSpace)
+        }
     }
 
     /**
