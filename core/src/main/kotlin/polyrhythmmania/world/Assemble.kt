@@ -326,7 +326,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
         fun addConditionalBounce(rod: EntityRodAsm, bounce: BounceAsm) {
             val hit = this.hitInput
             val early = rod.earlyInputResult
-            if (hit != null && MathUtils.isEqual(hit.perfectBeat, bounce.startBeat, 0.00f)) {
+            if (hit != null && MathUtils.isEqual(hit.perfectBeat, bounce.startBeat, 0.01f)) {
                 rod.bounce = bounce
             } else if (early != null && MathUtils.isEqual(early.perfectBeat, bounce.startBeat, 0.01f)) {
                 conditionalBounce = bounce
