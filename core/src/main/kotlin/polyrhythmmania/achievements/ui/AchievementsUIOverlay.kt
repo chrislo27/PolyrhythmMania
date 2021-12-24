@@ -76,7 +76,7 @@ class AchievementsUIOverlay {
         val mouseX = sceneRoot.mousePosition.x.get()
         val mouseY = sceneRoot.mousePosition.y.get()
         // Note: This works because all toasts are immediate children of the SceneRoot.
-        val mouseInAny = activeToasts.any { at -> at.containingPane.bounds.containsPointLocal(mouseX, mouseY) }
+        val mouseInAny = !Gdx.input.isCursorCatched && activeToasts.any { at -> at.containingPane.bounds.containsPointLocal(mouseX, mouseY) }
         sceneRoot.opacity.set(if (mouseInAny) 0.25f else 1f)
         
         batch.projectionMatrix.set(tmpMatrix)
