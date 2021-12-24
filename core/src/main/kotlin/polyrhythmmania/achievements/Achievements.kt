@@ -137,7 +137,7 @@ object Achievements {
      */
     val assemblePlayFirstTime = register(StatTriggered("assemble_play_first_time", OBJECTIVE, EXTRAS, false, GlobalStats.timesPlayedAssemble, 1, showProgress = false))
     /**
-     * Triggered when a No Miss is achieved in Assemble. TODO
+     * Triggered when a No Miss is achieved in Assemble.
      */
     val assembleNoMiss = register(Ordinary("assemble_no_miss", OBJECTIVE, EXTRAS, false))
 
@@ -153,11 +153,11 @@ object Achievements {
 
 
     /**
-     * Triggered when a Perfect is earned in a level with at least 40 inputs. TODO
+     * Triggered when a Perfect is earned in a level with at least 40 inputs.
      */
     val perfectFirstTime = register(NumericalThreshold("perfect_first_time", OBJECTIVE, GENERAL, false, 40))
     /**
-     * Triggered when at least 15 unique levels are in the Library. TODO
+     * Triggered when at least 15 unique levels are in the Library.
      */
     val libraryCollection15 = register(NumericalThreshold("library_collection_15", OBJECTIVE, GENERAL, false, 15))
     

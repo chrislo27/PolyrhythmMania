@@ -24,6 +24,7 @@ import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Ranking
@@ -31,6 +32,7 @@ import polyrhythmmania.engine.input.Score
 import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.PlayScreen
 import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.world.WorldType
 import kotlin.properties.Delegates
 
 class ResultsScreen(
@@ -400,10 +402,14 @@ class ResultsScreen(
                 val challenges = score.challenges
                 if (score.noMiss) {
                     GlobalStats.noMissesGotten.increment()
+                    if (container.world.worldMode.type == WorldType.ASSEMBLE) {
+                        Achievements.awardAchievement(Achievements.assembleNoMiss)
+                    }
                 }
                 if (challenges.goingForPerfect) {
                     if (score.noMiss) {
                         GlobalStats.perfectsEarned.increment()
+                        Achievements.attemptAwardThresholdAchievement(Achievements.perfectFirstTime, score.nInputs)
                     }
                 }
             }
