@@ -68,7 +68,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
             this.setScaleXY(0.8f)
             this.renderAlign.set(Align.left)
             this.padding.set(Insets.ZERO)
-            this.textColor.set(Color.GOLD)
+            this.textColor.set(achievement.quality.color.cpy())
         }
         nameLabel = TextLabel("", font = main.fontMainMenuMain).apply { 
             Anchor.BottomLeft.configure(this)
@@ -92,9 +92,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
     
     init {
         this.titleLabel.text.set(AchievementsL10N.getValue("achievement.toast.quality.${achievement.category.id}${if (achievement.isHidden) ".hidden" else ""}"))
-        this.titleLabel.textColor.set(achievement.quality.color.cpy())
         this.nameLabel.text.set(achievement.getLocalizedName().getOrCompute())
-        // TODO
         this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex"))) // FIXME
     }
 

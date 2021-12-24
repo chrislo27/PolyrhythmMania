@@ -10,4 +10,8 @@ enum class AchievementCategory(val id: String) {
     EXTRAS("extras"),
     ;
     
+    companion object {
+        val VALUES: List<AchievementCategory> = values().toList()
+    }
+    
 }

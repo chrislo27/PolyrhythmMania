@@ -48,7 +48,7 @@ sealed class Achievement(
     }
     
     class StatTriggered(id: String, quality: AchievementQuality, category: AchievementCategory, isHidden: Boolean,
-                        val stat: Stat, val threshold: Int)
+                        val stat: Stat, val threshold: Int, val showProgress: Boolean = true)
         : Achievement(id, quality, category, isHidden) {
 
         override fun getLocalizedDesc(): ReadOnlyVar<String> {

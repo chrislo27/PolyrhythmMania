@@ -24,8 +24,8 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     companion object {
         private const val ROW_HEIGHT: Float = 36f
-        private val HEADING_TEXT_COLOR: Color = Color.valueOf("564F2BFF")
-        private val NAME_TEXT_COLOR: Color = Color.valueOf("323232FF")
+        val HEADING_TEXT_COLOR: Color = Color.valueOf("564F2BFF")
+        val NAME_TEXT_COLOR: Color = Color.valueOf("323232FF")
     }
     
     private val scrollPane: ScrollPane

@@ -23,7 +23,7 @@ import polyrhythmmania.achievements.*
 import java.time.Instant
 
 
-class AchievementsUI {
+class AchievementsUIOverlay {
     
     companion object {
         private const val MAX_TOASTS_ON_SCREEN: Int = 3

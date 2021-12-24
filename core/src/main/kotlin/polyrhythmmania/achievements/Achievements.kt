@@ -40,7 +40,7 @@ object Achievements {
     /**
      * Triggered when Endless Mode is played for the first time.
      */
-    val endlessPlayFirstTime = register(StatTriggered("endless_play_first_time", STATISTICAL, ENDLESS_MODE, false, GlobalStats.timesPlayedEndlessMode, 1))
+    val endlessPlayFirstTime = register(StatTriggered("endless_play_first_time", STATISTICAL, ENDLESS_MODE, false, GlobalStats.timesPlayedEndlessMode, 1, showProgress = false))
     /**
      * Triggered when getting a score of at least 25 in Endless Mode, any settings. TODO
      */
@@ -75,7 +75,7 @@ object Achievements {
     /**
      * Triggered when Daily Challenge is played for the first time.
      */
-    val dailyPlayFirstTime = register(StatTriggered("daily_play_first_time", STATISTICAL, DAILY, false, GlobalStats.timesPlayedDailyChallenge, 1))
+    val dailyPlayFirstTime = register(StatTriggered("daily_play_first_time", STATISTICAL, DAILY, false, GlobalStats.timesPlayedDailyChallenge, 1, showProgress = false))
     /**
      * Triggered when Daily Challenge is played twice in the same play session. TODO
      */
@@ -109,7 +109,7 @@ object Achievements {
     /**
      * Triggered when Dunk is played for the first time.
      */
-    val dunkPlayFirstTime = register(StatTriggered("dunk_play_first_time", STATISTICAL, EXTRAS, false, GlobalStats.timesPlayedDunk, 1))
+    val dunkPlayFirstTime = register(StatTriggered("dunk_play_first_time", STATISTICAL, EXTRAS, false, GlobalStats.timesPlayedDunk, 1, showProgress = false))
     /**
      * Triggered when Dunk is played on a (local time) Friday between 5:00pm and 11:59pm. TODO
      */
@@ -135,7 +135,7 @@ object Achievements {
     /**
      * Triggered when Assemble is played for the first time.
      */
-    val assemblePlayFirstTime = register(StatTriggered("assemble_play_first_time", NORMAL, EXTRAS, false, GlobalStats.timesPlayedAssemble, 1))
+    val assemblePlayFirstTime = register(StatTriggered("assemble_play_first_time", NORMAL, EXTRAS, false, GlobalStats.timesPlayedAssemble, 1, showProgress = false))
     /**
      * Triggered when a No Miss is achieved in Assemble. TODO
      */
@@ -145,11 +145,11 @@ object Achievements {
     /**
      * Triggered when the editor is opened for the first time.
      */
-    val editorOpenFirstTime = register(StatTriggered("editor_open_first_time", NORMAL, EDITOR, false, GlobalStats.editorTime, 1))
+    val editorOpenFirstTime = register(StatTriggered("editor_open_first_time", NORMAL, EDITOR, false, GlobalStats.editorTime, 1, showProgress = false))
     /**
-     * Triggered when a level with at least 10 inputs is exported successfully. TODO
+     * Triggered when a level with at least 20 inputs is exported successfully. TODO
      */
-    val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", NORMAL, EDITOR, false, 10))
+    val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", NORMAL, EDITOR, false, 20))
 
 
     /**

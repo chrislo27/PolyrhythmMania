@@ -43,9 +43,8 @@ class AchievementsStatsForkMenu(menuCol: MenuCollection) : StandardMenu(menuCol)
             
             vbox += createLongButton { Localization.getVar("mainMenu.achievements.title").use() }.apply {
                 this.setOnAction {
-                    // TODO
+                    menuCol.pushNextMenu(menuCol.achievementsMenu)
                 }
-                this.disabled.set(true)
             }
             vbox += createLongButton { Localization.getVar("mainMenu.statistics.title").use() }.apply {
                 this.setOnAction {

@@ -35,7 +35,7 @@ import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.achievements.AchievementsL10N
-import polyrhythmmania.achievements.ui.AchievementsUI
+import polyrhythmmania.achievements.ui.AchievementsUIOverlay
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.discord.DiscordCore
@@ -99,7 +99,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     lateinit var mainMenuScreen: MainMenuScreen
         private set
     private val permanentScreens: MutableList<PaintboxScreen> = mutableListOf()
-    private lateinit var achievementsUI: AchievementsUI
+    private lateinit var achievementsUIOverlay: AchievementsUIOverlay
     private var enableAchievementsUI: Boolean = false
     
     val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
@@ -140,7 +140,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         GlobalStats.load()
         Achievements.load()
-        achievementsUI = AchievementsUI()
+        achievementsUIOverlay = AchievementsUIOverlay()
         GlobalStats.timesGameStarted.increment()
         
 
@@ -291,7 +291,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         batch.setColor(1f, 1f, 1f, 1f)
         
         if (enableAchievementsUI) {
-            achievementsUI.render(this, batch)
+            achievementsUIOverlay.render(this, batch)
             resetViewportToScreen()
             batch.projectionMatrix = cam.combined
             batch.setColor(1f, 1f, 1f, 1f)
@@ -321,7 +321,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
-        achievementsUI.resize(width, height)
+        achievementsUIOverlay.resize(width, height)
     }
 
     private val userHomeFile: File = File(System.getProperty("user.home"))
