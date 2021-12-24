@@ -79,11 +79,11 @@ object Achievements {
     /**
      * Triggered when Daily Challenge is played twice in the same play session. TODO
      */
-    val dailyTwiceInOneSession = register(Ordinary("daily_twice_in_one_session", NORMAL, DAILY, false))
+    val dailyTwiceInOneSession = register(Ordinary("daily_twice_in_one_session", OBJECTIVE, DAILY, false))
     /**
      * Triggered when Daily Challenge is played 7 days in a row. TODO
      */
-    val dailyWeekStreak = register(Ordinary("daily_week_streak", NORMAL, DAILY, false))
+    val dailyWeekStreak = register(Ordinary("daily_week_streak", OBJECTIVE, DAILY, false))
     /**
      * Triggered when getting a score of at least 25 in Daily Challenge. TODO
      */
@@ -113,7 +113,7 @@ object Achievements {
     /**
      * Triggered when Dunk is played on a (local time) Friday between 5:00pm and 11:59pm. TODO
      */
-    val dunkFridayNight = register(Ordinary("dunk_friday_night", NORMAL, EXTRAS, false))
+    val dunkFridayNight = register(Ordinary("dunk_friday_night", OBJECTIVE, EXTRAS, false))
     /**
      * Triggered when getting a score of at least 10 in Dunk. TODO
      */
@@ -135,87 +135,87 @@ object Achievements {
     /**
      * Triggered when Assemble is played for the first time.
      */
-    val assemblePlayFirstTime = register(StatTriggered("assemble_play_first_time", NORMAL, EXTRAS, false, GlobalStats.timesPlayedAssemble, 1, showProgress = false))
+    val assemblePlayFirstTime = register(StatTriggered("assemble_play_first_time", OBJECTIVE, EXTRAS, false, GlobalStats.timesPlayedAssemble, 1, showProgress = false))
     /**
      * Triggered when a No Miss is achieved in Assemble. TODO
      */
-    val assembleNoMiss = register(Ordinary("assemble_no_miss", NORMAL, EXTRAS, false))
+    val assembleNoMiss = register(Ordinary("assemble_no_miss", OBJECTIVE, EXTRAS, false))
 
 
     /**
      * Triggered when the editor is opened for the first time.
      */
-    val editorOpenFirstTime = register(StatTriggered("editor_open_first_time", NORMAL, EDITOR, false, GlobalStats.editorTime, 1, showProgress = false))
+    val editorOpenFirstTime = register(StatTriggered("editor_open_first_time", OBJECTIVE, EDITOR, false, GlobalStats.editorTime, 1, showProgress = false))
     /**
      * Triggered when a level with at least 20 inputs is exported successfully. TODO
      */
-    val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", NORMAL, EDITOR, false, 20))
+    val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", OBJECTIVE, EDITOR, false, 20))
 
 
     /**
      * Triggered when a Perfect is earned in a level with at least 40 inputs. TODO
      */
-    val perfectFirstTime = register(NumericalThreshold("perfect_first_time", NORMAL, GENERAL, false, 40))
+    val perfectFirstTime = register(NumericalThreshold("perfect_first_time", OBJECTIVE, GENERAL, false, 40))
     /**
      * Triggered when at least 10 unique levels are in the Library. TODO
      */
-    val libraryCollection10 = register(NumericalThreshold("library_collection_10", NORMAL, GENERAL, false, 10))
+    val libraryCollection10 = register(NumericalThreshold("library_collection_10", OBJECTIVE, GENERAL, false, 10))
     
     
     /**
      * Triggered when X successful inputs are gotten.
      */
-    val successfulInputs1000 = register(StatTriggered("successful_inputs_1000", NORMAL, GENERAL, false, GlobalStats.inputsGottenTotal, 1000))
+    val successfulInputs1000 = register(StatTriggered("successful_inputs_1000", OBJECTIVE, GENERAL, false, GlobalStats.inputsGottenTotal, 1000))
     /**
      * Triggered when X ace inputs are gotten.
      */
-    val aceInputs1000 = register(StatTriggered("ace_inputs_1000", NORMAL, GENERAL, false, GlobalStats.inputsGottenAce, 1000))
+    val aceInputs1000 = register(StatTriggered("ace_inputs_1000", OBJECTIVE, GENERAL, false, GlobalStats.inputsGottenAce, 1000))
     /**
      * Triggered when X rods have exploded.
      */
-    val rodsExploded10000 = register(StatTriggered("rods_exploded_10000", NORMAL, GENERAL, false, GlobalStats.rodsExploded, 10000))
+    val rodsExploded10000 = register(StatTriggered("rods_exploded_10000", OBJECTIVE, GENERAL, false, GlobalStats.rodsExploded, 10000))
     /**
      * Triggered when a Skill Star is earned for the 5th time.
      */
-    val skillStar5 = register(StatTriggered("skill_star_5", NORMAL, GENERAL, false, GlobalStats.skillStarsEarned, 5))
+    val skillStar5 = register(StatTriggered("skill_star_5", OBJECTIVE, GENERAL, false, GlobalStats.skillStarsEarned, 5))
     /**
      * Triggered when a Skill Star is earned for the 100th time.
      */
-    val skillStar100 = register(StatTriggered("skill_star_100", NORMAL, GENERAL, false, GlobalStats.skillStarsEarned, 100))
+    val skillStar100 = register(StatTriggered("skill_star_100", OBJECTIVE, GENERAL, false, GlobalStats.skillStarsEarned, 100))
     /**
      * Triggered when 30 unique levels have been played.
      */
-    val uniqueLevelsPlayed30 = register(StatTriggered("unique_levels_played_30", NORMAL, GENERAL, false, GlobalStats.timesPlayedUniqueCustomLevel, 30))
+    val uniqueLevelsPlayed30 = register(StatTriggered("unique_levels_played_30", OBJECTIVE, GENERAL, false, GlobalStats.timesPlayedUniqueCustomLevel, 30))
     /**
      * Triggered when 10 hours of total playtime have been reached.
      */
-    val playtimeHours10 = register(StatTriggered("playtime_hours_10", NORMAL, GENERAL, false, GlobalStats.totalPlayTime, 10 * 60 * 60))
+    val playtimeHours10 = register(StatTriggered("playtime_hours_10", OBJECTIVE, GENERAL, false, GlobalStats.totalPlayTime, 10 * 60 * 60))
 
     
     /**
      * Triggered in the editor when a rod is launched with no other platforms raised afterward. TODO
      */
-    val rodToSpace = register(Ordinary("rod_to_space", NORMAL, EDITOR, false))
+    val rodToSpace = register(Ordinary("rod_to_space", OBJECTIVE, EDITOR, false))
     /**
      * Triggered in Endless Mode when paused in between a pattern and the point is still awarded at score 50 or greater. TODO
      */
-    val endlessPauseBetweenInputs = register(NumericalThreshold("endless_pause_between_inputs", NORMAL, ENDLESS_MODE, false, 50))
+    val endlessPauseBetweenInputs = register(NumericalThreshold("endless_pause_between_inputs", OBJECTIVE, ENDLESS_MODE, false, 50))
     /**
      * Triggered in Endless Mode when getting a score of at least 50 while the master volume is 0. TODO
      */
-    val endlessSilentEndless = register(Ordinary("endless_silent_endless", NORMAL, ENDLESS_MODE, false))
+    val endlessSilentEndless = register(Ordinary("endless_silent_endless", OBJECTIVE, ENDLESS_MODE, false))
     /**
      * Triggered after every Tutorial (I + II) has been completed. TODO
      */
-    val playAllTutorials = register(Ordinary("play_all_tutorials", NORMAL, GENERAL, false))
+    val playAllTutorials = register(Ordinary("play_all_tutorials", OBJECTIVE, GENERAL, false))
     /**
      * Triggered after every Practice (PR1 + 2) has been completed. TODO
      */
-    val playAllPractices = register(Ordinary("play_all_practices", NORMAL, GENERAL, false))
+    val playAllPractices = register(Ordinary("play_all_practices", OBJECTIVE, GENERAL, false))
     /**
      * Triggered after scrolling to the end of the credits list. TODO
      */
-    val seeAllCredits = register(Ordinary("see_all_credits", NORMAL, GENERAL, false))
+    val seeAllCredits = register(Ordinary("see_all_credits", OBJECTIVE, GENERAL, false))
 
     
     /**
@@ -237,16 +237,6 @@ object Achievements {
                 }
             }
         }
-    }
-    
-    init {
-//        println(achievementIDMap.size)
-//        achievementIDMap.values.forEach { 
-//            println("Achievement." + it)
-//        }
-//        achievementIDMap.values.forEach { 
-//            println(it.id)
-//        }
     }
     
     private fun <A : Achievement> register(ach: A): A {
@@ -283,6 +273,12 @@ object Achievements {
 
     fun attemptAwardScoreAchievement(achievement: ScoreThreshold, score: Int) {
         if (achievement !in _achFulfillmentMap.getOrCompute() && score >= achievement.scoreMinimum) {
+            awardAchievement(achievement)
+        }
+    }
+    
+    fun attemptAwardThresholdAchievement(achievement: NumericalThreshold, value: Int) {
+        if (achievement !in _achFulfillmentMap.getOrCompute() && value >= achievement.minimumValue) {
             awardAchievement(achievement)
         }
     }

@@ -65,7 +65,7 @@ class AchievementsUIOverlay {
     }
     
     fun debugReloadToast() {
-        enqueueToast(Toast(Achievement.Ordinary("test", AchievementRank.NORMAL, AchievementCategory.GENERAL, false), Fulfillment(Instant.now())))
+        enqueueToast(Toast(Achievement.Ordinary("test", AchievementRank.OBJECTIVE, AchievementCategory.GENERAL, false), Fulfillment(Instant.now())))
     }
     
     fun render(main: PRManiaGame, batch: SpriteBatch) {
