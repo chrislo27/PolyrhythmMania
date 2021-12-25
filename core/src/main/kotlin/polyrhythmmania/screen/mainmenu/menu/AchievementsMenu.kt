@@ -172,10 +172,12 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             })
                         } else Var("")
                         this += TextLabel(binding = {
-                            val desc = if (achievement.isHidden && !achievementEarned.use()) { 
+                            val stillHidden = achievement.isHidden && !achievementEarned.use()
+                            val desc = if (stillHidden) { 
                                 "[i]${AchievementsL10N.getVar("achievement.hidden.desc").use()}[]"
                             } else "${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}"
-                            "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgress.use()}[] ${if (SHOW_IDS_WHEN_DEBUG && Paintbox.debugMode.use()) "[color=LIGHT_GRAY scale=0.75]${achievement.id}[]" else ""}\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
+                            val statProgressText = if (!stillHidden) statProgress.use() else ""
+                            "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgressText}[] ${if (SHOW_IDS_WHEN_DEBUG && Paintbox.debugMode.use()) "[color=LIGHT_GRAY scale=0.75]${achievement.id}[]" else ""}\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
                         }).apply {
                             Anchor.TopLeft.configure(this)
                             this.setScaleXY(1f)
