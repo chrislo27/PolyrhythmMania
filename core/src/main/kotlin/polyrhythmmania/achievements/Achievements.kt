@@ -227,6 +227,10 @@ object Achievements {
      * Triggered when Dunk is played on a (local time) Friday between 5:00pm and 11:59pm.
      */
     val dunkFridayNight = register(Ordinary("dunk_friday_night", OBJECTIVE, EXTRAS, isHidden = true))
+//    /**
+//     * Triggered when reaching the maximum speed increase in Dunk. NB: Max is reached at score = 96. Too high.
+//     */
+//    val dunkReachMaxSpeed = register(Ordinary("dunk_max_speed_reached", CHALLENGE, EXTRAS, false))
     
     /**
      * Triggered when Assemble is played for the first time.

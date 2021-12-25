@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
@@ -161,10 +162,16 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                 }
                 
                 if (newScore % increaseSpeedEvery == 0) {
-                    val pitch = Semitones.getALPitch(newScore / increaseSpeedEvery).coerceAtMost(2f)
+                    val maxValue = 12
+                    val semitone = (newScore / increaseSpeedEvery).coerceAtMost(maxValue)
+                    val pitch = Semitones.getALPitch(semitone)
                     engine.addEvent(EventChangePlaybackSpeed(engine, pitch).apply { 
                         this.beat = dunkBeat
                     })
+
+//                    if (engine.areStatisticsEnabled && semitone >= maxValue) {
+//                        Achievements.awardAchievement(Achievements.dunkReachMaxSpeed)
+//                    }
                 }
             }.apply { 
                 this.beat = dunkBeat
