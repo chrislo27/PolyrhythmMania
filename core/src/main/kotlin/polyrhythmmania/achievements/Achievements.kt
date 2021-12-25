@@ -286,11 +286,11 @@ object Achievements {
     
     fun dumpAchievementList() {
         Paintbox.LOGGER.debug("\n" + achievementIDMap.values.groupBy { it.category }.entries.sortedBy { it.key }.joinToString(separator = "\n") { (category, list) ->
-            val listStr = list.joinToString(separator = "\n-------------------------------------------\n") { ach ->
+            val listStr = list.joinToString(separator = "\n${"-".repeat(35)}\n") { ach ->
                 "${ach.getLocalizedName().getOrCompute()}\nRank: ${ach.rank} | Hidden? ${ach.isHidden} | ID: ${ach.id}\n${ach.getLocalizedDesc().getOrCompute()}"
             }
             
-            "\n\n\n===========================================\nCategory $category:\n$listStr"
+            "\n\n\n${"=".repeat(35)}\nCategory $category:\n$listStr"
         } + "\n")
     }
     
