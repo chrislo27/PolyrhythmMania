@@ -140,7 +140,7 @@ object Achievements {
     /**
      * Triggered when reaching the maximum speed increase in Endless Mode/Daily Challenge.
      */
-    val endlessReachMaxSpeed = register(Ordinary("endless_max_speed_reached", CHALLENGE, ENDLESS_MODE, false))
+    val endlessReachMaxSpeed = register(Ordinary("endless_max_speed_reached", CHALLENGE, ENDLESS_MODE, isHidden = true))
     /**
      * Triggered in Endless Mode when paused in between a pattern and the point is still awarded at score 50 or greater.
      * NB: This will also trigger if the new score is 50.
