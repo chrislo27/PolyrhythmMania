@@ -92,7 +92,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
     init {
         this.titleLabel.text.set(AchievementsL10N.getValue(achievement.rank.toLocalizationID(achievement.isHidden)))
         this.nameLabel.text.set(achievement.getLocalizedName().getOrCompute())
-        this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex"))) // FIXME
+        this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<Texture>("achievements_trophy"))) // FIXME
     }
 
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {

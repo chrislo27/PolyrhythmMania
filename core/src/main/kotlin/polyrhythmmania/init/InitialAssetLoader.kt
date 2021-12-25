@@ -122,6 +122,8 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("country_flags", "textures/flag_icon/flags32.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("library_default_banner", "textures/mainmenu/default_banner.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("achievements_completed_mark", "textures/achievements/completed.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("achievements_locked", "textures/achievements/locked.png")
+        AssetRegistry.loadAsset<Texture>("achievements_trophy", "textures/achievements/trophy2.png")
         
         listOf("applause", "despawn", "explosion", "input_a", "input_d", "land", "retract", "side_collision",
                 "spawn_a", "spawn_d", "cowbell",).forEach {

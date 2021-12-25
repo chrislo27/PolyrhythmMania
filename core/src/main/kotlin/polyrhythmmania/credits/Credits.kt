@@ -11,7 +11,7 @@ object Credits {
     val credits: Map<ReadOnlyVar<String>, List<ReadOnlyVar<String>>> = linkedMapOf(
             Localization.getVar("credits.programming") to listOf("chrislo27", "[font=rodin](◉.◉)☂[]").toVars(),
             Localization.getVar("credits.graphicDesign") to abcSorted(
-                    "garbo", "snow krow", "GENERIC",
+                    "garbo", "snow krow", "GENERIC", "Merch_Andise",
             ).toVars(),
             Localization.getVar("credits.music") to listOf(
                     Var("GENERIC"), Localization.getVar("credits.rhSoundtrack")

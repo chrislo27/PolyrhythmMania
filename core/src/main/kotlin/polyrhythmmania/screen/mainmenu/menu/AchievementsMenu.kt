@@ -144,7 +144,9 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this += ImageIcon(null, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
                         Anchor.TopLeft.configure(this)
                         this.bindWidthToSelfHeight()
-                        this.textureRegion.set(TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex"))) // FIXME
+                        this.textureRegion.bind { 
+                            TextureRegion(AssetRegistry.get<Texture>(if (achievementEarned.use()) "achievements_trophy" else "achievements_locked"))
+                        } // FIXME
                     }
                     this += ImageIcon(completedTextureReg, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
                         Anchor.TopRight.configure(this)
