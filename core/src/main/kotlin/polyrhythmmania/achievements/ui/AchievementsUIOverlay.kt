@@ -68,8 +68,8 @@ class AchievementsUIOverlay {
         }
     }
     
-    fun debugReloadToast() {
-        enqueueToast(Toast(Achievement.Ordinary("test", AchievementRank.CHALLENGE, AchievementCategory.GENERAL, false), Fulfillment(Instant.now())))
+    fun debugReloadToast(rank: AchievementRank, category: AchievementCategory) {
+        enqueueToast(Toast(Achievement.Ordinary("test", rank, category, false), Fulfillment(Instant.now())))
     }
     
     fun render(main: PRManiaGame, batch: SpriteBatch) {
@@ -119,9 +119,21 @@ class AchievementsUIOverlay {
             toast.frameUpdate(activeToastsReversed, index)
         }
         
-        if (Paintbox.debugMode.get() && PRMania.isDevVersion && Gdx.input.isKeyJustPressed(Input.Keys.T)) { // FIXME remove
-            repeat(if (Gdx.input.isShiftDown()) 3 else 1) {
-                debugReloadToast()
+        if (Paintbox.debugMode.get() && PRMania.isDevVersion) { // FIXME remove
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUMPAD_1)) {
+                repeat(if (Gdx.input.isShiftDown()) 3 else 1) {
+                    debugReloadToast(AchievementRank.STATISTICAL, AchievementCategory.GENERAL)
+                }
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUMPAD_2)) {
+                repeat(if (Gdx.input.isShiftDown()) 3 else 1) {
+                    debugReloadToast(AchievementRank.OBJECTIVE, AchievementCategory.GENERAL)
+                }
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUMPAD_3)) {
+                repeat(if (Gdx.input.isShiftDown()) 3 else 1) {
+                    debugReloadToast(AchievementRank.CHALLENGE, AchievementCategory.GENERAL)
+                }
             }
         }
     }

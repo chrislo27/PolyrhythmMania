@@ -30,7 +30,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
         this.bindWidthToSelfHeight(multiplier = 4.5f)
         
         val outermostBorderColor = Color(0f, 0f, 0f, 1f)
-        val middleBorderColor = Color().grey(85f / 255f)
+        val middleBorderColor = Color().grey(85f / 255f).lerp(achievement.rank.color, 0.35f)
         val innermostColor = Color().grey(33f / 255f)
         
         val innermostRect = RectElement(innermostColor).also { rect ->
