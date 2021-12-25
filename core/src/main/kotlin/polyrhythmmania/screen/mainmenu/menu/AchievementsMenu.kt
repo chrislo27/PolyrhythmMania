@@ -146,8 +146,8 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         Anchor.TopLeft.configure(this)
                         this.bindWidthToSelfHeight()
                         this.textureRegion.bind { 
-                            TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")[if (achievementEarned.use()) "trophy2" else "locked"])
-                        } // FIXME
+                            TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")[if (achievementEarned.use()) achievement.getIconID() else "locked"])
+                        }
                     }
                     this += ImageIcon(completedTextureReg, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
                         Anchor.TopRight.configure(this)
