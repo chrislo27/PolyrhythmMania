@@ -2,6 +2,7 @@ package polyrhythmmania.achievements.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
@@ -9,6 +10,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.binding.FloatVar
+import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
@@ -65,7 +67,7 @@ class AchievementsUIOverlay {
     }
     
     fun debugReloadToast() {
-        enqueueToast(Toast(Achievement.Ordinary("test", AchievementRank.OBJECTIVE, AchievementCategory.GENERAL, false), Fulfillment(Instant.now())))
+        enqueueToast(Toast(Achievement.Ordinary("test", AchievementRank.CHALLENGE, AchievementCategory.GENERAL, false), Fulfillment(Instant.now())))
     }
     
     fun render(main: PRManiaGame, batch: SpriteBatch) {
@@ -103,6 +105,9 @@ class AchievementsUIOverlay {
                         }
                     }
                 }, activeToast.showPercentage)
+                Gdx.app.postRunnable { 
+                    AssetRegistry.get<Sound>("sfx_challenge_complete").play(1f * (main.settings.menuSfxVolume.getOrCompute() / 100f))
+                }
             }
         }
         
