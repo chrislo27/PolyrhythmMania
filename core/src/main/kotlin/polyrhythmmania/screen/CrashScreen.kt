@@ -132,6 +132,10 @@ class CrashScreen(main: PRManiaGame, val throwable: Throwable, val lastScreen: S
     }
 
     override fun render(delta: Float) {
+        if (batch.isDrawing) {
+            batch.end() // In case crash happens in the middle of a batching operation
+        }
+        
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
@@ -147,11 +151,6 @@ class CrashScreen(main: PRManiaGame, val throwable: Throwable, val lastScreen: S
         sceneRoot.renderAsRoot(batch)
 
         batch.end()
-        
-        
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
-//            main.screen = main.mainMenuScreen.prepareShow(false)
-//        }
     }
     
     override fun show() {
