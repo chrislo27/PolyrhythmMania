@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import paintbox.Paintbox
 import paintbox.binding.FloatVar
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -16,6 +17,7 @@ import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
 import paintbox.ui.animation.Animation
 import paintbox.util.gdxutils.isShiftDown
+import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.*
 import java.time.Instant
@@ -117,7 +119,7 @@ class AchievementsUIOverlay {
             toast.frameUpdate(activeToastsReversed, index)
         }
         
-        if (Gdx.input.isKeyJustPressed(Input.Keys.T)) { // FIXME remove
+        if (Paintbox.debugMode.get() && PRMania.isDevVersion && Gdx.input.isKeyJustPressed(Input.Keys.T)) { // FIXME remove
             repeat(if (Gdx.input.isShiftDown()) 3 else 1) {
                 debugReloadToast()
             }

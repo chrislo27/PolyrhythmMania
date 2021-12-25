@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
@@ -92,7 +93,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
     init {
         this.titleLabel.text.set(AchievementsL10N.getValue(achievement.rank.toLocalizationID(achievement.isHidden)))
         this.nameLabel.text.set(achievement.getLocalizedName().getOrCompute())
-        this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<Texture>("achievements_trophy"))) // FIXME
+        this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")["trophy2"])) // FIXME
     }
 
     override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
