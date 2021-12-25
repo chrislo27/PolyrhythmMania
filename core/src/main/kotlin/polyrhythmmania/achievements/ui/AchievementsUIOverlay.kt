@@ -105,8 +105,10 @@ class AchievementsUIOverlay {
                         }
                     }
                 }, activeToast.showPercentage)
-                Gdx.app.postRunnable { 
-                    AssetRegistry.get<Sound>("sfx_challenge_complete").play(1f * (main.settings.menuSfxVolume.getOrCompute() / 100f))
+                if (next.achievement.rank == AchievementRank.CHALLENGE) {
+                    Gdx.app.postRunnable {
+                        AssetRegistry.get<Sound>("sfx_challenge_complete").play(1f * (main.settings.menuSfxVolume.getOrCompute() / 100f))
+                    }
                 }
             }
         }
