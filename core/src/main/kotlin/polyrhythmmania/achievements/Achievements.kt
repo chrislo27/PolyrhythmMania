@@ -37,7 +37,8 @@ object Achievements {
     // ACHIEVEMENT METADATA (tracking other sub-stats) -----------------------------------------------------------------
     
     var tutorialFlag: Int = 0 // LSB = I, next is II
-    var practiceFlag: Int = 0 // LSB = PR1, next is PR2
+    var practicePassFlag: Int = 0 // LSB = PR1, next is PR2
+    var practiceNoMissFlag: Int = 0 // LSB = PR1, next is PR2
     
     // ACHIEVEMENT LIST ------------------------------------------------------------------------------------------------
 
@@ -51,6 +52,10 @@ object Achievements {
      * Triggered after every Practice (PR1 + 2) has been completed with an OK or better.
      */
     val playAllPractices = register(Ordinary("play_all_practices", OBJECTIVE, GENERAL, false))
+    /**
+     * Triggered after every Practice (PR1 + 2) has been completed with a No Miss.
+     */
+    val noMissAllPractices = register(Ordinary("no_miss_all_practices", OBJECTIVE, GENERAL, false))
     /**
      * Triggered when a Perfect is earned in a level with at least 40 inputs.
      */
@@ -367,9 +372,13 @@ object Achievements {
         try {
             tutorialFlag = rootObj.getInt("tutorialFlag", 0)
         } catch (ignored: Exception) {}
-        practiceFlag = 0
+        practicePassFlag = 0
         try {
-            practiceFlag = rootObj.getInt("practiceFlag", 0)
+            practicePassFlag = rootObj.getInt("practicePassFlag", 0)
+        } catch (ignored: Exception) {}
+        practiceNoMissFlag = 0
+        try {
+            practiceNoMissFlag = rootObj.getInt("practiceNoMissFlag", 0)
         } catch (ignored: Exception) {}
     }
 
@@ -395,7 +404,8 @@ object Achievements {
             }
         })
         rootObj.add("tutorialFlag", tutorialFlag)
-        rootObj.add("practiceFlag", practiceFlag)
+        rootObj.add("practicePassFlag", practicePassFlag)
+        rootObj.add("practiceNoMissFlag", practiceNoMissFlag)
     }
 
     fun toJsonFile(file: FileHandle) {

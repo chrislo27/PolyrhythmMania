@@ -416,9 +416,15 @@ class ResultsScreen(
                 }
                 if (sideMode != null && sideMode is AbstractPolyrhythmPractice) {
                     if (score.ranking != Ranking.TRY_AGAIN) {
-                        Achievements.practiceFlag = Achievements.practiceFlag or sideMode.flagBit
-                        if (Achievements.practiceFlag == 0b0011) {
+                        Achievements.practicePassFlag = Achievements.practicePassFlag or sideMode.flagBit
+                        if (Achievements.practicePassFlag == 0b0011) {
                             Achievements.awardAchievement(Achievements.playAllPractices)
+                        }
+                        if (score.noMiss) {
+                            Achievements.practiceNoMissFlag = Achievements.practiceNoMissFlag or sideMode.flagBit
+                            if (Achievements.practiceNoMissFlag == 0b0011) {
+                                Achievements.awardAchievement(Achievements.noMissAllPractices)
+                            }
                         }
                         Achievements.persist()
                     }
