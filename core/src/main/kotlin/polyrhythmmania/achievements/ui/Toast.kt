@@ -30,18 +30,18 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
         this.bindWidthToSelfHeight(multiplier = 4.5f)
         
         val outermostBorderColor = Color(0f, 0f, 0f, 1f)
-        val middleBorderColor = Color().grey(85f / 255f).lerp(achievement.rank.color, 0.35f)
+        val middleBorderColor = Color().grey(85f / 255f).lerp(achievement.rank.color, 0.5f)
         val innermostColor = Color().grey(33f / 255f)
         
         val innermostRect = RectElement(innermostColor).also { rect ->
-            rect.padding.set(Insets(8f))
+            rect.padding.set(Insets(8f + 2))
             rect.border.set(Insets(3f))
             rect.borderStyle.set(SolidBorder(middleBorderColor))
         }
         
         // Outermost border
         this += RectElement(outermostBorderColor).apply { 
-            this.border.set(Insets(6f))
+            this.border.set(Insets(6f - 2))
             this.borderStyle.set(SolidBorder().also { border ->
                 border.color.bind { this@apply.color.use() }
                 border.roundedCorners.set(true)
