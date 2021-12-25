@@ -138,6 +138,10 @@ object Achievements {
     val endlessDaredevil100 = register(ScoreThreshold("endless_daredevil_100", CHALLENGE, ENDLESS_MODE, false, 100))
 
     /**
+     * Triggered when reaching the maximum speed increase in Endless Mode/Daily Challenge.
+     */
+    val endlessReachMaxSpeed = register(Ordinary("endless_max_speed_reached", CHALLENGE, ENDLESS_MODE, false))
+    /**
      * Triggered in Endless Mode when paused in between a pattern and the point is still awarded at score 50 or greater.
      * NB: This will also trigger if the new score is 50.
      */

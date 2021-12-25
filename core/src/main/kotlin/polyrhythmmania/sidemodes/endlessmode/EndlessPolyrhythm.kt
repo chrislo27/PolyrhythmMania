@@ -328,12 +328,17 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                     LoopingEvent(engine, 88f, { true }) { engine, startBeat ->
                         loopsCompleted.set(loopsCompleted.get() + 1)
                         val currentSpeedIncrease = speedIncreaseSemitones.get()
-                        val newSpeed = (currentSpeedIncrease + (if (currentSpeedIncrease >= 4) 1 else 2)).coerceAtMost(12)
+                        val maxSpeedIncrease = 12
+                        val newSpeed = (currentSpeedIncrease + (if (currentSpeedIncrease >= 4) 1 else 2)).coerceAtMost(maxSpeedIncrease)
                         speedIncreaseSemitones.set(newSpeed)
                         engine.playbackSpeed = Semitones.getALPitch(newSpeed)
                         
                         engine.addEvent(EventPaletteChange(engine, startBeat, 1f,
                                 createTilesetPaletteIterated(loopsCompleted.get(), colorChangeMultiplier, COLOR_CHANGE_LIMIT), false, false))
+                        
+                        if (engine.areStatisticsEnabled && newSpeed >= maxSpeedIncrease && currentSpeedIncrease < newSpeed) {
+                            Achievements.awardAchievement(Achievements.endlessReachMaxSpeed)
+                        }
                     }.also { e ->
                         e.beat = 88f
                     },
