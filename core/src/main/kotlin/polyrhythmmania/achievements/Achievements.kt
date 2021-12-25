@@ -158,14 +158,6 @@ object Achievements {
      */
     val dailyPlayFirstTime = register(StatTriggered("daily_play_first_time", STATISTICAL, DAILY, false, GlobalStats.timesPlayedDailyChallenge, 1, showProgress = false))
     /**
-     * Triggered when Daily Challenge is played twice in the same play session.
-     */
-    val dailyTwiceInOneSession = register(Ordinary("daily_twice_in_one_session", OBJECTIVE, DAILY, false))
-    /**
-     * Triggered when Daily Challenge is played 7 days in a row.
-     */
-    val dailyWeekStreak = register(Ordinary("daily_week_streak", OBJECTIVE, DAILY, false))
-    /**
      * Triggered when getting a score of at least 25 in Daily Challenge.
      */
     val dailyScore25 = register(ScoreThreshold("daily_score_25", OBJECTIVE, DAILY, false, 25))
@@ -185,6 +177,14 @@ object Achievements {
      * Triggered when getting a score of at least 125 in Daily Challenge.
      */
     val dailyScore125 = register(ScoreThreshold("daily_score_125", CHALLENGE, DAILY, false, 125))
+    /**
+     * Triggered when Daily Challenge is played twice in the same play session.
+     */
+    val dailyTwiceInOneSession = register(Ordinary("daily_twice_in_one_session", OBJECTIVE, DAILY, false))
+    /**
+     * Triggered when Daily Challenge is played 7 days in a row.
+     */
+    val dailyWeekStreak = register(Ordinary("daily_week_streak", OBJECTIVE, DAILY, false))
 
     
     // Category EDITOR
@@ -208,10 +208,6 @@ object Achievements {
      */
     val dunkPlayFirstTime = register(StatTriggered("dunk_play_first_time", STATISTICAL, EXTRAS, false, GlobalStats.timesPlayedDunk, 1, showProgress = false))
     /**
-     * Triggered when Dunk is played on a (local time) Friday between 5:00pm and 11:59pm.
-     */
-    val dunkFridayNight = register(Ordinary("dunk_friday_night", OBJECTIVE, EXTRAS, false))
-    /**
      * Triggered when getting a score of at least 10 in Dunk.
      */
     val dunkScore10 = register(ScoreThreshold("dunk_score_10", OBJECTIVE, EXTRAS, false, 10))
@@ -227,6 +223,10 @@ object Achievements {
      * Triggered when getting a score of at least 50 in Dunk.
      */
     val dunkScore50 = register(ScoreThreshold("dunk_score_50", OBJECTIVE, EXTRAS, false, 50))
+    /**
+     * Triggered when Dunk is played on a (local time) Friday between 5:00pm and 11:59pm.
+     */
+    val dunkFridayNight = register(Ordinary("dunk_friday_night", OBJECTIVE, EXTRAS, isHidden = true))
     
     /**
      * Triggered when Assemble is played for the first time.
