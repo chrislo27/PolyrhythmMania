@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.GLFrameBuffer
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
@@ -17,6 +19,7 @@ import paintbox.font.TextRun
 import paintbox.logging.SysOutPiper
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
+import paintbox.ui.ScissorStack
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
@@ -134,6 +137,15 @@ class CrashScreen(main: PRManiaGame, val throwable: Throwable, val lastScreen: S
     override fun render(delta: Float) {
         if (batch.isDrawing) {
             batch.end() // In case crash happens in the middle of a batching operation
+        }
+
+        // Attempt to undo any operations in the middle of the crash
+        GLFrameBuffer.unbind()
+        HdpiUtils.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
+        HdpiUtils.glScissor(0, 0, Gdx.graphics.width, Gdx.graphics.height)
+        var sc = ScissorStack.popScissor()
+        while (sc != null) {
+            sc = ScissorStack.popScissor()
         }
         
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
