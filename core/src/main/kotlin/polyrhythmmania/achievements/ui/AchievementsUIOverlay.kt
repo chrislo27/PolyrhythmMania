@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
 import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
@@ -61,6 +63,11 @@ class AchievementsUIOverlay {
     private val queue: MutableList<Toast> = mutableListOf()
     private val activeToasts: MutableList<ActiveToast> = mutableListOf()
     private val activeToastsReversed: List<ActiveToast> = activeToasts.asReversed()
+
+    /**
+     * Used to trigger an invisible toast so the codepath is loaded to reduce warmup lag
+     */
+    private var firstRender: Boolean = true
     
     init {
         Achievements.fulfillmentListeners += Achievements.FulfillmentListener { ach, ful ->
@@ -73,6 +80,20 @@ class AchievementsUIOverlay {
     }
     
     fun render(main: PRManiaGame, batch: SpriteBatch) {
+        if (firstRender) {
+            firstRender = false
+            enqueueToast(Toast(object : Achievement.Ordinary("", AchievementRank.OBJECTIVE, AchievementCategory.GENERAL, true) {
+                override fun getLocalizedName(): ReadOnlyVar<String> {
+                    return Var("")
+                }
+                override fun getLocalizedDesc(): ReadOnlyVar<String> {
+                    return Var("")
+                }
+            }, Fulfillment(Instant.now())).apply {
+                this.opacity.set(0f)
+            })
+        }
+        
         tmpMatrix.set(batch.projectionMatrix)
         batch.projectionMatrix = uiCamera.combined
         sceneRoot.renderAsRoot(batch)

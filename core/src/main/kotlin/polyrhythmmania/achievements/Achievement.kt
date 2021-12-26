@@ -12,7 +12,7 @@ sealed class Achievement(
         val isHidden: Boolean
 ) {
 
-    class Ordinary(id: String, rank: AchievementRank, category: AchievementCategory, isHidden: Boolean)
+    open class Ordinary(id: String, rank: AchievementRank, category: AchievementCategory, isHidden: Boolean)
         : Achievement(id, rank, category, isHidden) {
         
         override fun toString(): String {
