@@ -65,7 +65,7 @@ sealed class Achievement(
     open fun getLocalizedDesc(): ReadOnlyVar<String> = AchievementsL10N.getVar("achievement.desc.$id")
     
     fun getIconID(): String {
-        return overrideIconID ?: category.iconID
+        return overrideIconID ?: category.iconID ?: rank.defaultIconID
     }
     
 }

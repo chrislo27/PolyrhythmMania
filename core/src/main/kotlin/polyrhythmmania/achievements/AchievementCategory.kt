@@ -1,13 +1,13 @@
 package polyrhythmmania.achievements
 
 
-enum class AchievementCategory(val id: String, val iconID: String) {
+enum class AchievementCategory(val id: String, val iconID: String?) {
 
-    GENERAL("general", "trophy2"),
-    ENDLESS_MODE("endlessMode", "trophy2"),
-    DAILY("daily", "trophy2"),
-    EDITOR("editor", "trophy2"),
-    EXTRAS("extras", "trophy2"),
+    GENERAL("general", null),
+    ENDLESS_MODE("endlessMode", null),
+    DAILY("daily", null),
+    EDITOR("editor", null),
+    EXTRAS("extras", null),
     ;
     
     companion object {
