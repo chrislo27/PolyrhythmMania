@@ -104,7 +104,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     lateinit var mainMenuScreen: MainMenuScreen
         private set
     private val permanentScreens: MutableList<PaintboxScreen> = mutableListOf()
-    private lateinit var achievementsUIOverlay: AchievementsUIOverlay
+    lateinit var achievementsUIOverlay: AchievementsUIOverlay
+        private set
     private var enableAchievementsUI: Boolean = false
     
     val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)

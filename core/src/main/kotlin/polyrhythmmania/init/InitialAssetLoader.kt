@@ -126,6 +126,11 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("locked", "textures/achievements/locked.png"),
                 Packable("trophy1", "textures/achievements/trophy1.png"),
                 Packable("trophy2", "textures/achievements/trophy2.png"),
+                Packable("daily", "textures/achievements/daily.png"),
+                Packable("daily_calendar", "textures/achievements/daily_calendar.png"),
+                Packable("dunk", "textures/achievements/dunk.png"),
+                Packable("dunk_gold", "textures/achievements/dunk_gold.png"),
+                Packable("endless", "textures/achievements/endless.png"),
         ), PackedSheet.Config(padding = 2, maxSize = 512, duplicateBorder = false,
                 atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest)))
         

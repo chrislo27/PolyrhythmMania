@@ -4,8 +4,8 @@ package polyrhythmmania.achievements
 enum class AchievementCategory(val id: String, val iconID: String?) {
 
     GENERAL("general", null),
-    ENDLESS_MODE("endlessMode", null),
-    DAILY("daily", null),
+    ENDLESS_MODE("endlessMode", "endless"),
+    DAILY("daily", "daily"),
     EDITOR("editor", null),
     EXTRAS("extras", null),
     ;

@@ -211,27 +211,39 @@ object Achievements {
     /**
      * Triggered when Dunk is played for the first time.
      */
-    val dunkPlayFirstTime = register(StatTriggered("dunk_play_first_time", STATISTICAL, EXTRAS, false, GlobalStats.timesPlayedDunk, 1, showProgress = false))
+    val dunkPlayFirstTime = register(StatTriggered("dunk_play_first_time", STATISTICAL, EXTRAS, false, GlobalStats.timesPlayedDunk, 1, showProgress = false)).apply {
+        this.overrideIconID = "dunk"
+    }
     /**
      * Triggered when getting a score of at least 10 in Dunk.
      */
-    val dunkScore10 = register(ScoreThreshold("dunk_score_10", OBJECTIVE, EXTRAS, false, 10))
+    val dunkScore10 = register(ScoreThreshold("dunk_score_10", OBJECTIVE, EXTRAS, false, 10)).apply {
+        this.overrideIconID = "dunk"
+    }
     /**
      * Triggered when getting a score of at least 20 in Dunk.
      */
-    val dunkScore20 = register(ScoreThreshold("dunk_score_20", OBJECTIVE, EXTRAS, false, 20))
+    val dunkScore20 = register(ScoreThreshold("dunk_score_20", OBJECTIVE, EXTRAS, false, 20)).apply {
+        this.overrideIconID = "dunk"
+    }
     /**
      * Triggered when getting a score of at least 30 in Dunk.
      */
-    val dunkScore30 = register(ScoreThreshold("dunk_score_30", OBJECTIVE, EXTRAS, false, 30))
+    val dunkScore30 = register(ScoreThreshold("dunk_score_30", OBJECTIVE, EXTRAS, false, 30)).apply {
+        this.overrideIconID = "dunk"
+    }
     /**
      * Triggered when getting a score of at least 50 in Dunk.
      */
-    val dunkScore50 = register(ScoreThreshold("dunk_score_50", OBJECTIVE, EXTRAS, false, 50))
+    val dunkScore50 = register(ScoreThreshold("dunk_score_50", OBJECTIVE, EXTRAS, false, 50)).apply {
+        this.overrideIconID = "dunk_gold"
+    }
     /**
      * Triggered when Dunk is played on a (local time) Friday between 5:00pm and 11:59pm.
      */
-    val dunkFridayNight = register(Ordinary("dunk_friday_night", OBJECTIVE, EXTRAS, isHidden = true))
+    val dunkFridayNight = register(Ordinary("dunk_friday_night", OBJECTIVE, EXTRAS, isHidden = true)).apply {
+        this.overrideIconID = "dunk"
+    }
 //    /**
 //     * Triggered when reaching the maximum speed increase in Dunk. NB: Max is reached at score = 96. Too high.
 //     */

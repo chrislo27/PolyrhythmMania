@@ -26,10 +26,8 @@ import paintbox.util.DecimalFormats
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
-import polyrhythmmania.achievements.Achievement
-import polyrhythmmania.achievements.AchievementCategory
-import polyrhythmmania.achievements.Achievements
-import polyrhythmmania.achievements.AchievementsL10N
+import polyrhythmmania.achievements.*
+import polyrhythmmania.achievements.ui.Toast
 import polyrhythmmania.ui.PRManiaSkins
 import java.time.Instant
 import java.time.ZoneId
@@ -141,7 +139,13 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
             achievementsInCategory.forEach { achievement ->
                 val achievementEarned = BooleanVar { Achievements.fulfillmentMap.use()[achievement] != null }
-                val entire = Pane().apply {
+                val entire = ActionablePane().apply {
+                    this.setOnAltAction { 
+                        if (Paintbox.debugMode.get() && PRMania.isDevVersion) {
+                            main.achievementsUIOverlay.enqueueToast(Toast(achievement, Achievements.fulfillmentMap.getOrCompute()[achievement] ?: Fulfillment(Instant.now())))
+                        }
+                    }
+                    
                     this += ImageIcon(null, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
                         Anchor.TopLeft.configure(this)
                         this.bindWidthToSelfHeight()
