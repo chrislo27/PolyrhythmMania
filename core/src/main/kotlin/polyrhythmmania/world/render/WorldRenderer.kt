@@ -262,7 +262,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         }
         uiSceneRoot += perfectPane.apply {
             Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
-            this.bounds.width.set(500f)
+            this.bounds.width.set(600f)
             this.bounds.height.set(64f)
             this += Pane().apply {
                 this.bindWidthToSelfHeight()
@@ -272,7 +272,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                 this += perfectIconFailed
             }
             this += TextLabel(binding = { Localization.getVar("play.perfect").use() },
-                    font = PRManiaGame.instance.fontGameUIText).apply {
+                    font = PRManiaGame.instance.fontGameGoForPerfect).apply {
                 Anchor.TopRight.configure(this)
                 this.textColor.set(Color.WHITE)
                 this.padding.set(Insets(0f, 0f, 5f, 0f))

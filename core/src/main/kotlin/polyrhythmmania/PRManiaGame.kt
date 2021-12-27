@@ -61,6 +61,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.concurrent.thread
+import kotlin.math.roundToInt
 
 
 class PRManiaGame(paintboxSettings: PaintboxSettings)
@@ -464,7 +465,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             mono = false
             color = Color(1f, 1f, 1f, 1f)
             borderColor = Color(0f, 0f, 0f, 1f)
-            characters = ""
+            characters = " a" // Needed to at least put one glyph in each font to prevent errors
             hinting = FreeTypeFontGenerator.Hinting.Medium
         }
 
@@ -474,6 +475,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         val defaultScaledFontAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
             font.setUseIntegerPositions(false) // Stops glyphs from being offset due to rounding
+        }
+        val defaultScaledKurokaneAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
+            defaultScaledFontAfterLoad.invoke(this, font)
+            font.data.spaceXadvance /= 3f
+            val spaceGlyph = font.data.getGlyph(' ')
+            spaceGlyph.xadvance = font.data.spaceXadvance.roundToInt() + this.ftfParameter.spaceX
         }
         val defaultFontSize = 20
 
@@ -700,7 +707,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     size = 100
                     borderWidth = 10f
                     spaceX = -8
-                }).setAfterLoad(defaultScaledFontAfterLoad)
+                }).setAfterLoad(defaultScaledKurokaneAfterLoad)
         cache["game_textbox"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 42, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -727,7 +734,18 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 72
                     borderWidth = 6f
-                }).setAfterLoad(defaultScaledFontAfterLoad)
+                }).setAfterLoad { font ->
+            defaultScaledFontAfterLoad.invoke(this, font)
+            font.data.spaceXadvance /= 3.6f
+        }
+        cache["game_go_for_perfect"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/kurokane/kurokanestd.otf"), 36, 4f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 36
+                    spaceX = -2
+                    borderWidth = 4f
+                }).setAfterLoad(defaultScaledKurokaneAfterLoad)
         cache["results_main"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 32, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -742,7 +760,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     borderWidth = 6f
                     borderColor = Color().grey(0.4f, 1f)
                 }).setAfterLoad { font ->
-            defaultScaledFontAfterLoad.invoke(this, font)
+            defaultScaledKurokaneAfterLoad.invoke(this, font)
             font.setFixedWidthGlyphs("0123456789")
         }
     }
@@ -776,6 +794,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontGameMoreTimes: PaintboxFont get() = fontCache["game_more_times"]
     val fontGameUIText: PaintboxFont get() = fontCache["game_ui_text"]
     val fontGamePracticeClear: PaintboxFont get() = fontCache["game_practice_clear"]
+    val fontGameGoForPerfect: PaintboxFont get() = fontCache["game_go_for_perfect"]
     val fontResultsMain: PaintboxFont get() = fontCache["results_main"]
     val fontResultsScore: PaintboxFont get() = fontCache["results_score"]
 
