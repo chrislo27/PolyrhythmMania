@@ -15,6 +15,7 @@ import paintbox.ui.*
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.*
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.statistics.GlobalStats
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -132,6 +133,7 @@ class SolitaireGame : ActionablePane() {
     
     private val animationQueue: MutableList<EnqueuedAnimation> = mutableListOf()
     private var currentAnimation: CardMoveAnimation? = CardMoveAnimation(Card(CardSuit.A, CardSymbol.WIDGET_HALF), -10000f, -10000f, -10000f, -10000f, null, duration = 0.75f) // Short pause before dealing cards
+    private var gameWon: Boolean = false
     
     init {
         this.bounds.width.set(800f)
@@ -253,6 +255,10 @@ class SolitaireGame : ActionablePane() {
     }
     
     private fun checkTableauAfterDrag() {
+        if (gameWon) {
+            return
+        }
+        
         // Flip over completed widgets in free cells
         for (freeCell in freeCells) {
             if (!freeCell.stack.flippedOver.get() && freeCell.stack.isWidgetSet()) {
@@ -266,6 +272,11 @@ class SolitaireGame : ActionablePane() {
         }
         
         // TODO check for game complete. All foundations and free cells completed
+        if ((freeCells + foundationZones).all { z -> z.stack.flippedOver.get() }) {
+            gameWon = true
+            GlobalStats.solitaireGamesWon.increment()
+            return
+        }
         
         // Possible animations for auto-placing into the foundation pile
         val zones = playerZones + freeCells

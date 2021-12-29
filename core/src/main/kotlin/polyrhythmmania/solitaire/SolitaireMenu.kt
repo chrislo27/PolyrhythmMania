@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
@@ -15,6 +16,8 @@ import polyrhythmmania.Localization
 import polyrhythmmania.screen.mainmenu.menu.MMMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
+import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.statistics.PlayTimeType
 
 
 class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -57,8 +60,11 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         gameParent.addChild(loadingLabel)
     }
     
-    private fun createGame(): SolitaireGame = SolitaireGame().apply {
-        this.doClipping.set(false)
+    private fun createGame(): SolitaireGame {
+        GlobalStats.solitaireGamesPlayed.increment()
+        return SolitaireGame().apply {
+            this.doClipping.set(false)
+        }
     }
     
     private fun addMenubarButtons() {
@@ -69,6 +75,16 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.popLastMenu()
                 }
             }
+            hbox += TextLabel(binding = {
+                Localization.getVar("solitaire.gamesWon", Var {
+                    listOf(GlobalStats.solitaireGamesWon.value.use())
+                }).use()
+            }, font = font).apply {
+                this.bounds.width.set(170f)
+                this.renderAlign.set(Align.center)
+                this.padding.set(Insets(0f, 0f, 4f, 4f))
+                this.setScaleXY(0.75f)
+            }
             hbox += createSmallButton(binding = { Localization.getVar("solitaire.newGame").use() }).apply {
                 this.bounds.width.set(150f)
                 this.setOnAction {
@@ -78,7 +94,6 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     gameParent.addChild(game)
                 }
             }
-
         }
     }
 
@@ -98,5 +113,7 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         
         super.renderSelf(originX, originY, batch)
+        
+        GlobalStats.updateModePlayTime(PlayTimeType.SOLITAIRE)
     }
 }

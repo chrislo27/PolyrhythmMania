@@ -57,6 +57,10 @@ object GlobalStats : Stats() {
      * Total time playing assemble extra mode.
      */
     val assemblePlayTime: Stat = register(Stat("assemblePlayTime", DurationStatFormatter.DEFAULT))
+    /**
+     * Total time playing solitaire extra mode.
+     */
+    val solitairePlayTime: Stat = register(Stat("solitairePlayTime", DurationStatFormatter.DEFAULT))
 
     
     
@@ -250,6 +254,15 @@ object GlobalStats : Stats() {
      */
     val rodsDroppedAssemble: Stat = register(Stat("rodsDroppedAssemble", LocalizedStatFormatter.DEFAULT))
     
+    /**
+     * Total number of solitaire games played.
+     */
+    val solitaireGamesPlayed: Stat = register(Stat("solitaireGamesPlayed", LocalizedStatFormatter.DEFAULT))
+    /**
+     * Total number of games won in solitaire.
+     */
+    val solitaireGamesWon: Stat = register(Stat("solitaireGamesWon", LocalizedStatFormatter.DEFAULT))
+    
     
     // Accumulators for play time --------------------------------------------------------------------------------------
     
@@ -260,6 +273,7 @@ object GlobalStats : Stats() {
     private val dailyChallengePlayTimeAccumulator: TimeAccumulator = TimeAccumulator(dailyChallengePlayTime)
     private val dunkPlayTimeAccumulator: TimeAccumulator = TimeAccumulator(dunkPlayTime)
     private val assemblePlayTimeAccumulator: TimeAccumulator = TimeAccumulator(assemblePlayTime)
+    private val solitairePlayTimeAccumulator: TimeAccumulator = TimeAccumulator(solitairePlayTime)
 
     // -----------------------------------------------------------------------------------------------------------------
     
@@ -290,6 +304,7 @@ object GlobalStats : Stats() {
             PlayTimeType.DAILY_CHALLENGE -> dailyChallengePlayTimeAccumulator
             PlayTimeType.DUNK -> dunkPlayTimeAccumulator
             PlayTimeType.ASSEMBLE -> assemblePlayTimeAccumulator
+            PlayTimeType.SOLITAIRE -> solitairePlayTimeAccumulator
         }
         acc.update()
     }
