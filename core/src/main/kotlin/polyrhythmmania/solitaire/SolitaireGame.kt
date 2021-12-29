@@ -107,7 +107,7 @@ class SolitaireGame : ActionablePane() {
         var currentY: Float = fromY
     }
     
-    inner class EnqueuedAnimation(val card: Card, val from: CardZone, val to: CardZone, val duration: Float = 0.2f)
+    inner class EnqueuedAnimation(val card: Card, val from: CardZone, val to: CardZone, val duration: Float)
 
     private val lastMouseAbsolute: Vector2 = Vector2()
     private val lastMouseRelative: Vector2 = Vector2()
@@ -410,7 +410,7 @@ class SolitaireGame : ActionablePane() {
         return null
     }
     
-    private fun enqueueAnimation(card: Card, fromZone: CardZone, toZone: CardZone, duration: Float = 0.2f) {
+    private fun enqueueAnimation(card: Card, fromZone: CardZone, toZone: CardZone, duration: Float = 0.25f) {
         animationQueue += EnqueuedAnimation(card, fromZone, toZone, duration)
     }
 
