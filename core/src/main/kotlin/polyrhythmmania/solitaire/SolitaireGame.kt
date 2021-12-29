@@ -1,9 +1,11 @@
 package polyrhythmmania.solitaire
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
@@ -11,24 +13,26 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.ui.*
 import paintbox.util.ColorStack
-import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
 import polyrhythmmania.PRManiaGame
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sqrt
 
 
 class SolitaireGame : ActionablePane() {
     
     data class ZoneTarget(val zone: CardZone, val index: Int, val offsetX: Float, val offsetY: Float)
     
-    inner class CardZone(initX: Float, initY: Float, val maxCapacity: Int, val canDragFrom: Boolean) {
+    inner class CardZone(initX: Float, initY: Float, val maxCapacity: Int, val canDragFrom: Boolean,
+                         val showOutline: Boolean = true) {
         
         val x: FloatVar = FloatVar(initX)
         val y: FloatVar = FloatVar(initY)
         val stack: CardStack = CardStack(mutableListOf())
+        var dontStackDown: Boolean = false
+        val stackOffset: Float
+            get() = if (dontStackDown || stack.flippedOver.get()) cardStackOffsetFlipped else cardStackOffset
         
         init {
             stack.x.bind { x.use() }
@@ -95,6 +99,15 @@ class SolitaireGame : ActionablePane() {
             draggingStack.y.set(lastMouseRelative.y - offset.y)
         }
     }
+    
+    inner class CardMoveAnimation(val card: Card, val fromX: Float, val fromY: Float, val toX: Float, val toY: Float,
+                                  val targetZone: CardZone?, val duration: Float) {
+        var secondsElapsed: Float = 0f
+        var currentX: Float = fromX
+        var currentY: Float = fromY
+    }
+    
+    inner class EnqueuedAnimation(val card: Card, val from: CardZone, val to: CardZone, val duration: Float = 0.2f)
 
     private val lastMouseAbsolute: Vector2 = Vector2()
     private val lastMouseRelative: Vector2 = Vector2()
@@ -102,8 +115,9 @@ class SolitaireGame : ActionablePane() {
     val cardWidth: Float = 64f
     val cardHeight: Float = 80f
     val cardStackOffset: Float = 20f
+    val cardStackOffsetFlipped: Float = -0.5f
     
-    val inputsEnabled: BooleanVar = BooleanVar(true)
+    val inputsEnabled: BooleanVar = BooleanVar(false)
     
     val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled()
     
@@ -115,6 +129,9 @@ class SolitaireGame : ActionablePane() {
     private val placeableCardZones: List<CardZone>
     private val allCardZones: List<CardZone>
     private val dragInfo: DragInfo = DragInfo()
+    
+    private val animationQueue: MutableList<EnqueuedAnimation> = mutableListOf()
+    private var currentAnimation: CardMoveAnimation? = CardMoveAnimation(Card(CardSuit.A, CardSymbol.WIDGET_HALF), -10000f, -10000f, -10000f, -10000f, null, duration = 0.75f) // Short pause before dealing cards
     
     init {
         this.bounds.width.set(800f)
@@ -128,7 +145,6 @@ class SolitaireGame : ActionablePane() {
                 CardZone((1 + zoneSpacingX) * 0, 0f, 1, true),
                 CardZone((1 + zoneSpacingX) * 1, 0f, 1, true),
                 CardZone((1 + zoneSpacingX) * 2, 0f, 1, true),
-                CardZone((1 + zoneSpacingX) * 3, 0f, 1, true),
         )
         playerZones = listOf(
                 CardZone((1 + zoneSpacingX) * 0, (1 + zoneSpacingY), 999, true),
@@ -136,16 +152,19 @@ class SolitaireGame : ActionablePane() {
                 CardZone((1 + zoneSpacingX) * 2, (1 + zoneSpacingY), 999, true),
                 CardZone((1 + zoneSpacingX) * 3, (1 + zoneSpacingY), 999, true),
                 CardZone((1 + zoneSpacingX) * 4, (1 + zoneSpacingY), 999, true),
-                CardZone((1 + zoneSpacingX) * 5, (1 + zoneSpacingY), 999, true),
+//                CardZone((1 + zoneSpacingX) * 5, (1 + zoneSpacingY), 999, true),
         )
-        dealZone = CardZone((1 + zoneSpacingX) * 4.5f, 0f, 1, false)
+        dealZone = CardZone((1 + zoneSpacingX) * 4, 0f, 1, false, showOutline = false).apply { 
+            this.stack.flippedOver.set(true)
+        }
         foundationZones = mutableListOf(
-                CardZone((1 + zoneSpacingX) * 6.5f, 0f, 7, false),
-                CardZone((1 + zoneSpacingX) * 6.5f, 0f, 7, false),
-                CardZone((1 + zoneSpacingX) * 6.5f, 0f, 7, false),
+                CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, 7, false),
+                CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, 7, false),
+                CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, 7, false),
         ).apply {
             val totalHeight = this.size * 1 + (this.size - 1) * zoneSpacingY
             this.forEachIndexed { index, zone -> 
+                zone.dontStackDown = true
                 zone.y.set((5f - totalHeight) / 2 + index * (1 + zoneSpacingY))
             }
         }
@@ -187,11 +206,9 @@ class SolitaireGame : ActionablePane() {
     }
     
     init {
-        // FIXME REMOVE
-        playerZones.forEachIndexed { index, zone ->
-            zone.stack.cardList += deck[0 + index * 3]
-            zone.stack.cardList += deck[1 + index * 3]
-            zone.stack.cardList += deck[2 + index * 3]
+        dealZone.stack.cardList.addAll(deck)
+        dealZone.stack.cardList.forEachIndexed { index, card -> 
+            enqueueAnimation(card, dealZone, playerZones[index % playerZones.size], duration = 0.1f)
         }
     }
     
@@ -202,7 +219,7 @@ class SolitaireGame : ActionablePane() {
                     if (!dragInfo.isDragging()) {
                         // Check if clicking on any of the zones
                         val selected = getSelectedCardIndex()
-                        if (selected != null && selected.zone.canDragFrom) {
+                        if (selected != null && selected.zone.canDragFrom && !selected.zone.stack.flippedOver.get()) {
                             dragInfo.startDrag(selected)
                         }
                     }
@@ -236,9 +253,48 @@ class SolitaireGame : ActionablePane() {
     }
     
     private fun checkTableauAfterDrag() {
-        inputsEnabled.set(false)
+        // Flip over completed widgets in free cells
+        for (freeCell in freeCells) {
+            if (!freeCell.stack.flippedOver.get() && freeCell.stack.isWidgetSet()) {
+                freeCell.stack.flippedOver.set(true)
+            }
+        }
+        for (foundation in foundationZones) {
+            if (!foundation.stack.flippedOver.get() && foundation.stack.cardList.size == foundation.maxCapacity) {
+                foundation.stack.flippedOver.set(true)
+            }
+        }
         
-        inputsEnabled.set(true)
+        // TODO check for game complete. All foundations and free cells completed
+        
+        // Possible animations for auto-placing into the foundation pile
+        val zones = playerZones + freeCells
+        for (zone in zones) {
+            // Check if last item in the zone can be put in the foundation pile
+            // Must not be movable to any other zone AND other cards cannot be played on top of it
+            if (zone.canDragFrom && zone.stack.cardList.isNotEmpty()) {
+                val tail = zone.stack.cardList.last()
+//                val canBePlacedElsewhere = (playerZones - zone).any { pz ->
+//                    pz.stack.cardList.isNotEmpty() && checkStackingRules(listOfNotNull(pz.stack.cardList.lastOrNull()) + tail)
+//                }
+                val canBePlacedOnTopOf = (zones - zone).any { pz ->
+                    pz.stack.cardList.isNotEmpty() && checkStackingRules(listOf(tail) + pz.stack.cardList.last())
+                }
+                val targetFoundation = foundationZones.firstOrNull {
+                    if (tail.symbol.scaleOrder == 0) {
+                        it.stack.cardList.isEmpty()
+                    } else {
+                        val lastInFoundation = it.stack.cardList.lastOrNull()
+                        lastInFoundation != null && lastInFoundation.suit == tail.suit && lastInFoundation.symbol.scaleOrder == tail.symbol.scaleOrder - 1
+                    }
+                }
+                if (!tail.symbol.isWidgetLike() && /*!canBePlacedElsewhere &&*/ !canBePlacedOnTopOf && targetFoundation != null) {
+                    inputsEnabled.set(false)
+                    enqueueAnimation(tail, zone, targetFoundation)
+                    break
+                }
+            }
+        }
     }
     
     fun checkStackingRules(stack: List<Card>): Boolean {
@@ -246,14 +302,14 @@ class SolitaireGame : ActionablePane() {
             if (index > 0) {
                 val prevCard = stack[index - 1]
                 
-                if (prevCard.suit == CardSuit.WIDGET) {
-                    // Only alternating-symbol widgets can be here
-                    if (!(card.suit == CardSuit.WIDGET && card.symbol != prevCard.symbol)) {
+                if (prevCard.symbol.isWidgetLike()) {
+                    // Only alternating-symbol widgets can be here, with same suit
+                    if (!(card.symbol.isWidgetLike() && card.symbol != prevCard.symbol && prevCard.suit == card.suit)) {
                         return false
                     }
                 } else {
-                    // Non-WIDGET cards: must be alternating suit and directly one up in ASCENDING scale order
-                    if (!(prevCard.suit != card.suit && card.suit != CardSuit.WIDGET && prevCard.symbol.scaleOrder + 1 == card.symbol.scaleOrder)) {
+                    // Non-WIDGET cards: must be alternating suit and directly one up in DESCENDING scale order
+                    if (!(prevCard.suit != card.suit && !card.symbol.isWidgetLike() && prevCard.symbol.scaleOrder - 1 == card.symbol.scaleOrder)) {
                         return false
                     }
                 }
@@ -263,12 +319,46 @@ class SolitaireGame : ActionablePane() {
     }
     
     private fun canPlaceDragOn(targetZone: CardZone): Boolean {
-        val dragStack = dragInfo.draggingStack
-        if (dragStack.cardList.size + targetZone.stack.cardList.size > targetZone.maxCapacity) {
+        // Can't place if flipped over
+        if (targetZone.stack.flippedOver.get()) {
             return false
         }
         
-        return checkStackingRules(listOfNotNull(targetZone.stack.cardList.lastOrNull()) + dragStack.cardList)
+        val dragStack = dragInfo.draggingStack
+        val dragStackList = dragStack.cardList
+        
+        // Special exception when dragging a widget set to a free cell
+        if (dragStackList.size == 3 && targetZone in freeCells && targetZone.stack.cardList.isEmpty()) {
+            if (dragStack.isWidgetSet()) {
+                return true
+            }
+        }
+        
+        // Foundation pile check
+        if (targetZone in foundationZones && dragStackList.size == 1) {
+            val dragItem = dragStackList.first()
+            if (targetZone.stack.cardList.isEmpty()) {
+                // Can only drag to an empty one if the dragItem has scaleOrder = 0 and if that suit isn't already in another foundation
+                if (!(dragItem.symbol.scaleOrder == 0 && foundationZones.none { z -> z.stack.cardList.firstOrNull()?.suit == dragItem.suit })) {
+                    return false
+                }
+            } else {
+                val lastInTargetZone = targetZone.stack.cardList.last()
+                return dragItem.suit == lastInTargetZone.suit && lastInTargetZone.symbol.scaleOrder == dragItem.symbol.scaleOrder - 1 
+            }
+        }
+        
+        // Can't place if exceeds capacity
+        if (dragStackList.size + targetZone.stack.cardList.size > targetZone.maxCapacity) {
+            return false
+        }
+        
+        return checkStackingRules(listOfNotNull(targetZone.stack.cardList.lastOrNull()) + dragStackList)
+    }
+    
+    private fun CardStack.isWidgetSet(): Boolean {
+        return this.cardList.size == 3 && this.cardList[0].symbol == CardSymbol.WIDGET_HALF &&
+                this.cardList[1].symbol == CardSymbol.ROD && this.cardList[2].symbol == CardSymbol.WIDGET_HALF
     }
     
     private fun getNearestOverlappingDragZone(): CardZone? {
@@ -282,7 +372,7 @@ class SolitaireGame : ActionablePane() {
         val dragRect = Rectangle(dragX, dragY, dragW, dragH)
 
         for (zone in placeableCardZones) {
-            val zoneRect = Rectangle(zone.x.get(), zone.y.get(), cardWidth, cardHeight + (zone.maxCapacity - 1) * cardStackOffset)
+            val zoneRect = Rectangle(zone.x.get(), zone.y.get(), cardWidth, cardHeight + (zone.maxCapacity - 1) * zone.stackOffset)
             if (!dragRect.overlaps(zoneRect)) continue
             
             val minX = max(dragRect.x, zoneRect.x)
@@ -291,7 +381,7 @@ class SolitaireGame : ActionablePane() {
             val maxY = min(dragRect.maxY, zoneRect.maxY)
             val overlap = Rectangle(minX, minY, maxX - minX, maxY - minY)
             val area = overlap.area()
-
+            
             if (area > mostArea) {
                 mostArea = area
                 nearest = zone
@@ -308,6 +398,7 @@ class SolitaireGame : ActionablePane() {
             if (cardList.isEmpty()) continue
 
             // Height of the zone is cardHeight + (n - 1) * cardStackOffset 
+            val cardStackOffset = zone.stackOffset
             val cardHeightMinusOffset = cardHeight - cardStackOffset
             if (lastMouseRelative.x in zone.x.get()..(zone.x.get() + cardWidth) &&
                     lastMouseRelative.y in zone.y.get()..(zone.y.get() + (cardList.size * cardStackOffset) + cardHeightMinusOffset)) {
@@ -318,8 +409,50 @@ class SolitaireGame : ActionablePane() {
         
         return null
     }
+    
+    private fun enqueueAnimation(card: Card, fromZone: CardZone, toZone: CardZone, duration: Float = 0.2f) {
+        animationQueue += EnqueuedAnimation(card, fromZone, toZone, duration)
+    }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        // Animations
+        val currentAnimation = this.currentAnimation
+        if (currentAnimation == null) {
+            if (animationQueue.isNotEmpty()) {
+                val next = animationQueue.removeFirst()
+                val fromCardList = next.from.stack.cardList
+                this.currentAnimation = CardMoveAnimation(next.card,
+                        next.from.x.get(), next.from.y.get() + (fromCardList.size) * next.from.stackOffset,
+                        next.to.x.get(), next.to.y.get() + (next.to.stack.cardList.size) * next.to.stackOffset, next.to,
+                        next.duration)
+                val index = fromCardList.lastIndexOf(next.card)
+                if (index >= 0) {
+                    fromCardList.removeAt(index)
+                }
+            }
+        } else {
+            currentAnimation.secondsElapsed = (currentAnimation.secondsElapsed + Gdx.graphics.deltaTime).coerceIn(0f, currentAnimation.duration.coerceAtLeast(0.001f))
+            val progress = if (currentAnimation.duration <= 0f) 1f else (currentAnimation.secondsElapsed / currentAnimation.duration)
+            val interpolation = Interpolation.smoother
+            currentAnimation.currentX = interpolation.apply(currentAnimation.fromX, currentAnimation.toX, progress)
+            currentAnimation.currentY = interpolation.apply(currentAnimation.fromY, currentAnimation.toY, progress)
+            
+            if (progress >= 1f) {
+                this.currentAnimation = null
+                
+                // Add to that zone
+                if (currentAnimation.targetZone != null) {
+                    currentAnimation.targetZone.stack.cardList += currentAnimation.card
+                }
+                
+                
+                if (animationQueue.isEmpty()) {
+                    checkTableauAfterDrag()
+                    inputsEnabled.set(true)
+                }
+            }
+        }
+        
         val renderBounds = this.paddingZone
         val x = renderBounds.x.get() + originX
         val y = originY - renderBounds.y.get()
@@ -337,26 +470,31 @@ class SolitaireGame : ActionablePane() {
         val paintboxFont = PRManiaGame.instance.fontMainMenuMain
         val bmFont = paintboxFont.begin()
         bmFont.scaleMul(0.75f)
-        
-        allCardZones.forEach { zone ->
+
+        for (zone in allCardZones) {
+            if (!zone.showOutline) continue
             val cs = zone.stack
             val renderX = x + cs.x.get()
             val renderY = y - cs.y.get()
-            
+
             batch.setColor(1f, 1f, 1f, 0.2f)
             batch.drawRect(renderX, renderY - cardHeight, cardWidth, cardHeight, 4f)
         }
         
         batch.color = tmpColor
-        allCardZones.forEach { zone ->
+        for (zone in allCardZones) {
             val cs = zone.stack
             val renderX = x + cs.x.get()
             val renderY = y - cs.y.get()
-            
-            renderCardStack(renderX, renderY, batch, cs, bmFont)
+
+            renderCardStack(renderX, renderY, batch, cs, zone.stackOffset, bmFont)
         }
         val dragStack = dragInfo.draggingStack
-        renderCardStack(x + dragStack.x.get(), y - dragStack.y.get(), batch, dragStack, bmFont)
+        renderCardStack(x + dragStack.x.get(), y - dragStack.y.get(), batch, dragStack, cardStackOffset, bmFont)
+        
+        if (currentAnimation != null) {
+            renderCard(x + currentAnimation.currentX, y - currentAnimation.currentY, batch, currentAnimation.card, bmFont)
+        }
         
         paintboxFont.end()
 
@@ -364,22 +502,47 @@ class SolitaireGame : ActionablePane() {
         batch.packedColor = lastPackedColor
     }
     
-    private fun renderCardStack(x: Float, y: Float, batch: SpriteBatch, cardStack: CardStack, font: BitmapFont) {
-        val lastPackedColor = batch.packedColor
-        cardStack.cardList.forEachIndexed { index, card ->
-            val cw = cardWidth
-            val ch = cardHeight
-            val grey = 1f - (index * 0.1f)
-            val renderX = x
-            val renderY = (y - ch) - index * cardStackOffset
-            batch.setColor(1f, grey, grey, 1f)
-            batch.fillRect(renderX, renderY, cw, ch)
-            batch.setColor(1f, grey * 0.5f, grey * 0.5f, 0.75f)
-            batch.drawRect(renderX, renderY, cw, ch, 4f)
-            
-            font.setColor(card.suit.color)
-            font.drawCompressed(batch, "${card.symbol}", renderX + 8f, (renderY + ch) - 8f, cardWidth - 8f * 2, Align.left)
+    private fun renderCardStack(x: Float, y: Float, batch: SpriteBatch, cardStack: CardStack, stackOffset: Float, font: BitmapFont) {
+        if (cardStack.flippedOver.get()) {
+            val lastPackedColor = batch.packedColor
+
+            repeat(cardStack.cardList.size) {
+                val cw = cardWidth
+                val ch = cardHeight
+                val grey = 1f
+                val renderX = x
+                val renderY = (y - ch) - it * stackOffset
+                batch.setColor(1f, grey, grey, 1f)
+                batch.fillRect(renderX, renderY, cw, ch)
+                batch.setColor(grey * 0.5f, 1f, grey * 0.5f, 0.75f)
+                batch.drawRect(renderX, renderY, cw, ch, 4f)
+            }
+
+            batch.packedColor = lastPackedColor
+        } else {
+            cardStack.cardList.forEachIndexed { index, card ->
+                renderCard(x, y - index * stackOffset, batch, card, font)
+            }
         }
+    }
+    
+    private fun renderCard(x: Float, y: Float, batch: SpriteBatch, card: Card, font: BitmapFont) {
+        val lastPackedColor = batch.packedColor
+
+        val cw = cardWidth
+        val ch = cardHeight
+        val grey = 1f
+        val renderX = x
+        val renderY = (y - ch)
+        batch.setColor(1f, grey, grey, 1f)
+        batch.fillRect(renderX, renderY, cw, ch)
+        batch.setColor(1f, grey * 0.5f, grey * 0.5f, 0.75f)
+        batch.drawRect(renderX, renderY, cw, ch, 4f)
+
+        font.color = card.suit.color
+        font.drawCompressed(batch, card.symbol.textSymbol, renderX + 6f, (renderY + ch) - 6f, cardWidth - 6f * 2, Align.left)
+        font.drawCompressed(batch, card.symbol.textSymbol, renderX + 6f, (renderY + ch) - cardHeight + 6f + font.capHeight, cardWidth - 6f * 2, Align.right)
+        
         batch.packedColor = lastPackedColor
     }
 }

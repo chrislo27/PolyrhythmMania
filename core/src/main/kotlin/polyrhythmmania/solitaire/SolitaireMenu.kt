@@ -2,10 +2,10 @@ package polyrhythmmania.solitaire
 
 import com.badlogic.gdx.graphics.Color
 import paintbox.ui.Anchor
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
-import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.set
 import polyrhythmmania.Localization
 import polyrhythmmania.screen.mainmenu.menu.MMMenu
@@ -15,7 +15,8 @@ import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 
 class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
-    val game: SolitaireGame
+    private val gameParent: UIElement
+    private var game: SolitaireGame
 
     init {
         this.setSize(MMMenu.WIDTH_LARGE, adjust = 16f)
@@ -39,13 +40,10 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.doClipping.set(true)
         }
         contentPane.addChild(rect)
+        gameParent = rect
 
-        game = SolitaireGame().apply { 
-            this.doClipping.set(false)
-        }
-        rect.addChild(game)
-        
-        
+        game = createGame()
+        gameParent.addChild(game)
         
 
         hbox.temporarilyDisableLayouts {
@@ -55,7 +53,20 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.popLastMenu()
                 }
             }
+            hbox += createSmallButton(binding = { Localization.getVar("solitaire.newGame").use() }).apply {
+                this.bounds.width.set(150f)
+                this.setOnAction {
+                    val oldGame = game
+                    gameParent.removeChild(oldGame)
+                    game = createGame()
+                    gameParent.addChild(game)
+                }
+            }
 
         }
+    }
+    
+    private fun createGame(): SolitaireGame = SolitaireGame().apply {
+        this.doClipping.set(false)
     }
 }
