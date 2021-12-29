@@ -33,7 +33,6 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.titleText.bind { Localization.getVar("solitaire.title").use() }
         this.contentPane.bounds.height.set(520f)
         this.showLogo.set(false)
-        this.deleteWhenPopped.set(true)
 
         hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)

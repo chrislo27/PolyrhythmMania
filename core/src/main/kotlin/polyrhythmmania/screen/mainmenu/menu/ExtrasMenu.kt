@@ -105,9 +105,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 Localization.getVar("mainMenu.extras.solitaire").use() 
             }.apply {
                 this.setOnAction {
-                    val menu = SolitaireMenu(menuCol)
-                    menuCol.addMenu(menu)
-                    menuCol.pushNextMenu(menu)
+                    menuCol.pushNextMenu(menuCol.solitaireMenu)
                     
                     val newIndicator = settings.newIndicatorExtrasSolitaire
                     if (newIndicator.value.get()) {
