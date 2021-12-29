@@ -257,6 +257,19 @@ object Achievements {
      * Triggered when a No Miss is achieved in Assemble.
      */
     val assembleNoMiss = register(Ordinary("assemble_no_miss", OBJECTIVE, EXTRAS, false))
+    
+    /**
+     * Triggered when Solitaire is won for the 1st time.
+     */
+    val solitaireWin1 = register(StatTriggered("solitaire_win_1", OBJECTIVE, EXTRAS, false, GlobalStats.solitaireGamesWon, 1))
+    /**
+     * Triggered when Solitaire is won for the 10th time.
+     */
+    val solitaireWin10 = register(StatTriggered("solitaire_win_10", OBJECTIVE, EXTRAS, false, GlobalStats.solitaireGamesWon, 10))
+    /**
+     * Triggered when Solitaire is won for the 50th time.
+     */
+    val solitaireWin50 = register(StatTriggered("solitaire_win_50", CHALLENGE, EXTRAS, false, GlobalStats.solitaireGamesWon, 50))
 
     
     // End of Category GENERAL
