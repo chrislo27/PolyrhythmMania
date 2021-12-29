@@ -10,13 +10,14 @@ import paintbox.packing.Packable
 import paintbox.packing.PackedSheet
 import paintbox.packing.PackedSheetLoader
 import paintbox.registry.AssetRegistry
+import paintbox.registry.IAssetLoader
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsMusicLoader
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.BeadsSoundLoader
 
 
-class InitialAssetLoader : AssetRegistry.IAssetLoader {
+class InitialAssetLoader : IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
         manager.setLoader(BeadsSound::class.java, BeadsSoundLoader(InternalFileHandleResolver()))
         manager.setLoader(BeadsMusic::class.java, BeadsMusicLoader(InternalFileHandleResolver()))
