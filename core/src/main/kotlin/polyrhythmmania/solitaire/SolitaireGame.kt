@@ -74,6 +74,10 @@ class SolitaireGame : ActionablePane() {
             newZone.stack.cardList += myList
             oldZone = null
             
+            if (myList.size == 1 && newZone in foundationZones) {
+                playSound("sfx_base_note", pitch = Semitones.getALPitch(myList.last().symbol.semitone))
+            }
+            
             checkTableauAfterDrag()
         }
         
@@ -103,14 +107,16 @@ class SolitaireGame : ActionablePane() {
         }
     }
     
-    inner class CardMoveAnimation(val card: Card, val fromX: Float, val fromY: Float, val toX: Float, val toY: Float,
-                                  val targetZone: CardZone?, val duration: Float) {
+    inner class CardMoveAnimation(val card: Card, var fromX: Float, var fromY: Float, var toX: Float, var toY: Float,
+                                  val fromZone: CardZone?, val targetZone: CardZone?, val duration: Float) {
         var secondsElapsed: Float = 0f
         var currentX: Float = fromX
         var currentY: Float = fromY
+        var onComplete: () -> Unit = {}
     }
     
-    inner class EnqueuedAnimation(val card: Card, val from: CardZone, val to: CardZone, val duration: Float)
+    inner class EnqueuedAnimation(val card: Card, val from: CardZone, val to: CardZone, val duration: Float, val delay: Float,
+                                  var onComplete: () -> Unit)
 
     private val lastMouseAbsolute: Vector2 = Vector2()
     private val lastMouseRelative: Vector2 = Vector2()
@@ -134,7 +140,10 @@ class SolitaireGame : ActionablePane() {
     private val dragInfo: DragInfo = DragInfo()
     
     private val animationQueue: MutableList<EnqueuedAnimation> = mutableListOf()
-    private var currentAnimation: CardMoveAnimation? = CardMoveAnimation(Card(CardSuit.A, CardSymbol.WIDGET_HALF), -10000f, -10000f, -10000f, -10000f, null, duration = 0.75f) // Short pause before dealing cards
+    private var maxConcurrentAnimations: Int = 1
+    private var currentAnimations: List<CardMoveAnimation> = listOf(
+            CardMoveAnimation(Card(CardSuit.A, CardSymbol.WIDGET_HALF), -10000f, -10000f, -10000f, -10000f, null, null, duration = 0.75f) // Short pause before dealing cards
+    )
     private var gameWon: Boolean = false
     
     init {
@@ -278,7 +287,18 @@ class SolitaireGame : ActionablePane() {
         // Game complete check
         if ((freeCells + foundationZones).all { z -> z.stack.flippedOver.get() }) {
             gameWon = true
+            inputsEnabled.set(false)
             GlobalStats.solitaireGamesWon.increment()
+            // Falldown animation
+            maxConcurrentAnimations = Int.MAX_VALUE
+            val affectedZones = freeCells + foundationZones + playerZones
+            affectedZones.forEach { zone ->
+                val invisibleZone = CardZone(zone.x.get(), zone.y.get() + 6f * cardHeight, 999, false, showOutline = false)
+                val delayPer = 0.125f
+                zone.stack.cardList.asReversed().forEachIndexed { index, card ->
+                    enqueueAnimation(card, zone, invisibleZone, duration = 0.75f, delay = delayPer * index)
+                }
+            }
             return
         }
         
@@ -289,10 +309,7 @@ class SolitaireGame : ActionablePane() {
             // Must not be movable to any other zone AND other cards cannot be played on top of it
             if (zone.canDragFrom && zone.stack.cardList.isNotEmpty()) {
                 val tail = zone.stack.cardList.last()
-//                val canBePlacedElsewhere = (playerZones - zone).any { pz ->
-//                    pz.stack.cardList.isNotEmpty() && checkStackingRules(listOfNotNull(pz.stack.cardList.lastOrNull()) + tail)
-//                }
-                val canBePlacedOnTopOf = (zones - zone).any { pz ->
+                val canBePlacedOnTopOf = zone !in freeCells && (zones - zone).any { pz ->
                     pz.stack.cardList.isNotEmpty() && checkStackingRules(listOf(tail) + pz.stack.cardList.last())
                 }
                 val targetFoundation = foundationZones.firstOrNull {
@@ -303,10 +320,12 @@ class SolitaireGame : ActionablePane() {
                         lastInFoundation != null && lastInFoundation.suit == tail.suit && lastInFoundation.symbol.scaleOrder == tail.symbol.scaleOrder - 1
                     }
                 }
-                if (!tail.symbol.isWidgetLike() && /*!canBePlacedElsewhere &&*/ !canBePlacedOnTopOf && targetFoundation != null) {
+                if (!tail.symbol.isWidgetLike() && !canBePlacedOnTopOf && targetFoundation != null) {
                     inputsEnabled.set(false)
                     dragInfo.cancelDrag()
-                    enqueueAnimation(tail, zone, targetFoundation)
+                    enqueueAnimation(tail, zone, targetFoundation) {
+                        playSound("sfx_base_note", pitch = Semitones.getALPitch(tail.symbol.semitone))
+                    }
                     break
                 }
             }
@@ -426,45 +445,69 @@ class SolitaireGame : ActionablePane() {
         return null
     }
     
-    private fun enqueueAnimation(card: Card, fromZone: CardZone, toZone: CardZone, duration: Float = 0.25f) {
-        animationQueue += EnqueuedAnimation(card, fromZone, toZone, duration)
+    private fun enqueueAnimation(card: Card, fromZone: CardZone, toZone: CardZone, duration: Float = 0.25f, delay: Float = 0f, onComplete: () -> Unit = {}) {
+        animationQueue += EnqueuedAnimation(card, fromZone, toZone, duration, delay, onComplete)
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         // Animations
-        val currentAnimation = this.currentAnimation
-        if (currentAnimation == null) {
+        val currentAnimationList = this.currentAnimations
+        if (currentAnimationList.size < maxConcurrentAnimations) {
             if (animationQueue.isNotEmpty()) {
                 val next = animationQueue.removeFirst()
                 val fromCardList = next.from.stack.cardList
-                this.currentAnimation = CardMoveAnimation(next.card,
+                val newAnimation = CardMoveAnimation(next.card,
                         next.from.x.get(), next.from.y.get() + (fromCardList.size) * next.from.stackOffset,
-                        next.to.x.get(), next.to.y.get() + (next.to.stack.cardList.size) * next.to.stackOffset, next.to,
-                        next.duration)
-                val index = fromCardList.lastIndexOf(next.card)
-                if (index >= 0) {
-                    fromCardList.removeAt(index)
+                        next.to.x.get(), next.to.y.get() + (next.to.stack.cardList.size) * next.to.stackOffset,
+                        next.from, next.to, next.duration).apply {
+                    this.onComplete = next.onComplete
+                    this.secondsElapsed = -next.delay
+                }
+                this.currentAnimations += newAnimation
+            }
+        }
+
+        this.currentAnimations.forEach { currentAnimation ->
+            val oldSeconds = currentAnimation.secondsElapsed
+            currentAnimation.secondsElapsed = (currentAnimation.secondsElapsed + Gdx.graphics.deltaTime)
+            if (oldSeconds <= 0f && currentAnimation.secondsElapsed > 0) {
+                if (currentAnimation.targetZone != null) {
+                    currentAnimation.toX = currentAnimation.targetZone.x.get()
+                    currentAnimation.toY = currentAnimation.targetZone.y.get() + (currentAnimation.targetZone.stack.cardList.size) * currentAnimation.targetZone.stackOffset
+                }
+                
+                val fromCardList = currentAnimation.fromZone?.stack?.cardList
+                if (fromCardList != null) {
+                    currentAnimation.fromX = currentAnimation.fromZone.x.get()
+                    currentAnimation.fromY = currentAnimation.fromZone.y.get() + (fromCardList.size - 1) * currentAnimation.fromZone.stackOffset
+                    
+                    val index = fromCardList.lastIndexOf(currentAnimation.card)
+                    if (index >= 0) {
+                        fromCardList.removeAt(index)
+                    }
                 }
             }
-        } else {
-            currentAnimation.secondsElapsed = (currentAnimation.secondsElapsed + Gdx.graphics.deltaTime).coerceIn(0f, currentAnimation.duration.coerceAtLeast(0.001f))
-            val progress = if (currentAnimation.duration <= 0f) 1f else (currentAnimation.secondsElapsed / currentAnimation.duration)
+
+            val progress = if (currentAnimation.duration <= 0f) 1f else (currentAnimation.secondsElapsed / currentAnimation.duration).coerceIn(0f, 1f)
             val interpolation = Interpolation.linear
             currentAnimation.currentX = interpolation.apply(currentAnimation.fromX, currentAnimation.toX, progress)
             currentAnimation.currentY = interpolation.apply(currentAnimation.fromY, currentAnimation.toY, progress)
-            
+
             if (progress >= 1f) {
-                this.currentAnimation = null
-                
+                this.currentAnimations -= currentAnimation
+
                 // Add to that zone
                 if (currentAnimation.targetZone != null) {
                     currentAnimation.targetZone.stack.cardList += currentAnimation.card
                 }
-                
-                
+
+                currentAnimation.onComplete()
+
                 if (animationQueue.isEmpty()) {
                     checkTableauAfterDrag()
-                    inputsEnabled.set(true)
+                    if (!gameWon) {
+                        inputsEnabled.set(true)
+                    }
                 }
             }
         }
@@ -508,8 +551,11 @@ class SolitaireGame : ActionablePane() {
         val dragStack = dragInfo.draggingStack
         renderCardStack(x + dragStack.x.get(), y - dragStack.y.get(), batch, dragStack, cardStackOffset, bmFont)
         
-        if (currentAnimation != null) {
-            renderCard(x + currentAnimation.currentX, y - currentAnimation.currentY, batch, currentAnimation.card, bmFont)
+        if (currentAnimations.isNotEmpty()) {
+            for (it in currentAnimations.asReversed()) {
+                if (it.secondsElapsed < 0f) continue
+                renderCard(x + it.currentX, y - it.currentY, batch, it.card, bmFont)
+            }
         }
         
         paintboxFont.end()
