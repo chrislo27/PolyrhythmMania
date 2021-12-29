@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import paintbox.binding.BooleanVar
+import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -16,6 +18,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.Settings
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.screen.mainmenu.bg.BgType
@@ -28,6 +31,11 @@ import polyrhythmmania.ui.PRManiaSkins
 
 
 class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+    
+    private val settings: Settings = main.settings
+    val anyNewIndicators: ReadOnlyBooleanVar = BooleanVar {
+        settings.newIndicatorExtrasAssemble.value.use() || settings.newIndicatorExtrasSolitaire.value.use()
+    }
 
     init {
         this.setSize(MMMenu.WIDTH_SMALL)
@@ -79,25 +87,33 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             
             // Remember to update DataSettingsMenu to reset high scores
             vbox += createSidemodeLongButton("mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip",
-                    Var { listOf(use(main.settings.endlessDunkHighScore)) })) { main, _ ->
+                    Var { listOf(use(settings.endlessDunkHighScore)) })) { main, _ ->
                 DiscordCore.updateActivity(DefaultPresences.playingDunk())
                 mainMenu.backgroundType = BgType.DUNK
                 GlobalStats.timesPlayedDunk.increment()
-                DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
+                DunkMode(main, EndlessModeScore(settings.endlessDunkHighScore))
             }
             vbox += createSidemodeLongButton("mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
-                    Var { listOf(use(main.settings.sidemodeAssembleHighScore)) }), showResults = true,
-                    newIndicator = main.settings.newIndicatorExtrasAssemble) { main, _ ->
+                    Var { listOf(use(settings.sidemodeAssembleHighScore)) }), showResults = true,
+                    newIndicator = settings.newIndicatorExtrasAssemble) { main, _ ->
                 DiscordCore.updateActivity(DefaultPresences.playingAssemble())
                 mainMenu.backgroundType = BgType.ASSEMBLE
                 GlobalStats.timesPlayedAssemble.increment()
-                AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))
+                AssembleMode(main, EndlessModeScore(settings.sidemodeAssembleHighScore))
             }
-            vbox += createLongButton { Localization.getVar("mainMenu.extras.solitaire").use() }.apply {
+            vbox += createLongButtonWithNewIndicator(settings.newIndicatorExtrasSolitaire) {
+                Localization.getVar("mainMenu.extras.solitaire").use() 
+            }.apply {
                 this.setOnAction {
                     val menu = SolitaireMenu(menuCol)
                     menuCol.addMenu(menu)
                     menuCol.pushNextMenu(menu)
+                    
+                    val newIndicator = settings.newIndicatorExtrasSolitaire
+                    if (newIndicator.value.get()) {
+                        newIndicator.value.set(false)
+                        main.settings.persist()
+                    }
                 }
             }
 
