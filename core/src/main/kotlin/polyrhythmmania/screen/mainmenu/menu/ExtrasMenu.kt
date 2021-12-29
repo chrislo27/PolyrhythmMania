@@ -22,6 +22,7 @@ import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.sidemodes.AssembleMode
 import polyrhythmmania.sidemodes.DunkMode
 import polyrhythmmania.sidemodes.EndlessModeScore
+import polyrhythmmania.solitaire.SolitaireMenu
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 
@@ -65,6 +66,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Anchor.TopLeft.configure(this)
             this.spacing.set(0f)
             this.bindHeightToParent(-40f)
+            this.margin.set(Insets(0f, 0f, 0f, 4f))
         }
 
         vbox.temporarilyDisableLayouts {
@@ -91,11 +93,13 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 GlobalStats.timesPlayedAssemble.increment()
                 AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))
             }
-            
-//            vbox += createLongButton { """[font=thin]Future Spot for Side Mode #3[]""" }.apply {
-//                this.disabled.set(true)
-//                this.tooltipElement.set(createTooltip { "This NEW side mode will be developed for a future update if sufficient\ndevelopment costs are recovered — please consider donating\nto help with development costs! Donation link (goes to PayPal):\n[color=prmania_tooltip_keystroke scale=1]https://donate-to-polyrhythmmania.rhre.dev[]" })
-//            }
+            vbox += createLongButton { Localization.getVar("mainMenu.extras.solitaire").use() }.apply {
+                this.setOnAction {
+                    val menu = SolitaireMenu(menuCol)
+                    menuCol.addMenu(menu)
+                    menuCol.pushNextMenu(menu)
+                }
+            }
 
             vbox += separator()
             vbox += createLongButton { Localization.getVar("mainMenu.extras.ost").use() }.apply {
