@@ -1,9 +1,13 @@
 package polyrhythmmania.solitaire
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.Align
 import paintbox.ui.Anchor
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
+import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.gdxutils.set
@@ -15,8 +19,11 @@ import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 
 class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
+    private var loading: Boolean = true
+    private val loadingLabel: TextLabel
+    private val hbox: HBox
     private val gameParent: UIElement
-    private var game: SolitaireGame
+    private lateinit var game: SolitaireGame
 
     init {
         this.setSize(MMMenu.WIDTH_LARGE, adjust = 16f)
@@ -25,7 +32,7 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.showLogo.set(false)
         this.deleteWhenPopped.set(true)
 
-        val hbox = HBox().apply {
+        hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
             this.spacing.set(8f)
             this.padding.set(Insets(2f))
@@ -41,11 +48,20 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         contentPane.addChild(rect)
         gameParent = rect
-
-        game = createGame()
-        gameParent.addChild(game)
         
-
+        loadingLabel = TextLabel(binding = { Localization.getVar("solitaire.loading").use() }).apply { 
+            this.markup.set(this@SolitaireMenu.markup)
+            this.renderAlign.set(Align.center)
+            this.textColor.set(Color.WHITE.cpy())
+        }
+        gameParent.addChild(loadingLabel)
+    }
+    
+    private fun createGame(): SolitaireGame = SolitaireGame().apply {
+        this.doClipping.set(false)
+    }
+    
+    private fun addMenubarButtons() {
         hbox.temporarilyDisableLayouts {
             hbox += createSmallButton(binding = { Localization.getVar("common.close").use() }).apply {
                 this.bounds.width.set(100f)
@@ -65,8 +81,22 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         }
     }
-    
-    private fun createGame(): SolitaireGame = SolitaireGame().apply {
-        this.doClipping.set(false)
+
+    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        if (loading) {
+            val progress = SolitaireAssets.load(Gdx.graphics.deltaTime)
+            if (progress >= 1f) {
+                loading = false
+
+                loadingLabel.visible.set(false)
+                gameParent.removeChild(loadingLabel)
+
+                game = createGame()
+                gameParent.addChild(game)
+                addMenubarButtons()
+            }
+        }
+        
+        super.renderSelf(originX, originY, batch)
     }
 }
