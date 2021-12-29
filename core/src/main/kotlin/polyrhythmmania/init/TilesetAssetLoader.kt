@@ -7,9 +7,10 @@ import paintbox.packing.Packable
 import paintbox.packing.PackedSheet
 import paintbox.packing.PackedSheetLoader
 import paintbox.registry.AssetRegistry
+import paintbox.registry.IAssetLoader
 
 
-class TilesetAssetLoader : AssetRegistry.IAssetLoader {
+class TilesetAssetLoader : IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
         fun linearTexture(): TextureLoader.TextureParameter = TextureLoader.TextureParameter().apply {
             this.magFilter = Texture.TextureFilter.Linear
