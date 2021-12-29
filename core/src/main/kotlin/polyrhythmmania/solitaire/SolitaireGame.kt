@@ -2,6 +2,7 @@ package polyrhythmmania.solitaire
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -16,6 +17,7 @@ import paintbox.util.ColorStack
 import paintbox.util.gdxutils.*
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.util.Semitones
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -263,15 +265,17 @@ class SolitaireGame : ActionablePane() {
         for (freeCell in freeCells) {
             if (!freeCell.stack.flippedOver.get() && freeCell.stack.isWidgetSet()) {
                 freeCell.stack.flippedOver.set(true)
+                playSound("sfx_flick")
             }
         }
         for (foundation in foundationZones) {
             if (!foundation.stack.flippedOver.get() && foundation.stack.cardList.size == foundation.maxCapacity) {
                 foundation.stack.flippedOver.set(true)
+//                playSound("sfx_base_note", pitch = Semitones.getALPitch(12))
             }
         }
         
-        // TODO check for game complete. All foundations and free cells completed
+        // Game complete check
         if ((freeCells + foundationZones).all { z -> z.stack.flippedOver.get() }) {
             gameWon = true
             GlobalStats.solitaireGamesWon.increment()
@@ -301,6 +305,7 @@ class SolitaireGame : ActionablePane() {
                 }
                 if (!tail.symbol.isWidgetLike() && /*!canBePlacedElsewhere &&*/ !canBePlacedOnTopOf && targetFoundation != null) {
                     inputsEnabled.set(false)
+                    dragInfo.cancelDrag()
                     enqueueAnimation(tail, zone, targetFoundation)
                     break
                 }
@@ -444,7 +449,7 @@ class SolitaireGame : ActionablePane() {
         } else {
             currentAnimation.secondsElapsed = (currentAnimation.secondsElapsed + Gdx.graphics.deltaTime).coerceIn(0f, currentAnimation.duration.coerceAtLeast(0.001f))
             val progress = if (currentAnimation.duration <= 0f) 1f else (currentAnimation.secondsElapsed / currentAnimation.duration)
-            val interpolation = Interpolation.smoother
+            val interpolation = Interpolation.linear
             currentAnimation.currentX = interpolation.apply(currentAnimation.fromX, currentAnimation.toX, progress)
             currentAnimation.currentY = interpolation.apply(currentAnimation.fromY, currentAnimation.toY, progress)
             
@@ -555,5 +560,9 @@ class SolitaireGame : ActionablePane() {
         font.drawCompressed(batch, card.symbol.textSymbol, renderX + 6f, (renderY + ch) - cardHeight + 6f + font.capHeight, cardWidth - 6f * 2, Align.right)
         
         batch.packedColor = lastPackedColor
+    }
+    
+    private fun playSound(id: String, vol: Float = 1f, pitch: Float = 1f, pan: Float = 0f) {
+        PRManiaGame.instance.playMenuSfx(SolitaireAssets.get<Sound>(id), vol, pitch, pan)
     }
 }
