@@ -47,15 +47,21 @@ object Achievements {
     /**
      * Triggered after every Tutorial (I + II) has been completed.
      */
-    val playAllTutorials = register(Ordinary("play_all_tutorials", OBJECTIVE, GENERAL, false))
+    val playAllTutorials = register(Ordinary("play_all_tutorials", OBJECTIVE, GENERAL, false)).apply { 
+        this.overrideIconID = "new_grad"
+    }
     /**
      * Triggered after every Practice (PR1 + 2) has been completed with an OK or better.
      */
-    val playAllPractices = register(Ordinary("play_all_practices", OBJECTIVE, GENERAL, false))
+    val playAllPractices = register(Ordinary("play_all_practices", OBJECTIVE, GENERAL, false)).apply {
+        this.overrideIconID = "new_grad"
+    }
     /**
      * Triggered after every Practice (PR1 + 2) has been completed with a No Miss.
      */
-    val noMissAllPractices = register(Ordinary("no_miss_all_practices", OBJECTIVE, GENERAL, false))
+    val noMissAllPractices = register(Ordinary("no_miss_all_practices", OBJECTIVE, GENERAL, false)).apply {
+        this.overrideIconID = "new_grad_gold"
+    }
     /**
      * Triggered when a Perfect is earned in a level with at least 40 inputs.
      */
@@ -131,7 +137,9 @@ object Achievements {
     /**
      * Triggered when getting a score of at least 125 in Endless Mode, any settings.
      */
-    val endlessScore125 = register(ScoreThreshold("endless_score_125", CHALLENGE, ENDLESS_MODE, false, 125))
+    val endlessScore125 = register(ScoreThreshold("endless_score_125", CHALLENGE, ENDLESS_MODE, false, 125)).apply {
+        this.overrideIconID = "endless_gold"
+    }
     
     /**
      * Triggered when getting a score of at least 100 in Endless Mode with life regen disabled.
@@ -181,7 +189,9 @@ object Achievements {
     /**
      * Triggered when getting a score of at least 125 in Daily Challenge.
      */
-    val dailyScore125 = register(ScoreThreshold("daily_score_125", CHALLENGE, DAILY, false, 125))
+    val dailyScore125 = register(ScoreThreshold("daily_score_125", CHALLENGE, DAILY, false, 125)).apply {
+        this.overrideIconID = "daily_gold"
+    }
     /**
      * Triggered when Daily Challenge is played twice in the same play session.
      */
@@ -252,11 +262,15 @@ object Achievements {
     /**
      * Triggered when Assemble is played for the first time.
      */
-    val assemblePlayFirstTime = register(StatTriggered("assemble_play_first_time", STATISTICAL, EXTRAS, false, GlobalStats.timesPlayedAssemble, 1, showProgress = false))
+    val assemblePlayFirstTime = register(StatTriggered("assemble_play_first_time", STATISTICAL, EXTRAS, false, GlobalStats.timesPlayedAssemble, 1, showProgress = false)).apply {
+        this.overrideIconID = "assemble"
+    }
     /**
      * Triggered when a No Miss is achieved in Assemble.
      */
-    val assembleNoMiss = register(Ordinary("assemble_no_miss", OBJECTIVE, EXTRAS, false))
+    val assembleNoMiss = register(Ordinary("assemble_no_miss", OBJECTIVE, EXTRAS, false)).apply {
+        this.overrideIconID = "assemble_gold"
+    }
 
     
     // End of Category GENERAL

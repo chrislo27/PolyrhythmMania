@@ -124,14 +124,21 @@ class InitialAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("library_default_banner", "textures/mainmenu/default_banner.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("achievements_completed_mark", "textures/achievements/completed.png", linearTexture())
         AssetRegistry.loadAssetNoFile<PackedSheet>("achievements_icon", PackedSheetLoader.PackedSheetLoaderParam(listOf(
-                Packable("locked", "textures/achievements/locked.png"),
-                Packable("trophy1", "textures/achievements/trophy1.png"),
-                Packable("trophy2", "textures/achievements/trophy2.png"),
+                Packable("assemble", "textures/achievements/assemble.png"),
+                Packable("assemble_gold", "textures/achievements/assemble_gold.png"),
                 Packable("daily", "textures/achievements/daily.png"),
-                Packable("daily_calendar", "textures/achievements/daily_calendar.png"),
+                Packable("daily_gold", "textures/achievements/daily_gold.png"),
                 Packable("dunk", "textures/achievements/dunk.png"),
                 Packable("dunk_gold", "textures/achievements/dunk_gold.png"),
+                Packable("editor", "textures/achievements/editor.png"),
+                Packable("editor_gold", "textures/achievements/editor_gold.png"),
                 Packable("endless", "textures/achievements/endless.png"),
+                Packable("endless_gold", "textures/achievements/endless_gold.png"),
+                Packable("locked", "textures/achievements/locked.png"),
+                Packable("new_grad", "textures/achievements/new_grad.png"),
+                Packable("new_grad_gold", "textures/achievements/new_grad_gold.png"),
+                Packable("trophy1", "textures/achievements/trophy1.png"),
+                Packable("trophy2", "textures/achievements/trophy2.png"),
         ), PackedSheet.Config(padding = 2, maxSize = 512, duplicateBorder = false,
                 atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest)))
         
