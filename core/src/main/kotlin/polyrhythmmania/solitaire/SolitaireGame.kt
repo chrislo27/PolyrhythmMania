@@ -304,6 +304,7 @@ class SolitaireGame : ActionablePane() {
                     enqueueAnimation(card, zone, invisibleZone, duration = 0.75f, delay = delayPer * index)
                 }
             }
+            // TODO play a jingle to end
             return
         }
         
