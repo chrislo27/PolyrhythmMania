@@ -155,8 +155,14 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                     // Increment lives
                     engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_2"))
                     val endlessScore = engine.inputter.endlessScore
-                    val newLives = (endlessScore.lives.get() + 1).coerceIn(0, endlessScore.maxLives.get())
-                    endlessScore.lives.set(newLives)
+                    val currentLives = endlessScore.lives.get()
+                    val newLives = (currentLives + 1).coerceIn(0, endlessScore.maxLives.get())
+                    if (newLives > currentLives) {
+                        endlessScore.lives.set(newLives)
+                        if (engine.areStatisticsEnabled) {
+                            GlobalStats.livesGainedDunk.increment()
+                        }
+                    }
                 } else {
                     engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
                 }

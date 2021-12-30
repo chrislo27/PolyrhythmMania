@@ -22,6 +22,7 @@ import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.sidemodes.*
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.util.Semitones
@@ -260,7 +261,6 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                 engine.addEvent(EventRowBlockDespawn(engine, world.rowDpad, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))
             }
             
-            
             if (anyA || anyDpad) {
                 val awardScoreBeat = patternStart + patternDuration + 0.01f
                 engine.addEvent(EventConditionalOnRods(engine, awardScoreBeat,
@@ -272,6 +272,9 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                         if (!disableLifeRegen && newScore >= 20 && newScore % 10 == 0 && currentLives > 0 && currentLives < maxLives) {
                             engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_2"))
                             endlessScore.lives.set(currentLives + 1)
+                            if (engine.areStatisticsEnabled) {
+                                GlobalStats.livesGainedEndless.increment()
+                            }
                         } else {
                             engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_1"))
                         }

@@ -13,6 +13,7 @@ import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.input.*
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.entity.EntityInputIndicator
 import polyrhythmmania.world.entity.EntityPiston
@@ -257,7 +258,12 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
             if (lifeLostVar != null) {
                 if (!lifeLostVar.get()) {
                     lifeLostVar.set(true)
+                    val endlessScore = engine.inputter.endlessScore
+                    val oldLives = endlessScore.lives.get()
                     engine.inputter.triggerEndlessLifeLost()
+                    if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
+                        GlobalStats.livesLostEndless.increment()
+                    }
                 }
             }
         }

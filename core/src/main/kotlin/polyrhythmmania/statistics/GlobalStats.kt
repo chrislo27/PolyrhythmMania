@@ -227,6 +227,14 @@ object GlobalStats : Stats() {
      * Total number of rods exploded in regular Polyrhythm.
      */
     val rodsExplodedPolyrhythm: Stat = register(Stat("rodsExplodedPolyrhythm", LocalizedStatFormatter.DEFAULT))
+    /**
+     * Total number of lives lost in Endless/Daily Challenge.
+     */
+    val livesLostEndless: Stat = register(Stat("livesLostEndless", LocalizedStatFormatter.DEFAULT))
+    /**
+     * Total number of lives gained in Endless/Daily Challenge.
+     */
+    val livesGainedEndless: Stat = register(Stat("livesGainedEndless", LocalizedStatFormatter.DEFAULT))
     
     /**
      * Total number of rods deployed in dunk.
@@ -240,6 +248,14 @@ object GlobalStats : Stats() {
      * Total number of rods missed/exploded in dunk.
      */
     val rodsMissedDunk: Stat = register(Stat("rodsMissedDunk", LocalizedStatFormatter.DEFAULT))
+    /**
+     * Total number of lives lost in Dunk.
+     */
+    val livesLostDunk: Stat = register(Stat("livesLostDunk", LocalizedStatFormatter.DEFAULT))
+    /**
+     * Total number of lives gained in Dunk.
+     */
+    val livesGainedDunk: Stat = register(Stat("livesGainedDunk", LocalizedStatFormatter.DEFAULT))
     
     /**
      * Total number of rods deployed in assemble.
