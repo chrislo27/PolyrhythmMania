@@ -13,7 +13,7 @@ data class Card(val suit: CardSuit, val symbol: CardSymbol) {
                         this += Card(suit, CardSymbol.WIDGET_HALF)
                     }
                     this += Card(suit, CardSymbol.ROD)
-                }
+                } + listOf(Card(suit, CardSymbol.SPARE))
             }
         }
     }

@@ -2,7 +2,6 @@ package polyrhythmmania.solitaire
 
 
 enum class CardSymbol(val scaleOrder: Int, val textSymbol: String, val semitone: Int = 0) {
-    NUM_8(7, "8", 12),
     NUM_7(6, "7", 11),
     NUM_6(5, "6", 9),
     NUM_5(4, "5", 7),
@@ -12,6 +11,8 @@ enum class CardSymbol(val scaleOrder: Int, val textSymbol: String, val semitone:
     NUM_1(0, "1", 0),
     
     WIDGET_HALF(999, "Wh"), ROD(999, "R"),
+    
+    SPARE(9999, "SP", semitone = 12)
     ;
     
     companion object {

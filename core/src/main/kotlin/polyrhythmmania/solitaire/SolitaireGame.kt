@@ -139,6 +139,7 @@ class SolitaireGame : ActionablePane() {
     private val freeCells: List<CardZone>
     private val playerZones: List<CardZone>
     private val dealZone: CardZone
+    private val spareZone: CardZone
     private val foundationZones: List<CardZone>
     
     private val placeableCardZones: List<CardZone>
@@ -171,10 +172,13 @@ class SolitaireGame : ActionablePane() {
                 CardZone((1 + zoneSpacingX) * 2, (1 + zoneSpacingY), 999, true),
                 CardZone((1 + zoneSpacingX) * 3, (1 + zoneSpacingY), 999, true),
                 CardZone((1 + zoneSpacingX) * 4, (1 + zoneSpacingY), 999, true),
-//                CardZone((1 + zoneSpacingX) * 5, (1 + zoneSpacingY), 999, true),
+                CardZone((1 + zoneSpacingX) * 5, (1 + zoneSpacingY), 999, true),
         )
-        dealZone = CardZone((1 + zoneSpacingX) * 4, 0f, 1, false, showOutline = false).apply { 
+        dealZone = CardZone((1 + zoneSpacingX) * 4.5f, 0f, 2, false, showOutline = false).apply { 
             this.stack.flippedOver.set(true)
+        }
+        spareZone = CardZone((1 + zoneSpacingX) * 3.5f, 0f, 3, false).apply { 
+            this.dontStackDown = true
         }
         val numOfScaleCards = CardSymbol.SCALE_CARDS.size
         foundationZones = mutableListOf(
@@ -190,7 +194,7 @@ class SolitaireGame : ActionablePane() {
         }
         
         placeableCardZones = freeCells + playerZones + foundationZones
-        allCardZones = freeCells + playerZones + dealZone + foundationZones
+        allCardZones = freeCells + playerZones + spareZone + dealZone + foundationZones
         
         // Horizontal center
         val totalWidth = (allCardZones.maxOf { it.x.get() } + 1) - allCardZones.minOf { it.x.get() }
@@ -227,8 +231,12 @@ class SolitaireGame : ActionablePane() {
     
     init {
         dealZone.stack.cardList.addAll(deck)
-        dealZone.stack.cardList.forEachIndexed { index, card -> 
-            enqueueAnimation(card, dealZone, playerZones[index % playerZones.size], duration = 0.1f)
+        var index = 0
+        dealZone.stack.cardList.forEach { card -> 
+            val targetZone = if (card.symbol == CardSymbol.SPARE)
+                spareZone 
+            else playerZones[index++ % playerZones.size]
+            enqueueAnimation(card, dealZone, targetZone, duration = 0.1f)
         }
     }
     
@@ -314,30 +322,58 @@ class SolitaireGame : ActionablePane() {
         val zones = playerZones + freeCells
         for (zone in zones) {
             // Check if last item in the zone can be put in the foundation pile
-            // Must not be movable to any other zone AND other cards cannot be played on top of it
+            // Other cards cannot be played on top of it
             if (zone.canDragFrom && zone.stack.cardList.isNotEmpty()) {
                 val tail = zone.stack.cardList.last()
-                val canBePlacedOnTopOf = zone !in freeCells && (zones - zone).any { pz ->
-                    pz.stack.cardList.isNotEmpty() && checkStackingRules(listOf(tail) + pz.stack.cardList.last())
-                }
-                val targetFoundation = foundationZones.firstOrNull {
-                    if (tail.symbol.scaleOrder == 0) {
-                        it.stack.cardList.isEmpty()
-                    } else {
-                        val lastInFoundation = it.stack.cardList.lastOrNull()
-                        lastInFoundation != null && lastInFoundation.suit == tail.suit && lastInFoundation.symbol.scaleOrder == tail.symbol.scaleOrder - 1
-                    }
-                }
-                if (!tail.symbol.isWidgetLike() && !canBePlacedOnTopOf && targetFoundation != null) {
+                
+                // If it is the spare card, move it immediately to the spare zone
+                if (tail.symbol == CardSymbol.SPARE) {
                     inputsEnabled.set(false)
                     dragInfo.cancelDrag()
-                    enqueueAnimation(tail, zone, targetFoundation) {
-                        playSound("sfx_base_note", pitch = Semitones.getALPitch(tail.symbol.semitone))
+                    enqueueAnimation(tail, zone, spareZone)
+                    return
+                } else {
+                    val canBePlacedOnTopOf = zone !in freeCells && (zones - zone).any { pz ->
+                        pz.stack.cardList.isNotEmpty() && checkStackingRules(listOf(tail) + pz.stack.cardList.last())
                     }
-                    break
+                    val targetFoundation = foundationZones.firstOrNull {
+                        if (tail.symbol.scaleOrder == 0) {
+                            it.stack.cardList.isEmpty()
+                        } else {
+                            val lastInFoundation = it.stack.cardList.lastOrNull()
+                            lastInFoundation != null && lastInFoundation.suit == tail.suit && lastInFoundation.symbol.scaleOrder == tail.symbol.scaleOrder - 1
+                        }
+                    }
+                    if (!tail.symbol.isWidgetLike() && !canBePlacedOnTopOf && targetFoundation != null) {
+                        inputsEnabled.set(false)
+                        dragInfo.cancelDrag()
+                        enqueueAnimation(tail, zone, targetFoundation) {
+                            playSound("sfx_base_note", pitch = Semitones.getALPitch(tail.symbol.semitone))
+                        }
+                        return
+                    }
                 }
             }
         }
+        
+        // Check if a spare card can be placed to cap a foundation
+        if (spareZone.stack.cardList.isNotEmpty()) {
+            val tail = spareZone.stack.cardList.last()
+            val tailSuit = tail.suit
+            val targetFoundation = foundationZones.firstOrNull { 
+                val top = it.stack.cardList.lastOrNull()
+                top != null && top.suit == tailSuit && top.symbol == CardSymbol.SCALE_CARDS.first()
+            }
+            if (targetFoundation != null) {
+                inputsEnabled.set(false)
+                dragInfo.cancelDrag()
+                enqueueAnimation(tail, spareZone, targetFoundation, duration = 0.5f) {
+                    playSound("sfx_base_note", pitch = Semitones.getALPitch(tail.symbol.semitone))
+                }
+                return
+            }
+        }
+        
     }
     
     fun checkStackingRules(stack: List<Card>): Boolean {
