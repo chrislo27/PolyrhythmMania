@@ -134,6 +134,7 @@ class InitialAssetLoader : IAssetLoader {
                 Packable("editor_gold", "textures/achievements/editor_gold.png"),
                 Packable("endless", "textures/achievements/endless.png"),
                 Packable("endless_gold", "textures/achievements/endless_gold.png"),
+                Packable("explosion", "textures/achievements/explosion.png"),
                 Packable("locked", "textures/achievements/locked.png"),
                 Packable("new_grad", "textures/achievements/new_grad.png"),
                 Packable("new_grad_gold", "textures/achievements/new_grad_gold.png"),

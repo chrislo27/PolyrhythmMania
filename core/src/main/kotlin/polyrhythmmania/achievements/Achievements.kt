@@ -106,7 +106,9 @@ object Achievements {
     /**
      * Triggered when X rods have exploded.
      */
-    val rodsExploded10000 = register(StatTriggered("rods_exploded_10000", STATISTICAL, GENERAL, false, GlobalStats.rodsExploded, 10000))
+    val rodsExploded10000 = register(StatTriggered("rods_exploded_10000", STATISTICAL, GENERAL, false, GlobalStats.rodsExploded, 10000)).apply { 
+        this.overrideIconID = "explosion"
+    }
     /**
      * Triggered when 10 hours of total playtime have been reached.
      */
