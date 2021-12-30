@@ -11,8 +11,13 @@ abstract class Stats {
         const val SAVE_VERSION: Int = 1
     }
     
+    data class UnknownStat(val id: String, val value: Int)
+    
     private val _statMap: MutableMap<String, Stat> = linkedMapOf()
     val statMap: Map<String, Stat> = _statMap
+    
+    private val _unkStatMap: MutableMap<String, UnknownStat> = linkedMapOf()
+    protected val unknownStatMap: Map<String, UnknownStat> = _unkStatMap
     
     
     protected fun register(stat: Stat): Stat {
@@ -36,9 +41,18 @@ abstract class Stats {
         resetToInitialValues()
         
         val statsObj = rootObj["stats"].asObject()
-        for (stat in statMap.values) {
+        for (member in statsObj) {
             try {
-                stat.setValue(statsObj.getInt(stat.id, stat.initialValue))
+                val statName = member.name
+                val stat = statMap[statName]
+                if (stat != null) {
+                    stat.setValue(statsObj.getInt(stat.id, stat.initialValue))
+                } else {
+                    val value = member.value
+                    if (value.isNumber) {
+                        _unkStatMap[statName] = UnknownStat(statName, value.asInt())
+                    }
+                }
             } catch (ignored: Exception) {}
         }
     }
@@ -62,6 +76,11 @@ abstract class Stats {
                 val value = stat.value.get()
                 if (value != stat.initialValue) {
                     obj.add(stat.id, value)
+                }
+            }
+            unknownStatMap.values.forEach { unk ->
+                if (unk.id !in statMap.keys && obj.get(unk.id) == null) {
+                    obj.add(unk.id, unk.value)
                 }
             }
         })
