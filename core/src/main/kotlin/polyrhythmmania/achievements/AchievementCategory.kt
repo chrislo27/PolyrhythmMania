@@ -6,7 +6,7 @@ enum class AchievementCategory(val id: String, val iconID: String?) {
     GENERAL("general", null),
     ENDLESS_MODE("endlessMode", "endless"),
     DAILY("daily", "daily"),
-    EDITOR("editor", null),
+    EDITOR("editor", "editor"),
     EXTRAS("extras", null),
     ;
     

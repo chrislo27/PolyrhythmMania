@@ -39,6 +39,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
     companion object {
         private val SHOW_IDS_WHEN_DEBUG: Boolean = PRMania.isDevVersion
+        private val SHOW_ICONS_WHEN_DEBUG: Boolean = PRMania.isDevVersion
     }
 
     private val totalProgressLabel: TextLabel
@@ -150,7 +151,8 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         Anchor.TopLeft.configure(this)
                         this.bindWidthToSelfHeight()
                         this.textureRegion.bind { 
-                            TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")[if (achievementEarned.use()) achievement.getIconID() else "locked"])
+                            val iconID = if (achievementEarned.use() || (SHOW_ICONS_WHEN_DEBUG && Paintbox.debugMode.use())) achievement.getIconID() else "locked"
+                            TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")[iconID])
                         }
                     }
                     this += ImageIcon(completedTextureReg, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
@@ -181,7 +183,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 "[i]${AchievementsL10N.getVar("achievement.hidden.desc").use()}[]"
                             } else "${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}"
                             val statProgressText = if (!stillHidden) statProgress.use() else ""
-                            "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgressText}[] ${if (SHOW_IDS_WHEN_DEBUG && Paintbox.debugMode.use()) "[color=LIGHT_GRAY scale=0.75]${achievement.id}[]" else ""}\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
+                            "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgressText}[] ${if (SHOW_IDS_WHEN_DEBUG && Paintbox.debugMode.use()) "[i color=GRAY scale=0.75]${achievement.id}[]" else ""}\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
                         }).apply {
                             Anchor.TopLeft.configure(this)
                             this.setScaleXY(1f)
