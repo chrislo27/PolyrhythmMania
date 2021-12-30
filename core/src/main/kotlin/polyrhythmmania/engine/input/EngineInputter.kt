@@ -465,7 +465,11 @@ class EngineInputter(val engine: Engine) {
         val worldMode = world.worldMode
         when (worldMode.type) {
             WorldType.DUNK -> {
+                val oldLives = endlessScore.lives.get()
                 triggerEndlessLifeLost()
+                if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
+                    GlobalStats.livesLostDunk.increment()
+                }
             }
             WorldType.ASSEMBLE -> {
                 triggerEndlessLifeLost()
