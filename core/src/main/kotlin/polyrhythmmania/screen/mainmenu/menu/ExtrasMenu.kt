@@ -102,7 +102,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 AssembleMode(main, EndlessModeScore(settings.sidemodeAssembleHighScore))
             }
             vbox += createLongButtonWithNewIndicator(settings.newIndicatorExtrasSolitaire) {
-                Localization.getVar("mainMenu.extras.solitaire").use() 
+                Localization.getVar("mainMenu.play.solitaire").use() 
             }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.solitaireMenu)
@@ -113,6 +113,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         main.settings.persist()
                     }
                 }
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.solitaire.tooltip")))
             }
 
             vbox += separator()
