@@ -11,6 +11,7 @@ object SolitaireAssets : AssetRegistryInstance()
 class SolitaireAssetLoader : IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
         SolitaireAssets.loadAsset<Sound>("sfx_base_note", "sounds/solitaire/base_note.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_base_note_delayed", "sounds/solitaire/base_note_delayed.ogg")
         SolitaireAssets.loadAsset<Sound>("sfx_flick", "sounds/solitaire/flick.ogg")
     }
 

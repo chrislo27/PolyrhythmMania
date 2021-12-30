@@ -118,6 +118,7 @@ class SolitaireGame : ActionablePane() {
         var currentX: Float = fromX
         var currentY: Float = fromY
         var onComplete: () -> Unit = {}
+        var flippedOver: Boolean = false
     }
     
     inner class EnqueuedAnimation(val card: Card, val from: CardZone, val to: CardZone, val duration: Float, val delay: Float,
@@ -285,7 +286,7 @@ class SolitaireGame : ActionablePane() {
         for (foundation in foundationZones) {
             if (!foundation.stack.flippedOver.get() && foundation.stack.cardList.size == foundation.maxCapacity) {
                 foundation.stack.flippedOver.set(true)
-//                playSound("sfx_base_note", pitch = Semitones.getALPitch(12))
+//                playSound("sfx_base_note_delayed", pitch = Semitones.getALPitch(12))
             }
         }
         
@@ -468,6 +469,7 @@ class SolitaireGame : ActionablePane() {
                         next.from, next.to, next.duration).apply {
                     this.onComplete = next.onComplete
                     this.secondsElapsed = -next.delay
+                    this.flippedOver = next.from.stack.flippedOver.get()
                 }
                 this.currentAnimations += newAnimation
             }
@@ -560,7 +562,7 @@ class SolitaireGame : ActionablePane() {
         if (currentAnimations.isNotEmpty()) {
             for (it in currentAnimations.asReversed()) {
                 if (it.secondsElapsed < 0f) continue
-                renderCard(x + it.currentX, y - it.currentY, batch, it.card, bmFont)
+                renderCard(x + it.currentX, y - it.currentY, batch, it.card, it.flippedOver, bmFont)
             }
         }
         
@@ -570,31 +572,15 @@ class SolitaireGame : ActionablePane() {
         batch.packedColor = lastPackedColor
     }
     
-    private fun renderCardStack(x: Float, y: Float, batch: SpriteBatch, cardStack: CardStack, stackOffset: Float, font: BitmapFont) {
-        if (cardStack.flippedOver.get()) {
-            val lastPackedColor = batch.packedColor
-
-            repeat(cardStack.cardList.size) {
-                val cw = cardWidth
-                val ch = cardHeight
-                val grey = 1f
-                val renderX = x
-                val renderY = (y - ch) - it * stackOffset
-                batch.setColor(1f, grey, grey, 1f)
-                batch.fillRect(renderX, renderY, cw, ch)
-                batch.setColor(grey * 0.5f, 1f, grey * 0.5f, 0.75f)
-                batch.drawRect(renderX, renderY, cw, ch, 4f)
-            }
-
-            batch.packedColor = lastPackedColor
-        } else {
-            cardStack.cardList.forEachIndexed { index, card ->
-                renderCard(x, y - index * stackOffset, batch, card, font)
-            }
+    private fun renderCardStack(x: Float, y: Float, batch: SpriteBatch, cardStack: CardStack, stackOffset: Float,
+                                font: BitmapFont) {
+        val flippedOver = cardStack.flippedOver.get()
+        cardStack.cardList.forEachIndexed { index, card ->
+            renderCard(x, y - index * stackOffset, batch, card, flippedOver, font)
         }
     }
-    
-    private fun renderCard(x: Float, y: Float, batch: SpriteBatch, card: Card, font: BitmapFont) {
+
+    private fun renderCard(x: Float, y: Float, batch: SpriteBatch, card: Card, flippedOver: Boolean, font: BitmapFont) {
         val lastPackedColor = batch.packedColor
 
         val cw = cardWidth
@@ -602,18 +588,25 @@ class SolitaireGame : ActionablePane() {
         val grey = 1f
         val renderX = x
         val renderY = (y - ch)
-        batch.setColor(1f, grey, grey, 1f)
-        batch.fillRect(renderX, renderY, cw, ch)
-        batch.setColor(1f, grey * 0.5f, grey * 0.5f, 0.75f)
-        batch.drawRect(renderX, renderY, cw, ch, 4f)
+        if (flippedOver) {
+            batch.setColor(1f, grey, grey, 1f)
+            batch.fillRect(renderX, renderY, cw, ch)
+            batch.setColor(grey * 0.5f, 1f, grey * 0.5f, 0.75f)
+            batch.drawRect(renderX, renderY, cw, ch, 4f)
+        } else {
+            batch.setColor(1f, grey, grey, 1f)
+            batch.fillRect(renderX, renderY, cw, ch)
+            batch.setColor(1f, grey * 0.5f, grey * 0.5f, 0.75f)
+            batch.drawRect(renderX, renderY, cw, ch, 4f)
 
-        font.color = card.suit.color
-        font.drawCompressed(batch, card.symbol.textSymbol, renderX + 6f, (renderY + ch) - 6f, cardWidth - 6f * 2, Align.left)
-        font.drawCompressed(batch, card.symbol.textSymbol, renderX + 6f, (renderY + ch) - cardHeight + 6f + font.capHeight, cardWidth - 6f * 2, Align.right)
-        
+            font.color = card.suit.color
+            font.drawCompressed(batch, card.symbol.textSymbol, renderX + 6f, (renderY + ch) - 6f, cardWidth - 6f * 2, Align.left)
+            font.drawCompressed(batch, card.symbol.textSymbol, renderX + 6f, (renderY + ch) - cardHeight + 6f + font.capHeight, cardWidth - 6f * 2, Align.right)
+        }
+
         batch.packedColor = lastPackedColor
     }
-    
+
     private fun playSound(id: String, vol: Float = 1f, pitch: Float = 1f, pan: Float = 0f) {
         val main = PRManiaGame.instance
         if (main.settings.solitaireSFX.getOrCompute()) {
