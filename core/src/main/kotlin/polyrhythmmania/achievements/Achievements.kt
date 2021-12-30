@@ -277,7 +277,7 @@ object Achievements {
     /**
      * Triggered when Solitaire is won for the 1st time.
      */
-    val solitaireWin1 = register(StatTriggered("solitaire_win_1", OBJECTIVE, EXTRAS, false, GlobalStats.solitaireGamesWon, 1))
+    val solitaireWin1 = register(StatTriggered("solitaire_win_1", OBJECTIVE, EXTRAS, false, GlobalStats.solitaireGamesWon, 1, showProgress = false))
     /**
      * Triggered when Solitaire is won for the 10th time.
      */
