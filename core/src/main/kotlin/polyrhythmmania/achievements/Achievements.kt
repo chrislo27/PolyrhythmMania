@@ -32,6 +32,8 @@ object Achievements {
     private val _achFulfillmentMap: Var<Map<Achievement, Fulfillment>> = Var(emptyMap())
     val fulfillmentMap: ReadOnlyVar<Map<Achievement, Fulfillment>> = _achFulfillmentMap
     
+    private val unknownFulfillments: MutableMap<String, Fulfillment> = mutableMapOf()
+    
     val fulfillmentListeners: MutableList<FulfillmentListener> = mutableListOf()
     
     // ACHIEVEMENT METADATA (tracking other sub-stats) -----------------------------------------------------------------
@@ -382,15 +384,21 @@ object Achievements {
     
     fun fromJson(rootObj: JsonObject) {
         clearAllFulfilledAchievements()
+        unknownFulfillments.clear()
         
         val newMap = mutableMapOf<Achievement, Fulfillment>()
         val achObj = rootObj["achievements"].asObject()
-        for (ach in achievementIDMap.values) {
+        for (member in achObj) {
             try {
-                val fObj = achObj[ach.id].asObject()
-                if (fObj != null) {
-                    val f = Fulfillment.fromJson(fObj) ?: continue
-                    newMap[ach] = f
+                val key = member.name
+                if (key in achievementIDMap.keys) {
+                    val fObj = achObj[key].asObject()
+                    if (fObj != null) {
+                        val f = Fulfillment.fromJson(fObj) ?: continue
+                        newMap[achievementIDMap.getValue(key)] = f
+                    }
+                } else {
+                    unknownFulfillments += Pair(key, Fulfillment.fromJson(member.value.asObject()) ?: continue)
                 }
             } catch (ignored: Exception) {}
         }
@@ -425,10 +433,19 @@ object Achievements {
     fun toJson(rootObj: JsonObject) {
         rootObj.add("version", SAVE_VERSION)
         rootObj.add("achievements", Json.`object`().also { obj ->
-            fulfillmentMap.getOrCompute().forEach { (ach, ful) ->
+            val fulMap = fulfillmentMap.getOrCompute()
+            fulMap.forEach { (ach, ful) ->
                 obj.add(ach.id, Json.`object`().also { o ->
                     ful.toJson(o)
                 })
+            }
+            
+            unknownFulfillments.forEach { (id, ful) ->
+                if (obj.get(id) == null) {
+                    obj.add(id, Json.`object`().also { o ->
+                        ful.toJson(o)
+                    })
+                }
             }
         })
         rootObj.add("tutorialFlag", tutorialFlag)
