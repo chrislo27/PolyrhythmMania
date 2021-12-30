@@ -4,15 +4,19 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
+import paintbox.binding.invert
 import paintbox.ui.Anchor
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
+import paintbox.ui.control.CheckBox
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.gdxutils.set
 import polyrhythmmania.Localization
+import polyrhythmmania.Settings
 import polyrhythmmania.screen.mainmenu.menu.MMMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
@@ -22,6 +26,7 @@ import polyrhythmmania.statistics.PlayTimeType
 
 class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
+    private val settings: Settings = main.settings
     private var loading: Boolean = true
     private val loadingLabel: TextLabel
     private val hbox: HBox
@@ -91,6 +96,22 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     gameParent.removeChild(oldGame)
                     game = createGame()
                     gameParent.addChild(game)
+                }
+            }
+            hbox += createSmallButton(binding = { Localization.getVar("solitaire.instructions").use() }).apply {
+                this.bounds.width.set(180f)
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.solitaireHelpMenu, instant = true)
+                }
+            }
+            hbox += CheckBox(binding = { Localization.getVar("solitaire.gameSFX").use() }, font = font).apply {
+                this.bounds.width.set(170f)
+                this.textLabel.setScaleXY(0.75f)
+                this.imageNode.padding.set(Insets(4f, 4f, 4f, 0f))
+                this.checkedState.set(settings.solitaireSFX.getOrCompute())
+                this.onCheckChanged = {
+                    settings.solitaireSFX.invert()
+                    settings.persist()
                 }
             }
         }

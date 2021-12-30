@@ -16,6 +16,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.library.menu.LibraryMenu
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.solitaire.SolitaireHelpMenu
 import polyrhythmmania.solitaire.SolitaireMenu
 import java.lang.Float.max
 import java.lang.Float.min
@@ -56,6 +57,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val statisticsMenu: StatisticsMenu = StatisticsMenu(this)
     val achievementsMenu: AchievementsMenu = AchievementsMenu(this)
     val solitaireMenu: SolitaireMenu = SolitaireMenu(this)
+    val solitaireHelpMenu: SolitaireHelpMenu = SolitaireHelpMenu(this)
     
     init {
         addStockMenus()
@@ -89,6 +91,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(statisticsMenu)
         addMenu(achievementsMenu)
         addMenu(solitaireMenu)
+        addMenu(solitaireHelpMenu)
     }
     
     fun addMenu(menu: MMMenu) {

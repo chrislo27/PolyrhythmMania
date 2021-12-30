@@ -609,6 +609,9 @@ class SolitaireGame : ActionablePane() {
     }
     
     private fun playSound(id: String, vol: Float = 1f, pitch: Float = 1f, pan: Float = 0f) {
-        PRManiaGame.instance.playMenuSfx(SolitaireAssets.get<Sound>(id), vol, pitch, pan)
+        val main = PRManiaGame.instance
+        if (main.settings.solitaireSFX.getOrCompute()) {
+            main.playMenuSfx(SolitaireAssets.get<Sound>(id), vol, pitch, pan)
+        }
     }
 }
