@@ -70,9 +70,14 @@ class SolitaireGame : ActionablePane() {
         
         fun endDrag(newZone: CardZone) {
             val myList = draggingStack.cardList.toList()
+            
             draggingStack.cardList.clear()
             newZone.stack.cardList += myList
             oldZone = null
+            
+            if (myList.isNotEmpty()) {
+                GlobalStats.solitaireMovesMade.increment()
+            }
             
             if (myList.size == 1 && newZone in foundationZones) {
                 playSound("sfx_base_note", pitch = Semitones.getALPitch(myList.last().symbol.semitone))

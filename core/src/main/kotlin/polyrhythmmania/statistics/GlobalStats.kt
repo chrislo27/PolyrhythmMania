@@ -259,6 +259,10 @@ object GlobalStats : Stats() {
      */
     val solitaireGamesPlayed: Stat = register(Stat("solitaireGamesPlayed", LocalizedStatFormatter.DEFAULT))
     /**
+     * Total number of moves made in solitaire.
+     */
+    val solitaireMovesMade: Stat = register(Stat("solitaireMovesMade", LocalizedStatFormatter.DEFAULT))
+    /**
      * Total number of games won in solitaire.
      */
     val solitaireGamesWon: Stat = register(Stat("solitaireGamesWon", LocalizedStatFormatter.DEFAULT))
