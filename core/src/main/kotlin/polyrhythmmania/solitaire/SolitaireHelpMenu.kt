@@ -61,7 +61,7 @@ class SolitaireHelpMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
                 this += TextLabel(binding = { text.use() }).apply {
                     Anchor.BottomLeft.configure(this)
-                    this.bindHeightToParent(multiplier = 0.35f)
+                    this.bindHeightToParent(multiplier = 0.325f)
                     this.doLineWrapping.set(true)
                     this.markup.set(this@SolitaireHelpMenu.markup)
                     this.textColor.set(LongButtonSkin.TEXT_COLOR)

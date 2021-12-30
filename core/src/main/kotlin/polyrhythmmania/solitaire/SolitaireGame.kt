@@ -176,10 +176,11 @@ class SolitaireGame : ActionablePane() {
         dealZone = CardZone((1 + zoneSpacingX) * 4, 0f, 1, false, showOutline = false).apply { 
             this.stack.flippedOver.set(true)
         }
+        val numOfScaleCards = CardSymbol.SCALE_CARDS.size
         foundationZones = mutableListOf(
-                CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, 7, false),
-                CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, 7, false),
-                CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, 7, false),
+                CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, numOfScaleCards, false),
+                CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, numOfScaleCards, false),
+                CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, numOfScaleCards, false),
         ).apply {
             val totalHeight = this.size * 1 + (this.size - 1) * zoneSpacingY
             this.forEachIndexed { index, zone -> 
