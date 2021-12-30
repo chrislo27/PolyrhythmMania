@@ -180,7 +180,7 @@ class SolitaireGame : ActionablePane() {
         spareZone = CardZone((1 + zoneSpacingX) * 3.5f, 0f, 3, false).apply { 
             this.dontStackDown = true
         }
-        val numOfScaleCards = CardSymbol.SCALE_CARDS.size
+        val numOfScaleCards = CardSymbol.SCALE_CARDS.size + 1 /* SP card */
         foundationZones = mutableListOf(
                 CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, numOfScaleCards, false),
                 CardZone((1 + zoneSpacingX) * (playerZones.size + 0.5f), 0f, numOfScaleCards, false),
@@ -367,7 +367,7 @@ class SolitaireGame : ActionablePane() {
             if (targetFoundation != null) {
                 inputsEnabled.set(false)
                 dragInfo.cancelDrag()
-                enqueueAnimation(tail, spareZone, targetFoundation, duration = 0.5f) {
+                enqueueAnimation(tail, spareZone, targetFoundation, duration = 0.333f) {
                     playSound("sfx_base_note", pitch = Semitones.getALPitch(tail.symbol.semitone))
                 }
                 return
@@ -509,6 +509,7 @@ class SolitaireGame : ActionablePane() {
                     this.flippedOver = next.from.stack.flippedOver.get()
                 }
                 this.currentAnimations += newAnimation
+                inputsEnabled.set(false)
             }
         }
 
