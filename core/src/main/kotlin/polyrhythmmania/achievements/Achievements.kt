@@ -213,13 +213,13 @@ object Achievements {
      */
     val editorOpenFirstTime = register(StatTriggered("editor_open_first_time", OBJECTIVE, EDITOR, false, GlobalStats.editorTime, 1, showProgress = false))
     /**
-     * Triggered when a level with at least 40 inputs is exported successfully.
-     */
-    val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", OBJECTIVE, EDITOR, false, 40))
-    /**
      * Triggered in the editor when all help documents are viewed.
      */
     val viewAllEditorHelp = register(Ordinary("view_all_editor_help", OBJECTIVE, EDITOR, false))
+    /**
+     * Triggered when a level with at least 40 inputs is exported successfully.
+     */
+    val editorFirstGoodExport = register(NumericalThreshold("editor_first_good_export", OBJECTIVE, EDITOR, false, 40))
     /**
      * Triggered in the editor when a rod is launched with no other platforms raised afterward.
      */
