@@ -21,4 +21,6 @@ enum class CardSymbol(val scaleOrder: Int, val textSymbol: String, val semitone:
     }
     
     fun isWidgetLike(): Boolean = scaleOrder == 999
+    
+    fun isNumeric(): Boolean = scaleOrder in 0..6
 }

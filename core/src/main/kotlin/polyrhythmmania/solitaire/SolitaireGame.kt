@@ -322,36 +322,50 @@ class SolitaireGame : ActionablePane() {
         val zones = playerZones + freeCells
         for (zone in zones) {
             // Check if last item in the zone can be put in the foundation pile
-            // Other cards cannot be played on top of it
+            // Other cards cannot be played on top of it, and if its value is 3 or greater, all the cards with one less value must ALREADY be in the foundation
             if (zone.canDragFrom && zone.stack.cardList.isNotEmpty()) {
                 val tail = zone.stack.cardList.last()
-                
-                // If it is the spare card, move it immediately to the spare zone
                 if (tail.symbol == CardSymbol.SPARE) {
+                    // If it is the spare card, move it immediately to the spare zone
                     inputsEnabled.set(false)
                     dragInfo.cancelDrag()
                     enqueueAnimation(tail, zone, spareZone)
                     return
-                } else {
-                    val canBePlacedOnTopOf = zone !in freeCells && (zones - zone).any { pz ->
-                        pz.stack.cardList.isNotEmpty() && checkStackingRules(listOf(tail) + pz.stack.cardList.last())
+                } else if (!tail.symbol.isNumeric()) {
+                    continue
+                }
+
+                
+                val targetFoundation = foundationZones.firstOrNull { z ->
+                    if (tail.symbol.scaleOrder == 0) {
+                        z.stack.cardList.isEmpty()
+                    } else {
+                        val lastInFoundation = z.stack.cardList.lastOrNull()
+                        lastInFoundation != null && lastInFoundation.suit == tail.suit && lastInFoundation.symbol.scaleOrder == tail.symbol.scaleOrder - 1
                     }
-                    val targetFoundation = foundationZones.firstOrNull {
-                        if (tail.symbol.scaleOrder == 0) {
-                            it.stack.cardList.isEmpty()
-                        } else {
-                            val lastInFoundation = it.stack.cardList.lastOrNull()
-                            lastInFoundation != null && lastInFoundation.suit == tail.suit && lastInFoundation.symbol.scaleOrder == tail.symbol.scaleOrder - 1
+                }
+                
+                val canMoveToFoundation: Boolean = when (tail.symbol) {
+                    CardSymbol.NUM_1 -> true
+                    CardSymbol.NUM_2 -> true
+                    else -> {
+                        // All other cards with value one less than tail should ALREADY be in a foundation
+                        // AKA: no cards with value one less than tail will be in the free zone/player zones
+                        (zones - zone).all { z ->
+                            z.stack.cardList.none { c ->
+                                c.symbol.scaleOrder == tail.symbol.scaleOrder - 1
+                            }
                         }
                     }
-                    if (!tail.symbol.isWidgetLike() && !canBePlacedOnTopOf && targetFoundation != null) {
-                        inputsEnabled.set(false)
-                        dragInfo.cancelDrag()
-                        enqueueAnimation(tail, zone, targetFoundation) {
-                            playSound("sfx_base_note", pitch = Semitones.getALPitch(tail.symbol.semitone))
-                        }
-                        return
+                }
+                
+                if (targetFoundation != null && canMoveToFoundation) {
+                    inputsEnabled.set(false)
+                    dragInfo.cancelDrag()
+                    enqueueAnimation(tail, zone, targetFoundation) {
+                        playSound("sfx_base_note", pitch = Semitones.getALPitch(tail.symbol.semitone))
                     }
+                    return
                 }
             }
         }
