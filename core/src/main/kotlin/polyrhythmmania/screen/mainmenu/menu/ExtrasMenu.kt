@@ -104,7 +104,8 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 GlobalStats.timesPlayedAssemble.increment()
                 AssembleMode(main, EndlessModeScore(settings.sidemodeAssembleHighScore))
             }
-            vbox += createLongButtonWithNewIndicator(settings.newIndicatorExtrasSolitaire) {
+            // FIXME icon
+            vbox += createLongButtonWithNewIndicator(settings.newIndicatorExtrasSolitaire, TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex"))) {
                 Localization.getVar("mainMenu.play.solitaire").use() 
             }.apply {
                 this.setOnAction {
