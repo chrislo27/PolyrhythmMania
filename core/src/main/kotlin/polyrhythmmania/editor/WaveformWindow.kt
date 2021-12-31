@@ -27,7 +27,7 @@ class WaveformWindow(val editor: Editor) : Disposable {
     
     companion object {
         const val SECONDS_BLOCK_WIDTH: Int = 128
-        const val SECONDS_BLOCK_HEIGHT: Int = 32
+        const val SECONDS_BLOCK_HEIGHT: Int = 48
     }
     
     private data class CacheBlock(val index: Int, val x: Int, val y: Int, val textureRegion: TextureRegion,
