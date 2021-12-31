@@ -41,6 +41,7 @@ object Achievements {
     var tutorialFlag: Int = 0 // LSB = I, next is II
     var practicePassFlag: Int = 0 // LSB = PR1, next is PR2
     var practiceNoMissFlag: Int = 0 // LSB = PR1, next is PR2
+    var viewedEditorHelpDocs: Var<Set<String>> = Var(emptySet())
     
     // ACHIEVEMENT LIST ------------------------------------------------------------------------------------------------
 
@@ -211,6 +212,10 @@ object Achievements {
      * Triggered when the editor is opened for the first time.
      */
     val editorOpenFirstTime = register(StatTriggered("editor_open_first_time", OBJECTIVE, EDITOR, false, GlobalStats.editorTime, 1, showProgress = false))
+    /**
+     * Triggered in the editor when all help documents are viewed.
+     */
+    val viewAllEditorHelp = register(Ordinary("view_all_editor_help", OBJECTIVE, EDITOR, false))
     /**
      * Triggered when a level with at least 40 inputs is exported successfully.
      */
@@ -429,6 +434,10 @@ object Achievements {
         try {
             practiceNoMissFlag = rootObj.getInt("practiceNoMissFlag", 0)
         } catch (ignored: Exception) {}
+        viewedEditorHelpDocs.set(emptySet())
+        try {
+            viewedEditorHelpDocs.set(rootObj.get("viewedEditorHelpDocs").asArray().map { it.asString() }.toSet())
+        } catch (ignored: Exception) {}
     }
 
     fun fromJsonFile(file: FileHandle) {
@@ -464,6 +473,9 @@ object Achievements {
         rootObj.add("tutorialFlag", tutorialFlag)
         rootObj.add("practicePassFlag", practicePassFlag)
         rootObj.add("practiceNoMissFlag", practiceNoMissFlag)
+        rootObj.add("viewedEditorHelpDocs", Json.array().also { ar ->
+            viewedEditorHelpDocs.getOrCompute().forEach { ar.add(it) }
+        })
     }
 
     fun toJsonFile(file: FileHandle) {
