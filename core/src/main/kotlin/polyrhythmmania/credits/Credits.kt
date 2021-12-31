@@ -54,9 +54,10 @@ object Credits {
                     "Pexels",
                     "world-flags-sprite",
             ).toVars() + listOf(
+                    "Kurokane",
+                    "Leland",
                     "Roboto",
                     "Rodin",
-                    "Kurokane",
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
     
