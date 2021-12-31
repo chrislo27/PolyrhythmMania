@@ -66,8 +66,8 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             
             // Give vbar a min length
             this.minThumbSize.set(50f)
-            this.vBar.unitIncrement.set(30f)
-            this.vBar.blockIncrement.set(75f)
+            this.vBar.unitIncrement.set(40f)
+            this.vBar.blockIncrement.set(90f)
         }
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
