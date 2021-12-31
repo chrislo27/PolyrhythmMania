@@ -46,6 +46,7 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
     companion object {
         const val WIDTH_EXTRA_SMALL: Float = 0.3f
         const val WIDTH_SMALL: Float = 0.4f
+        const val WIDTH_SMALL_MID: Float = 0.45f
         const val WIDTH_MID: Float = 0.5f
         const val WIDTH_MEDIUM: Float = 0.6f
         const val WIDTH_LARGE: Float = 0.75f
@@ -224,7 +225,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    protected fun createLongButtonWithNewIndicator(newIndicator: Settings.NewIndicator, binding: Var.Context.() -> String): Button {
+    protected fun createLongButtonWithNewIndicator(newIndicator: Settings.NewIndicator, icon: TextureRegion? = null,
+                                                   binding: Var.Context.() -> String): Button {
         return Button(binding = {
             (if (newIndicator.value.use())
                 (Localization.getVar("common.newIndicator").use() + " ")
@@ -237,18 +239,30 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             this.renderAlign.set(Align.left)
             this.markup.set(this@StandardMenu.markup)
             this.setOnHoverStart(blipSoundListener)
+            
+            if (icon != null) {
+                val existingPadding = this.padding.getOrCompute()
+                this.padding.set(existingPadding.copy(left = existingPadding.left * 2 + 32f))
+                this.addChild(ImageIcon(icon, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+                    this.bounds.x.set(-(32f + 4f * 2))
+                    this.bounds.width.set(32f)
+                    this.bounds.height.set(32f)
+                })
+            }
         }
     }
     
-    protected fun createLongButtonWithIcon(icon: TextureRegion, binding: Var.Context.() -> String): Button {
+    protected fun createLongButtonWithIcon(icon: TextureRegion?, binding: Var.Context.() -> String): Button {
         return createLongButton(binding).apply { 
-            val existingPadding = this.padding.getOrCompute()
-            this.padding.set(existingPadding.copy(left = existingPadding.left * 2 + 32f))
-            this.addChild(ImageIcon(icon, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply { 
-                this.bounds.x.set(-(32f + 4f * 2))
-                this.bounds.width.set(32f)
-                this.bounds.height.set(32f)
-            })
+            if (icon != null) {
+                val existingPadding = this.padding.getOrCompute()
+                this.padding.set(existingPadding.copy(left = existingPadding.left * 2 + 32f))
+                this.addChild(ImageIcon(icon, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+                    this.bounds.x.set(-(32f + 4f * 2))
+                    this.bounds.width.set(32f)
+                    this.bounds.height.set(32f)
+                })
+            }
         }
     }
 
@@ -344,13 +358,14 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         return settingsOptionPane to combobox
     }
     
-    protected fun createSidemodeLongButton(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
+    protected fun createSidemodeLongButton(icon: TextureRegion?, name: String,
+                                           tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
                                            challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
                                            newIndicator: Settings.NewIndicator? = null,
                                            factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
         return (if (newIndicator == null)
-                (createLongButton { Localization.getVar(name).use() })
-        else (createLongButtonWithNewIndicator(newIndicator) { Localization.getVar(name).use() })).apply {
+                (createLongButtonWithIcon(icon) { Localization.getVar(name).use() })
+        else (createLongButtonWithNewIndicator(newIndicator, icon) { Localization.getVar(name).use() })).apply {
             this.tooltipElement.set(createTooltip(tooltipVar))
             this.setOnAction {
                 menuCol.playMenuSound("sfx_menu_enter_game")

@@ -66,7 +66,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> AbstractPracticeTutorial): UIElement {
-                return createSidemodeLongButton(name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false) { game, keymap ->
+                return createSidemodeLongButton(null, name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false) { game, keymap ->
                     DiscordCore.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL
                     GlobalStats.timesPlayedTutorial.increment()
@@ -77,7 +77,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             fun createSidemode(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
                                          challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
                                          factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
-                return createSidemodeLongButton(name, tooltipVar, challenges, showResults) { game, keymap ->
+                return createSidemodeLongButton(null, name, tooltipVar, challenges, showResults) { game, keymap ->
                     DiscordCore.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL
                     factory.invoke(game, keymap)

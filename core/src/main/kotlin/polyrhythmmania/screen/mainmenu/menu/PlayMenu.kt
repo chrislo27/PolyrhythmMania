@@ -25,7 +25,7 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private var epochSeconds: Long = System.currentTimeMillis() / 1000
 
     init {
-        this.setSize(MMMenu.WIDTH_SMALL)
+        this.setSize(MMMenu.WIDTH_SMALL_MID)
         this.titleText.bind { Localization.getVar("mainMenu.play.title").use() }
         this.contentPane.bounds.height.set(300f)
 
