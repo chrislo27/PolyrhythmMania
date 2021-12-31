@@ -99,7 +99,7 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             hbox += createSmallButton(binding = { Localization.getVar("solitaire.instructions").use() }).apply {
-                this.bounds.width.set(180f)
+                this.bounds.width.set(160f)
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.solitaireHelpMenu, instant = true)
                 }

@@ -172,7 +172,7 @@ class SolitaireGame : ActionablePane() {
                 CardZone((1 + zoneSpacingX) * 2, (1 + zoneSpacingY), 999, true),
                 CardZone((1 + zoneSpacingX) * 3, (1 + zoneSpacingY), 999, true),
                 CardZone((1 + zoneSpacingX) * 4, (1 + zoneSpacingY), 999, true),
-                CardZone((1 + zoneSpacingX) * 5, (1 + zoneSpacingY), 999, true),
+//                CardZone((1 + zoneSpacingX) * 5, (1 + zoneSpacingY), 999, true),
         )
         dealZone = CardZone((1 + zoneSpacingX) * 4.5f, 0f, 2, false, showOutline = false).apply { 
             this.stack.flippedOver.set(true)
