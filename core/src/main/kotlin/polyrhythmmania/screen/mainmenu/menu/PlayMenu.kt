@@ -1,8 +1,12 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.packing.PackedSheet
+import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
@@ -71,7 +75,9 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             
-            vbox += createLongButtonWithNewIndicator(main.settings.newIndicatorLibrary) { Localization.getVar("mainMenu.play.library").use() }.apply {
+            vbox += createLongButtonWithNewIndicator(main.settings.newIndicatorLibrary, TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 1, 85, 32, 32)) { 
+                Localization.getVar("mainMenu.play.library").use()
+            }.apply {
                 this.setOnAction {
                     main.settings.newIndicatorLibrary.value.set(false)
                     main.settings.persist()
@@ -79,12 +85,16 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.library.tooltip")))
             }
-            vbox += createLongButton { Localization.getVar("mainMenu.play.practice").use() }.apply {
+            vbox += createLongButtonWithIcon(AssetRegistry.get<PackedSheet>("achievements_icon")["new_grad"]) { 
+                Localization.getVar("mainMenu.play.practice").use()
+            }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.practiceMenu)
                 }
             }
-            vbox += createLongButton { Localization.getVar("mainMenu.play.playSavedLevel").use() }.apply {
+            vbox += createLongButtonWithIcon(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_open32"]) { 
+                Localization.getVar("mainMenu.play.playSavedLevel").use()
+            }.apply {
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.playSavedLevel.tooltip")))
                 this.setOnAction {
                     val loadMenu = LoadSavedLevelMenu(menuCol, null)
@@ -95,7 +105,9 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             
             vbox += separator()
 
-            vbox += createLongButton { Localization.getVar("mainMenu.play.endless").use() }.apply {
+            vbox += createLongButtonWithIcon(AssetRegistry.get<PackedSheet>("achievements_icon")["endless"]) { 
+                Localization.getVar("mainMenu.play.endless").use()
+            }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.endlessMenu)
                 }
@@ -117,7 +129,9 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             val dailyChallengeTitle: ReadOnlyVar<String> = Localization.getVar("mainMenu.play.endless.daily", Var {
                 listOf(dailyChallengeDate.use().format(DateTimeFormatter.ISO_DATE))
             })
-            vbox += createLongButton { dailyChallengeTitle.use() }.apply {
+            vbox += createLongButtonWithIcon(AssetRegistry.get<PackedSheet>("achievements_icon")["daily_calendar"]) { 
+                dailyChallengeTitle.use()
+            }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.dailyChallengeMenu.prepareShow())
                 }
