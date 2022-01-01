@@ -149,11 +149,15 @@ object Achievements {
     /**
      * Triggered when getting a score of at least 100 in Endless Mode with life regen disabled.
      */
-    val endlessNoLifeRegen100 = register(ScoreThreshold("endless_no_regen_100", CHALLENGE, ENDLESS_MODE, false, 100))
+    val endlessNoLifeRegen100 = register(ScoreThreshold("endless_no_regen_100", CHALLENGE, ENDLESS_MODE, false, 100)).apply {
+        this.overrideIconID = "endless_no_regen"
+    }
     /**
      * Triggered when getting a score of at least 100 in Endless Mode in daredevil mode.
      */
-    val endlessDaredevil100 = register(ScoreThreshold("endless_daredevil_100", CHALLENGE, ENDLESS_MODE, false, 100))
+    val endlessDaredevil100 = register(ScoreThreshold("endless_daredevil_100", CHALLENGE, ENDLESS_MODE, false, 100)).apply {
+        this.overrideIconID = "endless_daredevil"
+    }
 
     /**
      * Triggered when reaching the maximum speed increase in Endless Mode/Daily Challenge.
@@ -304,7 +308,9 @@ object Achievements {
     /**
      * Triggered when all other achievements are awarded.
      */
-    val polyrhythmManiac = register(Ordinary("polyrhythm_maniac", CHALLENGE, GENERAL, false))
+    val polyrhythmManiac = register(Ordinary("polyrhythm_maniac", CHALLENGE, GENERAL, false)).apply {
+        this.overrideIconID = "maniac"
+    }
     
     
     // -----------------------------------------------------------------------------------------------------------------
