@@ -225,21 +225,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    protected fun createLongButtonWithNewIndicator(newIndicator: Settings.NewIndicator, icon: TextureRegion? = null,
-                                                   binding: Var.Context.() -> String): Button {
-        return Button(binding = {
-            (if (newIndicator.value.use())
-                (Localization.getVar("common.newIndicator").use() + " ")
-            else "") + binding.invoke(this)
-        }, font = font).apply {
-            this.skinID.set(BUTTON_LONG_SKIN_ID)
-            this.padding.set(Insets(4f, 4f, 12f, 12f))
-            this.bounds.height.set(40f)
-            this.textAlign.set(TextAlign.LEFT)
-            this.renderAlign.set(Align.left)
-            this.markup.set(this@StandardMenu.markup)
-            this.setOnHoverStart(blipSoundListener)
-            
+    protected fun createLongButtonWithIcon(icon: TextureRegion?, binding: Var.Context.() -> String): Button {
+        return createLongButton(binding).apply {
             if (icon != null) {
                 val existingPadding = this.padding.getOrCompute()
                 this.padding.set(existingPadding.copy(left = existingPadding.left * 2 + 32f))
@@ -251,18 +238,13 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
         }
     }
-    
-    protected fun createLongButtonWithIcon(icon: TextureRegion?, binding: Var.Context.() -> String): Button {
-        return createLongButton(binding).apply { 
-            if (icon != null) {
-                val existingPadding = this.padding.getOrCompute()
-                this.padding.set(existingPadding.copy(left = existingPadding.left * 2 + 32f))
-                this.addChild(ImageIcon(icon, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
-                    this.bounds.x.set(-(32f + 4f * 2))
-                    this.bounds.width.set(32f)
-                    this.bounds.height.set(32f)
-                })
-            }
+
+    protected fun createLongButtonWithNewIndicator(newIndicator: Settings.NewIndicator, icon: TextureRegion? = null,
+                                                   binding: Var.Context.() -> String): Button {
+        return createLongButtonWithIcon(icon) {
+            (if (newIndicator.value.use())
+                (Localization.getVar("common.newIndicator").use() + " ")
+            else "") + binding.invoke(this)
         }
     }
 
