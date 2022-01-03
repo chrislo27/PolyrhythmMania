@@ -62,22 +62,6 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.contentPane.bounds.height.set(520f)
         this.showLogo.set(false)
 
-        val scrollPane = ScrollPane().apply {
-            Anchor.TopLeft.configure(this)
-            this.bindHeightToParent(-40f)
-
-            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
-
-            this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
-            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
-
-            val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
-            this.vBar.skinID.set(scrollBarSkinID)
-            this.hBar.skinID.set(scrollBarSkinID)
-
-            this.vBar.unitIncrement.set(10f)
-            this.vBar.blockIncrement.set(40f)
-        }
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
             this.spacing.set(8f)
@@ -85,7 +69,6 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.bounds.height.set(40f)
         }
 
-        contentPane.addChild(scrollPane)
         contentPane.addChild(hbox)
 
 
@@ -183,21 +166,9 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             
             vbox += separator()
             
-            val leaderboardScrollPane = ScrollPane().apply {
+            val internalPane = Pane().apply {
                 Anchor.TopLeft.configure(this)
                 this.bounds.height.set(390f)
-
-                (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
-
-                this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
-                this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
-
-                val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
-                this.vBar.skinID.set(scrollBarSkinID)
-                this.hBar.skinID.set(scrollBarSkinID)
-
-                this.vBar.unitIncrement.set(10f)
-                this.vBar.blockIncrement.set(40f)
             }
             
             val paneFetching = Pane().apply {
@@ -232,7 +203,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         paneNeedsRefresh
                     } else {
                         val list = leaderboardVar.use()
-                        if (list == null || list.isEmpty()) {
+                        if (list == null || list.isEmpty() || list.values.sumOf { it.size } == 0) {
                             paneNoData
                         } else {
                             createTable(list)
@@ -242,14 +213,15 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             
             scrollPaneContent.addListener {
-                leaderboardScrollPane.setContent(it.getOrCompute())
+                internalPane.children.forEach { c -> internalPane.removeChild(c) }
+                internalPane.addChild(it.getOrCompute())
             }
             
-            vbox += leaderboardScrollPane
+            vbox += internalPane
         }
 
         vbox.sizeHeightToChildren(100f)
-        scrollPane.setContent(vbox)
+        contentPane.addChild(vbox)
         
         hbox.temporarilyDisableLayouts {
             hbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
@@ -356,7 +328,6 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             
             val dateList = leaderboard.keys.sortedDescending()
-            var currentListing: VBox = VBox()
             fun updateList(date: LocalDate) {
                 val newPane = VBox().apply { 
                     this.temporarilyDisableLayouts {
@@ -376,7 +347,6 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this.sizeHeightToChildren(100f)
                 }
                 
-                currentListing = newPane
                 scrollPane.setContent(newPane)
             }
 
