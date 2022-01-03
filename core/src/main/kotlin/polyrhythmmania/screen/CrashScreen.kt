@@ -147,6 +147,7 @@ class CrashScreen(main: PRManiaGame, val throwable: Throwable, val lastScreen: S
         while (sc != null) {
             sc = ScissorStack.popScissor()
         }
+        PaintboxFont.LENIENT_BEGIN_END = true
         
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
