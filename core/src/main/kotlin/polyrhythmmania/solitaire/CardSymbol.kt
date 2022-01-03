@@ -1,18 +1,18 @@
 package polyrhythmmania.solitaire
 
 
-enum class CardSymbol(val scaleOrder: Int, val textSymbol: String, val semitone: Int = 0) {
-    NUM_7(6, "7", 11),
-    NUM_6(5, "6", 9),
-    NUM_5(4, "5", 7),
-    NUM_4(3, "4", 5),
-    NUM_3(2, "3", 4),
-    NUM_2(1, "2", 2),
-    NUM_1(0, "1", 0),
+enum class CardSymbol(val scaleOrder: Int, val textSymbol: String, val spriteID: String, val semitone: Int = 0) {
+    NUM_7(6, "7", "7", 11),
+    NUM_6(5, "6", "6", 9),
+    NUM_5(4, "5", "5", 7),
+    NUM_4(3, "4", "4", 5),
+    NUM_3(2, "3", "3", 4),
+    NUM_2(1, "2", "2", 2),
+    NUM_1(0, "1", "1", 0),
     
-    WIDGET_HALF(999, "Wh"), ROD(999, "R"),
+    WIDGET_HALF(999, "Wh", "widget"), ROD(999, "R", "rod"),
     
-    SPARE(9999, "SP", semitone = 12)
+    SPARE(9999, "SP", "rod" /* TODO */, semitone = 12)
     ;
     
     companion object {

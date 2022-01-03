@@ -9,9 +9,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
+import paintbox.packing.PackedSheet
 import paintbox.ui.*
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.*
@@ -635,25 +635,30 @@ class SolitaireGame : ActionablePane() {
     private fun renderCard(x: Float, y: Float, batch: SpriteBatch, card: Card, flippedOver: Boolean, font: BitmapFont) {
         val lastPackedColor = batch.packedColor
 
+        val sheet = SolitaireAssets.get<PackedSheet>("cards")
         val cw = cardWidth
         val ch = cardHeight
-        val grey = 1f
         val renderX = x
         val renderY = (y - ch)
         if (flippedOver) {
-            batch.setColor(1f, grey, grey, 1f)
-            batch.fillRect(renderX, renderY, cw, ch)
-            batch.setColor(grey * 0.5f, 1f, grey * 0.5f, 0.75f)
-            batch.drawRect(renderX, renderY, cw, ch, 4f)
+            batch.setColor(1f, 1f, 1f, 1f)
+            batch.draw(sheet["card_back"], renderX, renderY, cw, ch)
         } else {
-            batch.setColor(1f, grey, grey, 1f)
-            batch.fillRect(renderX, renderY, cw, ch)
-            batch.setColor(1f, grey * 0.5f, grey * 0.5f, 0.75f)
-            batch.drawRect(renderX, renderY, cw, ch, 4f)
-
-            font.color = card.suit.color
-            font.drawCompressed(batch, card.symbol.textSymbol, renderX + 6f, (renderY + ch) - 6f, cardWidth - 6f * 2, Align.left)
-            font.drawCompressed(batch, card.symbol.textSymbol, renderX + 6f, (renderY + ch) - cardHeight + 6f + font.capHeight, cardWidth - 6f * 2, Align.right)
+            batch.setColor(1f, 1f, 1f, 1f)
+            batch.draw(sheet["card_front"], renderX, renderY, cw, ch)
+            
+            val symbolIndent = 7f
+            batch.color = card.suit.color
+            // Symbol in top left and upside-down bottom right
+            val symbolRegion = sheet[card.symbol.spriteID]
+            batch.draw(symbolRegion, renderX + symbolIndent, renderY + ch - symbolIndent - symbolRegion.originalHeight)
+            batch.draw(symbolRegion, renderX + cw - (symbolIndent + symbolRegion.originalWidth), renderY + symbolIndent + symbolRegion.originalHeight,
+                    symbolRegion.originalWidth * 1f, -symbolRegion.originalHeight * 1f)
+            // Suit in top right and upside-down bottom left
+            val suitRegion = sheet[card.suit.spriteID]
+            batch.draw(suitRegion, renderX + cw - (symbolIndent + suitRegion.originalWidth), renderY + ch - symbolIndent - suitRegion.originalHeight)
+            batch.draw(suitRegion, renderX + symbolIndent, renderY + symbolIndent + suitRegion.originalHeight,
+                    suitRegion.originalWidth * 1f, -suitRegion.originalHeight * 1f)
         }
 
         batch.packedColor = lastPackedColor
