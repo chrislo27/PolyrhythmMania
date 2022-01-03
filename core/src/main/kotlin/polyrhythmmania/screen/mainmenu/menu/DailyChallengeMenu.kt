@@ -32,7 +32,7 @@ import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.flags.CountryFlags
-import java.time.LocalDate
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 
@@ -42,6 +42,11 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     private var epochSeconds: Long = System.currentTimeMillis() / 1000
     val dailyChallengeDate: Var<LocalDate> = Var(EndlessPolyrhythm.getCurrentDailyChallengeDate())
+    private val resetsAtLocalTimeText: ReadOnlyVar<String> = Localization.getVar("mainMenu.dailyChallenge.resetHint", Var { 
+        val localTime = ZonedDateTime.of(LocalDateTime.of(dailyChallengeDate.use(), LocalTime.MIDNIGHT), ZoneOffset.UTC)
+                .withZoneSameInstant(ZoneId.systemDefault()).toLocalTime()
+        listOf("${localTime.hour.toString().padStart(2, '0')}:${localTime.minute.toString().padStart(2, '0')}")
+    })
     
     private val isFetching: BooleanVar = BooleanVar(false)
     private val disableRefresh: BooleanVar = BooleanVar(false)
@@ -91,9 +96,13 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.bindHeightToParent(-40f)
         }
 
+        val needsRefreshString = Localization.getVar("mainMenu.dailyChallenge.leaderboard.needsRefresh", Var {
+            listOf(resetsAtLocalTimeText.use())
+        })
+        
         vbox.temporarilyDisableLayouts {
             val dailyChallengeTitle: ReadOnlyVar<String> = Localization.getVar("mainMenu.dailyChallenge.play", Var {
-                listOf(dailyChallengeDate.use().format(DateTimeFormatter.ISO_DATE))
+                listOf(dailyChallengeDate.use().format(DateTimeFormatter.ISO_DATE), resetsAtLocalTimeText.use())
             })
             vbox += createLongButton { dailyChallengeTitle.use() }.apply {
                 this.setOnAction {
@@ -151,10 +160,12 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     val (date, hiScore) = main.settings.endlessDailyChallenge.use()
                     if (date == dailyChallengeDate.use()) {
                         Localization.getVar("mainMenu.dailyChallenge.play.tooltip.expired", Var {
-                            listOf(hiScore)
+                            listOf(hiScore, resetsAtLocalTimeText.use())
                         })
                     } else {
-                        Localization.getVar("mainMenu.dailyChallenge.play.tooltip.ready")
+                        Localization.getVar("mainMenu.dailyChallenge.play.tooltip.ready", Var {
+                            listOf(resetsAtLocalTimeText.use())
+                        })
                     }.use()
                 }))
                 this.disabled.bind {
@@ -208,7 +219,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             val paneNeedsRefresh = Pane().apply {
                 this.bounds.height.set(200f)
-                this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.needsRefresh").use() }).apply {
+                this += TextLabel(binding = { needsRefreshString.use() }).apply {
                     this.renderAlign.set(Align.center)
                     this.doLineWrapping.set(true)
                     this.markup.set(this@DailyChallengeMenu.markup)
@@ -255,6 +266,11 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 this.disabled.bind { 
                     isFetching.use() || disableRefresh.use()
+                }
+                
+                val tt = createTooltip(needsRefreshString)
+                this.tooltipElement.bind { 
+                    if (disabled.use() || showRefreshPrompt) null else tt
                 }
             }
         }
@@ -329,6 +345,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this.renderAlign.set(Align.left)
                     this.padding.set(Insets(0f, 0f, 4f, 4f))
                     this.bounds.height.set(32f)
+                    this.tooltipElement.set(createTooltip(resetsAtLocalTimeText))
                 }
                 
                 var placeNumber = 1
