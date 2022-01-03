@@ -1,5 +1,6 @@
 package polyrhythmmania.solitaire
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.audio.Sound
@@ -9,9 +10,20 @@ import paintbox.packing.PackedSheet
 import paintbox.packing.PackedSheetLoader
 import paintbox.registry.AssetRegistryInstance
 import paintbox.registry.IAssetLoader
+import paintbox.util.gdxutils.disposeQuietly
+import polyrhythmmania.PRManiaGame
 
 
-object SolitaireAssets : AssetRegistryInstance()
+object SolitaireAssets : AssetRegistryInstance() {
+    
+    init {
+        Gdx.app.postRunnable { 
+            PRManiaGame.instance.addDisposeCall {
+                this.disposeQuietly()
+            }
+        }
+    }
+}
 
 class SolitaireAssetLoader : IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
