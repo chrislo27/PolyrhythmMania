@@ -304,7 +304,27 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
     
     private fun createTable(leaderboard: DailyLeaderboard): Pane {
-        return VBox().apply {
+        return Pane().apply {
+            val headerHBox = HBox().apply {
+                this.bounds.height.set(32f)
+            }
+            val scrollPane = ScrollPane().apply {
+                Anchor.TopLeft.configure(this, offsetY = 32f)
+                this.bindHeightToParent(-32f)
+
+                (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
+
+                this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+                this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+
+                val scrollBarSkinID = PRManiaSkins.SCROLLBAR_SKIN
+                this.vBar.skinID.set(scrollBarSkinID)
+                this.hBar.skinID.set(scrollBarSkinID)
+
+                this.vBar.unitIncrement.set(10f)
+                this.vBar.blockIncrement.set(40f)
+            }
+            
             fun DailyLeaderboardScore.createPane(place: Int): Pane {
                 return Pane().apply {
                     this.bounds.height.set(32f)
@@ -336,7 +356,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             
             val dateList = leaderboard.keys.sortedDescending()
-            var currentListing: Pane = Pane()
+            var currentListing: VBox = VBox()
             fun updateList(date: LocalDate) {
                 val newPane = VBox().apply { 
                     this.temporarilyDisableLayouts {
@@ -355,38 +375,33 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                     this.sizeHeightToChildren(100f)
                 }
-                this.removeChild(currentListing)
-                currentListing = newPane
-                this.addChild(newPane)
-                this.sizeHeightToChildren(100f)
-            }
-            
-            
-            this.temporarilyDisableLayouts {
-                val startingDate = dateList.firstOrNull() ?: dailyChallengeDate.getOrCompute()
                 
-                this += HBox().apply {
-                    this.bounds.height.set(32f)
-                    this += TextLabel(binding = {
-                        Localization.getVar("mainMenu.dailyChallenge.leaderboard.header").use() + " "
-                    }, font = main.fontMainMenuMain).apply {
-                        this.renderAlign.set(Align.left)
-                        this.padding.set(Insets(0f, 0f, 4f, 4f))
-                        this.tooltipElement.set(createTooltip(resetsAtLocalTimeText))
-                        this.resizeBoundsToContent(affectWidth = true, affectHeight = false, limitWidth = 300f)
-                    }
-                    this += ComboBox(dateList, startingDate, font = main.fontMainMenuMain).apply { 
-                        this.bounds.width.set(160f)
-                        this.onItemSelected = { newDate ->
-                            updateList(newDate)
-                        }
+                currentListing = newPane
+                scrollPane.setContent(newPane)
+            }
+
+
+            val startingDate = dateList.firstOrNull() ?: dailyChallengeDate.getOrCompute()
+
+            this += headerHBox.apply {
+                this += TextLabel(binding = {
+                    Localization.getVar("mainMenu.dailyChallenge.leaderboard.header").use() + " "
+                }, font = main.fontMainMenuMain).apply {
+                    this.renderAlign.set(Align.left)
+                    this.padding.set(Insets(0f, 0f, 4f, 2f))
+                    this.tooltipElement.set(createTooltip(resetsAtLocalTimeText))
+                    this.resizeBoundsToContent(affectWidth = true, affectHeight = false, limitWidth = 300f)
+                }
+                this += ComboBox(dateList, startingDate, font = main.fontMainMenuMain).apply {
+                    this.bounds.width.set(160f)
+                    this.onItemSelected = { newDate ->
+                        updateList(newDate)
                     }
                 }
-                
-                updateList(startingDate)
             }
-        }.apply { 
-            sizeHeightToChildren(100f)
+            this += scrollPane
+
+            updateList(startingDate)
         }
     }
     
