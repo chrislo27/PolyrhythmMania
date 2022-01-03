@@ -333,15 +333,21 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this.temporarilyDisableLayouts {
                         val list = leaderboard.getOrDefault(date, emptyList())
 
-                        var placeNumber = 1
-                        var placeValue = -1
                         val sorted = list.sortedByDescending { it.score }
-                        sorted.forEachIndexed { i, score ->
+                        val placeNumbersInverse = mutableMapOf<DailyLeaderboardScore, Int>()
+                        
+                        var placeNumber = 0
+                        var placeValue = -1
+                        sorted.asReversed().forEachIndexed { i, score ->
                             if (score.score != placeValue) {
                                 placeValue = score.score
                                 placeNumber = i + 1
                             }
-                            this += score.createPane(placeNumber)
+                            placeNumbersInverse[score] = placeNumber
+                        }
+                        
+                        sorted.forEach { score ->
+                            this += score.createPane(sorted.size - placeNumbersInverse.getOrDefault(score, 99999) + 1)
                         }
                     }
                     this.sizeHeightToChildren(100f)
