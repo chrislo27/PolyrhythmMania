@@ -51,8 +51,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private val isFetching: BooleanVar = BooleanVar(false)
     private val disableRefresh: BooleanVar = BooleanVar(false)
     private var disableRefreshUntil: Long = 0L
-    private val leaderboardList: Var<List<DailyLeaderboardScore>?> = Var(null)
-    private var leaderboardDate: LocalDate = dailyChallengeDate.getOrCompute()
+    private val leaderboardVar: Var<DailyLeaderboard?> = Var(null)
     private val scrollPaneContent: Var<Pane> = Var(Pane())
 
     private var showRefreshPrompt: Boolean = true
@@ -232,7 +231,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     if (showRefreshPrompt) {
                         paneNeedsRefresh
                     } else {
-                        val list = leaderboardList.use()
+                        val list = leaderboardVar.use()
                         if (list == null || list.isEmpty()) {
                             paneNoData
                         } else {
@@ -282,9 +281,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
     private fun getLeaderboard() {
         showRefreshPrompt = false
-        val date = dailyChallengeDate.getOrCompute()
-        leaderboardDate = date
-        DailyChallengeUtils.getLeaderboard(date, leaderboardList, isFetching)
+        DailyChallengeUtils.getLeaderboardPastWeek(leaderboardVar, isFetching)
         disableRefresh.set(true)
         disableRefreshUntil = System.currentTimeMillis() + 10_000L
     }
@@ -306,7 +303,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
     }
     
-    private fun createTable(list: List<DailyLeaderboardScore>): Pane {
+    private fun createTable(leaderboard: DailyLeaderboard): Pane {
         return VBox().apply {
             fun DailyLeaderboardScore.createPane(place: Int): Pane {
                 return Pane().apply {
@@ -338,26 +335,55 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             
-            this.temporarilyDisableLayouts { 
-                this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.header", Var { 
-                    listOf(leaderboardDate)
-                }).use() }, font = main.fontMainMenuMain).apply {
-                    this.renderAlign.set(Align.left)
-                    this.padding.set(Insets(0f, 0f, 4f, 4f))
+            val dateList = leaderboard.keys.sortedDescending()
+            var currentListing: Pane = Pane()
+            fun updateList(date: LocalDate) {
+                val newPane = VBox().apply { 
+                    this.temporarilyDisableLayouts {
+                        val list = leaderboard.getOrDefault(date, emptyList())
+
+                        var placeNumber = 1
+                        var placeValue = -1
+                        val sorted = list.sortedByDescending { it.score }
+                        sorted.forEachIndexed { i, score ->
+                            if (score.score != placeValue) {
+                                placeValue = score.score
+                                placeNumber = i + 1
+                            }
+                            this += score.createPane(placeNumber)
+                        }
+                    }
+                    this.sizeHeightToChildren(100f)
+                }
+                this.removeChild(currentListing)
+                currentListing = newPane
+                this.addChild(newPane)
+                this.sizeHeightToChildren(100f)
+            }
+            
+            
+            this.temporarilyDisableLayouts {
+                val startingDate = dateList.firstOrNull() ?: dailyChallengeDate.getOrCompute()
+                
+                this += HBox().apply {
                     this.bounds.height.set(32f)
-                    this.tooltipElement.set(createTooltip(resetsAtLocalTimeText))
+                    this += TextLabel(binding = {
+                        Localization.getVar("mainMenu.dailyChallenge.leaderboard.header").use() + " "
+                    }, font = main.fontMainMenuMain).apply {
+                        this.renderAlign.set(Align.left)
+                        this.padding.set(Insets(0f, 0f, 4f, 4f))
+                        this.tooltipElement.set(createTooltip(resetsAtLocalTimeText))
+                        this.resizeBoundsToContent(affectWidth = true, affectHeight = false, limitWidth = 300f)
+                    }
+                    this += ComboBox(dateList, startingDate, font = main.fontMainMenuMain).apply { 
+                        this.bounds.width.set(160f)
+                        this.onItemSelected = { newDate ->
+                            updateList(newDate)
+                        }
+                    }
                 }
                 
-                var placeNumber = 1
-                var placeValue = -1
-                val sorted = list.sortedByDescending { it.score }
-                sorted.forEachIndexed { i, score ->
-                    if (score.score != placeValue) {
-                        placeValue = score.score
-                        placeNumber = i + 1
-                    }
-                    this += score.createPane(placeNumber)
-                }
+                updateList(startingDate)
             }
         }.apply { 
             sizeHeightToChildren(100f)

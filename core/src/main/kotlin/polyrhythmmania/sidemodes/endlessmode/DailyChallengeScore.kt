@@ -31,6 +31,8 @@ data class EndlessHighScore(val seed: UInt, val score: Int) {
 
 data class DailyLeaderboardScore(val countryCode: String, val score: Int, val name: String)
 
+typealias DailyLeaderboard = Map<LocalDate, List<DailyLeaderboardScore>>
+
 object DailyChallengeUtils {
     
     val allowedNameChars: Set<Char> = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_".toSet()
@@ -94,18 +96,18 @@ object DailyChallengeUtils {
         }
     }
 
-    fun getLeaderboard(date: LocalDate, listVar: Var<List<DailyLeaderboardScore>?>, fetching: Var<Boolean>) {
+    fun getLeaderboardPastWeek(listVar: Var<DailyLeaderboard?>, fetching: Var<Boolean>) {
         thread(isDaemon = true, name = "Daily Challenge leaderboard GET", start = true) {
             Gdx.app.postRunnable { 
                 fetching.set(true)
             }
             
-            val uriBuilder = URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/top/${date.format(DateTimeFormatter.ISO_DATE)}")
+            val uriBuilder = URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/top_past_week")
                     .setParameter("v", PRMania.VERSION.toString())
                     .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
 
             val get = HttpGet(uriBuilder.build())
-            var returnList: List<DailyLeaderboardScore>? = null
+            var returnValue: DailyLeaderboard? = null
             try {
                 val httpClient = PRManiaGame.instance.httpClient
                 httpClient.execute(get).use { response ->
@@ -114,24 +116,33 @@ object DailyChallengeUtils {
                         Paintbox.LOGGER.warn("Failed to get daily challenge leaderboard: status was $status for url ${get.uri} ${EntityUtils.toString(response.entity)}")
                     } else {
                         val content = EntityUtils.toString(response.entity)
-                        val jsonArray = Json.parse(content).asArray()
-                        val list = mutableListOf<DailyLeaderboardScore>()
-                        jsonArray.forEach { v ->
-                            v as JsonObject
-                            val countryCode = v["countryCode"]
-                            list += DailyLeaderboardScore(countryCode?.takeIf { it.isString }?.asString() ?: "unknown", v.getInt("score", 0), v.getString("name", ""))
+                        val jsonObject = Json.parse(content).asObject()
+                        // key/value pairs of ISO date, score objects
+                        val map = mutableMapOf<LocalDate, List<DailyLeaderboardScore>>()
+                        jsonObject.forEach { member ->
+                            val date = LocalDate.parse(member.name, DateTimeFormatter.ISO_LOCAL_DATE)
+                            val list = mutableListOf<DailyLeaderboardScore>()
+                            member.value.asArray().forEach { v ->
+                                v as JsonObject
+                                val countryCode = v["countryCode"]
+                                list += DailyLeaderboardScore(countryCode?.takeIf { it.isString }?.asString() ?: "unknown", v.getInt("score", 0), v.getString("name", ""))
+                            }
+                            
+                            // Merge
+                            map[date] = map.getOrElse(date) { emptyList() } + list
                         }
-                        returnList = list
+                        
+                        returnValue = map
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                returnList = null
+                returnValue = null
             }
             
             Gdx.app.postRunnable { 
                 fetching.set(false)
-                listVar.set(returnList)
+                listVar.set(returnValue)
             }
         }
     }
