@@ -652,13 +652,13 @@ class SolitaireGame : ActionablePane() {
             // Symbol in top left and upside-down bottom right
             val symbolRegion = sheet[card.symbol.spriteID]
             batch.draw(symbolRegion, renderX + symbolIndent, renderY + ch - symbolIndent - symbolRegion.originalHeight)
-            batch.draw(symbolRegion, renderX + cw - (symbolIndent + symbolRegion.originalWidth), renderY + symbolIndent + symbolRegion.originalHeight,
-                    symbolRegion.originalWidth * 1f, -symbolRegion.originalHeight * 1f)
+            batch.draw(symbolRegion, renderX + cw - (symbolIndent), renderY + symbolIndent + symbolRegion.originalHeight,
+                    -symbolRegion.originalWidth * 1f, -symbolRegion.originalHeight * 1f)
             // Suit in top right and upside-down bottom left
             val suitRegion = sheet[card.suit.spriteID]
             batch.draw(suitRegion, renderX + cw - (symbolIndent + suitRegion.originalWidth), renderY + ch - symbolIndent - suitRegion.originalHeight)
-            batch.draw(suitRegion, renderX + symbolIndent, renderY + symbolIndent + suitRegion.originalHeight,
-                    suitRegion.originalWidth * 1f, -suitRegion.originalHeight * 1f)
+            batch.draw(suitRegion, renderX + symbolIndent + suitRegion.originalWidth, renderY + symbolIndent + suitRegion.originalHeight,
+                    -suitRegion.originalWidth * 1f, -suitRegion.originalHeight * 1f)
         }
 
         batch.packedColor = lastPackedColor
