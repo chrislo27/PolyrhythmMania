@@ -30,6 +30,7 @@ import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_PRMPROJ
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_TEXPACK
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_ASM
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_LIBRARY
+import polyrhythmmania.PreferenceKeys.SETTINGS_ACHIEVEMENT_NOTIFICATIONS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
@@ -102,6 +103,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
     private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, "")
     private val kv_mainMenuFlipAnimations: KeyValue<Boolean> = KeyValue(SETTINGS_MAINMENU_FLIP_ANIMATION, true)
+    private val kv_achievementNotifications: KeyValue<Boolean> = KeyValue(SETTINGS_ACHIEVEMENT_NOTIFICATIONS, true)
     private val kv_calibrationAudioOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_CALIBRATION_AUDIO_OFFSET_MS, 0)
     private val kv_calibrationDisableInputSFX: KeyValue<Boolean> = KeyValue(SETTINGS_CALIBRATION_DISABLE_INPUT_SFX, false)
     private val kv_vsyncEnabled: KeyValue<Boolean> = KeyValue(SETTINGS_VSYNC, false)
@@ -140,6 +142,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val discordRichPresence: Var<Boolean> = kv_discordRichPresence.value
     val mixer: Var<String> = kv_mixer.value
     val mainMenuFlipAnimation: Var<Boolean> = kv_mainMenuFlipAnimations.value
+    val achievementNotifications: Var<Boolean> = kv_achievementNotifications.value
     val calibrationAudioOffsetMs: Var<Int> = kv_calibrationAudioOffsetMs.value
     val calibrationDisableInputSFX: Var<Boolean> = kv_calibrationDisableInputSFX.value
     val vsyncEnabled: Var<Boolean> = kv_vsyncEnabled.value
@@ -195,6 +198,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_discordRichPresence)
         prefs.getString(kv_mixer)
         prefs.getBoolean(kv_mainMenuFlipAnimations)
+        prefs.getBoolean(kv_achievementNotifications)
         prefs.getString(kv_locale)
         prefs.getIntCoerceIn(kv_calibrationAudioOffsetMs, -500, 500)
         prefs.getBoolean(kv_calibrationDisableInputSFX)
@@ -248,6 +252,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_discordRichPresence)
                 .putString(kv_mixer)
                 .putBoolean(kv_mainMenuFlipAnimations)
+                .putBoolean(kv_achievementNotifications)
                 .putString(kv_locale)
                 .putInt(kv_calibrationAudioOffsetMs)
                 .putBoolean(kv_calibrationDisableInputSFX)
