@@ -104,6 +104,7 @@ object DumpAudioDebugInfo {
                     e.printStackTrace()
                 }
             }
+            strBuilder.println("Was open: $wasOpen")
             strBuilder.println("Is open: ${mixer.isOpen}")
             
             
