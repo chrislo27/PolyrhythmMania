@@ -36,6 +36,7 @@ object PreferenceKeys {
     val SETTINGS_DISCORD_RPC = "settings_discord_rich_presence"
     val SETTINGS_MIXER = "settings_mixer"
     val SETTINGS_MAINMENU_FLIP_ANIMATION = "settings_mainMenu_flipAnimation"
+    val SETTINGS_ACHIEVEMENT_NOTIFICATIONS = "settings_achievementNotifications"
     val SETTINGS_LOCALE = "settings_locale"
     val SETTINGS_CALIBRATION_AUDIO_OFFSET_MS = "settings_calibration_audioOffsetMs"
     val SETTINGS_CALIBRATION_DISABLE_INPUT_SFX = "settings_calibration_disableInputSFX"

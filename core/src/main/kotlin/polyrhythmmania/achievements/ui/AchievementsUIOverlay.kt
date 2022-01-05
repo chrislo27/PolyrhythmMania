@@ -108,29 +108,31 @@ class AchievementsUIOverlay {
         
         while (queue.isNotEmpty() && activeToasts.size < MAX_TOASTS_ON_SCREEN) {
             val next = queue.removeFirst()
-            activeToasts += ActiveToast(next).also { activeToast ->
-                sceneRoot += activeToast.containingPane
-                val interpolation = Interpolation.smoother
-                val animationDur = 0.35f
-                val showTime = 5f
-                sceneRoot.animations.enqueueAnimation(Animation(interpolation, animationDur, 0f, 1f).apply { 
-                    onComplete = {
-                        // Post animation going back up
-                        Gdx.app.postRunnable {
-                            sceneRoot.animations.enqueueAnimation(Animation(interpolation, animationDur, 1f, 0f, delay = showTime).apply {
-                                onComplete = {
-                                    Gdx.app.postRunnable {
-                                        activeToasts.remove(activeToast)
-                                        sceneRoot -= activeToast.containingPane
+            if (main.settings.achievementNotifications.getOrCompute()) {
+                activeToasts += ActiveToast(next).also { activeToast ->
+                    sceneRoot += activeToast.containingPane
+                    val interpolation = Interpolation.smoother
+                    val animationDur = 0.35f
+                    val showTime = 5f
+                    sceneRoot.animations.enqueueAnimation(Animation(interpolation, animationDur, 0f, 1f).apply {
+                        onComplete = {
+                            // Post animation going back up
+                            Gdx.app.postRunnable {
+                                sceneRoot.animations.enqueueAnimation(Animation(interpolation, animationDur, 1f, 0f, delay = showTime).apply {
+                                    onComplete = {
+                                        Gdx.app.postRunnable {
+                                            activeToasts.remove(activeToast)
+                                            sceneRoot -= activeToast.containingPane
+                                        }
                                     }
-                                }
-                            }, activeToast.showPercentage) 
+                                }, activeToast.showPercentage)
+                            }
                         }
-                    }
-                }, activeToast.showPercentage)
-                if (next.achievement.rank == AchievementRank.CHALLENGE) {
-                    Gdx.app.postRunnable {
-                        AssetRegistry.get<Sound>("sfx_challenge_complete").play(1f * (main.settings.menuSfxVolume.getOrCompute() / 100f))
+                    }, activeToast.showPercentage)
+                    if (next.achievement.rank == AchievementRank.CHALLENGE) {
+                        Gdx.app.postRunnable {
+                            AssetRegistry.get<Sound>("sfx_challenge_complete").play(1f * (main.settings.menuSfxVolume.getOrCompute() / 100f))
+                        }
                     }
                 }
             }
