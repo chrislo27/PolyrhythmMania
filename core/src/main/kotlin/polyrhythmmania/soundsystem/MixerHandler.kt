@@ -1,5 +1,6 @@
 package polyrhythmmania.soundsystem
 
+import java.lang.IllegalArgumentException
 import javax.sound.sampled.*
 
 
@@ -24,8 +25,14 @@ class MixerHandler(val audioFormat: AudioFormat) {
                     mixer.getLine(datalineInfo)
 //                    Paintbox.LOGGER.debug("Mixer ${mixer.mixerInfo} is compatible for outputting.")
                     true
-                } catch (e: Exception) {
+                } catch (e: LineUnavailableException) {
 //                    Paintbox.LOGGER.debug("Mixer ${mixer.mixerInfo} is NOT compatible for outputting!")
+                    false
+                } catch (e: IllegalArgumentException) {
+//                    Paintbox.LOGGER.debug("Mixer ${mixer.mixerInfo} is NOT compatible for outputting!")
+                    false
+                } catch (e: Exception) {
+                    e.printStackTrace()
                     false
                 }
             }

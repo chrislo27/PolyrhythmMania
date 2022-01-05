@@ -1,16 +1,21 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.font.TextAlign
 import paintbox.ui.Anchor
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Slider
 import paintbox.ui.control.TextLabel
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
+import polyrhythmmania.soundsystem.DumpAudioDebugInfo
 import polyrhythmmania.soundsystem.SoundSystem
 import javax.sound.sampled.Mixer
 
@@ -58,14 +63,30 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         vbox.temporarilyDisableLayouts {
+            fun separator(): UIElement {
+                return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
+                    this.bounds.height.set(10f)
+                    this.margin.set(Insets(4f, 4f, 12f, 12f))
+                }
+            }
+            
             vbox += TextLabel(binding = { Localization.getVar("mainMenu.advancedAudio.notice").use() }).apply {
                 this.markup.set(this@AdvAudioMenu.markup)
-                this.bounds.height.set(75f)    
+                this.bounds.height.set(65f)    
                 this.renderAlign.set(Align.topLeft)
                 this.doLineWrapping.set(true)
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)
+                this.setScaleXY(0.9f)
             }
             vbox += mixerPane
+            
+            vbox += separator()
+            vbox += createLongButton { Localization.getVar("mainMenu.advancedAudio.dumpAudioDebugInfo").use() }.apply {
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.advancedAudio.dumpAudioDebugInfo.tooltip")))
+                this.setOnAction {
+                    DumpAudioDebugInfo.dump()
+                }
+            }
         }
 
         hbox.temporarilyDisableLayouts {
