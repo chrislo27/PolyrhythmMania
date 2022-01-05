@@ -9,11 +9,9 @@ import net.beadsproject.beads.core.UGen
 import net.beadsproject.beads.core.io.JavaSoundAudioIO
 import polyrhythmmania.PRMania
 import polyrhythmmania.soundsystem.MixerTracking
-import polyrhythmmania.util.OnSpinWaitJ8
 import polyrhythmmania.util.metrics.timeInline
 import javax.sound.sampled.*
 import kotlin.concurrent.thread
-import java.util.concurrent.TimeUnit
 import kotlin.math.min
 
 /**
@@ -113,16 +111,7 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer, val systemBufferSizeInFrames:
                 primeBuffer((buffersSent + 1) % NUM_OUTPUT_BUFFERS)
                 primed++
             } else {
-                if (!OnSpinWaitJ8.onSpinWait()) {
-                    try {
-                        // If onSpinWait is not supported, attempt to sleep 1 ms to reduce CPU usage.
-                        // Obviously sleeping exactly 1 ms is not possible but the buffer duration is
-                        // about 10 ms which is plenty of time.
-                        // This will be removed once Java 11 is the new minimum language level.
-                        Thread.sleep(1L)
-                    } catch (ignored: Exception) {
-                    }
-                }
+                Thread.onSpinWait()
             }
         }
     }
