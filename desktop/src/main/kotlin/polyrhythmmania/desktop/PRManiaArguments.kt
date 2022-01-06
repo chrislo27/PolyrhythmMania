@@ -20,7 +20,7 @@ class PRManiaArguments : PaintboxArguments() {
     @Parameter(names = ["--audio-device-buffer-size"], description = "Sets the AudioDevice buffer size. Should be a power of two. Defaults to 512.")
     var audioDeviceBufferSize: Int = 512
     
-    @Parameter(names = ["--audio-device-buffer-count"], description = "Sets the AudioDevice buffer count. Defaults to 10.")
-    var audioDeviceBufferCount: Int = 10
+    @Parameter(names = ["--audio-device-buffer-count"], description = "Sets the AudioDevice buffer count. Defaults to 9.")
+    var audioDeviceBufferCount: Int = 9
     
 }
