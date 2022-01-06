@@ -2,6 +2,7 @@ package polyrhythmmania.soundsystem.beads
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.AudioDevice
+import com.badlogic.gdx.backends.lwjgl3.audio.OpenALAudioDevice
 import com.badlogic.gdx.utils.Disposable
 import com.codahale.metrics.MetricRegistry
 import com.codahale.metrics.Timer
@@ -32,7 +33,7 @@ class OpenALAudioIO
         
     }
     
-    private inner class Lifecycle(val audioDevice: AudioDevice) : Disposable {
+    private inner class Lifecycle(val audioDevice: OpenALAudioDevice) : Disposable {
         override fun dispose() {
             audioDevice.dispose()
         }
@@ -54,7 +55,7 @@ class OpenALAudioIO
         }
         val ioAudioFormat = getContext().audioFormat
         
-        val newAudioDevice: AudioDevice = Gdx.audio.newAudioDevice(ioAudioFormat.sampleRate.roundToInt(), ioAudioFormat.outputs == 1)
+        val newAudioDevice = Gdx.audio.newAudioDevice(ioAudioFormat.sampleRate.roundToInt(), ioAudioFormat.outputs == 1) as OpenALAudioDevice
         val lifecycle = Lifecycle(newAudioDevice)
         this.lifecycleInstance = lifecycle
         
