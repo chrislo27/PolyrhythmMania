@@ -17,4 +17,10 @@ class PRManiaArguments : PaintboxArguments() {
     @Parameter(names = ["--enable-metrics"], description = "Enables recording of certain program metrics. Used for debugging.")
     var enableMetrics: Boolean = false
     
+    @Parameter(names = ["--audio-device-buffer-size"], description = "Sets the AudioDevice buffer size. Should be a power of two. Defaults to 512.")
+    var audioDeviceBufferSize: Int = 512
+    
+    @Parameter(names = ["--audio-device-buffer-count"], description = "Sets the AudioDevice buffer count. Defaults to 10.")
+    var audioDeviceBufferCount: Int = 10
+    
 }

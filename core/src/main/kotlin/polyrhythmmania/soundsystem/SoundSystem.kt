@@ -19,7 +19,7 @@ import kotlin.math.abs
 
 /**
  * A wrapper for an [net.beadsproject.beads.core.AudioContext] and associated audio system utilities, using
- * [DaemonJavaSoundAudioIO] as the audio IO interface.
+ * [OpenALAudioIO] as the audio IO interface.
  */
 class SoundSystem(private val mixer: Mixer,
                   val ioAudioFormat: IOAudioFormat = DEFAULT_AUDIO_FORMAT,
@@ -50,16 +50,7 @@ class SoundSystem(private val mixer: Mixer,
     data class SoundSystemSettings(val reportAdaptiveSync: Boolean = true)
 
     val audioContext: AudioContext =
-            AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat)
-//            object : AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat) {
-//                init { // For testing delays
-//                    run {
-//                        val field = AudioContext::class.java.getDeclaredField("out")
-//                        field.isAccessible = true
-//                        field.set(this, Delay(this, this.out.outs, bufferSize * 10))
-//                    }
-//                }
-//            }
+            AudioContext(OpenALAudioIO(), bufferSize, ioAudioFormat)
 
     @Volatile
     private var currentlyRealTime: Boolean = true
