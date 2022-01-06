@@ -685,7 +685,7 @@ playerPos: ${soundSys.musicPlayer.position}
     }
     
     inner class SoundSys : Disposable {
-        val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem(settings = SoundSystem.SoundSystemSettings(false)).apply {
+        val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem(settings = SoundSystem.SoundSystemSettings()).apply {
             this.setPaused(true)
             this.audioContext.out.gain = menuMusicVolume.get()
         }
