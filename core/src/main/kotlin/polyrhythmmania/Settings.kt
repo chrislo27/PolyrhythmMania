@@ -315,6 +315,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             }
         }
 
+        Paintbox.LOGGER.info("Using ${if (useLegacyAudio.getOrCompute()) "legacy" else "OpenAL"} sound system")
         // Set correct JavaSound mixer
         val mixerHandler = MixerHandler.defaultMixerHandler
         val mixerString = this.mixer.getOrCompute()
@@ -323,7 +324,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 it.mixerInfo.name == mixerString
             }
             if (found != null) {
-                Paintbox.LOGGER.info("Attaching to JavaSound mixer from settings: ${found.mixerInfo.name}")
+                Paintbox.LOGGER.info("Setting recommended legacy audio JavaSound mixer to mixer from settings: ${found.mixerInfo.name}")
                 mixerHandler.recommendedMixer = found
             } else {
                 Paintbox.LOGGER.warn("Could not find JavaSound mixer from settings: settings = $mixerString")
@@ -331,7 +332,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         } else {
             val mixerName = mixerHandler.recommendedMixer.mixerInfo.name
             this.mixer.set(mixerName)
-            Paintbox.LOGGER.info("No saved JavaSound mixer string, using $mixerName")
+            Paintbox.LOGGER.info("No saved JavaSound mixer string, recommended will be $mixerName")
         }
         
         // LauncherSettings override properties
