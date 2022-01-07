@@ -49,6 +49,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_MIXER
 import polyrhythmmania.PreferenceKeys.SETTINGS_ONLY_DEFAULT_PALETTE_OLD
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_SKILL_STAR
+import polyrhythmmania.PreferenceKeys.SETTINGS_USE_LEGACY_SOUND
 import polyrhythmmania.PreferenceKeys.SETTINGS_VSYNC
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.PreferenceKeys.SIDEMODE_ASSEMBLE_NORMAL
@@ -60,6 +61,7 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.soundsystem.javasound.MixerHandler
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import java.time.LocalDate
@@ -104,6 +106,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
     private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, "")
+    private val kv_useLegacyAudio: KeyValue<Boolean> = KeyValue(SETTINGS_USE_LEGACY_SOUND, false)
     private val kv_mainMenuFlipAnimations: KeyValue<Boolean> = KeyValue(SETTINGS_MAINMENU_FLIP_ANIMATION, true)
     private val kv_achievementNotifications: KeyValue<Boolean> = KeyValue(SETTINGS_ACHIEVEMENT_NOTIFICATIONS, true)
     private val kv_calibrationAudioOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_CALIBRATION_AUDIO_OFFSET_MS, 0)
@@ -144,6 +147,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val showSkillStar: Var<Boolean> = kv_showSkillStar.value
     val discordRichPresence: Var<Boolean> = kv_discordRichPresence.value
     val mixer: Var<String> = kv_mixer.value
+    val useLegacyAudio: Var<Boolean> = kv_useLegacyAudio.value
     val mainMenuFlipAnimation: Var<Boolean> = kv_mainMenuFlipAnimations.value
     val achievementNotifications: Var<Boolean> = kv_achievementNotifications.value
     val calibrationAudioOffsetMs: Var<Int> = kv_calibrationAudioOffsetMs.value
@@ -203,6 +207,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_showSkillStar)
         prefs.getBoolean(kv_discordRichPresence)
         prefs.getString(kv_mixer)
+        prefs.getBoolean(kv_useLegacyAudio)
         prefs.getBoolean(kv_mainMenuFlipAnimations)
         prefs.getBoolean(kv_achievementNotifications)
         prefs.getString(kv_locale)
@@ -258,6 +263,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_showSkillStar)
                 .putBoolean(kv_discordRichPresence)
                 .putString(kv_mixer)
+                .putBoolean(kv_useLegacyAudio)
                 .putBoolean(kv_mainMenuFlipAnimations)
                 .putBoolean(kv_achievementNotifications)
                 .putString(kv_locale)
@@ -317,23 +323,24 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             }
         }
 
-        // Set correct mixer
-        val mixerHandler = SoundSystem.defaultMixerHandler
+        Paintbox.LOGGER.info("Using ${if (useLegacyAudio.getOrCompute()) "legacy" else "OpenAL"} sound system")
+        // Set correct JavaSound mixer
+        val mixerHandler = MixerHandler.defaultMixerHandler
         val mixerString = this.mixer.getOrCompute()
         if (mixerString.isNotEmpty()) {
-            val found = mixerHandler.supportedMixers.find {
+            val found = mixerHandler.supportedMixers.mixers.find {
                 it.mixerInfo.name == mixerString
             }
             if (found != null) {
-                Paintbox.LOGGER.info("Attaching to mixer from settings: ${found.mixerInfo.name}")
+                Paintbox.LOGGER.info("Setting recommended legacy audio JavaSound mixer to mixer from settings: ${found.mixerInfo.name}")
                 mixerHandler.recommendedMixer = found
             } else {
-                Paintbox.LOGGER.warn("Could not find mixer from settings: settings = $mixerString")
+                Paintbox.LOGGER.warn("Could not find JavaSound mixer from settings: settings = $mixerString")
             }
         } else {
             val mixerName = mixerHandler.recommendedMixer.mixerInfo.name
             this.mixer.set(mixerName)
-            Paintbox.LOGGER.info("No saved mixer string, using $mixerName")
+            Paintbox.LOGGER.info("No saved JavaSound mixer string, recommended will be $mixerName")
         }
         
         // LauncherSettings override properties

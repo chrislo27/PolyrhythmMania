@@ -35,6 +35,7 @@ object PreferenceKeys {
     val SETTINGS_SHOW_SKILL_STAR = "settings_showSkillStar"
     val SETTINGS_DISCORD_RPC = "settings_discord_rich_presence"
     val SETTINGS_MIXER = "settings_mixer"
+    val SETTINGS_USE_LEGACY_SOUND = "settings_useLegacySound"
     val SETTINGS_MAINMENU_FLIP_ANIMATION = "settings_mainMenu_flipAnimation"
     val SETTINGS_ACHIEVEMENT_NOTIFICATIONS = "settings_achievementNotifications"
     val SETTINGS_LOCALE = "settings_locale"

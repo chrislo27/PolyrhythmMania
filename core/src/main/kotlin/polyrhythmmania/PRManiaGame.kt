@@ -110,7 +110,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         private set
     private var enableAchievementsUI: Boolean = false
     
-    val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
+    private val internalGithubVersion: Var<Version> = Var(Version.ZERO)
+    val githubVersion: ReadOnlyVar<Version> = internalGithubVersion
     
     private val metricsReporter: ConsoleReporter by lazy {
         ConsoleReporter.forRegistry(PRMania.metrics)
@@ -250,7 +251,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                         if (parsed != null) {
                             Paintbox.LOGGER.info("Got version from server: $parsed")
                             Gdx.app.postRunnable {
-                                (githubVersion as Var).set(parsed)
+                                internalGithubVersion.set(parsed)
                             }
                         }
                     } else {

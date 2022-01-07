@@ -1,4 +1,4 @@
-package polyrhythmmania.soundsystem.beads
+package polyrhythmmania.soundsystem.beads.ugen
 
 import com.badlogic.gdx.Gdx
 import net.beadsproject.beads.core.AudioContext

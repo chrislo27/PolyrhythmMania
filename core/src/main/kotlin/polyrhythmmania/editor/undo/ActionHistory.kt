@@ -2,8 +2,6 @@ package polyrhythmmania.editor.undo
 
 import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyIntVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
 import java.util.*
 
 /**
@@ -21,8 +19,10 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
     private val undos: Deque<ReversibleAction<SELF>> by lazy { createDeque() }
     private val redos: Deque<ReversibleAction<SELF>> by lazy { createDeque() }
     
-    val undoStackSize: ReadOnlyIntVar = IntVar(0)
-    val redoStackSize: ReadOnlyIntVar = IntVar(0)
+    protected val internalUndoStackSize: IntVar = IntVar(0)
+    protected val internalRedoStackSize: IntVar = IntVar(0)
+    val undoStackSize: ReadOnlyIntVar = internalUndoStackSize
+    val redoStackSize: ReadOnlyIntVar = internalRedoStackSize
 
     /**
      * Mutate this object, adding the action on the undo stack, and clears all redos.
@@ -41,8 +41,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
         redos.clear()
         undos.push(action)
         ensureCapacity()
-        (undoStackSize as IntVar).set(undos.size)
-        (redoStackSize as IntVar).set(redos.size)
+        internalUndoStackSize.set(undos.size)
+        internalRedoStackSize.set(redos.size)
     }
 
     fun ensureCapacity() {
@@ -64,8 +64,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
 
         redos.push(action)
         ensureCapacity()
-        (undoStackSize as IntVar).set(undos.size)
-        (redoStackSize as IntVar).set(redos.size)
+        internalUndoStackSize.set(undos.size)
+        internalRedoStackSize.set(redos.size)
 
         return true
     }
@@ -78,8 +78,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
 
         undos.push(action)
         ensureCapacity()
-        (undoStackSize as IntVar).set(undos.size)
-        (redoStackSize as IntVar).set(redos.size)
+        internalUndoStackSize.set(undos.size)
+        internalRedoStackSize.set(redos.size)
 
         return true
     }
@@ -91,8 +91,8 @@ open class ActionHistory<SELF : ActionHistory<SELF>>(val maxItems: Int = 128) {
     fun clear() {
         undos.clear()
         redos.clear()
-        (undoStackSize as IntVar).set(0)
-        (redoStackSize as IntVar).set(0)
+        internalUndoStackSize.set(0)
+        internalRedoStackSize.set(0)
     }
     
     fun peekAtUndoStack(): ReversibleAction<SELF>? = undos.peekFirst()

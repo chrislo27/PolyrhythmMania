@@ -1,65 +1,53 @@
 package polyrhythmmania.soundsystem
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Disposable
-import paintbox.Paintbox
-import paintbox.util.Sync
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.IOAudioFormat
-import net.beadsproject.beads.ugens.Gain
-import javax.sound.sampled.*
-import polyrhythmmania.soundsystem.beads.*
-import polyrhythmmania.soundsystem.beads.ugen.Delay
+import polyrhythmmania.PRManiaGame
+import polyrhythmmania.soundsystem.beads.toBeadsAudioFormat
+import polyrhythmmania.soundsystem.javasound.MixerHandler
 import polyrhythmmania.soundsystem.sample.PlayerLike
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.concurrent.thread
-import kotlin.math.abs
 
 
 /**
- * A wrapper for an [net.beadsproject.beads.core.AudioContext] and associated audio system utilities, using
- * [DaemonJavaSoundAudioIO] as the audio IO interface.
+ * A wrapper for an [net.beadsproject.beads.core.AudioContext] and associated audio system utilities.
  */
-class SoundSystem(private val mixer: Mixer,
-                  val ioAudioFormat: IOAudioFormat = DEFAULT_AUDIO_FORMAT,
-                  bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+class SoundSystem(val realtimeOutput: RealtimeOutput,
+                  initCtxBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
                   val settings: SoundSystemSettings = SoundSystemSettings())
     : Disposable {
 
     companion object {
+        
         val AUDIO_FORMAT_44100: IOAudioFormat = IOAudioFormat(44_100f, 16, 2, 2, true, true)
         val AUDIO_FORMAT_48000: IOAudioFormat = IOAudioFormat(48_000f, 16, 2, 2, true, true)
         val DEFAULT_AUDIO_FORMAT: IOAudioFormat = AUDIO_FORMAT_48000
-        
-        val defaultMixerHandler: MixerHandler by lazy { MixerHandler(DEFAULT_AUDIO_FORMAT.toJavaAudioFormat()) }
 
-        fun createDefaultSoundSystem(bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+        fun createDefaultSoundSystem(initCtxBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
                                      settings: SoundSystemSettings = SoundSystemSettings()): SoundSystem {
-            return createDefaultSoundSystem(defaultMixerHandler, bufferSize, settings)
+            val useOpenAL = !PRManiaGame.instance.settings.useLegacyAudio.getOrCompute()
+            return if (useOpenAL) {
+                SoundSystem(RealtimeOutput.OpenAL, initCtxBufferSize, settings)
+            } else {
+                createDefaultSoundSystemJavaSound(MixerHandler.defaultMixerHandler, initCtxBufferSize, settings)
+            }
         }
-        
-        fun createDefaultSoundSystem(mixerHandler: MixerHandler,
-                                     bufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
-                                     settings: SoundSystemSettings = SoundSystemSettings()): SoundSystem {
+
+        fun createDefaultSoundSystemJavaSound(
+                mixerHandler: MixerHandler,
+                initBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+                settings: SoundSystemSettings = SoundSystemSettings(mixerHandler.audioFormat.toBeadsAudioFormat())
+        ): SoundSystem {
             val mixer = mixerHandler.recommendedMixer
-            return SoundSystem(mixer, mixerHandler.audioFormat.toBeadsAudioFormat(), bufferSize, settings)
+            return SoundSystem(RealtimeOutput.JavaSound(mixer), initBufferSize, settings)
         }
     }
     
-    data class SoundSystemSettings(val reportAdaptiveSync: Boolean = true)
+    data class SoundSystemSettings(val ioAudioFormat: IOAudioFormat = DEFAULT_AUDIO_FORMAT)
 
     val audioContext: AudioContext =
-            AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat)
-//            object : AudioContext(DaemonJavaSoundAudioIO(mixer), bufferSize, ioAudioFormat) {
-//                init { // For testing delays
-//                    run {
-//                        val field = AudioContext::class.java.getDeclaredField("out")
-//                        field.isAccessible = true
-//                        field.set(this, Delay(this, this.out.outs, bufferSize * 10))
-//                    }
-//                }
-//            }
+            AudioContext(realtimeOutput.createAudioIO(), initCtxBufferSize, settings.ioAudioFormat)
 
     @Volatile
     private var currentlyRealTime: Boolean = true
@@ -122,78 +110,4 @@ class SoundSystem(private val mixer: Mixer,
     
     fun getPlayer(id: Long): PlayerLike? = activePlayers[id]
 
-    private inner class AdaptiveTimingProvider : TimingProvider {
-        @Volatile
-        override var seconds: Float = 0f
-        override val listeners: MutableList<TimingListener> = CopyOnWriteArrayList()
-
-        val timingBead: TimingBead = TimingBead(audioContext)
-        val realtimeThread: Thread
-
-        private val reportWhenDesynced: Boolean = settings.reportAdaptiveSync
-        
-        init {
-            timingBead.listeners += TimingListener { oldSeconds, newSeconds ->
-                try {
-                    if (!currentlyRealTime && !isPaused) {
-                        this.seconds = newSeconds
-                        this.onUpdate(oldSeconds, newSeconds)
-                    }
-                } catch (t: Throwable) {
-                    exceptionHandler(t)
-                }
-            }
-            realtimeThread = thread(start = true, isDaemon = true, name = "AdaptiveTimingProvider", priority = Thread.MAX_PRIORITY) {
-                try {
-                    val pollRateHz = 1.0 / (512.0 / 44100.0)//100
-                    val forceSyncThreshold = 0.030f
-                    val sync = Sync()
-
-                    var nano = System.nanoTime()
-                    while (!this@SoundSystem.isDisposed) {
-                        sync.sync(pollRateHz)
-
-                        // Action
-                        if (currentlyRealTime && !isPaused) {
-                            val secondsDiff = (1.0 / pollRateHz).toFloat()
-                            val oldSeconds = this.seconds
-                            this.seconds += secondsDiff
-                            
-                            if (abs(this.seconds - timingBead.seconds) >= forceSyncThreshold) {
-                                if (reportWhenDesynced) {
-                                    Paintbox.LOGGER.debug("AdaptiveTimingProvider Force sync: this was ${this.seconds} and TimingBead was ${timingBead.seconds} (delta ${abs(this.seconds - timingBead.seconds)}, force sync threshold ${forceSyncThreshold})")
-                                }
-                                // Force sync with timing bead if off by too much
-                                this.seconds = timingBead.seconds
-                            }
-                            
-                            this.onUpdate(oldSeconds, this.seconds)
-
-//                            val ns = System.nanoTime() - nano
-//                            println("Expected ${1000.0 / pollRateHz}, actual ${ns / 1_000_000.0}  delta ${(1000.0 / pollRateHz) - (ns / 1_000_000.0)}")
-//                            nano = System.nanoTime()
-                        }
-                    }
-//                    Paintbox.LOGGER.debug("End of AdaptiveTimingProvider, dying.")
-                } catch (t: Throwable) {
-                    Paintbox.LOGGER.debug("AdaptiveTimingProvider thread encountered an exception")
-                    t.printStackTrace()
-                    exceptionHandler(t)
-                }
-            }
-        }
-        
-        fun forceSyncWithBead() {
-            val oldSeconds = this.seconds
-            this.seconds = timingBead.seconds
-            this.onUpdate(oldSeconds, this.seconds)
-        }
-
-        override fun exceptionHandler(throwable: Throwable): Boolean {
-            Gdx.app.postRunnable { 
-                throw throwable
-            }
-            return false
-        }
-    }
 }

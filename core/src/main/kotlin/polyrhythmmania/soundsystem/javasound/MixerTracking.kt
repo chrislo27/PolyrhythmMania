@@ -1,4 +1,4 @@
-package polyrhythmmania.soundsystem
+package polyrhythmmania.soundsystem.javasound
 
 import java.util.concurrent.ConcurrentHashMap
 import javax.sound.sampled.Mixer
