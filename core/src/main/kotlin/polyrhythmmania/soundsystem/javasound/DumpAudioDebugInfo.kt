@@ -1,4 +1,4 @@
-package polyrhythmmania.soundsystem
+package polyrhythmmania.soundsystem.javasound
 
 import java.lang.StringBuilder
 import javax.sound.sampled.*

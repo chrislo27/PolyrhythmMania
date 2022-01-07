@@ -58,6 +58,7 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.soundsystem.javasound.MixerHandler
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import java.time.LocalDate
@@ -309,23 +310,23 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             }
         }
 
-        // Set correct mixer
-        val mixerHandler = SoundSystem.defaultMixerHandler
+        // Set correct JavaSound mixer
+        val mixerHandler = MixerHandler.defaultMixerHandler
         val mixerString = this.mixer.getOrCompute()
         if (mixerString.isNotEmpty()) {
-            val found = mixerHandler.supportedMixers.find {
+            val found = mixerHandler.supportedMixers.mixers.find {
                 it.mixerInfo.name == mixerString
             }
             if (found != null) {
-                Paintbox.LOGGER.info("Attaching to mixer from settings: ${found.mixerInfo.name}")
+                Paintbox.LOGGER.info("Attaching to JavaSound mixer from settings: ${found.mixerInfo.name}")
                 mixerHandler.recommendedMixer = found
             } else {
-                Paintbox.LOGGER.warn("Could not find mixer from settings: settings = $mixerString")
+                Paintbox.LOGGER.warn("Could not find JavaSound mixer from settings: settings = $mixerString")
             }
         } else {
             val mixerName = mixerHandler.recommendedMixer.mixerInfo.name
             this.mixer.set(mixerName)
-            Paintbox.LOGGER.info("No saved mixer string, using $mixerName")
+            Paintbox.LOGGER.info("No saved JavaSound mixer string, using $mixerName")
         }
         
         // LauncherSettings override properties

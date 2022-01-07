@@ -1,6 +1,5 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
@@ -8,16 +7,14 @@ import paintbox.font.TextAlign
 import paintbox.ui.Anchor
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
-import paintbox.ui.control.Slider
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
-import polyrhythmmania.Settings
-import polyrhythmmania.soundsystem.DumpAudioDebugInfo
-import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.soundsystem.javasound.DumpAudioDebugInfo
+import polyrhythmmania.soundsystem.javasound.MixerHandler
 import javax.sound.sampled.Mixer
 
 
@@ -45,13 +42,13 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         contentPane.addChild(vbox)
         contentPane.addChild(hbox)
 
-        val mixerHandler = SoundSystem.defaultMixerHandler
-        val mixers: List<Mixer> = mixerHandler.supportedMixers
-        mixers.forEach { mixer ->
+        val mixerHandler = MixerHandler.defaultMixerHandler
+        val supportedMixers: MixerHandler.SupportedMixers = mixerHandler.supportedMixers
+        supportedMixers.mixers.forEach { mixer ->
             Paintbox.LOGGER.info("Supported mixer: ${mixer.mixerInfo.name}")
         }
 
-        val (mixerPane, mixerCombobox) = createComboboxOption(mixers, mixerHandler.recommendedMixer,
+        val (mixerPane, mixerCombobox) = createComboboxOption(supportedMixers.mixers, mixerHandler.recommendedMixer,
                 { Localization.getVar("mainMenu.advancedAudio.mixer").use() },
                 percentageContent = 1f, twoRowsTall = true, itemToString = { it.mixerInfo.name })
         mixerPane.label.textAlign.set(TextAlign.CENTRE)
@@ -108,8 +105,8 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
 
     fun setSoundSystemMixer(newMixer: Mixer) {
-        if (SoundSystem.defaultMixerHandler.recommendedMixer == newMixer) return
-        SoundSystem.defaultMixerHandler.recommendedMixer = newMixer
+        if (MixerHandler.defaultMixerHandler.recommendedMixer == newMixer) return
+        MixerHandler.defaultMixerHandler.recommendedMixer = newMixer
         // Restart the main menu sound system.
         synchronized(mainMenu) {
             val oldMusicPos = mainMenu.soundSys.musicPlayer.position
