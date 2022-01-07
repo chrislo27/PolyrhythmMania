@@ -1,9 +1,13 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.BooleanVar
+import paintbox.binding.FloatVar
+import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.ui.Anchor
 import paintbox.ui.UIElement
@@ -23,6 +27,7 @@ import javax.sound.sampled.Mixer
 class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
     private val settings: Settings = menuCol.main.settings
+    private val doneTextTimer: FloatVar = FloatVar(0f)
 
     init {
         this.setSize(MMMenu.WIDTH_MEDIUM)
@@ -61,7 +66,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val mixerHandler = MixerHandler.defaultMixerHandler
         val supportedMixers: MixerHandler.SupportedMixers = mixerHandler.supportedMixers
         supportedMixers.mixers.forEach { mixer ->
-            Paintbox.LOGGER.info("Supported mixer: ${mixer.mixerInfo.name}")
+            Paintbox.LOGGER.info("Supported JavaSound mixer: ${mixer.mixerInfo.name}")
         }
 
         val (mixerPane, mixerCombobox) = createComboboxOption(supportedMixers.mixers, mixerHandler.recommendedMixer,
@@ -102,13 +107,27 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             legacyAudioCheck.onCheckChanged = { newState ->
                 settings.useLegacyAudio.set(newState)
                 restartMainMenuAudio()
+                if (newState) {
+                    Paintbox.LOGGER.info("Now using OpenAL audio system")
+                }
             }
             legacyAudioCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.advancedAudio.useLegacyAudio.tooltip")))
             vbox += legacyAudioCheckPane
-            vbox += createLongButton { Localization.getVar("mainMenu.advancedAudio.dumpAudioDebugInfo").use() }.apply {
+            
+            val dumpAudioDebugInfoText = Var {
+                if (doneTextTimer.use() <= 0f) {
+                    Localization.getVar("mainMenu.advancedAudio.dumpAudioDebugInfo").use()
+                } else {
+                    Localization.getVar("mainMenu.advancedAudio.dumpAudioDebugInfo.done").use()
+                }
+            }
+            vbox += createLongButton { 
+                dumpAudioDebugInfoText.use()
+            }.apply {
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.advancedAudio.dumpAudioDebugInfo.tooltip")))
                 this.setOnAction {
                     DumpAudioDebugInfo.dump()
+                    doneTextTimer.set(3f)
                 }
             }
             
@@ -141,7 +160,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         restartMainMenuAudio()
         val name = newMixer.mixerInfo.name
         main.settings.mixer.set(name)
-        Paintbox.LOGGER.info("Set JavaSound mixer to ${name}")
+        Paintbox.LOGGER.info("Now using JavaSound audio system; set JavaSound mixer to $name")
     }
     
     fun restartMainMenuAudio() {
@@ -153,6 +172,14 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 start()
                 musicPlayer.position = oldMusicPos
             }
+        }
+    }
+
+    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        super.renderSelf(originX, originY, batch)
+        val timer = doneTextTimer.get()
+        if (timer > 0f) {
+            doneTextTimer.set((timer - Gdx.graphics.deltaTime).coerceAtLeast(0f))
         }
     }
 }
