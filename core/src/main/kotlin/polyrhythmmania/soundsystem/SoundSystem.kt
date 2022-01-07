@@ -3,6 +3,7 @@ package polyrhythmmania.soundsystem
 import com.badlogic.gdx.utils.Disposable
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.IOAudioFormat
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.soundsystem.beads.toBeadsAudioFormat
 import polyrhythmmania.soundsystem.javasound.MixerHandler
 import polyrhythmmania.soundsystem.sample.PlayerLike
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
  * A wrapper for an [net.beadsproject.beads.core.AudioContext] and associated audio system utilities.
  */
 class SoundSystem(val realtimeOutput: RealtimeOutput,
-                  initBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+                  initCtxBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
                   val settings: SoundSystemSettings = SoundSystemSettings())
     : Disposable {
 
@@ -22,17 +23,22 @@ class SoundSystem(val realtimeOutput: RealtimeOutput,
         val AUDIO_FORMAT_44100: IOAudioFormat = IOAudioFormat(44_100f, 16, 2, 2, true, true)
         val AUDIO_FORMAT_48000: IOAudioFormat = IOAudioFormat(48_000f, 16, 2, 2, true, true)
         val DEFAULT_AUDIO_FORMAT: IOAudioFormat = AUDIO_FORMAT_48000
-        
 
-        fun createDefaultSoundSystem(initBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+        fun createDefaultSoundSystem(initCtxBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
                                      settings: SoundSystemSettings = SoundSystemSettings()): SoundSystem {
-            // TODO real default is OpenAL
-            return createDefaultSoundSystem(MixerHandler.defaultMixerHandler, initBufferSize, settings)
+            val useOpenAL = !PRManiaGame.instance.settings.useLegacyAudio.getOrCompute()
+            return if (useOpenAL) {
+                SoundSystem(RealtimeOutput.OpenAL, initCtxBufferSize, settings)
+            } else {
+                createDefaultSoundSystemJavaSound(MixerHandler.defaultMixerHandler, initCtxBufferSize, settings)
+            }
         }
-        
-        fun createDefaultSoundSystem(mixerHandler: MixerHandler,
-                                     initBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
-                                     settings: SoundSystemSettings = SoundSystemSettings(mixerHandler.audioFormat.toBeadsAudioFormat())): SoundSystem {
+
+        fun createDefaultSoundSystemJavaSound(
+                mixerHandler: MixerHandler,
+                initBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+                settings: SoundSystemSettings = SoundSystemSettings(mixerHandler.audioFormat.toBeadsAudioFormat())
+        ): SoundSystem {
             val mixer = mixerHandler.recommendedMixer
             return SoundSystem(RealtimeOutput.JavaSound(mixer), initBufferSize, settings)
         }
@@ -41,7 +47,7 @@ class SoundSystem(val realtimeOutput: RealtimeOutput,
     data class SoundSystemSettings(val ioAudioFormat: IOAudioFormat = DEFAULT_AUDIO_FORMAT)
 
     val audioContext: AudioContext =
-            AudioContext(realtimeOutput.createAudioIO(), initBufferSize, settings.ioAudioFormat)
+            AudioContext(realtimeOutput.createAudioIO(), initCtxBufferSize, settings.ioAudioFormat)
 
     @Volatile
     private var currentlyRealTime: Boolean = true

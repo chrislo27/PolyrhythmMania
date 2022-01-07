@@ -13,7 +13,7 @@ sealed class RealtimeOutput {
     
     object OpenAL : RealtimeOutput() {
         override fun getName(): ReadOnlyVar<String> {
-            return Localization.getVar("mainMenu.advancedAudio.outputInterface.openAL")
+            return Var("OpenAL")
         }
 
         override fun createAudioIO(): AudioIO {
