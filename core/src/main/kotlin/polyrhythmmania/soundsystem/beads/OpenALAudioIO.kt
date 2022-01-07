@@ -18,14 +18,19 @@ import kotlin.math.roundToInt
 
 /**
  * This is an implementation of [AudioIO] that sends audio data to a [AudioDevice].
+ * Note there there is a rough warmup time of as much [latency][AudioDevice.getLatency] in milliseconds
+ * where there may be OpenAL buffer underflows, i.e. unpredictable timings. It is best to not immediately play any audio
+ * until that very brief period has elapsed.
+ * 
+ * Also note that [OpenALAudioDevice] has behaviour that doesn't follow the libGDX documentation for [AudioDevice]:
+ *   - The buffer size is in *bytes* and not samples, with 4 bytes per sample
+ *   - The return result of [AudioDevice.getLatency] is in *milliseconds* and not samples
  */
 class OpenALAudioIO
     : AudioIO() {
     
     companion object {
-        
         private val metricsPrepareBuffer: Timer = PRMania.metrics.timer(MetricRegistry.name(this::class.java, "prepareBuffer"))
-        
     }
     
     private inner class Lifecycle(val audioDevice: OpenALAudioDevice) : Disposable {
@@ -34,12 +39,9 @@ class OpenALAudioIO
         }
     }
 
-    /** Thread for running realtime audio.  */
+    private val threadPriority: Int = Thread.MAX_PRIORITY
     @Volatile
     private var audioThread: Thread? = null
-
-    /** The priority of the audio thread.  */
-    private val threadPriority: Int = Thread.MAX_PRIORITY
     
     @Volatile
     private var lifecycleInstance: Lifecycle? = null
@@ -48,19 +50,21 @@ class OpenALAudioIO
         if (this.lifecycleInstance != null) {
             return null
         }
-        val ioAudioFormat = getContext().audioFormat
         
+        val ioAudioFormat = getContext().audioFormat
         val newAudioDevice = Gdx.audio.newAudioDevice(ioAudioFormat.sampleRate.roundToInt(), ioAudioFormat.outputs == 1) as OpenALAudioDevice
         val lifecycle = Lifecycle(newAudioDevice)
         this.lifecycleInstance = lifecycle
         
         return lifecycle
     }
-    
-    /** Update loop called from within audio thread (created in start() method). */
+
+    /**
+     * Update loop called from within audio thread (thread is created in [start] function).
+     */
     private fun runRealTime() {
         val context = getContext()
-        val ioAudioFormat = getContext().audioFormat
+        val ioAudioFormat = context.audioFormat
         val audioFormat = ioAudioFormat.toJavaAudioFormat()
         val bufferSizeInFrames = context.bufferSize
         val sampleBufferSize = bufferSizeInFrames * ioAudioFormat.outputs
@@ -98,12 +102,14 @@ class OpenALAudioIO
         }
     }
 
-    /** Shuts down JavaSound elements, SourceDataLine and Mixer.  */
+    /**
+     * Destroys and disposes of the active lifecycle.
+     */
     private fun destroy(): Boolean {
         val lifecycle = this.lifecycleInstance
-        if (lifecycle != null) {
-            lifecycle.disposeQuietly()
-        }
+        lifecycle?.disposeQuietly()
+        this.lifecycleInstance = null
+        
         return true
     }
 
