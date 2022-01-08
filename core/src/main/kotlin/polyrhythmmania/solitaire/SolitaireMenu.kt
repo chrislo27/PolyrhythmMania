@@ -106,12 +106,22 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             hbox += CheckBox(binding = { Localization.getVar("solitaire.gameSFX").use() }, font = font).apply {
-                this.bounds.width.set(150f)
+                this.bounds.width.set(120f)
                 this.textLabel.setScaleXY(0.75f)
                 this.imageNode.padding.set(Insets(4f, 4f, 4f, 0f))
                 this.checkedState.set(settings.solitaireSFX.getOrCompute())
                 this.onCheckChanged = {
                     settings.solitaireSFX.invert()
+                    settings.persist()
+                }
+            }
+            hbox += CheckBox(binding = { Localization.getVar("solitaire.musicSetting").use() }, font = font).apply {
+                this.bounds.width.set(100f)
+                this.textLabel.setScaleXY(0.75f)
+                this.imageNode.padding.set(Insets(4f, 4f, 4f, 0f))
+                this.checkedState.set(settings.solitaireMusic.getOrCompute())
+                this.onCheckChanged = {
+                    settings.solitaireMusic.invert()
                     settings.persist()
                 }
             }

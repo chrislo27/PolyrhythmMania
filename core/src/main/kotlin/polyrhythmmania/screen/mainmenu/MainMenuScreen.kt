@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.StreamUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import net.beadsproject.beads.ugens.CrossFade
+import net.beadsproject.beads.ugens.Gain
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
 import paintbox.binding.*
@@ -685,13 +686,22 @@ playerPos: ${soundSys.musicPlayer.position}
             player.loopEndMs = sample.samplesToMs(8_061_382.0).toFloat()
             player.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
         }
+        val bandpassVolume: FloatVar = FloatVar {
+            if (use(main.settings.solitaireMusic)) 1f else 0f
+        }
         val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs, musicPlayer.outs)
-        val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpass else musicPlayer)
+        val bandpassGain: Gain = Gain(soundSystem.audioContext, musicPlayer.outs, bandpassVolume.get())
+        val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpassGain else musicPlayer)
         
         init {
             bandpass.addInput(musicPlayer)
+            bandpassGain.addInput(bandpass)
             
             soundSystem.audioContext.out.addInput(crossFade)
+            
+            bandpassVolume.addListener {
+                bandpassGain.gain = it.getOrCompute()
+            }
         }
         
         fun start() {
@@ -707,7 +717,7 @@ playerPos: ${soundSys.musicPlayer.position}
         fun fadeToBandpass(durationMs: Float = 1000f) {
             if (shouldBeBandpass) return
             shouldBeBandpass = true
-            crossFade.fadeTo(bandpass, durationMs) // Reimplement bandpass when needed.
+            crossFade.fadeTo(bandpassGain, durationMs) // Reimplement bandpass when needed.
         }
         
         fun fadeToNormal(durationMs: Float = 1000f) {

@@ -53,6 +53,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_USE_LEGACY_SOUND
 import polyrhythmmania.PreferenceKeys.SETTINGS_VSYNC
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.PreferenceKeys.SIDEMODE_ASSEMBLE_NORMAL
+import polyrhythmmania.PreferenceKeys.SIDEMODE_SOLITAIRE_GAME_MUSIC
 import polyrhythmmania.PreferenceKeys.SIDEMODE_SOLITAIRE_GAME_SFX
 import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
@@ -135,6 +136,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_endlessHighScore: KeyValue<EndlessHighScore> = KeyValue(ENDLESS_HIGH_SCORE, EndlessHighScore.ZERO)
     private val kv_assembleNormalHighScore: KeyValue<Int> = KeyValue(SIDEMODE_ASSEMBLE_NORMAL, 0)
     private val kv_solitaireSFX: KeyValue<Boolean> = KeyValue(SIDEMODE_SOLITAIRE_GAME_SFX, true)
+    private val kv_solitaireMusic: KeyValue<Boolean> = KeyValue(SIDEMODE_SOLITAIRE_GAME_MUSIC, true)
 
     val locale: Var<String> = kv_locale.value
     val masterVolumeSetting: Var<Int> = kv_masterVolumeSetting.value
@@ -176,6 +178,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val dailyChallengeStreak: Var<Int> = kv_endlessDailyChallengeStreak.value
     val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
     val solitaireSFX: Var<Boolean> = kv_solitaireSFX.value
+    val solitaireMusic: Var<Boolean> = kv_solitaireMusic.value
     
     val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind { 
         InputCalibration(use(calibrationAudioOffsetMs).toFloat(), use(calibrationDisableInputSFX))
@@ -245,6 +248,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getEndlessHighScore(kv_endlessHighScore)
         prefs.getInt(kv_endlessDailyChallengeStreak)
         prefs.getBoolean(kv_solitaireSFX)
+        prefs.getBoolean(kv_solitaireMusic)
         
         val lastVersion: Version? = Version.parse(prefs.getString(LAST_VERSION) ?: "")
         this.lastVersion = lastVersion
@@ -292,6 +296,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putEndlessHighScore(kv_endlessHighScore)
                 .putInt(kv_endlessDailyChallengeStreak)
                 .putBoolean(kv_solitaireSFX)
+                .putBoolean(kv_solitaireMusic)
 
         allNewIndicators.forEach { prefs.putNewIndicator(it) }
 
