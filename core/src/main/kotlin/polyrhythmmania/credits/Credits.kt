@@ -23,9 +23,6 @@ object Credits {
             ).toVars() + listOf(
                     Localization.getVar("credits.tourneycord"),
             ),
-            Localization.getVar("credits.githubBugReporters") to abcSorted(
-                    "thomasynthesis", "Dummatt", "user670", "ZaptorZap", "notpolyrhythmic", "Unnamedspaceuser",
-            ).toVars(),
             Localization.getVar("credits.specialThanks") to abcSorted(
                     "Lvl100Feraligatr",
                     "GrueKun",
@@ -34,7 +31,7 @@ object Credits {
                     "Turtike",
                     "J-D Thunder",
                     "RedCrowNose",
-            ).toVars() + listOf(Localization.getVar("credits.projectDonators")),
+            ).toVars() + listOf(Localization.getVar("credits.githubBugReporters"), Localization.getVar("credits.projectDonators")),
             Localization.getVar("credits.resourcesAndTechnologies") to listOf(
                     Localization.getVar("credits.rhAssets"),
             ) + listOf(
