@@ -622,6 +622,11 @@ class SolitaireGame : ActionablePane() {
 
         ColorStack.pop()
         batch.packedColor = lastPackedColor
+        
+        // Right click to cancel when NOT clicking this element
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && dragInfo.isDragging()) {
+            dragInfo.cancelDrag()
+        }
     }
     
     private fun renderCardStack(x: Float, y: Float, batch: SpriteBatch, cardStack: CardStack, stackOffset: Float,
