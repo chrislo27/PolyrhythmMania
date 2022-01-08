@@ -1,10 +1,14 @@
 package polyrhythmmania.solitaire
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.ReadOnlyVar
 import paintbox.ui.Anchor
+import paintbox.ui.ImageIcon
+import paintbox.ui.ImageRenderingMode
 import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
@@ -54,11 +58,19 @@ class SolitaireHelpMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.bounds.width.set(2f)
         }
         
-        fun createCornerPane(text: ReadOnlyVar<String>): Pane {
+        fun createCornerPane(text: ReadOnlyVar<String>, imageID: String): Pane {
             return Pane().apply { 
                 this.bindWidthToParent(multiplier = 0.5f, adjust = -8f)
                 this.bindHeightToParent(multiplier = 0.5f, adjust = -6f)
 
+                this += ImageIcon(tex = null, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+                    Anchor.TopCentre.configure(this)
+                    this.bounds.width.set(400f)
+                    this.bounds.height.set(140f)
+                    this.textureRegion.bind { 
+                        TextureRegion(SolitaireAssets.get<Texture>(imageID))
+                    }
+                }
                 this += TextLabel(binding = { text.use() }).apply {
                     Anchor.BottomLeft.configure(this)
                     this.bindHeightToParent(multiplier = 0.325f)
@@ -72,16 +84,16 @@ class SolitaireHelpMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
         
-        pane += createCornerPane(Localization.getVar("solitaire.instructions.1")).apply { 
+        pane += createCornerPane(Localization.getVar("solitaire.instructions.1"), "help_0").apply { 
             Anchor.TopLeft.configure(this)
         }
-        pane += createCornerPane(Localization.getVar("solitaire.instructions.2")).apply { 
+        pane += createCornerPane(Localization.getVar("solitaire.instructions.2"), "help_1").apply { 
             Anchor.TopRight.configure(this)
         }
-        pane += createCornerPane(Localization.getVar("solitaire.instructions.3")).apply { 
+        pane += createCornerPane(Localization.getVar("solitaire.instructions.3"), "help_2").apply { 
             Anchor.BottomLeft.configure(this)
         }
-        pane += createCornerPane(Localization.getVar("solitaire.instructions.4")).apply { 
+        pane += createCornerPane(Localization.getVar("solitaire.instructions.4"), "help_3").apply { 
             Anchor.BottomRight.configure(this)
         }
                 

@@ -52,6 +52,11 @@ class SolitaireAssetLoader : IAssetLoader {
                 Packable("widget", "textures/solitaire/widget.png"),
         ), PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false)))
         
+        SolitaireAssets.loadAsset("help_0", "textures/solitaire/help_0.png", linearTexture())
+        SolitaireAssets.loadAsset("help_1", "textures/solitaire/help_1.png", linearTexture())
+        SolitaireAssets.loadAsset("help_2", "textures/solitaire/help_2.png", linearTexture())
+        SolitaireAssets.loadAsset("help_3", "textures/solitaire/help_3.png", linearTexture())
+        
         SolitaireAssets.loadAsset<Sound>("sfx_base_note", "sounds/solitaire/base_note.ogg")
         SolitaireAssets.loadAsset<Sound>("sfx_base_note_delayed", "sounds/solitaire/base_note_delayed.ogg")
         SolitaireAssets.loadAsset<Sound>("sfx_flick", "sounds/solitaire/flick.ogg")
