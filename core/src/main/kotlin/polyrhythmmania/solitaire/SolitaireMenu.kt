@@ -76,6 +76,7 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             hbox += createSmallButton(binding = { Localization.getVar("common.close").use() }).apply {
                 this.bounds.width.set(100f)
                 this.setOnAction {
+                    mainMenu.soundSys.fadeToNormal()
                     menuCol.popLastMenu()
                 }
             }
@@ -105,7 +106,7 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             hbox += CheckBox(binding = { Localization.getVar("solitaire.gameSFX").use() }, font = font).apply {
-                this.bounds.width.set(170f)
+                this.bounds.width.set(150f)
                 this.textLabel.setScaleXY(0.75f)
                 this.imageNode.padding.set(Insets(4f, 4f, 4f, 0f))
                 this.checkedState.set(settings.solitaireSFX.getOrCompute())
@@ -115,6 +116,14 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
         }
+    }
+
+    override fun onMenuEntered() {
+        mainMenu.soundSys.fadeToBandpass()
+    }
+
+    override fun onMenuExited() {
+        // Fade to normal handled by close button due to being able to view help menu
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {

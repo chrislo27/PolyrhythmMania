@@ -158,9 +158,15 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
             
             RectangleStack.pop()
         }
-        menus.forEach { if (it !== menu) it.visible.set(false) }
+        menus.forEach { 
+            if (it !== menu && it.visible.get()) {
+                it.visible.set(false)
+                it.onMenuExited()
+            }
+        }
         menu.visible.set(true)
         (activeMenu as Var).set(menu)
+        menu.onMenuEntered()
     }
     
     fun pushNextMenu(menu: MMMenu, instant: Boolean = false, playSound: Boolean = true) {

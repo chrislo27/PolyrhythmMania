@@ -189,7 +189,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
     private val musicSample: MusicSample
     private val beadsMusic: BeadsMusic
-    private var shouldBeBandpass: Boolean = false
+    private var shouldBeBandpass: Boolean = false // Used if the sound system restarts
     var soundSys: SoundSys by settableLazy {
         SoundSys().apply {
             musicPlayer.pause(true)
@@ -362,16 +362,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         menuMusicVolume.addListener {
             this.soundSys.soundSystem.audioContext.out.gain = it.getOrCompute()
         }
-        
-        val visibleListener: VarChangedListener<Boolean> = VarChangedListener { v ->
-            if (v.getOrCompute()) {
-                soundSys.fadeToNormal()
-            } else {
-                soundSys.fadeToBandpass()
-            }
-        }
-        menuCollection.uppermostMenu.visible.addListener(visibleListener)
-        menuCollection.audioSettingsMenu.visible.addListener(visibleListener)
         
         // Show update notes if needed
         if (main.settings.lastUpdateNotes.getOrCompute() != UpdateNotesMenu.latestUpdate) {
@@ -715,13 +705,15 @@ playerPos: ${soundSys.musicPlayer.position}
         }
         
         fun fadeToBandpass(durationMs: Float = 1000f) {
-//            shouldBeBandpass = true
-//            crossFade.fadeTo(bandpass, durationMs) // Reimplement bandpass when needed.
+            if (shouldBeBandpass) return
+            shouldBeBandpass = true
+            crossFade.fadeTo(bandpass, durationMs) // Reimplement bandpass when needed.
         }
         
         fun fadeToNormal(durationMs: Float = 1000f) {
-//            shouldBeBandpass = false
-//            crossFade.fadeTo(musicPlayer, durationMs) // Reimplement bandpass when needed.
+            if (!shouldBeBandpass) return
+            shouldBeBandpass = false
+            crossFade.fadeTo(musicPlayer, durationMs) // Reimplement bandpass when needed.
         }
         
         fun resetMusic() {
