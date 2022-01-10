@@ -18,10 +18,10 @@ class PRManiaArguments : PaintboxArguments() {
     @Parameter(names = ["--enable-metrics"], description = "Enables recording of certain program metrics. Used for debugging.")
     var enableMetrics: Boolean = false
     
-    @Parameter(names = ["--audio-device-buffer-size"], description = "Sets the AudioDevice buffer size. Should be a power of two. Defaults to ${AudioDeviceSettings.DEFAULT_SIZE}.")
-    var audioDeviceBufferSize: Int = AudioDeviceSettings.DEFAULT_SIZE
+    @Parameter(names = ["--audio-device-buffer-size"], description = "Sets the AudioDevice buffer size. Should be a power of two and at least 256. On Windows, defaults to ${AudioDeviceSettings.DEFAULT_SIZE_WINDOWS}; ${AudioDeviceSettings.DEFAULT_SIZE} on other platforms.")
+    var audioDeviceBufferSize: Int = AudioDeviceSettings.getDefaultBufferSize()
     
-    @Parameter(names = ["--audio-device-buffer-count"], description = "Sets the AudioDevice buffer count. Defaults to ${AudioDeviceSettings.DEFAULT_COUNT}.")
-    var audioDeviceBufferCount: Int = AudioDeviceSettings.DEFAULT_COUNT
+    @Parameter(names = ["--audio-device-buffer-count"], description = "Sets the AudioDevice buffer count. Should be at least 3. On Windows, defaults to ${AudioDeviceSettings.DEFAULT_COUNT_WINDOWS}; ${AudioDeviceSettings.DEFAULT_COUNT} on other platforms.")
+    var audioDeviceBufferCount: Int = AudioDeviceSettings.getDefaultBufferCount()
     
 }

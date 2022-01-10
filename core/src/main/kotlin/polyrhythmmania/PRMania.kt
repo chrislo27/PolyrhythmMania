@@ -82,6 +82,6 @@ object PRMania {
     var logMissingLocalizations: Boolean = false
     var dumpPackedSheets: Boolean = false
     var enableMetrics: Boolean = false
-    var audioDeviceSettings: AudioDeviceSettings = AudioDeviceSettings()
+    var audioDeviceSettings: AudioDeviceSettings = AudioDeviceSettings.DEFAULT_SETTINGS
     
 }
