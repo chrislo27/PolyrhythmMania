@@ -5,6 +5,7 @@ import paintbox.Paintbox
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import polyrhythmmania.container.Container
+import polyrhythmmania.soundsystem.AudioDeviceSettings
 import java.io.File
 
 
@@ -81,5 +82,6 @@ object PRMania {
     var logMissingLocalizations: Boolean = false
     var dumpPackedSheets: Boolean = false
     var enableMetrics: Boolean = false
+    var audioDeviceSettings: AudioDeviceSettings = AudioDeviceSettings()
     
 }

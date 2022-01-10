@@ -2,6 +2,7 @@ package polyrhythmmania.desktop
 
 import com.beust.jcommander.Parameter
 import paintbox.desktop.PaintboxArguments
+import polyrhythmmania.soundsystem.AudioDeviceSettings
 
 class PRManiaArguments : PaintboxArguments() {
 
@@ -17,10 +18,10 @@ class PRManiaArguments : PaintboxArguments() {
     @Parameter(names = ["--enable-metrics"], description = "Enables recording of certain program metrics. Used for debugging.")
     var enableMetrics: Boolean = false
     
-    @Parameter(names = ["--audio-device-buffer-size"], description = "Sets the AudioDevice buffer size. Should be a power of two. Defaults to 512.")
-    var audioDeviceBufferSize: Int = 512
+    @Parameter(names = ["--audio-device-buffer-size"], description = "Sets the AudioDevice buffer size. Should be a power of two. Defaults to ${AudioDeviceSettings.DEFAULT_SIZE}.")
+    var audioDeviceBufferSize: Int = AudioDeviceSettings.DEFAULT_SIZE
     
-    @Parameter(names = ["--audio-device-buffer-count"], description = "Sets the AudioDevice buffer count. Defaults to 9.")
-    var audioDeviceBufferCount: Int = 9
+    @Parameter(names = ["--audio-device-buffer-count"], description = "Sets the AudioDevice buffer count. Defaults to ${AudioDeviceSettings.DEFAULT_COUNT}.")
+    var audioDeviceBufferCount: Int = AudioDeviceSettings.DEFAULT_COUNT
     
 }

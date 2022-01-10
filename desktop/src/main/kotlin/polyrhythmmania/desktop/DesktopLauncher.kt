@@ -9,6 +9,7 @@ import paintbox.desktop.PaintboxDesktopLauncher
 import paintbox.logging.Logger
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.soundsystem.AudioDeviceSettings
 import java.io.File
 
 object DesktopLauncher {
@@ -55,6 +56,8 @@ object DesktopLauncher {
         PRMania.logMissingLocalizations = arguments.logMissingLocalizations
         PRMania.dumpPackedSheets = arguments.dumpPackedSheets
         PRMania.enableMetrics = arguments.enableMetrics
+        val audioDeviceSettings = AudioDeviceSettings(arguments.audioDeviceBufferSize, arguments.audioDeviceBufferCount)
+        PRMania.audioDeviceSettings = audioDeviceSettings
         
         PaintboxDesktopLauncher(app, arguments).editConfig {
             this.setAutoIconify(true)
@@ -64,7 +67,7 @@ object DesktopLauncher {
             this.setTitle(app.getTitle())
             this.setResizable(true)
             this.setInitialBackgroundColor(Color(0f, 0f, 0f, 1f))
-            this.setAudioConfig(100, arguments.audioDeviceBufferSize, arguments.audioDeviceBufferCount)
+            this.setAudioConfig(100, audioDeviceSettings.bufferSize, audioDeviceSettings.bufferCount)
             this.setHdpiMode(HdpiMode.Logical)
             this.setBackBufferConfig(8, 8, 8, 8, 16, 0, /* samples = */ 2)
             this.setPreferencesConfig(".polyrhythmmania/prefs/", if (portableMode) Files.FileType.Local else Files.FileType.External)
