@@ -32,12 +32,14 @@ shadowJar {
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    
     manifest {
         attributes "Main-Class": "polyrhythmmania.desktop.DesktopLauncher"
     }
 
     from {
-        configurations.implementation.collect {
+        configurations.runtimeClasspath.collect {
             it.isDirectory() ? it : zipTree(it)
         }
     }
