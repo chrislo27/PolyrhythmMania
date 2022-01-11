@@ -25,7 +25,7 @@ class StatusBar(val editorPane: EditorPane) : Pane() {
             this.borderStyle.set(SolidBorder().apply {
                 this.color.bind { editorPane.palette.statusBorder.use() }
             })
-            this.padding.set(Insets(1f, 1f, 2f, 2f))
+            this.padding.set(Insets(1f, 1f, 4f, 4f))
         }
         this += bg
         
