@@ -34,6 +34,21 @@ class OpenALAudioIO
     }
     
     private inner class Lifecycle(val audioDevice: OpenALAudioDevice) : Disposable {
+        val bufferSize: Int
+        val bufferCount: Int
+        
+        init {
+            val clazz = OpenALAudioDevice::class.java
+            clazz.getDeclaredField("bufferSize").also { sz ->
+                sz.isAccessible = true
+                bufferSize = sz.getInt(audioDevice)
+            }
+            clazz.getDeclaredField("bufferCount").also { sz ->
+                sz.isAccessible = true
+                bufferCount = sz.getInt(audioDevice)
+            }
+        }
+        
         override fun dispose() {
             audioDevice.dispose()
         }
