@@ -19,7 +19,10 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
+import polyrhythmmania.soundsystem.AudioDeviceSettings
+import polyrhythmmania.soundsystem.RealtimeOutput
 import polyrhythmmania.soundsystem.beads.DaemonJavaSoundAudioIO
 import polyrhythmmania.soundsystem.beads.OpenALAudioIO
 import polyrhythmmania.soundsystem.javasound.DumpAudioDebugInfo
@@ -32,6 +35,7 @@ import kotlin.math.roundToInt
 class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
     private val settings: Settings = menuCol.main.settings
+    private val audioDeviceSettingsOverridden = PRMania.audioDeviceSettings != null
     private val soundSystemUpdatedFlag: BooleanVar = BooleanVar(false) // Toggled to indicate a sound system change
     private val doneTextTimer: FloatVar = FloatVar(0f)
 
@@ -70,7 +74,40 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         
         audioSettingsPane.temporarilyDisableLayouts {
-            audioSettingsPane += longSeparator()
+            // Buffer count: Should be disabled if the launch argument --audio-device-buffer-count was set (check PRMania.audioDeviceSettings != null)
+            val (bufCountPane, bufCountCombobox) = createComboboxOption((3..30).toList(), settings.audioDeviceSettings.getOrCompute().bufferCount,
+                    { Localization.getVar("mainMenu.advancedAudio.audioDeviceSettings.bufferCount").use() },
+                    percentageContent = 0.5f)
+            bufCountPane.label.tooltipElement.set(createTooltip {
+                Localization.getVar("mainMenu.advancedAudio.audioDeviceSettings.bufferCount.tooltip").use() + if (audioDeviceSettingsOverridden) {
+                    "\n${
+                        Localization.getVar("mainMenu.advancedAudio.audioDeviceSettings.bufferCount.tooltip.overridden", Var {
+                            listOf("--audio-device-buffer-count")
+                        }).use()
+                    }"
+                } else ""
+            })
+            bufCountCombobox.selectedItem.addListener { m ->
+                settings.kv_audioDeviceBufferCount.value.set(m.getOrCompute().coerceAtLeast(3))
+                restartMainMenuAudio()
+            }
+            bufCountPane.content -= bufCountCombobox
+            bufCountPane.content += HBox().apply {
+                this.spacing.set(8f)
+                this.align.set(HBox.Align.RIGHT)
+                this += bufCountCombobox.apply { 
+                    this.bounds.width.set(100f)
+                    this.disabled.set(audioDeviceSettingsOverridden)
+                }
+                this += createSmallButton { Localization.getVar("common.reset").use() }.apply { 
+                    this.bounds.width.set(90f)
+                    this.setOnAction { 
+                        bufCountCombobox.selectedItem.set(AudioDeviceSettings.getDefaultBufferCount())
+                    }
+                    this.disabled.set(audioDeviceSettingsOverridden)
+                }
+            }
+            audioSettingsPane += bufCountPane
         }
         audioSettingsPane.sizeHeightToChildren(10f)
         audioSettingsPane.visible.bind { !legacyAudioEnabled.use() }
@@ -130,7 +167,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             (s.bufferCount * ((s.bufferSize / 4) / audioIO.context.sampleRate) * 1000).roundToInt()
                         }
                         is DaemonJavaSoundAudioIO -> {
-                            (DaemonJavaSoundAudioIO.NUM_OUTPUT_BUFFERS * ((audioIO.systemBufferSizeInFrames / 4) / audioIO.context.sampleRate) * 1000).roundToInt()
+                            (DaemonJavaSoundAudioIO.NUM_OUTPUT_BUFFERS * (audioIO.systemBufferSizeInFrames / audioIO.context.sampleRate) * 1000).roundToInt()
                         }
                         else -> -1
                     }
@@ -150,9 +187,6 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             legacyAudioCheck.onCheckChanged = { newState ->
                 settings.useLegacyAudio.set(newState)
                 restartMainMenuAudio()
-                if (newState) {
-                    Paintbox.LOGGER.info("Now using OpenAL audio system: ${settings.audioDeviceSettings.getOrCompute()}")
-                }
             }
             legacyAudioCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.advancedAudio.useLegacyAudio.tooltip")))
             vbox += legacyAudioCheckPane
@@ -221,6 +255,9 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 musicPlayer.position = oldMusicPos
             }
             soundSystemUpdatedFlag.invert()
+            if (mainMenu.soundSys.soundSystem.realtimeOutput is RealtimeOutput.OpenAL) {
+                Paintbox.LOGGER.info("Now using OpenAL audio system: ${settings.audioDeviceSettings.getOrCompute()}")
+            }
         }
     }
 

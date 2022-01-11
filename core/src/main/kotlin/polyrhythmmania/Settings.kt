@@ -137,9 +137,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_assembleNormalHighScore: KeyValue<Int> = KeyValue(SIDEMODE_ASSEMBLE_NORMAL, 0)
 
     val audioDeviceSettings: ReadOnlyVar<AudioDeviceSettings> = Var {
-        AudioDeviceSettings(AudioDeviceSettings.getDefaultBufferSize(), use(kv_audioDeviceBufferCount.value).coerceAtLeast(3))
+        PRMania.audioDeviceSettings
+                ?: AudioDeviceSettings(AudioDeviceSettings.getDefaultBufferSize(), use(kv_audioDeviceBufferCount.value).coerceAtLeast(3))
     }
-    
+
     val locale: Var<String> = kv_locale.value
     val masterVolumeSetting: Var<Int> = kv_masterVolumeSetting.value
     val gameplayVolumeSetting: Var<Int> = kv_gameplayVolumeSetting.value
