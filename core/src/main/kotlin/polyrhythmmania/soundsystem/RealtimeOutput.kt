@@ -11,19 +11,19 @@ import javax.sound.sampled.Mixer
 
 sealed class RealtimeOutput {
     
-    object OpenAL : RealtimeOutput() {
+    class OpenAL(val audioDeviceSettings: AudioDeviceSettings) : RealtimeOutput() {
         override fun getName(): ReadOnlyVar<String> {
-            return Var("OpenAL")
+            return Var("OpenAL{$audioDeviceSettings}")
         }
 
         override fun createAudioIO(): AudioIO {
-            return OpenALAudioIO()
+            return OpenALAudioIO(audioDeviceSettings)
         }
     }
     
     class JavaSound(val mixer: Mixer) : RealtimeOutput() {
         override fun getName(): ReadOnlyVar<String> {
-            return Var(mixer.mixerInfo?.name ?: "<unknown name (${mixer})>")
+            return Var(mixer.mixerInfo?.name ?: "<unknown mixer name (${mixer})>")
         }
 
         override fun createAudioIO(): AudioIO {
