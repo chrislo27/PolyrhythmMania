@@ -19,16 +19,16 @@ class SoundSystem(val realtimeOutput: RealtimeOutput,
     : Disposable {
 
     companion object {
-        
         val AUDIO_FORMAT_44100: IOAudioFormat = IOAudioFormat(44_100f, 16, 2, 2, true, true)
         val AUDIO_FORMAT_48000: IOAudioFormat = IOAudioFormat(48_000f, 16, 2, 2, true, true)
         val DEFAULT_AUDIO_FORMAT: IOAudioFormat = AUDIO_FORMAT_48000
 
         fun createDefaultSoundSystem(initCtxBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
                                      settings: SoundSystemSettings = SoundSystemSettings()): SoundSystem {
-            val useOpenAL = !PRManiaGame.instance.settings.useLegacyAudio.getOrCompute()
+            val gameSettings = PRManiaGame.instance.settings
+            val useOpenAL = !gameSettings.useLegacyAudio.getOrCompute()
             return if (useOpenAL) {
-                SoundSystem(RealtimeOutput.OpenAL, initCtxBufferSize, settings)
+                SoundSystem(RealtimeOutput.OpenAL(gameSettings.audioDeviceSettings.getOrCompute()), initCtxBufferSize, settings)
             } else {
                 createDefaultSoundSystemJavaSound(MixerHandler.defaultMixerHandler, initCtxBufferSize, settings)
             }

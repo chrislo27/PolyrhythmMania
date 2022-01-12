@@ -32,6 +32,7 @@ import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_ASM
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_SOLITAIRE
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_LIBRARY
 import polyrhythmmania.PreferenceKeys.SETTINGS_ACHIEVEMENT_NOTIFICATIONS
+import polyrhythmmania.PreferenceKeys.SETTINGS_AUDIODEVICE_BUFFER_COUNT
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
@@ -61,6 +62,7 @@ import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
+import polyrhythmmania.soundsystem.AudioDeviceSettings
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.javasound.MixerHandler
 import polyrhythmmania.world.render.ForceTexturePack
@@ -106,6 +108,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
     private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
+    val kv_audioDeviceBufferCount: KeyValue<Int> = KeyValue(SETTINGS_AUDIODEVICE_BUFFER_COUNT, AudioDeviceSettings.getDefaultBufferCount())
     private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, "")
     private val kv_useLegacyAudio: KeyValue<Boolean> = KeyValue(SETTINGS_USE_LEGACY_SOUND, false)
     private val kv_mainMenuFlipAnimations: KeyValue<Boolean> = KeyValue(SETTINGS_MAINMENU_FLIP_ANIMATION, true)
@@ -137,6 +140,11 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_assembleNormalHighScore: KeyValue<Int> = KeyValue(SIDEMODE_ASSEMBLE_NORMAL, 0)
     private val kv_solitaireSFX: KeyValue<Boolean> = KeyValue(SIDEMODE_SOLITAIRE_GAME_SFX, true)
     private val kv_solitaireMusic: KeyValue<Boolean> = KeyValue(SIDEMODE_SOLITAIRE_GAME_MUSIC, true)
+
+    val audioDeviceSettings: ReadOnlyVar<AudioDeviceSettings> = Var {
+        PRMania.audioDeviceSettings
+                ?: AudioDeviceSettings(AudioDeviceSettings.getDefaultBufferSize(), use(kv_audioDeviceBufferCount.value).coerceAtLeast(3))
+    }
 
     val locale: Var<String> = kv_locale.value
     val masterVolumeSetting: Var<Int> = kv_masterVolumeSetting.value
@@ -209,6 +217,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getBoolean(kv_showInputFeedbackBar)
         prefs.getBoolean(kv_showSkillStar)
         prefs.getBoolean(kv_discordRichPresence)
+        prefs.getInt(kv_audioDeviceBufferCount)
         prefs.getString(kv_mixer)
         prefs.getBoolean(kv_useLegacyAudio)
         prefs.getBoolean(kv_mainMenuFlipAnimations)
@@ -266,6 +275,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putBoolean(kv_showInputFeedbackBar)
                 .putBoolean(kv_showSkillStar)
                 .putBoolean(kv_discordRichPresence)
+                .putInt(kv_audioDeviceBufferCount)
                 .putString(kv_mixer)
                 .putBoolean(kv_useLegacyAudio)
                 .putBoolean(kv_mainMenuFlipAnimations)

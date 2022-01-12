@@ -3,6 +3,7 @@ package polyrhythmmania.soundsystem.beads
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.AudioDevice
 import com.badlogic.gdx.backends.lwjgl3.audio.OpenALAudioDevice
+import com.badlogic.gdx.backends.lwjgl3.audio.OpenALLwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.codahale.metrics.MetricRegistry
 import com.codahale.metrics.Timer
@@ -11,6 +12,7 @@ import net.beadsproject.beads.core.AudioIO
 import net.beadsproject.beads.core.UGen
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
+import polyrhythmmania.soundsystem.AudioDeviceSettings
 import polyrhythmmania.util.metrics.timeInline
 import javax.sound.sampled.*
 import kotlin.concurrent.thread
@@ -26,7 +28,7 @@ import kotlin.math.roundToInt
  *   - The buffer size is in *bytes* and not samples, with 4 bytes per sample
  *   - The return result of [AudioDevice.getLatency] is in *milliseconds* and not samples
  */
-class OpenALAudioIO
+class OpenALAudioIO(val audioDeviceSettings: AudioDeviceSettings)
     : AudioIO() {
     
     companion object {
@@ -67,7 +69,8 @@ class OpenALAudioIO
         }
         
         val ioAudioFormat = getContext().audioFormat
-        val newAudioDevice = Gdx.audio.newAudioDevice(ioAudioFormat.sampleRate.roundToInt(), ioAudioFormat.outputs == 1) as OpenALAudioDevice
+        val newAudioDevice = OpenALAudioDevice(Gdx.audio as OpenALLwjgl3Audio, ioAudioFormat.sampleRate.roundToInt(),
+                ioAudioFormat.outputs == 1, audioDeviceSettings.bufferSize.coerceAtLeast(256), audioDeviceSettings.bufferCount.coerceAtLeast(3))
         val lifecycle = Lifecycle(newAudioDevice)
         this.lifecycleInstance = lifecycle
         

@@ -56,8 +56,13 @@ object DesktopLauncher {
         PRMania.logMissingLocalizations = arguments.logMissingLocalizations
         PRMania.dumpPackedSheets = arguments.dumpPackedSheets
         PRMania.enableMetrics = arguments.enableMetrics
-        val audioDeviceSettings = AudioDeviceSettings(arguments.audioDeviceBufferSize, arguments.audioDeviceBufferCount)
-        PRMania.audioDeviceSettings = audioDeviceSettings
+        if (arguments.audioDeviceBufferSize != null || arguments.audioDeviceBufferCount != null) {
+            val audioDeviceSettings = AudioDeviceSettings(
+                    arguments.audioDeviceBufferSize ?: AudioDeviceSettings.getDefaultBufferSize(),
+                    arguments.audioDeviceBufferCount ?: AudioDeviceSettings.getDefaultBufferCount()
+            )
+            PRMania.audioDeviceSettings = audioDeviceSettings
+        }
         
         PaintboxDesktopLauncher(app, arguments).editConfig {
             this.setAutoIconify(true)
@@ -67,15 +72,16 @@ object DesktopLauncher {
             this.setTitle(app.getTitle())
             this.setResizable(true)
             this.setInitialBackgroundColor(Color(0f, 0f, 0f, 1f))
-            this.setAudioConfig(100, audioDeviceSettings.bufferSize, audioDeviceSettings.bufferCount)
+            // Note: the buffer size and count here are largely ignored since we don't use Gdx.audio.newAudioDevice
+            this.setAudioConfig(100, PRMania.audioDeviceSettings?.bufferSize ?: AudioDeviceSettings.getDefaultBufferSize(),
+                    PRMania.audioDeviceSettings?.bufferCount ?: AudioDeviceSettings.getDefaultBufferCount())
             this.setHdpiMode(HdpiMode.Logical)
             this.setBackBufferConfig(8, 8, 8, 8, 16, 0, /* samples = */ 2)
             this.setPreferencesConfig(".polyrhythmmania/prefs/", if (portableMode) Files.FileType.Local else Files.FileType.External)
             
             val sizes: List<Int> = listOf(32, 24, 16)
             this.setWindowIcon(Files.FileType.Internal, *sizes.map { "icon/$it.png" }.toTypedArray())
-        }
-                .launch()
+        }.launch()
     }
 
 }
