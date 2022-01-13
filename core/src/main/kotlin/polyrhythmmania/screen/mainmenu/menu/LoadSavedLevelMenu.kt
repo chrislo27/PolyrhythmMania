@@ -29,12 +29,13 @@ import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
-import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.library.score.LevelScore
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.screen.play.OnRankingRevealed
+import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.statistics.GlobalStats
@@ -44,7 +45,7 @@ import java.util.*
 import kotlin.concurrent.thread
 
 class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
-                         val previousHighScore: Int = -1)
+                         val previousHighScore: Int? = null)
     : StandardMenu(menuCol) {
 
     enum class Substate {
@@ -233,7 +234,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                         mainMenu.transitionAway {
                             val main = mainMenu.main
                             val uuid = loadedData.modernLevelUUID
-                            val onRankingRevealed = PlayScreen.OnRankingRevealed { lsa, score ->
+                            val onRankingRevealed = OnRankingRevealed { lsa, score ->
                                 GlobalStats.timesPlayedCustomLevel.increment()
                                 if (uuid != null) {
                                     val levelScore: LevelScore? = GlobalScoreCache.scoreCache.getOrCompute().map[uuid] 
@@ -244,10 +245,10 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                                     GlobalScoreCache.pushNewLevelScoreAttempt(uuid, lsa)
                                 }
                             }
-                            val playScreen = PlayScreen(main, null, PlayTimeType.REGULAR, loadedData.newContainer, challenges,
+                            val playScreen = PlayScreen(main, PlayTimeType.REGULAR, loadedData.newContainer, challenges,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    onRankingRevealed = onRankingRevealed,
-                                    previousHighScore = previousHighScore, showResults = !robotMode)
+                                    resultsBehaviour = if (robotMode) ResultsBehaviour.NoResults
+                                    else ResultsBehaviour.ShowResults(onRankingRevealed, previousHighScore))
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
                                     playScreen.prepareGameStart()

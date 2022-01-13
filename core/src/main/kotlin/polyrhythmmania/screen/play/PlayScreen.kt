@@ -1,4 +1,4 @@
-package polyrhythmmania.screen
+package polyrhythmmania.screen.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -70,20 +70,14 @@ import java.util.*
 import kotlin.math.*
 
 
-class PlayScreen(
+class PlayScreen private constructor(
         main: PRManiaGame, val sideMode: SideMode?, val playTimeType: PlayTimeType,
         val container: Container, val challenges: Challenges,
         val inputCalibration: InputCalibration,
-        val onRankingRevealed: OnRankingRevealed?,
-        /** -1 to disable */ val previousHighScore: Int,
-        val showResults: Boolean = true,
+        val resultsBehaviour: ResultsBehaviour
 ) : PRManiaScreen(main) {
     
-    companion object // Used for early init
-    
-    fun interface OnRankingRevealed {
-        fun onRankingRevealed(lsa: LevelScoreAttempt, score: Score)
-    }
+    companion object; // Used for early init
 
     private val startTimestamp: Instant = Instant.now()
     val timing: TimingProvider get() = container.timing
@@ -128,8 +122,8 @@ class PlayScreen(
                 container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
                     engine.inputter.submitInputsFromRod(rod)
                 }
-                if (showResults) {
-                    transitionToResults()
+                if (resultsBehaviour is ResultsBehaviour.ShowResults) {
+                    transitionToResults(resultsBehaviour)
                 } else {
                     val sideMode = this.sideMode
                     if (sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null) {
@@ -158,6 +152,20 @@ class PlayScreen(
     }
     
     private var firstRender: Boolean = true
+    
+    constructor(
+            main: PRManiaGame, sideMode: SideMode,
+            challenges: Challenges,
+            inputCalibration: InputCalibration,
+            resultsBehaviour: ResultsBehaviour
+    ) : this(main, sideMode, sideMode.playTimeType, sideMode.container, challenges, inputCalibration, resultsBehaviour)
+    
+    constructor(
+            main: PRManiaGame, playTimeType: PlayTimeType,
+            container: Container, challenges: Challenges,
+            inputCalibration: InputCalibration,
+            resultsBehaviour: ResultsBehaviour
+    ) : this(main, null, playTimeType, container, challenges, inputCalibration, resultsBehaviour)
 
     init {
         var nextLayer: UIElement = sceneRoot
@@ -414,7 +422,7 @@ class PlayScreen(
         }
     }
 
-    private fun transitionToResults() {
+    private fun transitionToResults(resultsBehaviour: ResultsBehaviour.ShowResults) {
         val inputter = engine.inputter
         val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
         val nInputs = max(inputter.totalExpectedInputs, inputter.minimumInputCount)
@@ -439,8 +447,8 @@ class PlayScreen(
                 PRManiaGame.instance.settings.persist()
                 isNewHighScore = true
             }
-        } else if (previousHighScore >= 0) {
-            if (score > previousHighScore) {
+        } else if (resultsBehaviour.previousHighScore != null) {
+            if (score > resultsBehaviour.previousHighScore && resultsBehaviour.previousHighScore >= 0) {
                 isNewHighScore = true
             }
         }
@@ -452,13 +460,17 @@ class PlayScreen(
                 lines.first, lines.second,
                 ranking, isNewHighScore
         )
-        
+
         transitionAway(ResultsScreen(main, scoreObj, container, sideMode, {
-            PlayScreen(main, sideMode, playTimeType, container, challenges, inputCalibration, onRankingRevealed, 
-                    if (scoreObj.newHighScore) scoreObj.scoreInt else previousHighScore, showResults)
+            PlayScreen(
+                    main, sideMode, playTimeType, container, challenges, inputCalibration,
+                    resultsBehaviour.copy(
+                            previousHighScore = if (scoreObj.newHighScore) scoreObj.scoreInt else resultsBehaviour.previousHighScore
+                    )
+            )
         }, keyboardKeybinds,
                 LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges),
-                onRankingRevealed), disposeContainer = false) {}
+                resultsBehaviour.onRankingRevealed), disposeContainer = false) {}
     }
 
     private inline fun transitionAway(nextScreen: Screen, disposeContainer: Boolean, action: () -> Unit) {

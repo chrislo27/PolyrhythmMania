@@ -16,6 +16,7 @@ import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.practice.*
 import polyrhythmmania.statistics.GlobalStats
@@ -66,30 +67,31 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> AbstractPracticeTutorial): UIElement {
-                return createSidemodeLongButton(null, name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES, false) { game, keymap ->
+                return createSidemodeLongButton(null, name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES) { game, keymap ->
                     DiscordCore.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL
                     GlobalStats.timesPlayedTutorial.increment()
                     factory.invoke(game, keymap)
                 }
             }
-            
+
             fun createSidemode(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
-                                         challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
-                                         factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
-                return createSidemodeLongButton(null, name, tooltipVar, challenges, showResults) { game, keymap ->
+                               challenges: Challenges = Challenges.NO_CHANGES,
+                               resultsBehaviour: ResultsBehaviour,
+                               factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
+                return createSidemodeLongButton(null, name, tooltipVar, challenges, resultsBehaviour) { game, keymap ->
                     DiscordCore.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL
                     factory.invoke(game, keymap)
                 }
             }
-            
+
             vbox += createPractice("mainMenu.practice.tutorial1") { main, keymap ->
                 PracticeTutorial1(main, keymap)
             }
             vbox += createSidemode("mainMenu.practice.polyrhythm1",
                     Localization.getVar("mainMenu.practice.polyrhythm1.tooltip"),
-                    Challenges.NO_CHANGES, true) { main, _ ->
+                    Challenges.NO_CHANGES, ResultsBehaviour.ShowResults(null, null)) { main, _ ->
                 GlobalStats.timesPlayedPracticePolyrhythm1.increment()
                 Polyrhythm1Practice(main)
             }
@@ -98,7 +100,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += createSidemode("mainMenu.practice.polyrhythm2",
                     Localization.getVar("mainMenu.practice.polyrhythm2.tooltip"),
-                    Challenges.NO_CHANGES, true) { main, _ ->
+                    Challenges.NO_CHANGES, ResultsBehaviour.ShowResults(null, null)) { main, _ ->
                 GlobalStats.timesPlayedPracticePolyrhythm2.increment()
                 Polyrhythm2Practice(main)
             }

@@ -27,8 +27,9 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.SideMode
 
 
@@ -342,7 +343,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     
     protected fun createSidemodeLongButton(icon: TextureRegion?, name: String,
                                            tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
-                                           challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
+                                           challenges: Challenges = Challenges.NO_CHANGES,
+                                           resultsBehaviour: ResultsBehaviour = ResultsBehaviour.NoResults,
                                            newIndicator: Settings.NewIndicator? = null,
                                            factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
         return (if (newIndicator == null)
@@ -359,10 +361,10 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     }
                     Gdx.app.postRunnable {
                         val sidemode: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-                        val playScreen = PlayScreen(main, sidemode, sidemode.playTimeType, sidemode.container,
+                        val playScreen = PlayScreen(main, sidemode,
                                 inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                challenges = challenges, onRankingRevealed = null, showResults = showResults,
-                                previousHighScore = -1)
+                                challenges = challenges,
+                                resultsBehaviour = resultsBehaviour)
                         main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                             this.onEntryEnd = {
                                 sidemode.prepare()

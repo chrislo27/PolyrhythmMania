@@ -24,8 +24,9 @@ import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.endlessmode.*
 import polyrhythmmania.statistics.GlobalStats
@@ -114,13 +115,13 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             scoreVar.addListener {
                                 main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
                             }
-                            val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main,
+                            val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main, PlayTimeType.DAILY_CHALLENGE,
                                     EndlessModeScore(scoreVar, showHighScore = false),
                                     EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
-                            val playScreen = PlayScreen(main, sidemode, PlayTimeType.DAILY_CHALLENGE, sidemode.container,
-                                    challenges = Challenges.NO_CHANGES, showResults = false,
+                            val playScreen = PlayScreen(main, sidemode,
+                                    challenges = Challenges.NO_CHANGES,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    onRankingRevealed = null, previousHighScore = -1)
+                                    resultsBehaviour = ResultsBehaviour.NoResults)
                             main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
                             main.settings.persist()
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {

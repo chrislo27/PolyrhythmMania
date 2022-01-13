@@ -1,7 +1,7 @@
 package polyrhythmmania.engine.input
 
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldMode

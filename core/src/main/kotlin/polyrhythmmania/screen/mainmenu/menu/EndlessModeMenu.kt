@@ -26,8 +26,9 @@ import polyrhythmmania.Localization
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
@@ -104,15 +105,15 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             scoreVar.addListener {
                                 main.settings.endlessHighScore.set(EndlessHighScore(seedUInt, it.getOrCompute()))
                             }
-                            val sidemode: SideMode = EndlessPolyrhythm(main,
+                            val sidemode: SideMode = EndlessPolyrhythm(main, PlayTimeType.ENDLESS,
                                     EndlessModeScore(scoreVar, showHighScore = true),
                                     seed, dailyChallenge = null,
                                     disableLifeRegen = disableRegen.get(),
                                     maxLives = if (daredevilMode.get()) 1 else -1)
-                            val playScreen = PlayScreen(main, sidemode, PlayTimeType.ENDLESS, sidemode.container,
-                                    challenges = Challenges.NO_CHANGES, showResults = false,
+                            val playScreen = PlayScreen(main, sidemode,
+                                    challenges = Challenges.NO_CHANGES,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    onRankingRevealed = null, previousHighScore = -1)
+                                    resultsBehaviour = ResultsBehaviour.NoResults)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                 this.onEntryEnd = {
                                     sidemode.prepare()

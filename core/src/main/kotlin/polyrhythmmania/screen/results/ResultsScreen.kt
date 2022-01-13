@@ -30,7 +30,8 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.library.score.LevelScoreAttempt
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.play.OnRankingRevealed
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.practice.AbstractPolyrhythmPractice
 import polyrhythmmania.statistics.GlobalStats
@@ -42,7 +43,7 @@ class ResultsScreen(
         val startOverFactory: () -> PlayScreen,
         val keyboardKeybinds: InputKeymapKeyboard,
         val levelScoreAttempt: LevelScoreAttempt,
-        val onRankingRevealed: PlayScreen.OnRankingRevealed?,
+        val onRankingRevealed: OnRankingRevealed?,
 ) : PRManiaScreen(main) {
     
     private lateinit var soundFirstLine: Sound
