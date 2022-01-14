@@ -590,14 +590,15 @@ class SolitaireGame : ActionablePane() {
         val bmFont = paintboxFont.begin()
         bmFont.scaleMul(0.75f)
 
+        val sheet = SolitaireAssets.get<PackedSheet>("cards")
         for (zone in allCardZones) {
             if (!zone.showOutline) continue
             val cs = zone.stack
             val renderX = x + cs.x.get()
             val renderY = y - cs.y.get()
 
-            batch.setColor(1f, 1f, 1f, 0.2f)
-            batch.drawRect(renderX, renderY - cardHeight, cardWidth, cardHeight, 4f)
+            batch.setColor(1f, 1f, 1f, 1f)
+            batch.draw(sheet["zone_outline"], renderX, renderY - cardHeight, cardWidth, cardHeight)
         }
         
         batch.color = tmpColor
@@ -652,17 +653,20 @@ class SolitaireGame : ActionablePane() {
             batch.setColor(1f, 1f, 1f, 1f)
             batch.draw(sheet["card_front"], renderX, renderY, cw, ch)
             
-            val symbolIndent = 7f
+            val indent = 7f
+            val symbolIndentX = indent + card.symbol.offsetX
+            val symbolIndentY = indent + card.symbol.offsetY
+            val suitIndent = indent
             batch.color = card.suit.color
             // Symbol in top left and upside-down bottom right
             val symbolRegion = sheet[card.symbol.spriteID]
-            batch.draw(symbolRegion, renderX + symbolIndent, renderY + ch - symbolIndent - symbolRegion.originalHeight)
-            batch.draw(symbolRegion, renderX + cw - (symbolIndent), renderY + symbolIndent + symbolRegion.originalHeight,
+            batch.draw(symbolRegion, renderX + symbolIndentX, renderY + ch - symbolIndentY - symbolRegion.originalHeight)
+            batch.draw(symbolRegion, renderX + cw - (symbolIndentX), renderY + symbolIndentY + symbolRegion.originalHeight,
                     -symbolRegion.originalWidth * 1f, -symbolRegion.originalHeight * 1f)
             // Suit in top right and upside-down bottom left
             val suitRegion = sheet[card.suit.spriteID]
-            batch.draw(suitRegion, renderX + cw - (symbolIndent + suitRegion.originalWidth), renderY + ch - symbolIndent - suitRegion.originalHeight)
-            batch.draw(suitRegion, renderX + symbolIndent + suitRegion.originalWidth, renderY + symbolIndent + suitRegion.originalHeight,
+            batch.draw(suitRegion, renderX + cw - (suitIndent + suitRegion.originalWidth), renderY + ch - suitIndent - suitRegion.originalHeight)
+            batch.draw(suitRegion, renderX + suitIndent + suitRegion.originalWidth, renderY + suitIndent + suitRegion.originalHeight,
                     -suitRegion.originalWidth * 1f, -suitRegion.originalHeight * 1f)
         }
 
