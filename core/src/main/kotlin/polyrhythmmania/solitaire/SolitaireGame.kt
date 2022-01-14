@@ -301,7 +301,6 @@ class SolitaireGame : ActionablePane() {
         for (foundation in foundationZones) {
             if (!foundation.stack.flippedOver.get() && foundation.stack.cardList.size == foundation.maxCapacity) {
                 foundation.stack.flippedOver.set(true)
-//                playSound("sfx_base_note_delayed", pitch = Semitones.getALPitch(12))
             }
         }
         
