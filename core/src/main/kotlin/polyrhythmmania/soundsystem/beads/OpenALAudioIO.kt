@@ -106,11 +106,17 @@ class OpenALAudioIO(val audioDeviceSettings: AudioDeviceSettings)
             primeBuffer()
             lifecycle.audioDevice.writeSamples(sampleBuffer, 0, sampleBufferSize)
             if (sourceIDField != null && !directChannelsSoftWasSet) {
-                val sourceId = sourceIDField.getInt(lifecycle.audioDevice)
-                if (sourceId != -1) {
-                    AL10.alSourcei(sourceId, SOFTDirectChannels.AL_DIRECT_CHANNELS_SOFT, AL10.AL_TRUE)
+                try {
+                    val sourceId = sourceIDField.getInt(lifecycle.audioDevice)
+                    if (sourceId != -1) {
+                        AL10.alSourcei(sourceId, SOFTDirectChannels.AL_DIRECT_CHANNELS_SOFT, AL10.AL_TRUE)
+                        Paintbox.LOGGER.debug("Did AL_DIRECT_CHANNELS_SOFT fix for OpenALAudioDevice. This will be removed with libGDX 1.10.1")
+                        directChannelsSoftWasSet = true
+                    }
+                } catch (e: Exception) {
                     directChannelsSoftWasSet = true
-                    Paintbox.LOGGER.debug("Did AL_DIRECT_CHANNELS_SOFT fix for OpenALAudioDevice. This will be removed with libGDX 1.10.1")
+                    Paintbox.LOGGER.debug("Failed to apply AL_DIRECT_CHANNELS_SOFT fix for OpenALAudioDevice due to exception")
+                    e.printStackTrace()
                 }
             }
         }
