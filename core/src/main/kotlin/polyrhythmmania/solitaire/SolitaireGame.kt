@@ -24,7 +24,8 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-class SolitaireGame : ActionablePane() {
+class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled())
+    : ActionablePane() {
     
     companion object {
         private const val SHOW_ALL_CARDS_DEBUG: Boolean = false
@@ -139,8 +140,6 @@ class SolitaireGame : ActionablePane() {
     val cardStackOffsetFlipped: Float = -0.5f
     
     val inputsEnabled: BooleanVar = BooleanVar(false)
-    
-    val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled()
     
     private val freeCells: List<CardZone>
     private val playerZones: List<CardZone>
