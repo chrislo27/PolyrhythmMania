@@ -30,6 +30,7 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.library.score.LevelScoreAttempt
+import polyrhythmmania.screen.play.AbstractPlayScreen
 import polyrhythmmania.screen.play.OnRankingRevealed
 import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.sidemodes.SideMode
@@ -40,7 +41,7 @@ import kotlin.properties.Delegates
 
 class ResultsScreen(
         main: PRManiaGame, val score: Score, val container: Container, val sideMode: SideMode?,
-        val startOverFactory: () -> PlayScreen,
+        val startOverFactory: () -> AbstractPlayScreen,
         val keyboardKeybinds: InputKeymapKeyboard,
         val levelScoreAttempt: LevelScoreAttempt,
         val onRankingRevealed: OnRankingRevealed?,
@@ -111,12 +112,12 @@ class ResultsScreen(
                 }
                 this.setOnAction {
                     playSound(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                    val playScreen: PlayScreen = startOverFactory()
+                    val playScreen = startOverFactory()
                     Gdx.input.isCursorCatched = true
                     main.screen = TransitionScreen(main, main.screen, playScreen, FadeOut(0.5f, Color(0f, 0f, 0f, 1f)),
                             FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                         this.onEntryEnd = {
-                            playScreen.resetAndStartOver(doWipeTransition = false, playSound = false)
+                            playScreen.resetAndUnpause()
                         }
                     }
                 }

@@ -368,7 +368,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                         main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                             this.onEntryEnd = {
                                 sidemode.prepare()
-                                playScreen.resetAndStartOver(false, false)
+                                playScreen.resetAndUnpause()
                             }
                         }
                     }

@@ -86,7 +86,7 @@ class CrashScreen(main: PRManiaGame, val throwable: Throwable, val lastScreen: S
                 this.textAlign.set(TextAlign.CENTRE)
                 this.renderAlign.set(Align.top)
             }
-            vbox += TextLabel("[b]Last screen:[] ${lastScreen?.javaClass?.canonicalName}\n[b]Log file:[] <user.home>/.polyrhythmmania/logs/${SysOutPiper.logFile.name}\n[b]Exception:[] [color=#FF6B68]${throwable.stackTraceToString().replace("\t", "   ")}[]").apply {
+            vbox += TextLabel("[b]Last screen:[] ${lastScreen?.javaClass?.name}\n[b]Log file:[] <user.home>/.polyrhythmmania/logs/${SysOutPiper.logFile.name}\n[b]Exception:[] [color=#FF6B68]${throwable.stackTraceToString().replace("\t", "   ")}[]").apply {
                 this.bounds.height.set(500f)
                 this.textColor.set(Color.WHITE)
                 this.markup.set(this@CrashScreen.markupThin)

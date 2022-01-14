@@ -251,7 +251,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                                     else ResultsBehaviour.ShowResults(onRankingRevealed, previousHighScore))
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
-                                    playScreen.prepareGameStart()
+                                    playScreen.resetAndUnpause()
                                     menuCol.popLastMenu(playSound = false)
                                     DiscordCore.updateActivity(DefaultPresences.playingLevel())
                                     mainMenu.backgroundType = BgType.NORMAL
