@@ -1,4 +1,4 @@
-package polyrhythmmania.screen
+package polyrhythmmania.screen.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -18,9 +18,7 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.PaintboxGame
-import paintbox.binding.FloatVar
-import paintbox.binding.IntVar
-import paintbox.binding.VarChangedListener
+import paintbox.binding.*
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -60,7 +58,6 @@ import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.EntityRodPR
-import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.TilesetPalette
@@ -70,93 +67,58 @@ import java.util.*
 import kotlin.math.*
 
 
-class PlayScreen(
+abstract class AbstractPlayScreen protected constructor(
         main: PRManiaGame, val sideMode: SideMode?, val playTimeType: PlayTimeType,
         val container: Container, val challenges: Challenges,
         val inputCalibration: InputCalibration,
-        val onRankingRevealed: OnRankingRevealed?,
-        /** -1 to disable */ val previousHighScore: Int,
-        val showResults: Boolean = true,
+        val resultsBehaviour: ResultsBehaviour
 ) : PRManiaScreen(main) {
     
-    companion object // Used for early init
-    
-    fun interface OnRankingRevealed {
-        fun onRankingRevealed(lsa: LevelScoreAttempt, score: Score)
-    }
+    data class PauseOption(val localizationKey: String, val enabled: Boolean, val action: () -> Unit)
 
-    private val startTimestamp: Instant = Instant.now()
+    protected val startTimestamp: Instant = Instant.now()
+    
     val timing: TimingProvider get() = container.timing
     val soundSystem: SoundSystem
-        get() = container.soundSystem ?: error("PlayScreen requires a non-null SoundSystem in the Container")
+        get() = container.soundSystem ?: error("${this::javaClass.name} requires a non-null SoundSystem in the Container")
     val engine: Engine get() = container.engine
     val renderer: WorldRenderer get() = container.renderer
     val batch: SpriteBatch = main.batch
 
-    private val uiCamera: OrthographicCamera = OrthographicCamera().apply {
-        this.setToOrtho(false, 1280f, 720f)
-        this.update()
-    }
-    private val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
-    private val sceneRoot: SceneRoot = SceneRoot(uiViewport)
-    private val inputProcessor: InputProcessor = sceneRoot.inputSystem
-    private val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
-    private val pauseBg: PauseBackground = this.PauseBackground()
-    private val maxSelectionSize: Int = 3
-    private val selectionIndex: IntVar = IntVar(0)
-    private val panelAnimationValue: FloatVar = FloatVar(0f)
-    private var activePanelAnimation: Animation? = null
-    private val topPane: Pane
-    private val bottomPane: Pane
-    private val resumeLabel: TextLabel
-    private val startOverLabel: TextLabel
-    private val quitLabel: TextLabel
-    private val optionLabels: List<TextLabel>
-
-    private var isPaused: Boolean = false
-    private var isFinished: Boolean = false
-
-    private val keyboardKeybinds: InputKeymapKeyboard by lazy { main.settings.inputKeymapKeyboard.getOrCompute() }
-    private val bgSquareTexReg: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("pause_square"))
-    
-    private var pauseTime: Float = 0f
-    
+    protected val isPaused: BooleanVar = BooleanVar(false)
+    protected val keyboardKeybinds: InputKeymapKeyboard by lazy { main.settings.inputKeymapKeyboard.getOrCompute() }
     private val endSignalListener: VarChangedListener<Boolean> = VarChangedListener {
         if (it.getOrCompute()) {
             Gdx.app.postRunnable {
-                soundSystem.setPaused(true)
-                container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
-                    engine.inputter.submitInputsFromRod(rod)
-                }
-                if (showResults) {
-                    transitionToResults()
-                } else {
-                    val sideMode = this.sideMode
-                    if (sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null) {
-                        val menuCol = main.mainMenuScreen.menuCollection
-                        val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
-                        val nonce = sideMode.dailyChallengeUUIDNonce.getOrCompute()
-                        if (score.score > 0 && !engine.autoInputs) {
-                            val submitMenu = SubmitDailyChallengeScoreMenu(menuCol, sideMode.dailyChallenge, nonce, score)
-                            menuCol.addMenu(submitMenu)
-                            menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
-                        }
-
-                        quitToMainMenu(false)
-                    } else {
-                        if (sideMode is DunkMode) {
-                            val localDateTime = LocalDateTime.ofInstant(startTimestamp, ZoneId.systemDefault())
-                            if (localDateTime.dayOfWeek == DayOfWeek.FRIDAY && localDateTime.toLocalTime() >= LocalTime.of(17, 0)) {
-                                Achievements.awardAchievement(Achievements.dunkFridayNight)
-                            }
-                        }
-                        quitToMainMenu(false)
-                    }
-                }
+                onEndSignalFired()
             }
         }
     }
+
+    protected val uiCamera: OrthographicCamera = OrthographicCamera().apply {
+        this.setToOrtho(false, 1280f, 720f)
+        this.update()
+    }
+    protected val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
+    protected val sceneRoot: SceneRoot = SceneRoot(uiViewport)
+    protected val inputProcessor: InputProcessor = sceneRoot.inputSystem
+    protected val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
     
+    protected val pauseBg: PauseBackground = this.PauseBackground()
+    
+    protected val pauseOptions: Var<List<PauseOption>> = Var(emptyList())
+    protected val selectedPauseOption: Var<PauseOption?> = Var(null)
+    
+    private val panelAnimationValue: FloatVar = FloatVar(0f)
+    private var activePanelAnimation: Animation? = null
+    
+    protected val topPane: Pane
+    protected val bottomPane: Pane
+    protected val titleLabel: TextLabel
+
+    /**
+     * Used to render the pause [sceneRoot] for the first frame to reduce stutter.
+     */
     private var firstRender: Boolean = true
 
     init {
@@ -193,12 +155,14 @@ class PlayScreen(
         }
         topPane += leftVbox
 
+        titleLabel = TextLabel(binding = { Localization.getVar("play.pause.title").use() }, font = main.fontPauseMenuTitle).apply {
+            this.textColor.set(Color.WHITE)
+            this.bounds.height.set(128f)
+            this.renderAlign.set(Align.left)
+        }
+        
         leftVbox.temporarilyDisableLayouts {
-            leftVbox += TextLabel(binding = { Localization.getVar("play.pause.title").use() }, font = main.fontPauseMenuTitle).apply {
-                this.textColor.set(Color.WHITE)
-                this.bounds.height.set(128f)
-                this.renderAlign.set(Align.left)
-            }
+            leftVbox += titleLabel
         }
 
         val transparentBlack = Color(0f, 0f, 0f, 0.75f)
@@ -215,111 +179,129 @@ class PlayScreen(
         }
 
         val optionsBorderSize = 12f
+        val optionsContentHeight = 144f
         val optionsBg = RectElement(transparentBlack).apply {
             Anchor.BottomRight.configure(this, offsetY = -80f, offsetX = -15f)
             this.bounds.width.set(275f + optionsBorderSize * 2)
-            this.bounds.height.set(144f + optionsBorderSize * 2)
+            this.bounds.height.set(optionsContentHeight + optionsBorderSize * 2)
             this.border.set(Insets(optionsBorderSize))
             this.borderStyle.set(SolidBorder(transparentBlack).apply {
                 this.roundedCorners.set(true)
             })
         }
         bottomPane += optionsBg
-        
-        fun addArrowImageNode(index: Int): ArrowNode {
-            return ArrowNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_pointer_finger"])).apply {
-                Anchor.CentreLeft.configure(this, offsetY = 4f)
-//                this.bindHeightToParent(multiplier = 1.5f)
-                this.bounds.height.set(64f)
-                this.bindWidthToSelfHeight()
-                this.bounds.x.bind { -(bounds.width.use() + optionsBorderSize * 2 + 2f) }
-                this.visible.bind { selectionIndex.use() == index }
-            }
-        }
 
         val selectedLabelColor = Color(0f, 1f, 1f, 1f)
         val unselectedLabelColor = Color(1f, 1f, 1f, 1f)
-        fun createTextLabelOption(localiz: String, index: Int, enabled: Boolean): TextLabel {
-            return TextLabel(binding = { Localization.getVar(localiz).use() }, font = main.fontMainMenuMain).apply {
+        fun createTextLabelOption(option: PauseOption, index: Int, allOptions: List<PauseOption>): TextLabel {
+            return TextLabel(binding = { Localization.getVar(option.localizationKey).use() }, font = main.fontMainMenuMain).apply {
                 Anchor.TopLeft.configure(this)
-                this.disabled.set(!enabled)
+                this.disabled.set(!option.enabled)
                 this.textColor.bind {
-                    if (apparentDisabledState.use()) Color.GRAY else if (selectionIndex.use() == index) selectedLabelColor else unselectedLabelColor
+                    if (apparentDisabledState.use()) {
+                        Color.GRAY
+                    } else if (selectedPauseOption.use() == option) {
+                        selectedLabelColor
+                    } else {
+                        unselectedLabelColor
+                    }
                 }
-                this.bounds.height.set(48f)
+                this.bounds.height.set(optionsContentHeight / allOptions.size)
                 this.padding.set(Insets(2f, 2f, 12f, 12f))
                 this.renderAlign.set(Align.left)
                 this.textAlign.set(TextAlign.LEFT)
-                this += addArrowImageNode(index)
+                this += ArrowNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["arrow_pointer_finger"])).apply {
+                    Anchor.CentreLeft.configure(this, offsetY = 4f)
+                    this.bounds.height.set(64f)
+                    this.bindWidthToSelfHeight()
+                    this.bounds.x.bind { -(bounds.width.use() + optionsBorderSize * 2 + 2f) }
+                    this.visible.bind { selectedPauseOption.use() == option }
+                }
                 this.setOnAction {
                     attemptPauseEntrySelection()
                 }
                 this.setOnHoverStart {
-                    changeSelectionTo(index)
+                    changeSelectionTo(option)
                 }
             }
         }
-        resumeLabel = createTextLabelOption(if (engine.autoInputs) "play.pause.resume.robotMode" else "play.pause.resume", 0, true)
-        startOverLabel = createTextLabelOption("play.pause.startOver", 1, !(sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null))
-        quitLabel = createTextLabelOption("play.pause.quitToMainMenu", 2, true)
         
-        optionLabels = listOf(resumeLabel, startOverLabel, quitLabel)
         optionsBg += VBox().apply {
             this.spacing.set(0f)
-            this.temporarilyDisableLayouts {
-                this += resumeLabel
-                this += startOverLabel
-                this += quitLabel
+            
+            pauseOptions.addListener {
+                val optionList = it.getOrCompute()
+                this.removeAllChildren()
+                this.temporarilyDisableLayouts {
+                    optionList.forEachIndexed { index, op ->
+                        this += createTextLabelOption(op, index, optionList)
+                    }
+                }
             }
         }
+        
+        val optionList = mutableListOf<PauseOption>()
+        optionList += PauseOption(if (engine.autoInputs) "play.pause.resume.robotMode" else "play.pause.resume", true) {
+            unpauseGame(true)
+        }
+        optionList += PauseOption("play.pause.startOver", !(sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null)) {
+            playMenuSound("sfx_menu_enter_game")
+
+            val thisScreen: AbstractPlayScreen = this
+            val resetAction: () -> Unit = {
+                resetAndUnpause()
+            }
+            main.screen = TransitionScreen(main, thisScreen, thisScreen,
+                    WipeTransitionHead(Color.BLACK.cpy(), 0.4f), WipeTransitionTail(Color.BLACK.cpy(), 0.4f)).apply {
+                onEntryEnd = resetAction
+                onStart = {
+                    Gdx.input.isCursorCatched = true
+                }
+            }
+        }
+        optionList += PauseOption("play.pause.quitToMainMenu", true) {
+            quitToMainMenu(true)
+        }
+        this.pauseOptions.set(optionList)
     }
 
     init {
         engine.endSignalReceived.addListener(endSignalListener)
+    }
 
-        // Score achievements for endless-type modes
-        engine.inputter.endlessScore.score.addListener { scoreVar ->
-            if (engine.world.worldMode.showEndlessScore && engine.areStatisticsEnabled) {
-                val newScore = scoreVar.getOrCompute()
-                when (engine.world.worldMode.type) {
-                    WorldType.POLYRHYTHM -> {
-                        if (sideMode is EndlessPolyrhythm) {
-                            if (sideMode.dailyChallenge != null) {
-                                listOf(Achievements.dailyScore25, Achievements.dailyScore50,
-                                        Achievements.dailyScore75, Achievements.dailyScore100,
-                                        Achievements.dailyScore125).forEach {
-                                    Achievements.attemptAwardScoreAchievement(it, newScore)
-                                }
-                            } else {
-                                listOf(Achievements.endlessScore25, Achievements.endlessScore50,
-                                        Achievements.endlessScore75, Achievements.endlessScore100,
-                                        Achievements.endlessScore125).forEach {
-                                    Achievements.attemptAwardScoreAchievement(it, newScore)
-                                }
-                                
-                                if (sideMode.disableLifeRegen) {
-                                    Achievements.attemptAwardScoreAchievement(Achievements.endlessNoLifeRegen100, newScore)
-                                    if (engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil
-                                        Achievements.attemptAwardScoreAchievement(Achievements.endlessDaredevil100, newScore)
-                                    }
-                                }
-                                if (main.settings.masterVolumeSetting.getOrCompute() == 0) {
-                                    Achievements.attemptAwardScoreAchievement(Achievements.endlessSilent50, newScore)
-                                }
-                            }
-                        }
+    abstract fun copyScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractPlayScreen
 
-                    }
-                    WorldType.DUNK -> {
-                        listOf(Achievements.dunkScore10, Achievements.dunkScore20, Achievements.dunkScore30,
-                                Achievements.dunkScore50).forEach {
-                            Achievements.attemptAwardScoreAchievement(it, newScore)
-                        }
-                    }
-                    WorldType.ASSEMBLE -> {
-                        // NO-OP
+    /**
+     * Will be triggered in the gdx main thread.
+     */
+    open fun onEndSignalFired() {
+        soundSystem.setPaused(true)
+        container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
+            engine.inputter.submitInputsFromRod(rod)
+        }
+        if (resultsBehaviour is ResultsBehaviour.ShowResults) {
+            transitionToResults(resultsBehaviour)
+        } else {
+            val sideMode = this.sideMode
+            if (sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null) {
+                val menuCol = main.mainMenuScreen.menuCollection
+                val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
+                val nonce = sideMode.dailyChallengeUUIDNonce.getOrCompute()
+                if (score.score > 0 && !engine.autoInputs) {
+                    val submitMenu = SubmitDailyChallengeScoreMenu(menuCol, sideMode.dailyChallenge, nonce, score)
+                    menuCol.addMenu(submitMenu)
+                    menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
+                }
+
+                quitToMainMenu(false)
+            } else {
+                if (sideMode is DunkMode) {
+                    val localDateTime = LocalDateTime.ofInstant(startTimestamp, ZoneId.systemDefault())
+                    if (localDateTime.dayOfWeek == DayOfWeek.FRIDAY && localDateTime.toLocalTime() >= LocalTime.of(17, 0)) {
+                        Achievements.awardAchievement(Achievements.dunkFridayNight)
                     }
                 }
+                quitToMainMenu(false)
             }
         }
     }
@@ -344,7 +326,7 @@ class PlayScreen(
         batch.projectionMatrix = camera.combined
         batch.begin()
 
-        if (isPaused) {
+        if (isPaused.get()) {
             val width = camera.viewportWidth
             val height = camera.viewportHeight
             val shapeRenderer = main.shapeRenderer
@@ -395,8 +377,6 @@ class PlayScreen(
             shapeRenderer.projectionMatrix = main.nativeCamera.combined
 
             sceneRoot.renderAsRoot(batch)
-            
-            pauseTime += Gdx.graphics.deltaTime
         }
 
         batch.end()
@@ -408,13 +388,13 @@ class PlayScreen(
     override fun renderUpdate() {
         super.renderUpdate()
 
-        if (!isPaused && timing is SimpleTimingProvider) {
+        if (!isPaused.get() && timing is SimpleTimingProvider) {
             timing.seconds += Gdx.graphics.deltaTime
             GlobalStats.updateModePlayTime(playTimeType)
         }
     }
 
-    private fun transitionToResults() {
+    private fun transitionToResults(resultsBehaviour: ResultsBehaviour.ShowResults) {
         val inputter = engine.inputter
         val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
         val nInputs = max(inputter.totalExpectedInputs, inputter.minimumInputCount)
@@ -439,8 +419,8 @@ class PlayScreen(
                 PRManiaGame.instance.settings.persist()
                 isNewHighScore = true
             }
-        } else if (previousHighScore >= 0) {
-            if (score > previousHighScore) {
+        } else if (resultsBehaviour.previousHighScore != null) {
+            if (score > resultsBehaviour.previousHighScore && resultsBehaviour.previousHighScore >= 0) {
                 isNewHighScore = true
             }
         }
@@ -452,17 +432,15 @@ class PlayScreen(
                 lines.first, lines.second,
                 ranking, isNewHighScore
         )
-        
+
         transitionAway(ResultsScreen(main, scoreObj, container, sideMode, {
-            PlayScreen(main, sideMode, playTimeType, container, challenges, inputCalibration, onRankingRevealed, 
-                    if (scoreObj.newHighScore) scoreObj.scoreInt else previousHighScore, showResults)
+            copyScreenForResults(scoreObj, resultsBehaviour)
         }, keyboardKeybinds,
                 LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges),
-                onRankingRevealed), disposeContainer = false) {}
+                resultsBehaviour.onRankingRevealed), disposeContainer = false) {}
     }
 
     private inline fun transitionAway(nextScreen: Screen, disposeContainer: Boolean, action: () -> Unit) {
-        isFinished = true
         main.inputMultiplexer.removeProcessor(inputProcessor)
         Gdx.input.isCursorCatched = false
 
@@ -471,7 +449,7 @@ class PlayScreen(
         main.screen = TransitionScreen(main, this, nextScreen,
                 FadeOut(0.5f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
             this.onEntryEnd = {
-                this@PlayScreen.dispose()
+                this@AbstractPlayScreen.dispose()
                 if (disposeContainer) {
                     container.disposeQuietly()
                 }
@@ -479,7 +457,7 @@ class PlayScreen(
         }
     }
     
-    private fun applyForceTilesetPaletteSettings() {
+    protected fun applyForceTilesetPaletteSettings() {
         when (container.globalSettings.forceTilesetPalette) {
             ForceTilesetPalette.NO_FORCE ->
                 container.world.tilesetPalette.applyTo(container.renderer.tileset)
@@ -492,42 +470,59 @@ class PlayScreen(
         }
     }
 
-    fun prepareGameStart() {
+    /**
+     * Resets the entire game state but does not change the pause state
+     */
+    protected fun resetGameState() {
+        // Reset/clearing pass
+        engine.removeEvents(engine.events.toList())
         engine.inputter.areInputsLocked = engine.autoInputs
         engine.inputter.reset()
-        renderer.resetAnimations()
+        engine.soundInterface.clearAllNonMusicAudio()
         engine.inputCalibration = this.inputCalibration
         engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
         engine.resetEndSignal()
+        renderer.resetAnimations()
+        container.world.resetWorld()
+        challenges.applyToEngine(engine)
         
+        // Set everything else
         applyForceTilesetPaletteSettings()
+        container.setTexturePackFromSource()
         
-        timing.seconds = min(-1f, -1f + this.inputCalibration.audioOffsetMs / 1000f)
+        timing.seconds = -(1f + max(0f, this.inputCalibration.audioOffsetMs / 1000f))
         engine.seconds = timing.seconds
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
-        if (player != null) {
+        if (player != null) { // Set music player position
             val musicSample = player.musicSample
             musicSample.moveStartBuffer(0)
             engine.musicData.setMusicPlayerPositionToCurrentSec()
             player.pause(false)
         }
-
-        soundSystem.startRealtime()
+        soundSystem.startRealtime() // Does nothing if already started
+        
+        val blocks = container.blocks.toList()
+        engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
     }
 
-    private fun pauseGame(playSound: Boolean) {
-//        val endlessScore = engine.inputter.endlessScore
-//        if (endlessScore.lives.getOrCompute() <= 0 && endlessScore.maxLives.getOrCompute() > 0) {
-//            return // No pausing
-//        }
-        
-        isPaused = true
-        pauseTime = 0f
+    /**
+     * Should be called when first loading this screen so the sound system starts up.
+     */
+    fun resetAndUnpause() {
+        resetGameState()
+        unpauseGame(false)
+    }
+
+    /**
+     * Pauses the game.
+     */
+    protected open fun pauseGame(playSound: Boolean) {
+        isPaused.set(true)
         soundSystem.setPaused(true)
         Gdx.input.isCursorCatched = false
         main.inputMultiplexer.removeProcessor(inputProcessor)
         main.inputMultiplexer.addProcessor(inputProcessor)
-        selectionIndex.set(0)
+        selectedPauseOption.set(pauseOptions.getOrCompute().firstOrNull())
         pauseBg.randomizeSeed()
         panelAnimationValue.set(0f)
         val ani = Animation(Interpolation.smoother, 0.25f, 0f, 1f).apply {
@@ -547,8 +542,11 @@ class PlayScreen(
         }
     }
 
-    private fun unpauseGame(playSound: Boolean) {
-        isPaused = false
+    /**
+     * Unpauses the game.
+     */
+    protected open fun unpauseGame(playSound: Boolean) {
+        isPaused.set(false)
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
             engine.musicData.setMusicPlayerPositionToCurrentSec()
@@ -561,68 +559,24 @@ class PlayScreen(
         if (playSound) {
             playMenuSound("sfx_pause_exit")
         }
-        
-        if (sideMode != null && sideMode is EndlessPolyrhythm) {
-            sideMode.submitPauseTime(this.pauseTime)
-        }
-    }
-
-    fun resetAndStartOver(doWipeTransition: Boolean, playSound: Boolean = true) {
-        if (playSound) {
-            playMenuSound("sfx_menu_enter_game")
-        }
-        val thisScreen: PlayScreen = this
-        val resetAction: () -> Unit = {
-            challenges.applyToEngine(engine)
-            engine.removeEvents(engine.events.toList())
-            container.world.resetWorld()
-            applyForceTilesetPaletteSettings()
-            engine.soundInterface.clearAllNonMusicAudio()
-            container.setTexturePackFromSource()
-            
-            prepareGameStart()
-            val blocks = container.blocks.toList()
-            engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
-            unpauseGame(false)
-        }
-        if (doWipeTransition) {
-            main.screen = TransitionScreen(main, thisScreen, thisScreen,
-                    WipeTransitionHead(Color.BLACK.cpy(), 0.4f), WipeTransitionTail(Color.BLACK.cpy(), 0.4f)).apply {
-                onEntryEnd = resetAction
-                onStart = {
-                    Gdx.input.isCursorCatched = true
-                }
-            }
-        } else {
-            resetAction()
-        }
     }
 
     private fun attemptPauseEntrySelection() {
-        val index = selectionIndex.get()
-        if (optionLabels[index].apparentDisabledState.get()) return
-        when (index) {
-            0 -> { // Resume
-                unpauseGame(true)
-            }
-            1 -> { // Start Over
-                resetAndStartOver(true)
-            }
-            2 -> { // Quit to Main Menu
-                quitToMainMenu(true)
-            }
+        val pauseOp = selectedPauseOption.getOrCompute()
+        if (pauseOp != null && pauseOp.enabled) {
+            pauseOp.action()
         }
     }
 
     private fun quitToMainMenu(playSound: Boolean) {
-        val main = this@PlayScreen.main
+        val main = this.main
         val currentScreen = main.screen
         Gdx.app.postRunnable {
             val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
             main.screen = TransitionScreen(main, currentScreen, mainMenu,
                     FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
-                    if (currentScreen is PlayScreen) {
+                    if (currentScreen is AbstractPlayScreen) {
                         currentScreen.dispose()
                         container.disposeQuietly()
                     }
@@ -637,9 +591,9 @@ class PlayScreen(
         }
     }
     
-    private fun changeSelectionTo(index: Int): Boolean {
-        if (selectionIndex.get() != index && !optionLabels[index].disabled.get()) {
-            selectionIndex.set(index)
+    private fun changeSelectionTo(option: PauseOption): Boolean {
+        if (selectedPauseOption.getOrCompute() != option && option.enabled) {
+            selectedPauseOption.set(option)
             playMenuSound("sfx_menu_blip")
             return true
         }
@@ -648,22 +602,25 @@ class PlayScreen(
 
     override fun keyDown(keycode: Int): Boolean {
         var consumed = false
-        if (!isFinished) {
-            if (isPaused) {
+        if (main.screen === this) {
+            if (isPaused.get()) {
                 when (keycode) {
                     Input.Keys.ESCAPE, keyboardKeybinds.pause -> {
                         unpauseGame(true)
                         consumed = true
                     }
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown -> {
-                        if (optionLabels.any { !it.apparentDisabledState.get() }) {
-                            val currentIndex = selectionIndex.get()
+                        val options = this.pauseOptions.getOrCompute()
+                        if (options.isNotEmpty() && !options.all { !it.enabled }) {
+                            val maxSelectionSize = options.size
                             val incrementAmt = if (keycode == keyboardKeybinds.buttonDpadUp) -1 else 1
+                            val currentSelected = this.selectedPauseOption.getOrCompute()
+                            val currentIndex = options.indexOf(currentSelected)
                             var increment = incrementAmt
                             var nextIndex: Int
                             do {
-                                nextIndex = (selectionIndex.get() + increment + maxSelectionSize) % maxSelectionSize
-                                if (changeSelectionTo(nextIndex)) {
+                                nextIndex = (currentIndex + increment + maxSelectionSize) % maxSelectionSize
+                                if (changeSelectionTo(options[nextIndex])) {
                                     consumed = true
                                     break
                                 }
@@ -704,8 +661,8 @@ class PlayScreen(
 
     override fun keyUp(keycode: Int): Boolean {
         var consumed = false
-        if (!isFinished) {
-            if (!isPaused)  {
+        if (main.screen === this) {
+            if (!isPaused.get())  {
                 when (keycode) {
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
                     keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
@@ -727,7 +684,7 @@ class PlayScreen(
         return consumed || super.keyUp(keycode)
     }
 
-    private fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
+    protected fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
         val sound: Sound = AssetRegistry[id]
         val menuSFXVol = main.settings.menuSfxVolume.getOrCompute() / 100f
         val soundID = sound.play(menuSFXVol * volume, pitch, pan)
@@ -757,7 +714,8 @@ class PlayScreen(
     }
 
     override fun dispose() {
-        // NOTE: container instance is disposed separately
+        // NOTE: container instance is disposed separately.
+        // Additionally, the sound system is disposed in the container, so it doesn't have to be stopped.
         engine.endSignalReceived.removeListener(endSignalListener)
     }
 
@@ -768,7 +726,7 @@ ${engine.getDebugString()}
 ---
 ${renderer.getDebugString()}
 ---
-SideMode: ${sideMode?.javaClass?.canonicalName}${if (sideMode != null) ("\n" + sideMode.getDebugString()) else ""}
+SideMode: ${sideMode?.javaClass?.name}${if (sideMode != null) ("\n" + sideMode.getDebugString()) else ""}
 ---
 """
     }
@@ -784,6 +742,7 @@ SideMode: ${sideMode?.javaClass?.canonicalName}${if (sideMode != null) ("\n" + s
         val botTriangleX: Float = 1 / 3f
         private val topColor: Color = Color.valueOf("232CDD")
         private val bottomColor: Color = Color.valueOf("d020a0")
+        private val bgSquareTexReg: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("pause_square"))
 
         init {
             randomizeSeed()
@@ -836,19 +795,5 @@ SideMode: ${sideMode?.javaClass?.canonicalName}${if (sideMode != null) ("\n" + s
             batch.draw(bgSquareTexReg, x - width / 2, y - height / 2, width / 2, height / 2, width, height, 1f, 1f, rot)
         }
     }
-
-    class ArrowNode(val tex: TextureRegion) : UIElement() {
-        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-            val renderBounds = this.contentZone
-            val x = renderBounds.x.get() + originX
-            val y = originY - renderBounds.y.get()
-            val w = renderBounds.width.get()
-            val h = renderBounds.height.get()
-            val offsetXMax = (w * 0.35f)
-            val offsetX = (MathHelper.getSawtoothWave(1f) * 4f).coerceIn(0f, 1f) * offsetXMax
-            batch.draw(tex, x + offsetX - offsetXMax, y - h,
-                    0.5f * w, 0.5f * h,
-                    w, h, 1f, 1f, 0f)
-        }
-    }
+    
 }

@@ -39,10 +39,10 @@ import java.util.*
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-class EndlessPolyrhythm(main: PRManiaGame, prevHighScore: EndlessModeScore,
+class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighScore: EndlessModeScore,
                         /** A 48-bit seed. */ val seed: Long,
                         val dailyChallenge: LocalDate?, val disableLifeRegen: Boolean, maxLives: Int = -1)
-    : AbstractEndlessMode(main, prevHighScore, PlayTimeType.ENDLESS) {
+    : AbstractEndlessMode(main, prevHighScore, playTimeType) {
     
     companion object {
         private const val COLOR_CHANGE_LIMIT: Int = 18

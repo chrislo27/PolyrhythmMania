@@ -68,7 +68,7 @@ object DumpAudioDebugInfo {
                     try {
                         strBuilder.println(lineInfo.toString())
                         addIndent()
-                        strBuilder.println(lineInfo::class.java.canonicalName)
+                        strBuilder.println(lineInfo::class.java.name)
                         strBuilder.println("Is supported: ${mixer.isLineSupported(lineInfo)}")
                         strBuilder.println("Max lines open: ${mixer.getMaxLines(lineInfo)}")
                         

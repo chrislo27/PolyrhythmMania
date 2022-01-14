@@ -1,6 +1,11 @@
 package polyrhythmmania.engine.input
 
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.engine.Engine
+import polyrhythmmania.screen.play.PlayScreen
+import polyrhythmmania.soundsystem.SimpleTimingProvider
+import polyrhythmmania.world.World
+import polyrhythmmania.world.WorldMode
+import polyrhythmmania.world.WorldType
 
 
 object InputThresholds {
@@ -18,5 +23,23 @@ object InputThresholds {
         Ranking.SUPERB
         Score(0, 0f, 0, 1, false, false, Challenges.NO_CHANGES, "", "")
         PlayScreen
+        
+        // Warm up input-related code paths
+        val world = World()
+        val engine = Engine(SimpleTimingProvider { false }, world, null, null)
+        listOf(
+                WorldMode(WorldType.POLYRHYTHM, false), WorldMode(WorldType.POLYRHYTHM, true),
+                WorldMode(WorldType.DUNK, true), WorldMode(WorldType.ASSEMBLE, false)
+        ).forEach { mode ->
+            world.worldMode = mode
+            world.resetWorld()
+            repeat(60) {
+                engine.inputter.onAButtonPressed(false)
+                engine.inputter.onAButtonPressed(true)
+                engine.inputter.onDpadButtonPressed(false)
+                engine.inputter.onDpadButtonPressed(true)
+                (engine.timingProvider as SimpleTimingProvider).seconds += 1 / 60f
+            }
+        }
     }
 }

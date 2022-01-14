@@ -207,7 +207,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             if (!l.file.exists()) {
                                 startSearchThread() // Re-search the list. The level was deleted but this should be a very rare case.
                             } else {
-                                val previousHighScore = GlobalScoreCache.scoreCache.getOrCompute().map[l.uuid]?.attempts?.maxOrNull()?.score ?: (if (l.isPersistable) 0 else -1)
+                                val previousHighScore: Int? = GlobalScoreCache.scoreCache.getOrCompute().map[l.uuid]?.attempts?.maxOrNull()?.score ?: (if (l.isPersistable) 0 else null)
                                 val loadMenu = LoadSavedLevelMenu(menuCol, l.file, previousHighScore)
                                 menuCol.addMenu(loadMenu)
                                 menuCol.pushNextMenu(loadMenu)

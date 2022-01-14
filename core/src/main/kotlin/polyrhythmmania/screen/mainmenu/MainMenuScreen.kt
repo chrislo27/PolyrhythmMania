@@ -307,9 +307,15 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             github != Version.ZERO && github > PRMania.VERSION
         }
         val versionTooltip = Tooltip(binding = {
+            val ver = PRMania.VERSION
+            val verSuffixRegex = """(.+)(_\d{8}(?:.+)?)""".toRegex()
+            val suffixMatch = verSuffixRegex.matchEntire(ver.suffix)
+            val verSuffixNoDate = suffixMatch?.groupValues?.get(1) ?: ver.suffix // Use entire suffix if cannot match _date
+            val verSuffixDate = suffixMatch?.groupValues?.get(2) ?: ""
+            val versionString = "v${ver.major}.${ver.minor}.${ver.patch}${if (ver.suffix.isNotEmpty()) "-${verSuffixNoDate}[scale=0.75]${verSuffixDate}[]" else ""}"
             if (PRMania.portableMode) Localization.getVar("mainMenu.portableModeVersion", Var {
-                listOf(PRMania.VERSION.toString())
-            }).use() else PRMania.VERSION.toString()
+                listOf(versionString)
+            }).use() else (versionString)
         }, font = main.fontMainMenuMain).apply {
             Anchor.BottomRight.configure(this)
             resizeBoundsToContent()
@@ -321,6 +327,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.textColor.bind {
                 if (newVersionAvailable.use()) Color.ORANGE.cpy() else Color(1f, 1f, 1f, 1f)
             }
+            this.markup.set(markup)
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
             val latestReleasesURL = "${PRMania.GITHUB}/releases/latest"
             this.tooltipElement.set(Tooltip(binding = {

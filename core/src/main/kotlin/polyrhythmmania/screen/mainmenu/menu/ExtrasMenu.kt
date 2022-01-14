@@ -23,6 +23,7 @@ import polyrhythmmania.Settings
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.AssembleMode
 import polyrhythmmania.sidemodes.DunkMode
 import polyrhythmmania.sidemodes.EndlessModeScore
@@ -97,7 +98,8 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += createSidemodeLongButton(AssetRegistry.get<PackedSheet>("achievements_icon")["assemble"],
                     "mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
-                    Var { listOf(use(main.settings.sidemodeAssembleHighScore)) }), showResults = true,
+                    Var { listOf(use(main.settings.sidemodeAssembleHighScore)) }),
+                    resultsBehaviour = ResultsBehaviour.ShowResults(null, null), // Note: high score is handled by EndlessModeScore
                     newIndicator = main.settings.newIndicatorExtrasAssemble) { main, _ ->
                 DiscordCore.updateActivity(DefaultPresences.playingAssemble())
                 mainMenu.backgroundType = BgType.ASSEMBLE
