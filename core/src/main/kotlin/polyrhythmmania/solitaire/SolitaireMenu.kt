@@ -51,13 +51,6 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.bounds.height.set(40f)
         }
         contentPane.addChild(hbox)
-
-        val rect = RectElement(Color().set(0, 80, 53)).apply {
-            Anchor.TopLeft.configure(this)
-            this.bindHeightToParent(-40f)
-            this.doClipping.set(true)
-        }
-//        contentPane.addChild(rect)
         
         val tableau = ImageNode(TextureRegion(AssetRegistry.get<Texture>("solitaire_tableau"))).apply {
             Anchor.TopLeft.configure(this)
@@ -66,7 +59,6 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         contentPane.addChild(tableau)
         
-//        gameParent = rect
         val innerPane = Pane().apply {
             this.padding.set(Insets(24f))
         }
