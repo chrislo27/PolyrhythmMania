@@ -696,7 +696,7 @@ playerPos: ${soundSys.musicPlayer.position}
         val bandpassVolume: FloatVar = FloatVar {
             if (use(main.settings.solitaireMusic)) 1f else 0f
         }
-        val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs, musicPlayer.outs)
+        val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs)
         val bandpassGain: Gain = Gain(soundSystem.audioContext, musicPlayer.outs, bandpassVolume.get())
         val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpassGain else musicPlayer)
         
