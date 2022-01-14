@@ -624,6 +624,7 @@ class SolitaireGame : ActionablePane() {
             }
         }
         
+        // Show all cards debug
         if (SHOW_ALL_CARDS_DEBUG && Paintbox.stageOutlines.getOrCompute() == Paintbox.StageOutlineMode.ONLY_VISIBLE) {
             batch.fillRect(x, y - h, w, h)
             
@@ -632,7 +633,7 @@ class SolitaireGame : ActionablePane() {
             deck.forEachIndexed { index, card ->
                 val col = (index + 1) % cardsPerRow
                 val row = (index + 1) / cardsPerRow
-                renderCard(4f + x + col * cardWidth, y - 4f - row * cardHeight, batch, card, false, bmFont)
+                renderCard(4f + x + col * (cardWidth + 1), y - 4f - row * (cardHeight + 1), batch, card, false, bmFont)
             }
             renderCard(4f + x, y - 4f, batch, deck.first(), true, bmFont)
         }
