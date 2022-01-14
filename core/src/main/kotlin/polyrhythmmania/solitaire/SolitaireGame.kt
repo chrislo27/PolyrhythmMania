@@ -126,7 +126,8 @@ class SolitaireGame : ActionablePane() {
         var flippedOver: Boolean = false
     }
     
-    inner class EnqueuedAnimation(val card: Card, val from: CardZone, val to: CardZone, val duration: Float, val delay: Float,
+    inner class EnqueuedAnimation(val card: Card, val from: CardZone, val to: CardZone, val duration: Float,
+                                  val delay: Float, val under: Boolean,
                                   var onComplete: () -> Unit)
 
     private val lastMouseAbsolute: Vector2 = Vector2()
@@ -316,10 +317,9 @@ class SolitaireGame : ActionablePane() {
                 val invisibleZone = CardZone(zone.x.get(), zone.y.get() + 6f * cardHeight, 999, false, showOutline = false)
                 val delayPer = 0.175f
                 zone.stack.cardList.asReversed().forEachIndexed { index, card ->
-                    enqueueAnimation(card, zone, invisibleZone, duration = 0.75f, delay = delayPer * index)
+                    enqueueAnimation(card, zone, invisibleZone, duration = 0.75f, delay = delayPer * index, isUnder = true)
                 }
             }
-            // TODO play a jingle to end
             return
         }
         
@@ -511,8 +511,9 @@ class SolitaireGame : ActionablePane() {
         return null
     }
     
-    private fun enqueueAnimation(card: Card, fromZone: CardZone, toZone: CardZone, duration: Float = 0.25f, delay: Float = 0f, onComplete: () -> Unit = {}) {
-        animationQueue += EnqueuedAnimation(card, fromZone, toZone, duration, delay, onComplete)
+    private fun enqueueAnimation(card: Card, fromZone: CardZone, toZone: CardZone, duration: Float = 0.25f,
+                                 delay: Float = 0f, isUnder: Boolean = false, onComplete: () -> Unit = {}) {
+        animationQueue += EnqueuedAnimation(card, fromZone, toZone, duration, delay, isUnder, onComplete)
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
@@ -530,7 +531,11 @@ class SolitaireGame : ActionablePane() {
                     this.secondsElapsed = -next.delay
                     this.flippedOver = next.from.stack.flippedOver.get()
                 }
-                this.currentAnimations += newAnimation
+                if (next.under) {
+                    this.currentAnimations = listOf(newAnimation) + this.currentAnimations
+                } else {
+                    this.currentAnimations = this.currentAnimations + newAnimation
+                }
                 inputsEnabled.set(false)
             }
         }
