@@ -433,7 +433,10 @@ class SolitaireGame : ActionablePane() {
         }
         
         // Foundation pile check
-        if (targetZone in foundationZones && dragStackList.size == 1) {
+        if (targetZone in foundationZones) {
+            if (dragStackList.size != 1) {
+                return false
+            }
             val dragItem = dragStackList.first()
             if (targetZone.stack.cardList.isEmpty()) {
                 // Can only drag to an empty one if the dragItem has scaleOrder = 0 and if that suit isn't already in another foundation
