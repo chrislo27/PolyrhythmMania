@@ -314,7 +314,7 @@ class SolitaireGame : ActionablePane() {
             val affectedZones = freeCells + foundationZones + playerZones
             affectedZones.forEach { zone ->
                 val invisibleZone = CardZone(zone.x.get(), zone.y.get() + 6f * cardHeight, 999, false, showOutline = false)
-                val delayPer = 0.125f
+                val delayPer = 0.175f
                 zone.stack.cardList.asReversed().forEachIndexed { index, card ->
                     enqueueAnimation(card, zone, invisibleZone, duration = 0.75f, delay = delayPer * index)
                 }
@@ -341,11 +341,11 @@ class SolitaireGame : ActionablePane() {
                 }
 
                 
-                val targetFoundation = foundationZones.firstOrNull { z ->
-                    if (tail.symbol.scaleOrder == 0) {
-                        z.stack.cardList.isEmpty()
+                val targetFoundation = foundationZones.firstOrNull { fz ->
+                    if (tail.symbol.scaleOrder == 0) { // 1
+                        fz.stack.cardList.isEmpty()
                     } else {
-                        val lastInFoundation = z.stack.cardList.lastOrNull()
+                        val lastInFoundation = fz.stack.cardList.lastOrNull()
                         lastInFoundation != null && lastInFoundation.suit == tail.suit && lastInFoundation.symbol.scaleOrder == tail.symbol.scaleOrder - 1
                     }
                 }
@@ -356,7 +356,7 @@ class SolitaireGame : ActionablePane() {
                     else -> {
                         // All other cards with value one less than tail should ALREADY be in a foundation
                         // AKA: no cards with value one less than tail will be in the free zone/player zones
-                        (zones - zone).all { z ->
+                        zones.all { z ->
                             z.stack.cardList.none { c ->
                                 c.symbol.scaleOrder == tail.symbol.scaleOrder - 1
                             }
