@@ -2,12 +2,17 @@ package polyrhythmmania.solitaire
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.binding.invert
+import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
+import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.CheckBox
@@ -50,11 +55,23 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val rect = RectElement(Color().set(0, 80, 53)).apply {
             Anchor.TopLeft.configure(this)
             this.bindHeightToParent(-40f)
-            this.padding.set(Insets(24f))
             this.doClipping.set(true)
         }
-        contentPane.addChild(rect)
-        gameParent = rect
+//        contentPane.addChild(rect)
+        
+        val tableau = ImageNode(TextureRegion(AssetRegistry.get<Texture>("solitaire_tableau"))).apply {
+            Anchor.TopLeft.configure(this)
+            this.bindHeightToParent(-40f)
+            this.doClipping.set(true)
+        }
+        contentPane.addChild(tableau)
+        
+//        gameParent = rect
+        val innerPane = Pane().apply {
+            this.padding.set(Insets(24f))
+        }
+        tableau += innerPane
+        gameParent = innerPane
         
         loadingLabel = TextLabel(binding = { Localization.getVar("solitaire.loading").use() }).apply { 
             this.markup.set(this@SolitaireMenu.markup)
