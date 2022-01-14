@@ -576,7 +576,7 @@ abstract class AbstractPlayScreen protected constructor(
             main.screen = TransitionScreen(main, currentScreen, mainMenu,
                     FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
-                    if (currentScreen is PlayScreen) {
+                    if (currentScreen is AbstractPlayScreen) {
                         currentScreen.dispose()
                         container.disposeQuietly()
                     }
