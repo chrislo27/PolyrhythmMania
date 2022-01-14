@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.packing.PackedSheet
@@ -24,6 +25,10 @@ import kotlin.math.min
 
 
 class SolitaireGame : ActionablePane() {
+    
+    companion object {
+        private const val SHOW_ALL_CARDS_DEBUG: Boolean = false
+    }
     
     data class ZoneTarget(val zone: CardZone, val index: Int, val offsetX: Float, val offsetY: Float)
     
@@ -617,6 +622,19 @@ class SolitaireGame : ActionablePane() {
                 if (it.secondsElapsed < 0f) continue
                 renderCard(x + it.currentX, y - it.currentY, batch, it.card, it.flippedOver, bmFont)
             }
+        }
+        
+        if (SHOW_ALL_CARDS_DEBUG && Paintbox.stageOutlines.getOrCompute() == Paintbox.StageOutlineMode.ONLY_VISIBLE) {
+            batch.fillRect(x, y - h, w, h)
+            
+            val deck = Card.STANDARD_DECK
+            val cardsPerRow = 10
+            deck.forEachIndexed { index, card ->
+                val col = (index + 1) % cardsPerRow
+                val row = (index + 1) / cardsPerRow
+                renderCard(4f + x + col * cardWidth, y - 4f - row * cardHeight, batch, card, false, bmFont)
+            }
+            renderCard(4f + x, y - 4f, batch, deck.first(), true, bmFont)
         }
         
         paintboxFont.end()
