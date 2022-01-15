@@ -10,10 +10,14 @@ import com.codahale.metrics.Timer
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.AudioIO
 import net.beadsproject.beads.core.UGen
+import org.lwjgl.openal.AL10
+import org.lwjgl.openal.SOFTDirectChannels
+import paintbox.Paintbox
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
 import polyrhythmmania.soundsystem.AudioDeviceSettings
 import polyrhythmmania.util.metrics.timeInline
+import java.lang.reflect.Field
 import javax.sound.sampled.*
 import kotlin.concurrent.thread
 import kotlin.math.roundToInt
@@ -36,20 +40,8 @@ class OpenALAudioIO(val audioDeviceSettings: AudioDeviceSettings)
     }
     
     private inner class Lifecycle(val audioDevice: OpenALAudioDevice) : Disposable {
-        val bufferSize: Int
-        val bufferCount: Int
-        
-        init {
-            val clazz = OpenALAudioDevice::class.java
-            clazz.getDeclaredField("bufferSize").also { sz ->
-                sz.isAccessible = true
-                bufferSize = sz.getInt(audioDevice)
-            }
-            clazz.getDeclaredField("bufferCount").also { sz ->
-                sz.isAccessible = true
-                bufferCount = sz.getInt(audioDevice)
-            }
-        }
+        val bufferSize: Int = audioDeviceSettings.bufferSize
+        val bufferCount: Int = audioDeviceSettings.bufferCount
         
         override fun dispose() {
             audioDevice.dispose()
@@ -95,10 +87,38 @@ class OpenALAudioIO(val audioDeviceSettings: AudioDeviceSettings)
                 prepareLineBuffer(audioFormat, sampleBuffer, bufferSizeInFrames)
             }
         }
-
+        
+        // TODO remove once libGDX 1.10.1 is released with: API Change: Enable the AL_DIRECT_CHANNELS_SOFT option for Sounds and AudioDevices as well to fix stereo sound
+        // sourceID is possibly set to non-(-1) when writeSamples is called
+        // and is only set to -1 when stop() or dispose() is called. Therefore we only have to set it one time
+        var sourceIDField: Field?
+        var directChannelsSoftWasSet = false
+        try {
+            sourceIDField = OpenALAudioDevice::class.java.getDeclaredField("sourceID")
+            sourceIDField?.isAccessible = true
+        } catch (e: Exception) {
+            Paintbox.LOGGER.warn("Disabling AL_DIRECT_CHANNELS_SOFT fix for OpenALAudioDevice due to exception")
+            e.printStackTrace()
+            sourceIDField = null
+        }
+        
         while (context.isRunning) {
             primeBuffer()
             lifecycle.audioDevice.writeSamples(sampleBuffer, 0, sampleBufferSize)
+            if (sourceIDField != null && !directChannelsSoftWasSet) {
+                try {
+                    val sourceId = sourceIDField.getInt(lifecycle.audioDevice)
+                    if (sourceId != -1) {
+                        AL10.alSourcei(sourceId, SOFTDirectChannels.AL_DIRECT_CHANNELS_SOFT, AL10.AL_TRUE)
+                        Paintbox.LOGGER.debug("Did AL_DIRECT_CHANNELS_SOFT fix for OpenALAudioDevice. This will be removed with libGDX 1.10.1")
+                        directChannelsSoftWasSet = true
+                    }
+                } catch (e: Exception) {
+                    directChannelsSoftWasSet = true
+                    Paintbox.LOGGER.debug("Failed to apply AL_DIRECT_CHANNELS_SOFT fix for OpenALAudioDevice due to exception")
+                    e.printStackTrace()
+                }
+            }
         }
     }
     
