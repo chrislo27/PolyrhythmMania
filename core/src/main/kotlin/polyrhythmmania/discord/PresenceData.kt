@@ -6,7 +6,7 @@ import java.time.Instant
 
 
 data class PresenceData(
-        val details: String = "${PRMania.VERSION}",
+        val details: String = if (PRMania.enableEarlyAccessMessage) "" else "${PRMania.VERSION}",
         val state: String = "",
         val partySize: Int = 0, val partyMax: Int = 0, val partyID: String? = null,
         val smallIcon: String = "", val smallIconText: String = state,
