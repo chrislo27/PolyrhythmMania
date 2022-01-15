@@ -22,6 +22,8 @@ import paintbox.ui.layout.HBox
 import paintbox.util.gdxutils.set
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
+import polyrhythmmania.discord.DefaultPresences
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.screen.mainmenu.menu.MMMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
@@ -139,10 +141,12 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     override fun onMenuEntered() {
         mainMenu.soundSys.fadeToBandpass()
+        DiscordRichPresence.updateActivity(DefaultPresences.playingSolitaire())
     }
 
     override fun onMenuExited() {
         // Fade to normal handled by close button due to being able to view help menu
+        mainMenu.setMainMenuRichPresence()
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {

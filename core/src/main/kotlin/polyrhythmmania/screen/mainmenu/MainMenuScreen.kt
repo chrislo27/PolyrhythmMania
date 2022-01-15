@@ -611,6 +611,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private fun resetTiles() {
         tiles.forEach { it.forEach { t -> t.reset() } }
     }
+    
+    fun setMainMenuRichPresence() {
+        DiscordRichPresence.updateActivity(DefaultPresences.idle())
+    }
 
     override fun show() {
         super.show()
@@ -624,7 +628,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
         firstShowing.set(false)
 
-        DiscordRichPresence.updateActivity(DefaultPresences.idle())
+        setMainMenuRichPresence()
         background.initializeFromType(this.backgroundType)
         
         if (main.settings.lastVersion != null) {

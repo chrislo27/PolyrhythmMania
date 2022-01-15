@@ -14,5 +14,6 @@ object DefaultPresences {
     fun playingDailyChallenge(date: LocalDate): PresenceData = PresenceData(state = "Playing the Daily Challenge (${date.format(DateTimeFormatter.ISO_DATE)})", startTimestamp = System.currentTimeMillis() / 1000L)
     fun playingDunk(): PresenceData = PresenceData(state = "Playing Polyrhythm: Dunk", startTimestamp = System.currentTimeMillis() / 1000L)
     fun playingAssemble(): PresenceData = PresenceData(state = "Playing Polyrhythm: Assemble")
+    fun playingSolitaire(): PresenceData = PresenceData(state = "Playing Built to Scale: Solitaire", startTimestamp = System.currentTimeMillis() / 1000L)
 
 }
