@@ -42,14 +42,8 @@ object DiscordRichPresence : Disposable {
     private fun isLoaded(): Boolean = this.loaded.get()
 
     private fun attemptLoadCore() {
-        val nativeFile = DiscordSDKNatives.getNativeLoc()
-        if (nativeFile == null) {
-            Paintbox.LOGGER.warn("[DiscordCore] Could not init Core because natives file was null. Discord functionality disabled.")
-            return
-        }
-        
         try {
-            Core.init(nativeFile)
+            DiscordSDKNatives.initCore(force = false)
 
             val createParams = CreateParams().apply {
                 this.clientID = DiscordAppID.DISCORD_APP_ID
@@ -61,7 +55,7 @@ object DiscordRichPresence : Disposable {
             this._loaded.set(true)
             Paintbox.LOGGER.info("[DiscordCore] Loaded successfully.")
         } catch (t: Throwable) {
-            Paintbox.LOGGER.warn("[DiscordCore] Could not init Core (native: \"${nativeFile.absolutePath}\"). Discord functionality disabled.")
+            Paintbox.LOGGER.warn("[DiscordCore] Could not init Core. Discord functionality disabled.")
             t.printStackTrace()
             return
         }
