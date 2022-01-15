@@ -41,7 +41,7 @@ import polyrhythmmania.achievements.AchievementsL10N
 import polyrhythmmania.achievements.ui.AchievementsUIOverlay
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.editor.help.EditorHelpLocalization
 import polyrhythmmania.engine.input.InputThresholds
@@ -50,7 +50,6 @@ import polyrhythmmania.init.InitialAssetLoader
 import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
-import polyrhythmmania.screen.mainmenu.menu.StatisticsMenu
 import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
@@ -174,8 +173,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 InputThresholds.initInputClasses()
             }
             onAssetLoadingComplete = {
-                DiscordCore // Initialize discord-gamesdk
-                DiscordCore.enableRichPresence.bind { use(settings.discordRichPresence) }
+                DiscordRichPresence // Initialize discord-gamesdk
+                DiscordRichPresence.enableRichPresence.bind { use(settings.discordRichPresence) }
                 
                 initializeScreens()
                 
@@ -294,7 +293,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             metricsReporter.report()
         }
         
-        DiscordCore.disposeQuietly()
+        DiscordRichPresence.disposeQuietly()
     }
 
     override fun preRender() {
@@ -303,7 +302,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         discordCallbackDelta += Gdx.graphics.deltaTime
         if (discordCallbackDelta >= 1 / 30f) {
             discordCallbackDelta = 0f
-            DiscordCore.runCallbacks()
+            DiscordRichPresence.runCallbacks()
         }
         
         GlobalStats.updateTotalPlayTime()

@@ -17,7 +17,7 @@ import paintbox.ui.skin.SkinFactory
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 
@@ -105,7 +105,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                                 }
                             }
                         }
-                        DiscordCore.updateActivity(DefaultPresences.inEditor())
+                        DiscordRichPresence.updateActivity(DefaultPresences.inEditor())
                     }
                 }
             }

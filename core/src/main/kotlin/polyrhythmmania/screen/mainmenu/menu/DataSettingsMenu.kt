@@ -19,7 +19,6 @@ import polyrhythmmania.PRMania
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
-import polyrhythmmania.discord.DiscordCore
 import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.ui.PRManiaSkins

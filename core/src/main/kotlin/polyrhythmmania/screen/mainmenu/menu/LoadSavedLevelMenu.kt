@@ -26,7 +26,7 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.input.Challenges
@@ -253,7 +253,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                                 this.onEntryEnd = {
                                     playScreen.resetAndUnpause()
                                     menuCol.popLastMenu(playSound = false)
-                                    DiscordCore.updateActivity(DefaultPresences.playingLevel())
+                                    DiscordRichPresence.updateActivity(DefaultPresences.playingLevel())
                                     mainMenu.backgroundType = BgType.NORMAL
                                 }
                             }

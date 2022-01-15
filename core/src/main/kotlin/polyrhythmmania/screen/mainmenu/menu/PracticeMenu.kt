@@ -12,7 +12,7 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.mainmenu.bg.BgType
@@ -68,7 +68,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         vbox.temporarilyDisableLayouts {
             fun createPractice(name: String, factory: (PRManiaGame, InputKeymapKeyboard) -> AbstractPracticeTutorial): UIElement {
                 return createSidemodeLongButton(null, name, Localization.getVar("${name}.tooltip"), Challenges.NO_CHANGES) { game, keymap ->
-                    DiscordCore.updateActivity(DefaultPresences.playingPractice())
+                    DiscordRichPresence.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL
                     GlobalStats.timesPlayedTutorial.increment()
                     factory.invoke(game, keymap)
@@ -80,7 +80,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                resultsBehaviour: ResultsBehaviour,
                                factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
                 return createSidemodeLongButton(null, name, tooltipVar, challenges, resultsBehaviour) { game, keymap ->
-                    DiscordCore.updateActivity(DefaultPresences.playingPractice())
+                    DiscordRichPresence.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL
                     factory.invoke(game, keymap)
                 }
