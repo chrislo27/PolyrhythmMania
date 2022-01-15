@@ -2,6 +2,7 @@ package polyrhythmmania.discord
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import de.jcm.discordgamesdk.Core
 import paintbox.Paintbox
 import polyrhythmmania.util.TempFileUtils
 import java.io.File
@@ -12,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 object DiscordSDKNatives {
     
     private val firstTime: AtomicBoolean = AtomicBoolean(true)
+    private val hasCoreBeenInited: AtomicBoolean = AtomicBoolean(false)
     
     @Synchronized
     fun getNativeLoc(): File? {
@@ -60,5 +62,19 @@ object DiscordSDKNatives {
         }
         
         return tmpNativeFile
+    }
+    
+    @Synchronized
+    fun initCore(force: Boolean = false): Boolean {
+        if (hasCoreBeenInited.get() && !force) return false
+        
+        val nativeLoc = getNativeLoc()
+        return if (nativeLoc != null && nativeLoc.exists()) {
+            Core.init(nativeLoc)
+            hasCoreBeenInited.set(true)
+            true
+        } else {
+            false
+        }
     }
 }

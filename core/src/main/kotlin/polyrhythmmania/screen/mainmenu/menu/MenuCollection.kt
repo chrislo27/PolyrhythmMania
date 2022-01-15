@@ -110,6 +110,12 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     }
     
     fun resetMenuStack() {
+        val existing = menuStack.toList()
+        existing.forEach {
+            if (it.deleteWhenPopped.get()) {
+                this.removeMenu(it)
+            }
+        }
         menuStack.clear()
         menuStack.push(uppermostMenu)
     }

@@ -9,6 +9,7 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.logging.Logger
 
 /**
  * A basic interface to [Core] that supports changing the activity and getting the current user.
@@ -42,26 +43,29 @@ object DiscordRichPresence : Disposable {
     private fun isLoaded(): Boolean = this.loaded.get()
 
     private fun attemptLoadCore() {
-        val nativeFile = DiscordSDKNatives.getNativeLoc()
-        if (nativeFile == null) {
-            Paintbox.LOGGER.warn("[DiscordCore] Could not init Core because natives file was null. Discord functionality disabled.")
-            return
-        }
-        
         try {
-            Core.init(nativeFile)
+            DiscordSDKNatives.initCore(force = false)
 
             val createParams = CreateParams().apply {
                 this.clientID = DiscordAppID.DISCORD_APP_ID
                 this.setFlags(CreateParams.Flags.NO_REQUIRE_DISCORD)
                 this.registerEventHandler(eventHandler)
             }
-            this.core = Core(createParams)
+            this.core = Core(createParams).apply { 
+                this.setLogHook(LogLevel.INFO) { lvl, msg ->
+                    Paintbox.LOGGER.log(when (lvl) {
+                        LogLevel.ERROR -> Logger.LogLevel.ERROR
+                        LogLevel.WARN, null -> Logger.LogLevel.WARN
+                        LogLevel.INFO -> Logger.LogLevel.INFO
+                        LogLevel.DEBUG -> Logger.LogLevel.DEBUG
+                    }, msg ?: "null", tag = "[DiscordRichPresence]")
+                }
+            }
 
             this._loaded.set(true)
-            Paintbox.LOGGER.info("[DiscordCore] Loaded successfully.")
+            Paintbox.LOGGER.info("[DiscordRichPresence] Loaded successfully.")
         } catch (t: Throwable) {
-            Paintbox.LOGGER.warn("[DiscordCore] Could not init Core (native: \"${nativeFile.absolutePath}\"). Discord functionality disabled.")
+            Paintbox.LOGGER.warn("[DiscordRichPresence] Could not init Core. Discord functionality disabled.")
             t.printStackTrace()
             return
         }
@@ -79,7 +83,7 @@ object DiscordRichPresence : Disposable {
                 _lastCallbacksResult.set(e.result)
             }
             this._loaded.set(false)
-            Paintbox.LOGGER.warn("[DiscordCore] Error while running callbacks. Discord functionality has been disabled. Result = $result")
+            Paintbox.LOGGER.warn("[DiscordRichPresence] Error while running callbacks. Discord functionality has been disabled. Result = $result")
             e.printStackTrace()
         }
     }
@@ -93,7 +97,7 @@ object DiscordRichPresence : Disposable {
 
                 this.core.activityManager().updateActivity(activity, callback ?: { result ->
                     if (result != Result.OK) {
-                        Paintbox.LOGGER.warn("[DiscordCore] Non-OK result when updating activity: $result")
+                        Paintbox.LOGGER.warn("[DiscordRichPresence] Non-OK result when updating activity: $result")
                     }
                 })
             }
