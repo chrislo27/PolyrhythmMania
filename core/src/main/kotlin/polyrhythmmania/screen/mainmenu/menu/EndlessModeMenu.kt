@@ -24,7 +24,7 @@ import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
@@ -118,7 +118,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this.onEntryEnd = {
                                     sidemode.prepare()
                                     playScreen.resetAndUnpause()
-                                    DiscordCore.updateActivity(DefaultPresences.playingEndlessMode())
+                                    DiscordRichPresence.updateActivity(DefaultPresences.playingEndlessMode())
                                     mainMenu.backgroundType = BgType.ENDLESS
                                     GlobalStats.timesPlayedEndlessMode.increment()
                                 }

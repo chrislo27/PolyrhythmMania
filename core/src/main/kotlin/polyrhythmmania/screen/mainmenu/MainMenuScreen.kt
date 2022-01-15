@@ -42,7 +42,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.mainmenu.bg.MainMenuBg
 import polyrhythmmania.screen.mainmenu.menu.*
@@ -624,7 +624,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
         firstShowing.set(false)
 
-        DiscordCore.updateActivity(DefaultPresences.idle())
+        DiscordRichPresence.updateActivity(DefaultPresences.idle())
         background.initializeFromType(this.backgroundType)
         
         if (main.settings.lastVersion != null) {

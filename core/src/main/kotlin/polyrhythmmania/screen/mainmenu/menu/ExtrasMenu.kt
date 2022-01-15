@@ -21,7 +21,7 @@ import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.AssembleMode
@@ -91,7 +91,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createSidemodeLongButton(AssetRegistry.get<PackedSheet>("achievements_icon")["dunk"],
                     "mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip",
                     Var { listOf(use(main.settings.endlessDunkHighScore)) })) { main, _ ->
-                DiscordCore.updateActivity(DefaultPresences.playingDunk())
+                DiscordRichPresence.updateActivity(DefaultPresences.playingDunk())
                 mainMenu.backgroundType = BgType.DUNK
                 GlobalStats.timesPlayedDunk.increment()
                 DunkMode(main, EndlessModeScore(settings.endlessDunkHighScore))
@@ -101,7 +101,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     Var { listOf(use(main.settings.sidemodeAssembleHighScore)) }),
                     resultsBehaviour = ResultsBehaviour.ShowResults(null, null), // Note: high score is handled by EndlessModeScore
                     newIndicator = main.settings.newIndicatorExtrasAssemble) { main, _ ->
-                DiscordCore.updateActivity(DefaultPresences.playingAssemble())
+                DiscordRichPresence.updateActivity(DefaultPresences.playingAssemble())
                 mainMenu.backgroundType = BgType.ASSEMBLE
                 GlobalStats.timesPlayedAssemble.increment()
                 AssembleMode(main, EndlessModeScore(settings.sidemodeAssembleHighScore))
