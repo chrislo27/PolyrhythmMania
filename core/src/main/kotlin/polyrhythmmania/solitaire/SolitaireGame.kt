@@ -294,7 +294,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
         for (freeCell in freeCells) {
             if (!freeCell.stack.flippedOver.get() && freeCell.stack.isWidgetSet()) {
                 freeCell.stack.flippedOver.set(true)
-                playSound("sfx_flick")
+                playSound("sfx_flick", vol = 0.65f)
             }
         }
         for (foundation in foundationZones) {
@@ -366,7 +366,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
                     inputsEnabled.set(false)
                     dragInfo.cancelDrag()
                     enqueueAnimation(tail, zone, targetFoundation) {
-                        playSound("sfx_base_note", pitch = Semitones.getALPitch(tail.symbol.semitone))
+                        playSound(tail.symbol.getNoteSFXID())
                     }
                     return
                 }
@@ -385,7 +385,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
                 inputsEnabled.set(false)
                 dragInfo.cancelDrag()
                 enqueueAnimation(tail, spareZone, targetFoundation, duration = 0.333f) {
-                    playSound("sfx_base_note", pitch = Semitones.getALPitch(tail.symbol.semitone))
+                    playSound(CardSymbol.SPARE.getNoteSFXID())
                 }
                 return
             }

@@ -59,7 +59,14 @@ class SolitaireAssetLoader : IAssetLoader {
         SolitaireAssets.loadAsset("help_2", "textures/solitaire/help_2.png", linearTexture())
         SolitaireAssets.loadAsset("help_3", "textures/solitaire/help_3.png", linearTexture())
         
-        SolitaireAssets.loadAsset<Sound>("sfx_base_note", "sounds/solitaire/base_note.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_note_C3", "sounds/solitaire/note_C3.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_note_D3", "sounds/solitaire/note_D3.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_note_E3", "sounds/solitaire/note_E3.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_note_F3", "sounds/solitaire/note_F3.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_note_G3", "sounds/solitaire/note_G3.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_note_A3", "sounds/solitaire/note_A3.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_note_B3", "sounds/solitaire/note_B3.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_note_C4", "sounds/solitaire/note_C4.ogg")
         SolitaireAssets.loadAsset<Sound>("sfx_flick", "sounds/solitaire/flick.ogg")
     }
 

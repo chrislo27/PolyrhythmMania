@@ -26,4 +26,18 @@ enum class CardSymbol(
     fun isWidgetLike(): Boolean = scaleOrder == 999
     
     fun isNumeric(): Boolean = scaleOrder in 0..6
+    
+    fun getNoteSFXID(): String {
+        return when (this) {
+            NUM_7 -> "sfx_note_B3"
+            NUM_6 -> "sfx_note_A3"
+            NUM_5 -> "sfx_note_G3"
+            NUM_4 -> "sfx_note_F3"
+            NUM_3 -> "sfx_note_E3"
+            NUM_2 -> "sfx_note_D3"
+            NUM_1 -> "sfx_note_C3"
+            SPARE -> "sfx_note_C4"
+            else -> "sfx_note_C3"
+        }
+    }
 }
