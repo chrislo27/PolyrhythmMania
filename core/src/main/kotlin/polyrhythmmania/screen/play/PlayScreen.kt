@@ -10,6 +10,7 @@ import polyrhythmmania.engine.input.Score
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.statistics.PlayTimeType
+import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.WorldType
 
 
@@ -40,7 +41,7 @@ class PlayScreen private constructor(
     init {
         // Score achievements for endless-type modes
         engine.inputter.endlessScore.score.addListener { scoreVar ->
-            if (engine.world.worldMode.showEndlessScore && engine.areStatisticsEnabled) {
+            if (engine.world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS && engine.areStatisticsEnabled) {
                 val newScore = scoreVar.getOrCompute()
                 when (engine.world.worldMode.type) {
                     WorldType.POLYRHYTHM -> {

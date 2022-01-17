@@ -26,7 +26,7 @@ class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     val world: World = World().apply { 
-        this.worldMode = WorldMode(WorldType.DUNK, false)
+        this.worldMode = WorldMode(WorldType.DUNK, EndlessType.REGULAR_ENDLESS)
         resetWorld()
     }
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()
