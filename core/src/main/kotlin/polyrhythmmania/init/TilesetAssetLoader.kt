@@ -194,7 +194,7 @@ class TilesetAssetLoader : IAssetLoader {
                 "sign_ta",
                 "sign_ta_shadow",
         ).map { Packable(it, "textures/world/arcade/parts/$it.tga") },
-                PackedSheet.Config(padding = 2, maxSize = 2048, duplicateBorder = false, atlasMipMaps = false,
+                PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false, atlasMipMaps = false,
                         atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest)))
     }
 
