@@ -18,9 +18,11 @@ object StockTexturePacks {
     val gba: TexturePack by lazy { StockTexturePack("gba", emptySet(), AssetRegistry.get<PackedSheet>("tileset_gba")) }
     private val hdNoFallback: TexturePack by lazy { StockTexturePack("hdNoFallback", emptySet(), AssetRegistry.get<PackedSheet>("tileset_hd")) }
     val hd: TexturePack by lazy { CascadingTexturePack("hd", emptySet(), listOf(hdNoFallback, gba)) }
+    private val arcadeNoFallback: TexturePack by lazy { StockTexturePack("arcadeNoFallback", emptySet(), AssetRegistry.get<PackedSheet>("tileset_arcade")) }
+    val arcade: TexturePack by lazy { CascadingTexturePack("arcade", emptySet(), listOf(arcadeNoFallback, gba)) }
     
     val allPacks: List<TexturePack> by lazy {
-        listOf(gba, hd)
+        listOf(gba, hd, arcade)
     }
     val allPacksByID: Map<String, TexturePack> by lazy {
         allPacks.associateBy { it.id }

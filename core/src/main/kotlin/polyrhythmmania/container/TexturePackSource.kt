@@ -4,6 +4,7 @@ package polyrhythmmania.container
 enum class TexturePackSource(val jsonId: Int) {
     STOCK_GBA(0),
     STOCK_HD(1),
+    STOCK_ARCADE(2),
     CUSTOM(-1);
     
     companion object {
