@@ -32,7 +32,7 @@ class TestWorldAsmScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     val world: World = World().apply { 
-        this.worldMode = WorldMode(WorldType.ASSEMBLE, false)
+        this.worldMode = WorldMode(WorldType.ASSEMBLE, EndlessType.NOT_ENDLESS)
         resetWorld()
     }
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()

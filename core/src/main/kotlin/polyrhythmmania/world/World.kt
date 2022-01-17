@@ -19,7 +19,7 @@ class World {
     }
     
     val tilesetPalette: TilesetPalette = TilesetPalette.createGBA1TilesetPalette()
-    var worldMode: WorldMode = WorldMode(WorldType.POLYRHYTHM, false)
+    var worldMode: WorldMode = WorldMode(WorldType.POLYRHYTHM, EndlessType.NOT_ENDLESS)
     
     val entities: List<Entity> = CopyOnWriteArrayList()
     val cubeMap: LongMap<EntityCube> = LongMap(100)

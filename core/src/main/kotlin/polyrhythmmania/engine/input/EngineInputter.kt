@@ -8,7 +8,6 @@ import paintbox.lazysound.LazySound
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.sidemodes.SidemodeAssets
@@ -230,14 +229,6 @@ class EngineInputter(val engine: Engine) {
                     val minSec = perfectSeconds - InputThresholds.MAX_OFFSET_SEC
                     val maxSec = perfectSeconds + InputThresholds.MAX_OFFSET_SEC
 
-                    if (atSeconds !in minSec..maxSec) {
-//                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
-                        if (nextBlockIndex == activeIndex) {
-                            missed()
-                        }
-                        continue
-                    }
-
                     val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
                     val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
                     if (DEBUG_LOG_INPUTS) {
@@ -352,7 +343,7 @@ class EngineInputter(val engine: Engine) {
                         Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                     }
 
-                    if (!worldMode.showEndlessScore) {
+                    if (!worldMode.endlessType.isEndless) {
                         (inputResults as MutableList).add(inputResult)
                     }
                     
@@ -412,13 +403,7 @@ class EngineInputter(val engine: Engine) {
         val validResults = inputTracker.results.filter { it.inputScore != InputScore.MISS }
         
         totalExpectedInputs += numExpected
-        if (!world.worldMode.showEndlessScore) {
-            (inputResults as MutableList).addAll(validResults)
-            (expectedInputsPr as MutableList).addAll(inputTracker.expected.filterIsInstance<EntityRodPR.ExpectedInput.Expected>())
-            if (engine.areStatisticsEnabled && !rod.exploded && numExpected > 0 && validResults.size == numExpected) {
-                GlobalStats.rodsFerriedPolyrhythm.increment()
-            }
-        } else {
+        if (world.worldMode.endlessType.isEndless) {
             // Special case when in endless mode
             // Inputs don't count when lives = 0
             if (engine.areStatisticsEnabled && endlessScore.lives.get() > 0) {
@@ -429,6 +414,12 @@ class EngineInputter(val engine: Engine) {
                 inputCountStats.barelies += validResults.count { it.inputScore == InputScore.BARELY }
                 inputCountStats.early += validResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent < 0f }
                 inputCountStats.late += validResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent > 0f }
+            }
+        } else {
+            (inputResults as MutableList).addAll(validResults)
+            (expectedInputsPr as MutableList).addAll(inputTracker.expected.filterIsInstance<EntityRodPR.ExpectedInput.Expected>())
+            if (engine.areStatisticsEnabled && !rod.exploded && numExpected > 0 && validResults.size == numExpected) {
+                GlobalStats.rodsFerriedPolyrhythm.increment()
             }
         }
         
@@ -499,49 +490,51 @@ class EngineInputter(val engine: Engine) {
         
         engine.musicData.volumeMap.addMusicVolume(MusicVolume(currentBeat, (afterBeat - currentBeat) / 2f, 0))
         
-        engine.addEvent(object : Event(engine) {
-            override fun onStart(currentBeat: Float) {
-                super.onStart(currentBeat)
-                
-                val activeTextBox: ActiveTextBox = if (wasNewHighScore && endlessScore.showHighScoreAtEnd) {
-                    engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
-                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BANNER))
-                } else {
-                    engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
-                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BANNER))
-                }
-                activeTextBox.onComplete = { engine ->
-                    engine.addEvent(EventEndState(engine, currentBeat))
-                }
-                
-                if (wasNewHighScore) {
-                    endlessScore.highScore.set(score)
-                    PRManiaGame.instance.settings.persist()
-                }
-                endlessScore.gameOverUIShown.set(true)
+        if (world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS) {
+            engine.addEvent(object : Event(engine) {
+                override fun onStart(currentBeat: Float) {
+                    super.onStart(currentBeat)
 
-                if (engine.areStatisticsEnabled) {
-                    val worldType = world.worldMode.type
-                    when (worldType) {
-                        WorldType.POLYRHYTHM, WorldType.DUNK -> {
-                            GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
-                            GlobalStats.inputsMissed.increment(inputCountStats.missed)
-                            GlobalStats.inputsGottenAce.increment(inputCountStats.aces)
-                            GlobalStats.inputsGottenGood.increment(inputCountStats.goods)
-                            GlobalStats.inputsGottenBarely.increment(inputCountStats.barelies)
-                            GlobalStats.inputsGottenEarly.increment(inputCountStats.early)
-                            GlobalStats.inputsGottenLate.increment(inputCountStats.late)
-                        }
-                        WorldType.ASSEMBLE -> {
-                            // NO-OP
+                    val activeTextBox: ActiveTextBox = if (wasNewHighScore && endlessScore.showHighScoreAtEnd) {
+                        engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
+                        engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BANNER))
+                    } else {
+                        engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
+                        engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BANNER))
+                    }
+                    activeTextBox.onComplete = { engine ->
+                        engine.addEvent(EventEndState(engine, currentBeat))
+                    }
+
+                    if (wasNewHighScore) {
+                        endlessScore.highScore.set(score)
+                        PRManiaGame.instance.settings.persist()
+                    }
+                    endlessScore.gameOverUIShown.set(true)
+
+                    if (engine.areStatisticsEnabled) {
+                        val worldType = world.worldMode.type
+                        when (worldType) {
+                            WorldType.POLYRHYTHM, WorldType.DUNK -> {
+                                GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
+                                GlobalStats.inputsMissed.increment(inputCountStats.missed)
+                                GlobalStats.inputsGottenAce.increment(inputCountStats.aces)
+                                GlobalStats.inputsGottenGood.increment(inputCountStats.goods)
+                                GlobalStats.inputsGottenBarely.increment(inputCountStats.barelies)
+                                GlobalStats.inputsGottenEarly.increment(inputCountStats.early)
+                                GlobalStats.inputsGottenLate.increment(inputCountStats.late)
+                            }
+                            WorldType.ASSEMBLE -> {
+                                // NO-OP
+                            }
                         }
                     }
                 }
-            }
-        }.apply {
-            this.beat = afterBeat
-            this.width = 0.5f
-        })
+            }.apply {
+                this.beat = afterBeat
+                this.width = 0.5f
+            })
+        }
     }
 
     fun attemptSkillStar(beat: Float): Boolean {
@@ -564,7 +557,7 @@ class EngineInputter(val engine: Engine) {
     
     fun addNonEndlessInputStats() {
         if (!engine.areStatisticsEnabled) return
-        if (world.worldMode.showEndlessScore) return
+        if (world.worldMode.endlessType.isEndless) return
         
         when (world.worldMode.type) {
             WorldType.POLYRHYTHM, WorldType.ASSEMBLE -> {
@@ -592,16 +585,4 @@ class EngineInputter(val engine: Engine) {
         }
     }
     
-}
-
-class EventLockInputs(engine: Engine, val lockInputs: Boolean)
-    : Event(engine) {
-    
-    constructor(engine: Engine, lockInputs: Boolean, beat: Float) : this(engine, lockInputs) {
-        this.beat = beat
-    }
-
-    override fun onStart(currentBeat: Float) {
-        engine.inputter.areInputsLocked = lockInputs
-    }
 }

@@ -253,7 +253,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
         playSfxExplosion(engine)
         registerMiss(engine.inputter)
         engine.inputter.onRodPRExploded()
-        if (world.worldMode.showEndlessScore) {
+        if (world.worldMode.endlessType.isEndless) {
             val lifeLostVar = this.lifeLost
             if (lifeLostVar != null) {
                 if (!lifeLostVar.get()) {
