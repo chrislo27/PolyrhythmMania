@@ -12,11 +12,11 @@ built-in level editor and side modes.
 [Original Soundtrack on YouTube by GENERIC](https://www.youtube.com/playlist?list=PLt_3dgnFrUPwcA6SdTfi0RapEBdQV64v_)
 
 ## Features
-* Full re-creation of the Polyrhythm minigame from Rhythm Tengoku
+* Full re-creation of the Polyrhythm minigame from Rhythm Tengoku, *and more!*
 * Sort and organize your custom levels using the Library feature
 * Create custom levels with a built-in and intuitive level editor
 * Level effects such as changing the colour palette, adding text boxes, putting Skill Stars, and more
-* Switch between classic GBA or modern HD textures, or add your own custom texture pack
+* Switch between classic GBA, modern HD, and arcade textures, or add your own custom texture pack
 * Practice modes to improve your Polyrhythm skills with levels from the original GBA game
 * Endless Mode keeps you on your toes with never-ending procedurally generated patterns
 * Daily Challenge mode which has a series of patterns not seen in regular Endless Mode, with online leaderboards
