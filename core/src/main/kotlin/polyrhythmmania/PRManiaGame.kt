@@ -51,6 +51,8 @@ import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.solitaire.SolitaireAssetLoader
+import polyrhythmmania.solitaire.SolitaireAssets
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
@@ -149,10 +151,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         achievementsUIOverlay = AchievementsUIOverlay()
         GlobalStats.timesGameStarted.increment()
         
-
+        
         AssetRegistry.addAssetLoader(InitialAssetLoader())
         AssetRegistry.addAssetLoader(TilesetAssetLoader())
-
+        SolitaireAssets.addAssetLoader(SolitaireAssetLoader())
+        
         if (settings.fullscreen.getOrCompute()) {
             Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
         } else {

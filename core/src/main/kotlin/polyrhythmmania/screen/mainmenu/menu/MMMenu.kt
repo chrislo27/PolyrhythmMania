@@ -71,6 +71,9 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
     }
     
     open fun getTileFlipAnimationBounds(): UIElement = this
+    
+    open fun onMenuEntered() {}
+    open fun onMenuExited() {}
 }
 
 

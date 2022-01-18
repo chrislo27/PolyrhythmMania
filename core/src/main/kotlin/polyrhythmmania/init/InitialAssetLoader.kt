@@ -124,6 +124,7 @@ class InitialAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("country_flags", "textures/flag_icon/flags32.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("library_default_banner", "textures/mainmenu/default_banner.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("achievements_completed_mark", "textures/achievements/completed.png", linearTexture())
+        AssetRegistry.loadAsset("solitaire_tableau", "textures/solitaire/tableau.png", linearTexture())
         AssetRegistry.loadAssetNoFile<PackedSheet>("achievements_icon", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("assemble", "textures/achievements/assemble.png"),
                 Packable("assemble_gold", "textures/achievements/assemble_gold.png"),
@@ -143,6 +144,8 @@ class InitialAssetLoader : IAssetLoader {
                 Packable("maniac", "textures/achievements/maniac.png"),
                 Packable("new_grad", "textures/achievements/new_grad.png"),
                 Packable("new_grad_gold", "textures/achievements/new_grad_gold.png"),
+                Packable("solitaire", "textures/achievements/solitaire.png"),
+                Packable("solitaire_gold", "textures/achievements/solitaire_gold.png"),
                 Packable("trophy1", "textures/achievements/trophy1.png"),
                 Packable("trophy2", "textures/achievements/trophy2.png"),
         ), PackedSheet.Config(padding = 2, maxSize = 512, duplicateBorder = false,

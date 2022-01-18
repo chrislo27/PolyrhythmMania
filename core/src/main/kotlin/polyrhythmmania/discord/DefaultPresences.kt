@@ -17,5 +17,6 @@ object DefaultPresences {
     }
     fun playingDunk(): PresenceData = PresenceData(state = "Playing Polyrhythm: Dunk", startTimestamp = System.currentTimeMillis() / 1000L, smallIcon = "dunk")
     fun playingAssemble(): PresenceData = PresenceData(state = "Playing Polyrhythm: Assemble", smallIcon = "assemble")
+    fun playingSolitaire(): PresenceData = PresenceData(state = "Playing Built to Scale: Solitaire", startTimestamp = System.currentTimeMillis() / 1000L, smallIcon = "solitaire")
 
 }

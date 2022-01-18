@@ -29,6 +29,7 @@ import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_EXPORTING
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_PRMPROJ
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_TEXPACK
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_ASM
+import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_SOLITAIRE
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_LIBRARY
 import polyrhythmmania.PreferenceKeys.SETTINGS_ACHIEVEMENT_NOTIFICATIONS
 import polyrhythmmania.PreferenceKeys.SETTINGS_AUDIODEVICE_BUFFER_COUNT
@@ -53,6 +54,8 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_USE_LEGACY_SOUND
 import polyrhythmmania.PreferenceKeys.SETTINGS_VSYNC
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.PreferenceKeys.SIDEMODE_ASSEMBLE_NORMAL
+import polyrhythmmania.PreferenceKeys.SIDEMODE_SOLITAIRE_GAME_MUSIC
+import polyrhythmmania.PreferenceKeys.SIDEMODE_SOLITAIRE_GAME_SFX
 import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
 import polyrhythmmania.engine.InputCalibration
@@ -135,6 +138,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_endlessDailyChallengeStreak: KeyValue<Int> = KeyValue(ENDLESS_DAILY_CHALLENGE_STREAK, 0)
     private val kv_endlessHighScore: KeyValue<EndlessHighScore> = KeyValue(ENDLESS_HIGH_SCORE, EndlessHighScore.ZERO)
     private val kv_assembleNormalHighScore: KeyValue<Int> = KeyValue(SIDEMODE_ASSEMBLE_NORMAL, 0)
+    private val kv_solitaireSFX: KeyValue<Boolean> = KeyValue(SIDEMODE_SOLITAIRE_GAME_SFX, true)
+    private val kv_solitaireMusic: KeyValue<Boolean> = KeyValue(SIDEMODE_SOLITAIRE_GAME_MUSIC, true)
 
     val audioDeviceSettings: ReadOnlyVar<AudioDeviceSettings> = Var {
         PRMania.audioDeviceSettings
@@ -180,6 +185,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val endlessDailyChallenge: Var<DailyChallengeScore> = kv_endlessDailyChallenge.value
     val dailyChallengeStreak: Var<Int> = kv_endlessDailyChallengeStreak.value
     val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
+    val solitaireSFX: Var<Boolean> = kv_solitaireSFX.value
+    val solitaireMusic: Var<Boolean> = kv_solitaireMusic.value
     
     val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind { 
         InputCalibration(use(calibrationAudioOffsetMs).toFloat(), use(calibrationDisableInputSFX))
@@ -193,8 +200,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val newIndicatorEditorHelpExporting: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_EXPORTING, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorEditorHelpPrmproj: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_PRMPROJ, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorExtrasAssemble: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_ASM, Version(1, 1, 0), newEvenIfFirstPlay = false)
+    val newIndicatorExtrasSolitaire: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_SOLITAIRE, Version(1, 2, 0), newEvenIfFirstPlay = false)
     val allNewIndicators: List<NewIndicator> = listOf(newIndicatorLibrary, newIndicatorEditorHelpTexpack,
-            newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorExtrasAssemble)
+            newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorExtrasAssemble,
+            newIndicatorExtrasSolitaire)
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
@@ -247,6 +256,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getDailyChallenge(kv_endlessDailyChallenge)
         prefs.getEndlessHighScore(kv_endlessHighScore)
         prefs.getInt(kv_endlessDailyChallengeStreak)
+        prefs.getBoolean(kv_solitaireSFX)
+        prefs.getBoolean(kv_solitaireMusic)
         
         val lastVersion: Version? = Version.parse(prefs.getString(LAST_VERSION) ?: "")
         this.lastVersion = lastVersion
@@ -294,6 +305,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putDailyChallenge(kv_endlessDailyChallenge)
                 .putEndlessHighScore(kv_endlessHighScore)
                 .putInt(kv_endlessDailyChallengeStreak)
+                .putBoolean(kv_solitaireSFX)
+                .putBoolean(kv_solitaireMusic)
 
         allNewIndicators.forEach { prefs.putNewIndicator(it) }
 
