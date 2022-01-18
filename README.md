@@ -20,7 +20,7 @@ built-in level editor and side modes.
 * Practice modes to improve your Polyrhythm skills with levels from the original GBA game
 * Endless Mode keeps you on your toes with never-ending procedurally generated patterns
 * Daily Challenge mode which has a series of patterns not seen in regular Endless Mode, with online leaderboards
-* Bonus side modes like _Polyrhythm: Dunk_, _Polyrhythm: Assemble_, and _Built to Scale Solitaire_ add more Polyrhythm fun
+* Extra side modes like _Polyrhythm: Dunk_, _Polyrhythm: Assemble_, and _Built to Scale: Solitaire_ add more Polyrhythm fun
 
 [Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)  
 [Check out the August 2021 features trailer!](https://www.youtube.com/watch?v=k9PtPI1-tDo)
