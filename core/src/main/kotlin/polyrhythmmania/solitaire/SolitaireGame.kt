@@ -86,7 +86,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
             }
             
             if (myList.size == 1 && newZone in foundationZones) {
-                playSound("sfx_base_note", pitch = Semitones.getALPitch(myList.last().symbol.semitone))
+                playSound(myList.last().symbol.getNoteSFXID())
             }
             
             checkTableauAfterDrag()
