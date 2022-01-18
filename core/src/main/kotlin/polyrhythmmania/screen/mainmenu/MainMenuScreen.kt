@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.StreamUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import net.beadsproject.beads.ugens.CrossFade
+import net.beadsproject.beads.ugens.Gain
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
 import paintbox.binding.*
@@ -189,7 +190,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
     private val musicSample: MusicSample
     private val beadsMusic: BeadsMusic
-    private var shouldBeBandpass: Boolean = false
+    private var shouldBeBandpass: Boolean = false // Used if the sound system restarts
     var soundSys: SoundSys by settableLazy {
         SoundSys().apply {
             musicPlayer.pause(true)
@@ -369,16 +370,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         menuMusicVolume.addListener {
             this.soundSys.soundSystem.audioContext.out.gain = it.getOrCompute()
         }
-        
-        val visibleListener: VarChangedListener<Boolean> = VarChangedListener { v ->
-            if (v.getOrCompute()) {
-                soundSys.fadeToNormal()
-            } else {
-                soundSys.fadeToBandpass()
-            }
-        }
-        menuCollection.uppermostMenu.visible.addListener(visibleListener)
-        menuCollection.audioSettingsMenu.visible.addListener(visibleListener)
         
         // Show update notes if needed
         if (main.settings.lastUpdateNotes.getOrCompute() != UpdateNotesMenu.latestUpdate) {
@@ -620,6 +611,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private fun resetTiles() {
         tiles.forEach { it.forEach { t -> t.reset() } }
     }
+    
+    fun setMainMenuRichPresence() {
+        DiscordRichPresence.updateActivity(DefaultPresences.idle())
+    }
 
     override fun show() {
         super.show()
@@ -633,7 +628,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
         firstShowing.set(false)
 
-        DiscordRichPresence.updateActivity(DefaultPresences.idle())
+        setMainMenuRichPresence()
         background.initializeFromType(this.backgroundType)
         
         if (main.settings.lastVersion != null) {
@@ -702,13 +697,22 @@ playerPos: ${soundSys.musicPlayer.position}
             player.loopEndMs = sample.samplesToMs(8_061_382.0).toFloat()
             player.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
         }
-        val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs, musicPlayer.outs)
-        val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpass else musicPlayer)
+        val bandpassVolume: FloatVar = FloatVar {
+            if (use(main.settings.solitaireMusic)) 1f else 0f
+        }
+        val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs)
+        val bandpassGain: Gain = Gain(soundSystem.audioContext, musicPlayer.outs, bandpassVolume.get())
+        val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpassGain else musicPlayer)
         
         init {
             bandpass.addInput(musicPlayer)
+            bandpassGain.addInput(bandpass)
             
             soundSystem.audioContext.out.addInput(crossFade)
+            
+            bandpassVolume.addListener {
+                bandpassGain.gain = it.getOrCompute()
+            }
         }
         
         fun start() {
@@ -722,13 +726,15 @@ playerPos: ${soundSys.musicPlayer.position}
         }
         
         fun fadeToBandpass(durationMs: Float = 1000f) {
-//            shouldBeBandpass = true
-//            crossFade.fadeTo(bandpass, durationMs) // Reimplement bandpass when needed.
+            if (shouldBeBandpass) return
+            shouldBeBandpass = true
+            crossFade.fadeTo(bandpassGain, durationMs) // Reimplement bandpass when needed.
         }
         
         fun fadeToNormal(durationMs: Float = 1000f) {
-//            shouldBeBandpass = false
-//            crossFade.fadeTo(musicPlayer, durationMs) // Reimplement bandpass when needed.
+            if (!shouldBeBandpass) return
+            shouldBeBandpass = false
+            crossFade.fadeTo(musicPlayer, durationMs) // Reimplement bandpass when needed.
         }
         
         fun resetMusic() {

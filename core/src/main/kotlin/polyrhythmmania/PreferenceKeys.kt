@@ -12,6 +12,7 @@ object PreferenceKeys {
     val NEW_INDICATOR_EDITORHELP_EXPORTING = "newIndicator_editorHelp_exporting"
     val NEW_INDICATOR_EDITORHELP_PRMPROJ = "newIndicator_editorHelp_prmproj"
     val NEW_INDICATOR_EXTRAS_ASM = "newIndicator_extras_assemble"
+    val NEW_INDICATOR_EXTRAS_SOLITAIRE = "newIndicator_extras_solitaire"
     
     val FILE_CHOOSER_EDITOR_MUSIC = "fileChooser_editor_music"
     val FILE_CHOOSER_EDITOR_SAVE = "fileChooser_editor_save"
@@ -65,6 +66,8 @@ object PreferenceKeys {
     val ENDLESS_DAILY_CHALLENGE_STREAK = "endlessMode_dailyChallenge_streak"
     val ENDLESS_HIGH_SCORE = "endlessMode_endless_highScore"
     val SIDEMODE_ASSEMBLE_NORMAL = "sideMode_assemble_normal"
+    val SIDEMODE_SOLITAIRE_GAME_SFX = "sideMode_solitaire_gameSFX"
+    val SIDEMODE_SOLITAIRE_GAME_MUSIC = "sideMode_solitaire_gameMusic"
     
     
 }

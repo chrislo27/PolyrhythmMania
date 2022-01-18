@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import paintbox.binding.BooleanVar
+import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -17,6 +19,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.Settings
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.screen.mainmenu.bg.BgType
@@ -24,11 +27,17 @@ import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.AssembleMode
 import polyrhythmmania.sidemodes.DunkMode
 import polyrhythmmania.sidemodes.EndlessModeScore
+import polyrhythmmania.solitaire.SolitaireMenu
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 
 
 class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+    
+    private val settings: Settings = main.settings
+    val anyNewIndicators: ReadOnlyBooleanVar = BooleanVar {
+        settings.newIndicatorExtrasAssemble.value.use() || settings.newIndicatorExtrasSolitaire.value.use()
+    }
 
     init {
         this.setSize(MMMenu.WIDTH_SMALL_MID)
@@ -67,6 +76,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Anchor.TopLeft.configure(this)
             this.spacing.set(0f)
             this.bindHeightToParent(-40f)
+            this.margin.set(Insets(0f, 0f, 0f, 4f))
         }
 
         vbox.temporarilyDisableLayouts {
@@ -84,7 +94,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 DiscordRichPresence.updateActivity(DefaultPresences.playingDunk())
                 mainMenu.backgroundType = BgType.DUNK
                 GlobalStats.timesPlayedDunk.increment()
-                DunkMode(main, EndlessModeScore(main.settings.endlessDunkHighScore))
+                DunkMode(main, EndlessModeScore(settings.endlessDunkHighScore))
             }
             vbox += createSidemodeLongButton(AssetRegistry.get<PackedSheet>("achievements_icon")["assemble"],
                     "mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
@@ -94,13 +104,22 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 DiscordRichPresence.updateActivity(DefaultPresences.playingAssemble())
                 mainMenu.backgroundType = BgType.ASSEMBLE
                 GlobalStats.timesPlayedAssemble.increment()
-                AssembleMode(main, EndlessModeScore(main.settings.sidemodeAssembleHighScore))
+                AssembleMode(main, EndlessModeScore(settings.sidemodeAssembleHighScore))
             }
-            
-//            vbox += createLongButton { """[font=thin]Future Spot for Side Mode #3[]""" }.apply {
-//                this.disabled.set(true)
-//                this.tooltipElement.set(createTooltip { "This NEW side mode will be developed for a future update if sufficient\ndevelopment costs are recovered — please consider donating\nto help with development costs! Donation link (goes to PayPal):\n[color=prmania_tooltip_keystroke scale=1]https://donate-to-polyrhythmmania.rhre.dev[]" })
-//            }
+            vbox += createLongButtonWithNewIndicator(settings.newIndicatorExtrasSolitaire, AssetRegistry.get<PackedSheet>("achievements_icon")["solitaire"]) {
+                Localization.getVar("mainMenu.play.solitaire").use() 
+            }.apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.solitaireMenu)
+                    
+                    val newIndicator = settings.newIndicatorExtrasSolitaire
+                    if (newIndicator.value.get()) {
+                        newIndicator.value.set(false)
+                        main.settings.persist()
+                    }
+                }
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.solitaire.tooltip")))
+            }
 
             vbox += separator()
             vbox += createLongButtonWithIcon(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_music"]) {

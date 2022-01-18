@@ -284,6 +284,25 @@ object Achievements {
     val assembleNoMiss = register(Ordinary("assemble_no_miss", OBJECTIVE, EXTRAS, false)).apply {
         this.overrideIconID = "assemble_gold"
     }
+    
+    /**
+     * Triggered when Solitaire is won for the 1st time.
+     */
+    val solitaireWin1 = register(StatTriggered("solitaire_win_1", OBJECTIVE, EXTRAS, false, GlobalStats.solitaireGamesWon, 1, showProgress = false)).apply {
+        this.overrideIconID = "solitaire"
+    }
+    /**
+     * Triggered when Solitaire is won for the 10th time.
+     */
+    val solitaireWin10 = register(StatTriggered("solitaire_win_10", OBJECTIVE, EXTRAS, false, GlobalStats.solitaireGamesWon, 10)).apply {
+        this.overrideIconID = "solitaire"
+    }
+    /**
+     * Triggered when Solitaire is won for the 50th time.
+     */
+    val solitaireWin50 = register(StatTriggered("solitaire_win_50", CHALLENGE, EXTRAS, false, GlobalStats.solitaireGamesWon, 50)).apply {
+        this.overrideIconID = "solitaire_gold"
+    }
 
     
     // End of Category GENERAL
