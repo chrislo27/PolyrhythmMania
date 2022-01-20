@@ -17,8 +17,9 @@ class TexPackSrcSelectorMenuPane(editorPane: EditorPane, currentSource: TextureP
     val toggleGroup: ToggleGroup = ToggleGroup()
     val gbaRadio: TPSSettingRadioButton = TPSSettingRadioButton(TexturePackSource.STOCK_GBA, binding = { Localization.getVar("editor.dialog.texturePack.stock.gba").use() })
     val hdRadio: TPSSettingRadioButton = TPSSettingRadioButton(TexturePackSource.STOCK_HD, binding = { Localization.getVar("editor.dialog.texturePack.stock.hd").use() })
+    val arcadeRadio: TPSSettingRadioButton = TPSSettingRadioButton(TexturePackSource.STOCK_ARCADE, binding = { Localization.getVar("editor.dialog.texturePack.stock.arcade").use() })
     val customRadio: TPSSettingRadioButton = TPSSettingRadioButton(TexturePackSource.CUSTOM, binding = { Localization.getVar("editor.dialog.texturePack.stock.custom").use() })
-    val radios: List<RadioButton> = listOf(gbaRadio, hdRadio, customRadio)
+    val radios: List<RadioButton> = listOf(gbaRadio, hdRadio, arcadeRadio, customRadio)
 
     init {
         val radioHeight = 32f
@@ -37,6 +38,7 @@ class TexPackSrcSelectorMenuPane(editorPane: EditorPane, currentSource: TextureP
         when (currentSource) {
             TexturePackSource.STOCK_GBA -> gbaRadio
             TexturePackSource.STOCK_HD -> hdRadio
+            TexturePackSource.STOCK_ARCADE -> arcadeRadio
             TexturePackSource.CUSTOM -> customRadio
         }.checkedState.set(true)
 

@@ -80,6 +80,7 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         ForceTexturePack.NO_FORCE -> "noForce"
                         ForceTexturePack.FORCE_GBA -> "forceGBA"
                         ForceTexturePack.FORCE_HD -> "forceHD"
+                        ForceTexturePack.FORCE_ARCADE -> "forceArcade"
                     }
                 }")
             })

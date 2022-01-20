@@ -99,6 +99,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
             ForceTexturePack.NO_FORCE -> this.texturePack
             ForceTexturePack.FORCE_GBA -> Var(StockTexturePacks.gba)
             ForceTexturePack.FORCE_HD -> Var(StockTexturePacks.hd)
+            ForceTexturePack.FORCE_ARCADE -> Var(StockTexturePacks.arcade)
         }).apply { 
             world.tilesetPalette.applyTo(this)
         }, engine)
@@ -141,6 +142,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
         return when (source) {
             TexturePackSource.STOCK_GBA -> StockTexturePacks.gba
             TexturePackSource.STOCK_HD -> StockTexturePacks.hd
+            TexturePackSource.STOCK_ARCADE -> StockTexturePacks.arcade
             TexturePackSource.CUSTOM -> getCustomTexturePackAsCascading()
         }
     }
