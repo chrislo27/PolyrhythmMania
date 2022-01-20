@@ -74,6 +74,7 @@ class EngineInputter(val engine: Engine) {
         val score: IntVar = IntVar(0)
         var highScore: Var<Int> = GenericVar(0)
         var showHighScoreAtEnd: Boolean = true
+        var showPrevHighScore: Boolean = true
         val maxLives: IntVar = IntVar(0)
         val startingLives: IntVar = IntVar { maxLives.use() }
         val lives: IntVar = IntVar(startingLives.get())

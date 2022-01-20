@@ -146,6 +146,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     private val endlessModeScoreLabel: TextLabel
     private val endlessModeGameOverPane: Pane = Pane()
     private val endlessModeGameOverLabel: TextLabel
+    private val endlessModeHighScoreLabel: TextLabel
     
     init {
         val baseMarkup = Markup(mapOf(
@@ -181,7 +182,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                             Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) }).use()
                         }
                     }
-                    this += TextLabel(binding = { prevTextVar.use() },
+                    endlessModeHighScoreLabel = TextLabel(binding = { prevTextVar.use() },
                             font = PRManiaGame.instance.fontGameUIText).apply {
                         this.bindWidthToParent(multiplier = 0.4f)
                         this.doXCompression.set(false)
@@ -196,6 +197,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                             } else defaultTextColor
                         }
                     }
+                    this += endlessModeHighScoreLabel
 
 //                    val livesVar: ReadOnlyVar<String> = Localization.getVar("play.endless.lives", Var {
 //                        val l = currentEndlessLives.use()
@@ -545,6 +547,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                     scaleVar.set(1f)
                 }
             }
+            endlessModeHighScoreLabel.visible.set(endlessScore.showPrevHighScore)
         }
 
         uiSceneRoot.renderAsRoot(batch)
