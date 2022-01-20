@@ -122,7 +122,7 @@ class EditorHelpDocTexturePacks : HelpDocument(
         "editorHelp.texture_packs.title",
         listOf(
                 LayerParagraph("editorHelp.texture_packs.pp0", 80f),
-                LayerImage("textures/help/texture_packs/change_starting_texture_pack.png", 150f),
+                LayerImage("textures/help/texture_packs/change_starting_texture_pack.png", 200f),
                 LayerParagraph("editorHelp.texture_packs.pp1", 40f),
                 LayerImage("textures/help/texture_packs/dialog.png", 500f),
                 LayerParagraph("editorHelp.texture_packs.pp2", 500f),
