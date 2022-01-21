@@ -2,6 +2,7 @@ package polyrhythmmania
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Colors
+import polyrhythmmania.achievements.AchievementRank
 import polyrhythmmania.world.entity.EntityInputFeedback
 
 
@@ -34,6 +35,9 @@ object PRManiaColors {
         put("prmania_marker_loopstart", MARKER_LOOP_START.cpy())
         put("prmania_marker_loopend", MARKER_LOOP_END.cpy())
         put("prmania_ace", ACE.cpy())
+        AchievementRank.values().forEach { rank ->
+            put("prmania_ach_${rank.id}", rank.color.cpy())
+        }
     }
     
 }

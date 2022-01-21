@@ -219,8 +219,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 AchievementsL10N.getValue(cat.toLocalizationID())
             }
             AchievementRank.values().forEach { rank ->
-                AchievementsL10N.getValue(rank.toLocalizationID(false))
-                AchievementsL10N.getValue(rank.toLocalizationID(true))
+                AchievementsL10N.getValue(rank.toAchievementLocalizationID(false))
+                AchievementsL10N.getValue(rank.toAchievementLocalizationID(true))
             }
         }
         

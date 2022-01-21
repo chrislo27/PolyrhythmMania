@@ -69,14 +69,18 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.vBar.unitIncrement.set(40f)
             this.vBar.blockIncrement.set(90f)
         }
-        val hbox = HBox().apply {
+        val lowerBox = Pane().apply {
             Anchor.BottomLeft.configure(this)
-            this.spacing.set(8f)
-            this.padding.set(Insets(2f))
             this.bounds.height.set(40f)
         }
+        val hbox = HBox().apply {
+            this.spacing.set(8f)
+            this.padding.set(Insets(2f))
+            this.bindWidthToParent(adjust = -48f)
+        }
         contentPane.addChild(scrollPane)
-        contentPane.addChild(hbox)
+        contentPane.addChild(lowerBox)
+        lowerBox.addChild(hbox)
 
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)
@@ -231,6 +235,14 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setOnAction {
                     menuCol.popLastMenu()
                 }
+            }
+            
+            hbox += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["help"])).apply {
+                Anchor.BottomRight.configure(this)
+                this.padding.set(Insets(2f))
+                this.bounds.width.set(36f)
+                this.tint.set(Color.BLACK)
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.achievements.help.tooltip")))
             }
 
             hbox += ComboBox<AchievementCategory?>((listOf(null) + AchievementCategory.VALUES), viewingCategory.getOrCompute(), font = font).apply {
