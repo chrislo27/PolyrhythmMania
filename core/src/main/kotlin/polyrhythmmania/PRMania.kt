@@ -7,6 +7,7 @@ import paintbox.util.WindowSize
 import polyrhythmmania.container.Container
 import polyrhythmmania.soundsystem.AudioDeviceSettings
 import java.io.File
+import java.util.*
 
 
 object PRMania {
@@ -15,7 +16,7 @@ object PRMania {
     const val GITHUB = "https://github.com/chrislo27/PolyrhythmMania"
     const val HOMEPAGE = "https://polyrhythmmania.rhre.dev"
     const val DONATE_LINK = "https://www.paypal.com/donate/?hosted_button_id=9JLGHKZNWLLQ8"
-    val VERSION: Version = Version(1, 2, 0, "dev_20220121a")
+    val VERSION: Version = Version(1, 2, 0, "beta_20220121a")
     const val WIDTH: Int = 1280 //1080
     const val HEIGHT: Int = 720
     val DEFAULT_SIZE: WindowSize = WindowSize(WIDTH, HEIGHT)
@@ -74,7 +75,7 @@ object PRMania {
     ).sortedBy { it.width }
     
     val isDevVersion: Boolean = VERSION.suffix.startsWith("dev")
-    val isPrereleaseVersion: Boolean = VERSION.suffix.startsWith("beta") || VERSION.suffix.startsWith("RC")
+    val isPrereleaseVersion: Boolean = listOf("beta", "alpha", "rc").any { VERSION.suffix.startsWith(it, ignoreCase = true) }
     val enableEarlyAccessMessage: Boolean = (isDevVersion || isPrereleaseVersion)
     val metrics: MetricRegistry = MetricRegistry()
     
