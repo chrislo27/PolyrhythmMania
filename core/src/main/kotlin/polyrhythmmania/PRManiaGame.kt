@@ -366,6 +366,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         achievementsUIOverlay.resize(width, height)
+        if (Gdx.graphics.isFullscreen) {
+            persistFullscreenMonitor()
+        }
     }
 
     private val userHomeFile: File = File(System.getProperty("user.home"))
@@ -410,15 +413,19 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         func.invoke(callback)
     }
-
-    fun attemptFullscreen() {
-        lastWindowed = WindowSize(Gdx.graphics.width, Gdx.graphics.height)
-        Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+    
+    private fun persistFullscreenMonitor() {
         val monitor = Gdx.graphics.monitor
         if (monitor != null) {
             settings.fullscreenMonitor.set(MonitorInfo.fromMonitor(monitor))
             settings.persist()
         }
+    }
+
+    fun attemptFullscreen() {
+        lastWindowed = WindowSize(Gdx.graphics.width, Gdx.graphics.height)
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+        persistFullscreenMonitor()
     }
 
     fun attemptEndFullscreen() {
