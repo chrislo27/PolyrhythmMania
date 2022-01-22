@@ -31,6 +31,7 @@ import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
 import paintbox.transition.FadeOut
 import paintbox.transition.TransitionScreen
+import paintbox.util.MonitorInfo
 import paintbox.util.ResolutionSetting
 import paintbox.util.Version
 import paintbox.util.WindowSize
@@ -158,12 +159,20 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         SolitaireAssets.addAssetLoader(SolitaireAssetLoader())
         
         if (settings.fullscreen.getOrCompute()) {
-            val persistedMonitorName: String? = settings.fullscreenMonitor.getOrCompute()
-            val monitor: Graphics.Monitor = Gdx.graphics.monitors?.firstOrNull { 
-                m -> m.name != null && m.name == persistedMonitorName
-            } ?: Gdx.graphics.monitor
-            val displayMode: Graphics.DisplayMode = Gdx.graphics.getDisplayMode(monitor) ?: Gdx.graphics.displayMode
-            Gdx.graphics.setFullscreenMode(displayMode)
+            val monitorInfo: MonitorInfo? = settings.fullscreenMonitor.getOrCompute()
+            if (monitorInfo == null) {
+                // Use default
+                Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+            } else {
+                val monitors = Gdx.graphics.monitors
+                // Search in order of: exact match, primary monitor if name matches, any monitor matches the name, then current monitor
+                val monitor: Graphics.Monitor = monitors.firstOrNull(monitorInfo::doesMonitorMatch)
+                        ?: Gdx.graphics.primaryMonitor.takeIf { it.name == monitorInfo.name }
+                        ?: monitors.firstOrNull { it.name == monitorInfo.name }
+                        ?: Gdx.graphics.monitor
+                val displayMode: Graphics.DisplayMode = Gdx.graphics.getDisplayMode(monitor) ?: Gdx.graphics.displayMode
+                Gdx.graphics.setFullscreenMode(displayMode)
+            }
         } else {
             val res = settings.windowedResolution.getOrCompute()
             if (Gdx.graphics.width != res.width || Gdx.graphics.height != res.height) {
@@ -405,8 +414,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     fun attemptFullscreen() {
         lastWindowed = WindowSize(Gdx.graphics.width, Gdx.graphics.height)
         Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
-        settings.fullscreenMonitor.set(Gdx.graphics.monitor?.name)
-        settings.persist()
+        val monitor = Gdx.graphics.monitor
+        if (monitor != null) {
+            settings.fullscreenMonitor.set(MonitorInfo.fromMonitor(monitor))
+            settings.persist()
+        }
     }
 
     fun attemptEndFullscreen() {

@@ -7,6 +7,7 @@ import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.util.MonitorInfo
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_ARROW_KEYS_LIKE_SCROLL
@@ -64,7 +65,6 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.soundsystem.AudioDeviceSettings
-import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.javasound.MixerHandler
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
@@ -106,7 +106,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_menuSfxVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, 50)
     private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, PRMania.DEFAULT_SIZE)
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, true)
-    private val kv_fullscreenMonitor: KeyValue<String?> = KeyValue(SETTINGS_FULLSCREEN_MONITOR, null)
+    private val kv_fullscreenMonitor: KeyValue<MonitorInfo?> = KeyValue(SETTINGS_FULLSCREEN_MONITOR, null)
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
     private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
@@ -155,7 +155,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val menuSfxVolumeSetting: Var<Int> = kv_menuSfxVolumeSetting.value
     val windowedResolution: Var<WindowSize> = kv_windowedResolution.value
     val fullscreen: Var<Boolean> = kv_fullscreen.value
-    val fullscreenMonitor: Var<String?> = kv_fullscreenMonitor.value
+    val fullscreenMonitor: Var<MonitorInfo?> = kv_fullscreenMonitor.value
     val showInputFeedbackBar: Var<Boolean> = kv_showInputFeedbackBar.value
     val showSkillStar: Var<Boolean> = kv_showSkillStar.value
     val discordRichPresence: Var<Boolean> = kv_discordRichPresence.value
@@ -217,7 +217,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getIntCoerceIn(kv_menuSfxVolumeSetting, 0, 100)
         prefs.getWindowSize(kv_windowedResolution)
         prefs.getBoolean(kv_fullscreen)
-        prefs.getString(kv_fullscreenMonitor)
+        prefs.getMonitorInfo(kv_fullscreenMonitor)
         prefs.getBoolean(kv_showInputFeedbackBar)
         prefs.getBoolean(kv_showSkillStar)
         prefs.getBoolean(kv_discordRichPresence)
@@ -276,7 +276,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_menuSfxVolumeSetting)
                 .putWindowSize(kv_windowedResolution)
                 .putBoolean(kv_fullscreen)
-                .putString(kv_fullscreenMonitor)
+                .putMonitorInfo(kv_fullscreenMonitor)
                 .putBoolean(kv_showInputFeedbackBar)
                 .putBoolean(kv_showSkillStar)
                 .putBoolean(kv_discordRichPresence)
@@ -474,6 +474,20 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         val prefs: Preferences = this
         val windowSize = kv.value.getOrCompute()
         return prefs.putString(kv.key, "${windowSize.width}x${windowSize.height}")
+    }
+
+    private fun Preferences.getMonitorInfo(kv: KeyValue<MonitorInfo?>) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            val str = prefs.getString(kv.key)
+            kv.value.set(MonitorInfo.fromEncodedString(str))
+        }
+    }
+
+    private fun Preferences.putMonitorInfo(kv: KeyValue<MonitorInfo?>): Preferences {
+        val prefs: Preferences = this
+        val mi = kv.value.getOrCompute()
+        return prefs.putString(kv.key, mi?.toEncodedString() ?: "")
     }
 
     private fun Preferences.getInputKeymapKeyboard(kv: KeyValue<InputKeymapKeyboard>) {
