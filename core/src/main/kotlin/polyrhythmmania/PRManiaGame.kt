@@ -140,24 +140,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         
         preferences = Gdx.app.getPreferences("PolyrhythmMania")
-
-        addFontsToCache(this.fontCache)
-        PRManiaColors
-        PRManiaSkins
-        settings = Settings(this, preferences).apply { 
+        settings = Settings(this, preferences).apply {
             load()
             setStartupSettings(this@PRManiaGame)
         }
-        GlobalStats.load()
-        Achievements.load()
-        achievementsUIOverlay = AchievementsUIOverlay()
-        GlobalStats.timesGameStarted.increment()
-        
-        
-        AssetRegistry.addAssetLoader(InitialAssetLoader())
-        AssetRegistry.addAssetLoader(TilesetAssetLoader())
-        SolitaireAssets.addAssetLoader(SolitaireAssetLoader())
-        
+
         if (settings.fullscreen.getOrCompute()) {
             val monitorInfo: MonitorInfo? = settings.fullscreenMonitor.getOrCompute()
             if (monitorInfo == null) {
@@ -179,6 +166,19 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 Gdx.graphics.setWindowedMode(res.width, res.height)
             }
         }
+        (Gdx.graphics as Lwjgl3Graphics).window.setVisible(true)
+
+        addFontsToCache(this.fontCache)
+        PRManiaColors
+        PRManiaSkins
+        GlobalStats.load()
+        Achievements.load()
+        achievementsUIOverlay = AchievementsUIOverlay()
+        GlobalStats.timesGameStarted.increment()
+        
+        AssetRegistry.addAssetLoader(InitialAssetLoader())
+        AssetRegistry.addAssetLoader(TilesetAssetLoader())
+        SolitaireAssets.addAssetLoader(SolitaireAssetLoader())
 
         generateColourPickerTextures()
         
