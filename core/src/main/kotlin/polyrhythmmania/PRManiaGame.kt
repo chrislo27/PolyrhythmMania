@@ -1,6 +1,7 @@
 package polyrhythmmania
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.audio.Sound
@@ -30,6 +31,7 @@ import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
 import paintbox.transition.FadeOut
 import paintbox.transition.TransitionScreen
+import paintbox.util.MonitorInfo
 import paintbox.util.ResolutionSetting
 import paintbox.util.Version
 import paintbox.util.WindowSize
@@ -138,32 +140,45 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         
         preferences = Gdx.app.getPreferences("PolyrhythmMania")
-
-        addFontsToCache(this.fontCache)
-        PRManiaColors
-        PRManiaSkins
-        settings = Settings(this, preferences).apply { 
+        settings = Settings(this, preferences).apply {
             load()
             setStartupSettings(this@PRManiaGame)
         }
-        GlobalStats.load()
-        Achievements.load()
-        achievementsUIOverlay = AchievementsUIOverlay()
-        GlobalStats.timesGameStarted.increment()
-        
-        
-        AssetRegistry.addAssetLoader(InitialAssetLoader())
-        AssetRegistry.addAssetLoader(TilesetAssetLoader())
-        SolitaireAssets.addAssetLoader(SolitaireAssetLoader())
-        
+
         if (settings.fullscreen.getOrCompute()) {
-            Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+            val monitorInfo: MonitorInfo? = settings.fullscreenMonitor.getOrCompute()
+            if (monitorInfo == null) {
+                // Use default
+                Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+            } else {
+                val monitors = Gdx.graphics.monitors
+                // Search in order of: exact match, primary monitor if name matches, any monitor matches the name, then current monitor
+                val monitor: Graphics.Monitor = monitors.firstOrNull(monitorInfo::doesMonitorMatch)
+                        ?: Gdx.graphics.primaryMonitor.takeIf { it.name == monitorInfo.name }
+                        ?: monitors.firstOrNull { it.name == monitorInfo.name }
+                        ?: Gdx.graphics.monitor
+                val displayMode: Graphics.DisplayMode = Gdx.graphics.getDisplayMode(monitor) ?: Gdx.graphics.displayMode
+                Gdx.graphics.setFullscreenMode(displayMode)
+            }
         } else {
             val res = settings.windowedResolution.getOrCompute()
             if (Gdx.graphics.width != res.width || Gdx.graphics.height != res.height) {
                 Gdx.graphics.setWindowedMode(res.width, res.height)
             }
         }
+        (Gdx.graphics as Lwjgl3Graphics).window.setVisible(true)
+
+        addFontsToCache(this.fontCache)
+        PRManiaColors
+        PRManiaSkins
+        GlobalStats.load()
+        Achievements.load()
+        achievementsUIOverlay = AchievementsUIOverlay()
+        GlobalStats.timesGameStarted.increment()
+        
+        AssetRegistry.addAssetLoader(InitialAssetLoader())
+        AssetRegistry.addAssetLoader(TilesetAssetLoader())
+        SolitaireAssets.addAssetLoader(SolitaireAssetLoader())
 
         generateColourPickerTextures()
         
@@ -351,6 +366,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         achievementsUIOverlay.resize(width, height)
+        if (Gdx.graphics.isFullscreen) {
+            persistFullscreenMonitor()
+        }
     }
 
     private val userHomeFile: File = File(System.getProperty("user.home"))
@@ -395,10 +413,19 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         func.invoke(callback)
     }
+    
+    private fun persistFullscreenMonitor() {
+        val monitor = Gdx.graphics.monitor
+        if (monitor != null) {
+            settings.fullscreenMonitor.set(MonitorInfo.fromMonitor(monitor))
+            settings.persist()
+        }
+    }
 
     fun attemptFullscreen() {
         lastWindowed = WindowSize(Gdx.graphics.width, Gdx.graphics.height)
         Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+        persistFullscreenMonitor()
     }
 
     fun attemptEndFullscreen() {

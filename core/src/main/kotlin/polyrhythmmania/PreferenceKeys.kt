@@ -31,6 +31,7 @@ object PreferenceKeys {
     val SETTINGS_MENU_SFX_VOLUME = "settings_menu_volume_sfx"
     val SETTINGS_WINDOWED_RESOLUTION = "settings_windowedResolution"
     val SETTINGS_FULLSCREEN = "settings_fullscreen"
+    val SETTINGS_FULLSCREEN_MONITOR = "settings_fullscreen_monitor"
     val SETTINGS_SHOW_INPUT_FEEDBACK_BAR = "settings_showInputFeedbackBar"
     val SETTINGS_SHOW_SKILL_STAR = "settings_showSkillStar"
     val SETTINGS_DISCORD_RPC = "settings_discord_rich_presence"
