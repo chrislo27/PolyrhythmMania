@@ -371,6 +371,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             val gr = Gdx.graphics
             gr.setForegroundFPS(this.maxFramerate.getOrCompute())
             gr.setVSync(this.vsyncEnabled.getOrCompute())
+            Paintbox.LOGGER.debug("DEBUG MONITORS: Primary=${gr.primaryMonitor?.name}, current=${gr.monitor?.name}, allMonitors=${gr.monitors.joinToString { it.name }}")
         }
     }
     
