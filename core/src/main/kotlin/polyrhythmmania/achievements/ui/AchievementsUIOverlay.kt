@@ -82,7 +82,7 @@ class AchievementsUIOverlay {
     fun render(main: PRManiaGame, batch: SpriteBatch) {
         if (firstRender) {
             firstRender = false
-            enqueueToast(Toast(object : Achievement.Ordinary("", AchievementRank.OBJECTIVE, AchievementCategory.GENERAL, true) {
+            val blankToast = Toast(object : Achievement.Ordinary("", AchievementRank.OBJECTIVE, AchievementCategory.GENERAL, true) {
                 override fun getLocalizedName(): ReadOnlyVar<String> {
                     return Var("")
                 }
@@ -91,7 +91,8 @@ class AchievementsUIOverlay {
                 }
             }, Fulfillment(Instant.now())).apply {
                 this.opacity.set(0f)
-            })
+            }
+            queue.add(0, blankToast)
         }
         
         tmpMatrix.set(batch.projectionMatrix)
