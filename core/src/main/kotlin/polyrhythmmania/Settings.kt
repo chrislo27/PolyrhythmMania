@@ -39,6 +39,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TEXTURE_PACK
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TILESET_PALETTE
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
+import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN_MONITOR
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_LOCALE
 import polyrhythmmania.PreferenceKeys.SETTINGS_MAINMENU_FLIP_ANIMATION
@@ -105,6 +106,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_menuSfxVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, 50)
     private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, PRMania.DEFAULT_SIZE)
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, true)
+    private val kv_fullscreenMonitor: KeyValue<String?> = KeyValue(SETTINGS_FULLSCREEN_MONITOR, null)
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
     private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
@@ -153,6 +155,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val menuSfxVolumeSetting: Var<Int> = kv_menuSfxVolumeSetting.value
     val windowedResolution: Var<WindowSize> = kv_windowedResolution.value
     val fullscreen: Var<Boolean> = kv_fullscreen.value
+    val fullscreenMonitor: Var<String?> = kv_fullscreenMonitor.value
     val showInputFeedbackBar: Var<Boolean> = kv_showInputFeedbackBar.value
     val showSkillStar: Var<Boolean> = kv_showSkillStar.value
     val discordRichPresence: Var<Boolean> = kv_discordRichPresence.value
@@ -214,6 +217,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getIntCoerceIn(kv_menuSfxVolumeSetting, 0, 100)
         prefs.getWindowSize(kv_windowedResolution)
         prefs.getBoolean(kv_fullscreen)
+        prefs.getString(kv_fullscreenMonitor)
         prefs.getBoolean(kv_showInputFeedbackBar)
         prefs.getBoolean(kv_showSkillStar)
         prefs.getBoolean(kv_discordRichPresence)
@@ -272,6 +276,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_menuSfxVolumeSetting)
                 .putWindowSize(kv_windowedResolution)
                 .putBoolean(kv_fullscreen)
+                .putString(kv_fullscreenMonitor)
                 .putBoolean(kv_showInputFeedbackBar)
                 .putBoolean(kv_showSkillStar)
                 .putBoolean(kv_discordRichPresence)
@@ -433,6 +438,20 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     }
 
     private fun Preferences.putString(kv: KeyValue<String>): Preferences {
+        val prefs: Preferences = this
+        return prefs.putString(kv.key, kv.value.getOrCompute())
+    }
+
+    @JvmName("getStringNullable")
+    private fun Preferences.getString(kv: KeyValue<String?>, defaultValue: String? = kv.defaultValue) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            kv.value.set(prefs.getString(kv.key, defaultValue))
+        }
+    }
+
+    @JvmName("putStringNullable")
+    private fun Preferences.putString(kv: KeyValue<String?>): Preferences {
         val prefs: Preferences = this
         return prefs.putString(kv.key, kv.value.getOrCompute())
     }

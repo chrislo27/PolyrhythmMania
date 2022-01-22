@@ -1,6 +1,7 @@
 package polyrhythmmania
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.audio.Sound
@@ -157,7 +158,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         SolitaireAssets.addAssetLoader(SolitaireAssetLoader())
         
         if (settings.fullscreen.getOrCompute()) {
-            Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+            val persistedMonitorName: String? = settings.fullscreenMonitor.getOrCompute()
+            val monitor: Graphics.Monitor = Gdx.graphics.monitors?.firstOrNull { 
+                m -> m.name != null && m.name == persistedMonitorName
+            } ?: Gdx.graphics.monitor
+            val displayMode: Graphics.DisplayMode = Gdx.graphics.getDisplayMode(monitor) ?: Gdx.graphics.displayMode
+            Gdx.graphics.setFullscreenMode(displayMode)
         } else {
             val res = settings.windowedResolution.getOrCompute()
             if (Gdx.graphics.width != res.width || Gdx.graphics.height != res.height) {
@@ -399,6 +405,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     fun attemptFullscreen() {
         lastWindowed = WindowSize(Gdx.graphics.width, Gdx.graphics.height)
         Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+        settings.fullscreenMonitor.set(Gdx.graphics.monitor?.name)
+        settings.persist()
     }
 
     fun attemptEndFullscreen() {
