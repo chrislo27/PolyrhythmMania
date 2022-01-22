@@ -39,6 +39,7 @@ import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.ui.PRManiaSkins
 import paintbox.util.DecimalFormats
 import polyrhythmmania.achievements.Achievements
+import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.util.TimeUtils
 import polyrhythmmania.world.EntityRodPR
 import java.io.File
@@ -367,6 +368,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val endBlockPosition = container.endBlockPosition.get()
         val endStateSec = engine.tempos.beatsToSeconds(endBlockPosition).coerceAtLeast(0f)
         engine.resetEndSignal()
+        engine.statisticsMode = StatisticsMode.DISABLED
         val percentageSimulated = AtomicInteger(0)
         val endSignalTriggered = AtomicBoolean(false)
         val endListener: VarChangedListener<Boolean> = VarChangedListener {
@@ -461,6 +463,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             }
             return
         } finally {
+            engine.statisticsMode = StatisticsMode.IN_EDITOR
             engine.soundInterface.disableSounds = false
             engine.endSignalReceived.removeListener(endListener)
             val originalSecs = editor.playbackStart.get()
