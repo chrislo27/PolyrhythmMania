@@ -106,7 +106,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 main.settings.endlessHighScore.set(EndlessHighScore(seedUInt, it.getOrCompute()))
                             }
                             val sidemode: SideMode = EndlessPolyrhythm(main, PlayTimeType.ENDLESS,
-                                    EndlessModeScore(scoreVar, showHighScore = true),
+                                    EndlessModeScore(scoreVar, showNewHighScoreAtEnd = true),
                                     seed, dailyChallenge = null,
                                     disableLifeRegen = disableRegen.get(),
                                     maxLives = if (daredevilMode.get()) 1 else -1)

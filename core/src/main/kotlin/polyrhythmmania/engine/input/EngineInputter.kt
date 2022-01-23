@@ -73,8 +73,8 @@ class EngineInputter(val engine: Engine) {
     class EndlessScore {
         val score: IntVar = IntVar(0)
         var highScore: Var<Int> = GenericVar(0)
-        var showHighScoreAtEnd: Boolean = true
-        var showPrevHighScore: Boolean = true
+        var showNewHighScoreAtEnd: Boolean = true
+        var hideHighScoreText: Boolean = false
         val maxLives: IntVar = IntVar(0)
         val startingLives: IntVar = IntVar { maxLives.use() }
         val lives: IntVar = IntVar(startingLives.get())
@@ -496,7 +496,7 @@ class EngineInputter(val engine: Engine) {
                 override fun onStart(currentBeat: Float) {
                     super.onStart(currentBeat)
 
-                    val activeTextBox: ActiveTextBox = if (wasNewHighScore && endlessScore.showHighScoreAtEnd) {
+                    val activeTextBox: ActiveTextBox = if (wasNewHighScore && endlessScore.showNewHighScoreAtEnd) {
                         engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
                         engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BANNER))
                     } else {

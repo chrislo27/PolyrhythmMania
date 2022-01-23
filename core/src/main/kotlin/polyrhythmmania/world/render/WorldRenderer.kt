@@ -547,7 +547,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                     scaleVar.set(1f)
                 }
             }
-            endlessModeHighScoreLabel.visible.set(endlessScore.showPrevHighScore)
+            endlessModeHighScoreLabel.visible.set(!endlessScore.hideHighScoreText)
         }
 
         uiSceneRoot.renderAsRoot(batch)
