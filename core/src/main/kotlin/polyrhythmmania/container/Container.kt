@@ -559,10 +559,12 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
                                 val pack = StockTexturePacks.allPacksByIDWithDeprecations[stockID]
                                 if (pack != null) {
                                     texturePack.set(pack)
-                                    if (stockID == StockTexturePacks.hd.id) {
-                                        texturePackSource.set(TexturePackSource.STOCK_HD)
+                                    val sourceFromPack = StockTexturePacks.getTexturePackSource(pack)
+                                    if (sourceFromPack != null) {
+                                        texturePackSource.set(sourceFromPack)
                                     } else {
                                         texturePackSource.set(TexturePackSource.STOCK_GBA)
+                                        Paintbox.LOGGER.warn("[Container] TexturePackSource was not mapped for stock texture pack ${pack.id}, setting to GBA")
                                     }
                                 } else {
                                     Paintbox.LOGGER.warn("[Container] Unknown tilesetConfig.texturePack.stockID '${stockID}', skipping stock texture pack")
