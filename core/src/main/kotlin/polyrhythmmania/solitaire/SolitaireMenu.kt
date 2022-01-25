@@ -100,6 +100,11 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.renderAlign.set(Align.center)
                 this.padding.set(Insets(0f, 0f, 4f, 4f))
                 this.setScaleXY(0.75f)
+                this.tooltipElement.set(createTooltip(Localization.getVar("solitaire.gamesWon.tooltip", Var {
+                    listOf(GlobalStats.solitaireGamesPlayed.value.use(),
+                        GlobalStats.solitaireGamesWon.value.use(),
+                        GlobalStats.solitaireMovesMade.value.use())
+                })))
             }
             hbox += createSmallButton(binding = { Localization.getVar("solitaire.newGame").use() }).apply {
                 this.bounds.width.set(150f)
