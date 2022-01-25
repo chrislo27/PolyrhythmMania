@@ -41,6 +41,8 @@ abstract class SideMode(val main: PRManiaGame, val playTimeType: PlayTimeType) :
      * Implementors should set up music and other long-load items here.
      */
     protected abstract fun initialize()
+    
+    open fun renderUpdate() {}
 
     protected open fun createGlobalContainerSettings(): GlobalContainerSettings {
         return GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.forceTilesetPalette.getOrCompute())

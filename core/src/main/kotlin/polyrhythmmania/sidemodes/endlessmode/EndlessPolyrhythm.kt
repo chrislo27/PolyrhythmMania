@@ -91,6 +91,10 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
         }
     }
     
+    private enum class RecoveryAchievementState {
+        NOT_READY, READY, AWARDED;
+    }
+    
     val dailyChallengeUUIDNonce: Var<UUID?> = Var(null)
     
     private val colorChangeMultiplier: Int = VALID_COLOR_CHANGE_MULTIPLIERS[seed.toInt().absoluteValue % VALID_COLOR_CHANGE_MULTIPLIERS.size]
@@ -106,6 +110,9 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
     // pauseTime is sent by PlayScreen, and accepted only if currently in pattern
     private var currentlyInPattern: Boolean = false
     private var pauseTime: Float = 0f
+    
+    // For daily recovery achievement.
+    private var hasGottenDownToOneLifeAfterTwoSpeedups: RecoveryAchievementState = RecoveryAchievementState.NOT_READY
 
     init {
         container.texturePackSource.set(TexturePackSource.STOCK_HD)
@@ -122,6 +129,27 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
     fun submitPauseTime(pauseTime: Float) {
         if (currentlyInPattern) {
             this.pauseTime = pauseTime
+        }
+    }
+
+    override fun renderUpdate() {
+        // Recovery achievement
+        if (dailyChallenge != null && loopsCompleted.get() >= 2) {
+            val endlessScore = container.engine.inputter.endlessScore
+            when (hasGottenDownToOneLifeAfterTwoSpeedups) {
+                RecoveryAchievementState.NOT_READY -> {
+                    if (endlessScore.lives.get() == 1) {
+                        hasGottenDownToOneLifeAfterTwoSpeedups = RecoveryAchievementState.READY
+                    }
+                }
+                RecoveryAchievementState.READY -> {
+                    if (endlessScore.lives.get() >= endlessScore.maxLives.get()) {
+                        hasGottenDownToOneLifeAfterTwoSpeedups = RecoveryAchievementState.AWARDED
+                        Achievements.awardAchievement(Achievements.dailyRecovery)
+                    }
+                }
+                RecoveryAchievementState.AWARDED -> {}
+            }
         }
     }
 
@@ -317,6 +345,7 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                             engine.playbackSpeed = 1f
                             currentlyInPattern = false
                             pauseTime = 0f
+                            hasGottenDownToOneLifeAfterTwoSpeedups = RecoveryAchievementState.NOT_READY
                         }
                     }.also { e ->
 //                        e.beat = this.beat

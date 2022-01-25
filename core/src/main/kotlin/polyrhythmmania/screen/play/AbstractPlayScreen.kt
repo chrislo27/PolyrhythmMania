@@ -390,6 +390,7 @@ abstract class AbstractPlayScreen protected constructor(
 
         if (!isPaused.get() && timing is SimpleTimingProvider) {
             timing.seconds += Gdx.graphics.deltaTime
+            sideMode?.renderUpdate()
             GlobalStats.updateModePlayTime(playTimeType)
         }
     }

@@ -209,6 +209,10 @@ object Achievements {
      * Triggered when Daily Challenge is played 7 days in a row.
      */
     val dailyWeekStreak = register(Ordinary("daily_week_streak", OBJECTIVE, DAILY, false))
+    /**
+     * Triggered in Daily Challenge after two speedups and having 1 life then recovering back to three.
+     */
+    val dailyRecovery = register(Ordinary("daily_recovery", CHALLENGE, DAILY, false))
 
     
     // Category EDITOR
