@@ -33,6 +33,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -40,6 +41,12 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     companion object {
         private val SHOW_IDS_WHEN_DEBUG: Boolean = PRMania.isDevVersion
         private val SHOW_ICONS_WHEN_DEBUG: Boolean = PRMania.isDevVersion
+    }
+    
+    private sealed class ViewType {
+        object AllByCategory : ViewType()
+        object AllByName : ViewType()
+        class Category(val category: AchievementCategory) : ViewType()
     }
 
     private val totalProgressLabel: TextLabel
@@ -117,7 +124,71 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.setScaleXY(0.75f)
             this.renderAlign.set(Align.center)
         }
+        
+        fun createAchievementElement(achievement: Achievement): UIElement {
+            val achievementEarned = BooleanVar { Achievements.fulfillmentMap.use()[achievement] != null }
+            val entire = ActionablePane().apply {
+                this.setOnAltAction {
+                    if (Paintbox.debugMode.get() && PRMania.isDevVersion) {
+                        main.achievementsUIOverlay.enqueueToast(Toast(achievement, Achievements.fulfillmentMap.getOrCompute()[achievement] ?: Fulfillment(Instant.now())))
+                    }
+                }
 
+                this += ImageIcon(null, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+                    Anchor.TopLeft.configure(this)
+                    this.bindWidthToSelfHeight()
+                    this.textureRegion.bind {
+                        val iconID = if (achievementEarned.use() || (SHOW_ICONS_WHEN_DEBUG && Paintbox.debugMode.use())) achievement.getIconID() else "locked"
+                        TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")[iconID])
+                    }
+                }
+                this += ImageIcon(completedTextureReg, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+                    Anchor.TopRight.configure(this)
+                    this.bindWidthToSelfHeight()
+                    this.visible.bind { achievementEarned.use() }
+                    this.tooltipElement.set(createTooltip(AchievementsL10N.getVar("achievement.unlockedTooltip", Var {
+                        listOf(ZonedDateTime.ofInstant(Achievements.fulfillmentMap.use()[achievement]?.gotAt ?: Instant.EPOCH, ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                    })))
+                }
+                this += Pane().apply {
+                    Anchor.TopCentre.configure(this)
+                    this.bindWidthToParent(adjustBinding = {
+                        -(((parent.use()?.contentZone?.height?.use() ?: 0f) + 8f) * 2)
+                    })
+
+                    val statProgress: ReadOnlyVar<String> = if (achievement is Achievement.StatTriggered && achievement.showProgress) {
+                        val formatter = achievement.stat.formatter
+                        val formattedValue = formatter.format(achievement.stat.value)
+                        val formattedThreshold = formatter.format(IntVar(achievement.threshold))
+                        AchievementsL10N.getVar("achievement.statProgress", Var {
+                            listOf(formattedValue.use(), formattedThreshold.use())
+                        })
+                    } else Var("")
+                    this += TextLabel(binding = {
+                        val stillHidden = achievement.isHidden && !achievementEarned.use()
+                        val desc = if (stillHidden) {
+                            "[i]${AchievementsL10N.getVar("achievement.hidden.desc").use()}[]"
+                        } else "${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}"
+                        val statProgressText = if (!stillHidden) statProgress.use() else ""
+                        "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgressText}[] ${if (SHOW_IDS_WHEN_DEBUG && Paintbox.debugMode.use()) "[i color=GRAY scale=0.75]${achievement.id}[]" else ""}\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
+                    }).apply {
+                        Anchor.TopLeft.configure(this)
+                        this.setScaleXY(1f)
+                        this.renderAlign.set(Align.left)
+                        this.padding.set(Insets.ZERO)
+                        this.markup.set(descMarkup)
+                        this.doLineWrapping.set(true)
+                    }
+                }
+            }
+            return RectElement(Color.DARK_GRAY).apply {
+                this.bounds.height.set(72f)
+                this.padding.set(Insets(6f))
+                this += entire
+            }
+        }
+
+        val achievementPanes: Map<Achievement, UIElement> by lazy { Achievements.achievementIDMap.values.associateWith(::createAchievementElement) }
 
         AchievementCategory.VALUES.forEach { category ->
             val entireVBox = VBox().apply {
@@ -143,80 +214,35 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
 
             achievementsInCategory.forEach { achievement ->
-                val achievementEarned = BooleanVar { Achievements.fulfillmentMap.use()[achievement] != null }
-                val entire = ActionablePane().apply {
-                    this.setOnAltAction { 
-                        if (Paintbox.debugMode.get() && PRMania.isDevVersion) {
-                            main.achievementsUIOverlay.enqueueToast(Toast(achievement, Achievements.fulfillmentMap.getOrCompute()[achievement] ?: Fulfillment(Instant.now())))
-                        }
-                    }
-                    
-                    this += ImageIcon(null, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
-                        Anchor.TopLeft.configure(this)
-                        this.bindWidthToSelfHeight()
-                        this.textureRegion.bind { 
-                            val iconID = if (achievementEarned.use() || (SHOW_ICONS_WHEN_DEBUG && Paintbox.debugMode.use())) achievement.getIconID() else "locked"
-                            TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")[iconID])
-                        }
-                    }
-                    this += ImageIcon(completedTextureReg, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
-                        Anchor.TopRight.configure(this)
-                        this.bindWidthToSelfHeight()
-                        this.visible.bind { achievementEarned.use() }
-                        this.tooltipElement.set(createTooltip(AchievementsL10N.getVar("achievement.unlockedTooltip", Var {
-                            listOf(ZonedDateTime.ofInstant(Achievements.fulfillmentMap.use()[achievement]?.gotAt ?: Instant.EPOCH, ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME))
-                        })))
-                    }
-                    this += Pane().apply {
-                        Anchor.TopCentre.configure(this)
-                        this.bindWidthToParent(adjustBinding = {
-                            -(((parent.use()?.contentZone?.height?.use() ?: 0f) + 8f) * 2)
-                        })
-
-                        val statProgress: ReadOnlyVar<String> = if (achievement is Achievement.StatTriggered && achievement.showProgress) {
-                            val formatter = achievement.stat.formatter
-                            val formattedValue = formatter.format(achievement.stat.value)
-                            val formattedThreshold = formatter.format(IntVar(achievement.threshold))
-                            AchievementsL10N.getVar("achievement.statProgress", Var {
-                                listOf(formattedValue.use(), formattedThreshold.use())
-                            })
-                        } else Var("")
-                        this += TextLabel(binding = {
-                            val stillHidden = achievement.isHidden && !achievementEarned.use()
-                            val desc = if (stillHidden) { 
-                                "[i]${AchievementsL10N.getVar("achievement.hidden.desc").use()}[]"
-                            } else "${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}"
-                            val statProgressText = if (!stillHidden) statProgress.use() else ""
-                            "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgressText}[] ${if (SHOW_IDS_WHEN_DEBUG && Paintbox.debugMode.use()) "[i color=GRAY scale=0.75]${achievement.id}[]" else ""}\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
-                        }).apply {
-                            Anchor.TopLeft.configure(this)
-                            this.setScaleXY(1f)
-                            this.renderAlign.set(Align.left)
-                            this.padding.set(Insets.ZERO)
-                            this.markup.set(descMarkup)
-                            this.doLineWrapping.set(true)
-                        }
-                    }
-                }
-                entireVBox += RectElement(Color.DARK_GRAY).apply {
-                    this.bounds.height.set(72f)
-                    this.padding.set(Insets(6f))
-                    this += entire
-                }
+                entireVBox += createAchievementElement(achievement) // Intentionally not using cached ones due to scene graph layout
             }
 
             entireVBox.sizeHeightToChildren(10f)
             panePerCategory[category] = entireVBox
         }
         
-        val viewingCategory = Var<AchievementCategory?>(null)
+        val viewingCategory = Var<ViewType>(ViewType.AllByCategory)
         
         fun updateCategory() {
             vbox.children.forEach(vbox::removeChild)
             vbox.temporarilyDisableLayouts {
                 vbox += totalProgressLabel
-                (viewingCategory.getOrCompute()?.let { listOf(panePerCategory.getValue(it)) } ?: panePerCategory.values.toList()).forEach { 
-                    vbox += it
+
+                when (val v = viewingCategory.getOrCompute()) {
+                    ViewType.AllByCategory -> {
+                        panePerCategory.values.forEach { 
+                            vbox += it
+                        }
+                    }
+                    ViewType.AllByName -> {
+                        achievementPanes.entries.sortedBy { it.key.getLocalizedName().getOrCompute().lowercase(Locale.ROOT) }
+                            .forEach { 
+                                vbox += it.value
+                            }
+                    }
+                    is ViewType.Category -> {
+                        vbox += panePerCategory.getValue(v.category)
+                    }
                 }
             }
             
@@ -245,15 +271,17 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.achievements.help.tooltip")))
             }
 
-            hbox += ComboBox<AchievementCategory?>((listOf(null) + AchievementCategory.VALUES), viewingCategory.getOrCompute(), font = font).apply {
+            val viewTypeList = listOf(ViewType.AllByCategory, ViewType.AllByName) + AchievementCategory.VALUES.map(ViewType::Category)
+            hbox += ComboBox<ViewType>(viewTypeList, viewingCategory.getOrCompute(), font = font).apply {
                 this.bounds.width.set(250f)
                 this.setScaleXY(0.85f)
                 this.itemStringConverter.bind {
-                    val viewAll = AchievementsL10N.getVar("achievement.viewAll").use()
-                    fun (ac: AchievementCategory?): String {
-                        return if (ac != null) {
-                            AchievementsL10N.getVar(ac.toLocalizationID()).use()
-                        } else viewAll
+                    fun (view: ViewType): String {
+                        return when (view) {
+                            ViewType.AllByCategory -> AchievementsL10N.getVar("achievement.viewAll.category").use()
+                            ViewType.AllByName -> AchievementsL10N.getVar("achievement.viewAll.byName").use()
+                            is ViewType.Category -> AchievementsL10N.getVar(view.category.toLocalizationID()).use()
+                        }
                     }
                 }
                 this.onItemSelected = { newItem ->
