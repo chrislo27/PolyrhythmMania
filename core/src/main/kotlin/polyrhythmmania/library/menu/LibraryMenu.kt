@@ -737,9 +737,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["filter"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.sortAndFilter")))
                 this.setOnAction {
-                    val m = LibrarySortFilterMenu(menuCol, this@LibraryMenu, levelList.getOrCompute().toList())
-                    menuCol.addMenu(m)
-                    menuCol.pushNextMenu(m, instant = true, playSound = true)
+                    goToFilterMenu(sortFilter.getOrCompute())
                 }
             }
             leftBottomHbox += createSmallButton(binding = {""}).apply {
@@ -809,6 +807,12 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
         }
+    }
+    
+    fun goToFilterMenu(filter: LibrarySortFilter, playSound: Boolean = true) {
+        val m = LibrarySortFilterMenu(menuCol, this@LibraryMenu, levelList.getOrCompute().toList(), filter)
+        menuCol.addMenu(m)
+        menuCol.pushNextMenu(m, instant = true, playSound = playSound)
     }
 
     fun prepareShow(): LibraryMenu {
