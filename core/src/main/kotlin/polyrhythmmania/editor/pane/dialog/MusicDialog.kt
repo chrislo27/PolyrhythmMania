@@ -577,6 +577,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             player.position = window.playbackStart.get() * 1000.0
             player.useLoopParams(window.createLoopParams())
             player.pitch = editor.musicData.rate.get()
+            player.gain = 1f
             player.pause(false)
             editor.soundSystem.setPaused(false)
         }
