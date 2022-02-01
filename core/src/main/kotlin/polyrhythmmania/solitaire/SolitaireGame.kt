@@ -265,9 +265,8 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
             is TouchDragged -> {
                 if (dragInfo.isDragging()) {
                     dragInfo.updateDrag()
-                    
-                    true
-                } else false
+                }
+                false // TouchDragged should not be consumed
             }
             is ClickReleased -> {
                 if (event.button == Input.Buttons.LEFT && dragInfo.isDragging()) {
@@ -277,9 +276,9 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
                     } else {
                         dragInfo.endDrag(nearestZone)
                     }
-
-                    true
-                } else false
+                }
+                
+                false // ClickReleased always never consumes
             }
             else -> false
         }

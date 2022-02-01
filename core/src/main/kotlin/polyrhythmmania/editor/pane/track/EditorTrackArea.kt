@@ -59,7 +59,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
                 }
                 is TouchDragged -> {
                     onMouseMovedOrDragged(event.x, event.y)
-                    true
+                    false // TouchDragged should not be consumed
                 }
                 is Scrolled -> {
                     val trackView = editor.trackView
