@@ -372,7 +372,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
 
                         Vector2Stack.pop()
 
-                        true
+                        event !is TouchDragged // TouchDragged should not consume
                     } else false
                 } else if (event is Scrolled) {
                     value.set((value.get() - event.amountY.sign.toInt()).coerceIn(minValue, maxValue))

@@ -44,10 +44,10 @@ abstract class AbstrWavePane(val musicDialog: MusicDialog) : Pane() {
             } else if (event is ClickReleased) {
                 if (event.button == Input.Buttons.LEFT && isLeftClickDown) {
                     isLeftClickDown = false
-                    inputConsumed = true
+                    inputConsumed = false // Allow this event to continue
                 } else if (event.button == Input.Buttons.RIGHT && isRightClickDown) {
                     isRightClickDown = false
-                    inputConsumed = true
+                    inputConsumed = false // Allow this event to continue
                 }
             }
 

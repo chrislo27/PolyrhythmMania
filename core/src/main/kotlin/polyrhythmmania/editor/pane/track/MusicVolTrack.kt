@@ -101,7 +101,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                     }
                     is TouchDragged -> {
                         onMouseMovedOrDragged(event.x, event.y)
-                        true
+                        false // TouchDragged should not be consumed
                     }
                     is MouseExited -> {
                         isMouseOver.set(false)
