@@ -22,8 +22,9 @@ built-in level editor and side modes.
 * Daily Challenge mode which has a series of patterns not seen in regular Endless Mode, with online leaderboards
 * Extra side modes like _Polyrhythm: Dunk_, _Polyrhythm: Assemble_, and _Built to Scale: Solitaire_ add more Polyrhythm fun
 
+[Check out the v1.2 update trailer on YouTube!](https://www.youtube.com/watch?v=I4BXu7sNj-M)  
 [Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)  
-[Check out the August 2021 features trailer!](https://www.youtube.com/watch?v=k9PtPI1-tDo)
+[Check out the August 2021 features trailer!](https://www.youtube.com/watch?v=k9PtPI1-tDo)  
 
 
 ## System requirements to play
