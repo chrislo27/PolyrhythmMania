@@ -17,7 +17,7 @@ import paintbox.ui.skin.SkinFactory
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 
@@ -68,17 +68,17 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
 
     init {
-        this.setSize(WIDTH_EXTRA_SMALL)
+        this.setSize(0.325f)
         val vbox = VBox().apply {
             this.spacing.set(0f)
             this.align.set(VBox.Align.BOTTOM)
         }
 
         val font = mainMenu.main.fontMainMenuMain
-        val buttonHeight = 48f
+        val buttonHeight = 40f
         fun createButton(binding: Var.Context.() -> String): Button = Button(binding, font = font).apply {
             this.skinID.set(BUTTON_SKIN_ID)
-            this.padding.set(Insets(8f, 8f, 16f, 16f))
+            this.padding.set(Insets(4f, 4f, 16f, 16f))
             this.bounds.height.set(buttonHeight)
             this.textAlign.set(TextAlign.LEFT)
             this.renderAlign.set(Align.left)
@@ -105,14 +105,23 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                                 }
                             }
                         }
-                        DiscordCore.updateActivity(DefaultPresences.inEditor())
+                        DiscordRichPresence.updateActivity(DefaultPresences.inEditor())
                     }
                 }
             }
             // Remember to update DataSettingsMenu to reset high scores
-            vbox += createButton(binding = { Localization.getVar("mainMenu.main.extras").use() }).apply {
+            vbox += createButton(binding = {
+                (if (menuCol.extrasMenu.anyNewIndicators.use())
+                    (Localization.getVar("common.newIndicator").use() + " ")
+                else "") + Localization.getVar("mainMenu.main.extras").use()
+            }).apply {
                 this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.sideModesMenu)
+                    menuCol.pushNextMenu(menuCol.extrasMenu)
+                }
+            }
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.achievementsStats").use() }).apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.achievementsStatsForkMenu)
                 }
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.settings").use() }).apply {

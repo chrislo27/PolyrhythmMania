@@ -146,6 +146,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     private val endlessModeScoreLabel: TextLabel
     private val endlessModeGameOverPane: Pane = Pane()
     private val endlessModeGameOverLabel: TextLabel
+    private val endlessModeHighScoreLabel: TextLabel
     
     init {
         val baseMarkup = Markup(mapOf(
@@ -181,7 +182,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                             Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) }).use()
                         }
                     }
-                    this += TextLabel(binding = { prevTextVar.use() },
+                    endlessModeHighScoreLabel = TextLabel(binding = { prevTextVar.use() },
                             font = PRManiaGame.instance.fontGameUIText).apply {
                         this.bindWidthToParent(multiplier = 0.4f)
                         this.doXCompression.set(false)
@@ -196,6 +197,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                             } else defaultTextColor
                         }
                     }
+                    this += endlessModeHighScoreLabel
 
 //                    val livesVar: ReadOnlyVar<String> = Localization.getVar("play.endless.lives", Var {
 //                        val l = currentEndlessLives.use()
@@ -262,7 +264,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         }
         uiSceneRoot += perfectPane.apply {
             Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
-            this.bounds.width.set(500f)
+            this.bounds.width.set(600f)
             this.bounds.height.set(64f)
             this += Pane().apply {
                 this.bindWidthToSelfHeight()
@@ -272,7 +274,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                 this += perfectIconFailed
             }
             this += TextLabel(binding = { Localization.getVar("play.perfect").use() },
-                    font = PRManiaGame.instance.fontGameUIText).apply {
+                    font = PRManiaGame.instance.fontGameGoForPerfect).apply {
                 Anchor.TopRight.configure(this)
                 this.textColor.set(Color.WHITE)
                 this.padding.set(Insets(0f, 0f, 5f, 0f))
@@ -545,6 +547,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
                     scaleVar.set(1f)
                 }
             }
+            endlessModeHighScoreLabel.visible.set(!endlessScore.hideHighScoreText)
         }
 
         uiSceneRoot.renderAsRoot(batch)

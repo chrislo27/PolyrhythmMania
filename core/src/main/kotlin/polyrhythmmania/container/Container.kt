@@ -99,6 +99,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
             ForceTexturePack.NO_FORCE -> this.texturePack
             ForceTexturePack.FORCE_GBA -> Var(StockTexturePacks.gba)
             ForceTexturePack.FORCE_HD -> Var(StockTexturePacks.hd)
+            ForceTexturePack.FORCE_ARCADE -> Var(StockTexturePacks.arcade)
         }).apply { 
             world.tilesetPalette.applyTo(this)
         }, engine)
@@ -141,6 +142,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
         return when (source) {
             TexturePackSource.STOCK_GBA -> StockTexturePacks.gba
             TexturePackSource.STOCK_HD -> StockTexturePacks.hd
+            TexturePackSource.STOCK_ARCADE -> StockTexturePacks.arcade
             TexturePackSource.CUSTOM -> getCustomTexturePackAsCascading()
         }
     }
@@ -557,10 +559,12 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
                                 val pack = StockTexturePacks.allPacksByIDWithDeprecations[stockID]
                                 if (pack != null) {
                                     texturePack.set(pack)
-                                    if (stockID == StockTexturePacks.hd.id) {
-                                        texturePackSource.set(TexturePackSource.STOCK_HD)
+                                    val sourceFromPack = StockTexturePacks.getTexturePackSource(pack)
+                                    if (sourceFromPack != null) {
+                                        texturePackSource.set(sourceFromPack)
                                     } else {
                                         texturePackSource.set(TexturePackSource.STOCK_GBA)
+                                        Paintbox.LOGGER.warn("[Container] TexturePackSource was not mapped for stock texture pack ${pack.id}, setting to GBA")
                                     }
                                 } else {
                                     Paintbox.LOGGER.warn("[Container] Unknown tilesetConfig.texturePack.stockID '${stockID}', skipping stock texture pack")

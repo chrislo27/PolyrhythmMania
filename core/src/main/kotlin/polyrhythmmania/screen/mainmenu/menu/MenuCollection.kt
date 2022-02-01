@@ -16,6 +16,8 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.library.menu.LibraryMenu
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.solitaire.SolitaireHelpMenu
+import polyrhythmmania.solitaire.SolitaireMenu
 import java.lang.Float.max
 import java.lang.Float.min
 import java.util.*
@@ -39,7 +41,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val playMenu: PlayMenu = PlayMenu(this)
     val libraryMenu: LibraryMenu = LibraryMenu(this)
     val practiceMenu: PracticeMenu = PracticeMenu(this)
-    val sideModesMenu: ExtrasMenu = ExtrasMenu(this)
+    val extrasMenu: ExtrasMenu = ExtrasMenu(this)
     val endlessMenu: EndlessModeMenu = EndlessModeMenu(this)
     val settingsMenu: SettingsMenu = SettingsMenu(this)
     val audioSettingsMenu: AudioSettingsMenu = AudioSettingsMenu(this)
@@ -51,6 +53,11 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     val languageMenu: LanguageMenu = LanguageMenu(this)
     val calibrationSettingsMenu: CalibrationSettingsMenu = CalibrationSettingsMenu(this)
     val updateNotesMenu: UpdateNotesMenu = UpdateNotesMenu(this)
+    val achievementsStatsForkMenu: AchievementsStatsForkMenu = AchievementsStatsForkMenu(this)
+    val statisticsMenu: StatisticsMenu = StatisticsMenu(this)
+    val achievementsMenu: AchievementsMenu = AchievementsMenu(this)
+    val solitaireMenu: SolitaireMenu = SolitaireMenu(this)
+    val solitaireHelpMenu: SolitaireHelpMenu = SolitaireHelpMenu(this)
     
     init {
         addStockMenus()
@@ -68,7 +75,7 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(playMenu)
         addMenu(libraryMenu)
         addMenu(practiceMenu)
-        addMenu(sideModesMenu)
+        addMenu(extrasMenu)
         addMenu(endlessMenu)
         addMenu(settingsMenu)
         addMenu(videoSettingsMenu)
@@ -80,6 +87,11 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         addMenu(languageMenu)
         addMenu(calibrationSettingsMenu)
         addMenu(updateNotesMenu)
+        addMenu(achievementsStatsForkMenu)
+        addMenu(statisticsMenu)
+        addMenu(achievementsMenu)
+        addMenu(solitaireMenu)
+        addMenu(solitaireHelpMenu)
     }
     
     fun addMenu(menu: MMMenu) {
@@ -98,6 +110,12 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
     }
     
     fun resetMenuStack() {
+        val existing = menuStack.toList()
+        existing.forEach {
+            if (it.deleteWhenPopped.get()) {
+                this.removeMenu(it)
+            }
+        }
         menuStack.clear()
         menuStack.push(uppermostMenu)
     }
@@ -146,9 +164,15 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
             
             RectangleStack.pop()
         }
-        menus.forEach { if (it !== menu) it.visible.set(false) }
+        menus.forEach { 
+            if (it !== menu && it.visible.get()) {
+                it.visible.set(false)
+                it.onMenuExited()
+            }
+        }
         menu.visible.set(true)
         (activeMenu as Var).set(menu)
+        menu.onMenuEntered()
     }
     
     fun pushNextMenu(menu: MMMenu, instant: Boolean = false, playSound: Boolean = true) {
@@ -173,8 +197,12 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         main.playMenuSfx(sound, volume, pitch, pan)
     }
     
-    fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
-        val sound: Sound = AssetRegistry[id]
+    fun playMenuSound(sound: Sound, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
         return sound to main.playMenuSfx(sound, volume, pitch, pan)
     }
+    
+    fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
+        return playMenuSound(AssetRegistry.get<Sound>(id), volume, pitch, pan)
+    }
+    
 }

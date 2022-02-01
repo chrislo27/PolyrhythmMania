@@ -93,7 +93,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
                 }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("common.close")))
                 this.setOnRightClick {
-                    if (Paintbox.debugMode) { // DEBUG
+                    if (Paintbox.debugMode.get()) { // DEBUG
                         val doc = helpData.currentDocument.getOrCompute()
                         if (doc != null) {
                             scrollPane.setContent(renderer.renderDocument(helpData, doc))

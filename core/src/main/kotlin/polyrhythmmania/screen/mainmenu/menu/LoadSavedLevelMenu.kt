@@ -26,21 +26,26 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.library.score.LevelScoreAttempt
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.library.score.GlobalScoreCache
+import polyrhythmmania.library.score.LevelScore
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.screen.play.OnRankingRevealed
+import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.statistics.PlayTimeType
 import java.io.File
-import java.util.function.Consumer
+import java.util.*
 import kotlin.concurrent.thread
 
 class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
-                         val levelScoreAttemptConsumer: Consumer<LevelScoreAttempt>? = null, val previousHighScore: Int = -1)
+                         val previousHighScore: Int? = null)
     : StandardMenu(menuCol) {
 
     enum class Substate {
@@ -228,15 +233,27 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                         
                         mainMenu.transitionAway {
                             val main = mainMenu.main
-                            val playScreen = PlayScreen(main, null, loadedData.newContainer, challenges,
+                            val uuid = loadedData.modernLevelUUID
+                            val onRankingRevealed = OnRankingRevealed { lsa, score ->
+                                GlobalStats.timesPlayedCustomLevel.increment()
+                                if (uuid != null) {
+                                    val levelScore: LevelScore? = GlobalScoreCache.scoreCache.getOrCompute().map[uuid] 
+                                    if (levelScore?.lastPlayed == null) {
+                                        GlobalStats.timesPlayedUniqueCustomLevel.increment()
+                                    }
+                                    
+                                    GlobalScoreCache.pushNewLevelScoreAttempt(uuid, lsa)
+                                }
+                            }
+                            val playScreen = PlayScreen(main, PlayTimeType.REGULAR, loadedData.newContainer, challenges,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    levelScoreAttemptConsumer = levelScoreAttemptConsumer, previousHighScore = previousHighScore,
-                                    showResults = !robotMode)
+                                    resultsBehaviour = if (robotMode) ResultsBehaviour.NoResults
+                                    else ResultsBehaviour.ShowResults(onRankingRevealed, previousHighScore))
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
-                                    playScreen.prepareGameStart()
+                                    playScreen.resetAndUnpause()
                                     menuCol.popLastMenu(playSound = false)
-                                    DiscordCore.updateActivity(DefaultPresences.playingLevel())
+                                    DiscordRichPresence.updateActivity(DefaultPresences.playingLevel())
                                     mainMenu.backgroundType = BgType.NORMAL
                                 }
                             }
@@ -344,7 +361,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                     substate.set(Substate.LOADED)
                     descLabel.text.set(Localization.getValue("editor.dialog.load.loadedInformation", loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
                     loadMetadata.loadOnGLThread()
-                    loaded = LoadData(newContainer, loadMetadata)
+                    loaded = LoadData(newContainer, loadMetadata, loadMetadata.libraryRelevantData.levelUUID)
 
                     val newInitialDirectory = if (!newFile.isDirectory) newFile.parentFile else newFile
                     main.persistDirectory(PreferenceKeys.FILE_CHOOSER_PLAY_SAVED_LEVEL, newInitialDirectory)
@@ -365,5 +382,5 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
         }
     }
 
-    data class LoadData(val newContainer: Container, val loadMetadata: Container.LoadMetadata)
+    data class LoadData(val newContainer: Container, val loadMetadata: Container.LoadMetadata, val modernLevelUUID: UUID?)
 }

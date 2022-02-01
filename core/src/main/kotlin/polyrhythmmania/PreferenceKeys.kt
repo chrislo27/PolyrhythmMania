@@ -12,6 +12,7 @@ object PreferenceKeys {
     val NEW_INDICATOR_EDITORHELP_EXPORTING = "newIndicator_editorHelp_exporting"
     val NEW_INDICATOR_EDITORHELP_PRMPROJ = "newIndicator_editorHelp_prmproj"
     val NEW_INDICATOR_EXTRAS_ASM = "newIndicator_extras_assemble"
+    val NEW_INDICATOR_EXTRAS_SOLITAIRE = "newIndicator_extras_solitaire"
     
     val FILE_CHOOSER_EDITOR_MUSIC = "fileChooser_editor_music"
     val FILE_CHOOSER_EDITOR_SAVE = "fileChooser_editor_save"
@@ -30,11 +31,16 @@ object PreferenceKeys {
     val SETTINGS_MENU_SFX_VOLUME = "settings_menu_volume_sfx"
     val SETTINGS_WINDOWED_RESOLUTION = "settings_windowedResolution"
     val SETTINGS_FULLSCREEN = "settings_fullscreen"
+    val SETTINGS_FULLSCREEN_MONITOR = "settings_fullscreen_monitor"
     val SETTINGS_SHOW_INPUT_FEEDBACK_BAR = "settings_showInputFeedbackBar"
     val SETTINGS_SHOW_SKILL_STAR = "settings_showSkillStar"
     val SETTINGS_DISCORD_RPC = "settings_discord_rich_presence"
+    val SETTINGS_AUDIODEVICE_BUFFER_COUNT = "settings_audioDevice_bufferCount"
+    val SETTINGS_AUDIODEVICE_BUFFER_SIZE = "settings_audioDevice_bufferSize"
     val SETTINGS_MIXER = "settings_mixer"
+    val SETTINGS_USE_LEGACY_SOUND = "settings_useLegacySound"
     val SETTINGS_MAINMENU_FLIP_ANIMATION = "settings_mainMenu_flipAnimation"
+    val SETTINGS_ACHIEVEMENT_NOTIFICATIONS = "settings_achievementNotifications"
     val SETTINGS_LOCALE = "settings_locale"
     val SETTINGS_CALIBRATION_AUDIO_OFFSET_MS = "settings_calibration_audioOffsetMs"
     val SETTINGS_CALIBRATION_DISABLE_INPUT_SFX = "settings_calibration_disableInputSFX"
@@ -58,8 +64,11 @@ object PreferenceKeys {
     
     val ENDLESS_DUNK_HIGHSCORE = "endlessMode_dunk_highScore"
     val ENDLESS_DAILY_CHALLENGE = "endlessMode_dailyChallenge"
+    val ENDLESS_DAILY_CHALLENGE_STREAK = "endlessMode_dailyChallenge_streak"
     val ENDLESS_HIGH_SCORE = "endlessMode_endless_highScore"
     val SIDEMODE_ASSEMBLE_NORMAL = "sideMode_assemble_normal"
+    val SIDEMODE_SOLITAIRE_GAME_SFX = "sideMode_solitaire_gameSFX"
+    val SIDEMODE_SOLITAIRE_GAME_MUSIC = "sideMode_solitaire_gameMusic"
     
     
 }

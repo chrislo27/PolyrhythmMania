@@ -2,8 +2,8 @@ package polyrhythmmania.editor.help
 
 import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyBooleanVar
-import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import polyrhythmmania.achievements.Achievements
 import java.util.*
 
 
@@ -20,11 +20,29 @@ class HelpData(val documents: Map<String, HelpDocument>) {
         const val ROOT_ID: String = "root"
     }
 
+    private val reverseDocMap: Map<HelpDocument, String> = documents.entries.associate { it.value to it.key }
     private val docStack: Deque<HelpDocument> = ArrayDeque()
     private val forwardStack: Deque<HelpDocument> = ArrayDeque()
     val currentDocument: Var<HelpDocument?> = Var(null)
     val hasBack: ReadOnlyBooleanVar = BooleanVar(false)
     val hasForward: ReadOnlyBooleanVar = BooleanVar(false)
+    
+    init {
+        currentDocument.addListener {
+            val doc = it.getOrCompute()
+            if (doc != null) {
+                val docID = reverseDocMap[doc]
+                val viewedDocs = Achievements.viewedEditorHelpDocs.getOrCompute()
+                if (docID != null && docID !in viewedDocs) {
+                    val newViewedDocs = viewedDocs + docID
+                    Achievements.viewedEditorHelpDocs.set(newViewedDocs)
+                    if (newViewedDocs.containsAll(documents.keys)) {
+                        Achievements.awardAchievement(Achievements.viewAllEditorHelp)
+                    }
+                }
+            }
+        }
+    }
     
     private fun resetBackForwardVars() {
         (hasBack as BooleanVar).set(docStack.size > 1)

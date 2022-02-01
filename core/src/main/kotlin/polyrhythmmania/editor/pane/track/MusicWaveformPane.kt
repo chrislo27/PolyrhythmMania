@@ -54,7 +54,7 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
         like tempo changes (converted to sec) and loop points.
          */
         
-        val printDebugStuff = Paintbox.debugMode && Gdx.input.isKeyJustPressed(Input.Keys.Y)
+        val printDebugStuff = Paintbox.debugMode.get() && Gdx.input.isKeyJustPressed(Input.Keys.Y)
         if (printDebugStuff) println()
         
         batch.setColor(1f, 1f, 1f, 1f * apparentOpacity.get())
@@ -110,7 +110,7 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
                 val pxPerMsec: Float = pxPerBeat / (60f / currentTempo) / musicRate
                 
                 // DEBUG red lines at each segment split
-                if (Paintbox.debugMode) {
+                if (Paintbox.debugMode.get()) {
                     val pc = batch.packedColor
                     batch.setColor(1f, 0f, 0f, 1f)
                     batch.fillRect(x + blockPxOffset, y - h, 1f, h)

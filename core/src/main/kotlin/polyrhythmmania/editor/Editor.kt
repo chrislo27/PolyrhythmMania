@@ -51,6 +51,7 @@ import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
 import paintbox.util.DecimalFormats
+import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
@@ -182,6 +183,7 @@ class Editor(val main: PRManiaGame)
     }
 
     init {
+        engine.statisticsMode = StatisticsMode.IN_EDITOR
         engine.inputCalibration = main.settings.inputCalibration.getOrCompute()
         engine.autoInputs = true
         engine.endSignalReceived.addListener { endSignal ->

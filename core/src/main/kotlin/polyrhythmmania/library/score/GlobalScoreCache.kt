@@ -54,10 +54,4 @@ object GlobalScoreCache {
         }
     }
     
-    fun createConsumer(levelUUID: UUID): Consumer<LevelScoreAttempt> {
-        return Consumer { lsa ->
-            GlobalScoreCache.pushNewLevelScoreAttempt(levelUUID, lsa)
-        }
-    }
-    
 }

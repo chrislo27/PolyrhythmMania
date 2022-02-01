@@ -48,7 +48,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
         titleLabel.renderAlign.set(Align.topLeft)
         this.sidePanel.titleText.bind { Localization.getVar("editor.track.musicVol").use() }
         this.contentBgColor.bind { editorPane.palette.trackPaneTimeBg.use() }
-        this.bounds.height.set(32f)
+        this.bounds.height.set(allTracksPane.editorTrackHeight)
         this.showContentBorder.set(true)
 
         this.contentSection += MusicWaveformPane(editorPane).apply { 

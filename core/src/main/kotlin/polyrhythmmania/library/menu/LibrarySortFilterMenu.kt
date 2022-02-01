@@ -22,10 +22,10 @@ import polyrhythmmania.ui.PRManiaSkins
 import java.util.*
 
 
-class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, private val fullLevelList: List<LevelEntryData>)
+class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu,
+                            private val fullLevelList: List<LevelEntryData>,
+                            private val oldSettings: LibrarySortFilter)
     : StandardMenu(menuCol) {
-    
-    private val oldSettings: LibrarySortFilter = library.sortFilter.getOrCompute()
     
     private var currentSettings: Var<LibrarySortFilter> = Var(oldSettings.copy())
     
@@ -53,13 +53,17 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
             this.vBar.blockIncrement.set(24f * 4)
         }
         contentPane += scrollPane
-        val leftBottomHbox = HBox().apply {
+        val leftBottomPane = Pane().apply {
             Anchor.BottomLeft.configure(this)
-            this.spacing.set(8f)
             this.padding.set(Insets(2f))
             this.bounds.height.set(40f)
         }
-        contentPane += leftBottomHbox
+        contentPane += leftBottomPane
+        val leftBottomHbox = HBox().apply {
+            Anchor.BottomLeft.configure(this)
+            this.spacing.set(8f)
+        }
+        leftBottomPane += leftBottomHbox
 
         val vbox = VBox().apply {
             this.spacing.set(4f)
@@ -69,11 +73,12 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
         
         vbox.temporarilyDisableLayouts {
             vbox += TextLabel(binding = { Localization.getVar("mainMenu.librarySortFilter.desc").use() }, font = main.fontMainMenuThin).apply {
-                this.bounds.height.set(72f)
+                this.bounds.height.set(64f)
                 this.margin.set(Insets(2f, 2f, 0f, 0f))
                 this.renderAlign.set(Align.topLeft)
                 this.doLineWrapping.set(true)
                 this.setScaleXY(0.85f)
+                this.textColor.set(Color.DARK_GRAY)
             }
             
             // Sort half
@@ -95,6 +100,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                         Anchor.TopLeft.configure(this)
                         sortToggleGroup.addToggle(this)
                         this.bindHeightToParent(multiplier = 0.5f)
+                        this.textLabel.padding.set(this.textLabel.padding.getOrCompute().copy(left = 2f))
                         this.onSelected = {
                             currentSettings.set(currentSettings.getOrCompute().copy(sortDescending = false))
                         }
@@ -106,6 +112,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                         Anchor.BottomLeft.configure(this)
                         sortToggleGroup.addToggle(this)
                         this.bindHeightToParent(multiplier = 0.5f)
+                        this.textLabel.padding.set(this.textLabel.padding.getOrCompute().copy(left = 2f))
                         this.onSelected = {
                             currentSettings.set(currentSettings.getOrCompute().copy(sortDescending = true))
                         }
@@ -120,6 +127,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                     this.bindWidthToParent(multiplier = 0.325f)
                     this.selectedState.set(oldSettings.legacyOnTop)
                     this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.librarySortFilter.sort.legacyOnTop.tooltip")))
+                    this.textLabel.padding.set(this.textLabel.padding.getOrCompute().copy(left = 2f))
                     this.onCheckChanged = {
                         currentSettings.set(currentSettings.getOrCompute().copy(legacyOnTop = it))
                     }
@@ -136,6 +144,8 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                         this.bounds.x.bind { (parent.use()?.bounds?.width?.use() ?: 0f) * ((index % 3) / 3f) }
                         this.bounds.y.set(32f * (index / 3))
                         this.margin.set(Insets(0f, 0f, 0f, 4f))
+                        this.textLabel.padding.set(this.textLabel.padding.getOrCompute().copy(left = 1f))
+                        this.color.set(Color.DARK_GRAY)
                         toggleGroup.addToggle(this)
                         if (oldSettings.sortOn == sortable) {
                             this.selectedState.set(true)
@@ -153,7 +163,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
             vbox += HBox().apply {
                 this.bounds.height.set(64f + 8f)
                 this.spacing.set(4f)
-                this.margin.set(Insets(8f, 0f, 0f, 0f))
+                this.margin.set(Insets(12f, 0f, 0f, 0f))
                 this += TextLabel(binding = { Localization.getVar("mainMenu.librarySortFilter.filter").use() }, font = main.fontMainMenuHeading).apply {
                     this.bindWidthToParent(multiplier = 0.3f)
                 }
@@ -168,6 +178,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                         this.bounds.height.set(32f)
                         this.bindWidthToParent(multiplier = 0.45f)
                         this.selectedState.set(oldFilter.enabled)
+                        this.textLabel.padding.set(this.textLabel.padding.getOrCompute().copy(left = 2f))
                         this.color.bind { 
                             if (checkedState.use()) Color(0f, 0.5f, 0f, 1f) else Color.DARK_GRAY.cpy()
                         }
@@ -324,7 +335,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                 }
             }
             leftBottomHbox += createSmallButton(binding = { Localization.getVar("mainMenu.librarySortFilter.apply").use() }).apply {
-                this.bounds.width.set(200f)
+                this.bounds.width.set(300f)
                 this.setOnAction {
                     menuCol.popLastMenu(instant = true, playSound = true, backOut = false)
                     library.sortFilter.set(currentSettings.getOrCompute())
@@ -332,11 +343,11 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu, p
                 }
             }
             leftBottomHbox += createSmallButton(binding = { Localization.getVar("mainMenu.librarySortFilter.resetDefault").use() }).apply {
-                this.bounds.width.set(250f)
+                this.bounds.width.set(220f)
+                this.text
                 this.setOnAction {
-                    menuCol.popLastMenu(instant = true, playSound = true, backOut = false)
-                    library.sortFilter.set(LibrarySortFilter.DEFAULT)
-                    library.filterAndSortLevelList()
+                    menuCol.popLastMenu(instant = true, playSound = false, backOut = false)
+                    library.goToFilterMenu(LibrarySortFilter.DEFAULT, playSound = true)
                 }
             }
         }

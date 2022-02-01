@@ -16,11 +16,11 @@ allprojects {
     apply plugin: "java"
     apply plugin: "kotlin"
 
-    version = "1.1.2"
+    version = "1.2.0"
     ext {
         appName = "PolyrhythmMania"
         
-        paintboxVersion = "0.1.6"
+        paintboxVersion = "0.2.6"
         useLocalPaintbox = false
     }
     
@@ -36,9 +36,9 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jcenter.bintray.com/" }
-        maven { url 'https://repo.eclipse.org/content/groups/releases/' }
+        maven { url "https://repo.eclipse.org/content/groups/releases/" }
         maven { url "https://clojars.org/repo" }
-        maven { url 'https://jitpack.io/' }
+        maven { url "https://jitpack.io/" }
         maven { url "https://kotlin.bintray.com/kotlinx/" }
     }
     
@@ -51,10 +51,10 @@ allprojects {
             implementation "com.github.chrislo27.paintbox:paintbox-core:${paintboxVersion}"
         }
         
-        implementation 'net.lingala.zip4j:zip4j:2.9.1'
-        implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+        implementation "net.lingala.zip4j:zip4j:2.9.1"
+        implementation "org.apache.httpcomponents:httpclient:4.5.13"
         implementation "space.earlygrey:shapedrawer:v2.5.0"
-        implementation "com.github.JnCrMx:discord-game-sdk4j:2b5a903204"
+        implementation "com.github.JnCrMx:discord-game-sdk4j:d88df0922c"
         implementation "com.twelvemonkeys.imageio:imageio-tga:$imageio_tga_version"
     }
 

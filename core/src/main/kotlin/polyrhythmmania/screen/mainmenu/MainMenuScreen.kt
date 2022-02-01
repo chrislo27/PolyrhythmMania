@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.StreamUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import net.beadsproject.beads.ugens.CrossFade
+import net.beadsproject.beads.ugens.Gain
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
 import paintbox.binding.*
@@ -39,8 +40,9 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.mainmenu.bg.MainMenuBg
 import polyrhythmmania.screen.mainmenu.menu.*
@@ -50,6 +52,9 @@ import polyrhythmmania.soundsystem.beads.ugen.Bandpass
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
+import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.world.entity.EntityExplosion
+import polyrhythmmania.world.tileset.TintedRegion
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.math.ceil
@@ -185,7 +190,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
     private val musicSample: MusicSample
     private val beadsMusic: BeadsMusic
-    private var shouldBeBandpass: Boolean = false
+    private var shouldBeBandpass: Boolean = false // Used if the sound system restarts
     var soundSys: SoundSys by settableLazy {
         SoundSys().apply {
             musicPlayer.pause(true)
@@ -194,6 +199,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val enoughMusicLoaded: AtomicBoolean = AtomicBoolean(false)
     private val musicFinishedLoading: AtomicBoolean = AtomicBoolean(false)
     private val firstShowing: AtomicBoolean = AtomicBoolean(true)
+    
+    var resetExplosionEffect: Float = 0f
 
     init {
         val (sample, handler) = GdxAudioReader.newDecodingMusicSample(Gdx.files.internal("music/Title_ABC.ogg"),
@@ -234,7 +241,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     init {
-        val markup = Markup(mapOf(), TextRun(main.fontMainMenuMain, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
+        val markup = Markup(mapOf(
+                Markup.FONT_NAME_ITALIC to main.fontMainMenuItalic,
+                Markup.FONT_NAME_BOLDITALIC to main.fontMainMenuItalic,
+        ), TextRun(main.fontMainMenuMain, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
         val leftPane = Pane().apply {
             this.margin.set(Insets(64f))
         }
@@ -297,9 +307,15 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             github != Version.ZERO && github > PRMania.VERSION
         }
         val versionTooltip = Tooltip(binding = {
+            val ver = PRMania.VERSION
+            val verSuffixRegex = """(.+)(_\d{8}(?:.+)?)""".toRegex()
+            val suffixMatch = verSuffixRegex.matchEntire(ver.suffix)
+            val verSuffixNoDate = suffixMatch?.groupValues?.get(1) ?: ver.suffix // Use entire suffix if cannot match _date
+            val verSuffixDate = suffixMatch?.groupValues?.get(2) ?: ""
+            val versionString = "v${ver.major}.${ver.minor}.${ver.patch}${if (ver.suffix.isNotEmpty()) "-${verSuffixNoDate}[scale=0.75]${verSuffixDate}[]" else ""}"
             if (PRMania.portableMode) Localization.getVar("mainMenu.portableModeVersion", Var {
-                listOf(PRMania.VERSION.toString())
-            }).use() else PRMania.VERSION.toString()
+                listOf(versionString)
+            }).use() else (versionString)
         }, font = main.fontMainMenuMain).apply {
             Anchor.BottomRight.configure(this)
             resizeBoundsToContent()
@@ -311,6 +327,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.textColor.bind {
                 if (newVersionAvailable.use()) Color.ORANGE.cpy() else Color(1f, 1f, 1f, 1f)
             }
+            this.markup.set(markup)
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
             val latestReleasesURL = "${PRMania.GITHUB}/releases/latest"
             this.tooltipElement.set(Tooltip(binding = {
@@ -353,16 +370,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         menuMusicVolume.addListener {
             this.soundSys.soundSystem.audioContext.out.gain = it.getOrCompute()
         }
-        
-        val visibleListener: VarChangedListener<Boolean> = VarChangedListener { v ->
-            if (v.getOrCompute()) {
-                soundSys.fadeToNormal()
-            } else {
-                soundSys.fadeToBandpass()
-            }
-        }
-        menuCollection.uppermostMenu.visible.addListener(visibleListener)
-        menuCollection.audioSettingsMenu.visible.addListener(visibleListener)
         
         // Show update notes if needed
         if (main.settings.lastUpdateNotes.getOrCompute() != UpdateNotesMenu.latestUpdate) {
@@ -481,6 +488,25 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 batch.setColor(1f, 1f, 1f, 1f)
             }
         }
+        
+        if (resetExplosionEffect > 0f) {
+            val percentage = (1f - (resetExplosionEffect / EntityExplosion.EXPLOSION_DURATION)).coerceIn(0f, 1f)
+            val index = (percentage * EntityExplosion.STATES.size).toInt()
+            val state = EntityExplosion.STATES.getOrNull(index)
+            if (state != null) {
+                val renderWidth = state.renderWidth
+                val renderHeight = state.renderHeight
+
+                val tileset = background.renderer.tileset
+                val tintedRegion: TintedRegion = tileset.explosionFrames[state.index]
+                val tilesetRegion = tileset.getTilesetRegionForTinted(tintedRegion)
+                val maxWidth = 512f
+                val maxHeight = 512f
+                batch.draw(tilesetRegion, 350f - (maxWidth * renderWidth) / 2, 128f, maxWidth * renderWidth, maxHeight * renderHeight)
+            }
+            
+            resetExplosionEffect = (resetExplosionEffect - Gdx.graphics.deltaTime).coerceAtLeast(0f)
+        }
 
         batch.end()
     }
@@ -585,6 +611,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private fun resetTiles() {
         tiles.forEach { it.forEach { t -> t.reset() } }
     }
+    
+    fun setMainMenuRichPresence() {
+        DiscordRichPresence.updateActivity(DefaultPresences.idle())
+    }
 
     override fun show() {
         super.show()
@@ -598,12 +628,16 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
         firstShowing.set(false)
 
-        DiscordCore.updateActivity(DefaultPresences.idle())
+        setMainMenuRichPresence()
         background.initializeFromType(this.backgroundType)
         
         if (main.settings.lastVersion != null) {
             secretLogo.set(random.nextInt(1024) == 0)
         }
+        
+        // Persist statistics semi-regularly; the main menu screen opens frequently
+        GlobalStats.persist()
+        Achievements.persist()
     }
 
     override fun hide() {
@@ -653,7 +687,7 @@ playerPos: ${soundSys.musicPlayer.position}
     }
     
     inner class SoundSys : Disposable {
-        val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem(settings = SoundSystem.SoundSystemSettings(false)).apply {
+        val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem(settings = SoundSystem.SoundSystemSettings()).apply {
             this.setPaused(true)
             this.audioContext.out.gain = menuMusicVolume.get()
         }
@@ -663,13 +697,22 @@ playerPos: ${soundSys.musicPlayer.position}
             player.loopEndMs = sample.samplesToMs(8_061_382.0).toFloat()
             player.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
         }
-        val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs, musicPlayer.outs)
-        val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpass else musicPlayer)
+        val bandpassVolume: FloatVar = FloatVar {
+            if (use(main.settings.solitaireMusic)) 1f else 0f
+        }
+        val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs)
+        val bandpassGain: Gain = Gain(soundSystem.audioContext, musicPlayer.outs, bandpassVolume.get())
+        val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpassGain else musicPlayer)
         
         init {
             bandpass.addInput(musicPlayer)
+            bandpassGain.addInput(bandpass)
             
             soundSystem.audioContext.out.addInput(crossFade)
+            
+            bandpassVolume.addListener {
+                bandpassGain.gain = it.getOrCompute()
+            }
         }
         
         fun start() {
@@ -683,13 +726,15 @@ playerPos: ${soundSys.musicPlayer.position}
         }
         
         fun fadeToBandpass(durationMs: Float = 1000f) {
-//            shouldBeBandpass = true
-//            crossFade.fadeTo(bandpass, durationMs) // Reimplement bandpass when needed.
+            if (shouldBeBandpass) return
+            shouldBeBandpass = true
+            crossFade.fadeTo(bandpassGain, durationMs) // Reimplement bandpass when needed.
         }
         
         fun fadeToNormal(durationMs: Float = 1000f) {
-//            shouldBeBandpass = false
-//            crossFade.fadeTo(musicPlayer, durationMs) // Reimplement bandpass when needed.
+            if (!shouldBeBandpass) return
+            shouldBeBandpass = false
+            crossFade.fadeTo(musicPlayer, durationMs) // Reimplement bandpass when needed.
         }
         
         fun resetMusic() {

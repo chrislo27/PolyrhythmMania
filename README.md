@@ -12,14 +12,15 @@ built-in level editor and side modes.
 [Original Soundtrack on YouTube by GENERIC](https://www.youtube.com/playlist?list=PLt_3dgnFrUPwcA6SdTfi0RapEBdQV64v_)
 
 ## Features
-* Full re-creation of the Polyrhythm minigame from Rhythm Tengoku
-* Save and load custom levels with a built-in and intuitive level editor
+* Full re-creation of the Polyrhythm minigame from Rhythm Tengoku, *and more!*
+* Sort and organize your custom levels using the Library feature
+* Create custom levels with a built-in and intuitive level editor
 * Level effects such as changing the colour palette, adding text boxes, putting Skill Stars, and more
-* Switch between classic GBA or modern HD textures, or add your own custom texture pack
+* Switch between classic GBA, modern HD, and arcade textures, or add your own custom texture pack
 * Practice modes to improve your Polyrhythm skills with levels from the original GBA game
 * Endless Mode keeps you on your toes with never-ending procedurally generated patterns
 * Daily Challenge mode which has a series of patterns not seen in regular Endless Mode, with online leaderboards
-* Bonus Side Modes like _Polyrhythm: Dunk_ adds new twists on classic Polyrhythm
+* Extra side modes like _Polyrhythm: Dunk_, _Polyrhythm: Assemble_, and _Built to Scale: Solitaire_ add more Polyrhythm fun
 
 [Check out the announcement trailer on YouTube!](https://www.youtube.com/watch?v=A3ZUBIy_MAQ)  
 [Check out the August 2021 features trailer!](https://www.youtube.com/watch?v=k9PtPI1-tDo)

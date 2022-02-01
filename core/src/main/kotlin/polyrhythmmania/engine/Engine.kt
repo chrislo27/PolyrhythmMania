@@ -47,6 +47,10 @@ class Engine(timingProvider: TimingProvider,
     var deleteEventsAfterCompletion: Boolean = true
     var autoInputs: Boolean = false
     var inputCalibration: InputCalibration = InputCalibration.NONE
+    var statisticsMode: StatisticsMode = StatisticsMode.REGULAR
+    
+    val areStatisticsEnabled: Boolean
+        get() = statisticsMode == StatisticsMode.REGULAR && !autoInputs
     
     var activeTextBox: ActiveTextBox? = null
         private set
@@ -190,7 +194,7 @@ class Engine(timingProvider: TimingProvider,
                 activeTextBox.secondsTimer -= delta
             }
             if (activeTextBox.secondsTimer <= 0f) {
-                if (autoInputs && (!world.worldMode.showEndlessScore || inputter.endlessScore.lives.get() > 0)) {
+                if (autoInputs && (!world.worldMode.endlessType.isEndless || inputter.endlessScore.lives.get() > 0)) {
                     removeActiveTextbox(unpauseSoundInterface = true, runTextboxOnComplete = true)
                 }
             }

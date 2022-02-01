@@ -64,6 +64,13 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 main.settings.mainMenuFlipAnimation.set(it)
             }
             vbox += flipPane
+            
+            val (achvNotifPane, achvNotifCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.achievementNotifs").use() })
+            achvNotifCheck.selectedState.set(main.settings.achievementNotifications.getOrCompute())
+            achvNotifCheck.onCheckChanged = {
+                main.settings.achievementNotifications.set(it)
+            }
+            vbox += achvNotifPane
 
             val (forceTexPackPane, forceTexPackCombobox) = createComboboxOption(ForceTexturePack.VALUES, main.settings.forceTexturePack.getOrCompute(),
                     { Localization.getVar("mainMenu.graphicsSettings.forceTexturePack").use() },
@@ -73,6 +80,7 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         ForceTexturePack.NO_FORCE -> "noForce"
                         ForceTexturePack.FORCE_GBA -> "forceGBA"
                         ForceTexturePack.FORCE_HD -> "forceHD"
+                        ForceTexturePack.FORCE_ARCADE -> "forceArcade"
                     }
                 }")
             })

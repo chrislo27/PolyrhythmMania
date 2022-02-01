@@ -1,6 +1,7 @@
 package polyrhythmmania
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.audio.Sound
@@ -20,6 +21,7 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
 import org.lwjgl.glfw.GLFW
 import paintbox.*
+import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.*
@@ -29,13 +31,19 @@ import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
 import paintbox.transition.FadeOut
 import paintbox.transition.TransitionScreen
+import paintbox.util.MonitorInfo
 import paintbox.util.ResolutionSetting
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
+import polyrhythmmania.achievements.AchievementCategory
+import polyrhythmmania.achievements.AchievementRank
+import polyrhythmmania.achievements.Achievements
+import polyrhythmmania.achievements.AchievementsL10N
+import polyrhythmmania.achievements.ui.AchievementsUIOverlay
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.editor.help.EditorHelpLocalization
 import polyrhythmmania.engine.input.InputThresholds
@@ -45,6 +53,9 @@ import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.solitaire.SolitaireAssetLoader
+import polyrhythmmania.solitaire.SolitaireAssets
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
@@ -53,6 +64,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.concurrent.thread
+import kotlin.math.roundToInt
 
 
 class PRManiaGame(paintboxSettings: PaintboxSettings)
@@ -95,8 +107,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     lateinit var mainMenuScreen: MainMenuScreen
         private set
     private val permanentScreens: MutableList<PaintboxScreen> = mutableListOf()
+    lateinit var achievementsUIOverlay: AchievementsUIOverlay
+        private set
+    private var enableAchievementsUI: Boolean = false
     
-    val githubVersion: ReadOnlyVar<Version> = Var(Version.ZERO)
+    private val internalGithubVersion: Var<Version> = Var(Version.ZERO)
+    val githubVersion: ReadOnlyVar<Version> = internalGithubVersion
     
     private val metricsReporter: ConsoleReporter by lazy {
         ConsoleReporter.forRegistry(PRMania.metrics)
@@ -114,7 +130,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun create() {
         super.create()
         PRManiaGame.instance = this
-        this.reloadableLocalizationInstances = listOf(Localization, EditorHelpLocalization)
+        this.reloadableLocalizationInstances = listOf(Localization, EditorHelpLocalization, AchievementsL10N, UpdateNotesL10N)
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
 //        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
@@ -124,26 +140,45 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         
         preferences = Gdx.app.getPreferences("PolyrhythmMania")
-
-        addFontsToCache(this.fontCache)
-        PRManiaColors
-        PRManiaSkins
-        settings = Settings(this, preferences).apply { 
+        settings = Settings(this, preferences).apply {
             load()
             setStartupSettings(this@PRManiaGame)
         }
 
-        AssetRegistry.addAssetLoader(InitialAssetLoader())
-        AssetRegistry.addAssetLoader(TilesetAssetLoader())
-
         if (settings.fullscreen.getOrCompute()) {
-            Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+            val monitorInfo: MonitorInfo? = settings.fullscreenMonitor.getOrCompute()
+            if (monitorInfo == null) {
+                // Use default
+                Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+            } else {
+                val monitors = Gdx.graphics.monitors
+                // Search in order of: exact match, primary monitor if name matches, any monitor matches the name, then current monitor
+                val monitor: Graphics.Monitor = monitors.firstOrNull(monitorInfo::doesMonitorMatch)
+                        ?: Gdx.graphics.primaryMonitor.takeIf { it.name == monitorInfo.name }
+                        ?: monitors.firstOrNull { it.name == monitorInfo.name }
+                        ?: Gdx.graphics.monitor
+                val displayMode: Graphics.DisplayMode = Gdx.graphics.getDisplayMode(monitor) ?: Gdx.graphics.displayMode
+                Gdx.graphics.setFullscreenMode(displayMode)
+            }
         } else {
             val res = settings.windowedResolution.getOrCompute()
             if (Gdx.graphics.width != res.width || Gdx.graphics.height != res.height) {
                 Gdx.graphics.setWindowedMode(res.width, res.height)
             }
         }
+        (Gdx.graphics as Lwjgl3Graphics).window.setVisible(true)
+
+        addFontsToCache(this.fontCache)
+        PRManiaColors
+        PRManiaSkins
+        GlobalStats.load()
+        Achievements.load()
+        achievementsUIOverlay = AchievementsUIOverlay()
+        GlobalStats.timesGameStarted.increment()
+        
+        AssetRegistry.addAssetLoader(InitialAssetLoader())
+        AssetRegistry.addAssetLoader(TilesetAssetLoader())
+        SolitaireAssets.addAssetLoader(SolitaireAssetLoader())
 
         generateColourPickerTextures()
         
@@ -156,10 +191,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 InputThresholds.initInputClasses()
             }
             onAssetLoadingComplete = {
-                DiscordCore // Initialize discord-gamesdk
-                DiscordCore.enableRichPresence.bind { use(settings.discordRichPresence) }
+                DiscordRichPresence // Initialize discord-gamesdk
+                DiscordRichPresence.enableRichPresence.bind { use(settings.discordRichPresence) }
                 
                 initializeScreens()
+                
+                enableAchievementsUI = true
+                Achievements.checkAllStatTriggeredAchievements()
                 
                 if (PRMania.dumpPackedSheets) {
                     val gdxArray = com.badlogic.gdx.utils.Array<PackedSheet>()
@@ -179,6 +217,26 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         
         if (PRMania.logMissingLocalizations) {
             Localization.logMissingLocalizations()
+            EditorHelpLocalization.logMissingLocalizations()
+            AchievementsL10N.logMissingLocalizations()
+            
+            // Check for missing localizations in statistics and achievement names/descs
+            val testInt = IntVar(42)
+            GlobalStats.statMap.values.forEach { stat ->
+                Localization.getValue(stat.getLocalizationID())
+                stat.formatter.format(testInt).getOrCompute()
+            }
+            Achievements.achievementIDMap.values.forEach { ach ->
+                ach.getLocalizedName().getOrCompute()
+                ach.getLocalizedDesc().getOrCompute()
+            }
+            AchievementCategory.VALUES.forEach { cat ->
+                AchievementsL10N.getValue(cat.toLocalizationID())
+            }
+            AchievementRank.values().forEach { rank ->
+                AchievementsL10N.getValue(rank.toAchievementLocalizationID(false))
+                AchievementsL10N.getValue(rank.toAchievementLocalizationID(true))
+            }
         }
         
         Runtime.getRuntime().addShutdownHook(thread(start = false, isDaemon = true, name = "Level Recovery Shutdown Hook") {
@@ -207,7 +265,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                         if (parsed != null) {
                             Paintbox.LOGGER.info("Got version from server: $parsed")
                             Gdx.app.postRunnable {
-                                (githubVersion as Var).set(parsed)
+                                internalGithubVersion.set(parsed)
                             }
                         }
                     } else {
@@ -222,8 +280,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     override fun dispose() {
         super.dispose()
+        
         preferences.putString(PreferenceKeys.LAST_VERSION, PRMania.VERSION.toString()).flush()
         settings.persist()
+        GlobalStats.persist()
+        Achievements.persist()
+        
         colourPickerHueBar.disposeQuietly()
         colourPickerTransparencyGrid.disposeQuietly()
         SidemodeAssets.disposeQuietly()
@@ -231,6 +293,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             s.disposeQuietly()
         }
         (screen as? Disposable)?.disposeQuietly()
+        
         try {
             val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
             PRMania.RECOVERY_FOLDER.listFiles()?.filter { f ->
@@ -247,7 +310,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         if (PRMania.enableMetrics) {
             metricsReporter.report()
         }
-        DiscordCore.disposeQuietly()
+        
+        DiscordRichPresence.disposeQuietly()
     }
 
     override fun preRender() {
@@ -256,8 +320,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         discordCallbackDelta += Gdx.graphics.deltaTime
         if (discordCallbackDelta >= 1 / 30f) {
             discordCallbackDelta = 0f
-            DiscordCore.runCallbacks()
+            DiscordRichPresence.runCallbacks()
         }
+        
+        GlobalStats.updateTotalPlayTime()
     }
 
     override fun postRender() {
@@ -266,11 +332,18 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         val cam = nativeCamera
         batch.projectionMatrix = cam.combined
         batch.begin()
-        
         batch.setColor(1f, 1f, 1f, 1f)
+        
+        if (enableAchievementsUI) {
+            achievementsUIOverlay.render(this, batch)
+            resetViewportToScreen()
+            batch.projectionMatrix = cam.combined
+            batch.setColor(1f, 1f, 1f, 1f)
+        }
 
         @Suppress("ConstantConditionIf")
         if (PRMania.enableEarlyAccessMessage) {
+            batch.setColor(1f, 1f, 1f, 1f)
             val paintboxFont = fontRodinFixedBordered
             paintboxFont.useFont { font ->
                 val isEditor = this.getScreen() is EditorScreen
@@ -288,6 +361,14 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         batch.end()
         
         super.postRender()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        achievementsUIOverlay.resize(width, height)
+        if (Gdx.graphics.isFullscreen) {
+            persistFullscreenMonitor()
+        }
     }
 
     private val userHomeFile: File = File(System.getProperty("user.home"))
@@ -332,10 +413,19 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         func.invoke(callback)
     }
+    
+    private fun persistFullscreenMonitor() {
+        val monitor = Gdx.graphics.monitor
+        if (monitor != null) {
+            settings.fullscreenMonitor.set(MonitorInfo.fromMonitor(monitor))
+            settings.persist()
+        }
+    }
 
     fun attemptFullscreen() {
         lastWindowed = WindowSize(Gdx.graphics.width, Gdx.graphics.height)
         Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+        persistFullscreenMonitor()
     }
 
     fun attemptEndFullscreen() {
@@ -406,7 +496,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             mono = false
             color = Color(1f, 1f, 1f, 1f)
             borderColor = Color(0f, 0f, 0f, 1f)
-            characters = ""
+            characters = " a" // Needed to at least put one glyph in each font to prevent errors
             hinting = FreeTypeFontGenerator.Hinting.Medium
         }
 
@@ -416,6 +506,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         val defaultScaledFontAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
             font.setUseIntegerPositions(false) // Stops glyphs from being offset due to rounding
+        }
+        val defaultScaledKurokaneAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
+            defaultScaledFontAfterLoad.invoke(this, font)
+            font.data.spaceXadvance /= 3f
+            val spaceGlyph = font.data.getGlyph(' ')
+            spaceGlyph.xadvance = font.data.spaceXadvance.roundToInt() + this.ftfParameter.spaceX
         }
         val defaultFontSize = 20
 
@@ -611,6 +707,12 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 22
                 }).setAfterLoad(defaultScaledFontAfterLoad)
+        cache["mainmenu_ITALIC"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-MediumItalic.ttf"), 22, 0f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 22
+                }).setAfterLoad(defaultScaledFontAfterLoad)
         cache["mainmenu_thin"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Regular.ttf"), 22, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -636,7 +738,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     size = 100
                     borderWidth = 10f
                     spaceX = -8
-                }).setAfterLoad(defaultScaledFontAfterLoad)
+                }).setAfterLoad(defaultScaledKurokaneAfterLoad)
         cache["game_textbox"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 42, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -663,7 +765,18 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 72
                     borderWidth = 6f
-                }).setAfterLoad(defaultScaledFontAfterLoad)
+                }).setAfterLoad { font ->
+            defaultScaledFontAfterLoad.invoke(this, font)
+            font.data.spaceXadvance /= 3.6f
+        }
+        cache["game_go_for_perfect"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/kurokane/kurokanestd.otf"), 36, 4f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 36
+                    spaceX = -2
+                    borderWidth = 4f
+                }).setAfterLoad(defaultScaledKurokaneAfterLoad)
         cache["results_main"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 32, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -678,7 +791,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     borderWidth = 6f
                     borderColor = Color().grey(0.4f, 1f)
                 }).setAfterLoad { font ->
-            defaultScaledFontAfterLoad.invoke(this, font)
+            defaultScaledKurokaneAfterLoad.invoke(this, font)
             font.setFixedWidthGlyphs("0123456789")
         }
     }
@@ -703,6 +816,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontEditorMarker: PaintboxFont get() = fontCache["editor_marker"]
     val fontEditorDialogTitle: PaintboxFont get() = fontCache["editor_dialog_title"]
     val fontMainMenuMain: PaintboxFont get() = fontCache["mainmenu_main"]
+    val fontMainMenuItalic: PaintboxFont get() = fontCache["mainmenu_ITALIC"]
     val fontMainMenuThin: PaintboxFont get() = fontCache["mainmenu_thin"]
     val fontMainMenuHeading: PaintboxFont get() = fontCache["mainmenu_heading"]
     val fontMainMenuRodin: PaintboxFont get() = fontCache["mainmenu_rodin"]
@@ -711,6 +825,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontGameMoreTimes: PaintboxFont get() = fontCache["game_more_times"]
     val fontGameUIText: PaintboxFont get() = fontCache["game_ui_text"]
     val fontGamePracticeClear: PaintboxFont get() = fontCache["game_practice_clear"]
+    val fontGameGoForPerfect: PaintboxFont get() = fontCache["game_go_for_perfect"]
     val fontResultsMain: PaintboxFont get() = fontCache["results_main"]
     val fontResultsScore: PaintboxFont get() = fontCache["results_score"]
 

@@ -7,6 +7,7 @@ import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.util.MonitorInfo
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_ARROW_KEYS_LIKE_SCROLL
@@ -19,6 +20,7 @@ import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PANNING_DURING_PLAYBACK
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_PLAYTEST_STARTS_PLAY
 import polyrhythmmania.PreferenceKeys.EDITORSETTINGS_UI_SCALE
 import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE
+import polyrhythmmania.PreferenceKeys.ENDLESS_DAILY_CHALLENGE_STREAK
 import polyrhythmmania.PreferenceKeys.ENDLESS_DUNK_HIGHSCORE
 import polyrhythmmania.PreferenceKeys.ENDLESS_HIGH_SCORE
 import polyrhythmmania.PreferenceKeys.KEYMAP_KEYBOARD
@@ -28,13 +30,17 @@ import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_EXPORTING
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_PRMPROJ
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_TEXPACK
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_ASM
+import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_SOLITAIRE
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_LIBRARY
+import polyrhythmmania.PreferenceKeys.SETTINGS_ACHIEVEMENT_NOTIFICATIONS
+import polyrhythmmania.PreferenceKeys.SETTINGS_AUDIODEVICE_BUFFER_COUNT
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TEXTURE_PACK
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TILESET_PALETTE
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
+import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN_MONITOR
 import polyrhythmmania.PreferenceKeys.SETTINGS_GAMEPLAY_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_LOCALE
 import polyrhythmmania.PreferenceKeys.SETTINGS_MAINMENU_FLIP_ANIMATION
@@ -46,16 +52,20 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_MIXER
 import polyrhythmmania.PreferenceKeys.SETTINGS_ONLY_DEFAULT_PALETTE_OLD
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_SKILL_STAR
+import polyrhythmmania.PreferenceKeys.SETTINGS_USE_LEGACY_SOUND
 import polyrhythmmania.PreferenceKeys.SETTINGS_VSYNC
 import polyrhythmmania.PreferenceKeys.SETTINGS_WINDOWED_RESOLUTION
 import polyrhythmmania.PreferenceKeys.SIDEMODE_ASSEMBLE_NORMAL
+import polyrhythmmania.PreferenceKeys.SIDEMODE_SOLITAIRE_GAME_MUSIC
+import polyrhythmmania.PreferenceKeys.SIDEMODE_SOLITAIRE_GAME_SFX
 import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
-import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.soundsystem.AudioDeviceSettings
+import polyrhythmmania.soundsystem.javasound.MixerHandler
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import java.time.LocalDate
@@ -96,11 +106,15 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     private val kv_menuSfxVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, 50)
     private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, PRMania.DEFAULT_SIZE)
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, true)
+    private val kv_fullscreenMonitor: KeyValue<MonitorInfo?> = KeyValue(SETTINGS_FULLSCREEN_MONITOR, null)
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
     private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
+    val kv_audioDeviceBufferCount: KeyValue<Int> = KeyValue(SETTINGS_AUDIODEVICE_BUFFER_COUNT, AudioDeviceSettings.getDefaultBufferCount())
     private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, "")
+    private val kv_useLegacyAudio: KeyValue<Boolean> = KeyValue(SETTINGS_USE_LEGACY_SOUND, false)
     private val kv_mainMenuFlipAnimations: KeyValue<Boolean> = KeyValue(SETTINGS_MAINMENU_FLIP_ANIMATION, true)
+    private val kv_achievementNotifications: KeyValue<Boolean> = KeyValue(SETTINGS_ACHIEVEMENT_NOTIFICATIONS, true)
     private val kv_calibrationAudioOffsetMs: KeyValue<Int> = KeyValue(SETTINGS_CALIBRATION_AUDIO_OFFSET_MS, 0)
     private val kv_calibrationDisableInputSFX: KeyValue<Boolean> = KeyValue(SETTINGS_CALIBRATION_DISABLE_INPUT_SFX, false)
     private val kv_vsyncEnabled: KeyValue<Boolean> = KeyValue(SETTINGS_VSYNC, false)
@@ -123,8 +137,16 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             
     private val kv_endlessDunkHighScore: KeyValue<Int> = KeyValue(ENDLESS_DUNK_HIGHSCORE, 0)
     private val kv_endlessDailyChallenge: KeyValue<DailyChallengeScore> = KeyValue(ENDLESS_DAILY_CHALLENGE, DailyChallengeScore.ZERO)
+    private val kv_endlessDailyChallengeStreak: KeyValue<Int> = KeyValue(ENDLESS_DAILY_CHALLENGE_STREAK, 0)
     private val kv_endlessHighScore: KeyValue<EndlessHighScore> = KeyValue(ENDLESS_HIGH_SCORE, EndlessHighScore.ZERO)
     private val kv_assembleNormalHighScore: KeyValue<Int> = KeyValue(SIDEMODE_ASSEMBLE_NORMAL, 0)
+    private val kv_solitaireSFX: KeyValue<Boolean> = KeyValue(SIDEMODE_SOLITAIRE_GAME_SFX, true)
+    private val kv_solitaireMusic: KeyValue<Boolean> = KeyValue(SIDEMODE_SOLITAIRE_GAME_MUSIC, true)
+
+    val audioDeviceSettings: ReadOnlyVar<AudioDeviceSettings> = Var {
+        PRMania.audioDeviceSettings
+                ?: AudioDeviceSettings(AudioDeviceSettings.getDefaultBufferSize(), use(kv_audioDeviceBufferCount.value).coerceAtLeast(3))
+    }
 
     val locale: Var<String> = kv_locale.value
     val masterVolumeSetting: Var<Int> = kv_masterVolumeSetting.value
@@ -133,11 +155,14 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val menuSfxVolumeSetting: Var<Int> = kv_menuSfxVolumeSetting.value
     val windowedResolution: Var<WindowSize> = kv_windowedResolution.value
     val fullscreen: Var<Boolean> = kv_fullscreen.value
+    val fullscreenMonitor: Var<MonitorInfo?> = kv_fullscreenMonitor.value
     val showInputFeedbackBar: Var<Boolean> = kv_showInputFeedbackBar.value
     val showSkillStar: Var<Boolean> = kv_showSkillStar.value
     val discordRichPresence: Var<Boolean> = kv_discordRichPresence.value
     val mixer: Var<String> = kv_mixer.value
+    val useLegacyAudio: Var<Boolean> = kv_useLegacyAudio.value
     val mainMenuFlipAnimation: Var<Boolean> = kv_mainMenuFlipAnimations.value
+    val achievementNotifications: Var<Boolean> = kv_achievementNotifications.value
     val calibrationAudioOffsetMs: Var<Int> = kv_calibrationAudioOffsetMs.value
     val calibrationDisableInputSFX: Var<Boolean> = kv_calibrationDisableInputSFX.value
     val vsyncEnabled: Var<Boolean> = kv_vsyncEnabled.value
@@ -161,7 +186,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val endlessDunkHighScore: Var<Int> = kv_endlessDunkHighScore.value
     val sidemodeAssembleHighScore: Var<Int> = kv_assembleNormalHighScore.value
     val endlessDailyChallenge: Var<DailyChallengeScore> = kv_endlessDailyChallenge.value
+    val dailyChallengeStreak: Var<Int> = kv_endlessDailyChallengeStreak.value
     val endlessHighScore: Var<EndlessHighScore> = kv_endlessHighScore.value
+    val solitaireSFX: Var<Boolean> = kv_solitaireSFX.value
+    val solitaireMusic: Var<Boolean> = kv_solitaireMusic.value
     
     val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind { 
         InputCalibration(use(calibrationAudioOffsetMs).toFloat(), use(calibrationDisableInputSFX))
@@ -175,8 +203,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
     val newIndicatorEditorHelpExporting: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_EXPORTING, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorEditorHelpPrmproj: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_PRMPROJ, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorExtrasAssemble: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_ASM, Version(1, 1, 0), newEvenIfFirstPlay = false)
+    val newIndicatorExtrasSolitaire: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_SOLITAIRE, Version(1, 2, 0), newEvenIfFirstPlay = false)
     val allNewIndicators: List<NewIndicator> = listOf(newIndicatorLibrary, newIndicatorEditorHelpTexpack,
-            newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorExtrasAssemble)
+            newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorExtrasAssemble,
+            newIndicatorExtrasSolitaire)
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
@@ -187,11 +217,15 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getIntCoerceIn(kv_menuSfxVolumeSetting, 0, 100)
         prefs.getWindowSize(kv_windowedResolution)
         prefs.getBoolean(kv_fullscreen)
+        prefs.getMonitorInfo(kv_fullscreenMonitor)
         prefs.getBoolean(kv_showInputFeedbackBar)
         prefs.getBoolean(kv_showSkillStar)
         prefs.getBoolean(kv_discordRichPresence)
+        prefs.getInt(kv_audioDeviceBufferCount)
         prefs.getString(kv_mixer)
+        prefs.getBoolean(kv_useLegacyAudio)
         prefs.getBoolean(kv_mainMenuFlipAnimations)
+        prefs.getBoolean(kv_achievementNotifications)
         prefs.getString(kv_locale)
         prefs.getIntCoerceIn(kv_calibrationAudioOffsetMs, -500, 500)
         prefs.getBoolean(kv_calibrationDisableInputSFX)
@@ -225,6 +259,9 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         prefs.getInt(kv_assembleNormalHighScore)
         prefs.getDailyChallenge(kv_endlessDailyChallenge)
         prefs.getEndlessHighScore(kv_endlessHighScore)
+        prefs.getInt(kv_endlessDailyChallengeStreak)
+        prefs.getBoolean(kv_solitaireSFX)
+        prefs.getBoolean(kv_solitaireMusic)
         
         val lastVersion: Version? = Version.parse(prefs.getString(LAST_VERSION) ?: "")
         this.lastVersion = lastVersion
@@ -239,11 +276,15 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_menuSfxVolumeSetting)
                 .putWindowSize(kv_windowedResolution)
                 .putBoolean(kv_fullscreen)
+                .putMonitorInfo(kv_fullscreenMonitor)
                 .putBoolean(kv_showInputFeedbackBar)
                 .putBoolean(kv_showSkillStar)
                 .putBoolean(kv_discordRichPresence)
+                .putInt(kv_audioDeviceBufferCount)
                 .putString(kv_mixer)
+                .putBoolean(kv_useLegacyAudio)
                 .putBoolean(kv_mainMenuFlipAnimations)
+                .putBoolean(kv_achievementNotifications)
                 .putString(kv_locale)
                 .putInt(kv_calibrationAudioOffsetMs)
                 .putBoolean(kv_calibrationDisableInputSFX)
@@ -268,6 +309,9 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
                 .putInt(kv_assembleNormalHighScore)
                 .putDailyChallenge(kv_endlessDailyChallenge)
                 .putEndlessHighScore(kv_endlessHighScore)
+                .putInt(kv_endlessDailyChallengeStreak)
+                .putBoolean(kv_solitaireSFX)
+                .putBoolean(kv_solitaireMusic)
 
         allNewIndicators.forEach { prefs.putNewIndicator(it) }
 
@@ -299,23 +343,24 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             }
         }
 
-        // Set correct mixer
-        val mixerHandler = SoundSystem.defaultMixerHandler
+        Paintbox.LOGGER.info("Using ${if (useLegacyAudio.getOrCompute()) "legacy" else "OpenAL"} sound system")
+        // Set correct JavaSound mixer
+        val mixerHandler = MixerHandler.defaultMixerHandler
         val mixerString = this.mixer.getOrCompute()
         if (mixerString.isNotEmpty()) {
-            val found = mixerHandler.supportedMixers.find {
+            val found = mixerHandler.supportedMixers.mixers.find {
                 it.mixerInfo.name == mixerString
             }
             if (found != null) {
-                Paintbox.LOGGER.info("Attaching to mixer from settings: ${found.mixerInfo.name}")
+                Paintbox.LOGGER.info("Setting recommended legacy audio JavaSound mixer to mixer from settings: ${found.mixerInfo.name}")
                 mixerHandler.recommendedMixer = found
             } else {
-                Paintbox.LOGGER.warn("Could not find mixer from settings: settings = $mixerString")
+                Paintbox.LOGGER.warn("Could not find JavaSound mixer from settings: settings = $mixerString")
             }
         } else {
             val mixerName = mixerHandler.recommendedMixer.mixerInfo.name
             this.mixer.set(mixerName)
-            Paintbox.LOGGER.info("No saved mixer string, using $mixerName")
+            Paintbox.LOGGER.info("No saved JavaSound mixer string, recommended will be $mixerName")
         }
         
         // LauncherSettings override properties
@@ -331,6 +376,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
             val gr = Gdx.graphics
             gr.setForegroundFPS(this.maxFramerate.getOrCompute())
             gr.setVSync(this.vsyncEnabled.getOrCompute())
+            Paintbox.LOGGER.debug("DEBUG MONITORS: Primary=${gr.primaryMonitor?.name}, current=${gr.monitor?.name}, allMonitors=${gr.monitors.joinToString { it.name }}")
         }
     }
     
@@ -396,6 +442,20 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         return prefs.putString(kv.key, kv.value.getOrCompute())
     }
 
+    @JvmName("getStringNullable")
+    private fun Preferences.getString(kv: KeyValue<String?>, defaultValue: String? = kv.defaultValue) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            kv.value.set(prefs.getString(kv.key, defaultValue))
+        }
+    }
+
+    @JvmName("putStringNullable")
+    private fun Preferences.putString(kv: KeyValue<String?>): Preferences {
+        val prefs: Preferences = this
+        return prefs.putString(kv.key, kv.value.getOrCompute())
+    }
+
     private fun Preferences.getWindowSize(kv: KeyValue<WindowSize>) {
         val prefs: Preferences = this
         if (prefs.contains(kv.key)) {
@@ -414,6 +474,20 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) {
         val prefs: Preferences = this
         val windowSize = kv.value.getOrCompute()
         return prefs.putString(kv.key, "${windowSize.width}x${windowSize.height}")
+    }
+
+    private fun Preferences.getMonitorInfo(kv: KeyValue<MonitorInfo?>) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            val str = prefs.getString(kv.key)
+            kv.value.set(MonitorInfo.fromEncodedString(str))
+        }
+    }
+
+    private fun Preferences.putMonitorInfo(kv: KeyValue<MonitorInfo?>): Preferences {
+        val prefs: Preferences = this
+        val mi = kv.value.getOrCompute()
+        return prefs.putString(kv.key, mi?.toEncodedString() ?: "")
     }
 
     private fun Preferences.getInputKeymapKeyboard(kv: KeyValue<InputKeymapKeyboard>) {

@@ -181,7 +181,9 @@ class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Flo
     : SpriteEntity(world), TemporaryEntity {
 
     companion object {
-        private val STATES: List<State> = listOf(
+        const val EXPLOSION_DURATION: Float = 8 / 60f
+        
+        val STATES: List<State> = listOf(
                 State(0, 40f / 32f, 24f / 32f),
                 State(1, 32f / 32f, 24f / 32f),
                 State(2, 24f / 32f, 16f / 32f),
@@ -189,10 +191,10 @@ class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Flo
         )
     }
 
-    private data class State(val index: Int, val renderWidth: Float, val renderHeight: Float)
+    data class State(val index: Int, val renderWidth: Float, val renderHeight: Float)
 
     private var state: State = STATES[0]
-    var duration: Float = 8 / 60f
+    var duration: Float = EXPLOSION_DURATION
 
     override val renderWidth: Float
         get() = state.renderWidth

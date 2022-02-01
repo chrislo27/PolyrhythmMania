@@ -65,7 +65,9 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     private val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
     private val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val inputProcessor: InputProcessor = sceneRoot.inputSystem
-    private val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()
+    private val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply { 
+        this.audioContext.out.gain = main.settings.masterVolumeSetting.getOrCompute() / 100f
+    }
     
     private lateinit var player: PlayerLike
     private var lastCowbellBeat: Int = -1

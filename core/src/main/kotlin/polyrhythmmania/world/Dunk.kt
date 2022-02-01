@@ -6,11 +6,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.sidemodes.EventIncrementEndlessScore
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.entity.EntityPiston
@@ -113,6 +115,12 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
             playSfxExplosion(engine)
         }
         engine.inputter.missed()
+        if (engine.areStatisticsEnabled) {
+            engine.inputter.inputCountStats.total++
+            engine.inputter.inputCountStats.missed++
+            GlobalStats.rodsExploded.increment()
+            GlobalStats.rodsMissedDunk.increment()
+        }
     }
 
     fun bounce(engine: Engine, inputResult: InputResult) {
@@ -134,6 +142,12 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         if (ace) {
             this.aceWasHit = true
             engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
+                if (engine.areStatisticsEnabled) {
+                    engine.inputter.inputCountStats.total++
+                    engine.inputter.inputCountStats.aces++
+                    GlobalStats.rodsDunkedDunk.increment()
+                }
+                
                 val increaseLivesEvery = 4
                 val increaseSpeedEvery = 8
 
@@ -141,17 +155,29 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                     // Increment lives
                     engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_2"))
                     val endlessScore = engine.inputter.endlessScore
-                    val newLives = (endlessScore.lives.get() + 1).coerceIn(0, endlessScore.maxLives.get())
-                    endlessScore.lives.set(newLives)
+                    val currentLives = endlessScore.lives.get()
+                    val newLives = (currentLives + 1).coerceIn(0, endlessScore.maxLives.get())
+                    if (newLives > currentLives) {
+                        endlessScore.lives.set(newLives)
+                        if (engine.areStatisticsEnabled) {
+                            GlobalStats.livesGainedDunk.increment()
+                        }
+                    }
                 } else {
                     engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
                 }
                 
                 if (newScore % increaseSpeedEvery == 0) {
-                    val pitch = Semitones.getALPitch(newScore / increaseSpeedEvery).coerceAtMost(2f)
+                    val maxValue = 12
+                    val semitone = (newScore / increaseSpeedEvery).coerceAtMost(maxValue)
+                    val pitch = Semitones.getALPitch(semitone)
                     engine.addEvent(EventChangePlaybackSpeed(engine, pitch).apply { 
                         this.beat = dunkBeat
                     })
+
+//                    if (engine.areStatisticsEnabled && semitone >= maxValue) {
+//                        Achievements.awardAchievement(Achievements.dunkReachMaxSpeed)
+//                    }
                 }
             }.apply { 
                 this.beat = dunkBeat
@@ -164,6 +190,11 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
 
                 override fun onStart(currentBeat: Float) {
                     super.onStart(currentBeat)
+                    if (inputResult.accuracyPercent < 0f) {
+                        engine.inputter.inputCountStats.early++
+                    } else {
+                        engine.inputter.inputCountStats.late++
+                    }
                     explode(engine, true)
                 }
             })

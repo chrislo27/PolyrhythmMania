@@ -12,6 +12,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
+import polyrhythmmania.UpdateNotesL10N
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -20,7 +21,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     companion object {
         private val TEXT_COLOR: Color = LongButtonSkin.TEXT_COLOR
         
-        val updates: List<String> = listOf("v1.1")
+        val updates: List<String> = listOf("v1.1", "v1.2")
         val latestUpdate: String = updates.last()
     }
     
@@ -51,7 +52,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.popLastMenu()
                 }
             }
-            hbox += TextLabel(binding = {Localization.getVar("mainMenu.updateNotes.selectVersion").use()}, font = font).apply { 
+            hbox += TextLabel(binding = { Localization.getVar("mainMenu.updateNotes.selectVersion").use() }, font = font).apply {
                 this.bounds.width.set(130f)
                 this.renderAlign.set(Align.right)
                 this.padding.set(Insets(0f, 0f, 4f, 0f))
@@ -106,7 +107,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         val descVar: ReadOnlyVar<String> = Var {
             val u = viewingUpdate.use()
-            Localization.getVar("updateNotes.${u}.desc").use()
+            UpdateNotesL10N.getVar("updateNotes.${u}.desc").use()
         }
         descLabel = TextLabel(text = "" /* Bound later */, font = font).apply {
             this.text.addListener {
@@ -116,7 +117,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             Anchor.TopLeft.configure(this)
             this.bindWidthToParent(adjust = 0f, multiplier = 1f)
             this.bounds.x.set(0f)
-            this.padding.set(Insets(12f, 8f, 6f, 6f))
+            this.padding.set(Insets(12f, 12f, 6f, 6f))
             this.markup.set(this@UpdateNotesMenu.markup)
             this.textColor.set(TEXT_COLOR)
             this.renderAlign.set(Align.topLeft)

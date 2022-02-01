@@ -17,7 +17,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.sidemodes.endlessmode.DailyChallengeUtils
 import polyrhythmmania.ui.PRManiaSkins
@@ -72,7 +72,7 @@ class SubmitDailyChallengeScoreMenu(menuCol: MenuCollection,
             this.bindHeightToParent(-40f)
         }
         
-        val suggestedName = DiscordCore.takeIf { DiscordCore.enableRichPresence.get() }?.getCurrentUser()?.username?.takeUnless { it.any { c -> c !in DailyChallengeUtils.allowedNameChars } } ?: ""
+        val suggestedName = DiscordRichPresence.takeIf { DiscordRichPresence.enableRichPresence.get() }?.getCurrentUser()?.username?.takeUnless { it.any { c -> c !in DailyChallengeUtils.allowedNameChars } } ?: ""
         val nameText: Var<String> = Var("")
         val hideCountry: BooleanVar = BooleanVar(false)
         

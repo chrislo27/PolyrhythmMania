@@ -1,14 +1,14 @@
 package polyrhythmmania.sidemodes
 
-import paintbox.binding.IntVar
 import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.statistics.PlayTimeType
 
 
-abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: EndlessModeScore)
-    : SideMode(main) {
+abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: EndlessModeScore, playTimeType: PlayTimeType)
+    : SideMode(main, playTimeType) {
 
     init {
         val renderer = container.renderer
@@ -16,11 +16,16 @@ abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: Endless
         renderer.prevHighScore.set(prevHighScore.highScore.getOrCompute())
         
         engine.inputter.endlessScore.highScore = prevHighScore.highScore
-        engine.inputter.endlessScore.showHighScoreAtEnd = prevHighScore.showHighScore
+        engine.inputter.endlessScore.showNewHighScoreAtEnd = prevHighScore.showNewHighScoreAtEnd
+        engine.inputter.endlessScore.hideHighScoreText = prevHighScore.hideHighScoreText
     }
 }
 
-data class EndlessModeScore(val highScore: Var<Int> /* Should not be specialized */, val showHighScore: Boolean = true)
+data class EndlessModeScore(
+        /** Should not be specialized */ val highScore: Var<Int>, 
+        val showNewHighScoreAtEnd: Boolean = true,
+        val hideHighScoreText: Boolean = false,
+)
 
 class EventIncrementEndlessScore(engine: Engine, val callback: (newScore: Int) -> Unit = {})
     : Event(engine) {

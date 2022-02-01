@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
 import paintbox.transition.*
 import paintbox.ui.Anchor
@@ -25,17 +24,28 @@ import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.library.score.LevelScoreAttempt
+import polyrhythmmania.screen.play.AbstractPlayScreen
+import polyrhythmmania.screen.play.OnRankingRevealed
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.sidemodes.practice.AbstractPolyrhythmPractice
+import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.world.WorldType
 import kotlin.properties.Delegates
 
-class ResultsScreen(main: PRManiaGame, val score: Score, val container: Container,
-                    val startOverFactory: () -> PlayScreen,
-                    val keyboardKeybinds: InputKeymapKeyboard)
-    : PRManiaScreen(main) {
+class ResultsScreen(
+        main: PRManiaGame, val score: Score, val container: Container, val sideMode: SideMode?,
+        val startOverFactory: () -> AbstractPlayScreen,
+        val keyboardKeybinds: InputKeymapKeyboard,
+        val levelScoreAttempt: LevelScoreAttempt,
+        val onRankingRevealed: OnRankingRevealed?,
+) : PRManiaScreen(main) {
     
     private lateinit var soundFirstLine: Sound
     private lateinit var soundMiddleLine: Sound
@@ -102,12 +112,12 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
                 }
                 this.setOnAction {
                     playSound(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                    val playScreen: PlayScreen = startOverFactory()
+                    val playScreen = startOverFactory()
                     Gdx.input.isCursorCatched = true
                     main.screen = TransitionScreen(main, main.screen, playScreen, FadeOut(0.5f, Color(0f, 0f, 0f, 1f)),
                             FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                         this.onEntryEnd = {
-                            playScreen.resetAndStartOver(doWipeTransition = false, playSound = false)
+                            playScreen.resetAndUnpause()
                         }
                     }
                 }
@@ -383,6 +393,45 @@ class ResultsScreen(main: PRManiaGame, val score: Score, val container: Containe
             controlsPane.visible.set(true)
             controlsPane.opacity.set(0f)
             sceneRoot.animations.enqueueAnimation(Animation(Interpolation.smooth2, 0.25f, 0f, 1f, delay = 0.75f), controlsPane.opacity)
+            Gdx.app.postRunnable { 
+                onRankingRevealed?.onRankingRevealed(levelScoreAttempt, score)
+                
+                // Statistics-related
+                container.engine.inputter.addNonEndlessInputStats()
+                when (score.ranking) {
+                    Ranking.TRY_AGAIN -> GlobalStats.rankingTryAgain
+                    Ranking.OK -> GlobalStats.rankingOK
+                    Ranking.SUPERB -> GlobalStats.rankingSuperb
+                }.increment()
+                val challenges = score.challenges
+                if (score.noMiss) {
+                    GlobalStats.noMissesGotten.increment()
+                    if (container.world.worldMode.type == WorldType.ASSEMBLE) {
+                        Achievements.awardAchievement(Achievements.assembleNoMiss)
+                    }
+                }
+                if (challenges.goingForPerfect) {
+                    if (score.noMiss) {
+                        GlobalStats.perfectsEarned.increment()
+                        Achievements.attemptAwardThresholdAchievement(Achievements.perfectFirstTime, score.nInputs)
+                    }
+                }
+                if (sideMode != null && sideMode is AbstractPolyrhythmPractice) {
+                    if (score.ranking != Ranking.TRY_AGAIN) {
+                        Achievements.practicePassFlag = Achievements.practicePassFlag or sideMode.flagBit
+                        if (Achievements.practicePassFlag == 0b0011) {
+                            Achievements.awardAchievement(Achievements.playAllPractices)
+                        }
+                        if (score.noMiss) {
+                            Achievements.practiceNoMissFlag = Achievements.practiceNoMissFlag or sideMode.flagBit
+                            if (Achievements.practiceNoMissFlag == 0b0011) {
+                                Achievements.awardAchievement(Achievements.noMissAllPractices)
+                            }
+                        }
+                        Achievements.persist()
+                    }
+                }
+            }
         }
 
         override fun nextStage(): ResultsStage? {

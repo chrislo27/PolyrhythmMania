@@ -24,14 +24,17 @@ import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.discord.DefaultPresences
-import polyrhythmmania.discord.DiscordCore
+import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
+import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.ui.PRManiaSkins
 import java.util.*
 
@@ -102,21 +105,22 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             scoreVar.addListener {
                                 main.settings.endlessHighScore.set(EndlessHighScore(seedUInt, it.getOrCompute()))
                             }
-                            val sidemode: SideMode = EndlessPolyrhythm(main,
-                                    EndlessModeScore(scoreVar, showHighScore = true),
+                            val sidemode: SideMode = EndlessPolyrhythm(main, PlayTimeType.ENDLESS,
+                                    EndlessModeScore(scoreVar, showNewHighScoreAtEnd = true),
                                     seed, dailyChallenge = null,
                                     disableLifeRegen = disableRegen.get(),
                                     maxLives = if (daredevilMode.get()) 1 else -1)
-                            val playScreen = PlayScreen(main, sidemode, sidemode.container,
-                                    challenges = Challenges.NO_CHANGES, showResults = false,
+                            val playScreen = PlayScreen(main, sidemode,
+                                    challenges = Challenges.NO_CHANGES,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    levelScoreAttemptConsumer = null, previousHighScore = -1)
+                                    resultsBehaviour = ResultsBehaviour.NoResults)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                 this.onEntryEnd = {
                                     sidemode.prepare()
-                                    playScreen.resetAndStartOver(false, false)
-                                    DiscordCore.updateActivity(DefaultPresences.playingEndlessMode())
+                                    playScreen.resetAndUnpause()
+                                    DiscordRichPresence.updateActivity(DefaultPresences.playingEndlessMode())
                                     mainMenu.backgroundType = BgType.ENDLESS
+                                    GlobalStats.timesPlayedEndlessMode.increment()
                                 }
                             }
                         }

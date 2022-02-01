@@ -15,6 +15,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.credits.Credits
 import polyrhythmmania.ui.PRManiaSkins
 import kotlin.math.max
@@ -24,8 +25,8 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     companion object {
         private const val ROW_HEIGHT: Float = 36f
-        private val HEADING_TEXT_COLOR: Color = Color.valueOf("564F2BFF")
-        private val NAME_TEXT_COLOR: Color = Color.valueOf("323232FF")
+        val HEADING_TEXT_COLOR: Color = Color.valueOf("564F2BFF")
+        val NAME_TEXT_COLOR: Color = Color.valueOf("323232FF")
     }
     
     private val scrollPane: ScrollPane
@@ -87,6 +88,13 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         contentPane.addChild(scrollPane)
 
+        // View end of credits achievement
+        scrollPane.vBar.value.addListener { valueVar ->
+            if (valueVar.getOrCompute() >= scrollPane.vBar.maximum.get()) {
+                Achievements.awardAchievement(Achievements.seeAllCredits)
+            }
+        }
+        
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)
             this.bounds.height.set(300f)

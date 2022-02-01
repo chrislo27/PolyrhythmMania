@@ -7,13 +7,13 @@ import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
-import polyrhythmmania.world.DunkWorldBackground
-import polyrhythmmania.world.EntityRodDunk
-import polyrhythmmania.world.WorldMode
-import polyrhythmmania.world.WorldType
+import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.statistics.PlayTimeType
+import polyrhythmmania.world.*
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.tileset.StockTexturePacks
@@ -21,10 +21,10 @@ import polyrhythmmania.world.tileset.TilesetPalette
 
 
 class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
-    : AbstractEndlessMode(main, prevHighScore) {
+    : AbstractEndlessMode(main, prevHighScore, PlayTimeType.DUNK) {
     
     init {
-        container.world.worldMode = WorldMode(WorldType.DUNK, true)
+        container.world.worldMode = WorldMode(WorldType.DUNK, EndlessType.REGULAR_ENDLESS)
         container.engine.inputter.endlessScore.maxLives.set(5)
         container.renderer.worldBackground = DunkWorldBackground
         container.texturePackSource.set(TexturePackSource.STOCK_GBA)
@@ -76,5 +76,10 @@ class EventDeployRodDunk(engine: Engine, startBeat: Float) : Event(engine) {
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
         engine.world.addEntity(EntityRodDunk(engine.world, this.beat))
+
+        if (engine.areStatisticsEnabled) {
+            GlobalStats.rodsDeployed.increment()
+            GlobalStats.rodsDeployedDunk.increment()
+        }
     }
 }

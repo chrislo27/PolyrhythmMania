@@ -10,13 +10,14 @@ import paintbox.packing.Packable
 import paintbox.packing.PackedSheet
 import paintbox.packing.PackedSheetLoader
 import paintbox.registry.AssetRegistry
+import paintbox.registry.IAssetLoader
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsMusicLoader
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.BeadsSoundLoader
 
 
-class InitialAssetLoader : AssetRegistry.IAssetLoader {
+class InitialAssetLoader : IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
         manager.setLoader(BeadsSound::class.java, BeadsSoundLoader(InternalFileHandleResolver()))
         manager.setLoader(BeadsMusic::class.java, BeadsMusicLoader(InternalFileHandleResolver()))
@@ -51,6 +52,7 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
                 Packable("toolbar_texture_pack", "textures/ui/icon/toolbar/texture_pack.png"),
                 Packable("menubar_new", "textures/ui/icon/menubar/new.png"),
                 Packable("menubar_open", "textures/ui/icon/menubar/open.png"),
+                Packable("menubar_open32", "textures/ui/icon/menubar/open32.png"),
                 Packable("menubar_save", "textures/ui/icon/menubar/save.png"),
                 Packable("menubar_exit", "textures/ui/icon/menubar/exit.png"),
                 Packable("menubar_undo", "textures/ui/icon/menubar/undo.png"),
@@ -121,6 +123,33 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         AssetRegistry.loadAsset<Texture>("hud_song_card", "textures/ui/hud/song_card.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("country_flags", "textures/flag_icon/flags32.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("library_default_banner", "textures/mainmenu/default_banner.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("achievements_completed_mark", "textures/achievements/completed.png", linearTexture())
+        AssetRegistry.loadAsset("solitaire_tableau", "textures/solitaire/tableau.png", linearTexture())
+        AssetRegistry.loadAssetNoFile<PackedSheet>("achievements_icon", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                Packable("assemble", "textures/achievements/assemble.png"),
+                Packable("assemble_gold", "textures/achievements/assemble_gold.png"),
+                Packable("daily", "textures/achievements/daily.png"),
+                Packable("daily_calendar", "textures/achievements/daily_calendar.png"),
+                Packable("daily_gold", "textures/achievements/daily_gold.png"),
+                Packable("dunk", "textures/achievements/dunk.png"),
+                Packable("dunk_gold", "textures/achievements/dunk_gold.png"),
+                Packable("editor", "textures/achievements/editor.png"),
+                Packable("editor_gold", "textures/achievements/editor_gold.png"),
+                Packable("endless", "textures/achievements/endless.png"),
+                Packable("endless_daredevil", "textures/achievements/endless_daredevil.png"),
+                Packable("endless_gold", "textures/achievements/endless_gold.png"),
+                Packable("endless_no_regen", "textures/achievements/endless_no_regen.png"),
+                Packable("explosion", "textures/achievements/explosion.png"),
+                Packable("locked", "textures/achievements/locked.png"),
+                Packable("maniac", "textures/achievements/maniac.png"),
+                Packable("new_grad", "textures/achievements/new_grad.png"),
+                Packable("new_grad_gold", "textures/achievements/new_grad_gold.png"),
+                Packable("solitaire", "textures/achievements/solitaire.png"),
+                Packable("solitaire_gold", "textures/achievements/solitaire_gold.png"),
+                Packable("trophy1", "textures/achievements/trophy1.png"),
+                Packable("trophy2", "textures/achievements/trophy2.png"),
+        ), PackedSheet.Config(padding = 2, maxSize = 512, duplicateBorder = false,
+                atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest)))
         
         listOf("applause", "despawn", "explosion", "input_a", "input_d", "land", "retract", "side_collision",
                 "spawn_a", "spawn_d", "cowbell",).forEach {
@@ -148,6 +177,8 @@ class InitialAssetLoader : AssetRegistry.IAssetLoader {
         listOf("fail_music_hi", "fail_music_nohi").forEach {
             AssetRegistry.loadAsset<LazySound>("sfx_$it", "sounds/${it}.ogg")
         }
+        AssetRegistry.loadAsset<LazySound>("sfx_reset_achievements", "sounds/menu/reset_achievements.ogg")
+        AssetRegistry.loadAsset<Sound>("sfx_challenge_complete", "sounds/menu/challenge_complete.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_silence", "sounds/silence.wav") // DEBUG
     }
 

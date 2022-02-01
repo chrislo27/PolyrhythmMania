@@ -46,6 +46,7 @@ import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 import polyrhythmmania.ui.PRManiaSkins
 import paintbox.util.DecimalFormats
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.util.TimeUtils
 import java.io.File
@@ -206,10 +207,8 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             if (!l.file.exists()) {
                                 startSearchThread() // Re-search the list. The level was deleted but this should be a very rare case.
                             } else {
-                                val previousHighScore = GlobalScoreCache.scoreCache.getOrCompute().map[l.uuid]?.attempts?.maxOrNull()?.score ?: (if (l.isPersistable) 0 else -1)
-                                val loadMenu = LoadSavedLevelMenu(menuCol, l.file,
-                                        if (l.isPersistable) GlobalScoreCache.createConsumer(l.uuid) else null,
-                                        previousHighScore)
+                                val previousHighScore: Int? = GlobalScoreCache.scoreCache.getOrCompute().map[l.uuid]?.attempts?.maxOrNull()?.score ?: (if (l.isPersistable) 0 else null)
+                                val loadMenu = LoadSavedLevelMenu(menuCol, l.file, previousHighScore)
                                 menuCol.addMenu(loadMenu)
                                 menuCol.pushNextMenu(loadMenu)
                             }
@@ -738,9 +737,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["filter"]))
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.library.sortAndFilter")))
                 this.setOnAction {
-                    val m = LibrarySortFilterMenu(menuCol, this@LibraryMenu, levelList.getOrCompute().toList())
-                    menuCol.addMenu(m)
-                    menuCol.pushNextMenu(m, instant = true, playSound = true)
+                    goToFilterMenu(sortFilter.getOrCompute())
                 }
             }
             leftBottomHbox += createSmallButton(binding = {""}).apply {
@@ -810,6 +807,12 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
         }
+    }
+    
+    fun goToFilterMenu(filter: LibrarySortFilter, playSound: Boolean = true) {
+        val m = LibrarySortFilterMenu(menuCol, this@LibraryMenu, levelList.getOrCompute().toList(), filter)
+        menuCol.addMenu(m)
+        menuCol.pushNextMenu(m, instant = true, playSound = playSound)
     }
 
     fun prepareShow(): LibraryMenu {
@@ -949,6 +952,10 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 
                 pushEntriesToUI()
                 Paintbox.LOGGER.info("[Library Search] Levels read: $levelsAdded (took ${(System.nanoTime() - startNano) / 1_000_000f} ms)")
+                
+                Gdx.app.postRunnable { 
+                    Achievements.attemptAwardThresholdAchievement(Achievements.libraryCollection15, levelsAdded)
+                }
             } catch (ignored: InterruptedException) {
             } catch (e: Exception) {
                 Paintbox.LOGGER.error("Exception when searching for files in library directory ${searchFolder.absolutePath}")

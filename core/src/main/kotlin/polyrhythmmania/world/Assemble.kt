@@ -11,12 +11,14 @@ import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
+import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.sidemodes.EventAsmAssemble
 import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityRod
@@ -324,7 +326,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
         fun addConditionalBounce(rod: EntityRodAsm, bounce: BounceAsm) {
             val hit = this.hitInput
             val early = rod.earlyInputResult
-            if (hit != null && MathUtils.isEqual(hit.perfectBeat, bounce.startBeat, 0.00f)) {
+            if (hit != null && MathUtils.isEqual(hit.perfectBeat, bounce.startBeat, 0.01f)) {
                 rod.bounce = bounce
             } else if (early != null && MathUtils.isEqual(early.perfectBeat, bounce.startBeat, 0.01f)) {
                 conditionalBounce = bounce
@@ -463,6 +465,10 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
                     engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_collide"), SoundInterface.SFXType.NORMAL) {
                         it.gain = 0.5f
                     }
+                }
+
+                if (engine.areStatisticsEnabled) {
+                    GlobalStats.rodsDroppedAssemble.increment()
                 }
             }
         }

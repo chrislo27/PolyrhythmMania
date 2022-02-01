@@ -475,36 +475,33 @@ class TexturePackEditDialog(editorPane: EditorPane,
                 this.doLineWrapping.set(true)
                 this.bounds.width.set(200f)
             }
+
             val toggleGroup = ToggleGroup()
+            fun createRadioButton(textKey: String, pack: TexturePack): RadioButton {
+                return RadioButton(binding = { Localization.getVar(textKey).use() },
+                        font = editorPane.palette.musicDialogFont).apply {
+                    this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
+                    this.textLabel.markup.set(editorPane.palette.markup)
+                    this.imageNode.padding.set(Insets(1f))
+                    this.color.set(Color.WHITE.cpy())
+                    toggleGroup.addToggle(this)
+                    this.onSelected = {
+                        baseTexturePack.set(pack)
+                        onTexturePackUpdated.invert()
+                    }
+                    this.selectedState.set(baseTexturePack.getOrCompute() == pack)
+                }
+            }
+            bottomRightHbox += VBox().apply {
+                this.spacing.set(2f)
+                this.bounds.width.set(80f) // Smaller because text is just "GBA" or "HD". 
+                this += createRadioButton("editor.dialog.texturePack.stock.gba", StockTexturePacks.gba)
+                this += createRadioButton("editor.dialog.texturePack.stock.hd", StockTexturePacks.hd)
+            }
             bottomRightHbox += VBox().apply {
                 this.spacing.set(2f)
                 this.bounds.width.set(125f)
-                this += RadioButton(binding = { Localization.getVar("editor.dialog.texturePack.stock.gba").use() },
-                        font = editorPane.palette.musicDialogFont).apply {
-                    this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
-                    this.textLabel.markup.set(editorPane.palette.markup)
-                    this.imageNode.padding.set(Insets(1f))
-                    this.color.set(Color.WHITE.cpy())
-                    toggleGroup.addToggle(this)
-                    this.onSelected = {
-                        baseTexturePack.set(StockTexturePacks.gba)
-                        onTexturePackUpdated.invert()
-                    }
-                    this.selectedState.set(baseTexturePack.getOrCompute() == StockTexturePacks.gba)
-                }
-                this += RadioButton(binding = { Localization.getVar("editor.dialog.texturePack.stock.hd").use() },
-                        font = editorPane.palette.musicDialogFont).apply {
-                    this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
-                    this.textLabel.markup.set(editorPane.palette.markup)
-                    this.imageNode.padding.set(Insets(1f))
-                    this.color.set(Color.WHITE.cpy())
-                    toggleGroup.addToggle(this)
-                    this.onSelected = {
-                        baseTexturePack.set(StockTexturePacks.hd)
-                        onTexturePackUpdated.invert()
-                    }
-                    this.selectedState.set(baseTexturePack.getOrCompute() == StockTexturePacks.hd)
-                }
+                this += createRadioButton("editor.dialog.texturePack.stock.arcade", StockTexturePacks.arcade)
             }
         }
         bottomPaneContainer.addChild(bottomRightHbox)

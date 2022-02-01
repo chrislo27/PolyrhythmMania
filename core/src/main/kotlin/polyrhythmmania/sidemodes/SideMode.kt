@@ -10,10 +10,11 @@ import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.World
 
 
-abstract class SideMode(val main: PRManiaGame) : Disposable {
+abstract class SideMode(val main: PRManiaGame, val playTimeType: PlayTimeType) : Disposable {
 
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
         this.audioContext.out.gain = main.settings.gameplayVolume.getOrCompute() / 100f
@@ -40,6 +41,8 @@ abstract class SideMode(val main: PRManiaGame) : Disposable {
      * Implementors should set up music and other long-load items here.
      */
     protected abstract fun initialize()
+    
+    open fun renderUpdate() {}
 
     protected open fun createGlobalContainerSettings(): GlobalContainerSettings {
         return GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.forceTilesetPalette.getOrCompute())

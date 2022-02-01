@@ -27,8 +27,9 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.screen.PlayScreen
+import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.SideMode
 
 
@@ -46,6 +47,7 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
     companion object {
         const val WIDTH_EXTRA_SMALL: Float = 0.3f
         const val WIDTH_SMALL: Float = 0.4f
+        const val WIDTH_SMALL_MID: Float = 0.45f
         const val WIDTH_MID: Float = 0.5f
         const val WIDTH_MEDIUM: Float = 0.6f
         const val WIDTH_LARGE: Float = 0.75f
@@ -69,6 +71,9 @@ abstract class MMMenu(val menuCol: MenuCollection) : Pane() {
     }
     
     open fun getTileFlipAnimationBounds(): UIElement = this
+    
+    open fun onMenuEntered() {}
+    open fun onMenuExited() {}
 }
 
 
@@ -157,6 +162,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     val main: PRManiaGame get() = mainMenu.main
     val font: PaintboxFont = main.fontMainMenuMain
     protected val markup: Markup = Markup(mapOf(
+            Markup.FONT_NAME_ITALIC to main.fontMainMenuItalic,
+            Markup.FONT_NAME_BOLDITALIC to main.fontMainMenuItalic,
             "prmania_icons" to main.fontIcons,
             "rodin" to main.fontMainMenuRodin,
             "thin" to main.fontMainMenuThin
@@ -222,31 +229,26 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    protected fun createLongButtonWithNewIndicator(newIndicator: Settings.NewIndicator, binding: Var.Context.() -> String): Button {
-        return Button(binding = {
+    protected fun createLongButtonWithIcon(icon: TextureRegion?, binding: Var.Context.() -> String): Button {
+        return createLongButton(binding).apply {
+            if (icon != null) {
+                val existingPadding = this.padding.getOrCompute()
+                this.padding.set(existingPadding.copy(left = existingPadding.left * 2 + 32f))
+                this.addChild(ImageIcon(icon, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply {
+                    this.bounds.x.set(-(32f + 4f * 2))
+                    this.bounds.width.set(32f)
+                    this.bounds.height.set(32f)
+                })
+            }
+        }
+    }
+
+    protected fun createLongButtonWithNewIndicator(newIndicator: Settings.NewIndicator, icon: TextureRegion? = null,
+                                                   binding: Var.Context.() -> String): Button {
+        return createLongButtonWithIcon(icon) {
             (if (newIndicator.value.use())
                 (Localization.getVar("common.newIndicator").use() + " ")
             else "") + binding.invoke(this)
-        }, font = font).apply {
-            this.skinID.set(BUTTON_LONG_SKIN_ID)
-            this.padding.set(Insets(4f, 4f, 12f, 12f))
-            this.bounds.height.set(40f)
-            this.textAlign.set(TextAlign.LEFT)
-            this.renderAlign.set(Align.left)
-            this.markup.set(this@StandardMenu.markup)
-            this.setOnHoverStart(blipSoundListener)
-        }
-    }
-    
-    protected fun createLongButtonWithIcon(icon: TextureRegion, binding: Var.Context.() -> String): Button {
-        return createLongButton(binding).apply { 
-            val existingPadding = this.padding.getOrCompute()
-            this.padding.set(existingPadding.copy(left = existingPadding.left * 2 + 32f))
-            this.addChild(ImageIcon(icon, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO).apply { 
-                this.bounds.x.set(-(32f + 4f * 2))
-                this.bounds.width.set(32f)
-                this.bounds.height.set(32f)
-            })
         }
     }
 
@@ -342,13 +344,15 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         return settingsOptionPane to combobox
     }
     
-    protected fun createSidemodeLongButton(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
-                                           challenges: Challenges = Challenges.NO_CHANGES, showResults: Boolean = false,
+    protected fun createSidemodeLongButton(icon: TextureRegion?, name: String,
+                                           tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
+                                           challenges: Challenges = Challenges.NO_CHANGES,
+                                           resultsBehaviour: ResultsBehaviour = ResultsBehaviour.NoResults,
                                            newIndicator: Settings.NewIndicator? = null,
                                            factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
         return (if (newIndicator == null)
-                (createLongButton { Localization.getVar(name).use() })
-        else (createLongButtonWithNewIndicator(newIndicator) { Localization.getVar(name).use() })).apply {
+                (createLongButtonWithIcon(icon) { Localization.getVar(name).use() })
+        else (createLongButtonWithNewIndicator(newIndicator, icon) { Localization.getVar(name).use() })).apply {
             this.tooltipElement.set(createTooltip(tooltipVar))
             this.setOnAction {
                 menuCol.playMenuSound("sfx_menu_enter_game")
@@ -360,14 +364,14 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     }
                     Gdx.app.postRunnable {
                         val sidemode: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-                        val playScreen = PlayScreen(main, sidemode, sidemode.container,
+                        val playScreen = PlayScreen(main, sidemode,
                                 inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                challenges = challenges, levelScoreAttemptConsumer = null, showResults = showResults,
-                                previousHighScore = -1)
+                                challenges = challenges,
+                                resultsBehaviour = resultsBehaviour)
                         main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                             this.onEntryEnd = {
                                 sidemode.prepare()
-                                playScreen.resetAndStartOver(false, false)
+                                playScreen.resetAndUnpause()
                             }
                         }
                     }

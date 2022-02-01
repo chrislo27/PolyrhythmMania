@@ -10,16 +10,15 @@ import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
-import polyrhythmmania.engine.AudioEvent
-import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.SoundInterface
+import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
 import polyrhythmmania.world.render.ForceTexturePack
@@ -31,10 +30,10 @@ import kotlin.math.sign
 
 
 class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
-    : AbstractEndlessMode(main, prevHighScore) {
+    : AbstractEndlessMode(main, prevHighScore, PlayTimeType.ASSEMBLE) {
 
     init {
-        container.world.worldMode = WorldMode(WorldType.ASSEMBLE, false)
+        container.world.worldMode = WorldMode(WorldType.ASSEMBLE, EndlessType.NOT_ENDLESS)
         container.renderer.showEndlessModeScore.set(false)
 //        container.engine.inputter.endlessScore.maxLives.set(3)
         container.renderer.worldBackground = AssembleWorldBackground
@@ -335,6 +334,11 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
             val newRod = EntityRodAsm(world, this.beat)
             world.addEntity(newRod)
             bounceRod(newRod)
+
+            if (engine.areStatisticsEnabled) {
+                GlobalStats.rodsDeployed.increment()
+                GlobalStats.rodsDeployedAssemble.increment()
+            }
         } else {
             super.onStart(currentBeat)
         }
@@ -515,6 +519,10 @@ class EventAsmAssemble(engine: Engine, val combineBeat: Float)
             })
             val score = engine.inputter.endlessScore.score
             score.set(score.get() + 1)
+            
+            if (engine.areStatisticsEnabled) {
+                GlobalStats.widgetsAssembledAssemble.increment()
+            }
         }
     }
 }

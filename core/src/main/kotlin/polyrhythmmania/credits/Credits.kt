@@ -11,7 +11,7 @@ object Credits {
     val credits: Map<ReadOnlyVar<String>, List<ReadOnlyVar<String>>> = linkedMapOf(
             Localization.getVar("credits.programming") to listOf("chrislo27", "[font=rodin](◉.◉)☂[]").toVars(),
             Localization.getVar("credits.graphicDesign") to abcSorted(
-                    "garbo", "snow krow", "GENERIC",
+                    "garbo", "snow krow", "GENERIC", "Merch_Andise", "Kievit"
             ).toVars(),
             Localization.getVar("credits.music") to listOf(
                     Var("GENERIC"), Localization.getVar("credits.rhSoundtrack")
@@ -23,9 +23,6 @@ object Credits {
             ).toVars() + listOf(
                     Localization.getVar("credits.tourneycord"),
             ),
-            Localization.getVar("credits.githubBugReporters") to abcSorted(
-                    "thomasynthesis", "Dummatt", "user670", "ZaptorZap", "notpolyrhythmic", "Unnamedspaceuser",
-            ).toVars(),
             Localization.getVar("credits.specialThanks") to abcSorted(
                     "Lvl100Feraligatr",
                     "GrueKun",
@@ -34,7 +31,7 @@ object Credits {
                     "Turtike",
                     "J-D Thunder",
                     "RedCrowNose",
-            ).toVars() + listOf(Localization.getVar("credits.projectDonators")),
+            ).toVars() + listOf(Localization.getVar("credits.githubBugReporters"), Localization.getVar("credits.projectDonators")),
             Localization.getVar("credits.resourcesAndTechnologies") to listOf(
                     Localization.getVar("credits.rhAssets"),
             ) + listOf(
@@ -54,9 +51,10 @@ object Credits {
                     "Pexels",
                     "world-flags-sprite",
             ).toVars() + listOf(
+                    "Kurokane",
+                    "Leland",
                     "Roboto",
                     "Rodin",
-                    "Kurokane",
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
     

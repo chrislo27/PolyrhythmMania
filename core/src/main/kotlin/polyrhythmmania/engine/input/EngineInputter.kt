@@ -12,8 +12,10 @@ import polyrhythmmania.engine.*
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.sidemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
+import kotlin.math.max
 
 
 /**
@@ -71,7 +73,8 @@ class EngineInputter(val engine: Engine) {
     class EndlessScore {
         val score: IntVar = IntVar(0)
         var highScore: Var<Int> = GenericVar(0)
-        var showHighScoreAtEnd: Boolean = true
+        var showNewHighScoreAtEnd: Boolean = true
+        var hideHighScoreText: Boolean = false
         val maxLives: IntVar = IntVar(0)
         val startingLives: IntVar = IntVar { maxLives.use() }
         val lives: IntVar = IntVar(startingLives.get())
@@ -86,9 +89,30 @@ class EngineInputter(val engine: Engine) {
             gameOverUIShown.set(false)
         }
     }
+    
+    class InputCountStats {
+        var total: Int = 0
+        var missed: Int = 0
+        var aces: Int = 0
+        var goods: Int = 0
+        var barelies: Int = 0
+        var early: Int = 0
+        var late: Int = 0
+        
+        fun reset() {
+            total = 0
+            missed = 0
+            aces = 0
+            goods = 0
+            barelies = 0
+            early = 0
+            late = 0
+        }
+    }
 
     private val world: World = engine.world
-    
+
+    val inputCountStats: InputCountStats = InputCountStats()
     var areInputsLocked: Boolean = true
     var skillStarBeat: Float = Float.POSITIVE_INFINITY
     val practice: PracticeData = PracticeData()
@@ -129,6 +153,7 @@ class EngineInputter(val engine: Engine) {
         challenge.reset()
         endlessScore.reset()
         rodsExplodedPR = 0
+        inputCountStats.reset()
     }
     
     fun onAButtonPressed(release: Boolean) {
@@ -205,14 +230,6 @@ class EngineInputter(val engine: Engine) {
                     val minSec = perfectSeconds - InputThresholds.MAX_OFFSET_SEC
                     val maxSec = perfectSeconds + InputThresholds.MAX_OFFSET_SEC
 
-                    if (atSeconds !in minSec..maxSec) {
-//                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
-                        if (nextBlockIndex == activeIndex) {
-                            missed()
-                        }
-                        continue
-                    }
-
                     val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
                     val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
                     if (DEBUG_LOG_INPUTS) {
@@ -280,14 +297,6 @@ class EngineInputter(val engine: Engine) {
                 val minSec = perfectSeconds - InputThresholds.MAX_OFFSET_SEC
                 val maxSec = perfectSeconds + InputThresholds.MAX_OFFSET_SEC
 
-                if (atSeconds !in minSec..maxSec) {
-//                    Paintbox.LOGGER.debug("$rod: Skipping input because difference is not in bounds: perfect=$perfectSeconds, diff=$differenceSec, minmax=[$minSec, $maxSec], actual=$atSeconds")
-                    if (nextBlockIndex == activeIndex) {
-                        missed()
-                    }
-                    continue
-                }
-
                 val accuracyPercent = (differenceSec / InputThresholds.MAX_OFFSET_SEC).coerceIn(-1f, 1f)
                 val inputResult = InputResult(perfectBeats, type, accuracyPercent, differenceSec, activeIndex)
                 if (DEBUG_LOG_INPUTS) {
@@ -335,7 +344,7 @@ class EngineInputter(val engine: Engine) {
                         Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                     }
 
-                    if (!worldMode.showEndlessScore) {
+                    if (!worldMode.endlessType.isEndless) {
                         (inputResults as MutableList).add(inputResult)
                     }
                     
@@ -395,9 +404,24 @@ class EngineInputter(val engine: Engine) {
         val validResults = inputTracker.results.filter { it.inputScore != InputScore.MISS }
         
         totalExpectedInputs += numExpected
-        if (!world.worldMode.showEndlessScore) {
+        if (world.worldMode.endlessType.isEndless) {
+            // Special case when in endless mode
+            // Inputs don't count when lives = 0
+            if (engine.areStatisticsEnabled && endlessScore.lives.get() > 0) {
+                inputCountStats.total += numExpected
+                inputCountStats.missed += (numExpected - validResults.size).coerceAtLeast(0)
+                inputCountStats.aces += validResults.count { it.inputScore == InputScore.ACE }
+                inputCountStats.goods += validResults.count { it.inputScore == InputScore.GOOD }
+                inputCountStats.barelies += validResults.count { it.inputScore == InputScore.BARELY }
+                inputCountStats.early += validResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent < 0f }
+                inputCountStats.late += validResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent > 0f }
+            }
+        } else {
             (inputResults as MutableList).addAll(validResults)
             (expectedInputsPr as MutableList).addAll(inputTracker.expected.filterIsInstance<EntityRodPR.ExpectedInput.Expected>())
+            if (engine.areStatisticsEnabled && !rod.exploded && numExpected > 0 && validResults.size == numExpected) {
+                GlobalStats.rodsFerriedPolyrhythm.increment()
+            }
         }
         
         if (!engine.autoInputs && noMiss && !rod.registeredMiss) {
@@ -416,16 +440,23 @@ class EngineInputter(val engine: Engine) {
                 engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
                     player.gain = 0.45f
                 }
+                if (engine.areStatisticsEnabled) {
+                    GlobalStats.perfectsLost.increment()
+                }
             }
         }
 
         val worldMode = world.worldMode
         when (worldMode.type) {
             WorldType.DUNK -> {
-                triggerLifeLost()
+                val oldLives = endlessScore.lives.get()
+                triggerEndlessLifeLost()
+                if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
+                    GlobalStats.livesLostDunk.increment()
+                }
             }
             WorldType.ASSEMBLE -> {
-                triggerLifeLost()
+                triggerEndlessLifeLost()
             }
             else -> {}
         }
@@ -433,19 +464,23 @@ class EngineInputter(val engine: Engine) {
     
     fun onRodPRExploded() {
         rodsExplodedPR++
-    }
-    
-    fun triggerLifeLost() {
-        val endlessScore = this.endlessScore
-        val oldScore = endlessScore.lives.get()
-        val newScore = (oldScore - 1).coerceIn(0, endlessScore.maxLives.get())
-        endlessScore.lives.set(newScore)
-        if (oldScore > 0 && newScore == 0) {
-            onGameOver()
+        if (engine.areStatisticsEnabled) {
+            GlobalStats.rodsExploded.increment()
+            GlobalStats.rodsExplodedPolyrhythm.increment()
         }
     }
     
-    fun onGameOver() {
+    fun triggerEndlessLifeLost() {
+        val endlessScore = this.endlessScore
+        val oldLives = endlessScore.lives.get()
+        val newLives = (oldLives - 1).coerceIn(0, endlessScore.maxLives.get())
+        endlessScore.lives.set(newLives)
+        if (oldLives > 0 && newLives == 0) {
+            onEndlessGameOver()
+        }
+    }
+    
+    fun onEndlessGameOver() {
         engine.playbackSpeed = 1f
         val currentSeconds = engine.seconds
         val currentBeat = engine.beat
@@ -456,31 +491,51 @@ class EngineInputter(val engine: Engine) {
         
         engine.musicData.volumeMap.addMusicVolume(MusicVolume(currentBeat, (afterBeat - currentBeat) / 2f, 0))
         
-        engine.addEvent(object : Event(engine) {
-            override fun onStart(currentBeat: Float) {
-                super.onStart(currentBeat)
-                
-                val activeTextBox: ActiveTextBox = if (wasNewHighScore && endlessScore.showHighScoreAtEnd) {
-                    engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
-                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BANNER))
-                } else {
-                    engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
-                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BANNER))
+        if (world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS) {
+            engine.addEvent(object : Event(engine) {
+                override fun onStart(currentBeat: Float) {
+                    super.onStart(currentBeat)
+
+                    val activeTextBox: ActiveTextBox = if (wasNewHighScore && endlessScore.showNewHighScoreAtEnd) {
+                        engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
+                        engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BANNER))
+                    } else {
+                        engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
+                        engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BANNER))
+                    }
+                    activeTextBox.onComplete = { engine ->
+                        engine.addEvent(EventEndState(engine, currentBeat))
+                    }
+
+                    if (wasNewHighScore) {
+                        endlessScore.highScore.set(score)
+                        PRManiaGame.instance.settings.persist()
+                    }
+                    endlessScore.gameOverUIShown.set(true)
+
+                    if (engine.areStatisticsEnabled) {
+                        val worldType = world.worldMode.type
+                        when (worldType) {
+                            WorldType.POLYRHYTHM, WorldType.DUNK -> {
+                                GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
+                                GlobalStats.inputsMissed.increment(inputCountStats.missed)
+                                GlobalStats.inputsGottenAce.increment(inputCountStats.aces)
+                                GlobalStats.inputsGottenGood.increment(inputCountStats.goods)
+                                GlobalStats.inputsGottenBarely.increment(inputCountStats.barelies)
+                                GlobalStats.inputsGottenEarly.increment(inputCountStats.early)
+                                GlobalStats.inputsGottenLate.increment(inputCountStats.late)
+                            }
+                            WorldType.ASSEMBLE -> {
+                                // NO-OP
+                            }
+                        }
+                    }
                 }
-                activeTextBox.onComplete = { engine ->
-                    engine.addEvent(EventEndState(engine, currentBeat))
-                }
-                
-                if (wasNewHighScore) {
-                    endlessScore.highScore.set(score)
-                    PRManiaGame.instance.settings.persist()
-                }
-                endlessScore.gameOverUIShown.set(true)
-            }
-        }.apply {
-            this.beat = afterBeat
-            this.width = 0.5f
-        })
+            }.apply {
+                this.beat = afterBeat
+                this.width = 0.5f
+            })
+        }
     }
 
     fun attemptSkillStar(beat: Float): Boolean {
@@ -496,18 +551,39 @@ class EngineInputter(val engine: Engine) {
         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_skill_star"), SoundInterface.SFXType.PLAYER_INPUT) { player ->
             player.gain = 0.6f
         }
+        if (engine.areStatisticsEnabled) {
+            GlobalStats.skillStarsEarned.increment()
+        }
     }
     
-}
+    fun addNonEndlessInputStats() {
+        if (!engine.areStatisticsEnabled) return
+        if (world.worldMode.endlessType.isEndless) return
+        
+        when (world.worldMode.type) {
+            WorldType.POLYRHYTHM, WorldType.ASSEMBLE -> {
+                val results = this.inputResults
+                val nInputs = max(results.size, max(totalExpectedInputs, minimumInputCount))
+                val nonMissResults = results.filter { it.inputScore != InputScore.MISS }
+                val missed = nInputs - nonMissResults.size
+                val aces = results.count { it.inputScore == InputScore.ACE }
+                val goods = results.count { it.inputScore == InputScore.GOOD }
+                val barelies = results.count { it.inputScore == InputScore.BARELY }
+                val earlies = nonMissResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent < 0f }
+                val lates = nonMissResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent > 0f }
 
-class EventLockInputs(engine: Engine, val lockInputs: Boolean)
-    : Event(engine) {
+                GlobalStats.inputsGottenTotal.increment(nInputs)
+                GlobalStats.inputsMissed.increment(missed)
+                GlobalStats.inputsGottenAce.increment(aces)
+                GlobalStats.inputsGottenGood.increment(goods)
+                GlobalStats.inputsGottenBarely.increment(barelies)
+                GlobalStats.inputsGottenEarly.increment(earlies)
+                GlobalStats.inputsGottenLate.increment(lates)
+            }
+            WorldType.DUNK -> {
+                // NO-OP
+            }
+        }
+    }
     
-    constructor(engine: Engine, lockInputs: Boolean, beat: Float) : this(engine, lockInputs) {
-        this.beat = beat
-    }
-
-    override fun onStart(currentBeat: Float) {
-        engine.inputter.areInputsLocked = lockInputs
-    }
 }
