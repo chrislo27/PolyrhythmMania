@@ -373,6 +373,11 @@ object Achievements {
     
     fun clearAllFulfilledAchievements() {
         _achFulfillmentMap.set(emptyMap())
+        
+        tutorialFlag = 0
+        practicePassFlag = 0
+        practiceNoMissFlag = 0
+        viewedEditorHelpDocs.set(emptySet())
     }
 
     /**
