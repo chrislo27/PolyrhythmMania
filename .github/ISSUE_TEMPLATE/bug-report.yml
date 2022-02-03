@@ -11,8 +11,8 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of Polyrhythm Mania were you running? You can find the version string on the main menu; it looks like "vX.Y.Z", for example v1.2.3.
-      placeholder: "v1.0.0"
+      description: What version of Polyrhythm Mania were you running? You can find the version string on the main menu; it looks like "vX.Y.Z" followed by 8 digits and a letter, for example "v1.2.0-20220201a".
+      placeholder: "v1.2.0-20220201a"
     validations:
       required: true
   - type: dropdown
@@ -21,6 +21,7 @@ body:
       label: Operating System
       description: "What operating system are you using?"
       options:
+        - Windows 11
         - Windows 10
         - Windows 8.1
         - Windows 8
