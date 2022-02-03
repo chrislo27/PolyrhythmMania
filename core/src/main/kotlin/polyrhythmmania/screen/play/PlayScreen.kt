@@ -61,9 +61,9 @@ class PlayScreen private constructor(
 
                                 if (sideMode.disableLifeRegen) {
                                     Achievements.attemptAwardScoreAchievement(Achievements.endlessNoLifeRegen100, newScore)
-                                    if (engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil
-                                        Achievements.attemptAwardScoreAchievement(Achievements.endlessDaredevil100, newScore)
-                                    }
+                                }
+                                if (engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil
+                                    Achievements.attemptAwardScoreAchievement(Achievements.endlessDaredevil100, newScore)
                                 }
                                 if (main.settings.masterVolumeSetting.getOrCompute() == 0) {
                                     Achievements.attemptAwardScoreAchievement(Achievements.endlessSilent50, newScore)
