@@ -20,7 +20,7 @@ allprojects {
     ext {
         appName = "PolyrhythmMania"
         
-        paintboxVersion = "0.3.0"
+        paintboxVersion = "0.4.0"
         useLocalPaintbox = false
     }
     
@@ -43,20 +43,6 @@ allprojects {
     }
     
     dependencies {
-//        implementation fileTree(dir: 'libs', includes: ['/**/*.jar'])
-
-        if (useLocalPaintbox) {
-            implementation "com.github.chrislo27:paintbox-core:${paintboxVersion}"
-        } else {
-            implementation "com.github.chrislo27.paintbox:paintbox-core:${paintboxVersion}"
-        }
-        
-        implementation "net.beadsproject:beads:3.2"
-        implementation "net.lingala.zip4j:zip4j:2.9.1"
-        implementation "org.apache.httpcomponents:httpclient:4.5.13"
-        implementation "space.earlygrey:shapedrawer:v2.5.0"
-        implementation "com.github.JnCrMx:discord-game-sdk4j:d88df0922c"
-        implementation "com.twelvemonkeys.imageio:imageio-tga:$imageio_tga_version"
     }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
@@ -68,17 +54,23 @@ allprojects {
 }
 
 project(":core") {
-    apply plugin: "java"
-    apply plugin: "kotlin"
-
     dependencies {
+        if (useLocalPaintbox) {
+            implementation "com.github.chrislo27:paintbox-core:${paintboxVersion}"
+        } else {
+            implementation "com.github.chrislo27.paintbox:paintbox-core:${paintboxVersion}"
+        }
+
+        api "net.beadsproject:beads:3.2"
+        api "net.lingala.zip4j:zip4j:2.9.1"
+        api "org.apache.httpcomponents:httpclient:4.5.13"
+        api "space.earlygrey:shapedrawer:v2.5.0"
+        api "com.github.JnCrMx:discord-game-sdk4j:d88df0922c"
+        api "com.twelvemonkeys.imageio:imageio-tga:$imageio_tga_version"
     }
 }
 
 project(":desktop") {
-    apply plugin: "java"
-    apply plugin: "kotlin"
-
     dependencies {
         implementation project(":core")
 
