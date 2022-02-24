@@ -63,7 +63,7 @@ project(":core") {
         api "net.lingala.zip4j:zip4j:2.9.1"
         api "org.apache.httpcomponents:httpclient:4.5.13"
         api "space.earlygrey:shapedrawer:v2.5.0"
-        api "com.github.JnCrMx:discord-game-sdk4j:d88df0922c"
+        api "com.github.JnCrMx:discord-game-sdk4j:0.5.5"
         api "com.twelvemonkeys.imageio:imageio-tga:$imageio_tga_version"
     }
 }
