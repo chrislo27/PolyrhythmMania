@@ -9,6 +9,7 @@ import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.binding.VarChangedListener
+import paintbox.filechooser.FileExtFilter
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -23,7 +24,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.TinyFDWrapper
+import paintbox.filechooser.TinyFDWrapper
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PreferenceKeys
@@ -322,7 +323,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         editorPane.main.restoreForExternalDialog { completionCallback ->
             thread(isDaemon = true) {
                 val title = Localization.getValue("fileChooser.exportLevel.title")
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.exportLevel.filter"),
+                val filter = FileExtFilter(Localization.getValue("fileChooser.exportLevel.filter"),
                         listOf("*.${Container.LEVEL_FILE_EXTENSION}")).copyWithExtensionsInDesc()
                 val savedFileName: String? = editorPane.saveDialog.lastSaveLoc?.nameWithoutExtension
                 val defaultFile = (main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_EXPORT)

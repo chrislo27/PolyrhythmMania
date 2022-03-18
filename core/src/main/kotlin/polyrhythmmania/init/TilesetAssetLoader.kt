@@ -12,11 +12,6 @@ import paintbox.registry.IAssetLoader
 
 class TilesetAssetLoader : IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
-        fun linearTexture(): TextureLoader.TextureParameter = TextureLoader.TextureParameter().apply {
-            this.magFilter = Texture.TextureFilter.Linear
-            this.minFilter = Texture.TextureFilter.Linear
-        }
-        
         AssetRegistry.loadAsset<Texture>("tileset_missing_tex", "textures/world/missing.png")
         AssetRegistry.loadAsset<Texture>("gba_spritesheet", "textures/world/gba_spritesheet.png")
         AssetRegistry.loadAsset<Texture>("green_grid", "textures/world/green_grid.png", linearTexture())

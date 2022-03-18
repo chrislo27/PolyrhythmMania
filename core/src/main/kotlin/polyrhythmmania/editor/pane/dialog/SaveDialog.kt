@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.Var
+import paintbox.filechooser.FileExtFilter
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -13,7 +14,7 @@ import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
 import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
-import paintbox.util.TinyFDWrapper
+import paintbox.filechooser.TinyFDWrapper
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.container.Container
@@ -102,7 +103,7 @@ class SaveDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             editorPane.main.restoreForExternalDialog { completionCallback ->
                 thread(isDaemon = true) {
                     val title = Localization.getValue("fileChooser.save.project.title")
-                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.save.project.filter"), listOf("*.${Container.PROJECT_FILE_EXTENSION}")).copyWithExtensionsInDesc()
+                    val filter = FileExtFilter(Localization.getValue("fileChooser.save.project.filter"), listOf("*.${Container.PROJECT_FILE_EXTENSION}")).copyWithExtensionsInDesc()
                     val correctFileLoc = if (location == null) null else getFileWithCorrectExt(location)
                     TinyFDWrapper.saveFile(title,
                             correctFileLoc

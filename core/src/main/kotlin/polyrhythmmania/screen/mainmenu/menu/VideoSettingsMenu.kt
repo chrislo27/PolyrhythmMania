@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.Var
 import paintbox.ui.Anchor
+import paintbox.ui.StringConverter
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
@@ -99,7 +100,7 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     { Localization.getVar("mainMenu.videoSettings.maxFramerate").use() })
             vbox += fpsPane
             fpsCombobox.itemStringConverter.bind {
-                return@bind { fps: Int ->
+                return@bind StringConverter { fps: Int ->
                     if (fps <= 0) unlimitedFpsText.use() else "$fps"
                 }
             }

@@ -8,6 +8,7 @@ import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.binding.IntVar
 import paintbox.binding.Var
+import paintbox.filechooser.FileExtFilter
 import paintbox.font.TextAlign
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
@@ -19,7 +20,7 @@ import paintbox.ui.control.Slider
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.TinyFDWrapper
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
@@ -292,7 +293,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                 main.restoreForExternalDialog { completionCallback ->
                     thread(isDaemon = true) {
                         val title = Localization.getValue("fileChooser.load.level.title")
-                        val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.load.level.filter"),
+                        val filter = FileExtFilter(Localization.getValue("fileChooser.load.level.filter"),
                                 listOf("*.${Container.LEVEL_FILE_EXTENSION}")).copyWithExtensionsInDesc()
                         TinyFDWrapper.openFile(title,
                                 main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_PLAY_SAVED_LEVEL)

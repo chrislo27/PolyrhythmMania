@@ -74,7 +74,7 @@ import kotlin.math.roundToInt
 
 
 @Suppress("PrivatePropertyName", "PropertyName")
-class Settings(val main: PRManiaGame, val prefs: Preferences) {
+class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this predates PaintboxPreferences
     
     companion object {
         private fun determineMaxRefreshRate(): Int {

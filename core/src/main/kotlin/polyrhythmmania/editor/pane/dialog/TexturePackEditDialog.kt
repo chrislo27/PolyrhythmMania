@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Align
 import net.lingala.zip4j.ZipFile
 import paintbox.Paintbox
 import paintbox.binding.*
+import paintbox.filechooser.FileExtFilter
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -25,7 +26,7 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.Matrix4Stack
-import paintbox.util.TinyFDWrapper
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import paintbox.util.gdxutils.openFileExplorer
@@ -591,7 +592,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         isFileChooserOpen.set(true)
         editorPane.main.restoreForExternalDialog { completionCallback ->
             thread(isDaemon = true) {
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.texturePack.filter.textureFiles"),
+                val filter = FileExtFilter(Localization.getValue("fileChooser.texturePack.filter.textureFiles"),
                         listOf("*.tga", "*.png")).copyWithExtensionsInDesc()
                 TinyFDWrapper.openMultipleFiles(Localization.getValue("fileChooser.texturePack.importCustomTextures"),
                         main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_IMPORT_TEX_TO_DIR)
@@ -618,7 +619,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         isFileChooserOpen.set(true)
         editorPane.main.restoreForExternalDialog { completionCallback ->
             thread(isDaemon = true) {
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.texturePack.filter.texturePackFile"),
+                val filter = FileExtFilter(Localization.getValue("fileChooser.texturePack.filter.texturePackFile"),
                         listOf("*.zip")).copyWithExtensionsInDesc()
                 TinyFDWrapper.saveFile(Localization.getValue("fileChooser.texturePack.exportEntire"),
                         (main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_ENTIRE)
@@ -648,7 +649,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         isFileChooserOpen.set(true)
         editorPane.main.restoreForExternalDialog { completionCallback ->
             thread(isDaemon = true) {
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.texturePack.filter.texturePackFile"),
+                val filter = FileExtFilter(Localization.getValue("fileChooser.texturePack.filter.texturePackFile"),
                         listOf("*.zip")).copyWithExtensionsInDesc()
                 TinyFDWrapper.openFile(Localization.getValue("fileChooser.texturePack.importEntire"),
                         main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_TEXPACK_ENTIRE)

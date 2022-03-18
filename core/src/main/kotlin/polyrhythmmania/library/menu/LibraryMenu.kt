@@ -24,7 +24,7 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.TinyFDWrapper
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
+import paintbox.filechooser.FileExtFilter
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -20,7 +21,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.TinyFDWrapper
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
@@ -155,7 +156,7 @@ class BannerDialog(editorPane: EditorPane, val afterDialogClosed: () -> Unit) : 
         editorPane.main.restoreForExternalDialog { completionCallback ->
             thread(isDaemon = true) {
                 val title = Localization.getValue("fileChooser.bannerImage.title")
-                val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.bannerImage.filter"),
+                val filter = FileExtFilter(Localization.getValue("fileChooser.bannerImage.filter"),
                         listOf("*.png")).copyWithExtensionsInDesc()
                 TinyFDWrapper.openFile(title, dir, filter) { file: File? ->
                     completionCallback()

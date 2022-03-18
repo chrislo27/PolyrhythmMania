@@ -21,10 +21,11 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.TinyFDWrapper
+import paintbox.filechooser.TinyFDWrapper
 import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.binding.BooleanVar
 import paintbox.binding.LongVar
+import paintbox.filechooser.FileExtFilter
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PreferenceKeys
@@ -624,7 +625,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             editorPane.main.restoreForExternalDialog { completionCallback ->
                 thread(isDaemon = true) {
                     val title = Localization.getValue("fileChooser.musicSelect.title")
-                    val filter = TinyFDWrapper.FileExtFilter(Localization.getValue("fileChooser.musicSelect.filter"), SUPPORTED_MUSIC_EXTENSIONS).copyWithExtensionsInDesc()
+                    val filter = FileExtFilter(Localization.getValue("fileChooser.musicSelect.filter"), SUPPORTED_MUSIC_EXTENSIONS).copyWithExtensionsInDesc()
                     TinyFDWrapper.openFile(title,
                             main.attemptRememberDirectory(PreferenceKeys.FILE_CHOOSER_EDITOR_MUSIC)
                                     ?: main.getDefaultDirectory(), filter) { file: File? ->

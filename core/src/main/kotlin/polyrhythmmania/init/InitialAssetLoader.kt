@@ -22,11 +22,6 @@ class InitialAssetLoader : IAssetLoader {
         manager.setLoader(BeadsSound::class.java, BeadsSoundLoader(InternalFileHandleResolver()))
         manager.setLoader(BeadsMusic::class.java, BeadsMusicLoader(InternalFileHandleResolver()))
         
-        fun linearTexture(): TextureLoader.TextureParameter = TextureLoader.TextureParameter().apply {
-            this.magFilter = Texture.TextureFilter.Linear
-            this.minFilter = Texture.TextureFilter.Linear
-        }
-        
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_tool", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("selection", "textures/ui/icon/tool/selection.png"),
                 Packable("tempo_change", "textures/ui/icon/tool/tempo_change.png"),

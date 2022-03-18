@@ -276,8 +276,8 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.bounds.width.set(250f)
                 this.setScaleXY(0.85f)
                 this.itemStringConverter.bind {
-                    fun (view: ViewType): String {
-                        return when (view) {
+                    StringConverter { view ->
+                        when (view) {
                             ViewType.AllByCategory -> AchievementsL10N.getVar("achievement.viewAll.category").use()
                             ViewType.AllByName -> AchievementsL10N.getVar("achievement.viewAll.byName").use()
                             is ViewType.Category -> AchievementsL10N.getVar(view.category.toLocalizationID()).use()
