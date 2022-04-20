@@ -263,10 +263,10 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                 batch.fillRect(x + trackView.translateBeatToX(playbackStartOld), y - h, lineWidth, h)
                 batch.draw(triangle, x + trackView.translateBeatToX(playbackStartOld) - triangleSize / 2 + lineWidth / 2,
                         y, triangleSize, -triangleSize)
+                ColorStack.pop()
             }
 
             val tmpColor2 = ColorStack.getAndPush()
-
             editor.markerMap.values.forEach { marker ->
                 val playbackStart = marker.beat.get()
                 tmpColor2.set(marker.type.color)
@@ -285,6 +285,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                             y - 4f, 0f, Align.right, false)
                 }
             }
+            ColorStack.pop()
 
             if (editor.playState.getOrCompute() != PlayState.STOPPED) {
                 val pos = editor.engineBeat.get()
@@ -293,8 +294,6 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                 batch.fillRect(x + trackView.translateBeatToX(pos), y - h, lineWidth, h)
                 ColorStack.pop()
             }
-
-            ColorStack.pop()
 
             // Draw beat numbers
             editorPane.palette.beatTrackFont.useFont { font ->
