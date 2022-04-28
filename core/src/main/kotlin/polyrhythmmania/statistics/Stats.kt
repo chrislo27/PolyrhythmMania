@@ -57,15 +57,21 @@ abstract class Stats {
         }
     }
 
-    fun fromJsonFile(file: FileHandle) {
+    /**
+     * Returns true if the stats were loaded successfully or if there was no file.
+     * Returns false if an exception occurred.
+     */
+    fun fromJsonFile(file: FileHandle): Boolean {
         resetToInitialValues()
-        if (!file.exists() || file.isDirectory) return
+        if (!file.exists() || file.isDirectory) return true
         
         return try {
             val str = file.readString("UTF-8")
             fromJson(Json.parse(str).asObject())
+            true
         } catch (e: Exception) {
             e.printStackTrace()
+            false
         }
     }
 

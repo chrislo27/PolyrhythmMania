@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle
 import paintbox.Paintbox
 import polyrhythmmania.PRMania
 import polyrhythmmania.engine.input.EngineInputter
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 object GlobalStats : Stats() {
@@ -297,14 +298,24 @@ object GlobalStats : Stats() {
 
     // -----------------------------------------------------------------------------------------------------------------
     
+    private val successfulLoad: AtomicBoolean = AtomicBoolean(false)
+    
     fun load() {
-        Paintbox.LOGGER.debug("Statistics loaded", "GlobalStats")
-        this.fromJsonFile(storageLoc)
+        if (this.fromJsonFile(storageLoc)) {
+            Paintbox.LOGGER.debug("Statistics loaded", "GlobalStats")
+            successfulLoad.set(true)
+        } else {
+            Paintbox.LOGGER.warn("Statistics NOT loaded successfully!", "GlobalStats")
+        }
     }
 
     fun persist() {
-        Paintbox.LOGGER.debug("Statistics saved", "GlobalStats")
-        this.toJsonFile(storageLoc)
+        if (successfulLoad.get()) {
+            this.toJsonFile(storageLoc)
+            Paintbox.LOGGER.debug("Statistics saved", "GlobalStats")
+        } else {
+            Paintbox.LOGGER.warn("Statistics NOT saved due to no successful load flag!", "GlobalStats")
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------

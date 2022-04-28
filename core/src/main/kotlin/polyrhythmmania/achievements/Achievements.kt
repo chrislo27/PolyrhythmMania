@@ -15,6 +15,7 @@ import polyrhythmmania.achievements.AchievementCategory.*
 import polyrhythmmania.achievements.AchievementRank.*
 import polyrhythmmania.statistics.GlobalStats
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 object Achievements {
@@ -454,22 +455,30 @@ object Achievements {
         practiceNoMissFlag = 0
         try {
             practiceNoMissFlag = rootObj.getInt("practiceNoMissFlag", 0)
-        } catch (ignored: Exception) {}
+        } catch (ignored: Exception) {
+        }
         viewedEditorHelpDocs.set(emptySet())
         try {
             viewedEditorHelpDocs.set(rootObj.get("viewedEditorHelpDocs").asArray().map { it.asString() }.toSet())
-        } catch (ignored: Exception) {}
+        } catch (ignored: Exception) {
+        }
     }
 
-    fun fromJsonFile(file: FileHandle) {
+    /**
+     * Returns true if the achievements were loaded successfully or if there was no file.
+     * Returns false if an exception occurred.
+     */
+    fun fromJsonFile(file: FileHandle): Boolean {
         clearAllFulfilledAchievements()
-        if (!file.exists() || file.isDirectory) return
-        
+        if (!file.exists() || file.isDirectory) return true
+
         return try {
             val str = file.readString("UTF-8")
             fromJson(Json.parse(str).asObject())
+            true
         } catch (e: Exception) {
             e.printStackTrace()
+            false
         }
     }
 
@@ -509,13 +518,23 @@ object Achievements {
         }
     }
 
+    private val successfulLoad: AtomicBoolean = AtomicBoolean(false)
+
     fun load() {
-        this.fromJsonFile(storageLoc)
-        Paintbox.LOGGER.debug("Achievements loaded", "Achievements")
+        if (this.fromJsonFile(storageLoc)) {
+            successfulLoad.set(true)
+            Paintbox.LOGGER.debug("Achievements loaded", "Achievements")
+        } else {
+            Paintbox.LOGGER.warn("Achievements NOT loaded successfully!", "Achievements")
+        }
     }
 
     fun persist() {
-        this.toJsonFile(storageLoc)
-        Paintbox.LOGGER.debug("Achievements saved", "Achievements")
+        if (successfulLoad.get()) {
+            this.toJsonFile(storageLoc)
+            Paintbox.LOGGER.debug("Achievements saved", "Achievements")
+        } else {
+            Paintbox.LOGGER.debug("Achievements NOT saved due to no successful load flag!", "Achievements")
+        }
     }
 }
