@@ -1,19 +1,20 @@
 package polyrhythmmania.ui
 
-import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
+import paintbox.ui.UIElement
 import paintbox.ui.control.TextField
 import paintbox.util.DecimalFormats
 import java.text.DecimalFormat
 
 
+@Deprecated("Use Paintbox DecimalTextField instead")
 class DecimalTextField(
         startingValue: Float,
         decimalFormat: DecimalFormat = DecimalFormats["0.0##"],
-        font: PaintboxFont = PaintboxGame.gameInstance.debugFont
+        font: PaintboxFont = UIElement.defaultFont
 ) : TextField(font) {
 
     val value: FloatVar = FloatVar(startingValue)

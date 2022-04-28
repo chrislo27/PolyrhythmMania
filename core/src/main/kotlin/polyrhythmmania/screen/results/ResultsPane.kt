@@ -129,7 +129,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             this.textColor.set(Color.WHITE)
             this.setScaleXY(0.75f)
         }
-        bonusStatsPane += ImageIcon().apply { 
+        bonusStatsPane += ImageIcon(tex = null).apply { 
             val success = AssetRegistry.get<PackedSheet>("tileset_ui")["perfect"]
             val failed = AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_failed"]
             this.textureRegion.bind { 

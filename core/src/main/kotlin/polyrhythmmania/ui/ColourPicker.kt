@@ -34,7 +34,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sign
 
 
-open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame.gameInstance.debugFont, scale: Float = 1f)
+open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = UIElement.defaultFont, scale: Float = 1f)
     : Control<ColourPicker>() {
     
     companion object {
@@ -146,31 +146,31 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = PaintboxGame
                 hueArrow)
         val satPane = createPropertyPane(hsv.saturation, "S: ",
                 Gradient().also { grad ->
-                    grad.leftColor.sideEffecting { c -> 
+                    grad.leftColor.sideEffectingAndRetain { c -> 
                         c.fromHsv(hsv.hue.use().toFloat(), 0f, hsv.value.use() / 100f)
                     }
-                    grad.rightColor.sideEffecting { c ->
+                    grad.rightColor.sideEffectingAndRetain { c ->
                         c.fromHsv(hsv.hue.use().toFloat(), 1f, hsv.value.use() / 100f)
                     }
                 }, satArrow)
         val valuePane = createPropertyPane(hsv.value, "V: ",
                 Gradient().also { grad ->
-                    grad.leftColor.sideEffecting { c -> 
+                    grad.leftColor.sideEffectingAndRetain { c -> 
                         c.fromHsv(hsv.hue.use().toFloat(), hsv.saturation.use() / 100f, 0f)
                     }
-                    grad.rightColor.sideEffecting { c ->
+                    grad.rightColor.sideEffectingAndRetain { c ->
                         c.fromHsv(hsv.hue.use().toFloat(), hsv.saturation.use() / 100f, 1f)
                     }
                 }, valueArrow)
         val alphaPane = createPropertyPane(hsv.alpha, "A: ",
                 createTransparencyNode().also { im ->
                     im += Gradient().also { grad ->
-                        grad.leftColor.sideEffecting { c ->
+                        grad.leftColor.sideEffectingAndRetain { c ->
                             c.set(currentColor.use())
                             c.a = 0f
                             c
                         }
-                        grad.rightColor.sideEffecting { c ->
+                        grad.rightColor.sideEffectingAndRetain { c ->
                             c.set(currentColor.use())
                             c.a = 1f
                             c

@@ -9,6 +9,7 @@ import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
+import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.layout.VBox
@@ -70,8 +71,8 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     init {
         this.setSize(0.325f)
         val vbox = VBox().apply {
+            Anchor.BottomLeft.configure(this)
             this.spacing.set(0f)
-            this.align.set(VBox.Align.BOTTOM)
         }
 
         val font = mainMenu.main.fontMainMenuMain
@@ -147,7 +148,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 }
             }
         }
-        this.bounds.height.set(buttonHeight * vbox.children.size)
+        vbox.sizeHeightToChildren()
 
         this += vbox
     }

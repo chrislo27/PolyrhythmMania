@@ -5,6 +5,7 @@ import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
@@ -21,9 +22,9 @@ class IndentedButton : Button, Toggle {
     val indentedButtonBorder: Var<Insets> = Var(Insets(2f))
     val indentedButtonBorderColor: Var<Color> = Var(Color.BLACK)
     
-    constructor(text: String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
+    constructor(text: String, font: PaintboxFont = UIElement.defaultFont)
             : super(text, font)
-    constructor(binding: Var.Context.() -> String, font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
+    constructor(binding: Var.Context.() -> String, font: PaintboxFont = UIElement.defaultFont)
             : super(binding, font)
     
     init {

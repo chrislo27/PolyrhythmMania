@@ -169,7 +169,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                         }
                         (this.skin.getOrCompute() as Slider.SliderSkin).also { skin ->
                             val filledColors = listOf(Challenges.TEMPO_DOWN_COLOR, Color(0.24f, 0.74f, 0.94f, 1f), Challenges.TEMPO_UP_COLOR)
-                            skin.filledColor.sideEffecting { existing -> 
+                            skin.filledColor.sideEffectingAndRetain { existing -> 
                                 val tempo = this@slider.value.use().toInt()
                                 existing.set(filledColors[if (tempo < 100) 0 else if (tempo > 100) 2 else 1])
                             }

@@ -5,6 +5,7 @@ import paintbox.PaintboxGame
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
 import paintbox.ui.Pane
+import paintbox.ui.UIElement
 import paintbox.ui.control.RadioButton
 import paintbox.ui.control.ToggleGroup
 import polyrhythmmania.Localization
@@ -48,7 +49,7 @@ class TexPackSrcSelectorMenuPane(editorPane: EditorPane, currentSource: TextureP
 
     inner class TPSSettingRadioButton(val src: TexturePackSource,
                                       binding: Var.Context.() -> String,
-                                      font: PaintboxFont = PaintboxGame.gameInstance.debugFont)
+                                      font: PaintboxFont = UIElement.defaultFont)
         : RadioButton(binding, font) {
 
         init {
