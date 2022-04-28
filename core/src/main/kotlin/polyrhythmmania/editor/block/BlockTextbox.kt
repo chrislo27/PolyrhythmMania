@@ -7,10 +7,7 @@ import paintbox.binding.BooleanVar
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
-import paintbox.ui.control.ComboBox
-import paintbox.ui.control.FocusGroup
-import paintbox.ui.control.TextField
-import paintbox.ui.control.TextLabel
+import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
@@ -19,7 +16,6 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.engine.TextBoxStyle
-import polyrhythmmania.ui.DecimalTextField
 import paintbox.util.DecimalFormats
 import polyrhythmmania.world.EventTextbox
 import java.util.*
@@ -128,7 +124,7 @@ class BlockTextbox(engine: Engine)
                             this.padding.set(Insets(2f))
                             this += DecimalTextField(startingValue = duration, decimalFormat = DecimalFormats["0.0##"],
                                     font = editor.editorPane.palette.musicDialogFont).apply {
-                                this.allowNegatives.set(false)
+                                this.minimumValue.set(0f)
                                 this.textColor.set(Color(1f, 1f, 1f, 1f))
 
                                 this.value.addListener {

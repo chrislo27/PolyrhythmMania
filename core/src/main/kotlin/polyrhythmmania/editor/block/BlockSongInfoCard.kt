@@ -8,10 +8,7 @@ import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
-import paintbox.ui.control.FocusGroup
-import paintbox.ui.control.RadioButton
-import paintbox.ui.control.TextField
-import paintbox.ui.control.ToggleGroup
+import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
@@ -20,7 +17,6 @@ import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.ui.DecimalTextField
 import paintbox.util.DecimalFormats
 import polyrhythmmania.world.render.WorldRenderer
 import java.util.*
@@ -109,7 +105,7 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
                         fun createTextField(): Pair<UIElement, TextField> {
                             val textField = DecimalTextField(startingValue = duration, decimalFormat = DecimalFormats["0.0##"],
                                     font = editor.editorPane.palette.musicDialogFont).apply {
-                                this.allowNegatives.set(false)
+                                this.minimumValue.set(0f)
                                 this.textColor.set(Color(1f, 1f, 1f, 1f))
 
                                 this.value.addListener {
