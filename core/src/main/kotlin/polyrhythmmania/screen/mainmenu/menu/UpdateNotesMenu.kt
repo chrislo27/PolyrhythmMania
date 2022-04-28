@@ -110,10 +110,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             UpdateNotesL10N.getVar("updateNotes.${u}.desc").use()
         }
         descLabel = TextLabel(text = "" /* Bound later */, font = font).apply {
-            this.text.addListener {
-                this.resizeBoundsToContent(affectWidth = false)
-                scrollPane.setContent(this)
-            }
+            this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
             Anchor.TopLeft.configure(this)
             this.bindWidthToParent(adjust = 0f, multiplier = 1f)
             this.bounds.x.set(0f)
