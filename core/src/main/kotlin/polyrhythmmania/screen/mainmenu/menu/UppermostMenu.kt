@@ -71,7 +71,6 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     init {
         this.setSize(0.325f)
         val vbox = VBox().apply {
-            Anchor.BottomLeft.configure(this)
             this.spacing.set(0f)
         }
 
@@ -149,6 +148,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }
         }
         vbox.sizeHeightToChildren()
+        this.bounds.height.bind { vbox.bounds.height.use() }
 
         this += vbox
     }
