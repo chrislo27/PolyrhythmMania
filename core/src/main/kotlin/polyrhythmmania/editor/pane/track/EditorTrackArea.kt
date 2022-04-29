@@ -213,7 +213,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         // Darken disallowed tracks for placement
         if (click is Click.DragSelection) {
             val allowedTracks = click.tracksThatWillAccept
-            batch.setColor(0.1f, 0f, 0f, 0.5f)
+            batch.setColor(0.25f, 0f, 0f, 0.75f)
             val darkAreaX = originX + renderBounds.x.get()
             editor.tracks.forEachIndexed { index, track ->
                 if (track !in allowedTracks) {
