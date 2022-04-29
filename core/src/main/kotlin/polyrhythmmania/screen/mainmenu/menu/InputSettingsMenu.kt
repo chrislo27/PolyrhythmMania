@@ -107,7 +107,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val inputKeymap: Var<InputKeymapKeyboard> = settings.inputKeymapKeyboard
 
         init {
-            this.setSize(MMMenu.WIDTH_SMALL)
+            this.setSize(MMMenu.WIDTH_MID)
             this.titleText.bind { Localization.getVar("mainMenu.inputSettings.keyboard.title").use() }
             this.contentPane.bounds.height.set(300f)
 
@@ -124,14 +124,29 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.vBar.skinID.set(scrollBarSkinID)
                 this.hBar.skinID.set(scrollBarSkinID)
             }
-            val hbox = HBox().apply {
+            val bottomBar = Pane().apply {
                 Anchor.BottomLeft.configure(this)
-                this.spacing.set(8f)
-                this.padding.set(Insets(2f))
                 this.bounds.height.set(40f)
             }
+            val hboxButtons = HBox().apply {
+                this.spacing.set(8f)
+                this.padding.set(Insets(2f))
+                this.visible.bind {
+                    pendingKeyboardBinding.use() == null
+                }
+            }
             contentPane.addChild(scrollPane)
-            contentPane.addChild(hbox)
+            contentPane.addChild(bottomBar)
+            bottomBar.addChild(hboxButtons)
+            val cancelPrompt = TextLabel(Localization.getVar("mainMenu.inputSettings.keyboard.cancelPrompt"),
+                    font = main.fontMainMenuItalic).apply {
+                this.renderAlign.set(Align.center)
+                this.textColor.set(LongButtonSkin.TEXT_COLOR)
+                this.visible.bind { 
+                    pendingKeyboardBinding.use() != null
+                }
+            }
+            bottomBar.addChild(cancelPrompt)
 
             val vbox = VBox().apply {
                 Anchor.TopLeft.configure(this)
@@ -162,16 +177,16 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox.sizeHeightToChildren(100f)
             scrollPane.setContent(vbox)
 
-            hbox.temporarilyDisableLayouts {
-                hbox += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
+            hboxButtons.temporarilyDisableLayouts {
+                hboxButtons += createSmallButton(binding = { Localization.getVar("common.back").use() }).apply {
                     this.bounds.width.set(100f)
                     this.setOnAction {
                         menuCol.popLastMenu()
                     }
                     this.disabled.bind { pendingKeyboardBinding.use() != null }
                 }
-                hbox += createSmallButton(binding = { Localization.getVar("mainMenu.inputSettings.resetToDefault").use() }).apply {
-                    this.bounds.width.set(300f)
+                hboxButtons += createSmallButton(binding = { Localization.getVar("mainMenu.inputSettings.resetToDefault").use() }).apply {
+                    this.bounds.width.set(280f)
                     this.setOnAction {
                         inputKeymap.set(InputKeymapKeyboard())
                     }
@@ -210,18 +225,20 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 val pane = Pane().also { pane ->
                     pane += TextLabel(binding = { if (inwardArrows.use()) ">" else "<" }, font = main.fontMainMenuMain).apply { 
-                        this.bindWidthToParent(multiplier = 0.2f)
+                        this.bindWidthToParent(multiplier = 0.175f)
                         Anchor.TopLeft.configure(this)
                         this.renderAlign.set(Align.center)
                         this.textColor.bind { this@settingsOptionPane.textColorVar.use() }
                         this.visible.bind { inwardArrows.use() }
+                        this.doXCompression.set(false)
                     }
                     pane += TextLabel(binding = { if (inwardArrows.use()) "<" else ">" }, font = main.fontMainMenuMain).apply { 
-                        this.bindWidthToParent(multiplier = 0.2f)
+                        this.bindWidthToParent(multiplier = 0.175f)
                         Anchor.TopRight.configure(this)
                         this.renderAlign.set(Align.center)
                         this.textColor.bind { this@settingsOptionPane.textColorVar.use() }
                         this.visible.bind { inwardArrows.use() }
+                        this.doXCompression.set(false)
                     }
                     pane += Button(binding = {
                         settings.inputKeymapKeyboard.use()
@@ -229,7 +246,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             "..."
                         } else Input.Keys.toString(getter())
                     }, font = main.fontMainMenuRodin).apply {
-                        this.bindWidthToParent(multiplier = 0.6f)
+                        this.bindWidthToParent(multiplier = 0.65f)
                         Anchor.Centre.configure(this)
                         @Suppress("UNCHECKED_CAST")
                         this.skinFactory.set(skinFactory as SkinFactory<Button, Skin<Button>, Skinnable<Button>>)
