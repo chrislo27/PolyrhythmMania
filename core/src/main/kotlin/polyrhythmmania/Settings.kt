@@ -110,6 +110,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     private val kv_showInputFeedbackBar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_INPUT_FEEDBACK_BAR, true)
     private val kv_showSkillStar: KeyValue<Boolean> = KeyValue(SETTINGS_SHOW_SKILL_STAR, true)
     private val kv_discordRichPresence: KeyValue<Boolean> = KeyValue(SETTINGS_DISCORD_RPC, true)
+    // Note: Not private due to being used by AdvAudioMenu
     val kv_audioDeviceBufferCount: KeyValue<Int> = KeyValue(SETTINGS_AUDIODEVICE_BUFFER_COUNT, AudioDeviceSettings.getDefaultBufferCount())
     private val kv_mixer: KeyValue<String> = KeyValue(SETTINGS_MIXER, "")
     private val kv_useLegacyAudio: KeyValue<Boolean> = KeyValue(SETTINGS_USE_LEGACY_SOUND, false)
