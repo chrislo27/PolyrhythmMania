@@ -13,6 +13,9 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.ui.skin.Skin
+import paintbox.ui.skin.SkinFactory
+import paintbox.ui.skin.Skinnable
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
@@ -178,8 +181,30 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         private fun createKeyboardInput(labelText: Var.Context.() -> String, setter: (code: Int) -> Unit, getter: () -> Int): SettingsOptionPane {
+            val inwardArrows = BooleanVar(false)
+            val skinFactory: SkinFactory<Button, ButtonSkin, Button> = SkinFactory { button: Button ->
+                object : ButtonSkin(button) {
+                    init {
+                        this.roundedRadius.set(0)
+                        
+                        val goodTextColor = Color(0f, 0f, 0f, 1f)
+                        val badTextColor = Color(1f, 0f, 0f, 1f)
+                        val textColor = Var.bind {
+                            if (!inwardArrows.use() && settings.inputKeymapKeyboard.use().numOccurrencesOfThisKey(getter()) > 1) {
+                                badTextColor
+                            } else {
+                                goodTextColor
+                            }
+                        }
+                        this.defaultTextColor.bind { textColor.use() }
+                        this.hoveredTextColor.bind { textColor.use() }
+                        this.pressedTextColor.bind { textColor.use() }
+                        this.pressedAndHoveredTextColor.bind { textColor.use() }
+                    }
+                }
+            }
+            
             return createSettingsOption(labelText, font = main.fontMainMenuRodin, percentageContent = 0.65f).apply settingsOptionPane@{
-                val inwardArrows: BooleanVar = BooleanVar(false)
                 pendingKeyboardBinding.addListener {
                     if (it.getOrCompute() == null) inwardArrows.set(false)
                 }
@@ -206,7 +231,8 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }, font = main.fontMainMenuRodin).apply {
                         this.bindWidthToParent(multiplier = 0.6f)
                         Anchor.Centre.configure(this)
-                        (this.skin.getOrCompute() as ButtonSkin).roundedRadius.set(0)
+                        @Suppress("UNCHECKED_CAST")
+                        this.skinFactory.set(skinFactory as SkinFactory<Button, Skin<Button>, Skinnable<Button>>)
                         this.setOnAction { 
                             val currentPendingKBBinding = pendingKeyboardBinding.getOrCompute()
                             if (currentPendingKBBinding != null) {

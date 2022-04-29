@@ -34,6 +34,10 @@ data class InputKeymapKeyboard(
         }
     }
 
+    fun numOccurrencesOfThisKey(key: Int): Int {
+        return listOf(buttonA, buttonDpadUp, buttonDpadDown, buttonDpadLeft, buttonDpadRight, pause).count { it == key }
+    }
+
     fun toJson(): JsonObject {
         return Json.`object`().also { obj ->
             obj.add("a", this.buttonA)
