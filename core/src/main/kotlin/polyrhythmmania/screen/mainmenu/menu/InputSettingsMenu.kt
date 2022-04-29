@@ -7,10 +7,13 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.InputKeymapKeyboard
@@ -46,6 +49,12 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         contentPane.addChild(vbox)
         contentPane.addChild(hbox)
 
+        fun separator(): UIElement {
+            return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
+                this.bounds.height.set(10f)
+                this.margin.set(Insets(4f, 4f, 0f, 0f))
+            }
+        }
         vbox.temporarilyDisableLayouts {
             vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.feedback").use() }.apply {
                 this.setOnAction {
@@ -55,6 +64,12 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createLongButton { Localization.getVar("mainMenu.inputSettings.keyboard").use() }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(keyboardSettings)
+                }
+            }
+            vbox += separator()
+            vbox += createLongButton { Localization.getVar("mainMenu.audioSettings.goToCalibration").use() }.apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.calibrationSettingsMenu)
                 }
             }
         }
