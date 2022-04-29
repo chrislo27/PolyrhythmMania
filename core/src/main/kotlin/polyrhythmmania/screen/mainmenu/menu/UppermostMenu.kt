@@ -3,11 +3,13 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeIn
+import paintbox.transition.FadeOut
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
@@ -20,6 +22,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
+import polyrhythmmania.screen.SimpleLoadingScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 
 /**
@@ -96,16 +99,25 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 this.setOnAction {
                     mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                     mainMenu.transitionAway {
+                        DiscordRichPresence.updateActivity(DefaultPresences.inEditor())
+                        
                         val main = mainMenu.main
-                        val editorScreen = EditorScreen(main)
-                        main.screen = TransitionScreen(main, main.screen, editorScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
+                        main.screen = TransitionScreen(main, main.screen, SimpleLoadingScreen(main), null, FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                             this.onDestEnd = {
                                 Gdx.app.postRunnable {
                                     mainMenu.backgroundType = BgType.NORMAL
+
+                                    val editorScreen = EditorScreen(main)
+                                    Gdx.app.postRunnable {
+                                        editorScreen.render(1 / 60f)
+                                        Gdx.app.postRunnable {
+                                            main.screen = TransitionScreen(main, main.screen, editorScreen,
+                                                    FadeOut(0.125f, Color(0f, 0f, 0f, 1f)), FadeIn(0.25f, Color(0f, 0f, 0f, 1f)))
+                                        }
+                                    }
                                 }
                             }
                         }
-                        DiscordRichPresence.updateActivity(DefaultPresences.inEditor())
                     }
                 }
             }
