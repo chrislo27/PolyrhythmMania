@@ -38,7 +38,7 @@ import polyrhythmmania.Settings
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.engine.tempo.TempoUtils
-import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.sample.LoopParams

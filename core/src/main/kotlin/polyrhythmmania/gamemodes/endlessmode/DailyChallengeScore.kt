@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes.endlessmode
+package polyrhythmmania.gamemodes.endlessmode
 
 import com.badlogic.gdx.Gdx
 import com.eclipsesource.json.Json

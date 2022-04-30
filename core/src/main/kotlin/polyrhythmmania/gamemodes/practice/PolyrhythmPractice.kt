@@ -1,17 +1,16 @@
-package polyrhythmmania.sidemodes.practice
+package polyrhythmmania.gamemodes.practice
 
 import com.eclipsesource.json.Json
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.gamemodes.GameMode
+import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.statistics.PlayTimeType
@@ -20,7 +19,7 @@ import polyrhythmmania.world.tileset.TilesetPalette
 
 
 abstract class AbstractPolyrhythmPractice(main: PRManiaGame, val flagBit: Int)
-    : SideMode(main, PlayTimeType.REGULAR) {
+    : GameMode(main, PlayTimeType.REGULAR) {
     
     companion object {
         fun parseBlocksJson(json: String, engine: Engine): List<Block> {

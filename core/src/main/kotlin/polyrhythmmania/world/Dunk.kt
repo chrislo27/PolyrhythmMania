@@ -10,7 +10,7 @@ import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
-import polyrhythmmania.sidemodes.EventIncrementEndlessScore
+import polyrhythmmania.gamemodes.EventIncrementEndlessScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.util.Semitones

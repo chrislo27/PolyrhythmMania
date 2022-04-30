@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes
+package polyrhythmmania.gamemodes
 
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
@@ -13,7 +13,7 @@ import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
+import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.LoopParams

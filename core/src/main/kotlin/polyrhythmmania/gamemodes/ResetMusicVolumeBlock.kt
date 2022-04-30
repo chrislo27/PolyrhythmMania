@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes
+package polyrhythmmania.gamemodes
 
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType

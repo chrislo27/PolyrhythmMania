@@ -62,8 +62,8 @@ import polyrhythmmania.editor.CameraPanningSetting
 import polyrhythmmania.editor.EditorSetting
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
-import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
+import polyrhythmmania.gamemodes.endlessmode.DailyChallengeScore
+import polyrhythmmania.gamemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.soundsystem.AudioDeviceSettings
 import polyrhythmmania.soundsystem.javasound.MixerHandler
 import polyrhythmmania.world.render.ForceTexturePack

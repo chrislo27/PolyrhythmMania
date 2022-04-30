@@ -20,11 +20,11 @@ import polyrhythmmania.engine.input.*
 import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
 import polyrhythmmania.screen.results.ResultsScreen
-import polyrhythmmania.sidemodes.AbstractEndlessMode
-import polyrhythmmania.sidemodes.DunkMode
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
-import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
+import polyrhythmmania.gamemodes.AbstractEndlessMode
+import polyrhythmmania.gamemodes.DunkMode
+import polyrhythmmania.gamemodes.GameMode
+import polyrhythmmania.gamemodes.endlessmode.DailyChallengeScore
+import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -44,12 +44,12 @@ import kotlin.math.roundToInt
  */
 abstract class AbstractEnginePlayScreen(
         main: PRManiaGame, playTimeType: PlayTimeType?,
-        
+
         val container: Container,
         val challenges: Challenges, val inputCalibration: InputCalibration,
         
         // TODO: BELOW: refactor to GameMode
-        val sideMode: SideMode?, val resultsBehaviour: ResultsBehaviour
+        val gameMode: GameMode?, val resultsBehaviour: ResultsBehaviour
 ) : AbstractPlayScreen(main, playTimeType) {
 
     val timing: TimingProvider get() = container.timing
@@ -121,7 +121,7 @@ abstract class AbstractEnginePlayScreen(
 
         if (!isPaused.get() && timing is SimpleTimingProvider) {
             timing.seconds += Gdx.graphics.deltaTime
-            sideMode?.renderUpdate()
+            gameMode?.renderUpdate()
         }
     }
 
@@ -138,7 +138,7 @@ abstract class AbstractEnginePlayScreen(
         if (resultsBehaviour is ResultsBehaviour.ShowResults) {
             transitionToResults(resultsBehaviour)
         } else {
-            val sideMode = this.sideMode
+            val sideMode = this.gameMode
             if (sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null) {
                 val menuCol = main.mainMenuScreen.menuCollection
                 val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
@@ -195,8 +195,8 @@ abstract class AbstractEnginePlayScreen(
                 && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
         val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
         var isNewHighScore = false
-        if (sideMode != null && sideMode is AbstractEndlessMode) {
-            val endlessModeScore = sideMode.prevHighScore
+        if (gameMode != null && gameMode is AbstractEndlessMode) {
+            val endlessModeScore = gameMode.prevHighScore
             val prevScore = endlessModeScore.highScore.getOrCompute()
             if (score > prevScore) {
                 endlessModeScore.highScore.set(score)
@@ -232,7 +232,7 @@ abstract class AbstractEnginePlayScreen(
             }
         }
 
-        transitionAway(ResultsScreen(main, scoreObj, container, sideMode, {
+        transitionAway(ResultsScreen(main, scoreObj, container, gameMode, {
             copyThisScreenForResults(scoreObj, resultsBehaviour)
         }, keyboardKeybinds,
                 LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges),
@@ -326,7 +326,7 @@ ${engine.getDebugString()}
 ---
 ${renderer.getDebugString()}
 ---
-SideMode: ${sideMode?.javaClass?.name}${if (sideMode != null) ("\n" + sideMode.getDebugString()) else ""}
+SideMode: ${gameMode?.javaClass?.name}${if (gameMode != null) ("\n" + gameMode.getDebugString()) else ""}
 """
     }
     

@@ -17,8 +17,8 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.play.ResultsBehaviour
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.practice.*
+import polyrhythmmania.gamemodes.GameMode
+import polyrhythmmania.gamemodes.practice.*
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 
@@ -78,7 +78,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             fun createSidemode(name: String, tooltipVar: ReadOnlyVar<String> = Localization.getVar("${name}.tooltip"),
                                challenges: Challenges = Challenges.NO_CHANGES,
                                resultsBehaviour: ResultsBehaviour,
-                               factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
+                               factory: (PRManiaGame, InputKeymapKeyboard) -> GameMode): UIElement {
                 return createSidemodeLongButton(null, name, tooltipVar, challenges, resultsBehaviour) { game, keymap ->
                     DiscordRichPresence.updateActivity(DefaultPresences.playingPractice())
                     mainMenu.backgroundType = BgType.PRACTICE_NORMAL

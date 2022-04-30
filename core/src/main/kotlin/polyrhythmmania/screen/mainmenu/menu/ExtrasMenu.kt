@@ -24,9 +24,9 @@ import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.play.ResultsBehaviour
-import polyrhythmmania.sidemodes.AssembleMode
-import polyrhythmmania.sidemodes.DunkMode
-import polyrhythmmania.sidemodes.EndlessModeScore
+import polyrhythmmania.gamemodes.AssembleMode
+import polyrhythmmania.gamemodes.DunkMode
+import polyrhythmmania.gamemodes.EndlessModeScore
 import polyrhythmmania.solitaire.SolitaireMenu
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins

@@ -10,7 +10,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.music.MusicVolume
-import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.*

@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes.endlessmode
+package polyrhythmmania.gamemodes.endlessmode
 
 import polyrhythmmania.editor.block.CubeType
 

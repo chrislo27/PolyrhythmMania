@@ -35,14 +35,14 @@ import polyrhythmmania.engine.input.Score
 import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.play.AbstractPlayScreen
 import polyrhythmmania.screen.play.OnRankingRevealed
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.practice.AbstractPolyrhythmPractice
+import polyrhythmmania.gamemodes.GameMode
+import polyrhythmmania.gamemodes.practice.AbstractPolyrhythmPractice
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.WorldType
 import kotlin.properties.Delegates
 
 class ResultsScreen(
-        main: PRManiaGame, val score: Score, val container: Container, val sideMode: SideMode?,
+        main: PRManiaGame, val score: Score, val container: Container, val gameMode: GameMode?,
         val startOverFactory: () -> AbstractPlayScreen, // FIXME needs to become NewAbstractPlayScreen
         val keyboardKeybinds: InputKeymapKeyboard,
         val levelScoreAttempt: LevelScoreAttempt,
@@ -418,14 +418,14 @@ class ResultsScreen(
                         Achievements.attemptAwardThresholdAchievement(Achievements.perfectFirstTime, score.nInputs)
                     }
                 }
-                if (sideMode != null && sideMode is AbstractPolyrhythmPractice) {
+                if (gameMode != null && gameMode is AbstractPolyrhythmPractice) {
                     if (score.ranking != Ranking.TRY_AGAIN) {
-                        Achievements.practicePassFlag = Achievements.practicePassFlag or sideMode.flagBit
+                        Achievements.practicePassFlag = Achievements.practicePassFlag or gameMode.flagBit
                         if (Achievements.practicePassFlag == 0b0011) {
                             Achievements.awardAchievement(Achievements.playAllPractices)
                         }
                         if (score.noMiss) {
-                            Achievements.practiceNoMissFlag = Achievements.practiceNoMissFlag or sideMode.flagBit
+                            Achievements.practiceNoMissFlag = Achievements.practiceNoMissFlag or gameMode.flagBit
                             if (Achievements.practiceNoMissFlag == 0b0011) {
                                 Achievements.awardAchievement(Achievements.noMissAllPractices)
                             }

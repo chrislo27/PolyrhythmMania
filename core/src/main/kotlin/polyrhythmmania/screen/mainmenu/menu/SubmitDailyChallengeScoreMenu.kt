@@ -18,8 +18,8 @@ import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.discord.DiscordRichPresence
-import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
-import polyrhythmmania.sidemodes.endlessmode.DailyChallengeUtils
+import polyrhythmmania.gamemodes.endlessmode.DailyChallengeScore
+import polyrhythmmania.gamemodes.endlessmode.DailyChallengeUtils
 import polyrhythmmania.ui.PRManiaSkins
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

@@ -29,10 +29,10 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.play.EnginePlayScreenBase
 import polyrhythmmania.screen.play.ResultsBehaviour
-import polyrhythmmania.sidemodes.EndlessModeScore
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
-import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
+import polyrhythmmania.gamemodes.EndlessModeScore
+import polyrhythmmania.gamemodes.GameMode
+import polyrhythmmania.gamemodes.endlessmode.EndlessHighScore
+import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.ui.PRManiaSkins
@@ -105,13 +105,13 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             scoreVar.addListener {
                                 main.settings.endlessHighScore.set(EndlessHighScore(seedUInt, it.getOrCompute()))
                             }
-                            val sidemode: SideMode = EndlessPolyrhythm(main, PlayTimeType.ENDLESS,
+                            val sidemode: GameMode = EndlessPolyrhythm(main, PlayTimeType.ENDLESS,
                                     EndlessModeScore(scoreVar, showNewHighScoreAtEnd = true),
                                     seed, dailyChallenge = null,
                                     disableLifeRegen = disableRegen.get(),
                                     maxLives = if (daredevilMode.get()) 1 else -1)
                             val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType, sidemode.container, 
-                                    sideMode = sidemode,
+                                    gameMode = sidemode,
                                     challenges = Challenges.NO_CHANGES,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                     resultsBehaviour = ResultsBehaviour.NoResults)

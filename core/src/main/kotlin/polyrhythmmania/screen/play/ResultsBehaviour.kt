@@ -1,6 +1,6 @@
 package polyrhythmmania.screen.play
 
-import polyrhythmmania.sidemodes.AbstractEndlessMode
+import polyrhythmmania.gamemodes.AbstractEndlessMode
 
 
 sealed class ResultsBehaviour {

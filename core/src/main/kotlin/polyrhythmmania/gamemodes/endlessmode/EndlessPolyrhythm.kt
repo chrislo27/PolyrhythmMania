@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes.endlessmode
+package polyrhythmmania.gamemodes.endlessmode
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
@@ -19,7 +19,7 @@ import polyrhythmmania.engine.EventConditionalOnRods
 import polyrhythmmania.engine.EventPlaySFX
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.sidemodes.*
+import polyrhythmmania.gamemodes.*
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.statistics.GlobalStats

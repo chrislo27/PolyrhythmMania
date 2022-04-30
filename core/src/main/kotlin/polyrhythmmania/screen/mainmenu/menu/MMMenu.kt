@@ -30,7 +30,7 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.screen.play.EnginePlayScreenBase
 import polyrhythmmania.screen.play.ResultsBehaviour
-import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.gamemodes.GameMode
 
 
 /**
@@ -349,7 +349,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                                            challenges: Challenges = Challenges.NO_CHANGES,
                                            resultsBehaviour: ResultsBehaviour = ResultsBehaviour.NoResults,
                                            newIndicator: Settings.NewIndicator? = null,
-                                           factory: (PRManiaGame, InputKeymapKeyboard) -> SideMode): UIElement {
+                                           factory: (PRManiaGame, InputKeymapKeyboard) -> GameMode): UIElement {
         return (if (newIndicator == null)
                 (createLongButtonWithIcon(icon) { Localization.getVar(name).use() })
         else (createLongButtonWithNewIndicator(newIndicator, icon) { Localization.getVar(name).use() })).apply {
@@ -363,8 +363,8 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                         main.settings.persist()
                     }
                     Gdx.app.postRunnable {
-                        val sidemode: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-                        val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType, sideMode = sidemode, container = sidemode.container,
+                        val sidemode: GameMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
+                        val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType, gameMode = sidemode, container = sidemode.container,
                                 inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                 challenges = challenges,
                                 resultsBehaviour = resultsBehaviour)

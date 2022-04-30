@@ -17,7 +17,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
-import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
+import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.ui.PRManiaSkins
 import java.time.format.DateTimeFormatter
 

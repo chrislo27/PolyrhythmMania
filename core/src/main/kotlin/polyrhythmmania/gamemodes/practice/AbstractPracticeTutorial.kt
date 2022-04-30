@@ -1,10 +1,9 @@
-package polyrhythmmania.sidemodes.practice
+package polyrhythmmania.gamemodes.practice
 
 import com.badlogic.gdx.Gdx
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievements
-import polyrhythmmania.container.GlobalContainerSettings
-import polyrhythmmania.sidemodes.SideMode
+import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.WorldMode
@@ -13,7 +12,7 @@ import polyrhythmmania.world.WorldType
 
 
 abstract class AbstractPracticeTutorial(main: PRManiaGame, playTimeType: PlayTimeType, val flagBit: Int)
-    : SideMode(main, playTimeType) {
+    : GameMode(main, playTimeType) {
     
     init {
         container.world.worldMode = WorldMode(WorldType.POLYRHYTHM, EndlessType.NOT_ENDLESS)

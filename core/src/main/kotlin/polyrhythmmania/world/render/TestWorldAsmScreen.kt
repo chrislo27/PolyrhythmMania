@@ -14,7 +14,7 @@ import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.sidemodes.*
+import polyrhythmmania.gamemodes.*
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.world.*

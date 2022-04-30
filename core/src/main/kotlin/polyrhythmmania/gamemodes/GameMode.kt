@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes
+package polyrhythmmania.gamemodes
 
 
 import com.badlogic.gdx.Gdx
@@ -14,7 +14,7 @@ import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.World
 
 
-abstract class SideMode(val main: PRManiaGame, val playTimeType: PlayTimeType) : Disposable {
+abstract class GameMode(val main: PRManiaGame, val playTimeType: PlayTimeType) : Disposable {
 
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
         this.audioContext.out.gain = main.settings.gameplayVolume.getOrCompute() / 100f

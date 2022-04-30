@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes
+package polyrhythmmania.gamemodes
 
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame

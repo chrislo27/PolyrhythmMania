@@ -27,8 +27,8 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.play.EnginePlayScreenBase
 import polyrhythmmania.screen.play.ResultsBehaviour
-import polyrhythmmania.sidemodes.EndlessModeScore
-import polyrhythmmania.sidemodes.endlessmode.*
+import polyrhythmmania.gamemodes.EndlessModeScore
+import polyrhythmmania.gamemodes.endlessmode.*
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.ui.PRManiaSkins
@@ -119,7 +119,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     EndlessModeScore(scoreVar, showNewHighScoreAtEnd = false),
                                     EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
                             val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType, 
-                                    sidemode.container, sideMode = sidemode,
+                                    sidemode.container, gameMode = sidemode,
                                     challenges = Challenges.NO_CHANGES,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                     resultsBehaviour = ResultsBehaviour.NoResults)

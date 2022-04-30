@@ -53,7 +53,7 @@ import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.SimpleLoadingScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
-import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.solitaire.SolitaireAssetLoader
 import polyrhythmmania.solitaire.SolitaireAssets
 import polyrhythmmania.statistics.GlobalStats

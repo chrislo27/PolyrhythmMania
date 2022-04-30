@@ -16,8 +16,8 @@ import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.engine.input.InputType
-import polyrhythmmania.sidemodes.EventAsmAssemble
-import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.gamemodes.EventAsmAssemble
+import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.entity.EntityPiston

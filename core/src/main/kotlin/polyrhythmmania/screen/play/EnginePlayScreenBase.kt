@@ -21,7 +21,6 @@ import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
-import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.prepareStencilMask
 import paintbox.util.gdxutils.useStencilMask
@@ -32,8 +31,8 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.Score
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
+import polyrhythmmania.gamemodes.GameMode
+import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.WorldType
@@ -43,8 +42,8 @@ class EnginePlayScreenBase(
         main: PRManiaGame, playTimeType: PlayTimeType?,
         container: Container,
         challenges: Challenges, inputCalibration: InputCalibration,
-        sideMode: SideMode?, resultsBehaviour: ResultsBehaviour
-) : AbstractEnginePlayScreen(main, playTimeType, container, challenges, inputCalibration, sideMode, resultsBehaviour) {
+        gameMode: GameMode?, resultsBehaviour: ResultsBehaviour
+) : AbstractEnginePlayScreen(main, playTimeType, container, challenges, inputCalibration, gameMode, resultsBehaviour) {
 
     companion object; // Used for early init
 
@@ -67,8 +66,8 @@ class EnginePlayScreenBase(
                 val newScore = scoreVar.getOrCompute()
                 when (engine.world.worldMode.type) {
                     WorldType.POLYRHYTHM -> {
-                        if (sideMode is EndlessPolyrhythm) {
-                            if (sideMode.dailyChallenge != null) {
+                        if (gameMode is EndlessPolyrhythm) {
+                            if (gameMode.dailyChallenge != null) {
                                 listOf(Achievements.dailyScore25, Achievements.dailyScore50,
                                         Achievements.dailyScore75, Achievements.dailyScore100,
                                         Achievements.dailyScore125).forEach {
@@ -81,7 +80,7 @@ class EnginePlayScreenBase(
                                     Achievements.attemptAwardScoreAchievement(it, newScore)
                                 }
 
-                                if (sideMode.disableLifeRegen) {
+                                if (gameMode.disableLifeRegen) {
                                     Achievements.attemptAwardScoreAchievement(Achievements.endlessNoLifeRegen100, newScore)
                                 }
                                 if (engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil
@@ -113,7 +112,7 @@ class EnginePlayScreenBase(
         optionList += PauseOption(if (engine.autoInputs) "play.pause.resume.robotMode" else "play.pause.resume", true) {
             unpauseGame(true)
         }
-        optionList += PauseOption("play.pause.startOver", !(sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null)) {
+        optionList += PauseOption("play.pause.startOver", !(gameMode is EndlessPolyrhythm && gameMode.dailyChallenge != null)) {
             playMenuSound("sfx_menu_enter_game")
 
             val thisScreen: EnginePlayScreenBase = this
@@ -263,7 +262,7 @@ class EnginePlayScreenBase(
     }
     
     override fun copyThisScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen {
-        return EnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, sideMode,
+        return EnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, gameMode,
                 if (resultsBehaviour is ResultsBehaviour.ShowResults)
                     resultsBehaviour.copy(previousHighScore = if (scoreObj.newHighScore) 
                         scoreObj.scoreInt 
@@ -360,8 +359,8 @@ class EnginePlayScreenBase(
     override fun unpauseGame(playSound: Boolean) {
         super.unpauseGame(playSound)
 
-        if (sideMode != null && sideMode is EndlessPolyrhythm) {
-            sideMode.submitPauseTime(this.endlessPrPauseTime)
+        if (gameMode != null && gameMode is EndlessPolyrhythm) {
+            gameMode.submitPauseTime(this.endlessPrPauseTime)
         }
         
         // TODO move me

@@ -20,7 +20,7 @@ import polyrhythmmania.PreferenceKeys
 import polyrhythmmania.Settings
 import polyrhythmmania.container.Container
 import polyrhythmmania.library.score.GlobalScoreCache
-import polyrhythmmania.sidemodes.endlessmode.EndlessHighScore
+import polyrhythmmania.gamemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.ui.PRManiaSkins
 
 

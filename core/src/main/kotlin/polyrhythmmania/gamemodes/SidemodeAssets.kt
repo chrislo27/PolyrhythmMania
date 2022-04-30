@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes
+package polyrhythmmania.gamemodes
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Disposable

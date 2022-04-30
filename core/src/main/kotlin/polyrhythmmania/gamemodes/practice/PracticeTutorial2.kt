@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes.practice
+package polyrhythmmania.gamemodes.practice
 
 import com.badlogic.gdx.Input
 import net.beadsproject.beads.ugens.SamplePlayer
@@ -13,8 +13,8 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.sidemodes.ResetMusicVolumeBlock
-import polyrhythmmania.sidemodes.SidemodeAssets
+import polyrhythmmania.gamemodes.ResetMusicVolumeBlock
+import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.statistics.PlayTimeType

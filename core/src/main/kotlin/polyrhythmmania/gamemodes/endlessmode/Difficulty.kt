@@ -1,4 +1,4 @@
-package polyrhythmmania.sidemodes.endlessmode
+package polyrhythmmania.gamemodes.endlessmode
 
 enum class Difficulty(val value: Int) {
     VERY_EASY(0),
