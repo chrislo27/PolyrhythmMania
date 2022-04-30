@@ -107,6 +107,35 @@ class EnginePlayScreenBase(
             }
         }
     }
+    
+    init {
+        val optionList = mutableListOf<PauseOption>()
+        optionList += PauseOption(if (engine.autoInputs) "play.pause.resume.robotMode" else "play.pause.resume", true) {
+            unpauseGame(true)
+        }
+        optionList += PauseOption("play.pause.startOver", !(sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null)) {
+            playMenuSound("sfx_menu_enter_game")
+
+            val thisScreen: EnginePlayScreenBase = this
+            val resetAction: () -> Unit = {
+                resetAndUnpause()
+            }
+            main.screen = TransitionScreen(main, thisScreen, thisScreen,
+                    WipeTransitionHead(Color.BLACK.cpy(), 0.4f), WipeTransitionTail(Color.BLACK.cpy(), 0.4f)).apply {
+                onEntryEnd = resetAction
+                onStart = {
+                    Gdx.input.isCursorCatched = true
+                }
+            }
+        }
+        optionList += PauseOption("play.pause.quitToMainMenu", true) {
+            quitToMainMenu()
+            Gdx.app.postRunnable {
+                playMenuSound("sfx_pause_exit")
+            }
+        }
+        this.pauseOptions.set(optionList)
+    }
 
 
     init { // TODO remove these
@@ -227,44 +256,6 @@ class EnginePlayScreenBase(
                 }
             }
         }
-
-        val optionList = mutableListOf<PauseOption>()
-        optionList += PauseOption(if (engine.autoInputs) "play.pause.resume.robotMode" else "play.pause.resume", true) {
-            unpauseGame(true)
-        }
-        optionList += PauseOption("play.pause.startOver", !(sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null)) {
-            playMenuSound("sfx_menu_enter_game")
-
-            val thisScreen: EnginePlayScreenBase = this
-            val resetAction: () -> Unit = {
-                resetAndUnpause()
-            }
-            main.screen = TransitionScreen(main, thisScreen, thisScreen,
-                    WipeTransitionHead(Color.BLACK.cpy(), 0.4f), WipeTransitionTail(Color.BLACK.cpy(), 0.4f)).apply {
-                onEntryEnd = resetAction
-                onStart = {
-                    Gdx.input.isCursorCatched = true
-                }
-            }
-        }
-        optionList += PauseOption("play.pause.quitToMainMenu", true) {
-            val main = this.main
-            val currentScreen = main.screen
-            Gdx.app.postRunnable {
-                val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
-                main.screen = TransitionScreen(main, currentScreen, mainMenu,
-                        FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
-                    this.onEntryEnd = {
-                        currentScreen.dispose()
-                        container.disposeQuietly()
-                    }
-                }
-            }
-            Gdx.app.postRunnable {
-                playMenuSound("sfx_pause_exit")
-            }
-        }
-        this.pauseOptions.set(optionList)
     }
     
     override fun copyThisScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen {

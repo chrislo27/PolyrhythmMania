@@ -163,7 +163,7 @@ abstract class AbstractEnginePlayScreen(
     }
     
     
-    private fun quitToMainMenu() { // TODO remove me
+    protected fun quitToMainMenu() { // TODO remove me
         val main = this.main
         val currentScreen = main.screen
         Gdx.app.postRunnable {
@@ -178,7 +178,7 @@ abstract class AbstractEnginePlayScreen(
         }
     }
     // TODO results should be handled per GameMode
-    private fun transitionToResults(resultsBehaviour: ResultsBehaviour.ShowResults) {
+    protected fun transitionToResults(resultsBehaviour: ResultsBehaviour.ShowResults) {
         val inputter = engine.inputter
         val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
         val nInputs = max(inputter.totalExpectedInputs, inputter.minimumInputCount)
