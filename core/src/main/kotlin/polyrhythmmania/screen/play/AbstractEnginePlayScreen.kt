@@ -1,4 +1,4 @@
-package polyrhythmmania.screen.newplay
+package polyrhythmmania.screen.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
@@ -19,7 +19,6 @@ import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.*
 import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
-import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.sidemodes.AbstractEndlessMode
 import polyrhythmmania.sidemodes.DunkMode
@@ -43,7 +42,7 @@ import kotlin.math.roundToInt
 /**
  * A generic play screen for [Engine]-based gameplay.
  */
-abstract class NewAbstractEnginePlayScreen(
+abstract class AbstractEnginePlayScreen(
         main: PRManiaGame, playTimeType: PlayTimeType?,
         
         val container: Container,
@@ -51,7 +50,7 @@ abstract class NewAbstractEnginePlayScreen(
         
         // TODO: BELOW: refactor to GameMode
         val sideMode: SideMode?, val resultsBehaviour: ResultsBehaviour
-) : NewAbstractPlayScreen(main, playTimeType) {
+) : AbstractPlayScreen(main, playTimeType) {
 
     val timing: TimingProvider get() = container.timing
     val soundSystem: SoundSystem
@@ -225,7 +224,7 @@ abstract class NewAbstractEnginePlayScreen(
             main.screen = TransitionScreen(main, this, nextScreen,
                     FadeOut(0.5f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
-                    this@NewAbstractEnginePlayScreen.dispose()
+                    this@AbstractEnginePlayScreen.dispose()
                     if (disposeContainer) {
                         container.disposeQuietly()
                     }
@@ -240,7 +239,7 @@ abstract class NewAbstractEnginePlayScreen(
                 resultsBehaviour.onRankingRevealed), disposeContainer = false) {}
     }
     @Deprecated("Remove me later")
-    abstract fun copyThisScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): NewAbstractEnginePlayScreen // TODO remove me
+    abstract fun copyThisScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen // TODO remove me
 
     
     override fun pauseGame(playSound: Boolean) {

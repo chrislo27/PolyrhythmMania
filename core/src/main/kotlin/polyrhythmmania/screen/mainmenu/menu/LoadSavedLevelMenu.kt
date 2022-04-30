@@ -34,7 +34,7 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.library.score.LevelScore
 import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.screen.newplay.NewEnginePlayScreenBase
+import polyrhythmmania.screen.play.EnginePlayScreenBase
 import polyrhythmmania.screen.play.OnRankingRevealed
 import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.soundsystem.SimpleTimingProvider
@@ -246,7 +246,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                                     GlobalScoreCache.pushNewLevelScoreAttempt(uuid, lsa)
                                 }
                             }
-                            val playScreen = NewEnginePlayScreenBase(main, PlayTimeType.REGULAR, loadedData.newContainer, challenges,
+                            val playScreen = EnginePlayScreenBase(main, PlayTimeType.REGULAR, loadedData.newContainer, challenges,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                     resultsBehaviour = if (robotMode) ResultsBehaviour.NoResults
                                     else ResultsBehaviour.ShowResults(onRankingRevealed, previousHighScore), sideMode = null)

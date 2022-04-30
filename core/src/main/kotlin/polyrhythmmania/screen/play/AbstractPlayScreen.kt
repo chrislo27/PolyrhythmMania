@@ -1,4 +1,4 @@
-package polyrhythmmania.screen.newplay
+package polyrhythmmania.screen.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -18,7 +18,6 @@ import paintbox.ui.SceneRoot
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.screen.play.PauseOption
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import space.earlygrey.shapedrawer.ShapeDrawer
@@ -27,7 +26,7 @@ import space.earlygrey.shapedrawer.ShapeDrawer
 /**
  * A generic play screen that can be paused.
  */
-abstract class NewAbstractPlayScreen(
+abstract class AbstractPlayScreen(
         main: PRManiaGame,
         val playTimeType: PlayTimeType?
 ) : PRManiaScreen(main) {

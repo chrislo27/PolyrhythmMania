@@ -28,7 +28,7 @@ import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
-import polyrhythmmania.screen.newplay.NewEnginePlayScreenBase
+import polyrhythmmania.screen.play.EnginePlayScreenBase
 import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.SideMode
 
@@ -364,7 +364,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     }
                     Gdx.app.postRunnable {
                         val sidemode: SideMode = factory.invoke(main, main.settings.inputKeymapKeyboard.getOrCompute().copy())
-                        val playScreen = NewEnginePlayScreenBase(main, sidemode.playTimeType, sideMode = sidemode, container = sidemode.container,
+                        val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType, sideMode = sidemode, container = sidemode.container,
                                 inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                 challenges = challenges,
                                 resultsBehaviour = resultsBehaviour)

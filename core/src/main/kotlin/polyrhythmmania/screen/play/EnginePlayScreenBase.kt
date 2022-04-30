@@ -1,4 +1,4 @@
-package polyrhythmmania.screen.newplay
+package polyrhythmmania.screen.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
@@ -32,7 +32,6 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.Score
-import polyrhythmmania.screen.play.*
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.statistics.PlayTimeType
@@ -40,12 +39,12 @@ import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.WorldType
 
 
-class NewEnginePlayScreenBase(
+class EnginePlayScreenBase(
         main: PRManiaGame, playTimeType: PlayTimeType?,
         container: Container,
         challenges: Challenges, inputCalibration: InputCalibration,
         sideMode: SideMode?, resultsBehaviour: ResultsBehaviour
-) : NewAbstractEnginePlayScreen(main, playTimeType, container, challenges, inputCalibration, sideMode, resultsBehaviour) {
+) : AbstractEnginePlayScreen(main, playTimeType, container, challenges, inputCalibration, sideMode, resultsBehaviour) {
 
     companion object; // Used for early init
 
@@ -236,7 +235,7 @@ class NewEnginePlayScreenBase(
         optionList += PauseOption("play.pause.startOver", !(sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null)) {
             playMenuSound("sfx_menu_enter_game")
 
-            val thisScreen: NewEnginePlayScreenBase = this
+            val thisScreen: EnginePlayScreenBase = this
             val resetAction: () -> Unit = {
                 resetAndUnpause()
             }
@@ -268,8 +267,8 @@ class NewEnginePlayScreenBase(
         this.pauseOptions.set(optionList)
     }
     
-    override fun copyThisScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): NewAbstractEnginePlayScreen {
-        return NewEnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, sideMode,
+    override fun copyThisScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen {
+        return EnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, sideMode,
                 if (resultsBehaviour is ResultsBehaviour.ShowResults)
                     resultsBehaviour.copy(previousHighScore = if (scoreObj.newHighScore) 
                         scoreObj.scoreInt 

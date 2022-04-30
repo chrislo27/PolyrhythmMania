@@ -33,7 +33,7 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.library.score.LevelScoreAttempt
-import polyrhythmmania.screen.newplay.NewAbstractPlayScreen
+import polyrhythmmania.screen.play.AbstractPlayScreen
 import polyrhythmmania.screen.play.OnRankingRevealed
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.practice.AbstractPolyrhythmPractice
@@ -43,7 +43,7 @@ import kotlin.properties.Delegates
 
 class ResultsScreen(
         main: PRManiaGame, val score: Score, val container: Container, val sideMode: SideMode?,
-        val startOverFactory: () -> NewAbstractPlayScreen, // FIXME needs to become NewAbstractPlayScreen
+        val startOverFactory: () -> AbstractPlayScreen, // FIXME needs to become NewAbstractPlayScreen
         val keyboardKeybinds: InputKeymapKeyboard,
         val levelScoreAttempt: LevelScoreAttempt,
         val onRankingRevealed: OnRankingRevealed?,

@@ -1,7 +1,7 @@
 package polyrhythmmania.engine.input
 
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.screen.newplay.NewEnginePlayScreenBase
+import polyrhythmmania.screen.play.EnginePlayScreenBase
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.World
@@ -23,7 +23,7 @@ object InputThresholds {
         InputScore.ACE
         Ranking.SUPERB
         Score(0, 0f, 0, 1, false, false, Challenges.NO_CHANGES, "", "")
-        NewEnginePlayScreenBase
+        EnginePlayScreenBase
         
         // Warm up input-related code paths
         val world = World()

@@ -27,7 +27,7 @@ import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.screen.newplay.NewEnginePlayScreenBase
+import polyrhythmmania.screen.play.EnginePlayScreenBase
 import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.sidemodes.EndlessModeScore
 import polyrhythmmania.sidemodes.SideMode
@@ -110,7 +110,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     seed, dailyChallenge = null,
                                     disableLifeRegen = disableRegen.get(),
                                     maxLives = if (daredevilMode.get()) 1 else -1)
-                            val playScreen = NewEnginePlayScreenBase(main, sidemode.playTimeType, sidemode.container, 
+                            val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType, sidemode.container, 
                                     sideMode = sidemode,
                                     challenges = Challenges.NO_CHANGES,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
