@@ -2,7 +2,6 @@ package polyrhythmmania.engine.input
 
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.screen.newplay.NewEnginePlayScreenBase
-import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.World

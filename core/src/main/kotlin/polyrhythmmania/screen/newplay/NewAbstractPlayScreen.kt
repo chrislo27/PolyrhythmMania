@@ -100,7 +100,7 @@ abstract class NewAbstractPlayScreen(
      *
      * Use to render the pause screen.
      */
-    protected abstract fun renderAfterGameplay(delta: Float)
+    protected abstract fun renderAfterGameplay(delta: Float, camera: OrthographicCamera)
     
     
     // Note: May remove final modifier if needed later down the road
@@ -127,7 +127,7 @@ abstract class NewAbstractPlayScreen(
         batch.projectionMatrix = camera.combined
         batch.begin()
 
-        renderAfterGameplay(delta)
+        renderAfterGameplay(delta, camera)
 
         batch.end()
         batch.projectionMatrix = main.nativeCamera.combined

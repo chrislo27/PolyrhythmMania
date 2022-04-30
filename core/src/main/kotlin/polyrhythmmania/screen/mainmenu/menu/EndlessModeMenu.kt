@@ -26,7 +26,6 @@ import polyrhythmmania.Localization
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.newplay.NewEnginePlayScreenBase
 import polyrhythmmania.screen.play.ResultsBehaviour

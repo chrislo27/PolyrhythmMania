@@ -27,7 +27,6 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.screen.newplay.NewEnginePlayScreenBase
 import polyrhythmmania.screen.play.ResultsBehaviour

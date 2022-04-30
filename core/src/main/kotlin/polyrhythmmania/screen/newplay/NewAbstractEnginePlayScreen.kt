@@ -3,6 +3,7 @@ package polyrhythmmania.screen.newplay
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import paintbox.binding.VarChangedListener
 import paintbox.transition.FadeIn
 import paintbox.transition.FadeOut
@@ -18,7 +19,6 @@ import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.*
 import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
-import polyrhythmmania.screen.play.AbstractPlayScreen
 import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.sidemodes.AbstractEndlessMode
@@ -113,7 +113,7 @@ abstract class NewAbstractEnginePlayScreen(
     override fun onStartOver() {
     }
 
-    override fun renderAfterGameplay(delta: Float) {
+    override fun renderAfterGameplay(delta: Float, camera: OrthographicCamera) {
         // TODO pause menu
     }
 
@@ -172,10 +172,8 @@ abstract class NewAbstractEnginePlayScreen(
             main.screen = TransitionScreen(main, currentScreen, mainMenu,
                     FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
-                    if (currentScreen is AbstractPlayScreen) {
-                        currentScreen.dispose()
-                        container.disposeQuietly()
-                    }
+                    currentScreen.dispose()
+                    container.disposeQuietly()
                 }
             }
         }
