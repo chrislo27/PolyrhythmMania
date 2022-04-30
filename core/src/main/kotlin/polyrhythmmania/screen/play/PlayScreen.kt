@@ -24,19 +24,19 @@ class PlayScreen private constructor(
 
     private var pauseTime: Float = 0f
     
-    constructor(
-            main: PRManiaGame, sideMode: SideMode,
-            challenges: Challenges,
-            inputCalibration: InputCalibration,
-            resultsBehaviour: ResultsBehaviour
-    ) : this(main, sideMode, sideMode.playTimeType, sideMode.container, challenges, inputCalibration, resultsBehaviour)
-
-    constructor(
-            main: PRManiaGame, playTimeType: PlayTimeType,
-            container: Container, challenges: Challenges,
-            inputCalibration: InputCalibration,
-            resultsBehaviour: ResultsBehaviour
-    ) : this(main, null, playTimeType, container, challenges, inputCalibration, resultsBehaviour)
+//    constructor(
+//            main: PRManiaGame, sideMode: SideMode,
+//            challenges: Challenges,
+//            inputCalibration: InputCalibration,
+//            resultsBehaviour: ResultsBehaviour
+//    ) : this(main, sideMode, sideMode.playTimeType, sideMode.container, challenges, inputCalibration, resultsBehaviour)
+//
+//    constructor(
+//            main: PRManiaGame, playTimeType: PlayTimeType,
+//            container: Container, challenges: Challenges,
+//            inputCalibration: InputCalibration,
+//            resultsBehaviour: ResultsBehaviour
+//    ) : this(main, null, playTimeType, container, challenges, inputCalibration, resultsBehaviour)
 
     init {
         // Score achievements for endless-type modes

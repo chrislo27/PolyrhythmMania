@@ -1,9 +1,8 @@
-package polyrhythmmania.screen.play
+package polyrhythmmania.screen.newplay
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
@@ -16,7 +15,10 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.PaintboxGame
-import paintbox.binding.*
+import paintbox.binding.BooleanVar
+import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyBooleanVar
+import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -31,64 +33,36 @@ import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
-import paintbox.util.gdxutils.*
-import paintbox.util.sumOfFloat
+import paintbox.util.gdxutils.fillRect
+import paintbox.util.gdxutils.prepareStencilMask
+import paintbox.util.gdxutils.useStencilMask
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
-import polyrhythmmania.achievements.Achievements
-import polyrhythmmania.container.Container
-import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.InputCalibration
-import polyrhythmmania.engine.input.*
-import polyrhythmmania.library.score.LevelScoreAttempt
-import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
-import polyrhythmmania.screen.results.ResultsScreen
-import polyrhythmmania.sidemodes.AbstractEndlessMode
-import polyrhythmmania.sidemodes.DunkMode
-import polyrhythmmania.sidemodes.SideMode
-import polyrhythmmania.sidemodes.endlessmode.DailyChallengeScore
-import polyrhythmmania.sidemodes.endlessmode.EndlessPolyrhythm
-import polyrhythmmania.soundsystem.SimpleTimingProvider
-import polyrhythmmania.soundsystem.SoundSystem
-import polyrhythmmania.soundsystem.TimingProvider
+import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.screen.play.ArrowNode
+import polyrhythmmania.screen.play.PauseBackground
+import polyrhythmmania.screen.play.PauseOption
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
-import polyrhythmmania.world.EntityRodPR
-import polyrhythmmania.world.render.ForceTilesetPalette
-import polyrhythmmania.world.render.WorldRenderer
-import polyrhythmmania.world.tileset.TilesetPalette
 import space.earlygrey.shapedrawer.ShapeDrawer
-import java.time.*
-import java.util.*
-import kotlin.math.*
 
 
-abstract class AbstractPlayScreen protected constructor(
-        main: PRManiaGame, val sideMode: SideMode?, val playTimeType: PlayTimeType,
-        val container: Container, val challenges: Challenges,
-        val inputCalibration: InputCalibration,
-        val resultsBehaviour: ResultsBehaviour
+@Deprecated("Delete me later")
+abstract class NewAbstractPlayScreenWithPauseMenu(
+        main: PRManiaGame,
+        val playTimeType: PlayTimeType?
 ) : PRManiaScreen(main) {
 
-    protected val startTimestamp: Instant = Instant.now()
+    /**
+     * Used to render the pause [sceneRoot] for the first frame to reduce stutter.
+     */
+    private var firstRender: Boolean = true
     
-    val timing: TimingProvider get() = container.timing
-    val soundSystem: SoundSystem
-        get() = container.soundSystem ?: error("${this::javaClass.name} requires a non-null SoundSystem in the Container")
-    val engine: Engine get() = container.engine
-    val renderer: WorldRenderer get() = container.renderer
     val batch: SpriteBatch = main.batch
-
-    protected val isPaused: BooleanVar = BooleanVar(false)
+    
+    protected val isPaused: ReadOnlyBooleanVar = BooleanVar(false)
     protected val keyboardKeybinds: InputKeymapKeyboard by lazy { main.settings.inputKeymapKeyboard.getOrCompute() }
-    private val endSignalListener: VarChangedListener<Boolean> = VarChangedListener {
-        if (it.getOrCompute()) {
-            Gdx.app.postRunnable {
-                onEndSignalFired()
-            }
-        }
-    }
 
     protected val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
@@ -96,35 +70,29 @@ abstract class AbstractPlayScreen protected constructor(
     }
     protected val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
     protected val sceneRoot: SceneRoot = SceneRoot(uiViewport)
-    protected val inputProcessor: InputProcessor = sceneRoot.inputSystem
+    protected val pauseMenuInputProcessor: InputProcessor = sceneRoot.inputSystem
     protected val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
-    
+
     protected val pauseBg: PauseBackground = PauseBackground()
-    
     protected val pauseOptions: Var<List<PauseOption>> = Var(emptyList())
     protected val selectedPauseOption: Var<PauseOption?> = Var(null)
-    
+
+    // TODO remove these
     private val panelAnimationValue: FloatVar = FloatVar(0f)
     private var activePanelAnimation: Animation? = null
-    
-    protected val topPane: Pane
-    protected val bottomPane: Pane
-    protected val titleLabel: TextLabel
+    private val topPane: Pane
+    private val bottomPane: Pane
+    private val titleLabel: TextLabel
 
-    /**
-     * Used to render the pause [sceneRoot] for the first frame to reduce stutter.
-     */
-    private var firstRender: Boolean = true
-
-    init {
+    init { // TODO remove these
         var nextLayer: UIElement = sceneRoot
         fun addLayer(element: UIElement) {
             nextLayer += element
             nextLayer = element
         }
         addLayer(RectElement(Color(0f, 0f, 0f, 0f)))
-        
-        topPane = Pane().apply { 
+
+        topPane = Pane().apply {
             Anchor.TopLeft.configure(this, offsetY = {
                 val h = bounds.height.use()
                 -h + panelAnimationValue.use() * h
@@ -134,7 +102,7 @@ abstract class AbstractPlayScreen protected constructor(
             this.padding.set(Insets(36f, 0f, 64f, 0f))
         }
         nextLayer += topPane
-        bottomPane = Pane().apply { 
+        bottomPane = Pane().apply {
             Anchor.BottomRight.configure(this, offsetY = {
                 val h = bounds.height.use()
                 h + panelAnimationValue.use() * -h
@@ -155,7 +123,7 @@ abstract class AbstractPlayScreen protected constructor(
             this.bounds.height.set(128f)
             this.renderAlign.set(Align.left)
         }
-        
+
         leftVbox.temporarilyDisableLayouts {
             leftVbox += titleLabel
         }
@@ -220,10 +188,10 @@ abstract class AbstractPlayScreen protected constructor(
                 }
             }
         }
-        
+
         optionsBg += VBox().apply {
             this.spacing.set(0f)
-            
+
             pauseOptions.addListener {
                 val optionList = it.getOrCompute()
                 this.removeAllChildren()
@@ -234,89 +202,57 @@ abstract class AbstractPlayScreen protected constructor(
                 }
             }
         }
-        
+
         val optionList = mutableListOf<PauseOption>()
-        optionList += PauseOption(if (engine.autoInputs) "play.pause.resume.robotMode" else "play.pause.resume", true) {
+        optionList += PauseOption("play.pause.resume", true) {
             unpauseGame(true)
         }
-        optionList += PauseOption("play.pause.startOver", !(sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null)) {
+        optionList += PauseOption("play.pause.startOver", false) {
             playMenuSound("sfx_menu_enter_game")
 
-            val thisScreen: AbstractPlayScreen = this
-            val resetAction: () -> Unit = {
-                resetAndUnpause()
-            }
-            main.screen = TransitionScreen(main, thisScreen, thisScreen,
-                    WipeTransitionHead(Color.BLACK.cpy(), 0.4f), WipeTransitionTail(Color.BLACK.cpy(), 0.4f)).apply {
-                onEntryEnd = resetAction
-                onStart = {
-                    Gdx.input.isCursorCatched = true
-                }
-            }
+//            val thisScreen: AbstractPlayScreen = this
+//            val resetAction: () -> Unit = {
+//                resetAndUnpause()
+//            }
+//            main.screen = TransitionScreen(main, thisScreen, thisScreen,
+//                    WipeTransitionHead(Color.BLACK.cpy(), 0.4f), WipeTransitionTail(Color.BLACK.cpy(), 0.4f)).apply {
+//                onEntryEnd = resetAction
+//                onStart = {
+//                    Gdx.input.isCursorCatched = true
+//                }
+//            }
         }
         optionList += PauseOption("play.pause.quitToMainMenu", true) {
             quitToMainMenu(true)
         }
         this.pauseOptions.set(optionList)
     }
-
-    init {
-        engine.endSignalReceived.addListener(endSignalListener)
-    }
-
-    abstract fun copyScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractPlayScreen
-
-    /**
-     * Will be triggered in the gdx main thread.
-     */
-    open fun onEndSignalFired() {
-        soundSystem.setPaused(true)
-        container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
-            engine.inputter.submitInputsFromRod(rod)
-        }
-        if (resultsBehaviour is ResultsBehaviour.ShowResults) {
-            transitionToResults(resultsBehaviour)
-        } else {
-            val sideMode = this.sideMode
-            if (sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null) {
-                val menuCol = main.mainMenuScreen.menuCollection
-                val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
-                val nonce = sideMode.dailyChallengeUUIDNonce.getOrCompute()
-                if (score.score > 0 && !engine.autoInputs) {
-                    val submitMenu = SubmitDailyChallengeScoreMenu(menuCol, sideMode.dailyChallenge, nonce, score)
-                    menuCol.addMenu(submitMenu)
-                    menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
-                }
-
-                quitToMainMenu(false)
-            } else {
-                if (sideMode is DunkMode) {
-                    val localDateTime = LocalDateTime.ofInstant(startTimestamp, ZoneId.systemDefault())
-                    if (localDateTime.dayOfWeek == DayOfWeek.FRIDAY && localDateTime.toLocalTime() >= LocalTime.of(17, 0)) {
-                        Achievements.awardAchievement(Achievements.dunkFridayNight)
-                    }
-                }
-                quitToMainMenu(false)
-            }
-        }
-    }
+    
+    
+    protected abstract fun renderGameplay(delta: Float)
+    
+    protected abstract fun shouldCatchCursor(): Boolean
+    
 
     override fun render(delta: Float) {
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
         val batch = this.batch
-        
+
+        // JIT optimization so there is less stutter when opening pause menu for the first time
         if (this.firstRender) {
             this.firstRender = false
             batch.begin()
-            sceneRoot.renderAsRoot(batch) // Optimization so there is less stutter when opening pause menu for the first time
+            sceneRoot.renderAsRoot(batch) 
             batch.end()
         }
         
-        uiViewport.apply()
-        renderer.render(batch)
+        
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
+        uiViewport.apply()
+        renderGameplay(delta)
+
+        
         val camera = uiCamera
         batch.projectionMatrix = camera.combined
         batch.begin()
@@ -376,149 +312,31 @@ abstract class AbstractPlayScreen protected constructor(
 
         batch.end()
         batch.projectionMatrix = main.nativeCamera.combined
-
+        
         super.render(delta)
     }
 
     override fun renderUpdate() {
         super.renderUpdate()
-
-        if (!isPaused.get() && timing is SimpleTimingProvider) {
-            timing.seconds += Gdx.graphics.deltaTime
-            sideMode?.renderUpdate()
+        
+        if (!isPaused.get() && playTimeType != null) {
             GlobalStats.updateModePlayTime(playTimeType)
         }
-    }
-
-    private fun transitionToResults(resultsBehaviour: ResultsBehaviour.ShowResults) {
-        val inputter = engine.inputter
-        val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
-        val nInputs = max(inputter.totalExpectedInputs, inputter.minimumInputCount)
-        val rawScore: Float = (if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
-            inputScore.weight
-        } / nInputs) * 100))
-        val score: Int = rawScore.roundToInt().coerceIn(0, 100)
-        
-        val resultsText = container.resultsText
-        val ranking = Ranking.getRanking(score)
-        val leftResults = inputter.inputResults.filter { it.inputType == InputType.DPAD }
-        val rightResults = inputter.inputResults.filter { it.inputType == InputType.A }
-        val badLeftGoodRight = leftResults.isNotEmpty() && rightResults.isNotEmpty()
-                && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
-        val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
-        var isNewHighScore = false
-        if (sideMode != null && sideMode is AbstractEndlessMode) {
-            val endlessModeScore = sideMode.prevHighScore
-            val prevScore = endlessModeScore.highScore.getOrCompute()
-            if (score > prevScore) {
-                endlessModeScore.highScore.set(score)
-                PRManiaGame.instance.settings.persist()
-                isNewHighScore = true
-            }
-        } else if (resultsBehaviour.previousHighScore != null) {
-            if (score > resultsBehaviour.previousHighScore && resultsBehaviour.previousHighScore >= 0) {
-                isNewHighScore = true
-            }
-        }
-        
-        val scoreObj = Score(score, rawScore, inputsHit, nInputs,
-                inputter.skillStarGotten.get() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
-                challenges,
-                resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
-                lines.first, lines.second,
-                ranking, isNewHighScore
-        )
-
-        transitionAway(ResultsScreen(main, scoreObj, container, sideMode, {
-            copyScreenForResults(scoreObj, resultsBehaviour)
-        }, keyboardKeybinds,
-                LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges),
-                resultsBehaviour.onRankingRevealed), disposeContainer = false) {}
-    }
-
-    private inline fun transitionAway(nextScreen: Screen, disposeContainer: Boolean, action: () -> Unit) {
-        main.inputMultiplexer.removeProcessor(inputProcessor)
-        Gdx.input.isCursorCatched = false
-
-        action.invoke()
-
-        main.screen = TransitionScreen(main, this, nextScreen,
-                FadeOut(0.5f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
-            this.onEntryEnd = {
-                this@AbstractPlayScreen.dispose()
-                if (disposeContainer) {
-                    container.disposeQuietly()
-                }
-            }
-        }
-    }
-    
-    protected fun applyForceTilesetPaletteSettings() {
-        when (container.globalSettings.forceTilesetPalette) {
-            ForceTilesetPalette.NO_FORCE ->
-                container.world.tilesetPalette.applyTo(container.renderer.tileset)
-            ForceTilesetPalette.FORCE_PR1 ->
-                TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
-            ForceTilesetPalette.FORCE_PR2 ->
-                TilesetPalette.createGBA2TilesetPalette().applyTo(container.renderer.tileset)
-            ForceTilesetPalette.ORANGE_BLUE ->
-                TilesetPalette.createOrangeBlueTilesetPalette().applyTo(container.renderer.tileset)
-        }
-    }
-
-    /**
-     * Resets the entire game state but does not change the pause state
-     */
-    protected fun resetGameState() {
-        // Reset/clearing pass
-        engine.removeEvents(engine.events.toList())
-        engine.inputter.areInputsLocked = engine.autoInputs
-        engine.inputter.reset()
-        engine.soundInterface.clearAllNonMusicAudio()
-        engine.inputCalibration = this.inputCalibration
-        engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
-        engine.resetEndSignal()
-        renderer.resetAnimations()
-        container.world.resetWorld()
-        challenges.applyToEngine(engine)
-        
-        // Set everything else
-        applyForceTilesetPaletteSettings()
-        container.setTexturePackFromSource()
-        
-        timing.seconds = -(1f + max(0f, this.inputCalibration.audioOffsetMs / 1000f))
-        engine.seconds = timing.seconds
-        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
-        if (player != null) { // Set music player position
-            val musicSample = player.musicSample
-            musicSample.moveStartBuffer(0)
-            engine.musicData.setMusicPlayerPositionToCurrentSec()
-            player.pause(false)
-        }
-        soundSystem.startRealtime() // Does nothing if already started
-        
-        val blocks = container.blocks.toList()
-        engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
-    }
-
-    /**
-     * Should be called when first loading this screen so the sound system starts up.
-     */
-    fun resetAndUnpause() {
-        resetGameState()
-        unpauseGame(false)
     }
 
     /**
      * Pauses the game.
      */
     protected open fun pauseGame(playSound: Boolean) {
-        isPaused.set(true)
-        soundSystem.setPaused(true)
-        Gdx.input.isCursorCatched = false
-        main.inputMultiplexer.removeProcessor(inputProcessor)
-        main.inputMultiplexer.addProcessor(inputProcessor)
+        (isPaused as BooleanVar).set(true)
+        if (shouldCatchCursor()) {
+            Gdx.input.isCursorCatched = false
+        }
+        main.inputMultiplexer.removeProcessor(pauseMenuInputProcessor)
+        main.inputMultiplexer.addProcessor(pauseMenuInputProcessor)
+        
         selectedPauseOption.set(pauseOptions.getOrCompute().firstOrNull())
+        
         pauseBg.randomizeSeed()
         panelAnimationValue.set(0f)
         val ani = Animation(Interpolation.smoother, 0.25f, 0f, 1f).apply {
@@ -532,6 +350,8 @@ abstract class AbstractPlayScreen protected constructor(
         }
         this.activePanelAnimation = ani
         sceneRoot.animations.enqueueAnimation(ani, panelAnimationValue)
+
+//        soundSystem.setPaused(true)
         
         if (playSound) {
             playMenuSound("sfx_pause_enter")
@@ -542,20 +362,24 @@ abstract class AbstractPlayScreen protected constructor(
      * Unpauses the game.
      */
     protected open fun unpauseGame(playSound: Boolean) {
-        isPaused.set(false)
-        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
-        if (player != null) {
-            engine.musicData.setMusicPlayerPositionToCurrentSec()
-            player.pause(false)
+        (isPaused as BooleanVar).set(false)
+//        val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
+//        if (player != null) {
+//            engine.musicData.setMusicPlayerPositionToCurrentSec()
+//            player.pause(false)
+//        }
+//        soundSystem.setPaused(false)
+        if (shouldCatchCursor()) {
+            Gdx.input.isCursorCatched = true
         }
-        soundSystem.setPaused(false)
-        Gdx.input.isCursorCatched = true
-        main.inputMultiplexer.removeProcessor(inputProcessor)
+        main.inputMultiplexer.removeProcessor(pauseMenuInputProcessor)
+        
         panelAnimationValue.set(0f)
         if (playSound) {
             playMenuSound("sfx_pause_exit")
         }
     }
+
 
     private fun attemptPauseEntrySelection() {
         val pauseOp = selectedPauseOption.getOrCompute()
@@ -572,21 +396,22 @@ abstract class AbstractPlayScreen protected constructor(
             main.screen = TransitionScreen(main, currentScreen, mainMenu,
                     FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
-                    if (currentScreen is AbstractPlayScreen) {
-                        currentScreen.dispose()
-                        container.disposeQuietly()
-                    }
+                    // FIXME
+//                    if (currentScreen is AbstractPlayScreen) {
+//                        currentScreen.dispose()
+//                        container.disposeQuietly()
+//                    }
                 }
             }
         }
-        
+
         if (playSound) {
             Gdx.app.postRunnable {
                 playMenuSound("sfx_pause_exit")
             }
         }
     }
-    
+
     private fun changeSelectionTo(option: PauseOption): Boolean {
         if (selectedPauseOption.getOrCompute() != option && option.enabled) {
             selectedPauseOption.set(option)
@@ -630,24 +455,24 @@ abstract class AbstractPlayScreen protected constructor(
                     }
                 }
             } else {
-                when (keycode) {
+                when (keycode) { // FIXME
                     Input.Keys.ESCAPE, keyboardKeybinds.pause -> {
                         pauseGame(true)
                         consumed = true
                     }
-                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
-                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
-                        engine.postRunnable {
-                            engine.inputter.onDpadButtonPressed(false)
-                        }
-                        consumed = true
-                    }
-                    keyboardKeybinds.buttonA -> {
-                        engine.postRunnable {
-                            engine.inputter.onAButtonPressed(false)
-                        }
-                        consumed = true
-                    }
+//                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
+//                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
+//                        engine.postRunnable {
+//                            engine.inputter.onDpadButtonPressed(false)
+//                        }
+//                        consumed = true
+//                    }
+//                    keyboardKeybinds.buttonA -> {
+//                        engine.postRunnable {
+//                            engine.inputter.onAButtonPressed(false)
+//                        }
+//                        consumed = true
+//                    }
                 }
             }
         }
@@ -657,26 +482,26 @@ abstract class AbstractPlayScreen protected constructor(
 
     override fun keyUp(keycode: Int): Boolean {
         var consumed = false
-        if (main.screen === this) {
-            if (!isPaused.get())  {
-                when (keycode) {
-                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
-                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
-                        engine.postRunnable {
-                            engine.inputter.onDpadButtonPressed(true)
-                        }
-                        consumed = true
-                    }
-                    keyboardKeybinds.buttonA -> {
-                        engine.postRunnable {
-                            engine.inputter.onAButtonPressed(true)
-                        }
-                        consumed = true
-                    }
-                }
-            }
-        }
-        
+//        if (main.screen === this) { // FIXME
+//            if (!isPaused.get())  {
+//                when (keycode) {
+//                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
+//                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
+//                        engine.postRunnable {
+//                            engine.inputter.onDpadButtonPressed(true)
+//                        }
+//                        consumed = true
+//                    }
+//                    keyboardKeybinds.buttonA -> {
+//                        engine.postRunnable {
+//                            engine.inputter.onAButtonPressed(true)
+//                        }
+//                        consumed = true
+//                    }
+//                }
+//            }
+//        }
+
         return consumed || super.keyUp(keycode)
     }
 
@@ -700,31 +525,23 @@ abstract class AbstractPlayScreen protected constructor(
     override fun show() {
         super.show()
         unpauseGame(false)
-        Gdx.input.isCursorCatched = true
+        if (shouldCatchCursor()) {
+            Gdx.input.isCursorCatched = true
+        }
     }
 
     override fun hide() {
         super.hide()
-        Gdx.input.isCursorCatched = false
-        main.inputMultiplexer.removeProcessor(inputProcessor)
+        if (shouldCatchCursor()) {
+            Gdx.input.isCursorCatched = false
+        }
+        main.inputMultiplexer.removeProcessor(pauseMenuInputProcessor)
     }
 
-    override fun dispose() {
-        // NOTE: container instance is disposed separately.
-        // Additionally, the sound system is disposed in the container, so it doesn't have to be stopped.
-        engine.endSignalReceived.removeListener(endSignalListener)
+    override fun getDebugString(): String? {
+        return super.getDebugString()
     }
 
-    override fun getDebugString(): String {
-        return """SoundSystem: paused=${soundSystem.isPaused}
----
-${engine.getDebugString()}
----
-${renderer.getDebugString()}
----
-SideMode: ${sideMode?.javaClass?.name}${if (sideMode != null) ("\n" + sideMode.getDebugString()) else ""}
----
-"""
-    }
-
+    abstract override fun dispose()
+    
 }

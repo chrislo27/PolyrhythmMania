@@ -12,7 +12,10 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.registry.AssetRegistry
-import paintbox.transition.*
+import paintbox.transition.FadeIn
+import paintbox.transition.FadeOut
+import paintbox.transition.TransitionScreen
+import paintbox.transition.WipeTransitionHead
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
@@ -30,9 +33,9 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.library.score.LevelScoreAttempt
+import polyrhythmmania.screen.newplay.NewAbstractPlayScreen
 import polyrhythmmania.screen.play.AbstractPlayScreen
 import polyrhythmmania.screen.play.OnRankingRevealed
-import polyrhythmmania.screen.play.PlayScreen
 import polyrhythmmania.sidemodes.SideMode
 import polyrhythmmania.sidemodes.practice.AbstractPolyrhythmPractice
 import polyrhythmmania.statistics.GlobalStats
@@ -41,7 +44,7 @@ import kotlin.properties.Delegates
 
 class ResultsScreen(
         main: PRManiaGame, val score: Score, val container: Container, val sideMode: SideMode?,
-        val startOverFactory: () -> AbstractPlayScreen,
+        val startOverFactory: () -> PRManiaScreen, // FIXME needs to become NewAbstractPlayScreen
         val keyboardKeybinds: InputKeymapKeyboard,
         val levelScoreAttempt: LevelScoreAttempt,
         val onRankingRevealed: OnRankingRevealed?,
@@ -117,7 +120,10 @@ class ResultsScreen(
                     main.screen = TransitionScreen(main, main.screen, playScreen, FadeOut(0.5f, Color(0f, 0f, 0f, 1f)),
                             FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                         this.onEntryEnd = {
-                            playScreen.resetAndUnpause()
+                            when (playScreen) {
+                                is AbstractPlayScreen -> playScreen.resetAndUnpause()
+                                is NewAbstractPlayScreen -> playScreen.resetAndUnpause()
+                            }
                         }
                     }
                 }
