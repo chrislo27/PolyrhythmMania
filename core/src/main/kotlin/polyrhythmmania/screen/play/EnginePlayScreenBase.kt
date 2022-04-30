@@ -246,8 +246,7 @@ class EnginePlayScreenBase(
         optionsBg += VBox().apply {
             this.spacing.set(0f)
 
-            pauseOptions.addListener {
-                val optionList = it.getOrCompute()
+            fun refreshPauseOptions(optionList: List<PauseOption>) {
                 this.removeAllChildren()
                 this.temporarilyDisableLayouts {
                     optionList.forEachIndexed { index, op ->
@@ -255,6 +254,11 @@ class EnginePlayScreenBase(
                     }
                 }
             }
+            pauseOptions.addListener {
+                val optionList = it.getOrCompute()
+                refreshPauseOptions(optionList)
+            }
+            refreshPauseOptions(pauseOptions.getOrCompute())
         }
     }
     
