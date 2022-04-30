@@ -1,4 +1,4 @@
-package polyrhythmmania.screen.play
+package polyrhythmmania.screen.play.pause
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion

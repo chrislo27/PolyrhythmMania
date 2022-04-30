@@ -18,6 +18,8 @@ import paintbox.ui.SceneRoot
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.screen.play.pause.PauseMenuHandler
+import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import space.earlygrey.shapedrawer.ShapeDrawer
@@ -38,21 +40,22 @@ abstract class AbstractPlayScreen(
     
     val batch: SpriteBatch = main.batch
     
-    protected val isPaused: ReadOnlyBooleanVar = BooleanVar(false)
-    protected val keyboardKeybinds: InputKeymapKeyboard by lazy { main.settings.inputKeymapKeyboard.getOrCompute() }
+    val isPaused: ReadOnlyBooleanVar = BooleanVar(false)
+    val keyboardKeybinds: InputKeymapKeyboard by lazy { main.settings.inputKeymapKeyboard.getOrCompute() }
 
-    protected val uiCamera: OrthographicCamera = OrthographicCamera().apply {
+    val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
-    protected val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
-    protected val sceneRoot: SceneRoot = SceneRoot(uiViewport)
+    val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
+    val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     protected val pauseMenuInputProcessor: InputProcessor = sceneRoot.inputSystem
-    protected val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
+    val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
 
-    protected val pauseOptions: Var<List<PauseOption>> = Var(emptyList())
-    protected val selectedPauseOption: Var<PauseOption?> = Var(null)
-
+    val pauseOptions: Var<List<PauseOption>> = Var(emptyList())
+    val selectedPauseOption: Var<PauseOption?> = Var(null)
+    abstract val pauseMenuHandler: PauseMenuHandler
+    
     
     protected abstract fun shouldCatchCursor(): Boolean
 
@@ -67,13 +70,20 @@ abstract class AbstractPlayScreen(
      * Called when starting over.
      * @see startOver
      */
-    protected abstract fun onStartOver()
+    protected open fun onStartOver() {
+        pauseMenuHandler.onStartOver()
+    }
 
     /**
      * Call to dispose this screen. This should be called when leaving this screen and not returning, INCLUDING
      * if going to results. 
      */
-    abstract override fun dispose()
+    protected abstract fun _dispose()
+    
+    final override fun dispose() {
+        _dispose()
+        pauseMenuHandler.dispose()
+    }
     
     /**
      * Reinitializes the game and unpauses (without playing a sound).
@@ -99,7 +109,9 @@ abstract class AbstractPlayScreen(
      *
      * Use to render the pause screen.
      */
-    protected abstract fun renderAfterGameplay(delta: Float, camera: OrthographicCamera)
+    protected open fun renderAfterGameplay(delta: Float, camera: OrthographicCamera) {
+        pauseMenuHandler.renderAfterGameplay(delta, camera)
+    }
     
     
     // Note: May remove final modifier if needed later down the road
@@ -161,6 +173,8 @@ abstract class AbstractPlayScreen(
         if (playSound) {
             playMenuSound("sfx_pause_enter")
         }
+        
+        pauseMenuHandler.onPaused()
     }
 
     /**
@@ -177,6 +191,8 @@ abstract class AbstractPlayScreen(
         if (playSound) {
             playMenuSound("sfx_pause_exit")
         }
+        
+        pauseMenuHandler.onUnpaused()
     }
     
 
@@ -200,7 +216,7 @@ abstract class AbstractPlayScreen(
                             var nextIndex: Int
                             do {
                                 nextIndex = (currentIndex + increment + maxSelectionSize) % maxSelectionSize
-                                if (changeSelectionTo(options[nextIndex])) {
+                                if (changePauseSelectionTo(options[nextIndex])) {
                                     consumed = true
                                     break
                                 }
@@ -254,14 +270,14 @@ abstract class AbstractPlayScreen(
     }
 
 
-    protected fun attemptSelectCurrentPauseOption() {
+    fun attemptSelectCurrentPauseOption() {
         val pauseOp = selectedPauseOption.getOrCompute()
         if (pauseOp != null && pauseOp.enabled) {
             pauseOp.action()
         }
     }
 
-    protected fun changeSelectionTo(option: PauseOption): Boolean {
+    fun changePauseSelectionTo(option: PauseOption): Boolean {
         if (selectedPauseOption.getOrCompute() != option && option.enabled) {
             selectedPauseOption.set(option)
             playMenuSound("sfx_menu_blip")
@@ -270,7 +286,7 @@ abstract class AbstractPlayScreen(
         return false
     }
 
-    protected fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
+    fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
         val sound: Sound = AssetRegistry[id]
         val menuSFXVol = main.settings.menuSfxVolume.getOrCompute() / 100f
         val soundID = sound.play(menuSFXVol * volume, pitch, pan)

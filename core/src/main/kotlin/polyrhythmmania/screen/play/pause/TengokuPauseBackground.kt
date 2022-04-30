@@ -1,4 +1,4 @@
-package polyrhythmmania.screen.play
+package polyrhythmmania.screen.play.pause
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -14,7 +14,7 @@ import java.util.*
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
-class PauseBackground {
+class TengokuPauseBackground {
     
     private val random = Random()
     var seed: Int = 0

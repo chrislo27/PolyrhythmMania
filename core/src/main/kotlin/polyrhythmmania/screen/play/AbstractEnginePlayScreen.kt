@@ -110,10 +110,7 @@ abstract class AbstractEnginePlayScreen(
     }
 
     override fun onStartOver() {
-    }
-
-    override fun renderAfterGameplay(delta: Float, camera: OrthographicCamera) {
-        // TODO pause menu
+        super.onStartOver()
     }
 
     override fun renderUpdate() {
@@ -312,7 +309,7 @@ abstract class AbstractEnginePlayScreen(
         return consumed || super.keyUp(keycode)
     }
 
-    override fun dispose() {
+    override fun _dispose() {
         // NOTE: container instance is disposed separately.
         // Additionally, the sound system is disposed in the container, so it doesn't have to be stopped.
         engine.endSignalReceived.removeListener(endSignalListener)
