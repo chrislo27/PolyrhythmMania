@@ -28,12 +28,12 @@ import polyrhythmmania.screen.play.AbstractPlayScreen
 
 class TengokuBgPauseMenuHandler(screen: AbstractPlayScreen) : PauseMenuHandler(screen) {
 
-    private val pauseBg: TengokuPauseBackground = TengokuPauseBackground()
-    private val panelAnimationValue: FloatVar = FloatVar(0f)
-    private var activePanelAnimation: Animation? = null
-    private val topPane: Pane
-    private val bottomPane: Pane
-    private val titleLabel: TextLabel
+    val pauseBg: TengokuPauseBackground = TengokuPauseBackground()
+    val panelAnimationValue: FloatVar = FloatVar(0f)
+    var activePanelAnimation: Animation? = null
+    val topPane: Pane
+    val bottomPane: Pane
+    val titleLabel: TextLabel
     
     init {
         var nextLayer: UIElement = screen.sceneRoot

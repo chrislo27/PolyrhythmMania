@@ -50,9 +50,22 @@ class EnginePlayScreenBase(
     
     private var endlessPrPauseTime: Float = 0f
     
+    init {
+        if (engine.world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS
+                && engine.world.worldMode.type == WorldType.POLYRHYTHM
+                && engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil mode in endless
+            // 232CDD
+            (pauseMenuHandler as? TengokuBgPauseMenuHandler)?.also { handler ->
+                val hex = "DB2323"
+                val bg = handler.pauseBg
+                bg.cycleSpeed = 0f
+                bg.topColor.set(Color.valueOf(hex))
+                bg.bottomColor.set(Color.valueOf(hex))
+            }
+        }
+    }
     
     init {
-        // TODO move me
         // Score achievements for endless-type modes
         engine.inputter.endlessScore.score.addListener { scoreVar ->
             if (engine.world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS && engine.areStatisticsEnabled) {

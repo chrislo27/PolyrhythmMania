@@ -20,12 +20,13 @@ class TengokuPauseBackground {
     var seed: Int = 0
         private set
     private val hsv: FloatArray = FloatArray(3)
+    var squareCount: Int = 90
     var cycleSpeed: Float = 1 / 30f
     val triangleSlope: Float = 1 / 2f
     val topTriangleY: Float = 2 / 3f
     val botTriangleX: Float = 1 / 3f
-    private val topColor: Color = Color.valueOf("232CDD")
-    private val bottomColor: Color = Color.valueOf("d020a0")
+    val topColor: Color = Color.valueOf("232CDD")
+    val bottomColor: Color = Color.valueOf("d020a0")
     private val bgSquareTexReg: TextureRegion = TextureRegion(AssetRegistry.get<Texture>("pause_square"))
 
     init {
@@ -54,7 +55,7 @@ class TengokuPauseBackground {
         batch.setColor(1f, 1f, 1f, 1f)
 
         // Squares
-        val squareCount = 90
+        val squareCount = this.squareCount
         batch.setColor(1f, 1f, 1f, 0.65f)
         for (i in 0 until squareCount) {
             val alpha = i / squareCount.toFloat()
