@@ -20,7 +20,7 @@ allprojects {
     ext {
         appName = "PolyrhythmMania"
         
-        paintboxVersion = "0.5.2"
+        paintboxVersion = "0.5.3"
         useLocalPaintbox = false
     }
     
