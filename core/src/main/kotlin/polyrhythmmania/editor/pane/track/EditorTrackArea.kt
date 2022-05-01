@@ -11,6 +11,7 @@ import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.util.gdxutils.*
+import polyrhythmmania.Localization
 import polyrhythmmania.editor.*
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.editor.pane.EditorPane
@@ -23,7 +24,7 @@ import kotlin.math.sign
  * Note: Does NOT support [margin], [border], or [padding]!
  * You should wrap this [EditorTrackArea] in a [Pane] to set those properties.
  */
-class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
+class EditorTrackArea(val allTracksPane: AllTracksPane) : PaneWithTooltip() {
     
     val editorPane: EditorPane = allTracksPane.editorPane
     val trackView: TrackView = allTracksPane.trackView
@@ -36,6 +37,12 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
     val beatWidth: FloatVar = FloatVar {
         this@EditorTrackArea.bounds.width.use() / trackView.pxPerBeat.use()
     }
+    
+    private val blankTooltip: Pane = Pane().apply { 
+        this.bounds.width.set(1f)
+        this.bounds.height.set(1f)
+    }
+    private val incompatibleTrackTooltip: Tooltip = editorPane.createDefaultTooltip(Localization.getVar("editor.incompatibleTrack.tooltip"))
 
     init {
         this.doClipping.set(true)
@@ -45,6 +52,8 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
             this.border.set(Insets(0f, 2f, 0f, 0f))
             this.borderStyle.set(SolidBorder().apply { this.color.set(Color().grey(0.4f, 1f)) })
         }
+        
+        suggestIncompatibleTooltip(false)
     }
 
     init {
@@ -162,6 +171,14 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : Pane() {
         }
         trackView.beat.addListener {
             onMouseMovedOrDragged(lastMouseAbsolute.x, lastMouseAbsolute.y)
+        }
+    }
+    
+    fun suggestIncompatibleTooltip(enabled: Boolean) {
+        if (enabled) {
+            this.tooltipElement.set(incompatibleTrackTooltip)
+        } else {
+            this.tooltipElement.set(blankTooltip)
         }
     }
 

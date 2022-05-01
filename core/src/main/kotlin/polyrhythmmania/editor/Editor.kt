@@ -800,9 +800,14 @@ class Editor(val main: PRManiaGame)
             this@Editor.forceUpdateStatus.use()
             val tool = this@Editor.tool.use()
             val currentClick = this@Editor.click.use()
+            editorPane.allTracksPane.editorTrackArea.suggestIncompatibleTooltip(false)
             when (currentClick) {
                 is Click.CreateSelection -> Localization.getVar("editor.status.creatingSelection").use()
                 is Click.DragSelection -> {
+                    if (currentClick.incompatibleTracks.use()) {
+                        editorPane.allTracksPane.editorTrackArea.suggestIncompatibleTooltip(true)
+                    }
+                    
                     var res = Localization.getVar("editor.status.draggingSelection").use()
                     if (currentClick.wouldBeDeleted.use() && !currentClick.isNew) {
                         res += " " + Localization.getVar("editor.status.draggingSelection.willBeDeleted").use()
