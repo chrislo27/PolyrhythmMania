@@ -196,7 +196,12 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this.markup.set(this@DailyChallengeMenu.markup)
                 }
             }
-            scrollPaneContent.bind { 
+            
+            scrollPaneContent.addListener {
+                internalPane.children.forEach { c -> internalPane.removeChild(c) }
+                internalPane.addChild(it.getOrCompute())
+            }
+            scrollPaneContent.bind {
                 if (isFetching.use()) {
                     paneFetching
                 } else {
@@ -211,11 +216,6 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         }
                     }
                 }
-            }
-            
-            scrollPaneContent.addListener {
-                internalPane.children.forEach { c -> internalPane.removeChild(c) }
-                internalPane.addChild(it.getOrCompute())
             }
             
             vbox += internalPane
