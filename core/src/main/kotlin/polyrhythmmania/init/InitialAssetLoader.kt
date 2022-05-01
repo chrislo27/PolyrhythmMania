@@ -121,6 +121,7 @@ class InitialAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("achievements_completed_mark", "textures/achievements/completed.png", linearTexture())
         AssetRegistry.loadAsset("solitaire_tableau", "textures/solitaire/tableau.png", linearTexture())
         AssetRegistry.loadAssetNoFile<PackedSheet>("achievements_icon", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                Packable("compact_mode", "textures/achievements/compact_mode.png"),
                 Packable("assemble", "textures/achievements/assemble.png"),
                 Packable("assemble_gold", "textures/achievements/assemble_gold.png"),
                 Packable("daily", "textures/achievements/daily.png"),
