@@ -12,6 +12,7 @@ import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.ComboBox
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.ScrollPaneSkin
@@ -131,7 +132,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.renderAlign.set(Align.center)
         }
         
-        fun createAchievementElement(achievement: Achievement): UIElement {
+        fun createAchievementElement(achievement: Achievement, compact: Boolean): UIElement {
             val achievementEarned = BooleanVar { Achievements.fulfillmentMap.use()[achievement] != null }
             val entire = ActionablePane().apply {
                 this.setOnAltAction {
@@ -170,13 +171,18 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             listOf(formattedValue.use(), formattedThreshold.use())
                         })
                     } else Var("")
-                    this += TextLabel(binding = {
+                    val achDesc = Var.bind {
                         val stillHidden = achievement.isHidden && !achievementEarned.use()
-                        val desc = if (stillHidden) {
+                        if (stillHidden) {
                             "[i]${AchievementsL10N.getVar("achievement.hidden.desc").use()}[]"
                         } else "${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}"
+                    }
+                    this += TextLabel(binding = {
+                        val stillHidden = achievement.isHidden && !achievementEarned.use()
+                        val desc = achDesc.use()
                         val statProgressText = if (!stillHidden) statProgress.use() else ""
-                        "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgressText}[] ${if (SHOW_IDS_WHEN_DEBUG && Paintbox.debugMode.use()) "[i color=GRAY scale=0.75]${achievement.id}[]" else ""}\n[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]"
+                        "[color=#${achievement.rank.color.toString()} scale=1.0 lineheight=0.75]${achievement.getLocalizedName().use()} [color=#$statProgressColor scale=0.75] ${statProgressText}[] ${if (SHOW_IDS_WHEN_DEBUG && Paintbox.debugMode.use()) "[i color=GRAY scale=0.75]${achievement.id}[]" else ""}${if (!compact) "\n" +
+                                "[][color=LIGHT_GRAY scale=0.75 lineheight=0.9]${desc}[]" else ""}"
                     }).apply {
                         Anchor.TopLeft.configure(this)
                         this.setScaleXY(1f)
@@ -184,17 +190,24 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         this.padding.set(Insets.ZERO)
                         this.markup.set(descMarkup)
                         this.doLineWrapping.set(true)
+                        if (compact) {
+                            this.tooltipElement.set(createTooltip(achDesc).apply { 
+                                this.doLineWrapping.set(true)
+                                this.maxWidth.set(800f)
+                            })
+                        }
                     }
                 }
             }
             return RectElement(Color.DARK_GRAY).apply {
-                this.bounds.height.set(72f)
+                this.bounds.height.set(if (!compact) 72f else 36f)
                 this.padding.set(Insets(6f))
                 this += entire
             }
         }
 
-        val achievementPanes: Map<Achievement, UIElement> by lazy { Achievements.achievementIDMap.values.associateWith(::createAchievementElement) }
+        val achievementPanes: Map<Achievement, UIElement> by lazy { Achievements.achievementIDMap.values.associateWith { createAchievementElement(it, false) } }
+        val achievementPanesCompact: Map<Achievement, UIElement> by lazy { Achievements.achievementIDMap.values.associateWith { createAchievementElement(it, true) } }
         val categoryHeadings: Map<AchievementCategory, UIElement> by lazy { 
             AchievementCategory.VALUES.associateWith { category ->
                 val achievementsInCategory = Achievements.achievementIDMap.values.filter { it.category == category }
@@ -216,46 +229,17 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
         }
-
-//        AchievementCategory.VALUES.forEach { category ->
-//            val entireVBox = VBox().apply {
-//                spacing.set(vbox.spacing.get())
-//            }
-//            val achievementsInCategory = Achievements.achievementIDMap.values.filter { it.category == category }
-//
-//            entireVBox += TextLabel(binding = {
-//                AchievementsL10N.getVar("achievement.categoryProgress", Var {
-//                    val map = Achievements.fulfillmentMap.use()
-//                    val numGotten = map.keys.count { it.category == category }
-//                    val numTotal = achievementsInCategory.size
-//                    val percentageWhole = (100f * numGotten / numTotal).coerceIn(0f, 100f)
-//                    listOf(AchievementsL10N.getVar(category.toLocalizationID()).use(), percentFormat.format(percentageWhole), numGotten, numTotal)
-//                }).use()
-//            }).apply {
-//                this.textColor.set(Color().grey(0.35f))
-//                this.bounds.height.set(56f)
-//                this.padding.set(Insets(16f, 8f, 0f, 32f))
-//                this.renderAlign.set(Align.bottomLeft)
-//                this.setScaleXY(0.75f)
-//                this.markup.set(headingMarkup)
-//            }
-//
-//            achievementsInCategory.forEach { achievement ->
-//                entireVBox += createAchievementElement(achievement) // Intentionally not using cached ones due to scene graph layout
-//            }
-//
-//            entireVBox.sizeHeightToChildren(10f)
-//            panePerCategory[category] = entireVBox
-//        }
         
         val viewingCategory = Var<ViewType>(ViewType.AllByCategory)
         val currentSort = Var<SortType>(SortType.DEFAULT)
+        val compactMode = BooleanVar(false)
         
         fun updateCategory() {
             vbox.children.forEach(vbox::removeChild)
             vbox.temporarilyDisableLayouts {
                 vbox += totalProgressLabel
 
+                val achievementUIElements = if (compactMode.get()) achievementPanesCompact else achievementPanes
                 val cat = viewingCategory.getOrCompute()
                 val sort = currentSort.getOrCompute()
                 val isCategorical = cat != ViewType.AllTogether
@@ -305,13 +289,13 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         if (achInCat.isNotEmpty()) {
                             vbox += categoryHeadings.getValue(category)
                             achInCat.forEach { ach ->
-                                vbox += achievementPanes.getValue(ach)
+                                vbox += achievementUIElements.getValue(ach)
                             }
                         }
                     }
                 } else {
                     filteredAchievements.forEach { ach ->
-                        vbox += achievementPanes.getValue(ach)
+                        vbox += achievementUIElements.getValue(ach)
                     }
                 }
             }
@@ -327,6 +311,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         viewingCategory.addListener(updateCategoryTrigger)
         currentSort.addListener(updateCategoryTrigger)
         AchievementsL10N.currentBundle.addListener(updateCategoryTrigger)
+        compactMode.addListener(updateCategoryTrigger)
         
         
         hbox.temporarilyDisableLayouts {
@@ -379,7 +364,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             val sortTypeList = SortType.values().toList()
             hbox += ComboBox<SortType>(sortTypeList, currentSort.getOrCompute(), font = font).apply {
-                this.bounds.width.set(200f)
+                this.bounds.width.set(180f)
                 this.setScaleXY(0.75f)
                 this.itemStringConverter.bind {
                     StringConverter { sort ->
@@ -388,6 +373,29 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 this.onItemSelected = { newItem ->
                     currentSort.set(newItem)
+                }
+            }
+            
+            hbox += createSmallButton { "" }.apply {
+                val borderSize = Insets(4f)
+                this.bindWidthToSelfHeight()
+                this.padding.set(Insets.ZERO)
+                this += RectElement(Color(1f, 1f, 1f, 0f)).apply { // Indent effect
+                    this.borderStyle.set(SolidBorder().apply {
+                        this.color.set(Color.CYAN)
+                    })
+                    this.border.bind {
+                        if (compactMode.use()) borderSize else Insets.ZERO
+                    }
+                }
+                
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.achievements.compactMode.tooltip")))
+                this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")["compact_mode"])).apply {
+                    this.margin.set(borderSize)
+                    this.tint.set(Color.BLACK)
+                }
+                this.setOnAction { 
+                    compactMode.invert()
                 }
             }
         }
