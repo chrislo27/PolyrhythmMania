@@ -66,7 +66,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
             this.spacing.set(8f)
-            this.padding.set(Insets(2f))
+            this.padding.set(Insets(4f, 0f, 2f, 2f))
             this.bounds.height.set(40f)
         }
 
@@ -197,7 +197,12 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this.markup.set(this@DailyChallengeMenu.markup)
                 }
             }
-            scrollPaneContent.bind { 
+            
+            scrollPaneContent.addListener {
+                internalPane.children.forEach { c -> internalPane.removeChild(c) }
+                internalPane.addChild(it.getOrCompute())
+            }
+            scrollPaneContent.bind {
                 if (isFetching.use()) {
                     paneFetching
                 } else {
@@ -212,11 +217,6 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         }
                     }
                 }
-            }
-            
-            scrollPaneContent.addListener {
-                internalPane.children.forEach { c -> internalPane.removeChild(c) }
-                internalPane.addChild(it.getOrCompute())
             }
             
             vbox += internalPane

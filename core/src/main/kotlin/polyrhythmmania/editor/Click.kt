@@ -115,6 +115,7 @@ sealed class Click {
         var beat: Float = 0f
         var track: Int = -1
         val isPlacementInvalid: ReadOnlyBooleanVar = BooleanVar(true)
+        val incompatibleTracks: ReadOnlyBooleanVar = BooleanVar(false)
         val wouldBeDeleted: ReadOnlyBooleanVar = BooleanVar(false)
         val collidesWithOtherBlocks: ReadOnlyBooleanVar = BooleanVar(false)
         val placementInvalidDuplicates: Boolean = isNew && (blocks.mapNotNull { block ->
@@ -188,11 +189,13 @@ sealed class Click {
             originRegion.beat = originRegion.beat.coerceAtLeast(0f)
 
             val targetTrackIndex = (trackY /*- mouseOffset.y*/).toInt() // Target for originBlock
-            if (!placementInvalidDuplicates && isPlacementValidForTargetTrack(targetTrackIndex)) {
+            val placementValidForTargetTrack = isPlacementValidForTargetTrack(targetTrackIndex)
+            if (!placementInvalidDuplicates && placementValidForTargetTrack) {
                 isPlacementInvalid.set(false)
             } else {
                 isPlacementInvalid.set(true)
             }
+            (incompatibleTracks as BooleanVar).set(!placementValidForTargetTrack)
             originRegion.track = targetTrackIndex
             
 

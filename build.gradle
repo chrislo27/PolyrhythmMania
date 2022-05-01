@@ -16,7 +16,7 @@ allprojects {
     apply plugin: "java"
     apply plugin: "kotlin"
 
-    version = "1.2.0"
+    version = "1.2.1"
     ext {
         appName = "PolyrhythmMania"
         
@@ -59,7 +59,8 @@ project(":core") {
             implementation "com.github.chrislo27.paintbox:paintbox-core:${paintboxVersion}"
         }
 
-        api "net.beadsproject:beads:3.2"
+        api("net.beadsproject:beads:3.2")
+        implementation "com.badlogicgames.jlayer:jlayer:1.0.1-gdx"
         api "net.lingala.zip4j:zip4j:2.9.1"
         api "org.apache.httpcomponents:httpclient:4.5.13"
         api "space.earlygrey:shapedrawer:v2.5.0"

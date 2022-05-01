@@ -83,18 +83,14 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.vBar.unitIncrement.set(40f)
             this.vBar.blockIncrement.set(90f)
         }
-        val lowerBox = Pane().apply {
+        val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
+            this.spacing.set(8f)
+            this.padding.set(Insets(4f, 0f, 2f, 2f))
             this.bounds.height.set(40f)
         }
-        val hbox = HBox().apply {
-            this.spacing.set(8f)
-            this.padding.set(Insets(2f))
-            this.bindWidthToParent(adjust = -48f)
-        }
         contentPane.addChild(scrollPane)
-        contentPane.addChild(lowerBox)
-        lowerBox.addChild(hbox)
+        contentPane.addChild(hbox)
 
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)
@@ -382,7 +378,9 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.padding.set(Insets.ZERO)
                 this += RectElement(Color(1f, 1f, 1f, 0f)).apply { // Indent effect
                     this.borderStyle.set(SolidBorder().apply {
-                        this.color.set(Color.CYAN)
+                        this.color.set(Color.valueOf("2AE030").apply { 
+                            this.a = 0.9f
+                        })
                     })
                     this.border.bind {
                         if (compactMode.use()) borderSize else Insets.ZERO
@@ -390,9 +388,14 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.achievements.compactMode.tooltip")))
+                this += RectElement(binding = {
+                    if (compactMode.use()) Color(0f, 0f, 0f, 0.4f) else Color.CLEAR
+                })
                 this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")["compact_mode"])).apply {
                     this.margin.set(borderSize)
-                    this.tint.set(Color.BLACK)
+                    this.tint.bind {
+                        if (compactMode.use()) Color.WHITE else Color().grey(0.1f, 1f)
+                    }
                 }
                 this.setOnAction { 
                     compactMode.invert()
