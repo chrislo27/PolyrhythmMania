@@ -83,18 +83,14 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.vBar.unitIncrement.set(40f)
             this.vBar.blockIncrement.set(90f)
         }
-        val lowerBox = Pane().apply {
-            Anchor.BottomLeft.configure(this)
-            this.bounds.height.set(40f)
-        }
         val hbox = HBox().apply {
+            Anchor.BottomLeft.configure(this)
             this.spacing.set(8f)
             this.padding.set(Insets(2f))
-            this.bindWidthToParent(adjust = -48f)
+            this.bounds.height.set(40f)
         }
         contentPane.addChild(scrollPane)
-        contentPane.addChild(lowerBox)
-        lowerBox.addChild(hbox)
+        contentPane.addChild(hbox)
 
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)
