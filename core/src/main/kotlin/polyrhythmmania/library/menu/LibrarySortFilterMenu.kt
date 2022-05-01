@@ -55,7 +55,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu,
         contentPane += scrollPane
         val leftBottomPane = Pane().apply {
             Anchor.BottomLeft.configure(this)
-            this.padding.set(Insets(2f))
+            this.padding.set(Insets(4f, 0f, 2f, 2f))
             this.bounds.height.set(40f)
         }
         contentPane += leftBottomPane

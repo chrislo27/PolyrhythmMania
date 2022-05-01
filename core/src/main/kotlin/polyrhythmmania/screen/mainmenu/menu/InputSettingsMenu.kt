@@ -45,7 +45,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
             this.spacing.set(8f)
-            this.padding.set(Insets(2f))
+            this.padding.set(Insets(4f, 0f, 2f, 2f))
             this.bounds.height.set(40f)
         }
 
@@ -295,7 +295,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             val hbox = HBox().apply {
                 Anchor.BottomLeft.configure(this)
                 this.spacing.set(8f)
-                this.padding.set(Insets(2f))
+                this.padding.set(Insets(4f, 0f, 2f, 2f))
                 this.bounds.height.set(40f)
             }
             contentPane.addChild(scrollPane)
