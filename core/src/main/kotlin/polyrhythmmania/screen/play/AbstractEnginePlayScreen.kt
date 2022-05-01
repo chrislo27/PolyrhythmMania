@@ -3,7 +3,6 @@ package polyrhythmmania.screen.play
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.OrthographicCamera
 import paintbox.binding.VarChangedListener
 import paintbox.transition.FadeIn
 import paintbox.transition.FadeOut
@@ -52,6 +51,8 @@ abstract class AbstractEnginePlayScreen(
         val gameMode: GameMode?, val resultsBehaviour: ResultsBehaviour
 ) : AbstractPlayScreen(main, playTimeType) {
 
+    companion object; // Used for early init
+    
     val timing: TimingProvider get() = container.timing
     val soundSystem: SoundSystem
         get() = container.soundSystem ?: error("${this::javaClass.name} requires a non-null SoundSystem in the Container")
@@ -160,7 +161,7 @@ abstract class AbstractEnginePlayScreen(
     }
     
     
-    protected fun quitToMainMenu() { // TODO remove me
+    protected fun quitToMainMenu() {
         val main = this.main
         val currentScreen = main.screen
         Gdx.app.postRunnable {
@@ -174,7 +175,8 @@ abstract class AbstractEnginePlayScreen(
             }
         }
     }
-    // TODO results should be handled per GameMode
+    
+    
     protected fun transitionToResults(resultsBehaviour: ResultsBehaviour.ShowResults) {
         val inputter = engine.inputter
         val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
@@ -230,13 +232,13 @@ abstract class AbstractEnginePlayScreen(
         }
 
         transitionAway(ResultsScreen(main, scoreObj, container, gameMode, {
-            copyThisScreenForResults(scoreObj, resultsBehaviour)
+            copyThisScreenForResultsStartOver(scoreObj, resultsBehaviour)
         }, keyboardKeybinds,
                 LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges),
                 resultsBehaviour.onRankingRevealed), disposeContainer = false) {}
     }
-    @Deprecated("Remove me later")
-    abstract fun copyThisScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen // TODO remove me
+    
+    protected abstract fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen
 
     
     override fun pauseGame(playSound: Boolean) {

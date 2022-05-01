@@ -45,9 +45,7 @@ class EnginePlayScreenBase(
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: GameMode?, resultsBehaviour: ResultsBehaviour
 ) : AbstractEnginePlayScreen(main, playTimeType, container, challenges, inputCalibration, gameMode, resultsBehaviour) {
-
-    companion object; // Used for early init
-
+    
     override val pauseMenuHandler: PauseMenuHandler = TengokuBgPauseMenuHandler(this)
     
     private var endlessPrPauseTime: Float = 0f
@@ -132,7 +130,7 @@ class EnginePlayScreenBase(
     }
 
     
-    override fun copyThisScreenForResults(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen {
+    override fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen {
         return EnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, gameMode,
                 if (resultsBehaviour is ResultsBehaviour.ShowResults)
                     resultsBehaviour.copy(previousHighScore = if (scoreObj.newHighScore) 
