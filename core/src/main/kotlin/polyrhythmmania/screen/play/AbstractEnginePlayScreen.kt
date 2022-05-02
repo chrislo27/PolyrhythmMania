@@ -89,8 +89,8 @@ abstract class AbstractEnginePlayScreen(
         engine.inputCalibration = this.inputCalibration
         engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
         engine.resetEndSignal()
-        renderer.resetAnimations()
         container.world.resetWorld()
+        renderer.onWorldReset()
         challenges.applyToEngine(engine)
 
         // Set everything else

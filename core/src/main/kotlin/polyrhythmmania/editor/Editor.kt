@@ -621,7 +621,7 @@ class Editor(val main: PRManiaGame)
             engine.resetEndSignal()
             cameraOffset.changeTarget(0f)
             cameraOffset.reset()
-            renderer.resetAnimations()
+            renderer.onWorldReset()
 
             val playbackStartBeats = this.playbackStart.get()
             val newSeconds = engine.tempos.beatsToSeconds(playbackStartBeats)

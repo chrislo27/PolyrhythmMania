@@ -92,11 +92,9 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     }
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
-//        setToOrtho(false, 7.5f, 5f) // GBA aspect ratio
         setToOrtho(false, 5 * (16f / 9f), 5f)
         zoom = 1f
         position.set(zoom * viewportWidth / 2.0f, zoom * viewportHeight / 2.0f, 0f)
-//        zoom = 1.5f
         update()
     }
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
@@ -332,7 +330,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         skillStarPulseAnimation = 2f
     }
 
-    fun resetAnimations() {
+    fun onWorldReset() {
         skillStarSpinAnimation = 0f
         skillStarPulseAnimation = 0f
         hudRedFlash = 0f
