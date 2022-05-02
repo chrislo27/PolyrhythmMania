@@ -184,7 +184,6 @@ class ResultsScreen(
 
     override fun show() {
         super.show()
-        Gdx.input.isCursorCatched = false
         main.inputMultiplexer.addProcessor(inputProcessor)
     }
 
@@ -390,6 +389,7 @@ class ResultsScreen(
         override fun onStart() {
             super.onStart()
             playSound(soundRanking)
+            Gdx.input.isCursorCatched = false
             resultsPane.rankingPane.visible.set(true)
             resultsPane.bonusStatsPane.visible.set(true)
             controlsPane.visible.set(true)

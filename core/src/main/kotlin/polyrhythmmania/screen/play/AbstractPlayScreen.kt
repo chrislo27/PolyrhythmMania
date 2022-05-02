@@ -58,6 +58,7 @@ abstract class AbstractPlayScreen(
     
     
     protected abstract fun shouldCatchCursor(): Boolean
+    protected abstract fun uncatchCursorOnHide(): Boolean
 
     /**
      * Called to initialize gameplay. This will be called before entering this screen for the first time,
@@ -251,6 +252,9 @@ abstract class AbstractPlayScreen(
     override fun showTransition() {
         super.showTransition()
         resize(Gdx.graphics.width, Gdx.graphics.height)
+        if (shouldCatchCursor()) {
+            Gdx.input.isCursorCatched = true
+        }
     }
 
     override fun show() {
@@ -263,7 +267,7 @@ abstract class AbstractPlayScreen(
 
     override fun hide() {
         super.hide()
-        if (shouldCatchCursor()) {
+        if (shouldCatchCursor() && uncatchCursorOnHide()) {
             Gdx.input.isCursorCatched = false
         }
         main.inputMultiplexer.removeProcessor(pauseMenuInputProcessor)

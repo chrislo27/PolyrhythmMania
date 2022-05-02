@@ -218,6 +218,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                     }
                 }
                 this.setOnAction {
+                    Gdx.input.isCursorCatched = true
                     val loadedData = loaded
                     if (loadedData != null) {
                         val engine = loadedData.newContainer.engine

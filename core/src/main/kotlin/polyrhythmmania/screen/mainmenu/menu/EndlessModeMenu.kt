@@ -90,6 +90,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += createLongButton { playButtonText.use() }.apply {
                 this.setOnAction {
+                    Gdx.input.isCursorCatched = true
                     menuCol.playMenuSound("sfx_menu_enter_game")
                     mainMenu.transitionAway {
                         val main = mainMenu.main

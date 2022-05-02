@@ -50,6 +50,8 @@ class EnginePlayScreenBase(
     
     private var endlessPrPauseTime: Float = 0f
     
+    private var disableCatchingCursorOnHide: Boolean = false
+    
     init {
         if (engine.world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS
                 && engine.world.worldMode.type == WorldType.POLYRHYTHM
@@ -124,13 +126,15 @@ class EnginePlayScreenBase(
             val thisScreen: EnginePlayScreenBase = this
             val resetAction: () -> Unit = {
                 resetAndUnpause()
+                disableCatchingCursorOnHide = false
+            }
+            if (shouldCatchCursor()) {
+                disableCatchingCursorOnHide = true
+                Gdx.input.isCursorCatched = true
             }
             main.screen = TransitionScreen(main, thisScreen, thisScreen,
                     WipeTransitionHead(Color.BLACK.cpy(), 0.4f), WipeTransitionTail(Color.BLACK.cpy(), 0.4f)).apply {
                 onEntryEnd = resetAction
-                onStart = {
-                    Gdx.input.isCursorCatched = true
-                }
             }
         }
         optionList += PauseOption("play.pause.quitToMainMenu", true) {
@@ -142,7 +146,11 @@ class EnginePlayScreenBase(
         this.pauseOptions.set(optionList)
     }
 
-    
+
+    override fun uncatchCursorOnHide(): Boolean {
+        return super.uncatchCursorOnHide() && !disableCatchingCursorOnHide
+    }
+
     override fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen {
         return EnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, gameMode,
                 if (resultsBehaviour is ResultsBehaviour.ShowResults)

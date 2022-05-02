@@ -355,6 +355,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         else (createLongButtonWithNewIndicator(newIndicator, icon) { Localization.getVar(name).use() })).apply {
             this.tooltipElement.set(createTooltip(tooltipVar))
             this.setOnAction {
+                Gdx.input.isCursorCatched = true
                 menuCol.playMenuSound("sfx_menu_enter_game")
                 mainMenu.transitionAway {
                     val main = mainMenu.main

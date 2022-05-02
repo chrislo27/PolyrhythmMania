@@ -58,6 +58,8 @@ abstract class AbstractEnginePlayScreen(
         get() = container.soundSystem ?: error("${this::javaClass.name} requires a non-null SoundSystem in the Container")
     val engine: Engine get() = container.engine
     val renderer: WorldRenderer get() = container.renderer
+    
+    protected var goingToResults: Boolean = false
 
     private val endSignalListener: VarChangedListener<Boolean> = VarChangedListener {
         if (it.getOrCompute()) {
@@ -231,6 +233,7 @@ abstract class AbstractEnginePlayScreen(
             }
         }
 
+        goingToResults = true
         transitionAway(ResultsScreen(main, scoreObj, container, gameMode, {
             copyThisScreenForResultsStartOver(scoreObj, resultsBehaviour)
         }, keyboardKeybinds,
@@ -260,6 +263,9 @@ abstract class AbstractEnginePlayScreen(
 
 
     override fun shouldCatchCursor(): Boolean = true
+    override fun uncatchCursorOnHide(): Boolean {
+        return !goingToResults
+    }
     
     override fun keyDown(keycode: Int): Boolean {
         var consumed = false
