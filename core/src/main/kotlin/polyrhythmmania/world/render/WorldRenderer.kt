@@ -35,6 +35,7 @@ import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.render.bg.NoOpWorldBackground
 import polyrhythmmania.world.render.bg.WorldBackground
+import polyrhythmmania.world.render.bg.WorldBackgroundFromWorldType
 import polyrhythmmania.world.tileset.Tileset
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -108,7 +109,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     var entityRenderTimeNano: Long = 0L
         private set
     
-    var worldBackground: WorldBackground = NoOpWorldBackground
+    var worldBackground: WorldBackground = WorldBackgroundFromWorldType
 
     var renderUI: Boolean = true
     var showSkillStarSetting: Boolean = PRManiaGame.instance.settings.showSkillStar.getOrCompute()
@@ -352,7 +353,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
 //                GL20.GL_SRC_ALPHA, GL20.GL_ONE)
         
         // Background
-        worldBackground.render(batch, engine, camera)
+        worldBackground.render(batch, world, engine, camera)
 
         // Entities
         val entityRenderTime = System.nanoTime()

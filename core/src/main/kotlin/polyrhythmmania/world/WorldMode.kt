@@ -1,10 +1,13 @@
 package polyrhythmmania.world
 
+import polyrhythmmania.world.render.bg.NoOpWorldBackground
+import polyrhythmmania.world.render.bg.WorldBackground
 
-enum class WorldType {
-    POLYRHYTHM,
-    DUNK,
-    ASSEMBLE,
+
+enum class WorldType(val defaultBackground: WorldBackground) {
+    POLYRHYTHM(NoOpWorldBackground),
+    DUNK(DunkWorldBackground),
+    ASSEMBLE(AssembleWorldBackground),
 }
 
 enum class EndlessType(val isEndless: Boolean) {

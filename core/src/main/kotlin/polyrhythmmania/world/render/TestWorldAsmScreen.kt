@@ -56,7 +56,6 @@ class TestWorldAsmScreen(main: PRManiaGame) : PRManiaScreen(main) {
         engine.autoInputs = false
         engine.inputter.areInputsLocked = false
 
-        renderer.worldBackground = AssembleWorldBackground
         addEvents()
     }
     

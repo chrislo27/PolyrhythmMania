@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
-import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
@@ -374,8 +373,8 @@ class EntityPistonDunk(world: World)
 
 
 object DunkWorldBackground : WorldBackground() {
-    override fun render(batch: SpriteBatch, engine: Engine, camera: OrthographicCamera) {
+    override fun render(batch: SpriteBatch, world: World, engine: Engine, camera: OrthographicCamera) {
         val tex: Texture = AssetRegistry["dunk_background"]
-        batch.draw(tex, 0f, 0f, camera.viewportWidth, camera.viewportHeight)
+        batch.draw(tex, camera.position.x - camera.viewportWidth / 2f, camera.position.y - camera.viewportHeight / 2f, camera.viewportWidth, camera.viewportHeight)
     }
 }

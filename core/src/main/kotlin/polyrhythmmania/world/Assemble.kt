@@ -11,7 +11,6 @@ import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
-import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.engine.input.InputThresholds
@@ -37,7 +36,7 @@ object AssembleWorldBackground : WorldBackground() {
     private val gradientStart: Color = Color.valueOf("1B6B17")
     private val gradientEnd: Color = Color.BLACK.cpy()
     
-    override fun render(batch: SpriteBatch, engine: Engine, camera: OrthographicCamera) {
+    override fun render(batch: SpriteBatch, world: World, engine: Engine, camera: OrthographicCamera) {
         batch.drawQuad(0f, camera.viewportHeight * 0.25f, gradientEnd, 
                 camera.viewportWidth, camera.viewportHeight * 0.25f, gradientEnd,
                 camera.viewportWidth, camera.viewportHeight, gradientStart,

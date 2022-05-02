@@ -36,7 +36,6 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         container.world.worldMode = WorldMode(WorldType.ASSEMBLE, EndlessType.NOT_ENDLESS)
         container.renderer.showEndlessModeScore.set(false)
 //        container.engine.inputter.endlessScore.maxLives.set(3)
-        container.renderer.worldBackground = AssembleWorldBackground
         container.texturePackSource.set(TexturePackSource.STOCK_GBA)
         TilesetPalette.createAssembleTilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
