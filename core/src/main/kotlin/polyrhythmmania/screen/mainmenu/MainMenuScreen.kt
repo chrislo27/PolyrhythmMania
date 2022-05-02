@@ -325,7 +325,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.renderBackground.set(true)
             this.bgPadding.set(Insets(8f))
             this.textColor.bind {
-                if (newVersionAvailable.use()) Color.ORANGE.cpy() else Color(1f, 1f, 1f, 1f)
+                val baseColor = (if (newVersionAvailable.use()) Color.ORANGE else Color.WHITE).cpy()
+                
+                if (isHoveredOver.use()) {
+                    baseColor.sub(0.2f, 0.2f, 0.2f, 0f)
+                } else {
+                    baseColor
+                }
             }
             this.markup.set(markup)
             (this.skin.getOrCompute() as TextLabelSkin).defaultBgColor.set(Color().grey(0.1f, 0.5f))
@@ -343,7 +349,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         }
         sceneRoot += versionTooltip
-        sceneRoot += Tooltip(binding = { Localization.getVar("mainMenu.newVersionFloater").use() }, font = main.fontMainMenuMain).apply {
+        sceneRoot += Tooltip(binding = {
+            Localization.getVar("mainMenu.newVersionFloater", Var.bind { listOf(main.githubVersion.use()) }).use()
+        }, font = main.fontMainMenuMain).apply {
             Anchor.BottomRight.configure(this)
             val leftSide = FloatVar {
                 versionTooltip.bounds.x.use() - bounds.width.use()
