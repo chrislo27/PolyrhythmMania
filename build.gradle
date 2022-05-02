@@ -16,12 +16,12 @@ allprojects {
     apply plugin: "java"
     apply plugin: "kotlin"
 
-    version = "1.2.1"
+    version = "2.0.0"
     ext {
         appName = "PolyrhythmMania"
         
-        paintboxVersion = "0.5.3"
-        useLocalPaintbox = false
+        paintboxVersion = "0.5.4"
+        useLocalPaintbox = true
     }
     
     java {
