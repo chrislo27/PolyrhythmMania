@@ -66,8 +66,9 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             hbox += CheckBox(binding = { Localization.getVar("mainMenu.updateNotes.dontShowAgain").use() }, font = font).apply {
-                this.bounds.width.set(320f)
-                this.textLabel.setScaleXY(0.75f)
+                this.bounds.width.set(160f)
+                this.textLabel.setScaleXY(0.5f)
+                this.textLabel.doLineWrapping.set(true)
                 this.imageNode.padding.set(Insets(4f, 4f, 4f, 0f))
                 this.checkedState.set(settings.lastUpdateNotes.getOrCompute() == latestUpdate)
                 this.onCheckChanged = {
