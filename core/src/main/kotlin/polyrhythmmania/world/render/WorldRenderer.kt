@@ -32,6 +32,7 @@ import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
+import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.render.bg.NoOpWorldBackground
 import polyrhythmmania.world.render.bg.WorldBackground
@@ -93,9 +94,8 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
     }
 
     val camera: OrthographicCamera = OrthographicCamera().apply {
-        setToOrtho(false, 5 * (16f / 9f), 5f)
         zoom = 1f
-        position.set(zoom * viewportWidth / 2.0f, zoom * viewportHeight / 2.0f, 0f)
+        setToOrtho(false, 5 * (16f / 9f), 5f)
         update()
     }
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
@@ -341,10 +341,17 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
 
     fun render(batch: SpriteBatch) {
         val engine = this.engine
-        
-        tmpMatrix.set(batch.projectionMatrix)
         val camera = this.camera
+        // TODO better camera controls and refactoring
+        if (world.worldMode.type == WorldType.DUNK) {
+            camera.position.x = camera.zoom * camera.viewportWidth / 2f
+            camera.position.y = camera.zoom * camera.viewportHeight / 2f
+            camera.position.x -= 2f
+            camera.position.y += 0.125f
+        }
         camera.update()
+
+        tmpMatrix.set(batch.projectionMatrix)
         batch.projectionMatrix = camera.combined
         batch.begin()
 
