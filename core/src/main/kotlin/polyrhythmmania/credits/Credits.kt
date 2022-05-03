@@ -6,9 +6,9 @@ import polyrhythmmania.Localization
 import java.util.*
 
 
-object Credits {
+object Credits : CreditsBase() {
     
-    val credits: Map<ReadOnlyVar<String>, List<ReadOnlyVar<String>>> = linkedMapOf(
+    override val credits: Map<ReadOnlyVar<String>, List<ReadOnlyVar<String>>> = linkedMapOf(
             Localization.getVar("credits.programming") to listOf("chrislo27", "[font=rodin](◉.◉)☂[]").toVars(),
             Localization.getVar("credits.graphicDesign") to abcSorted(
                     "garbo", "snow krow", "GENERIC", "Merch_Andise", "Kievit"
@@ -58,6 +58,4 @@ object Credits {
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
     
-    private fun abcSorted(vararg things: String): List<String> = things.sortedBy { it.lowercase(Locale.ROOT) }
-    private fun List<String>.toVars(): List<ReadOnlyVar<String>> = this.map { Var(it) }
 }
