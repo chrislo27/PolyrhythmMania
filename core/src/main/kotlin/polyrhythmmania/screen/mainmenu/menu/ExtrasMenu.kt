@@ -27,7 +27,6 @@ import polyrhythmmania.screen.play.ResultsBehaviour
 import polyrhythmmania.gamemodes.AssembleMode
 import polyrhythmmania.gamemodes.DunkMode
 import polyrhythmmania.gamemodes.EndlessModeScore
-import polyrhythmmania.solitaire.SolitaireMenu
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 

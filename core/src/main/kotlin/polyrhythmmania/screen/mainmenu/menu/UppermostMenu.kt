@@ -89,10 +89,27 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 menuCol.playBlipSound()
             }
         }
+
+        val settings = menuCol.main.settings
         vbox.temporarilyDisableLayouts {
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.play").use() }).apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.playMenu)
+                }
+            }
+            vbox += createButton(binding = {
+                (if (settings.newIndicatorStoryMode.value.use())
+                    (Localization.getVar("common.newIndicator").use() + " ")
+                else "") + Localization.getVar("mainMenu.main.storyMode").use()
+            }).apply {
+                this.setOnAction {
+                    // TODO
+
+                    val newIndicator = settings.newIndicatorStoryMode
+                    if (newIndicator.value.get()) {
+                        newIndicator.value.set(false)
+                        settings.persist()
+                    }
                 }
             }
             vbox += createButton(binding = { Localization.getVar("mainMenu.main.edit").use() }).apply { 

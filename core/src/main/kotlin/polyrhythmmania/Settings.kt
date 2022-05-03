@@ -32,6 +32,7 @@ import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_TEXPACK
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_ASM
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_SOLITAIRE
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_LIBRARY
+import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_STORY_MODE
 import polyrhythmmania.PreferenceKeys.SETTINGS_ACHIEVEMENT_NOTIFICATIONS
 import polyrhythmmania.PreferenceKeys.SETTINGS_AUDIODEVICE_BUFFER_COUNT
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
@@ -205,9 +206,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     val newIndicatorEditorHelpPrmproj: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_PRMPROJ, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorExtrasAssemble: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_ASM, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorExtrasSolitaire: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_SOLITAIRE, Version(1, 2, 0), newEvenIfFirstPlay = false)
+    val newIndicatorStoryMode: NewIndicator = NewIndicator(NEW_INDICATOR_STORY_MODE, Version(2, 0, 0), newEvenIfFirstPlay = true)
     val allNewIndicators: List<NewIndicator> = listOf(newIndicatorLibrary, newIndicatorEditorHelpTexpack,
             newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorExtrasAssemble,
-            newIndicatorExtrasSolitaire)
+            newIndicatorExtrasSolitaire, newIndicatorStoryMode)
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
