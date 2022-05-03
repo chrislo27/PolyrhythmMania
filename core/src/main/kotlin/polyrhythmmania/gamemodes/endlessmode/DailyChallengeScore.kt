@@ -36,36 +36,37 @@ typealias DailyLeaderboard = Map<LocalDate, List<DailyLeaderboardScore>>
 object DailyChallengeUtils {
     
     val allowedNameChars: Set<Char> = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_".toSet()
-    
-    fun sendNonceRequest(date: LocalDate, nonceVar: Var<UUID?>) {
-        thread(isDaemon = true, name = "Daily Challenge UUID getter", start = true) {
-            val post = HttpPost(
-                    URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/start/${date.format(DateTimeFormatter.ISO_DATE)}")
-                            .setParameter("v", PRMania.VERSION.toString())
-                            .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
-                            .build()
-            )
-            try {
-                val httpClient = PRManiaGame.instance.httpClient
-                httpClient.execute(post).use { response ->
-                    val status = response.statusLine.statusCode
-                    if (status == 200) {
-                        val content = EntityUtils.toString(response.entity)
-                        try {
-                            val uuid: UUID = UUID.fromString(content.trim())
-                            nonceVar.set(uuid)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            Paintbox.LOGGER.warn("Failed to get daily challenge high score nonce from server: bad uuid $content")
-                        }
-                    } else {
-                        Paintbox.LOGGER.warn("Failed to get daily challenge high score nonce from server: status was $status for url ${post.uri} ${EntityUtils.toString(response.entity)}")
+
+    fun sendNonceRequestSync(date: LocalDate): UUID? {
+        val post = HttpPost(
+                URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/start/${date.format(DateTimeFormatter.ISO_DATE)}")
+                        .setParameter("v", PRMania.VERSION.toString())
+                        .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
+                        .build()
+        )
+        
+        try {
+            val httpClient = PRManiaGame.instance.httpClient
+            httpClient.execute(post).use { response ->
+                val status = response.statusLine.statusCode
+                if (status == 200) {
+                    val content = EntityUtils.toString(response.entity)
+                    try {
+                        val uuid: UUID = UUID.fromString(content.trim())
+                        return uuid
+                    } catch (e: Exception) {
+                        Paintbox.LOGGER.warn("Failed to get daily challenge high score nonce from server: bad uuid $content")
+                        e.printStackTrace()
                     }
+                } else {
+                    Paintbox.LOGGER.warn("Failed to get daily challenge high score nonce from server: status was $status for url ${post.uri} ${EntityUtils.toString(response.entity)}")
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+        
+        return null
     }
     
     fun submitHighScore(date: LocalDate, score: Int, name: String, nonce: UUID,

@@ -35,6 +35,9 @@ import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.flags.CountryFlags
 import java.time.*
 import java.time.format.DateTimeFormatter
+import java.util.*
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
 
 
 class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -89,58 +92,64 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             })
             vbox += createLongButton { dailyChallengeTitle.use() }.apply {
                 this.setOnAction {
-                    Gdx.input.isCursorCatched = true
-                    menuCol.playMenuSound("sfx_menu_enter_game")
-                    mainMenu.transitionAway {
-                        val main = mainMenu.main
-                        val date = dailyChallengeDate.getOrCompute()
-                        
-                        // Daily challenge streak calculation
-                        val lastScore = main.settings.endlessDailyChallenge.getOrCompute()
-                        if (lastScore.date == date.plusDays(-1L)) {
-                            val newStreak = main.settings.dailyChallengeStreak.incrementAndGet()
-                            if (newStreak >= 7) {
-                                Achievements.awardAchievement(Achievements.dailyWeekStreak)
-                            }
-                        } else {
-                            main.settings.dailyChallengeStreak.set(1)
-                        }
+                    val date = dailyChallengeDate.getOrCompute()
+                    val onSuccess: (UUID?) -> Unit = { nonce ->
+                        Gdx.input.isCursorCatched = true
+                        menuCol.playMenuSound("sfx_menu_enter_game")
+                        mainMenu.transitionAway {
+                            val main = mainMenu.main
 
-                        numTimesPlayedThisSession++
-                        if (numTimesPlayedThisSession >= 2) {
-                            Achievements.awardAchievement(Achievements.dailyTwiceInOneSession)
-                        }
-                        
-                        Gdx.app.postRunnable {
-                            val scoreVar = IntVar(0)
-                            scoreVar.addListener {
-                                main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
-                            }
-                            val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main, PlayTimeType.DAILY_CHALLENGE,
-                                    EndlessModeScore(scoreVar, showNewHighScoreAtEnd = false),
-                                    EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
-                            val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType, 
-                                    sidemode.container, gameMode = sidemode,
-                                    challenges = Challenges.NO_CHANGES,
-                                    inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                    resultsBehaviour = ResultsBehaviour.NoResults)
-                            main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
-                            main.settings.persist()
-                            main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
-                                this.onEntryEnd = {
-                                    sidemode.prepare()
-                                    playScreen.resetAndUnpause()
-                                    DiscordRichPresence.updateActivity(DefaultPresences.playingDailyChallenge(date))
-                                    mainMenu.backgroundType = BgType.ENDLESS
-                                    GlobalStats.timesPlayedDailyChallenge.increment()
+                            // Daily challenge streak calculation
+                            val lastScore = main.settings.endlessDailyChallenge.getOrCompute()
+                            if (lastScore.date == date.plusDays(-1L)) {
+                                val newStreak = main.settings.dailyChallengeStreak.incrementAndGet()
+                                if (newStreak >= 7) {
+                                    Achievements.awardAchievement(Achievements.dailyWeekStreak)
                                 }
+                            } else {
+                                main.settings.dailyChallengeStreak.set(1)
                             }
 
-                            // Get UUID nonce from high score server
-                            DailyChallengeUtils.sendNonceRequest(date, sidemode.dailyChallengeUUIDNonce)
+                            numTimesPlayedThisSession++
+                            if (numTimesPlayedThisSession >= 2) {
+                                Achievements.awardAchievement(Achievements.dailyTwiceInOneSession)
+                            }
+
+                            Gdx.app.postRunnable {
+                                val scoreVar = IntVar(0)
+                                scoreVar.addListener {
+                                    main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
+                                }
+                                val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main, PlayTimeType.DAILY_CHALLENGE,
+                                        EndlessModeScore(scoreVar, showNewHighScoreAtEnd = false),
+                                        EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
+                                val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType,
+                                        sidemode.container, gameMode = sidemode,
+                                        challenges = Challenges.NO_CHANGES,
+                                        inputCalibration = main.settings.inputCalibration.getOrCompute(),
+                                        resultsBehaviour = ResultsBehaviour.NoResults)
+                                main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
+                                main.settings.persist()
+                                main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                                    this.onEntryEnd = {
+                                        sidemode.prepare()
+                                        playScreen.resetAndUnpause()
+                                        DiscordRichPresence.updateActivity(DefaultPresences.playingDailyChallenge(date))
+                                        mainMenu.backgroundType = BgType.ENDLESS
+                                        GlobalStats.timesPlayedDailyChallenge.increment()
+                                    }
+                                }
+                                
+                                sidemode.dailyChallengeUUIDNonce.set(nonce)
+                            }
                         }
                     }
+                    
+                    val waitingForNonceMenu = WaitingForNonceMenu(menuCol, date, onSuccess)
+                    menuCol.addMenu(waitingForNonceMenu)
+                    menuCol.pushNextMenu(waitingForNonceMenu)
                 }
+                
                 this.tooltipElement.set(createTooltip(binding = {
                     val (date, hiScore) = main.settings.endlessDailyChallenge.use()
                     if (date == dailyChallengeDate.use()) {
@@ -381,6 +390,127 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this += scrollPane
 
             updateList(startingDate)
+        }
+    }
+
+    
+    class WaitingForNonceMenu(menuCol: MenuCollection, val date: LocalDate, val onSuccess: (nonce: UUID?) -> Unit)
+        : StandardMenu(menuCol) {
+        
+        companion object {
+            const val TIMEOUT: Long = 5_000L
+        }
+        
+        private sealed class NonceValue {
+            object None : NonceValue()
+            object Errored : NonceValue()
+            class Success(val uuid: UUID) : NonceValue()
+        }
+        
+        private val nonce: AtomicReference<NonceValue> = AtomicReference(NonceValue.None)
+        private val timeoutThread: Thread
+        private val fetchThread: Thread
+        
+        init {
+            this.setSize(MMMenu.WIDTH_SMALL)
+            this.titleText.bind { Localization.getVar("mainMenu.dailyChallenge.title").use() }
+            this.contentPane.bounds.height.set(250f)
+            this.deleteWhenPopped.set(true)
+
+            contentPane.addChild(TextLabel(Localization.getVar("mainMenu.dailyChallenge.contactingServer")).apply {
+                this.markup.set(this@WaitingForNonceMenu.markup)
+                this.textColor.set(LongButtonSkin.TEXT_COLOR)
+                this.renderAlign.set(Align.center)
+                this.doLineWrapping.set(true)
+            })
+        }
+        
+        init {
+            fun goToErrorMenu() { // Will already be in the gdx thread
+                menuCol.popLastMenu(instant = true, playSound = false)
+                
+                val errorMenu = NonceErrorMenu(menuCol, onSuccess)
+                menuCol.addMenu(errorMenu)
+                menuCol.pushNextMenu(errorMenu, playSound = false)
+            }
+            
+            timeoutThread = thread(isDaemon = true, name = "Daily Challenge UUID getter timeout", start = true) {
+                Thread.sleep(TIMEOUT)
+                if (nonce.get() == NonceValue.None) {
+                    nonce.set(NonceValue.Errored)
+                    Gdx.app.postRunnable {
+                        goToErrorMenu()
+                    }
+                }
+            }
+            fetchThread = thread(isDaemon = true, name = "Daily Challenge UUID getter", start = true) {
+                val uuid: UUID? = try {
+                    DailyChallengeUtils.sendNonceRequestSync(date)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
+                val nonceValue = if (uuid != null) NonceValue.Success(uuid) else NonceValue.Errored
+                
+                if (nonce.get() == NonceValue.None) {
+                    nonce.set(nonceValue)
+
+                    if (nonceValue is NonceValue.Success) {
+                        // If nonce is gotten, set in gdx thread, and enter game, and pop this menu
+                        Gdx.app.postRunnable {
+                            menuCol.popLastMenu(instant = true, playSound = false)
+                            onSuccess(nonceValue.uuid)
+                        }
+                    } else {
+                        Gdx.app.postRunnable {
+                            goToErrorMenu()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    class NonceErrorMenu(menuCol: MenuCollection, val onSuccess: (nonce: UUID?) -> Unit)
+        : StandardMenu(menuCol) {
+        init {
+            this.setSize(MMMenu.WIDTH_SMALL)
+            this.titleText.bind { Localization.getVar("mainMenu.dailyChallenge.title").use() }
+            this.contentPane.bounds.height.set(250f)
+            this.deleteWhenPopped.set(true)
+
+            contentPane.addChild(TextLabel(Localization.getVar("mainMenu.dailyChallenge.contactingServer.failed")).apply {
+                this.bindHeightToParent(adjust = -40f)
+                this.markup.set(this@NonceErrorMenu.markup)
+                this.textColor.set(LongButtonSkin.TEXT_COLOR)
+                this.renderAlign.set(Align.topLeft)
+                this.doLineWrapping.set(true)
+            })
+            
+            val hbox = HBox().apply {
+                Anchor.BottomLeft.configure(this)
+                this.spacing.set(8f)
+                this.padding.set(Insets(4f, 0f, 2f, 2f))
+                this.bounds.height.set(40f)
+            }
+            contentPane.addChild(hbox)
+            hbox.temporarilyDisableLayouts {
+                hbox += createSmallButton(binding = { Localization.getVar("common.cancel").use() }).apply {
+                    this.bounds.width.set(100f)
+                    this.setOnAction {
+                        menuCol.popLastMenu()
+                    }
+                }
+                hbox += createSmallButton(binding = { Localization.getVar("mainMenu.play.playAction").use() }).apply {
+                    this.bounds.width.set(200f)
+                    this.setOnAction {
+                        Gdx.app.postRunnable {
+                            menuCol.popLastMenu(instant = true, playSound = false)
+                            onSuccess(null)
+                        }
+                    }
+                }
+            }
         }
     }
     
