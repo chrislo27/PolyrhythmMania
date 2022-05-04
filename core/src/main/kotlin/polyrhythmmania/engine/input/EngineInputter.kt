@@ -156,29 +156,30 @@ class EngineInputter(val engine: Engine) {
         inputCountStats.reset()
     }
     
-    fun onAButtonPressed(release: Boolean) {
-        val activeTextBox = engine.activeTextBox
-        if (activeTextBox != null && activeTextBox.textBox.requiresInput && activeTextBox.secondsTimer <= 0f) {
-            if (!activeTextBox.isADown) {
-                if (!release) {
-                    engine.soundInterface.playMenuSfx(AssetRegistry.get<Sound>("sfx_text_advance_1"))
-                    activeTextBox.isADown = true
+    fun onButtonPressed(release: Boolean, type: InputType) {
+        if (type == InputType.A) {
+            val activeTextBox = engine.activeTextBox
+            if (activeTextBox != null && activeTextBox.textBox.requiresInput && activeTextBox.secondsTimer <= 0f) {
+                if (!activeTextBox.isADown) {
+                    if (!release) {
+                        engine.soundInterface.playMenuSfx(AssetRegistry.get<Sound>("sfx_text_advance_1"))
+                        activeTextBox.isADown = true
+                    }
+                } else {
+                    if (release) {
+                        engine.soundInterface.playMenuSfx(AssetRegistry.get<Sound>("sfx_text_advance_2"))
+                        engine.removeActiveTextbox(unpauseSoundInterface = true, runTextboxOnComplete = true)
+                    }
                 }
             } else {
-                if (release) {
-                    engine.soundInterface.playMenuSfx(AssetRegistry.get<Sound>("sfx_text_advance_2"))
-                    engine.removeActiveTextbox(unpauseSoundInterface = true, runTextboxOnComplete = true)
+                if (!release) {
+                    onInput(InputType.A)
                 }
             }
         } else {
             if (!release) {
-                onInput(InputType.A)
+                onInput(InputType.DPAD_ANY)
             }
-        }
-    }
-    fun onDpadButtonPressed(release: Boolean) {
-        if (!release) {
-            onInput(InputType.DPAD)
         }
     }
 
@@ -189,10 +190,7 @@ class EngineInputter(val engine: Engine) {
         
         val worldMode = world.worldMode
         if (worldMode.type == WorldType.POLYRHYTHM) {
-            val rowBlockType: EntityPiston.Type = when (type) {
-                InputType.A -> EntityPiston.Type.PISTON_A
-                InputType.DPAD -> EntityPiston.Type.PISTON_DPAD
-            }
+            val rowBlockType: EntityPiston.Type = if (type.isDpad) EntityPiston.Type.PISTON_DPAD else EntityPiston.Type.PISTON_A
 
             for (row in world.rows) {
                 row.updateInputIndicators()
@@ -241,7 +239,7 @@ class EngineInputter(val engine: Engine) {
                         val allWereHit = practice.requiredInputs.all { it.wasHit }
                         if (!allWereHit) {
                             practice.requiredInputs.forEach { ri ->
-                                if (!ri.wasHit && ri.inputType == type && MathUtils.isEqual(perfectBeats, ri.beat, BEAT_EPSILON)) {
+                                if (!ri.wasHit && type.isInputEquivalent(ri.inputType) && MathUtils.isEqual(perfectBeats, ri.beat, BEAT_EPSILON)) {
                                     ri.wasHit = true
                                     ri.hitScore = inputResult.inputScore
                                 }

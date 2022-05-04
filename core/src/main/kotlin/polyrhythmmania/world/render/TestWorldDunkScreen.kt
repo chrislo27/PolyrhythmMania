@@ -10,6 +10,7 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.world.*
@@ -116,20 +117,20 @@ class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
         // Inputs
         if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
             engine.postRunnable {
-                engine.inputter.onDpadButtonPressed(false)
+                engine.inputter.onButtonPressed(false, InputType.DPAD_ANY)
             }
         } else if (Gdx.input.isKeyJustReleased(Input.Keys.F)) {
             engine.postRunnable {
-                engine.inputter.onDpadButtonPressed(true)
+                engine.inputter.onButtonPressed(true, InputType.DPAD_ANY)
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
             engine.postRunnable {
-                engine.inputter.onAButtonPressed(false)
+                engine.inputter.onButtonPressed(false, InputType.A)
             }
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+        } else if (Gdx.input.isKeyJustReleased(Input.Keys.J)) {
             engine.postRunnable {
-                engine.inputter.onDpadButtonPressed(true)
+                engine.inputter.onButtonPressed(true, InputType.A)
             }
         }
 

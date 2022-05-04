@@ -128,7 +128,7 @@ class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
         practiceSection2.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat))
             engine.addEvent(EventPracticeRetract(engine, engine.world.rowDpad, 0, startBeat + 3.5f, affectThisIndexAndForward = true))
-            listOf(0, 4).map { EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD) }
+            listOf(0, 4).map { EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY) }
         }
         practiceSection2.endBlock = PracticeEndBlock(7f) { engine, startBeat ->
             engine.addEvent(EventLockInputs(engine, true, startBeat))
@@ -184,7 +184,7 @@ class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
             listOf(0, 4).flatMap { 
                 listOf(
                         EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.A),
-                        EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD)
+                        EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY)
                 )
             }
         }
@@ -249,7 +249,7 @@ class PracticeTutorial1(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
             listOf(0, 2, 6, 4).flatMap {
                 listOf(
                         EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.A),
-                        EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD)
+                        EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY)
                 )
             }
         }

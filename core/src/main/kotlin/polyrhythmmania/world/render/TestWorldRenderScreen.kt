@@ -19,6 +19,7 @@ import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import paintbox.util.DecimalFormats
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.tileset.StockTexturePacks
@@ -123,20 +124,20 @@ class TestWorldRenderScreen(main: PRManiaGame) : PRManiaScreen(main) {
         // Inputs
         if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
             engine.postRunnable {
-                engine.inputter.onDpadButtonPressed(false)
+                engine.inputter.onButtonPressed(false, InputType.DPAD_ANY)
             }
         } else if (Gdx.input.isKeyJustReleased(Input.Keys.F)) {
             engine.postRunnable {
-                engine.inputter.onDpadButtonPressed(true)
+                engine.inputter.onButtonPressed(true, InputType.DPAD_ANY)
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
             engine.postRunnable {
-                engine.inputter.onAButtonPressed(false)
+                engine.inputter.onButtonPressed(false, InputType.A)
             }
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+        } else if (Gdx.input.isKeyJustReleased(Input.Keys.J)) {
             engine.postRunnable {
-                engine.inputter.onDpadButtonPressed(true)
+                engine.inputter.onButtonPressed(true, InputType.A)
             }
         }
 

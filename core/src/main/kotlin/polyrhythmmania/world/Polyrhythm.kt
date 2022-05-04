@@ -238,7 +238,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
         return (row.startX + 0.5f - 4 * xUnitsPerBeat) + (beatsFromDeploy) * xUnitsPerBeat - (6 / 32f)
     }
     
-    fun getThisInputType(): InputType = if (row == world.rowA) InputType.A else InputType.DPAD
+    fun getThisInputType(): InputType = if (row == world.rowA) InputType.A else InputType.DPAD_ANY
     
     fun getBeatForIndex(index: Int): Float {
         return index / this.xUnitsPerBeat + this.deployBeat + 4f

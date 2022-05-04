@@ -52,6 +52,7 @@ import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
 import paintbox.util.DecimalFormats
 import polyrhythmmania.engine.StatisticsMode
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
@@ -1042,16 +1043,33 @@ class Editor(val main: PRManiaGame)
             } else if (!engine.autoInputs && !engine.inputter.areInputsLocked) {
                 val keyboardKeybinds = inputKeymapKeyboard
                 when (keycode) {
-                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
-                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
+                    keyboardKeybinds.buttonDpadUp -> {
                         engine.postRunnable {
-                            engine.inputter.onDpadButtonPressed(false)
+                            engine.inputter.onButtonPressed(false, InputType.DPAD_UP)
+                        }
+                        inputConsumed = true
+                    }
+                    keyboardKeybinds.buttonDpadDown -> {
+                        engine.postRunnable {
+                            engine.inputter.onButtonPressed(false, InputType.DPAD_DOWN)
+                        }
+                        inputConsumed = true
+                    }
+                    keyboardKeybinds.buttonDpadLeft -> {
+                        engine.postRunnable {
+                            engine.inputter.onButtonPressed(false, InputType.DPAD_LEFT)
+                        }
+                        inputConsumed = true
+                    }
+                    keyboardKeybinds.buttonDpadRight -> {
+                        engine.postRunnable {
+                            engine.inputter.onButtonPressed(false, InputType.DPAD_RIGHT)
                         }
                         inputConsumed = true
                     }
                     keyboardKeybinds.buttonA -> {
                         engine.postRunnable {
-                            engine.inputter.onAButtonPressed(false)
+                            engine.inputter.onButtonPressed(false, InputType.A)
                         }
                         inputConsumed = true
                     }
@@ -1086,16 +1104,33 @@ class Editor(val main: PRManiaGame)
         if (!engine.autoInputs && !engine.inputter.areInputsLocked) {
             val keyboardKeybinds = inputKeymapKeyboard
             when (keycode) {
-                keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
-                keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
+                keyboardKeybinds.buttonDpadUp -> {
                     engine.postRunnable {
-                        engine.inputter.onDpadButtonPressed(true)
+                        engine.inputter.onButtonPressed(true, InputType.DPAD_UP)
+                    }
+                    inputConsumed = true
+                }
+                keyboardKeybinds.buttonDpadDown -> {
+                    engine.postRunnable {
+                        engine.inputter.onButtonPressed(true, InputType.DPAD_DOWN)
+                    }
+                    inputConsumed = true
+                }
+                keyboardKeybinds.buttonDpadLeft -> {
+                    engine.postRunnable {
+                        engine.inputter.onButtonPressed(true, InputType.DPAD_LEFT)
+                    }
+                    inputConsumed = true
+                }
+                keyboardKeybinds.buttonDpadRight -> {
+                    engine.postRunnable {
+                        engine.inputter.onButtonPressed(true, InputType.DPAD_RIGHT)
                     }
                     inputConsumed = true
                 }
                 keyboardKeybinds.buttonA -> {
                     engine.postRunnable {
-                        engine.inputter.onAButtonPressed(true)
+                        engine.inputter.onButtonPressed(true, InputType.A)
                     }
                     inputConsumed = true
                 }

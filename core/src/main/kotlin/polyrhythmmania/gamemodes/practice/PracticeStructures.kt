@@ -86,7 +86,7 @@ class PracticeSection(engine: Engine) : Block(engine, EnumSet.allOf(BlockType::c
                 (engine.world.entities.filterIsInstance<EntityRodPR>().flatMap { it.inputTracker.results }.filterNotNull() +
                         engine.inputter.inputResults).toSet().forEach { result ->
                     val required = inputBeats.firstOrNull { 
-                        !it.wasHit && it.inputType == result.inputType && MathUtils.isEqual(result.perfectBeat, it.beat, EngineInputter.BEAT_EPSILON) 
+                        !it.wasHit && it.inputType.isInputEquivalent(result.inputType) && MathUtils.isEqual(result.perfectBeat, it.beat, EngineInputter.BEAT_EPSILON) 
                     }
                     if (required != null) {
                         required.wasHit = true

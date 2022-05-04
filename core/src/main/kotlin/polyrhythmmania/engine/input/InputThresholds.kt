@@ -35,11 +35,12 @@ object InputThresholds {
         ).forEach { mode ->
             world.worldMode = mode
             world.resetWorld()
+            val types = InputType.values()
             repeat(60) {
-                engine.inputter.onAButtonPressed(false)
-                engine.inputter.onAButtonPressed(true)
-                engine.inputter.onDpadButtonPressed(false)
-                engine.inputter.onDpadButtonPressed(true)
+                types.forEach { t ->
+                    engine.inputter.onButtonPressed(false, t)
+                    engine.inputter.onButtonPressed(true, t)
+                }
                 (engine.timingProvider as SimpleTimingProvider).seconds += 1 / 60f
             }
         }

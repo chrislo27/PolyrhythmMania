@@ -190,7 +190,7 @@ abstract class AbstractEnginePlayScreen(
 
         val resultsText = container.resultsText
         val ranking = Ranking.getRanking(score)
-        val leftResults = inputter.inputResults.filter { it.inputType == InputType.DPAD }
+        val leftResults = inputter.inputResults.filter { it.inputType == InputType.DPAD_ANY }
         val rightResults = inputter.inputResults.filter { it.inputType == InputType.A }
         val badLeftGoodRight = leftResults.isNotEmpty() && rightResults.isNotEmpty()
                 && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
@@ -272,16 +272,33 @@ abstract class AbstractEnginePlayScreen(
         if (main.screen === this) {
             if (!isPaused.get()) {
                 when (keycode) {
-                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
-                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
+                    keyboardKeybinds.buttonDpadUp -> {
                         engine.postRunnable {
-                            engine.inputter.onDpadButtonPressed(false)
+                            engine.inputter.onButtonPressed(false, InputType.DPAD_UP)
+                        }
+                        consumed = true
+                    }
+                    keyboardKeybinds.buttonDpadDown -> {
+                        engine.postRunnable {
+                            engine.inputter.onButtonPressed(false, InputType.DPAD_DOWN)
+                        }
+                        consumed = true
+                    }
+                    keyboardKeybinds.buttonDpadLeft -> {
+                        engine.postRunnable {
+                            engine.inputter.onButtonPressed(false, InputType.DPAD_LEFT)
+                        }
+                        consumed = true
+                    }
+                    keyboardKeybinds.buttonDpadRight -> {
+                        engine.postRunnable {
+                            engine.inputter.onButtonPressed(false, InputType.DPAD_RIGHT)
                         }
                         consumed = true
                     }
                     keyboardKeybinds.buttonA -> {
                         engine.postRunnable {
-                            engine.inputter.onAButtonPressed(false)
+                            engine.inputter.onButtonPressed(false, InputType.A)
                         }
                         consumed = true
                     }
@@ -297,16 +314,33 @@ abstract class AbstractEnginePlayScreen(
         if (main.screen === this) {
             if (!isPaused.get())  {
                 when (keycode) {
-                    keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown,
-                    keyboardKeybinds.buttonDpadLeft, keyboardKeybinds.buttonDpadRight -> {
+                    keyboardKeybinds.buttonDpadUp -> {
                         engine.postRunnable {
-                            engine.inputter.onDpadButtonPressed(true)
+                            engine.inputter.onButtonPressed(true, InputType.DPAD_UP)
+                        }
+                        consumed = true
+                    }
+                    keyboardKeybinds.buttonDpadDown -> {
+                        engine.postRunnable {
+                            engine.inputter.onButtonPressed(true, InputType.DPAD_DOWN)
+                        }
+                        consumed = true
+                    }
+                    keyboardKeybinds.buttonDpadLeft -> {
+                        engine.postRunnable {
+                            engine.inputter.onButtonPressed(true, InputType.DPAD_LEFT)
+                        }
+                        consumed = true
+                    }
+                    keyboardKeybinds.buttonDpadRight -> {
+                        engine.postRunnable {
+                            engine.inputter.onButtonPressed(true, InputType.DPAD_RIGHT)
                         }
                         consumed = true
                     }
                     keyboardKeybinds.buttonA -> {
                         engine.postRunnable {
-                            engine.inputter.onAButtonPressed(true)
+                            engine.inputter.onButtonPressed(true, InputType.A)
                         }
                         consumed = true
                     }

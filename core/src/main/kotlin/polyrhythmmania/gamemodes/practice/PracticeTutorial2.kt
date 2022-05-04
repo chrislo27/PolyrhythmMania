@@ -112,7 +112,7 @@ class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
         practiceSection2.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat))
             engine.addEvent(EventPracticeRetract(engine, engine.world.rowDpad, 0, startBeat + 3.5f, affectThisIndexAndForward = true))
-            listOf(3, 6).map { EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD) }
+            listOf(3, 6).map { EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY) }
         }
         practiceSection2.endBlock = PracticeEndBlock(7f) { engine, startBeat ->
             engine.addEvent(EventLockInputs(engine, true, startBeat))
@@ -176,8 +176,8 @@ class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
                     EngineInputter.RequiredInput(startBeat + 4 * 0.5f, InputType.A),
                     EngineInputter.RequiredInput(startBeat + 6 * 0.5f, InputType.A),
                     
-                    EngineInputter.RequiredInput(startBeat + 3 * 0.5f, InputType.DPAD),
-                    EngineInputter.RequiredInput(startBeat + 6 * 0.5f, InputType.DPAD),
+                    EngineInputter.RequiredInput(startBeat + 3 * 0.5f, InputType.DPAD_ANY),
+                    EngineInputter.RequiredInput(startBeat + 6 * 0.5f, InputType.DPAD_ANY),
             )
         }
         practiceSection3.endBlock = PracticeEndBlock(7f) { engine, startBeat ->
@@ -242,9 +242,9 @@ class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
                     EngineInputter.RequiredInput(startBeat + 4 * 0.5f, InputType.A),
                     EngineInputter.RequiredInput(startBeat + 6 * 0.5f, InputType.A),
 
-                    EngineInputter.RequiredInput(startBeat + 0 * 0.5f, InputType.DPAD),
-                    EngineInputter.RequiredInput(startBeat + 3 * 0.5f, InputType.DPAD),
-                    EngineInputter.RequiredInput(startBeat + 6 * 0.5f, InputType.DPAD),
+                    EngineInputter.RequiredInput(startBeat + 0 * 0.5f, InputType.DPAD_ANY),
+                    EngineInputter.RequiredInput(startBeat + 3 * 0.5f, InputType.DPAD_ANY),
+                    EngineInputter.RequiredInput(startBeat + 6 * 0.5f, InputType.DPAD_ANY),
             )
         }
         practiceSection4.endBlock = PracticeEndBlock(7f) { engine, startBeat ->
