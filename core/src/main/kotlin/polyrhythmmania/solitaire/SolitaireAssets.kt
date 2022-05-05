@@ -26,12 +26,7 @@ object SolitaireAssets : AssetRegistryInstance() {
 }
 
 class SolitaireAssetLoader : IAssetLoader {
-    override fun addManagedAssets(manager: AssetManager) {
-        fun linearTexture(): TextureLoader.TextureParameter = TextureLoader.TextureParameter().apply {
-            this.magFilter = Texture.TextureFilter.Linear
-            this.minFilter = Texture.TextureFilter.Linear
-        }
-        
+    override fun addManagedAssets(manager: AssetManager) {        
         SolitaireAssets.loadAssetNoFile<PackedSheet>("cards", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("1", "textures/solitaire/1.png"),
                 Packable("2", "textures/solitaire/2.png"),

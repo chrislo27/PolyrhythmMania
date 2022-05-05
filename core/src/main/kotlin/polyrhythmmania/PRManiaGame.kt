@@ -28,8 +28,8 @@ import paintbox.font.*
 import paintbox.logging.Logger
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.transition.FadeIn
-import paintbox.transition.FadeOut
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.util.MonitorInfo
 import paintbox.util.ResolutionSetting
@@ -57,6 +57,8 @@ import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.solitaire.SolitaireAssetLoader
 import polyrhythmmania.solitaire.SolitaireAssets
 import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.storymode.StoryAssetLoader
+import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
@@ -180,6 +182,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         AssetRegistry.addAssetLoader(InitialAssetLoader())
         AssetRegistry.addAssetLoader(TilesetAssetLoader())
         SolitaireAssets.addAssetLoader(SolitaireAssetLoader())
+        StoryAssets.addAssetLoader(StoryAssetLoader())
 
         generateColourPickerTextures()
         
@@ -212,7 +215,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 //                polyrhythmmania.world.render.TestWorldDunkScreen(this@PRManiaGame)
 //                polyrhythmmania.world.render.TestWorldAsmScreen(this@PRManiaGame)
                 TransitionScreen(this@PRManiaGame, this@PRManiaGame.getScreen(), mainMenuScreen.prepareShow(doFlipAnimation = true),
-                        FadeOut(0.125f, Color(0f, 0f, 0f, 1f)), FadeIn(0.25f, Color(0f, 0f, 0f, 1f)))
+                        FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f)))
             }
         })
         

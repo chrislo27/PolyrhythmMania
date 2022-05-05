@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.VarChangedListener
-import paintbox.transition.FadeIn
-import paintbox.transition.FadeOut
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.sumOfFloat
@@ -169,7 +169,7 @@ abstract class AbstractEnginePlayScreen(
         Gdx.app.postRunnable {
             val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
             main.screen = TransitionScreen(main, currentScreen, mainMenu,
-                    FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
+                    FadeToOpaque(0.25f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
                     currentScreen.dispose()
                     container.disposeQuietly()
@@ -223,7 +223,7 @@ abstract class AbstractEnginePlayScreen(
             action.invoke()
 
             main.screen = TransitionScreen(main, this, nextScreen,
-                    FadeOut(0.5f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
+                    FadeToOpaque(0.5f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
                     this@AbstractEnginePlayScreen.dispose()
                     if (disposeContainer) {

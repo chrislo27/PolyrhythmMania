@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.*
 import paintbox.registry.AssetRegistry
-import paintbox.transition.FadeIn
+import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
@@ -130,7 +130,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                         resultsBehaviour = ResultsBehaviour.NoResults)
                                 main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
                                 main.settings.persist()
-                                main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                                main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                     this.onEntryEnd = {
                                         sidemode.prepare()
                                         playScreen.resetAndUnpause()

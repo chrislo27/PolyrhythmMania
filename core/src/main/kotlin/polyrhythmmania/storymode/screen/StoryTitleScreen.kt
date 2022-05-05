@@ -1,29 +1,26 @@
-package polyrhythmmania.screen
+package polyrhythmmania.storymode.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.ui.Anchor
-import paintbox.ui.Pane
+import paintbox.ui.ImageIcon
 import paintbox.ui.SceneRoot
 import paintbox.ui.area.Insets
-import paintbox.ui.control.TextLabel
-import paintbox.util.gdxutils.grey
-import polyrhythmmania.Localization
+import paintbox.ui.element.RectElement
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.storymode.StoryAssets
 
 
-/**
- * A simple black screen with "Loading..." at the bottom right.
- */
-open class SimpleLoadingScreen(main: PRManiaGame) : PRManiaScreen(main) {
-
+class StoryTitleScreen(main: PRManiaGame) : PRManiaScreen(main) {
+    
     val batch: SpriteBatch = main.batch
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
@@ -31,30 +28,22 @@ open class SimpleLoadingScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
     val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
-    
-    val textLabelLoading: TextLabel
-    
+
     init {
-        textLabelLoading = TextLabel(Localization.getVar("loadingScreen.loading"), font = main.fontMainMenuHeading).apply {
-            Anchor.BottomRight.configure(this)
-            this.renderAlign.set(Align.bottomRight)
-            this.bounds.height.set(64f)
-            this.bounds.width.set(300f)
-            this.textColor.set(Color().grey(0.9f))
+        // FIXME
+        sceneRoot += RectElement(Color(1f, 165f / 255f, 0.5f, 1f)).apply { 
+            this += ImageIcon(TextureRegion(StoryAssets.get<Texture>("logo"))).apply { 
+                this.bindHeightToParent(multiplier = 0.4f)
+                this.margin.set(Insets(8f))
+                Anchor.TopCentre.configure(this)
+            }
         }
-        
-        val pane = Pane().apply { 
-            this.margin.set(Insets(48f))
-            
-            this += textLabelLoading
-        }
-        sceneRoot += pane
     }
     
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        
+
         super.render(delta)
 
         val camera = uiCamera
@@ -68,10 +57,9 @@ open class SimpleLoadingScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
-
         uiViewport.update(width, height)
     }
-
+    
     override fun dispose() {
     }
 }

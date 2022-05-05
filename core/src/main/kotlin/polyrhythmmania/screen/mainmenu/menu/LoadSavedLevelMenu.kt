@@ -10,7 +10,6 @@ import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.filechooser.FileExtFilter
 import paintbox.font.TextAlign
-import paintbox.transition.FadeIn
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
@@ -21,6 +20,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.filechooser.TinyFDWrapper
+import paintbox.transition.FadeToTransparent
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
@@ -251,7 +251,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                     resultsBehaviour = if (robotMode) ResultsBehaviour.NoResults
                                     else ResultsBehaviour.ShowResults(onRankingRevealed, previousHighScore), gameMode = null)
-                            main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
+                            main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
                                     playScreen.resetAndUnpause()
                                     menuCol.popLastMenu(playSound = false)

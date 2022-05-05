@@ -12,7 +12,7 @@ import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
-import paintbox.transition.FadeIn
+import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
@@ -369,7 +369,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                                 inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                 challenges = challenges,
                                 resultsBehaviour = resultsBehaviour)
-                        main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                        main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                             this.onEntryEnd = {
                                 sidemode.prepare()
                                 playScreen.resetAndUnpause()

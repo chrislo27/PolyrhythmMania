@@ -12,10 +12,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.registry.AssetRegistry
-import paintbox.transition.FadeIn
-import paintbox.transition.FadeOut
-import paintbox.transition.TransitionScreen
-import paintbox.transition.WipeTransitionHead
+import paintbox.transition.*
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
@@ -97,7 +94,7 @@ class ResultsScreen(
                     val thisScreen = main.screen
                     main.screen = TransitionScreen(main, thisScreen, main.mainMenuScreen,
                             WipeTransitionHead(Color.BLACK.cpy(), 0.4f, invertDirection = true),
-                            FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
+                            FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                         onEntryEnd = {
                             container.disposeQuietly()
                             main.mainMenuScreen.prepareShow(doFlipAnimation = true)
@@ -116,8 +113,8 @@ class ResultsScreen(
                     playSound(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                     val playScreen = startOverFactory()
                     Gdx.input.isCursorCatched = true
-                    main.screen = TransitionScreen(main, main.screen, playScreen, FadeOut(0.5f, Color(0f, 0f, 0f, 1f)),
-                            FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                    main.screen = TransitionScreen(main, main.screen, playScreen, FadeToOpaque(0.5f, Color(0f, 0f, 0f, 1f)),
+                            FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                         this.onEntryEnd = {
                             playScreen.resetAndUnpause()
                         }

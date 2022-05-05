@@ -17,8 +17,8 @@ import paintbox.binding.FloatVar
 import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
-import paintbox.transition.FadeIn
-import paintbox.transition.FadeOut
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.SceneRoot
@@ -160,7 +160,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
                         this.applyStyleContent()
                         this.setOnAction {
                             main.screen = TransitionScreen(main, main.screen, main.mainMenuScreen,
-                                    FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                                    FadeToOpaque(0.25f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                 this.onEntryEnd = {
                                     this@CalibrationScreen.disposeQuietly()
                                 }

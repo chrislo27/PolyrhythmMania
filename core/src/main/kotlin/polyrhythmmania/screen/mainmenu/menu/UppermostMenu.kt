@@ -3,15 +3,13 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
-import paintbox.transition.FadeIn
-import paintbox.transition.FadeOut
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
-import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.layout.VBox
@@ -24,6 +22,9 @@ import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.SimpleLoadingScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.storymode.screen.StoryLoadingScreen
+import polyrhythmmania.storymode.screen.StoryTitleScreen
+import polyrhythmmania.util.Semitones
 
 /**
  * The very beginning of the main menu.
@@ -103,7 +104,31 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 else "") + Localization.getVar("mainMenu.main.storyMode").use()
             }).apply {
                 this.setOnAction {
-                    // TODO
+                    mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
+
+                    mainMenu.transitionAway {
+                        // TODO Discord rich presence
+//                        DiscordRichPresence.updateActivity(DefaultPresences.inEditor())
+
+                        val main = mainMenu.main
+                        val doAfterLoad: () -> Unit = {
+                            val newScreen = StoryTitleScreen(main)
+                            Gdx.app.postRunnable {
+                                newScreen.render(1 / 60f)
+                                Gdx.app.postRunnable {
+                                    main.screen = TransitionScreen(main, main.screen, newScreen,
+                                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                                }
+                            }
+                        }
+                        
+                        main.screen = TransitionScreen(main, main.screen, StoryLoadingScreen(main, false, doAfterLoad),
+                                null, FadeToTransparent(0.25f, Color.BLACK)).apply {
+                            this.onDestEnd = {
+                                mainMenu.backgroundType = BgType.NORMAL // TODO new background type for story mode?
+                            }
+                        }
+                    }
 
                     val newIndicator = settings.newIndicatorStoryMode
                     if (newIndicator.value.get()) {
@@ -119,7 +144,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                         DiscordRichPresence.updateActivity(DefaultPresences.inEditor())
                         
                         val main = mainMenu.main
-                        main.screen = TransitionScreen(main, main.screen, SimpleLoadingScreen(main), null, FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply {
+                        main.screen = TransitionScreen(main, main.screen, SimpleLoadingScreen(main), null, FadeToTransparent(0.125f, Color.BLACK)).apply {
                             this.onDestEnd = {
                                 Gdx.app.postRunnable {
                                     mainMenu.backgroundType = BgType.NORMAL
@@ -129,7 +154,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                                         editorScreen.render(1 / 60f)
                                         Gdx.app.postRunnable {
                                             main.screen = TransitionScreen(main, main.screen, editorScreen,
-                                                    FadeOut(0.125f, Color(0f, 0f, 0f, 1f)), FadeIn(0.25f, Color(0f, 0f, 0f, 1f)))
+                                                    FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                                         }
                                     }
                                 }

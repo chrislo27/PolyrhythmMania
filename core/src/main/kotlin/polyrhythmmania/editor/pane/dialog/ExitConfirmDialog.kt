@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.font.TextAlign
-import paintbox.transition.FadeIn
-import paintbox.transition.FadeOut
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.control.Button
@@ -63,7 +63,7 @@ class ExitConfirmDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 Gdx.app.postRunnable {
                     val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
                     main.screen = TransitionScreen(main, currentScreen, mainMenu,
-                            FadeOut(0.125f, Color(0f, 0f, 0f, 1f)), FadeIn(0.125f, Color(0f, 0f, 0f, 1f))).apply { 
+                            FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply { 
                         this.onEntryEnd = {
                             if (currentScreen is EditorScreen) 
                                 currentScreen.dispose()

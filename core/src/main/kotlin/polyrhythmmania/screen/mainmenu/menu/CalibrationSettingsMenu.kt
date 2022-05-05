@@ -3,8 +3,8 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.Var
-import paintbox.transition.FadeIn
-import paintbox.transition.FadeOut
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
@@ -82,7 +82,7 @@ class CalibrationSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     Gdx.app.postRunnable {
                         val playScreen = CalibrationScreen(main, main.settings.inputCalibration.getOrCompute(), main.settings.inputKeymapKeyboard.getOrCompute().buttonA)
                         main.screen = TransitionScreen(main, main.screen, playScreen,
-                                FadeOut(0.25f, Color(0f, 0f, 0f, 1f)), FadeIn(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                                FadeToOpaque(0.25f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                             this.onEntryEnd = {
                                 playScreen.prepareShow()
                             }
