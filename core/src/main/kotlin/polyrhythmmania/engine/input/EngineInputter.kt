@@ -48,8 +48,11 @@ class EngineInputter(val engine: Engine) {
         var hitScore: InputScore = InputScore.MISS
     }
     
-    data class PracticeData(var practiceModeEnabled: Boolean = false,
-                            val moreTimes: IntVar = IntVar(0), var requiredInputs: List<RequiredInput> = emptyList()) {
+    class PracticeData {
+        var practiceModeEnabled: Boolean = false
+        val moreTimes: IntVar = IntVar(0)
+        var requiredInputs: List<RequiredInput> = emptyList()
+        
         var clearText: Float = 0f
         
         fun reset() {
@@ -60,13 +63,24 @@ class EngineInputter(val engine: Engine) {
         }
     }
     
-    data class ChallengeData(var goingForPerfect: Boolean = false) {
+    class PerfectChallengeData {
+        var goingForPerfect: Boolean = false
         var hit: Float = 0f
         var failed: Boolean = false
         
         fun reset() {
             hit = 0f
             failed = false
+        }
+    }
+    
+    class InputChallengeData {
+        var acesOnly: Boolean = false
+        
+        fun isInputScoreMiss(inputScore: InputScore): Boolean {
+            if (inputScore == InputScore.MISS) return true
+            if (acesOnly && inputScore != InputScore.ACE) return true
+            return false
         }
     }
     
@@ -116,7 +130,8 @@ class EngineInputter(val engine: Engine) {
     var areInputsLocked: Boolean = true
     var skillStarBeat: Float = Float.POSITIVE_INFINITY
     val practice: PracticeData = PracticeData()
-    val challenge: ChallengeData = ChallengeData()
+    val perfectChallenge: PerfectChallengeData = PerfectChallengeData()
+    val inputChallenge: InputChallengeData = InputChallengeData()
     val endlessScore: EndlessScore = EndlessScore()
 
     val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
@@ -150,7 +165,7 @@ class EngineInputter(val engine: Engine) {
         skillStarGotten.set(false)
         skillStarBeat = Float.POSITIVE_INFINITY
         practice.reset()
-        challenge.reset()
+        perfectChallenge.reset()
         endlessScore.reset()
         rodsExplodedPR = 0
         inputCountStats.reset()
@@ -235,7 +250,7 @@ class EngineInputter(val engine: Engine) {
                     }
                     inputTracker.results += inputResult
 
-                    if (practice.practiceModeEnabled && inputResult.inputScore != InputScore.MISS) {
+                    if (practice.practiceModeEnabled && !inputChallenge.isInputScoreMiss(inputResult.inputScore)) {
                         val allWereHit = practice.requiredInputs.all { it.wasHit }
                         if (!allWereHit) {
                             practice.requiredInputs.forEach { ri ->
@@ -263,13 +278,13 @@ class EngineInputter(val engine: Engine) {
                     }
 
                     // Bounce the rod
-                    if (inputResult.inputScore != InputScore.MISS) {
+                    if (!inputChallenge.isInputScoreMiss(inputResult.inputScore)) {
                         rod.bounce(nextBlockIndex)
                         if (inputResult.inputScore == InputScore.ACE) {
                             attemptSkillStar(perfectBeats)
                         }
-                        if (challenge.goingForPerfect && !challenge.failed) {
-                            challenge.hit = 1f
+                        if (perfectChallenge.goingForPerfect && !perfectChallenge.failed) {
+                            perfectChallenge.hit = 1f
                         }
                     } else {
                         missed()
@@ -306,10 +321,9 @@ class EngineInputter(val engine: Engine) {
                     inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                 }
 
-                // Bounce the rod
-                if (inputResult.inputScore != InputScore.MISS) {
-                    rod.bounce(engine, inputResult)
-                } else {
+                // Bounce the rod regardless of miss; if aces only, bounce still has to apply for early/late
+                rod.bounce(engine, inputResult)
+                if (inputResult.inputScore == InputScore.MISS) { // Explicitly checking for MISS, since rod.bounce returns immediately if it is MISS
                     missed()
                 }
             }
@@ -352,7 +366,7 @@ class EngineInputter(val engine: Engine) {
                     }
 
                     // Bounce the rod
-                    if (inputResult.inputScore != InputScore.MISS) {
+                    if (!inputChallenge.isInputScoreMiss(inputResult.inputScore)) {
                         rod.addInputResult(engine, inputResult)
                         hit = true
                         hitDuration = 1f
@@ -399,7 +413,7 @@ class EngineInputter(val engine: Engine) {
         val inputTracker = rod.inputTracker
         
         val numExpected = inputTracker.expected.count { it is EntityRodPR.ExpectedInput.Expected }
-        val validResults = inputTracker.results.filter { it.inputScore != InputScore.MISS }
+        val validResults = inputTracker.results.filter { !inputChallenge.isInputScoreMiss(it.inputScore) }
         
         totalExpectedInputs += numExpected
         if (world.worldMode.endlessType.isEndless) {
@@ -423,7 +437,7 @@ class EngineInputter(val engine: Engine) {
         }
         
         if (!engine.autoInputs && noMiss && !rod.registeredMiss) {
-            if ((rod.exploded && numExpected > 0) || (numExpected > validResults.size) || inputTracker.results.any { it.inputScore == InputScore.MISS }) {
+            if ((rod.exploded && numExpected > 0) || (numExpected > validResults.size) || inputTracker.results.any { inputChallenge.isInputScoreMiss(it.inputScore) }) {
                 missed()
             }
         }
@@ -431,10 +445,10 @@ class EngineInputter(val engine: Engine) {
     
     fun missed() {
         noMiss = false
-        if (challenge.goingForPerfect) {
-            if (!challenge.failed) {
-                challenge.failed = true
-                challenge.hit = 1f
+        if (perfectChallenge.goingForPerfect) {
+            if (!perfectChallenge.failed) {
+                perfectChallenge.failed = true
+                perfectChallenge.hit = 1f
                 engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
                     player.gain = 0.45f
                 }
@@ -562,7 +576,7 @@ class EngineInputter(val engine: Engine) {
             WorldType.POLYRHYTHM, WorldType.ASSEMBLE -> {
                 val results = this.inputResults
                 val nInputs = max(results.size, max(totalExpectedInputs, minimumInputCount))
-                val nonMissResults = results.filter { it.inputScore != InputScore.MISS }
+                val nonMissResults = results.filter { !inputChallenge.isInputScoreMiss(it.inputScore) }
                 val missed = nInputs - nonMissResults.size
                 val aces = results.count { it.inputScore == InputScore.ACE }
                 val goods = results.count { it.inputScore == InputScore.GOOD }

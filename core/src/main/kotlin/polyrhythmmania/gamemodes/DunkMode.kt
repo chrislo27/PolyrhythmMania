@@ -25,7 +25,9 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     
     init {
         container.world.worldMode = WorldMode(WorldType.DUNK, EndlessType.REGULAR_ENDLESS)
-        container.engine.inputter.endlessScore.maxLives.set(5)
+        val inputter = container.engine.inputter
+        inputter.endlessScore.maxLives.set(5)
+        inputter.inputChallenge.acesOnly = true
         container.texturePackSource.set(TexturePackSource.STOCK_GBA)
         TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
     }

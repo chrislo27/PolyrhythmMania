@@ -1,32 +1,35 @@
 package polyrhythmmania.engine.input
 
 import com.badlogic.gdx.graphics.Color
-import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.library.score.LevelScoreAttempt
 
 
-data class Challenges(val tempoUp: Int, val goingForPerfect: Boolean) {
+data class Challenges(val tempoUp: Int, val goingForPerfect: Boolean, val acesOnly: Boolean = false) {
     companion object {
-        val NO_CHANGES: Challenges = Challenges(100, false)
+        val NO_CHANGES: Challenges = Challenges(tempoUp = 100, goingForPerfect = false, acesOnly = false)
         
         val TEMPO_DOWN_COLOR: Color = Color.valueOf("3E5BEF")
         val TEMPO_UP_COLOR: Color = Color.valueOf("ED3D3D")
 
 
         fun fromJson(obj: JsonObject): Challenges {
-            return Challenges(obj.getInt("tempoUp", 100), obj.getBoolean("perfect", false))
+            return Challenges(obj.getInt("tempoUp", 100), obj.getBoolean("perfect", false), obj.getBoolean("acesOnly", false))
         }
     }
 
     fun toJson(obj: JsonObject) {
         obj.add("tempoUp", tempoUp)
         obj.add("perfect", goingForPerfect)
+        obj.add("acesOnly", acesOnly)
     }
     
     fun applyToEngine(engine: Engine) {
+        val inputter = engine.inputter
         engine.playbackSpeed = tempoUp / 100f
-        engine.inputter.challenge.goingForPerfect = goingForPerfect
+        inputter.perfectChallenge.goingForPerfect = goingForPerfect
+        if (acesOnly) {
+            inputter.inputChallenge.acesOnly = true
+        }
     }
 }

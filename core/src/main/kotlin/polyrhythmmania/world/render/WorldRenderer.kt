@@ -34,7 +34,6 @@ import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.Entity
-import polyrhythmmania.world.render.bg.NoOpWorldBackground
 import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.render.bg.WorldBackgroundFromWorldType
 import polyrhythmmania.world.tileset.Tileset
@@ -457,7 +456,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
             textBoxInputLabel.textColor.set(textColor)
         }
 
-        val challenge = inputter.challenge
+        val challenge = inputter.perfectChallenge
         if (challenge.goingForPerfect) {
             perfectPane.visible.set(true)
             challenge.hit = (challenge.hit - Gdx.graphics.deltaTime / (if (challenge.failed) 0.5f else 0.125f)).coerceIn(0f, 1f)

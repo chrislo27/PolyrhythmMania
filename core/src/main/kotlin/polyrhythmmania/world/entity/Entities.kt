@@ -243,7 +243,7 @@ class EntitySign(world: World, val type: Type) : SpriteEntity(world) {
     }
 }
 
-class EntityInputFeedback(world: World, val end: End, color: Color, val flashIndex: Int)
+class EntityInputFeedback(world: World, val end: End, color: Color, val isAce: Boolean, val flashIndex: Int)
     : SimpleRenderedEntity(world) {
     
     companion object {
@@ -258,7 +258,16 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val flashInd
     }
     
     private val originalColor: Color = color.cpy()
-    private val color: Color = color.cpy()
+    private val currentColor: Color = color.cpy()
+    
+    private fun getBaseColorToUse(renderer: WorldRenderer): Color {
+        val inputter = renderer.engine.inputter
+        return if (inputter.inputChallenge.acesOnly && !this.isAce) {
+            MISS_COLOUR
+        } else {
+            originalColor
+        }
+    }
 
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
         super.renderSimple(renderer, batch, tileset, engine, vec)
@@ -266,11 +275,12 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val flashInd
         val currentSec = engine.seconds
         val flashSec = engine.inputter.inputFeedbackFlashes[flashIndex]
         val flashTime = 0.25f
+        val baseColor = getBaseColorToUse(renderer)
         if (currentSec - flashSec < flashTime) {
             val percentage = ((currentSec - flashSec) / flashTime).coerceIn(0f, 1f)
-            color.set(originalColor).lerp(Color.WHITE, 1f - percentage)
+            currentColor.set(baseColor).lerp(Color.WHITE, 1f - percentage)
         } else {
-            color.set(originalColor)
+            currentColor.set(baseColor)
         }
         
         val tintedRegion = when (end) {
@@ -279,7 +289,7 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val flashInd
             End.RIGHT -> tileset.inputFeedbackEnd
         }
         val tmpColor = ColorStack.getAndPush().set(tintedRegion.color.getOrCompute())
-        tmpColor.mul(this.color)
+        tmpColor.mul(this.currentColor)
         drawTintedRegion(batch, vec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tmpColor)
         ColorStack.pop()
     }

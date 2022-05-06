@@ -85,7 +85,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         private set
 
     private var playedDunkSfx: Boolean = false
-    private var aceWasHit: Boolean = false
+    private var inputWasSuccessful: Boolean = false
     private var inputAccepted: Boolean = false
     
     val acceptingInputs: Boolean
@@ -127,23 +127,32 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
 
         fun indexToX(index: Float): Float = index + world.dunkPiston.position.x
 
-        val ace = inputResult.inputScore == InputScore.ACE
+        val inputter = engine.inputter
+        val inputSuccessful = !inputter.inputChallenge.isInputScoreMiss(inputResult.inputScore)
         val lerpResult = (inputResult.accuracyPercent + 1f) / 2f // 0.5 = perfect
-        val endX = if (ace) indexToX(MathUtils.random(4.4f, 5.2f)) else indexToX(MathUtils.lerp(3f, 4f, lerpResult))
-        val endY = if (ace) 5f else this.position.y
+        val endX = if (inputSuccessful) indexToX(MathUtils.random(4.4f, 5.2f)) else indexToX(MathUtils.lerp(3f, 4f, lerpResult))
+        val endY = if (inputSuccessful) 5f else this.position.y
         val xDistance = endX - this.position.x
         val calculatedHeight = this.position.y + 1f + xDistance
-        val maxHeight = if (ace) (calculatedHeight + MathUtils.lerp(-0.2f, 0.2f, lerpResult)) else (calculatedHeight)
+        val maxHeight = if (inputSuccessful) (calculatedHeight + MathUtils.lerp(-0.2f, 0.2f, lerpResult)) else (calculatedHeight)
         val prevBounce = collision.bounce
         collision.bounce = Bounce(this, maxHeight, this.position.x, this.position.y, endX, endY, prevBounce)
 
         val dunkBeat = inputResult.perfectBeat + 2f
-        if (ace) {
-            this.aceWasHit = true
+        if (inputSuccessful) {
+            this.inputWasSuccessful = true
             engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
                 if (engine.areStatisticsEnabled) {
-                    engine.inputter.inputCountStats.total++
-                    engine.inputter.inputCountStats.aces++
+                    inputter.inputCountStats.total++
+                    if (inputResult.inputScore == InputScore.ACE) {
+                        inputter.inputCountStats.aces++
+                    } else {
+                        if (inputResult.accuracyPercent < 0f) {
+                            inputter.inputCountStats.early++
+                        } else {
+                            inputter.inputCountStats.late++
+                        }
+                    }
                     GlobalStats.rodsDunkedDunk.increment()
                 }
                 
@@ -153,7 +162,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                 if (newScore % increaseLivesEvery == 0) {
                     // Increment lives
                     engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_2"))
-                    val endlessScore = engine.inputter.endlessScore
+                    val endlessScore = inputter.endlessScore
                     val currentLives = endlessScore.lives.get()
                     val newLives = (currentLives + 1).coerceIn(0, endlessScore.maxLives.get())
                     if (newLives > currentLives) {
@@ -182,6 +191,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                 this.beat = dunkBeat
             })
         } else {
+            this.inputWasSuccessful = false
             engine.addEvent(object : Event(engine) {
                 init {
                     this.beat = dunkBeat
@@ -189,11 +199,6 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
 
                 override fun onStart(currentBeat: Float) {
                     super.onStart(currentBeat)
-                    if (inputResult.accuracyPercent < 0f) {
-                        engine.inputter.inputCountStats.early++
-                    } else {
-                        engine.inputter.inputCountStats.late++
-                    }
                     explode(engine, true)
                 }
             })
@@ -220,7 +225,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         if (seconds >= explodeAtSec && !exploded) {
             explode(engine, true)
         } else if ((beat - deployBeat) >= killAfterBeats && !isKilled) {
-            if (!aceWasHit) {
+            if (!inputWasSuccessful) {
                 explode(engine, true)
             }
             kill()
