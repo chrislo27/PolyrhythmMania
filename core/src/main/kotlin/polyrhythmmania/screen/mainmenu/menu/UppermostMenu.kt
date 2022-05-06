@@ -23,7 +23,7 @@ import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.SimpleLoadingScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.storymode.screen.StoryLoadingScreen
-import polyrhythmmania.storymode.screen.StoryTitleScreen
+import polyrhythmmania.storymode.test.TestStoryGimmickDebugScreen
 import polyrhythmmania.util.Semitones
 
 /**
@@ -48,14 +48,14 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             val HOVERED_TEXT: Color = Color().grey(1f)
             val PRESSED_TEXT: Color = Color(0.4f, 1f, 1f, 1f)
             val PRESSED_AND_HOVERED_TEXT: Color = Color(0.5f, 1f, 1f, 1f)
-            
+
             val BG_COLOR: Color = Color(1f, 1f, 1f, 0f)
             val HOVERED_BG: Color = Color().grey(90f / 255f, 0.8f)
             val DISABLED_BG: Color = BG_COLOR.cpy()
             val PRESSED_BG: Color = HOVERED_BG.cpy()
             val PRESSED_AND_HOVERED_BG: Color = HOVERED_BG.cpy()
         }
-        
+
         init {
             val grey = TEXT_COLOR
             this.defaultTextColor.set(grey)
@@ -98,51 +98,75 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     menuCol.pushNextMenu(menuCol.playMenu)
                 }
             }
-            vbox += createButton(binding = {
-                (if (settings.newIndicatorStoryMode.value.use())
-                    (Localization.getVar("common.newIndicator").use() + " ")
-                else "") + Localization.getVar("mainMenu.main.storyMode").use()
+//            vbox += createButton(binding = {
+//                (if (settings.newIndicatorStoryMode.value.use())
+//                    (Localization.getVar("common.newIndicator").use() + " ")
+//                else "") + Localization.getVar("mainMenu.main.storyMode").use()
+//            }).apply {
+//                this.setOnAction {
+//                    mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
+//
+//                    mainMenu.transitionAway {
+//                        // TODO Discord rich presence
+////                        DiscordRichPresence.updateActivity(DefaultPresences.inEditor())
+//
+//                        val main = mainMenu.main
+//                        val doAfterLoad: () -> Unit = {
+//                            val newScreen = StoryTitleScreen(main)
+//                            Gdx.app.postRunnable {
+//                                newScreen.render(1 / 60f)
+//                                Gdx.app.postRunnable {
+//                                    main.screen = TransitionScreen(main, main.screen, newScreen,
+//                                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+//                                }
+//                            }
+//                        }
+//                        
+//                        main.screen = TransitionScreen(main, main.screen, StoryLoadingScreen(main, false, doAfterLoad),
+//                                null, FadeToTransparent(0.25f, Color.BLACK)).apply {
+//                            this.onDestEnd = {
+//                                mainMenu.backgroundType = BgType.NORMAL // TODO new background type for story mode?
+//                            }
+//                        }
+//                    }
+//
+//                    val newIndicator = settings.newIndicatorStoryMode
+//                    if (newIndicator.value.get()) {
+//                        newIndicator.value.set(false)
+//                        settings.persist()
+//                    }
+//                }
+//            }
+
+            vbox += createButton(binding = {// TODO remove me, test story mode gimmicks
+                "DEBUG Test Story Mode gimmicks"
             }).apply {
                 this.setOnAction {
                     mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
 
-                    mainMenu.transitionAway {
-                        // TODO Discord rich presence
-//                        DiscordRichPresence.updateActivity(DefaultPresences.inEditor())
-
-                        val main = mainMenu.main
-                        val doAfterLoad: () -> Unit = {
-                            val newScreen = StoryTitleScreen(main)
+                    val main = mainMenu.main
+                    val doAfterLoad: () -> Unit = {
+                        val newScreen = TestStoryGimmickDebugScreen(main)
+                        Gdx.app.postRunnable {
+                            newScreen.render(1 / 60f)
                             Gdx.app.postRunnable {
-                                newScreen.render(1 / 60f)
-                                Gdx.app.postRunnable {
-                                    main.screen = TransitionScreen(main, main.screen, newScreen,
-                                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-                                }
-                            }
-                        }
-                        
-                        main.screen = TransitionScreen(main, main.screen, StoryLoadingScreen(main, false, doAfterLoad),
-                                null, FadeToTransparent(0.25f, Color.BLACK)).apply {
-                            this.onDestEnd = {
-                                mainMenu.backgroundType = BgType.NORMAL // TODO new background type for story mode?
+                                main.screen = TransitionScreen(main, main.screen, newScreen,
+                                        FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
                         }
                     }
 
-                    val newIndicator = settings.newIndicatorStoryMode
-                    if (newIndicator.value.get()) {
-                        newIndicator.value.set(false)
-                        settings.persist()
-                    }
+                    main.screen = TransitionScreen(main, main.screen, StoryLoadingScreen(main, false, doAfterLoad),
+                            FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
                 }
             }
-            vbox += createButton(binding = { Localization.getVar("mainMenu.main.edit").use() }).apply { 
+
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.edit").use() }).apply {
                 this.setOnAction {
                     mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                     mainMenu.transitionAway {
                         DiscordRichPresence.updateActivity(DefaultPresences.inEditor())
-                        
+
                         val main = mainMenu.main
                         main.screen = TransitionScreen(main, main.screen, SimpleLoadingScreen(main), null, FadeToTransparent(0.125f, Color.BLACK)).apply {
                             this.onDestEnd = {
@@ -206,5 +230,5 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
         this += vbox
     }
-    
+
 }

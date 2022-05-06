@@ -1,29 +1,19 @@
 package polyrhythmmania.screen.play
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.VarChangedListener
 import paintbox.transition.FadeToOpaque
 import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.util.gdxutils.disposeQuietly
-import paintbox.util.sumOfFloat
-import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.InputCalibration
-import polyrhythmmania.engine.input.*
-import polyrhythmmania.library.score.LevelScoreAttempt
-import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
-import polyrhythmmania.screen.results.ResultsScreen
-import polyrhythmmania.gamemodes.AbstractEndlessMode
-import polyrhythmmania.gamemodes.DunkMode
+import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.gamemodes.GameMode
-import polyrhythmmania.gamemodes.endlessmode.DailyChallengeScore
-import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
@@ -32,10 +22,7 @@ import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.TilesetPalette
-import java.time.*
-import kotlin.math.abs
 import kotlin.math.max
-import kotlin.math.roundToInt
 
 
 /**
@@ -47,8 +34,7 @@ abstract class AbstractEnginePlayScreen(
         val container: Container,
         val challenges: Challenges, val inputCalibration: InputCalibration,
         
-        // TODO: BELOW: refactor to GameMode
-        val gameMode: GameMode?, val resultsBehaviour: ResultsBehaviour
+        val gameMode: GameMode?
 ) : AbstractPlayScreen(main, playTimeType) {
 
     companion object; // Used for early init
@@ -68,8 +54,6 @@ abstract class AbstractEnginePlayScreen(
             }
         }
     }
-    
-    protected val dunkAchievementStartTimestamp: Instant = Instant.now() // TODO remove me, used only for dunk achievement
 
     init {
         engine.endSignalReceived.addListener(endSignalListener)
@@ -112,10 +96,6 @@ abstract class AbstractEnginePlayScreen(
         engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
     }
 
-    override fun onStartOver() {
-        super.onStartOver()
-    }
-
     override fun renderUpdate() {
         super.renderUpdate()
 
@@ -132,33 +112,6 @@ abstract class AbstractEnginePlayScreen(
         soundSystem.setPaused(true)
         container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
             engine.inputter.submitInputsFromRod(rod)
-        }
-        
-        // TODO this should be handled by each GameMode
-        if (resultsBehaviour is ResultsBehaviour.ShowResults) {
-            transitionToResults(resultsBehaviour)
-        } else {
-            val sideMode = this.gameMode
-            if (sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null) {
-                val menuCol = main.mainMenuScreen.menuCollection
-                val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
-                val nonce = sideMode.dailyChallengeUUIDNonce.getOrCompute()
-                if (score.score > 0 && !engine.autoInputs) {
-                    val submitMenu = SubmitDailyChallengeScoreMenu(menuCol, sideMode.dailyChallenge, nonce, score)
-                    menuCol.addMenu(submitMenu)
-                    menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
-                }
-
-                quitToMainMenu()
-            } else {
-                if (sideMode is DunkMode) {
-                    val localDateTime = LocalDateTime.ofInstant(dunkAchievementStartTimestamp, ZoneId.systemDefault())
-                    if (localDateTime.dayOfWeek == DayOfWeek.FRIDAY && localDateTime.toLocalTime() >= LocalTime.of(17, 0)) {
-                        Achievements.awardAchievement(Achievements.dunkFridayNight)
-                    }
-                }
-                quitToMainMenu()
-            }
         }
     }
     
@@ -177,72 +130,6 @@ abstract class AbstractEnginePlayScreen(
             }
         }
     }
-    
-    
-    protected fun transitionToResults(resultsBehaviour: ResultsBehaviour.ShowResults) {
-        val inputter = engine.inputter
-        val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
-        val nInputs = max(inputter.totalExpectedInputs, inputter.minimumInputCount)
-        val rawScore: Float = (if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
-            inputScore.weight
-        } / nInputs) * 100))
-        val score: Int = rawScore.roundToInt().coerceIn(0, 100)
-
-        val resultsText = container.resultsText
-        val ranking = Ranking.getRanking(score)
-        val leftResults = inputter.inputResults.filter { it.inputType == InputType.DPAD_ANY }
-        val rightResults = inputter.inputResults.filter { it.inputType == InputType.A }
-        val badLeftGoodRight = leftResults.isNotEmpty() && rightResults.isNotEmpty()
-                && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
-        val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
-        var isNewHighScore = false
-        if (gameMode != null && gameMode is AbstractEndlessMode) {
-            val endlessModeScore = gameMode.prevHighScore
-            val prevScore = endlessModeScore.highScore.getOrCompute()
-            if (score > prevScore) {
-                endlessModeScore.highScore.set(score)
-                PRManiaGame.instance.settings.persist()
-                isNewHighScore = true
-            }
-        } else if (resultsBehaviour.previousHighScore != null) {
-            if (score > resultsBehaviour.previousHighScore && resultsBehaviour.previousHighScore >= 0) {
-                isNewHighScore = true
-            }
-        }
-
-        val scoreObj = Score(score, rawScore, inputsHit, nInputs,
-                inputter.skillStarGotten.get() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
-                challenges,
-                resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
-                lines.first, lines.second,
-                ranking, isNewHighScore
-        )
-
-
-        fun transitionAway(nextScreen: Screen, disposeContainer: Boolean, action: () -> Unit) {
-            action.invoke()
-
-            main.screen = TransitionScreen(main, this, nextScreen,
-                    FadeToOpaque(0.5f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
-                this.onEntryEnd = {
-                    this@AbstractEnginePlayScreen.dispose()
-                    if (disposeContainer) {
-                        container.disposeQuietly()
-                    }
-                }
-            }
-        }
-
-        goingToResults = true
-        transitionAway(ResultsScreen(main, scoreObj, container, gameMode, {
-            copyThisScreenForResultsStartOver(scoreObj, resultsBehaviour)
-        }, keyboardKeybinds,
-                LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges),
-                resultsBehaviour.onRankingRevealed), disposeContainer = false) {}
-    }
-    
-    protected abstract fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen
-
     
     override fun pauseGame(playSound: Boolean) {
         super.pauseGame(playSound)
@@ -263,6 +150,7 @@ abstract class AbstractEnginePlayScreen(
 
 
     override fun shouldCatchCursor(): Boolean = true
+    
     override fun uncatchCursorOnHide(): Boolean {
         return !goingToResults
     }

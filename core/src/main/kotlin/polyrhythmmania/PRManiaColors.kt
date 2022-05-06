@@ -19,6 +19,8 @@ object PRManiaColors {
     val MARKER_LOOP_END: Color = Color(1f, 0.45f, 0f, 1f)
     val ACE: Color = Color.valueOf("#EFC700")
     
+    val debugColor: Color = Color(1f, 165f / 255f, 0.5f, 1f) // RHRE0 debug colour. Does not have a string key
+    
     init {
         fun put(key: String, color: Color) = Colors.put(key, color)
         

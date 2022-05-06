@@ -118,7 +118,7 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     resultsBehaviour = ResultsBehaviour.NoResults)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                 this.onEntryEnd = {
-                                    sidemode.prepare()
+                                    sidemode.prepareFirstTime()
                                     playScreen.resetAndUnpause()
                                     DiscordRichPresence.updateActivity(DefaultPresences.playingEndlessMode())
                                     mainMenu.backgroundType = BgType.ENDLESS

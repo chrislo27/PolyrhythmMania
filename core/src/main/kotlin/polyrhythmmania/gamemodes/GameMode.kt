@@ -14,7 +14,7 @@ import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.World
 
 
-abstract class GameMode(val main: PRManiaGame, val playTimeType: PlayTimeType) : Disposable {
+abstract class GameMode(val main: PRManiaGame, val playTimeType: PlayTimeType?) : Disposable {
 
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
         this.audioContext.out.gain = main.settings.gameplayVolume.getOrCompute() / 100f
@@ -33,7 +33,7 @@ abstract class GameMode(val main: PRManiaGame, val playTimeType: PlayTimeType) :
     /**
      * Call the first time to initialize the scene.
      */
-    fun prepare() {
+    fun prepareFirstTime() {
         initialize()
     }
 

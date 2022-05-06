@@ -132,7 +132,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 main.settings.persist()
                                 main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                     this.onEntryEnd = {
-                                        sidemode.prepare()
+                                        sidemode.prepareFirstTime()
                                         playScreen.resetAndUnpause()
                                         DiscordRichPresence.updateActivity(DefaultPresences.playingDailyChallenge(date))
                                         mainMenu.backgroundType = BgType.ENDLESS

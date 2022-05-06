@@ -1,43 +1,49 @@
-package polyrhythmmania.storymode.screen
+package polyrhythmmania.storymode.test
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import paintbox.transition.TransitionScreen
-import paintbox.transition.WipeTransitionHead
-import paintbox.transition.WipeTransitionTail
+import paintbox.binding.ReadOnlyVar
+import paintbox.transition.*
+import paintbox.util.gdxutils.disposeQuietly
+import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.gamemodes.GameMode
-import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
-import polyrhythmmania.screen.play.pause.PauseMenuHandler
 import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
-import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.storymode.gamemode.StoryGameMode
 
 
-class StoryPlayScreen(
+class TestStoryPlayScreen(
         main: PRManiaGame,
         container: Container,
         challenges: Challenges, inputCalibration: InputCalibration,
-        gameMode: GameMode?
+        gameMode: StoryGameMode
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode)  {
 
-    override val pauseMenuHandler: PauseMenuHandler = TengokuBgPauseMenuHandler(this)
+    override val pauseMenuHandler: TengokuBgPauseMenuHandler = TengokuBgPauseMenuHandler(this)
 
     private var disableCatchingCursorOnHide: Boolean = false
+    
+    init {
+        pauseMenuHandler.pauseBg.also { 
+            it.cycleSpeed = 0f
+            it.topColor.set(PRManiaColors.debugColor)
+            it.bottomColor.set(PRManiaColors.debugColor)
+        }
+    }
     
     init {
         val optionList = mutableListOf<PauseOption>()
         optionList += PauseOption("play.pause.resume", true) {
             unpauseGame(true)
         }
-        optionList += PauseOption("play.pause.startOver", !(gameMode is EndlessPolyrhythm && gameMode.dailyChallenge != null)) {
+        optionList += PauseOption("play.pause.startOver", true) {
             playMenuSound("sfx_menu_enter_game")
 
-            val thisScreen: StoryPlayScreen = this
+            val thisScreen: TestStoryPlayScreen = this
             val resetAction: () -> Unit = {
                 resetAndUnpause()
                 disableCatchingCursorOnHide = false
@@ -51,22 +57,22 @@ class StoryPlayScreen(
                 onEntryEnd = resetAction
             }
         }
-        optionList += PauseOption("play.pause.quitToMainMenu", true) {
-            quitToMainMenu()
+        optionList += PauseOption(ReadOnlyVar.const("Quit to Debug Menu"), true) {
+            playMenuSound("sfx_pause_exit")
+            
+            val currentScreen = main.screen
             Gdx.app.postRunnable {
-                playMenuSound("sfx_pause_exit")
+                val mainMenu = TestStoryGimmickDebugScreen(main)
+                main.screen = TransitionScreen(main, currentScreen, mainMenu,
+                        FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
+                    this.onEntryEnd = {
+                        currentScreen.dispose()
+                        container.disposeQuietly()
+                    }
+                }
             }
         }
         this.pauseOptions.set(optionList)
-    }
-
-    override fun renderUpdate() {
-        super.renderUpdate()
-        
-        if (!isPaused.get()) {
-            // TODO increment play time for save file, call StorySavefile.updatePlayTime
-            GlobalStats.updateTotalStoryModePlayTime()
-        }
     }
 
     override fun uncatchCursorOnHide(): Boolean {

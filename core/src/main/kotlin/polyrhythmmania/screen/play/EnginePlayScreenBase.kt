@@ -1,54 +1,54 @@
 package polyrhythmmania.screen.play
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.utils.Align
-import paintbox.binding.FloatVar
-import paintbox.font.TextAlign
-import paintbox.packing.PackedSheet
-import paintbox.registry.AssetRegistry
 import paintbox.transition.*
-import paintbox.ui.Anchor
-import paintbox.ui.Pane
-import paintbox.ui.UIElement
-import paintbox.ui.animation.Animation
-import paintbox.ui.area.Insets
-import paintbox.ui.border.SolidBorder
-import paintbox.ui.control.TextLabel
-import paintbox.ui.element.RectElement
-import paintbox.ui.layout.VBox
-import paintbox.util.gdxutils.fillRect
-import paintbox.util.gdxutils.prepareStencilMask
-import paintbox.util.gdxutils.useStencilMask
+import paintbox.util.gdxutils.disposeQuietly
+import paintbox.util.sumOfFloat
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.InputCalibration
-import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.engine.input.Score
+import polyrhythmmania.engine.input.*
+import polyrhythmmania.gamemodes.AbstractEndlessMode
+import polyrhythmmania.gamemodes.DunkMode
 import polyrhythmmania.gamemodes.GameMode
+import polyrhythmmania.gamemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
-import polyrhythmmania.screen.play.pause.*
+import polyrhythmmania.library.score.LevelScoreAttempt
+import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
+import polyrhythmmania.screen.play.pause.PauseMenuHandler
+import polyrhythmmania.screen.play.pause.PauseOption
+import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
+import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.WorldType
+import java.time.*
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 
+/**
+ * Base implementation of [AbstractEnginePlayScreen] for standard game modes (Polyrhythm, practice, 
+ * Dunk, Assemble).
+ * 
+ * Handles score + dunk achievements, results (standard PR), Daily Challenge score submission.
+ */
 class EnginePlayScreenBase(
         main: PRManiaGame, playTimeType: PlayTimeType?,
         container: Container,
         challenges: Challenges, inputCalibration: InputCalibration,
-        gameMode: GameMode?, resultsBehaviour: ResultsBehaviour
-) : AbstractEnginePlayScreen(main, playTimeType, container, challenges, inputCalibration, gameMode, resultsBehaviour) {
+        gameMode: GameMode?, val resultsBehaviour: ResultsBehaviour
+) : AbstractEnginePlayScreen(main, playTimeType, container, challenges, inputCalibration, gameMode) {
     
     override val pauseMenuHandler: PauseMenuHandler = TengokuBgPauseMenuHandler(this)
     
-    private var endlessPrPauseTime: Float = 0f
+    private val dunkAchievementStartTimestamp: Instant = Instant.now() // Used for a dunk achievement
+    private var endlessPrPauseTime: Float = 0f // Used for an endless achievement for pausing in between patterns
     
     private var disableCatchingCursorOnHide: Boolean = false
     
@@ -56,7 +56,6 @@ class EnginePlayScreenBase(
         if (engine.world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS
                 && engine.world.worldMode.type == WorldType.POLYRHYTHM
                 && engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil mode in endless
-            // 232CDD
             (pauseMenuHandler as? TengokuBgPauseMenuHandler)?.also { handler ->
                 val hex = "DB2323"
                 val bg = handler.pauseBg
@@ -147,17 +146,114 @@ class EnginePlayScreenBase(
     }
 
 
-    override fun uncatchCursorOnHide(): Boolean {
-        return super.uncatchCursorOnHide() && !disableCatchingCursorOnHide
+    override fun onEndSignalFired() {
+        super.onEndSignalFired()
+        
+        when (val behaviour = resultsBehaviour) {
+            is ResultsBehaviour.ShowResults -> {
+                transitionToResults(behaviour)
+            }
+            else -> {
+                val sideMode = this.gameMode
+                if (sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null) {
+                    val menuCol = main.mainMenuScreen.menuCollection
+                    val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
+                    val nonce = sideMode.dailyChallengeUUIDNonce.getOrCompute()
+                    if (score.score > 0 && !engine.autoInputs) {
+                        val submitMenu = SubmitDailyChallengeScoreMenu(menuCol, sideMode.dailyChallenge, nonce, score)
+                        menuCol.addMenu(submitMenu)
+                        menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
+                    }
+
+                    quitToMainMenu()
+                } else {
+                    if (sideMode is DunkMode) {
+                        val localDateTime = LocalDateTime.ofInstant(dunkAchievementStartTimestamp, ZoneId.systemDefault())
+                        if (localDateTime.dayOfWeek == DayOfWeek.FRIDAY && localDateTime.toLocalTime() >= LocalTime.of(17, 0)) {
+                            Achievements.awardAchievement(Achievements.dunkFridayNight)
+                        }
+                    }
+                    quitToMainMenu()
+                }
+            }
+        }
     }
 
-    override fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): EnginePlayScreenBase {
+    
+    private fun transitionToResults(resultsBehaviour: ResultsBehaviour.ShowResults) {
+        val inputter = engine.inputter
+        val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
+        val nInputs = max(inputter.totalExpectedInputs, inputter.minimumInputCount)
+        val rawScore: Float = (if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
+            inputScore.weight
+        } / nInputs) * 100))
+        val score: Int = rawScore.roundToInt().coerceIn(0, 100)
+
+        val resultsText = container.resultsText
+        val ranking = Ranking.getRanking(score)
+        val leftResults = inputter.inputResults.filter { it.inputType == InputType.DPAD_ANY }
+        val rightResults = inputter.inputResults.filter { it.inputType == InputType.A }
+        val badLeftGoodRight = leftResults.isNotEmpty() && rightResults.isNotEmpty()
+                && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
+        val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
+        var isNewHighScore = false
+        if (gameMode != null && gameMode is AbstractEndlessMode) {
+            val endlessModeScore = gameMode.prevHighScore
+            val prevScore = endlessModeScore.highScore.getOrCompute()
+            if (score > prevScore) {
+                endlessModeScore.highScore.set(score)
+                PRManiaGame.instance.settings.persist()
+                isNewHighScore = true
+            }
+        } else if (resultsBehaviour.previousHighScore != null) {
+            if (score > resultsBehaviour.previousHighScore && resultsBehaviour.previousHighScore >= 0) {
+                isNewHighScore = true
+            }
+        }
+
+        val scoreObj = Score(score, rawScore, inputsHit, nInputs,
+                inputter.skillStarGotten.get() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
+                challenges,
+                resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
+                lines.first, lines.second,
+                ranking, isNewHighScore
+        )
+
+
+        fun transitionAway(nextScreen: Screen, disposeContainer: Boolean, action: () -> Unit) {
+            action.invoke()
+
+            main.screen = TransitionScreen(main, this, nextScreen,
+                    FadeToOpaque(0.5f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
+                this.onEntryEnd = {
+                    this@EnginePlayScreenBase.disposeQuietly()
+                    if (disposeContainer) {
+                        container.disposeQuietly()
+                    }
+                }
+            }
+        }
+
+        goingToResults = true
+        transitionAway(ResultsScreen(main, scoreObj, container, gameMode, {
+            copyThisScreenForResultsStartOver(scoreObj, resultsBehaviour)
+        }, keyboardKeybinds,
+                LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges),
+                resultsBehaviour.onRankingRevealed), disposeContainer = false) {}
+    }
+    
+    private fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): EnginePlayScreenBase {
         return EnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, gameMode,
                 if (resultsBehaviour is ResultsBehaviour.ShowResults)
-                    resultsBehaviour.copy(previousHighScore = if (scoreObj.newHighScore) 
-                        scoreObj.scoreInt 
+                    resultsBehaviour.copy(previousHighScore = if (scoreObj.newHighScore)
+                        scoreObj.scoreInt
                     else resultsBehaviour.previousHighScore)
                 else resultsBehaviour)
+    }
+
+    
+    override fun uncatchCursorOnHide(): Boolean {
+        return super.uncatchCursorOnHide() && !disableCatchingCursorOnHide
     }
 
     override fun renderGameplay(delta: Float) {
