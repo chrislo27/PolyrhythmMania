@@ -1,6 +1,5 @@
 package polyrhythmmania.statistics
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import paintbox.Paintbox
 import polyrhythmmania.PRMania
@@ -9,20 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 
 object GlobalStats : Stats() {
-
-    private class TimeAccumulator(val stat: Stat) {
-        private var msAcc: Float = 0f
-
-        fun update() {
-            msAcc += Gdx.graphics.deltaTime * 1000
-            
-            if (msAcc >= 1000f) {
-                val addSeconds = msAcc.toLong() / 1000L
-                stat.increment(addSeconds.toInt().coerceAtLeast(0))
-                msAcc = (msAcc - addSeconds * 1000).coerceAtLeast(0f)
-            }
-        }
-    }
 
     private val storageLoc: FileHandle by lazy { FileHandle(PRMania.MAIN_FOLDER.resolve("prefs/statistics.json")) }
 
@@ -62,6 +47,11 @@ object GlobalStats : Stats() {
      * Total time playing solitaire extra mode.
      */
     val solitairePlayTime: Stat = register(Stat("solitairePlayTime", DurationStatFormatter.DEFAULT))
+    /**
+     * Total time playing story mode in any save file, while the save file is loaded.
+     * Time tracking for the save file itself is handled separately.
+     */
+    val totalStoryModePlayTime: Stat = register(Stat("totalStoryModePlayTime", DurationStatFormatter.DEFAULT))
 
     
     
@@ -295,6 +285,7 @@ object GlobalStats : Stats() {
     private val dunkPlayTimeAccumulator: TimeAccumulator = TimeAccumulator(dunkPlayTime)
     private val assemblePlayTimeAccumulator: TimeAccumulator = TimeAccumulator(assemblePlayTime)
     private val solitairePlayTimeAccumulator: TimeAccumulator = TimeAccumulator(solitairePlayTime)
+    private val totalStoryModePlayTimeAccumulator: TimeAccumulator = TimeAccumulator(totalStoryModePlayTime)
 
     // -----------------------------------------------------------------------------------------------------------------
     
@@ -326,6 +317,10 @@ object GlobalStats : Stats() {
 
     fun updateEditorPlayTime() {
         editorTimeAccumulator.update()
+    }
+
+    fun updateTotalStoryModePlayTime() {
+        totalStoryModePlayTimeAccumulator.update()
     }
     
     fun updateModePlayTime(type: PlayTimeType) {

@@ -151,7 +151,7 @@ class EnginePlayScreenBase(
         return super.uncatchCursorOnHide() && !disableCatchingCursorOnHide
     }
 
-    override fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): AbstractEnginePlayScreen {
+    override fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): EnginePlayScreenBase {
         return EnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, gameMode,
                 if (resultsBehaviour is ResultsBehaviour.ShowResults)
                     resultsBehaviour.copy(previousHighScore = if (scoreObj.newHighScore) 

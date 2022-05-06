@@ -5,6 +5,9 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import paintbox.Paintbox
 import polyrhythmmania.PRMania
+import polyrhythmmania.statistics.DurationStatFormatter
+import polyrhythmmania.statistics.Stat
+import polyrhythmmania.statistics.TimeAccumulator
 
 
 class StorySavefile private constructor(val saveNumber: Int) {
@@ -54,6 +57,16 @@ class StorySavefile private constructor(val saveNumber: Int) {
 
     val storageLoc: FileHandle by lazy { FileHandle(PRMania.MAIN_FOLDER.resolve("prefs/storymode_save_${saveNumber}.json")) }
     
+    
+    val playTime: Stat = Stat("storyModePlayTime", DurationStatFormatter.DEFAULT)
+    private val playTimeAccumulator: TimeAccumulator = TimeAccumulator(playTime)
+    
+    
+    fun updatePlayTime() {
+        playTimeAccumulator.update()
+    }
+    
+    
     fun doesSavefileExist(): Boolean {
         return storageLoc.exists() && !storageLoc.isDirectory
     }
@@ -62,7 +75,14 @@ class StorySavefile private constructor(val saveNumber: Int) {
         if (!doesSavefileExist()) {
             return // No file. Treat as new.
         }
+
         // May throw any exception if something fails to load.
+        
+        val str = storageLoc.readString("UTF-8")
+        val obj = Json.parse(str).asObject()
+        val saveFileVersion = obj.getInt("save_file_version", SAVE_FILE_VERSION)
+        
+        playTime.setValue(obj.getInt("play_time", 0))
         // TODO load
     }
     
@@ -80,6 +100,8 @@ class StorySavefile private constructor(val saveNumber: Int) {
         // TODO write data
         obj.add("save_file_version", SAVE_FILE_VERSION)
         obj.add("game_version", PRMania.VERSION.toString())
+        
+        obj.add("play_time", playTime.value.get())
     }
     
 }
