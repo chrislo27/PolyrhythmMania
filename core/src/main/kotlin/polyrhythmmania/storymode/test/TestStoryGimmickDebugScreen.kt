@@ -23,7 +23,10 @@ import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.screen.StoryLoadingScreen
+import polyrhythmmania.storymode.test.gamemode.TestStoryAcesOnlyGameMode
+import polyrhythmmania.storymode.test.gamemode.TestStoryGameMode
 
 
 class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
@@ -67,13 +70,25 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         }
                     }
                     this += separator()
-                    this += Button("TODO").apply {
+                    this += Button("Aces Only PR2").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            // TODO
+                            enterGameMode(TestStoryAcesOnlyGameMode(main))
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    private fun enterGameMode(gameMode: TestStoryGameMode) {
+        main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+        val playScreen = TestStoryPlayScreen(main, Challenges.NO_CHANGES, main.settings.inputCalibration.getOrCompute(), gameMode)
+        main.screen = TransitionScreen(main, main.screen, playScreen,
+                FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+            this.onEntryEnd = {
+                gameMode.prepareFirstTime()
+                playScreen.resetAndUnpause()
             }
         }
     }

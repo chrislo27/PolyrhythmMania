@@ -7,7 +7,6 @@ import paintbox.transition.*
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.container.Container
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
@@ -18,10 +17,9 @@ import polyrhythmmania.storymode.gamemode.StoryGameMode
 
 class TestStoryPlayScreen(
         main: PRManiaGame,
-        container: Container,
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: StoryGameMode
-) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode)  {
+) : AbstractEnginePlayScreen(main, null, gameMode.container, challenges, inputCalibration, gameMode)  {
 
     override val pauseMenuHandler: TengokuBgPauseMenuHandler = TengokuBgPauseMenuHandler(this)
 
@@ -60,19 +58,29 @@ class TestStoryPlayScreen(
         optionList += PauseOption(ReadOnlyVar.const("Quit to Debug Menu"), true) {
             playMenuSound("sfx_pause_exit")
             
-            val currentScreen = main.screen
-            Gdx.app.postRunnable {
-                val mainMenu = TestStoryGimmickDebugScreen(main)
-                main.screen = TransitionScreen(main, currentScreen, mainMenu,
-                        FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
-                    this.onEntryEnd = {
-                        currentScreen.dispose()
-                        container.disposeQuietly()
-                    }
+            quitToDebugMenu()
+        }
+        this.pauseOptions.set(optionList)
+    }
+    
+    private fun quitToDebugMenu() {
+        val currentScreen = main.screen
+        Gdx.app.postRunnable {
+            val mainMenu = TestStoryGimmickDebugScreen(main)
+            main.screen = TransitionScreen(main, currentScreen, mainMenu,
+                    FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
+                this.onEntryEnd = {
+                    currentScreen.dispose()
+                    gameMode?.disposeQuietly()
                 }
             }
         }
-        this.pauseOptions.set(optionList)
+    }
+
+    override fun onEndSignalFired() {
+        super.onEndSignalFired()
+        
+        quitToDebugMenu()
     }
 
     override fun uncatchCursorOnHide(): Boolean {
