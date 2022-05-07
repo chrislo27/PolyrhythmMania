@@ -25,6 +25,10 @@ open class Entity(val world: World) {
     open val renderWidth: Float = 1f
     open val renderHeight: Float = 1f
     
+    open val renderSortOffsetX: Float get() = 0f
+    open val renderSortOffsetY: Float get() = 0f
+    open val renderSortOffsetZ: Float get() = 0f
+    
     open fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
     }
     

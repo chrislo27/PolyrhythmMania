@@ -44,15 +44,21 @@ import java.time.format.DateTimeFormatter
 class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) {
 
     companion object {
-        val comparatorRenderOrder: Comparator<Entity> = Comparator<Entity> { o1, o2 ->
+        val comparatorRenderOrder: Comparator<Entity> = Comparator { o1, o2 ->
             // Explicitly choose rows on the x-axis first, ordered by z value
-            if (o1.position.z < o2.position.z) {
+            val o1Z = o1.position.z + o1.renderSortOffsetZ
+            val o2Z = o2.position.z + o2.renderSortOffsetZ
+            if (o1Z < o2Z) {
                 -1
-            } else if (o1.position.z > o2.position.z) {
+            } else if (o1Z > o2Z) {
                 1
             } else {
-                val xyz1 = o1.position.x - o1.position.z - o1.position.y
-                val xyz2 = o2.position.x - o2.position.z - o2.position.y
+                val o1X = o1.position.x + o1.renderSortOffsetX
+                val o1Y = o1.position.y + o1.renderSortOffsetY
+                val o2X = o2.position.x + o2.renderSortOffsetX
+                val o2Y = o2.position.y + o2.renderSortOffsetY
+                val xyz1 = o1X - o1Z - o1Y
+                val xyz2 = o2X - o2Z - o2Y
                 -xyz1.compareTo(xyz2)
             }
         }
