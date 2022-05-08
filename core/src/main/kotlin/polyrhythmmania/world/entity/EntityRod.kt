@@ -9,10 +9,10 @@ import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.World
-import polyrhythmmania.world.tileset.Tileset
-import polyrhythmmania.world.tileset.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.TexturePack
+import polyrhythmmania.world.tileset.Tileset
+import polyrhythmmania.world.tileset.TintedRegion
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
@@ -20,13 +20,22 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
     
     val xUnitsPerBeat: Float = 2f
     open val isInAir: Boolean = isInAir
+    
+    open val renderScale: Float get() = 1f
 
-    override val renderWidth: Float = 0.75f
-    override val renderHeight: Float = 0.5f
+    open val unscaledRenderWidth: Float = 0.75f
+    open val unscaledRenderHeight: Float = 0.5f
     
-    protected open val offsetX: Float = -(1 / 32f) * 0
-    protected open val offsetY: Float = 1f / 32f * 0
+    final override val renderWidth: Float get() = unscaledRenderWidth * renderScale
+    final override val renderHeight: Float get() = unscaledRenderHeight * renderScale
     
+    protected open val offsetX: Float get() = -((renderWidth - unscaledRenderWidth) / 2)
+    protected open val offsetY: Float get() = -((renderHeight - unscaledRenderHeight) / 2)
+
+    override val renderSortOffsetX: Float get() = 0f //sqrt((renderWidth * renderWidth) + (renderHeight * renderHeight))
+    override val renderSortOffsetY: Float get() = 0f
+    override val renderSortOffsetZ: Float get() = 0f // 0.5f * renderScale
+
     constructor(world: World) : this(world, false)
     
     protected open fun getAnimationAlpha(): Float {
@@ -54,6 +63,14 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
         drawTintedRegion(batch, vec, tileset, regionFill, offsetX, offsetY, renderW, renderH)
 
         batch.setColor(1f, 1f, 1f, 1f)
+
+        // Debug bounds rendering
+//        batch.setColor(0.8f, 0.8f, 1f, 0.75f)
+//        batch.fillRect(vec.x, vec.y, renderW, renderH)
+//        batch.setColor(0f, 0f, 1f, 0.75f)
+//        batch.fillRect(vec.x, vec.y, 0.1f, 0.1f)
+//        batch.fillRect(vec.x + unscaledRenderWidth / 2, vec.y + unscaledRenderHeight / 2, 0.1f, 0.1f)
+//        batch.setColor(1f, 1f, 1f, 1f)
     }
 }
 

@@ -107,7 +107,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
     fun explode(engine: Engine, playSound: Boolean) {
         if (isKilled || exploded) return
         exploded = true
-        world.addEntity(EntityExplosion(world, engine.seconds, this.renderWidth).also {
+        world.addEntity(EntityExplosion(world, engine.seconds, this.renderScale, this.offsetX, this.offsetY).also {
             it.position.set(this.position)
         })
         if (playSound) {

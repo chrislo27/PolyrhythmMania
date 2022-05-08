@@ -70,6 +70,13 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         }
                     }
                     this += separator()
+                    this += Button("Polyrhythm 2 no changes").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGameMode(object : TestStoryGameMode(main) {
+                            })
+                        }
+                    }
                     this += Button("Aces Only PR2").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {

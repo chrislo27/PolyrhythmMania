@@ -247,7 +247,7 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
     fun explode(engine: Engine) {
         if (isKilled || exploded) return
         exploded = true
-        world.addEntity(EntityExplosion(world, engine.seconds, this.renderWidth).also {
+        world.addEntity(EntityExplosion(world, engine.seconds, this.renderScale, this.offsetX, this.offsetY).also {
             it.position.set(this.position)
         })
         playSfxExplosion(engine)

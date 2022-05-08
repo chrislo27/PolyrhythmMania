@@ -177,8 +177,10 @@ open class EntityCube(world: World, val withLine: Boolean = false, val withBorde
     }
 }
 
-class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Float)
-    : SpriteEntity(world), TemporaryEntity {
+class EntityExplosion(
+        world: World, val secondsStarted: Float,
+        val renderScale: Float, val rodOffsetX: Float, val rodOffsetY: Float
+) : SpriteEntity(world), TemporaryEntity {
 
     companion object {
         const val EXPLOSION_DURATION: Float = 8 / 60f
@@ -197,9 +199,13 @@ class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Flo
     var duration: Float = EXPLOSION_DURATION
 
     override val renderWidth: Float
-        get() = state.renderWidth
+        get() = state.renderWidth * renderScale
     override val renderHeight: Float
-        get() = state.renderHeight
+        get() = state.renderHeight * renderScale
+    
+    override val renderSortOffsetX: Float get() = 0f
+    override val renderSortOffsetY: Float get() = 0f
+    override val renderSortOffsetZ: Float get() = 0f
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
         return tileset.explosionFrames[state.index]
@@ -217,8 +223,19 @@ class EntityExplosion(world: World, val secondsStarted: Float, val rodWidth: Flo
 
             val tr = getTintedRegion(tileset, 0)
             if (tr != null) {
-                drawTintedRegion(batch, vec, tileset, tr, -renderWidth / 2f + rodWidth / 2f - (2f / 32f), (3f / 32f), renderWidth, renderHeight)
+                val centreOfExplosionX = 10f / 32f // X-centre of the explosion at normal 1.0 scaling is 10 px right
+                val baseOfExplosionY = 3f / 32f // Base of the explosion at normal 1.0 scaling is 3 px up
+                
+                drawTintedRegion(batch, vec, tileset, tr, (centreOfExplosionX) * renderScale - (renderWidth / 2f) + rodOffsetX, baseOfExplosionY * renderScale + rodOffsetY, renderWidth, renderHeight)
             }
+
+
+            // Debug bounds rendering
+//            batch.setColor(0.8f, 0.8f, 1f, 0.75f)
+//            batch.fillRect(vec.x, vec.y, renderWidth, renderHeight)
+//            batch.setColor(0f, 0f, 1f, 0.75f)
+//            batch.fillRect(vec.x, vec.y, 0.1f, 0.1f)
+//            batch.setColor(1f, 1f, 1f, 1f)
         }
     }
 }
