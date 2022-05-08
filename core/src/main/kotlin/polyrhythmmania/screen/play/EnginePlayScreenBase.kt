@@ -54,7 +54,7 @@ class EnginePlayScreenBase(
     
     init {
         if (engine.world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS
-                && engine.world.worldMode.type == WorldType.POLYRHYTHM
+                && engine.world.worldMode.worldType is WorldType.Polyrhythm
                 && engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil mode in endless
             (pauseMenuHandler as? TengokuBgPauseMenuHandler)?.also { handler ->
                 val hex = "DB2323"
@@ -71,8 +71,8 @@ class EnginePlayScreenBase(
         engine.inputter.endlessScore.score.addListener { scoreVar ->
             if (engine.world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS && engine.areStatisticsEnabled) {
                 val newScore = scoreVar.getOrCompute()
-                when (engine.world.worldMode.type) {
-                    WorldType.POLYRHYTHM -> {
+                when (engine.world.worldMode.worldType) {
+                    is WorldType.Polyrhythm -> {
                         if (gameMode is EndlessPolyrhythm) {
                             if (gameMode.dailyChallenge != null) {
                                 listOf(Achievements.dailyScore25, Achievements.dailyScore50,
@@ -100,13 +100,13 @@ class EnginePlayScreenBase(
                         }
 
                     }
-                    WorldType.DUNK -> {
+                    WorldType.Dunk -> {
                         listOf(Achievements.dunkScore10, Achievements.dunkScore20, Achievements.dunkScore30,
                                 Achievements.dunkScore50).forEach {
                             Achievements.attemptAwardScoreAchievement(it, newScore)
                         }
                     }
-                    WorldType.ASSEMBLE -> {
+                    WorldType.Assemble -> {
                         // NO-OP
                     }
                 }

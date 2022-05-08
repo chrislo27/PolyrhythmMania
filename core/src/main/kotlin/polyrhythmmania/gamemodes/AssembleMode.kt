@@ -2,7 +2,6 @@ package polyrhythmmania.gamemodes
 
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
-import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
@@ -13,17 +12,13 @@ import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.soundsystem.BeadsMusic
-import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
-import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
-import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.*
 import kotlin.math.sign
@@ -33,7 +28,7 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     : AbstractEndlessMode(main, prevHighScore, PlayTimeType.ASSEMBLE) {
 
     init {
-        container.world.worldMode = WorldMode(WorldType.ASSEMBLE, EndlessType.NOT_ENDLESS)
+        container.world.worldMode = WorldMode(WorldType.Assemble, EndlessType.NOT_ENDLESS)
         container.renderer.showEndlessModeScore.set(false)
 //        container.engine.inputter.endlessScore.maxLives.set(3)
         container.texturePackSource.set(TexturePackSource.STOCK_GBA)

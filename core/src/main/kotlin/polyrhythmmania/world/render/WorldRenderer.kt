@@ -348,7 +348,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         val engine = this.engine
         val camera = this.camera
         // TODO better camera controls and refactoring
-        if (world.worldMode.type == WorldType.DUNK) {
+        if (world.worldMode.worldType == WorldType.Dunk) {
             camera.position.x = camera.zoom * camera.viewportWidth / 2f
             camera.position.y = camera.zoom * camera.viewportHeight / 2f
             camera.position.x -= 2f

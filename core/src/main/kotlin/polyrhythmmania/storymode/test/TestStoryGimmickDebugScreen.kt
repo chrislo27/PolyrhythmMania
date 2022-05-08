@@ -25,6 +25,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.screen.StoryLoadingScreen
+import polyrhythmmania.storymode.test.gamemode.TestStory8BallGameMode
 import polyrhythmmania.storymode.test.gamemode.TestStoryAcesOnlyGameMode
 import polyrhythmmania.storymode.test.gamemode.TestStoryGameMode
 
@@ -81,6 +82,12 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             enterGameMode(TestStoryAcesOnlyGameMode(main))
+                        }
+                    }
+                    this += Button("Continuous (8-ball) PR2").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGameMode(TestStory8BallGameMode(main))
                         }
                     }
                 }

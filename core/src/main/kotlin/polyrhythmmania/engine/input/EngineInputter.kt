@@ -204,7 +204,7 @@ class EngineInputter(val engine: Engine) {
         val atBeat = engine.tempos.secondsToBeats(atSeconds)
         
         val worldMode = world.worldMode
-        if (worldMode.type == WorldType.POLYRHYTHM) {
+        if (worldMode.worldType is WorldType.Polyrhythm) {
             val rowBlockType: EntityPiston.Type = if (type.isDpad) EntityPiston.Type.PISTON_DPAD else EntityPiston.Type.PISTON_A
 
             for (row in world.rows) {
@@ -294,7 +294,7 @@ class EngineInputter(val engine: Engine) {
                 // Trigger this piston (will also call updateInputIndicators)
                 rowBlock.fullyExtend(engine, atBeat)
             }
-        } else if (worldMode.type == WorldType.DUNK && type == InputType.A) {
+        } else if (worldMode.worldType == WorldType.Dunk && type == InputType.A) {
             for (entity in engine.world.entities) {
                 if (entity !is EntityRodDunk || !entity.acceptingInputs) continue
                 val rod: EntityRodDunk = entity
@@ -328,7 +328,7 @@ class EngineInputter(val engine: Engine) {
                 }
             }
             world.dunkPiston.fullyExtend(engine, atBeat)
-        } else if (worldMode.type == WorldType.ASSEMBLE && type == InputType.A) {
+        } else if (worldMode.worldType == WorldType.Assemble && type == InputType.A) {
             val asmPlayerPiston = world.asmPlayerPiston
             var hit = false
             var hitDuration = 1.5f
@@ -459,15 +459,15 @@ class EngineInputter(val engine: Engine) {
         }
 
         val worldMode = world.worldMode
-        when (worldMode.type) {
-            WorldType.DUNK -> {
+        when (worldMode.worldType) {
+            WorldType.Dunk -> {
                 val oldLives = endlessScore.lives.get()
                 triggerEndlessLifeLost()
                 if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
                     GlobalStats.livesLostDunk.increment()
                 }
             }
-            WorldType.ASSEMBLE -> {
+            WorldType.Assemble -> {
                 triggerEndlessLifeLost()
             }
             else -> {}
@@ -526,9 +526,9 @@ class EngineInputter(val engine: Engine) {
                     endlessScore.gameOverUIShown.set(true)
 
                     if (engine.areStatisticsEnabled) {
-                        val worldType = world.worldMode.type
+                        val worldType = world.worldMode.worldType
                         when (worldType) {
-                            WorldType.POLYRHYTHM, WorldType.DUNK -> {
+                            is WorldType.Polyrhythm, WorldType.Dunk -> {
                                 GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
                                 GlobalStats.inputsMissed.increment(inputCountStats.missed)
                                 GlobalStats.inputsGottenAce.increment(inputCountStats.aces)
@@ -537,7 +537,7 @@ class EngineInputter(val engine: Engine) {
                                 GlobalStats.inputsGottenEarly.increment(inputCountStats.early)
                                 GlobalStats.inputsGottenLate.increment(inputCountStats.late)
                             }
-                            WorldType.ASSEMBLE -> {
+                            WorldType.Assemble -> {
                                 // NO-OP
                             }
                         }
@@ -572,8 +572,8 @@ class EngineInputter(val engine: Engine) {
         if (!engine.areStatisticsEnabled) return
         if (world.worldMode.endlessType.isEndless) return
         
-        when (world.worldMode.type) {
-            WorldType.POLYRHYTHM, WorldType.ASSEMBLE -> {
+        when (world.worldMode.worldType) {
+            is WorldType.Polyrhythm, WorldType.Assemble -> {
                 val results = this.inputResults
                 val nInputs = max(results.size, max(totalExpectedInputs, minimumInputCount))
                 val nonMissResults = results.filter { !inputChallenge.isInputScoreMiss(it.inputScore) }
@@ -592,7 +592,7 @@ class EngineInputter(val engine: Engine) {
                 GlobalStats.inputsGottenEarly.increment(earlies)
                 GlobalStats.inputsGottenLate.increment(lates)
             }
-            WorldType.DUNK -> {
+            WorldType.Dunk -> {
                 // NO-OP
             }
         }

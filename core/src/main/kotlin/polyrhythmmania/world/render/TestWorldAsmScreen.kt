@@ -3,9 +3,6 @@ package polyrhythmmania.world.render
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
-import net.beadsproject.beads.ugens.SamplePlayer
-import paintbox.packing.PackedSheet
-import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.isKeyJustReleased
 import polyrhythmmania.PRManiaGame
@@ -19,7 +16,6 @@ import polyrhythmmania.gamemodes.*
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.world.*
-import polyrhythmmania.world.tileset.StockTexturePack
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TilesetPalette
@@ -33,7 +29,7 @@ class TestWorldAsmScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     val world: World = World().apply { 
-        this.worldMode = WorldMode(WorldType.ASSEMBLE, EndlessType.NOT_ENDLESS)
+        this.worldMode = WorldMode(WorldType.Assemble, EndlessType.NOT_ENDLESS)
         resetWorld()
     }
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()

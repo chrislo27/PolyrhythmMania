@@ -20,6 +20,6 @@ object NoOpWorldBackground : WorldBackground() {
 
 object WorldBackgroundFromWorldType : WorldBackground() {
     override fun render(batch: SpriteBatch, world: World, engine: Engine, camera: OrthographicCamera) {
-        world.worldMode.type.defaultBackground.render(batch, world, engine, camera)
+        world.worldMode.worldType.defaultBackground.render(batch, world, engine, camera)
     }
 }

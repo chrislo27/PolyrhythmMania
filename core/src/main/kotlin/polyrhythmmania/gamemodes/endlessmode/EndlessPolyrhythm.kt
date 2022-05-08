@@ -9,7 +9,6 @@ import paintbox.binding.IntVar
 import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievements
-import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
@@ -28,8 +27,6 @@ import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
-import polyrhythmmania.world.render.ForceTexturePack
-import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.time.LocalDate
 import java.time.Year
@@ -119,7 +116,7 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
         TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         
-        container.world.worldMode = WorldMode(WorldType.POLYRHYTHM, EndlessType.REGULAR_ENDLESS)
+        container.world.worldMode = WorldMode(WorldType.Polyrhythm(), EndlessType.REGULAR_ENDLESS)
         container.renderer.endlessModeSeed.set(getSeedString(seed.toUInt()))
         container.renderer.dailyChallengeDate.set(dailyChallenge)
         container.renderer.flashHudRedWhenLifeLost.set(true)

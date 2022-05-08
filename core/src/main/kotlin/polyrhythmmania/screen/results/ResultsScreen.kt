@@ -405,7 +405,7 @@ class ResultsScreen(
                 val challenges = score.challenges
                 if (score.noMiss) {
                     GlobalStats.noMissesGotten.increment()
-                    if (container.world.worldMode.type == WorldType.ASSEMBLE) {
+                    if (container.world.worldMode.worldType == WorldType.Assemble) {
                         Achievements.awardAchievement(Achievements.assembleNoMiss)
                     }
                 }

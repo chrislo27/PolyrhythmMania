@@ -15,7 +15,7 @@ abstract class AbstractPracticeTutorial(main: PRManiaGame, playTimeType: PlayTim
     : GameMode(main, playTimeType) {
     
     init {
-        container.world.worldMode = WorldMode(WorldType.POLYRHYTHM, EndlessType.NOT_ENDLESS)
+        container.world.worldMode = WorldMode(WorldType.Polyrhythm(), EndlessType.NOT_ENDLESS)
         container.world.showInputFeedback = true // Overrides user settings
         container.world.worldSettings = WorldSettings(showInputIndicators = true)
     }

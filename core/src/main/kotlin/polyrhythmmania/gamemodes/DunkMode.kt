@@ -7,7 +7,6 @@ import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -16,7 +15,6 @@ import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.*
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
-import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.TilesetPalette
 
 
@@ -24,7 +22,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     : AbstractEndlessMode(main, prevHighScore, PlayTimeType.DUNK) {
     
     init {
-        container.world.worldMode = WorldMode(WorldType.DUNK, EndlessType.REGULAR_ENDLESS)
+        container.world.worldMode = WorldMode(WorldType.Dunk, EndlessType.REGULAR_ENDLESS)
         val inputter = container.engine.inputter
         inputter.endlessScore.maxLives.set(5)
         inputter.inputChallenge.acesOnly = true

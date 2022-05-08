@@ -4,10 +4,16 @@ import polyrhythmmania.world.render.bg.NoOpWorldBackground
 import polyrhythmmania.world.render.bg.WorldBackground
 
 
-enum class WorldType(val defaultBackground: WorldBackground) {
-    POLYRHYTHM(NoOpWorldBackground),
-    DUNK(DunkWorldBackground),
-    ASSEMBLE(AssembleWorldBackground),
+sealed class WorldType(val defaultBackground: WorldBackground) {
+    
+    class Polyrhythm(val isContinuous: Boolean)
+        : WorldType(NoOpWorldBackground) {
+        
+        constructor() : this(false)
+    }
+    object Dunk : WorldType(DunkWorldBackground)
+    object Assemble : WorldType(AssembleWorldBackground)
+    
 }
 
 enum class EndlessType(val isEndless: Boolean) {
@@ -22,4 +28,4 @@ enum class EndlessType(val isEndless: Boolean) {
     REGULAR_ENDLESS(true),
 }
 
-data class WorldMode(val type: WorldType, val endlessType: EndlessType)
+data class WorldMode(val worldType: WorldType, val endlessType: EndlessType)

@@ -2,7 +2,6 @@ package polyrhythmmania.engine.input
 
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
-import polyrhythmmania.screen.play.EnginePlayScreenBase
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.World
@@ -30,8 +29,8 @@ object InputThresholds {
         val world = World()
         val engine = Engine(SimpleTimingProvider { false }, world, null, null)
         listOf(
-                WorldMode(WorldType.POLYRHYTHM, EndlessType.NOT_ENDLESS), WorldMode(WorldType.POLYRHYTHM, EndlessType.REGULAR_ENDLESS),
-                WorldMode(WorldType.DUNK, EndlessType.REGULAR_ENDLESS), WorldMode(WorldType.ASSEMBLE, EndlessType.NOT_ENDLESS)
+                WorldMode(WorldType.Polyrhythm(), EndlessType.NOT_ENDLESS), WorldMode(WorldType.Polyrhythm(), EndlessType.REGULAR_ENDLESS),
+                WorldMode(WorldType.Dunk, EndlessType.REGULAR_ENDLESS), WorldMode(WorldType.Assemble, EndlessType.NOT_ENDLESS)
         ).forEach { mode ->
             world.worldMode = mode
             world.resetWorld()
