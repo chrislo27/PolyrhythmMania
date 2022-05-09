@@ -342,6 +342,7 @@ class WorldRenderer(val world: World, val tileset: Tileset, val engine: Engine) 
         hudRedFlash = 0f
         songTitleCard.reset()
         songArtistCard.reset()
+        camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0f) // Ignore zoom value
     }
 
     fun render(batch: SpriteBatch) {

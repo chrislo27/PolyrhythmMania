@@ -248,7 +248,18 @@ class World {
         
         val worldType = this.worldMode.worldType
         if (worldType is WorldType.Polyrhythm && worldType.isContinuous) {
-            getNewEntities().forEach {// Copy all blocks over
+            val ents = getNewEntities().toMutableList()
+
+            // Last 6 raised platforms
+            for (x in -3..4) {
+                for (zMul in 0..1) {
+                    val ent: Entity = EntityPlatform(this)
+                    ents += ent.apply {
+                        this.position.set(x.toFloat() + (8 + 8 + 2), 2f, zMul * -3f)
+                    }
+                }
+            }
+            ents.forEach {// Copy all blocks over
                 it.position.x += 24f
                 addEntity(it)
             }

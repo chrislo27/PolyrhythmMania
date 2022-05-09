@@ -30,8 +30,8 @@ class EntityCameraFrame(world: World, color: Color) : SimpleRenderedEntity(world
         val camW = camera.viewportWidth
         val camH = camera.viewportHeight
 
-        val renderX = camera.position.x - camW / 2 + this.position.x
-        val renderY = camera.position.y - camH / 2 + this.position.y
+        val renderX = vec.x
+        val renderY = vec.y
         
         val tmpColor = ColorStack.getAndPush()
         
