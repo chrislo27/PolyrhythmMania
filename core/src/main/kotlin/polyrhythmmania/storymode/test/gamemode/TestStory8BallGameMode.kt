@@ -26,9 +26,14 @@ class TestStory8BallGameMode(main: PRManiaGame) : TestStoryGameMode(main) {
 //                this.position.y = 3f
 //            })
 //            world.addEntity(EntityCameraFrame(world, Color.BLUE).apply {
-//                this.position.y = 3f 
+//                this.position.y = 3f
 //                this.position.x += 24f
 //            })
+//            world.addEntity(EntityCameraFrame(world, Color.BLACK).apply {
+//                this.position.y = 3f
+//                this.position.x += 12f
+//            })
+//            world.addEntity(EntityCameraFrame(world, Color.ORANGE, lockToCamera = true))
         }
     }
 
@@ -45,7 +50,9 @@ class TestStory8BallGameMode(main: PRManiaGame) : TestStoryGameMode(main) {
         })
 
         container.blocks.filterIsInstance<BlockDespawnPattern>().forEach { block ->
-            val b = block.beat - 2f
+            val width = 3f
+            // Event must end, at latest, one beat AFTER despawn block starts 
+            val b = block.beat + 1 - width
             
             val newBlock = object : Block(container.engine, EnumSet.allOf(BlockType::class.java)) {
                 override fun compileIntoEvents(): List<Event> {
@@ -53,14 +60,14 @@ class TestStory8BallGameMode(main: PRManiaGame) : TestStoryGameMode(main) {
                             object : Event(container.engine) {
                                 init {
                                     this.beat = b
-                                    this.width = 3f
+                                    this.width = width
                                 }
                                 
                                 val camera = container.renderer.camera
                                 val originalCameraPos = Vector3(camera.viewportWidth / 2, camera.viewportHeight / 2, camera.position.z)
 
                                 override fun onStart(currentBeat: Float) {
-                                    container.renderer.camera.position.set(originalCameraPos)
+                                    camera.position.set(originalCameraPos)
                                 }
 
                                 override fun onUpdate(currentBeat: Float) {
@@ -76,14 +83,14 @@ class TestStory8BallGameMode(main: PRManiaGame) : TestStoryGameMode(main) {
                                     val tmpVec = Vector3Stack.getAndPush()
                                             .set(originalCameraPos)
                                             .lerp(targetPosVec, interpolated)
-                                    container.renderer.camera.position.set(tmpVec)
+                                    camera.position.set(tmpVec)
                                     
                                     Vector3Stack.pop()
                                     Vector3Stack.pop()
                                 }
 
                                 override fun onEnd(currentBeat: Float) {
-                                    container.renderer.camera.position.set(originalCameraPos)
+                                    camera.position.set(originalCameraPos)
                                 }
                             }
                     )
