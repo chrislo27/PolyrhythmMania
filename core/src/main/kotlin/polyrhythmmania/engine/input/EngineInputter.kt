@@ -75,11 +75,12 @@ class EngineInputter(val engine: Engine) {
     }
     
     class InputChallengeData {
-        var acesOnly: Boolean = false
+        var restriction: InputTimingRestriction = InputTimingRestriction.NORMAL
         
         fun isInputScoreMiss(inputScore: InputScore): Boolean {
             if (inputScore == InputScore.MISS) return true
-            if (acesOnly && inputScore != InputScore.ACE) return true
+            if (restriction == InputTimingRestriction.ACES_ONLY && inputScore != InputScore.ACE) return true
+            if (restriction == InputTimingRestriction.NO_BARELY && !(inputScore == InputScore.ACE || inputScore == InputScore.GOOD)) return true
             return false
         }
     }

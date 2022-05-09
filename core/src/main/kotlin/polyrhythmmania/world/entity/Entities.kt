@@ -8,6 +8,8 @@ import paintbox.util.ColorStack
 import paintbox.util.Vector3Stack
 import paintbox.util.gdxutils.drawUV
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.input.InputScore
+import polyrhythmmania.engine.input.InputTimingRestriction
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.Tileset
@@ -260,7 +262,7 @@ class EntitySign(world: World, val type: Type) : SpriteEntity(world) {
     }
 }
 
-class EntityInputFeedback(world: World, val end: End, color: Color, val isAce: Boolean, val flashIndex: Int)
+class EntityInputFeedback(world: World, val end: End, color: Color, val inputScore: InputScore, val flashIndex: Int)
     : SimpleRenderedEntity(world) {
     
     companion object {
@@ -279,7 +281,10 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val isAce: B
     
     private fun getBaseColorToUse(renderer: WorldRenderer): Color {
         val inputter = renderer.engine.inputter
-        return if (inputter.inputChallenge.acesOnly && !this.isAce) {
+        val restriction = inputter.inputChallenge.restriction
+        return if (restriction == InputTimingRestriction.ACES_ONLY && this.inputScore != InputScore.ACE) {
+            MISS_COLOUR
+        } else if (restriction == InputTimingRestriction.NO_BARELY && this.inputScore == InputScore.BARELY) {
             MISS_COLOUR
         } else {
             originalColor

@@ -6,6 +6,7 @@ import paintbox.util.gdxutils.grey
 import paintbox.util.settableLazy
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.tileset.TilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
@@ -224,19 +225,19 @@ class World {
 
 
             if (showInputFeedback) {
-                list += EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.BARELY_COLOUR, false, 0).apply {
+                list += EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.BARELY_COLOUR, InputScore.BARELY, 0).apply {
                     this.position.set(7f, 1f, 3f)
                 }
-                list += EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, false, 1).apply {
+                list += EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, InputScore.GOOD, 1).apply {
                     this.position.set(8f, 1f, 3f)
                 }
-                list += EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.ACE_COLOUR, true, 2).apply {
+                list += EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.ACE_COLOUR, InputScore.ACE, 2).apply {
                     this.position.set(9f, 1f, 3f)
                 }
-                list += EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, false, 3).apply {
+                list += EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, InputScore.GOOD, 3).apply {
                     this.position.set(10f, 1f, 3f)
                 }
-                list += EntityInputFeedback(this, EntityInputFeedback.End.RIGHT, EntityInputFeedback.BARELY_COLOUR, false, 4).apply {
+                list += EntityInputFeedback(this, EntityInputFeedback.End.RIGHT, EntityInputFeedback.BARELY_COLOUR, InputScore.BARELY, 4).apply {
                     this.position.set(11f, 1f, 3f)
                 }
             }
@@ -341,19 +342,19 @@ class World {
         }
 
 
-        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.BARELY_COLOUR, false, 0).apply {
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.BARELY_COLOUR, InputScore.BARELY, 0).apply {
             this.position.set(5f, 1f, 2f)
         })
-        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, false, 1).apply {
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, InputScore.GOOD, 1).apply {
             this.position.set(6f, 1f, 2f)
         })
-        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.ACE_COLOUR, true, 2).apply {
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.ACE_COLOUR, InputScore.ACE, 2).apply {
             this.position.set(7f, 1f, 2f)
         })
-        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, false, 3).apply {
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR, InputScore.GOOD, 3).apply {
             this.position.set(8f, 1f, 2f)
         })
-        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.RIGHT, EntityInputFeedback.BARELY_COLOUR, false, 4).apply {
+        addEntity(EntityInputFeedback(this, EntityInputFeedback.End.RIGHT, EntityInputFeedback.BARELY_COLOUR, InputScore.BARELY, 4).apply {
             this.position.set(9f, 1f, 2f)
         })
 
@@ -424,19 +425,19 @@ class World {
             val zPos = -9f
             val tint = Color().grey(0.8f)
             
-            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.BARELY_COLOUR.cpy().mul(tint), false, 0).apply {
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.LEFT, EntityInputFeedback.BARELY_COLOUR.cpy().mul(tint), InputScore.BARELY, 0).apply {
                 this.position.set(7f + xOff, yPos, zPos)
             })
-            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR.cpy().mul(tint), false, 1).apply {
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR.cpy().mul(tint), InputScore.GOOD, 1).apply {
                 this.position.set(8f + xOff, yPos, zPos)
             })
-            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.ACE_COLOUR.cpy().mul(tint), true, 2).apply {
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.ACE_COLOUR.cpy().mul(tint), InputScore.ACE, 2).apply {
                 this.position.set(9f + xOff, yPos, zPos)
             })
-            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR.cpy().mul(tint), false, 3).apply {
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.MIDDLE, EntityInputFeedback.GOOD_COLOUR.cpy().mul(tint), InputScore.GOOD, 3).apply {
                 this.position.set(10f + xOff, yPos, zPos)
             })
-            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.RIGHT, EntityInputFeedback.BARELY_COLOUR.cpy().mul(tint), false, 4).apply {
+            addEntity(EntityInputFeedback(this, EntityInputFeedback.End.RIGHT, EntityInputFeedback.BARELY_COLOUR.cpy().mul(tint), InputScore.BARELY, 4).apply {
                 this.position.set(11f + xOff, yPos, zPos)
             })
         }

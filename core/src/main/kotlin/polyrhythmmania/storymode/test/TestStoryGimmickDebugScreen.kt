@@ -28,6 +28,7 @@ import polyrhythmmania.storymode.screen.StoryLoadingScreen
 import polyrhythmmania.storymode.test.gamemode.TestStory8BallGameMode
 import polyrhythmmania.storymode.test.gamemode.TestStoryAcesOnlyGameMode
 import polyrhythmmania.storymode.test.gamemode.TestStoryGameMode
+import polyrhythmmania.storymode.test.gamemode.TestStoryNoBarelyGameMode
 
 
 class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
@@ -82,6 +83,12 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             enterGameMode(TestStoryAcesOnlyGameMode(main))
+                        }
+                    }
+                    this += Button("No Barelies PR2").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGameMode(TestStoryNoBarelyGameMode(main))
                         }
                     }
                     this += Button("Continuous (8-ball) PR2").apply {
