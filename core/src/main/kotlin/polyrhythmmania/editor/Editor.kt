@@ -67,7 +67,7 @@ import kotlin.concurrent.thread
 import kotlin.math.ceil
 
 
-class Editor(val main: PRManiaGame)
+class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     : ActionHistory<Editor>(), InputProcessor, Disposable, Lwjgl3WindowListener {
 
     companion object {

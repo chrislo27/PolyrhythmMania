@@ -17,12 +17,16 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.statistics.GlobalStats
+import java.util.*
 
 
-class EditorScreen(main: PRManiaGame, val debugMode: Boolean = false) : PRManiaScreen(main) {
+class EditorScreen(
+    main: PRManiaGame,
+    val editorFlags: EnumSet<EditorSpecialFlags> = EnumSet.noneOf(EditorSpecialFlags::class.java),
+) : PRManiaScreen(main) {
 
     val batch: SpriteBatch = main.batch
-    val editor: Editor = Editor(main)
+    val editor: Editor = Editor(main, editorFlags)
     private val sceneRoot: SceneRoot = editor.sceneRoot
     private val processor: InputProcessor = editor
 

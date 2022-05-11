@@ -23,8 +23,10 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.container.ExternalResource
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.EditorScreen
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.pane.EditorPane
 import java.io.File
+import java.util.*
 import kotlin.concurrent.thread
 
 
@@ -179,7 +181,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         descLabel.text.set(Localization.getValue("editor.dialog.load.loading"))
         substate.set(Substate.LOADING)
 
-        val newEditorScreen = EditorScreen(main, debugMode = ((main.screen as? EditorScreen?)?.debugMode ?: false))
+        val newEditorScreen = EditorScreen(main, (main.screen as? EditorScreen)?.editorFlags ?: EnumSet.noneOf(EditorSpecialFlags::class.java))
         val newEditor: Editor = newEditorScreen.editor
         val newContainer: Container = newEditor.container
 
