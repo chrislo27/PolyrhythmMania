@@ -15,43 +15,25 @@ import paintbox.util.DecimalFormats
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.Event
-import polyrhythmmania.world.EventDeployRod
-import polyrhythmmania.world.EventDeployRodStoryMode
-import polyrhythmmania.world.entity.EntityRodDecor
-import java.util.*
 
 
-class BlockDeployRodStoryMode(engine: Engine, blockTypes: EnumSet<BlockType> = BlockDeployRod.BLOCK_TYPES)
-    : BlockDeployRod(engine, blockTypes) {
+class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
 
-    var xUnitsPerBeat: Float = 2f
+    private var beatsPerBlock: Float = 0.5f
     
     init {
-        this.defaultText.set("Rod (SM)")
-    }
-
-    override fun compileIntoEvents(): List<Event> {
-        val b = this.beat - 4
-        return RowSetting.getRows(rowData.rowSetting.getOrCompute(), engine.world).map { row ->
-            EventDeployRodStoryMode(engine, row, b) { rod ->
-                rod.xUnitsPerBeat = this.xUnitsPerBeat.coerceAtLeast(0.25f)
-            }
-        }
+        this.width = 4f
+        this.defaultText.set("Spawn Pat (SM)")
     }
     
-    override fun copy(): BlockDeployRodStoryMode {
-        return BlockDeployRodStoryMode(engine).also {
-            this.copyBaseInfoTo(it)
-            it.rowData.rowSetting.set(this.rowData.rowSetting.getOrCompute())
-            it.xUnitsPerBeat = this.xUnitsPerBeat
-        }
+    override fun getBeatsPerBlock(): Float {
+        return this.beatsPerBlock
     }
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return super.createContextMenu(editor).also { ctxmenu ->
             ctxmenu.addMenuItem(SeparatorMenuItem())
-            ctxmenu.addMenuItem(LabelMenuItem.create("X-units per beat (def. 2)", editor.editorPane.palette.markup))
+            ctxmenu.addMenuItem(LabelMenuItem.create("Beats per block (def. 0.5)", editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(CustomMenuItem(
                 HBox().apply {
                     this.bounds.height.set(32f)
@@ -60,13 +42,13 @@ class BlockDeployRodStoryMode(engine: Engine, blockTypes: EnumSet<BlockType> = B
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
                         this.padding.set(Insets(2f))
-                        this += DecimalTextField(startingValue = xUnitsPerBeat, decimalFormat = DecimalFormats["0.0##"],
+                        this += DecimalTextField(startingValue = beatsPerBlock, decimalFormat = DecimalFormats["0.0##"],
                             font = editor.editorPane.palette.musicDialogFont).apply {
-                            this.minimumValue.set(0.25f)
+                            this.minimumValue.set(1 / 16f)
                             this.textColor.set(Color(1f, 1f, 1f, 1f))
 
                             this.value.addListener {
-                                xUnitsPerBeat = it.getOrCompute()
+                                beatsPerBlock = it.getOrCompute()
                             }
                         }
                     }
@@ -75,13 +57,25 @@ class BlockDeployRodStoryMode(engine: Engine, blockTypes: EnumSet<BlockType> = B
         }
     }
 
+    override fun copy(): BlockSpawnPatternStoryMode {
+        return BlockSpawnPatternStoryMode(engine).also {
+            this.copyBaseInfoTo(it)
+            for (i in 0 until ROW_COUNT) {
+                it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
+                it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
+            }
+            it.disableTailEnd.set(this.disableTailEnd.get())
+            it.beatsPerBlock = this.beatsPerBlock
+        }
+    }
+
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
-        obj.add("xUnitsPerBeat", this.xUnitsPerBeat)
+        obj.add("beatsPerBlock", this.beatsPerBlock)
     }
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        xUnitsPerBeat = obj.getFloat("xUnitsPerBeat", EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT)
+        this.beatsPerBlock = obj.getFloat("beatsPerBlock", 0.5f)
     }
 }

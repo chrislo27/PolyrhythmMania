@@ -221,6 +221,24 @@ class EventDeployRodEndless(engine: Engine, val row: Row, startBeat: Float, val 
     }
 }
 
+class EventDeployRodStoryMode(engine: Engine, val row: Row, startBeat: Float, val after: (EntityRodPR) -> Unit)
+    : Event(engine) {
+    
+    init {
+        this.beat = startBeat
+    }
+
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
+        engine.world.addEntity(EntityRodPR(engine.world, this.beat, row).also(after))
+
+        if (engine.areStatisticsEnabled) {
+            GlobalStats.rodsDeployed.increment()
+            GlobalStats.rodsDeployedPolyrhythm.increment()
+        }
+    }
+}
+
 class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
     init {
         this.beat = startBeat

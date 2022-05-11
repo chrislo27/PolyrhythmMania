@@ -216,6 +216,13 @@ object Instantiators {
             BlockDeployRod.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
             BlockDeployRodStoryMode(engine)
         })
+        add(CATEGORY_STORYMODE, Instantiator("storyMode_spawnPattern", BlockSpawnPatternStoryMode::class.java,
+            ReadOnlyVar.const("Spawn Pattern (SM)"),
+            Localization.getVar("instantiator.spawnPattern.summary"),
+            Localization.getVar("instantiator.spawnPattern.desc"),
+            BlockSpawnPattern.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
+            BlockSpawnPatternStoryMode(engine)
+        })
 
         instantiatorMap = tempMap
         instantiatorList = tempList

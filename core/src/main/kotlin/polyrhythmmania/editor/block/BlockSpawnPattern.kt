@@ -16,7 +16,7 @@ import polyrhythmmania.world.Row
 import java.util.*
 
 
-class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
+open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
 
     companion object {
         val ROW_COUNT: Int = 10
@@ -40,14 +40,17 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
         this.width = 4f
         this.defaultText.bind { Localization.getVar("block.spawnPattern.name").use() }
     }
+    
+    protected open fun getBeatsPerBlock(): Float = 0.5f
 
     fun compileIntoEvents(rowDelayA: Float, rowDelayDpad: Float): List<Event> {
         val b = this.beat
         val events = mutableListOf<Event>()
 
         val world = engine.world
-        events += compileRow(b + rowDelayA, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A)
-        events += compileRow(b + rowDelayDpad, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD)
+        val beatsPerBlock = getBeatsPerBlock()
+        events += compileRow(b + rowDelayA, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A, beatsPerBlock)
+        events += compileRow(b + rowDelayDpad, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD, beatsPerBlock)
 
         return events
     }
@@ -56,7 +59,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
         return compileIntoEvents(0f, 0f)
     }
 
-    private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityPiston.Type): List<Event> {
+    private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityPiston.Type, beatsPerBlock: Float): List<Event> {
         val events = mutableListOf<Event>()
 
         /*
@@ -70,7 +73,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
           - is nothing: fill in the rest of the blocks at the time of the first end index
         */
 
-        val timings: FloatArray = FloatArray(rowArray.size) { it * 0.5f }
+        val timings: FloatArray = FloatArray(rowArray.size) { it * beatsPerBlock }
 
         var index: Int = 0
         while (index in 0 until rowArray.size) {
@@ -121,7 +124,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
                         val next = ind + 1
                         if (next < row.length) {
                             events += EventRowBlockSpawn(engine, row, next, EntityPiston.Type.PLATFORM,
-                                    beat + next * 0.5f, affectThisIndexAndForward = true)
+                                    beat + next * beatsPerBlock, affectThisIndexAndForward = true)
                         }
                     }
                     CubeType.PLATFORM -> {
@@ -136,7 +139,7 @@ class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
                         if (next < row.length) {
                             events += EventRowBlockSpawn(
                                 engine, row, next, EntityPiston.Type.PLATFORM,
-                                beat + next * 0.5f, affectThisIndexAndForward = true,
+                                beat + next * beatsPerBlock, affectThisIndexAndForward = true,
                                 startPistonExtended = cube == CubeType.PISTON_OPEN
                             )
                         }

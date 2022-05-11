@@ -18,7 +18,11 @@ import kotlin.math.floor
 
 open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRenderedEntity(world) {
     
-    val xUnitsPerBeat: Float = 2f
+    companion object {
+        const val DEFAULT_X_UNITS_PER_BEAT: Float = 2f
+    }
+    
+    var xUnitsPerBeat: Float = DEFAULT_X_UNITS_PER_BEAT
     open val isInAir: Boolean = isInAir
     
     open val renderScale: Float get() = 1f
