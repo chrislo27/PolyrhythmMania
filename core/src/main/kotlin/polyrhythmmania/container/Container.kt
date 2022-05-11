@@ -113,7 +113,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
     var levelMetadata: LevelMetadata = LevelMetadata.DEFAULT_METADATA.copy(initialCreationDate = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC))
     var wasLevelMetadataLoaded: Boolean = false
         private set
-    val trackIDs: List<TrackID> = Editor.DEFAULT_TRACKS.map { it.id }
+    val trackIDs: List<TrackID> = Editor.DEFAULT_TRACKS.map { it.id } // Intentionally doesn't use editor.tracks
 
     private val _resources: MutableMap<String, ExternalResource> = ConcurrentHashMap()
     val resources: Map<String, ExternalResource> get() = _resources
@@ -627,7 +627,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
                     Paintbox.LOGGER.warn("[Container] Missing instantiator ID '$instID', skipping")
                 }
                 continue
-            } else if (containerVersion >= 11 && editorFlags.isNotEmpty()) {
+            } else if (containerVersion >= 11) {
                 if (!inst.canBeShown(editorFlags)) {
                     if (instID != null) {
                         Paintbox.LOGGER.warn("[Container] Instantiator '$instID' is not compatible with current editor flags $editorFlags, skipping")

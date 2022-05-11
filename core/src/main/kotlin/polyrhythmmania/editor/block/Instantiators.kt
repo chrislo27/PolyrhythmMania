@@ -213,7 +213,7 @@ object Instantiators {
             ReadOnlyVar.const("Deploy Rod (SM)"),
             Localization.getVar("instantiator.deployRod.summary"),
             Localization.getVar("instantiator.deployRod.desc"),
-            BlockDeployRod.BLOCK_TYPES) { engine ->
+            BlockDeployRod.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
             BlockDeployRodStoryMode(engine)
         })
 

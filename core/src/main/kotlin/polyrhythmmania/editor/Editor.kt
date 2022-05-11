@@ -79,6 +79,13 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
                 Track(TrackID.FX_1, EnumSet.of(BlockType.FX)),
                 Track(TrackID.FX_2, EnumSet.of(BlockType.FX)),
         )
+        val UTILITY_TRACKS: List<Track> = listOf(
+            Track(TrackID.UTILITY_0, EnumSet.allOf(BlockType::class.java)),
+            Track(TrackID.UTILITY_1, EnumSet.allOf(BlockType::class.java)),
+            Track(TrackID.UTILITY_2, EnumSet.allOf(BlockType::class.java)),
+            Track(TrackID.UTILITY_3, EnumSet.allOf(BlockType::class.java)),
+            Track(TrackID.UTILITY_4, EnumSet.allOf(BlockType::class.java)),
+        )
         
         val MOVE_WINDOW_LEFT_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.A)
         val MOVE_WINDOW_RIGHT_KEYCODES: Set<Int> = setOf(Input.Keys.RIGHT, Input.Keys.D)
@@ -123,7 +130,10 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
             "prmania_icons" to main.fontIcons,
     ), TextRun(main.mainFontBoldBordered, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
 
-    val tracks: List<Track> = DEFAULT_TRACKS
+    val tracks: List<Track> = when {
+        EditorSpecialFlags.STORY_MODE in flags -> DEFAULT_TRACKS + UTILITY_TRACKS
+        else -> DEFAULT_TRACKS
+    }
     val trackMap: Map<TrackID, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
 
     // Editor tooling states
