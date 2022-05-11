@@ -187,7 +187,7 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
         thread(isDaemon = true) {
             try {
-                val loadMetadata = newContainer.readFromFile(newFile)
+                val loadMetadata = newContainer.readFromFile(newFile, editor.flags)
                 
                 if (loadMetadata.isFutureVersion) {
                     Gdx.app.postRunnable {

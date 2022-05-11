@@ -28,6 +28,7 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.input.Challenges
@@ -341,7 +342,7 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
         }, GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.forceTilesetPalette.getOrCompute()))
 
         try {
-            val loadMetadata = newContainer.readFromFile(newFile)
+            val loadMetadata = newContainer.readFromFile(newFile, EnumSet.noneOf(EditorSpecialFlags::class.java))
 
             if (newContainer.blocks.none { it is BlockEndState }) {
                 Gdx.app.postRunnable {

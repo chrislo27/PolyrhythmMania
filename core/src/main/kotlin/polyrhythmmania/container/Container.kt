@@ -22,6 +22,7 @@ import polyrhythmmania.container.manifest.LibraryRelevantData
 import polyrhythmmania.container.manifest.ResourceTag
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.TrackID
 import polyrhythmmania.editor.block.*
 import polyrhythmmania.engine.Engine
@@ -68,7 +69,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
     companion object {
         const val LEVEL_FILE_EXTENSION: String = "prmania"
         const val PROJECT_FILE_EXTENSION: String = "prmproj"
-        const val CONTAINER_VERSION: Int = 10
+        const val CONTAINER_VERSION: Int = 11
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
         
@@ -457,7 +458,7 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
     /**
      * Reads container info from a file. This should only be called on a NEW [Container] object!
      */
-    fun readFromFile(file: File): LoadMetadata {
+    fun readFromFile(file: File, editorFlags: EnumSet<EditorSpecialFlags>): LoadMetadata {
         val zipFile = ZipFile(file)
         val json: JsonObject
         zipFile.getInputStream(zipFile.getFileHeader("manifest.json")).use { zipInputStream ->
@@ -626,6 +627,13 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
                     Paintbox.LOGGER.warn("[Container] Missing instantiator ID '$instID', skipping")
                 }
                 continue
+            } else if (containerVersion >= 11 && editorFlags.isNotEmpty()) {
+                if (!inst.canBeShown(editorFlags)) {
+                    if (instID != null) {
+                        Paintbox.LOGGER.warn("[Container] Instantiator '$instID' is not compatible with current editor flags $editorFlags, skipping")
+                    }
+                    continue
+                }
             }
             val block: Block = inst.factory.invoke(inst, engine)
             block.readFromJson(obj)

@@ -18,7 +18,7 @@ interface ObjectListable {
     val editorFlags: EnumSet<EditorSpecialFlags>
     
     fun canBeShown(allowedFlags: EnumSet<EditorSpecialFlags>): Boolean {
-        return this.editorFlags.isEmpty() || allowedFlags.isEmpty() || allowedFlags.any { f -> f in this.editorFlags }
+        return this.editorFlags.none { f -> f !in allowedFlags }
     }
 }
 
