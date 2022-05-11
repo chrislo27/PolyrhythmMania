@@ -2,6 +2,7 @@ package polyrhythmmania.editor.block
 
 import paintbox.binding.ReadOnlyVar
 import polyrhythmmania.Localization
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.Engine
 import java.util.*
 
@@ -14,35 +15,45 @@ interface ObjectListable {
     val summary: ReadOnlyVar<String>
     val desc: ReadOnlyVar<String>
     val allowedTracks: EnumSet<BlockType>?
+    val editorFlags: EnumSet<EditorSpecialFlags>
+    
+    fun canBeShown(allowedFlags: EnumSet<EditorSpecialFlags>): Boolean {
+        return this.editorFlags.isEmpty() || allowedFlags.isEmpty() || allowedFlags.any { f -> f in this.editorFlags }
+    }
 }
 
 data class ListCategory(
-        val categoryID: String,
-        override val name: ReadOnlyVar<String>,
-        override val summary: ReadOnlyVar<String>,
-        override val desc: ReadOnlyVar<String>,
-): ObjectListable {
+    val categoryID: String,
+    override val name: ReadOnlyVar<String>,
+    override val summary: ReadOnlyVar<String>,
+    override val desc: ReadOnlyVar<String>,
+    override val editorFlags: EnumSet<EditorSpecialFlags>,
+) : ObjectListable {
     override val allowedTracks: EnumSet<BlockType>? = null
 }
 
 /**
  * An [Instantiator] is effectively a [Block] factory with extra metadata for the UI.
  */
-data class Instantiator<B : Block>(val id: String,
-                                   val blockClass: Class<B>,
-                                   override val name: ReadOnlyVar<String>,
-                                   override val summary: ReadOnlyVar<String>,
-                                   override val desc: ReadOnlyVar<String>,
-                                   override val allowedTracks: EnumSet<BlockType>,
-                                   val deprecatedIDs: Set<String> = emptySet(),
-                                   val onlyOne: Boolean = false,
-                                   val factory: Instantiator<B>.(Engine) -> B) : ObjectListable
+data class Instantiator<B : Block>(
+    val id: String,
+    val blockClass: Class<B>,
+    override val name: ReadOnlyVar<String>,
+    override val summary: ReadOnlyVar<String>,
+    override val desc: ReadOnlyVar<String>,
+    override val allowedTracks: EnumSet<BlockType>,
+    val deprecatedIDs: Set<String> = emptySet(),
+    val onlyOne: Boolean = false,
+    override val editorFlags: EnumSet<EditorSpecialFlags> = EnumSet.noneOf(EditorSpecialFlags::class.java),
+    val factory: Instantiator<B>.(Engine) -> B
+) : ObjectListable
 
 object Instantiators {
     
     private const val CATEGORY_CORE: String = "core"
     private const val CATEGORY_FX: String = "fx"
     private const val CATEGORY_ADVANCED: String = "advanced"
+    private const val CATEGORY_STORYMODE: String = "storymode"
 
     val endStateInstantiator: Instantiator<BlockEndState>
     
@@ -83,17 +94,26 @@ object Instantiators {
 
         // Categories
         add(ListCategory(CATEGORY_CORE,
-                Localization.getVar("instantiatorCategory.core.name"),
-                Localization.getVar("instantiatorCategory.core.summary"),
-                Localization.getVar("instantiatorCategory.core.desc")))
+            Localization.getVar("instantiatorCategory.core.name"),
+            Localization.getVar("instantiatorCategory.core.summary"),
+            Localization.getVar("instantiatorCategory.core.desc"),
+            EnumSet.noneOf(EditorSpecialFlags::class.java)
+        ))
         add(ListCategory(CATEGORY_FX,
-                Localization.getVar("instantiatorCategory.fx.name"),
-                Localization.getVar("instantiatorCategory.fx.summary"),
-                Localization.getVar("instantiatorCategory.fx.desc")))
+            Localization.getVar("instantiatorCategory.fx.name"),
+            Localization.getVar("instantiatorCategory.fx.summary"),
+            Localization.getVar("instantiatorCategory.fx.desc"),
+            EnumSet.noneOf(EditorSpecialFlags::class.java)))
         add(ListCategory(CATEGORY_ADVANCED,
-                Localization.getVar("instantiatorCategory.advanced.name"),
-                Localization.getVar("instantiatorCategory.advanced.summary"),
-                Localization.getVar("instantiatorCategory.advanced.desc")))
+            Localization.getVar("instantiatorCategory.advanced.name"),
+            Localization.getVar("instantiatorCategory.advanced.summary"),
+            Localization.getVar("instantiatorCategory.advanced.desc"),
+            EnumSet.noneOf(EditorSpecialFlags::class.java)))
+        add(ListCategory(CATEGORY_STORYMODE,
+            ReadOnlyVar.const("Story Mode Only"),
+            ReadOnlyVar.const("Special Category: Story Mode"),
+            ReadOnlyVar.const("Blocks used for Story Mode.\n\nWill not function in regular levels."),
+            EnumSet.of(EditorSpecialFlags.STORY_MODE)))
         
         // Basic instantiators
         endStateInstantiator = Instantiator("endState", BlockEndState::class.java,

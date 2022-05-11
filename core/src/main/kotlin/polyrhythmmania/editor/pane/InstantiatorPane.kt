@@ -59,7 +59,11 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
         this += descPane
         descPane += this.InstantiatorDesc()
 
-        instantiatorList = InstantiatorList(this, Instantiators.categoryList, Instantiators.categoryMap)
+        instantiatorList = InstantiatorList(this, Instantiators.categoryList.filter { cat ->
+            cat.canBeShown(editor.flags)
+        }, Instantiators.categoryMap.map { entry ->
+            entry.key to entry.value.filter { it.canBeShown(editor.flags) }
+        }.toMap())
         scrollSelector += instantiatorList
     }
 

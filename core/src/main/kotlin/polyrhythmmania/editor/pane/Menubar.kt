@@ -1,6 +1,7 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
@@ -15,6 +16,7 @@ import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
+import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
@@ -225,12 +227,22 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             leftBox += levelMetadataButton
 //            leftBox += levelBannerButton
         }
-        rightBox.temporarilyDisableLayouts { 
+        rightBox.temporarilyDisableLayouts {
+            if (editor.flags.isNotEmpty()) {
+                rightBox += TextLabel("(!) Special Editor Flags: ${editor.flags}", font = editor.main.mainFontBordered).apply {
+                    this.bounds.width.set(500f)
+                    this.textColor.set(Color.RED)
+                    this.renderAlign.set(Align.right)
+                }
+                rightBox += separator()
+            }
+            
             rightBox += helpButton
             rightBox += settingsButton
             rightBox += separator()
             rightBox += exitButton
         }
+        rightBox.sizeWidthToChildren(minimumWidth = 64f)
         
         autosavePane = Pane().apply {
             this.bounds.y.bind { parent.use()?.bounds?.height?.use() ?: 0f }
