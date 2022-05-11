@@ -9,6 +9,12 @@ enum class TrackID(val id: String, val deprecatedIDs: List<String>) {
     FX_0("fx_0", emptyList()),
     FX_1("fx_1", emptyList()),
     FX_2("fx_2", emptyList()),
+    
+    UTILITY_0("utility_0", emptyList()),
+    UTILITY_1("utility_1", emptyList()),
+    UTILITY_2("utility_2", emptyList()),
+    UTILITY_3("utility_3", emptyList()),
+    UTILITY_4("utility_4", emptyList()),
     ;
     
     companion object {

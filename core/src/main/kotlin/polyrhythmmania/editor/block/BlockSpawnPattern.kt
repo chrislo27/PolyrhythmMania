@@ -2,7 +2,6 @@ package polyrhythmmania.editor.block
 
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.BooleanVar
-import paintbox.binding.Var
 import paintbox.ui.contextmenu.CheckBoxMenuItem
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.ui.contextmenu.LabelMenuItem

@@ -6,7 +6,6 @@ import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.EventChangePlaybackSpeed
 import polyrhythmmania.world.EventChangeTexturePack
 import java.util.*
 

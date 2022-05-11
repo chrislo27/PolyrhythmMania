@@ -11,7 +11,8 @@ import polyrhythmmania.world.EventDeployRod
 import java.util.*
 
 
-class BlockDeployRod(engine: Engine) : Block(engine, BlockDeployRod.BLOCK_TYPES) {
+open class BlockDeployRod(engine: Engine, blockTypes: EnumSet<BlockType> = BlockDeployRod.BLOCK_TYPES)
+    : Block(engine, blockTypes) {
     
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.INPUT)

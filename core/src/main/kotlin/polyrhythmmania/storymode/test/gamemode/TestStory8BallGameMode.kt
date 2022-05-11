@@ -1,6 +1,5 @@
 package polyrhythmmania.storymode.test.gamemode
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.Vector3Stack
@@ -11,7 +10,6 @@ import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldType
-import polyrhythmmania.world.entity.EntityCameraFrame
 import java.util.*
 
 

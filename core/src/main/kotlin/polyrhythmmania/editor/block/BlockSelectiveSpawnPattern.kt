@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.block
 
 import com.eclipsesource.json.JsonObject
-import paintbox.binding.Var
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem

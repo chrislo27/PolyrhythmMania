@@ -208,14 +208,14 @@ object Instantiators {
             BlockSelectiveSpawnPattern(engine)
         })
 
-//        add(Instantiator("baselineTest", Var("Baseline Test"), Var("Description baseline test."), Var("[font=prmania_icons]RspladAD[]")) { engine ->
-//            BlockTest(engine)
-//        })
-//        (1..19).forEach { i ->
-//            add(Instantiator("test$i", Var("Test$i"), Var(""), Var("[font=prmania_icons]RspladAD[]")) { engine ->
-//                BlockTest(engine)
-//            })
-//        }
+        // Story Mode instantiators
+        add(CATEGORY_STORYMODE, Instantiator("storyMode_deployRod", BlockDeployRodStoryMode::class.java,
+            ReadOnlyVar.const("Deploy Rod (SM)"),
+            Localization.getVar("instantiator.deployRod.summary"),
+            Localization.getVar("instantiator.deployRod.desc"),
+            BlockDeployRod.BLOCK_TYPES) { engine ->
+            BlockDeployRodStoryMode(engine)
+        })
 
         instantiatorMap = tempMap
         instantiatorList = tempList

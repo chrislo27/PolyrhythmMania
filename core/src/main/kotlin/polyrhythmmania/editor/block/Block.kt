@@ -2,18 +2,14 @@ package polyrhythmmania.editor.block
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.font.TextBlock
-import paintbox.font.TextRun
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.util.MathHelper
-import paintbox.util.gdxutils.drawCompressed
 import paintbox.util.gdxutils.drawRect
 import paintbox.util.gdxutils.fillRect
-import paintbox.util.gdxutils.scaleMul
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.track.EditorTrackArea
