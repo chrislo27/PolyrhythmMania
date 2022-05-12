@@ -139,7 +139,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 //            }
 
             vbox += createButton(binding = {// TODO remove me, test story mode gimmicks
-                "DEBUG Test Story Mode gimmicks"
+                "TEST: Story Mode debug screen"
             }).apply {
                 this.setOnAction {
                     mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
