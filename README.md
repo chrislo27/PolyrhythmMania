@@ -41,14 +41,14 @@ are used, since the same underlying graphics library (GLFW with OpenGL 4.4) is u
 * GPU (Integrated): Intel HD Graphics 4000 (Ivy Bridge) or AMD Radeon R5 series (Kaveri line) with OpenGL 4.4
 * GPU (Discrete): NVIDIA GeForce 400 Series or AMD Radeon HD 7000 series with OpenGL 4.4 
 * HDD: At least 1GB for game and levels 
-* OS: Windows 7 and up, Linux 64-bit distributions from 2014 onwards
+* OS: Windows 7 and up, Linux 64-bit distributions from 2018 onwards
 
 ### Recommended requirements
 * CPU: Intel Core i5-4690 3.5GHz / AMD A10-7800 APU 3.5 GHz or equivalent 
 * RAM: 8GB 
 * GPU: NVIDIA GeForce 700 Series or AMD Radeon Rx 200 Series (excluding integrated chipsets) with OpenGL 4.5 
 * HDD: 2GB (SSD is recommended) 
-* OS: Windows 10 and newer (*strongly* recommended to be 64-bit!), Linux 64-bit distributions from 2014 onwards 
+* OS: Windows 10 and newer (*strongly* recommended to be 64-bit!), Linux 64-bit distributions from 2018 onwards (rec. Ubuntu 18.04) 
 
 ## Installation instructions
 These instructions are the same if you're downloading the game for the first time or upgrading to a new version.
