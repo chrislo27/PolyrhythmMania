@@ -2,12 +2,22 @@ package polyrhythmmania.init
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.Viewport
+import paintbox.binding.FloatVar
 import paintbox.registry.AssetRegistry
-import paintbox.util.gdxutils.drawRect
-import paintbox.util.gdxutils.fillRect
+import paintbox.ui.Anchor
+import paintbox.ui.Pane
+import paintbox.ui.SceneRoot
+import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
+import paintbox.ui.element.RectElement
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.ui.LoadingIconRod
 
 class AssetRegistryLoadingScreen(main: PRManiaGame)
     : PRManiaScreen(main) {
@@ -22,6 +32,10 @@ class AssetRegistryLoadingScreen(main: PRManiaGame)
     private val camera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
     }
+    private val uiViewport: Viewport = FitViewport(camera.viewportWidth, camera.viewportHeight, camera)
+    private val sceneRoot: SceneRoot = SceneRoot(uiViewport)
+    
+    private val loadingBarProgress: FloatVar = FloatVar(0f)
 
     /**
      * Called at the very start of loading.
@@ -40,6 +54,24 @@ class AssetRegistryLoadingScreen(main: PRManiaGame)
     var nextScreenProducer: (() -> Screen?) = { null }
 
     private var substate: Substate = Substate.BEFORE_START
+    
+    init {
+        this.sceneRoot += Pane().apply { 
+            this.bounds.width.set(960f)
+            this.bounds.height.set(36f)
+            Anchor.BottomCentre.configure(this, offsetY = -64f)
+            
+            val borderColor = Color.WHITE
+            val borderSize = 4f
+            this.border.set(Insets(borderSize))
+            this.borderStyle.set(SolidBorder(borderColor))
+            this.padding.set(Insets(borderSize))
+            
+            this += RectElement(borderColor).apply { 
+                this.bindWidthToParent(multiplierBinding = { loadingBarProgress.use() }) { 0f }
+            }
+        }
+    }
 
     override fun render(delta: Float) {
         if (substate == Substate.BEFORE_START) {
@@ -51,27 +83,22 @@ class AssetRegistryLoadingScreen(main: PRManiaGame)
             substate = Substate.LOADING_ASSETS
             0f
         } else AssetRegistry.load(delta)
+        this.loadingBarProgress.set(progress)
 
         // Start of rendering -------------------------------------------------------------------------------------
-        val cam = camera
-        val batch = main.batch
-        batch.projectionMatrix = cam.combined
-
-        val viewportWidth = cam.viewportWidth
-        val viewportHeight = cam.viewportHeight
-        val width = 960f
-        val height = 24f
-        val line = height / 8f
-        val x = viewportWidth * 0.5f - width * 0.5f
-        val y = 64f
-
-        batch.begin()
-        batch.setColor(1f, 1f, 1f, 1f)
-        batch.fillRect(x, y, width * progress, height)
-        batch.drawRect(x - line * 2, y - line * 2, width + (line * 4), height + (line * 4), line)
-        batch.end()
-
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        
         super.render(delta)
+        
+        val batch = main.batch
+        val camera = this.camera
+        batch.projectionMatrix = camera.combined
+        batch.begin()
+
+        sceneRoot.renderAsRoot(batch)
+
+        batch.end()
 
         // End of rendering ---------------------------------------------------------------------------------------
 
@@ -87,6 +114,11 @@ class AssetRegistryLoadingScreen(main: PRManiaGame)
                 }
             }
         }
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        uiViewport.update(width, height)
     }
 
     override fun dispose() {
