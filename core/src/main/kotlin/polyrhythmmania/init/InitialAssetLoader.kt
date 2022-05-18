@@ -179,5 +179,8 @@ class InitialAssetLoader : IAssetLoader {
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
+        AssetRegistry.bindAsset("loading_icon_rod", "textures/loading/rod_loading.png").let { (key, filename) ->
+            assets[key] = Texture(filename)
+        }
     }
 }

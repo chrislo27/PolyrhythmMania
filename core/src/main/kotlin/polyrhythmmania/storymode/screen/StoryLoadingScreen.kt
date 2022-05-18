@@ -1,10 +1,14 @@
 package polyrhythmmania.storymode.screen
 
 import paintbox.Paintbox
+import paintbox.ui.Anchor
+import paintbox.ui.Pane
+import paintbox.ui.area.Insets
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.screen.SimpleLoadingScreen
 import polyrhythmmania.solitaire.SolitaireAssets
 import polyrhythmmania.storymode.StoryAssets
+import polyrhythmmania.ui.LoadingIconRod
 
 
 class StoryLoadingScreen(main: PRManiaGame, val unload: Boolean, val doAfterLoad: () -> Unit)
@@ -15,7 +19,18 @@ class StoryLoadingScreen(main: PRManiaGame, val unload: Boolean, val doAfterLoad
     private var alreadyRanAfterLoad: Boolean = false
     
     init {
-        this.textLabelLoading.font.set(main.fontArvo)
+        this.textLabelLoading.text.set("")
+        
+        val pane = Pane().apply {
+            this.margin.set(Insets(32f))
+
+            this += LoadingIconRod().apply {
+                this.bounds.height.set(64f)
+                Anchor.BottomRight.configure(this)
+                this.bindWidthToSelfHeight(multiplier = 192f / 128f)
+            }
+        }
+        this.sceneRoot += pane
     }
     
     override fun render(delta: Float) {
