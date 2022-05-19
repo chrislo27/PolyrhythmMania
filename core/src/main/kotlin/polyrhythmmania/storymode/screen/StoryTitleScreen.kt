@@ -22,6 +22,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
+import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.storymode.StoryAssets
@@ -41,11 +42,11 @@ class StoryTitleScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
-    val savefiles: List<StorySavefile.SavefileLoaded> = (1..3).map(StorySavefile.Companion::attemptLoad)
+    val savefiles: List<StorySavefile.LoadedState> = (1..3).map(StorySavefile.Companion::attemptLoad)
     
     init {
         // FIXME
-        sceneRoot += RectElement(Color(1f, 165f / 255f, 0.5f, 1f)).apply { 
+        sceneRoot += RectElement(PRManiaColors.debugColor).apply { 
             this += ColumnarPane(listOf(5, 5), true).apply {
                 this.spacing.set(48f)
                 this.columnBoxes.forEach { pane ->
@@ -65,6 +66,13 @@ class StoryTitleScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             pane += Button("File ${savefile.number}\n\n${savefile.javaClass.simpleName}").apply {
                                 Anchor.Centre.configure(this)
                                 this.bindWidthToSelfHeight()
+                                if (savefile is StorySavefile.LoadedState.FailedToLoad) {
+                                    this.disabled.set(true)
+                                }
+                                
+                                this.setOnAction { 
+                                    
+                                }
                             }
                         }
                     }

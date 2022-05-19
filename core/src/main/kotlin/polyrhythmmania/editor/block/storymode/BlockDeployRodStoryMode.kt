@@ -1,4 +1,4 @@
-package polyrhythmmania.editor.block
+package polyrhythmmania.editor.block.storymode
 
 import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.JsonObject
@@ -12,17 +12,18 @@ import paintbox.ui.control.DecimalTextField
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.DecimalFormats
-import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.block.BlockDeployRod
+import polyrhythmmania.editor.block.BlockType
+import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.EventDeployRodStoryMode
 import polyrhythmmania.world.entity.EntityRodDecor
 import java.util.*
 
 
-class BlockDeployRodStoryMode(engine: Engine, blockTypes: EnumSet<BlockType> = BlockDeployRod.BLOCK_TYPES)
+class BlockDeployRodStoryMode(engine: Engine, blockTypes: EnumSet<BlockType> = BLOCK_TYPES)
     : BlockDeployRod(engine, blockTypes) {
 
     var xUnitsPerBeat: Float = 2f

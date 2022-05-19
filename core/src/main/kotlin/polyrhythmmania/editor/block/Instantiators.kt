@@ -3,6 +3,9 @@ package polyrhythmmania.editor.block
 import paintbox.binding.ReadOnlyVar
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.EditorSpecialFlags
+import polyrhythmmania.editor.block.storymode.BlockDeployRodStoryMode
+import polyrhythmmania.editor.block.storymode.BlockMemoStoryMode
+import polyrhythmmania.editor.block.storymode.BlockSpawnPatternStoryMode
 import polyrhythmmania.engine.Engine
 import java.util.*
 
@@ -209,18 +212,25 @@ object Instantiators {
         })
 
         // Story Mode instantiators
+        add(CATEGORY_STORYMODE, Instantiator("storyMode_memo", BlockMemoStoryMode::class.java,
+                ReadOnlyVar.const("Memo (SM)"),
+                ReadOnlyVar.const("A block for storing a comment string."),
+                ReadOnlyVar.const("This block does not affect the game.\n\nIt only serves as a comment block.\n\nYou can put up to two separate strings."),
+                BlockMemoStoryMode.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
+            BlockMemoStoryMode(engine)
+        })
         add(CATEGORY_STORYMODE, Instantiator("storyMode_deployRod", BlockDeployRodStoryMode::class.java,
-            ReadOnlyVar.const("Deploy Rod (SM)"),
-            Localization.getVar("instantiator.deployRod.summary"),
-            Localization.getVar("instantiator.deployRod.desc"),
-            BlockDeployRod.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
+                ReadOnlyVar.const("Deploy Rod (SM)"),
+                Localization.getVar("instantiator.deployRod.summary"),
+                Localization.getVar("instantiator.deployRod.desc"),
+                BlockDeployRod.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
             BlockDeployRodStoryMode(engine)
         })
         add(CATEGORY_STORYMODE, Instantiator("storyMode_spawnPattern", BlockSpawnPatternStoryMode::class.java,
-            ReadOnlyVar.const("Spawn Pattern (SM)"),
-            Localization.getVar("instantiator.spawnPattern.summary"),
-            Localization.getVar("instantiator.spawnPattern.desc"),
-            BlockSpawnPattern.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
+                ReadOnlyVar.const("Spawn Pattern (SM)"),
+                Localization.getVar("instantiator.spawnPattern.summary"),
+                Localization.getVar("instantiator.spawnPattern.desc"),
+                BlockSpawnPattern.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
             BlockSpawnPatternStoryMode(engine)
         })
 

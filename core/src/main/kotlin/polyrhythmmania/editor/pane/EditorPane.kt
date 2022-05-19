@@ -18,10 +18,12 @@ import paintbox.ui.element.RectElement
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.Palette
 import polyrhythmmania.editor.help.HelpDialog
 import polyrhythmmania.editor.pane.dialog.*
 import polyrhythmmania.editor.pane.track.AllTracksPane
+import polyrhythmmania.storymode.test.TestStoryGimmickDebugScreen
 import polyrhythmmania.ui.DialogPane
 import kotlin.math.roundToInt
 
@@ -106,7 +108,13 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
 
     init {
         musicDialog = MusicDialog(this)
-        exitConfirmDialog = ExitConfirmDialog(this)
+        exitConfirmDialog = ExitConfirmDialog(this) {
+            if (EditorSpecialFlags.STORY_MODE in editor.flags) {
+                TestStoryGimmickDebugScreen(main)
+            } else {
+                main.mainMenuScreen.prepareShow(doFlipAnimation = true)
+            }
+        }
         editorSettingsDialog = EditorSettingsDialog(this)
         helpDialog = HelpDialog(this)
         saveDialog = SaveDialog(this)

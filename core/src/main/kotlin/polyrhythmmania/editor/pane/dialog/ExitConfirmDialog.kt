@@ -1,6 +1,7 @@
 package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.font.TextAlign
@@ -18,7 +19,7 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.BasicDialog
 
 
-class ExitConfirmDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
+class ExitConfirmDialog(editorPane: EditorPane, val quitToScreen: () -> Screen?) : EditorDialog(editorPane) {
 
     init {
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.exit.title").use() }
@@ -61,7 +62,7 @@ class ExitConfirmDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 val main = main
                 val currentScreen = main.screen
                 Gdx.app.postRunnable {
-                    val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
+                    val mainMenu = quitToScreen()
                     main.screen = TransitionScreen(main, currentScreen, mainMenu,
                             FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply { 
                         this.onEntryEnd = {

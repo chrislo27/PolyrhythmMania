@@ -27,6 +27,7 @@ import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.screen.StoryLoadingScreen
+import polyrhythmmania.storymode.screen.StoryTitleScreen
 import polyrhythmmania.storymode.test.gamemode.TestStory8BallGameMode
 import polyrhythmmania.storymode.test.gamemode.TestStoryAcesOnlyGameMode
 import polyrhythmmania.storymode.test.gamemode.TestStoryGameMode
@@ -82,6 +83,17 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                                 val editorScreen = EditorScreen(main, EnumSet.of(EditorSpecialFlags.STORY_MODE))
                                 main.screen = TransitionScreen(main, main.screen, editorScreen,
                                     FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
+                    this += separator()
+                    this += Button("Story Mode file select").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            Gdx.app.postRunnable {
+                                val titleScreen = StoryTitleScreen(main)
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
                         }
                     }

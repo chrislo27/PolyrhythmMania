@@ -1,4 +1,4 @@
-package polyrhythmmania.editor.block
+package polyrhythmmania.editor.block.storymode
 
 import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.JsonObject
@@ -12,8 +12,8 @@ import paintbox.ui.control.DecimalTextField
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.DecimalFormats
-import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.block.BlockSpawnPattern
 import polyrhythmmania.engine.Engine
 
 

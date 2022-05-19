@@ -32,26 +32,26 @@ class StorySavefile private constructor(val saveNumber: Int) {
             }
         }
         
-        fun attemptLoad(saveNumber: Int): SavefileLoaded {
+        fun attemptLoad(saveNumber: Int): LoadedState {
             return try {
                 val s = StorySavefile(saveNumber)
                 if (s.doesSavefileExist()) {
                     s.loadFromStorageLoc()
-                    SavefileLoaded.Loaded(saveNumber, s)
+                    LoadedState.Loaded(saveNumber, s)
                 } else {
-                    SavefileLoaded.NoSavefile(saveNumber, s)
+                    LoadedState.NoSavefile(saveNumber, s)
                 }
             } catch (e: Exception) {
                 Paintbox.LOGGER.error("Failed to load story mode savefile $saveNumber", throwable = e)
-                SavefileLoaded.FailedToLoad(saveNumber, e)
+                LoadedState.FailedToLoad(saveNumber, e)
             }
         }
     }
 
-    sealed class SavefileLoaded(val number: Int) {
-        class NoSavefile(number: Int, val blankFile: StorySavefile) : SavefileLoaded(number)
-        class FailedToLoad(number: Int, val exception: Exception) : SavefileLoaded(number)
-        class Loaded(number: Int, val savefile: StorySavefile) : SavefileLoaded(number)
+    sealed class LoadedState(val number: Int) {
+        class NoSavefile(number: Int, val blankFile: StorySavefile) : LoadedState(number)
+        class FailedToLoad(number: Int, val exception: Exception) : LoadedState(number)
+        class Loaded(number: Int, val savefile: StorySavefile) : LoadedState(number)
     }
     
 
@@ -75,7 +75,6 @@ class StorySavefile private constructor(val saveNumber: Int) {
         if (!doesSavefileExist()) {
             return // No file. Treat as new.
         }
-
         // May throw any exception if something fails to load.
         
         val str = storageLoc.readString("UTF-8")
@@ -97,11 +96,11 @@ class StorySavefile private constructor(val saveNumber: Int) {
     }
     
     private fun toJson(obj: JsonObject) {
-        // TODO write data
         obj.add("save_file_version", SAVE_FILE_VERSION)
         obj.add("game_version", PRMania.VERSION.toString())
         
         obj.add("play_time", playTime.value.get())
+        // TODO write data
     }
     
 }
