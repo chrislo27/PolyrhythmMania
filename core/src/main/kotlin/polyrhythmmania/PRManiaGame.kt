@@ -59,6 +59,7 @@ import polyrhythmmania.solitaire.SolitaireAssets
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.storymode.StoryAssetLoader
 import polyrhythmmania.storymode.StoryAssets
+import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
@@ -222,7 +223,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         if (PRMania.logMissingLocalizations) {
             Localization.logMissingLocalizations()
             EditorHelpLocalization.logMissingLocalizations()
+            UpdateNotesL10N.logMissingLocalizations()
             AchievementsL10N.logMissingLocalizations()
+            StoryL10N.logMissingLocalizations()
             
             // Check for missing localizations in statistics and achievement names/descs
             val testInt = IntVar(42)
