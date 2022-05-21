@@ -17,8 +17,10 @@ class StorySavefile private constructor(val saveNumber: Int) {
         const val NUM_FILES: Int = 3
         const val SAVE_FILE_VERSION: Int = 0
         
-        fun newSaveFile(saveNumber: Int): StorySavefile {
-            return StorySavefile(saveNumber)
+        fun newSaveFile(saveNumber: Int, disableSaving: Boolean = false): StorySavefile {
+            return StorySavefile(saveNumber).apply { 
+                this.disableSaving = disableSaving
+            }
         }
         
         fun loadFromSave(saveNumber: Int): StorySavefile? {
@@ -56,6 +58,11 @@ class StorySavefile private constructor(val saveNumber: Int) {
     
 
     val storageLoc: FileHandle by lazy { FileHandle(PRMania.MAIN_FOLDER.resolve("prefs/storymode_save_${saveNumber}.json")) }
+
+    /**
+     * Disables saving. The [persist] function will not do anything if true.
+     */
+    var disableSaving: Boolean = false
     
     
     val playTime: Stat = Stat("storyModePlayTime", DurationStatFormatter.DEFAULT)
@@ -86,6 +93,7 @@ class StorySavefile private constructor(val saveNumber: Int) {
     }
     
     fun persist() {
+        if (disableSaving) return
         try {
             storageLoc.writeString(Json.`object`().also { obj ->
                 toJson(obj)
