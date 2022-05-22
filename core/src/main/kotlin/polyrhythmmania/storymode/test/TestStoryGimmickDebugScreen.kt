@@ -26,6 +26,9 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.storymode.StoryMode
+import polyrhythmmania.storymode.StorySavefile
+import polyrhythmmania.storymode.screen.StoryContractsScreen
 import polyrhythmmania.storymode.screen.StoryLoadingScreen
 import polyrhythmmania.storymode.screen.StoryTitleScreen
 import polyrhythmmania.storymode.test.gamemode.TestStory8BallGameMode
@@ -96,6 +99,17 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
                         }
+                    }
+                    this += Button("Contracts screen with new, unsaveable save file").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            Gdx.app.postRunnable {
+                                val titleScreen = StoryContractsScreen(main, StoryMode(StorySavefile.newSaveFile(999, disableSaving = true)))
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                        this.disabled.set(true)
                     }
                     this += separator()
                     this += Button("Polyrhythm 2 no changes").apply {

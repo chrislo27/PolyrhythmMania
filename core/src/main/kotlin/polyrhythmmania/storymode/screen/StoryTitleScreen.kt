@@ -32,7 +32,6 @@ import polyrhythmmania.storymode.StorySavefile
 
 class StoryTitleScreen(main: PRManiaGame) : PRManiaScreen(main) {
     
-    
     val batch: SpriteBatch = main.batch
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
