@@ -8,10 +8,10 @@ data class Contract(
 
         val name: ReadOnlyVar<String>,
         val desc: ReadOnlyVar<String>,
-        
+
         val conditions: List<Condition>,
 
         val fpPrereq: Int,
         val fpReward: Int,
-        val prereqs: Set<Prereq> = emptySet(),
+        val otherPrereqs: Set<Prereq> = emptySet(),
 )
