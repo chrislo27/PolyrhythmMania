@@ -182,6 +182,7 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
         add(TilesetRegion.create("asm_widget_complete", regionMap.getOrNull("asm_widget_complete")))
         add(TilesetRegion.create("asm_widget_complete_blur", regionMap.getOrNull("asm_widget_complete_blur")))
         add(TilesetRegion.create("asm_widget_roll", regionMap.getOrNull("asm_widget_roll")))
+        add(TilesetRegion.create("asm_widget_roll_test", regionMap.getOrNull("asm_widget_roll_test")))
     }
     
 }
