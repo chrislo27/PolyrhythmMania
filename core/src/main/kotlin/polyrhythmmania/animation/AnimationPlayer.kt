@@ -18,8 +18,9 @@ class AnimationPlayer(val animation: Animation) {
     private var currentStepIndex: Int = 0
     private var currentStepFrameOffset: Int = 0
     
-    val framesPerSec: FloatVar = FloatVar(30f)
+    val framesPerSec: FloatVar = FloatVar(animation.framesPerSecond)
     val secondsPerFrame: ReadOnlyFloatVar = FloatVar { 1f / framesPerSec.use() }
+    val speedMultiplier: FloatVar = FloatVar(1f)
     
     
     fun reset() {
@@ -39,6 +40,8 @@ class AnimationPlayer(val animation: Animation) {
         currentStepFrameOffset = 0
         lookupCurrentStep(frame)
     }
+    
+    fun getCurrentStep(): Step = animation.steps[currentStepIndex]
 
     /**
      * Looks up the current step info from the beginning of the step list.
@@ -47,7 +50,7 @@ class AnimationPlayer(val animation: Animation) {
         var counter = 0
         for ((index, step) in animation.steps.withIndex()) {
             counter += step.delay
-            if (counter > frame) {
+            if (counter > frame || index == animation.steps.size - 1) {
                 currentStepIndex = index
                 currentStepFrameOffset = counter - frame
                 break
@@ -57,7 +60,7 @@ class AnimationPlayer(val animation: Animation) {
     
     fun update(deltaSec: Float) {
         val secPerFrame = secondsPerFrame.get()
-        secCounter += deltaSec
+        secCounter += deltaSec * speedMultiplier.get()
         
         if (secCounter > secPerFrame) {
             val addFrames = (secCounter / secPerFrame).toInt()
