@@ -7,7 +7,6 @@ import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
@@ -28,8 +27,6 @@ class StatisticsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
             this.bindHeightToParent(-40f)
-
-            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
 
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
             this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)

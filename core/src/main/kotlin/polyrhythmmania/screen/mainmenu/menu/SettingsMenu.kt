@@ -1,11 +1,9 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import com.badlogic.gdx.graphics.Color
 import paintbox.Paintbox
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
@@ -25,8 +23,6 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
             this.bindHeightToParent(-40f)
-
-            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
 
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
             this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)

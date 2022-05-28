@@ -132,7 +132,6 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         checklistPane = ScrollPane().apply { 
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
-            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(0f, 0f, 0f, 0f))
             this.vBar.unitIncrement.set(64f)
             this.vBar.blockIncrement.set(100f)
             this.vBar.skinID.set(PRManiaSkins.SCROLLBAR_SKIN)

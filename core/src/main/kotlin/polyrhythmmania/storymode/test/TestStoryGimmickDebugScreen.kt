@@ -14,6 +14,7 @@ import paintbox.transition.FadeToOpaque
 import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.SceneRoot
+import paintbox.ui.Tooltip
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
@@ -99,17 +100,19 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
                         }
+                        this.disabled.set(true)
+                        this.tooltipElement.set(Tooltip("No functionality yet"))
                     }
-                    this += Button("Contracts screen with new, unsaveable save file").apply {
+                    this += Button("Test contracts screen with everything unlocked").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             Gdx.app.postRunnable {
-                                val titleScreen = StoryContractsScreen(main, StoryMode(StorySavefile.newSaveFile(999, disableSaving = true)))
+                                val savefile = StorySavefile.newSaveFile(999, disableSaving = true)
+                                val titleScreen = TestStoryContractsScreen(main, StoryMode(savefile), this@TestStoryGimmickDebugScreen)
                                 main.screen = TransitionScreen(main, main.screen, titleScreen,
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
                         }
-                        this.disabled.set(true)
                     }
                     this += separator()
                     this += Button("Polyrhythm 2 no changes").apply {

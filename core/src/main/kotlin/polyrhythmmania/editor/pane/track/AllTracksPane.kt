@@ -73,7 +73,6 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
             this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.ALWAYS)
             this.vBar.blockIncrement.set(editorTrackHeight)
             this.vBar.unitIncrement.set(editorTrackHeight)
-            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
             this.border.set(Insets(0f, 2f, 0f, 0f))
             this.borderStyle.set(SolidBorder(Color.WHITE))
         }

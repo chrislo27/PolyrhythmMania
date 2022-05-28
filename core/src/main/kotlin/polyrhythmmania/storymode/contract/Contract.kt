@@ -11,7 +11,5 @@ data class Contract(
 
         val conditions: List<Condition>,
 
-        val fpPrereq: Int,
         val fpReward: Int,
-        val otherPrereqs: Set<Prereq> = emptySet(),
 )

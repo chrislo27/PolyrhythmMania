@@ -87,7 +87,6 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
         val scrollPane: ScrollPane = ScrollPane().apply {
             this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.ALWAYS)
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
-            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(0f, 0f, 0f, 0f))
             this.vBar.unitIncrement.set(64f)
             this.vBar.blockIncrement.set(100f)
             this.vBar.skinID.set(PRManiaSkins.SCROLLBAR_SKIN)

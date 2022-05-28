@@ -1,21 +1,16 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
-import paintbox.Paintbox
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.control.TextLabel
-import paintbox.ui.control.ToggleGroup
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.openFileExplorer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
-import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -30,8 +25,6 @@ class PortableModeWarningMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)
             this.bindHeightToParent(-40f)
-
-            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(1f, 1f, 1f, 0f))
 
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
             this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
