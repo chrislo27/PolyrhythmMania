@@ -803,6 +803,20 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         
         addFontFamily(familyName = "Arvo", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true)
+        cache["Caveat"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/Caveat/Caveat-SemiBold.ttf"), 24, 0f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 24
+                    borderWidth = 0f
+                }).setAfterLoad(defaultAfterLoad)
+        cache["CoveredByYourGrace"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/CoveredByYourGrace/CoveredByYourGrace-Regular.ttf"), 24, 0f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 24
+                    borderWidth = 0f
+                }).setAfterLoad(defaultAfterLoad)
     }
 
 
@@ -815,13 +829,14 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val mainFontBoldBordered: PaintboxFont get() = fontCache["Roboto_BOLD_BORDERED"]
     val mainFontItalicBordered: PaintboxFont get() = fontCache["Roboto_ITALIC_BORDERED"]
     val mainFontBoldItalicBordered: PaintboxFont get() = fontCache["Roboto_BOLD_ITALIC_BORDERED"]
+    val fontRodinFixed: PaintboxFont get() = fontCache["rodin_fixed"]
+    val fontRodinFixedBordered: PaintboxFont get() = fontCache["rodin_fixed_BORDERED"]
+    
     val fontEditorBeatTime: PaintboxFont get() = fontCache["editor_instantiator_summary"] // fontCache["editor_beat_time"]
     val fontEditorBeatTrack: PaintboxFont get() = fontCache["editor_beat_track"]
     val fontEditorMusicScore: PaintboxFont get() = fontCache["editor_music_score"]
     val fontEditorInstantiatorName: PaintboxFont get() = fontCache["editor_instantiator"]
     val fontEditorInstantiatorSummary: PaintboxFont get() = fontCache["editor_instantiator_summary"]
-    val fontRodinFixed: PaintboxFont get() = fontCache["rodin_fixed"]
-    val fontRodinFixedBordered: PaintboxFont get() = fontCache["rodin_fixed_BORDERED"]
     val fontEditorMarker: PaintboxFont get() = fontCache["editor_marker"]
     val fontEditorDialogTitle: PaintboxFont get() = fontCache["editor_dialog_title"]
     
@@ -848,6 +863,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontArvoBoldBordered: PaintboxFont get() = fontCache["Arvo_BOLD_BORDERED"]
     val fontArvoItalicBordered: PaintboxFont get() = fontCache["Arvo_ITALIC_BORDERED"]
     val fontArvoBoldItalicBordered: PaintboxFont get() = fontCache["Arvo_BOLD_ITALIC_BORDERED"]
+    
+    val fontHandwriting1: PaintboxFont get() = fontCache["Caveat"]
+    val fontHandwriting2: PaintboxFont get() = fontCache["CoveredByYourGrace"]
 
     
     private fun generateColourPickerTextures() {
