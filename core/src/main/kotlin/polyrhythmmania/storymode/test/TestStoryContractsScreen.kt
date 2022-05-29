@@ -10,22 +10,30 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import paintbox.ui.Anchor
-import paintbox.ui.Pane
-import paintbox.ui.SceneRoot
+import paintbox.binding.FloatVar
+import paintbox.binding.Var
+import paintbox.font.Markup
+import paintbox.font.TextRun
+import paintbox.ui.*
 import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.control.ScrollPane
+import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
+import paintbox.ui.layout.VBox
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
-import polyrhythmmania.storymode.StoryMode
+import polyrhythmmania.storymode.inbox.InboxFolder
+import polyrhythmmania.storymode.inbox.InboxDB
+import polyrhythmmania.storymode.inbox.InboxItem
+import kotlin.math.sqrt
 
 
-class TestStoryContractsScreen(main: PRManiaGame, val storyMode: StoryMode, val prevScreen: Screen)
+class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
     : PRManiaScreen(main) {
     
     val batch: SpriteBatch = main.batch
@@ -50,18 +58,19 @@ class TestStoryContractsScreen(main: PRManiaGame, val storyMode: StoryMode, val 
             }
         }
         sceneRoot += bg
-        
-        val pane =  Pane().apply { 
+
+        val pane = Pane().apply {
             Anchor.Centre.configure(this)
             this.bounds.width.set(1100f)
             this.bounds.height.set(600f)
         }
         bg += pane
-        val columns = ColumnarPane(3, false).apply {
+        val columns = ColumnarPane(listOf(1, 2), false).apply {
             this.spacing.set(16f)
         }
         pane += columns
         
+        val currentInboxFolder: Var<InboxFolder?> = Var(null)
         columns[0] += RectElement(Color(0f, 0f, 0f, 0.5f)).apply { 
             this += TextLabel("Inbox Tray", font = main.fontMainMenuHeading).apply {
                 this.bounds.height.set(70f)
@@ -76,7 +85,123 @@ class TestStoryContractsScreen(main: PRManiaGame, val storyMode: StoryMode, val 
                 this += ScrollPane().apply { 
                     this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.ALWAYS)
                     this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+                    
+                    this.setContent(VBox().apply { 
+                        this.spacing.set(2f)
+                        this.temporarilyDisableLayouts { 
+                            InboxDB.allFolders.values.forEach { folder ->
+                                this += ActionablePane().apply {
+                                    this.bounds.height.set(48f)
+                                    this += RectElement(Color(1f, 1f, 1f, 0.2f)).apply {
+                                        this.padding.set(Insets(4f))
+                                        this += TextLabel("Folder: ${folder.id}\n1st item: ${folder.firstItem.id} (${folder.firstItem.fpPrereq} FP)").apply {
+                                            this.renderAlign.set(RenderAlign.topLeft)
+                                        }
+                                    }
+                                    this.setOnAction { 
+                                        if (currentInboxFolder.getOrCompute() == folder) {
+                                            currentInboxFolder.set(null)
+                                        } else {
+                                            currentInboxFolder.set(folder)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    })
                 }
+            }
+        }
+        
+        val contentScrollPane = ScrollPane().apply {
+            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.ALWAYS)
+            this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
+            (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(0f, 0f, 0f, 0.5f))
+            this.visible.bind { currentInboxFolder.use() != null }
+        }
+        columns[1] += contentScrollPane
+        
+        fun createInboxItemUI(item: InboxItem): UIElement {
+            return when (item) {
+                is InboxItem.Memo -> {
+                    RectElement(Color.WHITE).apply {
+                        this.doClipping.set(true)
+                        this.border.set(Insets(2f))
+                        this.borderStyle.set(SolidBorder(Color.valueOf("7FC9FF")))
+                        this.bindHeightToParent(multiplier = sqrt(2f))
+                    }
+                }
+                is InboxItem.IndexCard -> {
+                    RectElement(Color.valueOf("FFF9EE")).apply {
+                        this.doClipping.set(true)
+                        this.border.set(Insets(1f))
+                        this.borderStyle.set(SolidBorder(Color.valueOf("E5D58B"))) 
+                        this.bindWidthToParent(multiplier = 0.85f)
+                        this.bindHeightToSelfWidth(multiplier = 3f / 5f)
+                        
+                        // Rules, 1 main red one and 10 light blue ones
+                        val spaces = (1 + 10) + 2
+                        val spacing = 1f / spaces
+                        val red = Color(1f, 0f, 0f, 0.5f)
+                        val blue = Color(0.2f, 0.7f, 1f, 0.5f)
+                        for (i in 0 until (1 + 10)) {
+                            this += RectElement(if (i == 0) red else blue).apply { 
+                                this.bounds.height.set(1.5f)
+                                this.bounds.y.bind { (parent.use()?.contentZone?.height?.use() ?: 0f) * (spacing * (i + 2)) }
+                            }
+                        }
+                        val leftRule = FloatVar { (parent.use()?.contentZone?.width?.use() ?: 0f) * 0.125f }
+                        this += RectElement(red).apply {
+                            this.bounds.width.set(1.5f)
+                            this.bounds.x.bind { leftRule.use() }
+                        }
+                        
+                        this += Pane().apply {
+                            Anchor.BottomRight.configure(this)
+                            this.bindHeightToParent(multiplier = 1f - spacing * 2, adjust = -5f)
+                            this.bindWidthToParent(adjustBinding = { -leftRule.use() })
+                            this.padding.set(Insets(0f, 0f, 3f, 15f))
+                            
+                            this += TextLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis").apply {
+                                this.markup.set(Markup(mapOf(Markup.DEFAULT_FONT_NAME to main.fontHandwriting2),
+                                        TextRun(main.fontHandwriting2, "", lineHeightScale = 0.865f),
+                                        styles = Markup.FontStyles.ALL_USING_DEFAULT_FONT))
+                                this.renderAlign.set(RenderAlign.topLeft)
+                                this.doLineWrapping.set(true)
+                                this.bounds.y.set(3f)
+                            }
+                        }
+                    }
+                }
+                is InboxItem.ContractDoc -> {
+                    RectElement(Color.WHITE).apply {
+                        this.doClipping.set(true) 
+                        this.border.set(Insets(2f))
+                        this.borderStyle.set(SolidBorder(Color.valueOf("7FC9FF")))
+                        this.bindHeightToParent(multiplier = sqrt(2f))
+                    }
+                }
+            }
+        }
+        
+        currentInboxFolder.addListener { varr ->
+            val newChain = varr.getOrCompute()
+            if (newChain != null) {
+                val vbox = VBox().apply { 
+                    this.spacing.set(8f)
+                    this.temporarilyDisableLayouts { 
+                        newChain.items.forEach { item ->
+                            this += createInboxItemUI(item).apply { 
+                                Anchor.TopCentre.xConfigure(this, 0f)
+                            }
+                        }
+                    }
+                }
+                
+                vbox.sizeHeightToChildren()
+                contentScrollPane.setContent(vbox)
+            } else {
+                contentScrollPane.setContent(Pane())
             }
         }
     }

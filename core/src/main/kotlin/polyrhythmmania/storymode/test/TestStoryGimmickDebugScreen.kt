@@ -107,8 +107,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             Gdx.app.postRunnable {
-                                val savefile = StorySavefile.newSaveFile(999, disableSaving = true)
-                                val titleScreen = TestStoryContractsScreen(main, StoryMode(savefile), this@TestStoryGimmickDebugScreen)
+                                val titleScreen = TestStoryContractsScreen(main, this@TestStoryGimmickDebugScreen)
                                 main.screen = TransitionScreen(main, main.screen, titleScreen,
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }

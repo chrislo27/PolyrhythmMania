@@ -4,20 +4,26 @@ package polyrhythmmania.storymode.inbox
 object InboxDB {
     
     val allItems: Map<String, InboxItem>
-    val allChains: Map<String, InboxChain>
+    val allFolders: Map<String, InboxFolder>
 
     init {
         this.allItems = mutableMapOf()
-        this.allChains = mutableMapOf()
+        this.allFolders = mutableMapOf()
 
-        fun add(inboxItem: InboxItem) {
+        fun addItem(inboxItem: InboxItem) {
             this.allItems[inboxItem.id] = inboxItem
         }
-        fun add(chain: InboxChain) {
-            this.allChains[chain.id] = chain
+        fun addFolder(chain: InboxFolder) {
+            this.allFolders[chain.id] = chain
+        }
+        fun buildAndAddFolder(id: String, vararg item: InboxItem): InboxFolder {
+            val chain = InboxFolder(id, item.toList())
+            item.forEach { addItem(it) }
+            addFolder(chain)
+            return chain
         }
 
-        
+        buildAndAddFolder("test_indexcard", InboxItem.IndexCard("test_indexcard", 0))
     }
     
 }
