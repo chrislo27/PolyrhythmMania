@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
 import paintbox.font.TextRun
@@ -222,11 +223,59 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                 }
                 is InboxItem.ContractDoc -> {
                     RectElement(Color.WHITE).apply {
-                        this.doClipping.set(true) 
+                        this.doClipping.set(true)
                         this.border.set(Insets(2f))
                         this.borderStyle.set(SolidBorder(Color.valueOf("7FC9FF")))
-                        this.bindWidthToParent(multiplier = 0.85f)
-                        this.bindHeightToSelfWidth(multiplier = sqrt(2f))
+                        this.bindWidthToSelfHeight(multiplier = 1f / sqrt(2f))
+
+                        this.padding.set(Insets(16f))
+
+                        this += VBox().apply {
+                            this.spacing.set(6f)
+                            this.temporarilyDisableLayouts {
+                                this += TextLabel(ReadOnlyVar.const("Letterhead"), font = main.fontMainMenuHeading).apply {
+                                    this.bounds.height.set(40f)
+                                    this.textColor.set(Color.BLACK)
+                                    this.renderAlign.set(Align.top)
+                                    this.padding.set(Insets(0f, 8f, 0f, 8f))
+                                }
+                                this += RectElement(Color.BLACK).apply {
+                                    this.bounds.height.set(2f)
+                                }
+                                this += ColumnarPane(3, true).apply {
+                                    this.bounds.height.set(28f * 3)
+                                    listOf("title", "requester", "reward").forEachIndexed { index, type ->
+                                        this[index] += Pane().apply {
+                                            this.margin.set(Insets(2f))
+                                            this += TextLabel(StoryL10N.getVar("inboxItem.contract.${type}"), font = main.robotoFontBold).apply {
+                                                this.textColor.set(Color.BLACK)
+                                                this.renderAlign.set(Align.right)
+                                                this.padding.set(Insets(2f, 2f, 0f, 4f))
+                                                this.bounds.width.set(90f)
+                                            }
+                                            this += TextLabel("Test $type field", font = main.fontSlab).apply {
+                                                this.textColor.set(Color.BLACK)
+                                                this.renderAlign.set(Align.left)
+                                                this.padding.set(Insets(2f, 2f, 4f, 10f))
+                                                this.bounds.x.set(90f)
+                                                this.bindWidthToParent(adjust = -90f)
+                                            }
+                                        }
+                                    }
+                                }
+                                this += RectElement(Color.BLACK).apply {
+                                    this.bounds.height.set(2f)
+                                }
+
+                                this += TextLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error", font = main.fontSlab).apply {
+                                    this.textColor.set(Color.BLACK)
+                                    this.renderAlign.set(Align.topLeft)
+                                    this.padding.set(Insets(4f, 0f, 0f, 0f))
+                                    this.bounds.height.set(400f)
+                                    this.doLineWrapping.set(true)
+                                }
+                            }
+                        }
                     }
                 }
             }

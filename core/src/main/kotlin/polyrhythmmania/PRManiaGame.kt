@@ -25,6 +25,7 @@ import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.*
+import paintbox.i18n.LocalizationBase
 import paintbox.logging.Logger
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -134,7 +135,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun create() {
         super.create()
         PRManiaGame.instance = this
-        this.reloadableLocalizationInstances = listOf(Localization, EditorHelpLocalization, AchievementsL10N, UpdateNotesL10N)
+        this.reloadableLocalizationInstances = listOf(Localization, EditorHelpLocalization, AchievementsL10N, UpdateNotesL10N, StoryL10N)
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
 //        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
@@ -221,11 +222,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         })
         
         if (PRMania.logMissingLocalizations) {
-            Localization.logMissingLocalizations()
-            EditorHelpLocalization.logMissingLocalizations()
-            UpdateNotesL10N.logMissingLocalizations()
-            AchievementsL10N.logMissingLocalizations()
-            StoryL10N.logMissingLocalizations()
+            this.reloadableLocalizationInstances.forEach(LocalizationBase::logMissingLocalizations)
             
             // Check for missing localizations in statistics and achievement names/descs
             val testInt = IntVar(42)
