@@ -1,5 +1,8 @@
 package polyrhythmmania.storymode.inbox
 
+import paintbox.binding.ReadOnlyVar
+import polyrhythmmania.storymode.contract.Contract
+
 
 object InboxDB {
     
@@ -24,6 +27,8 @@ object InboxDB {
         }
 
         buildAndAddFolder("test_indexcard", InboxItem.IndexCard("test_indexcard", 0))
+        buildAndAddFolder("test_memo", InboxItem.Memo("test_memo", 100))
+        buildAndAddFolder("test_contract", InboxItem.ContractDoc(Contract("test_contract", ReadOnlyVar.const("Test Contract"), ReadOnlyVar.const("Test contract desc"), listOf(), 100), 0))
     }
     
 }

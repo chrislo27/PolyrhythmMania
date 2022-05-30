@@ -27,6 +27,7 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.inbox.InboxFolder
 import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
@@ -128,7 +129,53 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                         this.doClipping.set(true)
                         this.border.set(Insets(2f))
                         this.borderStyle.set(SolidBorder(Color.valueOf("7FC9FF")))
-                        this.bindHeightToParent(multiplier = sqrt(2f))
+                        this.bindWidthToSelfHeight(multiplier = 1f / sqrt(2f))
+                        
+                        this.padding.set(Insets(16f))
+                        
+                        this += VBox().apply { 
+                            this.spacing.set(6f)
+                            this.temporarilyDisableLayouts {
+                                this += TextLabel(StoryL10N.getVar("inboxItem.memo.title"), font = main.fontMainMenuHeading).apply {
+                                    this.bounds.height.set(40f)
+                                    this.textColor.set(Color.BLACK)
+                                    this.renderAlign.set(Align.topLeft)
+                                    this.padding.set(Insets(0f, 8f, 0f, 8f))
+                                }
+                                this += ColumnarPane(3, true).apply {
+                                    this.bounds.height.set(32f * 3)
+                                    listOf("to", "from", "subject").forEachIndexed { index, type ->
+                                        this[index] += Pane().apply {
+                                            this.margin.set(Insets(2f))
+                                            this += TextLabel(StoryL10N.getVar("inboxItem.memo.${type}"), font = main.robotoFontBold).apply {
+                                                this.textColor.set(Color.BLACK)
+                                                this.renderAlign.set(Align.left)
+                                                this.padding.set(Insets(2f, 2f, 0f, 10f))
+                                                this.bounds.width.set(90f)
+                                            }
+                                            this += TextLabel("Test $type field", font = main.fontSlab).apply {
+                                                this.textColor.set(Color.BLACK)
+                                                this.renderAlign.set(Align.left)
+                                                this.padding.set(Insets(2f, 2f, 4f, 10f))
+                                                this.bounds.x.set(90f)
+                                                this.bindWidthToParent(adjust = -90f)
+                                            }
+                                        }
+                                    }
+                                }
+                                this += RectElement(Color.BLACK).apply { 
+                                    this.bounds.height.set(2f)
+                                }
+
+                                this += TextLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error", font = main.fontSlab).apply {
+                                    this.textColor.set(Color.BLACK)
+                                    this.renderAlign.set(Align.topLeft)
+                                    this.padding.set(Insets(4f, 0f, 0f, 0f))
+                                    this.bounds.height.set(400f)
+                                    this.doLineWrapping.set(true)
+                                }
+                            }
+                        }
                     }
                 }
                 is InboxItem.IndexCard -> {
@@ -178,7 +225,8 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                         this.doClipping.set(true) 
                         this.border.set(Insets(2f))
                         this.borderStyle.set(SolidBorder(Color.valueOf("7FC9FF")))
-                        this.bindHeightToParent(multiplier = sqrt(2f))
+                        this.bindWidthToParent(multiplier = 0.85f)
+                        this.bindHeightToSelfWidth(multiplier = sqrt(2f))
                     }
                 }
             }
@@ -198,8 +246,8 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                     }
                 }
                 
-                vbox.sizeHeightToChildren()
                 contentScrollPane.setContent(vbox)
+                vbox.sizeHeightToChildren()
             } else {
                 contentScrollPane.setContent(Pane())
             }

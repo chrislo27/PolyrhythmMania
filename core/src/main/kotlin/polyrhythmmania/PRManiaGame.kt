@@ -803,18 +803,19 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         
         addFontFamily(familyName = "Arvo", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true)
+        addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, fontIDPrefix = "Roboto_scaled", generateBordered = false)
         cache["RobotoSlab"] = PaintboxFontFreeType(
-                PaintboxFontParams(Gdx.files.internal("fonts/RobotoSlab/RobotoSlab-Regular.ttf"), 24, 0f, true, WindowSize(1280, 720)),
+                PaintboxFontParams(Gdx.files.internal("fonts/RobotoSlab/RobotoSlab-Regular.ttf"), 20, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
-                    size = 24
+                    size = 20
                     borderWidth = 0f
                 }).setAfterLoad(defaultAfterLoad)
         cache["RobotoSlab_BOLD"] = PaintboxFontFreeType(
-                PaintboxFontParams(Gdx.files.internal("fonts/RobotoSlab/RobotoSlab-Bold.ttf"), 24, 0f, true, WindowSize(1280, 720)),
+                PaintboxFontParams(Gdx.files.internal("fonts/RobotoSlab/RobotoSlab-Bold.ttf"), 20, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
-                    size = 24
+                    size = 20
                     borderWidth = 0f
                 }).setAfterLoad(defaultAfterLoad)
         cache["Caveat"] = PaintboxFontFreeType(
@@ -877,6 +878,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontArvoBoldBordered: PaintboxFont get() = fontCache["Arvo_BOLD_BORDERED"]
     val fontArvoItalicBordered: PaintboxFont get() = fontCache["Arvo_ITALIC_BORDERED"]
     val fontArvoBoldItalicBordered: PaintboxFont get() = fontCache["Arvo_BOLD_ITALIC_BORDERED"]
+
+    val robotoFont: PaintboxFont get() = fontCache["Roboto_scaled"]
+    val robotoFontBold: PaintboxFont get() = fontCache["Roboto_scaled_BOLD"]
+    val robotoFontItalic: PaintboxFont get() = fontCache["Roboto_scaled_ITALIC"]
+    val robotoFontBoldItalic: PaintboxFont get() = fontCache["Roboto_scaled_BOLD_ITALIC"]
     
     val fontSlab: PaintboxFont get() = fontCache["RobotoSlab"]
     val fontSlabBold: PaintboxFont get() = fontCache["RobotoSlab_BOLD"]
