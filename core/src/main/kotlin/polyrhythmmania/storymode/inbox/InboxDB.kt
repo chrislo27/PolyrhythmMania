@@ -1,6 +1,7 @@
 package polyrhythmmania.storymode.inbox
 
 import paintbox.binding.ReadOnlyVar
+import polyrhythmmania.storymode.contract.Condition
 import polyrhythmmania.storymode.contract.Contract
 
 
@@ -28,7 +29,7 @@ object InboxDB {
 
         buildAndAddFolder("test_indexcard", InboxItem.IndexCard("test_indexcard", 0))
         buildAndAddFolder("test_memo", InboxItem.Memo("test_memo", 100))
-        buildAndAddFolder("test_contract", InboxItem.ContractDoc(Contract("test_contract", ReadOnlyVar.const("Test Contract"), ReadOnlyVar.const("Test contract desc"), listOf(), 100), 0))
+        buildAndAddFolder("test_contract", InboxItem.ContractDoc(Contract("test_contract", ReadOnlyVar.const("Test Contract"), ReadOnlyVar.const("Test contract desc"), listOf(Condition.Debug("Condition 1"), Condition.Debug("Don't get chompulated")), 100), 0))
     }
     
 }

@@ -801,6 +801,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         
         addFontFamily(familyName = "Arvo", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true)
         addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, fontIDPrefix = "Roboto_scaled", generateBordered = false)
+        addFontFamily(familyName = "RobotoMono", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         cache["RobotoSlab"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/RobotoSlab/RobotoSlab-Regular.ttf"), 20, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -880,6 +881,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val robotoFontBold: PaintboxFont get() = fontCache["Roboto_scaled_BOLD"]
     val robotoFontItalic: PaintboxFont get() = fontCache["Roboto_scaled_ITALIC"]
     val robotoFontBoldItalic: PaintboxFont get() = fontCache["Roboto_scaled_BOLD_ITALIC"]
+    val robotoMonoFont: PaintboxFont get() = fontCache["RobotoMono"]
+    val robotoMonoFontBold: PaintboxFont get() = fontCache["RobotoMono_BOLD"]
+    val robotoMonoFontItalic: PaintboxFont get() = fontCache["RobotoMono_ITALIC"]
+    val robotoMonoFontBoldItalic: PaintboxFont get() = fontCache["RobotoMono_BOLD_ITALIC"]
     
     val fontSlab: PaintboxFont get() = fontCache["RobotoSlab"]
     val fontSlabBold: PaintboxFont get() = fontCache["RobotoSlab_BOLD"]

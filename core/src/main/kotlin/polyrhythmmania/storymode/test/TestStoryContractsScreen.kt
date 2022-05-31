@@ -47,6 +47,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
+    private val monoMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.robotoMonoFontBold, Markup.FONT_NAME_ITALIC to main.robotoMonoFontItalic, Markup.FONT_NAME_BOLDITALIC to main.robotoMonoFontBoldItalic), TextRun(main.robotoMonoFont, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     
     init {
         val bg = RectElement(PRManiaColors.debugColor).apply {
@@ -125,6 +126,48 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
         
         fun createInboxItemUI(item: InboxItem): UIElement {
             return when (item) {
+                is InboxItem.IndexCard -> {
+                    RectElement(Color.valueOf("FFF9EE")).apply {
+                        this.doClipping.set(true)
+                        this.border.set(Insets(1f))
+                        this.borderStyle.set(SolidBorder(Color.valueOf("E5D58B")))
+                        this.bindWidthToParent(multiplier = 0.85f)
+                        this.bindHeightToSelfWidth(multiplier = 3f / 5f)
+
+                        // Rules, 1 main red one and 10 light blue ones
+                        val spaces = (1 + 10) + 2
+                        val spacing = 1f / spaces
+                        val red = Color(1f, 0f, 0f, 0.5f)
+                        val blue = Color(0.2f, 0.7f, 1f, 0.5f)
+                        for (i in 0 until (1 + 10)) {
+                            this += RectElement(if (i == 0) red else blue).apply {
+                                this.bounds.height.set(1.5f)
+                                this.bounds.y.bind { (parent.use()?.contentZone?.height?.use() ?: 0f) * (spacing * (i + 2)) }
+                            }
+                        }
+                        val leftRule = FloatVar { (parent.use()?.contentZone?.width?.use() ?: 0f) * 0.125f }
+                        this += RectElement(red).apply {
+                            this.bounds.width.set(1.5f)
+                            this.bounds.x.bind { leftRule.use() }
+                        }
+
+                        this += Pane().apply {
+                            Anchor.BottomRight.configure(this)
+                            this.bindHeightToParent(multiplier = 1f - spacing * 2, adjust = -5f)
+                            this.bindWidthToParent(adjustBinding = { -leftRule.use() })
+                            this.padding.set(Insets(0f, 0f, 3f, 15f))
+
+                            this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc")).apply {
+                                this.markup.set(Markup(mapOf(Markup.DEFAULT_FONT_NAME to main.fontHandwriting2),
+                                        TextRun(main.fontHandwriting2, "", lineHeightScale = 0.865f),
+                                        styles = Markup.FontStyles.ALL_USING_DEFAULT_FONT))
+                                this.renderAlign.set(RenderAlign.topLeft)
+                                this.doLineWrapping.set(true)
+                                this.bounds.y.set(3f)
+                            }
+                        }
+                    }
+                }
                 is InboxItem.Memo -> {
                     RectElement(Color.WHITE).apply {
                         this.doClipping.set(true)
@@ -145,7 +188,8 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                 }
                                 this += ColumnarPane(3, true).apply {
                                     this.bounds.height.set(32f * 3)
-                                    listOf("to", "from", "subject").forEachIndexed { index, type ->
+
+                                    fun addField(index: Int, type: String, valueField: String, valueMarkup: Markup? = null) {
                                         this[index] += Pane().apply {
                                             this.margin.set(Insets(2f))
                                             this += TextLabel(StoryL10N.getVar("inboxItem.memo.${type}"), font = main.robotoFontBold).apply {
@@ -154,69 +198,34 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                                 this.padding.set(Insets(2f, 2f, 0f, 10f))
                                                 this.bounds.width.set(90f)
                                             }
-                                            this += TextLabel("Test $type field", font = main.fontSlab).apply {
+                                            this += TextLabel(valueField, font = main.fontSlab).apply {
                                                 this.textColor.set(Color.BLACK)
                                                 this.renderAlign.set(Align.left)
                                                 this.padding.set(Insets(2f, 2f, 4f, 10f))
                                                 this.bounds.x.set(90f)
                                                 this.bindWidthToParent(adjust = -90f)
+                                                if (valueMarkup != null) {
+                                                    this.markup.set(valueMarkup)
+                                                }
                                             }
                                         }
                                     }
+                                    
+                                    addField(0, "to", StoryL10N.getValue("inboxItemDetails.${item.id}.to"))
+                                    addField(1, "from", StoryL10N.getValue("inboxItemDetails.${item.id}.from"))
+                                    addField(2, "subject", StoryL10N.getValue("inboxItemDetails.${item.id}.subject"))
                                 }
                                 this += RectElement(Color.BLACK).apply { 
                                     this.bounds.height.set(2f)
                                 }
 
-                                this += TextLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error", font = main.fontSlab).apply {
+                                this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc"), font = main.fontSlab).apply {
                                     this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(Align.topLeft)
                                     this.padding.set(Insets(4f, 0f, 0f, 0f))
                                     this.bounds.height.set(400f)
                                     this.doLineWrapping.set(true)
                                 }
-                            }
-                        }
-                    }
-                }
-                is InboxItem.IndexCard -> {
-                    RectElement(Color.valueOf("FFF9EE")).apply {
-                        this.doClipping.set(true)
-                        this.border.set(Insets(1f))
-                        this.borderStyle.set(SolidBorder(Color.valueOf("E5D58B"))) 
-                        this.bindWidthToParent(multiplier = 0.85f)
-                        this.bindHeightToSelfWidth(multiplier = 3f / 5f)
-                        
-                        // Rules, 1 main red one and 10 light blue ones
-                        val spaces = (1 + 10) + 2
-                        val spacing = 1f / spaces
-                        val red = Color(1f, 0f, 0f, 0.5f)
-                        val blue = Color(0.2f, 0.7f, 1f, 0.5f)
-                        for (i in 0 until (1 + 10)) {
-                            this += RectElement(if (i == 0) red else blue).apply { 
-                                this.bounds.height.set(1.5f)
-                                this.bounds.y.bind { (parent.use()?.contentZone?.height?.use() ?: 0f) * (spacing * (i + 2)) }
-                            }
-                        }
-                        val leftRule = FloatVar { (parent.use()?.contentZone?.width?.use() ?: 0f) * 0.125f }
-                        this += RectElement(red).apply {
-                            this.bounds.width.set(1.5f)
-                            this.bounds.x.bind { leftRule.use() }
-                        }
-                        
-                        this += Pane().apply {
-                            Anchor.BottomRight.configure(this)
-                            this.bindHeightToParent(multiplier = 1f - spacing * 2, adjust = -5f)
-                            this.bindWidthToParent(adjustBinding = { -leftRule.use() })
-                            this.padding.set(Insets(0f, 0f, 3f, 15f))
-                            
-                            this += TextLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis").apply {
-                                this.markup.set(Markup(mapOf(Markup.DEFAULT_FONT_NAME to main.fontHandwriting2),
-                                        TextRun(main.fontHandwriting2, "", lineHeightScale = 0.865f),
-                                        styles = Markup.FontStyles.ALL_USING_DEFAULT_FONT))
-                                this.renderAlign.set(RenderAlign.topLeft)
-                                this.doLineWrapping.set(true)
-                                this.bounds.y.set(3f)
                             }
                         }
                     }
@@ -233,7 +242,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                         this += VBox().apply {
                             this.spacing.set(6f)
                             this.temporarilyDisableLayouts {
-                                this += TextLabel(ReadOnlyVar.const("Letterhead"), font = main.fontMainMenuHeading).apply {
+                                this += TextLabel(ReadOnlyVar.const("<Letterhead>"), font = main.fontMainMenuHeading).apply { // TODO replace with proper letterhead
                                     this.bounds.height.set(40f)
                                     this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(Align.top)
@@ -244,7 +253,8 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                 }
                                 this += ColumnarPane(3, true).apply {
                                     this.bounds.height.set(28f * 3)
-                                    listOf("title", "requester", "reward").forEachIndexed { index, type ->
+                                    
+                                    fun addField(index: Int, type: String, valueField: String, valueMarkup: Markup? = null) {
                                         this[index] += Pane().apply {
                                             this.margin.set(Insets(2f))
                                             this += TextLabel(StoryL10N.getVar("inboxItem.contract.${type}"), font = main.robotoFontBold).apply {
@@ -253,26 +263,51 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                                 this.padding.set(Insets(2f, 2f, 0f, 4f))
                                                 this.bounds.width.set(90f)
                                             }
-                                            this += TextLabel("Test $type field", font = main.fontSlab).apply {
+                                            this += TextLabel(valueField, font = main.fontSlab).apply {
                                                 this.textColor.set(Color.BLACK)
                                                 this.renderAlign.set(Align.left)
                                                 this.padding.set(Insets(2f, 2f, 4f, 10f))
                                                 this.bounds.x.set(90f)
                                                 this.bindWidthToParent(adjust = -90f)
+                                                if (valueMarkup != null) {
+                                                    this.markup.set(valueMarkup)
+                                                }
                                             }
                                         }
                                     }
+                                    
+                                    addField(0, "title", item.contract.name.getOrCompute())
+                                    addField(1, "requester", "(TODO) Requester field") // TODO fill in requester name
+                                    addField(2, "reward", StoryL10N.getValue("inboxItem.contract.reward.value", item.contract.fpReward), monoMarkup)
                                 }
                                 this += RectElement(Color.BLACK).apply {
                                     this.bounds.height.set(2f)
                                 }
 
-                                this += TextLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\n\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error", font = main.fontSlab).apply {
+                                this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc"), font = main.fontSlab).apply {
                                     this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(Align.topLeft)
-                                    this.padding.set(Insets(4f, 0f, 0f, 0f))
+                                    this.padding.set(Insets(4f, 4f, 0f, 0f))
                                     this.bounds.height.set(400f)
                                     this.doLineWrapping.set(true)
+                                    this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
+                                }
+
+                                if (item.contract.conditions.isNotEmpty()) {
+                                    this += TextLabel(StoryL10N.getValue("inboxItem.contract.conditions"), font = main.robotoFontBold).apply {
+                                        this.textColor.set(Color.BLACK)
+                                        this.renderAlign.set(Align.bottomLeft)
+                                        this.padding.set(Insets(0f, 6f, 4f, 0f))
+                                        this.bounds.height.set(32f)
+                                    }
+                                    item.contract.conditions.forEach { condition ->
+                                        this += TextLabel("• " + condition.name.getOrCompute(), font = main.fontSlab).apply {
+                                            this.textColor.set(Color.BLACK)
+                                            this.renderAlign.set(Align.left)
+                                            this.padding.set(Insets(2f, 2f, 16f, 0f))
+                                            this.bounds.height.set(20f)
+                                        }
+                                    }
                                 }
                             }
                         }

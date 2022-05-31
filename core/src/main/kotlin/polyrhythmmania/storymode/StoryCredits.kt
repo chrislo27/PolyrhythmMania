@@ -28,6 +28,7 @@ object StoryCredits : CreditsBase() {
                     "Arvo",
                     "Caveat",
                     "Covered By Your Grace",
+                    "Roboto Mono",
                     "Roboto Slab",
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
