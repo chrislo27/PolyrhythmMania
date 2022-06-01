@@ -25,7 +25,6 @@ object StoryCredits : CreditsBase() {
             Localization.getVar("credits.specialThanks") to abcSorted(
                     "", // TODO possibly drop special thanks in favour of more detailed roles for SM
             ).toVars() + listOf(Localization.getVar("credits.projectDonators")) + listOf(
-                    "Arvo",
                     "Caveat",
                     "Covered By Your Grace",
                     "Roboto Mono",

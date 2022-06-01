@@ -799,7 +799,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             font.setFixedWidthGlyphs("0123456789")
         }
         
-        addFontFamily(familyName = "Arvo", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true)
         addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, fontIDPrefix = "Roboto_scaled", generateBordered = false)
         addFontFamily(familyName = "RobotoMono", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         cache["RobotoSlab"] = PaintboxFontFreeType(
@@ -867,15 +866,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontGameGoForPerfect: PaintboxFont get() = fontCache["game_go_for_perfect"]
     val fontResultsMain: PaintboxFont get() = fontCache["results_main"]
     val fontResultsScore: PaintboxFont get() = fontCache["results_score"]
-    
-    val fontArvo: PaintboxFont get() = fontCache["Arvo"]
-    val fontArvoBold: PaintboxFont get() = fontCache["Arvo_BOLD"]
-    val fontArvoItalic: PaintboxFont get() = fontCache["Arvo_ITALIC"]
-    val fontArvoBoldItalic: PaintboxFont get() = fontCache["Arvo_BOLD_ITALIC"]
-    val fontArvoBordered: PaintboxFont get() = fontCache["Arvo_BORDERED"]
-    val fontArvoBoldBordered: PaintboxFont get() = fontCache["Arvo_BOLD_BORDERED"]
-    val fontArvoItalicBordered: PaintboxFont get() = fontCache["Arvo_ITALIC_BORDERED"]
-    val fontArvoBoldItalicBordered: PaintboxFont get() = fontCache["Arvo_BOLD_ITALIC_BORDERED"]
 
     val robotoFont: PaintboxFont get() = fontCache["Roboto_scaled"]
     val robotoFontBold: PaintboxFont get() = fontCache["Roboto_scaled_BOLD"]
