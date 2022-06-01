@@ -807,7 +807,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 20
                     borderWidth = 0f
-                }).setAfterLoad(defaultAfterLoad)
+                }).setAfterLoad { font ->
+            defaultAfterLoad.invoke(this, font)
+            font.data.blankLineScale = 0.25f
+        }
         cache["RobotoSlab_BOLD"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/RobotoSlab/RobotoSlab-Bold.ttf"), 20, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {

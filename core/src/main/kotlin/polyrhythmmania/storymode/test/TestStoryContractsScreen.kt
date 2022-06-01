@@ -48,6 +48,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
     private val monoMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.robotoMonoFontBold, Markup.FONT_NAME_ITALIC to main.robotoMonoFontItalic, Markup.FONT_NAME_BOLDITALIC to main.robotoMonoFontBoldItalic), TextRun(main.robotoMonoFont, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
+    private val slabMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.fontSlabBold), TextRun(main.fontSlab, ""), Markup.FontStyles(Markup.FONT_NAME_BOLD, Markup.DEFAULT_FONT_NAME, Markup.DEFAULT_FONT_NAME))
     
     init {
         val bg = RectElement(PRManiaColors.debugColor).apply {
@@ -92,10 +93,15 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                     this.setContent(VBox().apply { 
                         this.spacing.set(2f)
                         this.temporarilyDisableLayouts { 
-                            InboxDB.allFolders.values.forEach { folder ->
+                            InboxDB.allFolders.values.sortedBy { it.firstItem.fpPrereq }.forEach { folder ->
                                 this += ActionablePane().apply {
                                     this.bounds.height.set(48f)
-                                    this += RectElement(Color(1f, 1f, 1f, 0.2f)).apply {
+                                    this += RectElement().apply {
+                                        this.color.bind { 
+                                            if (currentInboxFolder.use() == folder) {
+                                                Color(0f, 1f, 1f, 0.2f)
+                                            } else Color(1f, 1f, 1f, 0.2f)
+                                        }
                                         this.padding.set(Insets(4f))
                                         this += TextLabel("Folder: ${folder.id}\n1st item: ${folder.firstItem.id} (${folder.firstItem.fpPrereq} FP)").apply {
                                             this.renderAlign.set(RenderAlign.topLeft)
@@ -117,7 +123,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
         }
         
         val contentScrollPane = ScrollPane().apply {
-            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.ALWAYS)
+            this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.AS_NEEDED)
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
             (this.skin.getOrCompute() as ScrollPaneSkin).bgColor.set(Color(0f, 0f, 0f, 0.5f))
             this.visible.bind { currentInboxFolder.use() != null }
@@ -173,6 +179,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                         this.doClipping.set(true)
                         this.border.set(Insets(2f))
                         this.borderStyle.set(SolidBorder(Color.valueOf("7FC9FF")))
+                        this.bounds.height.set(600f)
                         this.bindWidthToSelfHeight(multiplier = 1f / sqrt(2f))
                         
                         this.padding.set(Insets(16f))
@@ -201,7 +208,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                             this += TextLabel(valueField, font = main.fontSlab).apply {
                                                 this.textColor.set(Color.BLACK)
                                                 this.renderAlign.set(Align.left)
-                                                this.padding.set(Insets(2f, 2f, 4f, 10f))
+                                                this.padding.set(Insets(2f, 2f, 4f, 0f))
                                                 this.bounds.x.set(90f)
                                                 this.bindWidthToParent(adjust = -90f)
                                                 if (valueMarkup != null) {
@@ -219,10 +226,11 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     this.bounds.height.set(2f)
                                 }
 
-                                this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc"), font = main.fontSlab).apply {
+                                this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc")).apply {
+                                    this.markup.set(slabMarkup)
                                     this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(Align.topLeft)
-                                    this.padding.set(Insets(4f, 0f, 0f, 0f))
+                                    this.padding.set(Insets(8f, 0f, 0f, 0f))
                                     this.bounds.height.set(400f)
                                     this.doLineWrapping.set(true)
                                 }
@@ -235,6 +243,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                         this.doClipping.set(true)
                         this.border.set(Insets(2f))
                         this.borderStyle.set(SolidBorder(Color.valueOf("7FC9FF")))
+                        this.bounds.height.set(600f)
                         this.bindWidthToSelfHeight(multiplier = 1f / sqrt(2f))
 
                         this.padding.set(Insets(16f))
@@ -261,14 +270,14 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                                 this.textColor.set(Color.BLACK)
                                                 this.renderAlign.set(Align.right)
                                                 this.padding.set(Insets(2f, 2f, 0f, 4f))
-                                                this.bounds.width.set(90f)
+                                                this.bounds.width.set(96f)
                                             }
                                             this += TextLabel(valueField, font = main.fontSlab).apply {
                                                 this.textColor.set(Color.BLACK)
                                                 this.renderAlign.set(Align.left)
-                                                this.padding.set(Insets(2f, 2f, 4f, 10f))
-                                                this.bounds.x.set(90f)
-                                                this.bindWidthToParent(adjust = -90f)
+                                                this.padding.set(Insets(2f, 2f, 4f, 0f))
+                                                this.bounds.x.set(96f)
+                                                this.bindWidthToParent(adjust = -96f)
                                                 if (valueMarkup != null) {
                                                     this.markup.set(valueMarkup)
                                                 }
@@ -277,17 +286,18 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     }
                                     
                                     addField(0, "title", item.contract.name.getOrCompute())
-                                    addField(1, "requester", "(TODO) Requester field") // TODO fill in requester name
+                                    addField(1, "requester", item.contract.requester.localizedName.getOrCompute())
                                     addField(2, "reward", StoryL10N.getValue("inboxItem.contract.reward.value", item.contract.fpReward), monoMarkup)
                                 }
                                 this += RectElement(Color.BLACK).apply {
                                     this.bounds.height.set(2f)
                                 }
 
-                                this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc"), font = main.fontSlab).apply {
+                                this += TextLabel(StoryL10N.getValue("contract.desc.${item.id}")).apply {
+                                    this.markup.set(slabMarkup)
                                     this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(Align.topLeft)
-                                    this.padding.set(Insets(4f, 4f, 0f, 0f))
+                                    this.padding.set(Insets(8f, 4f, 0f, 0f))
                                     this.bounds.height.set(400f)
                                     this.doLineWrapping.set(true)
                                     this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
