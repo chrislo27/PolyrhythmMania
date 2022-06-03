@@ -12,7 +12,7 @@ object Contracts {
             this.contracts[contract.id] = contract
         }
         
-        add(Contract.createWithAutofill("first", Requester.HR, listOf(Condition.PASS_THE_LEVEL), 100))
+        add(Contract.createWithAutofill("first", listOf(Condition.PASS_THE_LEVEL), 100, Requester.HR, JingleType.GBA))
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)

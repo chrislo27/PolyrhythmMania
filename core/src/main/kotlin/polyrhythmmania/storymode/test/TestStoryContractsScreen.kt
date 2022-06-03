@@ -18,10 +18,7 @@ import paintbox.font.TextRun
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
-import paintbox.ui.control.Button
-import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
-import paintbox.ui.control.TextLabel
+import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
@@ -316,6 +313,16 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                             this.renderAlign.set(Align.left)
                                             this.padding.set(Insets(2f, 2f, 16f, 0f))
                                             this.bounds.height.set(20f)
+                                        }
+                                    }
+                                }
+                                
+                                this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply { 
+                                    this.bounds.height.set(48f)
+                                    this.padding.set(Insets(8f))
+                                    this += Button("Play Level").apply {
+                                        this.setOnAction { 
+                                            // TODO
                                         }
                                     }
                                 }
