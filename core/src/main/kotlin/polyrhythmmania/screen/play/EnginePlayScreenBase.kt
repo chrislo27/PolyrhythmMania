@@ -137,7 +137,7 @@ class EnginePlayScreenBase(
             }
         }
         optionList += PauseOption("play.pause.quitToMainMenu", true) {
-            quitToMainMenu()
+            quitToScreen()
             Gdx.app.postRunnable {
                 playMenuSound("sfx_pause_exit")
             }
@@ -165,7 +165,7 @@ class EnginePlayScreenBase(
                         menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
                     }
 
-                    quitToMainMenu()
+                    quitToScreen()
                 } else {
                     if (sideMode is DunkMode) {
                         val localDateTime = LocalDateTime.ofInstant(dunkAchievementStartTimestamp, ZoneId.systemDefault())
@@ -173,7 +173,7 @@ class EnginePlayScreenBase(
                             Achievements.awardAchievement(Achievements.dunkFridayNight)
                         }
                     }
-                    quitToMainMenu()
+                    quitToScreen()
                 }
             }
         }

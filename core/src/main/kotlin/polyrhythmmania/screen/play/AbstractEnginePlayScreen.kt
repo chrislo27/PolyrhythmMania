@@ -1,6 +1,7 @@
 package polyrhythmmania.screen.play
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.VarChangedListener
 import paintbox.transition.FadeToOpaque
@@ -43,7 +44,7 @@ abstract class AbstractEnginePlayScreen(
     val soundSystem: SoundSystem
         get() = container.soundSystem ?: error("${this::javaClass.name} requires a non-null SoundSystem in the Container")
     val engine: Engine get() = container.engine
-    val renderer: WorldRenderer get() = container.renderer
+    val worldRenderer: WorldRenderer get() = container.renderer
     
     protected var goingToResults: Boolean = false
 
@@ -61,7 +62,7 @@ abstract class AbstractEnginePlayScreen(
     
 
     override fun renderGameplay(delta: Float) {
-        renderer.render(batch)
+        worldRenderer.render(batch)
     }
 
     override fun initializeGameplay() {
@@ -74,7 +75,7 @@ abstract class AbstractEnginePlayScreen(
         engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
         engine.resetEndSignal()
         container.world.resetWorld()
-        renderer.onWorldReset()
+        worldRenderer.onWorldReset()
         challenges.applyToEngine(engine)
 
         // Set everything else
@@ -116,12 +117,11 @@ abstract class AbstractEnginePlayScreen(
     }
     
     
-    protected fun quitToMainMenu() {
+    protected fun quitToScreen(targetScreen: Screen? = main.mainMenuScreen.prepareShow(doFlipAnimation = true)) {
         val main = this.main
-        val currentScreen = main.screen
+        val currentScreen = this
         Gdx.app.postRunnable {
-            val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
-            main.screen = TransitionScreen(main, currentScreen, mainMenu,
+            main.screen = TransitionScreen(main, currentScreen, targetScreen,
                     FadeToOpaque(0.25f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
                     currentScreen.dispose()
@@ -251,7 +251,7 @@ SoundSystem: paused=${soundSystem.isPaused}
 ---
 ${engine.getDebugString()}
 ---
-${renderer.getDebugString()}
+${worldRenderer.getDebugString()}
 ---
 SideMode: ${gameMode?.javaClass?.name}${if (gameMode != null) ("\n" + gameMode.getDebugString()) else ""}
 """

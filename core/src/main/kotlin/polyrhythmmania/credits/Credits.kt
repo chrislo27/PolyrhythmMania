@@ -50,6 +50,7 @@ object Credits : CreditsBase() {
                     "twelvemonkeys",
                     "Pexels",
                     "world-flags-sprite",
+                    "Jam3/glsl-fast-gaussian-blur",
             ).toVars() + listOf(
                     "Kurokane",
                     "Leland",

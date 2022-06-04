@@ -3,6 +3,7 @@ package polyrhythmmania.storymode.test
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -15,6 +16,10 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
 import paintbox.font.TextRun
+import paintbox.registry.AssetRegistry
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
+import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -25,10 +30,13 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.gamemodes.practice.PracticeTutorial1
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.inbox.InboxFolder
 import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
+import polyrhythmmania.storymode.screen.StoryPlayScreen
 import kotlin.math.sqrt
 
 
@@ -323,9 +331,21 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     this += Button("Play Level").apply {
                                         this.setOnAction { 
                                             // TODO
+                                            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+                                            val gameMode = PracticeTutorial1(main, main.settings.inputKeymapKeyboard.getOrCompute())
+                                            val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
+                                                    main.settings.inputCalibration.getOrCompute(), gameMode, this@TestStoryContractsScreen)
+                                            main.screen = TransitionScreen(main, main.screen, playScreen,
+                                                    FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+                                                this.onEntryEnd = {
+                                                    gameMode.prepareFirstTime()
+                                                    playScreen.resetAndUnpause()
+                                                }
+                                            }
                                         }
                                     }
                                 }
+                                
                             }
                         }
                     }

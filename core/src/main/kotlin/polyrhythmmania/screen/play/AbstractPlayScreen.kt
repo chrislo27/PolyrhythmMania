@@ -134,7 +134,8 @@ abstract class AbstractPlayScreen(
         uiViewport.apply()
         renderGameplay(delta)
 
-        
+
+        uiViewport.apply()
         val camera = uiCamera
         batch.projectionMatrix = camera.combined
         batch.begin()
