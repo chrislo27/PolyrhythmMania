@@ -1,5 +1,7 @@
 package polyrhythmmania.storymode.contract
 
+import polyrhythmmania.storymode.gamemode.FirstContractGameMode
+
 
 object Contracts {
     
@@ -12,7 +14,9 @@ object Contracts {
             this.contracts[contract.id] = contract
         }
         
-        add(Contract.createWithAutofill("first", listOf(Condition.PASS_THE_LEVEL), 100, Requester.HR, JingleType.GBA))
+        add(Contract("first", listOf(Condition.COMPLETE_TRAINING), 100, Requester.HR, JingleType.GBA) { main ->
+            FirstContractGameMode(main)
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)

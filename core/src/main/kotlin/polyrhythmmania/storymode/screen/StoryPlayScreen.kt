@@ -12,6 +12,7 @@ import paintbox.PaintboxScreen
 import paintbox.transition.TransitionScreen
 import paintbox.transition.WipeTransitionHead
 import paintbox.transition.WipeTransitionTail
+import paintbox.util.MathHelper
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.viewport.ExtendNoOversizeViewport
@@ -29,6 +30,7 @@ import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.contract.Contract
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -38,6 +40,7 @@ class StoryPlayScreen(
         container: Container,
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: GameMode?,
+        val contract: Contract,
         val exitToScreen: PaintboxScreen,
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
 
@@ -145,43 +148,46 @@ class StoryPlayScreen(
         
         
         // Do blur
-        val cam = this.uiCamera // 1280x720 camera always
-        val shader = this.blurShader
-        batch.projectionMatrix = cam.combined
-        batch.shader = shader
-        batch.begin()
-        batch.setColor(1f, 1f, 1f, 1f)
-        
-        shader.setUniformf("resolution", max(cam.viewportHeight, cam.viewportWidth))
-        
-        val passes = 4
-        val blurStrength = 1f
+        val passes = 6
+        val blurStrength = 0f // FIXME
         var readBuffer = frameBuffer
         var writeBuffer = frameBuffer2
         
-        for (i in 0 until passes * 2) {
-            val radius = (passes - i / 2) * blurStrength
-            
-            writeBuffer.begin()
-            if (i % 2 == 0) {
-                shader.setUniformf("dir", radius, 0f)
-            } else {
-                shader.setUniformf("dir", 0f, radius)
-            }
-            val bufferTex = readBuffer.colorBufferTexture
-            batch.draw(bufferTex, 0f, 0f, cam.viewportWidth, cam.viewportHeight, 0, 0, bufferTex.width, bufferTex.height, false, true)
-            batch.flush()
-            writeBuffer.end()
-            
-            
-            // Swap buffers
-            val tmp = readBuffer
-            readBuffer = writeBuffer
-            writeBuffer = tmp
-        }
+        val cam = this.uiCamera // 1280x720 camera always
+        val shader = this.blurShader
+        batch.projectionMatrix = cam.combined
         
-        batch.end()
-        batch.shader = null // Reset shader
+        if (blurStrength > 0f) {
+            batch.shader = shader
+            batch.begin()
+            batch.setColor(1f, 1f, 1f, 1f)
+
+            shader.setUniformf("resolution", max(cam.viewportHeight, cam.viewportWidth))
+
+            for (i in 0 until passes * 2) {
+                val radius = (passes - i / 2) * blurStrength
+
+                writeBuffer.begin()
+                if (i % 2 == 0) {
+                    shader.setUniformf("dir", radius, 0f)
+                } else {
+                    shader.setUniformf("dir", 0f, radius)
+                }
+                val bufferTex = readBuffer.colorBufferTexture
+                batch.draw(bufferTex, 0f, 0f, cam.viewportWidth, cam.viewportHeight, 0, 0, bufferTex.width, bufferTex.height, false, true)
+                batch.flush()
+                writeBuffer.end()
+
+
+                // Swap buffers
+                val tmp = readBuffer
+                readBuffer = writeBuffer
+                writeBuffer = tmp
+            }
+
+            batch.end()
+            batch.shader = null // Reset shader
+        }
         
 
         // Render final buffer to screen
@@ -192,6 +198,13 @@ class StoryPlayScreen(
         batch.end()
         
         main.resetViewportToScreen()
+    }
+
+    override fun onEndSignalFired() {
+        super.onEndSignalFired()
+        
+        // TODO
+        quitToScreen(exitToScreen)
     }
 
     override fun renderUpdate() {

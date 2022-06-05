@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 
 
 object GaussianBlur {
+    
     private val VERT = """
 attribute vec4 ${ShaderProgram.POSITION_ATTRIBUTE};
 attribute vec4 ${ShaderProgram.COLOR_ATTRIBUTE};

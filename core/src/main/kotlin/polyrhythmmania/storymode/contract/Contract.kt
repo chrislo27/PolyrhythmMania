@@ -1,6 +1,8 @@
 package polyrhythmmania.storymode.contract
 
 import paintbox.binding.ReadOnlyVar
+import polyrhythmmania.PRManiaGame
+import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.storymode.StoryL10N
 
 
@@ -15,13 +17,17 @@ data class Contract(
 
         val requester: Requester,
         val jingleType: JingleType,
+        
+        val gamemodeFactory: (main: PRManiaGame) -> GameMode
 ) {
-    companion object {
-        fun createWithAutofill(
-                id: String, conditions: List<Condition>, fpReward: Int, requester: Requester, jingleType: JingleType,
-        ): Contract {
-            return Contract(id, StoryL10N.getVar("contract.name.$id"), StoryL10N.getVar("contract.desc.$id"),
-                    conditions, fpReward, requester, jingleType)
-        }
-    }
+
+    constructor(
+            id: String, conditions: List<Condition>, fpReward: Int, requester: Requester, jingleType: JingleType,
+            gamemodeFactory: (main: PRManiaGame) -> GameMode
+    ) : this(
+            id, StoryL10N.getVar("contract.name.$id"), StoryL10N.getVar("contract.desc.$id"), conditions, fpReward,
+            requester, jingleType,
+            gamemodeFactory
+    )
+
 }

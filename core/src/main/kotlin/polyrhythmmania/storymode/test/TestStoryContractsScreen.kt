@@ -332,9 +332,9 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                         this.setOnAction { 
                                             // TODO
                                             main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                                            val gameMode = PracticeTutorial1(main, main.settings.inputKeymapKeyboard.getOrCompute())
+                                            val gameMode = item.contract.gamemodeFactory(main)
                                             val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
-                                                    main.settings.inputCalibration.getOrCompute(), gameMode, this@TestStoryContractsScreen)
+                                                    main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryContractsScreen)
                                             main.screen = TransitionScreen(main, main.screen, playScreen,
                                                     FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
                                                 this.onEntryEnd = {

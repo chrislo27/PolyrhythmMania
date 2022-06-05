@@ -8,6 +8,7 @@ sealed class Condition(val name: ReadOnlyVar<String>) {
     
     companion object {
         val PASS_THE_LEVEL = TextOnly(StoryL10N.getVar("contract.condition.passLevel"))
+        val COMPLETE_TRAINING = TextOnly(StoryL10N.getVar("contract.condition.completeTraining"))
     }
     
     class Debug(name: ReadOnlyVar<String>) : Condition(name) {
