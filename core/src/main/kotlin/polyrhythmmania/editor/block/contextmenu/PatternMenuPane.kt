@@ -1,19 +1,15 @@
 package polyrhythmmania.editor.block.contextmenu
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.font.TextAlign
-import paintbox.packing.PackedSheet
-import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.TextLabel
-import paintbox.ui.element.RectElement
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.block.CubeType
@@ -28,8 +24,23 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
     init {
         val blockSize = 32f + 3f * 2
         val clearL10NStr = Localization.getVar("blockContextMenu.spawnPattern.clear")
+        
+        fun invertButtonSkin(button: Button) {
+            (button.skin.getOrCompute() as ButtonSkin).also { skin ->
+                listOf(skin.defaultBgColor, skin.disabledBgColor, skin.hoveredBgColor,
+                        skin.pressedAndHoveredBgColor, skin.pressedBgColor,
+                        skin.defaultTextColor, skin.disabledTextColor, skin.hoveredTextColor,
+                        skin.pressedAndHoveredTextColor, skin.pressedTextColor).forEach {
+                    val color = it.getOrCompute()
+                    color.r = 1f - color.r
+                    color.g = 1f - color.g
+                    color.b = 1f - color.b
+                }
+            }
+        }
 
-        fun createRowPane(label: String, rowTypes: Array<CubeType>, isARow: Boolean): Pane {
+        fun createRowPane(label: String, rowTypes: Array<CubeType>, isARow: Boolean): Pair<Pane, List<CubeButton>> {
+            val cubeButtons: MutableList<CubeButton> = mutableListOf()
             return Pane().also { pane ->
                 Anchor.TopLeft.configure(this)
 
@@ -49,7 +60,6 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
                     label.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("blockContextMenu.spawnPattern.cycleHint")))
                 })
 
-                val buttons: MutableList<CubeButton> = mutableListOf()
                 rowTypes.forEachIndexed { index, cubeType ->
                     val b = CubeButton(isARow, cubeType).also { button ->
                         button.cube.addListener {
@@ -61,7 +71,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
                         button.bounds.x.set((index + 1) * blockSize)
                         button.bounds.y.set(0 * blockSize)
                     }
-                    buttons += b
+                    cubeButtons += b
                     pane.addChild(b)
                 }
 
@@ -73,22 +83,12 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
                         this.bounds.width.set(blockSize * 1.5f)
                         this.bounds.height.set(blockSize * 0.75f)
                         this.setOnAction {
-                            buttons.forEach { it.cube.set(clearType) }
+                            cubeButtons.forEach { it.cube.set(clearType) }
                         }
-                        (this.skin.getOrCompute() as ButtonSkin).also { skin ->
-                            listOf(skin.defaultBgColor, skin.disabledBgColor, skin.hoveredBgColor,
-                                    skin.pressedAndHoveredBgColor, skin.pressedBgColor,
-                                    skin.defaultTextColor, skin.disabledTextColor, skin.hoveredTextColor,
-                                    skin.pressedAndHoveredTextColor, skin.pressedTextColor).forEach {
-                                val color = it.getOrCompute()
-                                color.r = 1f - color.r
-                                color.g = 1f - color.g
-                                color.b = 1f - color.b
-                            }
-                        }
+                        invertButtonSkin(this)
                     })
                 })
-            }
+            } to cubeButtons
         }
         
         val beatLabels = Pane().also { pane ->
@@ -114,11 +114,36 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
         this += vbox
         vbox.temporarilyDisableLayouts { 
             vbox += beatLabels
-            vbox += createRowPane("${RodinSpecialChars.BORDERED_DPAD}:", data.rowDpadTypes, false)
-            vbox += createRowPane("${RodinSpecialChars.BORDERED_A}:", data.rowATypes, true)
+            vbox += Pane().apply {
+                val dpadRowPane = createRowPane("${RodinSpecialChars.BORDERED_DPAD}:", data.rowDpadTypes, false)
+                val aRowPane = createRowPane("${RodinSpecialChars.BORDERED_A}:", data.rowATypes, true)
+                
+                this += VBox().apply { 
+                    this.spacing.set(0f)
+                    this += dpadRowPane.first
+                    this += aRowPane.first
+                    this.sizeHeightToChildren(1f)
+                    this.sizeWidthToChildren(1f)
+                }
+                this.sizeHeightToChildren(1f)
+                
+                this += Button(Localization.getVar("blockContextMenu.spawnPattern.swap"), font = editorPane.main.mainFont).apply {
+                    Anchor.CentreRight.configure(this)
+                    this.bounds.width.set(blockSize * 1.5f)
+                    this.bounds.height.set(blockSize * 0.75f)
+                    this.setOnAction {
+                        val dpadButtonStates = dpadRowPane.second.map { it.cube.getOrCompute() }
+                        aRowPane.second.zip(dpadRowPane.second).forEachIndexed { index, (a, dpad) ->
+                            dpad.cube.set(a.cube.getOrCompute())
+                            a.cube.set(dpadButtonStates[index])
+                        }
+                    }
+                    invertButtonSkin(this)
+                }
+            }
         }
 
-        this.bounds.width.set(blockSize * (data.rowCount + 3 /* label + Clear */))
+        this.bounds.width.set(blockSize * (data.rowCount + 4.5f /* label + Clear + Swap */))
         this.bounds.height.set(90f)
     }
 
