@@ -71,21 +71,24 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     : ActionHistory<Editor>(), InputProcessor, Disposable, Lwjgl3WindowListener {
 
     companion object {
-        val DEFAULT_TRACKS: List<Track> = listOf(
+        val DEFAULT_TRACKS_INPUT: List<Track> = listOf(
                 Track(TrackID.INPUT_0, EnumSet.of(BlockType.INPUT)),
                 Track(TrackID.INPUT_1, EnumSet.of(BlockType.INPUT)),
                 Track(TrackID.INPUT_2, EnumSet.of(BlockType.INPUT)),
+        )
+        val DEFAULT_TRACKS_FX: List<Track> = listOf(
                 Track(TrackID.FX_0, EnumSet.of(BlockType.FX)),
                 Track(TrackID.FX_1, EnumSet.of(BlockType.FX)),
                 Track(TrackID.FX_2, EnumSet.of(BlockType.FX)),
         )
-        val UTILITY_TRACKS: List<Track> = listOf(
+        val DEFAULT_TRACKS: List<Track> = DEFAULT_TRACKS_INPUT + DEFAULT_TRACKS_FX
+        private val STORY_TRACKS: List<Track> = DEFAULT_TRACKS_INPUT + listOf(
             Track(TrackID.UTILITY_0, EnumSet.allOf(BlockType::class.java)),
             Track(TrackID.UTILITY_1, EnumSet.allOf(BlockType::class.java)),
             Track(TrackID.UTILITY_2, EnumSet.allOf(BlockType::class.java)),
             Track(TrackID.UTILITY_3, EnumSet.allOf(BlockType::class.java)),
             Track(TrackID.UTILITY_4, EnumSet.allOf(BlockType::class.java)),
-        )
+        ) + DEFAULT_TRACKS_FX
         
         val MOVE_WINDOW_LEFT_KEYCODES: Set<Int> = setOf(Input.Keys.LEFT, Input.Keys.A)
         val MOVE_WINDOW_RIGHT_KEYCODES: Set<Int> = setOf(Input.Keys.RIGHT, Input.Keys.D)
@@ -131,7 +134,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     ), TextRun(main.mainFontBoldBordered, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
 
     val tracks: List<Track> = when {
-        EditorSpecialFlags.STORY_MODE in flags -> DEFAULT_TRACKS + UTILITY_TRACKS
+        EditorSpecialFlags.STORY_MODE in flags -> STORY_TRACKS
         else -> DEFAULT_TRACKS
     }
     val trackMap: Map<TrackID, Track> = tracks.associateByTo(LinkedHashMap()) { track -> track.id }
