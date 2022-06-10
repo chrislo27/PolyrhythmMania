@@ -66,6 +66,8 @@ import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
 import polyrhythmmania.util.TempFileUtils
 import java.io.File
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.concurrent.thread
@@ -307,7 +309,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 it.delete()
                 Paintbox.LOGGER.info("Deleted old recovery file ${it.name}, lastModified() = ${it.lastModified()}, limit=$expiry")
             }
-            TempFileUtils.clearTempFolder()
+            TempFileUtils.clearTempFolder(Duration.of(48, ChronoUnit.HOURS))
         } catch (s: SecurityException) {
             s.printStackTrace()
         }

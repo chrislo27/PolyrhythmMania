@@ -1,6 +1,10 @@
 package polyrhythmmania.util
 
 import java.io.File
+import java.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
+import kotlin.time.toJavaDuration
 
 
 object TempFileUtils {
@@ -21,5 +25,14 @@ object TempFileUtils {
     
     fun clearTempFolder() {
         TEMP_FOLDER.deleteRecursively() // This might not get files with active locks, but will get old unused files
+    }
+    
+    fun clearTempFolder(minAge: Duration) {
+        TEMP_FOLDER.walkBottomUp().filter { f ->
+            val age = (System.currentTimeMillis() - f.lastModified()).coerceAtLeast(0L).toDuration(DurationUnit.MILLISECONDS).toJavaDuration()
+            age > minAge
+        }.forEach { f ->
+            f.delete()
+        }
     }
 }
