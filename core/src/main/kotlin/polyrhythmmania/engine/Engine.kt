@@ -9,6 +9,7 @@ import polyrhythmmania.engine.timesignature.TimeSignatureMap
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import paintbox.util.DecimalFormats
+import polyrhythmmania.engine.modifiers.EngineModifiers
 import polyrhythmmania.util.metrics.timeInline
 import polyrhythmmania.world.World
 import java.util.concurrent.CopyOnWriteArrayList
@@ -36,6 +37,7 @@ class Engine(timingProvider: TimingProvider,
 
     private val queuedRunnables: MutableList<Runnable> = CopyOnWriteArrayList()
     val inputter: EngineInputter = EngineInputter(this)
+    val modifiers: EngineModifiers = EngineModifiers(this)
     val soundInterface: SoundInterface = SoundInterface.createFromSoundSystem(soundSystem, this)
     private val _events: MutableList<Event> = CopyOnWriteArrayList()
     val events: List<Event> = _events
