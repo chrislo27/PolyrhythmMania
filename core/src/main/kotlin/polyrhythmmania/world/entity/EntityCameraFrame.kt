@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawRect
-import paintbox.util.gdxutils.fillRect
-import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.Tileset
@@ -24,8 +22,7 @@ class EntityCameraFrame(world: World, color: Color, val lockToCamera: Boolean = 
 
     override val renderSortOffsetZ: Float get() = if (lockToCamera) 9999f else 9000f
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine,
-                              vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val camera = renderer.camera
         val camW = camera.viewportWidth
         val camH = camera.viewportHeight

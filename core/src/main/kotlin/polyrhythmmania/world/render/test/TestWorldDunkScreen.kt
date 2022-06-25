@@ -1,4 +1,4 @@
-package polyrhythmmania.world.render
+package polyrhythmmania.world.render.test
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -14,6 +14,8 @@ import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.world.*
+import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.render.WorldRendererWithUI
 import polyrhythmmania.world.tileset.StockTexturePacks
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TilesetPalette
@@ -37,7 +39,7 @@ class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
     val engine: Engine = Engine(timing, world, soundSystem, null)
     val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(StockTexturePacks.gba).apply { 
+        WorldRendererWithUI(world, Tileset(StockTexturePacks.gba).apply { 
             TilesetPalette.createGBA1TilesetPalette().applyTo(this)
         }, engine)
     }

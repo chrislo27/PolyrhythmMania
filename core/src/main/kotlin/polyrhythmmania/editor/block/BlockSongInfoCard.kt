@@ -19,6 +19,7 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import paintbox.util.DecimalFormats
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.render.WorldRendererWithUI
 import java.util.*
 import kotlin.math.min
 
@@ -196,7 +197,7 @@ class EventSongInfoCard(engine: Engine, val field: BlockSongInfoCard.Field, dura
         this.width = duration
     }
     
-    private fun getCard(container: Container): WorldRenderer.SongInfoCard = when (field) {
+    private fun getCard(container: Container): WorldRendererWithUI.SongInfoCard = when (field) {
         BlockSongInfoCard.Field.SONG_TITLE -> container.renderer.songTitleCard
         BlockSongInfoCard.Field.SONG_ARTIST -> container.renderer.songArtistCard
     }

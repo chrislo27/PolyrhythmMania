@@ -214,10 +214,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 }
             }
             nextScreenProducer = {
-//                polyrhythmmania.world.render.TestWorldRenderScreen(this@PRManiaGame)
+//                polyrhythmmania.world.render.test.TestWorldRenderScreen(this@PRManiaGame)
 //                EditorScreen(this@PRManiaGame, debugMode = true)
-//                polyrhythmmania.world.render.TestWorldDunkScreen(this@PRManiaGame)
-//                polyrhythmmania.world.render.TestWorldAsmScreen(this@PRManiaGame)
+//                polyrhythmmania.world.render.test.TestWorldDunkScreen(this@PRManiaGame)
+//                polyrhythmmania.world.render.test.TestWorldAsmScreen(this@PRManiaGame)
                 TransitionScreen(this@PRManiaGame, this@PRManiaGame.getScreen(), mainMenuScreen.prepareShow(doFlipAnimation = true),
                         FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f)))
             }

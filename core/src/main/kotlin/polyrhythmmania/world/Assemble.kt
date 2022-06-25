@@ -39,7 +39,7 @@ object AssembleWorldBackground : WorldBackground() {
     private val gradientStart: Color = Color.valueOf("1B6B17")
     private val gradientEnd: Color = Color.BLACK.cpy()
     
-    override fun render(batch: SpriteBatch, world: World, engine: Engine, camera: OrthographicCamera) {
+    override fun render(batch: SpriteBatch, world: World, camera: OrthographicCamera) {
         batch.drawQuad(0f, camera.viewportHeight * 0.25f, gradientEnd, 
                 camera.viewportWidth, camera.viewportHeight * 0.25f, gradientEnd,
                 camera.viewportWidth, camera.viewportHeight, gradientStart,
@@ -193,8 +193,7 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
         }
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine,
-                              vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         if (animation is Animation.Charged) {
             vec.x += MathUtils.random() * MathUtils.randomSign() * 0.025f
             vec.y += MathUtils.random() * MathUtils.randomSign() * 0.025f
@@ -572,14 +571,11 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
         }
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine,
-                              vec: Vector3) {
-        
-        
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val xOff = -0.5f * 0
         vec.x += xOff
         vec.y += xOff / 2
-        super.renderSimple(renderer, batch, tileset, engine, vec)
+        super.renderSimple(renderer, batch, tileset, vec)
     }
 }
 
@@ -640,8 +636,8 @@ class EntityAsmWidgetCompleteBlur(world: World,
         super.engineUpdate(engine, beat, seconds)
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
-        super.render(renderer, batch, tileset, engine)
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+        super.render(renderer, batch, tileset)
         frameCountdown--
         if (frameCountdown <= 0) {
             kill()

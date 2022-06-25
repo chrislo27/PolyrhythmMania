@@ -26,16 +26,16 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
         return this.position
     }
     
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
         val tmpVec = Vector3Stack.getAndPush()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor
-        renderSimple(renderer, batch, tileset, engine, convertedVec)
+        renderSimple(renderer, batch, tileset, convertedVec)
         Vector3Stack.pop()
         batch.packedColor = packedColor
     }
     
-    protected open fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+    protected open fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
     }
     
     protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion,
@@ -101,7 +101,7 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
     
     abstract fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion?
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val tmpColor = ColorStack.getAndPush()
         val tint = this.tint
         for (i in 0 until numLayers) {
@@ -208,18 +208,17 @@ class EntityExplosion(
     override val renderSortOffsetX: Float get() = 0f
     override val renderSortOffsetY: Float get() = 0f
     override val renderSortOffsetZ: Float get() = 0f
+    
+    private var percentageLife: Float = 0f
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
         return tileset.explosionFrames[state.index]
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         if (isKilled) return
-        val secondsElapsed = engine.seconds - secondsStarted
-        val percentage = (secondsElapsed / duration).coerceIn(0f, 1f)
-        if (percentage >= 1f) {
-            kill()
-        } else {
+        val percentage = this.percentageLife
+        if (percentage < 1f) {
             val index = (percentage * STATES.size).toInt()
             state = STATES[index]
 
@@ -227,7 +226,7 @@ class EntityExplosion(
             if (tr != null) {
                 val centreOfExplosionX = 10f / 32f // X-centre of the explosion at normal 1.0 scaling is 10 px right
                 val baseOfExplosionY = 3f / 32f // Base of the explosion at normal 1.0 scaling is 3 px up
-                
+
                 drawTintedRegion(batch, vec, tileset, tr, (centreOfExplosionX) * renderScale - (renderWidth / 2f) + rodOffsetX, baseOfExplosionY * renderScale + rodOffsetY, renderWidth, renderHeight)
             }
 
@@ -238,6 +237,19 @@ class EntityExplosion(
 //            batch.setColor(0f, 0f, 1f, 0.75f)
 //            batch.fillRect(vec.x, vec.y, 0.1f, 0.1f)
 //            batch.setColor(1f, 1f, 1f, 1f)
+        }
+    }
+
+    override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
+        super.engineUpdate(engine, beat, seconds)
+        
+        if (isKilled) return
+        
+        val secondsElapsed = engine.seconds - secondsStarted
+        val percentage = (secondsElapsed / duration).coerceIn(0f, 1f)
+        this.percentageLife = percentage
+        if (percentage >= 1f) {
+            kill()
         }
     }
 }
@@ -279,8 +291,8 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val inputSco
     private val originalColor: Color = color.cpy()
     private val currentColor: Color = color.cpy()
     
-    private fun getBaseColorToUse(renderer: WorldRenderer): Color {
-        val inputter = renderer.engine.inputter
+    private fun getBaseColorToUse(engine: Engine): Color {
+        val inputter = engine.inputter
         val restriction = inputter.inputChallenge.restriction
         return if (restriction == InputTimingRestriction.ACES_ONLY && this.inputScore != InputScore.ACE) {
             MISS_COLOUR
@@ -291,20 +303,9 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val inputSco
         }
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
-        super.renderSimple(renderer, batch, tileset, engine, vec)
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+        super.renderSimple(renderer, batch, tileset, vec)
 
-        val currentSec = engine.seconds
-        val flashSec = engine.inputter.inputFeedbackFlashes[flashIndex]
-        val flashTime = 0.25f
-        val baseColor = getBaseColorToUse(renderer)
-        if (currentSec - flashSec < flashTime) {
-            val percentage = ((currentSec - flashSec) / flashTime).coerceIn(0f, 1f)
-            currentColor.set(baseColor).lerp(Color.WHITE, 1f - percentage)
-        } else {
-            currentColor.set(baseColor)
-        }
-        
         val tintedRegion = when (end) {
             End.LEFT -> tileset.inputFeedbackStart
             End.MIDDLE -> tileset.inputFeedbackMiddle
@@ -315,6 +316,21 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val inputSco
         drawTintedRegion(batch, vec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tmpColor)
         ColorStack.pop()
     }
+
+    override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
+        super.engineUpdate(engine, beat, seconds)
+        
+        val currentSec = engine.seconds
+        val flashSec = engine.inputter.inputFeedbackFlashes[flashIndex]
+        val baseColor = getBaseColorToUse(engine)
+        val flashTime = 0.25f
+        if (currentSec - flashSec < flashTime) {
+            val percentage = ((currentSec - flashSec) / flashTime).coerceIn(0f, 1f)
+            currentColor.set(baseColor).lerp(Color.WHITE, 1f - percentage)
+        } else {
+            currentColor.set(baseColor)
+        }
+    }
 }
 
 class EntityInputIndicator(world: World, var isDpad: Boolean)
@@ -324,20 +340,27 @@ class EntityInputIndicator(world: World, var isDpad: Boolean)
 
     override val renderWidth: Float = 16f / 32f
     override val renderHeight: Float = 16f / 32f
+    
+    private var lastBeat: Float = 0f
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         if (!visible || !world.worldSettings.showInputIndicators) return
         val tintedRegion = if (isDpad) tileset.indicatorDpad else tileset.indicatorA
         val renderWidth = this.renderWidth
         val renderHeight = this.renderHeight
 
         val bumpHeight = 2f / 32f
-        val beat = engine.beat
+        val beat = lastBeat
         val bumpTime = 0.28f
         val normalizedBeat = if (beat < 0f) (beat + floor(beat).absoluteValue) else (beat)
         val bumpAmt = (1f - (normalizedBeat % 1f).coerceIn(0f, bumpTime) / bumpTime)//.coerceIn(0f, 1f)
 
         drawTintedRegion(batch, vec, tileset, tintedRegion, -renderWidth / 2f, (bumpAmt) * bumpHeight - (2f / 32f),
                 renderWidth, renderHeight)
+    }
+
+    override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
+        super.engineUpdate(engine, beat, seconds)
+        this.lastBeat = beat
     }
 }

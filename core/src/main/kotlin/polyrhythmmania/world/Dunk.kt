@@ -29,7 +29,7 @@ class EntityDunkBasketBack(world: World) : SpriteEntity(world) {
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return tileset.dunkBasketBack
     }
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val xOff = -0.5f
         vec.x += xOff
         vec.y += xOff * 0.5f
@@ -51,8 +51,7 @@ class EntityDunkBasketFrontFaceZ(world: World) : SpriteEntity(world) {
         return tileset.dunkBasketFrontFaceZ
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine,
-                              vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val xOff = -0.5f
         vec.x += xOff
         vec.y += xOff * 0.5f + (0.5f)
@@ -345,8 +344,8 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         super.onRemovedFromWorld(engine)
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
-        if (!exploded) super.render(renderer, batch, tileset, engine)
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+        if (!exploded) super.render(renderer, batch, tileset)
     }
 }
 
@@ -378,7 +377,7 @@ class EntityPistonDunk(world: World)
 
 
 object DunkWorldBackground : WorldBackground() {
-    override fun render(batch: SpriteBatch, world: World, engine: Engine, camera: OrthographicCamera) {
+    override fun render(batch: SpriteBatch, world: World, camera: OrthographicCamera) {
         val tex: Texture = AssetRegistry["dunk_background"]
         batch.draw(tex, camera.position.x - camera.viewportWidth / 2f, camera.position.y - camera.viewportHeight / 2f, camera.viewportWidth, camera.viewportHeight)
     }

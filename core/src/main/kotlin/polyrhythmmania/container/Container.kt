@@ -41,6 +41,7 @@ import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldSettings
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.render.WorldRendererWithUI
 import polyrhythmmania.world.tileset.*
 import java.io.File
 import java.time.Instant
@@ -95,8 +96,8 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
     val texturePack: Var<TexturePack> = Var(StockTexturePacks.gba)
     val customTexturePack: Var<CustomTexturePack?> = Var(null)
     val texturePackSource: Var<TexturePackSource> = Var(TexturePackSource.STOCK_GBA)
-    val renderer: WorldRenderer by lazy {
-        WorldRenderer(world, Tileset(when (globalSettings.forceTexturePack) {
+    val renderer: WorldRendererWithUI by lazy {
+        WorldRendererWithUI(world, Tileset(when (globalSettings.forceTexturePack) {
             ForceTexturePack.NO_FORCE -> this.texturePack
             ForceTexturePack.FORCE_GBA -> Var(StockTexturePacks.gba)
             ForceTexturePack.FORCE_HD -> Var(StockTexturePacks.hd)

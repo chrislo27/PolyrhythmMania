@@ -2,7 +2,6 @@ package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
-import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.Tileset
@@ -18,8 +17,7 @@ class EntityBackgroundImg(world: World, val layer: Layer)
     override val renderHeight: Float = 5f
     override val renderWidth: Float get() = renderHeight * (16f / 9)
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine,
-                              vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val tintedRegion = when (this.layer) {
             Layer.BACK -> tileset.backgroundBack
             Layer.MIDDLE -> tileset.backgroundMiddle

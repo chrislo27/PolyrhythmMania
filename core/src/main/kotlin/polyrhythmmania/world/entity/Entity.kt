@@ -29,7 +29,7 @@ open class Entity(val world: World) {
     open val renderSortOffsetY: Float get() = 0f
     open val renderSortOffsetZ: Float get() = 0f
     
-    open fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
+    open fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
     }
     
     open fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {}

@@ -907,7 +907,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
         val world: World = World()
         val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(editor.container.renderer.tileset.texturePack).apply { 
 //            tilesetPalette.applyTo(this)
-        }, editor.engine)
+        })
         
         val rodEntity: EntityRodDecor
         

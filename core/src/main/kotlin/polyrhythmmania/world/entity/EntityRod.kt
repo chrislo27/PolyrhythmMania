@@ -46,7 +46,7 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
         return 0f
     }
     
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val animationAlpha = getAnimationAlpha().coerceIn(0f, 1f)
 
         val renderW = renderWidth

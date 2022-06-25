@@ -118,9 +118,9 @@ open class EntityPiston(world: World)
         }
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         if (active) {
-            super.renderSimple(renderer, batch, tileset, engine, vec)
+            super.renderSimple(renderer, batch, tileset, vec)
         }
     }
 }

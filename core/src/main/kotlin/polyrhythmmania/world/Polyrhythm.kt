@@ -529,8 +529,8 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
         engine.inputter.submitInputsFromRod(this)
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, engine: Engine) {
-        if (!exploded) super.render(renderer, batch, tileset, engine)
+    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+        if (!exploded) super.render(renderer, batch, tileset)
     }
 
     private fun registerMiss(inputter: EngineInputter) {
