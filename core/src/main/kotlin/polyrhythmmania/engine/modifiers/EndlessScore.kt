@@ -119,8 +119,10 @@ class EndlessScore : ModifierModule {
     // InputterListener overrides
 
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
+        // NO-OP
     }
 
     override fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean) {
+        // NO-OP
     }
 }

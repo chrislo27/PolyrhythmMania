@@ -1,6 +1,6 @@
 package polyrhythmmania.screen.play
 
-import polyrhythmmania.gamemodes.AbstractEndlessMode
+import paintbox.binding.Var
 
 
 sealed class ResultsBehaviour {
@@ -9,9 +9,13 @@ sealed class ResultsBehaviour {
     
     data class ShowResults(
             val onRankingRevealed: OnRankingRevealed?,
-            /**
-             * Note: No effect when sideMode is active and it is an [AbstractEndlessMode]
-             */
-            val previousHighScore: Int?
+
+            val previousHighScore: PreviousHighScore,
     ) : ResultsBehaviour()
+
+    sealed class PreviousHighScore {
+        object None : PreviousHighScore()
+        class NumberOnly(val previousHigh: Int) : PreviousHighScore()
+        class Persisted(val scoreVar: Var<Int>) : PreviousHighScore()
+    }
 }

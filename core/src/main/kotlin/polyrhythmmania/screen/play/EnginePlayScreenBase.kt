@@ -198,7 +198,7 @@ class EnginePlayScreenBase(
                 && (leftResults.sumOfFloat { abs(it.accuracyPercent) } / leftResults.size) - 0.15f > (rightResults.sumOfFloat { abs(it.accuracyPercent) } / rightResults.size)
         val lines: Pair<String, String> = resultsText.generateLinesOfText(score, badLeftGoodRight)
         var isNewHighScore = false
-        if (gameMode != null && gameMode is AbstractEndlessMode) {
+        if (gameMode is AbstractEndlessMode) {
             val endlessModeScore = gameMode.prevHighScore
             val prevScore = endlessModeScore.highScore.getOrCompute()
             if (score > prevScore) {
@@ -206,9 +206,22 @@ class EnginePlayScreenBase(
                 PRManiaGame.instance.settings.persist()
                 isNewHighScore = true
             }
-        } else if (resultsBehaviour.previousHighScore != null) {
-            if (score > resultsBehaviour.previousHighScore && resultsBehaviour.previousHighScore >= 0) {
-                isNewHighScore = true
+        } else if (resultsBehaviour.previousHighScore != ResultsBehaviour.PreviousHighScore.None) {
+            when (val prev = resultsBehaviour.previousHighScore) {
+                ResultsBehaviour.PreviousHighScore.None -> {}
+                is ResultsBehaviour.PreviousHighScore.NumberOnly -> {
+                    if (score > prev.previousHigh && prev.previousHigh != -1) {
+                        isNewHighScore = true
+                    }
+                }
+                is ResultsBehaviour.PreviousHighScore.Persisted -> {
+                    val prevValue = prev.scoreVar.getOrCompute()
+                    if (score > prevValue && prevValue != -1) {
+                        prev.scoreVar.set(score)
+                        PRManiaGame.instance.settings.persist()
+                        isNewHighScore = true
+                    }
+                }
             }
         }
 
@@ -245,11 +258,14 @@ class EnginePlayScreenBase(
     
     private fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): EnginePlayScreenBase {
         return EnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, gameMode,
-                if (resultsBehaviour is ResultsBehaviour.ShowResults)
-                    resultsBehaviour.copy(previousHighScore = if (scoreObj.newHighScore)
-                        scoreObj.scoreInt
-                    else resultsBehaviour.previousHighScore)
-                else resultsBehaviour)
+                if (resultsBehaviour is ResultsBehaviour.ShowResults) {
+                    val prevHi = resultsBehaviour.previousHighScore
+                    val newHi = if (scoreObj.newHighScore && prevHi is ResultsBehaviour.PreviousHighScore.NumberOnly) {
+                        ResultsBehaviour.PreviousHighScore.NumberOnly(scoreObj.scoreInt)
+                    } else prevHi
+                    
+                    resultsBehaviour.copy(previousHighScore = newHi)
+                } else resultsBehaviour)
     }
 
     

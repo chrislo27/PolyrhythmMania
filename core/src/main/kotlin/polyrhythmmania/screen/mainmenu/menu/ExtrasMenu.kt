@@ -95,12 +95,12 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createSidemodeLongButton(AssetRegistry.get<PackedSheet>("achievements_icon")["assemble"],
                     "mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
                     Var { listOf(use(main.settings.sidemodeAssembleHighScore)) }),
-                    resultsBehaviour = ResultsBehaviour.ShowResults(null, null), // Note: high score is handled by EndlessModeScore
+                    resultsBehaviour = ResultsBehaviour.ShowResults(null, ResultsBehaviour.PreviousHighScore.Persisted(settings.sidemodeAssembleHighScore)),
                     newIndicator = main.settings.newIndicatorExtrasAssemble) { main, _ ->
                 DiscordRichPresence.updateActivity(DefaultPresences.playingAssemble())
                 mainMenu.backgroundType = BgType.ASSEMBLE
                 GlobalStats.timesPlayedAssemble.increment()
-                AssembleMode(main, EndlessModeScore(settings.sidemodeAssembleHighScore))
+                AssembleMode(main)
             }
             vbox += createLongButtonWithNewIndicator(settings.newIndicatorExtrasSolitaire, AssetRegistry.get<PackedSheet>("achievements_icon")["solitaire"]) {
                 Localization.getVar("mainMenu.play.solitaire").use() 

@@ -46,9 +46,10 @@ import java.io.File
 import java.util.*
 import kotlin.concurrent.thread
 
-class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
-                         val previousHighScore: Int? = null)
-    : StandardMenu(menuCol) {
+class LoadSavedLevelMenu(
+        menuCol: MenuCollection, immediateLoad: File?,
+        val previousHighScore: Int? = null
+) : StandardMenu(menuCol) {
 
     enum class Substate {
         FILE_DIALOG_OPEN,
@@ -251,7 +252,9 @@ class LoadSavedLevelMenu(menuCol: MenuCollection, immediateLoad: File?,
                             val playScreen = EnginePlayScreenBase(main, PlayTimeType.REGULAR, loadedData.newContainer, challenges,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                     resultsBehaviour = if (robotMode) ResultsBehaviour.NoResults
-                                    else ResultsBehaviour.ShowResults(onRankingRevealed, previousHighScore), gameMode = null)
+                                    else ResultsBehaviour.ShowResults(onRankingRevealed,
+                                            previousHighScore?.let { ResultsBehaviour.PreviousHighScore.NumberOnly(it) } ?: ResultsBehaviour.PreviousHighScore.None),
+                                    gameMode = null)
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply { 
                                 this.onEntryEnd = {
                                     playScreen.resetAndUnpause()

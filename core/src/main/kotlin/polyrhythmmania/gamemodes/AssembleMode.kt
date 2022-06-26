@@ -10,7 +10,6 @@ import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.*
-import polyrhythmmania.engine.input.InputTimingRestriction
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
@@ -25,8 +24,8 @@ import java.util.*
 import kotlin.math.sign
 
 
-class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
-    : AbstractEndlessMode(main, prevHighScore, PlayTimeType.ASSEMBLE) {
+class AssembleMode(main: PRManiaGame)
+    : GameMode(main, PlayTimeType.ASSEMBLE) {
 
     init {
         container.world.worldMode = WorldMode(WorldType.Assemble)

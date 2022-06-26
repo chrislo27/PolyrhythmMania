@@ -87,7 +87,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += createSidemode("mainMenu.practice.polyrhythm1",
                     Localization.getVar("mainMenu.practice.polyrhythm1.tooltip"),
-                    Challenges.NO_CHANGES, ResultsBehaviour.ShowResults(null, null)) { main, _ ->
+                    Challenges.NO_CHANGES, ResultsBehaviour.ShowResults(null, ResultsBehaviour.PreviousHighScore.None)) { main, _ ->
                 GlobalStats.timesPlayedPracticePolyrhythm1.increment()
                 Polyrhythm1Practice(main)
             }
@@ -96,7 +96,7 @@ class PracticeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += createSidemode("mainMenu.practice.polyrhythm2",
                     Localization.getVar("mainMenu.practice.polyrhythm2.tooltip"),
-                    Challenges.NO_CHANGES, ResultsBehaviour.ShowResults(null, null)) { main, _ ->
+                    Challenges.NO_CHANGES, ResultsBehaviour.ShowResults(null, ResultsBehaviour.PreviousHighScore.None)) { main, _ ->
                 GlobalStats.timesPlayedPracticePolyrhythm2.increment()
                 Polyrhythm2Practice(main)
             }
