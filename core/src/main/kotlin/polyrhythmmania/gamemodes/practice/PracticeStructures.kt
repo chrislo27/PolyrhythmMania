@@ -6,6 +6,7 @@ import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.input.EngineInputter
+import polyrhythmmania.engine.input.RequiredInput
 import polyrhythmmania.world.EntityRodPR
 import java.util.*
 
@@ -110,7 +111,7 @@ open class PracticeBlock<R>(val duration: Float, val block: (engine: Engine, sta
 
 class PracticeInitBlock(duration: Float, val moreTimes: Int, block: (engine: Engine, startBeat: Float) -> Unit)
     : PracticeBlock<Unit>(duration, block)
-class PracticeLoopBlock(duration: Float, block: (engine: Engine, startBeat: Float) -> List<EngineInputter.RequiredInput>)
-    : PracticeBlock<List<EngineInputter.RequiredInput>>(duration, block)
+class PracticeLoopBlock(duration: Float, block: (engine: Engine, startBeat: Float) -> List<RequiredInput>)
+    : PracticeBlock<List<RequiredInput>>(duration, block)
 class PracticeEndBlock(duration: Float, block: (engine: Engine, startBeat: Float) -> Unit)
     : PracticeBlock<Unit>(duration, block)

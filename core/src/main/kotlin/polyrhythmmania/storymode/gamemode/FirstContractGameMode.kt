@@ -6,10 +6,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockTextbox
 import polyrhythmmania.engine.EventCowbellSFX
-import polyrhythmmania.engine.input.EngineInputter
-import polyrhythmmania.engine.input.EventLockInputs
-import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.engine.input.InputType
+import polyrhythmmania.engine.input.*
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.gamemodes.ResetMusicVolumeBlock
@@ -63,7 +60,7 @@ class FirstContractGameMode(main: PRManiaGame) : StoryGameMode(main) {
         practiceSection1.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowA, startBeat))
             engine.addEvent(EventPracticeRetract(engine, engine.world.rowA, 0, startBeat + 3.5f, affectThisIndexAndForward = true))
-            listOf(0, 4).map { EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.A) }
+            listOf(0, 4).map { RequiredInput(startBeat + it * 0.5f, InputType.A) }
         }
         practiceSection1.endBlock = PracticeEndBlock(12f) { engine, startBeat ->
             engine.addEvent(EventLockInputs(engine, true, startBeat))
@@ -135,7 +132,7 @@ class FirstContractGameMode(main: PRManiaGame) : StoryGameMode(main) {
         practiceSection2.loopBlock = PracticeLoopBlock(4f) { engine, startBeat ->
             engine.addEvent(EventDeployRod(engine, engine.world.rowDpad, startBeat))
             engine.addEvent(EventPracticeRetract(engine, engine.world.rowDpad, 0, startBeat + 3.5f, affectThisIndexAndForward = true))
-            listOf(0, 4).map { EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY) }
+            listOf(0, 4).map { RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY) }
         }
         practiceSection2.endBlock = PracticeEndBlock(7f) { engine, startBeat ->
             engine.addEvent(EventLockInputs(engine, true, startBeat))
@@ -190,8 +187,8 @@ class FirstContractGameMode(main: PRManiaGame) : StoryGameMode(main) {
             engine.addEvent(EventPracticeRetract(engine, engine.world.rowDpad, 0, startBeat + 3.5f, affectThisIndexAndForward = true))
             listOf(0, 4).flatMap {
                 listOf(
-                        EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.A),
-                        EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY)
+                        RequiredInput(startBeat + it * 0.5f, InputType.A),
+                        RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY)
                 )
             }
         }
@@ -255,8 +252,8 @@ class FirstContractGameMode(main: PRManiaGame) : StoryGameMode(main) {
             engine.addEvent(EventPracticeRetract(engine, engine.world.rowDpad, 0, startBeat + 3.5f, affectThisIndexAndForward = true))
             listOf(0, 2, 6, 4).flatMap {
                 listOf(
-                        EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.A),
-                        EngineInputter.RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY)
+                        RequiredInput(startBeat + it * 0.5f, InputType.A),
+                        RequiredInput(startBeat + it * 0.5f, InputType.DPAD_ANY)
                 )
             }
         }

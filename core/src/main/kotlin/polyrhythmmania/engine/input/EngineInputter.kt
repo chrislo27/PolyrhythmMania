@@ -9,6 +9,9 @@ import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.*
+import polyrhythmmania.engine.modifiers.EndlessScore
+import polyrhythmmania.engine.modifiers.PerfectChallengeData
+import polyrhythmmania.engine.modifiers.PracticeData
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsSound
@@ -42,97 +45,16 @@ class EngineInputter(val engine: Engine) {
         const val DEBUG_LOG_INPUTS: Boolean = false
         const val BEAT_EPSILON: Float = 0.01f
     }
-    
-    data class RequiredInput(val beat: Float, val inputType: InputType) {
-        var wasHit: Boolean = false
-        var hitScore: InputScore = InputScore.MISS
-    }
-    
-    class PracticeData {
-        var practiceModeEnabled: Boolean = false
-        val moreTimes: IntVar = IntVar(0)
-        var requiredInputs: List<RequiredInput> = emptyList()
-        
-        var clearText: Float = 0f
-        
-        fun reset() {
-            practiceModeEnabled = false
-            requiredInputs = emptyList()
-            moreTimes.set(0)
-            clearText = 0f
-        }
-    }
-    
-    class PerfectChallengeData {
-        var goingForPerfect: Boolean = false
-        var hit: Float = 0f
-        var failed: Boolean = false
-        
-        fun reset() {
-            hit = 0f
-            failed = false
-        }
-    }
-    
-    class InputChallengeData {
-        var restriction: InputTimingRestriction = InputTimingRestriction.NORMAL
-        
-        fun isInputScoreMiss(inputScore: InputScore): Boolean {
-            if (inputScore == InputScore.MISS) return true
-            if (restriction == InputTimingRestriction.ACES_ONLY && inputScore != InputScore.ACE) return true
-            if (restriction == InputTimingRestriction.NO_BARELY && !(inputScore == InputScore.ACE || inputScore == InputScore.GOOD)) return true
-            return false
-        }
-    }
-    
-    class EndlessScore {
-        val score: IntVar = IntVar(0)
-        var highScore: Var<Int> = GenericVar(0)
-        var showNewHighScoreAtEnd: Boolean = true
-        var hideHighScoreText: Boolean = false
-        val maxLives: IntVar = IntVar(0)
-        val startingLives: IntVar = IntVar { maxLives.use() }
-        val lives: IntVar = IntVar(startingLives.get())
-        
-        val gameOverSeconds: FloatVar = FloatVar(Float.MAX_VALUE)
-        val gameOverUIShown: BooleanVar = BooleanVar(false)
-        
-        fun reset() {
-            score.set(0)
-            lives.set(startingLives.get())
-            gameOverSeconds.set(Float.MAX_VALUE)
-            gameOverUIShown.set(false)
-        }
-    }
-    
-    class InputCountStats {
-        var total: Int = 0
-        var missed: Int = 0
-        var aces: Int = 0
-        var goods: Int = 0
-        var barelies: Int = 0
-        var early: Int = 0
-        var late: Int = 0
-        
-        fun reset() {
-            total = 0
-            missed = 0
-            aces = 0
-            goods = 0
-            barelies = 0
-            early = 0
-            late = 0
-        }
-    }
 
     private val world: World = engine.world
 
     val inputCountStats: InputCountStats = InputCountStats()
     var areInputsLocked: Boolean = true
     var skillStarBeat: Float = Float.POSITIVE_INFINITY
+    val inputChallenge: InputChallengeData = InputChallengeData()
+    
     val practice: PracticeData = PracticeData()
     val perfectChallenge: PerfectChallengeData = PerfectChallengeData()
-    val inputChallenge: InputChallengeData = InputChallengeData()
     val endlessScore: EndlessScore = EndlessScore()
 
     val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
@@ -165,9 +87,9 @@ class EngineInputter(val engine: Engine) {
         noMiss = true
         skillStarGotten.set(false)
         skillStarBeat = Float.POSITIVE_INFINITY
-        practice.reset()
-        perfectChallenge.reset()
-        endlessScore.reset()
+        practice.resetState()
+        perfectChallenge.resetState()
+        endlessScore.resetState()
         rodsExplodedPR = 0
         inputCountStats.reset()
     }
