@@ -30,4 +30,14 @@ class InputCountStats {
         early = 0
         late = 0
     }
+    
+    fun addToGlobalStats() {
+        GlobalStats.inputsGottenTotal.increment(this.total)
+        GlobalStats.inputsMissed.increment(this.missed)
+        GlobalStats.inputsGottenAce.increment(this.aces)
+        GlobalStats.inputsGottenGood.increment(this.goods)
+        GlobalStats.inputsGottenBarely.increment(this.barelies)
+        GlobalStats.inputsGottenEarly.increment(this.early)
+        GlobalStats.inputsGottenLate.increment(this.late)
+    }
 }

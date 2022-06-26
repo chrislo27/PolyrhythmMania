@@ -23,7 +23,8 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     : AbstractEndlessMode(main, prevHighScore, PlayTimeType.DUNK) {
     
     init {
-        container.world.worldMode = WorldMode(WorldType.Dunk, EndlessType.REGULAR_ENDLESS)
+        container.world.worldMode = WorldMode(WorldType.Dunk)
+        engine.inputter.endlessScore.enabled = true
         val inputter = container.engine.inputter
         inputter.endlessScore.maxLives.set(5)
         inputter.inputChallenge.restriction = InputTimingRestriction.ACES_ONLY

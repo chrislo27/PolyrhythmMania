@@ -28,7 +28,7 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     : AbstractEndlessMode(main, prevHighScore, PlayTimeType.ASSEMBLE) {
 
     init {
-        container.world.worldMode = WorldMode(WorldType.Assemble, EndlessType.NOT_ENDLESS)
+        container.world.worldMode = WorldMode(WorldType.Assemble)
         container.renderer.showEndlessModeScore.set(false)
 //        container.engine.inputter.endlessScore.maxLives.set(3)
         container.texturePackSource.set(TexturePackSource.STOCK_GBA)

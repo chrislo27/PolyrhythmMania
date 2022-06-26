@@ -30,7 +30,7 @@ class FirstContractGameMode(main: PRManiaGame) : StoryGameMode(main) {
     private val practiceSection4: PracticeSection = PracticeSection(engine)
 
     init {
-        container.world.worldMode = WorldMode(WorldType.Polyrhythm(), EndlessType.NOT_ENDLESS)
+        container.world.worldMode = WorldMode(WorldType.Polyrhythm())
         container.world.showInputFeedback = true // Overrides user settings
         container.world.worldSettings = WorldSettings(showInputIndicators = true)
     }

@@ -7,6 +7,8 @@ import polyrhythmmania.engine.input.InputResult
 class EndlessScore : ModifierModule {
     
     // Settings
+    var enabled: Boolean = false
+    
     var showNewHighScoreAtEnd: Boolean = true
     var hideHighScoreText: Boolean = false
     val maxLives: IntVar = IntVar(0)
@@ -14,7 +16,7 @@ class EndlessScore : ModifierModule {
     /**
      * Set when the [score] is higher than this [highScore].
      */
-    var highScore: Var<Int> = GenericVar(0)
+    var highScore: Var<Int> = GenericVar(0) // Intentionally a Var<Int> and not a specialized IntVar.
     
     // Data
     val score: IntVar = IntVar(0)

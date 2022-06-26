@@ -29,7 +29,7 @@ class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     val world: World = World().apply { 
-        this.worldMode = WorldMode(WorldType.Dunk, EndlessType.REGULAR_ENDLESS)
+        this.worldMode = WorldMode(WorldType.Dunk)
         resetWorld()
     }
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem()
@@ -55,6 +55,8 @@ class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private var robotMode: Boolean = true
 
     init {
+        engine.inputter.endlessScore.enabled = true
+        
 //        soundSystem.audioContext.out.addInput(player)
         soundSystem.startRealtime()
 

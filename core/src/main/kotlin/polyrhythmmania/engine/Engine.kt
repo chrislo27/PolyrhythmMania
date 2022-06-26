@@ -209,7 +209,8 @@ class Engine(timingProvider: TimingProvider,
                 activeTextBox.secondsTimer -= delta
             }
             if (activeTextBox.secondsTimer <= 0f) {
-                if (autoInputs && (!world.worldMode.endlessType.isEndless || inputter.endlessScore.lives.get() > 0)) {
+                val endlessScore = inputter.endlessScore
+                if (autoInputs && (!endlessScore.enabled || endlessScore.lives.get() > 0)) {
                     removeActiveTextbox(unpauseSoundInterface = true, runTextboxOnComplete = true)
                 }
             }

@@ -92,7 +92,7 @@ class EngineInputter(val engine: Engine) {
         rodsExplodedPR = 0
         inputCountStats.reset()
 
-        endlessScore.resetState()
+        endlessScore.resetState() // FIXME
     }
 
     fun onButtonPressed(release: Boolean, type: InputType) {
@@ -283,7 +283,7 @@ class EngineInputter(val engine: Engine) {
                         Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                     }
 
-                    if (!worldMode.endlessType.isEndless) {
+                    if (!endlessScore.enabled) {
                         (inputResults as MutableList).add(inputResult)
                     }
 
@@ -346,7 +346,7 @@ class EngineInputter(val engine: Engine) {
         val validResults = inputTracker.results.filter { !inputChallenge.isInputScoreMiss(it.inputScore) }
 
         totalExpectedInputs += numExpected
-        if (world.worldMode.endlessType.isEndless) {
+        if (endlessScore.enabled) {
             // Special case when in endless mode
             // Inputs don't count when lives = 0
             if (engine.areStatisticsEnabled && endlessScore.lives.get() > 0) {
@@ -424,7 +424,7 @@ class EngineInputter(val engine: Engine) {
 
         engine.musicData.volumeMap.addMusicVolume(MusicVolume(currentBeat, (afterBeat - currentBeat) / 2f, 0))
 
-        if (world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS) {
+        if (endlessScore.enabled) {
             engine.addEvent(object : Event(engine) {
                 override fun onStart(currentBeat: Float) {
                     super.onStart(currentBeat)
@@ -447,16 +447,9 @@ class EngineInputter(val engine: Engine) {
                     endlessScore.gameOverUIShown.set(true)
 
                     if (engine.areStatisticsEnabled) {
-                        val worldType = world.worldMode.worldType
-                        when (worldType) {
+                        when (world.worldMode.worldType) {
                             is WorldType.Polyrhythm, WorldType.Dunk -> {
-                                GlobalStats.inputsGottenTotal.increment(inputCountStats.total)
-                                GlobalStats.inputsMissed.increment(inputCountStats.missed)
-                                GlobalStats.inputsGottenAce.increment(inputCountStats.aces)
-                                GlobalStats.inputsGottenGood.increment(inputCountStats.goods)
-                                GlobalStats.inputsGottenBarely.increment(inputCountStats.barelies)
-                                GlobalStats.inputsGottenEarly.increment(inputCountStats.early)
-                                GlobalStats.inputsGottenLate.increment(inputCountStats.late)
+                                inputCountStats.addToGlobalStats()
                             }
                             WorldType.Assemble -> {
                                 // NO-OP
@@ -491,7 +484,7 @@ class EngineInputter(val engine: Engine) {
 
     fun addNonEndlessInputStats() {
         if (!engine.areStatisticsEnabled) return
-        if (world.worldMode.endlessType.isEndless) return
+        if (endlessScore.enabled) return
 
         when (world.worldMode.worldType) {
             is WorldType.Polyrhythm, WorldType.Assemble -> {

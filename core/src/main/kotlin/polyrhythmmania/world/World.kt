@@ -23,7 +23,7 @@ class World {
     }
     
     val tilesetPalette: TilesetPalette = TilesetPalette.createGBA1TilesetPalette()
-    var worldMode: WorldMode = WorldMode(WorldType.Polyrhythm(), EndlessType.NOT_ENDLESS)
+    var worldMode: WorldMode = WorldMode(WorldType.Polyrhythm())
     
     val entities: List<Entity> = CopyOnWriteArrayList()
 

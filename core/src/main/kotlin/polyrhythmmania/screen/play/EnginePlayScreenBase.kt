@@ -24,7 +24,6 @@ import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
 import polyrhythmmania.screen.results.ResultsScreen
 import polyrhythmmania.statistics.PlayTimeType
-import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.WorldType
 import java.time.*
 import kotlin.math.abs
@@ -53,7 +52,7 @@ class EnginePlayScreenBase(
     private var disableCatchingCursorOnHide: Boolean = false
     
     init {
-        if (engine.world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS
+        if (engine.inputter.endlessScore.enabled
                 && engine.world.worldMode.worldType is WorldType.Polyrhythm
                 && engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil mode in endless
             (pauseMenuHandler as? TengokuBgPauseMenuHandler)?.also { handler ->
@@ -69,7 +68,7 @@ class EnginePlayScreenBase(
     init {
         // Score achievements for endless-type modes
         engine.inputter.endlessScore.score.addListener { scoreVar ->
-            if (engine.world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS && engine.areStatisticsEnabled) {
+            if (engine.inputter.endlessScore.enabled && engine.areStatisticsEnabled) {
                 val newScore = scoreVar.getOrCompute()
                 when (engine.world.worldMode.worldType) {
                     is WorldType.Polyrhythm -> {

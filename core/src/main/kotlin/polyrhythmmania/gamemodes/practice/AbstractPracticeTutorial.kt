@@ -5,7 +5,6 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.statistics.PlayTimeType
-import polyrhythmmania.world.EndlessType
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldSettings
 import polyrhythmmania.world.WorldType
@@ -15,7 +14,7 @@ abstract class AbstractPracticeTutorial(main: PRManiaGame, playTimeType: PlayTim
     : GameMode(main, playTimeType) {
     
     init {
-        container.world.worldMode = WorldMode(WorldType.Polyrhythm(), EndlessType.NOT_ENDLESS)
+        container.world.worldMode = WorldMode(WorldType.Polyrhythm())
         container.world.showInputFeedback = true // Overrides user settings
         container.world.worldSettings = WorldSettings(showInputIndicators = true)
     }
