@@ -64,6 +64,19 @@ class Engine(timingProvider: TimingProvider,
             }
         }
     }
+
+    /**
+     * Resets all mutable state within this [Engine].
+     */
+    fun resetMutableState() {
+        this.removeEvents(this.events.toList())
+        this.inputter.areInputsLocked = this.autoInputs
+        this.inputter.resetState()
+        this.modifiers.resetState()
+        this.soundInterface.clearAllNonMusicAudio()
+        this.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
+        this.resetEndSignal()
+    }
     
     fun resetEndSignal() {
         endSignalReceived.set(false)

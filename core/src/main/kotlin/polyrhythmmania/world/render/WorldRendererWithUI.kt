@@ -280,9 +280,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
     }
 
-    override fun onWorldReset() {
-        super.onWorldReset()
-
+    override fun onWorldReset(world: World) {
+        super.onWorldReset(world)
+        
         skillStarSpinAnimation = 0f
         skillStarPulseAnimation = 0f
         hudRedFlash = 0f

@@ -19,7 +19,6 @@ import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
@@ -388,7 +387,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             engine.seconds = 0f
             engine.playbackSpeed = 1f
             editor.compileEditorIntermediates()
-            inputter.reset()
+            inputter.resetState()
             
             var sec = 0f
             val step = 1f / 60f
@@ -469,7 +468,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             val originalSecs = editor.playbackStart.get()
             timing.seconds = originalSecs
             engine.seconds = originalSecs
-            editor.resetWorld()
+            editor.resetWorldEntitiesAndEngineModules()
             editor.updatePaletteAndTexPackChangesState()
             engine.soundInterface.clearAllNonMusicAudio()
             engine.playbackSpeed = previousPlaybackSpeed

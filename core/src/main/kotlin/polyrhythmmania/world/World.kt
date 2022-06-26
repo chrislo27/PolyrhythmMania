@@ -31,7 +31,7 @@ class World {
     var showInputFeedback: Boolean = PRManiaGame.instance.settings.showInputFeedbackBar.getOrCompute()
     var worldSettings: WorldSettings = WorldSettings.DEFAULT
     
-    var worldResetListener: WorldResetListener? = null
+    val worldResetListeners: MutableList<WorldResetListener> = mutableListOf()
     
     // World mode-specific things
     // POLYRHYTHM
@@ -98,7 +98,10 @@ class World {
     }
     
     // ------------------------------------------------------------------------------------------------------
-    
+
+    /**
+     * Removes [TemporaryEntity]s, repopulates the scenes, and calls [triggerWorldResetListeners].
+     */
     fun resetWorld() {
         (entities as MutableList).removeIf { it is TemporaryEntity }
         when (worldMode.worldType) {
@@ -113,7 +116,11 @@ class World {
                 populateAssembleScene()
             }
         }
-        worldResetListener?.onWorldReset(this)
+        triggerWorldResetListeners()
+    }
+    
+    fun triggerWorldResetListeners() {
+        worldResetListeners.toList().forEach { it.onWorldReset(this) }
     }
 
     private fun populateRegularScene() {

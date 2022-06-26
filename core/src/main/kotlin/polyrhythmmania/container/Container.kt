@@ -140,6 +140,20 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
         }
     }
     
+    /**
+     * Resets all mutable state within this [Container].
+     */
+    fun resetMutableState() {
+        engine.resetMutableState()
+        world.resetWorld()
+        
+        this.globalSettings.applyForcedTilesetPaletteSettings(this)
+        this.setTexturePackFromSource()
+        
+        val blocks = this.blocks.toList()
+        engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
+    }
+    
     fun getTexturePackFromSource(source: TexturePackSource): TexturePack? {
         return when (source) {
             TexturePackSource.STOCK_GBA -> StockTexturePacks.gba

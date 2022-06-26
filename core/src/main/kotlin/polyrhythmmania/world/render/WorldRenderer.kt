@@ -3,6 +3,7 @@ package polyrhythmmania.world.render
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.*
+import com.badlogic.gdx.utils.Disposable
 import paintbox.util.gdxutils.*
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
@@ -12,7 +13,7 @@ import polyrhythmmania.world.render.bg.WorldBackgroundFromWorldType
 import polyrhythmmania.world.tileset.Tileset
 
 
-open class WorldRenderer(val world: World, val tileset: Tileset) {
+open class WorldRenderer(val world: World, val tileset: Tileset) : World.WorldResetListener {
 
     companion object {
         val comparatorRenderOrder: Comparator<Entity> = Comparator { o1, o2 ->
@@ -64,9 +65,13 @@ open class WorldRenderer(val world: World, val tileset: Tileset) {
         private set
     
     var worldBackground: WorldBackground = WorldBackgroundFromWorldType
+    
+    init {
+        @Suppress("LeakingThis")
+        this.world.worldResetListeners += this as World.WorldResetListener
+    }
 
-
-    open fun onWorldReset() {
+    override fun onWorldReset(world: World) {
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0f) // Ignore zoom value
     }
 
@@ -126,5 +131,12 @@ open class WorldRenderer(val world: World, val tileset: Tileset) {
     open fun getDebugString(): String {
         return """e: ${world.entities.size}  r: ${entitiesRenderedLastCall} (${(entityRenderTimeNano) / 1_000_000f} ms)
 """
+    }
+
+    /**
+     * Removes any world listeners, like the world reset listener.
+     */
+    fun removeWorldHooks() {
+        this.world.worldResetListeners.remove(this)
     }
 }

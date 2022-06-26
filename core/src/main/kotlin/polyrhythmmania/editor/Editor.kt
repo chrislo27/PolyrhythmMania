@@ -52,7 +52,9 @@ import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
 import paintbox.util.DecimalFormats
 import polyrhythmmania.engine.StatisticsMode
+import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputType
+import polyrhythmmania.engine.modifiers.EngineModifiers
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
@@ -401,7 +403,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
      * into the [engine]. This mutates the [engine] state.
      */
     fun compileEditorIntermediates() {
-        resetWorld()
+        resetWorldEntitiesAndEngineModules()
         compileEditorTempos()
         compileEditorTimeSignatures()
         compileEditorMusicInfo()
@@ -452,7 +454,11 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
         volumeMap.addMusicVolumesBulk(this.musicVolumes.getOrCompute().toList())
     }
 
-    fun resetWorld() {
+    /**
+     * Resets certain world entities (deletes [TemporaryEntity]s), resets row blocks and input indicators. Also resets
+     * the [EngineInputter], [EngineModifiers], and clears the active textbox.
+     */
+    fun resetWorldEntitiesAndEngineModules() {
         world.entities.toList().forEach { ent ->
             if (ent is TemporaryEntity) {
                 world.removeEntity(ent)
@@ -464,7 +470,9 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
             }
             row.updateInputIndicators()
         }
-        engine.inputter.reset()
+        
+        engine.inputter.resetState()
+        engine.modifiers.resetState()
         engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
     }
 
@@ -631,11 +639,10 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
 
         if (lastState == PlayState.STOPPED && newState == PlayState.PLAYING) {
             compileEditorIntermediates()
-            resetWorld()
             engine.resetEndSignal()
             cameraOffset.changeTarget(0f)
             cameraOffset.reset()
-            renderer.onWorldReset()
+            world.triggerWorldResetListeners() // Not a full world reset to avoid throwing away so many entities
 
             val playbackStartBeats = this.playbackStart.get()
             val newSeconds = engine.tempos.beatsToSeconds(playbackStartBeats)
@@ -677,7 +684,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
             lastPlacedMetronomeBeat = -1
             populateMetronomeTicks(engine.beat + 8)
         } else if (newState == PlayState.STOPPED) {
-            resetWorld()
+            resetWorldEntitiesAndEngineModules()
             val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
             timing.seconds = newSeconds
             engine.seconds = newSeconds

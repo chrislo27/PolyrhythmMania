@@ -149,7 +149,7 @@ class EngineInputter(val engine: Engine) {
     val expectedInputsPr: List<EntityRodPR.ExpectedInput.Expected> = mutableListOf()
     
     init {
-        reset()
+        resetState()
     }
     
     fun clearInputs(beforeBeat: Float = Float.POSITIVE_INFINITY) {
@@ -159,7 +159,7 @@ class EngineInputter(val engine: Engine) {
         practice.requiredInputs = emptyList()
     }
     
-    fun reset() {
+    fun resetState() {
         clearInputs()
         inputFeedbackFlashes.fill(-10000f)
         noMiss = true

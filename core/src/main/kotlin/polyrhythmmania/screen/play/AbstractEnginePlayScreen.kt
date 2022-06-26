@@ -66,22 +66,9 @@ abstract class AbstractEnginePlayScreen(
     }
 
     override fun initializeGameplay() {
-        // Reset/clearing pass
-        engine.removeEvents(engine.events.toList())
-        engine.inputter.areInputsLocked = engine.autoInputs
-        engine.inputter.reset()
-        engine.soundInterface.clearAllNonMusicAudio()
         engine.inputCalibration = this.inputCalibration
-        engine.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
-        engine.resetEndSignal()
-        container.world.resetWorld()
-        worldRenderer.onWorldReset()
-        challenges.applyToEngine(engine)
-
-        // Set everything else
-        applyForcedTilesetPaletteSettings()
-        container.setTexturePackFromSource()
-
+        
+        // Set timing and music
         timing.seconds = -(1f + max(0f, this.inputCalibration.audioOffsetMs / 1000f))
         engine.seconds = timing.seconds
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
@@ -92,9 +79,10 @@ abstract class AbstractEnginePlayScreen(
             player.pause(false)
         }
         soundSystem.startRealtime() // Does nothing if already started
-
-        val blocks = container.blocks.toList()
-        engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
+        
+        container.resetMutableState()
+        
+        challenges.applyToEngine(engine)
     }
 
     override fun renderUpdate() {
@@ -257,17 +245,4 @@ SideMode: ${gameMode?.javaClass?.name}${if (gameMode != null) ("\n" + gameMode.g
 """
     }
     
-
-    protected fun applyForcedTilesetPaletteSettings() {
-        when (container.globalSettings.forceTilesetPalette) {
-            ForceTilesetPalette.NO_FORCE ->
-                container.world.tilesetPalette
-            ForceTilesetPalette.FORCE_PR1 ->
-                TilesetPalette.createGBA1TilesetPalette()
-            ForceTilesetPalette.FORCE_PR2 ->
-                TilesetPalette.createGBA2TilesetPalette()
-            ForceTilesetPalette.ORANGE_BLUE ->
-                TilesetPalette.createOrangeBlueTilesetPalette()
-        }.applyTo(container.renderer.tileset)
-    }
 }

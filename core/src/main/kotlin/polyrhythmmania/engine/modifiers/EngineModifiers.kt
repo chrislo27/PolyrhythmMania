@@ -7,5 +7,9 @@ import polyrhythmmania.engine.input.EngineInputter
 class EngineModifiers(val engine: Engine) {
     
     private val inputter: EngineInputter = engine.inputter
-    
+ 
+ 
+    fun resetState() {
+        // TODO
+    }
 }
