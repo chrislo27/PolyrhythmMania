@@ -1,6 +1,8 @@
 package polyrhythmmania.engine.modifiers
 
 import paintbox.binding.*
+import polyrhythmmania.engine.input.EngineInputter
+import polyrhythmmania.engine.input.InputResult
 
 class EndlessScore : ModifierModule {
     
@@ -25,5 +27,13 @@ class EndlessScore : ModifierModule {
         lives.set(startingLives.get())
         gameOverSeconds.set(Float.MAX_VALUE)
         gameOverUIShown.set(false)
+    }
+
+    override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
+        // TODO
+    }
+
+    override fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean) {
+        // TODO
     }
 }

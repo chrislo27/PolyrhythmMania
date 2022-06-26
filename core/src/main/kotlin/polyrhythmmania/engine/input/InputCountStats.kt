@@ -1,8 +1,11 @@
 package polyrhythmmania.engine.input
 
+import polyrhythmmania.statistics.GlobalStats
+
 
 /**
- * Holding class for counting input types.
+ * Holding class for counting input types. These numbers are batched and pushed to [GlobalStats] at the end
+ * of an endless mode or normal Polyrhythm gameplay.
  */
 class InputCountStats {
     

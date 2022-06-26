@@ -314,6 +314,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     private fun renderUI(batch: SpriteBatch) {
         val engine = this.engine
         val inputter = engine.inputter
+        val modifiers = engine.modifiers
 
         moreTimesVar.set(inputter.practice.moreTimes.get())
         val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
@@ -369,16 +370,16 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             textBoxInputLabel.textColor.set(textColor)
         }
 
-        val challenge = inputter.perfectChallenge
-        if (challenge.goingForPerfect) {
+        val perfectCh = modifiers.perfectChallenge
+        if (perfectCh.goingForPerfect) {
             perfectPane.visible.set(true)
-            challenge.hit = (challenge.hit - Gdx.graphics.deltaTime / (if (challenge.failed) 0.5f else 0.125f)).coerceIn(0f, 1f)
+            perfectCh.hit = (perfectCh.hit - Gdx.graphics.deltaTime / (if (perfectCh.failed) 0.5f else 0.125f)).coerceIn(0f, 1f)
 
-            perfectIconFlash.opacity.set(if (challenge.failed) 0f else challenge.hit)
-            perfectIcon.visible.set(!challenge.failed)
-            perfectIconFailed.visible.set(challenge.failed)
+            perfectIconFlash.opacity.set(if (perfectCh.failed) 0f else perfectCh.hit)
+            perfectIcon.visible.set(!perfectCh.failed)
+            perfectIconFailed.visible.set(perfectCh.failed)
 
-            if (challenge.failed && challenge.hit > 0f) {
+            if (perfectCh.failed && perfectCh.hit > 0f) {
                 val maxShake = 3
                 val x = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
                 val y = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
@@ -392,7 +393,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             perfectPane.visible.set(false)
         }
 
-        PRManiaGame.instance.fontGameTextbox.useFont { font ->
+        val textboxFont = PRManiaGame.instance.fontGameTextbox
+        textboxFont.useFont { font ->
             font.scaleMul(0.75f)
             val sec = engine.seconds
             renderSongInfoCard(batch, font, songTitleCard, false, sec)

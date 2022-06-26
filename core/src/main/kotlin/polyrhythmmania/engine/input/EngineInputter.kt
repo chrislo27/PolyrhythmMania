@@ -40,7 +40,7 @@ import kotlin.math.max
  *   - It sends its input data to this [EngineInputter]
  */
 class EngineInputter(val engine: Engine) {
-    
+
     companion object {
         const val DEBUG_LOG_INPUTS: Boolean = false
         const val BEAT_EPSILON: Float = 0.01f
@@ -52,10 +52,9 @@ class EngineInputter(val engine: Engine) {
     var areInputsLocked: Boolean = true
     var skillStarBeat: Float = Float.POSITIVE_INFINITY
     val inputChallenge: InputChallengeData = InputChallengeData()
-    
+    val inputterListeners: MutableList<InputterListener> = mutableListOf()
+
     val practice: PracticeData = PracticeData()
-    val perfectChallenge: PerfectChallengeData = PerfectChallengeData()
-    val endlessScore: EndlessScore = EndlessScore()
 
     val inputFeedbackFlashes: FloatArray = FloatArray(5) { -10000f }
     var totalExpectedInputs: Int = 0
@@ -65,22 +64,24 @@ class EngineInputter(val engine: Engine) {
     var rodsExplodedPR: Int = 0
         private set
     var minimumInputCount: Int = 0
-    
+
     val skillStarGotten: BooleanVar = BooleanVar(false)
     val inputResults: List<InputResult> = mutableListOf()
     val expectedInputsPr: List<EntityRodPR.ExpectedInput.Expected> = mutableListOf()
-    
+
+    val endlessScore: EndlessScore = EndlessScore() // FIXME
+
     init {
         resetState()
     }
-    
+
     fun clearInputs(beforeBeat: Float = Float.POSITIVE_INFINITY) {
         totalExpectedInputs = 0
         (inputResults as MutableList).removeIf { it.perfectBeat < beforeBeat }
         (expectedInputsPr as MutableList).removeIf { it.perfectBeat < beforeBeat }
         practice.requiredInputs = emptyList()
     }
-    
+
     fun resetState() {
         clearInputs()
         inputFeedbackFlashes.fill(-10000f)
@@ -90,11 +91,10 @@ class EngineInputter(val engine: Engine) {
         practice.reset()
         rodsExplodedPR = 0
         inputCountStats.reset()
-        
-        perfectChallenge.resetState()
+
         endlessScore.resetState()
     }
-    
+
     fun onButtonPressed(release: Boolean, type: InputType) {
         if (type == InputType.A) {
             val activeTextBox = engine.activeTextBox
@@ -124,9 +124,9 @@ class EngineInputter(val engine: Engine) {
 
     private fun onInput(type: InputType, atSeconds: Float = engine.seconds) {
         if (areInputsLocked || engine.activeTextBox?.textBox?.requiresInput == true) return
-        
+
         val atBeat = engine.tempos.secondsToBeats(atSeconds)
-        
+
         val worldMode = world.worldMode
         if (worldMode.worldType is WorldType.Polyrhythm) {
             val rowBlockType: EntityPiston.Type = if (type.isDpad) EntityPiston.Type.PISTON_DPAD else EntityPiston.Type.PISTON_A
@@ -174,7 +174,8 @@ class EngineInputter(val engine: Engine) {
                     }
                     inputTracker.results += inputResult
 
-                    if (practice.practiceModeEnabled && !inputChallenge.isInputScoreMiss(inputResult.inputScore)) {
+                    val countsAsMiss = inputChallenge.isInputScoreMiss(inputResult.inputScore)
+                    if (practice.practiceModeEnabled && !countsAsMiss) {
                         val allWereHit = practice.requiredInputs.all { it.wasHit }
                         if (!allWereHit) {
                             practice.requiredInputs.forEach { ri ->
@@ -201,14 +202,13 @@ class EngineInputter(val engine: Engine) {
                         inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                     }
 
+                    inputterListeners.forEach { it.onInputResultHit(this, inputResult, countsAsMiss) }
+
                     // Bounce the rod
-                    if (!inputChallenge.isInputScoreMiss(inputResult.inputScore)) {
+                    if (!countsAsMiss) {
                         rod.bounce(nextBlockIndex)
                         if (inputResult.inputScore == InputScore.ACE) {
                             attemptSkillStar(perfectBeats)
-                        }
-                        if (perfectChallenge.goingForPerfect && !perfectChallenge.failed) {
-                            perfectChallenge.hit = 1f
                         }
                     } else {
                         missed()
@@ -245,9 +245,12 @@ class EngineInputter(val engine: Engine) {
                     inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                 }
 
+                val countsAsMiss = inputChallenge.isInputScoreMiss(inputResult.inputScore)
+                inputterListeners.forEach { it.onInputResultHit(this, inputResult, countsAsMiss) }
+
                 // Bounce the rod regardless of miss; if aces only, bounce still has to apply for early/late
                 rod.bounce(engine, inputResult)
-                if (inputResult.inputScore == InputScore.MISS) { // Explicitly checking for MISS, since rod.bounce returns immediately if it is MISS
+                if (countsAsMiss) { // Explicitly checking for MISS, since rod.bounce returns immediately if it is MISS
                     missed()
                 }
             }
@@ -283,14 +286,17 @@ class EngineInputter(val engine: Engine) {
                     if (!worldMode.endlessType.isEndless) {
                         (inputResults as MutableList).add(inputResult)
                     }
-                    
+
                     val inputFeedbackIndex: Int = getInputFeedbackIndex(inputResult.inputScore, inputResult.accuracySec < 0f)
                     if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
                         inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
                     }
 
+                    val countsAsMiss = inputChallenge.isInputScoreMiss(inputResult.inputScore)
+                    inputterListeners.forEach { it.onInputResultHit(this, inputResult, countsAsMiss) }
+
                     // Bounce the rod
-                    if (!inputChallenge.isInputScoreMiss(inputResult.inputScore)) {
+                    if (!countsAsMiss) {
                         rod.addInputResult(engine, inputResult)
                         hit = true
                         hitDuration = 1f
@@ -323,7 +329,7 @@ class EngineInputter(val engine: Engine) {
             }
         }
     }
-    
+
     fun getInputFeedbackIndex(score: InputScore, early: Boolean): Int {
         return when (score) {
             InputScore.ACE -> 2
@@ -332,13 +338,13 @@ class EngineInputter(val engine: Engine) {
             InputScore.MISS -> -1
         }
     }
-    
+
     fun submitInputsFromRod(rod: EntityRodPR) {
         val inputTracker = rod.inputTracker
-        
+
         val numExpected = inputTracker.expected.count { it is EntityRodPR.ExpectedInput.Expected }
         val validResults = inputTracker.results.filter { !inputChallenge.isInputScoreMiss(it.inputScore) }
-        
+
         totalExpectedInputs += numExpected
         if (world.worldMode.endlessType.isEndless) {
             // Special case when in endless mode
@@ -359,28 +365,19 @@ class EngineInputter(val engine: Engine) {
                 GlobalStats.rodsFerriedPolyrhythm.increment()
             }
         }
-        
+
         if (!engine.autoInputs && noMiss && !rod.registeredMiss) {
             if ((rod.exploded && numExpected > 0) || (numExpected > validResults.size) || inputTracker.results.any { inputChallenge.isInputScoreMiss(it.inputScore) }) {
                 missed()
             }
         }
     }
-    
+
     fun missed() {
-        noMiss = false
-        if (perfectChallenge.goingForPerfect) {
-            if (!perfectChallenge.failed) {
-                perfectChallenge.failed = true
-                perfectChallenge.hit = 1f
-                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
-                    player.gain = 0.45f
-                }
-                if (engine.areStatisticsEnabled) {
-                    GlobalStats.perfectsLost.increment()
-                }
-            }
-        }
+        val wasNoMiss = this.noMiss
+        this.noMiss = false
+
+        inputterListeners.forEach { it.onMissed(this, wasNoMiss) }
 
         val worldMode = world.worldMode
         when (worldMode.worldType) {
@@ -397,7 +394,7 @@ class EngineInputter(val engine: Engine) {
             else -> {}
         }
     }
-    
+
     fun onRodPRExploded() {
         rodsExplodedPR++
         if (engine.areStatisticsEnabled) {
@@ -405,7 +402,7 @@ class EngineInputter(val engine: Engine) {
             GlobalStats.rodsExplodedPolyrhythm.increment()
         }
     }
-    
+
     fun triggerEndlessLifeLost() {
         val endlessScore = this.endlessScore
         val oldLives = endlessScore.lives.get()
@@ -415,7 +412,7 @@ class EngineInputter(val engine: Engine) {
             onEndlessGameOver()
         }
     }
-    
+
     fun onEndlessGameOver() {
         engine.playbackSpeed = 1f
         val currentSeconds = engine.seconds
@@ -424,9 +421,9 @@ class EngineInputter(val engine: Engine) {
         val score = endlessScore.score.get()
         val wasNewHighScore = score > endlessScore.highScore.getOrCompute()
         val afterBeat = engine.tempos.secondsToBeats(currentSeconds + 2f)
-        
+
         engine.musicData.volumeMap.addMusicVolume(MusicVolume(currentBeat, (afterBeat - currentBeat) / 2f, 0))
-        
+
         if (world.worldMode.endlessType == EndlessType.REGULAR_ENDLESS) {
             engine.addEvent(object : Event(engine) {
                 override fun onStart(currentBeat: Float) {
@@ -482,7 +479,7 @@ class EngineInputter(val engine: Engine) {
         }
         return false
     }
-    
+
     fun onSkillStarHit() {
         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_skill_star"), SoundInterface.SFXType.PLAYER_INPUT) { player ->
             player.gain = 0.6f
@@ -491,11 +488,11 @@ class EngineInputter(val engine: Engine) {
             GlobalStats.skillStarsEarned.increment()
         }
     }
-    
+
     fun addNonEndlessInputStats() {
         if (!engine.areStatisticsEnabled) return
         if (world.worldMode.endlessType.isEndless) return
-        
+
         when (world.worldMode.worldType) {
             is WorldType.Polyrhythm, WorldType.Assemble -> {
                 val results = this.inputResults
@@ -521,5 +518,5 @@ class EngineInputter(val engine: Engine) {
             }
         }
     }
-    
+
 }
