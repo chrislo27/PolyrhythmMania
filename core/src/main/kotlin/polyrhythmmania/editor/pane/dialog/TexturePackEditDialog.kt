@@ -3,19 +3,23 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import net.lingala.zip4j.ZipFile
 import paintbox.Paintbox
-import paintbox.binding.*
+import paintbox.binding.BooleanVar
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
 import paintbox.filechooser.FileExtFilter
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.*
+import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
+import paintbox.ui.ImageRenderingMode
+import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.ui.contextmenu.LabelMenuItem
@@ -25,8 +29,6 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.Matrix4Stack
-import paintbox.filechooser.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import paintbox.util.gdxutils.openFileExplorer
@@ -34,12 +36,14 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PreferenceKeys
+import polyrhythmmania.container.TexPackSrcSelectorMenuPane
+import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins
-import polyrhythmmania.world.World
-import polyrhythmmania.world.entity.*
-import polyrhythmmania.world.render.WorldRenderer
-import polyrhythmmania.world.tileset.*
+import polyrhythmmania.world.tileset.CustomTexturePack
+import polyrhythmmania.world.tileset.StockTexturePacks
+import polyrhythmmania.world.tileset.TexturePack
+import polyrhythmmania.world.tileset.TilesetRegion
 import java.io.File
 import java.util.*
 import java.util.zip.ZipOutputStream
@@ -128,8 +132,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
     private val currentMsg: Var<String> = Var("")
     
     private val previewPane: PreviewPane
-    
-    private val rodRotation: FloatVar = FloatVar(0f)
+    private val texPackSelectorPane: TexPackSrcSelectorMenuPane
 
     init {
         baseTexturePack.addListener { tp ->
@@ -465,42 +468,23 @@ class TexturePackEditDialog(editorPane: EditorPane,
             this.bounds.x.bind { (parent.use()?.bounds?.width?.use() ?: 0f) * 0.4f + 8f }
         }
         bottomRightHbox.temporarilyDisableLayouts {
-            bottomRightHbox += TextLabel(binding = { Localization.getVar("editor.dialog.texturePack.stock").use() },
-                    font = editorPane.palette.musicDialogFont).apply {
-                this.markup.set(editorPane.palette.markup)
-                this.textColor.set(Color.WHITE.cpy())
-                this.renderAlign.set(Align.right)
-                this.textAlign.set(TextAlign.RIGHT)
-                this.doLineWrapping.set(true)
-                this.bounds.width.set(200f)
-            }
-
-            val toggleGroup = ToggleGroup()
-            fun createRadioButton(textKey: String, pack: TexturePack): RadioButton {
-                return RadioButton(binding = { Localization.getVar(textKey).use() },
+            bottomRightHbox += VBox().apply {
+                this.spacing.set(2f)
+                this.bounds.width.set(340f)
+                
+                this += TextLabel(binding = { Localization.getVar("editor.dialog.texturePack.stock").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
-                    this.textLabel.markup.set(editorPane.palette.markup)
-                    this.imageNode.padding.set(Insets(1f))
-                    this.color.set(Color.WHITE.cpy())
-                    toggleGroup.addToggle(this)
-                    this.onSelected = {
-                        baseTexturePack.set(pack)
-                        onTexturePackUpdated.invert()
-                    }
-                    this.selectedState.set(baseTexturePack.getOrCompute() == pack)
+                    this.markup.set(editorPane.palette.markup)
+                    this.textColor.set(Color.WHITE.cpy())
                 }
-            }
-            bottomRightHbox += VBox().apply {
-                this.spacing.set(2f)
-                this.bounds.width.set(80f) // Smaller because text is just "GBA" or "HD". 
-                this += createRadioButton("editor.dialog.texturePack.stock.gba", StockTexturePacks.gba)
-                this += createRadioButton("editor.dialog.texturePack.stock.hd", StockTexturePacks.hd)
-            }
-            bottomRightHbox += VBox().apply {
-                this.spacing.set(2f)
-                this.bounds.width.set(125f)
-                this += createRadioButton("editor.dialog.texturePack.stock.arcade", StockTexturePacks.arcade)
+                val basePackSource: TexturePackSource = StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.STOCK_GBA
+                texPackSelectorPane = TexPackSrcSelectorMenuPane(editorPane, basePackSource,
+                        legalValues = TexturePackSource.VALUES_NON_CUSTOM) { src ->
+                    baseTexturePack.set(StockTexturePacks.getPackFromSource(src) ?: StockTexturePacks.gba)
+                    onTexturePackUpdated.invert()
+                }
+                this += texPackSelectorPane
             }
         }
         bottomPaneContainer.addChild(bottomRightHbox)
@@ -511,6 +495,9 @@ class TexturePackEditDialog(editorPane: EditorPane,
         val currentCustom = editor.container.customTexturePack.getOrCompute()
         if (currentCustom != null) {
             customTexturePack.set(currentCustom)
+            baseTexturePack.set(StockTexturePacks.allPacksByID[currentCustom.fallbackID] ?: StockTexturePacks.gba)
+            texPackSelectorPane.combobox.selectedItem.set(StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.STOCK_GBA)
+            
             onTexturePackUpdated.invert()
         }
         return this
@@ -565,7 +552,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
             }
             
             // Dispose the textures that have stopped being used
-            val texturesRemoved = oldTextureSet - ctp.getAllUniqueTextures() 
+            val texturesRemoved = oldTextureSet - ctp.getAllUniqueTextures().toSet() 
             if (texturesRemoved.isNotEmpty()) {
                 texturesRemoved.forEach { it.disposeQuietly() }
             }

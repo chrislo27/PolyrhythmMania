@@ -10,13 +10,15 @@ import java.util.*
 
 
 class TexPackSrcSelectorMenuPane(
-        editorPane: EditorPane, currentSource: TexturePackSource, val changeListener: (TexturePackSource) -> Unit
+        editorPane: EditorPane, currentSource: TexturePackSource,
+        val legalValues: List<TexturePackSource> = TexturePackSource.VALUES,
+        val changeListener: (TexturePackSource) -> Unit
 ) : Pane() {
     
-    val combobox: ComboBox<TexturePackSource> = ComboBox(TexturePackSource.VALUES, currentSource).also { combobox ->
+    val combobox: ComboBox<TexturePackSource> = ComboBox(legalValues, currentSource).also { combobox ->
         combobox.markup.set(editorPane.palette.markup)
-        combobox.selectedItem.addListener {
-            changeListener(it.getOrCompute())
+        combobox.onItemSelected = { src ->
+            changeListener(src)
         }
         combobox.itemStringConverter.set(StringConverter { src ->
             when (src) {

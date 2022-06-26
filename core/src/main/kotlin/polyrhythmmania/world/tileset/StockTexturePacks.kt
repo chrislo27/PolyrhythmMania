@@ -17,6 +17,7 @@ object StockTexturePacks {
     val missingTilesetRegion: TilesetRegion by lazy {
         TilesetRegion("MISSING", TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex")), RegionSpacing.ZERO)
     }
+    
 
     private val gbaSrc: TexturePackAndSource by lazy { 
         TexturePackAndSource(StockTexturePack("gba", emptySet(), AssetRegistry.get<PackedSheet>("tileset_gba")), TexturePackSource.STOCK_GBA)
@@ -39,22 +40,23 @@ object StockTexturePacks {
     }
     val arcade: TexturePack by lazy { arcadeSrc.texturePack }
     
-    private val allPacksWithSource: List<TexturePackAndSource> by lazy {
+    
+    private val allPackAndSources: List<TexturePackAndSource> by lazy {
         listOf(gbaSrc, hdSrc, arcadeSrc)
     }
-    private val allPacksBySource: Map<TexturePack, TexturePackSource> by lazy {
-        allPacksWithSource.associate { it.texturePack to it.source }
+    private val allPacksToSource: Map<TexturePack, TexturePackSource> by lazy {
+        allPackAndSources.associate { it.texturePack to it.source }
     }
-    val allPacks: List<TexturePack> by lazy {
-        allPacksWithSource.map { it.texturePack }
+    private val allPacksBySource: Map<TexturePackSource, TexturePack> by lazy {
+        allPackAndSources.associate { it.source to it.texturePack }
     }
-    val allPacksByID: Map<String, TexturePack> by lazy {
-        allPacks.associateBy { it.id }
-    }
+    val allPacks: List<TexturePack> by lazy { allPackAndSources.map { it.texturePack } }
+    val allPacksByID: Map<String, TexturePack> by lazy { allPacks.associateBy { it.id } }
     val allPacksByIDWithDeprecations: Map<String, TexturePack> by lazy {
         allPacks.flatMap { p -> p.deprecatedIDs.map { did -> did to p } }.associate { it.first to it.second } + allPacksByID
     }
     
-    fun getTexturePackSource(stock: TexturePack): TexturePackSource? = allPacksBySource[stock]
+    fun getTexturePackSource(stock: TexturePack): TexturePackSource? = allPacksToSource[stock]
+    fun getPackFromSource(source: TexturePackSource): TexturePack? = allPacksBySource[source]
 
 }
