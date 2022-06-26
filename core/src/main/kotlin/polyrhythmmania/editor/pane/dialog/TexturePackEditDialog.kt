@@ -128,7 +128,6 @@ class TexturePackEditDialog(editorPane: EditorPane,
     private val currentMsg: Var<String> = Var("")
     
     private val previewPane: PreviewPane
-    val objPreview: ObjectPreview = ObjectPreview()
     
     private val rodRotation: FloatVar = FloatVar(0f)
 
@@ -899,114 +898,6 @@ class TexturePackEditDialog(editorPane: EditorPane,
             val current = currentEntry.getOrCompute()
             
             removeButton.disabled.set(ctp.getOrNull(current.id) == null)
-        }
-    }
-    
-    inner class ObjectPreview : UIElement() {
-        
-        val world: World = World()
-        val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(editor.container.renderer.tileset.texturePack).apply { 
-//            tilesetPalette.applyTo(this)
-        })
-        
-        val rodEntity: EntityRodDecor
-        
-        init {
-            this += ImageNode(editor.previewTextureRegion)
-            rodEntity = object : EntityRodDecor(world) {
-                override fun getAnimationAlpha(): Float {
-                    return (rodRotation.get() % 1f).coerceIn(0f, 1f)
-                }
-            }
-        }
-        
-        init {
-            world.clearEntities()
-            for (x in 2..12) {
-                for (z in -5..4) {
-                    val ent = if (z == 0) EntityPlatform(world, withLine = x == 4) else EntityCube(world, withLine = x == 4, withBorder = z == 1)
-                    world.addEntity(ent.apply { 
-                        this.position.set(x.toFloat(), -1f, z.toFloat())
-                    })
-                    if (z == 0 && x <= 4) {
-                        world.addEntity(EntityPlatform(world, withLine = x == 4).apply {
-                            this.position.set(x.toFloat(), 0f, z.toFloat())
-                        })
-                    }
-                }
-            }
-            
-            world.addEntity(EntityPiston(world).apply { 
-                this.position.set(6f, 0f, 0f)
-                this.type = EntityPiston.Type.PISTON_A
-                this.pistonState = EntityPiston.PistonState.FULLY_EXTENDED
-            })
-            world.addEntity(EntityPiston(world).apply { 
-                this.position.set(9f, 0f, 0f)
-                this.type = EntityPiston.Type.PISTON_DPAD
-                this.pistonState = EntityPiston.PistonState.FULLY_EXTENDED
-            })
-            world.addEntity(EntityCube(world).apply { 
-                this.position.set(7f, 0f, 2f)
-            })
-            world.addEntity(rodEntity.apply {
-                this.position.set(4f, 1f, 0f)
-            })
-
-            // Button signs
-            val signs = mutableListOf<EntitySign>()
-            signs += EntitySign(world, EntitySign.Type.A).apply {
-                this.position.set(5f, 2f, -3f)
-            }
-            signs += EntitySign(world, EntitySign.Type.DPAD).apply {
-                this.position.set(6f, 2f, -3f)
-            }
-            signs += EntitySign(world, EntitySign.Type.BO).apply {
-                this.position.set(4f, 2f, -2f)
-            }
-            signs += EntitySign(world, EntitySign.Type.TA).apply {
-                this.position.set(5f, 2f, -2f)
-            }
-            signs += EntitySign(world, EntitySign.Type.N).apply {
-                this.position.set(6f, 2f, -2f)
-            }
-            signs.forEach { sign ->
-                sign.position.x += (12 / 32f)
-                sign.position.z += (8 / 32f)
-                world.addEntity(sign)
-            }
-        }
-
-        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-            val renderBounds = this.paddingZone
-            val x = renderBounds.x.get() + originX
-            val y = originY - renderBounds.y.get()
-            val w = renderBounds.width.get()
-            val h = renderBounds.height.get()
-            val lastPackedColor = batch.packedColor
-
-
-            val cam = worldRenderer.camera
-            cam.zoom = 1f / 2f
-            cam.position.x = 3.5f
-            cam.position.y = 1f
-            cam.update()
-
-            batch.end()
-            val prevMatrix = Matrix4Stack.getAndPush().set(batch.projectionMatrix)
-            batch.projectionMatrix = cam.combined
-            val frameBuffer = editor.previewFrameBuffer
-            frameBuffer.begin()
-            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-            worldRenderer.render(batch)
-            frameBuffer.end()
-            batch.projectionMatrix = prevMatrix
-            batch.begin()
-
-            Matrix4Stack.pop()
-            
-            batch.packedColor = lastPackedColor
         }
     }
 
