@@ -6,7 +6,7 @@ import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.input.EngineInputter
-import polyrhythmmania.engine.input.RequiredInput
+import polyrhythmmania.engine.input.practice.RequiredInput
 import polyrhythmmania.world.EntityRodPR
 import java.util.*
 

@@ -11,7 +11,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.modifiers.EndlessScore
 import polyrhythmmania.engine.modifiers.PerfectChallengeData
-import polyrhythmmania.engine.modifiers.PracticeData
+import polyrhythmmania.engine.input.practice.PracticeData
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsSound
@@ -87,11 +87,12 @@ class EngineInputter(val engine: Engine) {
         noMiss = true
         skillStarGotten.set(false)
         skillStarBeat = Float.POSITIVE_INFINITY
-        practice.resetState()
-        perfectChallenge.resetState()
-        endlessScore.resetState()
+        practice.reset()
         rodsExplodedPR = 0
         inputCountStats.reset()
+        
+        perfectChallenge.resetState()
+        endlessScore.resetState()
     }
     
     fun onButtonPressed(release: Boolean, type: InputType) {

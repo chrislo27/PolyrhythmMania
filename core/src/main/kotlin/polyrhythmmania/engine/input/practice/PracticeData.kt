@@ -1,22 +1,19 @@
-package polyrhythmmania.engine.modifiers
+package polyrhythmmania.engine.input.practice
 
 import paintbox.binding.IntVar
-import polyrhythmmania.engine.input.RequiredInput
 
-class PracticeData : ModifierModule {
+class PracticeData {
     
-    // Settings
     /**
-     * Note: This is reset to `false` when [resetState] is called.
+     * Note: This is reset to `false` when [reset] is called.
      */
     var practiceModeEnabled: Boolean = false
     
-    // Data
     val moreTimes: IntVar = IntVar(0)
     var requiredInputs: List<RequiredInput> = emptyList()
     var clearText: Float = 0f
     
-    override fun resetState() {
+    fun reset() {
         practiceModeEnabled = false
         requiredInputs = emptyList()
         moreTimes.set(0)
