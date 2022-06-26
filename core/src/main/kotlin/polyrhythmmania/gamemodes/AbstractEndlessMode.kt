@@ -14,10 +14,11 @@ abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: Endless
         val renderer = container.renderer
         renderer.showEndlessModeScore.set(true)
         renderer.prevHighScore.set(prevHighScore.highScore.getOrCompute())
-        
-        engine.inputter.endlessScore.highScore = prevHighScore.highScore
-        engine.inputter.endlessScore.showNewHighScoreAtEnd = prevHighScore.showNewHighScoreAtEnd
-        engine.inputter.endlessScore.hideHighScoreText = prevHighScore.hideHighScoreText
+
+        val endlessScore = engine.modifiers.endlessScore
+        endlessScore.highScore = prevHighScore.highScore
+        endlessScore.showNewHighScoreAtEnd = prevHighScore.showNewHighScoreAtEnd
+        endlessScore.hideHighScoreText = prevHighScore.hideHighScoreText
     }
 }
 
@@ -32,7 +33,7 @@ class EventIncrementEndlessScore(engine: Engine, val callback: (newScore: Int) -
     
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        val endlessScore = engine.inputter.endlessScore
+        val endlessScore = engine.modifiers.endlessScore
         if (endlessScore.lives.get() > 0) {
             val scoreVar = endlessScore.score
             val oldScore = scoreVar.get()

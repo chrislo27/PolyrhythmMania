@@ -11,9 +11,9 @@ class EngineModifiers(val engine: Engine) : InputterListener {
     private val inputter: EngineInputter = engine.inputter
 
     val perfectChallenge: PerfectChallengeData = PerfectChallengeData()
-//    val endlessScore: EndlessScore = EndlessScore() // FIXME uncomment later
+    val endlessScore: EndlessScore = EndlessScore()
     
-    private val allModules: List<ModifierModule> = listOf(perfectChallenge, /*endlessScore*/)
+    private val allModules: List<ModifierModule> = listOf(perfectChallenge, endlessScore)
  
     init {
         inputter.inputterListeners += this
@@ -24,7 +24,7 @@ class EngineModifiers(val engine: Engine) : InputterListener {
     }
 
     
-    // InputterListener override functions
+    // InputterListener overrides
     
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
         allModules.forEach { it.onMissed(inputter, firstMiss) }

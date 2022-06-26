@@ -127,6 +127,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         fun indexToX(index: Float): Float = index + world.dunkPiston.position.x
 
         val inputter = engine.inputter
+        val modifiers = engine.modifiers
         val inputSuccessful = !inputter.inputChallenge.isInputScoreMiss(inputResult.inputScore)
         val lerpResult = (inputResult.accuracyPercent + 1f) / 2f // 0.5 = perfect
         val endX = if (inputSuccessful) indexToX(MathUtils.random(4.4f, 5.2f)) else indexToX(MathUtils.lerp(3f, 4f, lerpResult))
@@ -161,7 +162,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                 if (newScore % increaseLivesEvery == 0) {
                     // Increment lives
                     engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_2"))
-                    val endlessScore = inputter.endlessScore
+                    val endlessScore = modifiers.endlessScore
                     val currentLives = endlessScore.lives.get()
                     val newLives = (currentLives + 1).coerceIn(0, endlessScore.maxLives.get())
                     if (newLives > currentLives) {

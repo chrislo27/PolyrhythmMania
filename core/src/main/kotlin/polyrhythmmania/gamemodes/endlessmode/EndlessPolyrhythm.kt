@@ -117,11 +117,11 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         
         container.world.worldMode = WorldMode(WorldType.Polyrhythm())
-        container.engine.inputter.endlessScore.enabled = true
+        container.engine.modifiers.endlessScore.enabled = true
         container.renderer.endlessModeSeed.set(getSeedString(seed.toUInt()))
         container.renderer.dailyChallengeDate.set(dailyChallenge)
         container.renderer.flashHudRedWhenLifeLost.set(true)
-        container.engine.inputter.endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
+        container.engine.modifiers.endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
     }
     
     fun submitPauseTime(pauseTime: Float) {
@@ -133,7 +133,7 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
     override fun renderUpdate() {
         // Recovery achievement
         if (dailyChallenge != null && loopsCompleted.get() >= 2) {
-            val endlessScore = container.engine.inputter.endlessScore
+            val endlessScore = container.engine.modifiers.endlessScore
             when (hasGottenDownToOneLifeAfterTwoSpeedups) {
                 RecoveryAchievementState.NOT_READY -> {
                     if (endlessScore.lives.get() == 1) {
@@ -292,7 +292,7 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                 engine.addEvent(EventConditionalOnRods(engine, awardScoreBeat,
                         if (anyA && anyDpad) RowSetting.BOTH else if (anyA) RowSetting.ONLY_A else RowSetting.ONLY_DPAD, true) {
                     engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
-                        val endlessScore = engine.inputter.endlessScore
+                        val endlessScore = engine.modifiers.endlessScore
                         val currentLives = endlessScore.lives.get()
                         val maxLives = endlessScore.maxLives.get()
                         if (!disableLifeRegen && newScore >= 20 && newScore % 10 == 0 && currentLives > 0 && currentLives < maxLives) {

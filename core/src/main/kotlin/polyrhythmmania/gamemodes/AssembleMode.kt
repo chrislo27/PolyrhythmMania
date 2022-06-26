@@ -511,7 +511,7 @@ class EventAsmAssemble(engine: Engine, val combineBeat: Float)
             world.addEntity(EntityAsmWidgetCompleteBlur(world, combineBeat).also {
                 it.position.set(complete.position)
             })
-            val score = engine.inputter.endlessScore.score
+            val score = engine.modifiers.endlessScore.score
             score.set(score.get() + 1)
             
             if (engine.areStatisticsEnabled) {

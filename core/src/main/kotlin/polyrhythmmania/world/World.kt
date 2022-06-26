@@ -75,7 +75,7 @@ class World {
         }
 
         if (worldMode.worldType == WorldType.Dunk) {
-            if (engine.inputter.endlessScore.lives.get() <= 0) {
+            if (engine.modifiers.endlessScore.lives.get() <= 0) {
                 entities.forEach {
                     if (it is EntityRodDunk && !it.exploded) {
                         it.explode(engine, playSound = false)

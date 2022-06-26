@@ -144,7 +144,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                         this.textColor.set(defaultTextColor)
                         this.setScaleXY(0.6f)
                         this.textColor.bind {
-                            val maxLives = engine.inputter.endlessScore.maxLives.use()
+                            val maxLives = engine.modifiers.endlessScore.maxLives.use()
                             if (endlessModeSeed.use() != null && maxLives == 1) {
                                 Color(1f, 0.35f, 0.35f, 1f)
                             } else defaultTextColor
@@ -238,7 +238,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
         endlessModeGameOverPane.apply {
             this.visible.bind {
-                engine.inputter.endlessScore.gameOverUIShown.use()
+                engine.modifiers.endlessScore.gameOverUIShown.use()
             }
             this += RectElement(Color(0f, 0f, 0f, 0.5f))
         }
@@ -446,7 +446,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
 
         if (showEndlessModeScore.get()) {
-            val endlessScore = engine.inputter.endlessScore
+            val endlessScore = engine.modifiers.endlessScore
             val oldLives = currentEndlessLives.get()
             val newLives = endlessScore.lives.get()
             currentEndlessLives.set(newLives)

@@ -176,9 +176,10 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
 
 }
 
-class EntityRodPR(world: World, deployBeat: Float, val row: Row,
-                  val lifeLost: BooleanVar? = null)
-    : EntityRod(world, deployBeat) {
+class EntityRodPR(
+        world: World, deployBeat: Float, val row: Row,
+        val lifeLost: BooleanVar? = null
+) : EntityRod(world, deployBeat) {
 
     data class InputTracker(
             val totalResultCount: Int,
@@ -246,21 +247,31 @@ class EntityRodPR(world: World, deployBeat: Float, val row: Row,
 
     fun explode(engine: Engine) {
         if (isKilled || exploded) return
+        
+        val inputter = engine.inputter
+        
         exploded = true
         world.addEntity(EntityExplosion(world, engine.seconds, this.renderScale, this.offsetX, this.offsetY).also {
             it.position.set(this.position)
         })
         playSfxExplosion(engine)
-        registerMiss(engine.inputter)
-        engine.inputter.onRodPRExploded()
-        if (engine.inputter.endlessScore.enabled) {
+        
+        registerMiss(inputter)
+
+        if (engine.areStatisticsEnabled) {
+            GlobalStats.rodsExploded.increment()
+            GlobalStats.rodsExplodedPolyrhythm.increment()
+        }
+        
+        val endlessScore = engine.modifiers.endlessScore
+        if (endlessScore.enabled) {
             val lifeLostVar = this.lifeLost
             if (lifeLostVar != null) {
                 if (!lifeLostVar.get()) {
                     lifeLostVar.set(true)
-                    val endlessScore = engine.inputter.endlessScore
+                    
                     val oldLives = endlessScore.lives.get()
-                    engine.inputter.triggerEndlessLifeLost()
+                    endlessScore.triggerEndlessLifeLost(inputter) // This intentionally does not normally automatically trigger in EndlessScore
                     if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
                         GlobalStats.livesLostEndless.increment()
                     }

@@ -24,9 +24,10 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     
     init {
         container.world.worldMode = WorldMode(WorldType.Dunk)
-        engine.inputter.endlessScore.enabled = true
+        val modifiers = engine.modifiers
+        modifiers.endlessScore.enabled = true
+        modifiers.endlessScore.maxLives.set(5)
         val inputter = container.engine.inputter
-        inputter.endlessScore.maxLives.set(5)
         inputter.inputChallenge.restriction = InputTimingRestriction.ACES_ONLY
         container.texturePackSource.set(TexturePackSource.STOCK_GBA)
         TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
@@ -55,7 +56,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
             this.beat = 0f
         }
         val loop = LoopingEventBlock(engine, 4f, { engine ->
-            engine.inputter.endlessScore.lives.get() > 0
+            engine.modifiers.endlessScore.lives.get() > 0
         }) { engine, startBeat ->
             engine.addEvent(EventDeployRodDunk(engine, startBeat))
         }

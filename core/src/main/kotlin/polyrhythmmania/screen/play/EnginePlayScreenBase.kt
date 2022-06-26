@@ -52,9 +52,10 @@ class EnginePlayScreenBase(
     private var disableCatchingCursorOnHide: Boolean = false
     
     init {
-        if (engine.inputter.endlessScore.enabled
+        val endlessScore = engine.modifiers.endlessScore
+        if (endlessScore.enabled
                 && engine.world.worldMode.worldType is WorldType.Polyrhythm
-                && engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil mode in endless
+                && endlessScore.maxLives.get() == 1) { // Daredevil mode in endless
             (pauseMenuHandler as? TengokuBgPauseMenuHandler)?.also { handler ->
                 val hex = "DB2323"
                 val bg = handler.pauseBg
@@ -67,8 +68,9 @@ class EnginePlayScreenBase(
     
     init {
         // Score achievements for endless-type modes
-        engine.inputter.endlessScore.score.addListener { scoreVar ->
-            if (engine.inputter.endlessScore.enabled && engine.areStatisticsEnabled) {
+        val modifiers = engine.modifiers
+        modifiers.endlessScore.score.addListener { scoreVar ->
+            if (modifiers.endlessScore.enabled && engine.areStatisticsEnabled) {
                 val newScore = scoreVar.getOrCompute()
                 when (engine.world.worldMode.worldType) {
                     is WorldType.Polyrhythm -> {
@@ -89,7 +91,7 @@ class EnginePlayScreenBase(
                                 if (gameMode.disableLifeRegen) {
                                     Achievements.attemptAwardScoreAchievement(Achievements.endlessNoLifeRegen100, newScore)
                                 }
-                                if (engine.inputter.endlessScore.maxLives.get() == 1) { // Daredevil
+                                if (modifiers.endlessScore.maxLives.get() == 1) { // Daredevil
                                     Achievements.attemptAwardScoreAchievement(Achievements.endlessDaredevil100, newScore)
                                 }
                                 if (main.settings.masterVolumeSetting.getOrCompute() == 0) {

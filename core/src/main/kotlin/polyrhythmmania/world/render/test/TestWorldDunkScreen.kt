@@ -55,7 +55,7 @@ class TestWorldDunkScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private var robotMode: Boolean = true
 
     init {
-        engine.inputter.endlessScore.enabled = true
+        engine.modifiers.endlessScore.enabled = true
         
 //        soundSystem.audioContext.out.addInput(player)
         soundSystem.startRealtime()
