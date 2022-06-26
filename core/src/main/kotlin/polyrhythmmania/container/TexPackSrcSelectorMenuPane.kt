@@ -1,62 +1,38 @@
 package polyrhythmmania.container
 
 
-import paintbox.PaintboxGame
-import paintbox.binding.Var
-import paintbox.font.PaintboxFont
 import paintbox.ui.Pane
-import paintbox.ui.UIElement
-import paintbox.ui.control.RadioButton
-import paintbox.ui.control.ToggleGroup
+import paintbox.ui.StringConverter
+import paintbox.ui.control.ComboBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
+import java.util.*
 
 
-class TexPackSrcSelectorMenuPane(editorPane: EditorPane, currentSource: TexturePackSource, val changeListener: (TexturePackSource) -> Unit)
-    : Pane() {
-
-    val toggleGroup: ToggleGroup = ToggleGroup()
-    val gbaRadio: TPSSettingRadioButton = TPSSettingRadioButton(TexturePackSource.STOCK_GBA, binding = { Localization.getVar("editor.dialog.texturePack.stock.gba").use() })
-    val hdRadio: TPSSettingRadioButton = TPSSettingRadioButton(TexturePackSource.STOCK_HD, binding = { Localization.getVar("editor.dialog.texturePack.stock.hd").use() })
-    val arcadeRadio: TPSSettingRadioButton = TPSSettingRadioButton(TexturePackSource.STOCK_ARCADE, binding = { Localization.getVar("editor.dialog.texturePack.stock.arcade").use() })
-    val customRadio: TPSSettingRadioButton = TPSSettingRadioButton(TexturePackSource.CUSTOM, binding = { Localization.getVar("editor.dialog.texturePack.stock.custom").use() })
-    val radios: List<RadioButton> = listOf(gbaRadio, hdRadio, arcadeRadio, customRadio)
+class TexPackSrcSelectorMenuPane(
+        editorPane: EditorPane, currentSource: TexturePackSource, val changeListener: (TexturePackSource) -> Unit
+) : Pane() {
+    
+    val combobox: ComboBox<TexturePackSource> = ComboBox(TexturePackSource.VALUES, currentSource).also { combobox ->
+        combobox.markup.set(editorPane.palette.markup)
+        combobox.selectedItem.addListener {
+            changeListener(it.getOrCompute())
+        }
+        combobox.itemStringConverter.set(StringConverter { src ->
+            when (src) {
+                TexturePackSource.STOCK_GBA -> Localization.getVar("editor.dialog.texturePack.stock.gba")
+                TexturePackSource.STOCK_HD -> Localization.getVar("editor.dialog.texturePack.stock.hd")
+                TexturePackSource.STOCK_ARCADE -> Localization.getVar("editor.dialog.texturePack.stock.arcade")
+                TexturePackSource.CUSTOM -> Localization.getVar("editor.dialog.texturePack.stock.custom")
+            }.getOrCompute()
+        })
+    }
 
     init {
-        val radioHeight = 32f
-        var posY = 0f
-        for (radio in radios) {
-            radio.bounds.y.set(posY)
-            radio.bounds.height.set(radioHeight)
-            radio.textLabel.markup.set(editorPane.palette.markup)
-            toggleGroup.addToggle(radio)
+        this += combobox
 
-            posY += radio.bounds.height.get()
-
-            this.addChild(radio)
-        }
-
-        when (currentSource) {
-            TexturePackSource.STOCK_GBA -> gbaRadio
-            TexturePackSource.STOCK_HD -> hdRadio
-            TexturePackSource.STOCK_ARCADE -> arcadeRadio
-            TexturePackSource.CUSTOM -> customRadio
-        }.checkedState.set(true)
-
-        this.bounds.width.set(250f)
-        this.bounds.height.set(posY)
+//        this.bounds.width.set(250f)
+        this.bounds.height.set(32f)
     }
-
-    inner class TPSSettingRadioButton(val src: TexturePackSource,
-                                      binding: Var.Context.() -> String,
-                                      font: PaintboxFont = UIElement.defaultFont)
-        : RadioButton(binding, font) {
-
-        init {
-            this.onSelected = {
-                changeListener.invoke(src)
-            }
-        }
-    }
-
+    
 }

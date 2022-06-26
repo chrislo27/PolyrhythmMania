@@ -31,7 +31,7 @@ class BlockTexPackChange(engine: Engine)
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return ContextMenu().also { ctxmenu ->
-            ctxmenu.defaultWidth.set(320f)
+            ctxmenu.defaultWidth.set(350f)
             texPackSrcData.createMenuItems(editor).forEach { ctxmenu.addMenuItem(it) }
         }
     }

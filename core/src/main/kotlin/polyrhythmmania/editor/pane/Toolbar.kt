@@ -263,9 +263,9 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.setOnAction {
                     if (editor.allowedToEdit.get()) {
                         editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
-                            ctxmenu.defaultWidth.set(400f)
+                            ctxmenu.defaultWidth.set(360f)
                             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("editor.button.changeTexturePack"), editorPane.main.mainFontBold))
-                            ctxmenu.addMenuItem(SeparatorMenuItem())
+//                            ctxmenu.addMenuItem(SeparatorMenuItem())
                             ctxmenu.addMenuItem(CustomMenuItem(TexPackSrcSelectorMenuPane(editorPane,
                                     editor.container.texturePackSource.getOrCompute()) { newSrc ->
                                 val container = editor.container
