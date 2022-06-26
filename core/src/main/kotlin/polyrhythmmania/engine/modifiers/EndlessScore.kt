@@ -119,26 +119,6 @@ class EndlessScore : ModifierModule {
     // InputterListener overrides
 
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
-        if (!enabled) {
-            return
-        }
-
-        val engine = inputter.engine
-        val world = engine.world
-        val worldMode = world.worldMode
-        when (worldMode.worldType) {
-            is WorldType.Polyrhythm -> {
-                // NO-OP
-                // Note: Handled in EntityRodPR, since you can only lose one life per pattern (and not per "miss")
-            }
-            WorldType.Dunk -> {
-                // NO-OP
-                // Note: Handled in EntityRodDunk, since you can only lose the life on explosion
-            }
-            WorldType.Assemble -> {
-                triggerEndlessLifeLost(inputter)
-            }
-        }
     }
 
     override fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean) {

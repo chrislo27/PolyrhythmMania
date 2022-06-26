@@ -311,7 +311,8 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
             private set
 
         fun addInput(rod: EntityRodAsm, input: InputResult) {
-            if (input.inputScore == InputScore.MISS || !MathUtils.isEqual(input.perfectBeat, inputBeat, 0.01f)) return
+            if (!MathUtils.isEqual(input.perfectBeat, inputBeat, 0.01f)) return
+            if (input.inputScore == InputScore.MISS) return
             hitInput = input
             
             if (isFire) {
@@ -454,7 +455,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
         if (!failed && expected != null && (expected.hitInput == null || expected.hitInput?.inputScore == InputScore.MISS)) {
             val expectedInputSec = engine.tempos.beatsToSeconds(expected.inputBeat)
             if (seconds > expectedInputSec + InputThresholds.MAX_OFFSET_SEC) {
-                failed = true
+                markAsFailed(engine)
                 killAtBeat = expected.inputBeat + 2f
                 engine.inputter.missed()
                 if (expected.isFire) {
@@ -488,8 +489,22 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
         }
     }
 
-    override fun onRemovedFromWorld(engine: Engine) {
-        super.onRemovedFromWorld(engine)
+    private fun markAsFailed(engine: Engine) {
+        if (failed) return
+        
+        failed = true
+        loseLife(engine)
+    }
+    
+    private fun loseLife(engine: Engine) {
+        val endlessScore = engine.modifiers.endlessScore
+        if (endlessScore.enabled) {
+            val oldLives = endlessScore.lives.get()
+            endlessScore.triggerEndlessLifeLost(engine.inputter) // This intentionally does not normally automatically trigger in EndlessScore
+            if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
+//                GlobalStats.livesLostAssemble.increment() // TODO
+            }
+        }
     }
 }
 

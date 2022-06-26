@@ -10,6 +10,7 @@ import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.*
+import polyrhythmmania.engine.input.InputTimingRestriction
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
@@ -29,12 +30,10 @@ class AssembleMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
 
     init {
         container.world.worldMode = WorldMode(WorldType.Assemble)
-        container.renderer.showEndlessModeScore.set(false)
-//        container.engine.inputter.endlessScore.maxLives.set(3)
+        
         container.texturePackSource.set(TexturePackSource.STOCK_GBA)
         TilesetPalette.createAssembleTilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
-        container.renderer.flashHudRedWhenLifeLost.set(true)
         
         container.resultsText = ResultsText(
                 Localization.getValue("play.results.assemble.title"),
