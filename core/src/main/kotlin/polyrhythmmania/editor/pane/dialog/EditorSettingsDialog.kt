@@ -8,6 +8,7 @@ import paintbox.Paintbox
 import paintbox.PaintboxGame
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.binding.WeakVarChangedListener
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
@@ -191,11 +192,11 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             val (uiScalePane, uiScaleControl) = createCycleOption("editorSettings.uiScale", "editorSettings.uiScale.tooltip",
                     settings.kv_editorUIScale, listOf(1, 2, 3, 4),
                     itemToStringBinding = { if (it == 1) Localization.getValue("editorSettings.uiScale.native") else "$it" })
-            uiScaleControl.currentItem.addListener {
+            uiScaleControl.currentItem.addListener( WeakVarChangedListener {
                 Gdx.app.postRunnable { 
                     editor.resize()
                 }
-            }
+            })
             vbox += uiScalePane
         }
         vbox.sizeHeightToChildren(300f)
