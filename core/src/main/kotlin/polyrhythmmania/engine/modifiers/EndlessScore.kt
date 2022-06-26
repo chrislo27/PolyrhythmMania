@@ -22,13 +22,14 @@ class EndlessScore : ModifierModule {
     // Settings
     var enabled: Boolean = false
 
-    var showNewHighScoreAtEnd: Boolean = true
-    var hideHighScoreText: Boolean = false
+    var showNewHighScoreAtEnd: Boolean = true // Hidden for something like Daily Challenge
+    var hideHighScoreText: Boolean = false // The label that shows the Prev. High Score or daily challenge seed, etc
+    var flashHudRedWhenLifeLost: Boolean = false // Only used in Endless Polyrhythm
+    
     val maxLives: IntVar = IntVar(0)
     val startingLives: IntVar = IntVar { maxLives.use() }
-
     /**
-     * Set when the [score] is higher than this [highScore].
+     * Will be set when the [score] is higher than this [highScore].
      */
     var highScore: Var<Int> = GenericVar(0) // Intentionally a Var<Int> and not a specialized IntVar.
 

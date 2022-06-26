@@ -72,7 +72,6 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     val prevHighScore: IntVar = IntVar(-1)
     val dailyChallengeDate: Var<LocalDate?> = Var(null)
     val endlessModeSeed: Var<String?> = Var(null)
-    val flashHudRedWhenLifeLost: BooleanVar = BooleanVar(false)
     private val currentEndlessScore: IntVar = IntVar(0)
     private val currentEndlessLives: IntVar = IntVar(0)
 
@@ -446,11 +445,11 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
 
         if (showEndlessModeScore.get()) {
-            val endlessScore = engine.modifiers.endlessScore
+            val endlessScore = modifiers.endlessScore
             val oldLives = currentEndlessLives.get()
             val newLives = endlessScore.lives.get()
             currentEndlessLives.set(newLives)
-            if (newLives < oldLives && flashHudRedWhenLifeLost.get()) {
+            if (newLives < oldLives) {
                 hudRedFlash = 1f
             }
             val oldScore = currentEndlessScore.get()
@@ -473,9 +472,11 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         uiSceneRoot.renderAsRoot(batch)
 
         if (hudRedFlash > 0f) {
-            batch.setColor(1f, 0f, 0f, hudRedFlash)
-            batch.draw(AssetRegistry.get<Texture>("hud_vignette"), 0f, 0f, uiCam.viewportWidth, uiCam.viewportHeight)
-            batch.setColor(1f, 1f, 1f, 1f)
+            if (modifiers.endlessScore.flashHudRedWhenLifeLost) {
+                batch.setColor(1f, 0f, 0f, hudRedFlash)
+                batch.draw(AssetRegistry.get<Texture>("hud_vignette"), 0f, 0f, uiCam.viewportWidth, uiCam.viewportHeight)
+                batch.setColor(1f, 1f, 1f, 1f)
+            }
 
             hudRedFlash = (hudRedFlash - (Gdx.graphics.deltaTime / 0.75f)).coerceAtLeast(0f)
         }

@@ -117,11 +117,12 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         
         container.world.worldMode = WorldMode(WorldType.Polyrhythm())
-        container.engine.modifiers.endlessScore.enabled = true
+        val endlessScore = container.engine.modifiers.endlessScore
+        endlessScore.enabled = true
+        endlessScore.flashHudRedWhenLifeLost = true
+        endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
         container.renderer.endlessModeSeed.set(getSeedString(seed.toUInt()))
         container.renderer.dailyChallengeDate.set(dailyChallenge)
-        container.renderer.flashHudRedWhenLifeLost.set(true)
-        container.engine.modifiers.endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
     }
     
     fun submitPauseTime(pauseTime: Float) {
