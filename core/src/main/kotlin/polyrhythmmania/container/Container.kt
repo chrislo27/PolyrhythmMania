@@ -39,6 +39,8 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldSettings
+import polyrhythmmania.world.entity.EntityInputFeedback
+import polyrhythmmania.world.entity.EntityInputIndicator
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.render.WorldRendererWithUI
@@ -152,6 +154,11 @@ class Container(soundSystem: SoundSystem?, timingProvider: TimingProvider,
         
         val blocks = this.blocks.toList()
         engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
+        
+        world.entities.filterIsInstance<EntityInputFeedback>().forEach { ent ->
+            // Refreshes the feedback entity's base color if the input timing restriction is different     
+            ent.updateCurrentColor(engine)
+        }
     }
     
     fun getTexturePackFromSource(source: TexturePackSource): TexturePack? {

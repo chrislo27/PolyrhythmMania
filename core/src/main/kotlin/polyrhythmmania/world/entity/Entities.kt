@@ -274,7 +274,7 @@ class EntitySign(world: World, val type: Type) : SpriteEntity(world) {
     }
 }
 
-class EntityInputFeedback(world: World, val end: End, color: Color, val inputScore: InputScore, val flashIndex: Int)
+class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inputScore: InputScore, val flashIndex: Int)
     : SimpleRenderedEntity(world) {
     
     companion object {
@@ -288,8 +288,8 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val inputSco
         LEFT, MIDDLE, RIGHT;
     }
     
-    private val originalColor: Color = color.cpy()
-    private val currentColor: Color = color.cpy()
+    private val originalColor: Color = baseColor.cpy()
+    private val currentColor: Color = baseColor.cpy()
     
     private fun getBaseColorToUse(engine: Engine): Color {
         val inputter = engine.inputter
@@ -311,7 +311,7 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val inputSco
             End.MIDDLE -> tileset.inputFeedbackMiddle
             End.RIGHT -> tileset.inputFeedbackEnd
         }
-        val tmpColor = ColorStack.getAndPush().set(tintedRegion.color.getOrCompute())
+        val tmpColor = ColorStack.getAndPush().set(tintedRegion.color.getOrCompute()) // tintedRegion's color is likely just white
         tmpColor.mul(this.currentColor)
         drawTintedRegion(batch, vec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tmpColor)
         ColorStack.pop()
@@ -320,15 +320,19 @@ class EntityInputFeedback(world: World, val end: End, color: Color, val inputSco
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         super.engineUpdate(engine, beat, seconds)
         
+        updateCurrentColor(engine)
+    }
+    
+    fun updateCurrentColor(engine: Engine) {
+        val updatedBaseColor = getBaseColorToUse(engine)
         val currentSec = engine.seconds
         val flashSec = engine.inputter.inputFeedbackFlashes[flashIndex]
-        val baseColor = getBaseColorToUse(engine)
         val flashTime = 0.25f
         if (currentSec - flashSec < flashTime) {
             val percentage = ((currentSec - flashSec) / flashTime).coerceIn(0f, 1f)
-            currentColor.set(baseColor).lerp(Color.WHITE, 1f - percentage)
+            currentColor.set(updatedBaseColor).lerp(Color.WHITE, 1f - percentage)
         } else {
-            currentColor.set(baseColor)
+            currentColor.set(updatedBaseColor)
         }
     }
 }
