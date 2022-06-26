@@ -113,6 +113,15 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
             playSfxExplosion(engine)
         }
         engine.inputter.missed()
+        
+        val endlessScore = engine.modifiers.endlessScore
+        if (endlessScore.enabled) {
+            val oldLives = endlessScore.lives.get()
+            endlessScore.triggerEndlessLifeLost(engine.inputter) // This intentionally does not normally automatically trigger in EndlessScore
+            if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
+                GlobalStats.livesLostDunk.increment()
+            }
+        }
         if (engine.areStatisticsEnabled) {
             engine.inputter.inputCountStats.total++
             engine.inputter.inputCountStats.missed++

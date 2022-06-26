@@ -363,6 +363,10 @@ class EngineInputter(val engine: Engine) {
         }
     }
 
+    /**
+     * Called when a miss is flagged. This could be called on an input or when a rod explodes, etc, so it shouldn't be
+     * used as an indicator for endless lives being lost.
+     */
     fun missed() {
         val wasNoMiss = this.noMiss
         this.noMiss = false

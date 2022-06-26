@@ -132,11 +132,8 @@ class EndlessScore : ModifierModule {
                 // Note: Handled in EntityRodPR, since you can only lose one life per pattern (and not per "miss")
             }
             WorldType.Dunk -> {
-                val oldLives = this.lives.get()
-                triggerEndlessLifeLost(inputter)
-                if (engine.areStatisticsEnabled && this.lives.get() < oldLives) {
-                    GlobalStats.livesLostDunk.increment()
-                }
+                // NO-OP
+                // Note: Handled in EntityRodDunk, since you can only lose the life on explosion
             }
             WorldType.Assemble -> {
                 triggerEndlessLifeLost(inputter)
