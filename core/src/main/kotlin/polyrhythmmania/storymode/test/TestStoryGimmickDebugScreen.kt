@@ -32,10 +32,7 @@ import polyrhythmmania.storymode.StorySavefile
 import polyrhythmmania.storymode.screen.StoryContractsScreen
 import polyrhythmmania.storymode.screen.StoryLoadingScreen
 import polyrhythmmania.storymode.screen.StoryTitleScreen
-import polyrhythmmania.storymode.test.gamemode.TestStory8BallGameMode
-import polyrhythmmania.storymode.test.gamemode.TestStoryAcesOnlyGameMode
-import polyrhythmmania.storymode.test.gamemode.TestStoryGameMode
-import polyrhythmmania.storymode.test.gamemode.TestStoryNoBarelyGameMode
+import polyrhythmmania.storymode.test.gamemode.*
 import java.util.*
 
 
@@ -137,6 +134,12 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             enterGameMode(TestStory8BallGameMode(main))
+                        }
+                    }
+                    this += Button("Endless UI debug").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGameMode(TestStoryNoOpEndlessUIGameMode(main))
                         }
                     }
                 }

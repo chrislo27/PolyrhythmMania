@@ -20,9 +20,7 @@ import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.EntityRodPR
-import polyrhythmmania.world.render.ForceTilesetPalette
-import polyrhythmmania.world.render.WorldRenderer
-import polyrhythmmania.world.tileset.TilesetPalette
+import polyrhythmmania.world.render.WorldRendererWithUI
 import kotlin.math.max
 
 
@@ -44,7 +42,7 @@ abstract class AbstractEnginePlayScreen(
     val soundSystem: SoundSystem
         get() = container.soundSystem ?: error("${this::javaClass.name} requires a non-null SoundSystem in the Container")
     val engine: Engine get() = container.engine
-    val worldRenderer: WorldRenderer get() = container.renderer
+    val worldRenderer: WorldRendererWithUI get() = container.renderer
     
     protected var goingToResults: Boolean = false
 

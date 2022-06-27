@@ -15,7 +15,7 @@ import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
 import polyrhythmmania.storymode.gamemode.StoryGameMode
 
 
-class TestStoryPlayScreen(
+open class TestStoryPlayScreen(
         main: PRManiaGame,
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: StoryGameMode
