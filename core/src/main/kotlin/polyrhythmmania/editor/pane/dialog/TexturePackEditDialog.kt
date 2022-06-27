@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Align
 import net.lingala.zip4j.ZipFile
 import paintbox.Paintbox
 import paintbox.binding.BooleanVar
+import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.filechooser.FileExtFilter
@@ -51,7 +52,8 @@ import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 
 
-class TexturePackEditDialog(editorPane: EditorPane, 
+class TexturePackEditDialog(
+        editorPane: EditorPane, 
 ) : EditorDialog(editorPane) {
 
     companion object {
@@ -120,6 +122,12 @@ class TexturePackEditDialog(editorPane: EditorPane,
         class Category(val categoryID: String) : ListEntry("editor.dialog.texturePack.objectCategory.${categoryID}")
         class Region(val id: String) : ListEntry("editor.dialog.texturePack.object.${id}")
     }
+
+    /**
+     * 0-indexed.
+     */
+    val customPackIndex: IntVar = IntVar(0)
+    val customPackFromContainer: Var<CustomTexturePack?> get() = editor.container.customTexturePacks[customPackIndex.get()]
     
     private val isFileChooserOpen: BooleanVar = BooleanVar(false)
     private val isMessageVisible: BooleanVar = BooleanVar(false)
@@ -139,7 +147,9 @@ class TexturePackEditDialog(editorPane: EditorPane,
             customTexturePack.getOrCompute().fallbackID = tp.getOrCompute().id
         }
         
-        this.titleLabel.text.bind { Localization.getVar("editor.dialog.texturePack.title").use() }
+        this.titleLabel.text.bind {
+            Localization.getVar("editor.dialog.texturePack.title", Var { listOf(customPackIndex.use() + 1) }).use()
+        }
 
 
         val hideMainContent = BooleanVar {
@@ -478,7 +488,7 @@ class TexturePackEditDialog(editorPane: EditorPane,
                     this.markup.set(editorPane.palette.markup)
                     this.textColor.set(Color.WHITE.cpy())
                 }
-                val basePackSource: TexturePackSource = StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.STOCK_GBA
+                val basePackSource: TexturePackSource = StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.StockGBA
                 texPackSelectorPane = TexPackSrcSelectorMenuPane(editorPane, basePackSource,
                         legalValues = TexturePackSource.VALUES_NON_CUSTOM) { src ->
                     baseTexturePack.set(StockTexturePacks.getPackFromSource(src) ?: StockTexturePacks.gba)
@@ -492,11 +502,11 @@ class TexturePackEditDialog(editorPane: EditorPane,
     
     
     fun prepareShow(): TexturePackEditDialog {
-        val currentCustom = editor.container.customTexturePack.getOrCompute()
+        val currentCustom = customPackFromContainer.getOrCompute()
         if (currentCustom != null) {
             customTexturePack.set(currentCustom)
             baseTexturePack.set(StockTexturePacks.allPacksByID[currentCustom.fallbackID] ?: StockTexturePacks.gba)
-            texPackSelectorPane.combobox.selectedItem.set(StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.STOCK_GBA)
+            texPackSelectorPane.combobox.selectedItem.set(StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.StockGBA)
             
             onTexturePackUpdated.invert()
         }
@@ -518,10 +528,9 @@ class TexturePackEditDialog(editorPane: EditorPane,
     }
     
     fun syncThisCustomPackWithContainer() {
-        val container = editor.container
         val ctp = customTexturePack.getOrCompute()
-        container.customTexturePack.set(ctp)
-        container.setTexturePackFromSource()
+        customPackFromContainer.set(ctp)
+        editor.container.setTexturePackFromSource()
     }
     
     private fun importTextures(files: List<File>) {

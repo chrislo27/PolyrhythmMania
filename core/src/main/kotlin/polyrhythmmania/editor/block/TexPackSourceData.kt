@@ -10,10 +10,9 @@ import polyrhythmmania.Localization
 import polyrhythmmania.container.TexPackSrcSelectorMenuPane
 import polyrhythmmania.container.TexturePackSource
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.block.contextmenu.RowSelectorMenuPane
 
 
-class TexPackSourceData(defaultSetting: TexturePackSource = TexturePackSource.STOCK_GBA) {
+class TexPackSourceData(defaultSetting: TexturePackSource = TexturePackSource.StockGBA) {
 
     var texPackSrc: Var<TexturePackSource> = Var(defaultSetting)
 
@@ -33,7 +32,7 @@ class TexPackSourceData(defaultSetting: TexturePackSource = TexturePackSource.ST
     }
 
     fun readFromJson(obj: JsonObject) {
-        texPackSrc.set(TexturePackSource.INDEX_MAP[obj.getInt("texPackSrc", 0)] ?: TexturePackSource.STOCK_GBA)
+        texPackSrc.set(TexturePackSource.idToSource(obj.getInt("texPackSrc", 0)) ?: TexturePackSource.StockGBA)
     }
 
 }

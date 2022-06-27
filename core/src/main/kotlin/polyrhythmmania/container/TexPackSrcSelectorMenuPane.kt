@@ -6,12 +6,11 @@ import paintbox.ui.StringConverter
 import paintbox.ui.control.ComboBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
-import java.util.*
 
 
 class TexPackSrcSelectorMenuPane(
         editorPane: EditorPane, currentSource: TexturePackSource,
-        val legalValues: List<TexturePackSource> = TexturePackSource.VALUES,
+        val legalValues: List<TexturePackSource> = TexturePackSource.VALUES_WITH_CUSTOM,
         val changeListener: (TexturePackSource) -> Unit
 ) : Pane() {
     
@@ -22,11 +21,11 @@ class TexPackSrcSelectorMenuPane(
         }
         combobox.itemStringConverter.set(StringConverter { src ->
             when (src) {
-                TexturePackSource.STOCK_GBA -> Localization.getVar("editor.dialog.texturePack.stock.gba")
-                TexturePackSource.STOCK_HD -> Localization.getVar("editor.dialog.texturePack.stock.hd")
-                TexturePackSource.STOCK_ARCADE -> Localization.getVar("editor.dialog.texturePack.stock.arcade")
-                TexturePackSource.CUSTOM -> Localization.getVar("editor.dialog.texturePack.stock.custom")
-            }.getOrCompute()
+                TexturePackSource.StockGBA -> Localization.getValue("editor.dialog.texturePack.stock.gba")
+                TexturePackSource.StockHD -> Localization.getValue("editor.dialog.texturePack.stock.hd")
+                TexturePackSource.StockArcade -> Localization.getValue("editor.dialog.texturePack.stock.arcade")
+                is TexturePackSource.Custom -> Localization.getValue("editor.dialog.texturePack.stock.custom", src.id)
+            }
         })
     }
 

@@ -30,7 +30,7 @@ class AssembleMode(main: PRManiaGame)
     init {
         container.world.worldMode = WorldMode(WorldType.Assemble)
         
-        container.texturePackSource.set(TexturePackSource.STOCK_GBA)
+        container.texturePackSource.set(TexturePackSource.StockGBA)
         TilesetPalette.createAssembleTilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         

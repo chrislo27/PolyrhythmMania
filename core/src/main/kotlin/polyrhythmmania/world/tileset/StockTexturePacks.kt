@@ -20,7 +20,7 @@ object StockTexturePacks {
     
 
     private val gbaSrc: TexturePackAndSource by lazy { 
-        TexturePackAndSource(StockTexturePack("gba", emptySet(), AssetRegistry.get<PackedSheet>("tileset_gba")), TexturePackSource.STOCK_GBA)
+        TexturePackAndSource(StockTexturePack("gba", emptySet(), AssetRegistry.get<PackedSheet>("tileset_gba")), TexturePackSource.StockGBA)
     }
     val gba: TexturePack by lazy { gbaSrc.texturePack }
     
@@ -28,7 +28,7 @@ object StockTexturePacks {
         StockTexturePack("hdNoFallback", emptySet(), AssetRegistry.get<PackedSheet>("tileset_hd")) 
     }
     private val hdSrc: TexturePackAndSource by lazy { 
-        TexturePackAndSource(CascadingTexturePack("hd", emptySet(), listOf(hdNoFallback, gba)), TexturePackSource.STOCK_HD)
+        TexturePackAndSource(CascadingTexturePack("hd", emptySet(), listOf(hdNoFallback, gba)), TexturePackSource.StockHD)
     }
     val hd: TexturePack by lazy { hdSrc.texturePack }
     
@@ -36,7 +36,7 @@ object StockTexturePacks {
         StockTexturePack("arcadeNoFallback", emptySet(), AssetRegistry.get<PackedSheet>("tileset_arcade"))
     }
     private val arcadeSrc: TexturePackAndSource by lazy { 
-        TexturePackAndSource(CascadingTexturePack("arcade", emptySet(), listOf(arcadeNoFallback, gba)), TexturePackSource.STOCK_ARCADE)
+        TexturePackAndSource(CascadingTexturePack("arcade", emptySet(), listOf(arcadeNoFallback, gba)), TexturePackSource.StockArcade)
     }
     val arcade: TexturePack by lazy { arcadeSrc.texturePack }
     

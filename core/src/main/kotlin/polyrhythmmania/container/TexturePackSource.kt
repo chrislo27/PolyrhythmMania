@@ -1,15 +1,29 @@
 package polyrhythmmania.container
 
+import kotlin.math.absoluteValue
 
-enum class TexturePackSource(val jsonId: Int) {
-    STOCK_GBA(0),
-    STOCK_HD(1),
-    STOCK_ARCADE(2),
-    CUSTOM(-1);
-    
+
+sealed class TexturePackSource(val jsonId: Int, val isCustom: Boolean) {
+
     companion object {
-        val VALUES: List<TexturePackSource> = values().toList()
-        val INDEX_MAP: Map<Int, TexturePackSource> = VALUES.associateBy { it.jsonId }
-        val VALUES_NON_CUSTOM: List<TexturePackSource> = listOf(STOCK_GBA, STOCK_HD, STOCK_ARCADE)
+        val CUSTOM_RANGE: IntRange = 1..5
+        
+        val VALUES_NON_CUSTOM: List<TexturePackSource> = listOf(StockGBA, StockHD, StockArcade)
+        private val INDEX_MAP: Map<Int, TexturePackSource> = VALUES_NON_CUSTOM.associateBy { it.jsonId }
+        val VALUES_WITH_CUSTOM: List<TexturePackSource> = VALUES_NON_CUSTOM + CUSTOM_RANGE.map { Custom(it) }
+        
+        fun idToSource(jsonId: Int): TexturePackSource? {
+            return if (jsonId < 0) {
+                if (jsonId in CUSTOM_RANGE) {
+                    Custom(jsonId.absoluteValue)
+                } else null
+            } else INDEX_MAP[jsonId]
+        }
     }
+
+    object StockGBA : TexturePackSource(0, false)
+    object StockHD : TexturePackSource(1, false)
+    object StockArcade : TexturePackSource(2, false)
+    
+    class Custom(/** 1-indexed. */ val id: Int) : TexturePackSource(-id, true)
 }

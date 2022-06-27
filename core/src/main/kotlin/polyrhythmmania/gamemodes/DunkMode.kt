@@ -29,7 +29,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
         modifiers.endlessScore.maxLives.set(5)
         val inputter = container.engine.inputter
         inputter.inputChallenge.restriction = InputTimingRestriction.ACES_ONLY
-        container.texturePackSource.set(TexturePackSource.STOCK_GBA)
+        container.texturePackSource.set(TexturePackSource.StockGBA)
         TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
     }
     

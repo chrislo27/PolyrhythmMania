@@ -112,7 +112,7 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
     private var hasGottenDownToOneLifeAfterTwoSpeedups: RecoveryAchievementState = RecoveryAchievementState.NOT_READY
 
     init {
-        container.texturePackSource.set(TexturePackSource.STOCK_HD)
+        container.texturePackSource.set(TexturePackSource.StockHD)
         TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
         
