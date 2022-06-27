@@ -17,10 +17,7 @@ import paintbox.filechooser.TinyFDWrapper
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.ImageRenderingMode
-import paintbox.ui.Pane
+import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.ui.contextmenu.LabelMenuItem
@@ -122,7 +119,14 @@ class TexturePackEditDialog(
         class Category(val categoryID: String) : ListEntry("editor.dialog.texturePack.objectCategory.${categoryID}")
         class Region(val id: String) : ListEntry("editor.dialog.texturePack.object.${id}")
     }
-
+    
+    private enum class PreviewBg(val localizationKey: String) {
+        CHECKERED("editor.dialog.texturePack.preview.background.checkered"),
+        WHITE("editor.dialog.texturePack.preview.background.white"),
+        GREY("editor.dialog.texturePack.preview.background.grey"),
+        BLACK("editor.dialog.texturePack.preview.background.black"),
+    }
+    
     /**
      * 0-indexed.
      */
@@ -484,7 +488,7 @@ class TexturePackEditDialog(
                 
                 this += TextLabel(binding = { Localization.getVar("editor.dialog.texturePack.stock").use() },
                         font = editorPane.palette.musicDialogFont).apply {
-                    this.bindHeightToParent(multiplier = 0.5f, adjust = -1f)
+                    this.bindHeightToParent(multiplier = 0.4f, adjust = -1f)
                     this.markup.set(editorPane.palette.markup)
                     this.textColor.set(Color.WHITE.cpy())
                 }
@@ -493,6 +497,9 @@ class TexturePackEditDialog(
                         legalValues = TexturePackSource.VALUES_NON_CUSTOM) { src ->
                     baseTexturePack.set(StockTexturePacks.getPackFromSource(src) ?: StockTexturePacks.gba)
                     onTexturePackUpdated.invert()
+                }.apply {
+                    this.bindHeightToParent(multiplier = 0.6f, adjust = -1f)
+                    this.bindWidthToParent(multiplier = 0.9f)
                 }
                 this += texPackSelectorPane
             }
@@ -569,7 +576,7 @@ class TexturePackEditDialog(
             if (numberImported < files.size) {
                 pushMessage(Localization.getValue("editor.dialog.texturePack.message.importTextures.someIgnored",
                         numberImported, files.size - numberImported,
-                        (files - acceptedFiles).joinToString(separator = ", ") { it.name }))
+                        (files - acceptedFiles.toSet()).joinToString(separator = ", ") { it.name }))
             } else {
                 pushMessage(Localization.getValue("editor.dialog.texturePack.message.importTextures.success", numberImported))
             }
@@ -666,6 +673,7 @@ class TexturePackEditDialog(
     }
     
     inner class PreviewPane : Pane() {
+        
         private val updateVar: BooleanVar = BooleanVar(false)
         val vbox: VBox = VBox().apply {
             this.spacing.set(2f)
@@ -715,7 +723,7 @@ class TexturePackEditDialog(
                     ctp.remove(ctp.getOrNull(current.id))
 
                     // Dispose the textures that have stopped being used
-                    val texturesRemoved = oldTextureSet - ctp.getAllUniqueTextures()
+                    val texturesRemoved = oldTextureSet - ctp.getAllUniqueTextures().toSet()
                     if (texturesRemoved.isNotEmpty()) {
                         texturesRemoved.forEach { it.disposeQuietly() }
                     }
@@ -736,7 +744,7 @@ class TexturePackEditDialog(
                 buttonBar += separator()
                 
                 val filterToggleGroup = ToggleGroup()
-                buttonBar += TextLabel(binding = {Localization.getVar("editor.dialog.texturePack.button.filtering").use()}).apply {
+                buttonBar += TextLabel(binding = { Localization.getVar("editor.dialog.texturePack.button.filtering").use() }).apply {
                     this.markup.set(editorPane.palette.markup)
                     this.renderAlign.set(Align.right)
                     this.bounds.width.set(100f)
@@ -833,32 +841,60 @@ class TexturePackEditDialog(
                 
             }
             
-            val showBox = HBox().apply { 
+            
+            val showBox = Pane().apply { 
                 Anchor.TopCentre.configure(this)
+                this.bounds.width.set(256f)
+                this.bounds.height.set(256f)
+            }
+            val transparencyNode = ImageNode(null, ImageRenderingMode.FULL).also { im ->
+                im.textureRegion.sideEffecting(TextureRegion(PRManiaGame.instance.colourPickerTransparencyGrid)) { tr ->
+                    tr?.setRegion(0, 0, im.bounds.width.use().toInt(), im.bounds.height.use().toInt())
+                    tr
+                }
+            }
+            val solidColorNode = RectElement(Color.CLEAR)
+            val regionImageNode = ImageNode(binding = {
+                updateVar.use()
+                val entry = currentEntry.use()
+                customTexturePack.use().getOrNull(entry.id) ?: baseTexturePack.use().getOrNull(entry.id)
+            }, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
+            
+            fun setPreviewBg(new: PreviewBg) {
+                when (new) {
+                    PreviewBg.CHECKERED -> solidColorNode.color.set(Color.CLEAR)
+                    PreviewBg.WHITE -> solidColorNode.color.set(Color.WHITE)
+                    PreviewBg.GREY -> solidColorNode.color.set(Color.GRAY)
+                    PreviewBg.BLACK -> solidColorNode.color.set(Color.BLACK)
+                }
+            }
+            
+            showBox += transparencyNode
+            transparencyNode += solidColorNode
+            solidColorNode += regionImageNode
+            
+            val bgOptionsBox = HBox().apply { 
                 this.spacing.set(8f)
-                this.bounds.height.set(200f)
+                this.bounds.height.set(32f)
             }
-            showBox.temporarilyDisableLayouts {
-                fun createTransparencyNode(): ImageNode {
-                    return ImageNode(null, ImageRenderingMode.FULL).also { im ->
-                        im.textureRegion.sideEffecting(TextureRegion(PRManiaGame.instance.colourPickerTransparencyGrid)) { tr ->
-                            tr?.setRegion(0, 0, im.bounds.width.use().toInt(), im.bounds.height.use().toInt())
-                            tr
-                        }
+            bgOptionsBox.temporarilyDisableLayouts { 
+                bgOptionsBox += TextLabel(binding = { Localization.getVar("editor.dialog.texturePack.preview.background").use() }).apply {
+                    this.markup.set(editorPane.palette.markup)
+                    this.renderAlign.set(Align.right)
+                    this.bounds.width.set(200f)
+                    this.textColor.set(Color.WHITE.cpy())
+                }
+                bgOptionsBox += ComboBox(PreviewBg.values().toList(), PreviewBg.CHECKERED, font = editorPane.palette.musicDialogFont).apply {
+                    this.bounds.width.set(200f)
+                    this.itemStringConverter.set(StringConverter { 
+                        Localization.getValue(it.localizationKey)
+                    })
+                    this.onItemSelected = { item ->
+                        setPreviewBg(item)
                     }
-                }
-                
-                // Current texture (custom or not)
-                showBox += createTransparencyNode().apply { 
-                    this.bindWidthToSelfHeight()
-                    this += ImageNode(binding = { 
-                        updateVar.use()
-                        val entry = currentEntry.use()
-                        customTexturePack.use().getOrNull(entry.id) ?: baseTexturePack.use().getOrNull(entry.id)
-                                                }, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
+                    setPreviewBg(this.selectedItem.getOrCompute())
                 }
             }
-            showBox.sizeWidthToChildren(200f)
 
 
             fun separator(): RectElement {
@@ -874,6 +910,8 @@ class TexturePackEditDialog(
                 vbox += buttonBar
                 vbox += separator()
                 vbox += showBox
+                vbox += separator().apply { this.color.set(Color.CLEAR) }
+                vbox += bgOptionsBox
             }
         }
         

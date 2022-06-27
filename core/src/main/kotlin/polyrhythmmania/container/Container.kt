@@ -612,7 +612,7 @@ class Container(
                             }
                             "custom" -> {
                                 // index is present as of container version 12
-                                if (containerVersion >= 12) {
+                                if (containerVersion >= VERSION_MULTIPLE_TEX_PACK_ADDED) {
                                     texturePackSource.set(TexturePackSource.Custom((texturePackObj.get("srcIndex").asInt() + 1).coerceIn(TexturePackSource.CUSTOM_RANGE)))
                                 } else {
                                     texturePackSource.set(TexturePackSource.Custom(1)) // Default to first pack for older levels
@@ -625,7 +625,7 @@ class Container(
                             }
                         }
                         
-                        if (containerVersion < 12 && texturePackObj.get("hasCustom")?.asBoolean() == true) {
+                        if (containerVersion < VERSION_MULTIPLE_TEX_PACK_ADDED && texturePackObj.get("hasCustom")?.asBoolean() == true) {
                             zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack.zip")).use { zipInputStream ->
                                 val tempFile = TempFileUtils.createTempFile("extres", ".zip")
                                 val out = tempFile.outputStream()
@@ -635,7 +635,7 @@ class Container(
                                 customTexturePacksRead[0] = readResult
                                 tempFile.delete()
                             }
-                        } else if (containerVersion >= 12) {
+                        } else if (containerVersion >= VERSION_MULTIPLE_TEX_PACK_ADDED) {
                             val slotCount = texturePackObj.get("slotCount").asInt()
                             val presentIndicesArr = texturePackObj.get("presentIndices").asArray()
                             val presentIndices: Set<Int> = presentIndicesArr.filter { it.isNumber }.map { it.asInt() }.toSet()
