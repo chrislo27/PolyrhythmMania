@@ -223,7 +223,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         if (list == null || list.isEmpty() || list.values.sumOf { it.size } == 0) {
                             paneNoData
                         } else {
-                            createTable(list)
+                            createTable(list, dailyChallengeDate.getOrCompute())
                         }
                     }
                 }
@@ -287,7 +287,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
     }
     
-    private fun createTable(leaderboard: DailyLeaderboard): Pane {
+    private fun createTable(leaderboard: DailyLeaderboard, currentChallengeDate: LocalDate): Pane {
         return Pane().apply {
             val headerHBox = HBox().apply {
                 this.bounds.height.set(32f)
@@ -336,8 +336,8 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     }
                 }
             }
-            
-            val dateList = leaderboard.keys.sortedDescending()
+
+            val dateList = (leaderboard.keys + currentChallengeDate).sortedDescending()
             fun updateList(date: LocalDate) {
                 val newPane = VBox().apply { 
                     this.temporarilyDisableLayouts {
@@ -356,8 +356,17 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             placeNumbersInverse[score] = placeNumber
                         }
                         
-                        sorted.forEach { score ->
-                            this += score.createPane(sorted.size - placeNumbersInverse.getOrDefault(score, 99999) + 1)
+                        if (sorted.isEmpty()) {
+                            this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.noData").use() }).apply {
+                                this.renderAlign.set(Align.center)
+                                this.doLineWrapping.set(true)
+                                this.markup.set(this@DailyChallengeMenu.markup)
+                                this.bounds.height.set(128f)
+                            }
+                        } else {
+                            sorted.forEach { score ->
+                                this += score.createPane(sorted.size - placeNumbersInverse.getOrDefault(score, 99999) + 1)
+                            }
                         }
                     }
                     this.sizeHeightToChildren(100f)
@@ -367,7 +376,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
 
 
-            val startingDate = dateList.firstOrNull() ?: dailyChallengeDate.getOrCompute()
+            val startingDate = dateList.firstOrNull() ?: currentChallengeDate
 
             this += headerHBox.apply {
                 this += TextLabel(binding = {
