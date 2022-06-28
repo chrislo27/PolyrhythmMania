@@ -8,6 +8,7 @@ import paintbox.Paintbox
 import paintbox.PaintboxGame
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.binding.VarChangedListener
 import paintbox.binding.WeakVarChangedListener
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
@@ -31,6 +32,12 @@ import kotlin.math.max
 class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
 
     val settings: Settings = editorPane.main.settings
+    
+    private val uiScaleListener: VarChangedListener<Int> = VarChangedListener {
+        Gdx.app.postRunnable {
+            editor.resize()
+        }
+    }
 
     init {
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.settings.title").use() }
@@ -192,11 +199,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             val (uiScalePane, uiScaleControl) = createCycleOption("editorSettings.uiScale", "editorSettings.uiScale.tooltip",
                     settings.kv_editorUIScale, listOf(1, 2, 3, 4),
                     itemToStringBinding = { if (it == 1) Localization.getValue("editorSettings.uiScale.native") else "$it" })
-            uiScaleControl.currentItem.addListener( WeakVarChangedListener {
-                Gdx.app.postRunnable { 
-                    editor.resize()
-                }
-            })
+            uiScaleControl.currentItem.addListener(WeakVarChangedListener(uiScaleListener))
             vbox += uiScalePane
         }
         vbox.sizeHeightToChildren(300f)
