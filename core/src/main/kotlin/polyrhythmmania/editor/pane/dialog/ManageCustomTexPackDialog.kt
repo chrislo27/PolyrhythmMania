@@ -27,6 +27,7 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.tileset.CustomTexturePack
 import polyrhythmmania.world.tileset.StockTexturePacks
+import java.util.zip.Deflater
 import java.util.zip.ZipOutputStream
 
 
@@ -190,6 +191,7 @@ class ManageCustomTexPackDialog(
                                                     
                                                     tmpFile.outputStream().use { fos ->
                                                         ZipOutputStream(fos).use { zip ->
+                                                            zip.setLevel(Deflater.NO_COMPRESSION)
                                                             fromPack.writeToOutputStream(zip)
                                                         }
                                                     }
