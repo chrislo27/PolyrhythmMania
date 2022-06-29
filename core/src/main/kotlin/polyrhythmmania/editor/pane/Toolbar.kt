@@ -263,7 +263,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                 this.setOnAction {
                     if (editor.allowedToEdit.get()) {
                         editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
-                            ctxmenu.defaultWidth.set(360f)
+                            ctxmenu.defaultWidth.set(380f)
                             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("editor.button.changeTexturePack"), editorPane.main.mainFontBold))
 //                            ctxmenu.addMenuItem(SeparatorMenuItem())
                             ctxmenu.addMenuItem(CustomMenuItem(TexPackSrcSelectorMenuPane(editorPane,
@@ -275,27 +275,11 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                             ctxmenu.addMenuItem(SeparatorMenuItem())
                             ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("editor.button.changeTexturePack.edit"), editorPane.palette.markup).apply {
                                 this.onAction = {
-                                    editor.attemptOpenTexturePackEditDialog()
+                                    editor.attemptOpenManageTexturePacksDialog()
                                 }
                             })
                         })
                     }
-//                    val editor = editorPane.editor
-//                    if (editor.allowedToEdit.getOrCompute()) {
-//                        editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
-//                            val useHDVar: Var<Boolean> = Var(editor.container.texturePack.getOrCompute().id == "hd").apply {
-//                                addListener {
-//                                    editor.container.texturePack.set(if (it.getOrCompute()) StockTexturePacks.hd else StockTexturePacks.gba)
-//                                }
-//                            }
-//
-//                            ctxmenu.defaultWidth.set(400f)
-//                            ctxmenu.addMenuItem(LabelMenuItem.create("(Temporary) Change texture pack", editorPane.palette.markup))
-//                            ctxmenu.addMenuItem(SeparatorMenuItem())
-//                            ctxmenu.addMenuItem(CheckBoxMenuItem.create(useHDVar,
-//                                    """Use "HD" texture pack instead of GBA""", editorPane.palette.markup))
-//                        })
-//                    }
                 }
             }
             leftControlHBox += Button("").apply {

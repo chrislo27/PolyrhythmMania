@@ -137,7 +137,7 @@ class TexturePackEditDialog(
     private val isMessageVisible: BooleanVar = BooleanVar(false)
     
     private val baseTexturePack: Var<TexturePack> = Var(StockTexturePacks.gba)
-    private val customTexturePack: Var<CustomTexturePack> = Var(CustomTexturePack(UUID.randomUUID().toString(), baseTexturePack.getOrCompute().id))
+    private val customTexturePack: Var<CustomTexturePack> = Var(createNewBlankCustomTexturePack())
     private val onTexturePackUpdated: BooleanVar = BooleanVar(false)
     private val currentEntry: Var<ListEntry.Region> = Var(LIST_ENTRIES.first { it is ListEntry.Region } as ListEntry.Region)
     
@@ -178,7 +178,7 @@ class TexturePackEditDialog(
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor_linear")["x"])).apply {
                 this.tint.bind { editorPane.palette.toolbarIconToolNeutralTint.use() }
             }
-            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("common.close")))
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("common.back")))
         })
         
         // Close file chooser msg
@@ -301,13 +301,14 @@ class TexturePackEditDialog(
                                 val old = customTexturePack.getOrCompute()
                                 val oldTextures = old.getAllUniqueTextures()
                                 
-                                customTexturePack.set(CustomTexturePack(UUID.randomUUID().toString(), baseTexturePack.getOrCompute().id))
+                                customTexturePack.set(createNewBlankCustomTexturePack())
                                 syncThisCustomPackWithContainer()
                                 
                                 Gdx.app.postRunnable { 
                                     oldTextures.forEach { it.disposeQuietly() }
                                 }
                                 
+                                updateBasePackCombobox()
                                 onTexturePackUpdated.invert()
                             }
                         })
@@ -341,6 +342,7 @@ class TexturePackEditDialog(
                             }
                             
                             pushMessage(Localization.getValue("editor.dialog.texturePack.message.loadAll.success", readResult.formatVersion.toString()))
+                            updateBasePackCombobox()
                             onTexturePackUpdated.invert()
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -482,8 +484,7 @@ class TexturePackEditDialog(
             this.bounds.x.bind { (parent.use()?.bounds?.width?.use() ?: 0f) * 0.4f + 8f }
         }
         bottomRightHbox.temporarilyDisableLayouts {
-            bottomRightHbox += VBox().apply {
-                this.spacing.set(2f)
+            bottomRightHbox += Pane().apply {
                 this.bounds.width.set(340f)
                 
                 this += TextLabel(binding = { Localization.getVar("editor.dialog.texturePack.stock").use() },
@@ -491,6 +492,7 @@ class TexturePackEditDialog(
                     this.bindHeightToParent(multiplier = 0.4f, adjust = -1f)
                     this.markup.set(editorPane.palette.markup)
                     this.textColor.set(Color.WHITE.cpy())
+                    this.renderAlign.set(RenderAlign.topLeft)
                 }
                 val basePackSource: TexturePackSource = StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.StockGBA
                 texPackSelectorPane = TexPackSrcSelectorMenuPane(editorPane, basePackSource,
@@ -498,6 +500,7 @@ class TexturePackEditDialog(
                     baseTexturePack.set(StockTexturePacks.getPackFromSource(src) ?: StockTexturePacks.gba)
                     onTexturePackUpdated.invert()
                 }.apply {
+                    Anchor.BottomLeft.configure(this)
                     this.bindHeightToParent(multiplier = 0.6f, adjust = -1f)
                     this.bindWidthToParent(multiplier = 0.9f)
                 }
@@ -508,16 +511,25 @@ class TexturePackEditDialog(
     }
     
     
-    fun prepareShow(): TexturePackEditDialog {
-        val currentCustom = customPackFromContainer.getOrCompute()
-        if (currentCustom != null) {
-            customTexturePack.set(currentCustom)
-            baseTexturePack.set(StockTexturePacks.allPacksByID[currentCustom.fallbackID] ?: StockTexturePacks.gba)
-            texPackSelectorPane.combobox.selectedItem.set(StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.StockGBA)
-            
-            onTexturePackUpdated.invert()
-        }
+    private fun createNewBlankCustomTexturePack(basePack: TexturePack = StockTexturePacks.gba): CustomTexturePack {
+        return CustomTexturePack(UUID.randomUUID().toString(), basePack.id)
+    }
+    
+    fun prepareShow(index: Int): TexturePackEditDialog {
+        this.customPackIndex.set(index)
+
+        val currentCustom = customPackFromContainer.getOrCompute() ?: createNewBlankCustomTexturePack()
+        customTexturePack.set(currentCustom)
+        baseTexturePack.set(StockTexturePacks.allPacksByID[currentCustom.fallbackID] ?: StockTexturePacks.gba)
+
+        updateBasePackCombobox()
+        onTexturePackUpdated.invert()
+        
         return this
+    }
+    
+    private fun updateBasePackCombobox() {
+        texPackSelectorPane.combobox.selectedItem.set(StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.StockGBA)
     }
 
     override fun canCloseDialog(): Boolean {
@@ -527,6 +539,10 @@ class TexturePackEditDialog(
     override fun onCloseDialog() {
         super.onCloseDialog()
         syncThisCustomPackWithContainer()
+    }
+    
+    override fun afterDialogClosed() {
+        editor.attemptOpenManageTexturePacksDialog()
     }
     
     fun pushMessage(msg: String) {

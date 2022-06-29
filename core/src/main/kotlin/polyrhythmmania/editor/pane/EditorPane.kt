@@ -55,6 +55,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     val playtestDialog: PlaytestDialog
     val paletteEditDialog: PaletteEditDialog
     val texturePackEditDialog: TexturePackEditDialog
+    val manageTexturePackDialog: ManageCustomTexPackDialog
 
     init {
         // Background
@@ -123,6 +124,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         playtestDialog = PlaytestDialog(this)
         paletteEditDialog = PaletteEditDialog(this, editor.container.world.tilesetPalette, null, false)
         texturePackEditDialog = TexturePackEditDialog(this)
+        manageTexturePackDialog = ManageCustomTexPackDialog(this)
     }
     
     fun resetHelpDialog() {

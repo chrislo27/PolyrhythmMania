@@ -560,9 +560,15 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
         }
     }
     
-    fun attemptOpenTexturePackEditDialog() {
+    fun attemptOpenTexturePackEditDialog(index: Int) {
         if (allowedToEdit.get()) {
-            editorPane.openDialog(editorPane.texturePackEditDialog.prepareShow())
+            editorPane.openDialog(editorPane.texturePackEditDialog.prepareShow(index))
+        }
+    }
+    
+    fun attemptOpenManageTexturePacksDialog() {
+        if (allowedToEdit.get()) {
+            editorPane.openDialog(editorPane.manageTexturePackDialog.prepareShow())
         }
     }
     
