@@ -49,7 +49,7 @@ class EndlessScore : ModifierModule {
 
 
     /**
-     * Triggers a life to be lost. This is already called by [onMissed], and with an exception in [EntityRodPR].
+     * Triggers a life to be lost.
      */
     fun triggerEndlessLifeLost(inputter: EngineInputter) {
         val oldLives = this.lives.get()
@@ -74,46 +74,45 @@ class EndlessScore : ModifierModule {
         val wasNewHighScore = score > this.highScore.getOrCompute()
         val afterBeat = engine.tempos.secondsToBeats(currentSeconds + 2f)
 
+        // TODO this is a destructive action that is manually reset by ResetMusicVolumeBlock. Eventually that block will be deprecated
         engine.musicData.volumeMap.addMusicVolume(MusicVolume(currentBeat, (afterBeat - currentBeat) / 2f, 0))
 
-        if (this.enabled) {
-            engine.addEvent(object : Event(engine) {
-                override fun onStart(currentBeat: Float) {
-                    super.onStart(currentBeat)
+        engine.addEvent(object : Event(engine) {
+            override fun onStart(currentBeat: Float) {
+                super.onStart(currentBeat)
 
-                    val activeTextBox: ActiveTextBox = if (wasNewHighScore && this@EndlessScore.showNewHighScoreAtEnd) {
-                        engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
-                        engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BANNER))
-                    } else {
-                        engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
-                        engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BANNER))
-                    }
-                    activeTextBox.onComplete = { engine ->
-                        engine.addEvent(EventEndState(engine, currentBeat))
-                    }
+                val activeTextBox: ActiveTextBox = if (wasNewHighScore && this@EndlessScore.showNewHighScoreAtEnd) {
+                    engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_hi").sound)
+                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results.newHighScore", score), true, style = TextBoxStyle.BANNER))
+                } else {
+                    engine.soundInterface.playMenuSfx(AssetRegistry.get<LazySound>("sfx_fail_music_nohi").sound)
+                    engine.setActiveTextbox(TextBox(Localization.getValue("play.endless.gameOver.results", score), true, style = TextBoxStyle.BANNER))
+                }
+                activeTextBox.onComplete = { engine ->
+                    engine.addEvent(EventEndState(engine, currentBeat))
+                }
 
-                    if (wasNewHighScore) {
-                        this@EndlessScore.highScore.set(score)
-                        PRManiaGame.instance.settings.persist()
-                    }
-                    this@EndlessScore.gameOverUIShown.set(true)
+                if (wasNewHighScore) {
+                    this@EndlessScore.highScore.set(score)
+                    PRManiaGame.instance.settings.persist()
+                }
+                this@EndlessScore.gameOverUIShown.set(true)
 
-                    if (engine.areStatisticsEnabled) {
-                        when (world.worldMode.worldType) {
-                            is WorldType.Polyrhythm, WorldType.Dunk -> {
-                                inputter.inputCountStats.addToGlobalStats()
-                            }
-                            WorldType.Assemble -> {
-                                // NO-OP
-                            }
+                if (engine.areStatisticsEnabled) {
+                    when (world.worldMode.worldType) {
+                        is WorldType.Polyrhythm, WorldType.Dunk -> {
+                            inputter.inputCountStats.addToGlobalStats()
+                        }
+                        WorldType.Assemble -> {
+                            // NO-OP
                         }
                     }
                 }
-            }.apply {
-                this.beat = afterBeat
-                this.width = 0.5f
-            })
-        }
+            }
+        }.apply {
+            this.beat = afterBeat
+            this.width = 0.5f
+        })
     }
 
 

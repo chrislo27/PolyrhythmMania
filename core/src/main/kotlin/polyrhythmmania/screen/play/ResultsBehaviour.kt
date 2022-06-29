@@ -3,6 +3,10 @@ package polyrhythmmania.screen.play
 import paintbox.binding.Var
 
 
+/**
+ * Results behaviour for normal non-story gameplay.
+ */
+@Deprecated("This will be replaced with a generic level end behaviour")
 sealed class ResultsBehaviour {
     
     object NoResults : ResultsBehaviour()

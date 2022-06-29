@@ -8,6 +8,7 @@ import polyrhythmmania.engine.music.MusicVolume
 import java.util.*
 
 
+@Deprecated("Eventually replace with mutable volume coeff in Engine that can be reset")
 class ResetMusicVolumeBlock(engine: Engine, val startingVolume: Int = 100)
     : Block(engine, EnumSet.allOf(BlockType::class.java)) {
     

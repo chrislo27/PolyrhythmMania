@@ -20,6 +20,7 @@ abstract class AbstractPracticeTutorial(main: PRManiaGame, playTimeType: PlayTim
     }
 
     init {
+        // Trigger play all tutorials achievement
         engine.endSignalReceived.addListener {
             if (it.getOrCompute()) {
                 Gdx.app.postRunnable {

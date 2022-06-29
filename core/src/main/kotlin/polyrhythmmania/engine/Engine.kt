@@ -58,6 +58,7 @@ class Engine(timingProvider: TimingProvider,
         private set
     
     init {
+        // Flush metrics when end signal received
         endSignalReceived.addListener {
             if (it.getOrCompute() && this.metricsEnabled) {
                 metricsReporter.report()
