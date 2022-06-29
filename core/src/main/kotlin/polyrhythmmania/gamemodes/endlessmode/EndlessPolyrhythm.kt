@@ -170,9 +170,6 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
     
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
-        blocks += ResetMusicVolumeBlock(engine).apply {
-            this.beat = 0f
-        }
         blocks += InitializationBlock().apply {
             this.beat = 0f
         }

@@ -10,7 +10,7 @@ import polyrhythmmania.engine.input.*
 import polyrhythmmania.engine.input.practice.RequiredInput
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.gamemodes.ResetMusicVolumeBlock
+import polyrhythmmania.gamemodes.practice.ResetMusicVolumeBlock
 import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.gamemodes.practice.*
 import polyrhythmmania.soundsystem.BeadsMusic

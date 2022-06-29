@@ -11,6 +11,7 @@ import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.ResultsText
+import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -84,6 +85,8 @@ class AssembleMode(main: PRManiaGame)
         musicData.beadsMusic = music
         musicData.update()
         
+        engine.musicData.volumeMap.addMusicVolume(MusicVolume(0f, 0f, 100))
+        
         SidemodeAssets.assembleSfx // Call get to load
 
         addInitialBlocks()
@@ -91,9 +94,6 @@ class AssembleMode(main: PRManiaGame)
 
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
-        blocks += ResetMusicVolumeBlock(engine).apply {
-            this.beat = 0f
-        }
         blocks += InitializationBlock().apply {
             this.beat = 0f
         }

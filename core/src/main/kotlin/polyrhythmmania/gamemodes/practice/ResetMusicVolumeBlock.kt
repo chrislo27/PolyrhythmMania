@@ -1,4 +1,4 @@
-package polyrhythmmania.gamemodes
+package polyrhythmmania.gamemodes.practice
 
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
@@ -8,7 +8,6 @@ import polyrhythmmania.engine.music.MusicVolume
 import java.util.*
 
 
-@Deprecated("Eventually replace with mutable volume coeff in Engine that can be reset")
 class ResetMusicVolumeBlock(engine: Engine, val startingVolume: Int = 100)
     : Block(engine, EnumSet.allOf(BlockType::class.java)) {
     

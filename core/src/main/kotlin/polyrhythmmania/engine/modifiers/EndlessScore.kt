@@ -12,6 +12,7 @@ import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.music.MusicVolume
+import polyrhythmmania.gamemodes.ChangeMusicVolMultiplierEvent
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.EventEndState
@@ -74,9 +75,7 @@ class EndlessScore : ModifierModule {
         val wasNewHighScore = score > this.highScore.getOrCompute()
         val afterBeat = engine.tempos.secondsToBeats(currentSeconds + 2f)
 
-        // TODO this is a destructive action that is manually reset by ResetMusicVolumeBlock. Eventually that block will be deprecated
-        engine.musicData.volumeMap.addMusicVolume(MusicVolume(currentBeat, (afterBeat - currentBeat) / 2f, 0))
-
+        engine.addEvent(ChangeMusicVolMultiplierEvent(engine, 1f, 0f, currentBeat, (afterBeat - currentBeat) / 2f))
         engine.addEvent(object : Event(engine) {
             override fun onStart(currentBeat: Float) {
                 super.onStart(currentBeat)

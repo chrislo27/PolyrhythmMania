@@ -8,6 +8,7 @@ import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.input.InputTimingRestriction
+import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -39,6 +40,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     
     override fun initialize() {
         engine.tempos.addTempoChange(TempoChange(0f, 129f))
+        engine.musicData.volumeMap.addMusicVolume(MusicVolume(0f, 0f, 100))
 
         val music: BeadsMusic = SidemodeAssets.practiceTheme
         val musicData = engine.musicData
@@ -52,9 +54,6 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
-        blocks += ResetMusicVolumeBlock(engine).apply { 
-            this.beat = 0f
-        }
         val loop = LoopingEventBlock(engine, 4f, { engine ->
             engine.modifiers.endlessScore.lives.get() > 0
         }) { engine, startBeat ->

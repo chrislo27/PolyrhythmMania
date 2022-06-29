@@ -2,6 +2,7 @@ package polyrhythmmania.engine
 
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
+import paintbox.binding.FloatVar
 import polyrhythmmania.engine.music.MusicVolMap
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -25,14 +26,27 @@ class MusicData(val engine: Engine) {
 
     var beadsMusic: BeadsMusic? = null
 
+    
+    // Mutable state that is not file-persisted
+    
+    /**
+     * Music volume multiplier for temporary effects, like the music fade out when Endless Mode ends. 
+     * This is reset to 1.0 in [resetState].
+     */
+    var musicVolumeMultiplier: Float = 1f
+    
+    fun resetState() {
+        this.musicVolumeMultiplier = 1f
+    }
+    
     fun update() {
         val currentBeat = engine.beat
         val music = this.beadsMusic
         val player = engine.soundInterface.getCurrentMusicPlayer(music)
         if (player != null) {
             val volume: Int = volumeMap.volumeAtBeat(currentBeat)
-            player.gain = volume / 100f
-            player.pitch = rate * engine.playbackSpeed
+            player.gain = (volume / 100f) * this.musicVolumeMultiplier
+            player.pitch = this.rate * engine.playbackSpeed
 
             if (!player.isPaused && !player.context.out.isPaused) {
                 // Player desync correction
