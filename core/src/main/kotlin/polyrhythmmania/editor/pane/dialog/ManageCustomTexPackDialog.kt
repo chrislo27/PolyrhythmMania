@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import net.lingala.zip4j.ZipFile
+import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -88,35 +89,32 @@ class ManageCustomTexPackDialog(
                         this.bounds.height.set(44f)
                         this.align.set(HBox.Align.CENTRE)
                         this.temporarilyDisableLayouts { 
-                            this += TextLabel(binding = {
-                                var str = Localization.getVar("editor.dialog.manageTexPacks.packNumber", Var {
-                                    val fallbackID = container.customTexturePacks[id - 1].use()?.fallbackID ?: StockTexturePacks.gba.id
-                                    listOf(id, Localization.getVar("editor.dialog.texturePack.stock.${fallbackID}").use())
-                                }).use()
-                                
-                                if (container.customTexturePacks[id - 1].use()?.isEmpty() == false) {
-                                    str = "[font=rodin color=CYAN]★[] $str"
-                                }
-                                
-                                str
-                            }).apply {
+                            this += TextLabel("").apply {
                                 this.markup.set(editorPane.palette.markup)
                                 this.textColor.set(Color.WHITE.cpy())
                                 this.renderAlign.set(Align.center)
                                 
-                                this.bounds.width.set(350f)
+                                this.bounds.width.set(450f)
                                 
                                 this.borderStyle.set(SolidBorder(Color.LIGHT_GRAY).apply { 
                                     this.roundedCorners.set(true)
                                 })
                                 this.border.set(Insets(2f))
                                 
-                                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.manageTexPacks.packNumber.tooltip", Var { 
-                                    // Note: string says number of TEXTURES but I use REGIONS intentionally. 
-                                    // Best wording would be number of SPRITES, but "sprite" is not used as a term
-                                    val numberOfRegions = container.customTexturePacks[id - 1].use()?.getAllTilesetRegions()?.size ?: 0
-                                    listOf(numberOfRegions)
-                                })))
+                                val thisPackVar: Var<CustomTexturePack?> = container.customTexturePacks[id - 1]
+                                val regionCount = IntVar { thisPackVar.use()?.getAllTilesetRegions()?.size ?: 0 }
+                                this.text.bind {
+                                    var str = Localization.getVar("editor.dialog.manageTexPacks.packNumber", Var {
+                                        val fallbackID: String = thisPackVar.use()?.fallbackID?.use() ?: StockTexturePacks.gba.id
+                                        listOf(id, regionCount.use(), Localization.getVar("editor.dialog.texturePack.stock.${fallbackID}").use())
+                                    }).use()
+
+                                    if (thisPackVar.use()?.isEmpty() == false) {
+                                        str = "[font=rodin color=CYAN]★[] $str [font=rodin color=CLEAR]★[]" // Clear star is so the centering looks good
+                                    }
+
+                                    str
+                                }
                             }
                             val mainActionButton = Button(binding = {
                                 when (val s = currentState.use()) {

@@ -180,7 +180,7 @@ class Container(
         val ctp = customTexturePacks[index].getOrCompute()
         if (ctp != null) {
             return CascadingTexturePack("cascading_custom", emptySet(),
-                    listOf(ctp, StockTexturePacks.allPacksByIDWithDeprecations[ctp.fallbackID] ?: StockTexturePacks.gba))
+                    listOf(ctp, StockTexturePacks.allPacksByIDWithDeprecations[ctp.fallbackID.getOrCompute()] ?: StockTexturePacks.gba))
         }
         
         return null

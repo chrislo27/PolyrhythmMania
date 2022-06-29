@@ -9,6 +9,7 @@ import com.eclipsesource.json.JsonObject
 import com.eclipsesource.json.WriterConfig
 import com.twelvemonkeys.imageio.plugins.tga.TGAImageWriteParam
 import net.lingala.zip4j.ZipFile
+import paintbox.binding.Var
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
@@ -26,7 +27,7 @@ import javax.imageio.ImageWriteParam
 import javax.imageio.ImageWriter
 
 
-class CustomTexturePack(id: String, var fallbackID: String)
+class CustomTexturePack(id: String, fallbackID: String)
     : TexturePack(id, emptySet()), Disposable {
     
     companion object {
@@ -222,6 +223,8 @@ class CustomTexturePack(id: String, var fallbackID: String)
             }
         }
     }
+    
+    val fallbackID: Var<String> = Var(fallbackID) 
 
     fun isEmpty(): Boolean {
         return getAllTilesetRegions().isEmpty()
@@ -251,7 +254,7 @@ class CustomTexturePack(id: String, var fallbackID: String)
         jsonObj.add("formatVersion", TEXTURE_PACK_VERSION)
         jsonObj.add("programVersion", PRMania.VERSION.toString())
         jsonObj.add("id", id)
-        jsonObj.add("fallbackID", fallbackID)
+        jsonObj.add("fallbackID", fallbackID.getOrCompute())
         
         val texturesObj = Json.`object`()
         textures.forEach { tex ->

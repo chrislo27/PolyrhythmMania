@@ -148,7 +148,8 @@ class TexturePackEditDialog(
 
     init {
         baseTexturePack.addListener { tp ->
-            customTexturePack.getOrCompute().fallbackID = tp.getOrCompute().id
+            customTexturePack.getOrCompute().fallbackID.set(tp.getOrCompute().id)
+            onTexturePackUpdated.invert()
         }
         
         this.titleLabel.text.bind {
@@ -520,7 +521,7 @@ class TexturePackEditDialog(
 
         val currentCustom = customPackFromContainer.getOrCompute() ?: createNewBlankCustomTexturePack()
         customTexturePack.set(currentCustom)
-        baseTexturePack.set(StockTexturePacks.allPacksByID[currentCustom.fallbackID] ?: StockTexturePacks.gba)
+        baseTexturePack.set(StockTexturePacks.allPacksByID[currentCustom.fallbackID.getOrCompute()] ?: StockTexturePacks.gba)
 
         updateBasePackCombobox()
         onTexturePackUpdated.invert()
@@ -558,7 +559,7 @@ class TexturePackEditDialog(
     
     private fun importTextures(files: List<File>) {
         val ctp = customTexturePack.getOrCompute()
-        val basePack = StockTexturePacks.allPacksByIDWithDeprecations[ctp.fallbackID] ?: StockTexturePacks.gba
+        val basePack = StockTexturePacks.allPacksByIDWithDeprecations[ctp.fallbackID.getOrCompute()] ?: StockTexturePacks.gba
         val orderedFiles = files.sortedBy { it.name }
         try {
             val oldTextureSet = ctp.getAllUniqueTextures()
