@@ -117,7 +117,10 @@ class Container(
     var wasLevelMetadataLoaded: Boolean = false
         private set
     val trackIDs: List<TrackID> = Editor.DEFAULT_TRACKS.map { it.id } // Intentionally doesn't use editor.tracks
+    
+    val storyModeMetadata: Var<StoryModeContainerMetadata> = Var(StoryModeContainerMetadata.BLANK)
 
+    
     private val _resources: MutableMap<String, ExternalResource> = ConcurrentHashMap()
     val resources: Map<String, ExternalResource> get() = _resources
     var compressedMusic: ExternalResource? = null
@@ -420,6 +423,11 @@ class Container(
         if (worldSettings != WorldSettings.DEFAULT) {
             jsonObj.add("worldSettings", worldSettings.toJson())
         }
+        
+        val storyModeMetadata = this.storyModeMetadata.getOrCompute()
+        if (storyModeMetadata != StoryModeContainerMetadata.BLANK) {
+            jsonObj.add("storyModeMetadata", storyModeMetadata.toJson())
+        }
 
 
         // Pack
@@ -669,6 +677,12 @@ class Container(
             val worldSettingsObj = json.get("worldSettings")?.asObject()
             if (worldSettingsObj != null) {
                 this.world.worldSettings = WorldSettings.fromJson(worldSettingsObj)
+            }
+        }
+        if (containerVersion >= 12 && EditorSpecialFlags.STORY_MODE in editorFlags) {
+            val storyModeMetadataObj = json.get("storyModeMetadata")?.asObject()
+            if (storyModeMetadataObj != null) {
+                this.storyModeMetadata.set(StoryModeContainerMetadata.fromJson(storyModeMetadataObj))
             }
         }
 
