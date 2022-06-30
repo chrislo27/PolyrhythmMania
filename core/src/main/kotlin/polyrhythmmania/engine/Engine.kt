@@ -2,6 +2,7 @@ package polyrhythmmania.engine
 
 import com.codahale.metrics.*
 import paintbox.binding.BooleanVar
+import paintbox.binding.Var
 import polyrhythmmania.PRMania
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.EngineInputter
@@ -56,7 +57,7 @@ class Engine(timingProvider: TimingProvider,
     
     var activeTextBox: ActiveTextBox? = null
         private set
-    var resultFlag: ResultFlag = ResultFlag.NONE
+    val resultFlag: Var<ResultFlag> = Var(ResultFlag.NONE)
     
     init {
         // Flush metrics when end signal received
@@ -72,7 +73,7 @@ class Engine(timingProvider: TimingProvider,
      */
     fun resetMutableState() {
         this.removeEvents(this.events.toList())
-        this.resultFlag = ResultFlag.NONE
+        this.resultFlag.set(ResultFlag.NONE)
         this.inputter.areInputsLocked = this.autoInputs
         this.inputter.resetState()
         this.modifiers.resetState()

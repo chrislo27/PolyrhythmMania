@@ -68,7 +68,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     var renderUI: Boolean = true
     var showSkillStarSetting: Boolean = PRManiaGame.instance.settings.showSkillStar.getOrCompute()
 
-    val showEndlessModeScore: BooleanVar = BooleanVar(false)
+    val showEndlessModeScore: ReadOnlyBooleanVar = BooleanVar { engine.modifiers.endlessScore.enabled.use() }
     val prevHighScore: IntVar = IntVar(-1)
     val dailyChallengeDate: Var<LocalDate?> = Var(null)
     val endlessModeSeed: Var<String?> = Var(null)

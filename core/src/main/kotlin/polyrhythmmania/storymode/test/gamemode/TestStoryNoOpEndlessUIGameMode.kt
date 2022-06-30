@@ -12,8 +12,6 @@ class TestStoryNoOpEndlessUIGameMode(main: PRManiaGame) : TestStoryGameMode(main
         val endlessScore = engine.modifiers.endlessScore
         endlessScore.enabled.set(true)
         endlessScore.maxLives.set(5)
-        
-        container.renderer.showEndlessModeScore.set(true)
     }
 
     override fun initialize() {
