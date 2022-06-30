@@ -5,24 +5,16 @@ import paintbox.lazysound.LazySound
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.engine.ActiveTextBox
-import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.TextBox
-import polyrhythmmania.engine.TextBoxStyle
+import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
-import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.gamemodes.ChangeMusicVolMultiplierEvent
-import polyrhythmmania.statistics.GlobalStats
-import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.EventEndState
 import polyrhythmmania.world.WorldType
 
-class EndlessScore : ModifierModule {
+class EndlessScore : ModifierModule() {
 
     // Settings
-    var enabled: Boolean = false
-
     var showNewHighScoreAtEnd: Boolean = true // Hidden for something like Daily Challenge
     var hideHighScoreText: Boolean = false // The label that shows the Prev. High Score or daily challenge seed, etc
     var flashHudRedWhenLifeLost: Boolean = false // Only used in Endless Polyrhythm
@@ -67,6 +59,7 @@ class EndlessScore : ModifierModule {
         val world = engine.world
 
         engine.playbackSpeed = 1f
+        engine.resultFlag = ResultFlag.FAIL
 
         val currentSeconds = engine.seconds
         val currentBeat = engine.beat

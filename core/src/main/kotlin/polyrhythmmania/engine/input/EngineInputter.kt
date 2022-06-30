@@ -272,7 +272,7 @@ class EngineInputter(val engine: Engine) {
                         Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                     }
 
-                    if (!modifiers.endlessScore.enabled) {
+                    if (!modifiers.endlessScore.enabled.get()) {
                         (inputResults as MutableList).add(inputResult)
                     }
 
@@ -336,7 +336,7 @@ class EngineInputter(val engine: Engine) {
 
         totalExpectedInputs += numExpected
         val endlessScore = modifiers.endlessScore
-        if (endlessScore.enabled) {
+        if (endlessScore.enabled.get()) {
             // Special case when in endless mode
             // Inputs don't count when lives = 0
             if (engine.areStatisticsEnabled && endlessScore.lives.get() > 0) {
@@ -394,7 +394,7 @@ class EngineInputter(val engine: Engine) {
 
     fun addNonEndlessInputStats() {
         if (!engine.areStatisticsEnabled) return
-        if (modifiers.endlessScore.enabled) return
+        if (modifiers.endlessScore.enabled.get()) return
 
         when (world.worldMode.worldType) {
             is WorldType.Polyrhythm, WorldType.Assemble -> {

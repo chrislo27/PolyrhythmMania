@@ -56,6 +56,7 @@ class Engine(timingProvider: TimingProvider,
     
     var activeTextBox: ActiveTextBox? = null
         private set
+    var resultFlag: ResultFlag = ResultFlag.NONE
     
     init {
         // Flush metrics when end signal received
@@ -71,6 +72,7 @@ class Engine(timingProvider: TimingProvider,
      */
     fun resetMutableState() {
         this.removeEvents(this.events.toList())
+        this.resultFlag = ResultFlag.NONE
         this.inputter.areInputsLocked = this.autoInputs
         this.inputter.resetState()
         this.modifiers.resetState()
@@ -212,7 +214,7 @@ class Engine(timingProvider: TimingProvider,
             }
             if (activeTextBox.secondsTimer <= 0f) {
                 val endlessScore = modifiers.endlessScore
-                if (autoInputs && (!endlessScore.enabled || endlessScore.lives.get() > 0)) {
+                if (autoInputs && (!endlessScore.enabled.get() || endlessScore.lives.get() > 0)) {
                     removeActiveTextbox(unpauseSoundInterface = true, runTextboxOnComplete = true)
                 }
             }

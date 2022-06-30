@@ -264,7 +264,7 @@ class EntityRodPR(
         }
         
         val endlessScore = engine.modifiers.endlessScore
-        if (endlessScore.enabled) {
+        if (endlessScore.enabled.get()) {
             val lifeLostVar = this.lifeLost
             if (lifeLostVar != null) {
                 if (!lifeLostVar.get()) {

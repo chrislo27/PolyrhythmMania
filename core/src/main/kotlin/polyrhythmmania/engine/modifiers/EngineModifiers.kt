@@ -12,9 +12,10 @@ class EngineModifiers(val engine: Engine) : InputterListener {
 
     val perfectChallenge: PerfectChallengeData = PerfectChallengeData()
     val endlessScore: EndlessScore = EndlessScore()
+    val livesMode: LivesMode = LivesMode()
     
-    private val allModules: List<ModifierModule> = listOf(perfectChallenge, endlessScore)
- 
+    private val allModules: List<ModifierModule> = listOf(perfectChallenge, endlessScore, livesMode)
+
     init {
         inputter.inputterListeners += this
     }

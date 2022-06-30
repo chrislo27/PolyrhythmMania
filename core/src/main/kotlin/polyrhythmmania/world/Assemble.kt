@@ -498,7 +498,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
     
     private fun loseLife(engine: Engine) {
         val endlessScore = engine.modifiers.endlessScore
-        if (endlessScore.enabled) {
+        if (endlessScore.enabled.get()) {
             val oldLives = endlessScore.lives.get()
             endlessScore.triggerEndlessLifeLost(engine.inputter) // This intentionally does not normally automatically trigger in EndlessScore
             if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {

@@ -4,12 +4,16 @@ import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
 
 
-class BarrageMode : ModifierModule() {
-    
-    // TODO implement barrage mode
+class LivesMode : ModifierModule() {
 
+    // Settings
+
+    // Data
+    
     override fun resetState() {
+        
     }
+    
     
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
     }

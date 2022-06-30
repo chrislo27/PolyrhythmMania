@@ -370,7 +370,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
 
         val perfectCh = modifiers.perfectChallenge
-        if (perfectCh.goingForPerfect) {
+        if (perfectCh.enabled.get()) {
             perfectPane.visible.set(true)
             perfectCh.hit = (perfectCh.hit - Gdx.graphics.deltaTime / (if (perfectCh.failed) 0.5f else 0.125f)).coerceIn(0f, 1f)
 

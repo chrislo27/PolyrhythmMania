@@ -118,7 +118,7 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
         
         container.world.worldMode = WorldMode(WorldType.Polyrhythm())
         val endlessScore = container.engine.modifiers.endlessScore
-        endlessScore.enabled = true
+        endlessScore.enabled.set(true)
         endlessScore.flashHudRedWhenLifeLost = true
         endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
         container.renderer.endlessModeSeed.set(getSeedString(seed.toUInt()))

@@ -25,6 +25,6 @@ data class Challenges(val tempoUp: Int, val goingForPerfect: Boolean) {
     
     fun applyToEngine(engine: Engine) {
         engine.playbackSpeed = tempoUp / 100f
-        engine.modifiers.perfectChallenge.goingForPerfect = goingForPerfect
+        engine.modifiers.perfectChallenge.enabled.set(goingForPerfect)
     }
 }

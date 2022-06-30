@@ -53,7 +53,7 @@ class EnginePlayScreenBase(
     
     init {
         val endlessScore = engine.modifiers.endlessScore
-        if (endlessScore.enabled
+        if (endlessScore.enabled.get()
                 && engine.world.worldMode.worldType is WorldType.Polyrhythm
                 && endlessScore.maxLives.get() == 1) { // Daredevil mode in endless
             (pauseMenuHandler as? TengokuBgPauseMenuHandler)?.also { handler ->
@@ -70,7 +70,7 @@ class EnginePlayScreenBase(
         // Score achievements for endless-type modes
         val modifiers = engine.modifiers
         modifiers.endlessScore.score.addListener { scoreVar ->
-            if (modifiers.endlessScore.enabled && engine.areStatisticsEnabled) {
+            if (modifiers.endlessScore.enabled.get() && engine.areStatisticsEnabled) {
                 val newScore = scoreVar.getOrCompute()
                 when (engine.world.worldMode.worldType) {
                     is WorldType.Polyrhythm -> {

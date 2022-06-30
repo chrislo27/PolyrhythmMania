@@ -8,10 +8,7 @@ import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
 
-class PerfectChallengeData : ModifierModule {
-    
-    // Settings
-    var goingForPerfect: Boolean = false
+class PerfectChallengeData : ModifierModule() {
     
     // Data
     var hit: Float = 0f
@@ -25,7 +22,7 @@ class PerfectChallengeData : ModifierModule {
 
 
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
-        if (this.goingForPerfect && !this.failed) {
+        if (this.enabled.get() && !this.failed) {
             this.failed = true
             this.hit = 1f
 
@@ -40,7 +37,7 @@ class PerfectChallengeData : ModifierModule {
     }
 
     override fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean) {
-        if (this.goingForPerfect && !this.failed && !countsAsMiss) {
+        if (this.enabled.get() && !this.failed && !countsAsMiss) {
             this.hit = 1f
         }
     }

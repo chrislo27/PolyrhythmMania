@@ -26,7 +26,7 @@ class DunkMode(main: PRManiaGame, prevHighScore: EndlessModeScore)
     init {
         container.world.worldMode = WorldMode(WorldType.Dunk)
         val modifiers = engine.modifiers
-        modifiers.endlessScore.enabled = true
+        modifiers.endlessScore.enabled.set(true)
         modifiers.endlessScore.maxLives.set(5)
         val inputter = container.engine.inputter
         inputter.inputChallenge.restriction = InputTimingRestriction.ACES_ONLY
