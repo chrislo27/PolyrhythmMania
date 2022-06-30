@@ -2,12 +2,10 @@ package polyrhythmmania.world
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Cursor
 import paintbox.binding.BooleanVar
-import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
-import polyrhythmmania.container.TexturePackSource
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.engine.*
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
@@ -15,7 +13,6 @@ import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.tileset.TilesetPalette
-import kotlin.math.max
 import kotlin.math.min
 
 

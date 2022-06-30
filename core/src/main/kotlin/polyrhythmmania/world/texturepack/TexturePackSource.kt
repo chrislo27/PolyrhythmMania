@@ -1,8 +1,11 @@
-package polyrhythmmania.container
+package polyrhythmmania.world.texturepack
 
 import kotlin.math.absoluteValue
 
 
+/**
+ * Represents the options for a texture pack source.
+ */
 sealed class TexturePackSource(val jsonId: Int, val isCustom: Boolean) {
 
     companion object {

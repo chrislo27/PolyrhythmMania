@@ -110,7 +110,7 @@ class TilesetPalette {
 
     val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeBorderZ, /*cubeFaceX,*/ cubeFaceY, cubeFaceZ,
             pistonFaceX, pistonFaceZ, signShadow, rodBorder, rodFill,
-            backgroundBack, backgroundMiddle, backgroundFore) + listOf(cubeFaceX) /* Deprioritized. */
+            backgroundBack, backgroundMiddle, backgroundFore) + listOf(cubeFaceX) /* Deprioritized to be later in the list. */
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
 
     fun copy(): TilesetPalette {

@@ -43,6 +43,7 @@ import polyrhythmmania.world.entity.EntityInputFeedback
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.render.WorldRendererWithUI
+import polyrhythmmania.world.texturepack.*
 import polyrhythmmania.world.tileset.*
 import java.io.File
 import java.time.Instant

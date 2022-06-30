@@ -1,4 +1,4 @@
-package polyrhythmmania.world.tileset
+package polyrhythmmania.world.texturepack
 
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -218,7 +218,7 @@ class CustomTexturePack(id: String, fallbackID: String)
                             tr.setRegion(rmd.regionX, rmd.regionY, rmd.regionW, rmd.regionH)
                         }
                     }
-                    ctp.add(TilesetRegion(rmd.id, texRegion, rmd.spacing))
+                    ctp.add(PackTexRegion(rmd.id, texRegion, rmd.spacing))
                 }
             }
         }
@@ -238,8 +238,8 @@ class CustomTexturePack(id: String, fallbackID: String)
         // Create texture pack manifest
         val allRegions = this.allRegions.toList()
         val textures: List<Texture> = getAllUniqueTextures()
-        val regionIDs: Map<String, List<TilesetRegion>> = allRegions.groupBy({ it.id }, { it })
-        val texturesGroupedByRegion: Map<Texture, List<TilesetRegion>> = allRegions.groupBy({ it.texture }, { it })
+        val regionIDs: Map<String, List<PackTexRegion>> = allRegions.groupBy({ it.id }, { it })
+        val texturesGroupedByRegion: Map<Texture, List<PackTexRegion>> = allRegions.groupBy({ it.texture }, { it })
         val texturesMap: Map<Texture, String> = textures.associateWith {
             val regionList = texturesGroupedByRegion[it] ?: emptyList()
             if (regionList.size == 1 && regionIDs[regionList.first().id]?.size == 1) {

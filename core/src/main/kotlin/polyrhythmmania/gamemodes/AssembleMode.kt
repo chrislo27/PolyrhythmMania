@@ -5,7 +5,7 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
-import polyrhythmmania.container.TexturePackSource
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType

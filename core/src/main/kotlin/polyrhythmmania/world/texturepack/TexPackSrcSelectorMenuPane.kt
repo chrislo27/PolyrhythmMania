@@ -1,4 +1,4 @@
-package polyrhythmmania.container
+package polyrhythmmania.world.texturepack
 
 
 import paintbox.ui.Pane

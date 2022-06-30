@@ -3,7 +3,7 @@ package polyrhythmmania.gamemodes
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
-import polyrhythmmania.container.TexturePackSource
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event

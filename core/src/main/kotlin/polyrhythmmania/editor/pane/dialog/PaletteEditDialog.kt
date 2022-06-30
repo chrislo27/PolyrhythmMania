@@ -33,6 +33,7 @@ import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.texturepack.StockTexturePacks
 import polyrhythmmania.world.tileset.*
 import kotlin.math.sign
 

@@ -7,8 +7,8 @@ import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.MenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
-import polyrhythmmania.container.TexPackSrcSelectorMenuPane
-import polyrhythmmania.container.TexturePackSource
+import polyrhythmmania.world.texturepack.TexPackSrcSelectorMenuPane
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.editor.Editor
 
 

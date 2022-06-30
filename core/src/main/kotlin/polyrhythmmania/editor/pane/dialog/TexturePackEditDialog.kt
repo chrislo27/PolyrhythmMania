@@ -34,14 +34,14 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PreferenceKeys
-import polyrhythmmania.container.TexPackSrcSelectorMenuPane
-import polyrhythmmania.container.TexturePackSource
+import polyrhythmmania.world.texturepack.TexPackSrcSelectorMenuPane
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins
-import polyrhythmmania.world.tileset.CustomTexturePack
-import polyrhythmmania.world.tileset.StockTexturePacks
-import polyrhythmmania.world.tileset.TexturePack
-import polyrhythmmania.world.tileset.TilesetRegion
+import polyrhythmmania.world.texturepack.CustomTexturePack
+import polyrhythmmania.world.texturepack.StockTexturePacks
+import polyrhythmmania.world.texturepack.TexturePack
+import polyrhythmmania.world.texturepack.PackTexRegion
 import java.io.File
 import java.util.*
 import java.util.zip.ZipOutputStream
@@ -564,15 +564,15 @@ class TexturePackEditDialog(
         try {
             val oldTextureSet = ctp.getAllUniqueTextures()
             val acceptedFiles: MutableList<File> = mutableListOf()
-            val toApply = mutableListOf<TilesetRegion>()
+            val toApply = mutableListOf<PackTexRegion>()
             for (regionID in CustomTexturePack.ALLOWED_LIST) {
                 val toImportFile = orderedFiles.firstOrNull { it.nameWithoutExtension == regionID } ?: continue
                 Paintbox.LOGGER.debug("Importing texture: ${toImportFile.name}")
 
                 // Load in as a texture and tileset region.
-                val baseRegion: TilesetRegion = basePack[regionID]
+                val baseRegion: PackTexRegion = basePack[regionID]
                 val newTexture = Texture(FileHandle(toImportFile))
-                val newRegion = TilesetRegion(baseRegion.id, TextureRegion(newTexture), baseRegion.spacing)
+                val newRegion = PackTexRegion(baseRegion.id, TextureRegion(newTexture), baseRegion.spacing)
                 toApply += newRegion
 
                 acceptedFiles += toImportFile

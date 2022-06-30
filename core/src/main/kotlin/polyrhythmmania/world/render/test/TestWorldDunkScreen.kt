@@ -16,7 +16,7 @@ import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.world.*
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.render.WorldRendererWithUI
-import polyrhythmmania.world.tileset.StockTexturePacks
+import polyrhythmmania.world.texturepack.StockTexturePacks
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TilesetPalette
 import kotlin.system.measureNanoTime

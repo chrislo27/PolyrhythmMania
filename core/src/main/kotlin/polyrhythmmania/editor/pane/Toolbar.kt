@@ -13,7 +13,7 @@ import paintbox.ui.contextmenu.*
 import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
-import polyrhythmmania.container.TexPackSrcSelectorMenuPane
+import polyrhythmmania.world.texturepack.TexPackSrcSelectorMenuPane
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool

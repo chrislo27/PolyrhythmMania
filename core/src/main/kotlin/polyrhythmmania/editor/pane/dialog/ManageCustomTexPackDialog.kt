@@ -22,11 +22,11 @@ import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.container.Container
-import polyrhythmmania.container.TexturePackSource
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.util.TempFileUtils
-import polyrhythmmania.world.tileset.CustomTexturePack
-import polyrhythmmania.world.tileset.StockTexturePacks
+import polyrhythmmania.world.texturepack.CustomTexturePack
+import polyrhythmmania.world.texturepack.StockTexturePacks
 import java.util.zip.Deflater
 import java.util.zip.ZipOutputStream
 

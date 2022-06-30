@@ -1,10 +1,9 @@
-package polyrhythmmania.world.tileset
+package polyrhythmmania.world.texturepack
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import polyrhythmmania.container.TexturePackSource
 
 
 /**
@@ -14,8 +13,8 @@ object StockTexturePacks {
     
     private data class TexturePackAndSource(val texturePack: TexturePack, val source: TexturePackSource)
 
-    val missingTilesetRegion: TilesetRegion by lazy {
-        TilesetRegion("MISSING", TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex")), RegionSpacing.ZERO)
+    val missingPackTexRegion: PackTexRegion by lazy {
+        PackTexRegion("MISSING", TextureRegion(AssetRegistry.get<Texture>("tileset_missing_tex")), RegionSpacing.ZERO)
     }
     
 

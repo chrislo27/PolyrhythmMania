@@ -9,7 +9,7 @@ import paintbox.binding.IntVar
 import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievements
-import polyrhythmmania.container.TexturePackSource
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.RowSetting

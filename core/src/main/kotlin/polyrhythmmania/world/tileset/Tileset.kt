@@ -3,8 +3,8 @@ package polyrhythmmania.world.tileset
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
-import polyrhythmmania.animation.Animation
-import polyrhythmmania.animation.Step
+import polyrhythmmania.world.texturepack.TexturePack
+import polyrhythmmania.world.texturepack.PackTexRegion
 
 
 /**
@@ -31,7 +31,7 @@ class Tileset(val texturePack: ReadOnlyVar<TexturePack>) {
     
     constructor(initialPack: TexturePack) : this(Var(initialPack))
     
-    fun getTilesetRegionForTinted(tinted: TintedRegion): TilesetRegion {
+    fun getTilesetRegionForTinted(tinted: TintedRegion): PackTexRegion {
         return texturePack.getOrCompute()[tinted.regionID]
     }
 

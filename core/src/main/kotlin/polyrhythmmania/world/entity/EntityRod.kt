@@ -10,7 +10,7 @@ import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.WaveUtils
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
-import polyrhythmmania.world.tileset.TexturePack
+import polyrhythmmania.world.texturepack.TexturePack
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
 import kotlin.math.absoluteValue
