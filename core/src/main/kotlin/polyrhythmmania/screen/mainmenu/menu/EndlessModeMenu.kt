@@ -27,8 +27,8 @@ import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.screen.play.EnginePlayScreenBase
-import polyrhythmmania.screen.play.ResultsBehaviour
+import polyrhythmmania.screen.play.regular.EnginePlayScreenBase
+import polyrhythmmania.screen.play.regular.ResultsBehaviour
 import polyrhythmmania.gamemodes.EndlessModeScore
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.endlessmode.EndlessHighScore

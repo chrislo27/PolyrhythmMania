@@ -24,6 +24,7 @@ data class StoryModeContainerMetadata(
     
     fun toJson(): JsonObject {
         return Json.`object`().apply {
+            this.add("_version", METADATA_VERSION)
             // TODO
         }
     }

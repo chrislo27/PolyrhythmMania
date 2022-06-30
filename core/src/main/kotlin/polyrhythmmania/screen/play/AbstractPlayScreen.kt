@@ -36,7 +36,7 @@ abstract class AbstractPlayScreen(
     /**
      * Used to render the pause [sceneRoot] for the first frame to reduce stutter.
      */
-    private var firstRender: Boolean = true
+    private var firstPauseMenuRender: Boolean = true
     
     val batch: SpriteBatch = main.batch
     
@@ -120,8 +120,8 @@ abstract class AbstractPlayScreen(
         val batch = this.batch
 
         // JIT optimization so there is less stutter when opening pause menu for the first time
-        if (this.firstRender) {
-            this.firstRender = false
+        if (this.firstPauseMenuRender) {
+            this.firstPauseMenuRender = false
             batch.begin()
             sceneRoot.renderAsRoot(batch) 
             batch.end()

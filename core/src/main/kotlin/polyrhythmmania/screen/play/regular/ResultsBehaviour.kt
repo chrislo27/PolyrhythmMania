@@ -1,20 +1,18 @@
-package polyrhythmmania.screen.play
+package polyrhythmmania.screen.play.regular
 
 import paintbox.binding.Var
 
 
 /**
- * Results behaviour for normal non-story gameplay.
+ * Results behaviour for normal non-story gameplay. This is only used with [EnginePlayScreenBase].
  */
-@Deprecated("This will be replaced with a generic level end behaviour")
 sealed class ResultsBehaviour {
     
     object NoResults : ResultsBehaviour()
     
     data class ShowResults(
-            val onRankingRevealed: OnRankingRevealed?,
-
-            val previousHighScore: PreviousHighScore,
+            val onRankingRevealed: OnRankingRevealed?, // Used to update GlobalScoreCache
+            val previousHighScore: PreviousHighScore
     ) : ResultsBehaviour()
 
     sealed class PreviousHighScore {

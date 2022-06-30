@@ -14,7 +14,7 @@ import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.screen.play.ResultsBehaviour
+import polyrhythmmania.screen.play.regular.ResultsBehaviour
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.practice.*
 import polyrhythmmania.statistics.GlobalStats

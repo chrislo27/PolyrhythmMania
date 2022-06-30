@@ -22,7 +22,7 @@ import polyrhythmmania.Settings
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.screen.play.ResultsBehaviour
+import polyrhythmmania.screen.play.regular.ResultsBehaviour
 import polyrhythmmania.gamemodes.AssembleMode
 import polyrhythmmania.gamemodes.DunkMode
 import polyrhythmmania.gamemodes.EndlessModeScore

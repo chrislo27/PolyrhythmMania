@@ -1,4 +1,4 @@
-package polyrhythmmania.screen.results
+package polyrhythmmania.screen.play.regular
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -30,18 +30,20 @@ import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.Ranking
 import polyrhythmmania.engine.input.Score
 import polyrhythmmania.library.score.LevelScoreAttempt
-import polyrhythmmania.screen.play.AbstractPlayScreen
-import polyrhythmmania.screen.play.OnRankingRevealed
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.practice.AbstractPolyrhythmPractice
+import polyrhythmmania.screen.results.ResultsPane
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.WorldType
 import kotlin.properties.Delegates
 
+/**
+ * Results screen for non-story gamemodes, like tutorials, Library levels, and extras.
+ */
 class ResultsScreen(
         main: PRManiaGame, val score: Score, val container: Container, val gameMode: GameMode?,
-        val startOverFactory: () -> AbstractPlayScreen, // FIXME needs to become NewAbstractPlayScreen
-        val keyboardKeybinds: InputKeymapKeyboard,
+        val startOverFactory: () -> EnginePlayScreenBase,
+        private val keyboardKeybinds: InputKeymapKeyboard,
         val levelScoreAttempt: LevelScoreAttempt,
         val onRankingRevealed: OnRankingRevealed?,
 ) : PRManiaScreen(main) {

@@ -35,9 +35,9 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.library.score.LevelScore
 import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.screen.play.EnginePlayScreenBase
-import polyrhythmmania.screen.play.OnRankingRevealed
-import polyrhythmmania.screen.play.ResultsBehaviour
+import polyrhythmmania.screen.play.regular.EnginePlayScreenBase
+import polyrhythmmania.screen.play.regular.OnRankingRevealed
+import polyrhythmmania.screen.play.regular.ResultsBehaviour
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.statistics.GlobalStats

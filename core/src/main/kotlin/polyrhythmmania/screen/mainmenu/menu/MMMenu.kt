@@ -28,8 +28,8 @@ import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
-import polyrhythmmania.screen.play.EnginePlayScreenBase
-import polyrhythmmania.screen.play.ResultsBehaviour
+import polyrhythmmania.screen.play.regular.EnginePlayScreenBase
+import polyrhythmmania.screen.play.regular.ResultsBehaviour
 import polyrhythmmania.gamemodes.GameMode
 
 
