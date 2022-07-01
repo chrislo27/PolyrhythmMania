@@ -91,13 +91,11 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     ), TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
     
     private val textboxRendering: TextBoxRendering
+    private val perfectRendering: PerfectRendering
     
-    private val perfectPane: Pane = Pane()
-    private val perfectIcon: ImageNode
-    private val perfectIconFlash: ImageNode
-    private val perfectIconFailed: ImageNode
     private val moreTimesLabel: TextLabel = TextLabel("")
     private val moreTimesVar: IntVar = IntVar(0)
+    
     private val endlessModeScorePane: Pane = Pane()
     private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
     private val endlessModeScoreLabel: TextLabel
@@ -187,33 +185,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             this.textColor.set(Color.WHITE)
             this.visible.bind { moreTimesVar.use() > 0 }
         }
-        perfectIcon = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect"])
-        perfectIconFailed = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_failed"]).apply {
-            this.visible.set(false)
-        }
-        perfectIconFlash = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_hit"]).apply {
-            this.opacity.set(0f)
-        }
-        uiSceneRoot += perfectPane.apply {
-            Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
-            this.bounds.width.set(600f)
-            this.bounds.height.set(64f)
-            this += Pane().apply {
-                this.bindWidthToSelfHeight()
-                this.padding.set(Insets(4f))
-                this += perfectIcon
-                this += perfectIconFlash
-                this += perfectIconFailed
-            }
-            this += TextLabel(binding = { Localization.getVar("play.perfect").use() },
-                    font = PRManiaGame.instance.fontGameGoForPerfect).apply {
-                Anchor.TopRight.configure(this)
-                this.textColor.set(Color.WHITE)
-                this.padding.set(Insets(0f, 0f, 5f, 0f))
-                this.bindWidthToParent(adjust = -64f)
-                this.renderAlign.set(Align.left)
-            }
-        }
+        
+        this.perfectRendering = this.PerfectRendering()
+        uiSceneRoot += this.perfectRendering.uiElement
 
         endlessModeGameOverPane.apply {
             this.visible.bind {
@@ -310,28 +284,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
         textboxRendering.renderUI(batch)
 
-        val perfectCh = modifiers.perfectChallenge
-        if (perfectCh.enabled.get()) {
-            perfectPane.visible.set(true)
-            perfectCh.hit = (perfectCh.hit - Gdx.graphics.deltaTime / (if (perfectCh.failed) 0.5f else 0.125f)).coerceIn(0f, 1f)
-
-            perfectIconFlash.opacity.set(if (perfectCh.failed) 0f else perfectCh.hit)
-            perfectIcon.visible.set(!perfectCh.failed)
-            perfectIconFailed.visible.set(perfectCh.failed)
-
-            if (perfectCh.failed && perfectCh.hit > 0f) {
-                val maxShake = 3
-                val x = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
-                val y = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
-                perfectIconFailed.bounds.x.set(x)
-                perfectIconFailed.bounds.y.set(y)
-            } else {
-                perfectIconFailed.bounds.x.set(0f)
-                perfectIconFailed.bounds.y.set(0f)
-            }
-        } else {
-            perfectPane.visible.set(false)
-        }
+        perfectRendering.renderUI(batch)
 
         val textboxFont = PRManiaGame.instance.fontGameTextbox
         textboxFont.useFont { font ->
@@ -519,4 +472,69 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
     }
     
+    inner class PerfectRendering : InnerRenderer() {
+
+        private val perfectPane: Pane
+        private val perfectIcon: ImageNode
+        private val perfectIconFlash: ImageNode
+        private val perfectIconFailed: ImageNode
+        
+        override val uiElement: UIElement get() = perfectPane
+        
+        init {
+            perfectIcon = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect"])
+            perfectIconFailed = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_failed"]).apply {
+                this.visible.set(false)
+            }
+            perfectIconFlash = ImageNode(AssetRegistry.get<PackedSheet>("tileset_ui")["perfect_hit"]).apply {
+                this.opacity.set(0f)
+            }
+            perfectPane = Pane().apply {
+                Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
+                this.bounds.width.set(600f)
+                this.bounds.height.set(64f)
+                this += Pane().apply {
+                    this.bindWidthToSelfHeight()
+                    this.padding.set(Insets(4f))
+                    this += perfectIcon
+                    this += perfectIconFlash
+                    this += perfectIconFailed
+                }
+                this += TextLabel(binding = { Localization.getVar("play.perfect").use() },
+                        font = PRManiaGame.instance.fontGameGoForPerfect).apply {
+                    Anchor.TopRight.configure(this)
+                    this.textColor.set(Color.WHITE)
+                    this.padding.set(Insets(0f, 0f, 5f, 0f))
+                    this.bindWidthToParent(adjust = -64f)
+                    this.renderAlign.set(Align.left)
+                }
+            }
+        }
+
+        override fun renderUI(batch: SpriteBatch) {
+            val modifiers = this@WorldRendererWithUI.engine.modifiers
+            val perfectCh = modifiers.perfectChallenge
+            if (perfectCh.enabled.get()) {
+                perfectPane.visible.set(true)
+                perfectCh.hit = (perfectCh.hit - Gdx.graphics.deltaTime / (if (perfectCh.failed) 0.5f else 0.125f)).coerceIn(0f, 1f)
+
+                perfectIconFlash.opacity.set(if (perfectCh.failed) 0f else perfectCh.hit)
+                perfectIcon.visible.set(!perfectCh.failed)
+                perfectIconFailed.visible.set(perfectCh.failed)
+
+                if (perfectCh.failed && perfectCh.hit > 0f) {
+                    val maxShake = 3
+                    val x = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
+                    val y = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
+                    perfectIconFailed.bounds.x.set(x)
+                    perfectIconFailed.bounds.y.set(y)
+                } else {
+                    perfectIconFailed.bounds.x.set(0f)
+                    perfectIconFailed.bounds.y.set(0f)
+                }
+            } else {
+                perfectPane.visible.set(false)
+            }
+        }
+    }
 }
