@@ -94,106 +94,20 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     private val textboxRendering: TextBoxRendering
     private val perfectRendering: PerfectRendering
     private val practiceRendering: PracticeRendering
-    
-    private val endlessModeScorePane: Pane = Pane()
-    private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
-    private val endlessModeScoreLabel: TextLabel
-    private val endlessModeGameOverPane: Pane = Pane()
-    private val endlessModeGameOverLabel: TextLabel
-    private val endlessModeHighScoreLabel: TextLabel
+    private val endlessModeRendering: EndlessModeRendering
 
     init {
-        uiSceneRoot += endlessModeScorePane.apply {
-            this.visible.bind { showEndlessModeScore.use() }
-            Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
-//            this.bounds.width.set(400f)
-            this.bindWidthToParent(adjust = -64f)
-            this.bounds.height.set(200f)
-
-            val vbox = VBox().apply {
-                this += Pane().apply {
-                    this.bounds.height.set(40f)
-
-                    val prevTextVar: ReadOnlyVar<String> = Var.bind {
-                        val date = dailyChallengeDate.use()
-                        val seed = endlessModeSeed.use()
-                        if (date != null) {
-                            Localization.getVar("play.endless.dailyChallenge", Var { listOf(date.format(DateTimeFormatter.ISO_DATE)) }).use()
-                        } else if (seed != null) {
-                            Localization.getVar("play.endless.seed", Var { listOf(seed) }).use()
-                        } else {
-                            Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) }).use()
-                        }
-                    }
-                    endlessModeHighScoreLabel = TextLabel(binding = { prevTextVar.use() },
-                            font = PRManiaGame.instance.fontGameUIText).apply {
-                        this.bindWidthToParent(multiplier = 0.4f)
-                        this.doXCompression.set(false)
-                        this.renderAlign.set(Align.topLeft)
-                        val defaultTextColor = Color().grey(229f / 255f)
-                        this.textColor.set(defaultTextColor)
-                        this.setScaleXY(0.6f)
-                        this.textColor.bind {
-                            val maxLives = engine.modifiers.endlessScore.maxLives.use()
-                            if (endlessModeSeed.use() != null && maxLives == 1) {
-                                Color(1f, 0.35f, 0.35f, 1f)
-                            } else defaultTextColor
-                        }
-                    }
-                    this += endlessModeHighScoreLabel
-                }
-
-                val currentScoreVar = Localization.getVar("play.endless.score", Var { listOf(currentEndlessScore.use()) })
-                endlessModeScoreLabel = TextLabel(binding = { currentScoreVar.use() },
-                        font = PRManiaGame.instance.fontPauseMenuTitle).apply {
-                    this.bounds.height.set(100f)
-                    this.renderAlign.set(Align.topLeft)
-                    this.textColor.set(Color(1f, 1f, 1f, 1f))
-                    val scaleMul = 1f / 1.25f
-                    this.scaleX.bind { endlessModeScoreLabelScaleXY.use() * scaleMul }
-                    this.scaleY.bind { endlessModeScoreLabelScaleXY.use() * scaleMul }
-                }
-                this += endlessModeScoreLabel
-
-                val endlessModeLivesLabel = TextLabel(binding = {
-                    val l = currentEndlessLives.use()
-                    /* space at start is necessary -> */ " [font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]"
-                }).apply {
-                    this.bounds.height.set(40f)
-                    Anchor.TopRight.configure(this)
-                    this.markup.set(baseMarkup)
-                    this.renderAlign.set(Align.left)
-                    this.textColor.set(Color(1f, 1f, 1f, 1f))
-                    this.setScaleXY(0.333f)
-                }
-                this += endlessModeLivesLabel
-
-            }
-            this += vbox
-        }
+        this.endlessModeRendering = this.EndlessModeRendering()
+        uiSceneRoot += this.endlessModeRendering.uiElement
 
         this.practiceRendering = this.PracticeRendering()
         uiSceneRoot += this.practiceRendering.uiElement
         
         this.perfectRendering = this.PerfectRendering()
         uiSceneRoot += this.perfectRendering.uiElement
-
-        endlessModeGameOverPane.apply {
-            this.visible.bind {
-                engine.modifiers.endlessScore.gameOverUIShown.use()
-            }
-            this += RectElement(Color(0f, 0f, 0f, 0.5f))
-        }
-        uiSceneRoot += endlessModeGameOverPane
-
-        endlessModeGameOverLabel = TextLabel(binding = { Localization.getVar("play.endless.gameOver").use() },
-                font = PRManiaGame.instance.fontPauseMenuTitle).apply {
-            Anchor.Centre.configure(this)
-            this.bounds.height.set(350f)
-            this.textColor.set(Color(81f / 255, 107f / 255, 1f, 1f))
-            this.renderAlign.set(Align.center)
-        }
-        endlessModeGameOverPane += endlessModeGameOverLabel
+        
+        // "Game Over" pane must be on top of other UI elements, but below the text box
+        uiSceneRoot += this.endlessModeRendering.endlessModeGameOverPane
 
         this.textboxRendering = this.TextBoxRendering()
         uiSceneRoot += this.textboxRendering.uiElement
@@ -274,6 +188,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
         perfectRendering.renderUI(batch)
 
+        // Song info cards
         val textboxFont = PRManiaGame.instance.fontGameTextbox
         textboxFont.useFont { font ->
             font.scaleMul(0.75f)
@@ -284,30 +199,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         
         practiceRendering.renderUI(batch)
 
-        if (showEndlessModeScore.get()) {
-            val endlessScore = modifiers.endlessScore
-            val oldLives = currentEndlessLives.get()
-            val newLives = endlessScore.lives.get()
-            currentEndlessLives.set(newLives)
-            if (newLives < oldLives) {
-                hudRedFlash = 1f
-            }
-            val oldScore = currentEndlessScore.get()
-            val newScore = endlessScore.score.get()
-            if (oldScore != newScore) {
-                currentEndlessScore.set(newScore)
-                val scaleVar = endlessModeScoreLabelScaleXY
-                if (newScore > oldScore) {
-                    val newScale = 1.25f
-                    scaleVar.set(newScale)
-                    uiSceneRoot.animations.enqueueAnimation(Animation(Interpolation.pow5In, 0.25f, newScale, 1f, delay = 0.15f), scaleVar)
-                } else {
-                    uiSceneRoot.animations.cancelAnimationFor(scaleVar)
-                    scaleVar.set(1f)
-                }
-            }
-            endlessModeHighScoreLabel.visible.set(!endlessScore.hideHighScoreText)
-        }
+        this.endlessModeRendering.renderUI(batch)
 
         uiSceneRoot.renderAsRoot(batch)
 
@@ -556,6 +448,133 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
                 val newValue = (clearText - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f)
                 inputter.practice.clearText = newValue
+            }
+        }
+    }
+    
+    inner class EndlessModeRendering : InnerRendering() {
+
+        private val endlessModeScorePane: Pane
+        private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
+        private val endlessModeScoreLabel: TextLabel
+        val endlessModeGameOverPane: Pane
+        private val endlessModeGameOverLabel: TextLabel
+        private val endlessModeHighScoreLabel: TextLabel
+
+        override val uiElement: UIElement get() = endlessModeScorePane
+        
+        init {
+            endlessModeScorePane = Pane().apply {
+                this.visible.bind { showEndlessModeScore.use() }
+                Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
+//            this.bounds.width.set(400f)
+                this.bindWidthToParent(adjust = -64f)
+                this.bounds.height.set(200f)
+
+                val vbox = VBox().apply {
+                    this += Pane().apply {
+                        this.bounds.height.set(40f)
+
+                        val prevTextVar: ReadOnlyVar<String> = Var.bind {
+                            val date = dailyChallengeDate.use()
+                            val seed = endlessModeSeed.use()
+                            if (date != null) {
+                                Localization.getVar("play.endless.dailyChallenge", Var { listOf(date.format(DateTimeFormatter.ISO_DATE)) }).use()
+                            } else if (seed != null) {
+                                Localization.getVar("play.endless.seed", Var { listOf(seed) }).use()
+                            } else {
+                                Localization.getVar("play.endless.prevHighScore", Var { listOf(prevHighScore.use()) }).use()
+                            }
+                        }
+                        endlessModeHighScoreLabel = TextLabel(binding = { prevTextVar.use() },
+                                font = PRManiaGame.instance.fontGameUIText).apply {
+                            this.bindWidthToParent(multiplier = 0.4f)
+                            this.doXCompression.set(false)
+                            this.renderAlign.set(Align.topLeft)
+                            val defaultTextColor = Color().grey(229f / 255f)
+                            this.textColor.set(defaultTextColor)
+                            this.setScaleXY(0.6f)
+                            this.textColor.bind {
+                                val maxLives = engine.modifiers.endlessScore.maxLives.use()
+                                if (endlessModeSeed.use() != null && maxLives == 1) {
+                                    Color(1f, 0.35f, 0.35f, 1f)
+                                } else defaultTextColor
+                            }
+                        }
+                        this += endlessModeHighScoreLabel
+                    }
+
+                    val currentScoreVar = Localization.getVar("play.endless.score", Var { listOf(currentEndlessScore.use()) })
+                    endlessModeScoreLabel = TextLabel(binding = { currentScoreVar.use() },
+                            font = PRManiaGame.instance.fontPauseMenuTitle).apply {
+                        this.bounds.height.set(100f)
+                        this.renderAlign.set(Align.topLeft)
+                        this.textColor.set(Color(1f, 1f, 1f, 1f))
+                        val scaleMul = 1f / 1.25f
+                        this.scaleX.bind { endlessModeScoreLabelScaleXY.use() * scaleMul }
+                        this.scaleY.bind { endlessModeScoreLabelScaleXY.use() * scaleMul }
+                    }
+                    this += endlessModeScoreLabel
+
+                    val endlessModeLivesLabel = TextLabel(binding = {
+                        val l = currentEndlessLives.use()
+                        /* space at start is necessary -> */ " [font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]"
+                    }).apply {
+                        this.bounds.height.set(40f)
+                        Anchor.TopRight.configure(this)
+                        this.markup.set(baseMarkup)
+                        this.renderAlign.set(Align.left)
+                        this.textColor.set(Color(1f, 1f, 1f, 1f))
+                        this.setScaleXY(0.333f)
+                    }
+                    this += endlessModeLivesLabel
+
+                }
+                this += vbox
+            }
+
+            endlessModeGameOverPane = Pane().apply {
+                this.visible.bind {
+                    engine.modifiers.endlessScore.gameOverUIShown.use()
+                }
+                this += RectElement(Color(0f, 0f, 0f, 0.5f))
+            }
+
+            endlessModeGameOverLabel = TextLabel(binding = { Localization.getVar("play.endless.gameOver").use() },
+                    font = PRManiaGame.instance.fontPauseMenuTitle).apply {
+                Anchor.Centre.configure(this)
+                this.bounds.height.set(350f)
+                this.textColor.set(Color(81f / 255, 107f / 255, 1f, 1f))
+                this.renderAlign.set(Align.center)
+            }
+            endlessModeGameOverPane += endlessModeGameOverLabel
+        }
+
+        override fun renderUI(batch: SpriteBatch) {
+            val modifiers = this@WorldRendererWithUI.engine.modifiers
+            if (showEndlessModeScore.get()) {
+                val endlessScore = modifiers.endlessScore
+                val oldLives = currentEndlessLives.get()
+                val newLives = endlessScore.lives.get()
+                currentEndlessLives.set(newLives)
+                if (newLives < oldLives) {
+                    hudRedFlash = 1f
+                }
+                val oldScore = currentEndlessScore.get()
+                val newScore = endlessScore.score.get()
+                if (oldScore != newScore) {
+                    currentEndlessScore.set(newScore)
+                    val scaleVar = endlessModeScoreLabelScaleXY
+                    if (newScore > oldScore) {
+                        val newScale = 1.25f
+                        scaleVar.set(newScale)
+                        uiSceneRoot.animations.enqueueAnimation(Animation(Interpolation.pow5In, 0.25f, newScale, 1f, delay = 0.15f), scaleVar)
+                    } else {
+                        uiSceneRoot.animations.cancelAnimationFor(scaleVar)
+                        scaleVar.set(1f)
+                    }
+                }
+                endlessModeHighScoreLabel.visible.set(!endlessScore.hideHighScoreText)
             }
         }
     }
