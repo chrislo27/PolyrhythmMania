@@ -2,6 +2,7 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
@@ -19,6 +20,8 @@ import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
 import paintbox.util.DecimalFormats
+import polyrhythmmania.editor.EditorSpecialFlags
+import java.util.*
 
 
 class Toolbar(val upperPane: UpperPane) : Pane() {
@@ -327,6 +330,35 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                             ctxmenu.addMenuItem(SeparatorMenuItem())
                             ctxmenu.addMenuItem(CheckBoxMenuItem.create(showInputIndicatorsVar,
                                     Localization.getValue("editor.dialog.worldSettings.showInputIndicators"), editorPane.palette.markup))
+                            
+                            if (EditorSpecialFlags.STORY_MODE in editor.flags) {
+                                ctxmenu.defaultWidth.set(450f)
+                                ctxmenu.addMenuItem(SeparatorMenuItem())
+                                ctxmenu.addMenuItem(LabelMenuItem.create("[b]Story Mode engine modifiers:[]", editorPane.palette.markup))
+
+                                val livesCombobox = ComboBox((0..10).toList(), editor.container.storyModeMetadata.getOrCompute().lives).also { combobox ->
+                                    combobox.markup.set(editor.editorPane.palette.markup)
+                                    combobox.itemStringConverter.set {
+                                        if (it == 0) "<disabled>" else "$it"
+                                    }
+                                    combobox.onItemSelected = {
+                                        val old = editor.container.storyModeMetadata.getOrCompute()
+                                        editor.container.storyModeMetadata.set(old.copy(lives = it))
+                                    }
+                                }
+                                ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
+                                    hbox.spacing.set(8f)
+                                    hbox.bounds.height.set(32f)
+                                    hbox += TextLabel("Lives:").apply {
+                                        this.markup.set(editor.editorPane.palette.markup)
+                                        this.renderAlign.set(Align.right)
+                                        this.bounds.width.set(100f)
+                                    }
+                                    hbox += livesCombobox.apply {
+                                        this.bindWidthToParent(adjust = -108f)
+                                    }
+                                }))
+                            }
                         })
                     }
                 }

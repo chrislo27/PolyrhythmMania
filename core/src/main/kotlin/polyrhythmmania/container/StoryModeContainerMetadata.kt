@@ -5,27 +5,28 @@ import com.eclipsesource.json.JsonObject
 
 
 data class StoryModeContainerMetadata(
-        val nodata: Int = 0 // FIXME
+        val lives: Int,
 ) {
     
     companion object {
         const val METADATA_VERSION: Int = 1
         
         val BLANK: StoryModeContainerMetadata = StoryModeContainerMetadata(
-                0
+                lives = 0,
         )
         
         fun fromJson(obj: JsonObject): StoryModeContainerMetadata {
-//            val showInputIndicators: Boolean = obj.get("showInputIndicators")?.takeIf { it.isBoolean }?.asBoolean() ?: WorldSettings.DEFAULT.showInputIndicators
+            val versionNumber: Int = obj.get("_version").asInt()
 
-            return StoryModeContainerMetadata()
+            return StoryModeContainerMetadata(obj.getInt("lives", 0))
         }
     }
     
     fun toJson(): JsonObject {
         return Json.`object`().apply {
             this.add("_version", METADATA_VERSION)
-            // TODO
+            
+            this.add("lives", lives)
         }
     }
     

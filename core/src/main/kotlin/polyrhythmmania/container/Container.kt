@@ -144,6 +144,15 @@ class Container(
                 renderer.fireSkillStar()
             }
         }
+        storyModeMetadata.addListener {
+            val metadata = it.getOrCompute()
+            
+            val livesMode = engine.modifiers.livesMode
+            val lives = metadata.lives
+            livesMode.enabled.set(lives > 0)
+            livesMode.maxLives.set(lives)
+            livesMode.resetState()
+        }
     }
     
     /**
@@ -634,7 +643,8 @@ class Container(
                             }
                         }
                         
-                        if (containerVersion < VERSION_MULTIPLE_TEX_PACK_ADDED && texturePackObj.get("hasCustom")?.asBoolean() == true) {
+                        val hasCustomPack = texturePackObj.get("hasCustom")?.asBoolean() == true
+                        if (containerVersion < VERSION_MULTIPLE_TEX_PACK_ADDED && hasCustomPack) {
                             zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack.zip")).use { zipInputStream ->
                                 val tempFile = TempFileUtils.createTempFile("extres", ".zip")
                                 val out = tempFile.outputStream()
@@ -644,7 +654,7 @@ class Container(
                                 customTexturePacksRead[0] = readResult
                                 tempFile.delete()
                             }
-                        } else if (containerVersion >= VERSION_MULTIPLE_TEX_PACK_ADDED) {
+                        } else if (containerVersion >= VERSION_MULTIPLE_TEX_PACK_ADDED && hasCustomPack) {
                             val slotCount = texturePackObj.get("slotCount").asInt()
                             val presentIndicesArr = texturePackObj.get("presentIndices").asArray()
                             val presentIndices: Set<Int> = presentIndicesArr.filter { it.isNumber }.map { it.asInt() }.toSet()
