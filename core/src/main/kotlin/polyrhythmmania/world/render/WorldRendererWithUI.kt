@@ -29,6 +29,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.TextBoxStyle
+import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
@@ -92,9 +93,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     
     private val textboxRendering: TextBoxRendering
     private val perfectRendering: PerfectRendering
-    
-    private val moreTimesLabel: TextLabel = TextLabel("")
-    private val moreTimesVar: IntVar = IntVar(0)
+    private val practiceRendering: PracticeRendering
     
     private val endlessModeScorePane: Pane = Pane()
     private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
@@ -173,18 +172,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             this += vbox
         }
 
-        uiSceneRoot += moreTimesLabel.apply {
-            Anchor.BottomRight.configure(this)
-            val locVar = Localization.getVar("practice.moreTimes.times", Var { listOf(moreTimesVar.use()) })
-            this.text.bind { locVar.use() }
-            this.renderAlign.set(Align.right)
-            this.margin.set(Insets(0f, 16f, 0f, 16f))
-            this.markup.set(Markup(emptyMap(), TextRun(PRManiaGame.instance.fontGameMoreTimes, "")))
-            this.bounds.width.set(510f)
-            this.bounds.height.set(86f)
-            this.textColor.set(Color.WHITE)
-            this.visible.bind { moreTimesVar.use() > 0 }
-        }
+        this.practiceRendering = this.PracticeRendering()
+        uiSceneRoot += this.practiceRendering.uiElement
         
         this.perfectRendering = this.PerfectRendering()
         uiSceneRoot += this.perfectRendering.uiElement
@@ -245,8 +234,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         val engine = this.engine
         val inputter = engine.inputter
         val modifiers = engine.modifiers
-
-        moreTimesVar.set(inputter.practice.moreTimes.get())
+        val uiCam = this.uiCamera
         val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
 
         // Skill star
@@ -293,50 +281,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             renderSongInfoCard(batch, font, songTitleCard, false, sec)
             renderSongInfoCard(batch, font, songArtistCard, true, sec)
         }
-
-        val clearText = inputter.practice.clearText
-        val uiCam = this.uiCamera
-        if (clearText > 0f) {
-            val normalScale = 1f
-            val transitionEnd = 0.15f
-            val transitionStart = 0.2f
-            val scale: Float = when (val progress = 1f - clearText) {
-                in 0f..transitionStart -> {
-                    Interpolation.exp10Out.apply(normalScale * 2f, normalScale, progress / transitionStart)
-                }
-                in (1f - transitionEnd)..1f -> {
-                    Interpolation.exp10Out.apply(normalScale, normalScale * 1.5f, (progress - (1f - transitionEnd)) / transitionEnd)
-                }
-                else -> normalScale
-            }
-            val alpha: Float = when (val progress = 1f - clearText) {
-                in 0f..transitionStart -> {
-                    Interpolation.exp10Out.apply(0f, 1f, progress / transitionStart)
-                }
-                in (1f - transitionEnd)..1f -> {
-                    Interpolation.exp10Out.apply(1f, 0f, (progress - (1f - transitionEnd)) / transitionEnd)
-                }
-                else -> 1f
-            }
-            val white: Float = when (val progress = 1f - clearText) {
-                in 0f..transitionStart * 0.75f -> {
-                    Interpolation.linear.apply(1f, 0f, progress / (transitionStart * 0.75f))
-                }
-                else -> 0f
-            }
-
-            val paintboxFont = PRManiaGame.instance.fontGamePracticeClear
-            paintboxFont.useFont { font ->
-                font.scaleMul(scale)
-                font.setColor(1f, 1f, MathUtils.lerp(0.125f, 1f, white), alpha)
-                font.drawCompressed(batch, Localization.getValue("practice.clear"),
-                        0f, uiCam.viewportHeight / 2f + font.capHeight / 2, uiCam.viewportWidth, Align.center)
-                font.scaleMul(1f / scale)
-            }
-
-            val newValue = (clearText - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f)
-            inputter.practice.clearText = newValue
-        }
+        
+        practiceRendering.renderUI(batch)
 
         if (showEndlessModeScore.get()) {
             val endlessScore = modifiers.endlessScore
@@ -407,12 +353,12 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     }
     
     
-    abstract inner class InnerRenderer {
+    abstract inner class InnerRendering {
         abstract val uiElement: UIElement
         abstract fun renderUI(batch: SpriteBatch)
     }
     
-    inner class TextBoxRendering : InnerRenderer() {
+    inner class TextBoxRendering : InnerRendering() {
 
         private val textBoxSuperpane: Pane
         private val textBoxDialoguePane: TextboxPane = TextboxPane()
@@ -472,7 +418,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
     }
     
-    inner class PerfectRendering : InnerRenderer() {
+    inner class PerfectRendering : InnerRendering() {
 
         private val perfectPane: Pane
         private val perfectIcon: ImageNode
@@ -537,4 +483,81 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             }
         }
     }
+    
+    inner class PracticeRendering : InnerRendering() {
+
+        private val moreTimesLabel: TextLabel = TextLabel("")
+        private val moreTimesVar: IntVar = IntVar(0)
+
+        override val uiElement: UIElement get() = moreTimesLabel
+        
+        init {
+            moreTimesLabel.apply {
+                Anchor.BottomRight.configure(this)
+                val locVar = Localization.getVar("practice.moreTimes.times", Var { listOf(moreTimesVar.use()) })
+                this.text.bind { locVar.use() }
+                this.renderAlign.set(Align.right)
+                this.margin.set(Insets(0f, 16f, 0f, 16f))
+                this.markup.set(Markup(emptyMap(), TextRun(PRManiaGame.instance.fontGameMoreTimes, "")))
+                this.bounds.width.set(510f)
+                this.bounds.height.set(86f)
+                this.textColor.set(Color.WHITE)
+                this.visible.bind { moreTimesVar.use() > 0 }
+            }
+        }
+
+        override fun renderUI(batch: SpriteBatch) {
+            val inputter = this@WorldRendererWithUI.engine.inputter
+            moreTimesVar.set(inputter.practice.moreTimes.get())
+            
+            renderClearText(batch, inputter)
+        }
+        
+        private fun renderClearText(batch: SpriteBatch, inputter: EngineInputter) {
+            val clearText = inputter.practice.clearText
+            val uiCam = this@WorldRendererWithUI.uiCamera
+            if (clearText > 0f) {
+                val normalScale = 1f
+                val transitionEnd = 0.15f
+                val transitionStart = 0.2f
+                val scale: Float = when (val progress = 1f - clearText) {
+                    in 0f..transitionStart -> {
+                        Interpolation.exp10Out.apply(normalScale * 2f, normalScale, progress / transitionStart)
+                    }
+                    in (1f - transitionEnd)..1f -> {
+                        Interpolation.exp10Out.apply(normalScale, normalScale * 1.5f, (progress - (1f - transitionEnd)) / transitionEnd)
+                    }
+                    else -> normalScale
+                }
+                val alpha: Float = when (val progress = 1f - clearText) {
+                    in 0f..transitionStart -> {
+                        Interpolation.exp10Out.apply(0f, 1f, progress / transitionStart)
+                    }
+                    in (1f - transitionEnd)..1f -> {
+                        Interpolation.exp10Out.apply(1f, 0f, (progress - (1f - transitionEnd)) / transitionEnd)
+                    }
+                    else -> 1f
+                }
+                val white: Float = when (val progress = 1f - clearText) {
+                    in 0f..transitionStart * 0.75f -> {
+                        Interpolation.linear.apply(1f, 0f, progress / (transitionStart * 0.75f))
+                    }
+                    else -> 0f
+                }
+
+                val paintboxFont = PRManiaGame.instance.fontGamePracticeClear
+                paintboxFont.useFont { font ->
+                    font.scaleMul(scale)
+                    font.setColor(1f, 1f, MathUtils.lerp(0.125f, 1f, white), alpha)
+                    font.drawCompressed(batch, Localization.getValue("practice.clear"),
+                            0f, uiCam.viewportHeight / 2f + font.capHeight / 2, uiCam.viewportWidth, Align.center)
+                    font.scaleMul(1f / scale)
+                }
+
+                val newValue = (clearText - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f)
+                inputter.practice.clearText = newValue
+            }
+        }
+    }
+    
 }
