@@ -771,10 +771,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 72
                     borderWidth = 6f
-                }).setAfterLoad { font ->
-            defaultScaledFontAfterLoad.invoke(this, font)
-            font.data.spaceXadvance /= 3.6f
-        }
+                }).setAfterLoad(defaultScaledKurokaneAfterLoad)
         cache["game_go_for_perfect"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/kurokane/kurokanestd.otf"), 36, 4f, true, WindowSize(1280, 720)),
                 makeParam().apply {
