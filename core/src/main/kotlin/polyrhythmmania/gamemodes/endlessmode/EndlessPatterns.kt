@@ -4,7 +4,7 @@ import polyrhythmmania.editor.block.CubeType
 
 object EndlessPatterns {
     
-    const val ENDLESS_PATTERNS_VERSION: Int = 1
+    const val ENDLESS_PATTERNS_VERSION: Int = 2
 
     /*
     From CubeType.kt:

@@ -293,7 +293,7 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                         val endlessScore = engine.modifiers.endlessScore
                         val currentLives = endlessScore.lives.get()
                         val maxLives = endlessScore.maxLives.get()
-                        if (!disableLifeRegen && newScore >= 20 && newScore % 10 == 0 && currentLives > 0 && currentLives < maxLives) {
+                        if (!disableLifeRegen && newScore >= 10 && newScore % 10 == 0 && currentLives > 0 && currentLives < maxLives) {
                             engine.addEvent(EventPlaySFX(engine, awardScoreBeat, "sfx_practice_moretimes_2"))
                             endlessScore.lives.set(currentLives + 1)
                             if (engine.areStatisticsEnabled) {
