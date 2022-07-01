@@ -39,6 +39,13 @@ object InboxDB {
                 InboxItem.ContractDoc(Contracts["first"], 0),
         ))
         buildAndAddFolder("fp_explanation", InboxItem.Memo("fp_explanation", 100))
+        
+        // FIXME debug contracts
+        Contracts.contracts.forEach { (key, contract) ->
+            buildAndAddFolder("debugcontr_$key", listOf(
+                    InboxItem.ContractDoc(contract, 200),
+            ))
+        }
     }
     
 }

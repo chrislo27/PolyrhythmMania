@@ -6,6 +6,7 @@ import polyrhythmmania.storymode.StoryL10N
 
 enum class Requester(val id: String) {
     
+    DEBUG("debug"),
     HR("hr"),
     ;
     
