@@ -15,10 +15,7 @@ import paintbox.font.TextAlign
 import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.Pane
-import paintbox.ui.SceneRoot
+import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
@@ -65,7 +62,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         setToOrtho(false, 1280f, 720f)
         update()
     }
-    var renderUI: Boolean = true
+    var renderUI: BooleanVar = BooleanVar(true)
     var showSkillStarSetting: Boolean = PRManiaGame.instance.settings.showSkillStar.getOrCompute()
 
     val showEndlessModeScore: ReadOnlyBooleanVar = BooleanVar { engine.modifiers.endlessScore.enabled.use() }
@@ -82,11 +79,19 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     val songArtistCard: SongInfoCard = SongInfoCard()
 
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
-    private val textBoxSuperpane: Pane
-    private val textBoxDialoguePane: TextboxPane = TextboxPane()
-    private val textBoxBlackPane: RectElement = RectElement(Color(0f, 0f, 0f, 0.5f))
-    private val textBoxLabel: TextLabel = TextLabel("")
-    private val textBoxInputLabel: TextLabel = TextLabel(RodinSpecialChars.BORDERED_A, font = PRManiaGame.instance.fontGameTextbox)
+    private val baseMarkup: Markup = Markup(mapOf(
+            "prmania_icons" to PRManiaGame.instance.fontIcons,
+            "moretimes" to PRManiaGame.instance.fontGameMoreTimes,
+            "bordered" to PRManiaGame.instance.fontGameUIText,
+            "practiceclear" to PRManiaGame.instance.fontGamePracticeClear,
+            "mainmenu_main" to PRManiaGame.instance.fontMainMenuMain,
+            "mainmenu_thin" to PRManiaGame.instance.fontMainMenuThin,
+            "mainmenu_heading" to PRManiaGame.instance.fontMainMenuHeading,
+            "mainmenu_rodin" to PRManiaGame.instance.fontMainMenuRodin,
+    ), TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
+    
+    private val textboxRendering: TextBoxRendering
+    
     private val perfectPane: Pane = Pane()
     private val perfectIcon: ImageNode
     private val perfectIconFlash: ImageNode
@@ -101,17 +106,6 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     private val endlessModeHighScoreLabel: TextLabel
 
     init {
-        val baseMarkup = Markup(mapOf(
-                "prmania_icons" to PRManiaGame.instance.fontIcons,
-                "moretimes" to PRManiaGame.instance.fontGameMoreTimes,
-                "bordered" to PRManiaGame.instance.fontGameUIText,
-                "practiceclear" to PRManiaGame.instance.fontGamePracticeClear,
-                "mainmenu_main" to PRManiaGame.instance.fontMainMenuMain,
-                "mainmenu_thin" to PRManiaGame.instance.fontMainMenuThin,
-                "mainmenu_heading" to PRManiaGame.instance.fontMainMenuHeading,
-                "mainmenu_rodin" to PRManiaGame.instance.fontMainMenuRodin,
-        ), TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
-
         uiSceneRoot += endlessModeScorePane.apply {
             this.visible.bind { showEndlessModeScore.use() }
             Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
@@ -150,20 +144,6 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                         }
                     }
                     this += endlessModeHighScoreLabel
-
-//                    val livesVar: ReadOnlyVar<String> = Localization.getVar("play.endless.lives", Var {
-//                        val l = currentEndlessLives.use()
-//                        listOf("[font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]")
-//                    })
-//                    val endlessModeLivesLabel = TextLabel(binding = { livesVar.use() }).apply {
-//                        this.bounds.width.set(480f)
-//                        Anchor.TopRight.configure(this)
-//                        this.markup.set(baseMarkup)
-//                        this.renderAlign.set(Align.left)
-//                        this.textColor.set(Color(1f, 1f, 1f, 1f))
-//                        this.setScaleXY(0.5f)
-//                    }
-//                    this += endlessModeLivesLabel
                 }
 
                 val currentScoreVar = Localization.getVar("play.endless.score", Var { listOf(currentEndlessScore.use()) })
@@ -252,31 +232,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
         endlessModeGameOverPane += endlessModeGameOverLabel
 
-        textBoxSuperpane = Pane().apply {
-            Anchor.TopCentre.configure(this, offsetY = 64f)
-            this.bounds.height.set(150f)
-        }
-        uiSceneRoot += textBoxSuperpane
-        textBoxSuperpane += textBoxBlackPane
-
-        textBoxSuperpane += Pane().apply {
-            Anchor.TopCentre.configure(this)
-            this.bounds.width.set(1000f)
-
-            this += textBoxDialoguePane
-            this += textBoxLabel.apply {
-                Anchor.TopCentre.configure(this)
-                this.markup.set(baseMarkup)
-                this.renderAlign.set(Align.center)
-                this.textAlign.set(TextAlign.LEFT)
-            }
-            this += textBoxInputLabel.apply {
-                this.renderAlign.set(Align.right)
-                this.bounds.width.set(48f)
-                this.bounds.height.set(48f)
-                Anchor.BottomRight.configure(this, offsetX = -10f, offsetY = -6f)
-            }
-        }
+        this.textboxRendering = this.TextBoxRendering()
+        uiSceneRoot += this.textboxRendering.uiElement
     }
 
     override fun onWorldReset(world: World) {
@@ -302,7 +259,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         batch.projectionMatrix = uiCamera.combined
         batch.begin()
 
-        if (renderUI) {
+        if (renderUI.get()) {
             renderUI(batch)
         }
         
@@ -351,23 +308,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                     1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
         }
 
-        val textBox = engine.activeTextBox
-        textBoxSuperpane.visible.set(textBox != null)
-        if (textBox != null) {
-            val style = textBox.textBox.style
-            textBoxBlackPane.visible.set(style == TextBoxStyle.BANNER)
-            textBoxDialoguePane.visible.set(style == TextBoxStyle.DIALOGUE)
-
-            textBoxLabel.text.set(textBox.textBox.text)
-            textBoxLabel.textAlign.set(textBox.textBox.align)
-            val textColor = if (style == TextBoxStyle.BANNER) Color.WHITE else Color.BLACK
-            textBoxLabel.textColor.set(textColor)
-            textBoxInputLabel.text.set(if (textBox.secondsTimer > 0f) "" else {
-                if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f)
-                    RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A
-            })
-            textBoxInputLabel.textColor.set(textColor)
-        }
+        textboxRendering.renderUI(batch)
 
         val perfectCh = modifiers.perfectChallenge
         if (perfectCh.enabled.get()) {
@@ -511,4 +452,71 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
         batch.packedColor = lastPackedColor
     }
+    
+    
+    abstract inner class InnerRenderer {
+        abstract val uiElement: UIElement
+        abstract fun renderUI(batch: SpriteBatch)
+    }
+    
+    inner class TextBoxRendering : InnerRenderer() {
+
+        private val textBoxSuperpane: Pane
+        private val textBoxDialoguePane: TextboxPane = TextboxPane()
+        private val textBoxBlackPane: RectElement = RectElement(Color(0f, 0f, 0f, 0.5f))
+        private val textBoxLabel: TextLabel = TextLabel("")
+        private val textBoxInputLabel: TextLabel = TextLabel(RodinSpecialChars.BORDERED_A, font = PRManiaGame.instance.fontGameTextbox)
+        
+        override val uiElement: UIElement get() = textBoxSuperpane
+        
+        init {
+            textBoxSuperpane = Pane().apply {
+                Anchor.TopCentre.configure(this, offsetY = 64f)
+                this.bounds.height.set(150f)
+            }
+            textBoxSuperpane += textBoxBlackPane
+
+            textBoxSuperpane += Pane().apply {
+                Anchor.TopCentre.configure(this)
+                this.bounds.width.set(1000f)
+
+                this += textBoxDialoguePane
+                this += textBoxLabel.apply {
+                    Anchor.TopCentre.configure(this)
+                    this.markup.set(baseMarkup)
+                    this.renderAlign.set(Align.center)
+                    this.textAlign.set(TextAlign.LEFT)
+                }
+                this += textBoxInputLabel.apply {
+                    this.renderAlign.set(Align.right)
+                    this.bounds.width.set(48f)
+                    this.bounds.height.set(48f)
+                    Anchor.BottomRight.configure(this, offsetX = -10f, offsetY = -6f)
+                }
+            }
+        }
+
+        override fun renderUI(batch: SpriteBatch) {
+            val engine = this@WorldRendererWithUI.engine
+
+            val textBox = engine.activeTextBox
+            textBoxSuperpane.visible.set(textBox != null)
+            if (textBox != null) {
+                val style = textBox.textBox.style
+                textBoxBlackPane.visible.set(style == TextBoxStyle.BANNER)
+                textBoxDialoguePane.visible.set(style == TextBoxStyle.DIALOGUE)
+
+                textBoxLabel.text.set(textBox.textBox.text)
+                textBoxLabel.textAlign.set(textBox.textBox.align)
+                val textColor = if (style == TextBoxStyle.BANNER) Color.WHITE else Color.BLACK
+                textBoxLabel.textColor.set(textColor)
+                textBoxInputLabel.text.set(if (textBox.secondsTimer > 0f) "" else {
+                    if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f)
+                        RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A
+                })
+                textBoxInputLabel.textColor.set(textColor)
+            }
+        }
+    }
+    
 }

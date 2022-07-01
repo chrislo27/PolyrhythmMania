@@ -20,6 +20,7 @@ import polyrhythmmania.world.entity.EntityPlatform
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.render.WorldRendererWithUI
 
 
 class MainMenuBg(val mainMenu: MainMenuScreen) {
@@ -32,9 +33,10 @@ class MainMenuBg(val mainMenu: MainMenuScreen) {
     private val gradientEnd: Color = Color.BLACK.cpy()
     
     private val world: World = container.world
-    val renderer: WorldRenderer = container.renderer
+    val renderer: WorldRendererWithUI = container.renderer
     
     init {
+        renderer.renderUI.set(false)
         renderer.camera.position.x = -2f
         renderer.camera.position.y = 0.5f
 
