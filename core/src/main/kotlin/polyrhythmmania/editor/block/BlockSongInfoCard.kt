@@ -198,8 +198,8 @@ class EventSongInfoCard(engine: Engine, val field: BlockSongInfoCard.Field, dura
     }
     
     private fun getCard(container: Container): WorldRendererWithUI.SongInfoCard = when (field) {
-        BlockSongInfoCard.Field.SONG_TITLE -> container.renderer.songTitleCard
-        BlockSongInfoCard.Field.SONG_ARTIST -> container.renderer.songArtistCard
+        BlockSongInfoCard.Field.SONG_TITLE -> container.renderer.songCardRendering.songTitleCard
+        BlockSongInfoCard.Field.SONG_ARTIST -> container.renderer.songCardRendering.songArtistCard
     }
 
     override fun onStartContainer(container: Container, currentBeat: Float) {

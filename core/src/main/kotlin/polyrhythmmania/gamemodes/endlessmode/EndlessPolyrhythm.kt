@@ -121,8 +121,8 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
         endlessScore.enabled.set(true)
         endlessScore.flashHudRedWhenLifeLost = true
         endlessScore.maxLives.set(if (maxLives <= 0) 3 else maxLives)
-        container.renderer.endlessModeSeed.set(getSeedString(seed.toUInt()))
-        container.renderer.dailyChallengeDate.set(dailyChallenge)
+        container.renderer.endlessModeRendering.endlessModeSeed.set(getSeedString(seed.toUInt()))
+        container.renderer.endlessModeRendering.dailyChallengeDate.set(dailyChallenge)
     }
     
     fun submitPauseTime(pauseTime: Float) {

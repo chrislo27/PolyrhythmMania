@@ -12,7 +12,7 @@ abstract class AbstractEndlessMode(main: PRManiaGame, val prevHighScore: Endless
 
     init {
         val renderer = container.renderer
-        renderer.prevHighScore.set(prevHighScore.highScore.getOrCompute())
+        renderer.endlessModeRendering.prevHighScore.set(prevHighScore.highScore.getOrCompute())
 
         val endlessScore = engine.modifiers.endlessScore
         endlessScore.highScore = prevHighScore.highScore

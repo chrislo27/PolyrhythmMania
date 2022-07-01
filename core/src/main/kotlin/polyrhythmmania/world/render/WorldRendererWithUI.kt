@@ -64,20 +64,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         update()
     }
     var renderUI: BooleanVar = BooleanVar(true)
-    var showSkillStarSetting: Boolean = PRManiaGame.instance.settings.showSkillStar.getOrCompute()
-
-    val showEndlessModeScore: ReadOnlyBooleanVar = BooleanVar { engine.modifiers.endlessScore.enabled.use() }
-    val prevHighScore: IntVar = IntVar(-1)
-    val dailyChallengeDate: Var<LocalDate?> = Var(null)
-    val endlessModeSeed: Var<String?> = Var(null)
-    private val currentEndlessScore: IntVar = IntVar(0)
-    private val currentEndlessLives: IntVar = IntVar(0)
-
-    private var skillStarSpinAnimation: Float = 0f
-    private var skillStarPulseAnimation: Float = 0f
+    
     private var hudRedFlash: Float = 0f
-    val songTitleCard: SongInfoCard = SongInfoCard()
-    val songArtistCard: SongInfoCard = SongInfoCard()
 
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val baseMarkup: Markup = Markup(mapOf(
@@ -91,10 +79,14 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             "mainmenu_rodin" to PRManiaGame.instance.fontMainMenuRodin,
     ), TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
     
-    private val textboxRendering: TextBoxRendering
-    private val perfectRendering: PerfectRendering
+    val endlessModeRendering: EndlessModeRendering
     private val practiceRendering: PracticeRendering
-    private val endlessModeRendering: EndlessModeRendering
+    private val perfectRendering: PerfectRendering
+    val songCardRendering: SongCardRendering
+    private val skillStarRendering: SkillStarRendering
+    private val textboxRendering: TextBoxRendering
+    
+    private val allInnerRenderers: List<InnerRendering>
 
     init {
         this.endlessModeRendering = this.EndlessModeRendering()
@@ -106,26 +98,32 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         this.perfectRendering = this.PerfectRendering()
         uiSceneRoot += this.perfectRendering.uiElement
         
+        this.songCardRendering = this.SongCardRendering()
+        uiSceneRoot += this.songCardRendering.uiElement
+        
+        this.skillStarRendering = this.SkillStarRendering()
+        uiSceneRoot += this.skillStarRendering.uiElement
+        
         // "Game Over" pane must be on top of other UI elements, but below the text box
         uiSceneRoot += this.endlessModeRendering.endlessModeGameOverPane
 
         this.textboxRendering = this.TextBoxRendering()
         uiSceneRoot += this.textboxRendering.uiElement
+        
+        
+        this.allInnerRenderers = listOf(textboxRendering, perfectRendering, practiceRendering, endlessModeRendering, skillStarRendering)
     }
 
     override fun onWorldReset(world: World) {
         super.onWorldReset(world)
         
-        skillStarSpinAnimation = 0f
-        skillStarPulseAnimation = 0f
+        this.allInnerRenderers.forEach { it.onWorldReset(world) }
+        
         hudRedFlash = 0f
-        songTitleCard.reset()
-        songArtistCard.reset()
     }
 
     fun fireSkillStar() {
-        skillStarSpinAnimation = 1f
-        skillStarPulseAnimation = 2f
+        this.skillStarRendering.fireSkillStar()
     }
 
     override fun render(batch: SpriteBatch) {
@@ -146,63 +144,24 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
     private fun renderUI(batch: SpriteBatch) {
         val engine = this.engine
-        val inputter = engine.inputter
         val modifiers = engine.modifiers
         val uiCam = this.uiCamera
-        val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
-
-        // Skill star
-        val skillStarInput = inputter.skillStarBeat
-        if (skillStarInput.isFinite() && showSkillStarSetting) {
-            if (skillStarSpinAnimation > 0) {
-                skillStarSpinAnimation -= Gdx.graphics.deltaTime / 1f
-                if (skillStarSpinAnimation < 0)
-                    skillStarSpinAnimation = 0f
-            }
-            if (skillStarPulseAnimation > 0) {
-                skillStarPulseAnimation -= Gdx.graphics.deltaTime / 0.5f
-                if (skillStarPulseAnimation < 0)
-                    skillStarPulseAnimation = 0f
-            } else {
-                // Pulse before skill star input
-                val threshold = 0.1f
-                for (i in 0 until 4) {
-                    val beatPoint = engine.tempos.beatsToSeconds(skillStarInput - i)
-                    if (engine.seconds in beatPoint..beatPoint + threshold) {
-                        skillStarPulseAnimation = 0.5f
-                        break
-                    }
-                }
-            }
-
-            val texColoured = uiSheet["skill_star"]
-            val texGrey = uiSheet["skill_star_grey"]
-
-            val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
-            val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
-            batch.draw(if (inputter.skillStarGotten.get()) texColoured else texGrey,
-                    1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
-        }
+        
+        skillStarRendering.renderUI(batch)
 
         textboxRendering.renderUI(batch)
 
         perfectRendering.renderUI(batch)
 
-        // Song info cards
-        val textboxFont = PRManiaGame.instance.fontGameTextbox
-        textboxFont.useFont { font ->
-            font.scaleMul(0.75f)
-            val sec = engine.seconds
-            renderSongInfoCard(batch, font, songTitleCard, false, sec)
-            renderSongInfoCard(batch, font, songArtistCard, true, sec)
-        }
+        songCardRendering.renderUI(batch)
         
         practiceRendering.renderUI(batch)
 
-        this.endlessModeRendering.renderUI(batch)
+        endlessModeRendering.renderUI(batch)
 
         uiSceneRoot.renderAsRoot(batch)
 
+        // HUD red flash when endless mode life lost
         if (hudRedFlash > 0f) {
             if (modifiers.endlessScore.flashHudRedWhenLifeLost) {
                 batch.setColor(1f, 0f, 0f, hudRedFlash)
@@ -245,9 +204,13 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     }
     
     
-    abstract inner class InnerRendering {
+    abstract inner class InnerRendering : World.WorldResetListener {
         abstract val uiElement: UIElement
+        
         abstract fun renderUI(batch: SpriteBatch)
+        
+        override fun onWorldReset(world: World) {
+        }
     }
     
     inner class TextBoxRendering : InnerRendering() {
@@ -453,6 +416,13 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     }
     
     inner class EndlessModeRendering : InnerRendering() {
+        
+        val showEndlessModeScore: ReadOnlyBooleanVar = BooleanVar { engine.modifiers.endlessScore.enabled.use() }
+        val prevHighScore: IntVar = IntVar(-1)
+        val dailyChallengeDate: Var<LocalDate?> = Var(null)
+        val endlessModeSeed: Var<String?> = Var(null)
+        private val currentEndlessScore: IntVar = IntVar(0)
+        private val currentEndlessLives: IntVar = IntVar(0)
 
         private val endlessModeScorePane: Pane
         private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
@@ -576,6 +546,94 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                 }
                 endlessModeHighScoreLabel.visible.set(!endlessScore.hideHighScoreText)
             }
+        }
+    }
+    
+    inner class SkillStarRendering : InnerRendering() {
+        override val uiElement: UIElement = Pane().apply { 
+            this.bounds.width.set(0f)
+            this.bounds.height.set(0f)
+        }
+        
+        var showSkillStarSetting: Boolean = PRManiaGame.instance.settings.showSkillStar.getOrCompute()
+
+        private var skillStarSpinAnimation: Float = 0f
+        private var skillStarPulseAnimation: Float = 0f
+
+        override fun renderUI(batch: SpriteBatch) {
+            val engine = this@WorldRendererWithUI.engine
+            val inputter = engine.inputter
+            val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
+            
+            val skillStarInput = inputter.skillStarBeat
+            if (skillStarInput.isFinite() && showSkillStarSetting) {
+                if (skillStarSpinAnimation > 0) {
+                    skillStarSpinAnimation -= Gdx.graphics.deltaTime / 1f
+                    if (skillStarSpinAnimation < 0)
+                        skillStarSpinAnimation = 0f
+                }
+                if (skillStarPulseAnimation > 0) {
+                    skillStarPulseAnimation -= Gdx.graphics.deltaTime / 0.5f
+                    if (skillStarPulseAnimation < 0)
+                        skillStarPulseAnimation = 0f
+                } else {
+                    // Pulse before skill star input
+                    val threshold = 0.1f
+                    for (i in 0 until 4) {
+                        val beatPoint = engine.tempos.beatsToSeconds(skillStarInput - i)
+                        if (engine.seconds in beatPoint..beatPoint + threshold) {
+                            skillStarPulseAnimation = 0.5f
+                            break
+                        }
+                    }
+                }
+
+                val texColoured = uiSheet["skill_star"]
+                val texGrey = uiSheet["skill_star_grey"]
+
+                val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
+                val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
+                batch.draw(if (inputter.skillStarGotten.get()) texColoured else texGrey,
+                        1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
+            }
+        }
+
+        override fun onWorldReset(world: World) {
+            super.onWorldReset(world)
+            skillStarSpinAnimation = 0f
+            skillStarPulseAnimation = 0f
+        }
+
+        fun fireSkillStar() {
+            skillStarSpinAnimation = 1f
+            skillStarPulseAnimation = 2f
+        }
+    }
+    
+    inner class SongCardRendering : InnerRendering() {
+        
+        override val uiElement: UIElement = Pane().apply {
+            this.bounds.width.set(0f)
+            this.bounds.height.set(0f)
+        }
+        
+        val songTitleCard: SongInfoCard = SongInfoCard()
+        val songArtistCard: SongInfoCard = SongInfoCard()
+
+        override fun renderUI(batch: SpriteBatch) {
+            val textboxFont = PRManiaGame.instance.fontGameTextbox
+            textboxFont.useFont { font ->
+                font.scaleMul(0.75f)
+                val sec = engine.seconds
+                renderSongInfoCard(batch, font, songTitleCard, false, sec)
+                renderSongInfoCard(batch, font, songArtistCard, true, sec)
+            }
+        }
+
+        override fun onWorldReset(world: World) {
+            super.onWorldReset(world)
+            songTitleCard.reset()
+            songArtistCard.reset()
         }
     }
     
