@@ -21,7 +21,7 @@ class LivesMode : ModifierModule() {
 
     // Settings
     val maxLives: IntVar = IntVar(3)
-    val cooldownAmount: FloatVar = FloatVar(DEFAULT_COOLDOWN)
+    val cooldownBaseAmount: FloatVar = FloatVar(DEFAULT_COOLDOWN)
 
 
     // Data
@@ -34,8 +34,23 @@ class LivesMode : ModifierModule() {
     }
 
     override fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
-        if (cooldownAmount.get() > 0f && deltaSec > 0f) {
-            cooldownAmount.set((cooldownAmount.get() - deltaSec).coerceAtLeast(0f))
+        if (currentCooldown.get() > 0f && deltaSec > 0f) {
+            currentCooldown.set((currentCooldown.get() - deltaSec).coerceAtLeast(0f))
+        }
+    }
+    
+    fun loseALife(inputter: EngineInputter) {
+        if (currentCooldown.get() > 0 || lives.get() <= 0 || maxLives.get() <= 0) {
+            return
+        }
+
+        val oldLives = this.lives.get()
+        val newLives = (oldLives - 1).coerceIn(0, this.maxLives.get())
+        this.lives.set(newLives)
+        this.currentCooldown.set(cooldownBaseAmount.get())
+
+        if (oldLives > 0 && newLives == 0) {
+            onAllLivesLost(inputter)
         }
     }
 
@@ -49,18 +64,7 @@ class LivesMode : ModifierModule() {
     // InputterListener overrides
 
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
-        if (currentCooldown.get() > 0 || lives.get() <= 0 || maxLives.get() <= 0) {
-            return
-        }
-        
-        val oldLives = this.lives.get()
-        val newLives = (oldLives - 1).coerceIn(0, this.maxLives.get())
-        this.lives.set(newLives)
-        this.currentCooldown.set(cooldownAmount.get())
-
-        if (oldLives > 0 && newLives == 0) {
-            onAllLivesLost(inputter)
-        }
+        loseALife(inputter)
     }
 
     override fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean) {

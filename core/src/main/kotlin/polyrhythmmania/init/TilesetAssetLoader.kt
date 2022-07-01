@@ -17,6 +17,7 @@ class TilesetAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("green_grid", "textures/world/green_grid.png", linearTexture())
         
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                "heart",
                 "skill_star",
                 "skill_star_grey",
                 "perfect",

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
@@ -20,6 +21,7 @@ import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
+import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.drawCompressed
@@ -30,6 +32,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.engine.input.EngineInputter
+import polyrhythmmania.engine.modifiers.LivesMode
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
@@ -80,6 +83,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     ), TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
     
     val endlessModeRendering: EndlessModeRendering
+    private val livesModeRendering: LivesModeRendering
     private val practiceRendering: PracticeRendering
     private val perfectRendering: PerfectRendering
     val songCardRendering: SongCardRendering
@@ -91,6 +95,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     init {
         this.endlessModeRendering = this.EndlessModeRendering()
         uiSceneRoot += this.endlessModeRendering.uiElement
+        
+        this.livesModeRendering = this.LivesModeRendering()
+        uiSceneRoot += this.livesModeRendering.uiElement
 
         this.practiceRendering = this.PracticeRendering()
         uiSceneRoot += this.practiceRendering.uiElement
@@ -148,15 +155,11 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         val uiCam = this.uiCamera
         
         skillStarRendering.renderUI(batch)
-
         textboxRendering.renderUI(batch)
-
         perfectRendering.renderUI(batch)
-
         songCardRendering.renderUI(batch)
-        
         practiceRendering.renderUI(batch)
-
+        livesModeRendering.renderUI(batch)
         endlessModeRendering.renderUI(batch)
 
         uiSceneRoot.renderAsRoot(batch)
@@ -634,6 +637,46 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             super.onWorldReset(world)
             songTitleCard.reset()
             songArtistCard.reset()
+        }
+    }
+    
+    inner class LivesModeRendering : InnerRendering() {
+        
+        private val mainPane: Pane
+        
+        private val livesMode: LivesMode = engine.modifiers.livesMode
+        private val maxLives: ReadOnlyIntVar = IntVar { livesMode.maxLives.use() }
+        private val currentLives: ReadOnlyIntVar = IntVar { livesMode.lives.use() }
+        
+        override val uiElement: UIElement get() = mainPane
+        
+        init {
+            mainPane = Pane().apply {
+                this.visible.bind { livesMode.enabled.use() }
+                Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
+                this.bindWidthToParent(adjust = -64f)
+                this.bounds.height.set(64f)
+
+                val hbox = HBox()
+                this += hbox
+                val listener: (v: ReadOnlyVar<Int>) -> Unit = {
+                    val newAmount = it.getOrCompute()
+                    hbox.temporarilyDisableLayouts {
+                        hbox.removeAllChildren()
+                        for (i in 1..newAmount) {
+                            hbox += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("tileset_ui")["heart"])).apply {
+                                this.visible.bind { currentLives.use() >= i }
+                                this.bindWidthToSelfHeight()
+                            }
+                        }
+                    }
+                }
+                maxLives.addListener(listener)
+                listener.invoke(maxLives)
+            }
+        }
+
+        override fun renderUI(batch: SpriteBatch) {
         }
     }
     
