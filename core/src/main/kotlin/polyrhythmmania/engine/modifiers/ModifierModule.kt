@@ -19,4 +19,6 @@ abstract class ModifierModule : InputterListener {
      */
     abstract fun resetState()
     
+    abstract fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float)
+    
 }

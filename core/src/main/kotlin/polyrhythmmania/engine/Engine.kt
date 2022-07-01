@@ -255,6 +255,7 @@ class Engine(timingProvider: TimingProvider,
         }
         
         musicData.update()
+        modifiers.engineUpdate(currentBeat, currentSeconds, delta)
     }
 
     fun getDebugString(): String {

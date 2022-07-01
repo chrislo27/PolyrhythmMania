@@ -20,6 +20,9 @@ class PerfectChallengeData : ModifierModule() {
         failed = false
     }
 
+    override fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
+    }
+
 
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
         if (this.enabled.get() && !this.failed) {

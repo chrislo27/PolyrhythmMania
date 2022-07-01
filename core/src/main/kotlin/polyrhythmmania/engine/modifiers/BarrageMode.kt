@@ -19,6 +19,10 @@ class BarrageMode : ModifierModule() {
         currentScore.set(0)
     }
     
+    override fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
+    }
+
+
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
     }
 

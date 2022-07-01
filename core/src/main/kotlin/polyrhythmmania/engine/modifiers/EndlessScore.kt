@@ -12,6 +12,11 @@ import polyrhythmmania.gamemodes.ChangeMusicVolMultiplierEvent
 import polyrhythmmania.world.EventEndState
 import polyrhythmmania.world.WorldType
 
+/**
+ * Designed for Endless Mode/Daily Challenge.
+ * 
+ * Not compatible with [LivesMode].
+ */
 class EndlessScore : ModifierModule() {
 
     // Settings
@@ -40,6 +45,9 @@ class EndlessScore : ModifierModule() {
         gameOverUIShown.set(false)
     }
 
+    override fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
+    }
+    
 
     /**
      * Triggers a life to be lost.

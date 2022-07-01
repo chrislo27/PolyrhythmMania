@@ -12,8 +12,9 @@ class EngineModifiers(val engine: Engine) : InputterListener {
 
     val perfectChallenge: PerfectChallengeData = PerfectChallengeData()
     val endlessScore: EndlessScore = EndlessScore()
+    val livesMode: LivesMode = LivesMode()
     
-    private val allModules: List<ModifierModule> = listOf(perfectChallenge, endlessScore)
+    private val allModules: List<ModifierModule> = listOf(perfectChallenge, endlessScore, livesMode)
 
     init {
         inputter.inputterListeners += this
@@ -21,6 +22,12 @@ class EngineModifiers(val engine: Engine) : InputterListener {
     
     fun resetState() {
         allModules.forEach(ModifierModule::resetState)
+    }
+
+    fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
+        allModules.forEach { module ->
+            module.engineUpdate(beat, seconds, deltaSec)
+        }
     }
 
     
