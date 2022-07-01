@@ -560,6 +560,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         
         var showSkillStarSetting: Boolean = PRManiaGame.instance.settings.showSkillStar.getOrCompute()
 
+        private var skillStarOpacity: Float = 0f
         private var skillStarSpinAnimation: Float = 0f
         private var skillStarPulseAnimation: Float = 0f
 
@@ -590,14 +591,24 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                         }
                     }
                 }
+                
+                if (skillStarOpacity < 1f) {
+                    skillStarOpacity = (skillStarOpacity + Gdx.graphics.deltaTime / 0.25f).coerceIn(0f, 1f)
+                }
 
                 val texColoured = uiSheet["skill_star"]
                 val texGrey = uiSheet["skill_star_grey"]
 
                 val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
                 val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
+                
+                val prevColor = batch.packedColor
+                batch.setColor(1f, 1f, 1f, skillStarOpacity)
                 batch.draw(if (inputter.skillStarGotten.get()) texColoured else texGrey,
                         1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
+                batch.packedColor = prevColor
+            } else {
+                skillStarOpacity = 0f
             }
         }
 
