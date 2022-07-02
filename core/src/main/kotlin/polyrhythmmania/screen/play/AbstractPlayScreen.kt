@@ -292,7 +292,10 @@ abstract class AbstractPlayScreen(
     }
 
     fun playMenuSound(id: String, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
-        val sound: Sound = AssetRegistry[id]
+        return playMenuSound(AssetRegistry.get<Sound>(id), volume, pitch, pan)
+    }
+
+    fun playMenuSound(sound: Sound, volume: Float = 1f, pitch: Float = 1f, pan: Float = 0f): Pair<Sound, Long> {
         val menuSFXVol = main.settings.menuSfxVolume.getOrCompute() / 100f
         val soundID = sound.play(menuSFXVol * volume, pitch, pan)
         return sound to soundID

@@ -1,18 +1,32 @@
 package polyrhythmmania.storymode.screen
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.Interpolation.ExpIn
+import com.badlogic.gdx.math.Interpolation.ExpOut
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
 import paintbox.PaintboxScreen
+import paintbox.binding.BooleanVar
+import paintbox.binding.FloatVar
+import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.transition.TransitionScreen
 import paintbox.transition.WipeTransitionHead
 import paintbox.transition.WipeTransitionTail
-import paintbox.util.MathHelper
+import paintbox.ui.Anchor
+import paintbox.ui.RenderAlign
+import paintbox.ui.SceneRoot
+import paintbox.ui.animation.Animation
+import paintbox.ui.animation.AnimationHandler
+import paintbox.ui.control.TextLabel
+import paintbox.ui.element.QuadElement
+import paintbox.ui.element.RectElement
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.viewport.ExtendNoOversizeViewport
@@ -29,6 +43,7 @@ import polyrhythmmania.screen.play.pause.PauseMenuHandler
 import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
 import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Contract
 import kotlin.math.max
@@ -67,6 +82,16 @@ class StoryPlayScreen(
         this.update()
     })
     
+    // Intro card
+    private val introCardDefaultDuration: Float = 3f
+    private val introCardSceneRoot: SceneRoot = SceneRoot(uiViewport)
+    private val introCardAnimationHandler: AnimationHandler = AnimationHandler(introCardSceneRoot)
+    private val introCardTime: FloatVar = FloatVar(0f)
+    private val inIntroCard: ReadOnlyBooleanVar = BooleanVar { introCardTime.use() > 0f }
+    private val blurStrength: FloatVar
+    private val blackBarsAmount: FloatVar
+    private val textSlideAmount: FloatVar
+    
     init {
         val optionList = mutableListOf<PauseOption>()
         optionList += PauseOption("play.pause.resume", true) {
@@ -99,6 +124,90 @@ class StoryPlayScreen(
     }
     
     init {
+        blurStrength = FloatVar {
+            val effectInLastSec = 0.5f // Unblur only in the first and last 0.5 seconds
+            val time = introCardTime.use() * introCardDefaultDuration // Counts down from duration to 0.0 sec
+            
+            val interpolation = Interpolation.pow2Out
+            when {
+                time <= 0f -> 0f
+                time < effectInLastSec -> {
+                    val timePercent = 1f - time / effectInLastSec
+                    interpolation.apply(1f, 0f, timePercent)
+                }
+                else -> 1f
+            }
+        }
+        blackBarsAmount = FloatVar {
+            val effectInLastSec = 0.5f // Effect only in the first and last few seconds
+            val time = introCardTime.use() * introCardDefaultDuration // Counts down from duration to 0.0 sec
+            
+            val interpolation = Interpolation.smoother
+            val firstThreshold = introCardDefaultDuration - effectInLastSec
+            when {
+                time <= 0f -> 0f
+                time > firstThreshold -> {
+                    val timePercent = 1f - (time - firstThreshold) / effectInLastSec
+                    interpolation.apply(0f, 1f, timePercent)
+                }
+                time < effectInLastSec -> {
+                    val timePercent = 1f - time / effectInLastSec
+                    interpolation.apply(1f, 0f, timePercent)
+                }
+                else -> 1f
+            }
+        }
+        val textSlideInterpFrontHalf: Interpolation = ExpOut(2f, 5f) 
+        val textSlideInterpBackHalf: Interpolation = ExpIn(2f, 5f) 
+        textSlideAmount = FloatVar {
+            val timeIncreasing = 1f - introCardTime.use()
+            if (timeIncreasing < 0.5f) {
+                textSlideInterpFrontHalf.apply(timeIncreasing / 0.5f) * 0.5f
+            } else {
+                0.5f + textSlideInterpBackHalf.apply((timeIncreasing - 0.5f) / 0.5f) * 0.5f
+            }
+        }
+        
+        // Black bars: Full is 16:9 = 1.778, cinema is 2.35:1 = 2.35. About 25% less height
+        val slantAmount = 1.5f
+        val barHeight = 0.125f * 1.5f
+        introCardSceneRoot += QuadElement(Color.BLACK).apply { 
+            this.bindHeightToParent(multiplier = barHeight * slantAmount)
+            Anchor.TopLeft.yConfigure(this) {
+                val h = bounds.height.use()
+                -h + (blackBarsAmount.use() * h)
+            }
+            
+            this.bottomLeftOffsetV.set(0f)
+            this.bottomRightOffsetV.set(1 / slantAmount)
+        }
+        introCardSceneRoot += QuadElement(Color.BLACK).apply { 
+            this.bindHeightToParent(multiplier = barHeight * slantAmount)
+            Anchor.BottomLeft.yConfigure(this) {
+                val h = bounds.height.use()
+                h - (blackBarsAmount.use() * h)
+            }
+
+            this.topLeftOffsetV.set(1f - 1 / slantAmount)
+            this.topRightOffsetV.set(1f)
+        }
+        // Title
+        introCardSceneRoot += TextLabel(contract.name.getOrCompute(), font = PRManiaGame.instance.fontGamePracticeClear).apply { 
+//            this.bindYToParentHeight(multiplier = 0.3f)
+            Anchor.CentreLeft.configure(this)
+            this.bindHeightToParent(multiplier = 0.25f)
+            
+            this.renderAlign.set(RenderAlign.center)
+            this.textColor.set(Color.WHITE.cpy())
+            
+            this.bounds.x.bind {
+                val parentW = parent.use()?.bounds?.width?.use() ?: 0f    
+                MathUtils.lerp(-(bounds.width.use()), parentW, textSlideAmount.use())
+            }
+        }
+    }
+    
+    init {
         val startingWidth = Gdx.graphics.width
         val startingHeight = Gdx.graphics.height
         if (startingWidth > 0 && startingHeight > 0) {
@@ -121,6 +230,34 @@ class StoryPlayScreen(
         }
         this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
         Paintbox.LOGGER.debug("Updated gameplay framebuffer to be backbuffer ${newFbWidth}x${newFbHeight} (logical ${width}x${height})")
+    }
+
+    override fun initializeGameplay() {
+        super.initializeGameplay()
+        cancelIntroCard()
+    }
+
+    fun initializeIntroCard() {
+        introCardTime.set(1f)
+        shouldUpdateTiming.set(false)
+        soundSystem.setPaused(true)
+        
+        // Play jingle
+        val jingle: Sound = StoryAssets.get<Sound>(contract.jingleType.soundID)
+        playMenuSound(jingle)
+
+        introCardAnimationHandler.enqueueAnimation(Animation(Interpolation.linear, introCardDefaultDuration, 1f, 0f).apply { 
+            this.onComplete = {
+                cancelIntroCard()
+            }                                                                                                     
+        }, introCardTime)
+    }
+    
+    fun cancelIntroCard() {
+        introCardTime.set(0f)
+        introCardAnimationHandler.cancelAnimationFor(introCardTime)
+        shouldUpdateTiming.set(true)
+        soundSystem.setPaused(false)
     }
 
     override fun resize(width: Int, height: Int) {
@@ -148,8 +285,8 @@ class StoryPlayScreen(
         
         
         // Do blur
-        val passes = 6
-        val blurStrength = 0f // FIXME
+        val passes = 7
+        val blurStrength = this.blurStrength.get()
         var readBuffer = frameBuffer
         var writeBuffer = frameBuffer2
         
@@ -200,6 +337,18 @@ class StoryPlayScreen(
         main.resetViewportToScreen()
     }
 
+    override fun renderAfterGameplay(delta: Float, camera: OrthographicCamera) {
+        super.renderAfterGameplay(delta, camera)
+
+        introCardAnimationHandler.frameUpdate()
+        
+        if (inIntroCard.get()) {
+            uiViewport.apply()
+            introCardSceneRoot.renderAsRoot(batch)
+            main.resetViewportToScreen()
+        }
+    }
+
     override fun onEndSignalFired() {
         super.onEndSignalFired()
         
@@ -218,6 +367,18 @@ class StoryPlayScreen(
 
     override fun uncatchCursorOnHide(): Boolean {
         return super.uncatchCursorOnHide() && !disableCatchingCursorOnHide
+    }
+
+    override fun pauseGame(playSound: Boolean) {
+        if (!inIntroCard.get()) {
+            super.pauseGame(playSound)
+        }
+    }
+
+    override fun unpauseGame(playSound: Boolean) {
+        if (!inIntroCard.get()) {
+            super.unpauseGame(playSound)
+        }
     }
 
     override fun _dispose() {

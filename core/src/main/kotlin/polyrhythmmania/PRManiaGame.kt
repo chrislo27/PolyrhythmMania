@@ -770,6 +770,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 72
+                    spaceX = -6
                     borderWidth = 6f
                 }).setAfterLoad(defaultScaledKurokaneAfterLoad)
         cache["game_go_for_perfect"] = PaintboxFontFreeType(

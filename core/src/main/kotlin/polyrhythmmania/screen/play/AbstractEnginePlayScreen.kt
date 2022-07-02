@@ -3,6 +3,7 @@ package polyrhythmmania.screen.play
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
+import paintbox.binding.BooleanVar
 import paintbox.binding.VarChangedListener
 import paintbox.transition.FadeToOpaque
 import paintbox.transition.FadeToTransparent
@@ -43,6 +44,8 @@ abstract class AbstractEnginePlayScreen(
         get() = container.soundSystem ?: error("${this::javaClass.name} requires a non-null SoundSystem in the Container")
     val engine: Engine get() = container.engine
     val worldRenderer: WorldRendererWithUI get() = container.renderer
+    
+    val shouldUpdateTiming: BooleanVar = BooleanVar(true)
     
     protected var goingToResults: Boolean = false
 
@@ -86,7 +89,7 @@ abstract class AbstractEnginePlayScreen(
     override fun renderUpdate() {
         super.renderUpdate()
 
-        if (!isPaused.get() && timing is SimpleTimingProvider) {
+        if (!isPaused.get() && timing is SimpleTimingProvider && shouldUpdateTiming.get()) {
             timing.seconds += Gdx.graphics.deltaTime
             gameMode?.renderUpdate()
         }

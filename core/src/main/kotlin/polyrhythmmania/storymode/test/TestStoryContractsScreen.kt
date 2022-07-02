@@ -340,6 +340,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                                 this.onEntryEnd = {
                                                     gameMode.prepareFirstTime()
                                                     playScreen.resetAndUnpause()
+                                                    playScreen.initializeIntroCard()
                                                 }
                                             }
                                         }
