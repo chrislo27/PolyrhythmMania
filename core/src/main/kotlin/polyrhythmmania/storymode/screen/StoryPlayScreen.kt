@@ -169,8 +169,8 @@ class StoryPlayScreen(
         }
         
         // Black bars: Full is 16:9 = 1.778, cinema is 2.35:1 = 2.35. About 25% less height
-        val slantAmount = 1.5f
-        val barHeight = 0.125f * 1.5f
+        val slantAmount = 1f
+        val barHeight = 0.125f * 1.25f
         introCardSceneRoot += QuadElement(Color.BLACK).apply { 
             this.bindHeightToParent(multiplier = barHeight * slantAmount)
             Anchor.TopLeft.yConfigure(this) {
@@ -179,7 +179,7 @@ class StoryPlayScreen(
             }
             
             this.bottomLeftOffsetV.set(0f)
-            this.bottomRightOffsetV.set(1 / slantAmount)
+            this.bottomRightOffsetV.set(1f - slantAmount)
         }
         introCardSceneRoot += QuadElement(Color.BLACK).apply { 
             this.bindHeightToParent(multiplier = barHeight * slantAmount)
@@ -188,8 +188,8 @@ class StoryPlayScreen(
                 h - (blackBarsAmount.use() * h)
             }
 
-            this.topLeftOffsetV.set(1f - 1 / slantAmount)
-            this.topRightOffsetV.set(1f)
+            this.topLeftOffsetV.set(1f)
+            this.topRightOffsetV.set(slantAmount)
         }
         // Title
         introCardSceneRoot += TextLabel(contract.name.getOrCompute(), font = PRManiaGame.instance.fontGamePracticeClear).apply { 
