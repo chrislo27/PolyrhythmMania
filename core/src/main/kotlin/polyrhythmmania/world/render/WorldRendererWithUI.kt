@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
+import paintbox.PaintboxGame
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.TextAlign
@@ -33,6 +34,7 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.modifiers.LivesMode
+import polyrhythmmania.ui.ExplosionFX
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
@@ -67,8 +69,6 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         update()
     }
     var renderUI: BooleanVar = BooleanVar(true)
-    
-    private var hudRedFlash: Float = 0f
 
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val baseMarkup: Markup = Markup(mapOf(
@@ -125,8 +125,6 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         super.onWorldReset(world)
         
         this.allInnerRenderers.forEach { it.onWorldReset(world) }
-        
-        hudRedFlash = 0f
     }
 
     fun fireSkillStar() {
@@ -150,10 +148,6 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     }
 
     private fun renderUI(batch: SpriteBatch) {
-        val engine = this.engine
-        val modifiers = engine.modifiers
-        val uiCam = this.uiCamera
-        
         skillStarRendering.renderUI(batch)
         textboxRendering.renderUI(batch)
         perfectRendering.renderUI(batch)
@@ -164,16 +158,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
         uiSceneRoot.renderAsRoot(batch)
 
-        // HUD red flash when endless mode life lost
-        if (hudRedFlash > 0f) {
-            if (modifiers.endlessScore.flashHudRedWhenLifeLost) {
-                batch.setColor(1f, 0f, 0f, hudRedFlash)
-                batch.draw(AssetRegistry.get<Texture>("hud_vignette"), 0f, 0f, uiCam.viewportWidth, uiCam.viewportHeight)
-                batch.setColor(1f, 1f, 1f, 1f)
-            }
-
-            hudRedFlash = (hudRedFlash - (Gdx.graphics.deltaTime / 0.75f)).coerceAtLeast(0f)
-        }
+        endlessModeRendering.renderRedHud(batch)
     }
 
     private fun renderSongInfoCard(batch: SpriteBatch, font: BitmapFont,
@@ -424,8 +409,14 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         val prevHighScore: IntVar = IntVar(-1)
         val dailyChallengeDate: Var<LocalDate?> = Var(null)
         val endlessModeSeed: Var<String?> = Var(null)
+        var hudRedFlash: Float = 0f
         private val currentEndlessScore: IntVar = IntVar(0)
         private val currentEndlessLives: IntVar = IntVar(0)
+        private val worldResetFlag: BooleanVar = BooleanVar(false)
+        private val currentMaxLives: ReadOnlyIntVar = IntVar {
+            worldResetFlag.use()    
+            this@WorldRendererWithUI.engine.modifiers.endlessScore.maxLives.use()
+        }
 
         private val endlessModeScorePane: Pane
         private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
@@ -439,9 +430,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         init {
             endlessModeScorePane = Pane().apply {
                 this.visible.bind { showEndlessModeScore.use() }
-                Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
+                Anchor.TopLeft.configure(this, offsetX = 0f, offsetY = 32f)
 //            this.bounds.width.set(400f)
-                this.bindWidthToParent(adjust = -64f)
+                this.bindWidthToParent(adjust = -64f, multiplier = 0.5f)
                 this.bounds.height.set(200f)
 
                 val vbox = VBox().apply {
@@ -462,6 +453,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                         endlessModeHighScoreLabel = TextLabel(binding = { prevTextVar.use() },
                                 font = PRManiaGame.instance.fontGameUIText).apply {
                             this.bindWidthToParent(multiplier = 0.4f)
+                            this.margin.set(Insets(0f, 0f, 32f, 0f))
                             this.doXCompression.set(false)
                             this.renderAlign.set(Align.topLeft)
                             val defaultTextColor = Color().grey(229f / 255f)
@@ -481,6 +473,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                     endlessModeScoreLabel = TextLabel(binding = { currentScoreVar.use() },
                             font = PRManiaGame.instance.fontPauseMenuTitle).apply {
                         this.bounds.height.set(100f)
+                        this.margin.set(Insets(0f, 0f, 32f, 0f))
                         this.renderAlign.set(Align.topLeft)
                         this.textColor.set(Color(1f, 1f, 1f, 1f))
                         val scaleMul = 1f / 1.25f
@@ -489,18 +482,112 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                     }
                     this += endlessModeScoreLabel
 
-                    val endlessModeLivesLabel = TextLabel(binding = {
-                        val l = currentEndlessLives.use()
-                        /* space at start is necessary -> */ " [font=prmania_icons scale=6 offsety=-0.125]${"R".repeat(l)}[]"
-                    }).apply {
-                        this.bounds.height.set(40f)
-                        Anchor.TopRight.configure(this)
-                        this.markup.set(baseMarkup)
-                        this.renderAlign.set(Align.left)
-                        this.textColor.set(Color(1f, 1f, 1f, 1f))
-                        this.setScaleXY(0.333f)
+                    this += HBox().apply { 
+                        this.bounds.height.set(44f)
+                        
+                        val black = Color(0f, 0f, 0f, 0.5f)
+                        val texture = AssetRegistry.get<Texture>("endless_lives_ui")
+                        val texregLife = TextureRegion(texture, 0, 0, texture.width, texture.width)
+                        val texregSilhouette = TextureRegion(texture, 0, texture.width, texture.width, texture.width)
+                        val texregOutline = TextureRegion(texture, 0, texture.width * 2, texture.width, texture.width)
+                        
+                        val livesIconHbox = HBox().apply { 
+                            this.autoSizeToChildren.set(true)
+                            this.autoSizeMinimumSize.set(10f)
+                            this.spacing.set(0f)
+                        }
+                        
+                        class LifeIcon(val lifeNum: Int) : Pane() {
+                            
+                            val mainIcon: ImageIcon = ImageIcon(texregLife)
+                            val outlineIcon: ImageIcon = ImageIcon(texregOutline)
+                            val silhouetteIcon: ImageIcon = ImageIcon(texregSilhouette)
+                            val explosionFX: ExplosionFX = ExplosionFX(ExplosionFX.TilesetStyle.GBA, ExplosionFX.EndBehaviour.DO_NOTHING)
+                            
+                            private val currentLives: ReadOnlyIntVar = IntVar(eager = true) { 
+                                this@EndlessModeRendering.currentEndlessLives.use()
+                            }
+                            private val silhouetteTime: FloatVar = FloatVar(0f)
+                            
+                            private var alreadyExploded: Boolean = false //currentLives.get() < lifeNum
+                            
+                            
+                            init {
+                                this += mainIcon.apply {
+                                    this.visible.bind { currentEndlessLives.use() >= lifeNum }
+                                }
+                                this += outlineIcon.apply { 
+                                    this.visible.bind { currentEndlessLives.use() < lifeNum }
+                                    this.tint.set(Color().grey(0.9f, a = 0.5f))
+                                }
+                                this += silhouetteIcon.apply {
+                                    this.tint.sideEffecting(Color(1f, 1f, 1f, 0f)) { c ->
+                                        c.a = Interpolation.pow5.apply(0f, 1f, silhouetteTime.use())
+                                        c
+                                    } 
+                                    this.scale.bind { 
+                                        Interpolation.pow5In.apply(1f, 2f, silhouetteTime.use())
+                                    }
+                                }
+                                this += explosionFX.apply { 
+                                    this.animationDuration = 0f
+                                    this.margin.set(Insets(0f, 8f, 4f, 0f))
+                                    this.scale.set(1.25f)
+                                }
+                                
+                                currentLives.addListener { 
+                                    val l = it.getOrCompute()
+                                    if (l < lifeNum) {
+                                        if (!alreadyExploded) {
+                                            alreadyExploded = true
+                                            explosionFX.reset()
+                                            sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(silhouetteTime)
+                                        }
+                                    } else if (l >= lifeNum) {
+                                        if (alreadyExploded) {
+                                            alreadyExploded = false
+                                            sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, 1f, 1f, 0f), silhouetteTime)
+                                            explosionFX.animationDuration = 0f
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        fun reloadLivesIcons() {
+                            livesIconHbox.temporarilyDisableLayouts { 
+                                livesIconHbox.removeAllChildren()
+                                
+                                val newMaxLives = currentMaxLives.get()
+                                for (i in 1..newMaxLives) {
+                                    livesIconHbox += LifeIcon(i).apply { 
+                                        this.bounds.width.set(44f)
+                                    }
+                                }
+                            }
+                        }
+                        currentMaxLives.addListener {
+                            reloadLivesIcons()
+                        }
+                        reloadLivesIcons()
+                        
+                        val bg = RectElement(black).apply { 
+                            this.bounds.width.eagerBind { livesIconHbox.bounds.width.use() }
+                            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_triangle_equilateral"))).apply {
+                                this.bindWidthToSelfHeight()
+                                this.tint.set(black)
+                                this.rotation.set(-90f)
+                                this.bindXToParentWidth()
+                            }
+                        }
+                        bg += livesIconHbox
+                        
+                        this.temporarilyDisableLayouts { 
+                            this += RectElement(black).apply { 
+                                this.bounds.width.set(32f)
+                            }
+                            this += bg
+                        }
                     }
-                    this += endlessModeLivesLabel
 
                 }
                 this += vbox
@@ -521,6 +608,12 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                 this.renderAlign.set(Align.center)
             }
             endlessModeGameOverPane += endlessModeGameOverLabel
+        }
+
+        override fun onWorldReset(world: World) {
+            super.onWorldReset(world)
+            hudRedFlash = 0f
+            worldResetFlag.invert()
         }
 
         override fun renderUI(batch: SpriteBatch) {
@@ -548,6 +641,20 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                     }
                 }
                 endlessModeHighScoreLabel.visible.set(!endlessScore.hideHighScoreText)
+            }
+        }
+        
+        fun renderRedHud(batch: SpriteBatch) {
+            val uiCam = this@WorldRendererWithUI.uiCamera
+            val modifiers = this@WorldRendererWithUI.engine.modifiers
+            if (hudRedFlash > 0f) {
+                if (modifiers.endlessScore.flashHudRedWhenLifeLost) {
+                    batch.setColor(1f, 0f, 0f, hudRedFlash)
+                    batch.draw(AssetRegistry.get<Texture>("hud_vignette"), 0f, 0f, uiCam.viewportWidth, uiCam.viewportHeight)
+                    batch.setColor(1f, 1f, 1f, 1f)
+                }
+
+                endlessModeRendering.hudRedFlash = (hudRedFlash - (Gdx.graphics.deltaTime / 0.75f)).coerceAtLeast(0f)
             }
         }
     }

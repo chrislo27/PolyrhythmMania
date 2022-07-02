@@ -16,6 +16,7 @@ class TilesetAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("gba_spritesheet", "textures/world/gba_spritesheet.png")
         AssetRegistry.loadAsset<Texture>("green_grid", "textures/world/green_grid.png", linearTexture())
         
+        AssetRegistry.loadAsset<Texture>("endless_lives_ui", "textures/world/ui/endless_lives.png")
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "heart",
                 "skill_star",

@@ -2,6 +2,7 @@ package polyrhythmmania.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import paintbox.binding.FloatVar
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.UIElement
@@ -19,7 +20,8 @@ class ExplosionFX(val style: TilesetStyle, val onFinish: EndBehaviour) : UIEleme
         DELETE, DO_NOTHING, LOOP
     }
     
-    var speed: Float = 1f
+    val speed: FloatVar = FloatVar(1f)
+    val scale: FloatVar = FloatVar(1f)
     var animationDuration: Float = 1f
     
     private var deleted: Boolean = false
@@ -43,15 +45,16 @@ class ExplosionFX(val style: TilesetStyle, val onFinish: EndBehaviour) : UIEleme
             val texReg = packedSheet.getIndexedRegions("explosion").getValue(state.index)
             
             val aspectRatio = min(w / biggestTexReg.regionWidth, h / biggestTexReg.regionHeight)
-            val rw: Float = texReg.regionWidth * aspectRatio
-            val rh: Float = texReg.regionHeight * aspectRatio
+            val scale = this.scale.get()
+            val rw: Float = texReg.regionWidth * aspectRatio * scale
+            val rh: Float = texReg.regionHeight * aspectRatio * scale
             val rx: Float = w / 2 - (rw / 2)
-            val ry: Float = 0f // Bottom aligned
+            val ry: Float = h / 2 - (biggestTexReg.regionHeight * aspectRatio * scale / 2) //0f // Bottom aligned
 
-            batch.draw(texReg, x + rx, y + ry - h, rw, rh)
+            batch.draw(texReg, x + rx, y - h + ry, rw, rh)
         }
 
-        animationDuration = (animationDuration - (Gdx.graphics.deltaTime * speed / (EntityExplosion.EXPLOSION_DURATION))).coerceAtLeast(0f)
+        animationDuration = (animationDuration - (Gdx.graphics.deltaTime * speed.get() / (EntityExplosion.EXPLOSION_DURATION))).coerceAtLeast(0f)
         if (animationDuration <= 0f) {
             when (onFinish) {
                 EndBehaviour.DELETE -> {
@@ -66,5 +69,9 @@ class ExplosionFX(val style: TilesetStyle, val onFinish: EndBehaviour) : UIEleme
                 }
             }
         }
+    }
+    
+    fun reset() {
+        animationDuration = 1f
     }
 }
