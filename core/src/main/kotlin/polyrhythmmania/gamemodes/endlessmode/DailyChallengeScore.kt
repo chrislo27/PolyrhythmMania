@@ -35,6 +35,8 @@ typealias DailyLeaderboard = Map<LocalDate, List<DailyLeaderboardScore>>
 
 object DailyChallengeUtils {
     
+    const val MIN_SCORE_TO_UNLOCK: Int = 10
+    
     val allowedNameChars: Set<Char> = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_".toSet()
 
     fun sendNonceRequestSync(date: LocalDate): UUID? {

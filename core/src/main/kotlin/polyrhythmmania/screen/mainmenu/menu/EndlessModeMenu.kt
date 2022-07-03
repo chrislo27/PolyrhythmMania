@@ -31,6 +31,7 @@ import polyrhythmmania.screen.play.regular.EnginePlayScreenBase
 import polyrhythmmania.screen.play.regular.ResultsBehaviour
 import polyrhythmmania.gamemodes.EndlessModeScore
 import polyrhythmmania.gamemodes.GameMode
+import polyrhythmmania.gamemodes.endlessmode.DailyChallengeUtils
 import polyrhythmmania.gamemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.statistics.GlobalStats
@@ -100,10 +101,10 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             }
                             val seedUInt = seed.toUInt()
                             val endlessHighScore = main.settings.endlessHighScore
-                            val scoreVar = IntVar(endlessHighScore.getOrCompute().score)
-                            scoreVar.addListener {
-                                main.settings.endlessHighScore.set(EndlessHighScore(seedUInt, it.getOrCompute()))
-                            }
+                            val oldScoreValue = endlessHighScore.getOrCompute().score
+                            val wasDailyChallengeUnlocked = oldScoreValue >= DailyChallengeUtils.MIN_SCORE_TO_UNLOCK
+                            val scoreVar = IntVar(oldScoreValue)
+                            
                             val sidemode: GameMode = EndlessPolyrhythm(main, PlayTimeType.ENDLESS,
                                     EndlessModeScore(scoreVar, showNewHighScoreAtEnd = true),
                                     seed, dailyChallenge = null,
@@ -114,6 +115,15 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     challenges = Challenges.NO_CHANGES,
                                     inputCalibration = main.settings.inputCalibration.getOrCompute(),
                                     resultsBehaviour = ResultsBehaviour.NoResults)
+                            
+                            scoreVar.addListener {
+                                val newScore = it.getOrCompute()
+                                main.settings.endlessHighScore.set(EndlessHighScore(seedUInt, newScore))
+                                if (!wasDailyChallengeUnlocked && newScore >= DailyChallengeUtils.MIN_SCORE_TO_UNLOCK) {
+                                    playScreen.goToDailyChallengeUnlockedMenu = true
+                                }
+                            }
+                            
                             main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
                                 this.onEntryEnd = {
                                     sidemode.prepareFirstTime()

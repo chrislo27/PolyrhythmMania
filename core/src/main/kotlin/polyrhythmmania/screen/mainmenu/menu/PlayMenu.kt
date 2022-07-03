@@ -8,6 +8,7 @@ import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
+import paintbox.ui.Tooltip
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
@@ -16,6 +17,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.gamemodes.endlessmode.DailyChallengeUtils
 import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.ui.PRManiaSkins
 import java.time.format.DateTimeFormatter
@@ -129,6 +131,13 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += createLongButtonWithIcon(AssetRegistry.get<PackedSheet>("achievements_icon")["daily_calendar"]) { 
                 dailyChallengeTitle.use()
             }.apply {
+                val minScore = DailyChallengeUtils.MIN_SCORE_TO_UNLOCK
+                this.disabled.bind { main.settings.endlessHighScore.use().score < minScore }
+                val ttip: Tooltip = createTooltip { 
+                    Localization.getVar("mainMenu.play.endless.daily.requirementTooltip", listOf(minScore)).use()
+                }
+                this.tooltipElement.bind { if (apparentDisabledState.use()) ttip else null }
+                
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.dailyChallengeMenu.prepareShow())
                 }

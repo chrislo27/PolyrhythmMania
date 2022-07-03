@@ -18,6 +18,7 @@ import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.library.score.LevelScoreAttempt
+import polyrhythmmania.screen.mainmenu.menu.DailyChallengeUnlockedMsgMenu
 import polyrhythmmania.screen.mainmenu.menu.SubmitDailyChallengeScoreMenu
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
 import polyrhythmmania.screen.play.pause.PauseMenuHandler
@@ -50,6 +51,8 @@ class EnginePlayScreenBase(
     private var endlessPrPauseTime: Float = 0f // Used for an endless achievement for pausing in between patterns
     
     private var disableCatchingCursorOnHide: Boolean = false
+    
+    var goToDailyChallengeUnlockedMenu: Boolean = false
     
     init {
         val endlessScore = engine.modifiers.endlessScore
@@ -156,14 +159,22 @@ class EnginePlayScreenBase(
             }
             else -> {
                 val sideMode = this.gameMode
-                if (sideMode is EndlessPolyrhythm && sideMode.dailyChallenge != null) {
+                if (sideMode is EndlessPolyrhythm) {
                     val menuCol = main.mainMenuScreen.menuCollection
-                    val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
-                    val nonce = sideMode.dailyChallengeUUIDNonce.getOrCompute()
-                    if (score.score > 0 && !engine.autoInputs) {
-                        val submitMenu = SubmitDailyChallengeScoreMenu(menuCol, sideMode.dailyChallenge, nonce, score)
-                        menuCol.addMenu(submitMenu)
-                        menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
+                    if (sideMode.dailyChallenge != null) {
+                        val score: DailyChallengeScore = main.settings.endlessDailyChallenge.getOrCompute()
+                        val nonce = sideMode.dailyChallengeUUIDNonce.getOrCompute()
+                        if (score.score > 0 && !engine.autoInputs) {
+                            val submitMenu = SubmitDailyChallengeScoreMenu(menuCol, sideMode.dailyChallenge, nonce, score)
+                            menuCol.addMenu(submitMenu)
+                            menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
+                        }
+                    } else {
+                        if (goToDailyChallengeUnlockedMenu) {
+                            val submitMenu = DailyChallengeUnlockedMsgMenu(menuCol)
+                            menuCol.addMenu(submitMenu)
+                            menuCol.pushNextMenu(submitMenu, instant = true, playSound = false)
+                        }
                     }
 
                     quitToScreen()
