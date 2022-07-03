@@ -15,7 +15,7 @@ class PatternBlockData(val rowCount: Int, val allowedCubeTypes: List<CubeType>, 
     companion object {
         val GENERAL_CUBE_TYPES: List<CubeType> = listOf(CubeType.NONE, CubeType.PISTON, CubeType.PLATFORM)
         val SELECTIVE_SPAWN_CUBE_TYPES: List<CubeType> = listOf(CubeType.NO_CHANGE, CubeType.NONE, CubeType.PISTON,
-                CubeType.PLATFORM, CubeType.PISTON_OPEN)
+                CubeType.PLATFORM, CubeType.PISTON_OPEN, CubeType.RETRACT_PISTON)
         
         fun readFromJson(obj: JsonObject, allowedCubeTypes: List<CubeType>, objName: String = "patternData"): PatternBlockData? {
             val patternDataObj = obj.get(objName)

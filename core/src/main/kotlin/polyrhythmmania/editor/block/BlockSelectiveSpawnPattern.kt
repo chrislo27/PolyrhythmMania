@@ -53,7 +53,7 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
         rowArray.forEachIndexed { index, type ->
             val affectThisIndexAndForward = shouldLastAffectAll && index == rowArray.size - 1
             when (type) {
-                CubeType.NO_CHANGE -> { /* Do nothing */}
+                CubeType.NO_CHANGE -> { /* Do nothing */ }
                 CubeType.NONE -> {
                     events += EventRowBlockDespawn(engine, row, index + indexOffset, beat, affectThisIndexAndForward = affectThisIndexAndForward)
                 }
@@ -63,6 +63,9 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
                 }
                 CubeType.PLATFORM -> {
                     events += EventRowBlockSpawn(engine, row, index + indexOffset, EntityPiston.Type.PLATFORM, beat, affectThisIndexAndForward = affectThisIndexAndForward)
+                }
+                CubeType.RETRACT_PISTON -> {
+                    events += EventRowBlockRetract(engine, row, index + indexOffset, beat, affectThisIndexAndForward = affectThisIndexAndForward)
                 }
             }
         }

@@ -161,6 +161,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
                     CubeType.PLATFORM -> palette.blockFlatPlatformRegion
                     CubeType.PISTON -> if (isA) palette.blockFlatPistonARegion else palette.blockFlatPistonDpadRegion
                     CubeType.PISTON_OPEN -> if (isA) palette.blockFlatPistonAOpenRegion else palette.blockFlatPistonDpadOpenRegion
+                    CubeType.RETRACT_PISTON -> palette.blockFlatRetractRegion
                 }
             }
             addChild(image)

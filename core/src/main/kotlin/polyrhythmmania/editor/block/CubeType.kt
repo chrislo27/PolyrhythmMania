@@ -9,6 +9,7 @@ enum class CubeType(val jsonId: Int, val character: Char, val localizationNameKe
     
     NO_CHANGE(3, '_', "blockContextMenu.spawnPattern.cubeType.noChange"),
     PISTON_OPEN(4, 'O', "blockContextMenu.spawnPattern.cubeType.pistonOpen"),
+    RETRACT_PISTON(5, 'R', "blockContextMenu.spawnPattern.cubeType.retractPiston"),
     ;
 
     companion object {

@@ -119,5 +119,6 @@ open class Palette(val main: PRManiaGame) {
     val blockFlatPistonAOpenRegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 1, 16 * 2, 16, 16) }
     val blockFlatPistonDpadOpenRegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 2, 16 * 2, 16, 16) }
     val blockFlatNoChangeRegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 3, 16 * 2, 16, 16) }
+    val blockFlatRetractRegion: TextureRegion by lazy { TextureRegion(blockFlatTexture, 16 * 0, 16 * 3, 16, 16) }
     
 }
