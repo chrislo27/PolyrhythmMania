@@ -10,26 +10,9 @@ import java.util.*
 object StoryCredits : CreditsBase() {
     
     override val credits: Map<ReadOnlyVar<String>, List<ReadOnlyVar<String>>> = linkedMapOf(
-            Localization.getVar("credits.programming") to listOf("chrislo27").toVars(),
-            Localization.getVar("credits.graphicDesign") to abcSorted(
-                    ""
+            Localization.getVar("credits.story.levelCreators") to abcSorted(
+                    "Dream Top", "Kievit", "J-D"
             ).toVars(),
-            Localization.getVar("credits.music") to listOf(
-                    Var("GENERIC"), Localization.getVar("credits.rhSoundtrack")
-            ),
-            Localization.getVar("credits.qa") to abcSorted(
-                    ""
-            ).toVars() + listOf(
-                    Localization.getVar("credits.tourneycord"),
-            ),
-            Localization.getVar("credits.specialThanks") to abcSorted(
-                    "", // TODO possibly drop special thanks in favour of more detailed roles for SM
-            ).toVars() + listOf(Localization.getVar("credits.projectDonators")) + listOf(
-                    "Caveat",
-                    "Covered By Your Grace",
-                    "Roboto Mono",
-                    "Roboto Slab",
-            ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
     
 }
