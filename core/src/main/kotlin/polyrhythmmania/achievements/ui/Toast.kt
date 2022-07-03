@@ -94,9 +94,4 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
         this.nameLabel.text.set(achievement.getLocalizedName().getOrCompute())
         this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")[achievement.getIconID()]))
     }
-
-    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
-        super.renderSelfAfterChildren(originX, originY, batch)
-        1 + 1
-    }
 }
