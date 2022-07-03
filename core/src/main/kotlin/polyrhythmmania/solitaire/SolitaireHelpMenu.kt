@@ -15,9 +15,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.gdxutils.grey
-import paintbox.util.gdxutils.set
 import polyrhythmmania.Localization
-import polyrhythmmania.Settings
 import polyrhythmmania.screen.mainmenu.menu.MMMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
@@ -36,7 +34,7 @@ class SolitaireHelpMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val hbox = HBox().apply {
             Anchor.BottomLeft.configure(this)
             this.spacing.set(8f)
-            this.padding.set(Insets(2f))
+            this.padding.set(Insets(4f, 0f, 2f, 2f))
             this.bounds.height.set(40f)
         }
         contentPane.addChild(hbox)

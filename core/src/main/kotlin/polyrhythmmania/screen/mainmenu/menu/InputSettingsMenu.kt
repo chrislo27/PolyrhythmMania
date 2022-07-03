@@ -128,7 +128,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             val hboxButtons = HBox().apply {
                 this.spacing.set(8f)
-                this.padding.set(Insets(2f))
+                this.padding.set(Insets(4f, 0f, 2f, 2f))
                 this.visible.bind {
                     pendingKeyboardBinding.use() == null
                 }
