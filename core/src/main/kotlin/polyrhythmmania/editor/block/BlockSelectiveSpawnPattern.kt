@@ -1,6 +1,8 @@
 package polyrhythmmania.editor.block
 
 import com.eclipsesource.json.JsonObject
+import paintbox.binding.BooleanVar
+import paintbox.ui.contextmenu.CheckBoxMenuItem
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
@@ -26,6 +28,7 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
         private set
     var tailEndData: PatternBlockData = PatternBlockData(2, ALLOWED_TAIL_END_TYPES, CubeType.NO_CHANGE)
         private set
+    val isSilent: BooleanVar = BooleanVar(false)
 
     init {
         this.width = 0.5f
@@ -37,17 +40,18 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
         val events = mutableListOf<Event>()
 
         val world = engine.world
-        events += compileRow(b, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A, 0, false)
-        events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD, 0, false)
+        val silent = this.isSilent.get()
+        events += compileRow(b, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A, 0, false, silent)
+        events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD, 0, false, silent)
         
-        events += compileRow(b, tailEndData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A, ROW_COUNT, true)
-        events += compileRow(b, tailEndData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD, ROW_COUNT, true)
+        events += compileRow(b, tailEndData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A, ROW_COUNT, true, silent)
+        events += compileRow(b, tailEndData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD, ROW_COUNT, true, silent)
 
         return events
     }
 
     private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityPiston.Type,
-                           indexOffset: Int, shouldLastAffectAll: Boolean): List<Event> {
+                           indexOffset: Int, shouldLastAffectAll: Boolean, silent: Boolean): List<Event> {
         val events = mutableListOf<Event>()
         
         rowArray.forEachIndexed { index, type ->
@@ -55,17 +59,25 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
             when (type) {
                 CubeType.NO_CHANGE -> { /* Do nothing */ }
                 CubeType.NONE -> {
-                    events += EventRowBlockDespawn(engine, row, index + indexOffset, beat, affectThisIndexAndForward = affectThisIndexAndForward)
+                    events += EventRowBlockDespawn(engine, row, index + indexOffset, beat, affectThisIndexAndForward = affectThisIndexAndForward).apply { 
+                        this.silent = silent
+                    }
                 }
                 CubeType.PISTON, CubeType.PISTON_OPEN -> {
                     events += EventRowBlockSpawn(engine, row, index + indexOffset, pistonType, beat,
-                            startPistonExtended = type == CubeType.PISTON_OPEN, affectThisIndexAndForward = affectThisIndexAndForward)
+                            startPistonExtended = type == CubeType.PISTON_OPEN, affectThisIndexAndForward = affectThisIndexAndForward).apply {
+                        this.silent = silent
+                    }
                 }
                 CubeType.PLATFORM -> {
-                    events += EventRowBlockSpawn(engine, row, index + indexOffset, EntityPiston.Type.PLATFORM, beat, affectThisIndexAndForward = affectThisIndexAndForward)
+                    events += EventRowBlockSpawn(engine, row, index + indexOffset, EntityPiston.Type.PLATFORM, beat, affectThisIndexAndForward = affectThisIndexAndForward).apply {
+                        this.silent = silent
+                    }
                 }
                 CubeType.RETRACT_PISTON -> {
-                    events += EventRowBlockRetract(engine, row, index + indexOffset, beat, affectThisIndexAndForward = affectThisIndexAndForward)
+                    events += EventRowBlockRetract(engine, row, index + indexOffset, beat, affectThisIndexAndForward = affectThisIndexAndForward).apply {
+                        this.silent = silent
+                    }
                 }
             }
         }
@@ -81,6 +93,10 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
             ctxmenu.addMenuItem(SeparatorMenuItem())
             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.selectiveSpawn.tailEnd"), editor.editorPane.palette.markup))
             tailEndData.createMenuItems(editor, CubeType.NO_CHANGE, ROW_COUNT / 2).forEach { ctxmenu.addMenuItem(it) }
+            ctxmenu.addMenuItem(SeparatorMenuItem())
+            ctxmenu.addMenuItem(CheckBoxMenuItem.create(isSilent,
+                    Localization.getValue("blockContextMenu.selectiveSpawn.silent"),
+                    editor.editorPane.palette.markup))
         }
     }
 
@@ -95,6 +111,7 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
                 it.tailEndData.rowATypes[i] = this.tailEndData.rowATypes[i]
                 it.tailEndData.rowDpadTypes[i] = this.tailEndData.rowDpadTypes[i]
             }
+            it.isSilent.set(this.isSilent.get())
         }
     }
 
@@ -102,12 +119,16 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
         super.writeToJson(obj)
         patternData.writeToJson(obj)
         tailEndData.writeToJson(obj, "tailEndData")
+        if (isSilent.get()) {
+            obj.add("silentMode", true)
+        }
     }
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
         this.patternData = PatternBlockData.readFromJson(obj, ALLOWED_CUBE_TYPES) ?: this.patternData
-        this.tailEndData = PatternBlockData.readFromJson(obj, ALLOWED_TAIL_END_TYPES, "tailEndData") ?: this.tailEndData 
+        this.tailEndData = PatternBlockData.readFromJson(obj, ALLOWED_TAIL_END_TYPES, "tailEndData") ?: this.tailEndData
+        this.isSilent.set(obj.getBoolean("silentMode", false))
         
         // Legacy system loading
         val overwriteA = obj.get("overwriteA")?.takeIf { it.isBoolean }?.asBoolean() ?: true

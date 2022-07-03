@@ -19,6 +19,8 @@ import kotlin.math.min
 abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, startBeat: Float,
                              val affectThisIndexAndForward: Boolean)
     : AudioEvent(engine) {
+    
+    var silent: Boolean = false
 
     init {
         this.beat = startBeat
@@ -102,7 +104,7 @@ class EventRowBlockSpawn(
     }
 
     override fun onAudioStart(atBeat: Float, actualBeat: Float) {
-        if (min(actualBeat, atBeat) < this.beat + this.width) {
+        if (!this.silent && min(actualBeat, atBeat) < this.beat + this.width) {
             when (val t = this.type) {
                 EntityPiston.Type.PLATFORM -> {
                 }
@@ -140,7 +142,7 @@ class EventRowBlockDespawn(engine: Engine, row: Row, index: Int, startBeat: Floa
     }
 
     override fun onAudioStart(atBeat: Float, actualBeat: Float) {
-        if (min(actualBeat, atBeat) < this.beat + this.width) {
+        if (!silent && min(actualBeat, atBeat) < this.beat + this.width) {
             if (row.rowBlocks.any { it.active } || shouldPlaySound) {
                 engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_despawn"), SoundInterface.SFXType.NORMAL)
             }
@@ -166,7 +168,7 @@ class EventRowBlockRetract(engine: Engine, row: Row, index: Int, startBeat: Floa
     }
 
     override fun onAudioStart(atBeat: Float, actualBeat: Float) {
-        if (min(actualBeat, atBeat) < this.beat + 0.125f) {
+        if (!silent && min(actualBeat, atBeat) < this.beat + 0.125f) {
             if (row.rowBlocks.any { it.pistonState != EntityPiston.PistonState.RETRACTED } || shouldPlaySound) {
                 engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_retract"), SoundInterface.SFXType.NORMAL)
             }
