@@ -54,7 +54,10 @@ class ExplosionFX(val style: TilesetStyle, val onFinish: EndBehaviour) : UIEleme
             batch.draw(texReg, x + rx, y - h + ry, rw, rh)
         }
 
-        animationDuration = (animationDuration - (Gdx.graphics.deltaTime * speed.get() / (EntityExplosion.EXPLOSION_DURATION))).coerceAtLeast(0f)
+        val currentSpeed = speed.get()
+        if (currentSpeed > 0f) {
+            animationDuration = (animationDuration - (Gdx.graphics.deltaTime * currentSpeed / (EntityExplosion.EXPLOSION_DURATION))).coerceAtLeast(0f)
+        }
         if (animationDuration <= 0f) {
             when (onFinish) {
                 EndBehaviour.DELETE -> {
