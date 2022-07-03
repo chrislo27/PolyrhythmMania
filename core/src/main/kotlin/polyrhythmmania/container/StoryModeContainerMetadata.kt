@@ -2,10 +2,12 @@ package polyrhythmmania.container
 
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
+import polyrhythmmania.engine.input.InputTimingRestriction
 
 
 data class StoryModeContainerMetadata(
         val lives: Int,
+        val inputTimingRestriction: InputTimingRestriction,
 ) {
     
     companion object {
@@ -13,12 +15,16 @@ data class StoryModeContainerMetadata(
         
         val BLANK: StoryModeContainerMetadata = StoryModeContainerMetadata(
                 lives = 0,
+                inputTimingRestriction = InputTimingRestriction.NORMAL,
         )
         
         fun fromJson(obj: JsonObject): StoryModeContainerMetadata {
             val versionNumber: Int = obj.get("_version").asInt()
 
-            return StoryModeContainerMetadata(obj.getInt("lives", 0))
+            return StoryModeContainerMetadata(
+                    obj.getInt("lives", 0),
+                    InputTimingRestriction.MAP[obj.getInt("inputTimingRestriction", BLANK.inputTimingRestriction.id)] ?: BLANK.inputTimingRestriction,
+            )
         }
     }
     
@@ -27,6 +33,7 @@ data class StoryModeContainerMetadata(
             this.add("_version", METADATA_VERSION)
             
             this.add("lives", lives)
+            this.add("inputTimingRestriction", inputTimingRestriction.id)
         }
     }
     

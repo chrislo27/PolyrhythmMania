@@ -152,6 +152,8 @@ class Container(
             livesMode.enabled.set(lives > 0)
             livesMode.maxLives.set(lives)
             livesMode.resetState()
+            
+            engine.inputter.inputChallenge.restriction = metadata.inputTimingRestriction
         }
     }
     
@@ -168,8 +170,14 @@ class Container(
         val blocks = this.blocks.toList()
         engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
         
+        resetInputFeedbackEntities()
+    }
+
+    /**
+     * Refreshes the feedback entity's base color if the input timing restriction is different
+     */
+    fun resetInputFeedbackEntities() {
         world.entities.filterIsInstance<EntityInputFeedback>().forEach { ent ->
-            // Refreshes the feedback entity's base color if the input timing restriction is different
             ent.updateCurrentColor(engine)
         }
     }

@@ -21,6 +21,7 @@ import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
 import paintbox.util.DecimalFormats
 import polyrhythmmania.editor.EditorSpecialFlags
+import polyrhythmmania.engine.input.InputTimingRestriction
 import java.util.*
 
 
@@ -336,16 +337,6 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                 ctxmenu.addMenuItem(SeparatorMenuItem())
                                 ctxmenu.addMenuItem(LabelMenuItem.create("[b]Story Mode engine modifiers:[]", editorPane.palette.markup))
 
-                                val livesCombobox = ComboBox((0..10).toList(), editor.container.storyModeMetadata.getOrCompute().lives).also { combobox ->
-                                    combobox.markup.set(editor.editorPane.palette.markup)
-                                    combobox.itemStringConverter.set {
-                                        if (it == 0) "<disabled>" else "$it"
-                                    }
-                                    combobox.onItemSelected = {
-                                        val old = editor.container.storyModeMetadata.getOrCompute()
-                                        editor.container.storyModeMetadata.set(old.copy(lives = it))
-                                    }
-                                }
                                 ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
                                     hbox.spacing.set(8f)
                                     hbox.bounds.height.set(32f)
@@ -354,8 +345,36 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                         this.renderAlign.set(Align.right)
                                         this.bounds.width.set(100f)
                                     }
-                                    hbox += livesCombobox.apply {
-                                        this.bindWidthToParent(adjust = -108f)
+                                    hbox += ComboBox((0..10).toList(), editor.container.storyModeMetadata.getOrCompute().lives).also { combobox ->
+                                        combobox.markup.set(editor.editorPane.palette.markup)
+                                        combobox.itemStringConverter.set {
+                                            if (it == 0) "<disabled>" else "$it"
+                                        }
+                                        combobox.onItemSelected = {
+                                            val old = editor.container.storyModeMetadata.getOrCompute()
+                                            editor.container.storyModeMetadata.set(old.copy(lives = it))
+                                        }
+                                        
+                                        combobox.bindWidthToParent(adjust = -108f)
+                                    }
+                                }))
+                                ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
+                                    hbox.spacing.set(8f)
+                                    hbox.bounds.height.set(32f)
+                                    hbox += TextLabel("Input restriction:").apply {
+                                        this.markup.set(editor.editorPane.palette.markup)
+                                        this.renderAlign.set(Align.right)
+                                        this.bounds.width.set(200f)
+                                    }
+                                    hbox += ComboBox(InputTimingRestriction.VALUES, editor.container.storyModeMetadata.getOrCompute().inputTimingRestriction).also { combobox ->
+                                        combobox.markup.set(editor.editorPane.palette.markup)
+                                        combobox.onItemSelected = {
+                                            val old = editor.container.storyModeMetadata.getOrCompute()
+                                            editor.container.storyModeMetadata.set(old.copy(inputTimingRestriction = it))
+                                            editor.container.resetInputFeedbackEntities()
+                                        }
+                                        
+                                        combobox.bindWidthToParent(adjust = -208f)
                                     }
                                 }))
                             }
