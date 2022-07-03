@@ -24,6 +24,7 @@ import paintbox.ui.RenderAlign
 import paintbox.ui.SceneRoot
 import paintbox.ui.animation.Animation
 import paintbox.ui.animation.AnimationHandler
+import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.QuadElement
 import paintbox.ui.element.RectElement
@@ -189,6 +190,7 @@ class StoryPlayScreen(
             Anchor.CentreLeft.configure(this)
             this.bindHeightToParent(multiplier = 0.25f)
             
+            this.margin.set(Insets(0f, 0f, 10f, 10f))
             this.renderAlign.set(RenderAlign.center)
             this.textColor.set(Color.WHITE.cpy())
             

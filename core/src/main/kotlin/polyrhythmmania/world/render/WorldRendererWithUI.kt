@@ -33,9 +33,11 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.TextBoxStyle
+import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.modifiers.LivesMode
 import polyrhythmmania.ui.ExplosionFX
+import polyrhythmmania.ui.TextSlideInterp
 import polyrhythmmania.ui.TextboxPane
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
@@ -419,14 +421,19 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             this@WorldRendererWithUI.engine.modifiers.endlessScore.maxLives.use()
         }
 
+        private val endlessModeEntirePane: Pane = Pane()
         private val endlessModeScorePane: Pane
         private val endlessModeScoreLabelScaleXY: FloatVar = FloatVar(1f)
         private val endlessModeScoreLabel: TextLabel
         val endlessModeGameOverPane: Pane
         private val endlessModeGameOverLabel: TextLabel
         private val endlessModeHighScoreLabel: TextLabel
+        
+        private val textSlideTime: FloatVar = FloatVar(0f)
+        private val textSlide: TextSlideInterp = TextSlideInterp(textSlideTime)
+        private val speedUpTextLabel: TextLabel
 
-        override val uiElement: UIElement get() = endlessModeScorePane
+        override val uiElement: UIElement get() = endlessModeEntirePane
         
         init {
             endlessModeScorePane = Pane().apply {
@@ -597,6 +604,22 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                 }
                 this += vbox
             }
+            endlessModeEntirePane += endlessModeScorePane
+
+            speedUpTextLabel = TextLabel(Localization.getVar("play.endless.tempoUp"), font = PRManiaGame.instance.fontGamePracticeClear).apply {
+                Anchor.TopLeft.configure(this)
+                this.bindHeightToParent(multiplier = 0.25f)
+
+                this.margin.set(Insets(0f, 0f, 10f, 10f))
+                this.renderAlign.set(RenderAlign.center)
+                this.textColor.set(Challenges.TEMPO_UP_COLOR.cpy().add(0.1f, 0.1f, 0.1f, 0f))
+
+                this.bounds.x.bind {
+                    val parentW = parent.use()?.bounds?.width?.use() ?: 0f
+                    MathUtils.lerp(-(bounds.width.use()), parentW, textSlide.textSlideAmount.use())
+                }
+            }
+            endlessModeEntirePane += speedUpTextLabel
 
             endlessModeGameOverPane = Pane().apply {
                 this.visible.bind {
@@ -604,7 +627,6 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                 }
                 this += RectElement(Color(0f, 0f, 0f, 0.5f))
             }
-
             endlessModeGameOverLabel = TextLabel(binding = { Localization.getVar("play.endless.gameOver").use() },
                     font = PRManiaGame.instance.fontPauseMenuTitle).apply {
                 Anchor.Centre.configure(this)
@@ -619,6 +641,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             super.onWorldReset(world)
             hudRedFlash = 0f
             worldResetFlag.invert()
+            textSlideTime.set(0f)
         }
 
         override fun renderUI(batch: SpriteBatch) {
@@ -646,6 +669,10 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                     }
                 }
                 endlessModeHighScoreLabel.visible.set(!endlessScore.hideHighScoreText)
+                
+                if (textSlideTime.get() > 0f) {
+                    textSlideTime.set((textSlideTime.get() - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f))
+                }
             }
         }
         
@@ -661,6 +688,10 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
                 endlessModeRendering.hudRedFlash = (hudRedFlash - (Gdx.graphics.deltaTime / 0.75f)).coerceAtLeast(0f)
             }
+        }
+        
+        fun triggerSpeedUpText() {
+            textSlideTime.set(1f)
         }
     }
     

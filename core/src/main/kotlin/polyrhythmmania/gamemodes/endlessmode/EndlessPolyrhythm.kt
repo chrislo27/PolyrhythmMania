@@ -364,6 +364,10 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                         engine.addEvent(EventPaletteChange(engine, startBeat, 1f,
                                 createTilesetPaletteIterated(loopsCompleted.get(), colorChangeMultiplier, COLOR_CHANGE_LIMIT), false, false))
                         
+                        if (newSpeed > currentSpeedIncrease) {
+                            container.renderer.endlessModeRendering.triggerSpeedUpText()
+                        }
+                        
                         if (engine.areStatisticsEnabled && newSpeed >= maxSpeedIncrease && currentSpeedIncrease < newSpeed) {
                             Achievements.awardAchievement(Achievements.endlessReachMaxSpeed)
                         }
