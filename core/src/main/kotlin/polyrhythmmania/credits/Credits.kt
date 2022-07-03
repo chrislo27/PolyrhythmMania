@@ -9,6 +9,7 @@ import java.util.*
 object Credits : CreditsBase() {
     
     override val credits: Map<ReadOnlyVar<String>, List<ReadOnlyVar<String>>> = linkedMapOf(
+            Localization.getVar("credits.projectLead") to listOf("chrislo27").toVars(),
             Localization.getVar("credits.programming") to listOf("chrislo27", "[font=rodin](◉.◉)☂[]").toVars(),
             Localization.getVar("credits.graphicDesign") to abcSorted(
                     "garbo", "snow krow", "GENERIC", "Merch_Andise", "Kievit"
@@ -18,7 +19,7 @@ object Credits : CreditsBase() {
             ),
             Localization.getVar("credits.qa") to abcSorted(
                     "Lvl100Feraligatr", "Gosh", "GENERIC", "snow krow", "Kievit", "Chloe", "GrueKun", "Huebird",
-                    "RedCrowNose", "J-D Thunder", "garbo", "Conn",
+                    "RedCrowNose", "J-D Thunder", "garbo", "Conn", "Merch_Andise",
                     "The Eggo55",
             ).toVars() + listOf(
                     Localization.getVar("credits.tourneycord"),
@@ -45,12 +46,12 @@ object Credits : CreditsBase() {
                     "JCommander",
                     "SLF4J",
                     "zip4j",
-                    "earlygrey/shapedrawer",
+                    "shapedrawer",
                     "discord-game-sdk4j",
                     "twelvemonkeys",
                     "Pexels",
                     "world-flags-sprite",
-                    "Jam3/glsl-fast-gaussian-blur",
+                    "glsl-fast-gaussian-blur",
             ).toVars() + abcSorted(
                     "Kurokane",
                     "Leland",
