@@ -109,6 +109,14 @@ class PlayMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }.apply {
                 this.setOnAction {
                     menuCol.pushNextMenu(menuCol.endlessMenu)
+                    
+                    val newIndic = main.settings.newIndicatorEndlessModeHelp
+                    if (newIndic.value.get()) {
+                        newIndic.value.set(false)
+                        main.settings.persist()
+                        
+                        menuCol.pushNextMenu(menuCol.endlessHelpMenu, playSound = false) // No sound b/c endless menu push plays a sound
+                    }
                 }
                 val highScoreSubstitutionVar = Localization.getVar("mainMenu.play.endless.tooltip.highScore", Var {
                     val endlessScore = main.settings.endlessHighScore.use()

@@ -14,6 +14,7 @@ object PreferenceKeys {
     val NEW_INDICATOR_EXTRAS_ASM = "newIndicator_extras_assemble"
     val NEW_INDICATOR_EXTRAS_SOLITAIRE = "newIndicator_extras_solitaire"
     val NEW_INDICATOR_STORY_MODE = "newIndicator_storyMode"
+    val NEW_INDICATOR_ENDLESS_MODE_HELP = "newIndicator_endlessMode_help"
     
     val FILE_CHOOSER_EDITOR_MUSIC = "fileChooser_editor_music"
     val FILE_CHOOSER_EDITOR_SAVE = "fileChooser_editor_save"

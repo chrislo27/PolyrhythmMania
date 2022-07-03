@@ -119,6 +119,7 @@ class InitialAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("country_flags", "textures/flag_icon/flags32.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("library_default_banner", "textures/mainmenu/default_banner.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("achievements_completed_mark", "textures/achievements/completed.png", linearTexture())
+        (0..3).forEach { AssetRegistry.loadAsset<Texture>("endless_mode_help_$it", "textures/ui/endless_help/help_$it.png", linearTexture()) }
         AssetRegistry.loadAsset("solitaire_tableau", "textures/solitaire/tableau.png", linearTexture())
         AssetRegistry.loadAssetNoFile<PackedSheet>("achievements_icon", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("compact_mode", "textures/achievements/compact_mode.png"),

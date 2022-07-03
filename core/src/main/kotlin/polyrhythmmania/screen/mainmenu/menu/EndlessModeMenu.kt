@@ -251,6 +251,12 @@ class EndlessModeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     menuCol.popLastMenu()
                 }
             }
+            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.endlessModeHelp.button").use() }).apply {
+                this.bounds.width.set(160f)
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.endlessHelpMenu, instant = true)
+                }
+            }
         }
     }
     

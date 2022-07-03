@@ -29,6 +29,7 @@ import polyrhythmmania.PreferenceKeys.LAST_VERSION
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_EXPORTING
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_PRMPROJ
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_TEXPACK
+import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_ENDLESS_MODE_HELP
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_ASM
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_SOLITAIRE
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_LIBRARY
@@ -207,9 +208,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     val newIndicatorExtrasAssemble: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_ASM, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorExtrasSolitaire: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_SOLITAIRE, Version(1, 2, 0), newEvenIfFirstPlay = false)
     val newIndicatorStoryMode: NewIndicator = NewIndicator(NEW_INDICATOR_STORY_MODE, Version(2, 0, 0), newEvenIfFirstPlay = true)
+    val newIndicatorEndlessModeHelp: NewIndicator = NewIndicator(NEW_INDICATOR_ENDLESS_MODE_HELP, Version(2, 0, 0), newEvenIfFirstPlay = true)
     val allNewIndicators: List<NewIndicator> = listOf(newIndicatorLibrary, newIndicatorEditorHelpTexpack,
             newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorExtrasAssemble,
-            newIndicatorExtrasSolitaire, newIndicatorStoryMode)
+            newIndicatorExtrasSolitaire, newIndicatorStoryMode, newIndicatorEndlessModeHelp)
 
     @Suppress("UNCHECKED_CAST")
     fun load() {
