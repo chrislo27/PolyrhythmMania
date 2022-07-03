@@ -46,6 +46,7 @@ import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Contract
+import polyrhythmmania.ui.TextSlideInterp
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -90,7 +91,7 @@ class StoryPlayScreen(
     private val inIntroCard: ReadOnlyBooleanVar = BooleanVar { introCardTime.use() > 0f }
     private val blurStrength: FloatVar
     private val blackBarsAmount: FloatVar
-    private val textSlideAmount: FloatVar
+    private val textSlide: TextSlideInterp
     
     init {
         val optionList = mutableListOf<PauseOption>()
@@ -157,16 +158,7 @@ class StoryPlayScreen(
                 else -> 1f
             }
         }
-        val textSlideInterpFrontHalf: Interpolation = ExpOut(2f, 5f) 
-        val textSlideInterpBackHalf: Interpolation = ExpIn(2f, 5f) 
-        textSlideAmount = FloatVar {
-            val timeIncreasing = 1f - introCardTime.use()
-            if (timeIncreasing < 0.5f) {
-                textSlideInterpFrontHalf.apply(timeIncreasing / 0.5f) * 0.5f
-            } else {
-                0.5f + textSlideInterpBackHalf.apply((timeIncreasing - 0.5f) / 0.5f) * 0.5f
-            }
-        }
+        textSlide = TextSlideInterp(introCardTime)
         
         // Black bars: Full is 16:9 = 1.778, cinema is 2.35:1 = 2.35. About 25% less height
         val slantAmount = 1f
@@ -202,7 +194,7 @@ class StoryPlayScreen(
             
             this.bounds.x.bind {
                 val parentW = parent.use()?.bounds?.width?.use() ?: 0f    
-                MathUtils.lerp(-(bounds.width.use()), parentW, textSlideAmount.use())
+                MathUtils.lerp(-(bounds.width.use()), parentW, textSlide.textSlideAmount.use())
             }
         }
     }
