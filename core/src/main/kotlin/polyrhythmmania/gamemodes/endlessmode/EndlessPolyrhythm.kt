@@ -3,10 +3,7 @@ package polyrhythmmania.gamemodes.endlessmode
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
-import paintbox.binding.BooleanVar
-import paintbox.binding.FloatVar
-import paintbox.binding.IntVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.world.texturepack.TexturePackSource
@@ -101,7 +98,8 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
     }
     val difficultyFactor: FloatVar = FloatVar(0f)
     val loopsCompleted: IntVar = IntVar(0)
-    val speedIncreaseSemitones: IntVar = IntVar(0)
+    val speedIncreaseLevel: IntVar = IntVar(0)
+    val speedIncreaseSemitones: ReadOnlyIntVar = IntVar(eager = true) { EndlessSpeedup.map(speedIncreaseLevel.use()) }
     
     // For pausing in between pattern achievement.
     // pauseTime is sent by PlayScreen, and accepted only if currently in pattern
@@ -188,7 +186,7 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
         return """seed: ${if (dailyChallenge != null) "daily challenge" else seed.toString(16).uppercase()}
 difficultyFactor: ${difficultyFactor.get()}
 distribution: mean = ${getMeanFromDifficulty()}, stddev = ${getStdDevFromDifficulty()}
-loops: ${loopsCompleted.get()} / speed: ${speedIncreaseSemitones.get()} semitones
+loops: ${loopsCompleted.get()} / speed: Lvl ${speedIncreaseLevel.get()} (${speedIncreaseSemitones.get()} semitones)
 currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
 """.dropLast(1)
     }
@@ -337,7 +335,7 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                             }
                             difficultyFactor.set(0f)
                             loopsCompleted.set(0)
-                            speedIncreaseSemitones.set(0)
+                            speedIncreaseLevel.set(0)
                             engine.playbackSpeed = 1f
                             currentlyInPattern = false
                             pauseTime = 0f
@@ -355,20 +353,20 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                     
                     LoopingEvent(engine, 88f, { true }) { engine, startBeat ->
                         loopsCompleted.set(loopsCompleted.get() + 1)
-                        val currentSpeedIncrease = speedIncreaseSemitones.get()
-                        val maxSpeedIncrease = 12
-                        val newSpeed = (currentSpeedIncrease + (if (currentSpeedIncrease >= 4) 1 else 2)).coerceAtMost(maxSpeedIncrease)
-                        speedIncreaseSemitones.set(newSpeed)
-                        engine.playbackSpeed = Semitones.getALPitch(newSpeed)
+                        val currentSpeedIncrease = speedIncreaseLevel.get()
+                        val maxSpeedIncrease = EndlessSpeedup.MAX_LEVEL
+                        val newSpeedLvl = (currentSpeedIncrease + 1).coerceAtMost(maxSpeedIncrease)
+                        speedIncreaseLevel.set(newSpeedLvl)
+                        engine.playbackSpeed = Semitones.getALPitch(speedIncreaseSemitones.get())
                         
                         engine.addEvent(EventPaletteChange(engine, startBeat, 1f,
                                 createTilesetPaletteIterated(loopsCompleted.get(), colorChangeMultiplier, COLOR_CHANGE_LIMIT), false, false))
                         
-                        if (newSpeed > currentSpeedIncrease) {
+                        if (newSpeedLvl > currentSpeedIncrease) {
                             container.renderer.endlessModeRendering.triggerSpeedUpText()
                         }
                         
-                        if (engine.areStatisticsEnabled && newSpeed >= maxSpeedIncrease && currentSpeedIncrease < newSpeed) {
+                        if (engine.areStatisticsEnabled && newSpeedLvl >= maxSpeedIncrease && currentSpeedIncrease < newSpeedLvl) {
                             Achievements.awardAchievement(Achievements.endlessReachMaxSpeed)
                         }
                     }.also { e ->
