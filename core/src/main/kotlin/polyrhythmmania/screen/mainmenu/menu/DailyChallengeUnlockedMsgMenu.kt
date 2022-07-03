@@ -13,7 +13,7 @@ class DailyChallengeUnlockedMsgMenu(
 ) : StandardMenu(menuCol) {
     
     init {
-        this.setSize(MMMenu.WIDTH_MID)
+        this.setSize(MMMenu.WIDTH_MEDIUM)
         this.titleText.bind { Localization.getVar("mainMenu.dailyChallengeUnlocked.title").use() }
         this.contentPane.bounds.height.set(250f)
         this.deleteWhenPopped.set(true)
