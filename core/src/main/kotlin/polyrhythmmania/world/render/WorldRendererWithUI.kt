@@ -21,6 +21,7 @@ import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
+import paintbox.ui.element.QuadElement
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
@@ -582,8 +583,12 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                         bg += livesIconHbox
                         
                         this.temporarilyDisableLayouts { 
-                            this += RectElement(black).apply { 
+//                            this += RectElement(black).apply { 
+//                                this.bounds.width.set(32f)
+//                            }
+                            this += QuadElement(black).apply { 
                                 this.bounds.width.set(32f)
+                                this.leftRightGradient(black.cpy().also { it.a *= 0.5f }, black)
                             }
                             this += bg
                         }
