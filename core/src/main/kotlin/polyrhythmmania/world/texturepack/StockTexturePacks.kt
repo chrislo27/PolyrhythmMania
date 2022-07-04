@@ -55,6 +55,10 @@ object StockTexturePacks {
         allPacks.flatMap { p -> p.deprecatedIDs.map { did -> did to p } }.associate { it.first to it.second } + allPacksByID
     }
     
+    init {
+        TexturePackSource // Forces initialization of companion object and objects inside TexturePackSource
+    }
+    
     fun getTexturePackSource(stock: TexturePack): TexturePackSource? = allPacksToSource[stock]
     fun getPackFromSource(source: TexturePackSource): TexturePack? = allPacksBySource[source]
 
