@@ -1,6 +1,7 @@
 package polyrhythmmania.world.render
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -11,6 +12,7 @@ import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
+import paintbox.registry.AssetRegistry
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import paintbox.util.viewport.ExtendNoOversizeViewport
@@ -76,6 +78,10 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     })
+    private val fbRenderCamera: OrthographicCamera = OrthographicCamera().apply {
+        setToOrtho(false, 1280f, 720f)
+        update()
+    }
     private var lastKnownWindowSize: WindowSize = WindowSize(-1, -1)
     private var lightFrameBuffer: NestedFrameBuffer? = null
     private var framebufferSize: WindowSize = WindowSize(0, 0)
@@ -101,9 +107,6 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     }
 
     open fun render(batch: SpriteBatch) {
-        checkForResize()
-        
-        
         val camera = this.camera
         // TODO better camera controls and refactoring
         if (world.worldMode.worldType == WorldType.Dunk) {
@@ -113,6 +116,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             camera.position.y += 0.125f
         }
         camera.update()
+        
 
         tmpMatrix.set(batch.projectionMatrix)
         batch.projectionMatrix = camera.combined
@@ -153,6 +157,51 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         
         batch.end()
         batch.projectionMatrix = tmpMatrix
+
+        
+        // Build light buffer
+        checkForResize()
+        val fb = lightFrameBuffer
+        if (fb != null) {
+            val oldSrcFunc = batch.blendSrcFunc
+            val oldDstFunc = batch.blendDstFunc
+
+            // Render lights
+            fb.begin()
+            tmpMatrix.set(batch.projectionMatrix)
+            batch.projectionMatrix = this.camera.combined
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+            batch.begin()
+
+            // RGB value dictates strength of ambient light. Alpha doesn't matter, so the RGB has to be premultiplied with A
+            Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f) // TODO set ambient light
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+            // TODO put lights here
+            val lightTex = AssetRegistry.get<Texture>("lighttest")
+            val size = 3f
+            batch.setColor(1f, 1f, 1f, 0.7f)
+            batch.draw(lightTex, 4f, 1f, size, size)
+
+            batch.end()
+            batch.setColor(1f, 1f, 1f, 1f)
+            fb.end()
+
+
+            // Render light fb
+            batch.projectionMatrix = fbRenderCamera.combined
+            batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ZERO)
+            batch.begin()
+
+            batch.setColor(1f, 1f, 1f, 1f)
+            val fbTex = fb.colorBufferTexture
+            batch.draw(fbTex, 0f, 0f, fbRenderCamera.viewportWidth, fbRenderCamera.viewportHeight, 0, 0, fbTex.width, fbTex.height, false, true)
+
+            batch.end()
+            batch.setColor(1f, 1f, 1f, 1f)
+            batch.setBlendFunction(oldSrcFunc, oldDstFunc)
+            batch.projectionMatrix = tmpMatrix
+        }
     }
 
     private fun checkForResize() { // Must be called on the GL thread.
@@ -160,7 +209,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         val windowWidth = Gdx.graphics.width
         val windowHeight = Gdx.graphics.height
         val nullWindowSize = cachedWindowSize.width == -1 || cachedWindowSize.height == -1
-        if ((windowWidth > 0 && windowHeight > 0) || nullWindowSize) {
+        if (((windowWidth > 0 && windowHeight > 0) && (windowWidth != cachedWindowSize.width || windowHeight != cachedWindowSize.height)) || nullWindowSize) {
             // Width/height MAY be 0.
             this.lastKnownWindowSize = WindowSize(windowWidth, windowHeight)
 
@@ -182,7 +231,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         oldBuffer?.disposeQuietly()
         val newFbWidth = HdpiUtils.toBackBufferX(width)
         val newFbHeight = HdpiUtils.toBackBufferY(height)
-        this.lightFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply {
+        this.lightFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGBA8888, newFbWidth, newFbHeight, true).apply {
             this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         }
         this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
