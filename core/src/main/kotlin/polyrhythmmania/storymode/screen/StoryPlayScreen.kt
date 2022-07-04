@@ -29,6 +29,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.QuadElement
 import paintbox.ui.element.RectElement
 import paintbox.util.WindowSize
+import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.viewport.ExtendNoOversizeViewport
 import polyrhythmmania.PRMania
@@ -72,8 +73,8 @@ class StoryPlayScreen(
     private var disableCatchingCursorOnHide: Boolean = false
 
     private val blurShader: ShaderProgram = GaussianBlur.createShaderProgram()
-    private lateinit var gameplayFrameBuffer: FrameBuffer
-    private lateinit var gameplayFrameBuffer2: FrameBuffer
+    private lateinit var gameplayFrameBuffer: NestedFrameBuffer
+    private lateinit var gameplayFrameBuffer2: NestedFrameBuffer
     private var framebufferSize: WindowSize = WindowSize(0, 0)
 
     /**
@@ -216,10 +217,10 @@ class StoryPlayScreen(
         oldBuffer2?.disposeQuietly()
         val newFbWidth = HdpiUtils.toBackBufferX(width)
         val newFbHeight = HdpiUtils.toBackBufferY(height)
-        this.gameplayFrameBuffer = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply { 
+        this.gameplayFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply { 
             this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         }
-        this.gameplayFrameBuffer2 = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply { 
+        this.gameplayFrameBuffer2 = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply { 
             this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         }
         this.framebufferSize = WindowSize(newFbWidth, newFbHeight)

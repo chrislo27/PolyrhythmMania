@@ -77,7 +77,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         this.update()
     })
     private var lastKnownWindowSize: WindowSize = WindowSize(-1, -1)
-    private var lightFrameBuffer: FrameBuffer? = null
+    private var lightFrameBuffer: NestedFrameBuffer? = null
     private var framebufferSize: WindowSize = WindowSize(0, 0)
 
     var entitiesRenderedLastCall: Int = 0
@@ -182,7 +182,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         oldBuffer?.disposeQuietly()
         val newFbWidth = HdpiUtils.toBackBufferX(width)
         val newFbHeight = HdpiUtils.toBackBufferY(height)
-        this.lightFrameBuffer = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply {
+        this.lightFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply {
             this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         }
         this.framebufferSize = WindowSize(newFbWidth, newFbHeight)

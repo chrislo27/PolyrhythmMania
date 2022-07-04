@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntMap
+import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.music.EditorMusicData
@@ -37,9 +38,9 @@ class WaveformWindow(val editor: Editor) : Disposable {
     val width: Int = 1200
     val height: Int = MusicDialog.WAVEFORM_HEIGHT * 2 /* 2 channels */
     
-    val overallBuffer: FrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
-    val windowedBuffer: FrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
-    val secondsBuffer: FrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, false)
+    val overallBuffer: NestedFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+    val windowedBuffer: NestedFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+    val secondsBuffer: NestedFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGBA8888, 512, 512, false)
     
     val camera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, width.toFloat(), height.toFloat())

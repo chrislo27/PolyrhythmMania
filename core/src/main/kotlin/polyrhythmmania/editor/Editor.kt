@@ -23,10 +23,6 @@ import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.util.MathHelper
 import paintbox.util.Vector2Stack
-import paintbox.util.gdxutils.disposeQuietly
-import paintbox.util.gdxutils.isAltDown
-import paintbox.util.gdxutils.isControlDown
-import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
@@ -51,6 +47,7 @@ import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.engine.timesignature.TimeSignature
 import polyrhythmmania.soundsystem.*
 import paintbox.util.DecimalFormats
+import paintbox.util.gdxutils.*
 import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputType
@@ -103,7 +100,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
-    val previewFrameBuffer: FrameBuffer
+    val previewFrameBuffer: NestedFrameBuffer
     val previewTextureRegion: TextureRegion
     val waveformWindow: WaveformWindow
     val settings: Settings get() = main.settings
@@ -189,7 +186,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     }
 
     init {
-        previewFrameBuffer = FrameBuffer(Pixmap.Format.RGB888, 1280, 720, true, true)
+        previewFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGB888, 1280, 720, true, true)
         previewTextureRegion = TextureRegion(previewFrameBuffer.colorBufferTexture).also { tr ->
             tr.flip(false, true)
         }

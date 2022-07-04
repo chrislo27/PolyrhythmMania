@@ -31,6 +31,7 @@ import paintbox.ui.layout.VBox
 import paintbox.util.MathHelper
 import paintbox.util.Version
 import paintbox.util.WindowSize
+import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.grey
@@ -177,12 +178,12 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     /**
      * The old framebuffer should be the last rendered frame.
      */
-    private lateinit var framebufferOld: FrameBuffer
+    private lateinit var framebufferOld: NestedFrameBuffer
 
     /**
      * The current framebuffer is what's drawn for this frame.
      */
-    private lateinit var framebufferCurrent: FrameBuffer
+    private lateinit var framebufferCurrent: NestedFrameBuffer
 
     // Music related ----------------------------------------------------------------------------------------------
     private val menuMusicVolume: FloatVar = FloatVar { 
@@ -593,8 +594,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         oldBuffers?.second?.disposeQuietly()
         val newFbWidth = HdpiUtils.toBackBufferX(width)
         val newFbHeight = HdpiUtils.toBackBufferY(height)
-        this.framebufferOld = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
-        this.framebufferCurrent = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
+        this.framebufferOld = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
+        this.framebufferCurrent = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
         this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
         Paintbox.LOGGER.debug("Updated main menu framebuffers to be backbuffer ${newFbWidth}x${newFbHeight} (logical ${width}x${height})")
         // Render old old FB into new old FB
