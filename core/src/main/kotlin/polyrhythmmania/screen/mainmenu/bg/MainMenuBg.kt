@@ -1,45 +1,40 @@
 package polyrhythmmania.screen.mainmenu.bg
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import paintbox.util.gdxutils.drawQuad
-import polyrhythmmania.container.Container
-import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.screen.mainmenu.EntityAsmWidgetHovering
 import polyrhythmmania.screen.mainmenu.EntityCubeHovering
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
-import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.entity.EntityCube
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityPlatform
-import polyrhythmmania.world.render.ForceTexturePack
-import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
-import polyrhythmmania.world.render.WorldRendererWithUI
+import polyrhythmmania.world.texturepack.StockTexturePacks
+import polyrhythmmania.world.texturepack.TexturePackSource
+import polyrhythmmania.world.tileset.Tileset
+import polyrhythmmania.world.tileset.TilesetPalette
 
 
 class MainMenuBg(val mainMenu: MainMenuScreen) {
-    
-    private val container: Container = Container(null, SimpleTimingProvider { 
-        Gdx.app.postRunnable { throw it } 
-        false
-    }, GlobalContainerSettings(ForceTexturePack.FORCE_GBA, forceTilesetPalette = ForceTilesetPalette.NO_FORCE))
+
     private val gradientStart: Color = Color(0f, 32f / 255f, 55f / 255f, 1f)
     private val gradientEnd: Color = Color.BLACK.cpy()
     
-    private val world: World = container.world
-    val renderer: WorldRendererWithUI = container.renderer
+    private val world: World = World()
+    val renderer: WorldRenderer by lazy { 
+        WorldRenderer(world, Tileset(StockTexturePacks.gba)).also { renderer ->
+            TilesetPalette.createGBA1TilesetPalette().applyTo(renderer.tileset)
+            renderer.camera.position.x = -2f
+            renderer.camera.position.y = 0.5f
+        }
+    }
     
     init {
-        renderer.renderUI.set(false)
-        renderer.camera.position.x = -2f
-        renderer.camera.position.y = 0.5f
-
         world.clearEntities()
         initializeNormal()
     }
@@ -244,6 +239,6 @@ class MainMenuBg(val mainMenu: MainMenuScreen) {
         batch.end()
 
         // Render world
-        container.renderer.render(batch)
+        renderer.render(batch)
     }
 }
