@@ -1,16 +1,26 @@
 package polyrhythmmania.world.render
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.viewport.Viewport
+import paintbox.Paintbox
+import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
+import paintbox.util.viewport.ExtendNoOversizeViewport
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.render.bg.WorldBackgroundFromWorldType
 import polyrhythmmania.world.tileset.Tileset
+import kotlin.math.roundToInt
 
 
 open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, World.WorldResetListener {
@@ -59,6 +69,17 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     }
     protected val tmpMatrix: Matrix4 = Matrix4()
 
+    /**
+     * Used to compute the framebuffer size (locked aspect ratio of 16:9)
+     */
+    private val fbViewport: Viewport = ExtendNoOversizeViewport(1280f, 720f, OrthographicCamera().apply {
+        this.setToOrtho(false, 1280f, 720f)
+        this.update()
+    })
+    private var lastKnownWindowSize: WindowSize = WindowSize(-1, -1)
+    private var lightFrameBuffer: FrameBuffer? = null
+    private var framebufferSize: WindowSize = WindowSize(0, 0)
+
     var entitiesRenderedLastCall: Int = 0
         private set
     var entityRenderTimeNano: Long = 0L
@@ -69,6 +90,10 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     init {
         @Suppress("LeakingThis")
         this.world.worldResetListeners += this as World.WorldResetListener
+        
+        Gdx.app.postRunnable { 
+            checkForResize()
+        }
     }
 
     override fun onWorldReset(world: World) {
@@ -76,6 +101,9 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     }
 
     open fun render(batch: SpriteBatch) {
+        checkForResize()
+        
+        
         val camera = this.camera
         // TODO better camera controls and refactoring
         if (world.worldMode.worldType == WorldType.Dunk) {
@@ -125,6 +153,40 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         
         batch.end()
         batch.projectionMatrix = tmpMatrix
+    }
+
+    private fun checkForResize() { // Must be called on the GL thread.
+        val cachedWindowSize = this.lastKnownWindowSize
+        val windowWidth = Gdx.graphics.width
+        val windowHeight = Gdx.graphics.height
+        val nullWindowSize = cachedWindowSize.width == -1 || cachedWindowSize.height == -1
+        if ((windowWidth > 0 && windowHeight > 0) || nullWindowSize) {
+            // Width/height MAY be 0.
+            this.lastKnownWindowSize = WindowSize(windowWidth, windowHeight)
+
+            val viewport = fbViewport
+            viewport.update(windowWidth, windowHeight, true)
+            
+            val cachedFramebufferSize = this.framebufferSize
+            val vpWidth = viewport.worldWidth.roundToInt()
+            val vpHeight = viewport.worldHeight.roundToInt()
+            if (vpWidth > 0 && vpHeight > 0 && (cachedFramebufferSize.width != vpWidth || cachedFramebufferSize.height != vpHeight)) {
+                createFramebuffers(vpWidth, vpHeight, this.lightFrameBuffer)
+            } else if (nullWindowSize) {
+                createFramebuffers(1280, 720, this.lightFrameBuffer)
+            }
+        }
+    }
+    
+    private fun createFramebuffers(width: Int, height: Int, oldBuffer: FrameBuffer?) {
+        oldBuffer?.disposeQuietly()
+        val newFbWidth = HdpiUtils.toBackBufferX(width)
+        val newFbHeight = HdpiUtils.toBackBufferY(height)
+        this.lightFrameBuffer = FrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply {
+            this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        }
+        this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
+        Paintbox.LOGGER.debug("Updated world renderer light framebuffer to be backbuffer ${newFbWidth}x${newFbHeight} (logical ${width}x${height})")
     }
 
     override fun dispose() {
