@@ -432,6 +432,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         private val textSlideTime: FloatVar = FloatVar(0f)
         private val textSlide: TextSlideInterp = TextSlideInterp(textSlideTime)
         private val speedUpTextLabel: TextLabel
+        
+        private val scoreWiggleTime: FloatVar = FloatVar(0f)
 
         override val uiElement: UIElement get() = endlessModeEntirePane
         
@@ -642,6 +644,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             hudRedFlash = 0f
             worldResetFlag.invert()
             textSlideTime.set(0f)
+            scoreWiggleTime.set(0f)
         }
 
         override fun renderUI(batch: SpriteBatch) {
@@ -673,6 +676,18 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                 if (textSlideTime.get() > 0f) {
                     textSlideTime.set((textSlideTime.get() - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f))
                 }
+                if (scoreWiggleTime.get() > 0f) {
+                    scoreWiggleTime.set((scoreWiggleTime.get() - Gdx.graphics.deltaTime / 0.15f).coerceAtLeast(0f))
+                    
+                    val maxShake = 4
+                    val x = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
+                    val y = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat()
+                    endlessModeScoreLabel.contentOffsetX.set(x)
+                    endlessModeScoreLabel.contentOffsetY.set(y)
+                } else {
+                    endlessModeScoreLabel.contentOffsetX.set(0f)
+                    endlessModeScoreLabel.contentOffsetY.set(0f)
+                }
             }
         }
         
@@ -692,6 +707,10 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         
         fun triggerSpeedUpText() {
             textSlideTime.set(1f)
+        }
+        
+        fun triggerScoreNGInput() {
+            scoreWiggleTime.set(1f)
         }
     }
     

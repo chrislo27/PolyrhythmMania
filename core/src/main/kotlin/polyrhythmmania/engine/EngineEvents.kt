@@ -62,10 +62,12 @@ class EventChangePlaybackSpeed(engine: Engine, val newSpeed: Float)
     }
 }
 
-open class EventConditionalOnRods(engine: Engine, startBeat: Float, val rowSetting: RowSetting,
-                                  val mustHitAllInputs: Boolean,
-                                  val onSuccess: () -> Unit)
-    : Event(engine) {
+open class EventConditionalOnRods(
+        engine: Engine, startBeat: Float, val rowSetting: RowSetting,
+        val mustHitAllInputs: Boolean,
+        val onFailure: (() -> Unit)? = null,
+        val onSuccess: () -> Unit
+) : Event(engine) {
 
     init {
         this.beat = startBeat
@@ -96,6 +98,8 @@ open class EventConditionalOnRods(engine: Engine, startBeat: Float, val rowSetti
         }
         if (shouldPlay) {
             onSuccess()
+        } else {
+            onFailure?.invoke()
         }
     }
 }

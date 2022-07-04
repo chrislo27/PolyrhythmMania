@@ -285,8 +285,11 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
             
             if (anyA || anyDpad) {
                 val awardScoreBeat = patternStart + patternDuration + 0.01f
+                val onFailure: () -> Unit = {
+                    container.renderer.endlessModeRendering.triggerScoreNGInput()
+                }
                 engine.addEvent(EventConditionalOnRods(engine, awardScoreBeat,
-                        if (anyA && anyDpad) RowSetting.BOTH else if (anyA) RowSetting.ONLY_A else RowSetting.ONLY_DPAD, true) {
+                        if (anyA && anyDpad) RowSetting.BOTH else if (anyA) RowSetting.ONLY_A else RowSetting.ONLY_DPAD, true, onFailure) {
                     engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
                         val endlessScore = engine.modifiers.endlessScore
                         val currentLives = endlessScore.lives.get()
