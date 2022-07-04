@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.utils.Disposable
+import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.screen.mainmenu.EntityAsmWidgetHovering
 import polyrhythmmania.screen.mainmenu.EntityCubeHovering
@@ -20,7 +22,7 @@ import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TilesetPalette
 
 
-class MainMenuBg(val mainMenu: MainMenuScreen) {
+class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
 
     private val gradientStart: Color = Color(0f, 32f / 255f, 55f / 255f, 1f)
     private val gradientEnd: Color = Color.BLACK.cpy()
@@ -240,5 +242,9 @@ class MainMenuBg(val mainMenu: MainMenuScreen) {
 
         // Render world
         renderer.render(batch)
+    }
+
+    override fun dispose() {
+        renderer.disposeQuietly()
     }
 }

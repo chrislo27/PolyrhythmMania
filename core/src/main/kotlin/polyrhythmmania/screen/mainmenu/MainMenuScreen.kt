@@ -667,6 +667,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         soundSys.shutdown()
         soundSys.disposeQuietly()
         StreamUtils.closeQuietly(musicSample)
+        background.disposeQuietly()
     }
 
     override fun keyDown(keycode: Int): Boolean {

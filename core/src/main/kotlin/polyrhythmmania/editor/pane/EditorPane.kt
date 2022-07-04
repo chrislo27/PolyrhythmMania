@@ -250,5 +250,6 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
 
     override fun dispose() {
         helpDialog.dispose()
+        paletteEditDialog.dispose()
     }
 }

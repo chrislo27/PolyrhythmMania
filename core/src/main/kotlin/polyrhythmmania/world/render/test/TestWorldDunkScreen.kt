@@ -177,6 +177,7 @@ ${renderer.getDebugString()}
 
     override fun dispose() {
         soundSystem.disposeQuietly()
+        renderer.disposeQuietly()
     }
 
     

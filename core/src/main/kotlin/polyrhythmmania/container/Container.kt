@@ -283,6 +283,7 @@ class Container(
         }
         resources.values.toList().forEach { it.disposeQuietly() }
         _resources.clear()
+        renderer.disposeQuietly()
     }
 
     /*

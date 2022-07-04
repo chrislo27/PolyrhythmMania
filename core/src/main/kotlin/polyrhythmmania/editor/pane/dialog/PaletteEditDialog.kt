@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.Disposable
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.WriterConfig
 import paintbox.binding.FloatVar
@@ -25,6 +26,7 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.Matrix4Stack
+import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
@@ -41,7 +43,7 @@ import kotlin.math.sign
 class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalette,
                         val baseTileset: TilesetPalette?, val canChangeEnabledState: Boolean,
                         val titleLocalization: String = "editor.dialog.tilesetPalette.title",
-) : EditorDialog(editorPane) {
+) : EditorDialog(editorPane), Disposable {
 
     companion object {
         private val PR1_CONFIG: TilesetPalette = TilesetPalette.createGBA1TilesetPalette()
@@ -435,8 +437,12 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
         super.onCloseDialog()
         editor.updatePaletteAndTexPackChangesState()
     }
-    
-    inner class ObjectPreview : UIElement() {
+
+    override fun dispose() {
+        this.objPreview.disposeQuietly()
+    }
+
+    inner class ObjectPreview : UIElement(), Disposable {
         
         val world: World = World()
         val worldRenderer: WorldRenderer = WorldRenderer(world, Tileset(editor.container.renderer.tileset.texturePack).apply { 
@@ -541,6 +547,10 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
             Matrix4Stack.pop()
             
             batch.packedColor = lastPackedColor
+        }
+
+        override fun dispose() {
+            worldRenderer.disposeQuietly()
         }
     }
 

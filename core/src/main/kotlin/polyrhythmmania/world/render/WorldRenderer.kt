@@ -13,7 +13,7 @@ import polyrhythmmania.world.render.bg.WorldBackgroundFromWorldType
 import polyrhythmmania.world.tileset.Tileset
 
 
-open class WorldRenderer(val world: World, val tileset: Tileset) : World.WorldResetListener {
+open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, World.WorldResetListener {
 
     companion object {
         val comparatorRenderOrder: Comparator<Entity> = Comparator { o1, o2 ->
@@ -125,6 +125,10 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : World.WorldRe
         
         batch.end()
         batch.projectionMatrix = tmpMatrix
+    }
+
+    override fun dispose() {
+        removeWorldHooks()
     }
 
     @Suppress("RemoveCurlyBracesFromTemplate")
