@@ -173,7 +173,6 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
 
             engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_dunk_basket_swoosh"))
             
-            // TODO this should only be triggered in endless mode
             if (engine.modifiers.endlessScore.enabled.get()) {
                 engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
                     val increaseLivesEvery = 4
