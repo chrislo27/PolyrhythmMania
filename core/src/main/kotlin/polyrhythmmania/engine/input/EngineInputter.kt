@@ -401,7 +401,7 @@ class EngineInputter(val engine: Engine) {
         if (modifiers.endlessScore.enabled.get()) return
 
         when (world.worldMode.worldType) {
-            is WorldType.Polyrhythm, WorldType.Assemble -> {
+            is WorldType.Polyrhythm, WorldType.Assemble, WorldType.Dunk -> {
                 val results = this.inputResults
                 val nInputs = max(results.size, max(totalExpectedInputs, minimumInputCount))
                 val nonMissResults = results.filter { !inputChallenge.isInputScoreMiss(it.inputScore) }
@@ -419,9 +419,6 @@ class EngineInputter(val engine: Engine) {
                 GlobalStats.inputsGottenBarely.increment(barelies)
                 GlobalStats.inputsGottenEarly.increment(earlies)
                 GlobalStats.inputsGottenLate.increment(lates)
-            }
-            WorldType.Dunk -> {
-                // NO-OP
             }
         }
     }

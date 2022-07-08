@@ -150,30 +150,29 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         val dunkBeat = inputResult.perfectBeat + 2f
         if (inputSuccessful) {
             this.inputWasSuccessful = true
-            
-            engine.addEvent(object : Event(engine) {
-                override fun onStart(currentBeat: Float) {
-                    if (engine.areStatisticsEnabled) {
-                        inputter.inputCountStats.total++
-                        if (inputResult.inputScore == InputScore.ACE) {
-                            inputter.inputCountStats.aces++
-                        } else {
-                            if (inputResult.accuracyPercent < 0f) {
-                                inputter.inputCountStats.early++
-                            } else {
-                                inputter.inputCountStats.late++
-                            }
-                        }
-                        GlobalStats.rodsDunkedDunk.increment()
-                    }
-                }
-            }.apply {
-                this.beat = dunkBeat
-            })
 
             engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_dunk_basket_swoosh"))
             
             if (engine.modifiers.endlessScore.enabled.get()) {
+                engine.addEvent(object : Event(engine) { // Non-endless statistics are handled already via InputResult
+                    override fun onStart(currentBeat: Float) {
+                        if (engine.areStatisticsEnabled) {
+                            inputter.inputCountStats.total++
+                            if (inputResult.inputScore == InputScore.ACE) {
+                                inputter.inputCountStats.aces++
+                            } else {
+                                if (inputResult.accuracyPercent < 0f) {
+                                    inputter.inputCountStats.early++
+                                } else {
+                                    inputter.inputCountStats.late++
+                                }
+                            }
+                            GlobalStats.rodsDunkedDunk.increment()
+                        }
+                    }
+                }.apply {
+                    this.beat = dunkBeat
+                })
                 engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
                     val increaseLivesEvery = 4
                     val increaseSpeedEvery = 8
