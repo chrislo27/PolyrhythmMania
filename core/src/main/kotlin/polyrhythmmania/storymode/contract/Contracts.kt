@@ -35,6 +35,9 @@ object Contracts {
         add(Contract("ringside", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.MODERN) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/ringside.prmproj"))
         })
+        add(Contract("shootemup", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.ARCADE) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/shootemup.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
