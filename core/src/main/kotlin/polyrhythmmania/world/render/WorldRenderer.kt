@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
+import paintbox.util.ColorStack
+import paintbox.util.Vector3Stack
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import paintbox.util.viewport.ExtendNoOversizeViewport
@@ -159,10 +161,12 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         batch.projectionMatrix = tmpMatrix
 
         
-        // Build light buffer
+        // Build and render light buffer
         checkForResize()
         val fb = lightFrameBuffer
         if (fb != null) {
+            val spotlights = world.spotlights
+            
             val oldSrcFunc = batch.blendSrcFunc
             val oldDstFunc = batch.blendDstFunc
 
@@ -174,14 +178,26 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             batch.begin()
 
             // RGB value dictates strength of ambient light. Alpha doesn't matter, so the RGB has to be premultiplied with A
-            Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f) // TODO set ambient light
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            ColorStack.use { tmpColor ->
+                spotlights.getAmbientLightPremultipliedAlpha(tmpColor)
+                Gdx.gl.glClearColor(tmpColor.r, tmpColor.g, tmpColor.b, 1f)
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            }
 
-            // TODO put lights here
-            val lightTex = AssetRegistry.get<Texture>("lighttest")
-            val size = 3f
-            batch.setColor(1f, 1f, 1f, 0.7f)
-            batch.draw(lightTex, 4f, 1f, size, size)
+            // Render each light
+            val tmpVec = Vector3Stack.getAndPush()
+            val lightTex = AssetRegistry.get<Texture>("world_spotlight")
+            val lightTexAspectRatio = lightTex.height.toFloat() / lightTex.width
+            val width = 1.25f
+            for (spotlight in spotlights.allSpotlights) {
+                if (!spotlight.enabled) {
+                    continue
+                }
+                convertWorldToScreen(tmpVec.set(spotlight.position))
+                batch.setColor(spotlight.light.r, spotlight.light.g, spotlight.light.b, spotlight.light.a * spotlight.strength)
+                batch.draw(lightTex, tmpVec.x - width / 2f, tmpVec.y, width, width * lightTexAspectRatio)
+            }
+            Vector3Stack.pop()
 
             batch.end()
             batch.setColor(1f, 1f, 1f, 1f)

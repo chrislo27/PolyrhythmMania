@@ -26,6 +26,7 @@ class World {
     var worldMode: WorldMode = WorldMode(WorldType.Polyrhythm())
     
     val entities: List<Entity> = CopyOnWriteArrayList()
+    val spotlights: Spotlights = Spotlights(this)
 
     // Settings
     var showInputFeedback: Boolean = PRManiaGame.instance.settings.showInputFeedbackBar.getOrCompute()
@@ -103,11 +104,12 @@ class World {
      * Removes [TemporaryEntity]s, repopulates the scenes, and calls [triggerWorldResetListeners].
      */
     fun resetWorld() {
+        spotlights.onWorldReset()
         (entities as MutableList).removeIf { it is TemporaryEntity }
         when (worldMode.worldType) {
             is WorldType.Polyrhythm -> {
                 populateRegularScene()
-                rows.forEach(Row::initWithWorld)
+                rows.forEach(Row::onWorldReset)
             }
             WorldType.Dunk -> {
                 populateDunkScene()

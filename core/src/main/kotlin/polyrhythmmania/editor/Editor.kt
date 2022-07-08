@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
@@ -456,6 +455,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
      * the [EngineInputter], [EngineModifiers], and clears the active textbox.
      */
     fun resetWorldEntitiesAndEngineModules() {
+        world.spotlights.onWorldReset()
         world.entities.toList().forEach { ent ->
             if (ent is TemporaryEntity) {
                 world.removeEntity(ent)

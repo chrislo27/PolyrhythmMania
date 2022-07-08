@@ -139,7 +139,7 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
     var nextActiveIndex: Int = -1
         private set
 
-    fun initWithWorld() {
+    fun onWorldReset() {
         rowBlocks.forEach {
             world.addEntity(it)
             it.retract()
