@@ -150,66 +150,79 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         val dunkBeat = inputResult.perfectBeat + 2f
         if (inputSuccessful) {
             this.inputWasSuccessful = true
-            engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
-                if (engine.areStatisticsEnabled) {
-                    inputter.inputCountStats.total++
-                    if (inputResult.inputScore == InputScore.ACE) {
-                        inputter.inputCountStats.aces++
-                    } else {
-                        if (inputResult.accuracyPercent < 0f) {
-                            inputter.inputCountStats.early++
+            
+            engine.addEvent(object : Event(engine) {
+                override fun onStart(currentBeat: Float) {
+                    if (engine.areStatisticsEnabled) {
+                        inputter.inputCountStats.total++
+                        if (inputResult.inputScore == InputScore.ACE) {
+                            inputter.inputCountStats.aces++
                         } else {
-                            inputter.inputCountStats.late++
+                            if (inputResult.accuracyPercent < 0f) {
+                                inputter.inputCountStats.early++
+                            } else {
+                                inputter.inputCountStats.late++
+                            }
                         }
+                        GlobalStats.rodsDunkedDunk.increment()
                     }
-                    GlobalStats.rodsDunkedDunk.increment()
                 }
-                
-                val increaseLivesEvery = 4
-                val increaseSpeedEvery = 8
-
-                if (newScore % increaseLivesEvery == 0) {
-                    // Increment lives
-                    engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_2"))
-                    val endlessScore = modifiers.endlessScore
-                    val currentLives = endlessScore.lives.get()
-                    val newLives = (currentLives + 1).coerceIn(0, endlessScore.maxLives.get())
-                    if (newLives > currentLives) {
-                        endlessScore.lives.set(newLives)
-                        if (engine.areStatisticsEnabled) {
-                            GlobalStats.livesGainedDunk.increment()
-                        }
-                    }
-                } else {
-                    engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
-                }
-                
-                if (newScore % increaseSpeedEvery == 0) {
-                    val maxValue = 12
-                    val semitone = (newScore / increaseSpeedEvery).coerceAtMost(maxValue)
-                    val pitch = Semitones.getALPitch(semitone)
-                    engine.addEvent(EventChangePlaybackSpeed(engine, pitch).apply { 
-                        this.beat = dunkBeat
-                    })
-
-//                    if (engine.areStatisticsEnabled && semitone >= maxValue) {
-//                        Achievements.awardAchievement(Achievements.dunkReachMaxSpeed)
-//                    }
-                }
-            }.apply { 
+            }.apply {
                 this.beat = dunkBeat
             })
+
+            engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_dunk_basket_swoosh"))
+            
+            // TODO this should only be triggered in endless mode
+            if (engine.modifiers.endlessScore.enabled.get()) {
+                engine.addEvent(EventIncrementEndlessScore(engine) { newScore ->
+                    val increaseLivesEvery = 4
+                    val increaseSpeedEvery = 8
+
+                    if (newScore % increaseLivesEvery == 0) {
+                        // Increment lives
+                        engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_2"))
+                        val endlessScore = modifiers.endlessScore
+                        val currentLives = endlessScore.lives.get()
+                        val newLives = (currentLives + 1).coerceIn(0, endlessScore.maxLives.get())
+                        if (newLives > currentLives) {
+                            endlessScore.lives.set(newLives)
+                            if (engine.areStatisticsEnabled) {
+                                GlobalStats.livesGainedDunk.increment()
+                            }
+                        }
+                    } else {
+                        engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_practice_moretimes_1"))
+                    }
+
+                    if (newScore % increaseSpeedEvery == 0) {
+                        val maxValue = 12
+                        val semitone = (newScore / increaseSpeedEvery).coerceAtMost(maxValue)
+                        val pitch = Semitones.getALPitch(semitone)
+                        engine.addEvent(EventChangePlaybackSpeed(engine, pitch).apply {
+                            this.beat = dunkBeat
+                        })
+
+//                      if (engine.areStatisticsEnabled && semitone >= maxValue) {
+//                          Achievements.awardAchievement(Achievements.dunkReachMaxSpeed)
+//                      }
+                    }
+                }.apply {
+                    this.beat = dunkBeat
+                })
+            } else {
+                engine.addEvent(EventPlaySFX(engine, dunkBeat + 0.5f, "sfx_dunk_ok1"))
+                engine.addEvent(EventPlaySFX(engine, dunkBeat + 1.0f, "sfx_dunk_ok2"))
+            }
         } else {
             this.inputWasSuccessful = false
             engine.addEvent(object : Event(engine) {
-                init {
-                    this.beat = dunkBeat
-                }
-
                 override fun onStart(currentBeat: Float) {
                     super.onStart(currentBeat)
                     explode(engine, true)
                 }
+            }.apply { 
+                this.beat = dunkBeat
             })
         }
         
@@ -222,7 +235,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         
         if (!isKilled && !playedDunkSfx) {
             playedDunkSfx = true
-            engine.addEvent(object : EventPlaySFX(engine, deployBeat + 2f, "sfx_dunk_dunk") {
+            engine.addEvent(object : EventPlaySFX(engine, deployBeat + 2f, "sfx_dunk_dunk_callout") {
                 override fun onAudioStart(atBeat: Float, actualBeat: Float) {
                     if (!this@EntityRodDunk.isKilled) {
                         super.onAudioStart(atBeat, actualBeat)
@@ -371,8 +384,14 @@ class EntityPistonDunk(world: World)
         when (type) {
             Type.PLATFORM -> {
             }
-            Type.PISTON_A -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_a"), SoundInterface.SFXType.PLAYER_INPUT)
-            Type.PISTON_DPAD -> engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_input_d"), SoundInterface.SFXType.PLAYER_INPUT)
+            Type.PISTON_A, Type.PISTON_DPAD -> {
+                val aSound = AssetRegistry.get<BeadsSound>("sfx_input_a")
+                val dpadSound = AssetRegistry.get<BeadsSound>("sfx_input_d")
+                engine.soundInterface.playAudio(aSound, SoundInterface.SFXType.PLAYER_INPUT)
+                engine.soundInterface.playAudio(dpadSound, SoundInterface.SFXType.PLAYER_INPUT) { player ->
+                    player.gain = 0.5f
+                }
+            }
         }
     }
 

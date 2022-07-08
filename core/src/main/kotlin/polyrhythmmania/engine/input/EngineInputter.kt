@@ -229,6 +229,10 @@ class EngineInputter(val engine: Engine) {
                     Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                 }
 
+                if (!modifiers.endlessScore.enabled.get()) {
+                    (inputResults as MutableList).add(inputResult)
+                }
+
                 val inputFeedbackIndex: Int = getInputFeedbackIndex(inputResult.inputScore, inputResult.accuracySec < 0f)
                 if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
                     inputFeedbackFlashes[inputFeedbackIndex] = atSeconds
