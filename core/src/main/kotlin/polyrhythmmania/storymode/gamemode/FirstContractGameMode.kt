@@ -20,7 +20,7 @@ import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
 
 
-class FirstContractGameMode(main: PRManiaGame) : StoryGameMode(main) {   
+class FirstContractGameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {   
     
     private val keyboardKeymap: InputKeymapKeyboard = main.settings.inputKeymapKeyboard.getOrCompute().copy()
     

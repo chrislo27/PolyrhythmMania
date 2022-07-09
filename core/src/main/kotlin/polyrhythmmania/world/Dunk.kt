@@ -301,7 +301,10 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                 collision.collidedWithWall = true
                 this.position.x = currentIndex + 0.7f + (5 - 1)
 
-                playSfxSideCollision(engine)
+                // Don't play side collision if NOT endless AND input was successful
+                if (engine.modifiers.endlessScore.enabled.get() || !this.inputWasSuccessful) {
+                    playSfxSideCollision(engine)
+                }
             }
         }
 

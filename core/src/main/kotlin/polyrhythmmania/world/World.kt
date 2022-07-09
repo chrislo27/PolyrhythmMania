@@ -76,7 +76,8 @@ class World {
         }
 
         if (worldMode.worldType == WorldType.Dunk) {
-            if (engine.modifiers.endlessScore.lives.get() <= 0) {
+            val endlessScore = engine.modifiers.endlessScore
+            if (endlessScore.enabled.get() && endlessScore.lives.get() <= 0) {
                 entities.forEach {
                     if (it is EntityRodDunk && !it.exploded) {
                         it.explode(engine, playSound = false)

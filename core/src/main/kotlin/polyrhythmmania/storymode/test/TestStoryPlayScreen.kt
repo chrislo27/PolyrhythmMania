@@ -12,13 +12,13 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
 import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
-import polyrhythmmania.storymode.gamemode.StoryGameMode
+import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 
 
 open class TestStoryPlayScreen(
         main: PRManiaGame,
         challenges: Challenges, inputCalibration: InputCalibration,
-        gameMode: StoryGameMode
+        gameMode: AbstractStoryGameMode
 ) : AbstractEnginePlayScreen(main, null, gameMode.container, challenges, inputCalibration, gameMode)  {
 
     override val pauseMenuHandler: TengokuBgPauseMenuHandler = TengokuBgPauseMenuHandler(this)

@@ -8,7 +8,7 @@ import java.util.*
 
 
 class StoryGameModeFromFile(main: PRManiaGame, val file: FileHandle)
-    : StoryGameMode(main) {
+    : AbstractStoryGameMode(main) {
 
     init {
         // FIXME tmp file copy should probably be elsewhere, like a loading screen

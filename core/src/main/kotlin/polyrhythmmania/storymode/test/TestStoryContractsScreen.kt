@@ -122,6 +122,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                 }
                             }
                         }
+                        this.autoSizeToChildren.set(true)
                     })
                 }
             }

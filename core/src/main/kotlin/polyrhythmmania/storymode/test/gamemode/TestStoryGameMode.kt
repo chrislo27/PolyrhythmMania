@@ -9,10 +9,10 @@ import polyrhythmmania.gamemodes.practice.AbstractPolyrhythmPractice
 import polyrhythmmania.gamemodes.practice.Polyrhythm2Practice
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
-import polyrhythmmania.storymode.gamemode.StoryGameMode
+import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 
 
-abstract class TestStoryGameMode(main: PRManiaGame) : StoryGameMode(main) {
+abstract class TestStoryGameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
     
     override fun initialize() {
         engine.tempos.addTempoChange(TempoChange(0f, 148.5f))

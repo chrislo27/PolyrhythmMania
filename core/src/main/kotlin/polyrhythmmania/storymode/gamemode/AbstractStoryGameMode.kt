@@ -4,5 +4,5 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.gamemodes.GameMode
 
 
-abstract class StoryGameMode(main: PRManiaGame) : GameMode(main, null) {
+abstract class AbstractStoryGameMode(main: PRManiaGame) : GameMode(main, null) {
 }
