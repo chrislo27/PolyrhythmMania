@@ -17,8 +17,9 @@ sealed class TexturePackSource(val jsonId: Int, val isCustom: Boolean) {
         
         fun idToSource(jsonId: Int): TexturePackSource? {
             return if (jsonId < 0) {
-                if (jsonId in CUSTOM_RANGE) {
-                    Custom(jsonId.absoluteValue)
+                val absID = jsonId.absoluteValue
+                if (absID in CUSTOM_RANGE) {
+                    Custom(absID)
                 } else null
             } else INDEX_MAP[jsonId]
         }
