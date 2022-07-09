@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.gamemode
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.EditorSpecialFlags
@@ -18,8 +19,10 @@ class StoryGameModeFromFile(main: PRManiaGame, val file: FileHandle)
                 input.copyTo(output)
             }
         }
-        this.container.readFromFile(tmpFile, EnumSet.of(EditorSpecialFlags.STORY_MODE))
+        val loadMetadata = this.container.readFromFile(tmpFile, EnumSet.of(EditorSpecialFlags.STORY_MODE))
+        Gdx.app.postRunnable { loadMetadata.loadOnGLThread() }
         tmpFile.deleteOnExit()
+        println(this.container.texturePackSource.getOrCompute())
     }
 
     override fun initialize() {
