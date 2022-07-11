@@ -76,7 +76,10 @@ class TilesetAssetLoader : IAssetLoader {
                 "sign_n_shadow",
                 "sign_ta",
                 "sign_ta_shadow",
+                
                 "xyz",
+                "defective_rods_borders",
+                "defective_rods_fill",
         ).map { Packable(it, "textures/world/gba/parts/$it.png") } + listOf(
                 "basket_back",
                 "basket_front",
@@ -97,7 +100,7 @@ class TilesetAssetLoader : IAssetLoader {
                 "asm_widget_roll_test",
         ).map { Packable(it, "textures/world/assemble/${it.substringAfter("asm_")}.png") },
                 PackedSheet.Config(padding = 1,
-                        maxSize = 2048 /* FIXME was 512 */ /* Found to be the smallest Po2 size without splitting into more texs */,
+                        maxSize = 512 /* Found to be the smallest power of 2 size without splitting into more texs */,
                         duplicateBorder = false,)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_hd", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "cube_border",
@@ -144,6 +147,9 @@ class TilesetAssetLoader : IAssetLoader {
                 "sign_n_shadow",
                 "sign_ta",
                 "sign_ta_shadow",
+                
+                "defective_rods_borders",
+                "defective_rods_fill",
         ).map { Packable(it, "textures/world/hd/parts/$it.tga") },
                 PackedSheet.Config(padding = 2, maxSize = 2048, duplicateBorder = false, atlasMipMaps = true,
                         atlasMinFilter = Texture.TextureFilter.MipMapLinearLinear, atlasMagFilter = Texture.TextureFilter.Linear)))
@@ -192,6 +198,9 @@ class TilesetAssetLoader : IAssetLoader {
                 "sign_n_shadow",
                 "sign_ta",
                 "sign_ta_shadow",
+                
+                "defective_rods_borders",
+                "defective_rods_fill",
         ).map { Packable(it, "textures/world/arcade/parts/$it.tga") },
                 PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false, atlasMipMaps = false,
                         atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest)))

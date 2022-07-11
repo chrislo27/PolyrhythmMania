@@ -101,6 +101,12 @@ class Tileset(val texturePack: ReadOnlyVar<TexturePack>) {
     val rodGroundFillAnimations: List<TintedRegion> = mapRodTexture(rodFillSection, TexturePack.rodFrameCount, 0)
     val rodAerialBorderAnimations: List<TintedRegion> = mapRodTexture(rodBordersSection, TexturePack.rodFrameCount, 1)
     val rodAerialFillAnimations: List<TintedRegion> = mapRodTexture(rodFillSection, TexturePack.rodFrameCount, 1)
+    private val defectiveRodBordersSection: TintedRegion = TintedRegion("defective_rods_borders", rodBorderColor)
+    private val defectiveRodFillSection: TintedRegion = TintedRegion("defective_rods_fill", rodFillColor)
+    val defectiveRodGroundBorderAnimations: List<TintedRegion> = mapRodTexture(rodBordersSection, TexturePack.rodFrameCount, 0)
+    val defectiveRodGroundFillAnimations: List<TintedRegion> = mapRodTexture(rodFillSection, TexturePack.rodFrameCount, 0)
+    val defectiveRodAerialBorderAnimations: List<TintedRegion> = mapRodTexture(rodBordersSection, TexturePack.rodFrameCount, 1)
+    val defectiveRodAerialFillAnimations: List<TintedRegion> = mapRodTexture(rodFillSection, TexturePack.rodFrameCount, 1)
 
     val explosionFrames: List<TintedRegion> by lazy {
         (0 until TexturePack.explosionFrameCount).map { i ->

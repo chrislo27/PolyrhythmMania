@@ -163,6 +163,11 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
         add(PackTexRegion.create("background_back", regionMap.getOrNull("background_back")))
         add(PackTexRegion.create("background_middle", regionMap.getOrNull("background_middle")))
         add(PackTexRegion.create("background_fore", regionMap.getOrNull("background_fore")))
+        
+        
+        // NON-EDITABLE
+        add(PackTexRegion.create("defective_rods_borders", regionMap.getOrNull("defective_rods_borders")))
+        add(PackTexRegion.create("defective_rods_fill", regionMap.getOrNull("defective_rods_fill")))
 
         // DUNK
         add(PackTexRegion.create("basket_back", regionMap.getOrNull("basket_back")))
