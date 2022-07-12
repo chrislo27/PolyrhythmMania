@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
-import paintbox.PaintboxGame
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.TextAlign
@@ -36,6 +35,7 @@ import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.modifiers.LivesMode
+import polyrhythmmania.ui.ArrowRectBox
 import polyrhythmmania.ui.ExplosionFX
 import polyrhythmmania.ui.TextSlideInterp
 import polyrhythmmania.ui.TextboxPane
@@ -491,118 +491,96 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                         this.scaleY.bind { endlessModeScoreLabelScaleXY.use() * scaleMul }
                     }
                     this += endlessModeScoreLabel
+                    
 
-                    this += HBox().apply { 
-                        this.bounds.height.set(44f)
-                        
-                        val black = Color(0f, 0f, 0f, 0.5f)
-                        val texture = AssetRegistry.get<Texture>("endless_lives_ui")
-                        val texregLife = TextureRegion(texture, 0, 0, texture.width, texture.width)
-                        val texregSilhouette = TextureRegion(texture, 0, texture.width, texture.width, texture.width)
-                        val texregOutline = TextureRegion(texture, 0, texture.width * 2, texture.width, texture.width)
-                        
-                        val livesIconHbox = HBox().apply { 
-                            this.autoSizeToChildren.set(true)
-                            this.autoSizeMinimumSize.set(10f)
-                            this.spacing.set(0f)
-                        }
-                        
-                        class LifeIcon(val lifeNum: Int) : Pane() {
-                            
-                            val mainIcon: ImageIcon = ImageIcon(texregLife)
-                            val outlineIcon: ImageIcon = ImageIcon(texregOutline)
-                            val silhouetteIcon: ImageIcon = ImageIcon(texregSilhouette)
-                            val explosionFX: ExplosionFX = ExplosionFX(ExplosionFX.TilesetStyle.GBA, ExplosionFX.EndBehaviour.DO_NOTHING)
-                            
-                            private val currentLives: ReadOnlyIntVar = IntVar(eager = true) { 
-                                this@EndlessModeRendering.currentEndlessLives.use()
-                            }
-                            private val silhouetteTime: FloatVar = FloatVar(0f)
-                            
-                            private var alreadyExploded: Boolean = false //currentLives.get() < lifeNum
-                            
-                            
-                            init {
-                                this += mainIcon.apply {
-                                    this.visible.bind { currentEndlessLives.use() >= lifeNum }
-                                }
-                                this += outlineIcon.apply { 
-                                    this.visible.bind { currentEndlessLives.use() < lifeNum }
-                                    this.tint.set(Color().grey(0.9f, a = 0.5f))
-                                }
-                                this += silhouetteIcon.apply {
-                                    this.tint.sideEffecting(Color(1f, 1f, 1f, 0f)) { c ->
-                                        c.a = Interpolation.pow5.apply(0f, 1f, silhouetteTime.use())
-                                        c
-                                    } 
-                                    this.scale.bind { 
-                                        Interpolation.pow5In.apply(1f, 2f, silhouetteTime.use())
-                                    }
-                                }
-                                this += explosionFX.apply { 
-                                    this.animationDuration = 0f
-                                    this.margin.set(Insets(0f, 8f, 4f, 0f))
-                                    this.scale.set(1.25f)
-                                }
-                                
-                                currentLives.addListener { 
-                                    val l = it.getOrCompute()
-                                    if (l < lifeNum) {
-                                        if (!alreadyExploded) {
-                                            alreadyExploded = true
-                                            explosionFX.reset()
-                                            sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(silhouetteTime)
-                                        }
-                                    } else if (l >= lifeNum) {
-                                        if (alreadyExploded) {
-                                            alreadyExploded = false
-                                            sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, 1f, 1f, 0f), silhouetteTime)
-                                            explosionFX.animationDuration = 0f
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        fun reloadLivesIcons() {
-                            livesIconHbox.temporarilyDisableLayouts { 
-                                livesIconHbox.removeAllChildren()
-                                
-                                val newMaxLives = currentMaxLives.get()
-                                for (i in 1..newMaxLives) {
-                                    livesIconHbox += LifeIcon(i).apply { 
-                                        this.bounds.width.set(44f)
-                                    }
-                                }
-                            }
-                        }
-                        currentMaxLives.addListener {
-                            reloadLivesIcons()
-                        }
-                        reloadLivesIcons()
-                        
-                        val bg = RectElement(black).apply { 
-                            this.bounds.width.eagerBind { livesIconHbox.bounds.width.use() }
-                            this += ImageNode(TextureRegion(AssetRegistry.get<Texture>("ui_triangle_equilateral"))).apply {
-                                this.bindWidthToSelfHeight()
-                                this.tint.set(black)
-                                this.rotation.set(-90f)
-                                this.bindXToParentWidth()
-                            }
-                        }
-                        bg += livesIconHbox
-                        
-                        this.temporarilyDisableLayouts { 
-//                            this += RectElement(black).apply { 
-//                                this.bounds.width.set(32f)
-//                            }
-                            this += QuadElement(black).apply { 
-                                this.bounds.width.set(32f)
-                                this.leftRightGradient(black.cpy().also { it.a *= 0.5f }, black)
-                            }
-                            this += bg
-                        }
+                    val black = Color(0f, 0f, 0f, 0.5f)
+                    val texture = AssetRegistry.get<Texture>("endless_lives_ui")
+                    val texregLife = TextureRegion(texture, 0, 0, texture.width, texture.width)
+                    val texregSilhouette = TextureRegion(texture, 0, texture.width, texture.width, texture.width)
+                    val texregOutline = TextureRegion(texture, 0, texture.width * 2, texture.width, texture.width)
+
+                    val livesIconHbox = HBox().apply {
+                        this.autoSizeToChildren.set(true)
+                        this.autoSizeMinimumSize.set(10f)
+                        this.spacing.set(0f)
                     }
 
+                    class LifeIcon(val lifeNum: Int) : Pane() {
+
+                        val mainIcon: ImageIcon = ImageIcon(texregLife)
+                        val outlineIcon: ImageIcon = ImageIcon(texregOutline)
+                        val silhouetteIcon: ImageIcon = ImageIcon(texregSilhouette)
+                        val explosionFX: ExplosionFX = ExplosionFX(ExplosionFX.TilesetStyle.GBA, ExplosionFX.EndBehaviour.DO_NOTHING)
+
+                        private val currentLives: ReadOnlyIntVar = IntVar(eager = true) {
+                            this@EndlessModeRendering.currentEndlessLives.use()
+                        }
+                        private val silhouetteTime: FloatVar = FloatVar(0f)
+
+                        private var alreadyExploded: Boolean = false //currentLives.get() < lifeNum
+
+
+                        init {
+                            this += mainIcon.apply {
+                                this.visible.bind { currentEndlessLives.use() >= lifeNum }
+                            }
+                            this += outlineIcon.apply {
+                                this.visible.bind { currentEndlessLives.use() < lifeNum }
+                                this.tint.set(Color().grey(0.9f, a = 0.5f))
+                            }
+                            this += silhouetteIcon.apply {
+                                this.tint.sideEffecting(Color(1f, 1f, 1f, 0f)) { c ->
+                                    c.a = Interpolation.pow5.apply(0f, 1f, silhouetteTime.use())
+                                    c
+                                }
+                                this.scale.bind {
+                                    Interpolation.pow5In.apply(1f, 2f, silhouetteTime.use())
+                                }
+                            }
+                            this += explosionFX.apply {
+                                this.animationDuration = 0f
+                                this.margin.set(Insets(0f, 8f, 4f, 0f))
+                                this.scale.set(1.25f)
+                            }
+
+                            currentLives.addListener {
+                                val l = it.getOrCompute()
+                                if (l < lifeNum) {
+                                    if (!alreadyExploded) {
+                                        alreadyExploded = true
+                                        explosionFX.reset()
+                                        sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(silhouetteTime)
+                                    }
+                                } else if (l >= lifeNum) {
+                                    if (alreadyExploded) {
+                                        alreadyExploded = false
+                                        sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, 1f, 1f, 0f), silhouetteTime)
+                                        explosionFX.animationDuration = 0f
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    fun reloadLivesIcons() {
+                        livesIconHbox.temporarilyDisableLayouts {
+                            livesIconHbox.removeAllChildren()
+
+                            val newMaxLives = currentMaxLives.get()
+                            for (i in 1..newMaxLives) {
+                                livesIconHbox += LifeIcon(i).apply {
+                                    this.bounds.width.set(44f)
+                                }
+                            }
+                        }
+                    }
+                    currentMaxLives.addListener {
+                        reloadLivesIcons()
+                    }
+                    reloadLivesIcons()
+                    
+                    this += ArrowRectBox(livesIconHbox, black).apply { 
+                        this.bounds.height.set(44f)
+                    }
                 }
                 this += vbox
             }
