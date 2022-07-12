@@ -17,16 +17,25 @@ class TilesetAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("green_grid", "textures/world/green_grid.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("world_spotlight", "textures/world/spotlight.png", linearTexture())
         
-        AssetRegistry.loadAsset<Texture>("endless_lives_ui", "textures/world/ui/endless_lives.png")
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
-                "heart",
                 "skill_star",
                 "skill_star_grey",
                 "perfect",
                 "perfect_failed",
                 "perfect_hit",
-        ).map { Packable(it, "textures/world/ui/$it.png") }, PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false,
-                atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
+        ).map { Packable(it, "textures/world/ui/$it.png") },
+                PackedSheet.Config(
+                        padding = 1, maxSize = 512, duplicateBorder = false,
+                        atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear
+                )))
+        AssetRegistry.loadAsset<Texture>("endless_lives_ui", "textures/world/ui/endless_lives.png")
+        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui_px", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                "heart",
+        ).map { Packable(it, "textures/world/ui/$it.png") },
+                PackedSheet.Config(
+                        padding = 1, maxSize = 128, duplicateBorder = false,
+                        atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest
+                )))
 
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_gba", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "background_back",

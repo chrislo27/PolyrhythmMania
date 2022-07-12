@@ -837,7 +837,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                     hbox.temporarilyDisableLayouts {
                         hbox.removeAllChildren()
                         for (i in 1..newAmount) {
-                            hbox += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("tileset_ui")["heart"])).apply {
+                            hbox += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("tileset_ui_px")["heart"])).apply {
                                 this.visible.bind { currentLives.use() >= i }
                                 this.bindWidthToSelfHeight()
                             }
