@@ -29,9 +29,13 @@ class TilesetAssetLoader : IAssetLoader {
                         atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear
                 )))
         AssetRegistry.loadAsset<Texture>("endless_lives_ui", "textures/world/ui/endless_lives.png")
-        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui_px", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui_lives", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "heart",
-        ).map { Packable(it, "textures/world/ui/$it.png") },
+                "heart_dark",
+                "heart_noface",
+                "heart_outline",
+                "heart_outline_noface",
+        ).map { Packable(it, "textures/world/ui/lives/$it.png") },
                 PackedSheet.Config(
                         padding = 1, maxSize = 128, duplicateBorder = false,
                         atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest
