@@ -90,8 +90,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     this.padding.set(Insets(1f))
                     this.minimum.set(0f)
                     this.maximum.set((setSpeeds.size - 1).toFloat())
-                    this.setValue(oneIndex.toFloat())
                     this.tickUnit.set(1f)
+                    this.setValue(oneIndex.toFloat())
                     this.value.addListener { v ->
                         editor.playbackSpeed.set(setSpeeds.getOrNull(v.getOrCompute().toInt()) ?: 1f)
                     }
