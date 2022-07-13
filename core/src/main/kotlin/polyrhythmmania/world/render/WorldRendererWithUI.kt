@@ -20,7 +20,6 @@ import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
-import paintbox.ui.element.QuadElement
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
@@ -494,10 +493,6 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                     
 
                     val black = Color(0f, 0f, 0f, 0.5f)
-                    val texture = AssetRegistry.get<Texture>("endless_lives_ui")
-                    val texregLife = TextureRegion(texture, 0, 0, texture.width, texture.width)
-                    val texregSilhouette = TextureRegion(texture, 0, texture.width, texture.width, texture.width)
-                    val texregOutline = TextureRegion(texture, 0, texture.width * 2, texture.width, texture.width)
 
                     val livesIconHbox = HBox().apply {
                         this.autoSizeToChildren.set(true)
@@ -505,62 +500,6 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                         this.spacing.set(0f)
                     }
 
-                    class LifeIcon(val lifeNum: Int) : Pane() {
-
-                        val mainIcon: ImageIcon = ImageIcon(texregLife)
-                        val outlineIcon: ImageIcon = ImageIcon(texregOutline)
-                        val silhouetteIcon: ImageIcon = ImageIcon(texregSilhouette)
-                        val explosionFX: ExplosionFX = ExplosionFX(ExplosionFX.TilesetStyle.GBA, ExplosionFX.EndBehaviour.DO_NOTHING)
-
-                        private val currentLives: ReadOnlyIntVar = IntVar(eager = true) {
-                            this@EndlessModeRendering.currentEndlessLives.use()
-                        }
-                        private val silhouetteTime: FloatVar = FloatVar(0f)
-
-                        private var alreadyExploded: Boolean = false //currentLives.get() < lifeNum
-
-
-                        init {
-                            this += mainIcon.apply {
-                                this.visible.bind { currentEndlessLives.use() >= lifeNum }
-                            }
-                            this += outlineIcon.apply {
-                                this.visible.bind { currentEndlessLives.use() < lifeNum }
-                                this.tint.set(Color().grey(0.9f, a = 0.5f))
-                            }
-                            this += silhouetteIcon.apply {
-                                this.tint.sideEffecting(Color(1f, 1f, 1f, 0f)) { c ->
-                                    c.a = Interpolation.pow5.apply(0f, 1f, silhouetteTime.use())
-                                    c
-                                }
-                                this.scale.bind {
-                                    Interpolation.pow5In.apply(1f, 2f, silhouetteTime.use())
-                                }
-                            }
-                            this += explosionFX.apply {
-                                this.animationDuration = 0f
-                                this.margin.set(Insets(0f, 8f, 4f, 0f))
-                                this.scale.set(1.25f)
-                            }
-
-                            currentLives.addListener {
-                                val l = it.getOrCompute()
-                                if (l < lifeNum) {
-                                    if (!alreadyExploded) {
-                                        alreadyExploded = true
-                                        explosionFX.reset()
-                                        sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(silhouetteTime)
-                                    }
-                                } else if (l >= lifeNum) {
-                                    if (alreadyExploded) {
-                                        alreadyExploded = false
-                                        sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, 1f, 1f, 0f), silhouetteTime)
-                                        explosionFX.animationDuration = 0f
-                                    }
-                                }
-                            }
-                        }
-                    }
                     fun reloadLivesIcons() {
                         livesIconHbox.temporarilyDisableLayouts {
                             livesIconHbox.removeAllChildren()
@@ -690,6 +629,74 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         fun triggerScoreNGInput() {
             scoreWiggleTime.set(1f)
         }
+        
+        
+        inner class LifeIcon(val lifeNum: Int) : Pane() {
+
+            val mainIcon: ImageIcon
+            val outlineIcon: ImageIcon
+            val silhouetteIcon: ImageIcon
+            val explosionFX: ExplosionFX = ExplosionFX(ExplosionFX.TilesetStyle.GBA, ExplosionFX.EndBehaviour.DO_NOTHING)
+
+            private val currentLives: ReadOnlyIntVar = IntVar(eager = true) {
+                this@EndlessModeRendering.currentEndlessLives.use()
+            }
+            private val silhouetteTime: FloatVar = FloatVar(0f)
+
+            private var alreadyExploded: Boolean = false //currentLives.get() < lifeNum
+
+
+            init {
+                val texture = AssetRegistry.get<Texture>("endless_lives_ui")
+                val texregLife = TextureRegion(texture, 0, 0, texture.width, texture.width)
+                val texregSilhouette = TextureRegion(texture, 0, texture.width, texture.width, texture.width)
+                val texregOutline = TextureRegion(texture, 0, texture.width * 2, texture.width, texture.width)
+                
+                this.mainIcon = ImageIcon(texregLife)
+                this.outlineIcon = ImageIcon(texregOutline)
+                this.silhouetteIcon = ImageIcon(texregSilhouette)
+                
+                this += mainIcon.apply {
+                    this.visible.bind { currentEndlessLives.use() >= lifeNum }
+                }
+                this += outlineIcon.apply {
+                    this.visible.bind { currentEndlessLives.use() < lifeNum }
+                    this.tint.set(Color().grey(0.9f, a = 0.5f))
+                }
+                this += silhouetteIcon.apply {
+                    this.tint.sideEffecting(Color(1f, 1f, 1f, 0f)) { c ->
+                        c.a = Interpolation.pow5.apply(0f, 1f, silhouetteTime.use())
+                        c
+                    }
+                    this.scale.bind {
+                        Interpolation.pow5In.apply(1f, 2f, silhouetteTime.use())
+                    }
+                }
+                this += explosionFX.apply {
+                    this.animationDuration = 0f
+                    this.margin.set(Insets(0f, 8f, 4f, 0f))
+                    this.scale.set(1.25f)
+                }
+
+                currentLives.addListener {
+                    val l = it.getOrCompute()
+                    if (l < lifeNum) {
+                        if (!alreadyExploded) {
+                            alreadyExploded = true
+                            explosionFX.reset()
+                            sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(silhouetteTime)
+                        }
+                    } else if (l >= lifeNum) {
+                        if (alreadyExploded) {
+                            alreadyExploded = false
+                            sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, 1f, 1f, 0f), silhouetteTime)
+                            explosionFX.animationDuration = 0f
+                        }
+                    }
+                }
+            }
+        }
+        
     }
     
     inner class SkillStarRendering : InnerRendering() {
@@ -817,23 +824,110 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                     val newAmount = it.getOrCompute()
                     hbox.temporarilyDisableLayouts {
                         hbox.removeAllChildren()
-                        for (i in 1..newAmount) {
-                            hbox += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("tileset_ui_lives")["heart"])).apply {
-                                this.visible.bind { currentLives.use() >= i }
+                        (1..newAmount).map { i ->
+                            val icon = HeartIcon(i)
+                            hbox += Pane().apply {
                                 this.bindWidthToSelfHeight()
+                                this += icon
                             }
+                            icon
                         }
                     }
                 }
                 maxLives.addListener(listener)
                 listener.invoke(maxLives)
                 
-                this += ArrowRectBox(hbox)
+                val box = ArrowRectBox(hbox)
+                this += box
             }
         }
 
         override fun renderUI(batch: SpriteBatch) {
         }
+
+
+        inner class HeartIcon(val lifeNum: Int) : Pane() {
+
+            val mainIcon: ImageIcon
+            val silhouetteIcon: ImageIcon
+            val brokenIcon: ImageIcon
+
+            private val currentLives: ReadOnlyIntVar = IntVar(eager = true) {
+                this@LivesModeRendering.currentLives.use()
+            }
+            private val silhouetteTime: FloatVar = FloatVar(0f)
+
+            private var alreadyBroken: Boolean = false //currentLives.get() < lifeNum
+            private val shakeTime: FloatVar = FloatVar(0f)
+
+
+            init {
+                val sheet = AssetRegistry.get<PackedSheet>("tileset_ui_lives")
+                val texregLife = sheet["heart"]
+                val texregSilhouette = sheet["heart_noface"]
+                val texregBroken = sheet["heart_dark"]
+
+                this.mainIcon = ImageIcon(texregLife)
+                this.silhouetteIcon = ImageIcon(texregSilhouette)
+                this.brokenIcon = ImageIcon(texregBroken)
+
+                this += mainIcon.apply {
+                    this.visible.bind { this@LivesModeRendering.currentLives.use() >= lifeNum }
+                }
+                
+                this += brokenIcon.apply {
+                    this.visible.bind { this@LivesModeRendering.currentLives.use() < lifeNum }
+                    this.scale.bind {
+                        Interpolation.pow5In.apply(1f, 2f, shakeTime.use())
+                    }
+                }
+                this += silhouetteIcon.apply {
+                    this.tint.sideEffecting(Color(1f, 1f, 1f, 0f)) { c ->
+                        c.a = Interpolation.pow5.apply(0f, 1f, silhouetteTime.use())
+                        c
+                    }
+                    this.scale.bind {
+                        Interpolation.pow5In.apply(1f, 2f, silhouetteTime.use())
+                    }
+                }
+                
+                currentLives.addListener {
+                    val l = it.getOrCompute()
+                    if (l < lifeNum) {
+                        if (!alreadyBroken) {
+                            alreadyBroken = true
+                            sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(silhouetteTime)
+                            shakeTime.set(1f)
+                        }
+                    } else if (l >= lifeNum) {
+                        if (alreadyBroken) {
+                            alreadyBroken = false
+                            sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, 1f, 1f, 0f), silhouetteTime)
+                            shakeTime.set(0f)
+                        }
+                    }
+                }
+                
+            }
+
+            override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+                if (shakeTime.get() > 0f) {
+                    shakeTime.set((shakeTime.get() - Gdx.graphics.deltaTime).coerceAtLeast(0f))
+                    
+                    val maxShake = 5
+                    val x = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat() * shakeTime.get()
+                    val y = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat() * shakeTime.get()
+                    this.brokenIcon.contentOffsetX.set(x)
+                    this.brokenIcon.contentOffsetY.set(y)
+                } else {
+                    this.brokenIcon.contentOffsetX.set(0f)
+                    this.brokenIcon.contentOffsetY.set(0f)
+                }
+                
+                super.renderSelf(originX, originY, batch)
+            }
+        }
+        
     }
     
 }

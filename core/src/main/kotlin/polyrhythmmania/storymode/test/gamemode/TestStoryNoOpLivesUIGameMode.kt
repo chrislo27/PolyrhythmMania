@@ -36,7 +36,11 @@ class TestStoryNoOpLivesUIGameMode(main: PRManiaGame) : TestStoryGameMode(main) 
         }
         
         if (Gdx.input.isKeyJustPressed(Keys.F)) { // Reduce life by one
-            livesMode.loseALife(engine.inputter)
+            if (Gdx.input.isShiftDown()) {
+                livesMode.lives.set((livesMode.lives.get() + 1).coerceAtMost(livesMode.maxLives.get()))
+            } else {
+                livesMode.loseALife(engine.inputter)
+            }
         }
     }
 }
