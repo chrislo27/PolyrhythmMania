@@ -512,26 +512,14 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
                           val combineBeat: Float, val startBeatsBeforeCombine: Float,
                           val beatsPerUnit: Float = 1f)
     : SpriteEntity(world), TemporaryEntity {
-    
-    companion object {
-        private val asmWidgetRollTestBccadIDs: Map<String, Int> = listOf("17", "16", "15", "23", "14", "24", "13", "22", "21", "20", "19", "18").withIndex().associate { it.value to it.index }
-        private val asmWidgetRollTestStepL: Animation = Animation(listOf("13" to 1, "22" to 1, "19" to 1, "18" to 2, "17" to 2, "16" to 3, "15" to 3, "23" to 4, "14" to 13).map {
-            (id, delay) -> Step(id, delay)
-        })
-        private val asmWidgetRollTestStepR: Animation = Animation(listOf("13" to 1, "14" to 1, "15" to 1, "16" to 2, "17" to 2, "18" to 3, "19" to 3, "20" to 4, "21" to 13).map {
-            (id, delay) -> Step(id, delay)
-        })
-    }
 
     private val combineX: Float = 12f - 1 /* -1 due to positioning offset to fix floor clipping */
 
     private var lastBeat: Float = 0f
-    private val animation: Animation = if (goingRight) asmWidgetRollTestStepL else asmWidgetRollTestStepR
-    private val animationPlayer: AnimationPlayer = animation.createPlayer().apply { 
-        this.speedMultiplier.set(1 / 3f)
-    }
-    private var animationReset: Boolean = false
-    
+
+    override val pxOffsetX: Float get() = -2 / 16f
+    override val pxOffsetY: Float get() = 0f
+
     init {
         this.position.y = 0f
         this.position.z = if (goingRight) -6.5f else -6f
@@ -551,15 +539,9 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
 
         var x = combineX - (offset * movementSign)
         val beatPiece = 1f - (((beatsBeforeCombine / beatsPerUnit) + 1000f) % 1)
-        val moveTime = (17f / 30) * beatsPerUnit
+        val moveTime = 0.25f * beatsPerUnit
         if (beatPiece < moveTime) {
-            x += (Interpolation.linear.apply((beatPiece / moveTime)) - 1f) * movementSign
-            if (!animationReset) {
-                animationReset = true
-                animationPlayer.reset()
-            }
-        } else {
-            animationReset = false
+            x += (Interpolation.circleOut.apply((beatPiece / moveTime)) - 1f) * movementSign
         }
         
         if (!goingRight) {
@@ -570,13 +552,12 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
     }
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
-        return tileset.asmWidgetRollTestFrames[asmWidgetRollTestBccadIDs[animationPlayer.getCurrentStep().id] ?: 5]
+        return tileset.asmWidgetRoll
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
         super.engineUpdate(engine, beat, seconds)
         
-        animationPlayer.update((beat - this.lastBeat) / beatsPerUnit)
         this.lastBeat = beat
 
         this.position.x = getXFromBeat(-(beat - combineBeat))

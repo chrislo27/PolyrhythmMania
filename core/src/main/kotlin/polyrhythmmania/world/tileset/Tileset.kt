@@ -141,10 +141,4 @@ class Tileset(val texturePack: ReadOnlyVar<TexturePack>) {
     val asmWidgetCompleteBlur: TintedRegion = TintedRegion("asm_widget_complete_blur")
     val asmWidgetRoll: TintedRegion = TintedRegion("asm_widget_roll")
     
-    val asmWidgetRollTest: TintedRegion = TintedRegion("asm_widget_roll_test")
-    val asmWidgetRollTestFrames: List<TintedRegion> = (0 until 6).map {
-        TintedSubregion(asmWidgetRollTest, it / 6f, 0f, 1 / 6f, 0.5f)
-    } + (0 until 6).map {
-        TintedSubregion(asmWidgetRollTest, it / 6f, 0.5f, 1 / 6f, 0.5f)
-    }
 }

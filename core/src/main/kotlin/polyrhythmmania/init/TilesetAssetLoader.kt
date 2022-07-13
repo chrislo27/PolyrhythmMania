@@ -106,7 +106,6 @@ class TilesetAssetLoader : IAssetLoader {
                 "asm_widget_complete",
                 "asm_widget_complete_blur",
                 "asm_widget_roll",
-                "asm_widget_roll_test",
         ).map { Packable(it, "textures/world/assemble/${it.substringAfter("asm_")}.png") },
                 PackedSheet.Config(padding = 1,
                         maxSize = 512 /* Found to be the smallest power of 2 size without splitting into more texs */,
