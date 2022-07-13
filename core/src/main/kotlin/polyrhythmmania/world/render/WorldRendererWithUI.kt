@@ -804,12 +804,15 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         init {
             mainPane = Pane().apply {
                 this.visible.bind { livesMode.enabled.use() }
-                Anchor.TopLeft.configure(this, offsetX = 32f, offsetY = 32f)
+                Anchor.TopLeft.configure(this, offsetX = 0f, offsetY = 32f)
                 this.bindWidthToParent(adjust = -64f)
                 this.bounds.height.set(64f)
-
-                val hbox = HBox()
-                this += hbox
+                
+                val hbox = HBox().apply {
+                    this.autoSizeToChildren.set(true)
+                    this.autoSizeMinimumSize.set(10f)
+                    this.spacing.set(0f)
+                }
                 val listener: (v: ReadOnlyVar<Int>) -> Unit = {
                     val newAmount = it.getOrCompute()
                     hbox.temporarilyDisableLayouts {
@@ -824,6 +827,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                 }
                 maxLives.addListener(listener)
                 listener.invoke(maxLives)
+                
+                this += ArrowRectBox(hbox)
             }
         }
 

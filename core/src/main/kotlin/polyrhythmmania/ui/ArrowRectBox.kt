@@ -30,7 +30,7 @@ class ArrowRectBox(
         this += contentHbox
     }
     val fadeQuad: UIElement = QuadElement(black).apply {
-        this.bounds.width.set(32f)
+        this.bounds.width.eagerBind { bounds.height.use() }
         this.leftRightGradient(black.cpy().also { it.a *= 0.5f }, black)
     }
     

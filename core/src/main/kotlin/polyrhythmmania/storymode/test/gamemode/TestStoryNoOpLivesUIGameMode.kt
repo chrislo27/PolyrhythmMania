@@ -25,7 +25,7 @@ class TestStoryNoOpLivesUIGameMode(main: PRManiaGame) : TestStoryGameMode(main) 
 
         val livesMode = engine.modifiers.livesMode
         
-        if (Gdx.input.isKeyJustPressed(Keys.C)) { // Increment/decrement max lives
+        if (Gdx.input.isKeyJustPressed(Keys.L)) { // Increment/decrement max lives
             val amt = if (Gdx.input.isShiftDown()) -1 else 1
             val newMaxLives = livesMode.maxLives.get() + amt
             if (newMaxLives in 1..10) {
