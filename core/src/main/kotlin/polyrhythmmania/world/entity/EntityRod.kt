@@ -1,5 +1,6 @@
 package polyrhythmmania.world.entity
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
@@ -39,12 +40,15 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
     override val renderSortOffsetX: Float get() = 0f //sqrt((renderWidth * renderWidth) + (renderHeight * renderHeight))
     override val renderSortOffsetY: Float get() = 0f
     override val renderSortOffsetZ: Float get() = 0f // 0.5f * renderScale
-
+    
     constructor(world: World) : this(world, false)
     
     protected open fun getAnimationAlpha(): Float {
         return 0f
     }
+    
+    protected open fun getTintColorOverrideBorder(region: TintedRegion): Color? = null
+    protected open fun getTintColorOverrideFill(region: TintedRegion): Color? = null
     
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val animationAlpha = getAnimationAlpha().coerceIn(0f, 1f)
@@ -58,13 +62,13 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
         } else {
             tileset.rodAerialBorderAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         }
-        drawTintedRegion(batch, vec, tileset, regionBorder, offsetX, offsetY, renderW, renderH)
+        drawTintedRegion(batch, vec, tileset, regionBorder, offsetX, offsetY, renderW, renderH, tintColor = getTintColorOverrideBorder(regionBorder))
         val regionFill: TintedRegion = if (!isInAir) {
             tileset.rodGroundFillAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         } else {
             tileset.rodAerialFillAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         }
-        drawTintedRegion(batch, vec, tileset, regionFill, offsetX, offsetY, renderW, renderH)
+        drawTintedRegion(batch, vec, tileset, regionFill, offsetX, offsetY, renderW, renderH, tintColor = getTintColorOverrideFill(regionFill))
 
         batch.setColor(1f, 1f, 1f, 1f)
 
