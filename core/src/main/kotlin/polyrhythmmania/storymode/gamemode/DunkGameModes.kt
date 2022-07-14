@@ -16,7 +16,7 @@ class StoryDunkGameModeFruitBasket(main: PRManiaGame)
         engine.tempos.addTempoChange(TempoChange(0f, 151f))
         engine.musicData.volumeMap.addMusicVolume(MusicVolume(0f, 0f, 100))
 
-        val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("story/levels/music/fruitbasket.ogg"), null)
+        val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("story/levels/music/fruit_basket.ogg"), null)
         val musicData = engine.musicData
         musicData.musicSyncPointBeat = 0f
         musicData.firstBeatSec = 0.026f

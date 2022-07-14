@@ -39,7 +39,7 @@ object Contracts {
         add(Contract("shootemup", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.ARCADE) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/shootemup.prmproj"))
         })
-        add(Contract("fruitbasket", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
+        add(Contract("fruit_basket", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
             StoryDunkGameModeFruitBasket(main)
         })
     }
