@@ -22,7 +22,7 @@ abstract class AbstractStoryDunkGameMode(
         TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
     }
     
-    protected fun newDunkPattern(startBeat: Float): Block {
+    protected open fun newDunkPattern(startBeat: Float): Block {
         return object : Block(engine, EnumSet.noneOf(BlockType::class.java)) {
             override fun compileIntoEvents(): List<Event> {
                 return listOf(EventDeployRodDunk(this.engine, this.beat))
@@ -30,7 +30,7 @@ abstract class AbstractStoryDunkGameMode(
 
             override fun copy(): Block = throw NotImplementedError()
         }.apply { 
-            this.beat = startBeat
+            this.beat = startBeat - 2
         }
     }
     
