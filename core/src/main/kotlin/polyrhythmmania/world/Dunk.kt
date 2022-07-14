@@ -1,8 +1,10 @@
 package polyrhythmmania.world
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
@@ -83,6 +85,9 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
     var exploded: Boolean = false
         private set
 
+    private val tintColorOverrideBorder: Color = Color(1f, 1f, 1f, 1f)
+    private val tintColorOverrideFill: Color = Color(1f, 1f, 1f, 1f)
+    
     private var playedDunkSfx: Boolean = false
     private var inputWasSuccessful: Boolean = false
     private var inputAccepted: Boolean = false
@@ -94,6 +99,24 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         this.position.x = startingX
         this.position.z = -1f
         this.position.y = 2f + 1
+    }
+    
+    private fun getFadeInAlpha(): Float {
+        val lastBeat = this.collisionUpdateLastBeat
+        val duration = 1f / 3f
+        return Interpolation.linear.apply(0f, 1f, ((lastBeat - deployBeat) / duration).coerceIn(0f, 1f))
+    }
+
+    override fun getTintColorOverrideBorder(region: TintedRegion): Color {
+        return this.tintColorOverrideBorder.set(region.color.getOrCompute()).apply {
+            this.a *= getFadeInAlpha()
+        }
+    }
+
+    override fun getTintColorOverrideFill(region: TintedRegion): Color {
+        return this.tintColorOverrideFill.set(region.color.getOrCompute()).apply {
+            this.a *= getFadeInAlpha()
+        }
     }
 
     fun getCurrentIndex(posX: Float = this.position.x): Float = posX - 4f
@@ -330,7 +353,6 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                 collision.velocityY = (this.position.y - prevPosY) / deltaSec
             } else {
                 val floorBelow: Float = when {
-                    currentIndex < 0 -> 3f
                     currentIndex == 0 -> (dunkPiston.position.y + dunkPiston.collisionHeight)
                     currentIndex >= 4 -> -1E8f
                     else -> 2f
@@ -364,12 +386,10 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         }
     }
 
-    override fun onRemovedFromWorld(engine: Engine) {
-        super.onRemovedFromWorld(engine)
-    }
-
     override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
-        if (!exploded) super.render(renderer, batch, tileset)
+        if (!exploded) {
+            super.render(renderer, batch, tileset)
+        }
     }
 }
 
