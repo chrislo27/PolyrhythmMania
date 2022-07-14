@@ -3,6 +3,7 @@ package polyrhythmmania.storymode.contract
 import com.badlogic.gdx.Gdx
 import polyrhythmmania.storymode.gamemode.FirstContractGameMode
 import polyrhythmmania.storymode.gamemode.StoryDunkGameModeFruitBasket
+import polyrhythmmania.storymode.gamemode.StoryDunkGameModeHoleInOne2
 import polyrhythmmania.storymode.gamemode.StoryGameModeFromFile
 
 
@@ -41,6 +42,9 @@ object Contracts {
         })
         add(Contract("fruit_basket", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
             StoryDunkGameModeFruitBasket(main)
+        })
+        add(Contract("hole_in_one_2", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
+            StoryDunkGameModeHoleInOne2(main)
         })
     }
     
