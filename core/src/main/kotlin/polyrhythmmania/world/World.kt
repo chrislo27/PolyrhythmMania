@@ -266,7 +266,7 @@ class World {
         clearEntities()
 
         // Main floor
-        for (x in -1..9) {
+        for (x in -2..9) {
             for (z in -3 until 2) {
                 if (x >= 8 && z == -1) continue
                 val ent: Entity = if (z == -1) {
