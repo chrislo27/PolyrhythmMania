@@ -175,6 +175,7 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
         add(PackTexRegion.create("basket_front_face_z", regionMap.getOrNull("basket_front_face_z")))
         add(PackTexRegion.create("basket_rear", regionMap.getOrNull("basket_rear")))
         add(PackTexRegion.create("hoop_back", regionMap.getOrNull("hoop_back")))
+        add(PackTexRegion.create("dunk_star", regionMap.getOrNull("dunk_star")))
         
         // ASSEMBLE
         add(PackTexRegion.create("asm_lane", regionMap.getOrNull("asm_lane")))

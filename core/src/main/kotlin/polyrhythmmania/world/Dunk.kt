@@ -15,11 +15,8 @@ import polyrhythmmania.gamemodes.EventIncrementEndlessScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.util.Semitones
-import polyrhythmmania.world.entity.EntityExplosion
-import polyrhythmmania.world.entity.EntityPiston
-import polyrhythmmania.world.entity.EntityRod
+import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.entity.EntityRod.Companion.MIN_COLLISION_UPDATE_RATE
-import polyrhythmmania.world.entity.SpriteEntity
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
@@ -64,6 +61,10 @@ class EntityDunkBasketFrontFaceZ(world: World) : SpriteEntity(world) {
     }
 }
 class EntityDunkBasketRear(world: World) : SpriteEntity(world) {
+    override val renderSortOffsetX: Float get() = 0f // TODO
+    override val renderSortOffsetY: Float get() = 0f
+    override val renderSortOffsetZ: Float get() = 0f
+
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return tileset.dunkBasketRear
     }
@@ -235,6 +236,23 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                 engine.addEvent(EventPlaySFX(engine, dunkBeat + 0.5f, "sfx_dunk_ok1"))
                 engine.addEvent(EventPlaySFX(engine, dunkBeat + 1.0f, "sfx_dunk_ok2"))
             }
+            
+            // Star particles
+            engine.addEvent(object : Event(engine) {
+                override fun onStart(currentBeat: Float) {
+                    val leftVelocity = Vector3(0f, 2f, -0.75f)//.scl(60f / engine.tempos.tempoAtBeat(dunkBeat))
+                    val rightVelocity = leftVelocity.cpy().also { it.z *= -1 }
+                    
+//                    val hoopPosition = Vector3(8.5f, 4.5f, -1f)
+                    val leftPosition = Vector3(8.5f, 6f, -1.5f)
+                    val rightPosition = Vector3(8.5f, 6f, 0f)
+                    
+                    engine.world.addEntity(EntityDunkStarParticle(engine.world, dunkBeat, leftPosition, leftVelocity))
+                    engine.world.addEntity(EntityDunkStarParticle(engine.world, dunkBeat, rightPosition, rightVelocity))
+                }
+            }.apply { 
+                this.beat = dunkBeat
+            })
         } else {
             this.inputWasSuccessful = false
             engine.addEvent(object : Event(engine) {
@@ -421,6 +439,51 @@ class EntityPistonDunk(world: World)
         if (beat >= retractAfter) {
             retractAfter = Float.MAX_VALUE
             retract()
+        }
+    }
+}
+
+class EntityDunkStarParticle(world: World, val beatStarted: Float, val startPos: Vector3, val velocity: Vector3)
+    : SpriteEntity(world), TemporaryEntity {
+    
+    private var lastBeat: Float = beatStarted
+    private var duration: Float = 1f
+    private val renderScale: Float = 0.5f
+    
+    override val renderWidth: Float get() = super.renderWidth * renderScale
+    override val renderHeight: Float get() = super.renderHeight * renderScale
+
+    override val renderSortOffsetZ: Float get() = 0f
+
+    init {
+        this.position.set(startPos)
+        this.tint = Color(1f, 1f, 1f, 1f)
+    }
+    
+    override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
+        return tileset.dunkStar
+    }
+
+    override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
+        super.engineUpdate(engine, beat, seconds)
+        
+        if (isKilled) return
+
+        val beatsElapsed = engine.beat - beatStarted
+        val percentage = (beatsElapsed / duration).coerceIn(0f, 1f)
+        
+        val deltaBeat = engine.beat - lastBeat
+        this.lastBeat = engine.beat
+        velocity.y += -4f * deltaBeat
+        this.position.mulAdd(velocity, deltaBeat)
+        
+        val fadeThreshold = 0.75f
+        if (percentage >= fadeThreshold) {
+            this.tint?.a = Interpolation.linear.apply(1f, 0f, (percentage - fadeThreshold) / (1f - fadeThreshold))
+        }
+        
+        if (percentage >= 1f) {
+            kill()
         }
     }
 }

@@ -99,7 +99,8 @@ class TilesetAssetLoader : IAssetLoader {
                 "basket_front_face_z",
                 "basket_rear",
                 "hoop_back",
-        ).map { Packable(it, "textures/world/dunk/$it.png") } + listOf(
+                "dunk_star",
+        ).map { Packable(it, "textures/world/dunk/${it.substringAfter("dunk_")}.png") } + listOf(
                 "asm_lane",
                 "asm_centre_perp",
                 "asm_centre_perp_target",
