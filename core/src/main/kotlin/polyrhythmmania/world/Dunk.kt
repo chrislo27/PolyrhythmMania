@@ -61,9 +61,9 @@ class EntityDunkBasketFrontFaceZ(world: World) : SpriteEntity(world) {
     }
 }
 class EntityDunkBasketRear(world: World) : SpriteEntity(world) {
-    override val renderSortOffsetX: Float get() = 0f // TODO
+    override val renderSortOffsetX: Float get() = 0f
     override val renderSortOffsetY: Float get() = 0f
-    override val renderSortOffsetZ: Float get() = 0f
+    override val renderSortOffsetZ: Float get() = -1f
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return tileset.dunkBasketRear
@@ -452,8 +452,6 @@ class EntityDunkStarParticle(world: World, val beatStarted: Float, val startPos:
     
     override val renderWidth: Float get() = super.renderWidth * renderScale
     override val renderHeight: Float get() = super.renderHeight * renderScale
-
-    override val renderSortOffsetZ: Float get() = 0f
 
     init {
         this.position.set(startPos)

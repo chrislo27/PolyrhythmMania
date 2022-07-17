@@ -104,17 +104,17 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
         world.addEntity(EntityDunkBacking(world).apply {
             this.position.set(1f, 6f - 1, -1f)
         })
+        world.addEntity(EntityDunkBasketBack(world).apply {
+            this.position.set(1f, 5f - 1, -1f)
+        })
         world.addEntity(EntityDunkBasketRear(world).apply {
-            this.position.set(0f + 1, 5f - 1 - 1, -1f - 1)
+            this.position.set(0f, 5f - 1, -1f)
         })
         world.addEntity(EntityDunkBasketFront(world).apply {
             this.position.set(0f, 5f - 1, -1f)
         })
         world.addEntity(EntityDunkBasketFrontFaceZ(world).apply {
             this.position.set(0f, 5f - 1, 0f)
-        })
-        world.addEntity(EntityDunkBasketBack(world).apply {
-            this.position.set(1f, 5f - 1, -1f)
         })
         for (x in -1..1) {
             for (z in -1..1) {

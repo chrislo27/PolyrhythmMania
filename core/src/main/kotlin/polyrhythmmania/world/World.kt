@@ -303,17 +303,17 @@ class World {
         addEntity(EntityDunkBacking(this).apply { 
             this.position.set(9f, 6f, -1f)
         })
+        addEntity(EntityDunkBasketBack(this).apply { // Back skirt against the wall
+            this.position.set(9f, 5f, -1f)
+        })
         addEntity(EntityDunkBasketRear(this).apply {
-            this.position.set(8f + 1, 5f - 1, -1f - 1)
+            this.position.set(8f, 5f, -1f)
         })
         addEntity(EntityDunkBasketFront(this).apply {
             this.position.set(8f, 5f, -1f)
         })
         addEntity(EntityDunkBasketFrontFaceZ(this).apply {
             this.position.set(8f, 5f, 0f)
-        })
-        addEntity(EntityDunkBasketBack(this).apply { 
-            this.position.set(9f, 5f, -1f)
         })
 
         // Button signs
