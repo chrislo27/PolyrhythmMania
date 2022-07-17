@@ -219,6 +219,18 @@ object GlobalStats : Stats() {
      */
     val rodsExplodedPolyrhythm: Stat = register(Stat("rodsExplodedPolyrhythm", LocalizedStatFormatter.DEFAULT))
     /**
+     * Total number of defective rods deployed in regular Polyrhythm.
+     */
+    val defectiveRodsDeployed: Stat = register(Stat("defectiveRodsDeployed", LocalizedStatFormatter.DEFAULT))
+    /**
+     * Total number of defective rods exploded in regular Polyrhythm.
+     */
+    val defectiveRodsExploded: Stat = register(Stat("defectiveRodsExploded", LocalizedStatFormatter.DEFAULT))
+    /**
+     * Total number of defective rods that got through (escaped) in regular Polyrhythm.
+     */
+    val defectiveRodsEscaped: Stat = register(Stat("defectiveRodsEscaped", LocalizedStatFormatter.DEFAULT))
+    /**
      * Total number of lives lost in Endless/Daily Challenge.
      */
     val livesLostEndless: Stat = register(Stat("livesLostEndless", LocalizedStatFormatter.DEFAULT))

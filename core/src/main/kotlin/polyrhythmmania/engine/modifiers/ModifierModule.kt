@@ -1,7 +1,10 @@
 package polyrhythmmania.engine.modifiers
 
 import paintbox.binding.BooleanVar
+import polyrhythmmania.engine.input.EngineInputter
+import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputterListener
+import polyrhythmmania.world.EntityRodPR
 
 
 /**
@@ -20,5 +23,13 @@ abstract class ModifierModule : InputterListener {
     abstract fun resetState()
     
     abstract fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float)
-    
+
+
+    // InputterListener overrides
+
+    override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
+    }
+
+    override fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean) {
+    }
 }

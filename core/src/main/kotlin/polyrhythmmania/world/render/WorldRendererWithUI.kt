@@ -33,6 +33,7 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.EngineInputter
+import polyrhythmmania.engine.modifiers.DefectiveRodsMode
 import polyrhythmmania.engine.modifiers.LivesMode
 import polyrhythmmania.ui.ArrowRectBox
 import polyrhythmmania.ui.ExplosionFX
@@ -86,6 +87,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     
     val endlessModeRendering: EndlessModeRendering
     private val livesModeRendering: LivesModeRendering
+    private val defectiveRodsModeRendering: DefectiveRodsModeRendering
     private val practiceRendering: PracticeRendering
     private val perfectRendering: PerfectRendering
     val songCardRendering: SongCardRendering
@@ -100,6 +102,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         
         this.livesModeRendering = this.LivesModeRendering()
         uiSceneRoot += this.livesModeRendering.uiElement
+        
+        this.defectiveRodsModeRendering = this.DefectiveRodsModeRendering()
+        uiSceneRoot += this.defectiveRodsModeRendering.uiElement
 
         this.practiceRendering = this.PracticeRendering()
         uiSceneRoot += this.practiceRendering.uiElement
@@ -928,6 +933,138 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             }
         }
         
+    }
+
+    inner class DefectiveRodsModeRendering : InnerRendering() { // FIXME
+
+        private val mainPane: Pane
+
+        private val defRodsMode: DefectiveRodsMode = engine.modifiers.defectiveRodsMode
+        private val maxLives: ReadOnlyIntVar = IntVar { defRodsMode.maxLives.use() }
+        private val currentLives: ReadOnlyIntVar = IntVar { defRodsMode.lives.use() }
+
+        override val uiElement: UIElement get() = mainPane
+
+        init {
+            mainPane = Pane().apply {
+                this.visible.bind { defRodsMode.enabled.use() }
+                Anchor.TopLeft.configure(this, offsetX = 0f, offsetY = 32f)
+                this.bindWidthToParent(adjust = -64f)
+                this.bounds.height.set(64f)
+
+                val hbox = HBox().apply {
+                    this.autoSizeToChildren.set(true)
+                    this.autoSizeMinimumSize.set(10f)
+                    this.spacing.set(0f)
+                }
+                val listener: (v: ReadOnlyVar<Int>) -> Unit = {
+                    val newAmount = it.getOrCompute()
+                    hbox.temporarilyDisableLayouts {
+                        hbox.removeAllChildren()
+                        (1..newAmount).map { i ->
+                            val icon = DefRodHeartIcon(i)
+                            hbox += Pane().apply {
+                                this.bindWidthToSelfHeight()
+                                this += icon
+                            }
+                            icon
+                        }
+                    }
+                }
+                maxLives.addListener(listener)
+                listener.invoke(maxLives)
+
+                val box = ArrowRectBox(hbox)
+                this += box
+            }
+        }
+
+        override fun renderUI(batch: SpriteBatch) {
+        }
+
+
+        inner class DefRodHeartIcon(val lifeNum: Int) : Pane() {
+
+            val mainIcon: ImageIcon
+            val silhouetteIcon: ImageIcon
+            val brokenIcon: ImageIcon
+
+            private val currentLives: ReadOnlyIntVar = IntVar(eager = true) {
+                this@DefectiveRodsModeRendering.currentLives.use()
+            }
+            private val silhouetteTime: FloatVar = FloatVar(0f)
+
+            private var alreadyBroken: Boolean = false //currentLives.get() < lifeNum
+            private val shakeTime: FloatVar = FloatVar(0f)
+
+
+            init {
+                val sheet = AssetRegistry.get<PackedSheet>("tileset_ui_lives")
+                val texregLife = sheet["heart_noface"]
+                val texregSilhouette = sheet["heart_noface"]
+                val texregBroken = sheet["heart_dark"]
+
+                this.mainIcon = ImageIcon(texregLife)
+                this.silhouetteIcon = ImageIcon(texregSilhouette)
+                this.brokenIcon = ImageIcon(texregBroken)
+
+                this += mainIcon.apply {
+                    this.visible.bind { this@DefectiveRodsModeRendering.currentLives.use() >= lifeNum }
+                }
+
+                this += brokenIcon.apply {
+                    this.visible.bind { this@DefectiveRodsModeRendering.currentLives.use() < lifeNum }
+                    this.scale.bind {
+                        Interpolation.pow5In.apply(1f, 2f, shakeTime.use())
+                    }
+                }
+                this += silhouetteIcon.apply {
+                    this.tint.sideEffecting(Color(1f, 1f, 1f, 0f)) { c ->
+                        c.a = Interpolation.pow5.apply(0f, 1f, silhouetteTime.use())
+                        c
+                    }
+                    this.scale.bind {
+                        Interpolation.pow5In.apply(1f, 2f, silhouetteTime.use())
+                    }
+                }
+
+                currentLives.addListener {
+                    val l = it.getOrCompute()
+                    if (l < lifeNum) {
+                        if (!alreadyBroken) {
+                            alreadyBroken = true
+                            sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(silhouetteTime)
+                            shakeTime.set(1f)
+                        }
+                    } else if (l >= lifeNum) {
+                        if (alreadyBroken) {
+                            alreadyBroken = false
+                            sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, 1f, 1f, 0f), silhouetteTime)
+                            shakeTime.set(0f)
+                        }
+                    }
+                }
+
+            }
+
+            override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+                if (shakeTime.get() > 0f) {
+                    shakeTime.set((shakeTime.get() - Gdx.graphics.deltaTime).coerceAtLeast(0f))
+
+                    val maxShake = 5
+                    val x = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat() * shakeTime.get()
+                    val y = MathUtils.randomSign() * MathUtils.random(0, maxShake).toFloat() * shakeTime.get()
+                    this.brokenIcon.contentOffsetX.set(x)
+                    this.brokenIcon.contentOffsetY.set(y)
+                } else {
+                    this.brokenIcon.contentOffsetX.set(0f)
+                    this.brokenIcon.contentOffsetY.set(0f)
+                }
+
+                super.renderSelf(originX, originY, batch)
+            }
+        }
+
     }
     
 }

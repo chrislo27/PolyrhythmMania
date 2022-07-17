@@ -333,6 +333,10 @@ class EngineInputter(val engine: Engine) {
     }
 
     fun submitInputsFromRod(rod: EntityRodPR) {
+        if (rod.isDefective) {
+            return
+        }
+        
         val inputTracker = rod.inputTracker
 
         val numExpected = inputTracker.expected.count { it is EntityRodPR.ExpectedInput.Expected }

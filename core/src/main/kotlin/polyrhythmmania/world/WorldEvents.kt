@@ -190,18 +190,26 @@ class EventRowBlockExtend(engine: Engine, row: Row, index: Int, startBeat: Float
     }
 }
 
-class EventDeployRod(engine: Engine, val row: Row, startBeat: Float) : Event(engine) {
+class EventDeployRod(
+        engine: Engine, val row: Row, startBeat: Float,
+        val isDefective: Boolean = false,
+        val after: (EntityRodPR) -> Unit = {}
+) : Event(engine) {
+    
     init {
         this.beat = startBeat
     }
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        engine.world.addEntity(EntityRodPR(engine.world, this.beat, row))
+        engine.world.addEntity(EntityRodPR.createRod(engine.world, this.beat, row, this.isDefective).also(after))
         
         if (engine.areStatisticsEnabled) {
             GlobalStats.rodsDeployed.increment()
             GlobalStats.rodsDeployedPolyrhythm.increment()
+            if (this.isDefective) {
+                GlobalStats.defectiveRodsDeployed.increment()
+            }
         }
     }
 }
@@ -214,25 +222,7 @@ class EventDeployRodEndless(engine: Engine, val row: Row, startBeat: Float, val 
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        engine.world.addEntity(EntityRodPR(engine.world, this.beat, row, lifeLost = lifeLostVar))
-
-        if (engine.areStatisticsEnabled) {
-            GlobalStats.rodsDeployed.increment()
-            GlobalStats.rodsDeployedPolyrhythm.increment()
-        }
-    }
-}
-
-class EventDeployRodStoryMode(engine: Engine, val row: Row, startBeat: Float, val after: (EntityRodPR) -> Unit)
-    : Event(engine) {
-    
-    init {
-        this.beat = startBeat
-    }
-
-    override fun onStart(currentBeat: Float) {
-        super.onStart(currentBeat)
-        engine.world.addEntity(EntityRodPR(engine.world, this.beat, row).also(after))
+        engine.world.addEntity(EntityRodPR.createRodForEndless(engine.world, this.beat, row, lifeLostVar))
 
         if (engine.areStatisticsEnabled) {
             GlobalStats.rodsDeployed.increment()

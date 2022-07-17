@@ -2,23 +2,22 @@ package polyrhythmmania.editor.block.storymode
 
 import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.JsonObject
+import paintbox.binding.BooleanVar
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
-import paintbox.ui.contextmenu.ContextMenu
-import paintbox.ui.contextmenu.CustomMenuItem
-import paintbox.ui.contextmenu.LabelMenuItem
-import paintbox.ui.contextmenu.SeparatorMenuItem
+import paintbox.ui.contextmenu.*
 import paintbox.ui.control.DecimalTextField
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.DecimalFormats
+import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.block.BlockDeployRod
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.world.EventDeployRodStoryMode
+import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.entity.EntityRodDecor
 import java.util.*
 
@@ -27,15 +26,21 @@ class BlockDeployRodStoryMode(engine: Engine, blockTypes: EnumSet<BlockType> = B
     : BlockDeployRod(engine, blockTypes) {
 
     var xUnitsPerBeat: Float = 2f
+    val defective: BooleanVar = BooleanVar(false)
     
     init {
-        this.defaultText.set("Rod (SM)")
+        this.defaultText.bind { 
+            if (defective.use()) "Defect. Rod" else "Rod (SM)"
+        }
+        this.defaultTextSecondLine.bind { 
+            if (defective.use()) "(SM)" else ""
+        }
     }
 
     override fun compileIntoEvents(): List<Event> {
         val b = this.beat - 4
         return RowSetting.getRows(rowData.rowSetting.getOrCompute(), engine.world).map { row ->
-            EventDeployRodStoryMode(engine, row, b) { rod ->
+            EventDeployRod(engine, row, b, isDefective = this.defective.get()) { rod ->
                 rod.xUnitsPerBeat = this.xUnitsPerBeat.coerceAtLeast(0.25f)
             }
         }
@@ -51,6 +56,8 @@ class BlockDeployRodStoryMode(engine: Engine, blockTypes: EnumSet<BlockType> = B
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return super.createContextMenu(editor).also { ctxmenu ->
+            ctxmenu.addMenuItem(SeparatorMenuItem())
+            ctxmenu.addMenuItem(CheckBoxMenuItem.create(defective, "Defective?", editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(SeparatorMenuItem())
             ctxmenu.addMenuItem(LabelMenuItem.create("X-units per beat (def. 2)", editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(CustomMenuItem(
@@ -79,10 +86,14 @@ class BlockDeployRodStoryMode(engine: Engine, blockTypes: EnumSet<BlockType> = B
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
         obj.add("xUnitsPerBeat", this.xUnitsPerBeat)
+        if (this.defective.get()) {
+            obj.add("defective", true)
+        }
     }
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        xUnitsPerBeat = obj.getFloat("xUnitsPerBeat", EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT)
+        this.xUnitsPerBeat = obj.getFloat("xUnitsPerBeat", EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT)
+        this.defective.set(obj.getBoolean("defective", false))
     }
 }

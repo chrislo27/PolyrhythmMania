@@ -2,21 +2,23 @@ package polyrhythmmania.engine.modifiers
 
 import paintbox.binding.FloatVar
 import paintbox.binding.IntVar
+import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.ResultFlag
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
+import polyrhythmmania.world.EntityRodPR
 
 /**
- * Lives are separate from [EndlessScore] lives, and only flag the engine result to be failed.
+ * Tracks the number of defective rods that have escaped. If the threshold is met, the level has failed.
  * 
  * A life is lost when a miss occurs. There is a cooldown before more lives can be lost.
  * 
- * Not compatible with [EndlessScore] mode.
+ * Not compatible with [EndlessScore] mode nor [LivesMode].
  */
-class LivesMode : ModifierModule() {
+class DefectiveRodsMode : ModifierModule() {
     
     companion object {
-        const val DEFAULT_COOLDOWN: Float = 1.75f
+        const val DEFAULT_COOLDOWN: Float = 0.5f
     }
 
     // Settings
@@ -39,7 +41,10 @@ class LivesMode : ModifierModule() {
         }
     }
     
-    fun loseALife(inputter: EngineInputter) {
+    fun onDefectiveRodEscaped(engine: Engine, rod: EntityRodPR) {
+        if (!this.enabled.get()) {
+            return
+        }
         if (currentCooldown.get() > 0 || lives.get() <= 0 || maxLives.get() <= 0) {
             return
         }
@@ -50,20 +55,20 @@ class LivesMode : ModifierModule() {
         this.currentCooldown.set(cooldownBaseAmount.get())
 
         if (oldLives > 0 && newLives == 0) {
-            onAllLivesLost(inputter)
+            onAllLivesLost(engine.inputter)
         }
+    }
+    
+    fun onDefectiveRodExploded(engine: Engine, rod: EntityRodPR) {
+        if (!this.enabled.get()) {
+            return
+        }
+        
     }
 
     private fun onAllLivesLost(inputter: EngineInputter) {
         val engine = inputter.engine
         
         engine.resultFlag.set(ResultFlag.FAIL)
-    }
-
-
-    // InputterListener overrides
-
-    override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
-        loseALife(inputter)
     }
 }

@@ -21,6 +21,7 @@ import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.entity.EntityRod.Companion.MIN_COLLISION_UPDATE_RATE
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.tileset.TintedRegion
 import kotlin.math.floor
 
 
@@ -176,10 +177,20 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
 
 }
 
-class EntityRodPR(
+class EntityRodPR private constructor(
         world: World, deployBeat: Float, val row: Row,
-        val lifeLost: BooleanVar? = null
+        val lifeLost: BooleanVar?,
+        val isDefective: Boolean,
 ) : EntityRod(world, deployBeat) {
+    
+    companion object {
+        fun createRod(world: World, deployBeat: Float, row: Row, isDefective: Boolean): EntityRodPR {
+            return EntityRodPR(world, deployBeat, row, lifeLost = null, isDefective = isDefective)
+        }
+        fun createRodForEndless(world: World, deployBeat: Float, row: Row, lifeLost: BooleanVar): EntityRodPR {
+            return EntityRodPR(world, deployBeat, row, lifeLost = lifeLost, isDefective = false)
+        }
+    }
 
     data class InputTracker(
             val totalResultCount: Int,
@@ -191,10 +202,11 @@ class EntityRodPR(
         object Unknown : ExpectedInput()
         object Skipped : ExpectedInput()
         object InAir : ExpectedInput()
-        class Expected(val thisIndex: Int, val nextJumpIndex: Int,
-                       override val perfectBeat: Float, override val inputType: InputType)
-            : ExpectedInput(), InputResultLike {
-            
+        class Expected(
+                val thisIndex: Int, val nextJumpIndex: Int,
+                override val perfectBeat: Float, override val inputType: InputType
+        ) : ExpectedInput(), InputResultLike {
+
             override val expectedIndex: Int get() = this.thisIndex
             
             override fun toString(): String {
@@ -204,6 +216,7 @@ class EntityRodPR(
     }
 
     private val killAfterBeats: Float = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
+    private val defectiveEscapeIndexThreshold: Int = 10 // Index at which this defective rod has escaped
 
     private var explodeAtSec: Float = Float.MAX_VALUE
     var exploded: Boolean = false
@@ -213,12 +226,14 @@ class EntityRodPR(
     private var lastCurrentIndex: Float = -10000f
     var registeredMiss: Boolean = false
         private set
+    private var defectiveRodEscaped: Boolean = false // Set to true if this rod is defective and has "escaped"
 
     val inputTracker: InputTracker = InputTracker(row.length)
     val acceptingInputs: Boolean
         get() = !collision.collidedWithWall && !exploded
     
     private var bouncedToOutOfBounds: Int = 0 // 0 = false, 1 = true, 2 = checked already
+    
     
     init {
         this.position.x = getPosXFromBeat(0f)
@@ -230,6 +245,22 @@ class EntityRodPR(
 
     override fun getRenderVec(): Vector3 {
         return visualPosition
+    }
+
+    override fun getGroundBorderAnimations(tileset: Tileset): List<TintedRegion> {
+        return if (this.isDefective) tileset.defectiveRodGroundBorderAnimations else super.getGroundBorderAnimations(tileset)
+    }
+
+    override fun getAerialBorderAnimations(tileset: Tileset): List<TintedRegion> {
+        return if (this.isDefective) tileset.defectiveRodAerialBorderAnimations else super.getAerialBorderAnimations(tileset)
+    }
+
+    override fun getGroundFillAnimations(tileset: Tileset): List<TintedRegion> {
+        return if (this.isDefective) tileset.defectiveRodGroundFillAnimations else super.getGroundFillAnimations(tileset)
+    }
+
+    override fun getAerialFillAnimations(tileset: Tileset): List<TintedRegion> {
+        return if (this.isDefective) tileset.defectiveRodAerialFillAnimations else super.getAerialFillAnimations(tileset)
     }
 
     fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX
@@ -261,6 +292,9 @@ class EntityRodPR(
         if (engine.areStatisticsEnabled) {
             GlobalStats.rodsExploded.increment()
             GlobalStats.rodsExplodedPolyrhythm.increment()
+            if (this.isDefective) {
+                GlobalStats.defectiveRodsExploded.increment()
+            }
         }
         
         val endlessScore = engine.modifiers.endlessScore
@@ -275,6 +309,16 @@ class EntityRodPR(
                     if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
                         GlobalStats.livesLostEndless.increment()
                     }
+                }
+            }
+        }
+
+        if (this.isDefective) {
+            if (!this.defectiveRodEscaped) {
+                engine.modifiers.defectiveRodsMode.onDefectiveRodExploded(engine, this)
+
+                if (engine.areStatisticsEnabled) {
+                    GlobalStats.defectiveRodsExploded.increment()
                 }
             }
         }
@@ -532,6 +576,20 @@ class EntityRodPR(
             this.position.y = row.startY.toFloat() + 1
             this.visualPosition.y = this.position.y
             this.collision.velocityY = 0f
+        }
+        
+        // Defective rod handling
+        if (this.isDefective) {
+            if (!this.defectiveRodEscaped && !this.exploded) {
+                if (currentIndex >= defectiveEscapeIndexThreshold) {
+                    this.defectiveRodEscaped = true
+                    engine.modifiers.defectiveRodsMode.onDefectiveRodEscaped(engine, this)
+                    
+                    if (engine.areStatisticsEnabled) {
+                        GlobalStats.defectiveRodsEscaped.increment()
+                    }
+                }
+            }
         }
     }
 

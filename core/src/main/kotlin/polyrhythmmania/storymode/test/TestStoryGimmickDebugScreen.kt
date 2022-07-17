@@ -136,6 +136,12 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             enterGameMode(TestStory8BallGameMode(main))
                         }
                     }
+                    this += Button("All Defective Rods PR2").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGameMode(TestStoryDefectiveGameMode(main))
+                        }
+                    }
                     this += separator()
                     this += Button("Endless UI debug").apply {
                         this.bounds.height.set(32f)
