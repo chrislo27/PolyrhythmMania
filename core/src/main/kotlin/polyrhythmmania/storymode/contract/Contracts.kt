@@ -52,6 +52,12 @@ object Contracts {
         add(Contract("tram_and_pauline", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tram_and_pauline.prmproj"))
         })
+        add(Contract("air_rally", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj"))
+        })
+        add(Contract("first_contact", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/first_contact.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
