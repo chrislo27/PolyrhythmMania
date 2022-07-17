@@ -147,13 +147,19 @@ class Container(
         storyModeMetadata.addListener {
             val metadata = it.getOrCompute()
             
+            engine.inputter.inputChallenge.restriction = metadata.inputTimingRestriction
+            
             val livesMode = engine.modifiers.livesMode
             val lives = metadata.lives
             livesMode.enabled.set(lives > 0)
             livesMode.maxLives.set(lives)
             livesMode.resetState()
             
-            engine.inputter.inputChallenge.restriction = metadata.inputTimingRestriction
+            val defectiveRodsMode = engine.modifiers.defectiveRodsMode
+            val defectiveThreshold = metadata.defectiveRodsThreshold
+            defectiveRodsMode.enabled.set(defectiveThreshold > 0)
+            defectiveRodsMode.maxLives.set(defectiveThreshold)
+            defectiveRodsMode.resetState()
         }
     }
     

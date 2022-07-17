@@ -6,24 +6,27 @@ import polyrhythmmania.engine.input.InputTimingRestriction
 
 
 data class StoryModeContainerMetadata(
-        val lives: Int,
         val inputTimingRestriction: InputTimingRestriction,
+        val lives: Int,
+        val defectiveRodsThreshold: Int,
 ) {
     
     companion object {
         const val METADATA_VERSION: Int = 1
         
         val BLANK: StoryModeContainerMetadata = StoryModeContainerMetadata(
-                lives = 0,
                 inputTimingRestriction = InputTimingRestriction.NORMAL,
+                lives = 0,
+                defectiveRodsThreshold = 0,
         )
         
         fun fromJson(obj: JsonObject): StoryModeContainerMetadata {
             val versionNumber: Int = obj.get("_version").asInt()
 
             return StoryModeContainerMetadata(
-                    obj.getInt("lives", 0),
                     InputTimingRestriction.MAP[obj.getInt("inputTimingRestriction", BLANK.inputTimingRestriction.id)] ?: BLANK.inputTimingRestriction,
+                    obj.getInt("lives", 0),
+                    obj.getInt("defectiveRodsThreshold", 0),
             )
         }
     }
@@ -32,8 +35,9 @@ data class StoryModeContainerMetadata(
         return Json.`object`().apply {
             this.add("_version", METADATA_VERSION)
             
-            this.add("lives", lives)
             this.add("inputTimingRestriction", inputTimingRestriction.id)
+            this.add("lives", lives)
+            this.add("defectiveRodsThreshold", defectiveRodsThreshold)
         }
     }
     
