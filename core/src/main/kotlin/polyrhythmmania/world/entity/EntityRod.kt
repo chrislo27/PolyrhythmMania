@@ -50,6 +50,19 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
     protected open fun getTintColorOverrideBorder(region: TintedRegion): Color? = null
     protected open fun getTintColorOverrideFill(region: TintedRegion): Color? = null
     
+    protected open fun getGroundBorderAnimations(tileset: Tileset): List<TintedRegion> {
+        return tileset.rodGroundBorderAnimations
+    }
+    protected open fun getAerialBorderAnimations(tileset: Tileset): List<TintedRegion> {
+        return tileset.rodAerialBorderAnimations
+    }
+    protected open fun getGroundFillAnimations(tileset: Tileset): List<TintedRegion> {
+        return tileset.rodGroundFillAnimations
+    }
+    protected open fun getAerialFillAnimations(tileset: Tileset): List<TintedRegion> {
+        return tileset.rodAerialFillAnimations
+    }
+    
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val animationAlpha = getAnimationAlpha().coerceIn(0f, 1f)
 
@@ -58,15 +71,15 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
         val offsetX = this.offsetX
         val offsetY = this.offsetY
         val regionBorder: TintedRegion = if (!isInAir) {
-            tileset.rodGroundBorderAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
+            getGroundBorderAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         } else {
-            tileset.rodAerialBorderAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
+            getAerialBorderAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         }
         drawTintedRegion(batch, vec, tileset, regionBorder, offsetX, offsetY, renderW, renderH, tintColor = getTintColorOverrideBorder(regionBorder))
         val regionFill: TintedRegion = if (!isInAir) {
-            tileset.rodGroundFillAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
+            getGroundFillAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         } else {
-            tileset.rodAerialFillAnimations[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
+            getAerialFillAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         }
         drawTintedRegion(batch, vec, tileset, regionFill, offsetX, offsetY, renderW, renderH, tintColor = getTintColorOverrideFill(regionFill))
 
@@ -152,8 +165,6 @@ abstract class EntityRod(world: World, val deployBeat: Float)
             }
         }
 
-//        val engineUpdateDelta = seconds - engineUpdateLastSec
-
         val minCollisionUpdateInterval = 1f / MIN_COLLISION_UPDATE_RATE
         val collisionUpdateDeltaBeat = beat - collisionUpdateLastBeat
         var iterationCount = 0
@@ -179,15 +190,15 @@ abstract class EntityRod(world: World, val deployBeat: Float)
     protected open fun collisionCheck(engine: Engine, beat: Float, seconds: Float, deltaSec: Float) {
     }
 
-    protected fun playSfxLand(engine: Engine) {
+    protected open fun playSfxLand(engine: Engine) {
         engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_land"), SoundInterface.SFXType.NORMAL)
     }
 
-    protected fun playSfxSideCollision(engine: Engine) {
+    protected open fun playSfxSideCollision(engine: Engine) {
         engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_side_collision"), SoundInterface.SFXType.NORMAL)
     }
 
-    protected fun playSfxExplosion(engine: Engine) {
+    protected open fun playSfxExplosion(engine: Engine) {
         engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_explosion"), SoundInterface.SFXType.NORMAL)
     }
 }
