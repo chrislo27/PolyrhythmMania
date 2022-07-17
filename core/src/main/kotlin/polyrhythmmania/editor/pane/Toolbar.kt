@@ -343,6 +343,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                         this.markup.set(editor.editorPane.palette.markup)
                                         this.renderAlign.set(Align.right)
                                         this.bounds.width.set(100f)
+                                        this.tooltipElement.set(editorPane.createDefaultTooltip("Not compatible with Defective Rods."))
                                     }
                                     hbox += ComboBox((0..10).toList(), editor.container.storyModeMetadata.getOrCompute().lives).also { combobox ->
                                         combobox.markup.set(editor.editorPane.palette.markup)
@@ -364,6 +365,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                         this.markup.set(editor.editorPane.palette.markup)
                                         this.renderAlign.set(Align.right)
                                         this.bounds.width.set(250f)
+                                        this.tooltipElement.set(editorPane.createDefaultTooltip("Not compatible with Lives."))
                                     }
                                     hbox += ComboBox((0..10).toList(), editor.container.storyModeMetadata.getOrCompute().defectiveRodsThreshold).also { combobox ->
                                         combobox.markup.set(editor.editorPane.palette.markup)
