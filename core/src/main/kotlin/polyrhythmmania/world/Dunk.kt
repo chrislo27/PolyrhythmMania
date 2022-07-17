@@ -163,11 +163,11 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         val modifiers = engine.modifiers
         val inputSuccessful = !inputter.inputChallenge.isInputScoreMiss(inputResult.inputScore)
         val lerpResult = (inputResult.accuracyPercent + 1f) / 2f // 0.5 = perfect
-        val endX = if (inputSuccessful) indexToX(MathUtils.random(4.4f, 5.2f)) else indexToX(MathUtils.lerp(3f, 4f, lerpResult))
+        val endX = if (inputSuccessful) indexToX(MathUtils.random(4.5f, 4.8f)) else indexToX(MathUtils.lerp(3f, 4f, lerpResult))
         val endY = if (inputSuccessful) 5f else this.position.y
         val xDistance = endX - this.position.x
         val calculatedHeight = this.position.y + 1f + xDistance
-        val maxHeight = if (inputSuccessful) (calculatedHeight + MathUtils.lerp(-0.2f, 0.2f, lerpResult)) else (calculatedHeight)
+        val maxHeight = if (inputSuccessful) (calculatedHeight + MathUtils.lerp(-0.15f, 0.25f, lerpResult)) else (calculatedHeight)
         val prevBounce = collision.bounce
         collision.bounce = Bounce(this, maxHeight, this.position.x, this.position.y, endX, endY, prevBounce)
 
@@ -472,8 +472,9 @@ class EntityDunkStarParticle(world: World, val beatStarted: Float, val startPos:
         
         val deltaBeat = engine.beat - lastBeat
         this.lastBeat = engine.beat
-        velocity.y += -4f * deltaBeat
-        this.position.mulAdd(velocity, deltaBeat)
+        val velocitySpeed = 1f / 0.85f
+        velocity.y += -4f * deltaBeat * velocitySpeed
+        this.position.mulAdd(velocity, deltaBeat * velocitySpeed)
         
         val fadeThreshold = 0.75f
         if (percentage >= fadeThreshold) {
