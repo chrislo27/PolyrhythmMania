@@ -74,8 +74,11 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
     private val summedOffsets: FloatVar = FloatVar(0f)
     private val lastInputOffset: FloatVar = FloatVar(0f)
     private val inputCount: IntVar = IntVar(0)
-    private val estimatedOffset: FloatVar = FloatVar {
+    private val averageOffset: FloatVar = FloatVar {
         (summedOffsets.use() / inputCount.use().coerceAtLeast(1)) * 1000
+    }
+    private val suggestedOffsetSetting: FloatVar = FloatVar {
+        -averageOffset.use()
     }
     
     private val pistonAnimations: List<TextureRegion> = listOf(
@@ -122,7 +125,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
             this.padding.set(Insets(8f, 8f, 8f, 8f))
 
             this += TextLabel(binding = { Localization.getVar("calibration.offset", Var {
-                listOf(settings.inputCalibration.use().audioOffsetMs.roundToInt(), estimatedOffset.use().roundToInt())
+                listOf(settings.inputCalibration.use().audioOffsetMs.roundToInt(), suggestedOffsetSetting.use().roundToInt())
             }).use() }, font = main.fontMainMenuMain).apply {
                 this.textColor.set(Color.WHITE)
                 this.renderAlign.set(Align.center)
@@ -140,7 +143,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
             this.padding.set(Insets(8f, 8f, 8f, 8f))
 
             this += TextLabel(binding = { Localization.getVar("calibration.offset.details", Var {
-                listOf(DecimalFormats.format("0.00", estimatedOffset.use()), DecimalFormats.format("0.00", lastInputOffset.use()), inputCount.use())
+                listOf(DecimalFormats.format("0.00", averageOffset.use()), DecimalFormats.format("0.00", lastInputOffset.use()), inputCount.use())
             }).use() }, font = main.fontMainMenuMain).apply {
                 this.textColor.set(Color.WHITE)
                 this.renderAlign.set(Align.center)
@@ -168,17 +171,19 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
                         }
                     }
                     this += Button(binding = { Localization.getVar("calibration.button.resetEstimate").use() }, font = main.fontMainMenuThin).apply {
-                        this.bounds.width.set(300f)
+                        this.bounds.width.set(320f)
                         this.applyStyleContent()
                         this.setOnAction {
                             resetCalibrationEstimate()
                         }
                     }
-                    this += Button(binding = { Localization.getVar("calibration.button.setSettingAsEstimate").use() }, font = main.fontMainMenuThin).apply {
-                        this.bounds.width.set(600f)
+                    this += Button(binding = { 
+                        Localization.getVar("calibration.button.setSettingAsEstimate", Var { listOf(suggestedOffsetSetting.use().roundToInt()) }).use()
+                                             }, font = main.fontMainMenuThin).apply {
+                        this.bounds.width.set(650f)
                         this.applyStyleContent()
                         this.setOnAction {
-                            settings.calibrationAudioOffsetMs.set(estimatedOffset.get().roundToInt())
+                            settings.calibrationAudioOffsetMs.set(suggestedOffsetSetting.get().roundToInt())
                             main.mainMenuScreen.menuCollection.calibrationSettingsMenu.manualOffsetSlider.setValue(settings.calibrationAudioOffsetMs.getOrCompute().toFloat())
                         }
                     }
@@ -205,7 +210,9 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
         
         if (Gdx.input.isKeyJustPressed(aKeybind)) {
             pistonAnimation = 1f
-            val beatOffset = -(currentBeat - currentBeat.roundToInt())
+            
+            val targetBeat = currentBeat.roundToInt() // The beat the input should be on if perfect
+            val beatOffset = currentBeat - targetBeat // Positive if late
             val secOffset = TempoUtils.beatsToSeconds(beatOffset, CALIBRATION_BPM)
             lastInputOffset.set(secOffset * 1000)
             if (secOffset.absoluteValue <= InputThresholds.MAX_OFFSET_SEC * 2) {
