@@ -19,6 +19,7 @@ import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
@@ -961,6 +962,28 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                     val newAmount = it.getOrCompute()
                     hbox.temporarilyDisableLayouts {
                         hbox.removeAllChildren()
+                        
+                        hbox += ImageIcon(TextureRegion(AssetRegistry.get<Texture>("gba_spritesheet"), 205, 167, 24, 16)).apply { 
+                            this.bindWidthToSelfHeight()
+                        }
+                        hbox += Pane().apply { // Colon 
+                            this.bounds.width.set(16f)
+                            this += RectElement(Color.WHITE).apply {
+                                Anchor.TopLeft.configure(this, offsetY = 26f)
+                                this.bounds.width.set(4f)
+                                this.bindHeightToSelfWidth()
+                                this.border.set(Insets(2f))
+                                this.borderStyle.set(SolidBorder(Color.WHITE).apply { this.roundedCorners.set(true) })
+                            }
+                            this += RectElement(Color.WHITE).apply { 
+                                Anchor.BottomLeft.configure(this, offsetY = -20f)
+                                this.bounds.width.set(4f) 
+                                this.bindHeightToSelfWidth()
+                                this.border.set(Insets(2f))
+                                this.borderStyle.set(SolidBorder(Color.WHITE).apply { this.roundedCorners.set(true) })
+                            }
+                        }
+                        
                         (1..newAmount).map { i ->
                             val icon = DefRodHeartIcon(i)
                             hbox += Pane().apply {
