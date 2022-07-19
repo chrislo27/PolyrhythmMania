@@ -76,11 +76,15 @@ class EventDeployRodDunk(engine: Engine, startBeat: Float) : Event(engine) {
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        engine.world.addEntity(EntityRodDunk(engine.world, this.beat))
+        
+        val endless = engine.modifiers.endlessScore
+        if (!endless.enabled.get() || endless.lives.get() > 0) {
+            engine.world.addEntity(EntityRodDunk(engine.world, this.beat))
 
-        if (engine.areStatisticsEnabled) {
-            GlobalStats.rodsDeployed.increment()
-            GlobalStats.rodsDeployedDunk.increment()
+            if (engine.areStatisticsEnabled) {
+                GlobalStats.rodsDeployed.increment()
+                GlobalStats.rodsDeployedDunk.increment()
+            }
         }
     }
 }
