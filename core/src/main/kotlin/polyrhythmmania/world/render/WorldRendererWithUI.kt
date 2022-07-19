@@ -870,7 +870,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
                 val sheet = AssetRegistry.get<PackedSheet>("tileset_ui_lives")
                 val texregLife = sheet["heart"]
                 val texregSilhouette = sheet["heart_noface"]
-                val texregBroken = sheet["heart_dark"]
+                val texregBroken = sheet["heart_broken"]
 
                 this.mainIcon = ImageIcon(texregLife)
                 this.silhouetteIcon = ImageIcon(texregSilhouette)
@@ -1000,9 +1000,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
             init {
                 val sheet = AssetRegistry.get<PackedSheet>("tileset_ui_lives")
-                val texregLife = sheet["heart_noface"]
-                val texregSilhouette = sheet["heart_noface"]
-                val texregBroken = sheet["heart_dark"]
+                val texregLife = sheet["heart_checkmark"]
+                val texregSilhouette = sheet["heart_broken_cross"]
+                val texregBroken = sheet["heart_broken_cross"]
 
                 this.mainIcon = ImageIcon(texregLife)
                 this.silhouetteIcon = ImageIcon(texregSilhouette)

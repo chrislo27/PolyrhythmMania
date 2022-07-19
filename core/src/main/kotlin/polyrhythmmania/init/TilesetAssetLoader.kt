@@ -31,7 +31,9 @@ class TilesetAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("endless_lives_ui", "textures/world/ui/endless_lives.png")
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui_lives", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "heart",
-                "heart_dark",
+                "heart_broken",
+                "heart_broken_cross",
+                "heart_checkmark",
                 "heart_noface",
                 "heart_outline",
                 "heart_outline_noface",
