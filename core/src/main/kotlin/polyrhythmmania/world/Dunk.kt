@@ -79,8 +79,13 @@ class EntityDunkBacking(world: World) : SpriteEntity(world) {
 
 
 class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBeat) {
+    
+    companion object {
+        private const val KILL_AFTER_BEATS_NORMAL: Float = 5f
+        private const val KILL_AFTER_BEATS_SUCCESSFUL: Float = 8f
+    }
 
-    private val killAfterBeats: Float = 7f
+    private var killAfterBeats: Float = KILL_AFTER_BEATS_NORMAL
     private val startingX: Float = getPosXFromBeat(0f)
 
     private var explodeAtSec: Float = Float.MAX_VALUE
@@ -175,6 +180,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         val dunkBeat = inputResult.perfectBeat + 2f
         if (inputSuccessful) {
             this.inputWasSuccessful = true
+            this.killAfterBeats = KILL_AFTER_BEATS_SUCCESSFUL
 
             engine.addEvent(EventPlaySFX(engine, dunkBeat, "sfx_dunk_basket_swoosh"))
             
