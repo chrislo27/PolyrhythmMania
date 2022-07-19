@@ -136,6 +136,12 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             enterGameMode(TestStory8BallGameMode(main))
                         }
                     }
+                    this += Button("PR2 with lives").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGameMode(TestStoryLivesGameMode(main))
+                        }
+                    }
                     this += Button("All Defective Rods PR2").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
