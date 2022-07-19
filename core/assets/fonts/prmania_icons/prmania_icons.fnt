@@ -18,4 +18,5 @@ char id=99   x=133   y=1    width=32     height=32     xoffset=0     yoffset=-9 
 char id=101   x=264   y=32    width=32     height=32     xoffset=0     yoffset=-9    xadvance=32     page=0  chnl=15
 char id=87   x=383   y=1    width=23     height=28     xoffset=0     yoffset=-9    xadvance=28     page=0  chnl=15
 char id=119   x=412   y=1    width=42     height=40     xoffset=0     yoffset=-17    xadvance=42     page=0  chnl=15
+char id=100   x=205   y=167    width=24     height=16     xoffset=0     yoffset=0    xadvance=24     page=0  chnl=15
 kernings count=0

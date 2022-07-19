@@ -14,3 +14,4 @@ C   67 : Cube (Polyrhythm 1)
 c   99 : Cube (Polyrhythm 2)
 W   87 : Widget half
 w  119 : Solitaire special card icon
+d  100 : Defective rod
