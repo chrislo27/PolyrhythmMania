@@ -129,6 +129,7 @@ class Tileset(val texturePack: ReadOnlyVar<TexturePack>) {
     val dunkBasketRear: TintedRegion = TintedRegion("basket_rear")
     val dunkBacking: TintedRegion = TintedRegion("hoop_back")
     val dunkStar: TintedRegion = TintedRegion("dunk_star")
+    val dunkStarAnimation: List<TintedRegion> = (0 until 4).map { TintedSubregion(dunkStar, 0.25f * it, 0f, 0.25f, 1f) }
     
     // ASSEMBLE
     val asmLane: TintedRegion = TintedRegion("asm_lane")

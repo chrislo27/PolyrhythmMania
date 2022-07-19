@@ -448,10 +448,11 @@ class EntityDunkStarParticle(world: World, val beatStarted: Float, val startPos:
     
     private var lastBeat: Float = beatStarted
     private var duration: Float = 1f
-    private val renderScale: Float = 0.5f
+    private var percentage: Float = 0f
     
-    override val renderWidth: Float get() = super.renderWidth * renderScale
-    override val renderHeight: Float get() = super.renderHeight * renderScale
+    private val renderScale: Float = 1f
+    override val renderWidth: Float get() = (9f / 32f) * renderScale
+    override val renderHeight: Float get() = (9f / 32f) * renderScale
 
     init {
         this.position.set(startPos)
@@ -459,7 +460,8 @@ class EntityDunkStarParticle(world: World, val beatStarted: Float, val startPos:
     }
     
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
-        return tileset.dunkStar
+        val animation = tileset.dunkStarAnimation
+        return animation[(percentage * animation.size).toInt().coerceIn(0, animation.size - 1)]
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
@@ -469,6 +471,7 @@ class EntityDunkStarParticle(world: World, val beatStarted: Float, val startPos:
 
         val beatsElapsed = engine.beat - beatStarted
         val percentage = (beatsElapsed / duration).coerceIn(0f, 1f)
+        this.percentage = percentage
         
         val deltaBeat = engine.beat - lastBeat
         this.lastBeat = engine.beat
