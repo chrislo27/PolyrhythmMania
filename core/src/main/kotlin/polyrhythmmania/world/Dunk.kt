@@ -23,6 +23,7 @@ import polyrhythmmania.world.tileset.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.render.bg.WorldBackground
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 
 class EntityDunkBasketBack(world: World) : SpriteEntity(world) {
@@ -256,15 +257,46 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
             // Star particles
             engine.addEvent(object : Event(engine) {
                 override fun onStart(currentBeat: Float) {
-                    val leftVelocity = Vector3(0f, 2f, -0.75f)//.scl(60f / engine.tempos.tempoAtBeat(dunkBeat))
-                    val rightVelocity = leftVelocity.cpy().also { it.z *= -1 }
+                    val initialVelocity = Vector3(0f, 2f, -0.75f)
+                    val initialPosition = Vector3(8.5f, 6f, -0.75f)
+                    val rotationAxis = Vector3(0f, 1f, 0f)
+
+                    // 0 degrees is -Z, positive goes counterclockwise with 90 = -X, 180 = +Z
+                    fun addStar(degrees: Float, after: (pos: Vector3, velo: Vector3) -> Unit) {
+                        val pos = initialPosition.cpy().add(Vector3(0f, 0f, -1f).rotate(rotationAxis, degrees).scl(0.75f))
+                        val velo = initialVelocity.cpy().rotate(rotationAxis, degrees)
+                        
+                        after(pos, velo)
+
+                        engine.world.addEntity(EntityDunkStarParticle(engine.world, dunkBeat, pos, velo))
+                    }
                     
-//                    val hoopPosition = Vector3(8.5f, 4.5f, -1f)
-                    val leftPosition = Vector3(8.5f, 6f, -1.5f)
-                    val rightPosition = Vector3(8.5f, 6f, 0f)
+                    fun jitter(vec: Vector3, scale: Float) {
+                        vec.x += MathUtils.random(0f, 1f) * MathUtils.randomSign() * scale
+                        vec.y += MathUtils.random(0f, 1f) * MathUtils.randomSign() * scale
+                        vec.z += MathUtils.random(0f, 1f) * MathUtils.randomSign() * scale
+                    }
                     
-                    engine.world.addEntity(EntityDunkStarParticle(engine.world, dunkBeat, leftPosition, leftVelocity))
-                    engine.world.addEntity(EntityDunkStarParticle(engine.world, dunkBeat, rightPosition, rightVelocity))
+                    addStar(0f) { pos, velo ->
+                        velo.y *= 1.25f
+                        velo.z *= 1.5f
+                        jitter(velo, 0.125f)
+                    }
+                    addStar(270f) { pos, velo ->
+                        velo.y *= 1f
+                        velo.x *= 2f
+                        jitter(velo, 0.125f)
+                    }
+                    addStar(90f) { pos, velo ->
+                        velo.y *= 0.9f
+                        velo.x *= 1.1f
+                        jitter(velo, 0.125f)
+                    }
+                    addStar(180f) { pos, velo ->
+                        velo.y *= 0.9f
+                        velo.x *= 1.1f
+                        jitter(velo, 0.125f)
+                    }
                 }
             }.apply { 
                 this.beat = dunkBeat
@@ -466,9 +498,14 @@ class EntityDunkStarParticle(world: World, val beatStarted: Float, val startPos:
     private var duration: Float = 1f
     private var percentage: Float = 0f
     
+    private val flip: Boolean = MathUtils.randomBoolean() 
+    private val animationOffset: Float = MathUtils.random(0f, 1f) 
+    
     private val renderScale: Float = 1f
-    override val renderWidth: Float get() = (9f / 32f) * renderScale
+    override val renderWidth: Float get() = (9f / 32f) * renderScale * (if (flip) -1 else 1)
     override val renderHeight: Float get() = (9f / 32f) * renderScale
+    override val pxOffsetX: Float = if (flip) (-renderWidth) else 0f
+    override val pxOffsetY: Float = 0f
 
     init {
         this.position.set(startPos)
@@ -477,7 +514,7 @@ class EntityDunkStarParticle(world: World, val beatStarted: Float, val startPos:
     
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         val animation = tileset.dunkStarAnimation
-        return animation[(percentage * animation.size).toInt().coerceIn(0, animation.size - 1)]
+        return animation[((percentage + animationOffset) * animation.size).toInt() % animation.size]
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
