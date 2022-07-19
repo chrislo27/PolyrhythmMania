@@ -470,6 +470,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             engine.seconds = originalSecs
             editor.resetWorldEntitiesAndEngineModules()
             editor.updatePaletteAndTexPackChangesState()
+            container.resetInputFeedbackEntities()
             engine.soundInterface.clearAllNonMusicAudio()
             engine.playbackSpeed = previousPlaybackSpeed
         }
