@@ -544,7 +544,8 @@ class EntityRodPR private constructor(
                 val inputter = engine.inputter
                 val currentExpectedInput: ExpectedInput? = inputTracker.expected.getOrNull(currentIndex)
                 if (engine.autoInputs) {
-                    if (collision.velocityY == 0f && blockBelow.active && blockBelow.type != EntityPiston.Type.PLATFORM
+                    if (!this.isDefective && collision.velocityY == 0f && blockBelow.active
+                            && blockBelow.type != EntityPiston.Type.PLATFORM
                             && blockBelow.pistonState == EntityPiston.PistonState.RETRACTED
                             && (currentExpectedInput is ExpectedInput.Expected && currentExpectedInput.thisIndex == currentIndex)
                             && currentIndexFloat - currentIndex in 0.25f..0.65f) {
