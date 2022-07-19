@@ -215,7 +215,8 @@ class EntityRodPR private constructor(
         }
     }
 
-    private val killAfterBeats: Float = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
+    private val killAfterBeats: Float 
+        get() = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
     private val defectiveEscapeIndexThreshold: Int = 10 // Index at which this defective rod has escaped
 
     private var explodeAtSec: Float = Float.MAX_VALUE
