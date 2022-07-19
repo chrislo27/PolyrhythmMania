@@ -64,6 +64,12 @@ object Contracts {
         add(Contract("toss_boys", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/toss_boys.prmproj"))
         })
+        add(Contract("second_contact", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/second_contact.prmproj"))
+        })
+        add(Contract("rhythm_tweezers", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_tweezers.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
