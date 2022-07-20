@@ -78,6 +78,9 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
                 Track(TrackID.FX_0, EnumSet.of(BlockType.FX)),
                 Track(TrackID.FX_1, EnumSet.of(BlockType.FX)),
                 Track(TrackID.FX_2, EnumSet.of(BlockType.FX)),
+                Track(TrackID.FX_3, EnumSet.of(BlockType.FX)),
+                Track(TrackID.FX_4, EnumSet.of(BlockType.FX)),
+                Track(TrackID.FX_5, EnumSet.of(BlockType.FX)),
         )
         val DEFAULT_TRACKS: List<Track> = DEFAULT_TRACKS_INPUT + DEFAULT_TRACKS_FX
         private val STORY_TRACKS: List<Track> = DEFAULT_TRACKS_INPUT + listOf(
