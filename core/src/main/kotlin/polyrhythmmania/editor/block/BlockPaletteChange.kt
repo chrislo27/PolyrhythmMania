@@ -1,24 +1,15 @@
 package polyrhythmmania.editor.block
 
-import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.JsonObject
-import paintbox.binding.BooleanVar
-import paintbox.ui.UIElement
-import paintbox.ui.area.Insets
-import paintbox.ui.border.SolidBorder
-import paintbox.ui.contextmenu.*
-import paintbox.ui.control.DecimalTextField
-import paintbox.ui.control.TextField
-import paintbox.ui.element.RectElement
-import paintbox.ui.layout.HBox
+import paintbox.ui.contextmenu.ContextMenu
+import paintbox.ui.contextmenu.SeparatorMenuItem
+import paintbox.ui.contextmenu.SimpleMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.pane.dialog.PaletteEditDialog
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import paintbox.util.DecimalFormats
 import polyrhythmmania.world.EventPaletteChange
-import polyrhythmmania.world.tileset.PaletteTransition
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.*
 

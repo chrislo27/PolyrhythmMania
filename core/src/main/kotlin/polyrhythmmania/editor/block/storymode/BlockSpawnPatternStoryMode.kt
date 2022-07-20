@@ -15,25 +15,26 @@ import paintbox.util.DecimalFormats
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.block.BlockSpawnPattern
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.world.entity.EntityRodDecor
 
 
 class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
 
-    private var beatsPerBlock: Float = 0.5f
+    private var xUnitsPerBeat: Float = EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT
     
     init {
         this.width = 4f
-        this.defaultText.set("Spawn Pat (SM)")
+        this.defaultText.set("Spawn Pttn (SM)")
     }
     
     override fun getBeatsPerBlock(): Float {
-        return this.beatsPerBlock
+        return 1f / this.xUnitsPerBeat
     }
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return super.createContextMenu(editor).also { ctxmenu ->
             ctxmenu.addMenuItem(SeparatorMenuItem())
-            ctxmenu.addMenuItem(LabelMenuItem.create("Beats per block (def. 0.5)", editor.editorPane.palette.markup))
+            ctxmenu.addMenuItem(LabelMenuItem.create("X-units per beat (default ${EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT})", editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(CustomMenuItem(
                 HBox().apply {
                     this.bounds.height.set(32f)
@@ -42,13 +43,13 @@ class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
                         this.padding.set(Insets(2f))
-                        this += DecimalTextField(startingValue = beatsPerBlock, decimalFormat = DecimalFormats["0.0##"],
+                        this += DecimalTextField(startingValue = xUnitsPerBeat, decimalFormat = DecimalFormats["0.0##"],
                             font = editor.editorPane.palette.musicDialogFont).apply {
-                            this.minimumValue.set(1 / 16f)
+                            this.minimumValue.set(0.25f)
                             this.textColor.set(Color(1f, 1f, 1f, 1f))
 
                             this.value.addListener {
-                                beatsPerBlock = it.getOrCompute()
+                                xUnitsPerBeat = it.getOrCompute()
                             }
                         }
                     }
@@ -65,17 +66,21 @@ class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }
             it.disableTailEnd.set(this.disableTailEnd.get())
-            it.beatsPerBlock = this.beatsPerBlock
+            it.xUnitsPerBeat = this.xUnitsPerBeat
         }
     }
 
     override fun writeToJson(obj: JsonObject) {
         super.writeToJson(obj)
-        obj.add("beatsPerBlock", this.beatsPerBlock)
+        obj.add("xUnitsPerBeat", this.xUnitsPerBeat)
     }
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        this.beatsPerBlock = obj.getFloat("beatsPerBlock", 0.5f)
+        if (obj.get("beatsPerBlock") != null) {
+            this.xUnitsPerBeat = 1f / obj.getFloat("beatsPerBlock", 0.5f).coerceAtLeast(0.25f)
+        } else {
+            this.xUnitsPerBeat = obj.getFloat("xUnitsPerBeat", EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT).coerceAtLeast(0.25f)
+        }
     }
 }
