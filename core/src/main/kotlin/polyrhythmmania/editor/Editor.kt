@@ -708,8 +708,8 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     
     private fun populateMetronomeTicks(upUntilBeat: Float) {
         val engineBeatCeil = ceil(engine.beat).toInt()
-        
-        if (metronomeEnabled.get()) {
+
+        lastPlacedMetronomeBeat = if (metronomeEnabled.get()) {
             var beat: Int = engineBeatCeil
             while (beat < upUntilBeat) {
                 if (beat > lastPlacedMetronomeBeat) {
@@ -717,9 +717,9 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
                 }
                 beat++
             }
-            lastPlacedMetronomeBeat = beat - 1
+            beat - 1
         } else {
-            lastPlacedMetronomeBeat = engineBeatCeil
+            engineBeatCeil
         }
     }
     
@@ -954,30 +954,20 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
                         }
                         inputConsumed = true
                     }
-                } else if (!shift && !alt && !ctrl) {
+                } else if (!ctrl && !shift && !alt) {
                     when (keycode) {
                         Input.Keys.DEL, Input.Keys.FORWARD_DEL -> { // BACKSPACE or DELETE: Delete selection
                             if (currentClick == Click.None && state == PlayState.STOPPED) {
                                 val selected = selectedBlocks.keys.toList()
-                                if (!ctrl && !alt && !shift && selected.isNotEmpty()) {
+                                if (selected.isNotEmpty()) {
                                     this.mutate(ActionGroup(SelectionAction(selected.toSet(), emptySet()), DeletionAction(selected)))
                                     forceUpdateStatus.invert()
                                 }
                                 inputConsumed = true
                             }
                         }
-                        Input.Keys.HOME -> { // HOME: Jump to beat 0
-                            cameraPan = CameraPan(0.25f, trackView.beat.get(), 0f)
-                            inputConsumed = true
-                        }
-                        Input.Keys.END -> { // END: Jump to stopping position
-                            if (this.blocks.isNotEmpty()) {
-                                cameraPan = CameraPan(0.25f, trackView.beat.get(), (container.stopPosition.get()).coerceAtLeast(0f))
-                            }
-                            inputConsumed = true
-                        }
                         in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
-                            if (!ctrl && !alt && !shift && currentClick == Click.None) {
+                            if (currentClick == Click.None) {
                                 val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
                                 if (number in 0 until Tool.VALUES.size) {
                                     changeTool(Tool.VALUES.getOrNull(number) ?: Tool.SELECTION)
@@ -986,7 +976,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
                             }
                         }
                         Input.Keys.T -> {
-                            if (!shift && !alt && !ctrl && currentClick == Click.None) {
+                            if (currentClick == Click.None) {
                                 val tapalongPane = editorPane.toolbar.tapalongPane
                                 if (tapalongPane.apparentVisibility.get()) {
                                     tapalongPane.tap()
@@ -994,7 +984,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
                             }
                         }
                         Input.Keys.R -> {
-                            if (!shift && !alt && !ctrl && currentClick == Click.None) {
+                            if (currentClick == Click.None) {
                                 val tapalongPane = editorPane.toolbar.tapalongPane
                                 if (tapalongPane.apparentVisibility.get()) {
                                     tapalongPane.reset()
