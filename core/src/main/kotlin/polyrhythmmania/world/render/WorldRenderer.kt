@@ -164,7 +164,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         // Build and render light buffer
         checkForResize()
         val fb = lightFrameBuffer
-        if (fb != null) {
+        if (fb != null && world.spotlights.ambientLight.enabled) {
             val spotlights = world.spotlights
             
             val oldSrcFunc = batch.blendSrcFunc
@@ -179,7 +179,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
 
             // RGB value dictates strength of ambient light. Alpha doesn't matter, so the RGB has to be premultiplied with A
             ColorStack.use { tmpColor ->
-                spotlights.getAmbientLightPremultipliedAlpha(tmpColor)
+                spotlights.convertAmbientLightToRGB(tmpColor)
                 Gdx.gl.glClearColor(tmpColor.r, tmpColor.g, tmpColor.b, 1f)
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
             }
@@ -190,11 +190,13 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             val lightTexAspectRatio = lightTex.height.toFloat() / lightTex.width
             val width = 1.25f
             for (spotlight in spotlights.allSpotlights) {
-                if (!spotlight.enabled) {
+                if (!spotlight.lightColor.enabled) {
                     continue
                 }
                 convertWorldToScreen(tmpVec.set(spotlight.position))
-                batch.setColor(spotlight.light.r, spotlight.light.g, spotlight.light.b, spotlight.light.a * spotlight.strength)
+                ColorStack.use { tmp ->
+                    batch.color = spotlight.lightColor.multiplyStrength(tmp)
+                }
                 batch.draw(lightTex, tmpVec.x - width / 2f, tmpVec.y, width, width * lightTexAspectRatio)
             }
             Vector3Stack.pop()

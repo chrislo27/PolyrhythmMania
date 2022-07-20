@@ -2,21 +2,40 @@ package polyrhythmmania.world.spotlights
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector3
+import paintbox.util.ColorStack
 import polyrhythmmania.world.World
 
 
-class Spotlight(val spotlightsParent: Spotlights) {
+class LightColor(private val resetColor: Color) {
     
     var enabled: Boolean = false
+    val color: Color = Color(1f, 1f, 1f, 1f).set(resetColor)
     var strength: Float = 1f
-    val light: Color = Color(1f, 1f, 1f, 1f)
+
+    /**
+     * Modifies [tmpColor] by setting it to [color] and multiplying the alpha by [strength].
+     */
+    fun multiplyStrength(tmpColor: Color): Color {
+        return tmpColor.set(color).also { c ->
+            c.a *= strength
+        }
+    }
     
+    fun reset() {
+        color.set(resetColor)
+        strength = 1f
+        enabled = false
+    }
+    
+}
+
+class Spotlight(val spotlightsParent: Spotlights) {
+    
+    val lightColor: LightColor = LightColor(Spotlights.SPOTLIGHT_RESET_COLOR)
     val position: Vector3 = Vector3() // Indicates base of light
 
     fun reset() {
-        light.set(1f, 1f, 1f, 1f)
-        strength = 1f
-        enabled = false
+        lightColor.reset()
     }
 }
 
@@ -24,9 +43,11 @@ class Spotlights(val world: World) {
     
     companion object {
         const val NUM_ON_ROW: Int = 10
+        val AMBIENT_LIGHT_RESET_COLOR: Color = Color.BLACK.cpy()
+        val SPOTLIGHT_RESET_COLOR: Color = Color.WHITE.cpy()
     }
     
-    val ambientLight: Color = Color(1f, 1f, 1f, 1f)
+    val ambientLight: LightColor = LightColor(AMBIENT_LIGHT_RESET_COLOR)
     
     val spotlightsRowA: List<Spotlight>
     val spotlightsRowDpad: List<Spotlight>
@@ -49,16 +70,19 @@ class Spotlights(val world: World) {
     
     
     fun onWorldReset() {
-        ambientLight.set(1f, 1f, 1f, 1f)
+        ambientLight.reset()
         allSpotlights.forEach(Spotlight::reset)
     }
 
     /**
      * Returns [tmpColor], set to [ambientLight] with its alpha "premultiplied". 
-     * This is not true alpha premultiplication because it linearly interpolates to white based on the alpha.
+     * This is not true alpha premultiplication -- it linearly interpolates to white based on the alpha.
      */
-    fun getAmbientLightPremultipliedAlpha(tmpColor: Color): Color {
-        return tmpColor.set(1f, 1f, 1f, 1f).lerp(ambientLight.r, ambientLight.g, ambientLight.b, 1f, 1f - ambientLight.a)
+    fun convertAmbientLightToRGB(tmpColor: Color): Color {
+        val tmp2 = ambientLight.multiplyStrength(ColorStack.getAndPush())
+        tmpColor.set(tmp2.r, tmp2.g, tmp2.b, 1f).lerp(1f, 1f, 1f, 1f, tmp2.a)
+        ColorStack.pop()
+        return tmpColor
     }
     
 }
