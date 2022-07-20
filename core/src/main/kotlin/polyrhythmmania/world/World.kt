@@ -9,6 +9,7 @@ import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.tileset.TilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.spotlights.Spotlights
 import java.util.concurrent.CopyOnWriteArrayList
 
 

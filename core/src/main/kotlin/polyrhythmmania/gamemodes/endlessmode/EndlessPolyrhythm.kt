@@ -24,6 +24,7 @@ import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
+import polyrhythmmania.world.tileset.PaletteTransition
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.time.LocalDate
 import java.time.Year
@@ -362,8 +363,9 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                         speedIncreaseLevel.set(newSpeedLvl)
                         engine.playbackSpeed = Semitones.getALPitch(speedIncreaseSemitones.get())
                         
-                        engine.addEvent(EventPaletteChange(engine, startBeat, 1f,
-                                createTilesetPaletteIterated(loopsCompleted.get(), colorChangeMultiplier, COLOR_CHANGE_LIMIT), false, false))
+                        engine.addEvent(EventPaletteChange(engine, startBeat,
+                                PaletteTransition(duration = 1f, pulseMode = false, reverse = false),
+                                createTilesetPaletteIterated(loopsCompleted.get(), colorChangeMultiplier, COLOR_CHANGE_LIMIT)))
                         
                         if (newSpeedLvl > currentSpeedIncrease) {
                             container.renderer.endlessModeRendering.triggerSpeedUpText()

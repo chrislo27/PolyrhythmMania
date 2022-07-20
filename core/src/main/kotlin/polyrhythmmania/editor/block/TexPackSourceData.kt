@@ -14,7 +14,7 @@ import polyrhythmmania.editor.Editor
 
 class TexPackSourceData(defaultSetting: TexturePackSource = TexturePackSource.StockGBA) {
 
-    var texPackSrc: Var<TexturePackSource> = Var(defaultSetting)
+    val texPackSrc: Var<TexturePackSource> = Var(defaultSetting)
 
 
     fun createMenuItems(editor: Editor): List<MenuItem> {

@@ -12,6 +12,7 @@ import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
+import polyrhythmmania.world.tileset.PaletteTransition
 import polyrhythmmania.world.tileset.TilesetPalette
 import kotlin.math.min
 
@@ -244,9 +245,10 @@ class EventEndState(engine: Engine, startBeat: Float) : Event(engine) {
     }
 }
 
-class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
-                         val tilesetCopy: TilesetPalette, val pulseMode: Boolean, val reverse: Boolean)
-    : Event(engine) {
+class EventPaletteChange(
+        engine: Engine, startBeat: Float, val paletteTransition: PaletteTransition,
+        val tilesetCopy: TilesetPalette
+) : Event(engine) {
     
     private data class ColorTarget(val start: Color, val end: Color, val current: Color = start.cpy()) {
         fun lerp(percentage: Float): Color {
@@ -261,7 +263,7 @@ class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
     
     init {
         this.beat = startBeat
-        this.width = width
+        this.width = paletteTransition.duration
     }
 
     override fun onStartContainer(container: Container, currentBeat: Float) {
@@ -280,25 +282,14 @@ class EventPaletteChange(engine: Engine, startBeat: Float, width: Float,
         super.onUpdateContainer(container, currentBeat)
         if (container.globalSettings.forceTilesetPalette != ForceTilesetPalette.NO_FORCE) return
         
-        var percentage = getBeatPercentage(currentBeat).coerceIn(0f, 1f)
-        if (reverse) {
-            percentage = 1f - percentage
-        }
+        val percentage = this.paletteTransition.translatePercentage(getBeatPercentage(currentBeat)).coerceIn(0f, 1f)
         val tileset = container.renderer.tileset
         tilesetCopy.allMappings.forEach { m ->
             if (m.enabled.get()) {
                 val id = m.id
                 val target = colorTargets.getValue(id)
-
-                if (!pulseMode) {
-                    target.lerp(percentage)
-                } else {
-                    if (percentage <= 0.5f) {
-                        target.lerp((percentage * 2).coerceIn(0f, 1f))
-                    } else {
-                        target.lerp(1f - ((percentage - 0.5f) * 2).coerceIn(0f, 1f))
-                    }
-                }
+                
+                target.lerp(percentage)
 
                 val lerped: Color = target.current
                 m.tilesetGetter.invoke(tileset).set(lerped)

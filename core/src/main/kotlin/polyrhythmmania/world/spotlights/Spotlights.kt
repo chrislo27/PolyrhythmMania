@@ -1,7 +1,8 @@
-package polyrhythmmania.world
+package polyrhythmmania.world.spotlights
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector3
+import polyrhythmmania.world.World
 
 
 class Spotlight(val spotlightsParent: Spotlights) {
@@ -42,6 +43,8 @@ class Spotlights(val world: World) {
         this.spotlightsRowA = buildRow(0f)
         this.spotlightsRowDpad = buildRow(-3f)
         this.allSpotlights = (spotlightsRowA + spotlightsRowDpad)
+        
+        onWorldReset()
     }
     
     
