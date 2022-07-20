@@ -221,15 +221,15 @@ object Instantiators {
         })
         add(CATEGORY_STORYMODE, Instantiator("storyMode_deployRod", BlockDeployRodStoryMode::class.java,
                 ReadOnlyVar.const("Deploy Rod (SM)"),
-                Localization.getVar("instantiator.deployRod.summary"),
-                Localization.getVar("instantiator.deployRod.desc"),
+                ReadOnlyVar.const("Deploys a rod, with special settings."),
+                ReadOnlyVar.const("Deploys a rod. You can change how fast it moves.\n\nYou can also mark this rod as defective. This should be\nused with the appropriate setting in\nGlobal World Settings."),
                 BlockDeployRod.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
             BlockDeployRodStoryMode(engine)
         })
         add(CATEGORY_STORYMODE, Instantiator("storyMode_spawnPattern", BlockSpawnPatternStoryMode::class.java,
                 ReadOnlyVar.const("Spawn Pattern (SM)"),
-                Localization.getVar("instantiator.spawnPattern.summary"),
-                Localization.getVar("instantiator.spawnPattern.desc"),
+                ReadOnlyVar.const("Spawns a pattern, with special settings."),
+                ReadOnlyVar.const("Same as the normal Spawn Pattern block,\nbut lets you change the speed."),
                 BlockSpawnPattern.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
             BlockSpawnPatternStoryMode(engine)
         })
