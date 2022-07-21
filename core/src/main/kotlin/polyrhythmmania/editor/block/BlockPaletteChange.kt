@@ -6,6 +6,7 @@ import paintbox.ui.contextmenu.SeparatorMenuItem
 import paintbox.ui.contextmenu.SimpleMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.block.data.PaletteTransitionData
 import polyrhythmmania.editor.pane.dialog.PaletteEditDialog
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event

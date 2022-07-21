@@ -8,6 +8,7 @@ import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.block.data.CubePatternData
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.*
@@ -20,13 +21,13 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.INPUT)
         val ROW_COUNT: Int = 10
-        val ALLOWED_CUBE_TYPES: List<CubeType> by lazy { PatternBlockData.SELECTIVE_SPAWN_CUBE_TYPES }
+        val ALLOWED_CUBE_TYPES: List<CubeType> by lazy { CubePatternData.SELECTIVE_SPAWN_CUBE_TYPES }
         val ALLOWED_TAIL_END_TYPES: List<CubeType> = listOf(CubeType.NO_CHANGE, CubeType.NONE, CubeType.PLATFORM)
     }
 
-    var patternData: PatternBlockData = PatternBlockData(ROW_COUNT, ALLOWED_CUBE_TYPES, CubeType.NO_CHANGE)
+    var patternData: CubePatternData = CubePatternData(ROW_COUNT, ALLOWED_CUBE_TYPES, CubeType.NO_CHANGE)
         private set
-    var tailEndData: PatternBlockData = PatternBlockData(2, ALLOWED_TAIL_END_TYPES, CubeType.NO_CHANGE)
+    var tailEndData: CubePatternData = CubePatternData(2, ALLOWED_TAIL_END_TYPES, CubeType.NO_CHANGE)
         private set
     val isSilent: BooleanVar = BooleanVar(false)
 
@@ -50,7 +51,7 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
         return events
     }
 
-    private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityPiston.Type,
+    private fun compileRow(beat: Float, rowArray: MutableList<CubeType>, row: Row, pistonType: EntityPiston.Type,
                            indexOffset: Int, shouldLastAffectAll: Boolean, silent: Boolean): List<Event> {
         val events = mutableListOf<Event>()
         
@@ -96,7 +97,11 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
             ctxmenu.addMenuItem(SeparatorMenuItem())
             ctxmenu.addMenuItem(CheckBoxMenuItem.create(isSilent,
                     Localization.getValue("blockContextMenu.selectiveSpawn.silent"),
-                    editor.editorPane.palette.markup))
+                    editor.editorPane.palette.markup).apply {
+                this.createTooltip = { 
+                    it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.selectiveSpawn.silent.tooltip")))
+                }
+            })
         }
     }
 
@@ -126,8 +131,8 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        this.patternData = PatternBlockData.readFromJson(obj, ALLOWED_CUBE_TYPES) ?: this.patternData
-        this.tailEndData = PatternBlockData.readFromJson(obj, ALLOWED_TAIL_END_TYPES, "tailEndData") ?: this.tailEndData
+        this.patternData = CubePatternData.readFromJson(obj, ALLOWED_CUBE_TYPES) ?: this.patternData
+        this.tailEndData = CubePatternData.readFromJson(obj, ALLOWED_TAIL_END_TYPES, "tailEndData") ?: this.tailEndData
         this.isSilent.set(obj.getBoolean("silentMode", false))
         
         // Legacy system loading

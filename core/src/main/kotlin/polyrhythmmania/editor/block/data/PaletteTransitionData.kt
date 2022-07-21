@@ -1,4 +1,4 @@
-package polyrhythmmania.editor.block
+package polyrhythmmania.editor.block.data
 
 import com.badlogic.gdx.graphics.Color
 import com.eclipsesource.json.JsonObject

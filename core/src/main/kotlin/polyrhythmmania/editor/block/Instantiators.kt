@@ -56,6 +56,7 @@ object Instantiators {
     private const val CATEGORY_CORE: String = "core"
     private const val CATEGORY_FX: String = "fx"
     private const val CATEGORY_ADVANCED: String = "advanced"
+    private const val CATEGORY_SPOTLIGHTS: String = "spotlights"
     private const val CATEGORY_STORYMODE: String = "storymode"
 
     val endStateInstantiator: Instantiator<BlockEndState>
@@ -107,6 +108,11 @@ object Instantiators {
             Localization.getVar("instantiatorCategory.fx.summary"),
             Localization.getVar("instantiatorCategory.fx.desc"),
             EnumSet.noneOf(EditorSpecialFlags::class.java)))
+        add(ListCategory(CATEGORY_SPOTLIGHTS,
+                Localization.getVar("instantiatorCategory.spotlights.name"),
+                Localization.getVar("instantiatorCategory.spotlights.summary"),
+                Localization.getVar("instantiatorCategory.spotlights.desc"),
+                EnumSet.noneOf(EditorSpecialFlags::class.java)))
         add(ListCategory(CATEGORY_ADVANCED,
             Localization.getVar("instantiatorCategory.advanced.name"),
             Localization.getVar("instantiatorCategory.advanced.summary"),
@@ -200,6 +206,15 @@ object Instantiators {
                 Localization.getVar("instantiator.songInfoCard.desc"),
                 BlockSongInfoCard.BLOCK_TYPES) { engine ->
             BlockSongInfoCard(engine)
+        })
+        
+        // Spotlight instantiators
+        add(CATEGORY_SPOTLIGHTS, Instantiator("spotlightSwitch", BlockSpotlightSwitch::class.java,
+                Localization.getVar("instantiator.spotlightSwitch.name"),
+                Localization.getVar("instantiator.spotlightSwitch.summary"),
+                Localization.getVar("instantiator.spotlightSwitch.desc"),
+                BlockSpotlightSwitch.BLOCK_TYPES) { engine ->
+            BlockSpotlightSwitch(engine)
         })
         
         // Advanced instantiators

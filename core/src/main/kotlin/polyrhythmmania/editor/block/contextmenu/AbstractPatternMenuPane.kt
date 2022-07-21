@@ -1,10 +1,14 @@
 package polyrhythmmania.editor.block.contextmenu
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.font.TextAlign
-import paintbox.ui.*
+import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
+import paintbox.ui.ImageRenderingMode
+import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
@@ -12,14 +16,16 @@ import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
-import polyrhythmmania.editor.block.CubeType
-import polyrhythmmania.editor.block.PatternBlockData
+import polyrhythmmania.editor.Palette
+import polyrhythmmania.editor.block.CubeTypeLike
+import polyrhythmmania.editor.block.data.AbstractPatternBlockData
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.util.RodinSpecialChars
 
 
-class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, val clearType: CubeType, beatIndexStart: Int)
-    : Pane() {
+abstract class AbstractPatternMenuPane<E : CubeTypeLike, Data : AbstractPatternBlockData<E>>(
+        val editorPane: EditorPane, val data: Data, val clearType: E, beatIndexStart: Int
+) : Pane() {
 
     init {
         val blockSize = 32f + 3f * 2
@@ -39,7 +45,7 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
             }
         }
 
-        fun createRowPane(label: String, rowTypes: Array<CubeType>, isARow: Boolean): Pair<Pane, List<CubeButton>> {
+        fun createRowPane(label: String, rowTypes: MutableList<E>, isARow: Boolean): Pair<Pane, List<CubeButton>> {
             val cubeButtons: MutableList<CubeButton> = mutableListOf()
             return Pane().also { pane ->
                 Anchor.TopLeft.configure(this)
@@ -146,47 +152,41 @@ class PatternMenuPane(val editorPane: EditorPane, val data: PatternBlockData, va
         this.bounds.width.set(blockSize * (data.rowCount + 4.5f /* label + Clear + Swap */))
         this.bounds.height.set(90f)
     }
+    
+    protected abstract fun getTexRegForType(type: E, palette: Palette, isA: Boolean): TextureRegion
 
-    inner class CubeButton(val isA: Boolean, cube: CubeType) : Button("") {
+    inner class CubeButton(val isA: Boolean, cube: E) : Button("") {
 
-        val cube: Var<CubeType> = Var(cube)
+        val cube: Var<E> = Var(cube)
         val image: ImageNode = ImageNode(null, ImageRenderingMode.MAINTAIN_ASPECT_RATIO)
 
         init {
             image.textureRegion.bind {
                 val palette = editorPane.palette
-                when (this@CubeButton.cube.use()) {
-                    CubeType.NONE -> palette.blockFlatNoneRegion
-                    CubeType.NO_CHANGE -> palette.blockFlatNoChangeRegion
-                    CubeType.PLATFORM -> palette.blockFlatPlatformRegion
-                    CubeType.PISTON -> if (isA) palette.blockFlatPistonARegion else palette.blockFlatPistonDpadRegion
-                    CubeType.PISTON_OPEN -> if (isA) palette.blockFlatPistonAOpenRegion else palette.blockFlatPistonDpadOpenRegion
-                    CubeType.RETRACT_PISTON -> palette.blockFlatRetractRegion
-                }
+                getTexRegForType(this@CubeButton.cube.use(), palette, isA)
             }
             addChild(image)
             this.padding.set(Insets(2f))
             this.border.set(Insets(1f))
             this.borderStyle.set(SolidBorder(Color.BLACK))
             image.tint.bind { (skin.use() as ButtonSkin).bgColorToUse.use() }
-//            this.skinID.set(ContextMenu.CONTEXT_MENU_BUTTON_SKIN_ID)
         }
 
         init {
             setOnAction {
-                val values = data.allowedCubeTypes
+                val values = data.allowedTypes
                 val current = this.cube.getOrCompute()
                 val currentIndex = values.indexOf(current)
                 this.cube.set(values[(currentIndex + 1) % values.size])
             }
             setOnAltAction {
-                val values = data.allowedCubeTypes
+                val values = data.allowedTypes
                 val current = this.cube.getOrCompute()
                 val currentIndex = values.indexOf(current)
                 this.cube.set(values[(currentIndex - 1 + values.size) % values.size])
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(binding = {
-                Localization.getValue(this@CubeButton.cube.use().localizationNameKey) // Could be getVar but not necessary in a context menu
+                Localization.getValue(this@CubeButton.cube.use().localizationNameKey)
             }))
         }
     }

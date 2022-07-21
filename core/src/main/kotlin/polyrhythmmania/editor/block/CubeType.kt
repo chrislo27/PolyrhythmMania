@@ -1,7 +1,16 @@
 package polyrhythmmania.editor.block
 
 
-enum class CubeType(val jsonId: Int, val character: Char, val localizationNameKey: String) {
+/**
+ * An enum that has a JSON int ID and localization key.
+ */
+interface CubeTypeLike {
+    val jsonId: Int
+    val localizationNameKey: String
+}
+
+enum class CubeType(override val jsonId: Int, val character: Char, override val localizationNameKey: String)
+    : CubeTypeLike {
     
     NONE(0, '-', "blockContextMenu.spawnPattern.cubeType.none"),
     PISTON(1, 'P', "blockContextMenu.spawnPattern.cubeType.piston"),

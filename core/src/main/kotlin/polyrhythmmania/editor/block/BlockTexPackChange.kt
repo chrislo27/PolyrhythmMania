@@ -4,6 +4,7 @@ import com.eclipsesource.json.JsonObject
 import paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.block.data.TexPackSourceData
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EventChangeTexturePack

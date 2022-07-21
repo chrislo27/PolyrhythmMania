@@ -1,4 +1,4 @@
-package polyrhythmmania.editor.block
+package polyrhythmmania.editor.block.data
 
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.Var

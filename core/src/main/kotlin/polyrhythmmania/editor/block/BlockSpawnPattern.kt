@@ -8,6 +8,7 @@ import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.block.data.CubePatternData
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.entity.EntityPiston
@@ -20,11 +21,11 @@ open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
 
     companion object {
         val ROW_COUNT: Int = 10
-        val ALLOWED_CUBE_TYPES: List<CubeType> by lazy { PatternBlockData.GENERAL_CUBE_TYPES }
+        val ALLOWED_CUBE_TYPES: List<CubeType> by lazy { CubePatternData.GENERAL_CUBE_TYPES }
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.INPUT)
     }
 
-    var patternData: PatternBlockData = PatternBlockData(ROW_COUNT, ALLOWED_CUBE_TYPES, CubeType.NONE).also { patternData ->
+    var patternData: CubePatternData = CubePatternData(ROW_COUNT, ALLOWED_CUBE_TYPES, CubeType.NONE).also { patternData ->
         // Default settings.
         patternData.rowATypes[0] = CubeType.PISTON
         patternData.rowATypes[2] = CubeType.PISTON
@@ -59,7 +60,7 @@ open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
         return compileIntoEvents(0f, 0f)
     }
 
-    private fun compileRow(beat: Float, rowArray: Array<CubeType>, row: Row, pistonType: EntityPiston.Type, beatsPerBlock: Float): List<Event> {
+    private fun compileRow(beat: Float, rowArray: MutableList<CubeType>, row: Row, pistonType: EntityPiston.Type, beatsPerBlock: Float): List<Event> {
         val events = mutableListOf<Event>()
 
         /*
@@ -144,6 +145,7 @@ open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
                             )
                         }
                     }
+                    CubeType.RETRACT_PISTON -> { /* NO-OP, not needed for regular Spawn Pattern */ }
                 }
             }
         }
@@ -184,7 +186,7 @@ open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
 
     override fun readFromJson(obj: JsonObject) {
         super.readFromJson(obj)
-        this.patternData = PatternBlockData.readFromJson(obj, ALLOWED_CUBE_TYPES) ?: this.patternData 
+        this.patternData = CubePatternData.readFromJson(obj, ALLOWED_CUBE_TYPES) ?: this.patternData 
         val disableTailEndValue = obj.get("disableTailEnd")
         if (disableTailEndValue != null && disableTailEndValue.isBoolean) {
             disableTailEnd.set(disableTailEndValue.asBoolean())

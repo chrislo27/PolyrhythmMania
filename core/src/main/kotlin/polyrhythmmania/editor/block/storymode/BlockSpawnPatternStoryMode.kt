@@ -24,7 +24,7 @@ class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
     
     init {
         this.width = 4f
-        this.defaultText.set("Spawn Pttn (SM)")
+        this.defaultText.set("Spawn Pattern (SM)")
     }
     
     override fun getBeatsPerBlock(): Float {
