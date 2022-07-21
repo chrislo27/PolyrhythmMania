@@ -257,6 +257,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
         prefs.getBoolean(kv_editorHigherAccuracyPreview)
         prefs.getBoolean(kv_editorPlaytestStartsPlay)
         prefs.getBoolean(kv_editorArrowKeysLikeScroll)
+        prefs.getInt(kv_editorUIScale)
         
         prefs.getInputKeymapKeyboard(kv_keymapKeyboard)
         
@@ -307,6 +308,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
                 .putBoolean(kv_editorHigherAccuracyPreview)
                 .putBoolean(kv_editorPlaytestStartsPlay)
                 .putBoolean(kv_editorArrowKeysLikeScroll)
+                .putInt(kv_editorUIScale)
 
                 .putInputKeymapKeyboard(kv_keymapKeyboard)
 
