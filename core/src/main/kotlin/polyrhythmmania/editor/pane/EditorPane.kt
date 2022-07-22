@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.pane
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Disposable
@@ -14,8 +15,10 @@ import paintbox.ui.Tooltip
 import paintbox.ui.UIElement
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
+import paintbox.ui.border.SolidBorder
 import paintbox.ui.element.RectElement
 import paintbox.util.gdxutils.disposeQuietly
+import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.EditorSpecialFlags
@@ -185,6 +188,11 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     fun createDefaultTooltip(binding: Var.Context.() -> String): Tooltip {
         return Tooltip(binding = binding).apply {
             this.markup.set(palette.markup)
+            this.backgroundColor.set(Color(0f, 0f, 0f, 0.95f))
+            this.border.set(Insets(2f))
+            this.borderStyle.set(SolidBorder(Color().grey(0.925f, 1f)).apply { 
+                this.roundedCorners.set(true)
+            })
         }
     }
 
