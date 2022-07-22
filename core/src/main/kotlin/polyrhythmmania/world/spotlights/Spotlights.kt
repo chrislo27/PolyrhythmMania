@@ -80,7 +80,7 @@ class Spotlights(val world: World) {
      */
     fun convertAmbientLightToRGB(tmpColor: Color): Color {
         val tmp2 = ambientLight.multiplyStrength(ColorStack.getAndPush())
-        tmpColor.set(tmp2.r, tmp2.g, tmp2.b, 1f).lerp(1f, 1f, 1f, 1f, tmp2.a)
+        tmpColor.set(tmp2.r, tmp2.g, tmp2.b, 1f).lerp(1f, 1f, 1f, 1f, 1f - tmp2.a)
         ColorStack.pop()
         return tmpColor
     }

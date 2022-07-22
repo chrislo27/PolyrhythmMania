@@ -731,7 +731,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
         container.setTexturePackFromSource()
         
         val events = blocks.filter { 
-            it is BlockPaletteChange || it is BlockTexPackChange // TODO also apply spotlight blocks here
+            it is BlockPaletteChange || it is BlockTexPackChange || it is AbstBlockSpotlight
         }.flatMap { 
             it.compileIntoEvents()
         }.sortedBy { it.beat }
