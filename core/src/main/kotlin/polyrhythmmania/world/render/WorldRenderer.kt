@@ -164,7 +164,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         // Build and render light buffer
         checkForResize()
         val fb = lightFrameBuffer
-        if (fb != null && !world.spotlights.isAmbientLightingFull()) {
+        if (fb != null /*&& !world.spotlights.isAmbientLightingFull()*/) {
             val spotlights = world.spotlights
             
             val oldSrcFunc = batch.blendSrcFunc
@@ -224,9 +224,9 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
 
     private fun checkForResize() { // Must be called on the GL thread.
         val cachedWindowSize = this.lastKnownWindowSize
+        val nullWindowSize = cachedWindowSize.width == -1 || cachedWindowSize.height == -1
         val windowWidth = Gdx.graphics.width
         val windowHeight = Gdx.graphics.height
-        val nullWindowSize = cachedWindowSize.width == -1 || cachedWindowSize.height == -1
         if (((windowWidth > 0 && windowHeight > 0) && (windowWidth != cachedWindowSize.width || windowHeight != cachedWindowSize.height)) || nullWindowSize) {
             // Width/height MAY be 0.
             this.lastKnownWindowSize = WindowSize(windowWidth, windowHeight)
@@ -250,7 +250,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         oldBuffer?.disposeQuietly()
         val newFbWidth = HdpiUtils.toBackBufferX(width)
         val newFbHeight = HdpiUtils.toBackBufferY(height)
-        this.lightFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGBA8888, newFbWidth, newFbHeight, true).apply {
+        this.lightFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGBA8888, newFbWidth, newFbHeight, false).apply {
             this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         }
         this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
