@@ -6,32 +6,61 @@ import paintbox.util.ColorStack
 import polyrhythmmania.world.World
 
 
-class LightColor(private val resetColor: Color) {
+class LightColor(private val resetColor: Color, private val defaultStrength: Float) {
     
-    var enabled: Boolean = false
-    val color: Color = Color(1f, 1f, 1f, 1f).set(resetColor)
-    var strength: Float = 1f
-
-    /**
-     * Modifies [tmpColor] by setting it to [color] and multiplying the alpha by [strength].
+    /*
+    Colour and strength outputs:
+    
+    For a spotlight:
+        - RGB is RGB, closer to white = more visible
+        - Higher A * Strength = more visible through the darkness
+        - Total formula:
+            - (R, G, B, A * Strength)
+    
+    For ambient light:
+        - RGB is RGB, closer to white = rest of scene is more visible. Closer to black = darker overall
+        - Alpha does not do anything in actual rendering, so it has to be converted to RGB:
+            - A=1 means full darkness, A=0 means no darkness.
+            - If A=0, then RGB is full white. Therefore the interpolation is (from RGB to white, (1.0 - A)%)
+        - Full strength = full lighting, therefore RGB becomes full white. 0 strength = full RGB.
+            - The interpolation is (from RGB to white, (strength)%) 
+        - Total formula:
+            - lerp (from RGB to white, (1.0 - A)%)
+            - lerp (from RGB to white, (strength)%) 
      */
-    fun multiplyStrength(tmpColor: Color): Color {
+    
+    val color: Color = Color(1f, 1f, 1f, 1f).set(resetColor)
+    var strength: Float = defaultStrength
+
+
+    fun reset() {
+        color.set(resetColor)
+        strength = defaultStrength
+    }
+    
+    /**
+     * For [Spotlight]: Modifies [tmpColor] by setting it to [color] and multiplying the alpha by [strength].
+     */
+    fun computeFinalForSpotlight(tmpColor: Color): Color {
         return tmpColor.set(color).also { c ->
             c.a *= strength
         }
     }
     
-    fun reset() {
-        color.set(resetColor)
-        strength = 1f
-        enabled = false
+    /**
+     * For ambient light: Modifies [tmpColor] by applying the formula above.
+     */
+    fun computeFinalForAmbientLight(tmpColor: Color): Color {
+        return tmpColor.set(color).lerp(Color.WHITE, 1f - color.a).lerp(Color.WHITE, strength).also { c ->
+            c.a = 1f
+        }
     }
     
 }
 
 class Spotlight(val spotlightsParent: Spotlights) {
     
-    val lightColor: LightColor = LightColor(Spotlights.SPOTLIGHT_RESET_COLOR)
+    val lightColor: LightColor = LightColor(Spotlights.SPOTLIGHT_RESET_COLOR, 0f)
     val position: Vector3 = Vector3() // Indicates base of light
 
     fun reset() {
@@ -43,11 +72,11 @@ class Spotlights(val world: World) {
     
     companion object {
         const val NUM_ON_ROW: Int = 10
-        val AMBIENT_LIGHT_RESET_COLOR: Color = Color.BLACK.cpy()
-        val SPOTLIGHT_RESET_COLOR: Color = Color.WHITE.cpy()
+        val AMBIENT_LIGHT_RESET_COLOR: Color = Color(0f, 0f, 0f, 0.85f)
+        val SPOTLIGHT_RESET_COLOR: Color = Color(1f, 1f, 1f, 1f)
     }
     
-    val ambientLight: LightColor = LightColor(AMBIENT_LIGHT_RESET_COLOR)
+    val ambientLight: LightColor = LightColor(AMBIENT_LIGHT_RESET_COLOR, 1f)
     
     val spotlightsRowA: List<Spotlight>
     val spotlightsRowDpad: List<Spotlight>
@@ -73,16 +102,7 @@ class Spotlights(val world: World) {
         ambientLight.reset()
         allSpotlights.forEach(Spotlight::reset)
     }
-
-    /**
-     * Returns [tmpColor], set to [ambientLight] with its alpha "premultiplied". 
-     * This is not true alpha premultiplication -- it linearly interpolates to white based on the alpha.
-     */
-    fun convertAmbientLightToRGB(tmpColor: Color): Color {
-        val tmp2 = ambientLight.multiplyStrength(ColorStack.getAndPush())
-        tmpColor.set(tmp2.r, tmp2.g, tmp2.b, 1f).lerp(1f, 1f, 1f, 1f, 1f - tmp2.a)
-        ColorStack.pop()
-        return tmpColor
-    }
+    
+    fun isAmbientLightingFull(): Boolean = ambientLight.strength >= 1f || ambientLight.color.a <= 0f
     
 }

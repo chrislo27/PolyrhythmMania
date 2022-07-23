@@ -1,20 +1,17 @@
 package polyrhythmmania.editor.block
 
 import com.eclipsesource.json.JsonObject
-import paintbox.binding.BooleanVar
-import paintbox.ui.contextmenu.CheckBoxMenuItem
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.block.data.SpotlightActionData
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import java.util.*
 
 
-class BlockSpotlightPalette(engine: Engine) : AbstBlockSpotlight(engine, BlockSpotlightPalette.BLOCK_TYPES) {
+class BlockSpotlightAdvanced(engine: Engine) : AbstractBlockSpotlight(engine, BlockSpotlightAdvanced.BLOCK_TYPES) {
 
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
@@ -23,7 +20,7 @@ class BlockSpotlightPalette(engine: Engine) : AbstBlockSpotlight(engine, BlockSp
 
     init {
         this.width = 1f
-        this.defaultText.bind { Localization.getVar("block.spotlightPalette.name").use() }
+        this.defaultText.bind { Localization.getVar("block.spotlightAdvanced.name").use() }
     }
 
     override fun compileIntoEvents(): List<Event> {
@@ -42,13 +39,13 @@ class BlockSpotlightPalette(engine: Engine) : AbstBlockSpotlight(engine, BlockSp
     override fun createContextMenu(editor: Editor): ContextMenu {
         return ContextMenu().also { ctxmenu ->
             ctxmenu.defaultWidth.set(300f)
-            ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.spotlightPalette"), editor.editorPane.palette.markup))
+            ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.spotlightAdvanced"), editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(SeparatorMenuItem())
         }
     }
 
-    override fun copy(): BlockSpotlightPalette {
-        return BlockSpotlightPalette(engine).also {
+    override fun copy(): BlockSpotlightAdvanced {
+        return BlockSpotlightAdvanced(engine).also {
             this.copyBaseInfoTo(it)
             
         }

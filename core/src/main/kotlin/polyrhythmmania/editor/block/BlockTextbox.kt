@@ -47,7 +47,7 @@ class BlockTextbox(engine: Engine)
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return ContextMenu().also { ctxmenu ->
-            ctxmenu.defaultWidth.set(350f)
+            ctxmenu.defaultWidth.set(400f)
             
             val focusGroup = FocusGroup()
             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.textbox.title"), editor.editorPane.palette.markup))

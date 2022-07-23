@@ -103,7 +103,7 @@ open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
         this.defaultText.bind { Localization.getVar("block.spawnPattern.name").use() }
     }
     
-    protected open fun getBeatsPerBlock(): Float = 0.5f
+    open fun getBeatsPerBlock(): Float = 0.5f
 
     fun compileIntoEvents(rowDelayA: Float, rowDelayDpad: Float): List<Event> {
         val b = this.beat

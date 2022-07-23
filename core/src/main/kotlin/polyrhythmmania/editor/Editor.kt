@@ -729,9 +729,10 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     fun updatePaletteAndTexPackChangesState(currentBeat: Float = engine.beat) {
         world.tilesetPalette.applyTo(renderer.tileset)
         container.setTexturePackFromSource()
+        world.spotlights.onWorldReset()
         
         val events = blocks.filter { 
-            it is BlockPaletteChange || it is BlockTexPackChange || it is AbstBlockSpotlight
+            it is BlockPaletteChange || it is BlockTexPackChange || it is AbstractBlockSpotlight
         }.flatMap { 
             it.compileIntoEvents()
         }.sortedBy { it.beat }

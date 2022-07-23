@@ -12,9 +12,14 @@ data class PaletteTransition(
 ) {
 
     companion object {
-        val DEFAULT: PaletteTransition = PaletteTransition(0.5f, pulseMode = false, reverse = false)
+        val DEFAULT: PaletteTransition = PaletteTransition(duration = 0.5f, pulseMode = false, reverse = false)
+        val INSTANT: PaletteTransition = PaletteTransition(duration = 0f, pulseMode = false, reverse = false)
     }
 
+    /**
+     * Translates the percentage of time into a percentage based on this transition's settings.
+     * Also handles special interpolation curves if set. TODO
+     */
     fun translatePercentage(timePercentage: Float): Float {
         var per = timePercentage.coerceIn(0f, 1f)
 

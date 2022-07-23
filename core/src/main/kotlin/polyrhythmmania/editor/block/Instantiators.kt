@@ -209,26 +209,19 @@ object Instantiators {
         })
         
         // Spotlight instantiators
-        add(CATEGORY_SPOTLIGHTS, Instantiator("spotlightPattern", BlockSpotlightPattern::class.java,
-                Localization.getVar("instantiator.spotlightPattern.name"),
-                Localization.getVar("instantiator.spotlightPattern.summary"),
-                Localization.getVar("instantiator.spotlightPattern.desc"),
-                BlockSpotlightPattern.BLOCK_TYPES) { engine ->
-            BlockSpotlightPattern(engine)
+        add(CATEGORY_SPOTLIGHTS, Instantiator("spotlightSwitch", BlockSpotlightSwitch::class.java,
+                Localization.getVar("instantiator.spotlightSwitch.name"),
+                Localization.getVar("instantiator.spotlightSwitch.summary"),
+                Localization.getVar("instantiator.spotlightSwitch.desc"),
+                BlockSpotlightSwitch.BLOCK_TYPES) { engine ->
+            BlockSpotlightSwitch(engine)
         })
-        add(CATEGORY_SPOTLIGHTS, Instantiator("spotlightDarkness", BlockSpotlightDarkness::class.java,
-                Localization.getVar("instantiator.spotlightDarkness.name"),
-                Localization.getVar("instantiator.spotlightDarkness.summary"),
-                Localization.getVar("instantiator.spotlightDarkness.desc"),
-                BlockSpotlightDarkness.BLOCK_TYPES) { engine ->
-            BlockSpotlightDarkness(engine)
-        })
-        add(CATEGORY_SPOTLIGHTS, Instantiator("spotlightPalette", BlockSpotlightPalette::class.java,
-                Localization.getVar("instantiator.spotlightPalette.name"),
-                Localization.getVar("instantiator.spotlightPalette.summary"),
-                Localization.getVar("instantiator.spotlightPalette.desc"),
-                BlockSpotlightPalette.BLOCK_TYPES) { engine ->
-            BlockSpotlightPalette(engine)
+        add(CATEGORY_SPOTLIGHTS, Instantiator("spotlightAdvanced", BlockSpotlightAdvanced::class.java,
+                Localization.getVar("instantiator.spotlightAdvanced.name"),
+                Localization.getVar("instantiator.spotlightAdvanced.summary"),
+                Localization.getVar("instantiator.spotlightAdvanced.desc"),
+                BlockSpotlightAdvanced.BLOCK_TYPES) { engine ->
+            BlockSpotlightAdvanced(engine)
         })
         
         // Advanced instantiators
