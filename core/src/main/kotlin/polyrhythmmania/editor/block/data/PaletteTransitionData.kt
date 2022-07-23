@@ -101,7 +101,7 @@ class PaletteTransitionData {
         }
         val reverseVal = rootObj.get("reverse")
         if (reverseVal != null && reverseVal.isBoolean) {
-            pt = pt.copy(reverse = pulseVal.asBoolean())
+            pt = pt.copy(reverse = reverseVal.asBoolean())
         }
         
         this.paletteTransition.set(pt)
