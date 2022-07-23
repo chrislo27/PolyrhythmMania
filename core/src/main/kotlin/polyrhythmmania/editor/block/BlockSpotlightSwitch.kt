@@ -11,6 +11,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.data.SpotlightActionData
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
@@ -168,8 +169,8 @@ class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, Bloc
         patternData.writeToJson(obj)
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         this.ambientLightDarken.set(obj.getBoolean("ambientLightDarken", true))
         this.timingMode.set(SpotlightTimingMode.INDEX_MAP[obj.getInt("timingMode", 0)] ?: SpotlightTimingMode.SPAWN_PATTERN)
         this.patternData = SpotlightActionData.readFromJson(obj, ALLOWED_ACTION_TYPES) ?: this.patternData

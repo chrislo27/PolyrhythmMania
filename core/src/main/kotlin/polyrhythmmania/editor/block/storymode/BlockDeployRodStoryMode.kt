@@ -10,8 +10,8 @@ import paintbox.ui.control.DecimalTextField
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.DecimalFormats
-import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.BlockDeployRod
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.RowSetting
@@ -91,8 +91,8 @@ class BlockDeployRodStoryMode(engine: Engine, blockTypes: EnumSet<BlockType> = B
         }
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         this.xUnitsPerBeat = obj.getFloat("xUnitsPerBeat", EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT).coerceAtLeast(0.25f)
         this.defective.set(obj.getBoolean("defective", false))
     }

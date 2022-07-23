@@ -3,6 +3,7 @@ package polyrhythmmania.gamemodes.practice
 import com.eclipsesource.json.Json
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.Instantiator
 import polyrhythmmania.editor.block.Instantiators
@@ -16,6 +17,7 @@ import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.WorldSettings
 import polyrhythmmania.world.tileset.TilesetPalette
+import java.util.*
 
 
 abstract class AbstractPolyrhythmPractice(main: PRManiaGame, val flagBit: Int)
@@ -31,7 +33,7 @@ abstract class AbstractPolyrhythmPractice(main: PRManiaGame, val flagBit: Int)
                 @Suppress("UNCHECKED_CAST")
                 val inst = (instantiators[obj.getString("inst", null)] as? Instantiator<Block>?) ?: continue
                 val block: Block = inst.factory.invoke(inst, engine)
-                block.readFromJson(obj)
+                block.readFromJson(obj, EnumSet.noneOf(EditorSpecialFlags::class.java))
                 blocks.add(block)
             }
             blocks.sortWith(Block.getComparator())

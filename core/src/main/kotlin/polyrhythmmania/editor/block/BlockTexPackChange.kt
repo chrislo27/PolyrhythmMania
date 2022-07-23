@@ -4,6 +4,7 @@ import com.eclipsesource.json.JsonObject
 import paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.data.TexPackSourceData
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
@@ -49,8 +50,8 @@ class BlockTexPackChange(engine: Engine)
         texPackSrcData.writeToJson(obj)
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         texPackSrcData.readFromJson(obj)
     }
 }

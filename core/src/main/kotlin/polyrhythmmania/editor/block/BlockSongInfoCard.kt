@@ -18,7 +18,7 @@ import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import paintbox.util.DecimalFormats
-import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.world.render.WorldRendererWithUI
 import java.util.*
 import kotlin.math.min
@@ -181,8 +181,8 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
         obj.add("custom", customText)
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         duration = obj.getFloat("duration", 4f).coerceAtLeast(0f)
         field = Field.ID_MAPPING[obj.getInt("field", 0)] ?: Field.SONG_TITLE
         customText = obj.getString("custom", "")

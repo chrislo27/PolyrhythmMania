@@ -13,9 +13,11 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.DecimalFormats
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.BlockSpawnPattern
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.entity.EntityRodDecor
+import java.util.*
 
 
 class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
@@ -75,8 +77,8 @@ class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
         obj.add("xUnitsPerBeat", this.xUnitsPerBeat)
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         if (obj.get("beatsPerBlock") != null) {
             this.xUnitsPerBeat = 1f / obj.getFloat("beatsPerBlock", 0.5f).coerceAtLeast(0.25f)
         } else {

@@ -8,6 +8,7 @@ import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.data.CubePatternData
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
@@ -129,8 +130,8 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
         }
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         this.patternData = CubePatternData.readFromJson(obj, ALLOWED_CUBE_TYPES) ?: this.patternData
         this.tailEndData = CubePatternData.readFromJson(obj, ALLOWED_TAIL_END_TYPES, "tailEndData") ?: this.tailEndData
         this.isSilent.set(obj.getBoolean("silentMode", false))

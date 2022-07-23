@@ -9,6 +9,7 @@ import paintbox.ui.contextmenu.ContextMenu
 import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EventRowBlockDespawn
@@ -78,8 +79,8 @@ class BlockDespawnPattern(engine: Engine) : Block(engine, BlockDespawnPattern.BL
         }
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         rowData.readFromJson(obj)
         val disableTailEndValue = obj.get("disableTailEnd")
         if (disableTailEndValue != null && disableTailEndValue.isBoolean) {

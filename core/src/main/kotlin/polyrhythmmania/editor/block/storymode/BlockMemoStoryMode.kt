@@ -1,25 +1,19 @@
 package polyrhythmmania.editor.block.storymode
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.JsonObject
-import paintbox.binding.BooleanVar
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
-import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.TextBox
-import polyrhythmmania.engine.TextBoxStyle
-import paintbox.util.DecimalFormats
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
-import polyrhythmmania.world.EventTextbox
 import java.util.*
 
 
@@ -128,8 +122,8 @@ class BlockMemoStoryMode(engine: Engine)
         obj.add("text2", text2)
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         this.text = obj.getString("text", "")
         this.text2 = obj.getString("text2", "")
     }

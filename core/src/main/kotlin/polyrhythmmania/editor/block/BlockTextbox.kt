@@ -17,6 +17,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.engine.TextBoxStyle
 import paintbox.util.DecimalFormats
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.world.EventTextbox
 import java.util.*
 
@@ -156,8 +157,8 @@ class BlockTextbox(engine: Engine)
         obj.add("style", style.jsonId)
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         this.text = obj.getString("text", "")
         this.requireInput.set(obj.getBoolean("requireInput", false))
         this.duration = obj.getFloat("duration", 2f)

@@ -5,6 +5,7 @@ import paintbox.font.TextAlign
 import paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EventDeployRod
@@ -53,8 +54,8 @@ open class BlockDeployRod(engine: Engine, blockTypes: EnumSet<BlockType> = Block
         rowData.writeToJson(obj)
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         rowData.readFromJson(obj)
     }
 }

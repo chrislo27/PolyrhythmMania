@@ -6,6 +6,7 @@ import paintbox.ui.contextmenu.SeparatorMenuItem
 import paintbox.ui.contextmenu.SimpleMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.data.PaletteTransitionData
 import polyrhythmmania.editor.pane.dialog.PaletteEditDialog
 import polyrhythmmania.engine.Engine
@@ -70,8 +71,8 @@ class BlockPaletteChange(engine: Engine)
         paletteTransitionData.writeToJson(obj)
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         tilesetPalette.fromJson(obj.get("tileset").asObject())
         paletteTransitionData.readFromJson(obj)
     }

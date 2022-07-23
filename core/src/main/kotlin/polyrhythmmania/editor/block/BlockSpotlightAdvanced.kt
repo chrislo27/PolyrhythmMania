@@ -6,6 +6,7 @@ import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import java.util.*
@@ -56,8 +57,8 @@ class BlockSpotlightAdvanced(engine: Engine) : AbstractBlockSpotlight(engine, Bl
         
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         
     }
 }

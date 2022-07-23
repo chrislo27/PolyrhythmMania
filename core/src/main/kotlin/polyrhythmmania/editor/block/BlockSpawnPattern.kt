@@ -8,6 +8,7 @@ import paintbox.ui.contextmenu.LabelMenuItem
 import paintbox.ui.contextmenu.SeparatorMenuItem
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.data.CubePatternData
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
@@ -203,8 +204,8 @@ open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
         }
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         this.patternData = CubePatternData.readFromJson(obj, ALLOWED_CUBE_TYPES) ?: this.patternData 
         val disableTailEndValue = obj.get("disableTailEnd")
         if (disableTailEndValue != null && disableTailEndValue.isBoolean) {

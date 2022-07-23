@@ -5,6 +5,7 @@ import paintbox.font.TextAlign
 import paintbox.ui.contextmenu.ContextMenu
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.EventRowBlockRetract
@@ -52,8 +53,8 @@ class BlockRetractPistons(engine: Engine) : Block(engine, BlockRetractPistons.BL
         rowData.writeToJson(obj)
     }
 
-    override fun readFromJson(obj: JsonObject) {
-        super.readFromJson(obj)
+    override fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
+        super.readFromJson(obj, editorFlags)
         rowData.readFromJson(obj)
     }
 }

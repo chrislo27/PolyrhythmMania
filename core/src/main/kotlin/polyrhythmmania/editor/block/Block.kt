@@ -11,6 +11,7 @@ import paintbox.util.MathHelper
 import paintbox.util.gdxutils.drawRect
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.track.EditorTrackArea
 import polyrhythmmania.engine.Engine
@@ -165,7 +166,7 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
         obj.add("t", trackIndex)
     }
     
-    open fun readFromJson(obj: JsonObject) {
+    open fun readFromJson(obj: JsonObject, editorFlags: EnumSet<EditorSpecialFlags>) {
         this.beat = obj.getFloat("b", this.beat).coerceAtLeast(0f)
         this.width = obj.getFloat("w", this.width).coerceAtLeast(0f)
         this.trackIndex = obj.getInt("t", this.trackIndex).coerceAtLeast(0)

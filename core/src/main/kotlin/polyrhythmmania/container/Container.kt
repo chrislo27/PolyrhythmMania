@@ -735,7 +735,7 @@ class Container(
                 }
             }
             val block: Block = inst.factory.invoke(inst, engine)
-            block.readFromJson(obj)
+            block.readFromJson(obj, editorFlags)
             blocks.add(block)
         }
         blocks.sortWith(Block.getComparator())
