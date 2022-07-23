@@ -36,7 +36,7 @@ class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
     override fun createContextMenu(editor: Editor): ContextMenu {
         return super.createContextMenu(editor).also { ctxmenu ->
             ctxmenu.addMenuItem(SeparatorMenuItem())
-            ctxmenu.addMenuItem(LabelMenuItem.create("X-units per beat (default ${EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT})", editor.editorPane.palette.markup))
+            ctxmenu.addMenuItem(LabelMenuItem.create("Beats per block (default ${1f / EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT})", editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(CustomMenuItem(
                 HBox().apply {
                     this.bounds.height.set(32f)
@@ -45,13 +45,13 @@ class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
                         this.padding.set(Insets(2f))
-                        this += DecimalTextField(startingValue = xUnitsPerBeat, decimalFormat = DecimalFormats["0.0##"],
+                        this += DecimalTextField(startingValue = 1f / xUnitsPerBeat, decimalFormat = DecimalFormats["0.0##"],
                             font = editor.editorPane.palette.musicDialogFont).apply {
                             this.minimumValue.set(0.25f)
                             this.textColor.set(Color(1f, 1f, 1f, 1f))
 
                             this.value.addListener {
-                                xUnitsPerBeat = it.getOrCompute()
+                                xUnitsPerBeat = 1f / it.getOrCompute().coerceAtLeast(0.25f)
                             }
                         }
                     }
