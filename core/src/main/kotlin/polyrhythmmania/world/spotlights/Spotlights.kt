@@ -72,7 +72,7 @@ class Spotlights(val world: World) {
     
     companion object {
         const val NUM_ON_ROW: Int = 10
-        val AMBIENT_LIGHT_RESET_COLOR: Color = Color(0f, 0f, 0f, 0.85f)
+        val AMBIENT_LIGHT_RESET_COLOR: Color = Color(0f, 0f, 0f, 0.95f)
         val SPOTLIGHT_RESET_COLOR: Color = Color(1f, 1f, 1f, 1f)
     }
     
