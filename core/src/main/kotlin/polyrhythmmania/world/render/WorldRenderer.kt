@@ -240,6 +240,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             if (vpWidth > 0 && vpHeight > 0 && (cachedFramebufferSize.width != vpWidth || cachedFramebufferSize.height != vpHeight)) {
                 createFramebuffers(vpWidth, vpHeight, this.lightFrameBuffer)
             } else if (nullWindowSize) {
+                Paintbox.LOGGER.debug("World renderer light framebuffer: nullWindowSize")
                 createFramebuffers(1280, 720, this.lightFrameBuffer)
             }
         }
