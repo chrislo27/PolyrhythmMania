@@ -188,7 +188,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
     fun createDefaultTooltip(binding: Var.Context.() -> String): Tooltip {
         return Tooltip(binding = binding).apply {
             this.markup.set(palette.markup)
-            this.backgroundColor.set(Color(0f, 0f, 0f, 0.95f))
+            this.backgroundColor.set(Color(2 / 255f, 6 / 255f, 16 / 255f, 0.95f))
             this.border.set(Insets(2f))
             this.borderStyle.set(SolidBorder(Color().grey(0.925f, 1f)).apply { 
                 this.roundedCorners.set(true)

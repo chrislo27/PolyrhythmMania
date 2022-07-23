@@ -248,11 +248,12 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this.bounds.y.bind { parent.use()?.bounds?.height?.use() ?: 0f }
             this.doClipping.set(true)
         }
-        autosaveIndicator = editorPane.createDefaultTooltip("").apply { 
+        autosaveIndicator = Tooltip("").apply {
             Anchor.BottomLeft.configure(this)
+            this.markup.set(editorPane.palette.markup)
+            this.backgroundColor.set(Color(0f, 0f, 0f, 0.95f))    
             this.setScaleXY(0.8f)
             this.renderAlign.set(Align.bottomLeft)
-            this.border.set(Insets.ZERO)
         }
         autosavePane += autosaveIndicator
         ioSave += autosavePane
