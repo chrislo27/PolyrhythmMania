@@ -10,10 +10,12 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
 import paintbox.util.ColorStack
+import paintbox.util.Vector2Stack
 import paintbox.util.Vector3Stack
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
@@ -73,13 +75,6 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     }
     protected val tmpMatrix: Matrix4 = Matrix4()
 
-    /**
-     * Used to compute the framebuffer size (locked aspect ratio of 16:9)
-     */
-    private val fbViewport: Viewport = ExtendNoOversizeViewport(1280f, 720f, OrthographicCamera().apply {
-        this.setToOrtho(false, 1280f, 720f)
-        this.update()
-    })
     private val fbRenderCamera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
         update()
@@ -231,12 +226,15 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             // Width/height MAY be 0.
             this.lastKnownWindowSize = WindowSize(windowWidth, windowHeight)
 
-            val viewport = fbViewport
-            viewport.update(windowWidth, windowHeight, true)
+            val scaling: Scaling = Scaling.fit
+            val worldSize = Vector2Stack.getAndPush().set(
+                    scaling.apply(fbRenderCamera.viewportWidth, fbRenderCamera.viewportHeight, windowWidth.toFloat(), windowHeight.toFloat())
+            )
+            val vpWidth = worldSize.x.roundToInt()
+            val vpHeight = worldSize.y.roundToInt()
+            Vector2Stack.pop()
             
             val cachedFramebufferSize = this.framebufferSize
-            val vpWidth = viewport.worldWidth.roundToInt()
-            val vpHeight = viewport.worldHeight.roundToInt()
             if (vpWidth > 0 && vpHeight > 0 && (cachedFramebufferSize.width != vpWidth || cachedFramebufferSize.height != vpHeight)) {
                 createFramebuffers(vpWidth, vpHeight, this.lightFrameBuffer)
             } else if (nullWindowSize) {
