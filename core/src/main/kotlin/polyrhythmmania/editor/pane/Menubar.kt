@@ -252,6 +252,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             Anchor.BottomLeft.configure(this)
             this.setScaleXY(0.8f)
             this.renderAlign.set(Align.bottomLeft)
+            this.border.set(Insets.ZERO)
         }
         autosavePane += autosaveIndicator
         ioSave += autosavePane
