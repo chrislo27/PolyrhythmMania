@@ -169,15 +169,16 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             fb.begin()
             tmpMatrix.set(batch.projectionMatrix)
             batch.projectionMatrix = this.camera.combined
-            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
             batch.begin()
 
-            // RGB value dictates strength of ambient light. Alpha doesn't matter, so the RGB has to be premultiplied with A
+            // Clear with ambient light colour
             ColorStack.use { tmpColor ->
                 spotlights.ambientLight.computeFinalForAmbientLight(tmpColor)
                 Gdx.gl.glClearColor(tmpColor.r, tmpColor.g, tmpColor.b, 1f)
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
             }
+            
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
 
             // Render each light
             val tmpVec = Vector3Stack.getAndPush()
