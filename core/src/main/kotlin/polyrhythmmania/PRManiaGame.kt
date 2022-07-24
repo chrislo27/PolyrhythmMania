@@ -515,9 +515,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         val defaultScaledKurokaneAfterLoad: PaintboxFontFreeType.(font: BitmapFont) -> Unit = { font ->
             defaultScaledFontAfterLoad.invoke(this, font)
-            font.data.spaceXadvance /= 3f
-            val spaceGlyph = font.data.getGlyph(' ')
-            spaceGlyph.xadvance = font.data.spaceXadvance.roundToInt() + this.ftfParameter.spaceX
         }
         val defaultFontSize = 20
 
