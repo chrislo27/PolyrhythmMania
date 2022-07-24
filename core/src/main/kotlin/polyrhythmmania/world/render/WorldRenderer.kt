@@ -245,7 +245,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         oldBuffer?.disposeQuietly()
         val newFbWidth = HdpiUtils.toBackBufferX(width)
         val newFbHeight = HdpiUtils.toBackBufferY(height)
-        this.lightFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGBA8888, newFbWidth, newFbHeight, false).apply {
+        this.lightFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, false).apply {
             this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         }
         this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
