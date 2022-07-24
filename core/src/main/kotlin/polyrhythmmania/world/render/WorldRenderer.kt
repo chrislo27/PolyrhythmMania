@@ -159,7 +159,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         // Build and render light buffer
         checkForResize()
         val fb = lightFrameBuffer
-        if (fb != null /*&& !world.spotlights.isAmbientLightingFull()*/) {
+        if (fb != null && !world.spotlights.isAmbientLightingFull()) {
             val spotlights = world.spotlights
             
             val oldSrcFunc = batch.blendSrcFunc
