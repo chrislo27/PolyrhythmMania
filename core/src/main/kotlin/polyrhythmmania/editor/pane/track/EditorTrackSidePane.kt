@@ -38,7 +38,7 @@ class EditorTrackSidePane(val allTracksPane: AllTracksPane, val trackID: TrackID
             
             val click = editor.click.use()
             if (click is Click.DragSelection) {
-                if (!click.tracksThatWillAccept.any { t -> t.allowedTypes.any { bt -> bt in thisTrackTypes } }) {
+                if (track !in click.tracksThatWillAccept) {
                     disallowed
                 } else allowed
             } else {
