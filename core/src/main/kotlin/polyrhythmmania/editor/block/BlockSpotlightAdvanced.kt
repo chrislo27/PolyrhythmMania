@@ -28,12 +28,6 @@ class BlockSpotlightAdvanced(engine: Engine) : AbstractBlockSpotlight(engine, Bl
         val b = this.beat
         val events = mutableListOf<Event>()
 
-        val world = engine.world
-        // TODO
-//        val silent = false
-//        events += compileRow(b, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A, 0, false, silent)
-//        events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD, 0, false, silent)
-
         return events
     }
 
@@ -42,6 +36,7 @@ class BlockSpotlightAdvanced(engine: Engine) : AbstractBlockSpotlight(engine, Bl
             ctxmenu.defaultWidth.set(300f)
             ctxmenu.addMenuItem(LabelMenuItem.create(Localization.getValue("blockContextMenu.spotlightAdvanced"), editor.editorPane.palette.markup))
             ctxmenu.addMenuItem(SeparatorMenuItem())
+            ctxmenu.addMenuItem(LabelMenuItem.create("(Not implemented yet.)", editor.editorPane.palette.markup))
         }
     }
 
