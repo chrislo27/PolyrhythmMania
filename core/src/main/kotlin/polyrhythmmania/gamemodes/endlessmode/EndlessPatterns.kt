@@ -125,6 +125,10 @@ object EndlessPatterns {
   |P-----P-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
 """P--P----
   |P-PP--P-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""##P---P-
+  |PP-PPP--""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
+"""##P---P-
+  |P---PPP-""".trimMargin("|").parsePattern(Difficulty.HARD, flippable = true),
             
     )
     
