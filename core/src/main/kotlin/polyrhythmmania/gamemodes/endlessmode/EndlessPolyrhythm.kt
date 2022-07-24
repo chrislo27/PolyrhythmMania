@@ -234,7 +234,7 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
         override fun onStart(currentBeat: Float) {
             super.onStart(currentBeat)
 
-            val gaussian = nextGaussianAbs(getStdDevFromDifficulty(), getMeanFromDifficulty()).coerceIn(0f, (Difficulty.VALUES.size - 1).toFloat())
+            val gaussian = nextGaussianAbs(getStdDevFromDifficulty(), getMeanFromDifficulty()).coerceAtLeast(0f)
             val difficultyInt = gaussian.roundToInt()
             val diff = Difficulty.VALUES[difficultyInt % Difficulty.VALUES.size]
             
