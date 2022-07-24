@@ -93,10 +93,6 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     init {
         @Suppress("LeakingThis")
         this.world.worldResetListeners += this as World.WorldResetListener
-        
-        Gdx.app.postRunnable { 
-            checkForResize()
-        }
     }
 
     override fun onWorldReset(world: World) {
