@@ -3,6 +3,7 @@ package polyrhythmmania.editor.block
 import paintbox.binding.ReadOnlyVar
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.EditorSpecialFlags
+import polyrhythmmania.editor.block.storymode.Block8BallCamera
 import polyrhythmmania.editor.block.storymode.BlockDeployRodStoryMode
 import polyrhythmmania.editor.block.storymode.BlockMemoStoryMode
 import polyrhythmmania.editor.block.storymode.BlockSpawnPatternStoryMode
@@ -254,6 +255,13 @@ object Instantiators {
                 ReadOnlyVar.const("Same as the normal Spawn Pattern block,\nbut lets you change the speed."),
                 BlockSpawnPattern.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
             BlockSpawnPatternStoryMode(engine)
+        })
+        add(CATEGORY_STORYMODE, Instantiator("storyMode_panCamera", Block8BallCamera::class.java,
+                ReadOnlyVar.const("Camera Pan"),
+                ReadOnlyVar.const("Pans the camera for continuous mode."),
+                ReadOnlyVar.const("This pans the camera forward for [i]continuous mode[].\nYou need to enable [i]continuous mode[] in\nthe Global World Settings.\n\nYou should place this to be aligned at the same beat\nas every [b]Despawn Pattern[] block.\n\nEvery single [b]Despawn Pattern[] block needs to have\nits tail end disabled."),
+                Block8BallCamera.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
+            Block8BallCamera(engine)
         })
 
         instantiatorMap = tempMap

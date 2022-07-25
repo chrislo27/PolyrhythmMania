@@ -380,6 +380,17 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                         combobox.bindWidthToParent(adjust = -258f)
                                     }
                                 }))
+                                val continuousMode = BooleanVar(editor.container.storyModeMetadata.getOrCompute().continuous)
+                                continuousMode.addListener {
+                                    val old = editor.container.storyModeMetadata.getOrCompute()
+                                    editor.container.storyModeMetadata.set(old.copy(continuous = it.getOrCompute()))
+                                }
+                                ctxmenu.addMenuItem(CheckBoxMenuItem.create(continuousMode,
+                                        "Continuous mode", editorPane.palette.markup).apply { 
+                                            this.createTooltip = {
+                                                it.set(editorPane.createDefaultTooltip("To be used with single-life mode to provide a continously panning level.\nNOTE: All Despawn blocks should disable their tail-end setting."))
+                                            }
+                                })
                                 ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
                                     hbox.spacing.set(8f)
                                     hbox.bounds.height.set(32f)

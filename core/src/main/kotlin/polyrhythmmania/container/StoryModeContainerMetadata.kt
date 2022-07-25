@@ -9,6 +9,7 @@ data class StoryModeContainerMetadata(
         val inputTimingRestriction: InputTimingRestriction,
         val lives: Int,
         val defectiveRodsThreshold: Int,
+        val continuous: Boolean,
 ) {
     
     companion object {
@@ -18,6 +19,7 @@ data class StoryModeContainerMetadata(
                 inputTimingRestriction = InputTimingRestriction.NORMAL,
                 lives = 0,
                 defectiveRodsThreshold = 0,
+                continuous = false,
         )
         
         fun fromJson(obj: JsonObject): StoryModeContainerMetadata {
@@ -27,6 +29,7 @@ data class StoryModeContainerMetadata(
                     InputTimingRestriction.MAP[obj.getInt("inputTimingRestriction", BLANK.inputTimingRestriction.id)] ?: BLANK.inputTimingRestriction,
                     obj.getInt("lives", 0),
                     obj.getInt("defectiveRodsThreshold", 0),
+                    obj.getBoolean("continuous", false),
             )
         }
     }
@@ -38,6 +41,7 @@ data class StoryModeContainerMetadata(
             this.add("inputTimingRestriction", inputTimingRestriction.id)
             this.add("lives", lives)
             this.add("defectiveRodsThreshold", defectiveRodsThreshold)
+            this.add("continuous", continuous)
         }
     }
     

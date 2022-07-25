@@ -38,7 +38,9 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
+import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldSettings
+import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.EntityInputFeedback
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.WorldRenderer
@@ -160,6 +162,10 @@ class Container(
             defectiveRodsMode.enabled.set(defectiveThreshold > 0)
             defectiveRodsMode.maxLives.set(defectiveThreshold)
             defectiveRodsMode.resetState()
+            
+            world.worldMode = WorldMode(WorldType.Polyrhythm(metadata.continuous))
+
+            world.resetWorld()
         }
     }
     
