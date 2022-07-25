@@ -197,8 +197,8 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
         val loops = iteration / limit
         return TilesetPalette.createGBA1TilesetPalette().also { p ->
             val hsv = FloatArray(3)
-            listOf(p.cubeBorder, p.cubeBorderZ, p.cubeFaceX, p.cubeFaceY,
-                    p.cubeFaceZ, p.pistonFaceX, p.pistonFaceZ, p.signShadow).forEach { colorMapping ->
+            listOf(p.cubeBorder, p.cubeBorderZ, p.cubeFaceX, p.cubeFaceY, p.cubeFaceZ, p.pistonAFaceX, p.pistonAFaceZ,
+                    p.pistonDpadFaceX, p.pistonDpadFaceZ, p.signShadow).forEach { colorMapping ->
                 val color = colorMapping.color.getOrCompute()
                 color.toHsv(hsv)
                 hsv[0] = (hsv[0] + hueChange) % 360f

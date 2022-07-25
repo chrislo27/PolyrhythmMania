@@ -67,8 +67,10 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     }
 
     val groupFaceYMapping: ColorMappingGroupedCubeFaceY = ColorMappingGroupedCubeFaceY("groupCubeFaceYMapping")
-    val groupPistonFaceZMapping: ColorMappingGroupedPistonFaceZ = ColorMappingGroupedPistonFaceZ("groupPistonFaceZMapping")
-    private val groupMappings: List<ColorMapping> = listOf(groupFaceYMapping, groupPistonFaceZMapping)
+    val groupPistonAFaceZMapping: ColorMappingGroupedPistonFaceZ = ColorMappingGroupedPistonFaceZ("groupPistonAFaceZMapping", "pistonAFaceX", "pistonAFaceZ", { it.pistonAFaceXColor }, { it.pistonAFaceZColor })
+    val groupPistonDpadFaceZMapping: ColorMappingGroupedPistonFaceZ = ColorMappingGroupedPistonFaceZ("groupPistonDpadFaceZMapping", "pistonDpadFaceX", "pistonDpadFaceZ", { it.pistonDpadFaceXColor }, { it.pistonDpadFaceZColor })
+    val groupPistonsFaceMapping: ColorMappingBothPistonFaces = ColorMappingBothPistonFaces("groupBothPistonFaces", groupPistonAFaceZMapping, groupPistonDpadFaceZMapping)
+    private val groupMappings: List<ColorMapping> = listOf(groupFaceYMapping, groupPistonsFaceMapping, groupPistonAFaceZMapping, groupPistonDpadFaceZMapping)
     val allMappings: List<ColorMapping> = groupMappings + tilesetPalette.allMappings
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
     val currentMapping: Var<ColorMapping> = Var(allMappings[0])
@@ -441,6 +443,7 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     override fun dispose() {
         this.objPreview.disposeQuietly()
     }
+    
 
     inner class ObjectPreview : UIElement(), Disposable {
         
@@ -553,16 +556,19 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
             worldRenderer.disposeQuietly()
         }
     }
+    
 
-    open inner class ColorMappingGroup(id: String, val affectsMappings: List<ColorMapping>,
-                                       tilesetGetter: (Tileset) -> Var<Color>)
-        : ColorMapping(id, tilesetGetter) {
+    open inner class ColorMappingGroup(
+            id: String, val affectsMappings: List<ColorMapping>,
+            tilesetGetter: (Tileset) -> Var<Color>
+    ) : ColorMapping(id, tilesetGetter) {
+        
         init {
-            this.enabled.bind {
+            this.enabled.eagerBind {
                 var anyEnabled = false
                 affectsMappings.forEach { m ->
                     // Intentionally iterating through all of them since they are all dependencies.
-                    // The order of the anyEnabled assignment is also intentional to prevent bad short-circuiting
+                    // The order of the anyEnabled assignment is also intentional to ensure Var.use() is tested
                     anyEnabled = m.enabled.use() || anyEnabled
                 }
                 anyEnabled
@@ -614,24 +620,61 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
         }
     }
     
-    inner class ColorMappingGroupedPistonFaceZ(id: String)
-        : ColorMappingGroup(id,
-            listOf("pistonFaceZ", "pistonFaceX").map { tilesetPalette.allMappingsByID.getValue(it) },
-            { it.pistonFaceZColor }) {
+//    inner class ColorMappingGroupedPistonFaceZ(id: String)
+//        : ColorMappingGroup(id,
+//            listOf("pistonFaceZ", "pistonFaceX").map { tilesetPalette.allMappingsByID.getValue(it) },
+//            { it.pistonFaceZColor }) {
+//
+//        private val hsv: FloatArray = FloatArray(3) { 0f }
+//
+//        override fun applyTo(tileset: Tileset) {
+//            val varr = tilesetGetter(tileset)
+//            val thisColor = this.color.getOrCompute()
+//            varr.set(thisColor.cpy())
+//            allMappingsByID.getValue("pistonFaceZ").color.set(thisColor.cpy())
+//
+//            thisColor.toHsv(hsv)
+//            hsv[2] = (hsv[2] - 0.20f)
+//            val pistonFaceX = Color(1f, 1f, 1f, thisColor.a).fromHsv(hsv)
+//            tileset.pistonFaceXColor.set(pistonFaceX.cpy())
+//            allMappingsByID.getValue("pistonFaceX").color.set(pistonFaceX.cpy())
+//        }
+//    }
+
+    inner class ColorMappingGroupedPistonFaceZ(
+            id: String, val faceXID: String, val faceZID: String,
+            val tilesetGetterFaceX: (Tileset) -> Var<Color>,
+            val tilesetGetterFaceZ: (Tileset) -> Var<Color>
+    ) : ColorMappingGroup(id, listOf(faceZID, faceXID).map { tilesetPalette.allMappingsByID.getValue(it) }, tilesetGetterFaceZ) {
 
         private val hsv: FloatArray = FloatArray(3) { 0f }
 
         override fun applyTo(tileset: Tileset) {
-            val varr = tilesetGetter(tileset)
+            val varr = tilesetGetterFaceZ(tileset)
             val thisColor = this.color.getOrCompute()
             varr.set(thisColor.cpy())
-            allMappingsByID.getValue("pistonFaceZ").color.set(thisColor.cpy())
+            allMappingsByID.getValue(faceZID).color.set(thisColor.cpy())
 
             thisColor.toHsv(hsv)
             hsv[2] = (hsv[2] - 0.20f)
             val pistonFaceX = Color(1f, 1f, 1f, thisColor.a).fromHsv(hsv)
-            tileset.pistonFaceXColor.set(pistonFaceX.cpy())
-            allMappingsByID.getValue("pistonFaceX").color.set(pistonFaceX.cpy())
+            tilesetGetterFaceX(tileset).set(pistonFaceX.cpy())
+            allMappingsByID.getValue(faceXID).color.set(pistonFaceX.cpy())
+        }
+    }
+
+    inner class ColorMappingBothPistonFaces(
+            id: String, val firstPiston: ColorMappingGroupedPistonFaceZ, val secondPiston: ColorMappingGroupedPistonFaceZ
+    ) : ColorMappingGroup(id, listOf(firstPiston.faceXID, firstPiston.faceZID, secondPiston.faceXID, secondPiston.faceZID).map { tilesetPalette.allMappingsByID.getValue(it) },
+            firstPiston.tilesetGetterFaceZ) {
+
+        override fun applyTo(tileset: Tileset) {
+            val thisColor = this.color.getOrCompute()
+            firstPiston.color.set(thisColor.cpy())
+            secondPiston.color.set(thisColor.cpy())
+            
+            firstPiston.applyTo(tileset)
+            secondPiston.applyTo(tileset)
         }
     }
 

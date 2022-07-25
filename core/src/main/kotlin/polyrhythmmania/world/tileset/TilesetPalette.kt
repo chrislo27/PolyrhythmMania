@@ -24,8 +24,10 @@ class TilesetPalette {
                 cubeFaceY.color.getOrCompute().grey(1f)
                 cubeFaceZ.color.getOrCompute().grey(1f)
 
-                pistonFaceX.color.getOrCompute().grey(1f)
-                pistonFaceZ.color.getOrCompute().grey(1f)
+                pistonAFaceX.color.getOrCompute().grey(1f)
+                pistonAFaceZ.color.getOrCompute().grey(1f)
+                pistonDpadFaceX.color.getOrCompute().grey(1f)
+                pistonDpadFaceZ.color.getOrCompute().grey(1f)
 
                 signShadow.color.getOrCompute().grey(0f)
             }
@@ -42,8 +44,10 @@ class TilesetPalette {
                 cubeFaceY.color.getOrCompute().set(74, 255, 74)
                 cubeFaceZ.color.getOrCompute().set(58, 230, 49)
 
-                pistonFaceX.color.getOrCompute().set(33, 82, 206)
-                pistonFaceZ.color.getOrCompute().set(41, 99, 255)
+                pistonAFaceX.color.getOrCompute().set(33, 82, 206)
+                pistonAFaceZ.color.getOrCompute().set(41, 99, 255)
+                pistonDpadFaceX.color.getOrCompute().set(33, 82, 206)
+                pistonDpadFaceZ.color.getOrCompute().set(41, 99, 255)
 
                 signShadow.color.getOrCompute().set(33, 214, 25)
             }
@@ -60,8 +64,10 @@ class TilesetPalette {
                 cubeFaceY.color.getOrCompute().set(41, 99, 255)
                 cubeFaceZ.color.getOrCompute().set(33, 82, 214)
 
-                pistonFaceX.color.getOrCompute().set(214, 181, 8)
-                pistonFaceZ.color.getOrCompute().set(255, 214, 16)
+                pistonAFaceX.color.getOrCompute().set(214, 181, 8)
+                pistonAFaceZ.color.getOrCompute().set(255, 214, 16)
+                pistonDpadFaceX.color.getOrCompute().set(214, 181, 8)
+                pistonDpadFaceZ.color.getOrCompute().set(255, 214, 16)
 
                 signShadow.color.getOrCompute().set(0, 16, 189)
             }
@@ -69,8 +75,10 @@ class TilesetPalette {
         
         fun createAssembleTilesetPalette(): TilesetPalette {
             return createGBA1TilesetPalette().apply {
-                pistonFaceX.color.getOrCompute().set(214, 181, 8)
-                pistonFaceZ.color.getOrCompute().set(255, 214, 16)
+                pistonAFaceX.color.getOrCompute().set(214, 181, 8)
+                pistonAFaceZ.color.getOrCompute().set(255, 214, 16)
+                pistonDpadFaceX.color.getOrCompute().set(214, 181, 8)
+                pistonDpadFaceZ.color.getOrCompute().set(255, 214, 16)
             }
         }
 
@@ -86,8 +94,10 @@ class TilesetPalette {
                 cubeFaceY.color.getOrCompute().set(0, 0x71, 0xB2)
                 cubeFaceZ.color.getOrCompute().set(0, 0x5C, 0x98)
 
-                pistonFaceX.color.getOrCompute().set(188, 179, 50)
-                pistonFaceZ.color.getOrCompute().set(0xEF, 0xE4, 0x40)
+                pistonAFaceX.color.getOrCompute().set(188, 179, 50)
+                pistonAFaceZ.color.getOrCompute().set(0xEF, 0xE4, 0x40)
+                pistonDpadFaceX.color.getOrCompute().set(188, 179, 50)
+                pistonDpadFaceZ.color.getOrCompute().set(0xEF, 0xE4, 0x40)
 
                 signShadow.color.getOrCompute().set(0, 0x4C, 0x87)
             }
@@ -95,12 +105,14 @@ class TilesetPalette {
     }
 
     val cubeBorder: ColorMapping = ColorMapping("cubeBorder", { it.cubeBorder.color })
-    val cubeBorderZ: ColorMapping = ColorMapping("cubeBorderZ", { it.cubeBorderZ.color }, fallbackIDs = listOf("cubeBorder"))
+    val cubeBorderZ: ColorMapping = ColorMapping("cubeBorderZ", { it.cubeBorderZ.color }, fallbackIDs = setOf("cubeBorder"))
     val cubeFaceX: ColorMapping = ColorMapping("cubeFaceX", { it.cubeFaceX.color })
     val cubeFaceY: ColorMapping = ColorMapping("cubeFaceY", { it.cubeFaceY.color })
     val cubeFaceZ: ColorMapping = ColorMapping("cubeFaceZ", { it.cubeFaceZ.color })
-    val pistonFaceX: ColorMapping = ColorMapping("pistonFaceX", { it.pistonFaceXColor })
-    val pistonFaceZ: ColorMapping = ColorMapping("pistonFaceZ", { it.pistonFaceZColor })
+    val pistonAFaceX: ColorMapping = ColorMapping("pistonAFaceX", { it.pistonAFaceXColor }, fallbackIDs = setOf("pistonFaceX"))
+    val pistonAFaceZ: ColorMapping = ColorMapping("pistonAFaceZ", { it.pistonAFaceZColor }, fallbackIDs = setOf("pistonFaceZ"))
+    val pistonDpadFaceX: ColorMapping = ColorMapping("pistonDpadFaceX", { it.pistonDpadFaceXColor }, fallbackIDs = setOf("pistonFaceX"))
+    val pistonDpadFaceZ: ColorMapping = ColorMapping("pistonDpadFaceZ", { it.pistonDpadFaceZColor }, fallbackIDs = setOf("pistonFaceZ"))
     val signShadow: ColorMapping = ColorMapping("signShadow", { it.signShadowColor })
     val rodBorder: ColorMapping = ColorMapping("rodBorder", { it.rodBorderColor })
     val rodFill: ColorMapping = ColorMapping("rodFill", { it.rodFillColor })
@@ -109,7 +121,7 @@ class TilesetPalette {
     val backgroundFore: ColorMapping = ColorMapping("backgroundFore", { it.backgroundFore.color }, canAdjustAlpha = true)
 
     val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeBorderZ, /*cubeFaceX,*/ cubeFaceY, cubeFaceZ,
-            pistonFaceX, pistonFaceZ, signShadow, rodBorder, rodFill,
+            pistonAFaceX, pistonAFaceZ, pistonDpadFaceX, pistonDpadFaceZ, signShadow, rodBorder, rodFill,
             backgroundBack, backgroundMiddle, backgroundFore) + listOf(cubeFaceX) /* Deprioritized to be later in the list. */
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
 
@@ -196,7 +208,14 @@ class TilesetPalette {
                 }
                 set.forEach { id ->
                     val m = mappingsByID[id]
-                    m?.enabled?.set(true)
+                    if (m != null) {
+                        m.enabled.set(true)
+                    } else {
+                        // Find any mappings who have a fallback ID with id
+                        mappingsByID.values.filter { id in it.fallbackIDs }.forEach { cm ->
+                            cm.enabled.set(true)
+                        }
+                    }
                 }
             }
         } else {

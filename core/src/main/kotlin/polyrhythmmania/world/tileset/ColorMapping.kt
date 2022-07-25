@@ -8,7 +8,7 @@ import paintbox.binding.Var
  * A [ColorMapping] is a string ID-mapped setting of a color. Used for adjusting the tileset palette.
  */
 open class ColorMapping(val id: String, val tilesetGetter: (Tileset) -> Var<Color>,
-                        val canAdjustAlpha: Boolean = false, val fallbackIDs: List<String> = emptyList(),
+                        val canAdjustAlpha: Boolean = false, val fallbackIDs: Set<String> = emptySet(),
                         val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f)),
                         val enabled: BooleanVar = BooleanVar(true),
                         val defaultEnabledStateIfWasOlderVersion: Boolean = true) {
