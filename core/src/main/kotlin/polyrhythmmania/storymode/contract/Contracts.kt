@@ -76,6 +76,9 @@ object Contracts {
         add(Contract("crop_stomp", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/crop_stomp.prmproj"))
         })
+        add(Contract("boosted_tweezers", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/boosted_tweezers.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
