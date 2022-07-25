@@ -13,10 +13,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
 import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
-import paintbox.util.ColorStack
-import paintbox.util.Vector2Stack
-import paintbox.util.Vector3Stack
-import paintbox.util.WindowSize
+import paintbox.util.*
 import paintbox.util.gdxutils.*
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
@@ -259,7 +256,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
 
     @Suppress("RemoveCurlyBracesFromTemplate")
     open fun getDebugString(): String {
-        return """e: ${world.entities.size}  r: ${entitiesRenderedLastCall} (${(entityRenderTimeNano) / 1_000_000f} ms)
+        return """e: ${world.entities.size}  r: ${entitiesRenderedLastCall} (${DecimalFormats["0.0000"].format((entityRenderTimeNano) / 1_000_000.0)} ms)
 """
     }
 
