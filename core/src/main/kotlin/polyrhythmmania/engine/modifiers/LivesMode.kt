@@ -43,6 +43,9 @@ class LivesMode : ModifierModule() {
     }
     
     fun loseALife(inputter: EngineInputter) {
+        if (!this.enabled.get()) {
+            return
+        }
         if (currentCooldown.get() > 0 || lives.get() <= 0 || maxLives.get() <= 0) {
             return
         }
