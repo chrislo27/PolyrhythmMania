@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
-import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
 import paintbox.util.ColorStack
@@ -19,7 +18,6 @@ import paintbox.util.Vector2Stack
 import paintbox.util.Vector3Stack
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
-import paintbox.util.viewport.ExtendNoOversizeViewport
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.Entity
@@ -96,7 +94,10 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     }
 
     override fun onWorldReset(world: World) {
-        camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0f) // Ignore zoom value
+        val cam = camera
+        cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0f) // Ignore zoom value
+        cam.zoom = 1f
+        cam.update()
     }
 
     open fun render(batch: SpriteBatch) {
