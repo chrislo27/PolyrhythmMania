@@ -15,8 +15,10 @@ class TilesetPalette {
     companion object {
         fun createColourlessTilesetPalette(): TilesetPalette {
             return TilesetPalette().apply {
-                rodBorder.color.getOrCompute().grey(0f)
-                rodFill.color.getOrCompute().grey(1f)
+                rodABorder.color.getOrCompute().grey(0f)
+                rodAFill.color.getOrCompute().grey(1f)
+                rodDpadBorder.color.getOrCompute().grey(0f)
+                rodDpadFill.color.getOrCompute().grey(1f)
 
                 cubeBorder.color.getOrCompute().grey(1f)
                 cubeBorderZ.color.getOrCompute().grey(1f)
@@ -35,8 +37,10 @@ class TilesetPalette {
         
         fun createGBA1TilesetPalette(): TilesetPalette {
             return TilesetPalette().apply {
-                rodBorder.color.getOrCompute().set(0, 0, 0)
-                rodFill.color.getOrCompute().set(255, 8, 0)
+                rodABorder.color.getOrCompute().set(0, 0, 0)
+                rodAFill.color.getOrCompute().set(255, 8, 0)
+                rodDpadBorder.color.getOrCompute().set(0, 0, 0)
+                rodDpadFill.color.getOrCompute().set(255, 8, 0)
                 
                 cubeBorder.color.getOrCompute().set(33, 214, 25)
                 cubeBorderZ.color.getOrCompute().set(24, 181, 16)
@@ -55,8 +59,10 @@ class TilesetPalette {
 
         fun createGBA2TilesetPalette(): TilesetPalette {
             return TilesetPalette().apply {
-                rodBorder.color.getOrCompute().set(0, 0, 0)
-                rodFill.color.getOrCompute().set(255, 8, 0)
+                rodABorder.color.getOrCompute().set(0, 0, 0)
+                rodAFill.color.getOrCompute().set(255, 8, 0)
+                rodDpadBorder.color.getOrCompute().set(0, 0, 0)
+                rodDpadFill.color.getOrCompute().set(255, 8, 0)
 
                 cubeBorder.color.getOrCompute().set(0, 16, 189)
                 cubeBorderZ.color.getOrCompute().set(24, 66, 173)
@@ -85,8 +91,10 @@ class TilesetPalette {
         fun createOrangeBlueTilesetPalette(): TilesetPalette {
             // https://jfly.uni-koeln.de/color/#pallet
             return TilesetPalette().apply {
-                rodBorder.color.getOrCompute().set(0, 0, 0)
-                rodFill.color.getOrCompute().set(255, 0x6E, 0)
+                rodABorder.color.getOrCompute().set(0, 0, 0)
+                rodAFill.color.getOrCompute().set(255, 0x6E, 0)
+                rodDpadBorder.color.getOrCompute().set(0, 0, 0)
+                rodDpadFill.color.getOrCompute().set(255, 0x6E, 0)
 
                 cubeBorder.color.getOrCompute().set(0, 0x4C, 0x87)
                 cubeBorderZ.color.getOrCompute().set(0, 0x38, 0x65)
@@ -114,14 +122,16 @@ class TilesetPalette {
     val pistonDpadFaceX: ColorMapping = ColorMapping("pistonDpadFaceX", { it.pistonDpadFaceXColor }, fallbackIDs = setOf("pistonFaceX"))
     val pistonDpadFaceZ: ColorMapping = ColorMapping("pistonDpadFaceZ", { it.pistonDpadFaceZColor }, fallbackIDs = setOf("pistonFaceZ"))
     val signShadow: ColorMapping = ColorMapping("signShadow", { it.signShadowColor })
-    val rodBorder: ColorMapping = ColorMapping("rodBorder", { it.rodBorderColor })
-    val rodFill: ColorMapping = ColorMapping("rodFill", { it.rodFillColor })
+    val rodABorder: ColorMapping = ColorMapping("rodABorder", { it.rodABorderColor }, fallbackIDs = setOf("rodBorder"))
+    val rodAFill: ColorMapping = ColorMapping("rodAFill", { it.rodAFillColor }, fallbackIDs = setOf("rodFill"))
+    val rodDpadBorder: ColorMapping = ColorMapping("rodDpadBorder", { it.rodDpadBorderColor }, fallbackIDs = setOf("rodBorder"))
+    val rodDpadFill: ColorMapping = ColorMapping("rodDpadFill", { it.rodDpadFillColor }, fallbackIDs = setOf("rodFill"))
     val backgroundBack: ColorMapping = ColorMapping("backgroundBack", { it.backgroundBack.color }, canAdjustAlpha = true)
     val backgroundMiddle: ColorMapping = ColorMapping("backgroundMiddle", { it.backgroundMiddle.color }, canAdjustAlpha = true)
     val backgroundFore: ColorMapping = ColorMapping("backgroundFore", { it.backgroundFore.color }, canAdjustAlpha = true)
 
     val allMappings: List<ColorMapping> = listOf(cubeBorder, cubeBorderZ, /*cubeFaceX,*/ cubeFaceY, cubeFaceZ,
-            pistonAFaceX, pistonAFaceZ, pistonDpadFaceX, pistonDpadFaceZ, signShadow, rodBorder, rodFill,
+            pistonAFaceX, pistonAFaceZ, pistonDpadFaceX, pistonDpadFaceZ, signShadow, rodABorder, rodAFill, rodDpadBorder, rodDpadFill,
             backgroundBack, backgroundMiddle, backgroundFore) + listOf(cubeFaceX) /* Deprioritized to be later in the list. */
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
 

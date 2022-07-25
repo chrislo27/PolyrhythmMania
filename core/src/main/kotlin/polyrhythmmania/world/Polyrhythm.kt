@@ -249,19 +249,39 @@ class EntityRodPR private constructor(
     }
 
     override fun getGroundBorderAnimations(tileset: Tileset): List<TintedRegion> {
-        return if (this.isDefective) tileset.defectiveRodGroundBorderAnimations else super.getGroundBorderAnimations(tileset)
+        val isDpadRow = this.row.isDpad
+        return if (this.isDefective) {
+            if (isDpadRow) tileset.defectiveRodDpadGroundBorderAnimations else tileset.defectiveRodAGroundBorderAnimations
+        } else {
+            if (isDpadRow) tileset.rodDpadGroundBorderAnimations else tileset.rodAGroundBorderAnimations
+        }
     }
 
     override fun getAerialBorderAnimations(tileset: Tileset): List<TintedRegion> {
-        return if (this.isDefective) tileset.defectiveRodAerialBorderAnimations else super.getAerialBorderAnimations(tileset)
+        val isDpadRow = this.row.isDpad
+        return if (this.isDefective) {
+            if (isDpadRow) tileset.defectiveRodDpadAerialBorderAnimations else tileset.defectiveRodAAerialBorderAnimations
+        } else {
+            if (isDpadRow) tileset.rodDpadAerialBorderAnimations else tileset.rodAAerialBorderAnimations
+        }
     }
 
     override fun getGroundFillAnimations(tileset: Tileset): List<TintedRegion> {
-        return if (this.isDefective) tileset.defectiveRodGroundFillAnimations else super.getGroundFillAnimations(tileset)
+        val isDpadRow = this.row.isDpad
+        return if (this.isDefective) {
+            if (isDpadRow) tileset.defectiveRodDpadGroundFillAnimations else tileset.defectiveRodAGroundFillAnimations
+        } else {
+            if (isDpadRow) tileset.rodDpadGroundFillAnimations else tileset.rodAGroundFillAnimations
+        }
     }
 
     override fun getAerialFillAnimations(tileset: Tileset): List<TintedRegion> {
-        return if (this.isDefective) tileset.defectiveRodAerialFillAnimations else super.getAerialFillAnimations(tileset)
+        val isDpadRow = this.row.isDpad
+        return if (this.isDefective) {
+            if (isDpadRow) tileset.defectiveRodDpadAerialFillAnimations else tileset.defectiveRodAAerialFillAnimations
+        } else {
+            if (isDpadRow) tileset.rodDpadAerialFillAnimations else tileset.rodAAerialFillAnimations
+        }
     }
 
     fun getCurrentIndex(posX: Float = this.position.x): Float = posX - row.startX

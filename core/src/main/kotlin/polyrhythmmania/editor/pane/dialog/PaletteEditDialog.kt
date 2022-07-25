@@ -70,7 +70,10 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     val groupPistonAFaceZMapping: ColorMappingGroupedPistonFaceZ = ColorMappingGroupedPistonFaceZ("groupPistonAFaceZMapping", "pistonAFaceX", "pistonAFaceZ", { it.pistonAFaceXColor }, { it.pistonAFaceZColor })
     val groupPistonDpadFaceZMapping: ColorMappingGroupedPistonFaceZ = ColorMappingGroupedPistonFaceZ("groupPistonDpadFaceZMapping", "pistonDpadFaceX", "pistonDpadFaceZ", { it.pistonDpadFaceXColor }, { it.pistonDpadFaceZColor })
     val groupPistonsFaceMapping: ColorMappingBothPistonFaces = ColorMappingBothPistonFaces("groupBothPistonFaces", groupPistonAFaceZMapping, groupPistonDpadFaceZMapping)
-    private val groupMappings: List<ColorMapping> = listOf(groupFaceYMapping, groupPistonsFaceMapping, groupPistonAFaceZMapping, groupPistonDpadFaceZMapping)
+    val groupRodsBorderMapping: ColorMappingGroupedRodsBorder = ColorMappingGroupedRodsBorder("groupRodsBorder")
+    val groupRodsFillMapping: ColorMappingGroupedRodsFill = ColorMappingGroupedRodsFill("groupRodsFill")
+    private val groupMappings: List<ColorMapping> = listOf(groupFaceYMapping, groupPistonsFaceMapping, groupPistonAFaceZMapping,
+            groupPistonDpadFaceZMapping, groupRodsBorderMapping, groupRodsFillMapping)
     val allMappings: List<ColorMapping> = groupMappings + tilesetPalette.allMappings
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
     val currentMapping: Var<ColorMapping> = Var(allMappings[0])
@@ -452,15 +455,31 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
             tilesetPalette.applyTo(this)
         })
         
-        val rodEntity: EntityRodDecor
+        val rodEntityA: EntityRodDecor
+        val rodEntityDpad: EntityRodDecor
         
         init {
             this += ImageNode(editor.previewTextureRegion)
-            rodEntity = object : EntityRodDecor(world) {
+            
+            class RotatableRod(val isDpadRow: Boolean) : EntityRodDecor(world) {
                 override fun getAnimationAlpha(): Float {
-                    return (rodRotation.get() % 1f).coerceIn(0f, 1f)
+                    return ((rodRotation.get() + (if (isDpadRow) 0.5f else 0f)) % 1f).coerceIn(0f, 1f)
+                }
+                override fun getGroundBorderAnimations(tileset: Tileset): List<TintedRegion> {
+                    return if (isDpadRow) tileset.rodDpadGroundBorderAnimations else tileset.rodAGroundBorderAnimations
+                }
+                override fun getAerialBorderAnimations(tileset: Tileset): List<TintedRegion> {
+                    return if (isDpadRow) tileset.rodDpadAerialBorderAnimations else tileset.rodAAerialBorderAnimations
+                }
+                override fun getGroundFillAnimations(tileset: Tileset): List<TintedRegion> {
+                    return if (isDpadRow) tileset.rodDpadGroundFillAnimations else tileset.rodAGroundFillAnimations
+                }
+                override fun getAerialFillAnimations(tileset: Tileset): List<TintedRegion> {
+                    return if (isDpadRow) tileset.rodDpadAerialFillAnimations else tileset.rodAAerialFillAnimations
                 }
             }
+            rodEntityA = RotatableRod(false)
+            rodEntityDpad = RotatableRod(true)
         }
         
         init {
@@ -478,22 +497,27 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
                     }
                 }
             }
-            
-            world.addEntity(EntityPiston(world).apply { 
+
+            val pistonA = EntityPiston(world).apply {
                 this.position.set(6f, 0f, 0f)
                 this.type = EntityPiston.Type.PISTON_A
                 this.pistonState = EntityPiston.PistonState.FULLY_EXTENDED
-            })
-            world.addEntity(EntityPiston(world).apply { 
+            }
+            world.addEntity(pistonA)
+            val pistonDpad = EntityPiston(world).apply {
                 this.position.set(9f, 0f, 0f)
                 this.type = EntityPiston.Type.PISTON_DPAD
                 this.pistonState = EntityPiston.PistonState.FULLY_EXTENDED
-            })
+            }
+            world.addEntity(pistonDpad)
             world.addEntity(EntityCube(world).apply { 
-                this.position.set(7f, 0f, 2f)
+                this.position.set(10f, 0f, -3f)
             })
-            world.addEntity(rodEntity.apply {
+            world.addEntity(rodEntityA.apply {
                 this.position.set(4f, 1f, 0f)
+            })
+            world.addEntity(rodEntityDpad.apply {
+                this.position.set(8.25f, 0f, 0f)
             })
 
             // Button signs
@@ -619,27 +643,6 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
             allMappingsByID.getValue("cubeFaceX").color.set(faceXColor.cpy())
         }
     }
-    
-//    inner class ColorMappingGroupedPistonFaceZ(id: String)
-//        : ColorMappingGroup(id,
-//            listOf("pistonFaceZ", "pistonFaceX").map { tilesetPalette.allMappingsByID.getValue(it) },
-//            { it.pistonFaceZColor }) {
-//
-//        private val hsv: FloatArray = FloatArray(3) { 0f }
-//
-//        override fun applyTo(tileset: Tileset) {
-//            val varr = tilesetGetter(tileset)
-//            val thisColor = this.color.getOrCompute()
-//            varr.set(thisColor.cpy())
-//            allMappingsByID.getValue("pistonFaceZ").color.set(thisColor.cpy())
-//
-//            thisColor.toHsv(hsv)
-//            hsv[2] = (hsv[2] - 0.20f)
-//            val pistonFaceX = Color(1f, 1f, 1f, thisColor.a).fromHsv(hsv)
-//            tileset.pistonFaceXColor.set(pistonFaceX.cpy())
-//            allMappingsByID.getValue("pistonFaceX").color.set(pistonFaceX.cpy())
-//        }
-//    }
 
     inner class ColorMappingGroupedPistonFaceZ(
             id: String, val faceXID: String, val faceZID: String,
@@ -677,5 +680,30 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
             secondPiston.applyTo(tileset)
         }
     }
+    
+    inner class ColorMappingGroupedRodsBorder(id: String)
+        : ColorMappingGroup(id,
+            listOf("rodABorder", "rodDpadBorder").map { tilesetPalette.allMappingsByID.getValue(it) },
+            { it.rodABorderColor }) {
 
+        override fun applyTo(tileset: Tileset) {
+            val thisColor = this.color.getOrCompute()
+            affectsMappings.forEach { cm -> cm.color.set(thisColor.cpy()) }
+        }
+    }
+    
+    inner class ColorMappingGroupedRodsFill(id: String)
+        : ColorMappingGroup(id,
+            listOf("rodAFill", "rodDpadFill").map { tilesetPalette.allMappingsByID.getValue(it) },
+            { it.rodAFillColor }) {
+
+        override fun applyTo(tileset: Tileset) {
+            val thisColor = this.color.getOrCompute()
+            affectsMappings.forEach { cm -> 
+                cm.color.set(thisColor.cpy())
+                cm.applyTo(tileset)
+            }
+        }
+    }
+    
 }

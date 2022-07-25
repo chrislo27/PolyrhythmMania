@@ -51,16 +51,16 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
     protected open fun getTintColorOverrideFill(region: TintedRegion): Color? = null
     
     protected open fun getGroundBorderAnimations(tileset: Tileset): List<TintedRegion> {
-        return tileset.rodGroundBorderAnimations
+        return tileset.rodAGroundBorderAnimations
     }
     protected open fun getAerialBorderAnimations(tileset: Tileset): List<TintedRegion> {
-        return tileset.rodAerialBorderAnimations
+        return tileset.rodAAerialBorderAnimations
     }
     protected open fun getGroundFillAnimations(tileset: Tileset): List<TintedRegion> {
-        return tileset.rodGroundFillAnimations
+        return tileset.rodAGroundFillAnimations
     }
     protected open fun getAerialFillAnimations(tileset: Tileset): List<TintedRegion> {
-        return tileset.rodAerialFillAnimations
+        return tileset.rodAAerialFillAnimations
     }
     
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
