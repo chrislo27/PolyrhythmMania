@@ -2,10 +2,13 @@ package polyrhythmmania.engine.modifiers
 
 import paintbox.binding.FloatVar
 import paintbox.binding.IntVar
+import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.ResultFlag
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
+import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.EntityRodPR
 
 /**
@@ -53,6 +56,10 @@ class DefectiveRodsMode : ModifierModule() {
         val newLives = (oldLives - 1).coerceIn(0, this.maxLives.get())
         this.lives.set(newLives)
         this.currentCooldown.set(cooldownBaseAmount.get())
+        
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
+            player.gain = 0.4f
+        }
 
         if (oldLives > 0 && newLives == 0) {
             onAllLivesLost(engine.inputter)
