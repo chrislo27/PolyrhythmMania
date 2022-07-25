@@ -72,6 +72,11 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
             draggingStack.cardList.clear()
             oldZone?.stack?.cardList?.addAll(myList)
             oldZone = null
+            playPutdownSound()
+        }
+        
+        private fun playPutdownSound() {
+            playSound("sfx_card_putdown", pitch = 1.2f)
         }
         
         fun endDrag(newZone: CardZone) {
@@ -80,6 +85,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
             draggingStack.cardList.clear()
             newZone.stack.cardList += myList
             oldZone = null
+            playPutdownSound()
             
             if (myList.isNotEmpty()) {
                 GlobalStats.solitaireMovesMade.increment()
@@ -110,6 +116,8 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
             oldZone = zoneTarget.zone
             offset.set(zoneTarget.offsetX, zoneTarget.offsetY)
             updateDrag()
+            
+            playSound("sfx_card_pickup", pitch = 1.2f)
         }
         
         fun updateDrag() {
@@ -154,7 +162,15 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
     private val animationQueue: MutableList<EnqueuedAnimation> = mutableListOf()
     private var maxConcurrentAnimations: Int = 1
     private var currentAnimations: List<CardMoveAnimation> = listOf(
-            CardMoveAnimation(Card(CardSuit.A, CardSymbol.WIDGET_HALF), -10000f, -10000f, -10000f, -10000f, null, null, duration = 0.75f) // Short pause before dealing cards
+            CardMoveAnimation(Card(CardSuit.A, CardSymbol.WIDGET_HALF), -10000f, -10000f, -10000f, -10000f, null, null, duration = 0.75f).apply {
+                // Short pause before dealing cards
+                val dealSfxID = "sfx_card_deal"
+                val dealSfx = SolitaireAssets.get<Sound>(dealSfxID)
+                dealSfx.stop()
+                this.onComplete = {
+                    playSound(dealSfxID, pitch = 0.70f)
+                }
+            }
     )
     private var gameWon: Boolean = false
     
@@ -306,6 +322,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
         if ((freeCells + foundationZones).all { z -> z.stack.flippedOver.get() }) {
             gameWon = true
             inputsEnabled.set(false)
+            playSound("sfx_win", vol = 0.75f)
             GlobalStats.solitaireGamesWon.increment()
             // Falldown animation
             maxConcurrentAnimations = Int.MAX_VALUE

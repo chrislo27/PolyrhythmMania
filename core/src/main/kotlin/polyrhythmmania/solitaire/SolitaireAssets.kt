@@ -63,6 +63,10 @@ class SolitaireAssetLoader : IAssetLoader {
         SolitaireAssets.loadAsset<Sound>("sfx_note_B3", "sounds/solitaire/note_B3.ogg")
         SolitaireAssets.loadAsset<Sound>("sfx_note_C4", "sounds/solitaire/note_C4.ogg")
         SolitaireAssets.loadAsset<Sound>("sfx_flick", "sounds/solitaire/flick.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_win", "sounds/solitaire/win.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_card_deal", "sounds/solitaire/card_deal.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_card_pickup", "sounds/solitaire/card_pickup.ogg")
+        SolitaireAssets.loadAsset<Sound>("sfx_card_putdown", "sounds/solitaire/card_putdown.ogg")
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
