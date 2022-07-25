@@ -83,7 +83,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                             1.10f, 1.25f, 1.50f, 1.75f, 2.00f, 2.25f, 2.50f, 2.75f, 3.00f, 4.00f).sorted()
                     val oneIndex: Int = setSpeeds.indexOf(1f)
                     if (oneIndex == -1) error("Didn't find index of speed 1.0 for playback speed slider")
-                    
+
                     Anchor.BottomLeft.configure(this)
                     this.bindHeightToParent(multiplier = 0.5f)
                     this.padding.set(Insets(1f))
@@ -94,7 +94,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     this.value.addListener { v ->
                         editor.playbackSpeed.set(setSpeeds.getOrNull(v.getOrCompute().toInt()) ?: 1f)
                     }
-                    this.setOnRightClick { 
+                    this.setOnRightClick {
                         this.setValue(oneIndex.toFloat())
                     }
                 }
@@ -108,7 +108,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.align.set(HBox.Align.RIGHT)
         }
         previewSection += rightPreviewHbox
-        
+
         playtestButton = Button("").apply {
             this.padding.set(Insets.ZERO)
             this.bounds.width.set(32f)
@@ -128,7 +128,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         rightPreviewHbox.temporarilyDisableLayouts {
             rightPreviewHbox += playtestButton
         }
-        
+
         val playbackButtonPane = HBox().apply {
             Anchor.Centre.configure(this)
             this.spacing.set(4f)
@@ -201,7 +201,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             playbackButtonPane += playButton
             playbackButtonPane += stopButton
         }
-        previewSection += createPlaybackButtonSet().apply { 
+        previewSection += createPlaybackButtonSet().apply {
             Anchor.Centre.configure(this)
         }
 
@@ -330,7 +330,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                             ctxmenu.addMenuItem(SeparatorMenuItem())
                             ctxmenu.addMenuItem(CheckBoxMenuItem.create(showInputIndicatorsVar,
                                     Localization.getValue("editor.dialog.worldSettings.showInputIndicators"), editorPane.palette.markup))
-                            
+
                             if (EditorSpecialFlags.STORY_MODE in editor.flags) {
                                 ctxmenu.defaultWidth.set(450f)
                                 ctxmenu.addMenuItem(SeparatorMenuItem())
@@ -354,7 +354,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                             val old = editor.container.storyModeMetadata.getOrCompute()
                                             editor.container.storyModeMetadata.set(old.copy(lives = it))
                                         }
-                                        
+
                                         combobox.bindWidthToParent(adjust = -108f)
                                     }
                                 }))
@@ -376,21 +376,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                             val old = editor.container.storyModeMetadata.getOrCompute()
                                             editor.container.storyModeMetadata.set(old.copy(defectiveRodsThreshold = it))
                                         }
-                                        
+
                                         combobox.bindWidthToParent(adjust = -258f)
                                     }
                                 }))
-                                val continuousMode = BooleanVar(editor.container.storyModeMetadata.getOrCompute().continuous)
-                                continuousMode.addListener {
-                                    val old = editor.container.storyModeMetadata.getOrCompute()
-                                    editor.container.storyModeMetadata.set(old.copy(continuous = it.getOrCompute()))
-                                }
-                                ctxmenu.addMenuItem(CheckBoxMenuItem.create(continuousMode,
-                                        "Continuous mode", editorPane.palette.markup).apply { 
-                                            this.createTooltip = {
-                                                it.set(editorPane.createDefaultTooltip("To be used with single-life mode to provide a continously panning level.\nNOTE: All Despawn blocks should disable their tail-end setting."))
-                                            }
-                                })
                                 ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
                                     hbox.spacing.set(8f)
                                     hbox.bounds.height.set(32f)
@@ -406,7 +395,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                             editor.container.storyModeMetadata.set(old.copy(inputTimingRestriction = it))
                                             editor.container.resetInputFeedbackEntities()
                                         }
-                                        
+
                                         combobox.bindWidthToParent(adjust = -208f)
                                     }
                                 }))
@@ -462,7 +451,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     val state = it.getOrCompute()
 
                     if (state) {
-                        editorPane.enqueueAnimation(tapalongPane.opacity, 0f, 1f, 0.125f).apply { 
+                        editorPane.enqueueAnimation(tapalongPane.opacity, 0f, 1f, 0.125f).apply {
                             onStart = {
                                 tapalongPane.visible.set(true)
                             }
@@ -480,7 +469,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             leftControlHBox.addChild(tapalongPane)
         }
     }
-    
+
     fun createPlaybackButtonSet(): Pane {
         val playbackButtonPane = HBox().apply {
             this.spacing.set(4f)

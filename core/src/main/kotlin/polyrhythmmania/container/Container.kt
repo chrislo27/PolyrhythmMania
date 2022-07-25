@@ -162,8 +162,6 @@ class Container(
             defectiveRodsMode.enabled.set(defectiveThreshold > 0)
             defectiveRodsMode.maxLives.set(defectiveThreshold)
             defectiveRodsMode.resetState()
-            
-            world.worldMode = WorldMode(WorldType.Polyrhythm(metadata.continuous))
 
             world.resetWorld()
         }

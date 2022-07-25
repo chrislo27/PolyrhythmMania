@@ -259,7 +259,7 @@ object Instantiators {
         add(CATEGORY_STORYMODE, Instantiator("storyMode_panCamera", Block8BallCamera::class.java,
                 ReadOnlyVar.const("Camera Pan"),
                 ReadOnlyVar.const("Pans the camera for continuous mode."),
-                ReadOnlyVar.const("This pans the camera forward for [i]continuous mode[].\nYou need to enable [i]continuous mode[] in\nthe Global World Settings.\n\nYou should place this to be aligned at the same beat\nas every [b]Despawn Pattern[] block.\n\nEvery single [b]Despawn Pattern[] block needs to have\nits tail end disabled."),
+                ReadOnlyVar.const("This pans the camera forward for [i]continuous mode[].\n\nYou should place this to be aligned at the same beat\nas every [b]Despawn Pattern[] block.\nEvery single [b]Despawn Pattern[] block needs to have\nits tail end disabled."),
                 Block8BallCamera.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
             Block8BallCamera(engine)
         })

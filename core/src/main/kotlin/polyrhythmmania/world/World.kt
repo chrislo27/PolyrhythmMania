@@ -244,7 +244,9 @@ class World {
         getNewEntities().forEach(this::addEntity)
         
         val worldType = this.worldMode.worldType
-        if (worldType is WorldType.Polyrhythm && worldType.isContinuous) {
+        if (worldType is WorldType.Polyrhythm) {
+            // Extra entities for continuous mode
+            
             val ents = getNewEntities().toMutableList()
 
             // Last 6 raised platforms
@@ -256,7 +258,7 @@ class World {
                     }
                 }
             }
-            ents.forEach {// Copy all blocks over
+            ents.forEach {// Move all copied blocks over
                 it.position.x += 24f
                 addEntity(it)
             }

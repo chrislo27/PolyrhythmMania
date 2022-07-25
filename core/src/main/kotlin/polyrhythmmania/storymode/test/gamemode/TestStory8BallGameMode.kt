@@ -17,7 +17,7 @@ class TestStory8BallGameMode(main: PRManiaGame) : TestStoryGameMode(main) {
     init {
 //        container.renderer.camera.zoom = 2f
         
-        container.world.worldMode = WorldMode(WorldType.Polyrhythm(true))
+        container.world.worldMode = WorldMode(WorldType.Polyrhythm())
         container.world.worldResetListeners += World.WorldResetListener { world ->
 //            world.addEntity(EntityCameraFrame(world, Color.RED).apply {
 //                this.position.y = 3f
