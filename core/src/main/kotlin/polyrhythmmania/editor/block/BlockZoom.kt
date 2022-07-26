@@ -143,6 +143,8 @@ class BlockZoom(engine: Engine)
         return BlockZoom(engine).also {
             this.copyBaseInfoTo(it)
             it.transitionData.paletteTransition.set(this.transitionData.paletteTransition.getOrCompute().copy())
+            it.startZoom.set(this.startZoom.get())
+            it.endZoom.set(this.endZoom.get())
         }
     }
 
