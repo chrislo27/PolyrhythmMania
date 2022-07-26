@@ -184,6 +184,20 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         }
         return true
     }
+    
+    fun createDefaultTooltipParent(element: UIElement): UIElement {
+        return RectElement(Color(2 / 255f, 6 / 255f, 16 / 255f, 0.95f)).apply {
+            this.border.set(Insets(2f))
+            this.borderStyle.set(SolidBorder(Color().grey(0.925f, 1f)).apply {
+                this.roundedCorners.set(true)
+            })
+            this.padding.set(Insets(8f))
+            
+            this += element
+            this.sizeWidthToChildren()
+            this.sizeHeightToChildren()
+        }
+    }
 
     fun createDefaultTooltip(binding: Var.Context.() -> String): Tooltip {
         return Tooltip(binding = binding).apply {

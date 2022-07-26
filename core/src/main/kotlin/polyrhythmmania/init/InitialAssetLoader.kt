@@ -15,6 +15,7 @@ import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsMusicLoader
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.BeadsSoundLoader
+import polyrhythmmania.world.tileset.TransitionCurve
 
 
 class InitialAssetLoader : IAssetLoader {
@@ -85,8 +86,13 @@ class InitialAssetLoader : IAssetLoader {
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor_help", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("arrow_right", "textures/ui/icon/help/arrow_right.png"),
                 Packable("home", "textures/ui/icon/help/home.png"),
-        ), PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false, 
+        ), PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false,
                 atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
+        AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor_curves",
+                PackedSheetLoader.PackedSheetLoaderParam(TransitionCurve.VALUES.map {
+                    Packable(it.imageID, "textures/curves/${it.imageID}.png")
+                }, PackedSheet.Config(padding = 0, maxSize = 1024, duplicateBorder = false,
+                        atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
         AssetRegistry.loadAsset<Texture>("ui_triangle_equilateral", "textures/ui/triangle_equilateral.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_triangle_right", "textures/ui/triangle_right.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_triangle_equilateral_bordered", "textures/ui/triangle_equilateral_bordered.png", linearTexture())

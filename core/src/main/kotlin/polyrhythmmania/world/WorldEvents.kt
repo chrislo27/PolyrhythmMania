@@ -372,9 +372,4 @@ class EventZoomCamera(
         val percentage = this.transition.translatePercentage(getBeatPercentage(currentBeat)).coerceIn(0f, 1f)
         this.camera.zoom = MathUtils.lerp(this.startZoom, this.endZoom, percentage)
     }
-
-    override fun onEndContainer(container: Container, currentBeat: Float) {
-        super.onEndContainer(container, currentBeat)
-        this.camera.zoom = this.endZoom
-    }
 }

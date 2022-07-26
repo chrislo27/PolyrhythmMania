@@ -1,21 +1,33 @@
 package polyrhythmmania.editor.block.data
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.BooleanVar
+import paintbox.binding.FloatVar
 import paintbox.binding.Var
+import paintbox.binding.VarChangedListener
+import paintbox.packing.PackedSheet
+import paintbox.registry.AssetRegistry
+import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
+import paintbox.ui.RenderAlign
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
+import paintbox.ui.control.ComboBox
 import paintbox.ui.control.DecimalTextField
 import paintbox.ui.control.TextField
+import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
+import paintbox.ui.layout.VBox
 import paintbox.util.DecimalFormats
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.world.tileset.PaletteTransition
+import polyrhythmmania.world.tileset.TransitionCurve
 
 
 class PaletteTransitionData(val defaultValue: PaletteTransition = PaletteTransition.DEFAULT) {
@@ -24,8 +36,81 @@ class PaletteTransitionData(val defaultValue: PaletteTransition = PaletteTransit
 
 
     fun createMenuItems(editor: Editor): List<MenuItem> {
+        val markup = editor.editorPane.palette.markup
+        
+        val curveCombobox = ComboBox(TransitionCurve.VALUES, paletteTransition.getOrCompute().transitionCurve).also { combobox ->
+            combobox.markup.set(markup)
+            combobox.itemStringConverter.set {
+                Localization.getValue(it.localizationNameKey)
+            }
+            combobox.selectedItem.addListener {
+                paletteTransition.set(paletteTransition.getOrCompute().copy(transitionCurve = it.getOrCompute()))
+            }
+        }
+        val curveComboboxPane = HBox().also { hbox ->
+            hbox.spacing.set(8f)
+            hbox.bounds.height.set(32f)
+            hbox += TextLabel(Localization.getValue("blockContextMenu.transitionCurve")).apply {
+                this.markup.set(markup)
+                this.renderAlign.set(Align.right)
+                this.bounds.width.set(160f)
+                this.tooltipElement.set(editor.editorPane.createDefaultTooltipParent(
+                        VBox().apply { 
+                            this.spacing.set(8f)
+                            
+                            val widthResizeTrigger = FloatVar(0f)
+                            widthResizeTrigger.addListener {
+                                this.bounds.width.set(it.getOrCompute())
+                            }
+                            
+                            this += TextLabel(Localization.getValue("blockContextMenu.transitionCurve.tooltip")).apply { 
+                                this.markup.set(markup)
+                                this.textColor.set(Color.WHITE)
+                                this.bounds.width.set(100f)
+                                this.bounds.height.set(100f)
+                                this.bounds.width.addListener { 
+                                    widthResizeTrigger.set(it.getOrCompute())
+                                }
+                                this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.WIDTH_AND_HEIGHT))
+                            }
+                            this += ImageNode(binding = {
+                                AssetRegistry.get<PackedSheet>("ui_icon_editor_curves")[curveCombobox.selectedItem.use().imageID]
+                            }).apply { 
+                                Anchor.TopCentre.xConfigure(this, 0f)
+                                this.margin.set(Insets(10f, 0f, 0f, 0f))
+                                this.bounds.width.set(200f)
+                                this.bounds.height.set(210f)
+                            }
+                            this += TextLabel(binding = {
+                                Localization.getValue(curveCombobox.selectedItem.use().localizationNameKey)
+                            }, editor.editorPane.palette.musicDialogFontBold).apply {
+                                this.textColor.set(Color.WHITE)
+                                this.renderAlign.set(RenderAlign.center)
+                                this.bounds.height.set(32f)
+                            }
+                            
+                            this.autoSizeToChildren.set(true)
+                            
+                            val resizeParentListener: VarChangedListener<Float> = VarChangedListener { 
+                                val p = parent.getOrCompute()
+                                p?.sizeWidthToChildren()
+                                p?.sizeHeightToChildren()
+                            }
+                            this.bounds.width.addListener(resizeParentListener)
+                            this.bounds.height.addListener(resizeParentListener)
+
+                            this.sizeWidthToChildren()
+                            this.sizeHeightToChildren()
+                        }
+                ))
+            }
+            hbox += curveCombobox.apply {
+                this.bindWidthToParent(adjust = -(160f + 8f))
+            }
+        }
+        
         return listOf(
-                LabelMenuItem.create(Localization.getValue("blockContextMenu.paletteChange.transitionDuration"), editor.editorPane.palette.markup),
+                LabelMenuItem.create(Localization.getValue("blockContextMenu.paletteChange.transitionDuration"), markup),
                 CustomMenuItem(
                         HBox().apply {
                             this.bounds.height.set(32f)
@@ -60,8 +145,11 @@ class PaletteTransitionData(val defaultValue: PaletteTransition = PaletteTransit
                 ),
 
                 SeparatorMenuItem(),
+                CustomMenuItem(curveComboboxPane),
+                
+                SeparatorMenuItem(),
                 CheckBoxMenuItem.create(BooleanVar(paletteTransition.getOrCompute().pulseMode),
-                        Localization.getValue("blockContextMenu.paletteChange.pulseMode"), editor.editorPane.palette.markup).apply {
+                        Localization.getValue("blockContextMenu.paletteChange.pulseMode"), markup).apply {
                     this.createTooltip = {
                         it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.paletteChange.pulseMode.tooltip")))
                     }
@@ -70,7 +158,7 @@ class PaletteTransitionData(val defaultValue: PaletteTransition = PaletteTransit
                     }
                 },
                 CheckBoxMenuItem.create(BooleanVar(paletteTransition.getOrCompute().reverse),
-                        Localization.getValue("blockContextMenu.paletteChange.reverse"), editor.editorPane.palette.markup).apply {
+                        Localization.getValue("blockContextMenu.paletteChange.reverse"), markup).apply {
                     this.createTooltip = {
                         it.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.paletteChange.reverse.tooltip")))
                     }

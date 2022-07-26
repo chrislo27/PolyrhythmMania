@@ -26,6 +26,7 @@ import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.tileset.PaletteTransition
 import polyrhythmmania.world.tileset.TilesetPalette
+import polyrhythmmania.world.tileset.TransitionCurve
 import java.time.LocalDate
 import java.time.Year
 import java.time.ZoneOffset
@@ -364,7 +365,7 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                         engine.playbackSpeed = Semitones.getALPitch(speedIncreaseSemitones.get())
                         
                         engine.addEvent(EventPaletteChange(engine, startBeat,
-                                PaletteTransition(duration = 1f, pulseMode = false, reverse = false),
+                                PaletteTransition(duration = 1f, transitionCurve = TransitionCurve.LINEAR, pulseMode = false, reverse = false),
                                 createTilesetPaletteIterated(loopsCompleted.get(), colorChangeMultiplier, COLOR_CHANGE_LIMIT)))
                         
                         if (newSpeedLvl > currentSpeedIncrease) {
