@@ -174,6 +174,7 @@ class PaletteTransitionData(val defaultValue: PaletteTransition = PaletteTransit
         rootObj.add("duration", pt.duration)
         rootObj.add("pulseMode", pt.pulseMode)
         rootObj.add("reverse", pt.reverse)
+        rootObj.add("transitionCurve", pt.transitionCurve.jsonId)
     }
 
     fun readFromJson(rootObj: JsonObject) {
@@ -190,6 +191,10 @@ class PaletteTransitionData(val defaultValue: PaletteTransition = PaletteTransit
         val reverseVal = rootObj.get("reverse")
         if (reverseVal != null && reverseVal.isBoolean) {
             pt = pt.copy(reverse = reverseVal.asBoolean())
+        }
+        val curveVal = rootObj.get("transitionCurve")
+        if (curveVal != null && curveVal.isNumber) {
+            pt = pt.copy(transitionCurve = TransitionCurve.INDEX_MAP[curveVal.asInt()] ?: TransitionCurve.LINEAR)
         }
         
         this.paletteTransition.set(pt)

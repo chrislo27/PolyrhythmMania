@@ -29,6 +29,35 @@ class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, Bloc
         const val ROW_COUNT: Int = Spotlights.NUM_ON_ROW
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
         val ALLOWED_ACTION_TYPES: List<SpotlightActionType> by lazy { SpotlightActionType.VALUES }
+        
+        fun addTimingModeToContextMenu(ctxmenu: ContextMenu, editor: Editor, timingMode: Var<SpotlightTimingMode>, tooltipLocalizationKey: String) {
+            val combobox = ComboBox(SpotlightTimingMode.VALUES, timingMode.getOrCompute()).also { combobox ->
+                combobox.markup.set(editor.editorPane.palette.markup)
+                combobox.itemStringConverter.set {
+                    Localization.getValue(it.localizationNameKey)
+                }
+                combobox.selectedItem.addListener {
+                    timingMode.set(it.getOrCompute())
+                }
+            }
+            val comboboxPane = HBox().also { hbox ->
+                hbox.spacing.set(8f)
+                hbox.bounds.height.set(32f)
+                hbox += TextLabel(Localization.getValue("blockContextMenu.spotlightSwitch.timingMode")).apply {
+                    this.markup.set(editor.editorPane.palette.markup)
+                    this.renderAlign.set(Align.right)
+                    this.bounds.width.set(150f)
+                    this.tooltipElement.set(editor.editorPane.createDefaultTooltip(
+                            Localization.getValue(tooltipLocalizationKey,
+                                    Localization.getValue("blockContextMenu.spotlightSwitch.timingMode.explanation"))
+                    ))
+                }
+                hbox += combobox.apply {
+                    this.bindWidthToParent(adjust = -158f)
+                }
+            }
+            ctxmenu.addMenuItem(CustomMenuItem(comboboxPane))
+        }
     }
     
     val ambientLightDarken: BooleanVar = BooleanVar(true)
@@ -120,33 +149,7 @@ class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, Bloc
             ctxmenu.addMenuItem(SeparatorMenuItem())
             patternData.createMenuItems(editor, SpotlightActionType.NO_CHANGE, 0).forEach { ctxmenu.addMenuItem(it) }
             
-            val combobox = ComboBox(SpotlightTimingMode.VALUES, timingMode.getOrCompute()).also { combobox ->
-                combobox.markup.set(editor.editorPane.palette.markup)
-                combobox.itemStringConverter.set {
-                    Localization.getValue(it.localizationNameKey)
-                }
-                combobox.selectedItem.addListener {
-                    this.timingMode.set(it.getOrCompute())
-                }
-            }
-            val comboboxPane = HBox().also { hbox ->
-                hbox.spacing.set(8f)
-                hbox.bounds.height.set(32f)
-                hbox += TextLabel(Localization.getValue("blockContextMenu.spotlightSwitch.timingMode")).apply {
-                    this.markup.set(editor.editorPane.palette.markup)
-                    this.renderAlign.set(Align.right)
-                    this.bounds.width.set(150f)
-                    this.tooltipElement.set(editor.editorPane.createDefaultTooltip(
-                            Localization.getValue("blockContextMenu.spotlightSwitch.timingMode.tooltip",
-                                    Localization.getValue("editor.track.input_0"),
-                                    Localization.getValue("editor.track.input_1"))
-                    ))
-                }
-                hbox += combobox.apply {
-                    this.bindWidthToParent(adjust = -158f)
-                }
-            }
-            ctxmenu.addMenuItem(CustomMenuItem(comboboxPane))
+            addTimingModeToContextMenu(ctxmenu, editor, timingMode, "blockContextMenu.spotlightSwitch.timingMode.tooltip")
         }
     }
 
