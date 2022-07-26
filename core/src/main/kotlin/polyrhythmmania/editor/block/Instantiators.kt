@@ -208,6 +208,13 @@ object Instantiators {
                 BlockSongInfoCard.BLOCK_TYPES) { engine ->
             BlockSongInfoCard(engine)
         })
+        add(CATEGORY_FX, Instantiator("zoom", BlockZoom::class.java,
+                Localization.getVar("instantiator.zoom.name"),
+                Localization.getVar("instantiator.zoom.summary"),
+                Localization.getVar("instantiator.zoom.desc"),
+                BlockZoom.BLOCK_TYPES) { engine ->
+            BlockZoom(engine)
+        })
         
         // Spotlight instantiators
         add(CATEGORY_SPOTLIGHTS, Instantiator("spotlightSwitch", BlockSpotlightSwitch::class.java,

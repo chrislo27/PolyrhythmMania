@@ -159,7 +159,7 @@ class World {
 
             // Bottom floor
             for (x in -3..20) {
-                for (z in 3..7) {
+                for (z in 3..9) {
                     val ent: Entity = EntityCube(this, x == 4)
                     list += ent.apply {
                         this.position.set(x.toFloat(), 0f, z.toFloat())
@@ -169,7 +169,7 @@ class World {
 
             // Upper steps
             for (x in -3..20) {
-                for (z in -7 downTo -9) {
+                for (z in -7 downTo -11) {
                     val ent: Entity = EntityCube(this, x == 4)
                     list += ent.apply {
                         this.position.set(x.toFloat(), if (z == -7) 2f else 3f, z.toFloat())

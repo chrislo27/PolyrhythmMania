@@ -18,9 +18,9 @@ import polyrhythmmania.editor.Editor
 import polyrhythmmania.world.tileset.PaletteTransition
 
 
-class PaletteTransitionData {
+class PaletteTransitionData(val defaultValue: PaletteTransition = PaletteTransition.DEFAULT) {
 
-    val paletteTransition: Var<PaletteTransition> = Var(PaletteTransition.DEFAULT)
+    val paletteTransition: Var<PaletteTransition> = Var(defaultValue)
 
 
     fun createMenuItems(editor: Editor): List<MenuItem> {

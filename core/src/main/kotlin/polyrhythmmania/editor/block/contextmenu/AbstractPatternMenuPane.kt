@@ -26,11 +26,8 @@ import polyrhythmmania.util.RodinSpecialChars
 abstract class AbstractPatternMenuPane<E : CubeTypeLike, Data : AbstractPatternBlockData<E>>(
         val editorPane: EditorPane, val data: Data, val clearType: E, beatIndexStart: Int
 ) : Pane() {
-
-    init {
-        val blockSize = 32f + 3f * 2
-        val clearL10NStr = Localization.getVar("blockContextMenu.spawnPattern.clear")
-        
+    
+    companion object {
         fun invertButtonSkin(button: Button) {
             (button.skin.getOrCompute() as ButtonSkin).also { skin ->
                 listOf(skin.defaultBgColor, skin.disabledBgColor, skin.hoveredBgColor,
@@ -44,6 +41,11 @@ abstract class AbstractPatternMenuPane<E : CubeTypeLike, Data : AbstractPatternB
                 }
             }
         }
+    }
+
+    init {
+        val blockSize = 32f + 3f * 2
+        val clearL10NStr = Localization.getVar("blockContextMenu.spawnPattern.clear")
 
         fun createRowPane(label: String, rowTypes: MutableList<E>, isARow: Boolean): Pair<Pane, List<CubeButton>> {
             val cubeButtons: MutableList<CubeButton> = mutableListOf()

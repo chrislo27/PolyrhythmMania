@@ -2,8 +2,13 @@ package polyrhythmmania.world
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector3
 import paintbox.binding.BooleanVar
 import paintbox.registry.AssetRegistry
+import paintbox.util.Vector3Stack
 import polyrhythmmania.container.Container
 import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.engine.*
@@ -340,5 +345,36 @@ class EventChangeTexturePack(engine: Engine, startBeat: Float, val newSource: Te
         if (container.globalSettings.forceTexturePack == ForceTexturePack.NO_FORCE) {
             container.setTexturePackFromSource(newSource)
         }
+    }
+}
+
+class EventZoomCamera(
+        engine: Engine, startBeat: Float, val transition: PaletteTransition,
+        val startZoom: Float, val endZoom: Float
+) : Event(engine) {
+
+    private lateinit var camera: OrthographicCamera
+
+    init {
+        this.beat = startBeat
+        this.width = transition.duration
+    }
+
+    override fun onStartContainer(container: Container, currentBeat: Float) {
+        super.onStartContainer(container, currentBeat)
+        this.camera = container.renderer.camera
+        this.camera.zoom = this.startZoom
+    }
+
+    override fun onUpdateContainer(container: Container, currentBeat: Float) {
+        super.onUpdateContainer(container, currentBeat)
+
+        val percentage = this.transition.translatePercentage(getBeatPercentage(currentBeat)).coerceIn(0f, 1f)
+        this.camera.zoom = MathUtils.lerp(this.startZoom, this.endZoom, percentage)
+    }
+
+    override fun onEndContainer(container: Container, currentBeat: Float) {
+        super.onEndContainer(container, currentBeat)
+        this.camera.zoom = this.endZoom
     }
 }
