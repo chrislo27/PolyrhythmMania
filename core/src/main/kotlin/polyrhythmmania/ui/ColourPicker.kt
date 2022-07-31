@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
-import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
 import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
@@ -135,6 +134,10 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = UIElement.de
                                 if (!f.getOrCompute()) {
                                     this.text.set("${varr.get()}")
                                 }
+                            }
+                            this.setOnRightClick {
+                                requestFocus()
+                                text.set("")
                             }
                         }
                     }
