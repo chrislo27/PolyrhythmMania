@@ -40,7 +40,7 @@ class BlockPaletteChange(engine: Engine)
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return ContextMenu().also { ctxmenu ->
-            ctxmenu.defaultWidth.set(400f)
+            ctxmenu.defaultWidth.set(420f)
             ctxmenu.addMenuItem(SimpleMenuItem.create(Localization.getValue("blockContextMenu.paletteChange.edit"),
                     editor.editorPane.palette.markup).apply {
                 this.onAction = {
