@@ -125,7 +125,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         loadDialog = LoadDialog(this)
         newDialog = NewDialog(this)
         playtestDialog = PlaytestDialog(this)
-        paletteEditDialog = PaletteEditDialog(this, editor.container.world.tilesetPalette, null, false)
+        paletteEditDialog = PaletteEditDialog(this, editor.container.world.tilesetPalette, null, false, disposeOnClose = false)
         texturePackEditDialog = TexturePackEditDialog(this)
         manageTexturePackDialog = ManageCustomTexPackDialog(this)
     }

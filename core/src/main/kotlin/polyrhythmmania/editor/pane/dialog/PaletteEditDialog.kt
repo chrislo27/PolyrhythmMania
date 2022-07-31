@@ -40,9 +40,11 @@ import polyrhythmmania.world.tileset.*
 import kotlin.math.sign
 
 
-class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalette,
-                        val baseTileset: TilesetPalette?, val canChangeEnabledState: Boolean,
-                        val titleLocalization: String = "editor.dialog.tilesetPalette.title",
+class PaletteEditDialog(
+        editorPane: EditorPane, val tilesetPalette: TilesetPalette,
+        val baseTileset: TilesetPalette?, val canChangeEnabledState: Boolean,
+        val disposeOnClose: Boolean,
+        val titleLocalization: String = "editor.dialog.tilesetPalette.title",
 ) : EditorDialog(editorPane), Disposable {
 
     companion object {
@@ -441,6 +443,9 @@ class PaletteEditDialog(editorPane: EditorPane, val tilesetPalette: TilesetPalet
     override fun onCloseDialog() {
         super.onCloseDialog()
         editor.updatePaletteAndTexPackChangesState()
+        if (disposeOnClose) {
+            this.disposeQuietly()
+        }
     }
 
     override fun dispose() {
