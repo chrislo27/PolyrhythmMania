@@ -38,7 +38,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
     val redoButton: Button
     
     val levelMetadataButton: Button
-//    val levelBannerButton: Button
+    val levelBannerButton: Button
     
     val helpButton: Button
     val settingsButton: Button
@@ -56,7 +56,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
         val leftBox: HBox = HBox().apply { 
             this.spacing.set(4f)
             this.align.set(HBox.Align.LEFT)
-            this.bounds.width.set((32f + this.spacing.get()) * 15)
+            this.bounds.width.set((32f + this.spacing.get()) * 18)
         }
         this.addChild(leftBox)
         val rightBox: HBox = HBox().apply {
@@ -161,20 +161,21 @@ class Menubar(val editorPane: EditorPane) : Pane() {
         
         levelMetadataButton = Button(binding = { Localization.getVar("editor.dialog.levelMetadata.title").use() }, font = editorPane.palette.musicDialogFont).apply {
             this.padding.set(Insets.ZERO)
-            this.bounds.width.set(32f * 8)
+            this.bounds.width.set(32f * 7)
             this.skinID.set(EditorSkins.BUTTON)
             this.setOnAction {
                 editor.attemptOpenLevelMetadataDialog()
             }
         }
-//        levelBannerButton = Button(binding = { Localization.getVar("editor.dialog.banner.title").use() }, font = editorPane.palette.musicDialogFont).apply {
-//            this.padding.set(Insets.ZERO)
-//            this.bounds.width.set(32f * 6)
-//            this.skinID.set(EditorSkins.BUTTON)
-//            this.setOnAction {
-//                editor.attemptOpenBannerDialog()
-//            }
-//        }
+        levelBannerButton = Button(binding = { Localization.getVar("editor.dialog.banner.title").use() }, font = editorPane.palette.musicDialogFont).apply {
+            this.padding.set(Insets.ZERO)
+            this.bounds.width.set(32f * 5)
+            this.skinID.set(EditorSkins.BUTTON)
+            this.setOnAction {
+                editor.attemptOpenBannerDialog {}
+            }
+            this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.levelMetadata.banner.tooltip")))
+        }
         
         helpButton = Button("").apply {
             this.padding.set(Insets.ZERO)
@@ -225,7 +226,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             leftBox += redoButton
             leftBox += separator()
             leftBox += levelMetadataButton
-//            leftBox += levelBannerButton
+            leftBox += levelBannerButton
         }
         rightBox.temporarilyDisableLayouts {
             if (editor.flags.isNotEmpty()) {

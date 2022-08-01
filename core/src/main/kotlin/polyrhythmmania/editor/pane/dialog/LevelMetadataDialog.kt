@@ -258,26 +258,6 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
                 val datetime = it.initialCreationDate.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault())
                 DateTimeFormatter.RFC_1123_DATE_TIME.format(datetime)
             }
-            vbox += HBox().apply {
-                this.bounds.height.set(labelHeight)
-                this.spacing.set(4f)
-                this += TextLabel(binding = { Localization.getVar("editor.dialog.banner.title").use() }, font = editorPane.main.mainFontBold).apply {
-                    this.bounds.width.set(textLabelWidth)
-                    this.renderAlign.set(Align.right)
-                    this.textColor.set(Color.WHITE)
-                    this.padding.set(Insets(0f, 0f, 0f, 4f))
-                    this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.levelMetadata.banner.tooltip")))
-                }
-                this += Button(binding = { Localization.getVar("editor.dialog.levelMetadata.bannerButton").use() }, font = editorPane.palette.musicDialogFont).apply { 
-                    this.bounds.width.set(350f)
-                    this.applyDialogStyleContent()
-                    this.setOnAction { 
-                        editor.attemptOpenBannerDialog {
-                            editor.attemptOpenLevelMetadataDialog(this@LevelMetadataDialog.afterDialogClosed)
-                        }
-                    }
-                }
-            }
             vbox += addTextField("levelMetadata.levelCreator", LevelMetadata.LIMIT_LEVEL_CREATOR,
                     LevelMetadata::levelCreator, textFieldSizeMultiplier = 0.7f, requiredField = true) { t, newText ->
                 t.copy(levelCreator = newText)
