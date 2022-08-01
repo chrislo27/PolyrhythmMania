@@ -6,7 +6,7 @@ import paintbox.util.ColorStack
 import polyrhythmmania.world.World
 
 
-class LightColor(private val resetColor: Color, private val defaultStrength: Float) {
+open class LightColor(val resetColor: Color, val defaultStrength: Float) {
     
     /*
     Colour and strength outputs:
@@ -36,6 +36,10 @@ class LightColor(private val resetColor: Color, private val defaultStrength: Flo
     fun reset() {
         color.set(resetColor)
         strength = defaultStrength
+    }
+    
+    fun isInDefaultState(): Boolean {
+        return color == resetColor && strength == defaultStrength
     }
     
     /**

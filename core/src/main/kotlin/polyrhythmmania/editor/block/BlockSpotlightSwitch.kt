@@ -1,5 +1,6 @@
 package polyrhythmmania.editor.block
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.JsonObject
@@ -58,6 +59,81 @@ class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, Bloc
             }
             ctxmenu.addMenuItem(CustomMenuItem(comboboxPane))
         }
+
+        fun createSpotlightEvents(
+                engine: Engine, spotlights: Spotlights,
+                rowAActions: List<Pair<Color?, Float?>>, rowDpadActions: List<Pair<Color?, Float?>>,
+                blockBeat: Float, timingMode: SpotlightTimingMode, paletteTransition: PaletteTransition
+        ): List<Event> {
+            val spotlightEvents: MutableList<Event> = mutableListOf()
+            val spawnPatternBlocks: List<BlockSpawnPattern> = if (timingMode == SpotlightTimingMode.SPAWN_PATTERN) {
+                engine.container?.blocks?.filterIsInstance<BlockSpawnPattern>()?.filter {
+                    MathUtils.isEqual(blockBeat, it.beat, 0.01f)
+                }?.sortedBy { it.trackIndex } ?: emptyList()
+            } else emptyList() // Don't search if we don't need to
+            
+            /*
+            Spawn Pattern mode is handled as such:
+            - Block priority is top to bottom in track index order
+            - Rows (A and D-pad) are handled independently
+            - We can use a row from a SP block if it has at least one PLATFORM or PISTON CubeType in its list
+              - Once we find one, we stop searching
+            */
+
+            fun compileRow(isA: Boolean, spotlightRow: List<Spotlight>, actionRow: List<Pair<Color?, Float?>>) {
+                val timingOffsets = FloatArray(actionRow.size) { 0f }
+
+                if (timingMode == SpotlightTimingMode.IN_ORDER || timingMode == SpotlightTimingMode.SPAWN_PATTERN) {
+                    // Note: SPAWN_PATTERN uses IN_ORDER as a fallback
+                    for (i in timingOffsets.indices) {
+                        timingOffsets[i] = i * (1f / EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT)
+                    }
+                }
+                if (timingMode == SpotlightTimingMode.SPAWN_PATTERN) {
+                    if (spawnPatternBlocks.isNotEmpty()) {
+                        for (spb in spawnPatternBlocks) {
+                            val rowTypes = if (isA) spb.patternData.rowATypes else spb.patternData.rowDpadTypes
+                            if (rowTypes.any { it == CubeType.PLATFORM || it == CubeType.PISTON }) {
+                                val computed = BlockSpawnPattern.computeTimingOffsetsForRow(rowTypes, spb.getBeatsPerBlock())
+                                computed.forEachIndexed { index, fl ->
+                                    timingOffsets[index] = fl
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+
+                actionRow.forEachIndexed { index, (targetColor: Color?, targetStrength: Float?) ->
+                    if (targetColor != null || targetStrength != null) {
+                        spotlightEvents += EventSpotlightTransition(engine, blockBeat + timingOffsets[index],
+                                paletteTransition, spotlightRow[index].lightColor, targetColor, targetStrength)
+                    }
+                }
+            }
+            
+            compileRow(true, spotlights.spotlightsRowA, rowAActions)
+            compileRow(false, spotlights.spotlightsRowDpad, rowDpadActions)
+            
+            return spotlightEvents
+        }
+        
+        private fun createSpotlightEvents(
+                engine: Engine, spotlights: Spotlights,
+                patternData: SpotlightActionData,
+                blockBeat: Float, timingMode: SpotlightTimingMode, paletteTransition: PaletteTransition
+        ): List<Event> {
+            fun List<SpotlightActionType>.actionTypesToPairs(): List<Pair<Color?, Float?>> {
+                return this.map { Pair(null, when (it) {
+                    SpotlightActionType.NO_CHANGE -> null
+                    SpotlightActionType.TURN_ON -> 1f
+                    SpotlightActionType.TURN_OFF -> 0f
+                }) }
+            }
+            return createSpotlightEvents(engine, spotlights,
+                    patternData.rowATypes.actionTypesToPairs(), patternData.rowDpadTypes.actionTypesToPairs(),
+                    blockBeat, timingMode, paletteTransition)
+        }
     }
     
     val ambientLightDarken: BooleanVar = BooleanVar(true)
@@ -74,63 +150,11 @@ class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, Bloc
         val beat = this.beat
         val spotlights = engine.world.spotlights
         val events = mutableListOf<Event>()
-        
-        events += EventSpotlightTransition(engine, beat, PaletteTransition.INSTANT, spotlights.ambientLight, null, if (ambientLightDarken.get()) 0f else 1f)
-        
+
         val timingMode = timingMode.getOrCompute()
-        val spotlightEvents: MutableList<Event> = mutableListOf()
-        
-        val spawnPatternBlocks: List<BlockSpawnPattern> = if (timingMode == SpotlightTimingMode.SPAWN_PATTERN) {
-            engine.container?.blocks?.filterIsInstance<BlockSpawnPattern>()?.filter { 
-                MathUtils.isEqual(this.beat, it.beat, 0.01f)
-            }?.sortedBy { it.trackIndex } ?: emptyList()
-        } else emptyList() // Don't search if we don't need to
-
-        
-        /*
-        Spawn Pattern mode is handled as such:
-        - Block priority is top to bottom in track index order
-        - Rows (A and D-pad) are handled independently
-        - We can use a row from a SP block if it has at least one PLATFORM or PISTON CubeType in its list
-          - Once we find one, we stop searching
-        */
-
-        fun compileRow(isA: Boolean, spotlightRow: List<Spotlight>, actionRow: List<SpotlightActionType>) {
-            val timingOffsets = FloatArray(actionRow.size) { 0f }
-            
-            if (timingMode == SpotlightTimingMode.IN_ORDER || timingMode == SpotlightTimingMode.SPAWN_PATTERN) {
-                // Note: SPAWN_PATTERN uses IN_ORDER as a fallback
-                for (i in timingOffsets.indices) {
-                    timingOffsets[i] = i * (1f / EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT)
-                }
-            }
-            if (timingMode == SpotlightTimingMode.SPAWN_PATTERN) {
-                if (spawnPatternBlocks.isNotEmpty()) {
-                    for (spb in spawnPatternBlocks) {
-                        val rowTypes = if (isA) spb.patternData.rowATypes else spb.patternData.rowDpadTypes
-                        if (rowTypes.any { it == CubeType.PLATFORM || it == CubeType.PISTON }) {
-                            val computed = BlockSpawnPattern.computeTimingOffsetsForRow(rowTypes, spb.getBeatsPerBlock())
-                            computed.forEachIndexed { index, fl -> 
-                                timingOffsets[index] = fl
-                            }
-                            break
-                        }
-                    }
-                }
-            }
-            
-            actionRow.forEachIndexed { index, action -> 
-                if (action != SpotlightActionType.NO_CHANGE) {
-                    spotlightEvents += EventSpotlightTransition(engine, beat + timingOffsets[index],
-                            PaletteTransition.INSTANT, spotlightRow[index].lightColor, null,
-                            if (action == SpotlightActionType.TURN_OFF) 0f else 1f)
-                }
-            }
-        }
-        compileRow(true, spotlights.spotlightsRowA, patternData.rowATypes)
-        compileRow(false, spotlights.spotlightsRowDpad, patternData.rowDpadTypes)
-
-        events.addAll(spotlightEvents)
+        val paletteTransition = PaletteTransition.INSTANT
+        events += EventSpotlightTransition(engine, beat, paletteTransition, spotlights.ambientLight, null, if (ambientLightDarken.get()) 0f else 1f)
+        events.addAll(createSpotlightEvents(engine, spotlights, patternData, beat, timingMode, paletteTransition))
         
         return events
     }
