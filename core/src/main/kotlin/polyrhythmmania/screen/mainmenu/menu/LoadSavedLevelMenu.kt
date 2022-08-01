@@ -3,15 +3,21 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.filechooser.FileExtFilter
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.font.TextAlign
+import paintbox.packing.PackedSheet
+import paintbox.registry.AssetRegistry
+import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.Anchor
+import paintbox.ui.ImageIcon
 import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.control.CheckBox
@@ -19,8 +25,6 @@ import paintbox.ui.control.Slider
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.filechooser.TinyFDWrapper
-import paintbox.transition.FadeToTransparent
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.PreferenceKeys
@@ -86,6 +90,7 @@ class LoadSavedLevelMenu(
             this.spacing.set(8f)
             this.padding.set(Insets(4f, 0f, 2f, 2f))
             this.bounds.height.set(40f)
+            this.bindWidthToParent(adjust = -64f)
         }
 
         descLabel = TextLabel(text = Localization.getValue("common.closeFileChooser")).apply {
@@ -268,14 +273,20 @@ class LoadSavedLevelMenu(
                 }
             }
             val keyboardKeybindings = main.settings.inputKeymapKeyboard.getOrCompute()
-            hbox += TextLabel("${Localization.getValue("mainMenu.inputSettings.keyboard.keybindPause")}: ${Input.Keys.toString(Input.Keys.ESCAPE)}/${Input.Keys.toString(keyboardKeybindings.pause)} | " + keyboardKeybindings.toKeyboardString(false, true),
-                    font = main.fontMainMenuRodin).apply {
-                this.bounds.width.set(300f)
-                this.textColor.set(Color.BLACK)
-                this.visible.bind {
-                    substate.use() == Substate.LOADED
+            contentPane += Pane().apply { 
+                Anchor.BottomRight.configure(this)
+                this.padding.set(Insets(2f))
+                this.bounds.width.set(36f)
+                this.bounds.height.set(40f)
+                this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["help"])).apply {
+                    this.tint.set(Color.BLACK)
+                    this.visible.bind {
+                        substate.use() == Substate.LOADED
+                    }
+                    this.tooltipElement.set(createTooltip {
+                        Localization.getValue("mainMenu.play.controlsTooltip", "${Localization.getValue("mainMenu.inputSettings.keyboard.keybindPause")}: ${Input.Keys.toString(Input.Keys.ESCAPE)}/${Input.Keys.toString(keyboardKeybindings.pause)} | ${keyboardKeybindings.toKeyboardString(false, true)}")
+                    })
                 }
-                this.setScaleXY(0.8f)
             }
         }
     }
