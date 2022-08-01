@@ -17,6 +17,7 @@ data class LibrarySortFilter(
         val filterAlbumYear: FilterInteger,
         val filterGenre: FilterOnStringList,
         val filterDifficulty: FilterInteger,
+        val filterFlashingLightsWarning: FilterBoolean,
 ) {
 
     companion object {
@@ -28,10 +29,12 @@ data class LibrarySortFilter(
                 FilterInteger(false, Filterable.ALBUM_YEAR, FilterInteger.Op.EQ, 0, true),
                 FilterOnStringList(false, Filterable.GENRE, "", listOf("")),
                 FilterInteger(false, Filterable.DIFFICULTY, FilterInteger.Op.EQ, 0, true),
+                FilterBoolean(false, Filterable.FLASHING_LIGHTS_WARNING, true),
         )
     }
 
-    val filters: List<Filter> = listOf(filterLevelCreator, filterSongName, filterSongArtist, filterAlbumName, filterAlbumYear, filterGenre, filterDifficulty)
+    val filters: List<Filter> = listOf(filterLevelCreator, filterSongName, filterSongArtist, filterAlbumName,
+            filterAlbumYear, filterGenre, filterDifficulty, filterFlashingLightsWarning)
     val enabledFilters: List<Filter> = filters.filter { it.enabled }
     val anyFiltersEnabled: Boolean = enabledFilters.isNotEmpty()
     

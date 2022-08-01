@@ -302,6 +302,26 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu,
                                     }
                                 }
                             }
+                            is FilterBoolean -> {
+                                this += ComboBox(listOf(true, false), filter.targetValue, font = main.fontMainMenuMain).apply {
+                                    this.bounds.height.set(32f)
+                                    this.bounds.width.set(150f)
+                                    this.itemStringConverter.set {
+                                        if (it) Localization.getValue("mainMenu.librarySortFilter.filter.boolean.true") else Localization.getValue("mainMenu.librarySortFilter.filter.boolean.false")
+                                    }
+
+                                    @Suppress("UNCHECKED_CAST")
+                                    this.onItemSelected = { item ->
+                                        val lsf = currentSettings.getOrCompute()
+                                        val newFilter = getter(lsf) as FilterBoolean
+                                        currentSettings.set(setter(lsf, newFilter.copy(targetValue = item) as T))
+
+                                        if (!checkbox.checkedState.get()) {
+                                            checkbox.checkedState.set(true)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     this += VBox().apply { 
@@ -321,6 +341,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu,
             vbox += createFilter({ it.filterAlbumYear }, { lsf, filter -> lsf.copy(filterAlbumYear = filter) })
             vbox += createFilter({ it.filterGenre }, { lsf, filter -> lsf.copy(filterGenre = filter) })
             vbox += createFilter({ it.filterDifficulty }, { lsf, filter -> lsf.copy(filterDifficulty = filter) })
+            vbox += createFilter({ it.filterFlashingLightsWarning }, { lsf, filter -> lsf.copy(filterFlashingLightsWarning = filter) })
         }
         vbox.sizeHeightToChildren(100f)
         scrollPane.setContent(vbox)

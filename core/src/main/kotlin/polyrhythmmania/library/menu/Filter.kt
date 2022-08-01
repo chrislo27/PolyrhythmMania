@@ -68,3 +68,20 @@ data class FilterInteger(override val enabled: Boolean, override val filterable:
     }
 }
 
+data class FilterBoolean(override val enabled: Boolean, override val filterable: Filterable,
+                         val targetValue: Boolean)
+    : Filter(enabled, filterable) {
+
+    override fun filter(levelEntry: LevelEntry.Modern): Boolean {
+        val compareTo: Boolean = when (filterable) {
+            Filterable.FLASHING_LIGHTS_WARNING -> levelEntry.levelMetadata.flashingLightsWarning
+            else -> return false
+        }
+        return compareTo == targetValue
+    }
+
+    override fun copyBase(enabled: Boolean): FilterBoolean {
+        return this.copy(enabled = enabled)
+    }
+}
+

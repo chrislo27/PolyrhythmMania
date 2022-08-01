@@ -10,4 +10,5 @@ enum class Filterable(val nameKey: String) {
     ALBUM_YEAR("levelMetadata.albumYear"), // Numeric
     GENRE("levelMetadata.genre"), // Based on preset genres + what's available
     DIFFICULTY("levelMetadata.difficulty"), // Numeric
+    FLASHING_LIGHTS_WARNING("levelMetadata.flashingLightsWarning"), // Boolean
 }

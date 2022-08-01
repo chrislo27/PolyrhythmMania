@@ -14,6 +14,7 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -24,7 +25,7 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.filechooser.TinyFDWrapper
+import paintbox.util.DecimalFormats
 import paintbox.util.Version
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
@@ -32,6 +33,7 @@ import paintbox.util.gdxutils.openFileExplorer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PreferenceKeys
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.container.manifest.ExportStatistics
@@ -45,8 +47,6 @@ import polyrhythmmania.screen.mainmenu.menu.LoadSavedLevelMenu
 import polyrhythmmania.screen.mainmenu.menu.MenuCollection
 import polyrhythmmania.screen.mainmenu.menu.StandardMenu
 import polyrhythmmania.ui.PRManiaSkins
-import paintbox.util.DecimalFormats
-import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.util.TimeUtils
 import java.io.File
@@ -211,6 +211,13 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 menuCol.pushNextMenu(loadMenu)
                             }
                         }
+                    }
+                    val flashingLightsTooltip = createTooltip(Localization.getVar("mainMenu.play.flashingLightsWarning.tooltip"))
+                    this.tooltipElement.bind {
+                        val l = selectedLevelEntry.use()
+                        if (l != null && l is LevelEntry.Modern && l.levelMetadata.flashingLightsWarning) {
+                            flashingLightsTooltip
+                        } else null
                     }
                 }
             }
@@ -615,7 +622,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                     val scoreCache = GlobalScoreCache.scoreCache.getOrCompute()
                                     val levelScore = scoreCache.map[l.uuid]
                                     val attempts: List<LevelScoreAttempt>? = levelScore?.attempts?.sortedDescending()
-                                    if (attempts == null || attempts.isEmpty() || l is LevelEntry.Legacy) {
+                                    if (attempts.isNullOrEmpty() || l is LevelEntry.Legacy) {
                                         vbox += noHighScoresLabel
                                     } else {
                                         vbox.disableLayouts.set(true)
