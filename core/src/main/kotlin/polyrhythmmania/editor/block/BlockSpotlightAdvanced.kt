@@ -16,6 +16,7 @@ import polyrhythmmania.editor.pane.dialog.SpotlightEditDialog
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.world.spotlights.EventSpotlightTransition
+import polyrhythmmania.world.tileset.PaletteTransition
 import java.util.*
 
 
@@ -26,7 +27,7 @@ class BlockSpotlightAdvanced(engine: Engine) : AbstractBlockSpotlight(engine, Bl
     }
 
     val timingMode: Var<SpotlightTimingMode> = Var(SpotlightTimingMode.SPAWN_PATTERN)
-    val transitionData: PaletteTransitionData = PaletteTransitionData()
+    val transitionData: PaletteTransitionData = PaletteTransitionData(PaletteTransition.INSTANT)
     val colorData: SpotlightsColorData = SpotlightsColorData()
 
     init {
