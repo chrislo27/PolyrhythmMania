@@ -3,7 +3,6 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.Disposable
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
@@ -21,7 +20,6 @@ import paintbox.ui.layout.ColumnarHBox
 import paintbox.ui.layout.ColumnarVBox
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.block.data.SpotlightsColorData
 import polyrhythmmania.editor.block.data.SwitchedLightColor
@@ -36,7 +34,14 @@ import kotlin.math.roundToInt
 class SpotlightEditDialog(
         editorPane: EditorPane,
         val colorData: SpotlightsColorData,
-) : EditorDialog(editorPane), Disposable {
+) : EditorDialog(editorPane) {
+    
+    private enum class CopyProperties(val localizationKey: String) {
+        ALL("editor.dialog.spotlightsAdvanced.copy.properties.all"),
+        COLOR("editor.dialog.spotlightsAdvanced.copy.properties.color"),
+        STRENGTH("editor.dialog.spotlightsAdvanced.copy.properties.strength"),
+        TRIGGER("editor.dialog.spotlightsAdvanced.copy.properties.trigger"),
+    }
 
     data class LightSelection(val lightColor: SwitchedLightColor, val rowIndex: Int, val indexInRow: Int) {
         fun isGlobal(): Boolean = rowIndex == -1
@@ -65,6 +70,8 @@ class SpotlightEditDialog(
     }
     
     private val genericUpdateTrigger: BooleanVar = BooleanVar(false)
+    private val inCopyOp: BooleanVar = BooleanVar(false)
+    private val copyTargets: Var<Set<LightSelection>> = Var(emptySet())
 
     init {
         val palette = editorPane.palette
@@ -90,12 +97,16 @@ class SpotlightEditDialog(
         
         vbox += Pane().apply { 
             this.bindHeightToParent(multiplier = 0.275f)
-            
-            this += TextLabel(Localization.getVar("editor.dialog.spotlightsAdvanced.selectLight"), palette.musicDialogFontBold).apply {
+
+            this += TextLabel(binding = {
+                if (inCopyOp.use()) 
+                    Localization.getVar("editor.dialog.spotlightsAdvanced.copy.lightSourceTitle").use()
+                else Localization.getVar("editor.dialog.spotlightsAdvanced.selectLight").use()
+            }, palette.musicDialogFontBold).apply {
                 Anchor.TopLeft.configure(this)
                 this.textColor.set(Color.WHITE)
                 this.renderAlign.set(RenderAlign.left)
-                this.bounds.width.set(300f)
+                this.bounds.width.set(390f)
                 this.bounds.height.set(32f)
             }
             this += HBox().apply { 
@@ -133,13 +144,44 @@ class SpotlightEditDialog(
                                 }
                                 c
                             }
+                            skin.disabledTextColor.bind { 
+                                indentedButtonBorderColor.use()
+                            }
                         }
                         this.indentedButtonBorder.set(Insets(4f))
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
-                        this.selectedState.eagerBind { selection.use() == target }
+                        this.indentedButtonBorderColor.bind {
+                            val sel = selection.use()
+                            if (sel == target) {
+                                palette.toolbarIndentedButtonBorderTint.use()
+                            } else {
+                                Color.BLUE
+                            }
+                        }
+                        this.selectedState.eagerBind { 
+                            val sel = selection.use()
+                            val isCopying = inCopyOp.use()
+                            if (isCopying) {
+                                sel == target || target in copyTargets.use()
+                            } else (sel == target)
+                        }
+                        
+                        this.disabled.eagerBind {
+                            val sel = selection.use()
+                            inCopyOp.use() && sel == target
+                        }
                         this.setOnAction {
-                            selection.set(target)
+                            if (inCopyOp.get()) {
+                                val targets = copyTargets.getOrCompute()
+                                if (target in targets) {
+                                    copyTargets.set(targets - target)
+                                } else {
+                                    copyTargets.set(targets + target)
+                                }
+                            } else {
+                                selection.set(target)
+                            }
                         }
                     }
                 }
@@ -183,81 +225,226 @@ class SpotlightEditDialog(
             this.bounds.height.set(8f)
             this.margin.set(Insets(3f, 3f, 0f, 0f))
         }
-        vbox += TextLabel(Localization.getVar("editor.dialog.spotlightsAdvanced.adjustLightSettings"), palette.musicDialogFontBold).apply {
-            Anchor.TopLeft.configure(this)
-            this.textColor.set(Color.WHITE)
-            this.renderAlign.set(RenderAlign.left)
-            this.bounds.width.set(300f)
-            this.bounds.height.set(32f)
-        }
-        vbox += ColumnarVBox(listOf(6, 4), useRows = false).apply {
-            this.bindHeightToParent(multiplier = 0.6f, adjust = 8f)
-            this.spacing.set(20f)
-            this.setAllSpacers {
-                RectElement(spacerColor).apply {
-                    this.margin.set(Insets(0f, 4f, 9f, 9f))
-                }
+        vbox += Pane().apply {
+            this.bindHeightToParent(multiplier = 0.6f, adjust = 40f)
+            this += TextLabel(Localization.getVar("editor.dialog.spotlightsAdvanced.adjustLightSettings"), palette.musicDialogFontBold).apply {
+                Anchor.TopLeft.configure(this)
+                this.textColor.set(Color.WHITE)
+                this.renderAlign.set(RenderAlign.left)
+                this.bounds.width.set(300f)
+                this.bounds.height.set(32f)
+                this.visible.bind { !inCopyOp.use() }
             }
-
-            val left = this[0]
-            left.align.set(VBox.Align.CENTRE)
-            left.spacing.set(5f)
-            left += colourPicker.apply { 
-                this.bounds.height.set(220f)
-            }
-            left += HBox().apply { 
-                this.spacing.set(12f)
-                this.align.set(HBox.Align.CENTRE)
-                this.bounds.height.set(40f)
-                this += Button(Localization.getValue("editor.dialog.spotlightsAdvanced.resetColor"), font = palette.musicDialogFont).apply {
-                    this.bounds.width.set(300f)
-                    this.applyDialogStyleContent()
-                    this.setOnAction { 
-                        val sel = selection.getOrCompute()
-                        sel.lightColor.color.set(sel.lightColor.resetColor)
-                        setUIElementsFromLightColor()
+            this += ColumnarVBox(listOf(6, 4), useRows = false).apply {
+                this.bindHeightToParent(adjust = -32f)
+                this.bounds.y.set(32f)
+                this.spacing.set(20f)
+                this.visible.bind { !inCopyOp.use() }
+                this.setAllSpacers {
+                    RectElement(spacerColor).apply {
+                        this.margin.set(Insets(0f, 4f, 9f, 9f))
                     }
+                }
+
+                val left = this[0]
+                left.align.set(VBox.Align.CENTRE)
+                left.spacing.set(5f)
+                left += colourPicker.apply {
+                    this.bounds.height.set(220f)
+                }
+                left += HBox().apply {
+                    this.spacing.set(12f)
+                    this.align.set(HBox.Align.CENTRE)
+                    this.bounds.height.set(40f)
+                    this += Button(Localization.getValue("editor.dialog.spotlightsAdvanced.resetColor"), font = palette.musicDialogFont).apply {
+                        this.bounds.width.set(300f)
+                        this.applyDialogStyleContent()
+                        this.setOnAction {
+                            val sel = selection.getOrCompute()
+                            sel.lightColor.color.set(sel.lightColor.resetColor)
+                            setUIElementsFromLightColor()
+                        }
+                    }
+                }
+
+                val right = this[1]
+                right.align.set(VBox.Align.TOP)
+                right.spacing.set(8f)
+                right += HBox().apply {
+                    this.spacing.set(6f)
+                    this.bounds.height.set(40f)
+                    this += TextLabel(Localization.getVar("editor.dialog.spotlightsAdvanced.strength", Var {
+                        listOf(strengthSlider.value.use().roundToInt())
+                    }), palette.musicDialogFont).apply {
+                        Anchor.TopLeft.configure(this)
+                        this.bindWidthToParent(multiplier = 0.5f, adjust = -3f)
+                        this.textColor.set(Color.WHITE)
+                        this.renderAlign.set(RenderAlign.left)
+                    }
+                    this += Button(Localization.getValue("editor.dialog.spotlightsAdvanced.resetStrength"), font = palette.musicDialogFont).apply {
+                        this.bindWidthToParent(multiplier = 0.5f, adjust = -3f)
+                        this.applyDialogStyleContent()
+                        this.setOnAction {
+                            val sel = selection.getOrCompute()
+                            sel.lightColor.strength = sel.lightColor.defaultStrength
+                            setUIElementsFromLightColor()
+                        }
+                    }
+                }
+                right += strengthSlider.apply {
+                    this.bounds.height.set(32f)
+                }
+                right += RectElement(spacerColor).apply {
+                    this.bounds.height.set(8f)
+                    this.margin.set(Insets(3f, 3f, 0f, 0f))
+                }
+                right += enabledCheckbox.apply {
+                    this.bounds.height.set(32f)
+                    this.color.set(Color.WHITE.cpy())
+                }
+                right += RectElement(spacerColor).apply {
+                    this.bounds.height.set(8f)
+                    this.margin.set(Insets(3f, 3f, 0f, 0f))
                 }
             }
             
-            val right = this[1]
-            right.align.set(VBox.Align.TOP)
-            right.spacing.set(8f)
-            right += HBox().apply { 
-                this.spacing.set(6f)
-                this.bounds.height.set(40f)
-                this += TextLabel(Localization.getVar("editor.dialog.spotlightsAdvanced.strength", Var {
-                    listOf(strengthSlider.value.use().roundToInt())
-                }), palette.musicDialogFont).apply {
-                    Anchor.TopLeft.configure(this)
-                    this.bindWidthToParent(multiplier = 0.5f, adjust = -3f)
+            this += VBox().apply {
+                this.spacing.set(10f)
+                this.visible.bind { inCopyOp.use() } 
+                this.align.set(VBox.Align.CENTRE)
+                
+                this += TextLabel(Localization.getVar("editor.dialog.spotlightsAdvanced.copy.multiSelect"), palette.musicDialogFont).apply {
+                    this.renderAlign.set(RenderAlign.center)
+                    this.bounds.height.set(72f)
                     this.textColor.set(Color.WHITE)
-                    this.renderAlign.set(RenderAlign.left)
                 }
-                this += Button(Localization.getValue("editor.dialog.spotlightsAdvanced.resetStrength"), font = palette.musicDialogFont).apply {
-                    this.bindWidthToParent(multiplier = 0.5f, adjust = -3f)
+                this += HBox().apply { 
+                    this.spacing.set(16f)
+                    this.bounds.height.set(40f)
+                    this.align.set(HBox.Align.CENTRE)
+                    this += Button(Localization.getVar("editor.dialog.spotlightsAdvanced.copy.select.clear")).apply {
+                        this.markup.set(palette.markup)
+                        this.bounds.width.set(200f)
+                        this.applyDialogStyleContent()
+                        this.setOnAction {
+                            copyTargets.set(emptySet())
+                        }
+                    }
+                    this += Button(Localization.getVar("editor.dialog.spotlightsAdvanced.copy.select.all")).apply {
+                        this.markup.set(palette.markup)
+                        this.bounds.width.set(200f)
+                        this.applyDialogStyleContent()
+                        this.setOnAction {
+                            copyTargets.set(allSelections.toSet() - selection.getOrCompute())
+                        }
+                    }
+                    fun addRowButton(rowTxt: String, row: List<LightSelection>) {
+                        this += Button(binding = {
+                            (if (copyTargets.use().containsAll(row - selection.use())) {
+                                Localization.getVar("editor.dialog.spotlightsAdvanced.copy.deselect.$rowTxt")
+                            } else Localization.getVar("editor.dialog.spotlightsAdvanced.copy.select.$rowTxt")).use()
+                        }).apply {
+                            this.markup.set(palette.markup)
+                            this.bounds.width.set(200f)
+                            this.applyDialogStyleContent()
+                            this.setOnAction {
+                                val targets = copyTargets.getOrCompute()
+                                val rowAsSet = row.toSet() - selection.getOrCompute()
+                                if (targets.containsAll(rowAsSet)) {
+                                    copyTargets.set(targets - rowAsSet)
+                                } else copyTargets.set(targets + rowAsSet)
+                            }
+                        }
+                    }
+                    addRowButton("a", rowASelection)
+                    addRowButton("dpad", rowDpadSelection)
+                }
+                this += RectElement(spacerColor).apply {
+                    Anchor.TopCentre.configure(this)
+                    this.bounds.height.set(8f)
+                    this.bindWidthToParent(multiplier = 0.75f)
+                    this.margin.set(Insets(3f, 3f, 0f, 0f))
+                }
+                val copyProperties = Var(CopyProperties.ALL)
+                this += HBox().apply {
+                    this.spacing.set(8f)
+                    this.bounds.height.set(40f)
+                    this.align.set(HBox.Align.CENTRE)
+                    this += TextLabel(Localization.getVar("editor.dialog.spotlightsAdvanced.copy.properties"), palette.musicDialogFont).apply {
+                        this.textColor.set(Color.WHITE)
+                        this.margin.set(Insets(0f, 0f, 0f, 4f))
+                        this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.WIDTH_ONLY))
+                    }
+                    this += ComboBox(CopyProperties.values().toList(), copyProperties.getOrCompute(), font = palette.musicDialogFont).apply { 
+                        this.bounds.width.set(220f)
+                        this.itemStringConverter.set { Localization.getValue(it.localizationKey) }
+                        this.onItemSelected = {
+                            copyProperties.set(it)
+                        }
+                    }
+                }
+                this += RectElement(spacerColor).apply {
+                    Anchor.TopCentre.configure(this)
+                    this.bounds.height.set(8f)
+                    this.bindWidthToParent(multiplier = 0.75f)
+                    this.margin.set(Insets(3f, 3f, 0f, 0f))
+                }
+                this += Button(Localization.getVar("editor.dialog.spotlightsAdvanced.copy.paste", Var { 
+                    listOf(copyTargets.use().size)
+                }), font = palette.musicDialogFont).apply {
+                    Anchor.TopCentre.configure(this)
+                    this.bounds.width.set(450f)
+                    this.bounds.height.set(50f)
                     this.applyDialogStyleContent()
+                    this.disabled.bind {
+                        copyTargets.use().isEmpty()
+                    }
                     this.setOnAction {
-                        val sel = selection.getOrCompute()
-                        sel.lightColor.strength = sel.lightColor.defaultStrength
-                        setUIElementsFromLightColor()
+                        val sel = selection.getOrCompute().lightColor
+                        val targets = copyTargets.getOrCompute().map { it.lightColor } - sel
+                        val props = copyProperties.getOrCompute()
+                        targets.forEach { target ->
+                            if (props == CopyProperties.ALL || props == CopyProperties.COLOR) {
+                                target.color.set(sel.color)
+                            }
+                            if (props == CopyProperties.ALL || props == CopyProperties.STRENGTH) {
+                                target.strength = sel.strength
+                            }
+                            if (props == CopyProperties.ALL || props == CopyProperties.TRIGGER) {
+                                target.enabled = sel.enabled
+                            }
+                        }
+                        
+                        inCopyOp.set(false)
+                        copyTargets.set(emptySet())
+                        genericUpdateTrigger.invert()
                     }
                 }
             }
-            right += strengthSlider.apply { 
-                this.bounds.height.set(32f)
-            }
-            right += RectElement(spacerColor).apply {
-                this.bounds.height.set(8f)
-                this.margin.set(Insets(3f, 3f, 0f, 0f))
-            }
-            right += enabledCheckbox.apply {
-                this.bounds.height.set(32f)
-                this.color.set(Color.WHITE.cpy())
-            }
-            right += RectElement(spacerColor).apply {
-                this.bounds.height.set(8f)
-                this.margin.set(Insets(3f, 3f, 0f, 0f))
+        }
+        
+        bottomPane += HBox().apply {
+            Anchor.TopCentre.configure(this)
+            this.spacing.set(8f)
+            this.align.set(HBox.Align.CENTRE)
+            this.bindWidthToParent(multiplier = 0.6f)
+            
+            this += Button(binding = {
+                if (inCopyOp.use()) {
+                    Localization.getVar("editor.dialog.spotlightsAdvanced.copy.cancel").use()
+                } else Localization.getVar("editor.dialog.spotlightsAdvanced.copy").use()
+            }).apply {
+                this.markup.set(editorPane.palette.markup)
+                this.bounds.width.set(400f)
+                this.applyDialogStyleBottom()
+                this.setOnAction {
+                    if (!inCopyOp.get()) {
+                        inCopyOp.set(true)
+                    } else {
+                        inCopyOp.set(false)
+                    }
+                    copyTargets.set(emptySet())
+                }
             }
         }
     }
@@ -308,11 +495,6 @@ class SpotlightEditDialog(
     override fun onCloseDialog() {
         super.onCloseDialog()
         editor.updatePaletteAndTexPackChangesState()
-        this.disposeQuietly()
-    }
-
-    override fun dispose() {
-        // TODO don't know if this dialog has to be Disposable or not
     }
     
 }

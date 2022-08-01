@@ -8,7 +8,14 @@ import polyrhythmmania.world.spotlights.Spotlights
 
 
 class SwitchedLightColor(resetColor: Color, defaultStrength: Float) : LightColor(resetColor, defaultStrength) {
+    
     var enabled: Boolean = true // If enabled, the event for this light will be added
+
+    fun copyTo(other: SwitchedLightColor) {
+        other.color.set(this.color)
+        other.strength = this.strength
+        other.enabled = this.enabled
+    }
     
     fun toPair(): Pair<Color?, Float?> {
         if (!enabled) return Pair(null, null)
@@ -26,13 +33,7 @@ class SpotlightsColorData {
     val rowDpad: List<SwitchedLightColor> = rows[1]
     val allSpotlights: List<SwitchedLightColor> = rows.flatten()
     
-    fun copyTo(other: SpotlightsColorData) {
-        fun SwitchedLightColor.copyTo(other: SwitchedLightColor) {
-            other.color.set(this.color)
-            other.strength = this.strength
-            other.enabled = this.enabled
-        }
-        
+    fun copyTo(other: SpotlightsColorData) {        
         other.also { 
             this.ambientLight.copyTo(it.ambientLight)
             this.allSpotlights.forEachIndexed { index, lightColor -> 
