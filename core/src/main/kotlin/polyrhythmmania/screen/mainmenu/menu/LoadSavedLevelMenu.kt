@@ -55,14 +55,14 @@ class LoadSavedLevelMenu(
         val previousHighScore: Int? = null
 ) : StandardMenu(menuCol) {
 
-    enum class Substate {
-        FILE_DIALOG_OPEN,
-        LOADING,
-        LOADED,
-        LOAD_ERROR,
+    private sealed class Substate {
+        object FileDialogOpen : Substate()
+        object Loading : Substate()
+        class Loaded(val loadMetadata: Container.LoadMetadata, val needsFlashingLightsWarning: Boolean) : Substate()
+        object LoadError : Substate()
     }
 
-    val substate: Var<Substate> = Var(if (immediateLoad == null) Substate.FILE_DIALOG_OPEN else Substate.LOADING)
+    private val substate: Var<Substate> = Var(if (immediateLoad == null) Substate.FileDialogOpen else Substate.Loading)
 
     val descLabel: TextLabel
     val challengeSetting: Pane
@@ -73,6 +73,8 @@ class LoadSavedLevelMenu(
 
     @Volatile
     private var loaded: LoadData? = null
+    
+    private val flashingLightsAcked: BooleanVar = BooleanVar(false)
 
     init {
         this.setSize(WIDTH_MID)
@@ -90,7 +92,7 @@ class LoadSavedLevelMenu(
             this.spacing.set(8f)
             this.padding.set(Insets(4f, 0f, 2f, 2f))
             this.bounds.height.set(40f)
-            this.bindWidthToParent(adjust = -64f)
+            this.bindWidthToParent(adjust = -48f)
         }
 
         descLabel = TextLabel(text = Localization.getValue("common.closeFileChooser")).apply {
@@ -206,7 +208,7 @@ class LoadSavedLevelMenu(
                 this.bounds.width.set(100f)
                 this.visible.bind {
                     when (substate.use()) {
-                        Substate.LOADED, Substate.LOAD_ERROR -> true
+                        is Substate.Loaded, Substate.LoadError -> true
                         else -> false
                     }
                 }
@@ -220,9 +222,19 @@ class LoadSavedLevelMenu(
                 this.bounds.width.set(125f)
                 this.visible.bind {
                     when (substate.use()) {
-                        Substate.LOADED -> true
+                        is Substate.Loaded -> true
                         else -> false
                     }
+                }
+                this.disabled.bind {
+                    val ss = substate.use()
+                    ss is Substate.Loaded && ss.needsFlashingLightsWarning && !flashingLightsAcked.use()
+                }
+                val lockedTooltip = createTooltip(Localization.getVar("mainMenu.play.flashingLightsWarning.playButtonLocked"))
+                val ackedTooltip = createTooltip(Localization.getVar("mainMenu.play.flashingLightsWarning.tooltip"))
+                this.tooltipElement.bind {
+                    val ss = substate.use()
+                    if (disabled.use()) lockedTooltip else if (ss is Substate.Loaded && ss.needsFlashingLightsWarning) ackedTooltip else null
                 }
                 this.setOnAction {
                     Gdx.input.isCursorCatched = true
@@ -272,16 +284,33 @@ class LoadSavedLevelMenu(
                     }
                 }
             }
+
+            hbox += CheckBox(binding = { Localization.getVar("mainMenu.play.flashingLightsWarning").use() }, font = font).apply {
+                this.bounds.width.set(240f)
+                this.textLabel.setScaleXY(0.75f)
+                this.imageNode.padding.set(Insets(4f))
+                this.checkedState.set(flashingLightsAcked.get())
+                this.disabled.bind { flashingLightsAcked.use() }
+                this.visible.bind { 
+                    val ss = substate.use()
+                    ss is Substate.Loaded && ss.needsFlashingLightsWarning
+                }
+                this.onCheckChanged = {
+                    flashingLightsAcked.set(true)
+                }
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.flashingLightsWarning.tooltip")))
+            }
+            
             val keyboardKeybindings = main.settings.inputKeymapKeyboard.getOrCompute()
             contentPane += Pane().apply { 
                 Anchor.BottomRight.configure(this)
                 this.padding.set(Insets(2f))
-                this.bounds.width.set(36f)
+                this.bounds.width.set(40f)
                 this.bounds.height.set(40f)
                 this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["help"])).apply {
                     this.tint.set(Color.BLACK)
                     this.visible.bind {
-                        substate.use() == Substate.LOADED
+                        substate.use() is Substate.Loaded
                     }
                     this.tooltipElement.set(createTooltip {
                         Localization.getValue("mainMenu.play.controlsTooltip", "${Localization.getValue("mainMenu.inputSettings.keyboard.keybindPause")}: ${Input.Keys.toString(Input.Keys.ESCAPE)}/${Input.Keys.toString(keyboardKeybindings.pause)} | ${keyboardKeybindings.toKeyboardString(false, true)}")
@@ -342,7 +371,7 @@ class LoadSavedLevelMenu(
         Gdx.app.postRunnable {
             descLabel.doLineWrapping.set(false)
             descLabel.text.set(Localization.getValue("editor.dialog.load.loading"))
-            substate.set(Substate.LOADING)
+            substate.set(Substate.Loading)
         }
 
         val newSoundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
@@ -360,7 +389,7 @@ class LoadSavedLevelMenu(
 
             if (newContainer.blocks.none { it is BlockEndState }) {
                 Gdx.app.postRunnable {
-                    substate.set(Substate.LOAD_ERROR)
+                    substate.set(Substate.LoadError)
                     descLabel.doLineWrapping.set(true)
                     descLabel.text.set(Localization.getValue("mainMenu.play.noEndState",
                             Localization.getValue(Instantiators.endStateInstantiator.name.getOrCompute())))
@@ -368,14 +397,15 @@ class LoadSavedLevelMenu(
                 }
             } else if (loadMetadata.isFutureVersion) {
                 Gdx.app.postRunnable {
-                    substate.set(Substate.LOAD_ERROR)
+                    substate.set(Substate.LoadError)
                     descLabel.doLineWrapping.set(true)
                     descLabel.text.set(Localization.getValue("editor.dialog.load.error.futureVersion", loadMetadata.programVersion.toString(), "${loadMetadata.containerVersion}"))
                     newContainer.disposeQuietly()
                 }
             } else {
                 Gdx.app.postRunnable {
-                    substate.set(Substate.LOADED)
+                    substate.set(Substate.Loaded(loadMetadata, loadMetadata.libraryRelevantData.levelMetadata?.flashingLightsWarning == true))
+                    flashingLightsAcked.set(false)
                     descLabel.text.set(Localization.getValue("editor.dialog.load.loadedInformation", loadMetadata.programVersion, "${loadMetadata.containerVersion}"))
                     loadMetadata.loadOnGLThread()
                     loaded = LoadData(newContainer, loadMetadata, loadMetadata.libraryRelevantData.levelUUID)
@@ -390,7 +420,7 @@ class LoadSavedLevelMenu(
             e.printStackTrace()
             val exClassName = e.javaClass.name
             Gdx.app.postRunnable {
-                substate.set(Substate.LOAD_ERROR)
+                substate.set(Substate.LoadError)
                 descLabel.doLineWrapping.set(true)
                 descLabel.setScaleXY(0.75f)
                 descLabel.text.set(Localization.getValue("editor.dialog.load.loadError", exClassName))
