@@ -18,6 +18,7 @@ data class LevelMetadata(
         val albumYear: Int,
         val genre: String,
         val difficulty: Int,
+        val flashingLightsWarning: Boolean,
 ) {
     
     companion object {
@@ -36,7 +37,7 @@ data class LevelMetadata(
         const val BLANK_DIFFICULTY: Int = 0
         
         val DEFAULT_METADATA: LevelMetadata = LevelMetadata(
-                DEFAULT_DATE, DEFAULT_DATE, "", "", "", "", "", BLANK_YEAR, "", BLANK_DIFFICULTY,
+                DEFAULT_DATE, DEFAULT_DATE, "", "", "", "", "", BLANK_YEAR, "", BLANK_DIFFICULTY, false,
         )
         
         fun fromJson(obj: JsonObject, lastModifiedDate: LocalDateTime): LevelMetadata {
@@ -53,6 +54,7 @@ data class LevelMetadata(
                     obj.getInt("albumYear", DEFAULT_METADATA.albumYear),
                     obj.getString("genre", DEFAULT_METADATA.genre),
                     obj.get("difficulty")?.asInt() ?: DEFAULT_METADATA.difficulty,
+                    obj.getBoolean("flashingLightsWarning", false),
             )
         }
     }
@@ -90,6 +92,7 @@ data class LevelMetadata(
         obj.set("albumYear", albumYear)
         obj.set("genre", genre)
         obj.set("difficulty", difficulty)
+        obj.set("flashingLightsWarning", flashingLightsWarning)
         return obj
     }
 
@@ -107,6 +110,7 @@ data class LevelMetadata(
                 albumYear = this.albumYear.coerceIn(LIMIT_YEAR),
                 genre = this.genre.take(LIMIT_GENRE),
                 difficulty = this.difficulty.coerceIn(LIMIT_DIFFICULTY),
+                flashingLightsWarning = this.flashingLightsWarning,
         )
     }
 }

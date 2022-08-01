@@ -17,7 +17,7 @@ import java.util.*
 
 
 class BlockPaletteChange(engine: Engine)
-    : Block(engine, BlockPaletteChange.BLOCK_TYPES) {
+    : Block(engine, BlockPaletteChange.BLOCK_TYPES), FlashingLightsWarnable {
 
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)

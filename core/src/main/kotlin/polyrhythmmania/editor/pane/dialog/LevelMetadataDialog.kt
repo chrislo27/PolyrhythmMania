@@ -254,6 +254,39 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
                 }
             }
 
+            fun addCheckBox(
+                    labelText: String,
+                    getter: (LevelMetadata) -> Boolean,
+                    requiredField: Boolean = false,
+                    checkType: CheckBox.CheckType = CheckBox.CheckType.CHECKMARK,
+                    copyFunc: (LevelMetadata, newValue: Boolean) -> LevelMetadata,
+            ): Pair<HBox, CheckBox> {
+                val checkbox = CheckBox("").apply {
+                    this.color.set(Color.WHITE)
+                    this.bindWidthToSelfHeight()
+                    this.checkType.set(checkType)
+                    this.selectedState.set(getter(levelMetadata.getOrCompute()))
+                    this.onCheckChanged = { chk ->
+                        levelMetadata.set(copyFunc(levelMetadata.getOrCompute(), chk))
+                    }
+                }
+                val hbox = HBox().apply {
+                    this.bounds.height.set(labelHeight)
+                    this.spacing.set(4f)
+                    this += TextLabel(binding = { "${if (requiredField) "[color=prmania_negative]* []" else ""}${Localization.getVar(labelText).use()}" }).apply {
+                        this.bounds.width.set(textLabelWidth)
+                        this.markup.set(fieldLabelMarkup)
+                        this.renderAlign.set(Align.right)
+                        this.textColor.set(Color.WHITE)
+                        this.padding.set(Insets(0f, 0f, 0f, 4f))
+                        this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.${labelText}.tooltip")))
+                    }
+                    this += checkbox
+                }
+
+                return hbox to checkbox
+            }
+
             vbox += addInfoField("levelMetadata.initialCreationDate") { 
                 val datetime = it.initialCreationDate.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault())
                 DateTimeFormatter.RFC_1123_DATE_TIME.format(datetime)
@@ -315,13 +348,15 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
                     if (it <= 0) Localization.getValue("editor.dialog.levelMetadata.noDifficulty") else "$it"
                 }
                 combobox.bounds.width.set(150f)
-                hbox += TextLabel(text = " / 10", font = editorPane.palette.musicDialogFont).apply {
+                hbox += TextLabel(text = " / ${LevelMetadata.LIMIT_DIFFICULTY.last}", font = editorPane.palette.musicDialogFont).apply {
                     this.bounds.width.set(100f)
                     this.renderAlign.set(Align.left)
                     this.textColor.set(Color.WHITE)
                 }
             }.first
-            
+            vbox += addCheckBox("levelMetadata.flashingLightsWarning", { it.flashingLightsWarning }) { lm, newValue ->
+                lm.copy(flashingLightsWarning = newValue)
+            }.first
         }
 
 

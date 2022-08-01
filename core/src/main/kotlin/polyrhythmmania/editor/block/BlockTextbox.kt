@@ -10,20 +10,20 @@ import paintbox.ui.contextmenu.*
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
+import paintbox.util.DecimalFormats
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.engine.TextBoxStyle
-import paintbox.util.DecimalFormats
-import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.world.EventTextbox
 import java.util.*
 
 
 class BlockTextbox(engine: Engine)
-    : Block(engine, BlockTextbox.BLOCK_TYPES) {
+    : Block(engine, BlockTextbox.BLOCK_TYPES), FlashingLightsWarnable {
     
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)

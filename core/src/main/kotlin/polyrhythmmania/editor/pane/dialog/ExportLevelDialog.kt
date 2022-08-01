@@ -10,6 +10,7 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.binding.VarChangedListener
 import paintbox.filechooser.FileExtFilter
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -23,23 +24,23 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.filechooser.TinyFDWrapper
+import paintbox.util.DecimalFormats
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PreferenceKeys
+import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.ExportStatistics
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.block.BlockEndState
+import polyrhythmmania.editor.block.FlashingLightsWarnable
 import polyrhythmmania.editor.pane.EditorPane
+import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputResultLike
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.ui.PRManiaSkins
-import paintbox.util.DecimalFormats
-import polyrhythmmania.achievements.Achievements
-import polyrhythmmania.engine.StatisticsMode
 import polyrhythmmania.util.TimeUtils
 import polyrhythmmania.world.EntityRodPR
 import java.io.File
@@ -167,7 +168,7 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     return HBox().apply {
                         val iconSize = 64f
                         this.bounds.height.set(iconSize)
-                        this.margin.set(Insets(8f))
+                        this.margin.set(Insets(6f, 6f, 8f, 8f))
                         val check = ImageIcon(TextureRegion(when (completed) {
                             ChecklistState.NONE -> PaintboxGame.paintboxSpritesheet.checkboxX
                             ChecklistState.COMPLETE -> PaintboxGame.paintboxSpritesheet.checkboxCheck
@@ -219,6 +220,20 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         this.margin.set(Insets(4f))
                         this.setOnAction { 
                             editor.attemptOpenBannerDialog {
+                                editor.attemptExport()
+                            }
+                        }
+                    }
+                }
+                this += createChecklistItem("editor.dialog.exportLevel.checklist.item.flashingLightsWarning",
+                        getCheckboxStateForFlashingLights(), false).apply {
+                    this += Button(binding = { Localization.getVar("editor.dialog.exportLevel.checklist.item.levelMetadata.button").use() },
+                            font = editorPane.palette.musicDialogFont).apply {
+                        this.applyDialogStyleContent()
+                        this.bounds.width.set(350f)
+                        this.margin.set(Insets(4f))
+                        this.setOnAction {
+                            editor.attemptOpenLevelMetadataDialog {
                                 editor.attemptExport()
                             }
                         }
@@ -314,6 +329,18 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 save(levelFile, simulationResult.getOrCompute())
             }
         })
+    }
+    
+    private fun getCheckboxStateForFlashingLights(): ChecklistState {
+        val container = editor.container
+        if (container.levelMetadata.flashingLightsWarning) {
+            return ChecklistState.COMPLETE
+        }
+        
+        val blocks = editor.container.blocks
+        return if (blocks.any { it is FlashingLightsWarnable }) {
+            ChecklistState.NONE
+        } else ChecklistState.PARTIAL
     }
 
     private fun openFileDialog(callback: (File?) -> Unit) {

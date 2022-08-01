@@ -4,4 +4,5 @@ import polyrhythmmania.engine.Engine
 import java.util.*
 
 
-abstract class AbstractBlockSpotlight(engine: Engine, blockTypes: EnumSet<BlockType>) : Block(engine, blockTypes)
+abstract class AbstractBlockSpotlight(engine: Engine, blockTypes: EnumSet<BlockType>)
+    : Block(engine, blockTypes), FlashingLightsWarnable

@@ -13,7 +13,7 @@ import java.util.*
 
 
 class BlockTexPackChange(engine: Engine)
-    : Block(engine, BlockTexPackChange.BLOCK_TYPES) {
+    : Block(engine, BlockTexPackChange.BLOCK_TYPES), FlashingLightsWarnable {
     
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
