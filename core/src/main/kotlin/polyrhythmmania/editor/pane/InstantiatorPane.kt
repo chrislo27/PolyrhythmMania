@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.*
@@ -123,15 +124,16 @@ class InstantiatorPane(val upperPane: UpperPane) : Pane() {
     }
 }
 
-class InstantiatorList(val instantiatorPane: InstantiatorPane,
-                       val categories: List<ListCategory>,
-                       val perCategory: Map<String, List<Instantiator<*>>>
-                       )
-    : Pane() {
+class InstantiatorList(
+        val instantiatorPane: InstantiatorPane,
+        val categories: List<ListCategory>,
+        val perCategory: Map<String, List<Instantiator<*>>>
+) : Pane() {
     
-    data class IndexTween(val index: IntVar = IntVar(0), val tween: FloatVar = FloatVar(0f)) {
+    data class IndexTween(val index: IntVar = IntVar(0), val tweenY: FloatVar = FloatVar(0f), val tweenX: FloatVar = FloatVar(0f)) {
         fun instantUpdateTween() {
-            tween.set(index.get().toFloat())
+            tweenY.set(index.get().toFloat())
+            tweenX.set(0f)
         }
     }
 
@@ -282,11 +284,13 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
     private fun changeToCategories() {
         currentList.set(categories)
         inCategories.set(true)
+        currentIndex.getOrCompute().tweenX.set(1f)
     }
     
     private fun changeToSpecific(category: ListCategory = categories[categoryIndex.index.get()]) {
         currentList.set(perCategory.getValue(category.categoryID))
         inCategories.set(false)
+        currentIndex.getOrCompute().tweenX.set(-1f)
     }
     
     fun selectCertainInstantiator(inst: Instantiator<*>) {
@@ -320,14 +324,21 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
         override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
             val currentIndexTween = currentIndex.getOrCompute()
             val currentIndex = currentIndexTween.index.get()
-            var indexTween = currentIndexTween.tween.get()
+            var indexTween = currentIndexTween.tweenY.get()
             val indexAsFloat = currentIndex.toFloat()
             if (indexTween != indexAsFloat) {
                 indexTween = MathUtils.lerp(indexTween, indexAsFloat, (Gdx.graphics.deltaTime / 0.075f).coerceIn(0f, 1f))
                 if (MathUtils.isEqual(indexTween, indexAsFloat, 0.005f)) {
                     indexTween = indexAsFloat
                 }
-                currentIndexTween.tween.set(indexTween)
+                currentIndexTween.tweenY.set(indexTween)
+            }
+            if (currentIndexTween.tweenX.get() != 0f) {
+                val ty = currentIndexTween.tweenX.get()
+                currentIndexTween.tweenX.set(ty - (Gdx.graphics.deltaTime / 0.2f * ty.sign))
+                if (ty.sign != currentIndexTween.tweenX.get().sign) {
+                    currentIndexTween.tweenX.set(0f)
+                }
             }
 
             val renderBounds = this.contentZone
@@ -349,13 +360,15 @@ class InstantiatorList(val instantiatorPane: InstantiatorPane,
                 objs.forEachIndexed { index, instantiator ->
                     val offsetAmount = abs((currentTween - index)).coerceAtLeast(0f)
                     val xOffset = ((1.6f).pow(offsetAmount) - 1) * 15f
-                    val specificOpacity = (1f - offsetAmount / 5f).coerceAtLeast(0.3f) * opacity
+                    val tweenXRaw = currentIndexTween.tweenX.get()
+                    val tweenX = Interpolation.smooth.apply(0f, 1f, tweenXRaw.absoluteValue) * tweenXRaw.sign
+                    val specificOpacity = (1f - offsetAmount / 5f).coerceAtLeast(0.3f) * opacity * (1f - tweenX).coerceAtLeast(0.6f)
                     if (index == currentIndex) {
                         font.setColor(0.65f, 1f, 1f, specificOpacity)
                     } else {
                         font.setColor(1f, 1f, 1f, specificOpacity)
                     }
-                    font.drawCompressed(batch, instantiator.name.getOrCompute(), x + xOffset, y - index * lineHeight + yOffset, w, Align.left)
+                    font.drawCompressed(batch, instantiator.name.getOrCompute(), x + xOffset + tweenX * 24f, y - index * lineHeight + yOffset, w, Align.left)
                 }
             }
 
