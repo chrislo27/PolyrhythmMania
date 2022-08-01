@@ -24,7 +24,10 @@ import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.TrackID
-import polyrhythmmania.editor.block.*
+import polyrhythmmania.editor.block.Block
+import polyrhythmmania.editor.block.BlockEndState
+import polyrhythmmania.editor.block.Instantiator
+import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.music.MusicVolume
@@ -38,15 +41,13 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.world.World
-import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldSettings
-import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.EntityInputFeedback
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.render.WorldRendererWithUI
 import polyrhythmmania.world.texturepack.*
-import polyrhythmmania.world.tileset.*
+import polyrhythmmania.world.tileset.Tileset
 import java.io.File
 import java.time.Instant
 import java.time.LocalDateTime
@@ -561,7 +562,7 @@ class Container(
 
         fun JsonObject.decodeTempoChange(): TempoChange {
             val swingObj = this.get("swing")
-            val swing: Swing = if (swingObj != null && swingObj.isObject) {
+            val swing: Swing = if (swingObj != null && swingObj.isObject && EditorSpecialFlags.STORY_MODE in editorFlags) {
                 swingObj as JsonObject
                 Swing(swingObj.getInt("ratio", Swing.STRAIGHT.ratio), swingObj.getFloat("div", Swing.STRAIGHT.division))
             } else Swing.STRAIGHT
