@@ -8,13 +8,17 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
-import com.badlogic.gdx.math.*
+import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
 import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
 import paintbox.util.*
-import paintbox.util.gdxutils.*
+import paintbox.util.gdxutils.NestedFrameBuffer
+import paintbox.util.gdxutils.disposeQuietly
+import paintbox.util.gdxutils.intersects
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.Entity
@@ -74,9 +78,12 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         setToOrtho(false, 1280f, 720f)
         update()
     }
+    /**
+     * Used to determine when to re-create the framebuffers
+     */
     private var lastKnownWindowSize: WindowSize = WindowSize(-1, -1)
-    private var lightFrameBuffer: NestedFrameBuffer? = null
     private var framebufferSize: WindowSize = WindowSize(0, 0)
+    private var lightFrameBuffer: NestedFrameBuffer? = null
 
     var entitiesRenderedLastCall: Int = 0
         private set

@@ -3,10 +3,7 @@ package polyrhythmmania.editor.block
 import paintbox.binding.ReadOnlyVar
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.EditorSpecialFlags
-import polyrhythmmania.editor.block.storymode.Block8BallCamera
-import polyrhythmmania.editor.block.storymode.BlockDeployRodStoryMode
-import polyrhythmmania.editor.block.storymode.BlockMemoStoryMode
-import polyrhythmmania.editor.block.storymode.BlockSpawnPatternStoryMode
+import polyrhythmmania.editor.block.storymode.*
 import polyrhythmmania.engine.Engine
 import java.util.*
 
@@ -269,6 +266,20 @@ object Instantiators {
                 ReadOnlyVar.const("This pans the camera forward for [i]continuous mode[].\n\nYou should place this to be aligned at the same beat\nas every [b]Despawn Pattern[] block.\nEvery single [b]Despawn Pattern[] block needs to have\nits tail end disabled."),
                 Block8BallCamera.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE)) { engine ->
             Block8BallCamera(engine)
+        })
+        add(CATEGORY_STORYMODE, Instantiator("storyMode_monsterGoalPoints_start", BlockMonsterGoalPointStart::class.java,
+                ReadOnlyVar.const("Monster Goal Start"),
+                ReadOnlyVar.const("Sets the start point for Monster Goal."),
+                ReadOnlyVar.const("This sets the start point for Monster Goal.\nThis should be placed [i]2 beats[] before the FIRST INPUT.\n\nNeeds to be used in tandem with [b]Monster Goal End[]."),
+                BlockMonsterGoalPoints.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE), onlyOne = true) { engine ->
+            BlockMonsterGoalPointStart(engine)
+        })
+        add(CATEGORY_STORYMODE, Instantiator("storyMode_monsterGoalPoints_end", BlockMonsterGoalPointEnd::class.java,
+                ReadOnlyVar.const("Monster Goal End"),
+                ReadOnlyVar.const("Sets the end point for Monster Goal."),
+                ReadOnlyVar.const("This sets the end point for Monster Goal.\nThis should be placed where the last input is.\nThe monster goal will stop counting down at this point.\n\nNeeds to be used in tandem with [b]Monster Goal Start[]."),
+                BlockMonsterGoalPoints.BLOCK_TYPES, editorFlags = EnumSet.of(EditorSpecialFlags.STORY_MODE), onlyOne = true) { engine ->
+            BlockMonsterGoalPointEnd(engine)
         })
 
         instantiatorMap = tempMap

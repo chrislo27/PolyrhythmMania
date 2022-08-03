@@ -6,7 +6,6 @@ import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.ResultFlag
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.EngineInputter
-import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.soundsystem.BeadsSound
 
 /**
@@ -16,7 +15,7 @@ import polyrhythmmania.soundsystem.BeadsSound
  * 
  * Not compatible with [EndlessScore] mode.
  */
-class LivesMode : ModifierModule() {
+class LivesMode(parent: EngineModifiers) : ModifierModule(parent) {
     
     companion object {
         const val DEFAULT_COOLDOWN: Float = 1.75f

@@ -32,6 +32,7 @@ import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.ExportStatistics
 import polyrhythmmania.container.manifest.SaveOptions
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.FlashingLightsWarnable
 import polyrhythmmania.editor.pane.EditorPane
@@ -243,27 +244,47 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             this.sizeHeightToChildren(100f)
         })
         contentPane.addChild(checklistPane)
-        bottomPane.addChild(Button(binding = { Localization.getVar("editor.dialog.exportLevel.checklist.simulateButton").use() },
-                font = editorPane.palette.musicDialogFont).apply {
-            this.applyDialogStyleBottom()
-            this.bounds.width.set(500f)
+        bottomPane += HBox().apply { 
             Anchor.TopCentre.configure(this)
-            if (checklistIncomplete.get()) {
-                this.disabled.set(true)
-                this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.exportLevel.checklist.simulateButton.disabledTooltip")))
-            }
-            this.visible.bind { substate.use() == Substate.CHECKLIST }
-            this.setOnAction { 
-                openFileDialog { file: File? ->
-                    if (file != null) {
-                        levelFile = file
-                        startSimulation(file)
-                    } else {
-                        substate.set(Substate.CHECKLIST)
+            this.spacing.set(8f)
+            this.align.set(HBox.Align.CENTRE)
+            this.bindWidthToParent(multiplier = 0.9f)
+            
+            this += Button(binding = { Localization.getVar("editor.dialog.exportLevel.checklist.simulateButton").use() },
+                    font = editorPane.palette.musicDialogFont).apply {
+                this.applyDialogStyleBottom()
+                this.bounds.width.set(500f)
+                if (checklistIncomplete.get()) {
+                    this.disabled.set(true)
+                    this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.exportLevel.checklist.simulateButton.disabledTooltip")))
+                }
+                this.visible.bind { substate.use() == Substate.CHECKLIST }
+                this.setOnAction {
+                    openFileDialog { file: File? ->
+                        if (file != null) {
+                            levelFile = file
+                            startSimulation(file)
+                        } else {
+                            substate.set(Substate.CHECKLIST)
+                        }
                     }
                 }
             }
-        })
+            if (EditorSpecialFlags.STORY_MODE in editor.flags) {
+                this += Button("Simulate without export (STORY MODE)", font = editorPane.palette.musicDialogFont).apply {
+                    this.applyDialogStyleBottom()
+                    this.bounds.width.set(350f)
+                    this.visible.bind { substate.use() == Substate.CHECKLIST }
+                    if (!editor.container.blocks.any { it is BlockEndState }) {
+                        this.disabled.set(true)
+                        this.tooltipElement.set(editorPane.createDefaultTooltip("Missing End State block!"))
+                    }
+                    this.setOnAction {
+                        startSimulationNoSave()
+                    }
+                }
+            }
+        }
 
         contentPane += TextLabel(binding = { Localization.getVar("common.closeFileChooser").use() }).apply {
             this.markup.set(editorPane.palette.markup)
@@ -385,7 +406,14 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         }
     }
     
-    private fun simulation(levelFile: File) {
+    private fun startSimulationNoSave() {
+        substate.set(Substate.SIMULATING)
+        thread(start = true, isDaemon = true) {
+            simulation(null)
+        }
+    }
+    
+    private fun simulation(levelFile: File?) {
         val editor = this.editor
         val container = editor.container
         val engine = container.engine
@@ -501,17 +529,19 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             engine.soundInterface.clearAllNonMusicAudio()
             engine.playbackSpeed = previousPlaybackSpeed
         }
-        
+
         // Attempt to save
         save(levelFile, currentSimResult)
     }
 
-    private fun save(newFile: File, simulationResult: SimulationResult) {
+    private fun save(newFile: File?, simulationResult: SimulationResult) {
         try {
             editor.compileEditorIntermediates()
 
             val exportStatistics: ExportStatistics = simulationResult.exportStatistics!!
-            editor.container.writeToFile(newFile, SaveOptions.editorExportAsLevel(exportStatistics))
+            if (newFile != null) { // Null file is used for export only (debug)
+                editor.container.writeToFile(newFile, SaveOptions.editorExportAsLevel(exportStatistics))
+            }
 
             Gdx.app.postRunnable {
                 doneDescLabel.text.set(Localization.getValue("editor.dialog.exportLevel.done.desc",

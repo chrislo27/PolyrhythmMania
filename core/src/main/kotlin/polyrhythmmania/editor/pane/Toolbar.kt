@@ -7,21 +7,26 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.*
+import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
+import paintbox.ui.Pane
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
 import paintbox.ui.control.*
+import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
+import paintbox.util.DecimalFormats
 import polyrhythmmania.Localization
-import polyrhythmmania.world.texturepack.TexPackSrcSelectorMenuPane
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
 import polyrhythmmania.editor.pane.dialog.ResultsTextDialog
-import paintbox.util.DecimalFormats
-import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.input.InputTimingRestriction
+import polyrhythmmania.engine.modifiers.MonsterPresets
+import polyrhythmmania.world.texturepack.TexPackSrcSelectorMenuPane
 
 
 class Toolbar(val upperPane: UpperPane) : Pane() {
@@ -334,8 +339,29 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                             if (EditorSpecialFlags.STORY_MODE in editor.flags) {
                                 ctxmenu.defaultWidth.set(450f)
                                 ctxmenu.addMenuItem(SeparatorMenuItem())
+                                ctxmenu.addMenuItem(SeparatorMenuItem())
                                 ctxmenu.addMenuItem(LabelMenuItem.create("[b]Story Mode engine modifiers:[]", editorPane.palette.markup))
 
+                                ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hb ->
+                                    hb.spacing.set(8f)
+                                    hb.bounds.height.set(32f)
+                                    hb += TextLabel("Input restriction:").apply {
+                                        this.markup.set(editor.editorPane.palette.markup)
+                                        this.renderAlign.set(Align.right)
+                                        this.bounds.width.set(200f)
+                                    }
+                                    hb += ComboBox(InputTimingRestriction.VALUES, editor.container.storyModeMetadata.getOrCompute().inputTimingRestriction).also { combobox ->
+                                        combobox.markup.set(editor.editorPane.palette.markup)
+                                        combobox.onItemSelected = {
+                                            val old = editor.container.storyModeMetadata.getOrCompute()
+                                            editor.container.storyModeMetadata.set(old.copy(inputTimingRestriction = it))
+                                            editor.container.resetInputFeedbackEntities()
+                                        }
+
+                                        combobox.bindWidthToParent(adjust = -208f)
+                                    }
+                                }))
+                                ctxmenu.addMenuItem(SeparatorMenuItem())
                                 ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
                                     hbox.spacing.set(8f)
                                     hbox.bounds.height.set(32f)
@@ -358,6 +384,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                         combobox.bindWidthToParent(adjust = -108f)
                                     }
                                 }))
+                                ctxmenu.addMenuItem(SeparatorMenuItem())
                                 ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
                                     hbox.spacing.set(8f)
                                     hbox.bounds.height.set(32f)
@@ -380,23 +407,53 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                         combobox.bindWidthToParent(adjust = -258f)
                                     }
                                 }))
+                                ctxmenu.addMenuItem(SeparatorMenuItem())
+                                val monsterEnabled = BooleanVar(false)
+                                ctxmenu.addMenuItem(CheckBoxMenuItem.create(monsterEnabled, "Monster Goal enabled?", editor.editorPane.palette.markup))
                                 ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
                                     hbox.spacing.set(8f)
                                     hbox.bounds.height.set(32f)
-                                    hbox += TextLabel("Input restriction:").apply {
+                                    hbox += TextLabel("Monster Goal difficulty:").apply {
                                         this.markup.set(editor.editorPane.palette.markup)
                                         this.renderAlign.set(Align.right)
-                                        this.bounds.width.set(200f)
+                                        this.bounds.width.set(250f)
+                                        this.tooltipElement.set(editorPane.createDefaultTooltip("The difficulty of the monster goal challenge.\nSets how fast it is."))
                                     }
-                                    hbox += ComboBox(InputTimingRestriction.VALUES, editor.container.storyModeMetadata.getOrCompute().inputTimingRestriction).also { combobox ->
+                                    hbox += ComboBox(MonsterPresets.VALUES, MonsterPresets.VALUES.find { it.difficulty == editor.container.storyModeMetadata.getOrCompute().monsterDifficulty } ?: MonsterPresets.MEDIUM).also { combobox ->
                                         combobox.markup.set(editor.editorPane.palette.markup)
                                         combobox.onItemSelected = {
                                             val old = editor.container.storyModeMetadata.getOrCompute()
-                                            editor.container.storyModeMetadata.set(old.copy(inputTimingRestriction = it))
-                                            editor.container.resetInputFeedbackEntities()
+                                            editor.container.storyModeMetadata.set(old.copy(monsterDifficulty = it.difficulty))
                                         }
+                                        combobox.bindWidthToParent(adjust = -258f)
+                                    }
+                                }))
+                                ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
+                                    hbox.spacing.set(8f)
+                                    hbox.bounds.height.set(32f)
+                                    hbox += TextLabel("M. Goal recovery penalty:").apply {
+                                        this.markup.set(editor.editorPane.palette.markup)
+                                        this.renderAlign.set(Align.right)
+                                        this.bounds.width.set(250f)
+                                        this.tooltipElement.set(editorPane.createDefaultTooltip("Determines how much you recover when you hit an Ace.\nHigher values are more penalizing and give less recovery.\n[b]This should be as close to the total number of inputs as possible[];\nyou can find out how many inputs there are in\nExport > Simulate without export (STORY MODE)."))
+                                    }
 
-                                        combobox.bindWidthToParent(adjust = -208f)
+                                    val textField = DecimalTextField(startingValue = editor.container.storyModeMetadata.getOrCompute().monsterRecoveryPenalty, decimalFormat = DecimalFormats["0.#"],
+                                            font = editor.editorPane.palette.musicDialogFont).apply {
+                                        this.minimumValue.set(0f)
+                                        this.textColor.set(Color(1f, 1f, 1f, 1f))
+
+                                        this.value.addListener {
+                                            val dur = it.getOrCompute()
+                                            editor.container.storyModeMetadata.set(editor.container.storyModeMetadata.getOrCompute().copy(monsterRecoveryPenalty = dur.coerceAtLeast(0f)))
+                                        }
+                                    }
+                                    hbox += RectElement(Color(0f, 0f, 0f, 1f)).apply {
+                                        this.bindWidthToParent(adjust = -258f)
+                                        this.border.set(Insets(1f))
+                                        this.borderStyle.set(SolidBorder(Color.WHITE))
+                                        this.padding.set(Insets(2f))
+                                        this += textField
                                     }
                                 }))
                             }

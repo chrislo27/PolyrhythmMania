@@ -7,7 +7,6 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.EngineInputter
-import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.gamemodes.ChangeMusicVolMultiplierEvent
 import polyrhythmmania.world.EventEndState
 import polyrhythmmania.world.WorldType
@@ -17,7 +16,7 @@ import polyrhythmmania.world.WorldType
  * 
  * Not compatible with [LivesMode].
  */
-class EndlessScore : ModifierModule() {
+class EndlessScore(parent: EngineModifiers) : ModifierModule(parent) {
 
     // Settings
     var showNewHighScoreAtEnd: Boolean = true // Hidden for something like Daily Challenge

@@ -163,6 +163,13 @@ class Container(
             defectiveRodsMode.enabled.set(defectiveThreshold > 0)
             defectiveRodsMode.maxLives.set(defectiveThreshold)
             defectiveRodsMode.resetState()
+            
+            val monsterGoal = engine.modifiers.monsterGoal
+            val monsterEnabled = metadata.monsterEnabled
+            monsterGoal.enabled.set(monsterEnabled)
+            monsterGoal.difficulty.set(metadata.monsterDifficulty)
+            monsterGoal.recoveryPenalty.set(metadata.monsterRecoveryPenalty)
+            monsterGoal.resetState()
 
             world.resetWorld()
         }

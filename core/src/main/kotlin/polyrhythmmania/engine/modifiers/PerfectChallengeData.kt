@@ -4,11 +4,10 @@ import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
-import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
 
-class PerfectChallengeData : ModifierModule() {
+class PerfectChallengeData(parent: EngineModifiers) : ModifierModule(parent) {
     
     // Data
     var hit: Float = 0f

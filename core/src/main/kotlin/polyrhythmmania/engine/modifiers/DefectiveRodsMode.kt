@@ -7,7 +7,6 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.ResultFlag
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.EngineInputter
-import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.world.EntityRodPR
 
@@ -18,7 +17,7 @@ import polyrhythmmania.world.EntityRodPR
  * 
  * Not compatible with [EndlessScore] mode nor [LivesMode].
  */
-class DefectiveRodsMode : ModifierModule() {
+class DefectiveRodsMode(parent: EngineModifiers) : ModifierModule(parent) {
     
     companion object {
         const val DEFAULT_COOLDOWN: Float = 0.5f
