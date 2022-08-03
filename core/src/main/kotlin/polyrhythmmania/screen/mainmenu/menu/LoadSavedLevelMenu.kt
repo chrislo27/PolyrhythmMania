@@ -307,8 +307,7 @@ class LoadSavedLevelMenu(
                 this.padding.set(Insets(2f))
                 this.bounds.width.set(40f)
                 this.bounds.height.set(40f)
-                this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["help"])).apply {
-                    this.tint.set(Color.BLACK)
+                this += ImageIcon(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["controls_help"])).apply {
                     this.visible.bind {
                         substate.use() is Substate.Loaded
                     }

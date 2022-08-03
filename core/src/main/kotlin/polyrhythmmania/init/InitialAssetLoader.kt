@@ -1,7 +1,6 @@
 package polyrhythmmania.init
 
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
@@ -78,6 +77,7 @@ class InitialAssetLoader : IAssetLoader {
                 Packable("allowed_tracks", "textures/ui/icon/allowed_tracks.png"),
                 Packable("filter", "textures/ui/icon/filter.png"),
                 Packable("refresh", "textures/ui/icon/refresh.png"),
+                Packable("controls_help", "textures/ui/icon/controls_help.png"),
         ), PackedSheet.Config(padding = 1, maxSize = 256, duplicateBorder = false)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor_linear", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 Packable("x", "textures/ui/x.png"),
