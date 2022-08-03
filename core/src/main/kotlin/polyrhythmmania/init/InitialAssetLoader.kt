@@ -158,7 +158,7 @@ class InitialAssetLoader : IAssetLoader {
                 "spawn_a", "spawn_d", "cowbell",).forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_$it", "sounds/${it}.wav")
         }
-        listOf("perfect_fail").forEach {
+        listOf("perfect_fail", "monster_goal_ace",).forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_$it", "sounds/${it}.ogg")
         }
         listOf("moretimes_1", "moretimes_2",).forEach {

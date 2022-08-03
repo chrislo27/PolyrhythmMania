@@ -42,4 +42,8 @@ class EngineModifiers(val engine: Engine) : InputterListener {
     override fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean) {
         allModules.forEach { it.onInputResultHit(inputter, result, countsAsMiss) }
     }
+
+    override fun onSkillStarHit(beat: Float) {
+        allModules.forEach { it.onSkillStarHit(beat) }
+    }
 }

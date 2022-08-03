@@ -3,9 +3,10 @@ package polyrhythmmania.engine.input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.MathUtils
 import paintbox.Paintbox
-import paintbox.binding.*
+import paintbox.binding.BooleanVar
 import paintbox.registry.AssetRegistry
-import polyrhythmmania.engine.*
+import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.practice.PracticeData
 import polyrhythmmania.engine.modifiers.EngineModifiers
 import polyrhythmmania.gamemodes.SidemodeAssets
@@ -385,16 +386,17 @@ class EngineInputter(val engine: Engine) {
     fun attemptSkillStar(beat: Float): Boolean {
         if (!skillStarGotten.get() && MathUtils.isEqual(skillStarBeat, beat, BEAT_EPSILON)) {
             skillStarGotten.set(true)
-            onSkillStarHit()
+            onSkillStarHit(beat)
             return true
         }
         return false
     }
 
-    fun onSkillStarHit() {
+    fun onSkillStarHit(beat: Float) {
         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_skill_star"), SoundInterface.SFXType.PLAYER_INPUT) { player ->
             player.gain = 0.6f
         }
+        inputterListeners.forEach { it.onSkillStarHit(beat) }
         if (engine.areStatisticsEnabled) {
             GlobalStats.skillStarsEarned.increment()
         }

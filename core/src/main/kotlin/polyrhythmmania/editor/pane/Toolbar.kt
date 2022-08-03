@@ -408,7 +408,10 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                     }
                                 }))
                                 ctxmenu.addMenuItem(SeparatorMenuItem())
-                                val monsterEnabled = BooleanVar(false)
+                                val monsterEnabled = BooleanVar(editor.container.storyModeMetadata.getOrCompute().monsterEnabled)
+                                monsterEnabled.addListener {
+                                    editor.container.storyModeMetadata.set(editor.container.storyModeMetadata.getOrCompute().copy(monsterEnabled = it.getOrCompute()))
+                                }
                                 ctxmenu.addMenuItem(CheckBoxMenuItem.create(monsterEnabled, "Monster Goal enabled?", editor.editorPane.palette.markup))
                                 ctxmenu.addMenuItem(CustomMenuItem(HBox().also { hbox ->
                                     hbox.spacing.set(8f)

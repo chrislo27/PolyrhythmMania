@@ -7,4 +7,6 @@ interface InputterListener {
     
     fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean)
     
+    fun onSkillStarHit(beat: Float)
+    
 }

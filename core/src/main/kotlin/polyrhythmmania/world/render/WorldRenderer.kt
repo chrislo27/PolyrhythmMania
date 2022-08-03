@@ -76,7 +76,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     }
     protected val tmpMatrix: Matrix4 = Matrix4()
 
-    private val fbRenderCamera: OrthographicCamera = OrthographicCamera().apply {
+    protected val fbRenderCamera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
         update()
     }
@@ -89,15 +89,15 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     /**
      * Represents the rendered world as a framebuffer.
      */
-    private var mainFrameBuffer: NestedFrameBuffer?
+    protected var mainFrameBuffer: NestedFrameBuffer?
         get() = framebuffers[0]
-        set(value) { framebuffers[0] = value }
+        private set(value) { framebuffers[0] = value }
     /**
      * Represents just the light portion as a framebuffer.
      */
-    private var lightFrameBuffer: NestedFrameBuffer?
+    protected var lightFrameBuffer: NestedFrameBuffer?
         get() = framebuffers[1]
-        set(value) { framebuffers[1] = value }
+        private set(value) { framebuffers[1] = value }
 
     
     var entitiesRenderedLastCall: Int = 0
@@ -118,6 +118,10 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         cam.zoom = 1f
         cam.update()
     }
+    
+    protected open fun shouldUseMainFb(): Boolean {
+        return false
+    }
 
     open fun render(batch: SpriteBatch) {
         // Re-create framebuffers if needed
@@ -133,7 +137,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         }
         camera.update()
         
-        val mainFb = this.mainFrameBuffer
+        val mainFb: NestedFrameBuffer? = if (shouldUseMainFb()) this.mainFrameBuffer else null
         if (mainFb != null) {
             mainFb.begin()
             Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
@@ -244,6 +248,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         
         if (mainFb != null) {
             mainFb.end()
+            
             // Render main fb
             batch.projectionMatrix = fbRenderCamera.combined
             batch.begin()

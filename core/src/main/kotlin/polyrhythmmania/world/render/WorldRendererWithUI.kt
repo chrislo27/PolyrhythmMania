@@ -2,6 +2,7 @@ package polyrhythmmania.world.render
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -25,6 +26,7 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.MathHelper
+import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.drawCompressed
 import paintbox.util.gdxutils.grey
 import paintbox.util.gdxutils.scaleMul
@@ -36,6 +38,7 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.modifiers.DefectiveRodsMode
 import polyrhythmmania.engine.modifiers.LivesMode
+import polyrhythmmania.engine.modifiers.MonsterGoalData
 import polyrhythmmania.ui.ArrowRectBox
 import polyrhythmmania.ui.ExplosionFX
 import polyrhythmmania.ui.TextSlideInterp
@@ -94,6 +97,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     val songCardRendering: SongCardRendering
     private val skillStarRendering: SkillStarRendering
     private val textboxRendering: TextBoxRendering
+    private val monsterGoalRendering: MonsterGoalRendering
     
     private val allInnerRenderers: List<InnerRendering>
 
@@ -116,6 +120,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         this.songCardRendering = this.SongCardRendering()
         uiSceneRoot += this.songCardRendering.uiElement
         
+        this.monsterGoalRendering = this.MonsterGoalRendering()
+        uiSceneRoot += this.monsterGoalRendering.uiElement
+        
         this.skillStarRendering = this.SkillStarRendering()
         uiSceneRoot += this.skillStarRendering.uiElement
         
@@ -126,7 +133,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         uiSceneRoot += this.textboxRendering.uiElement
         
         
-        this.allInnerRenderers = listOf(textboxRendering, perfectRendering, practiceRendering, endlessModeRendering, skillStarRendering)
+        this.allInnerRenderers = listOf(endlessModeRendering, livesModeRendering, defectiveRodsModeRendering,
+                practiceRendering, perfectRendering, songCardRendering, skillStarRendering, textboxRendering,
+                monsterGoalRendering)
     }
 
     override fun onWorldReset(world: World) {
@@ -139,8 +148,38 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         this.skillStarRendering.fireSkillStar()
     }
 
+    override fun shouldUseMainFb(): Boolean {
+//        return engine.modifiers.monsterGoal.enabled.get() // TODO reenable this after one snapshot
+        return true
+    }
+
     override fun render(batch: SpriteBatch) {
         super.render(batch)
+        
+        val mainFb: NestedFrameBuffer? = if (shouldUseMainFb()) this.mainFrameBuffer else null
+        if (mainFb != null) {
+            Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            
+            val scaling = monsterGoalRendering.scaling.get()
+            
+            // Render main fb
+            batch.projectionMatrix = fbRenderCamera.combined
+            batch.begin()
+
+            batch.setColor(1f, 1f, 1f, 1f)
+            val fbTex = mainFb.colorBufferTexture
+            val w = fbRenderCamera.viewportWidth
+            val h = fbRenderCamera.viewportHeight
+            if (scaling == 1f) {
+                batch.draw(fbTex, 0f, 0f, w, h, 0, 0, fbTex.width, fbTex.height, false, true)
+            } else {
+                batch.draw(fbTex, (w - w * scaling) / 2, (h - h * scaling) / 2, w * scaling, h * scaling, 0, 0, fbTex.width, fbTex.height, false, true)
+            }
+
+            batch.end()
+            batch.projectionMatrix = tmpMatrix
+        }
         
         // tmpMatrix is still available at this point, will be used to reset camera at the end
         
@@ -162,6 +201,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         songCardRendering.renderUI(batch)
         practiceRendering.renderUI(batch)
         livesModeRendering.renderUI(batch)
+        defectiveRodsModeRendering.renderUI(batch)
+        monsterGoalRendering.renderUI(batch)
         endlessModeRendering.renderUI(batch)
 
         uiSceneRoot.renderAsRoot(batch)
@@ -198,8 +239,17 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
 
         batch.packedColor = lastPackedColor
     }
-    
-    
+
+    override fun getDebugString(): String {
+        val monster = engine.modifiers.monsterGoal
+        return super.getDebugString() + """
+MonsterGoal:
+untilGameOver: ${monster.untilGameOver.get()}
+recoveryPenalty: ${monster.recoveryPenalty.get()}
+duration: ${monster.activeDuration.get()} sec
+"""
+    }
+
     abstract inner class InnerRendering : World.WorldResetListener {
         abstract val uiElement: UIElement
         
@@ -1088,6 +1138,32 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             }
         }
 
+    }
+
+    inner class MonsterGoalRendering : InnerRendering() {
+
+        override val uiElement: UIElement = Pane().apply {
+            this.bounds.width.set(0f)
+            this.bounds.height.set(0f)
+        }
+
+        val scaling: FloatVar = FloatVar(1f)
+
+        override fun renderUI(batch: SpriteBatch) {
+            val monster = engine.modifiers.monsterGoal
+            if (monster.enabled.get()) {
+                val transitionTime = Gdx.graphics.deltaTime / 0.15f
+                val zoom = MonsterGoalData.computeCameraZoom(monster.untilGameOver.get())
+                scaling.set(MathUtils.lerp(scaling.get(), 1f / zoom, transitionTime))
+            } else {
+                scaling.set(1f)
+            }
+        }
+
+        override fun onWorldReset(world: World) {
+            super.onWorldReset(world)
+            scaling.set(1f)
+        }
     }
     
 }

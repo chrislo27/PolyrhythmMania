@@ -1,17 +1,22 @@
 package polyrhythmmania.engine.modifiers
 
+import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.ReadOnlyFloatVar
+import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.block.storymode.BlockMonsterGoalPoints
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.ResultFlag
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
+import polyrhythmmania.soundsystem.BeadsSound
 import kotlin.math.pow
 
 /**
@@ -31,6 +36,10 @@ class MonsterGoalData(parent: EngineModifiers) : ModifierModule(parent) {
             if (duration <= 0f) return 0f
             return (10f.pow(difficulty.coerceAtLeast(0f) / 100f)) / (3 * duration)
         }
+        
+        fun computeCameraZoom(countdown: Float): Float {
+            return Interpolation.sineIn.apply(1f, 4f, (1f - countdown).coerceIn(0f, 1f))
+        }
     }
     
     // Settings
@@ -38,7 +47,7 @@ class MonsterGoalData(parent: EngineModifiers) : ModifierModule(parent) {
      * The difficulty from 0-100. Used in computing [passiveCountdownRate].
      * RHRE presets from easiest to hardest were: 70, 80, 85, 90.
      */
-    val difficulty: FloatVar = FloatVar(50f)
+    val difficulty: FloatVar = FloatVar(MonsterPresets.MEDIUM.difficulty)
     /**
      * The recovery penalty value. Used in computing [passiveCountdownRate]. Higher means worse replenishment.
      * Ideally should be the total number of inputs in the level for balance. 
@@ -67,7 +76,7 @@ class MonsterGoalData(parent: EngineModifiers) : ModifierModule(parent) {
     /**
      * The duration in *SECONDS* between the start and end points. -1 on reset, computed on first engine update.
      */
-    private val activeDuration: FloatVar = FloatVar(-1f)
+    val activeDuration: ReadOnlyFloatVar = FloatVar(-1f)
     
     /**
      * Set by events to mark the start and end range.
@@ -80,12 +89,15 @@ class MonsterGoalData(parent: EngineModifiers) : ModifierModule(parent) {
     private val isMonsterGoalActive: ReadOnlyBooleanVar = BooleanVar { 
         this@MonsterGoalData.enabled.use() && passiveCountdownRate.use() > 0f && canStartCountingDown.use() && activeDuration.use() > 0f && untilGameOver.use() > 0f
     }
+    private val lastMonsterAceSfx: FloatVar = FloatVar(-1f)
     
     
     override fun resetState() {
         untilGameOver.set(1f)
-        activeDuration.set(-1f)
+        (activeDuration as FloatVar).set(-1f)
         passiveCountdownRate.set(0f)
+        lastMonsterAceSfx.set(-1f)
+        canStartCountingDown.set(false)
     }
 
     override fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
@@ -94,7 +106,8 @@ class MonsterGoalData(parent: EngineModifiers) : ModifierModule(parent) {
                 val blocks = engine.container.blocks
                 val startBlock = blocks.find { it is BlockMonsterGoalPoints && it.start }
                 val endBlock = blocks.find { it is BlockMonsterGoalPoints && !it.start }
-                
+
+                activeDuration as FloatVar
                 if (startBlock != null && endBlock != null) {
                     val tempos = engine.tempos
                     activeDuration.set((tempos.beatsToSeconds(endBlock.beat) - tempos.beatsToSeconds(startBlock.beat)).coerceAtLeast(0f))
@@ -119,10 +132,32 @@ class MonsterGoalData(parent: EngineModifiers) : ModifierModule(parent) {
 //        engine.playbackSpeed = 1f
         engine.resultFlag.set(ResultFlag.FAIL)
     }
+    
+    fun onAceHit(silent: Boolean = false) {
+        if (isMonsterGoalActive.get()) {
+            untilGameOver.set((untilGameOver.get() + countdownReplenishOnAce.get()).coerceIn(0f, 1f))
+            
+            if (!silent) {
+                val volume = MathUtils.lerp(0.5f, 1f, ((engine.seconds - lastMonsterAceSfx.get()) / engine.playbackSpeed / 0.85f).coerceIn(0f, 1f))
+                engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_monster_goal_ace"), SoundInterface.SFXType.NORMAL) { player ->
+                    player.gain = volume
+                }
+                lastMonsterAceSfx.set(engine.seconds)
+            }
+        }
+    }
+
+    override fun onSkillStarHit(beat: Float) {
+        super.onSkillStarHit(beat)
+        
+        // Skill Star gives 3x the recovery
+        onAceHit(silent = true)
+        onAceHit(silent = true)
+    }
 
     override fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean) {
         if (isMonsterGoalActive.get() && !countsAsMiss && result.inputScore == InputScore.ACE) {
-            untilGameOver.set((untilGameOver.get() + countdownReplenishOnAce.get()).coerceIn(0f, 1f))
+            onAceHit()
         }
     }
 

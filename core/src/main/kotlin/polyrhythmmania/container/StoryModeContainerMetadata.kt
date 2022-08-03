@@ -3,6 +3,7 @@ package polyrhythmmania.container
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import polyrhythmmania.engine.input.InputTimingRestriction
+import polyrhythmmania.engine.modifiers.MonsterPresets
 
 
 data class StoryModeContainerMetadata(
@@ -23,7 +24,7 @@ data class StoryModeContainerMetadata(
                 lives = 0,
                 defectiveRodsThreshold = 0,
                 monsterEnabled = false,
-                monsterDifficulty = 0f,
+                monsterDifficulty = MonsterPresets.MEDIUM.difficulty,
                 monsterRecoveryPenalty = 50f,
         )
         
@@ -35,8 +36,8 @@ data class StoryModeContainerMetadata(
                     obj.getInt("lives", 0),
                     obj.getInt("defectiveRodsThreshold", 0),
                     obj.getBoolean("monsterEnabled", false),
-                    obj.getFloat("monsterDifficulty", 0f),
-                    obj.getFloat("monsterRecoveryPenalty", 50f),
+                    obj.getFloat("monsterDifficulty", BLANK.monsterDifficulty),
+                    obj.getFloat("monsterRecoveryPenalty", BLANK.monsterRecoveryPenalty),
             )
         }
     }

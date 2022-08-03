@@ -34,4 +34,7 @@ abstract class ModifierModule(val parent: EngineModifiers) : InputterListener {
 
     override fun onInputResultHit(inputter: EngineInputter, result: InputResult, countsAsMiss: Boolean) {
     }
+
+    override fun onSkillStarHit(beat: Float) {
+    }
 }
