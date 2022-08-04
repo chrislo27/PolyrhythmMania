@@ -89,13 +89,13 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     /**
      * Represents the rendered world as a framebuffer.
      */
-    protected var mainFrameBuffer: NestedFrameBuffer?
+    var mainFrameBuffer: NestedFrameBuffer?
         get() = framebuffers[0]
         private set(value) { framebuffers[0] = value }
     /**
      * Represents just the light portion as a framebuffer.
      */
-    protected var lightFrameBuffer: NestedFrameBuffer?
+    var lightFrameBuffer: NestedFrameBuffer?
         get() = framebuffers[1]
         private set(value) { framebuffers[1] = value }
 

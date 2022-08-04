@@ -75,7 +75,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         setToOrtho(false, 1280f, 720f)
         update()
     }
-    var renderUI: BooleanVar = BooleanVar(true)
+    val renderUI: BooleanVar = BooleanVar(true)
+    val forceUseOfMainFramebuffer: BooleanVar = BooleanVar(false)
 
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val baseMarkup: Markup = Markup(mapOf(
@@ -149,6 +150,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     }
 
     override fun shouldUseMainFb(): Boolean {
+        if (forceUseOfMainFramebuffer.get()) {
+            return true
+        }
 //        return engine.modifiers.monsterGoal.enabled.get() // TODO reenable this after one snapshot
         return true
     }

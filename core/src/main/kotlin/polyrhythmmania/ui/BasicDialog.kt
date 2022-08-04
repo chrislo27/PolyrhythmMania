@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Align
 import paintbox.font.TextAlign
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
@@ -13,12 +14,11 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.editor.Editor
-import polyrhythmmania.editor.pane.EditorPane
 
 
 open class BasicDialog(val main: PRManiaGame, mergeTopAndContent: Boolean) : DialogPane() {
 
+    protected val bgElement: UIElement
     val titleLabel: TextLabel
     val topPane: Pane
     val contentPane: Pane
@@ -37,13 +37,9 @@ open class BasicDialog(val main: PRManiaGame, mergeTopAndContent: Boolean) : Dia
                 this.roundedCorners.set(true)
             })
             this.padding.set(Insets(40f))
-
-//            this.addChild(RectElement(Color.CLEAR).apply { // DEBUG for padding check
-//                this.border.set(Insets(1f))
-//                this.borderStyle.set(SolidBorder(Color.WHITE))
-//            })
         }
         backOverlay.addChild(bg)
+        this.bgElement = bg
 
         val tbPanePadding = 8f
         val tbPaneBorder = 4f
@@ -93,7 +89,6 @@ open class BasicDialog(val main: PRManiaGame, mergeTopAndContent: Boolean) : Dia
             this.textColor.set(Color.WHITE)
         }
         topPane.addChild(titleLabel)
-        
     }
     
     fun Button.applyDialogStyleBottom() {

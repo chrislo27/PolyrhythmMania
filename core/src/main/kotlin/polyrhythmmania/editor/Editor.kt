@@ -20,8 +20,10 @@ import paintbox.font.TextRun
 import paintbox.ui.SceneRoot
 import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
+import paintbox.util.DecimalFormats
 import paintbox.util.MathHelper
 import paintbox.util.Vector2Stack
+import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
@@ -39,24 +41,25 @@ import polyrhythmmania.editor.undo.ActionHistory
 import polyrhythmmania.editor.undo.impl.*
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.StatisticsMode
+import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.engine.input.InputType
+import polyrhythmmania.engine.modifiers.EngineModifiers
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.engine.tempo.TempoMap
 import polyrhythmmania.engine.timesignature.TimeSignature
-import polyrhythmmania.soundsystem.*
-import paintbox.util.DecimalFormats
-import paintbox.util.gdxutils.*
-import polyrhythmmania.engine.StatisticsMode
-import polyrhythmmania.engine.input.EngineInputter
-import polyrhythmmania.engine.input.InputType
-import polyrhythmmania.engine.modifiers.EngineModifiers
+import polyrhythmmania.soundsystem.BeadsMusic
+import polyrhythmmania.soundsystem.SimpleTimingProvider
+import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
-import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.render.WorldRendererWithUI
 import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -121,7 +124,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
 
     val world: World get() = container.world
     val engine: Engine get() = container.engine
-    val renderer: WorldRenderer get() = container.renderer
+    val renderer: WorldRendererWithUI get() = container.renderer
 
     val inputKeymapKeyboard: InputKeymapKeyboard = settings.inputKeymapKeyboard.getOrCompute()
 
@@ -285,8 +288,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
             
             populateMetronomeTicks(engine.beat + 8)
 
-            val currentPanSetting = panningDuringPlaybackSetting.getOrCompute()
-            when (currentPanSetting) {
+            when (panningDuringPlaybackSetting.getOrCompute()) {
                 CameraPanningSetting.PAN -> {
                     if (this.cameraPan == null && !pressedButtons.any { it in MOVE_WINDOW_KEYCODES }) {
                         val beatWidth = editorPane.allTracksPane.editorTrackArea.beatWidth.get()
@@ -587,6 +589,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     fun attemptStartPlaytest() {
         editorPane.openDialog(editorPane.playtestDialog)
         setPlaytestingEnabled(true)
+        renderer.forceUseOfMainFramebuffer.set(true)
         if (playState.getOrCompute() == PlayState.STOPPED && settings.editorPlaytestStartsPlay.getOrCompute()) {
             changePlayState(PlayState.PLAYING)
         }
