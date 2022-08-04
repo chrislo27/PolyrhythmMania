@@ -1,12 +1,12 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
-import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.StringConverter
 import paintbox.ui.area.Insets
-import paintbox.ui.control.*
+import paintbox.ui.control.CheckBox
+import paintbox.ui.control.ComboBox
+import paintbox.ui.control.ScrollPane
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.WindowSize
@@ -14,7 +14,6 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
-import kotlin.math.roundToInt
 
 
 class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -27,6 +26,7 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 120,
                 144,
                 240,
+                360,
                 0,
         )
     }
