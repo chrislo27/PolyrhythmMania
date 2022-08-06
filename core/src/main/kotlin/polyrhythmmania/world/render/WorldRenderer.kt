@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
@@ -25,6 +24,7 @@ import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.render.bg.WorldBackgroundFromWorldType
 import polyrhythmmania.world.tileset.Tileset
 import kotlin.math.roundToInt
+import kotlin.system.measureNanoTime
 
 
 open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, World.WorldResetListener {
@@ -59,11 +59,6 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                 this.z = 0f
             }
         }
-
-        // For doing entity render culling
-        private val tmpVec: Vector3 = Vector3(0f, 0f, 0f)
-        private val tmpRect: Rectangle = Rectangle(0f, 0f, 0f, 0f)
-        private val tmpRect2: Rectangle = Rectangle(0f, 0f, 0f, 0f)
     }
 
     protected var isDisposed: Boolean = false
@@ -155,28 +150,35 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         worldBackground.render(batch, world, camera)
 
         // Entities
-        val entityRenderTime = System.nanoTime()
-        var entitiesRendered = 0
         val camWidth = camera.viewportWidth * camera.zoom
         val camHeight = camera.viewportHeight * camera.zoom
         val leftEdge = camera.position.x - camWidth / 2f
         val bottomEdge = camera.position.y - camHeight / 2f
         val currentTileset = this.tileset
-        
-        tmpRect2.set(leftEdge, bottomEdge, camWidth, camHeight)
-        this.entitiesRenderedLastCall = 0
-        world.sortEntitiesByRenderOrder()
-        world.entities.forEach { entity ->
-            val convertedVec = convertWorldToScreen(tmpVec.set(entity.position))
-            tmpRect.set(convertedVec.x, convertedVec.y, entity.renderWidth, entity.renderHeight)
-            // Only render entities that are in scene
-            if (tmpRect.intersects(tmpRect2)) {
-                entitiesRendered++
-                entity.render(this, batch, currentTileset)
+
+        val visibleAreaRect = RectangleStack.getAndPush().set(leftEdge, bottomEdge, camWidth, camHeight)
+        val entityRenderTime = measureNanoTime {
+            var entitiesRendered = 0
+            val tmpEntityVec = Vector3Stack.getAndPush()
+            val tmpEntityRect = RectangleStack.getAndPush()
+            
+            world.sortEntitiesByRenderOrder()
+            world.entities.forEach { entity ->
+                val convertedVec = convertWorldToScreen(tmpEntityVec.set(entity.position))
+                tmpEntityRect.set(convertedVec.x, convertedVec.y, entity.renderWidth, entity.renderHeight)
+                // Only render entities that are in scene
+                if (tmpEntityRect.intersects(visibleAreaRect)) {
+                    entitiesRendered++
+                    entity.render(this, batch, currentTileset)
+                }
             }
+            
+            RectangleStack.pop()
+            Vector3Stack.pop()
+            
+            this.entitiesRenderedLastCall = entitiesRendered
         }
-        this.entitiesRenderedLastCall = entitiesRendered
-        this.entityRenderTimeNano = System.nanoTime() - entityRenderTime
+        this.entityRenderTimeNano = entityRenderTime
 
         // Blending for framebuffers w/ transparency in format. Assumes premultiplied
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
@@ -245,6 +247,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             batch.projectionMatrix = tmpMatrix
         }
         
+        RectangleStack.pop() // visibleAreaRect
         
         if (mainFb != null) {
             mainFb.end()
