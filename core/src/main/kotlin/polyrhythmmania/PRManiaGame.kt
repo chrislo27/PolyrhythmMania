@@ -48,13 +48,12 @@ import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.editor.help.EditorHelpLocalization
 import polyrhythmmania.engine.input.InputThresholds
+import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.init.AssetRegistryLoadingScreen
 import polyrhythmmania.init.InitialAssetLoader
 import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
-import polyrhythmmania.screen.SimpleLoadingScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
-import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.solitaire.SolitaireAssetLoader
 import polyrhythmmania.solitaire.SolitaireAssets
 import polyrhythmmania.statistics.GlobalStats
@@ -69,9 +68,9 @@ import java.io.File
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.imageio.ImageIO
 import kotlin.concurrent.thread
-import kotlin.math.roundToInt
 
 
 class PRManiaGame(paintboxSettings: PaintboxSettings)
@@ -131,6 +130,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val httpClient: CloseableHttpClient by lazy { HttpClients.createMinimal() }
     
     private var discordCallbackDelta: Float = 0f
+    private val hasLevelRecoveryHookBeenRun: AtomicBoolean = AtomicBoolean(false)
 
     override fun getTitle(): String = "${PRMania.TITLE} ${PRMania.VERSION}"
 
@@ -246,19 +246,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         }
         
         Runtime.getRuntime().addShutdownHook(thread(start = false, isDaemon = true, name = "Level Recovery Shutdown Hook") {
-            val currentScreen = getScreen()
-            if (currentScreen is EditorScreen) {
-                val editor = currentScreen.editor
-                val recoveryFile = editor.getRecoveryFile(overwrite = false)
-                val container = editor.container
-                try {
-                    container.writeToFile(recoveryFile, SaveOptions.SHUTDOWN_RECOVERY)
-                    Paintbox.LOGGER.info("Shutdown hook recovery completed (filename: ${recoveryFile.name})")
-                } catch (e: Exception) {
-                    Paintbox.LOGGER.warn("Shutdown hook recovery failed! filename: ${recoveryFile.name}")
-                    e.printStackTrace()
-                }
-            }
+            runLevelRecoveryShutdownHook()
         })
         thread(isDaemon = true, name = "GitHub version checker", start = true) {
             val get = HttpGet("https://api.github.com/repos/${PRMania.GITHUB.substringAfter("https://github.com/", "")}/releases/latest")
@@ -283,8 +271,31 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             }
         }
     }
+    
+    private fun runLevelRecoveryShutdownHook() {
+        if (hasLevelRecoveryHookBeenRun.get()) {
+            return
+        }
+        hasLevelRecoveryHookBeenRun.set(true)
+        
+        val currentScreen = getScreen()
+        if (currentScreen is EditorScreen) {
+            val editor = currentScreen.editor
+            val recoveryFile = editor.getRecoveryFile(overwrite = false)
+            val container = editor.container
+            try {
+                container.writeToFile(recoveryFile, SaveOptions.SHUTDOWN_RECOVERY)
+                Paintbox.LOGGER.info("Shutdown hook recovery completed (filename: ${recoveryFile.name})")
+            } catch (e: Exception) {
+                Paintbox.LOGGER.warn("Shutdown hook recovery failed! filename: ${recoveryFile.name}")
+                e.printStackTrace()
+            }
+        }
+    }
 
     override fun dispose() {
+        runLevelRecoveryShutdownHook()
+        
         super.dispose()
         
         preferences.putString(PreferenceKeys.LAST_VERSION, PRMania.VERSION.toString()).flush()

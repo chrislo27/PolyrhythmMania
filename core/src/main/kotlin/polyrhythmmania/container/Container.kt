@@ -242,7 +242,7 @@ class Container(
     fun addResource(res: ExternalResource) {
         val key = res.key
         val existing = _resources[key]
-        if (existing != res) {
+        if (existing != res) { // Don't dispose and add if it is the same resource
             existing?.dispose()
             _resources[key] = res
         }
