@@ -67,7 +67,7 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
             val packedColor = batch.packedColor
 
             val tintedRegion = getTintedRegion(tileset)
-            val tmpColor = ColorStack.getAndPush().set(1f, 1f, 1f, flash * 0.75f)
+            val tmpColor = ColorStack.getAndPush().set(1f, 1f, 1f, flash * 0.35f)
             drawTintedRegion(batch, convertedVec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tmpColor)
             ColorStack.pop()
             
