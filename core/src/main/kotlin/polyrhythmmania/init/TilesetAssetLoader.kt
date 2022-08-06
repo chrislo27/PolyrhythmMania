@@ -1,7 +1,6 @@
 package polyrhythmmania.init
 
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.graphics.Texture
 import paintbox.packing.Packable
 import paintbox.packing.PackedSheet
@@ -15,7 +14,7 @@ class TilesetAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("tileset_missing_tex", "textures/world/missing.png")
         AssetRegistry.loadAsset<Texture>("gba_spritesheet", "textures/world/gba_spritesheet.png")
         AssetRegistry.loadAsset<Texture>("green_grid", "textures/world/green_grid.png", linearTexture())
-        AssetRegistry.loadAsset<Texture>("world_spotlight", "textures/world/spotlight.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("world_spotlight", "textures/world/lighting/spotlight.png", linearTexture())
         
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "skill_star",
