@@ -20,6 +20,7 @@ import paintbox.util.gdxutils.intersects
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.Entity
+import polyrhythmmania.world.entity.HasLightingRender
 import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.render.bg.WorldBackgroundFromWorldType
 import polyrhythmmania.world.tileset.Tileset
@@ -226,6 +227,17 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                 batch.draw(lightTex, tmpVec.x - width / 2f, tmpVec.y, width, width * lightTexAspectRatio)
             }
             Vector3Stack.pop()
+            batch.setColor(1f, 1f, 1f, 1f)
+            
+            // Entities with lighting
+            this.entityRenderTimeNano += measureNanoTime {
+                // No need to sort, they are already sorted
+                world.entities.forEach { entity ->
+                    if (entity is HasLightingRender) {
+                        entity.renderLightingPass(this, batch, currentTileset)
+                    }
+                }
+            }
 
             batch.end()
             batch.setColor(1f, 1f, 1f, 1f)
