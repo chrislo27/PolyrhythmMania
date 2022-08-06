@@ -14,7 +14,10 @@ class TilesetAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("tileset_missing_tex", "textures/world/missing.png")
         AssetRegistry.loadAsset<Texture>("gba_spritesheet", "textures/world/gba_spritesheet.png")
         AssetRegistry.loadAsset<Texture>("green_grid", "textures/world/green_grid.png", linearTexture())
-        AssetRegistry.loadAsset<Texture>("world_spotlight", "textures/world/lighting/spotlight.png", linearTexture())
+        
+        AssetRegistry.loadAsset<Texture>("world_light_spotlight", "textures/world/lighting/spotlight.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("world_light_circular_aliased", "textures/world/lighting/circular_aliased.tga", linearTexture())
+        AssetRegistry.loadAsset<Texture>("world_light_circular_antialiased", "textures/world/lighting/circular_antialiased.tga", linearTexture())
         
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "skill_star",

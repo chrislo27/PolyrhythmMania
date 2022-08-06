@@ -210,10 +210,22 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             }
             
             batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
-
+            batch.setColor(1f, 1f, 1f, 1f)
+            
+            // Entities with lighting
+            this.entityRenderTimeNano += measureNanoTime {
+                // No need to sort, they are already sorted
+                world.entities.forEach { entity ->
+                    if (entity is HasLightingRender) {
+                        entity.renderLightingPass(this, batch, currentTileset)
+                    }
+                }
+            }
+            batch.setColor(1f, 1f, 1f, 1f)
+            
             // Render each light
             val tmpVec = Vector3Stack.getAndPush()
-            val lightTex = AssetRegistry.get<Texture>("world_spotlight")
+            val lightTex = AssetRegistry.get<Texture>("world_light_spotlight")
             val lightTexAspectRatio = lightTex.height.toFloat() / lightTex.width
             val width = 1.25f
             for (spotlight in spotlights.allSpotlights) {
@@ -227,17 +239,6 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                 batch.draw(lightTex, tmpVec.x - width / 2f, tmpVec.y, width, width * lightTexAspectRatio)
             }
             Vector3Stack.pop()
-            batch.setColor(1f, 1f, 1f, 1f)
-            
-            // Entities with lighting
-            this.entityRenderTimeNano += measureNanoTime {
-                // No need to sort, they are already sorted
-                world.entities.forEach { entity ->
-                    if (entity is HasLightingRender) {
-                        entity.renderLightingPass(this, batch, currentTileset)
-                    }
-                }
-            }
 
             batch.end()
             batch.setColor(1f, 1f, 1f, 1f)

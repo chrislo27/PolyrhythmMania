@@ -2,6 +2,7 @@ package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
+import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
@@ -11,7 +12,7 @@ import polyrhythmmania.world.tileset.TintedRegion
 class EntityExplosion(
         world: World, val secondsStarted: Float,
         val renderScale: Float, val rodOffsetX: Float, val rodOffsetY: Float
-) : SpriteEntity(world), TemporaryEntity {
+) : SpriteEntity(world), HasLightingRender, TemporaryEntity {
 
     companion object {
         const val EXPLOSION_DURATION: Float = 8 / 60f
@@ -67,6 +68,17 @@ class EntityExplosion(
 //            batch.fillRect(vec.x, vec.y, 0.1f, 0.1f)
 //            batch.setColor(1f, 1f, 1f, 1f)
         }
+    }
+    
+    override fun renderLightingPass(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+        if (this.isKilled) return
+
+        val tmpVec = Vector3Stack.getAndPush()
+        val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
+        val packedColor = batch.packedColor
+        renderSimple(renderer, batch, tileset, convertedVec)
+        Vector3Stack.pop()
+        batch.packedColor = packedColor
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
