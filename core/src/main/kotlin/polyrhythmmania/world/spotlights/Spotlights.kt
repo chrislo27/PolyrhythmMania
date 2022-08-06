@@ -2,7 +2,6 @@ package polyrhythmmania.world.spotlights
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector3
-import paintbox.util.ColorStack
 import polyrhythmmania.world.World
 
 
@@ -76,7 +75,7 @@ class Spotlights(val world: World) {
     
     companion object {
         const val NUM_ON_ROW: Int = 10
-        val AMBIENT_LIGHT_RESET_COLOR: Color = Color(0f, 0f, 0f, 0.95f)
+        val AMBIENT_LIGHT_RESET_COLOR: Color = Color(0f, 0f, 0f, 240 / 255f)
         val SPOTLIGHT_RESET_COLOR: Color = Color(1f, 1f, 1f, 1f)
     }
     
