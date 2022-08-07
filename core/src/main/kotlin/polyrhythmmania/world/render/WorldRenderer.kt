@@ -81,19 +81,25 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
      */
     private var lastKnownWindowSize: WindowSize = WindowSize(-1, -1)
     private var framebufferSize: WindowSize = WindowSize(0, 0)
-    private val framebuffers: Array<NestedFrameBuffer?> = Array(2) { null }
+    private val framebuffers: Array<NestedFrameBuffer?> = Array(3) { null }
     /**
-     * Represents the rendered world as a framebuffer.
+     * Represents the rendered world as a framebuffer. Format has alpha.
      */
     var mainFrameBuffer: NestedFrameBuffer?
         get() = framebuffers[0]
         private set(value) { framebuffers[0] = value }
     /**
-     * Represents just the light portion as a framebuffer.
+     * Represents the total light portion (ambient light + lighting) as a framebuffer. Format will have no alpha.
      */
-    var lightFrameBuffer: NestedFrameBuffer?
+    var totalLightFrameBuffer: NestedFrameBuffer?
         get() = framebuffers[1]
         private set(value) { framebuffers[1] = value }
+    /**
+     * Represents just the lighting portion for entities as a framebuffer. Used to handle "depth clipping". Format has alpha.
+     */
+    private var entityLightFrameBuffer: NestedFrameBuffer?
+        get() = framebuffers[2]
+        private set(value) { framebuffers[2] = value }
 
     
     var entitiesRenderedLastCall: Int = 0
@@ -189,18 +195,54 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
 
         
         // Build and render light buffer
-        val lightFb = lightFrameBuffer
-        if (lightFb != null && !world.spotlights.isAmbientLightingFull()) {
-            val spotlights = world.spotlights
-            
+        val entityLightFb = entityLightFrameBuffer
+        val totalLightFb = totalLightFrameBuffer
+        if (entityLightFb != null && totalLightFb != null && !world.spotlights.isAmbientLightingFull()) { // Full ambient lighting means no lights are visible anyway
             val oldSrcFunc = batch.blendSrcFunc
             val oldDstFunc = batch.blendDstFunc
-
-            // Render lights
-            lightFb.begin()
             tmpMatrix.set(batch.projectionMatrix)
+            
+            // Use world camera
             batch.projectionMatrix = this.camera.combined
+            
+            // Render entity light buffer
+            entityLightFb.begin()
             batch.begin()
+            
+            Gdx.gl.glClearColor(1f, 1f, 1f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            
+            // Entities either block or emit light
+            batch.setColor(1f, 1f, 1f, 1f)
+            this.entityRenderTimeNano += measureNanoTime {
+                world.entities.forEach { entity ->
+                    if (entity is HasLightingRender) {
+                        batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                        entity.renderBlockingEffectBeforeLighting(this, batch, currentTileset)
+                        
+                        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+                        entity.renderLightingEffect(this, batch, currentTileset)
+                        
+                        batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                        entity.renderBlockingEffectAfterLighting(this, batch, currentTileset)
+                    } else {
+                        // Not a light emitter, so just render the blocking effect using Entity.render
+                        batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                        entity.render(this, batch, currentTileset)
+                    }
+                }
+            }
+            
+            batch.end()
+            batch.setColor(1f, 1f, 1f, 1f)
+            entityLightFb.end()
+            
+            
+            // Render total light buffer
+            totalLightFb.begin()
+            batch.begin()
+            
+            val spotlights = world.spotlights
 
             // Clear with ambient light colour
             ColorStack.use { tmpColor ->
@@ -212,46 +254,45 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
             batch.setColor(1f, 1f, 1f, 1f)
             
-            // Entities with lighting
-            this.entityRenderTimeNano += measureNanoTime {
-                // No need to sort, they are already sorted
-                world.entities.forEach { entity ->
-                    if (entity is HasLightingRender) {
-                        entity.renderLightingPass(this, batch, currentTileset)
-                    }
-                }
-            }
-            batch.setColor(1f, 1f, 1f, 1f)
+            // Switch to fb space
+            batch.projectionMatrix = fbRenderCamera.combined
+            // Draw the entity light buffer on top
+            val entityFbTex = entityLightFb.colorBufferTexture
+            batch.draw(entityFbTex, 0f, 0f, fbRenderCamera.viewportWidth, fbRenderCamera.viewportHeight, 0, 0, entityFbTex.width, entityFbTex.height, false, true)
+
             
-            // Render each light
-            val tmpVec = Vector3Stack.getAndPush()
-            val lightTex = AssetRegistry.get<Texture>("world_light_spotlight")
-            val lightTexAspectRatio = lightTex.height.toFloat() / lightTex.width
-            val width = 1.25f
-            for (spotlight in spotlights.allSpotlights) {
-                if (spotlight.lightColor.strength <= 0f) {
-                    continue
+            // Back to world space
+            batch.projectionMatrix = this.camera.combined
+            
+            // Render each spotlight, this IGNORES entity blocking
+            Vector3Stack.use { tmpVec ->
+                val lightTex = AssetRegistry.get<Texture>("world_light_spotlight")
+                val lightTexAspectRatio = lightTex.height.toFloat() / lightTex.width
+                val width = 1.25f
+                for (spotlight in spotlights.allSpotlights) {
+                    if (spotlight.lightColor.strength <= 0f) {
+                        continue
+                    }
+                    convertWorldToScreen(tmpVec.set(spotlight.position))
+                    ColorStack.use { tmp ->
+                        batch.color = spotlight.lightColor.computeFinalForSpotlight(tmp)
+                    }
+                    batch.draw(lightTex, tmpVec.x - width / 2f, tmpVec.y, width, width * lightTexAspectRatio)
                 }
-                convertWorldToScreen(tmpVec.set(spotlight.position))
-                ColorStack.use { tmp ->
-                    batch.color = spotlight.lightColor.computeFinalForSpotlight(tmp)
-                }
-                batch.draw(lightTex, tmpVec.x - width / 2f, tmpVec.y, width, width * lightTexAspectRatio)
             }
-            Vector3Stack.pop()
 
             batch.end()
             batch.setColor(1f, 1f, 1f, 1f)
-            lightFb.end()
+            totalLightFb.end()
 
 
-            // Render light fb
+            // Render total light fb onto world scene
             batch.projectionMatrix = fbRenderCamera.combined
             batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ZERO)
             batch.begin()
 
             batch.setColor(1f, 1f, 1f, 1f)
-            val fbTex = lightFb.colorBufferTexture
+            val fbTex = totalLightFb.colorBufferTexture
             batch.draw(fbTex, 0f, 0f, fbRenderCamera.viewportWidth, fbRenderCamera.viewportHeight, 0, 0, fbTex.width, fbTex.height, false, true)
 
             batch.end()
@@ -323,6 +364,8 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             framebuffersArray.indices.forEach { i ->
                 val format: Pixmap.Format = when (i) {
                     0 -> Pixmap.Format.RGBA8888 // Main framebuffer needs transparency
+                    1 -> Pixmap.Format.RGB888 // Total light buffer doesn't need alpha
+                    2 -> Pixmap.Format.RGBA8888 // Intermediate light buffer needs transparency
                     else -> Pixmap.Format.RGB888
                 }
                 framebuffersArray[i] = NestedFrameBuffer(format, newFbWidth, newFbHeight, false).apply {

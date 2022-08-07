@@ -29,6 +29,7 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
     
     private val originalColor: Color = baseColor.cpy()
     private val currentColor: Color = baseColor.cpy()
+    private val currentBaseColor: Color = baseColor.cpy()
     private var currentFlashPercentage: Float = 0f
     
     private fun getBaseColorToUse(engine: Engine): Color {
@@ -59,7 +60,7 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
         ColorStack.pop()
     }
 
-    override fun renderLightingPass(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun renderLightingEffect(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
         val flash = this.currentFlashPercentage
         if (flash > 0f) {
             val tmpVec = Vector3Stack.getAndPush()
@@ -67,7 +68,8 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
             val packedColor = batch.packedColor
 
             val tintedRegion = getTintedRegion(tileset)
-            val tmpColor = ColorStack.getAndPush().set(1f, 1f, 1f, flash * 0.35f)
+            val tmpColor = ColorStack.getAndPush().set(this.currentBaseColor)
+            tmpColor.a *= flash * 0.4f
             drawTintedRegion(batch, convertedVec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tmpColor)
             ColorStack.pop()
             
@@ -84,6 +86,7 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
     
     fun updateCurrentColor(engine: Engine) {
         val updatedBaseColor = getBaseColorToUse(engine)
+        this.currentBaseColor.set(updatedBaseColor)
         val currentSec = engine.seconds
         val flashSec = engine.inputter.inputFeedbackFlashes[flashIndex]
         val flashTime = 0.25f

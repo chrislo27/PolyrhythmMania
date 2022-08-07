@@ -1,9 +1,7 @@
 package polyrhythmmania.world.entity
 
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
-import paintbox.registry.AssetRegistry
 import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
@@ -72,24 +70,34 @@ class EntityExplosion(
         }
     }
     
-    override fun renderLightingPass(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun renderLightingEffect(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
         if (this.isKilled || this.percentageLife !in 0f..1f) return
 
         val tmpVec = Vector3Stack.getAndPush()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor
+
+//        val tex = AssetRegistry.get<Texture>("world_light_circular_antialiased")
+//        batch.setColor(1f, 1f, 1f, 1f)
+//        val centreOfExplosionX = 10f / 32f // X-centre of the explosion at normal 1.0 scaling is 10 px right
+//        val baseOfExplosionY = 3f / 32f // Base of the explosion at normal 1.0 scaling is 3 px up
+//        val circleSize = this.renderHeight * 1.25f * 5
+//        val x = convertedVec.x + (centreOfExplosionX * renderScale) - (circleSize * (0.5f + 0.075f)) + rodOffsetX
+//        val y = convertedVec.y + (baseOfExplosionY * renderScale) - (circleSize * 0.5f) + (this.renderHeight / 2) + rodOffsetY
+//        batch.draw(tex, x, y, circleSize, circleSize)
         
-        val tex = AssetRegistry.get<Texture>("world_light_circular_antialiased")
-        batch.setColor(1f, 1f, 1f, 1f)
-        val centreOfExplosionX = 10f / 32f // X-centre of the explosion at normal 1.0 scaling is 10 px right
-        val baseOfExplosionY = 3f / 32f // Base of the explosion at normal 1.0 scaling is 3 px up
-        val circleSize = this.renderHeight * 1.25f
-        val x = convertedVec.x + (centreOfExplosionX * renderScale) - (circleSize * (0.5f + 0.075f)) + rodOffsetX
-        val y = convertedVec.y + (baseOfExplosionY * renderScale) - (circleSize * 0.5f) + (this.renderHeight / 2) + rodOffsetY
-        batch.draw(tex, x, y, circleSize, circleSize)
-        
+        renderSimple(renderer, batch, tileset, convertedVec)
+
         Vector3Stack.pop()
         batch.packedColor = packedColor
+    }
+
+    override fun renderBlockingEffectBeforeLighting(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+        // NO-OP
+    }
+
+    override fun renderBlockingEffectAfterLighting(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+        // NO-OP
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {

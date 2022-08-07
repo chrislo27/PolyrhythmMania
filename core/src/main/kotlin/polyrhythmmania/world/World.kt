@@ -7,9 +7,9 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.world.entity.*
-import polyrhythmmania.world.tileset.TilesetPalette
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.spotlights.Spotlights
+import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.concurrent.CopyOnWriteArrayList
 
 
@@ -96,8 +96,8 @@ class World {
         }
     }
 
-    fun sortEntitiesByRenderOrder() {
-        (entities as MutableList).sortWith(WorldRenderer.comparatorRenderOrder)
+    fun sortEntitiesByRenderOrder(comparator: Comparator<Entity> = WorldRenderer.comparatorRenderOrder) {
+        (entities as MutableList).sortWith(comparator)
     }
     
     // ------------------------------------------------------------------------------------------------------
