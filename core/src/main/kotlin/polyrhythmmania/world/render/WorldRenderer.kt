@@ -24,6 +24,7 @@ import polyrhythmmania.world.entity.HasLightingRender
 import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.render.bg.WorldBackgroundFromWorldType
 import polyrhythmmania.world.tileset.Tileset
+import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.system.measureNanoTime
 
@@ -47,6 +48,34 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                 val xyz1 = o1X - o1Z - o1Y
                 val xyz2 = o2X - o2Z - o2Y
                 -xyz1.compareTo(xyz2)
+            }
+        }
+        val comparatorRenderOrderLighting: Comparator<Entity> = Comparator { o1, o2 ->
+            val o1Z = o1.position.z + o1.renderSortOffsetZ
+            val o2Z = o2.position.z + o2.renderSortOffsetZ
+            val o1X = o1.position.x + o1.renderSortOffsetX
+            val o1Y = o1.position.y + o1.renderSortOffsetY
+            val o2X = o2.position.x + o2.renderSortOffsetX
+            val o2Y = o2.position.y + o2.renderSortOffsetY
+            
+            // Find the "depth value", which is z-x
+            val depth1 = floor(o1Z - o1X)
+            val depth2 = floor(o2Z - o2X)
+            
+            // Lower depths are rendered first
+            if (depth1 < depth2) {
+                -1
+            } else if (depth1 > depth2) {
+                1
+            } else {
+                // Everything is on the same depth. We go from lower Y to upper Y, left to right (increasing Z)
+                if (o1Y < o2Y) {
+                    -1
+                } else if (o1Y > o2Y) {
+                    1
+                } else {
+                    o1Z.compareTo(o2Z)
+                }
             }
         }
 
@@ -215,20 +244,23 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             // Entities either block or emit light
             batch.setColor(1f, 1f, 1f, 1f)
             this.entityRenderTimeNano += measureNanoTime {
-                world.entities.forEach { entity ->
-                    if (entity is HasLightingRender) {
-                        batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
-                        entity.renderBlockingEffectBeforeLighting(this, batch, currentTileset)
-                        
-                        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
-                        entity.renderLightingEffect(this, batch, currentTileset)
-                        
-                        batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
-                        entity.renderBlockingEffectAfterLighting(this, batch, currentTileset)
-                    } else {
-                        // Not a light emitter, so just render the blocking effect using Entity.render
-                        batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
-                        entity.render(this, batch, currentTileset)
+                if (world.entities.any { it is HasLightingRender }) {
+//                    world.sortEntitiesByRenderOrder(WorldRenderer.comparatorRenderOrderLighting)
+                    world.entities.forEach { entity ->
+                        if (entity is HasLightingRender) {
+                            batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                            entity.renderBlockingEffectBeforeLighting(this, batch, currentTileset)
+
+                            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+                            entity.renderLightingEffect(this, batch, currentTileset)
+
+                            batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                            entity.renderBlockingEffectAfterLighting(this, batch, currentTileset)
+                        } else {
+                            // Not a light emitter, so just render the blocking effect using Entity.render
+                            batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                            entity.render(this, batch, currentTileset)
+                        }
                     }
                 }
             }
