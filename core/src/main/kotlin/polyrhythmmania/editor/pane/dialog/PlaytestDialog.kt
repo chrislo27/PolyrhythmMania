@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
@@ -93,15 +92,6 @@ class PlaytestDialog(editorPane: EditorPane) : EditorDialog(editorPane, mergeTop
             this.renderAlign.set(Align.center)
             this.markup.set(editorPane.palette.markup)
         }
-    }
-
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-        val renderer = editor.renderer
-        val texreg = this.previewTr
-        texreg.setRegion(renderer.mainFrameBuffer?.colorBufferTexture ?: editor.previewTextureRegion.texture)
-        texreg.flip(false, true)
-        
-        super.renderSelf(originX, originY, batch)
     }
 
     override fun onCloseDialog() {
