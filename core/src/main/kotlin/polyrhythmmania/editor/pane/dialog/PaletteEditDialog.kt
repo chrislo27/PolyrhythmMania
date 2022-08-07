@@ -32,11 +32,14 @@ import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.ColourPicker
 import polyrhythmmania.ui.PRManiaSkins
-import polyrhythmmania.world.*
+import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.texturepack.StockTexturePacks
-import polyrhythmmania.world.tileset.*
+import polyrhythmmania.world.tileset.ColorMapping
+import polyrhythmmania.world.tileset.Tileset
+import polyrhythmmania.world.tileset.TilesetPalette
+import polyrhythmmania.world.tileset.TintedRegion
 import kotlin.math.sign
 
 
@@ -566,11 +569,13 @@ class PaletteEditDialog(
             val prevMatrix = Matrix4Stack.getAndPush().set(batch.projectionMatrix)
             batch.projectionMatrix = cam.combined
             val frameBuffer = editor.previewFrameBuffer
-            frameBuffer.begin()
-            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-            worldRenderer.render(batch)
-            frameBuffer.end()
+            if (frameBuffer != null) {
+                frameBuffer.begin()
+                Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+                worldRenderer.render(batch)
+                frameBuffer.end()
+            }
             batch.projectionMatrix = prevMatrix
             batch.begin()
 

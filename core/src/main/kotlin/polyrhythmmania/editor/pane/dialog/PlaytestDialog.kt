@@ -22,9 +22,7 @@ import polyrhythmmania.editor.pane.EditorPane
 
 class PlaytestDialog(editorPane: EditorPane) : EditorDialog(editorPane, mergeTopAndContent = true) {
 
-    private val previewTr: TextureRegion = TextureRegion(editor.previewTextureRegion).also { tr ->
-        tr.flip(false, true)
-    }
+    private val previewTr: TextureRegion = editor.previewTextureRegion
     
     init {
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.playtest.title").use() }

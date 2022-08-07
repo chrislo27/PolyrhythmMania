@@ -3,10 +3,12 @@ package polyrhythmmania.util
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
 import paintbox.Paintbox
+import paintbox.PaintboxGame
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
@@ -33,12 +35,16 @@ class FrameBufferManager(
     
     private val loggerTag: String = if (this.tag == "") "FrameBufferManager" else "FrameBufferManager: ${this.tag}"
     private val numBuffers: Int = frameBufferSettings.size
+    private var isDisposed: Boolean = false
+    
     private val framebuffers: Array<NestedFrameBuffer?> = Array(numBuffers) { null }
+    private val fbTexregs: Array<TextureRegion> = Array(numBuffers) { TextureRegion(PaintboxGame.fillTexture) }
+    
     private var lastKnownWindowSize: WindowSize = WindowSize(-1, -1)
     private var framebufferSize: WindowSize = WindowSize(0, 0)
-    private var isDisposed: Boolean = false
 
     fun getFramebuffer(index: Int): NestedFrameBuffer? = framebuffers.getOrNull(index)
+    fun getFramebufferRegion(index: Int): TextureRegion = fbTexregs[index]
     
     /**
      * Call once per frame. May update the frame buffers inside this manager.
@@ -79,9 +85,10 @@ class FrameBufferManager(
         framebuffersArray.fill(null)
         
         var numDisposed = 0
-        oldFbsList.forEach {
-            if (it != null) {
-                it.disposeQuietly()
+        oldFbsList.forEachIndexed { i, fb ->
+            if (fb != null) {
+                fb.disposeQuietly()
+                fbTexregs[i].texture = null
                 numDisposed++
             }
         }
@@ -99,8 +106,13 @@ class FrameBufferManager(
             val newFbHeight = HdpiUtils.toBackBufferY(height)
             framebuffersArray.indices.forEach { i ->
                 val settings = frameBufferSettings[i]
-                framebuffersArray[i] = NestedFrameBuffer(settings.format, newFbWidth, newFbHeight, settings.hasDepth, settings.hasStencil).apply {
+                val newFb = NestedFrameBuffer(settings.format, newFbWidth, newFbHeight, settings.hasDepth, settings.hasStencil).apply {
                     this.colorBufferTexture.setFilter(settings.minFilter, settings.magFilter)
+                }
+                framebuffersArray[i] = newFb
+                fbTexregs[i].also { tr ->
+                    tr.setRegion(newFb.colorBufferTexture)
+                    tr.flip(false, true)
                 }
             }
             this.framebufferSize = WindowSize(newFbWidth, newFbHeight)

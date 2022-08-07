@@ -23,6 +23,7 @@ import paintbox.ui.contextmenu.ContextMenu
 import paintbox.util.DecimalFormats
 import paintbox.util.MathHelper
 import paintbox.util.Vector2Stack
+import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
@@ -54,6 +55,8 @@ import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
+import polyrhythmmania.util.FrameBufferManager
+import polyrhythmmania.util.FrameBufferMgrSettings
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
@@ -105,8 +108,11 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
-    val previewFrameBuffer: NestedFrameBuffer
+    private val previewFbManager: FrameBufferManager = FrameBufferManager(listOf(FrameBufferMgrSettings(Pixmap.Format.RGB888)), tag = "Editor preview", referenceWindowSize = WindowSize(1280, 720))
+    val previewFrameBuffer: NestedFrameBuffer?
+        get() = previewFbManager.getFramebuffer(0)
     val previewTextureRegion: TextureRegion
+        get() = previewFbManager.getFramebufferRegion(0)
     val waveformWindow: WaveformWindow
     val settings: Settings get() = main.settings
 
@@ -191,10 +197,6 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     }
 
     init {
-        previewFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGB888, 1280, 720, true, true)
-        previewTextureRegion = TextureRegion(previewFrameBuffer.colorBufferTexture).also { tr ->
-            tr.flip(false, true)
-        }
         waveformWindow = WaveformWindow(this)
         soundSystem.setPaused(true)
         soundSystem.startRealtime()
@@ -243,12 +245,16 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     }
 
     fun render(delta: Float, batch: SpriteBatch) {
+        previewFbManager.frameUpdate()
+        
         val frameBuffer = this.previewFrameBuffer
-        frameBuffer.begin()
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        renderer.render(batch)
-        frameBuffer.end()
+        if (frameBuffer != null) {
+            frameBuffer.begin()
+            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            renderer.render(batch)
+            frameBuffer.end()
+        }
 
         val camera = uiCamera
         batch.projectionMatrix = camera.combined
@@ -791,7 +797,7 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     }
 
     override fun dispose() {
-        previewFrameBuffer.disposeQuietly()
+        previewFbManager.disposeQuietly()
         waveformWindow.disposeQuietly()
         editorPane.dispose()
 

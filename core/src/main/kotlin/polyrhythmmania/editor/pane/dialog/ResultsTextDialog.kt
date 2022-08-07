@@ -250,15 +250,15 @@ class ResultsTextDialog(editorPane: EditorPane)
             val prevMatrix = Matrix4Stack.getAndPush().set(batch.projectionMatrix)
             batch.projectionMatrix = cam.combined
             val frameBuffer = editor.previewFrameBuffer
-            frameBuffer.begin()
-            Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-            batch.begin()
-            
-            innerSceneRoot.renderAsRoot(batch)
-            
-            batch.end()
-            frameBuffer.end()
+            if (frameBuffer != null) {
+                frameBuffer.begin()
+                Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+                batch.begin()
+                innerSceneRoot.renderAsRoot(batch)
+                batch.end()
+                frameBuffer.end()
+            }
             batch.projectionMatrix = prevMatrix
             batch.begin()
         
