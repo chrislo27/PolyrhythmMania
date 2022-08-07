@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
@@ -54,12 +53,13 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.util.FrameBufferManager
+import polyrhythmmania.util.FrameBufferMgrSettings
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.tileset.TintedRegion
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.math.ceil
-import kotlin.math.roundToInt
 import kotlin.random.Random
 
 
@@ -127,6 +127,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 Corner.BOTTOM_RIGHT -> ((width - 1) - (ix - startX)) + ((height - 1) - (iy - startY))
             }
         }
+        
+        fun forceFinish() {
+            isDone = true
+        }
     }
     
     private val lastProjMatrix: Matrix4 = Matrix4()
@@ -164,6 +168,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
     // Related to tile flip effect --------------------------------------------------------
 
+    private var transitionAway: (() -> Unit)? = null
     private val flipAnimationEnabled: ReadOnlyVar<Boolean> = main.settings.mainMenuFlipAnimation
     val tileSize: Int = 48
     val tilesWidth: Int = ceil(1280f / tileSize).toInt()
@@ -171,19 +176,21 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val tiles: Array<Array<Tile>> = Array(tilesWidth) { x -> Array(tilesHeight) { y -> Tile(x, y) } }
     var flipAnimation: TileFlip? = null
         private set
+    private val framebufferManager: FrameBufferManager = FrameBufferManager(2, FrameBufferMgrSettings(Pixmap.Format.RGB888), tag = "Main Menu tileflip", referenceWindowSize = WindowSize(1280, 720))
     private var framebufferSwapRequested: Boolean = false
-    private var transitionAway: (() -> Unit)? = null
-    private var framebufferSize: WindowSize = WindowSize(0, 0)
+    private var shouldFramebuffersBeSwapped: Boolean = false
 
     /**
      * The old framebuffer should be the last rendered frame.
      */
-    private lateinit var framebufferOld: NestedFrameBuffer
+    private val framebufferOld: NestedFrameBuffer?
+        get() = framebufferManager.getFramebuffer(if (shouldFramebuffersBeSwapped) 0 else 1)
 
     /**
      * The current framebuffer is what's drawn for this frame.
      */
-    private lateinit var framebufferCurrent: NestedFrameBuffer
+    private val framebufferCurrent: NestedFrameBuffer?
+        get() = framebufferManager.getFramebuffer(if (shouldFramebuffersBeSwapped) 1 else 0)
 
     // Music related ----------------------------------------------------------------------------------------------
     private val menuMusicVolume: FloatVar = FloatVar { 
@@ -229,16 +236,6 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             Paintbox.LOGGER.debug("Finished main menu music decode")
         }
         beadsMusic = BeadsMusic(musicSample)
-    }
-
-    init {
-        val startingWidth = Gdx.graphics.width
-        val startingHeight = Gdx.graphics.height
-        if (startingWidth > 0 && startingHeight > 0) {
-            createFramebuffers(startingWidth, startingHeight, null)
-        } else {
-            createFramebuffers(PRMania.WIDTH, PRMania.HEIGHT, null)
-        }
     }
 
     init {
@@ -393,6 +390,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     override fun render(delta: Float) {
+        framebufferManager.frameUpdate()
+        
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
@@ -403,9 +402,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         
         if (framebufferSwapRequested) {
             framebufferSwapRequested = false
-            val tmpBuffer = framebufferOld
-            framebufferOld = framebufferCurrent
-            framebufferCurrent = tmpBuffer
+            shouldFramebuffersBeSwapped = !shouldFramebuffersBeSwapped
+        }
+        
+        val framebufferCurrent = this.framebufferCurrent
+        val framebufferOld = this.framebufferOld
+        if (framebufferCurrent == null || framebufferOld == null) {
+            return
         }
 
         // Draw active scene
@@ -562,7 +565,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             // Black out frame buffers
             lastProjMatrix.set(batch.projectionMatrix)
             val camera = fullCamera
-            listOf(framebufferOld, framebufferCurrent).forEach { newFB ->
+            listOfNotNull(framebufferOld, framebufferCurrent).forEach { newFB ->
                 newFB.begin()
                 batch.projectionMatrix = camera.combined
                 batch.begin()
@@ -579,44 +582,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         
         return this
     }
-
-    private fun updateFramebuffers() {
-        val cachedFramebufferSize = this.framebufferSize
-        val viewport = fullViewport
-        val width = viewport.worldWidth.roundToInt()
-        val height = viewport.worldHeight.roundToInt()
-        if (width > 0 && height > 0 && (cachedFramebufferSize.width != width || cachedFramebufferSize.height != height)) {
-            createFramebuffers(width, height, Pair(framebufferOld, framebufferCurrent))
-        }
-    }
-
-    private fun createFramebuffers(width: Int, height: Int, oldBuffers: Pair<FrameBuffer, FrameBuffer>?) {
-        oldBuffers?.second?.disposeQuietly()
-        val newFbWidth = HdpiUtils.toBackBufferX(width)
-        val newFbHeight = HdpiUtils.toBackBufferY(height)
-        this.framebufferOld = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
-        this.framebufferCurrent = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true)
-        this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
-        Paintbox.LOGGER.debug("Updated main menu framebuffers to be backbuffer ${newFbWidth}x${newFbHeight} (logical ${width}x${height})")
-        // Render old old FB into new old FB
-        val oldoldFB = oldBuffers?.first
-        if (oldoldFB != null) {
-            lastProjMatrix.set(batch.projectionMatrix)
-            val camera = fullCamera
-            val newFB = this.framebufferOld
-            newFB.begin()
-            batch.projectionMatrix = camera.combined
-            batch.begin()
-            batch.setColor(1f, 1f, 1f, 1f)
-            batch.draw(oldoldFB.colorBufferTexture, 0f, 0f, camera.viewportWidth, camera.viewportHeight, 0f, 0f, 1f, 1f)
-            batch.end()
-            batch.projectionMatrix = lastProjMatrix
-            newFB.end()
-        }
-
-        oldBuffers?.first?.disposeQuietly()
-    }
-
+    
     private fun resetTiles() {
         tiles.forEach { it.forEach { t -> t.reset() } }
     }
@@ -659,12 +625,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         super.resize(width, height)
         fullViewport.update(width, height, true)
         sceneRoot.resize()
-        updateFramebuffers()
     }
 
     override fun dispose() {
-        framebufferOld.disposeQuietly()
-        framebufferCurrent.disposeQuietly()
+        framebufferManager.disposeQuietly()
         soundSys.shutdown()
         soundSys.disposeQuietly()
         StreamUtils.closeQuietly(musicSample)
@@ -675,10 +639,9 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         var consumed = false
         val currentPendingKBBinding = pendingKeyboardBinding.getOrCompute()
         if (currentPendingKBBinding != null) {
-            val status: InputSettingsMenu.PendingKeyboardBinding.Status =
-                    if (keycode == Input.Keys.ESCAPE) {
-                        InputSettingsMenu.PendingKeyboardBinding.Status.CANCELLED
-                    } else InputSettingsMenu.PendingKeyboardBinding.Status.GOOD
+            val status: InputSettingsMenu.PendingKeyboardBinding.Status = if (keycode == Input.Keys.ESCAPE) {
+                InputSettingsMenu.PendingKeyboardBinding.Status.CANCELLED
+            } else InputSettingsMenu.PendingKeyboardBinding.Status.GOOD
             currentPendingKBBinding.onInput(status, keycode)
             this.pendingKeyboardBinding.set(null)
             consumed = true
@@ -688,8 +651,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     override fun getDebugString(): String {
-        return "" +
-                """path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
+        return """path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { it::class.java.simpleName }}
 currentMenu: ${menuCollection.activeMenu.getOrCompute()?.javaClass?.simpleName}
 soundSysPaused: ${soundSys.soundSystem.isPaused} / player: ${soundSys.musicPlayer.isPaused}
 playerPos: ${soundSys.musicPlayer.position}

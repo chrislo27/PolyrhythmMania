@@ -57,8 +57,10 @@ class FrameBufferManager(
      * 
      * If any dimension of the current window size is 0 (possible if the window is minimized),
      * then the [referenceWindowSize] is used as the buffer size.
+     * 
+     * @return True if framebuffers were recreated
      */
-    fun frameUpdate() {
+    fun frameUpdate(): Boolean {
         val cachedWindowSize = this.lastKnownWindowSize
         val nullWindowSize = cachedWindowSize.width == -1 || cachedWindowSize.height == -1
         val windowWidth = Gdx.graphics.width
@@ -79,8 +81,14 @@ class FrameBufferManager(
                 createFramebuffers(vpWidth, vpHeight)
             } else if (nullWindowSize) {
                 createFramebuffers(referenceWindowSize.width, referenceWindowSize.height)
+            } else {
+                return false
             }
+            
+            return true
         }
+        
+        return false
     }
 
     private fun disposeFramebuffers() {
