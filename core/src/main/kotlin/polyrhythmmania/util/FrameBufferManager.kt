@@ -42,6 +42,10 @@ class FrameBufferManager(
     
     private var lastKnownWindowSize: WindowSize = WindowSize(-1, -1)
     private var framebufferSize: WindowSize = WindowSize(0, 0)
+    
+    constructor(numBuffers: Int, settings: FrameBufferMgrSettings, tag: String = "", scaling: Scaling = Scaling.fit,
+                referenceWindowSize: WindowSize = WindowSize(1280, 720))
+        : this(List(numBuffers) { settings }, tag, scaling, referenceWindowSize)
 
     fun getFramebuffer(index: Int): NestedFrameBuffer? = framebuffers.getOrNull(index)
     fun getFramebufferRegion(index: Int): TextureRegion = fbTexregs[index]

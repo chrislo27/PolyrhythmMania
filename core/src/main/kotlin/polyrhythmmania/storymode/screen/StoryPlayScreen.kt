@@ -2,16 +2,13 @@ package polyrhythmmania.storymode.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
-import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.graphics.glutils.HdpiUtils
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.Interpolation.ExpIn
-import com.badlogic.gdx.math.Interpolation.ExpOut
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.utils.viewport.Viewport
-import paintbox.Paintbox
 import paintbox.PaintboxScreen
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
@@ -27,12 +24,9 @@ import paintbox.ui.animation.AnimationHandler
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.QuadElement
-import paintbox.ui.element.RectElement
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
-import paintbox.util.viewport.ExtendNoOversizeViewport
-import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
@@ -49,8 +43,9 @@ import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.ui.TextSlideInterp
+import polyrhythmmania.util.FrameBufferManager
+import polyrhythmmania.util.FrameBufferMgrSettings
 import kotlin.math.max
-import kotlin.math.roundToInt
 
 
 class StoryPlayScreen(
@@ -73,17 +68,7 @@ class StoryPlayScreen(
     private var disableCatchingCursorOnHide: Boolean = false
 
     private val blurShader: ShaderProgram = GaussianBlur.createShaderProgram()
-    private lateinit var gameplayFrameBuffer: NestedFrameBuffer
-    private lateinit var gameplayFrameBuffer2: NestedFrameBuffer
-    private var framebufferSize: WindowSize = WindowSize(0, 0)
-
-    /**
-     * Used to compute the framebuffer size (locked aspect ratio of 16:9)
-     */
-    private val fullViewport: Viewport = ExtendNoOversizeViewport(1280f, 720f, OrthographicCamera().apply {
-        this.setToOrtho(false, 1280f, 720f)
-        this.update()
-    })
+    private val framebufferMgr: FrameBufferManager = FrameBufferManager(2, FrameBufferMgrSettings(Pixmap.Format.RGB888), tag = "StoryPlayScreen", referenceWindowSize = WindowSize(1280, 720))
     
     // Intro card
     private val introCardDefaultDuration: Float = 3f
@@ -201,31 +186,6 @@ class StoryPlayScreen(
             }
         }
     }
-    
-    init {
-        val startingWidth = Gdx.graphics.width
-        val startingHeight = Gdx.graphics.height
-        if (startingWidth > 0 && startingHeight > 0) {
-            createFramebuffers(startingWidth, startingHeight, null, null)
-        } else {
-            createFramebuffers(PRMania.WIDTH, PRMania.HEIGHT, null, null)
-        }
-    }
-    
-    private fun createFramebuffers(width: Int, height: Int, oldBuffer: FrameBuffer?, oldBuffer2: FrameBuffer?) {
-        oldBuffer?.disposeQuietly()
-        oldBuffer2?.disposeQuietly()
-        val newFbWidth = HdpiUtils.toBackBufferX(width)
-        val newFbHeight = HdpiUtils.toBackBufferY(height)
-        this.gameplayFrameBuffer = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply { 
-            this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-        }
-        this.gameplayFrameBuffer2 = NestedFrameBuffer(Pixmap.Format.RGB888, newFbWidth, newFbHeight, true).apply { 
-            this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-        }
-        this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
-        Paintbox.LOGGER.debug("Updated gameplay framebuffer to be backbuffer ${newFbWidth}x${newFbHeight} (logical ${width}x${height})")
-    }
 
     override fun initializeGameplay() {
         super.initializeGameplay()
@@ -255,81 +215,73 @@ class StoryPlayScreen(
         soundSystem.setPaused(false)
     }
 
-    override fun resize(width: Int, height: Int) {
-        super.resize(width, height)
-        
-        fullViewport.update(width, height, true)
-        val cachedFramebufferSize = this.framebufferSize
-        val viewport = fullViewport
-        val width = viewport.worldWidth.roundToInt()
-        val height = viewport.worldHeight.roundToInt()
-        if (width > 0 && height > 0 && (cachedFramebufferSize.width != width || cachedFramebufferSize.height != height)) {
-            createFramebuffers(width, height, this.gameplayFrameBuffer, this.gameplayFrameBuffer2)
-        }
-    }
-
     override fun renderGameplay(delta: Float) {
+        framebufferMgr.frameUpdate()
+        
         val batch = this.batch
-        val frameBuffer = this.gameplayFrameBuffer
-        val frameBuffer2 = this.gameplayFrameBuffer2
-        frameBuffer.begin()
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        worldRenderer.render(batch)
-        frameBuffer.end()
+        val frameBuffer = this.framebufferMgr.getFramebuffer(0)
+        val frameBuffer2 = this.framebufferMgr.getFramebuffer(1)
         
-        
-        // Do blur
-        val passes = 7
-        val blurStrength = this.blurStrength.get()
-        var readBuffer = frameBuffer
-        var writeBuffer = frameBuffer2
-        
-        val cam = this.uiCamera // 1280x720 camera always
-        val shader = this.blurShader
-        batch.projectionMatrix = cam.combined
-        
-        if (blurStrength > 0f) {
-            batch.shader = shader
-            batch.begin()
-            batch.setColor(1f, 1f, 1f, 1f)
+        if (frameBuffer != null && frameBuffer2 != null) {
+            frameBuffer.begin()
+            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            worldRenderer.render(batch)
+            frameBuffer.end()
 
-            shader.setUniformf("resolution", max(cam.viewportHeight, cam.viewportWidth))
 
-            for (i in 0 until passes * 2) {
-                val radius = (passes - i / 2) * blurStrength
+            // Do blur
+            val passes = 7
+            val blurStrength = this.blurStrength.get()
+            var readBuffer: NestedFrameBuffer = frameBuffer
+            var writeBuffer: NestedFrameBuffer = frameBuffer2
 
-                writeBuffer.begin()
-                if (i % 2 == 0) {
-                    shader.setUniformf("dir", radius, 0f)
-                } else {
-                    shader.setUniformf("dir", 0f, radius)
+            val cam = this.uiCamera // 1280x720 camera always
+            val shader = this.blurShader
+            batch.projectionMatrix = cam.combined
+
+            if (blurStrength > 0f) {
+                batch.shader = shader
+                batch.begin()
+                batch.setColor(1f, 1f, 1f, 1f)
+
+                shader.setUniformf("resolution", max(cam.viewportHeight, cam.viewportWidth))
+
+                for (i in 0 until passes * 2) {
+                    val radius = (passes - i / 2) * blurStrength
+
+                    writeBuffer.begin()
+                    if (i % 2 == 0) {
+                        shader.setUniformf("dir", radius, 0f)
+                    } else {
+                        shader.setUniformf("dir", 0f, radius)
+                    }
+                    val bufferTex = readBuffer.colorBufferTexture
+                    batch.draw(bufferTex, 0f, 0f, cam.viewportWidth, cam.viewportHeight, 0, 0, bufferTex.width, bufferTex.height, false, true)
+                    batch.flush()
+                    writeBuffer.end()
+
+
+                    // Swap buffers
+                    val tmp = readBuffer
+                    readBuffer = writeBuffer
+                    writeBuffer = tmp
                 }
-                val bufferTex = readBuffer.colorBufferTexture
-                batch.draw(bufferTex, 0f, 0f, cam.viewportWidth, cam.viewportHeight, 0, 0, bufferTex.width, bufferTex.height, false, true)
-                batch.flush()
-                writeBuffer.end()
 
-
-                // Swap buffers
-                val tmp = readBuffer
-                readBuffer = writeBuffer
-                writeBuffer = tmp
+                batch.end()
+                batch.shader = null // Reset shader
             }
 
-            batch.end()
-            batch.shader = null // Reset shader
-        }
-        
 
-        // Render final buffer to screen
-        uiViewport.apply() // 1280x720 viewport always
-        batch.begin()
-        val bufferTex = readBuffer.colorBufferTexture
-        batch.draw(bufferTex, 0f, 0f, cam.viewportWidth, cam.viewportHeight, 0, 0, bufferTex.width, bufferTex.height, false, true)
-        batch.end()
-        
-        main.resetViewportToScreen()
+            // Render final buffer to screen
+            uiViewport.apply() // 1280x720 viewport always
+            batch.begin()
+            val bufferTex = readBuffer.colorBufferTexture
+            batch.draw(bufferTex, 0f, 0f, cam.viewportWidth, cam.viewportHeight, 0, 0, bufferTex.width, bufferTex.height, false, true)
+            batch.end()
+
+            main.resetViewportToScreen()
+        }
     }
 
     override fun renderAfterGameplay(delta: Float, camera: OrthographicCamera) {
@@ -378,7 +330,7 @@ class StoryPlayScreen(
 
     override fun _dispose() {
         super._dispose()
-        this.gameplayFrameBuffer.disposeQuietly()
+        this.framebufferMgr.disposeQuietly()
         this.blurShader.disposeQuietly()
     }
 }
