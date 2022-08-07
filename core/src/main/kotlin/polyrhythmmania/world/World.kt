@@ -204,8 +204,6 @@ class World {
                 this.position.set(10f, 2f, -2f)
             }
             signs.forEach { sign ->
-                sign.position.x += (12 / 32f)
-                sign.position.z += (8 / 32f)
                 list += sign
             }
 
@@ -334,8 +332,6 @@ class World {
             this.position.set(6f, 2f, 0f)
         }
         signs.forEach { sign ->
-            sign.position.x += (12 / 32f)
-            sign.position.z += (8 / 32f)
             addEntity(sign)
         }
 

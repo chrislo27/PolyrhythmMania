@@ -543,8 +543,6 @@ class PaletteEditDialog(
                 this.position.set(6f, 2f, -2f)
             }
             signs.forEach { sign ->
-                sign.position.x += (12 / 32f)
-                sign.position.z += (8 / 32f)
                 world.addEntity(sign)
             }
         }
