@@ -55,7 +55,7 @@ object Contracts {
         add(Contract("air_rally", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj"))
         })
-        add(Contract("first_contact", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
+        add(Contract("first_contact", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.ARCADE) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/first_contact.prmproj"))
         })
         add(Contract("spaceball", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
@@ -64,7 +64,7 @@ object Contracts {
         add(Contract("toss_boys", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/toss_boys.prmproj"))
         })
-        add(Contract("second_contact", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
+        add(Contract("second_contact", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.ARCADE) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/second_contact.prmproj"))
         })
         add(Contract("rhythm_tweezers", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
