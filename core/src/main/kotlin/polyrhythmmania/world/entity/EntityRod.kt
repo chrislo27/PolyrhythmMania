@@ -107,7 +107,7 @@ abstract class EntityRod(world: World, val deployBeat: Float)
     data class CollisionData(
             var collidedWithWall: Boolean = false,
             var velocityY: Float = 0f,
-            var isInAir: Boolean = false,
+//            var isInAir: Boolean = false,
             var bounce: Bounce? = null,
     )
 
@@ -139,7 +139,7 @@ abstract class EntityRod(world: World, val deployBeat: Float)
 
     protected open val collision: CollisionData = CollisionData()
     override val isInAir: Boolean
-        get() = collision.isInAir
+        get() = collision.bounce != null
     
     protected var engineUpdateLastSec: Float = Float.MAX_VALUE
     protected var collisionUpdateLastBeat: Float = Float.MAX_VALUE
