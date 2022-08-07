@@ -6,17 +6,17 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
-import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
 import paintbox.util.*
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.intersects
+import polyrhythmmania.util.FrameBufferManager
+import polyrhythmmania.util.FrameBufferMgrSettings
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.Entity
@@ -25,7 +25,6 @@ import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.render.bg.WorldBackgroundFromWorldType
 import polyrhythmmania.world.tileset.Tileset
 import kotlin.math.floor
-import kotlin.math.roundToInt
 import kotlin.system.measureNanoTime
 
 
@@ -105,30 +104,25 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         setToOrtho(false, 1280f, 720f)
         update()
     }
-    /**
-     * Used to determine when to re-create the framebuffers
-     */
-    private var lastKnownWindowSize: WindowSize = WindowSize(-1, -1)
-    private var framebufferSize: WindowSize = WindowSize(0, 0)
-    private val framebuffers: Array<NestedFrameBuffer?> = Array(3) { null }
+    protected val frameBufferManager: FrameBufferManager = FrameBufferManager(
+            listOf(FrameBufferMgrSettings(Pixmap.Format.RGBA8888), FrameBufferMgrSettings(Pixmap.Format.RGB888), FrameBufferMgrSettings(Pixmap.Format.RGBA8888)),
+            tag = "WorldRenderer", scaling = Scaling.fit, referenceWindowSize = WindowSize(1280, 720)
+    )
     /**
      * Represents the rendered world as a framebuffer. Format has alpha.
      */
-    var mainFrameBuffer: NestedFrameBuffer?
-        get() = framebuffers[0]
-        private set(value) { framebuffers[0] = value }
+    val mainFrameBuffer: NestedFrameBuffer?
+        get() = frameBufferManager.getFramebuffer(0)
     /**
      * Represents the total light portion (ambient light + lighting) as a framebuffer. Format will have no alpha.
      */
-    var totalLightFrameBuffer: NestedFrameBuffer?
-        get() = framebuffers[1]
-        private set(value) { framebuffers[1] = value }
+    val totalLightFrameBuffer: NestedFrameBuffer?
+        get() = frameBufferManager.getFramebuffer(1)
     /**
      * Represents just the lighting portion for entities as a framebuffer. Used to handle "depth clipping". Format has alpha.
      */
-    private var entityLightFrameBuffer: NestedFrameBuffer?
-        get() = framebuffers[2]
-        private set(value) { framebuffers[2] = value }
+    private val entityLightFrameBuffer: NestedFrameBuffer?
+        get() = frameBufferManager.getFramebuffer(2)
 
     
     var entitiesRenderedLastCall: Int = 0
@@ -156,7 +150,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
 
     open fun render(batch: SpriteBatch) {
         // Re-create framebuffers if needed
-        checkForResize()
+        frameBufferManager.frameUpdate()
         
         val camera = this.camera
         // TODO better camera controls and refactoring
@@ -351,67 +345,9 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         }
     }
 
-    private fun checkForResize() { // Must be called on the GL thread.
-        val cachedWindowSize = this.lastKnownWindowSize
-        val nullWindowSize = cachedWindowSize.width == -1 || cachedWindowSize.height == -1
-        val windowWidth = Gdx.graphics.width
-        val windowHeight = Gdx.graphics.height
-        if (((windowWidth > 0 && windowHeight > 0) && (windowWidth != cachedWindowSize.width || windowHeight != cachedWindowSize.height)) || nullWindowSize) {
-            // Width/height MAY be 0.
-            this.lastKnownWindowSize = WindowSize(windowWidth, windowHeight)
-
-            val scaling: Scaling = Scaling.fit
-            val worldSize = Vector2Stack.getAndPush().set(
-                    scaling.apply(fbRenderCamera.viewportWidth, fbRenderCamera.viewportHeight, windowWidth.toFloat(), windowHeight.toFloat())
-            )
-            val vpWidth = worldSize.x.roundToInt()
-            val vpHeight = worldSize.y.roundToInt()
-            Vector2Stack.pop()
-            
-            val cachedFramebufferSize = this.framebufferSize
-            if (vpWidth > 0 && vpHeight > 0 && (cachedFramebufferSize.width != vpWidth || cachedFramebufferSize.height != vpHeight)) {
-                createFramebuffers(vpWidth, vpHeight)
-            } else if (nullWindowSize) {
-                Paintbox.LOGGER.debug("World renderer light framebuffer: nullWindowSize")
-                createFramebuffers(1280, 720)
-            }
-        }
-    }
-    
-    protected fun disposeFramebuffers() {
-        val framebuffersArray = this.framebuffers
-        val oldFbsList = framebuffersArray.toList()
-        framebuffersArray.fill(null)
-        oldFbsList.forEach { it?.disposeQuietly() }
-        Paintbox.LOGGER.debug("Disposed WorldRenderer framebuffers")
-    }
-    
-    protected fun createFramebuffers(width: Int, height: Int) {
-        val framebuffersArray = this.framebuffers
-        disposeFramebuffers()
-        
-        if (!this.isDisposed) {
-            val newFbWidth = HdpiUtils.toBackBufferX(width)
-            val newFbHeight = HdpiUtils.toBackBufferY(height)
-            framebuffersArray.indices.forEach { i ->
-                val format: Pixmap.Format = when (i) {
-                    0 -> Pixmap.Format.RGBA8888 // Main framebuffer needs transparency
-                    1 -> Pixmap.Format.RGB888 // Total light buffer doesn't need alpha
-                    2 -> Pixmap.Format.RGBA8888 // Intermediate light buffer needs transparency
-                    else -> Pixmap.Format.RGB888
-                }
-                framebuffersArray[i] = NestedFrameBuffer(format, newFbWidth, newFbHeight, false).apply {
-                    this.colorBufferTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-                }
-            }
-            this.framebufferSize = WindowSize(newFbWidth, newFbHeight)
-            Paintbox.LOGGER.debug("Updated world renderer light framebuffer to be backbuffer ${newFbWidth}x${newFbHeight} (logical ${width}x${height})")
-        }
-    }
-
     override fun dispose() {
         removeWorldHooks()
-        disposeFramebuffers()
+        frameBufferManager.disposeQuietly()
         isDisposed = true
     }
 
