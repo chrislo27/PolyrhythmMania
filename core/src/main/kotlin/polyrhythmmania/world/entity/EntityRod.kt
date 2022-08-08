@@ -3,6 +3,7 @@ package polyrhythmmania.world.entity
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
@@ -92,6 +93,12 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
 //        batch.fillRect(vec.x, vec.y, 0.1f, 0.1f)
 //        batch.fillRect(vec.x + unscaledRenderWidth / 2, vec.y + unscaledRenderHeight / 2, 0.1f, 0.1f)
 //        batch.setColor(1f, 1f, 1f, 1f)
+    }
+
+    override fun setCullingRect(rect: Rectangle, tmpVec3: Vector3) {
+        super.setCullingRect(rect, tmpVec3)
+        rect.x += this.offsetX
+        rect.y += this.offsetY
     }
 }
 
