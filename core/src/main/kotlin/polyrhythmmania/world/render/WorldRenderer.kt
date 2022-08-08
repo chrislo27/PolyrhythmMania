@@ -194,8 +194,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             
             world.sortEntitiesByRenderOrder()
             world.entities.forEach { entity ->
-                val convertedVec = convertWorldToScreen(tmpEntityVec.set(entity.position))
-                tmpEntityRect.set(convertedVec.x, convertedVec.y, entity.renderWidth, entity.renderHeight)
+                entity.setCullingRect(tmpEntityRect, tmpEntityVec)
                 // Only render entities that are in scene
                 if (tmpEntityRect.intersects(visibleAreaRect)) {
                     entitiesRendered++
@@ -238,6 +237,9 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             // Entities either block or emit light
             batch.setColor(1f, 1f, 1f, 1f)
             this.entityRenderTimeNano += measureNanoTime {
+                val tmpEntityVec = Vector3Stack.getAndPush()
+                val tmpEntityRect = RectangleStack.getAndPush()
+                
                 if (world.entities.any { it is HasLightingRender }) {
 //                    world.sortEntitiesByRenderOrder(WorldRenderer.comparatorRenderOrderLighting)
                     world.entities.forEach { entity ->
@@ -251,12 +253,18 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                             batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
                             entity.renderBlockingEffectAfterLighting(this, batch, currentTileset)
                         } else {
-                            // Not a light emitter, so just render the blocking effect using Entity.render
-                            batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
-                            entity.render(this, batch, currentTileset)
+                            entity.setCullingRect(tmpEntityRect, tmpEntityVec)
+                            if (tmpEntityRect.intersects(visibleAreaRect)) {
+                                // Not a light emitter, so just render the blocking effect using Entity.render
+                                batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                                entity.render(this, batch, currentTileset)
+                            }
                         }
                     }
                 }
+                
+                RectangleStack.pop()
+                Vector3Stack.pop()
             }
             
             batch.end()

@@ -2,6 +2,7 @@ package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.ColorStack
 import polyrhythmmania.world.World
@@ -16,8 +17,8 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
     var tintIsMultiplied: Boolean = true
 
 
-    protected open val pxOffsetX: Float = 0f
-    protected open val pxOffsetY: Float = 0f
+    open val pxOffsetX: Float = 0f
+    open val pxOffsetY: Float = 0f
     
     abstract fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion?
 
@@ -43,5 +44,11 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
             }
         }
         ColorStack.pop()
+    }
+
+    override fun setCullingRect(rect: Rectangle, tmpVec3: Vector3) {
+        super.setCullingRect(rect, tmpVec3)
+        rect.x += pxOffsetX
+        rect.y += pxOffsetY
     }
 }
