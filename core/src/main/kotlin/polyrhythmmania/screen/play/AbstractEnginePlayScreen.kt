@@ -13,6 +13,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.InputCalibration
+import polyrhythmmania.engine.ResultFlag
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.gamemodes.GameMode
@@ -56,9 +57,18 @@ abstract class AbstractEnginePlayScreen(
             }
         }
     }
+    private val resultFlagListener: VarChangedListener<ResultFlag> = VarChangedListener {
+        val flag = it.getOrCompute()
+        if (flag != ResultFlag.NONE) {
+            Gdx.app.postRunnable {
+                onResultFlagChanged(flag)
+            }
+        }
+    }
 
     init {
         engine.endSignalReceived.addListener(endSignalListener)
+        engine.resultFlag.addListener(resultFlagListener)
     }
     
 
@@ -103,6 +113,12 @@ abstract class AbstractEnginePlayScreen(
         container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
             engine.inputter.submitInputsFromRod(rod)
         }
+    }
+
+    /**
+     * Will be triggered in the gdx main thread.
+     */
+    protected open fun onResultFlagChanged(flag: ResultFlag) {
     }
     
     
@@ -232,6 +248,7 @@ abstract class AbstractEnginePlayScreen(
         // NOTE: container instance is disposed separately.
         // Additionally, the sound system is disposed in the container, so it doesn't have to be stopped.
         engine.endSignalReceived.removeListener(endSignalListener)
+        engine.resultFlag.removeListener(resultFlagListener)
     }
 
     override fun getDebugString(): String {
