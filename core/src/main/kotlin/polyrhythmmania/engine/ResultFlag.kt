@@ -23,6 +23,7 @@ sealed class ResultFlag {
     open class Fail(val tagline: ReadOnlyVar<String>) : ResultFlag() {
         
         object Generic : Fail(Localization.getVar("resultFlag.fail.generic"))
+        object PerfectLost : Fail(Localization.getVar("resultFlag.fail.perfectLost"))
         object RanOutOfLives : Fail(Localization.getVar("resultFlag.fail.ranOutOfLives"))
         object TooManyDefectiveRods : Fail(Localization.getVar("resultFlag.fail.tooManyDefectiveRods"))
         object MonsterGoal : Fail(Localization.getVar("resultFlag.fail.monsterGoal"))

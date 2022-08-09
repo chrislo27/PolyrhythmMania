@@ -1,6 +1,7 @@
 package polyrhythmmania.engine.modifiers
 
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.engine.ResultFlag
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
@@ -29,6 +30,7 @@ class PerfectChallengeData(parent: EngineModifiers) : ModifierModule(parent) {
             this.hit = 1f
 
             val engine = inputter.engine
+            engine.resultFlag.set(ResultFlag.Fail.PerfectLost)
             engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
                 player.gain = 0.45f
             }
