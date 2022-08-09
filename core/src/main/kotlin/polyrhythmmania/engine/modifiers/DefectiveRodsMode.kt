@@ -75,6 +75,6 @@ class DefectiveRodsMode(parent: EngineModifiers) : ModifierModule(parent) {
     private fun onAllLivesLost(inputter: EngineInputter) {
         val engine = inputter.engine
         
-        engine.resultFlag.set(ResultFlag.FAIL)
+        engine.resultFlag.set(ResultFlag.Fail.TooManyDefectiveRods)
     }
 }

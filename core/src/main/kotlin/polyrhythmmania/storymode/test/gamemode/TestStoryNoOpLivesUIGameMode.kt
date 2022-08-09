@@ -31,7 +31,7 @@ class TestStoryNoOpLivesUIGameMode(main: PRManiaGame) : TestStoryGameMode(main) 
             if (newMaxLives in 1..10) {
                 livesMode.maxLives.set(newMaxLives)
                 livesMode.lives.set(newMaxLives)
-                engine.resultFlag.set(ResultFlag.NONE)
+                engine.resultFlag.set(ResultFlag.None)
             }
         }
         

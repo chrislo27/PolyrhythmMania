@@ -59,7 +59,7 @@ abstract class AbstractEnginePlayScreen(
     }
     private val resultFlagListener: VarChangedListener<ResultFlag> = VarChangedListener {
         val flag = it.getOrCompute()
-        if (flag != ResultFlag.NONE) {
+        if (flag != ResultFlag.None) {
             Gdx.app.postRunnable {
                 onResultFlagChanged(flag)
             }

@@ -130,7 +130,7 @@ class MonsterGoalData(parent: EngineModifiers) : ModifierModule(parent) {
     fun onGameOver(beat: Float) {
         // TODO
 //        engine.playbackSpeed = 1f
-        engine.resultFlag.set(ResultFlag.FAIL)
+        engine.resultFlag.set(ResultFlag.Fail.MonsterGoal)
     }
     
     fun onAceHit(silent: Boolean = false) {

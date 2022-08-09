@@ -57,7 +57,7 @@ class Engine(timingProvider: TimingProvider,
     
     var activeTextBox: ActiveTextBox? = null
         private set
-    val resultFlag: Var<ResultFlag> = Var(ResultFlag.NONE)
+    val resultFlag: Var<ResultFlag> = Var(ResultFlag.None)
     
     init {
         // Flush metrics when end signal received
@@ -73,7 +73,7 @@ class Engine(timingProvider: TimingProvider,
      */
     fun resetMutableState() {
         this.removeEvents(this.events.toList())
-        this.resultFlag.set(ResultFlag.NONE)
+        this.resultFlag.set(ResultFlag.None)
         this.inputter.areInputsLocked = this.autoInputs
         this.inputter.resetState()
         this.modifiers.resetState()
