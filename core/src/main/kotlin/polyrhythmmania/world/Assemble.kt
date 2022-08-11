@@ -281,7 +281,7 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
 
 }
 
-class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBeat) {
+class EntityRodAsm(world: World, deployBeat: Float, val rodID: Int) : EntityRod(world, deployBeat) {
 
     data class BounceAsm(val startBeat: Float, val duration: Float,
                          val peakHeight: Float,
@@ -459,6 +459,7 @@ class EntityRodAsm(world: World, deployBeat: Float) : EntityRod(world, deployBea
             this.addInputResult(engine, InputResult(expected.inputBeat, InputType.A, 0f, 0f, 0))
             val inputter = engine.inputter
             inputter.inputFeedbackFlashes[inputter.getInputFeedbackIndex(InputScore.ACE, false)] = seconds
+            inputter.attemptSkillStar(expected.inputBeat)
 
             val asmPlayerPiston = world.asmPlayerPiston
             if (asmPlayerPiston.animation is EntityPistonAsm.Animation.Neutral) {

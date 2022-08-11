@@ -30,7 +30,9 @@ abstract class AbstractStoryAsmGameMode(
         container.addBlocks(list.map { it.block })
     }
     
-    protected fun newBouncePattern(startBeat: Float, startOnLeft: Boolean, numBouncesInclFire: Int, beatsPerBounce: Float = 1f, firstBeatsPerBounce: Float = beatsPerBounce): BouncePattern {
+    protected fun newBouncePattern(startBeat: Float, startOnLeft: Boolean, numBouncesInclFire: Int,
+                                   beatsPerBounce: Float = 1f, firstBeatsPerBounce: Float = beatsPerBounce,
+                                   rodID: Int = -1): BouncePattern {
         val indices: List<Int> = buildList {
             var goingRight = startOnLeft
             var next: Int = if (numBouncesInclFire == 1) 2 else (if (startOnLeft) 0 else 3)
@@ -50,7 +52,7 @@ abstract class AbstractStoryAsmGameMode(
                 }
             }
         }
-        val block = BlockAsmBouncePattern(startBeat, if (startOnLeft) -1 else 999, indices, beatsPerBounce, firstBeatsPerBounce)
+        val block = BlockAsmBouncePattern(startBeat, if (startOnLeft) -1 else 999, indices, beatsPerBounce, firstBeatsPerBounce, rodID)
         return BouncePattern(block, block.getNumInputs())
     }
 
@@ -60,7 +62,8 @@ abstract class AbstractStoryAsmGameMode(
 
     protected inner class BlockAsmBouncePattern(
             startBeat: Float, val startIndex: Int, val bounceIndices: List<Int>,
-            val beatsPerBounce: Float = 1f, val firstBeatsPerBounce: Float = beatsPerBounce
+            val beatsPerBounce: Float = 1f, val firstBeatsPerBounce: Float = beatsPerBounce,
+            val rodID: Int = -1
     ) : Block(engine, EnumSet.allOf(BlockType::class.java)) {
 
         init {
@@ -78,7 +81,8 @@ abstract class AbstractStoryAsmGameMode(
             var prevIndex = startIndex
             bounceIndices.forEachIndexed { i, targetIndex ->
                 list += EventAsmRodBounce(engine, if (i == 0) (beatsPerBounce - firstBeatsPerBounce) else (i * beatsPerBounce),
-                        prevIndex, targetIndex, endsWithPlayer && i == bounceIndices.size - 1, timePerBounce = if (i == 0) firstBeatsPerBounce else beatsPerBounce)
+                        prevIndex, targetIndex, endsWithPlayer && i == bounceIndices.size - 1,
+                        timePerBounce = if (i == 0) firstBeatsPerBounce else beatsPerBounce, targetRodID = rodID)
                 
                 prevIndex = targetIndex
             }

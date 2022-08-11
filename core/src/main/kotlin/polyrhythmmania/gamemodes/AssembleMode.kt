@@ -296,7 +296,7 @@ class BlockAsmReset(engine: Engine) : Block(engine, EnumSet.allOf(BlockType::cla
     override fun copy(): Block = throw NotImplementedError("Copy not implemented for BlockAsmReset")
 }
 
-abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float) : AudioEvent(engine) {
+abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float, val targetRodID: Int) : AudioEvent(engine) {
     
     init {
         this.beat = startBeat
@@ -306,7 +306,7 @@ abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float) : AudioEven
 
     override fun onStart(currentBeat: Float) {
         engine.world.entities.forEach { e ->
-            if (e is EntityRodAsm && e.acceptingInputs) {
+            if (e is EntityRodAsm && e.acceptingInputs && targetRodID == e.rodID) {
                 onStartRod(currentBeat, e)
             }
         }
@@ -323,10 +323,12 @@ abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float) : AudioEven
  * If the [fromIndex] is the player index, then a conditional bounce is scheduled,
  * requiring the previous input to be hit for the bounce to succeed.
  */
-class EventAsmRodBounce(engine: Engine, startBeat: Float,
-                        val fromIndex: Int, val toIndex: Int,
-                        val nextInputIsFire: Boolean = false, val timePerBounce: Float = 1f)
-    : AbstractEventAsmRod(engine, startBeat) {
+class EventAsmRodBounce(
+        engine: Engine, startBeat: Float,
+        val fromIndex: Int, val toIndex: Int,
+        val nextInputIsFire: Boolean = false, val timePerBounce: Float = 1f,
+        targetRodID: Int = -1
+) : AbstractEventAsmRod(engine, startBeat, targetRodID) {
 
     override fun onStartRod(currentBeat: Float, rod: EntityRodAsm) {
         bounceRod(rod)
@@ -336,7 +338,7 @@ class EventAsmRodBounce(engine: Engine, startBeat: Float,
         val world = engine.world
         if (fromIndex !in 0 until world.asmPistons.size) {
             // Out of bounds. Spawn a new rod
-            val newRod = EntityRodAsm(world, this.beat)
+            val newRod = EntityRodAsm(world, this.beat, this.targetRodID)
             world.addEntity(newRod)
             bounceRod(newRod)
 
