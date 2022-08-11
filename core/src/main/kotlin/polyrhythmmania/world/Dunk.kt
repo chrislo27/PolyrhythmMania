@@ -12,18 +12,18 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputScore
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.gamemodes.EventIncrementEndlessScore
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.entity.*
 import polyrhythmmania.world.entity.EntityRod.Companion.MIN_COLLISION_UPDATE_RATE
-import polyrhythmmania.world.tileset.Tileset
-import polyrhythmmania.world.tileset.TintedRegion
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.render.bg.WorldBackground
+import polyrhythmmania.world.tileset.Tileset
+import polyrhythmmania.world.tileset.TintedRegion
 import kotlin.math.floor
-import kotlin.math.roundToInt
 
 
 class EntityDunkBasketBack(world: World) : SpriteEntity(world) {
@@ -445,7 +445,13 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
                 // Auto-inputs
                 if (engine.autoInputs) {
                     if (collision.velocityY == 0f && currentIndexFloat in 0.25f..0.65f) {
+                        val perfectBeat = deployBeat + 3f
                         dunkPiston.fullyExtend(engine, beat)
+                        this.bounce(engine, InputResult(perfectBeat, InputType.A, 0f, 0f, 0))
+
+                        val inputter = engine.inputter
+                        inputter.attemptSkillStar(perfectBeat)
+                        inputter.inputFeedbackFlashes[inputter.getInputFeedbackIndex(InputScore.ACE, false)] = seconds
                     }
                 }
             }
