@@ -82,6 +82,9 @@ object Contracts {
         add(Contract("bouncy_road", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.MODERN) { main ->
             StoryAsmGameModeBouncyRoad(main)
         })
+        add(Contract("bouncy_road_2", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.MODERN) { main ->
+            StoryAsmGameModeBouncyRoad2(main)
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
