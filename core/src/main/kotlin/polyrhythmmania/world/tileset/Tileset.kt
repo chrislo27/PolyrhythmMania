@@ -3,8 +3,8 @@ package polyrhythmmania.world.tileset
 import com.badlogic.gdx.graphics.Color
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
-import polyrhythmmania.world.texturepack.TexturePack
 import polyrhythmmania.world.texturepack.PackTexRegion
+import polyrhythmmania.world.texturepack.TexturePack
 
 
 /**
@@ -156,10 +156,12 @@ class Tileset(val texturePack: ReadOnlyVar<TexturePack>) {
     }
     
     // ASSEMBLE
-    val asmLane: TintedRegion = TintedRegion("asm_lane")
+    val asmLaneBorder: TintedRegion = TintedRegion("asm_lane_border", pistonDpadFaceXColor) // Uses color mapping for pistonDpadFaceX
+    val asmLaneTop: TintedRegion = TintedRegion("asm_lane_top", pistonDpadFaceZColor) // Uses color mapping for pistonDpadFaceZ
+    val asmLaneSides: TintedRegion = TintedRegion("asm_lane_sides", cubeFaceZ.color) // Uses color mapping for cubeFaceZ
     val asmCentrePerp: TintedRegion = TintedRegion("asm_centre_perp")
     val asmCentrePerpTarget: TintedRegion = TintedRegion("asm_centre_perp_target")
-    val asmCube: TintedRegion = TintedRegion("asm_cube")
+    val asmCubeFaceY: TintedRegion = TintedRegion("asm_cube_face_y", cubeFaceY.color)
     val asmPistonA: TintedRegion = TintedRegion("asm_piston_a")
     val asmPistonAExtended: TintedRegion = TintedRegion("asm_piston_a_extended")
     val asmPistonAPartial: TintedRegion = TintedRegion("asm_piston_a_partial")

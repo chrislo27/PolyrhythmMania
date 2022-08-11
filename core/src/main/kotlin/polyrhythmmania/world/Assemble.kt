@@ -10,8 +10,6 @@ import com.badlogic.gdx.math.Vector3
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.animation.Animation
-import polyrhythmmania.animation.AnimationPlayer
-import polyrhythmmania.animation.Step
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.InputResult
@@ -30,7 +28,8 @@ import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.render.bg.WorldBackground
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
-import kotlin.math.*
+import kotlin.math.floor
+import kotlin.math.pow
 
 
 
@@ -53,16 +52,32 @@ open class EntityAsmCube(world: World)
     constructor(world: World, tint: Color) : this(world) {
         this.tint = tint
     }
-    
+
+    override val numLayers: Int = 4
+
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
-        return tileset.asmCube
+        return when (index) {
+            0 -> tileset.cubeBorder
+            1 -> tileset.cubeFaceX
+            2 -> tileset.asmCubeFaceY
+            3 -> tileset.cubeFaceZ
+            else -> null
+        }
     }
 }
 
 open class EntityAsmLane(world: World)
     : SpriteEntity(world) {
+    
+    override val numLayers: Int = 3
+
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
-        return tileset.asmLane
+        return when (index) {
+            0 -> tileset.asmLaneBorder
+            1 -> tileset.asmLaneSides
+            2 -> tileset.asmLaneTop
+            else -> tileset.asmLaneBorder
+        }
     }
 }
 

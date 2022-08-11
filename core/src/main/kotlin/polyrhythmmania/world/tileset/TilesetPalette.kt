@@ -83,8 +83,9 @@ class TilesetPalette {
             return createGBA1TilesetPalette().apply {
                 pistonAFaceX.color.getOrCompute().set(214, 181, 8)
                 pistonAFaceZ.color.getOrCompute().set(255, 214, 16)
-                pistonDpadFaceX.color.getOrCompute().set(214, 181, 8)
-                pistonDpadFaceZ.color.getOrCompute().set(255, 214, 16)
+                
+                aliasAsmLaneBorder.color.getOrCompute().set(41, 172, 18)
+                aliasAsmLaneTop.color.getOrCompute().set(137, 255, 84)
             }
         }
 
@@ -135,6 +136,10 @@ class TilesetPalette {
             backgroundBack, backgroundMiddle, backgroundFore) + listOf(cubeFaceX) /* Deprioritized to be later in the list. */
     val allMappingsByID: Map<String, ColorMapping> = allMappings.associateBy { it.id }
 
+    // Extra mapping aliases, DO NOT ADD to allMappings
+    val aliasAsmLaneBorder: ColorMapping get() = pistonDpadFaceX
+    val aliasAsmLaneTop: ColorMapping get() = pistonDpadFaceZ
+    
     fun copy(): TilesetPalette {
         return TilesetPalette().also { copy ->
             val copyMap = copy.allMappings.associateBy { it.id }

@@ -178,10 +178,12 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
         add(PackTexRegion.create("dunk_star", regionMap.getOrNull("dunk_star")))
         
         // ASSEMBLE
-        add(PackTexRegion.create("asm_lane", regionMap.getOrNull("asm_lane")))
+        add(PackTexRegion.create("asm_lane_border", regionMap.getOrNull("asm_lane_border")))
+        add(PackTexRegion.create("asm_lane_sides", regionMap.getOrNull("asm_lane_sides")))
+        add(PackTexRegion.create("asm_lane_top", regionMap.getOrNull("asm_lane_top")))
         add(PackTexRegion.create("asm_centre_perp", regionMap.getOrNull("asm_centre_perp")))
         add(PackTexRegion.create("asm_centre_perp_target", regionMap.getOrNull("asm_centre_perp_target")))
-        add(PackTexRegion.create("asm_cube", regionMap.getOrNull("asm_cube")))
+        add(PackTexRegion.create("asm_cube_face_y", regionMap.getOrNull("asm_cube_face_y"), RegionSpacing(1, 32, 32)))
         add(PackTexRegion.create("asm_piston_a", regionMap.getOrNull("asm_piston_a"), RegionSpacing(1, 32, 40)))
         add(PackTexRegion.create("asm_piston_a_extended", regionMap.getOrNull("asm_piston_a_extended"), RegionSpacing(1, 32, 40)))
         add(PackTexRegion.create("asm_piston_a_partial", regionMap.getOrNull("asm_piston_a_partial"), RegionSpacing(1, 32, 40)))
