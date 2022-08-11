@@ -4,12 +4,15 @@ import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.Container
 import polyrhythmmania.container.GlobalContainerSettings
-import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
-import polyrhythmmania.engine.*
+import polyrhythmmania.engine.AudioEvent
+import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
@@ -20,6 +23,7 @@ import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.*
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.*
 import kotlin.math.sign
@@ -94,6 +98,7 @@ class AssembleMode(main: PRManiaGame)
 
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
+        blocks += BlockAsmReset(engine)
         blocks += InitializationBlock().apply {
             this.beat = 0f
         }
@@ -260,21 +265,7 @@ class AssembleMode(main: PRManiaGame)
             val minInputs = patterns.count { it is EventAsmRodBounce && it.toIndex == playerPistonIndex }
             engine.inputter.minimumInputCount = minInputs
             
-            val list = listOf(
-                    object : Event(engine) {
-                        override fun onStart(currentBeat: Float) {
-                            engine.playbackSpeed = 1f
-                            world.asmPistons.forEach { it.animation = EntityPistonAsm.Animation.Neutral(it) }
-                        }
-                    }.also { e ->
-                        e.beat = -10000f
-                    },
-
-                    EventAsmPistonRetractAll(engine, -10000f),
-                    ) + patterns
-            
-            
-            return list
+            return patterns
         }
 
         override fun copy(): Block = throw NotImplementedError()
@@ -282,6 +273,28 @@ class AssembleMode(main: PRManiaGame)
 }
 
 // EVENTS ------------------------------------------------------------------------------------------------------
+
+class BlockAsmReset(engine: Engine) : Block(engine, EnumSet.allOf(BlockType::class.java)) {
+    init {
+        this.beat = 0f
+    }
+
+    override fun compileIntoEvents(): List<Event> {
+        return listOf(
+                object : Event(engine) {
+                    override fun onStartContainer(container: Container, currentBeat: Float) {
+                        val world = container.world
+                        world.asmPistons.forEach { it.animation = EntityPistonAsm.Animation.Neutral(it) }
+                    }
+                }.also { e ->
+                    e.beat = -10000f
+                },
+                EventAsmPistonRetractAll(engine, -10000f),
+        )
+    }
+
+    override fun copy(): Block = throw NotImplementedError("Copy not implemented for BlockAsmReset")
+}
 
 abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float) : AudioEvent(engine) {
     

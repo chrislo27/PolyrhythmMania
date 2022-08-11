@@ -13,6 +13,8 @@ class StoryDunkGameModeFruitBasket(main: PRManiaGame)
     : AbstractStoryDunkGameMode(main) {
     
     override fun initialize() {
+        super.initialize()
+        
         engine.tempos.addTempoChange(TempoChange(0f, 151f))
         engine.musicData.volumeMap.addMusicVolume(MusicVolume(0f, 0f, 100))
 
@@ -61,6 +63,8 @@ class StoryDunkGameModeHoleInOne2(main: PRManiaGame)
     : AbstractStoryDunkGameMode(main) {
 
     override fun initialize() {
+        super.initialize()
+        
         val globalBeatOffset = 2f
         
         engine.tempos.addTempoChange(TempoChange(0f, 122f))

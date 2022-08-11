@@ -20,6 +20,7 @@ abstract class AbstractStoryDunkGameMode(
         container.world.worldMode = WorldMode(WorldType.Dunk)
         container.texturePackSource.set(TexturePackSource.StockGBA)
         TilesetPalette.createGBA1TilesetPalette().applyTo(container.renderer.tileset)
+        container.world.tilesetPalette.copyFrom(container.renderer.tileset)
     }
     
     protected open fun newDunkPattern(startBeat: Float): Block {
@@ -38,5 +39,7 @@ abstract class AbstractStoryDunkGameMode(
         engine.inputter.minimumInputCount = list.size
         container.addBlocks(list)
     }
-    
+
+    override fun initialize() {
+    }
 }

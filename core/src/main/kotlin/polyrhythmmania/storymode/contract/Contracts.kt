@@ -1,10 +1,7 @@
 package polyrhythmmania.storymode.contract
 
 import com.badlogic.gdx.Gdx
-import polyrhythmmania.storymode.gamemode.FirstContractGameMode
-import polyrhythmmania.storymode.gamemode.StoryDunkGameModeFruitBasket
-import polyrhythmmania.storymode.gamemode.StoryDunkGameModeHoleInOne2
-import polyrhythmmania.storymode.gamemode.StoryGameModeFromFile
+import polyrhythmmania.storymode.gamemode.*
 
 
 object Contracts {
@@ -81,6 +78,9 @@ object Contracts {
         })
         add(Contract("super_samurai_slice", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.GBA) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/super_samurai_slice.prmproj"))
+        })
+        add(Contract("bouncy_road", listOf(Condition.PASS_THE_LEVEL), 100, Requester.DEBUG, JingleType.MODERN) { main ->
+            StoryAsmGameModeBouncyRoad(main)
         })
     }
     
