@@ -246,6 +246,10 @@ class EngineInputter(val engine: Engine) {
                 rod.bounce(engine, inputResult)
                 if (countsAsMiss) { // Explicitly checking for MISS, since rod.bounce returns immediately if it is MISS
                     missed()
+                } else {
+                    if (inputResult.inputScore == InputScore.ACE) {
+                        attemptSkillStar(perfectBeats)
+                    }
                 }
             }
             world.dunkPiston.fullyExtend(engine, atBeat)
@@ -292,6 +296,9 @@ class EngineInputter(val engine: Engine) {
                     // Bounce the rod
                     if (!countsAsMiss) {
                         rod.addInputResult(engine, inputResult)
+                        if (inputResult.inputScore == InputScore.ACE) {
+                            attemptSkillStar(perfectBeats)
+                        }
                         hit = true
                         hitDuration = 1f
                     }
