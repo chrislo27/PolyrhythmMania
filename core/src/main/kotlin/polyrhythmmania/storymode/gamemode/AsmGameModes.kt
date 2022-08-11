@@ -1,6 +1,7 @@
 package polyrhythmmania.storymode.gamemode
 
 import com.badlogic.gdx.Gdx
+import paintbox.util.gdxutils.set
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockSkillStar
@@ -8,10 +9,25 @@ import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
+import polyrhythmmania.world.tileset.TilesetPalette
 
 
 class StoryAsmGameModeBouncyRoad(main: PRManiaGame)
     : AbstractStoryAsmGameMode(main) {
+    
+    init {
+        TilesetPalette.createAssembleTilesetPalette().also { palette ->
+            palette.cubeBorder.color.getOrCompute().set(0x00, 0x6B, 0xD3).mul(0.9f)
+            palette.cubeBorderZ.color.getOrCompute().set(0x00, 0x58, 0xB2).mul(0.9f)
+            palette.cubeFaceY.color.getOrCompute().set(0x00, 0x94, 0xFF).mul(0.9f)
+            palette.cubeFaceZ.color.getOrCompute().set(0x00, 0x7E, 0xE5).mul(0.9f)
+            palette.cubeFaceX.color.getOrCompute().set(0x00, 0x77, 0xDD).mul(0.9f)
+            
+            palette.aliasAsmLaneBorder.color.getOrCompute().set(0x00, 0x56, 0xA8).mul(0.975f)
+            palette.aliasAsmLaneTop.color.getOrCompute().set(0x7F, 0xFC, 0xFF).mul(0.975f)
+        }.applyTo(container.renderer.tileset)
+        container.world.tilesetPalette.copyFrom(container.renderer.tileset)
+    }
     
     override fun initialize() {
         super.initialize()
