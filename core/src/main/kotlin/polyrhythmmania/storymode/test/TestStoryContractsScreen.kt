@@ -23,7 +23,10 @@ import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
-import paintbox.ui.control.*
+import paintbox.ui.control.Button
+import paintbox.ui.control.ScrollPane
+import paintbox.ui.control.ScrollPaneSkin
+import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
@@ -31,10 +34,9 @@ import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.gamemodes.practice.PracticeTutorial1
 import polyrhythmmania.storymode.StoryL10N
-import polyrhythmmania.storymode.inbox.InboxFolder
 import polyrhythmmania.storymode.inbox.InboxDB
+import polyrhythmmania.storymode.inbox.InboxFolder
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 import kotlin.math.sqrt
@@ -293,7 +295,14 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     
                                     addField(0, "title", item.contract.name.getOrCompute())
                                     addField(1, "requester", item.contract.requester.localizedName.getOrCompute())
-                                    addField(2, "reward", StoryL10N.getValue("inboxItem.contract.reward.value", item.contract.fpReward), monoMarkup)
+                                    this[2] += Pane().apply {
+                                        this.margin.set(Insets(2f))
+                                        this += TextLabel(item.contract.tagline.getOrCompute(), font = main.fontSlab).apply {
+                                            this.textColor.set(Color.BLACK)
+                                            this.renderAlign.set(Align.center)
+                                            this.padding.set(Insets(2f, 2f, 4f, 0f))
+                                        }
+                                    }
                                 }
                                 this += RectElement(Color.BLACK).apply {
                                     this.bounds.height.set(2f)
