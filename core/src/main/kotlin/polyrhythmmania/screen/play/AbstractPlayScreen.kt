@@ -56,6 +56,9 @@ abstract class AbstractPlayScreen(
     val selectedPauseOption: Var<PauseOption?> = Var(null)
     abstract val pauseMenuHandler: PauseMenuHandler
     
+    init {
+        sceneRoot.doClipping.set(true)
+    }
     
     protected abstract fun shouldCatchCursor(): Boolean
     protected abstract fun uncatchCursorOnHide(): Boolean

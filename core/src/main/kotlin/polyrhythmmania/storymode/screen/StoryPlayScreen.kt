@@ -147,6 +147,8 @@ class StoryPlayScreen(
         }
         textSlide = TextSlideInterp(introCardTime)
         
+        introCardSceneRoot.doClipping.set(true)
+        
         // Black bars: Full is 16:9 = 1.778, cinema is 2.35:1 = 2.35. About 25% less height
         val slantAmount = 1f
         val barHeight = 0.125f * 1.25f
@@ -176,7 +178,7 @@ class StoryPlayScreen(
             Anchor.CentreLeft.configure(this)
             this.bindHeightToParent(multiplier = 0.25f)
             
-            this.margin.set(Insets(0f, 0f, 10f, 10f))
+            this.margin.set(Insets(0f, 0f, 40f, 40f))
             this.renderAlign.set(RenderAlign.center)
             this.textColor.set(Color.WHITE.cpy())
             
@@ -290,7 +292,6 @@ class StoryPlayScreen(
         introCardAnimationHandler.frameUpdate()
         
         if (inIntroCard.get()) {
-            uiViewport.apply()
             introCardSceneRoot.renderAsRoot(batch)
             main.resetViewportToScreen()
         }
@@ -299,7 +300,7 @@ class StoryPlayScreen(
     override fun onEndSignalFired() {
         super.onEndSignalFired()
         
-        // TODO
+        // TODO this should show a score check menu
         quitToScreen(exitToScreen)
     }
 
