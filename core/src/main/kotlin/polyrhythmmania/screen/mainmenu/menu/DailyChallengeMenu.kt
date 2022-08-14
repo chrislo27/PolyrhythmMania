@@ -222,7 +222,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         paneNeedsRefresh
                     } else {
                         val list = leaderboardVar.use()
-                        if (list == null || list.isEmpty() || list.values.sumOf { it.size } == 0) {
+                        if (list.isNullOrEmpty() || list.values.sumOf { it.size } == 0) {
                             paneNoData
                         } else {
                             createTable(list, dailyChallengeDate.getOrCompute())
@@ -365,7 +365,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this.temporarilyDisableLayouts {
                         val scores = leaderboard.getOrDefault(date, emptyList())
                         if (scores.isEmpty()) {
-                            this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.noData").use() }).apply {
+                            this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.noData.thisDay").use() }).apply {
                                 this.renderAlign.set(Align.center)
                                 this.doLineWrapping.set(true)
                                 this.markup.set(this@DailyChallengeMenu.markup)
@@ -376,8 +376,17 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 it.patternsVersion == currentPatternsVer
                             }.toList().map { DailyChallengeUtils.mapPlaceNumbers(it.sortedByDescending { s -> s.score }) }
 
-                            compatibleScores.forEach { (score, place) ->
-                                this += score.createPane(place)
+                            if (compatibleScores.isEmpty()) {
+                                this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.noData.thisVersion").use() }).apply {
+                                    this.renderAlign.set(Align.center)
+                                    this.doLineWrapping.set(true)
+                                    this.markup.set(this@DailyChallengeMenu.markup)
+                                    this.bounds.height.set(64f)
+                                }
+                            } else {
+                                compatibleScores.forEach { (score, place) ->
+                                    this += score.createPane(place)
+                                }
                             }
                             
                             if (incompatibleScores.isNotEmpty()) {
