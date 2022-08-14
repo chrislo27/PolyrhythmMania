@@ -29,7 +29,7 @@ data class EndlessHighScore(val seed: UInt, val score: Int) {
     }
 }
 
-data class DailyLeaderboardScore(val countryCode: String, val score: Int, val name: String)
+data class DailyLeaderboardScore(val countryCode: String, val score: Int, val name: String, val gameVersion: String?, val patternsVersion: Int)
 
 typealias DailyLeaderboard = Map<LocalDate, List<DailyLeaderboardScore>>
 
@@ -129,7 +129,9 @@ object DailyChallengeUtils {
                             member.value.asArray().forEach { v ->
                                 v as JsonObject
                                 val countryCode = v["countryCode"]
-                                list += DailyLeaderboardScore(countryCode?.takeIf { it.isString }?.asString() ?: "unknown", v.getInt("score", 0), v.getString("name", ""))
+                                list += DailyLeaderboardScore(countryCode?.takeIf { it.isString }?.asString() ?: "unknown", 
+                                        v.getInt("score", 0), v.getString("name", ""), v.get("gameVersion")?.asString(),
+                                        v.getInt("patternsVersion", 1))
                             }
                             
                             // Merge
@@ -148,6 +150,24 @@ object DailyChallengeUtils {
                 fetching.set(false)
                 listVar.set(returnValue)
             }
+        }
+    }
+    
+    fun mapPlaceNumbers(sortedScoresDescending: List<DailyLeaderboardScore>): Map<DailyLeaderboardScore, Int> {
+        val placeNumbersInverse = mutableMapOf<DailyLeaderboardScore, Int>()
+
+        var placeNumber = 0
+        var placeValue = -1
+        sortedScoresDescending.asReversed().forEachIndexed { i, score ->
+            if (score.score != placeValue) {
+                placeValue = score.score
+                placeNumber = i + 1
+            }
+            placeNumbersInverse[score] = placeNumber
+        }
+        
+        return placeNumbersInverse.mapValues { (_, pl) ->
+            sortedScoresDescending.size - pl + 1
         }
     }
 }

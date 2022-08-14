@@ -14,7 +14,9 @@ import paintbox.ui.ImageNode
 import paintbox.ui.Pane
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
-import paintbox.ui.control.*
+import paintbox.ui.control.ComboBox
+import paintbox.ui.control.ScrollPane
+import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
@@ -24,11 +26,11 @@ import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.gamemodes.EndlessModeScore
+import polyrhythmmania.gamemodes.endlessmode.*
 import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.play.regular.EnginePlayScreenBase
 import polyrhythmmania.screen.play.regular.ResultsBehaviour
-import polyrhythmmania.gamemodes.EndlessModeScore
-import polyrhythmmania.gamemodes.endlessmode.*
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.ui.PRManiaSkins
@@ -312,7 +314,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this.bounds.height.set(32f)
                     this += HBox().apply {
                         this.bindWidthToParent(adjust = -70f)
-                        this += TextLabel("${place}", font = main.fontMainMenuMain).apply {
+                        this += TextLabel("$place", font = main.fontMainMenuMain).apply {
                             this.renderAlign.set(Align.right)
                             this.padding.set(Insets(0f, 0f, 4f, 4f))
                             this.bounds.width.set(48f)
@@ -344,17 +346,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         val list = leaderboard.getOrDefault(date, emptyList())
 
                         val sorted = list.sortedByDescending { it.score }
-                        val placeNumbersInverse = mutableMapOf<DailyLeaderboardScore, Int>()
-                        
-                        var placeNumber = 0
-                        var placeValue = -1
-                        sorted.asReversed().forEachIndexed { i, score ->
-                            if (score.score != placeValue) {
-                                placeValue = score.score
-                                placeNumber = i + 1
-                            }
-                            placeNumbersInverse[score] = placeNumber
-                        }
+                        val placeNumbers = DailyChallengeUtils.mapPlaceNumbers(sorted)
                         
                         if (sorted.isEmpty()) {
                             this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.noData").use() }).apply {
@@ -365,7 +357,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                             }
                         } else {
                             sorted.forEach { score ->
-                                this += score.createPane(sorted.size - placeNumbersInverse.getOrDefault(score, 99999) + 1)
+                                this += score.createPane(placeNumbers.getOrDefault(score, 99999))
                             }
                         }
                     }
