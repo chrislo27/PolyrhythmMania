@@ -75,7 +75,7 @@ object DailyChallengeUtils {
     fun submitHighScore(date: LocalDate, score: Int, name: String, nonce: UUID,
                         noCountry: Boolean) {
         thread(isDaemon = true, name = "Daily Challenge high score submission", start = true) {
-            val uriBuilder = URIBuilder("${ROOT_URL}/prmania/dailychallenge/submit/${date.format(DateTimeFormatter.ISO_DATE)}")
+            val uriBuilder = URIBuilder("${ROOT_URL}/dailychallenge/submit/${date.format(DateTimeFormatter.ISO_DATE)}")
                     .setParameter("v", PRMania.VERSION.toString())
                     .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
                     .setParameter("uuid", nonce.toString())
@@ -154,7 +154,7 @@ object DailyChallengeUtils {
     }
     
     fun mapPlaceNumbers(sortedScoresDescending: List<DailyLeaderboardScore>): Map<DailyLeaderboardScore, Int> {
-        val placeNumbersInverse = mutableMapOf<DailyLeaderboardScore, Int>()
+        val placeNumbersInverse: MutableMap<DailyLeaderboardScore, Int> = sortedScoresDescending.associateWith { 0 }.toMutableMap()
 
         var placeNumber = 0
         var placeValue = -1

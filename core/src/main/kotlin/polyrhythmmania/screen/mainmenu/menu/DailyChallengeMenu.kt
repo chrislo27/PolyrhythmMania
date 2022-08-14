@@ -9,10 +9,7 @@ import paintbox.binding.*
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.Pane
-import paintbox.ui.UIElement
+import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ComboBox
 import paintbox.ui.control.ScrollPane
@@ -309,32 +306,42 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.vBar.blockIncrement.set(40f)
             }
             
+            val currentPatternsVer = EndlessPatterns.ENDLESS_PATTERNS_VERSION
+            
             fun DailyLeaderboardScore.createPane(place: Int): Pane {
-                return Pane().apply {
-                    this.bounds.height.set(32f)
-                    this += HBox().apply {
-                        this.bindWidthToParent(adjust = -70f)
-                        this += TextLabel("$place", font = main.fontMainMenuMain).apply {
+                return PaneWithTooltip().also { pane ->
+                    pane.bounds.height.set(32f)
+                    pane += HBox().also {hbox ->
+                        hbox.bindWidthToParent(adjust = -70f)
+                        hbox += TextLabel("$place", font = main.fontMainMenuMain).apply {
                             this.renderAlign.set(Align.right)
                             this.padding.set(Insets(0f, 0f, 4f, 4f))
                             this.bounds.width.set(48f)
                         }
                         val flag = CountryFlags.getFlagByCountryCode(this@createPane.countryCode)
-                        this += ImageNode(CountryFlags.getTextureRegionForFlag(flag,
+                        hbox += ImageNode(CountryFlags.getTextureRegionForFlag(flag,
                                 AssetRegistry.get<Texture>("country_flags"))).apply {
                             this.bindWidthToSelfHeight()
                         }
-                        this += TextLabel((this@createPane.name.takeUnless { it.isBlank() } ?: "..."), font = main.fontMainMenuThin).apply {
+                        hbox += TextLabel((this.name.takeUnless { it.isBlank() } ?: "..."), font = main.fontMainMenuThin).apply {
                             this.renderAlign.set(Align.left)
                             this.padding.set(Insets(0f, 0f, 4f, 4f))
                             this.bounds.width.set(350f)
                         }
                     }
 
-                    this += TextLabel("${this@createPane.score}", font = main.fontMainMenuMain).apply {
+                    pane += TextLabel("${this.score}", font = main.fontMainMenuMain).apply {
                         Anchor.TopRight.configure(this)
                         this.renderAlign.set(Align.center)
                         this.bounds.width.set(64f)
+                    }
+                    
+                    if (this.patternsVersion != currentPatternsVer) {
+                        val gameVer = this.gameVersion
+                        val pv = this.patternsVersion
+                        pane.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.dailyChallenge.leaderboard.score.tooltip", Var { listOf(gameVer, pv) })).apply { 
+                            this.setScaleXY(0.85f)
+                        })
                     }
                 }
             }
@@ -343,12 +350,8 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             fun updateList(date: LocalDate) {
                 val newPane = VBox().apply { 
                     this.temporarilyDisableLayouts {
-                        val list = leaderboard.getOrDefault(date, emptyList())
-
-                        val sorted = list.sortedByDescending { it.score }
-                        val placeNumbers = DailyChallengeUtils.mapPlaceNumbers(sorted)
-                        
-                        if (sorted.isEmpty()) {
+                        val scores = leaderboard.getOrDefault(date, emptyList())
+                        if (scores.isEmpty()) {
                             this += TextLabel(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.noData").use() }).apply {
                                 this.renderAlign.set(Align.center)
                                 this.doLineWrapping.set(true)
@@ -356,12 +359,35 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this.bounds.height.set(128f)
                             }
                         } else {
-                            sorted.forEach { score ->
-                                this += score.createPane(placeNumbers.getOrDefault(score, 99999))
+                            val (compatibleScores, incompatibleScores) = scores.partition {
+                                it.patternsVersion == currentPatternsVer
+                            }.toList().map { DailyChallengeUtils.mapPlaceNumbers(it.sortedByDescending { s -> s.score }) }
+
+                            compatibleScores.forEach { (score, place) ->
+                                this += score.createPane(place)
+                            }
+                            
+                            if (incompatibleScores.isNotEmpty()) {
+                                this += RectElement(Color().grey(90f / 255f, 0.8f)).apply { 
+                                    this.bounds.height.set(10f + 4 + 2)
+                                    this.margin.set(Insets(10f, 4f, 0f, 0f))
+                                }
+                                this += TextLabel(Localization.getVar("mainMenu.dailyChallenge.leaderboard.incompatibleScores", listOf(currentPatternsVer))).apply {
+                                    this.markup.set(this@DailyChallengeMenu.markup)
+                                    this.setScaleXY(0.75f)
+                                    this.margin.set(Insets(4f, 10f, 4f, 4f))
+                                    this.doLineWrapping.set(true)
+                                    this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
+                                }
+                                incompatibleScores.forEach { (score, place) ->
+                                    this += score.createPane(place)
+                                }
                             }
                         }
                     }
                     this.sizeHeightToChildren(100f)
+                    this.autoSizeMinimumSize.set(100f)
+                    this.autoSizeToChildren.set(true)
                 }
                 
                 scrollPane.setContent(newPane)
