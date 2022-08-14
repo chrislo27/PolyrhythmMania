@@ -11,6 +11,7 @@ import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
+import paintbox.ui.control.CheckBox
 import paintbox.ui.control.ComboBox
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.TextLabel
@@ -58,6 +59,8 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private val scrollPaneContent: Var<Pane> = Var(Pane())
 
     private var showRefreshPrompt: Boolean = true
+    
+    private val onlyShowThisVersionScores: BooleanVar = BooleanVar(false)
     
     init {
         this.setSize(MMMenu.WIDTH_MID)
@@ -255,6 +258,16 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     if (disabled.use() || showRefreshPrompt) null else tt
                 }
             }
+            hbox += CheckBox(binding = { Localization.getVar("mainMenu.dailyChallenge.leaderboard.incompatibleScores.toggle").use() }, font = font).apply {
+                this.bounds.width.set(160f)
+                this.textLabel.setScaleXY(0.65f)
+                this.textLabel.doLineWrapping.set(true)
+                this.imageNode.padding.set(Insets(4f, 4f, 4f, 0f))
+                this.checkedState.set(onlyShowThisVersionScores.get())
+                this.onCheckChanged = {
+                    onlyShowThisVersionScores.set(it)
+                }
+            }
         }
     }
     
@@ -371,16 +384,21 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this += RectElement(Color().grey(90f / 255f, 0.8f)).apply { 
                                     this.bounds.height.set(10f + 4 + 2)
                                     this.margin.set(Insets(10f, 4f, 0f, 0f))
+                                    this.visible.bind { !onlyShowThisVersionScores.use() }
                                 }
-                                this += TextLabel(Localization.getVar("mainMenu.dailyChallenge.leaderboard.incompatibleScores", listOf(currentPatternsVer))).apply {
+                                this += TextLabel(Localization.getVar("mainMenu.dailyChallenge.leaderboard.incompatibleScores")).apply {
                                     this.markup.set(this@DailyChallengeMenu.markup)
                                     this.setScaleXY(0.75f)
                                     this.margin.set(Insets(4f, 10f, 4f, 4f))
                                     this.doLineWrapping.set(true)
                                     this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
+                                    this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.dailyChallenge.leaderboard.incompatibleScores.tooltip", listOf(currentPatternsVer))))
+                                    this.visible.bind { !onlyShowThisVersionScores.use() }
                                 }
                                 incompatibleScores.forEach { (score, place) ->
-                                    this += score.createPane(place)
+                                    this += score.createPane(place).apply {
+                                        this.visible.bind { !onlyShowThisVersionScores.use() }
+                                    }
                                 }
                             }
                         }
