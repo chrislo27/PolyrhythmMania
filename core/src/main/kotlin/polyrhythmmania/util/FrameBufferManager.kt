@@ -114,8 +114,9 @@ class FrameBufferManager(
         disposeFramebuffers()
 
         if (!this.isDisposed) {
-            val newFbWidth = HdpiUtils.toBackBufferX(width)
-            val newFbHeight = HdpiUtils.toBackBufferY(height)
+            // fb width/height has to be at least 1. It can return 0 if the window width and/or height is 0 (minimized)
+            val newFbWidth = HdpiUtils.toBackBufferX(width).coerceAtLeast(1)
+            val newFbHeight = HdpiUtils.toBackBufferY(height).coerceAtLeast(1)
             framebuffersArray.indices.forEach { i ->
                 val settings = frameBufferSettings[i]
                 val newFb = NestedFrameBuffer(settings.format, newFbWidth, newFbHeight, settings.hasDepth, settings.hasStencil).apply {
