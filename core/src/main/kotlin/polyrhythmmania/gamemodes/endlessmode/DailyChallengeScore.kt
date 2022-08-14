@@ -35,13 +35,14 @@ typealias DailyLeaderboard = Map<LocalDate, List<DailyLeaderboardScore>>
 
 object DailyChallengeUtils {
     
+    private const val ROOT_URL: String = "https://api.rhre.dev/prmania"
     const val MIN_SCORE_TO_UNLOCK: Int = 10
     
     val allowedNameChars: Set<Char> = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_".toSet()
 
     fun sendNonceRequestSync(date: LocalDate): UUID? {
         val post = HttpPost(
-                URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/start/${date.format(DateTimeFormatter.ISO_DATE)}")
+                URIBuilder("${ROOT_URL}/dailychallenge/start/${date.format(DateTimeFormatter.ISO_DATE)}")
                         .setParameter("v", PRMania.VERSION.toString())
                         .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
                         .build()
@@ -74,7 +75,7 @@ object DailyChallengeUtils {
     fun submitHighScore(date: LocalDate, score: Int, name: String, nonce: UUID,
                         noCountry: Boolean) {
         thread(isDaemon = true, name = "Daily Challenge high score submission", start = true) {
-            val uriBuilder = URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/submit/${date.format(DateTimeFormatter.ISO_DATE)}")
+            val uriBuilder = URIBuilder("${ROOT_URL}/prmania/dailychallenge/submit/${date.format(DateTimeFormatter.ISO_DATE)}")
                     .setParameter("v", PRMania.VERSION.toString())
                     .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
                     .setParameter("uuid", nonce.toString())
@@ -105,7 +106,7 @@ object DailyChallengeUtils {
                 fetching.set(true)
             }
             
-            val uriBuilder = URIBuilder("https://api.rhre.dev:10443/prmania/dailychallenge/top_past_week")
+            val uriBuilder = URIBuilder("${ROOT_URL}/dailychallenge/top_past_week")
                     .setParameter("v", PRMania.VERSION.toString())
                     .setParameter("pv", EndlessPatterns.ENDLESS_PATTERNS_VERSION.toString())
 
