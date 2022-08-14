@@ -20,6 +20,7 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
@@ -94,62 +95,73 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             })
             vbox += createLongButton { dailyChallengeTitle.use() }.apply {
                 this.setOnAction {
-                    val date = dailyChallengeDate.getOrCompute()
-                    val onSuccess: (UUID?) -> Unit = { nonce ->
-                        Gdx.input.isCursorCatched = true
-                        menuCol.playMenuSound("sfx_menu_enter_game")
-                        mainMenu.transitionAway {
-                            val main = mainMenu.main
+                    val onContinue: () -> Unit = {
+                        val date = dailyChallengeDate.getOrCompute()
+                        val onSuccess: (UUID?) -> Unit = { nonce ->
+                            Gdx.input.isCursorCatched = true
+                            menuCol.playMenuSound("sfx_menu_enter_game")
+                            mainMenu.transitionAway {
+                                val main = mainMenu.main
 
-                            // Daily challenge streak calculation
-                            val lastScore = main.settings.endlessDailyChallenge.getOrCompute()
-                            if (lastScore.date == date.plusDays(-1L)) {
-                                val newStreak = main.settings.dailyChallengeStreak.incrementAndGet()
-                                if (newStreak >= 7) {
-                                    Achievements.awardAchievement(Achievements.dailyWeekStreak)
-                                }
-                            } else {
-                                main.settings.dailyChallengeStreak.set(1)
-                            }
-
-                            numTimesPlayedThisSession++
-                            if (numTimesPlayedThisSession >= 2) {
-                                Achievements.awardAchievement(Achievements.dailyTwiceInOneSession)
-                            }
-
-                            Gdx.app.postRunnable {
-                                val scoreVar = IntVar(0)
-                                scoreVar.addListener {
-                                    main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
-                                }
-                                val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main, PlayTimeType.DAILY_CHALLENGE,
-                                        EndlessModeScore(scoreVar, showNewHighScoreAtEnd = false),
-                                        EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
-                                val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType,
-                                        sidemode.container, gameMode = sidemode,
-                                        challenges = Challenges.NO_CHANGES,
-                                        inputCalibration = main.settings.inputCalibration.getOrCompute(),
-                                        resultsBehaviour = ResultsBehaviour.NoResults)
-                                main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
-                                main.settings.persist()
-                                main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
-                                    this.onEntryEnd = {
-                                        sidemode.prepareFirstTime()
-                                        playScreen.resetAndUnpause()
-                                        DiscordRichPresence.updateActivity(DefaultPresences.playingDailyChallenge(date))
-                                        mainMenu.backgroundType = BgType.ENDLESS
-                                        GlobalStats.timesPlayedDailyChallenge.increment()
+                                // Daily challenge streak calculation
+                                val lastScore = main.settings.endlessDailyChallenge.getOrCompute()
+                                if (lastScore.date == date.plusDays(-1L)) {
+                                    val newStreak = main.settings.dailyChallengeStreak.incrementAndGet()
+                                    if (newStreak >= 7) {
+                                        Achievements.awardAchievement(Achievements.dailyWeekStreak)
                                     }
+                                } else {
+                                    main.settings.dailyChallengeStreak.set(1)
                                 }
-                                
-                                sidemode.dailyChallengeUUIDNonce.set(nonce)
+
+                                numTimesPlayedThisSession++
+                                if (numTimesPlayedThisSession >= 2) {
+                                    Achievements.awardAchievement(Achievements.dailyTwiceInOneSession)
+                                }
+
+                                Gdx.app.postRunnable {
+                                    val scoreVar = IntVar(0)
+                                    scoreVar.addListener {
+                                        main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, it.getOrCompute()))
+                                    }
+                                    val sidemode: EndlessPolyrhythm = EndlessPolyrhythm(main, PlayTimeType.DAILY_CHALLENGE,
+                                            EndlessModeScore(scoreVar, showNewHighScoreAtEnd = false),
+                                            EndlessPolyrhythm.getSeedFromLocalDate(date), date, disableLifeRegen = false)
+                                    val playScreen = EnginePlayScreenBase(main, sidemode.playTimeType,
+                                            sidemode.container, gameMode = sidemode,
+                                            challenges = Challenges.NO_CHANGES,
+                                            inputCalibration = main.settings.inputCalibration.getOrCompute(),
+                                            resultsBehaviour = ResultsBehaviour.NoResults)
+                                    main.settings.endlessDailyChallenge.set(DailyChallengeScore(date, 0))
+                                    main.settings.persist()
+                                    main.screen = TransitionScreen(main, main.screen, playScreen, null, FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))).apply {
+                                        this.onEntryEnd = {
+                                            sidemode.prepareFirstTime()
+                                            playScreen.resetAndUnpause()
+                                            DiscordRichPresence.updateActivity(DefaultPresences.playingDailyChallenge(date))
+                                            mainMenu.backgroundType = BgType.ENDLESS
+                                            GlobalStats.timesPlayedDailyChallenge.increment()
+                                        }
+                                    }
+
+                                    sidemode.dailyChallengeUUIDNonce.set(nonce)
+                                }
                             }
                         }
+
+                        val waitingForNonceMenu = WaitingForNonceMenu(menuCol, date, onSuccess)
+                        menuCol.addMenu(waitingForNonceMenu)
+                        menuCol.pushNextMenu(waitingForNonceMenu)
                     }
                     
-                    val waitingForNonceMenu = WaitingForNonceMenu(menuCol, date, onSuccess)
-                    menuCol.addMenu(waitingForNonceMenu)
-                    menuCol.pushNextMenu(waitingForNonceMenu)
+                    val ghVersion = main.githubVersion.getOrCompute()
+                    if (ghVersion > PRMania.VERSION) {
+                        val warningMenu = OldVersionWarningMenu(menuCol, onContinue)
+                        menuCol.addMenu(warningMenu)
+                        menuCol.pushNextMenu(warningMenu)
+                    } else {
+                        onContinue()
+                    }
                 }
                 
                 this.tooltipElement.set(createTooltip(binding = {
@@ -559,6 +571,58 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         Gdx.app.postRunnable {
                             menuCol.popLastMenu(instant = true, playSound = false)
                             onSuccess(null)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    class OldVersionWarningMenu(menuCol: MenuCollection, val onContinue: () -> Unit)
+        : StandardMenu(menuCol) {
+        init {
+            this.setSize(MMMenu.WIDTH_SMALL_MID)
+            this.titleText.bind { Localization.getVar("mainMenu.dailyChallenge.title").use() }
+            this.contentPane.bounds.height.set(250f)
+            this.deleteWhenPopped.set(true)
+
+            contentPane.addChild(TextLabel(Localization.getVar("mainMenu.dailyChallenge.oldVersionWarning")).apply {
+                this.bindHeightToParent(adjust = -40f)
+                this.markup.set(this@OldVersionWarningMenu.markup)
+                this.textColor.set(LongButtonSkin.TEXT_COLOR)
+                this.renderAlign.set(Align.topLeft)
+                this.doLineWrapping.set(true)
+            })
+            
+            val hbox = HBox().apply {
+                Anchor.BottomLeft.configure(this)
+                this.spacing.set(8f)
+                this.padding.set(Insets(4f, 0f, 2f, 2f))
+                this.bounds.height.set(40f)
+            }
+            contentPane.addChild(hbox)
+            hbox.temporarilyDisableLayouts {
+                hbox += createSmallButton(binding = { Localization.getVar("common.cancel").use() }).apply {
+                    this.bounds.width.set(100f)
+                    this.setOnAction {
+                        menuCol.popLastMenu()
+                    }
+                }
+                hbox += createSmallButton(binding = { Localization.getVar("mainMenu.dailyChallenge.oldVersionWarning.update").use() }).apply {
+                    this.bounds.width.set(175f)
+                    val latestReleasesURL = "${PRMania.GITHUB}/releases/latest"
+                    this.setOnAction {
+                        Gdx.net.openURI(latestReleasesURL)
+                        menuCol.popLastMenu()
+                    }
+                    this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.credits.openToBrowser.tooltip", listOf(latestReleasesURL))))
+                }
+                hbox += createSmallButton(binding = { Localization.getVar("mainMenu.dailyChallenge.oldVersionWarning.playAnyway").use() }).apply {
+                    this.bounds.width.set(150f)
+                    this.setOnAction {
+                        Gdx.app.postRunnable {
+                            menuCol.popLastMenu(instant = true, playSound = false)
+                            onContinue()
                         }
                     }
                 }
