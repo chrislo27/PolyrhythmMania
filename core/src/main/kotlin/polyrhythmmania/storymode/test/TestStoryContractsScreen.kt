@@ -36,7 +36,6 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.inbox.InboxDB
-import polyrhythmmania.storymode.inbox.InboxFolder
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 import kotlin.math.sqrt
@@ -81,7 +80,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
         }
         pane += columns
         
-        val currentInboxFolder: Var<InboxFolder?> = Var(null)
+        val currentInboxFolder: Var<InboxItem?> = Var(null)
         columns[0] += RectElement(Color(0f, 0f, 0f, 0.5f)).apply { 
             this += TextLabel("Inbox Tray", font = main.fontMainMenuHeading).apply {
                 this.bounds.height.set(70f)
@@ -100,25 +99,25 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                     this.setContent(VBox().apply { 
                         this.spacing.set(2f)
                         this.temporarilyDisableLayouts { 
-                            InboxDB.allFolders.values.sortedBy { it.firstItem.fpPrereq }.forEach { folder ->
+                            InboxDB.allItems.values.sortedBy { it.fpPrereq }.forEach { inboxItem ->
                                 this += ActionablePane().apply {
                                     this.bounds.height.set(48f)
                                     this += RectElement().apply {
                                         this.color.bind { 
-                                            if (currentInboxFolder.use() == folder) {
+                                            if (currentInboxFolder.use() == inboxItem) {
                                                 Color(0f, 1f, 1f, 0.2f)
                                             } else Color(1f, 1f, 1f, 0.2f)
                                         }
                                         this.padding.set(Insets(4f))
-                                        this += TextLabel("Folder: ${folder.id}\n1st item: ${folder.firstItem.id} (${folder.firstItem.fpPrereq} FP)").apply {
+                                        this += TextLabel("Item: ${inboxItem.id}").apply {
                                             this.renderAlign.set(RenderAlign.topLeft)
                                         }
                                     }
                                     this.setOnAction { 
-                                        if (currentInboxFolder.getOrCompute() == folder) {
+                                        if (currentInboxFolder.getOrCompute() == inboxItem) {
                                             currentInboxFolder.set(null)
                                         } else {
-                                            currentInboxFolder.set(folder)
+                                            currentInboxFolder.set(inboxItem)
                                         }
                                     }
                                 }
@@ -365,15 +364,13 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
         }
         
         currentInboxFolder.addListener { varr ->
-            val newChain = varr.getOrCompute()
-            if (newChain != null) {
+            val newItem = varr.getOrCompute()
+            if (newItem != null) {
                 val vbox = VBox().apply { 
                     this.spacing.set(8f)
-                    this.temporarilyDisableLayouts { 
-                        newChain.items.forEach { item ->
-                            this += createInboxItemUI(item).apply { 
-                                Anchor.TopCentre.xConfigure(this, 0f)
-                            }
+                    this.temporarilyDisableLayouts {
+                        this += createInboxItemUI(newItem).apply {
+                            Anchor.TopCentre.xConfigure(this, 0f)
                         }
                     }
                 }

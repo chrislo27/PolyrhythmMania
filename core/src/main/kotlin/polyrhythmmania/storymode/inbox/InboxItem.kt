@@ -17,7 +17,7 @@ sealed class InboxItem(
     class Memo(id: String, fpPrereq: Int, otherPrereqs: Set<Prereq> = emptySet())
         : InboxItem(id, fpPrereq, otherPrereqs)
     
-    class ContractDoc(val contract: Contract, fpPrereq: Int, otherPrereqs: Set<Prereq> = emptySet()) 
-        : InboxItem(contract.id, fpPrereq, otherPrereqs)
+    class ContractDoc(val contract: Contract, fpPrereq: Int, otherPrereqs: Set<Prereq> = emptySet(), id: String = "contract_${contract.id}") 
+        : InboxItem(id, fpPrereq, otherPrereqs)
     
 }
