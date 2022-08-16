@@ -24,7 +24,7 @@ sealed class ResultFlag {
         
         object Generic : Fail(Localization.getVar("resultFlag.fail.generic"))
         object PerfectLost : Fail(Localization.getVar("resultFlag.fail.perfectLost"))
-        object RanOutOfLives : Fail(Localization.getVar("resultFlag.fail.ranOutOfLives"))
+        class RanOutOfLives(val onlyOne: Boolean) : Fail(Localization.getVar(if (onlyOne) "resultFlag.fail.ranOutOfLives.one" else "resultFlag.fail.ranOutOfLives"))
         object TooManyDefectiveRods : Fail(Localization.getVar("resultFlag.fail.tooManyDefectiveRods"))
         object MonsterGoal : Fail(Localization.getVar("resultFlag.fail.monsterGoal"))
         
