@@ -34,7 +34,7 @@ class TengokuPauseBackground {
     }
     
     fun randomizeSeed() {
-        seed = random.nextInt(Short.MAX_VALUE.toInt())
+        seed = random.nextInt()
     }
     
     fun render(delta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
@@ -55,16 +55,17 @@ class TengokuPauseBackground {
         batch.setColor(1f, 1f, 1f, 1f)
 
         // Squares
+        val currentMsTime = System.currentTimeMillis()
         val squareCount = this.squareCount
         batch.setColor(1f, 1f, 1f, 0.65f)
         for (i in 0 until squareCount) {
             val alpha = i / squareCount.toFloat()
             val size = Interpolation.circleIn.apply(20f, 80f, alpha) * 1.5f
-            val rotation = MathHelper.getSawtoothWave(System.currentTimeMillis() + (273L * alpha * 2).roundToLong(),
+            val rotation = MathHelper.getSawtoothWave(currentMsTime + (273L * alpha * 2).roundToLong(),
                     Interpolation.circleOut.apply(0.65f, 1.15f, alpha) * 0.75f) * (if (i % 2 == 0) -1 else 1)
 
             val yInterval = Interpolation.circleOut.apply(8f, 5f, alpha)
-            val yAlpha = 1f - MathHelper.getSawtoothWave(System.currentTimeMillis() + (562L * alpha * 2).roundToLong(), yInterval)
+            val yAlpha = 1f - MathHelper.getSawtoothWave(currentMsTime + (562L * alpha * 2).roundToLong(), yInterval)
             val x = MathUtils.lerp(width * -0.1f, width * 1.1f, yAlpha)
             val y = (width * 1.4142135f * (i + 23) * (alpha + seed) + (yAlpha * yInterval).roundToInt()) % (width * 1.25f)
 
