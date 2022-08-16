@@ -15,7 +15,7 @@ import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 
 
-open class TestStoryPlayScreen(
+open class TestStoryGimmickPlayScreen(
         main: PRManiaGame,
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: AbstractStoryGameMode
@@ -41,7 +41,7 @@ open class TestStoryPlayScreen(
         optionList += PauseOption("play.pause.startOver", true) {
             playMenuSound("sfx_menu_enter_game")
 
-            val thisScreen: TestStoryPlayScreen = this
+            val thisScreen: TestStoryGimmickPlayScreen = this
             val resetAction: () -> Unit = {
                 resetAndUnpause()
                 disableCatchingCursorOnHide = false

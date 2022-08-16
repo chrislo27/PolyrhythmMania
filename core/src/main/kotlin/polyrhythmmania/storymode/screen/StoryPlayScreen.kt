@@ -70,13 +70,15 @@ class StoryPlayScreen(
     private val blurShader: ShaderProgram = GaussianBlur.createShaderProgram()
     private val framebufferMgr: FrameBufferManager = FrameBufferManager(2, FrameBufferMgrSettings(Pixmap.Format.RGB888), tag = "StoryPlayScreen", referenceWindowSize = WindowSize(1280, 720))
     
+    private val animationHandler: AnimationHandler = AnimationHandler()
+    
     // Intro card
     private val introCardDefaultDuration: Float = 3f
+    private val introCardUnblurDuration: Float = 0.5f
     private val introCardSceneRoot: SceneRoot = SceneRoot(uiViewport)
-    private val introCardAnimationHandler: AnimationHandler = AnimationHandler(introCardSceneRoot)
     private val introCardTime: FloatVar = FloatVar(0f)
     private val inIntroCard: ReadOnlyBooleanVar = BooleanVar { introCardTime.use() > 0f }
-    private val blurStrength: FloatVar
+    private val blurStrength: FloatVar = FloatVar(0f)
     private val blackBarsAmount: FloatVar
     private val textSlide: TextSlideInterp
     
@@ -112,20 +114,6 @@ class StoryPlayScreen(
     }
     
     init {
-        blurStrength = FloatVar {
-            val effectInLastSec = 0.5f // Unblur only in the first and last 0.5 seconds
-            val time = introCardTime.use() * introCardDefaultDuration // Counts down from duration to 0.0 sec
-            
-            val interpolation = Interpolation.pow2Out
-            when {
-                time <= 0f -> 0f
-                time < effectInLastSec -> {
-                    val timePercent = 1f - time / effectInLastSec
-                    interpolation.apply(1f, 0f, timePercent)
-                }
-                else -> 1f
-            }
-        }
         blackBarsAmount = FloatVar {
             val effectInLastSec = 0.5f // Effect only in the first and last few seconds
             val time = introCardTime.use() * introCardDefaultDuration // Counts down from duration to 0.0 sec
@@ -196,6 +184,10 @@ class StoryPlayScreen(
 
     fun initializeIntroCard() {
         introCardTime.set(1f)
+        blurStrength.set(1f)
+        animationHandler.cancelAnimationFor(blurStrength)
+        animationHandler.enqueueAnimation(Animation(Interpolation.pow2Out, 0.5f, 1f, 0f, delay = introCardDefaultDuration - introCardUnblurDuration), blurStrength)
+        
         shouldUpdateTiming.set(false)
         soundSystem.setPaused(true)
         
@@ -203,7 +195,7 @@ class StoryPlayScreen(
         val jingle: Sound = StoryAssets.get<Sound>(contract.jingleType.soundID)
         playMenuSound(jingle)
 
-        introCardAnimationHandler.enqueueAnimation(Animation(Interpolation.linear, introCardDefaultDuration, 1f, 0f).apply { 
+        animationHandler.enqueueAnimation(Animation(Interpolation.linear, introCardDefaultDuration, 1f, 0f).apply { 
             this.onComplete = {
                 cancelIntroCard()
             }                                                                                                     
@@ -212,7 +204,9 @@ class StoryPlayScreen(
     
     fun cancelIntroCard() {
         introCardTime.set(0f)
-        introCardAnimationHandler.cancelAnimationFor(introCardTime)
+        animationHandler.cancelAnimationFor(blurStrength)
+        blurStrength.set(0f)
+        animationHandler.cancelAnimationFor(introCardTime)
         shouldUpdateTiming.set(true)
         soundSystem.setPaused(false)
     }
@@ -289,7 +283,7 @@ class StoryPlayScreen(
     override fun renderAfterGameplay(delta: Float, camera: OrthographicCamera) {
         super.renderAfterGameplay(delta, camera)
 
-        introCardAnimationHandler.frameUpdate()
+        animationHandler.frameUpdate()
         
         if (inIntroCard.get()) {
             introCardSceneRoot.renderAsRoot(batch)

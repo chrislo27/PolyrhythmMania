@@ -121,51 +121,51 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                     this += Button("Polyrhythm 2 no changes").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            enterGameMode(object : TestStoryGameMode(main) {
+                            enterGimmickGameMode(object : TestStoryGameMode(main) {
                             })
                         }
                     }
                     this += Button("Aces Only PR2").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            enterGameMode(TestStoryAcesOnlyGameMode(main))
+                            enterGimmickGameMode(TestStoryAcesOnlyGameMode(main))
                         }
                     }
                     this += Button("No Barelies PR2").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            enterGameMode(TestStoryNoBarelyGameMode(main))
+                            enterGimmickGameMode(TestStoryNoBarelyGameMode(main))
                         }
                     }
                     this += Button("Continuous (8-ball) PR2").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            enterGameMode(TestStory8BallGameMode(main))
+                            enterGimmickGameMode(TestStory8BallGameMode(main))
                         }
                     }
                     this += Button("PR2 with lives").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            enterGameMode(TestStoryLivesGameMode(main))
+                            enterGimmickGameMode(TestStoryLivesGameMode(main))
                         }
                     }
                     this += Button("All Defective Rods PR2").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            enterGameMode(TestStoryDefectiveGameMode(main))
+                            enterGimmickGameMode(TestStoryDefectiveGameMode(main))
                         }
                     }
                     this += separator()
                     this += Button("Endless UI debug").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            enterGameMode(TestStoryNoOpEndlessUIGameMode(main))
+                            enterGimmickGameMode(TestStoryNoOpEndlessUIGameMode(main))
                         }
                     }
                     this += Button("Lives UI debug").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            enterGameMode(TestStoryNoOpLivesUIGameMode(main))
+                            enterGimmickGameMode(TestStoryNoOpLivesUIGameMode(main))
                         }
                     }
                 }
@@ -173,9 +173,9 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
     }
     
-    private fun enterGameMode(gameMode: TestStoryGameMode) {
+    private fun enterGimmickGameMode(gameMode: TestStoryGameMode) {
         main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-        val playScreen = TestStoryPlayScreen(main, Challenges.NO_CHANGES, main.settings.inputCalibration.getOrCompute(), gameMode)
+        val playScreen = TestStoryGimmickPlayScreen(main, Challenges.NO_CHANGES, main.settings.inputCalibration.getOrCompute(), gameMode)
         main.screen = TransitionScreen(main, main.screen, playScreen,
                 FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
             this.onEntryEnd = {
