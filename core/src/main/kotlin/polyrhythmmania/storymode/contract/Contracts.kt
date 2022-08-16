@@ -52,6 +52,14 @@ object Contracts {
         add(Contract("air_rally", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj"))
         })
+        add(Contract("air_rally_one_life", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA) { main ->
+            // FIXME this is a debug contract
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply { 
+                val lives = this.engine.modifiers.livesMode
+                lives.maxLives.set(1)
+                lives.enabled.set(true)
+            }
+        })
         add(Contract("first_contact", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.ARCADE) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/first_contact.prmproj"))
         })
