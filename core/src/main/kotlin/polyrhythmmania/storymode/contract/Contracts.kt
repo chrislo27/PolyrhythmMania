@@ -93,6 +93,9 @@ object Contracts {
         add(Contract("bouncy_road_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.MODERN) { main ->
             StoryAsmGameModeBouncyRoad2(main)
         })
+        add(Contract("super_samurai_slice_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/super_samurai_slice_2.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
