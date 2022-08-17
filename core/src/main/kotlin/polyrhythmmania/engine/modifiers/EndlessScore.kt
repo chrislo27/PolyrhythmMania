@@ -66,7 +66,7 @@ class EndlessScore(parent: EngineModifiers) : ModifierModule(parent) {
         val world = engine.world
 
         engine.playbackSpeed = 1f
-        engine.resultFlag.set(ResultFlag.Fail.RanOutOfLives)
+        engine.resultFlag.set(ResultFlag.Fail.RanOutOfLives(this.maxLives.get() == 1))
 
         val currentSeconds = engine.seconds
         val currentBeat = engine.beat
