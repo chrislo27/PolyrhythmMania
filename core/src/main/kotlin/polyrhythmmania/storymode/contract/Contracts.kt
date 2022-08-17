@@ -106,6 +106,9 @@ object Contracts {
         add(Contract("super_samurai_slice_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/super_samurai_slice_2.prmproj"))
         })
+        add(Contract("rhythm_rally", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, 60) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_rally.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
