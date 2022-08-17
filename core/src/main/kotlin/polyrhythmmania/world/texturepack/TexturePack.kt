@@ -150,15 +150,15 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
         add(PackTexRegion.create("rods_borders", regionMap.getOrNull("rods_borders")))
         add(PackTexRegion.create("rods_fill", regionMap.getOrNull("rods_fill")))
 
-        val explosionRegions = regionMap.getIndexedRegions("explosion")
+        val explosionRegions = regionMap.getIndexedRegionsOrNull("explosion")
         (0 until explosionFrameCount).forEach { i ->
-            add(PackTexRegion.create("explosion_${i}", explosionRegions.getValue(i)))
+            add(PackTexRegion.create("explosion_${i}", explosionRegions?.getValue(i)))
         }
 
-        val inputFeedbackRegions = regionMap.getIndexedRegions("input_feedback")
-        add(PackTexRegion.create("input_feedback_0", inputFeedbackRegions.getValue(0)))
-        add(PackTexRegion.create("input_feedback_1", inputFeedbackRegions.getValue(1)))
-        add(PackTexRegion.create("input_feedback_2", inputFeedbackRegions.getValue(2)))
+        val inputFeedbackRegions = regionMap.getIndexedRegionsOrNull("input_feedback")
+        add(PackTexRegion.create("input_feedback_0", inputFeedbackRegions?.getValue(0)))
+        add(PackTexRegion.create("input_feedback_1", inputFeedbackRegions?.getValue(1)))
+        add(PackTexRegion.create("input_feedback_2", inputFeedbackRegions?.getValue(2)))
         
         add(PackTexRegion.create("background_back", regionMap.getOrNull("background_back")))
         add(PackTexRegion.create("background_middle", regionMap.getOrNull("background_middle")))
