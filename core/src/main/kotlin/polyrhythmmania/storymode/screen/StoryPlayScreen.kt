@@ -30,6 +30,7 @@ import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.QuadElement
 import paintbox.ui.element.RectElement
+import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.NestedFrameBuffer
@@ -58,6 +59,7 @@ import polyrhythmmania.util.FrameBufferManager
 import polyrhythmmania.util.FrameBufferMgrSettings
 import polyrhythmmania.world.EventEndState
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 
 class StoryPlayScreen(
@@ -83,6 +85,8 @@ class StoryPlayScreen(
     private val framebufferMgr: FrameBufferManager = FrameBufferManager(2, FrameBufferMgrSettings(Pixmap.Format.RGB888), tag = "StoryPlayScreen", referenceWindowSize = WindowSize(1280, 720))
     
     private val animationHandler: AnimationHandler = AnimationHandler()
+    
+    private val engineBeat: FloatVar = FloatVar(0f)
     
     // Intro card
     private val introCardDefaultDuration: Float = 3f
@@ -274,9 +278,40 @@ class StoryPlayScreen(
                     this.bounds.height.set(2f)
                 }
                 
-                // FIXME remove later
-                this += Pane().apply { 
-                    this.bounds.height.set(64f)
+                this += HBox().apply { 
+                    this.bounds.height.set(70f)
+                    this.spacing.set(4f)
+                    this.margin.set(Insets(16f, 18f, 2f, 2f))
+                    this.align.set(HBox.Align.CENTRE)
+                    
+                    this.temporarilyDisableLayouts { 
+                        val progress: ReadOnlyIntVar = IntVar(eager = true) { 
+                            (engineBeat.use() / container.stopPosition.use() * 100).roundToInt().coerceIn(0, 99)
+                        }
+                        this += TextLabel(StoryL10N.getVar("play.scoreCard.progress"), font = main.fontMainMenuMain).apply {
+                            this.bindWidthToParent(multiplier = 0.275f)
+                            this.textColor.set(Color.WHITE)
+                            this.renderAlign.set(RenderAlign.right)
+                            this.margin.set(Insets(1f, 1f, 4f, 6f))
+                        }
+                        this += Pane().apply { 
+                            this.bindWidthToParent(multiplier = 0.55f)
+                            val borderColor = Color.WHITE
+                            val borderSize = 4f
+                            this.border.set(Insets(borderSize))
+                            this.borderStyle.set(SolidBorder(borderColor))
+                            this.padding.set(Insets(borderSize))
+                            this += RectElement(borderColor).apply {
+                                this.bindWidthToParent(multiplierBinding = { progress.use() / 100f }) { 0f }
+                            }
+                        }
+                        this += TextLabel(StoryL10N.getVar("play.scoreCard.percentage", Var { listOf(progress.use()) }), font = main.fontMainMenuMain).apply {
+                            this.bindWidthToParent(multiplier = 0.125f)
+                            this.textColor.set(Color.WHITE)
+                            this.renderAlign.set(RenderAlign.left)
+                            this.margin.set(Insets(1f, 1f, 6f, 4f))
+                        }
+                    }
                 }
 
                 val allOptions = failScoreCardOptions
@@ -381,8 +416,10 @@ class StoryPlayScreen(
         showingScoreCard.set(false)
         scoreCardTransition.set(0f)
     }
-
+    
     override fun renderGameplay(delta: Float) {
+        this.engineBeat.set(engine.beat)
+        
         framebufferMgr.frameUpdate()
         
         val batch = this.batch
