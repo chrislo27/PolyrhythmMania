@@ -121,6 +121,11 @@ class TilesetAssetLoader : IAssetLoader {
                 PackedSheet.Config(padding = 1,
                         maxSize = 512 /* Found to be the smallest power of 2 size without splitting into more texs */,
                         duplicateBorder = false,)))
+        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_gba_title", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                "cube_border_z",
+                "cube_face_x",
+        ).map { Packable(it, "textures/world/gba/title/$it.png") },
+                PackedSheet.Config(padding = 1, maxSize = 128, duplicateBorder = false,)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_hd", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "cube_border",
                 "cube_border_platform",

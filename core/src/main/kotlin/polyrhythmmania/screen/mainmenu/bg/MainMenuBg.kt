@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Disposable
+import paintbox.packing.PackedSheet
+import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.screen.mainmenu.EntityAsmWidgetHovering
@@ -16,8 +18,9 @@ import polyrhythmmania.world.entity.EntityCube
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityPlatform
 import polyrhythmmania.world.render.WorldRenderer
+import polyrhythmmania.world.texturepack.CascadingTexturePack
+import polyrhythmmania.world.texturepack.StockTexturePack
 import polyrhythmmania.world.texturepack.StockTexturePacks
-import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TilesetPalette
 
@@ -28,8 +31,14 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
     private val gradientEnd: Color = Color.BLACK.cpy()
     
     private val world: World = World()
+    private val texPack: CascadingTexturePack by lazy {
+        CascadingTexturePack("gba_titleScreen", emptySet(), listOf(
+                StockTexturePack("gba_titleScreen_noFallback", emptySet(), AssetRegistry.get<PackedSheet>("tileset_gba_title")),
+                StockTexturePacks.gba),
+                shouldThrowErrorOnMissing = false)
+    }
     val renderer: WorldRenderer by lazy { 
-        WorldRenderer(world, Tileset(StockTexturePacks.gba)).also { renderer ->
+        WorldRenderer(world, Tileset(texPack)).also { renderer ->
             TilesetPalette.createGBA1TilesetPalette().applyTo(renderer.tileset)
             renderer.camera.position.x = -2f
             renderer.camera.position.y = 0.5f
