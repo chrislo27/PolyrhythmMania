@@ -105,7 +105,7 @@ class StoryPlayScreen(
     private val lastResultFlag: ReadOnlyVar<ResultFlag> = Var.eagerBind { engine.resultFlag.use() }
     
     private val failScoreCardOptions: List<PauseOption>
-    private val successScoreCardOptions: List<PauseOption> = emptyList() // TODO
+    private val successScoreCardOptions: List<PauseOption>
     private val currentScoreCardOptions: Var<List<PauseOption>> = Var(listOf())
     private val selectedScoreCardOption: Var<PauseOption?> = Var(null)
     
@@ -190,6 +190,11 @@ class StoryPlayScreen(
     }
     
     init {
+        currentScoreCardOptions.addListener {
+            val l = it.getOrCompute()
+            selectedScoreCardOption.set(l.firstOrNull())
+        }
+        
         scoreCardSceneRoot.doClipping.set(true)
         
         val mainPane = Pane().apply { 
@@ -202,6 +207,7 @@ class StoryPlayScreen(
                 Interpolation.smoother.apply(0f, 1f, 1f - scoreCardTransition.use())
             }
         }
+        val staticPane = Pane()
         scoreCardSceneRoot += RectElement(Color(0.25f, 0.25f, 0.25f, 0.35f)).apply { 
             this.opacity.bind {
                 Interpolation.smoother.apply(0f, 1f, (1f - scoreCardTransition.use()) * 2).coerceIn(0f, 1f)
@@ -209,6 +215,7 @@ class StoryPlayScreen(
         }
         scoreCardSceneRoot += fadeInPane
         scoreCardSceneRoot += mainPane
+        scoreCardSceneRoot += staticPane
         
         fun createTextLabelOption(option: PauseOption, index: Int): TextLabel {
             val selectedLabelColor = Color(0f, 1f, 1f, 1f)
@@ -257,6 +264,12 @@ class StoryPlayScreen(
                     // TODO
                 },
                 PauseOption(StoryL10N.getVar("play.pause.quit"), true) { quitPauseAction() },
+        )
+        successScoreCardOptions = listOf(
+                PauseOption(StoryL10N.getVar("play.pause.continue"), true) {
+                    quitPauseAction() // TODO
+                },
+                PauseOption("play.pause.startOver", true) { startOverPauseAction() },
         )
         
         val failPane = VBox().apply { 
@@ -324,8 +337,46 @@ class StoryPlayScreen(
             }
         }
         dialog += failPane
-        val scorePane = Pane().apply {
+        
+        val scorePane = VBox().apply {
             this.visible.bind { !failPane.visible.use() }
+            this.spacing.set(8f)
+
+            this.temporarilyDisableLayouts {
+                this += TextLabel(StoryL10N.getVar("play.scoreCard.scoreCardTitle"), font = main.fontMainMenuHeading).apply {
+                    this.bounds.height.set(50f)
+                    this.textColor.set(Color.WHITE)
+                    this.renderAlign.set(RenderAlign.center)
+                    this.doLineWrapping.set(true)
+                    this.margin.set(Insets(1f, 1f, 4f, 4f))
+                }
+                this += RectElement(Color().grey(0.8f)).apply {
+                    this.bounds.height.set(2f)
+                }
+            }
+
+            val successOptions = successScoreCardOptions.mapIndexed { i, opt ->
+                createTextLabelOption(opt, i).apply {
+                    Anchor.TopCentre.xConfigure(this, offsetX = 48f)
+                    this.bindWidthToParent(multiplier = 0.5f)
+                }
+            }
+            val failOptions = failScoreCardOptions.mapIndexed { i, opt ->
+                createTextLabelOption(opt, i).apply {
+                    Anchor.TopCentre.xConfigure(this, offsetX = 48f)
+                    this.bindWidthToParent(multiplier = 0.5f)
+                }
+            }
+            currentScoreCardOptions.addListener { vl ->
+                this.temporarilyDisableLayouts {
+                    (successOptions + failOptions).forEach { this.removeChild(it) }
+                    when (vl.getOrCompute()) {
+                        successScoreCardOptions -> successOptions
+                        failScoreCardOptions -> failOptions
+                        else -> emptyList()
+                    }.forEach { this.addChild(it) }
+                }
+            }
         }
         dialog += scorePane
         
@@ -340,6 +391,15 @@ class StoryPlayScreen(
             this.backgroundColor.set(Color(0f, 0f, 0f, 0.75f))
             this.renderBackground.set(true)
             this.setScaleXY(0.75f)
+            this.opacity.set(0f)
+            currentScoreCardOptions.addListener {
+                val l = it.getOrCompute()
+                if (l.isEmpty()) {
+                    this.opacity.set(0f)
+                } else {
+                    animationHandler.enqueueAnimation(Animation(Interpolation.smoother, 0.5f, 0f, 1f), this.opacity)
+                }
+            }
         }
     }
     
@@ -409,7 +469,6 @@ class StoryPlayScreen(
         animationHandler.cancelAnimationFor(scoreCardTransition)
         scoreCardTransition.set(1f)
         animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 1f, 0f), scoreCardTransition)
-        selectedScoreCardOption.set(currentScoreCardOptions.getOrCompute().firstOrNull())
     }
     
     fun closeScoreCard() {
@@ -533,7 +592,8 @@ class StoryPlayScreen(
         if (engine.resultFlag.getOrCompute() is ResultFlag.Fail) {
             currentScoreCardOptions.set(failScoreCardOptions)
         } else {
-            currentScoreCardOptions.set(successScoreCardOptions)
+            engine.resultFlag.set(ResultFlag.None)
+            currentScoreCardOptions.set(emptyList())
         }
         openScoreCard()
     }
