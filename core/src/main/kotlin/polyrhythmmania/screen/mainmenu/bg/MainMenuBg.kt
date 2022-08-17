@@ -18,14 +18,27 @@ import polyrhythmmania.world.entity.EntityCube
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityPlatform
 import polyrhythmmania.world.render.WorldRenderer
-import polyrhythmmania.world.texturepack.CascadingTexturePack
-import polyrhythmmania.world.texturepack.StockTexturePack
-import polyrhythmmania.world.texturepack.StockTexturePacks
+import polyrhythmmania.world.texturepack.*
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TilesetPalette
+import polyrhythmmania.world.tileset.TintedRegion
 
 
 class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
+    
+    private inner class EntityCubeMM(withBorder: Boolean = false, val showLeftVerticalEdge: Boolean = false)
+        : EntityCube(this@MainMenuBg.world, false, withBorder) {
+        
+        override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
+            if (!showLeftVerticalEdge) { // This is "not" because the title texreg variants extend past the edge
+                when (index) {
+                    1 -> return titleTintedRegions["title_cube_border_z"]
+                    2 -> return titleTintedRegions["title_cube_face_x"]
+                }
+            }
+            return super.getTintedRegion(tileset, index)
+        }
+    }
 
     private val gradientStart: Color = Color(0f, 32f / 255f, 55f / 255f, 1f)
     private val gradientEnd: Color = Color.BLACK.cpy()
@@ -33,9 +46,15 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
     private val world: World = World()
     private val texPack: CascadingTexturePack by lazy {
         CascadingTexturePack("gba_titleScreen", emptySet(), listOf(
-                StockTexturePack("gba_titleScreen_noFallback", emptySet(), AssetRegistry.get<PackedSheet>("tileset_gba_title")),
-                StockTexturePacks.gba),
-                shouldThrowErrorOnMissing = false)
+                object : TexturePack("gba_titleScreen_noFallback", emptySet()) {
+                    init {
+                        val regionMap = AssetRegistry.get<PackedSheet>("tileset_gba_title")
+                        add(PackTexRegion.create("title_cube_border_z", regionMap.getOrNull("cube_border_z"), RegionSpacing(1, 32, 32)))
+                        add(PackTexRegion.create("title_cube_face_x", regionMap.getOrNull("cube_face_x"), RegionSpacing(1, 32, 32)))
+                    }
+                },
+                StockTexturePacks.gba
+        ), shouldThrowErrorOnMissing = false)
     }
     val renderer: WorldRenderer by lazy { 
         WorldRenderer(world, Tileset(texPack)).also { renderer ->
@@ -43,6 +62,13 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
             renderer.camera.position.x = -2f
             renderer.camera.position.y = 0.5f
         }
+    }
+    private val titleTintedRegions: Map<String, TintedRegion> by lazy {
+        val tileset = renderer.tileset
+        listOf<TintedRegion>(
+                TintedRegion("title_cube_border_z", tileset.cubeBorderZ.color),
+                TintedRegion("title_cube_face_x", tileset.cubeFaceX.color),
+        ).associateBy { it.regionID }
     }
     
     init {
@@ -65,7 +91,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
 
         for (x in 0 until 7) {
             for (z in -2..0) {
-                world.addEntity(EntityCube(world, withLine = false, withBorder = z == 0).apply {
+                world.addEntity(EntityCubeMM(withBorder = z == 0, showLeftVerticalEdge = z == -2).apply {
                     this.position.set(x.toFloat(), 0f, z.toFloat())
                 })
             }
