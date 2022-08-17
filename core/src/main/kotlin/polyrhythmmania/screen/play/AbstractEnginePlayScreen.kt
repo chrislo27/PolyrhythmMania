@@ -104,15 +104,19 @@ abstract class AbstractEnginePlayScreen(
             gameMode?.renderUpdate()
         }
     }
+    
+    protected fun submitAllRodPRInputs() {
+        container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
+            engine.inputter.submitInputsFromRod(rod)
+        }
+    }
 
     /**
      * Will be triggered in the gdx main thread.
      */
     protected open fun onEndSignalFired() {
         soundSystem.setPaused(true)
-        container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
-            engine.inputter.submitInputsFromRod(rod)
-        }
+        submitAllRodPRInputs()
     }
 
     /**
