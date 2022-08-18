@@ -26,12 +26,15 @@ class StoryAssetLoader : IAssetLoader {
         
         StoryAssets.loadAsset<Texture>("desk_envelope", "story/textures/desk/envelope.png", linearTexture())
         
-        StoryAssets.loadAsset<Sound>("jingle_gba", "story/sounds/jingle_gba.ogg")
-        StoryAssets.loadAsset<Sound>("jingle_arcade", "story/sounds/jingle_arcade.ogg")
-        StoryAssets.loadAsset<Sound>("jingle_modern", "story/sounds/jingle_modern.ogg")
+        StoryAssets.loadAsset<Sound>("jingle_gba", "story/sounds/intro/jingle_gba.ogg")
+        StoryAssets.loadAsset<Sound>("jingle_arcade", "story/sounds/intro/jingle_arcade.ogg")
+        StoryAssets.loadAsset<Sound>("jingle_modern", "story/sounds/intro/jingle_modern.ogg")
         StoryAssets.loadAsset<Sound>("score_filling", "sounds/results/score_filling.ogg")
         StoryAssets.loadAsset<Sound>("score_finish", "sounds/results/score_finish.ogg")
         StoryAssets.loadAsset<Sound>("score_finish_nhs", "sounds/results/score_finish_nhs.ogg")
+        StoryAssets.loadAsset<Sound>("score_jingle_tryagain", "story/sounds/results/jingle_tryagain.ogg")
+        StoryAssets.loadAsset<Sound>("score_jingle_pass", "story/sounds/results/jingle_ok2.ogg")
+        StoryAssets.loadAsset<Sound>("score_jingle_pass_hard", "story/sounds/results/jingle_superb.ogg")
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {

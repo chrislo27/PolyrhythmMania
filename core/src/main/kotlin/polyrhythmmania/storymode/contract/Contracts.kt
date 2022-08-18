@@ -67,7 +67,14 @@ object Contracts {
                 this.container.addBlock(BlockEndState(this.engine).apply { 
                     this.beat = 16f
                 })
-                this.container.engine.playbackSpeed = 1.5f
+            }
+        })
+        add(Contract("air_rally_early_end2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, 50) { main ->
+            // FIXME this is a debug contract
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply { 
+                this.container.addBlock(BlockEndState(this.engine).apply { 
+                    this.beat = 16f
+                })
             }
         })
         add(Contract("first_contact", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.ARCADE, 60) { main ->

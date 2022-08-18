@@ -19,10 +19,7 @@ import paintbox.registry.AssetRegistry
 import paintbox.transition.TransitionScreen
 import paintbox.transition.WipeTransitionHead
 import paintbox.transition.WipeTransitionTail
-import paintbox.ui.Anchor
-import paintbox.ui.Pane
-import paintbox.ui.RenderAlign
-import paintbox.ui.SceneRoot
+import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.animation.AnimationHandler
 import paintbox.ui.area.Insets
@@ -36,6 +33,7 @@ import paintbox.util.WindowSize
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
+import paintbox.util.sumOfFloat
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
@@ -99,10 +97,12 @@ class StoryPlayScreen(
     private val textSlide: TextSlideInterp
     
     // Score card
+    private val scoreCardTransitionTime: Float = 0.5f
     private val scoreCardSceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val scoreCardTransition: FloatVar = FloatVar(0f) // Goes linearly from 1 to 0 when transitioning
     private val showingScoreCard: BooleanVar = BooleanVar(false)
     private val lastResultFlag: ReadOnlyVar<ResultFlag> = Var.eagerBind { engine.resultFlag.use() }
+    private val scoreBar: FloatVar = FloatVar(0f)
     
     private val failScoreCardOptions: List<PauseOption>
     private val successScoreCardOptions: List<PauseOption>
@@ -299,7 +299,7 @@ class StoryPlayScreen(
                     
                     this.temporarilyDisableLayouts { 
                         val progress: ReadOnlyIntVar = IntVar(eager = true) { 
-                            (engineBeat.use() / container.stopPosition.use() * 100).roundToInt().coerceIn(0, 99)
+                            (engineBeat.use() / container.stopPosition.use().coerceAtLeast(1f) * 100).roundToInt().coerceIn(0, 99)
                         }
                         this += TextLabel(StoryL10N.getVar("play.scoreCard.progress"), font = main.fontMainMenuMain).apply {
                             this.bindWidthToParent(multiplier = 0.275f)
@@ -353,24 +353,78 @@ class StoryPlayScreen(
                 this += RectElement(Color().grey(0.8f)).apply {
                     this.bounds.height.set(2f)
                 }
+
+
+                this += HBox().apply {
+                    this.bounds.height.set(90f)
+                    this.spacing.set(4f)
+                    this.margin.set(Insets(16f, 18f, 2f, 2f))
+                    this.align.set(HBox.Align.CENTRE)
+
+                    this.temporarilyDisableLayouts {
+                        val progress: ReadOnlyFloatVar = scoreBar
+                        this += Pane().apply {
+                            this.bindWidthToParent(multiplier = 0.85f)
+                            
+                            val borderColor = Color.WHITE
+                            val borderSize = 4f
+                            this += Pane().apply {
+                                this.border.set(Insets(borderSize))
+                                this.borderStyle.set(SolidBorder(borderColor))
+                                this.padding.set(Insets(borderSize * 1.25f))
+                                
+                                this += RectElement(borderColor).apply {
+                                    this.bindWidthToParent(multiplierBinding = { progress.use() / 100f }) { 0f }
+                                }
+                            }
+                            this += TextLabel(binding = {
+                                if (contract.immediatePass) {
+                                    if (progress.use() < 100f) "" else StoryL10N.getValue("play.scoreCard.pass")
+                                } else {
+                                    progress.use().toInt().toString()
+                                }
+                            }, font = main.fontResultsScore).apply {
+                                this.renderAlign.set(RenderAlign.center)
+                                this.padding.set(Insets(0f, 6f * 0.5f, 16f, 16f))
+                                this.textColor.set(Color.WHITE)
+                                this.setScaleXY(0.5f)
+                            }
+                        }
+                    }
+                }
             }
 
-            val successOptions = successScoreCardOptions.mapIndexed { i, opt ->
+            val optionsFade = FloatVar(1f)
+            val successOptions: List<UIElement> = listOf(Pane().apply { 
+                this.bounds.height.set(16f)
+            }) + successScoreCardOptions.mapIndexed { i, opt ->
                 createTextLabelOption(opt, i).apply {
                     Anchor.TopCentre.xConfigure(this, offsetX = 48f)
                     this.bindWidthToParent(multiplier = 0.5f)
                 }
             }
-            val failOptions = failScoreCardOptions.mapIndexed { i, opt ->
+            val failOptions: List<UIElement> = failScoreCardOptions.mapIndexed { i, opt ->
                 createTextLabelOption(opt, i).apply {
                     Anchor.TopCentre.xConfigure(this, offsetX = 48f)
                     this.bindWidthToParent(multiplier = 0.5f)
                 }
+            }
+            (successOptions + failOptions).forEach { 
+                it.opacity.bind { optionsFade.use() }
             }
             currentScoreCardOptions.addListener { vl ->
                 this.temporarilyDisableLayouts {
                     (successOptions + failOptions).forEach { this.removeChild(it) }
-                    when (vl.getOrCompute()) {
+                    
+                    val list = vl.getOrCompute()
+                    optionsFade.set(0f)
+                    if (list.isNotEmpty()) {
+                        animationHandler.enqueueAnimation(Animation(Interpolation.smoother, 0.25f, 0f, 1f), optionsFade)
+                        optionsFade.set(0f)
+                    } else {
+                        animationHandler.cancelAnimationFor(optionsFade)
+                    }
+                    when (list) {
                         successScoreCardOptions -> successOptions
                         failScoreCardOptions -> failOptions
                         else -> emptyList()
@@ -395,6 +449,7 @@ class StoryPlayScreen(
             currentScoreCardOptions.addListener {
                 val l = it.getOrCompute()
                 if (l.isEmpty()) {
+                    animationHandler.cancelAnimationFor(this.opacity)
                     this.opacity.set(0f)
                 } else {
                     animationHandler.enqueueAnimation(Animation(Interpolation.smoother, 0.5f, 0f, 1f), this.opacity)
@@ -433,6 +488,8 @@ class StoryPlayScreen(
         engine.inputter.areInputsLocked = false
         cancelIntroCard()
         closeScoreCard()
+        listOf(StoryAssets.get<Sound>("score_jingle_pass"), StoryAssets.get<Sound>("score_jingle_tryagain"),
+                StoryAssets.get<Sound>("score_jingle_pass_hard")).forEach { it.stop() }
     }
 
     fun initializeIntroCard() {
@@ -468,12 +525,13 @@ class StoryPlayScreen(
         showingScoreCard.set(true)
         animationHandler.cancelAnimationFor(scoreCardTransition)
         scoreCardTransition.set(1f)
-        animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 1f, 0f), scoreCardTransition)
+        animationHandler.enqueueAnimation(Animation(Interpolation.linear, scoreCardTransitionTime, 1f, 0f), scoreCardTransition)
     }
     
     fun closeScoreCard() {
         showingScoreCard.set(false)
         scoreCardTransition.set(0f)
+        animationHandler.cancelAnimationFor(scoreBar)
     }
     
     override fun renderGameplay(delta: Float) {
@@ -588,12 +646,61 @@ class StoryPlayScreen(
         engine.inputter.areInputsLocked = true // Unlocked in initialize()
         animationHandler.enqueueAnimation(Animation(Interpolation.smoother, 0.25f, 0f, 1f), blurStrength)
         
-        // TODO this should show a score check menu or failure
         if (engine.resultFlag.getOrCompute() is ResultFlag.Fail) {
             currentScoreCardOptions.set(failScoreCardOptions)
         } else {
             engine.resultFlag.set(ResultFlag.None)
             currentScoreCardOptions.set(emptyList())
+            scoreBar.set(0f)
+            
+            val delay = scoreCardTransitionTime + 0.25f
+            
+            if (contract.immediatePass) {
+                // Just a delay, then show Pass! with hit + music, options
+                animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, 0f, 100f, delay).apply {
+                    this.onComplete = {
+                        playMenuSound(StoryAssets.get<Sound>("score_finish"))
+                        playMenuSound(StoryAssets.get<Sound>("score_jingle_pass"))
+                        
+                        animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, 100f, 100f, 0.5f).apply {
+                            this.onComplete = {
+                                currentScoreCardOptions.set(successScoreCardOptions)
+                            }
+                        }, scoreBar)
+                    }
+                }, scoreBar)
+            } else {
+                // Delay, roll up score, hit+music, options
+                val inputter = engine.inputter
+                val nInputs = max(inputter.totalExpectedInputs, inputter.minimumInputCount)
+                val rawScore: Float = (if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
+                    inputScore.weight
+                } / nInputs) * 100))
+                val score: Int = rawScore.roundToInt().coerceIn(0, 100)
+
+                animationHandler.enqueueAnimation(Animation(Interpolation.linear, (145f / 60f) * (score / 100f), 0f, score.toFloat(), delay).apply {
+                    val fillingSound = StoryAssets.get<Sound>("score_filling")
+                    var fillingSoundID = -1L
+
+                    this.onStart = {
+                        fillingSoundID = playMenuSound(fillingSound).second
+                    }
+                    this.onComplete = {
+                        val passed = score >= contract.minimumScore
+                        
+                        fillingSound.stop(fillingSoundID)
+                        playMenuSound(StoryAssets.get<Sound>("score_finish"))
+                        playMenuSound(StoryAssets.get<Sound>(if (passed) "score_jingle_pass" else "score_jingle_tryagain"))
+
+                        animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, score.toFloat(), score.toFloat(), 0.5f).apply {
+                            this.onComplete = {
+                                currentScoreCardOptions.set(if (passed) successScoreCardOptions else failScoreCardOptions)
+                            }
+                        }, scoreBar)
+                    }
+                }, scoreBar)
+            }
+            
         }
         openScoreCard()
     }
