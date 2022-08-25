@@ -119,6 +119,9 @@ object Contracts {
         add(Contract("hole_in_one", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, 60) { main ->
             StoryDunkGameModeHoleInOne(main)
         })
+        add(Contract("rhythm_rally_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.ARCADE, 60) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_rally_2.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
