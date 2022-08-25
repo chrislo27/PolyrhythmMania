@@ -34,14 +34,9 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PreferenceKeys
-import polyrhythmmania.world.texturepack.TexPackSrcSelectorMenuPane
-import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins
-import polyrhythmmania.world.texturepack.CustomTexturePack
-import polyrhythmmania.world.texturepack.StockTexturePacks
-import polyrhythmmania.world.texturepack.TexturePack
-import polyrhythmmania.world.texturepack.PackTexRegion
+import polyrhythmmania.world.texturepack.*
 import java.io.File
 import java.util.*
 import java.util.zip.ZipOutputStream
@@ -555,6 +550,7 @@ class TexturePackEditDialog(
         val ctp = customTexturePack.getOrCompute()
         customPackFromContainer.set(ctp)
         editor.container.setTexturePackFromSource()
+        editor.container.customTexturePacks.forEach { it.invalidate() } // Fixes an issue with the manage tex pack screen invalidation
     }
     
     private fun importTextures(files: List<File>) {
