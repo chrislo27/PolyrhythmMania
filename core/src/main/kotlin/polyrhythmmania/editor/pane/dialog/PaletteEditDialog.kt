@@ -433,9 +433,11 @@ class PaletteEditDialog(
     }
     
     fun prepareShow(): PaletteEditDialog {
+        shouldColorPickerUpdateUpdateTileset = false
         tilesetPalette.applyTo(objPreview.worldRenderer.tileset)
         resetGroupMappingsToTileset()
         updateColourPickerToMapping()
+        shouldColorPickerUpdateUpdateTileset = true
         return this
     }
 
