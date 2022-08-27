@@ -107,16 +107,16 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             }
                         }
                     }
-//                    this += Button("Test interactable inbox/desk screen").apply {
-//                        this.bounds.height.set(32f)
-//                        this.setOnAction {
-//                            Gdx.app.postRunnable {
-//                                val titleScreen = TestStoryDeskScreen(main, this@TestStoryGimmickDebugScreen)
-//                                main.screen = TransitionScreen(main, main.screen, titleScreen,
-//                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-//                            }
-//                        }
-//                    }
+                    this += Button("Test \"all inbox items\" screen").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            Gdx.app.postRunnable {
+                                val titleScreen = TestStoryAllInboxItemsScreen(main, this@TestStoryGimmickDebugScreen)
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
                     this += separator()
                     this += Button("Polyrhythm 2 no changes").apply {
                         this.bounds.height.set(32f)
