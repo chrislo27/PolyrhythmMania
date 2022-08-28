@@ -122,6 +122,9 @@ object Contracts {
         add(Contract("rhythm_rally_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.ARCADE, 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_rally_2.prmproj"))
         })
+        add(Contract("built_to_scale_ds", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, 60) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/built_to_scale_ds.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
