@@ -786,18 +786,20 @@ duration: ${monster.activeDuration.get()} sec
                         skillStarSpinAnimation = 0f
                 }
                 if (skillStarPulseAnimation > 0) {
-                    skillStarPulseAnimation -= Gdx.graphics.deltaTime / 0.5f
+                    skillStarPulseAnimation -= Gdx.graphics.deltaTime / 0.75f
                     if (skillStarPulseAnimation < 0)
                         skillStarPulseAnimation = 0f
-                } else {
+                }
+
+                if (skillStarSpinAnimation <= 0f) { // Don't trigger if spin animation is playing
                     // Pulse before skill star input
-                    val threshold = 0.1f
+                    val beatThreshold = 0.1f
                     for (i in 0 until 4) {
                         val beatPoint = engine.tempos.beatsToSeconds(skillStarInput - i)
                         if (lastPulseBeat == beatPoint) {
                             continue
                         }
-                        if (engine.seconds in beatPoint..beatPoint + threshold) {
+                        if (engine.seconds in beatPoint..beatPoint + beatThreshold) {
                             skillStarPulseAnimation = 0.5f
                             lastPulseBeat = beatPoint
                             break
@@ -811,14 +813,16 @@ duration: ${monster.activeDuration.get()} sec
 
                 val texColoured = uiSheet["skill_star"]
                 val texGrey = uiSheet["skill_star_grey"]
-
-                val scale = Interpolation.exp10.apply(1f, 2f, (skillStarPulseAnimation).coerceAtMost(1f))
-                val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
                 
                 val prevColor = batch.packedColor
+                val size = 64f
+                val margin = 32f
+                val minMargin = 6f
+                val scale = Interpolation.exp10.apply(1f, (size + margin * 2 - minMargin * 2) / size, (skillStarPulseAnimation).coerceAtMost(1f))
+                val rotation = Interpolation.exp10Out.apply(0f, 360f, 1f - skillStarSpinAnimation)
                 batch.setColor(1f, 1f, 1f, skillStarOpacity)
                 batch.draw(if (inputter.skillStarGotten.get()) texColoured else texGrey,
-                        1184f, 32f, 32f, 32f, 64f, 64f, scale, scale, rotation)
+                        1280f - (size + margin), margin, size / 2, size / 2, size, size, scale, scale, rotation)
                 batch.packedColor = prevColor
             } else {
                 skillStarOpacity = 0f
