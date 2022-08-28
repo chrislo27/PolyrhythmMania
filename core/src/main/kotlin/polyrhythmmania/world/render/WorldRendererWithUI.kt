@@ -770,6 +770,8 @@ duration: ${monster.activeDuration.get()} sec
         private var skillStarOpacity: Float = 0f
         private var skillStarSpinAnimation: Float = 0f
         private var skillStarPulseAnimation: Float = 0f
+        
+        private var lastPulseBeat: Float = -10000f
 
         override fun renderUI(batch: SpriteBatch) {
             val engine = this@WorldRendererWithUI.engine
@@ -792,8 +794,12 @@ duration: ${monster.activeDuration.get()} sec
                     val threshold = 0.1f
                     for (i in 0 until 4) {
                         val beatPoint = engine.tempos.beatsToSeconds(skillStarInput - i)
+                        if (lastPulseBeat == beatPoint) {
+                            continue
+                        }
                         if (engine.seconds in beatPoint..beatPoint + threshold) {
                             skillStarPulseAnimation = 0.5f
+                            lastPulseBeat = beatPoint
                             break
                         }
                     }
@@ -823,6 +829,7 @@ duration: ${monster.activeDuration.get()} sec
             super.onWorldReset(world)
             skillStarSpinAnimation = 0f
             skillStarPulseAnimation = 0f
+            lastPulseBeat = -10000f
         }
 
         fun fireSkillStar() {
