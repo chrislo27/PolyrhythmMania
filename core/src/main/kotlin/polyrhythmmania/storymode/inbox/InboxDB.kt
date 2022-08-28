@@ -17,8 +17,7 @@ object InboxDB {
         addItem(InboxItem.IndexCard("test_indexcard", -1))
 
         addItem(InboxItem.Memo("first_memo0", 0))
-        addItem(InboxItem.ContractDoc(Contracts["first"], 0))
-        addItem(InboxItem.Memo("fp_explanation", 100))
+        addItem(InboxItem.ContractDoc(Contracts["tutorial1"], 0))
 
         // FIXME debug contracts
         Contracts.contracts.forEach { (key, contract) ->

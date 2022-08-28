@@ -41,6 +41,10 @@ import polyrhythmmania.storymode.screen.StoryPlayScreen
 import kotlin.math.sqrt
 
 
+/**
+ * Original all inbox items screen. Do not modify, just keeping as a reference.
+ * (Replaced with [TestStoryContractsScreen])
+ */
 class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
     : PRManiaScreen(main) {
     
@@ -53,7 +57,6 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
-    private val monoMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.robotoMonoFontBold, Markup.FONT_NAME_ITALIC to main.robotoMonoFontItalic, Markup.FONT_NAME_BOLDITALIC to main.robotoMonoFontBoldItalic), TextRun(main.robotoMonoFont, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     private val slabMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.fontSlabBold), TextRun(main.fontSlab, ""), Markup.FontStyles(Markup.FONT_NAME_BOLD, Markup.DEFAULT_FONT_NAME, Markup.DEFAULT_FONT_NAME))
     
     init {
@@ -258,7 +261,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                         this += VBox().apply {
                             this.spacing.set(6f)
                             this.temporarilyDisableLayouts {
-                                this += TextLabel(ReadOnlyVar.const("<Letterhead>"), font = main.fontMainMenuHeading).apply { // TODO replace with proper letterhead
+                                this += TextLabel(ReadOnlyVar.const("<Letterhead>"), font = main.fontMainMenuHeading).apply {
                                     this.bounds.height.set(40f)
                                     this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(Align.top)
@@ -339,7 +342,6 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     this.padding.set(Insets(8f))
                                     this += Button("Play Level").apply {
                                         this.setOnAction { 
-                                            // TODO
                                             main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                                             val gameMode = item.contract.gamemodeFactory(main)
                                             val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,

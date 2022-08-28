@@ -6,11 +6,12 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockTextbox
 import polyrhythmmania.engine.EventCowbellSFX
-import polyrhythmmania.engine.input.*
+import polyrhythmmania.engine.input.EventLockInputs
+import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.engine.input.practice.RequiredInput
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
-import polyrhythmmania.gamemodes.practice.ResetMusicVolumeBlock
 import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.gamemodes.practice.*
 import polyrhythmmania.soundsystem.BeadsMusic
@@ -20,7 +21,7 @@ import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
 
 
-class FirstContractGameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {   
+class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {   
     
     private val keyboardKeymap: InputKeymapKeyboard = main.settings.inputKeymapKeyboard.getOrCompute().copy()
     
@@ -73,37 +74,37 @@ class FirstContractGameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 0f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text1a")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text1a")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 1f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text1b")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text1b")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 2f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text1c")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text1c")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 3f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text1d")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text1d")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 4f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text1e")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text1e")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 5f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text1f")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text1f")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 6f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text2", keyboardKeymap.toDpadString())
+                this.text = StoryL10N.getValue("textbox.tutorial1.text2", keyboardKeymap.toDpadString())
             }.compileIntoEvents())
             engine.addEvents(practiceSection2.apply {
                 this.beat = startBeat + 4f + 8f
@@ -145,12 +146,12 @@ class FirstContractGameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text3")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text3")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text4")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text4")
             }.compileIntoEvents())
             engine.addEvents(practiceSection3.apply {
                 this.beat = startBeat + 4f + 3
@@ -205,12 +206,12 @@ class FirstContractGameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text5")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text5")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text6")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text6")
             }.compileIntoEvents())
             engine.addEvents(practiceSection4.apply {
                 this.beat = startBeat + 4f + 3
@@ -270,12 +271,12 @@ class FirstContractGameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text7")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text7")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.first_contract.text8")
+                this.text = StoryL10N.getValue("textbox.tutorial1.text8")
             }.compileIntoEvents())
             engine.addEvent(EventEndState(engine, startBeat + 4f + 3))
         }
@@ -303,12 +304,12 @@ class FirstContractGameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
         blocks += BlockTextbox(engine).apply {
             this.beat = 0f
             this.requireInput.set(true)
-            this.text = StoryL10N.getValue("textbox.first_contract.text0", Input.Keys.toString(keyboardKeymap.buttonA))
+            this.text = StoryL10N.getValue("textbox.tutorial1.text0", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += BlockTextbox(engine).apply {
             this.beat = 1f
             this.requireInput.set(true)
-            this.text = StoryL10N.getValue("textbox.first_contract.text1", Input.Keys.toString(keyboardKeymap.buttonA))
+            this.text = StoryL10N.getValue("textbox.tutorial1.text1", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += practiceSection1.apply {
             this.beat = 3f

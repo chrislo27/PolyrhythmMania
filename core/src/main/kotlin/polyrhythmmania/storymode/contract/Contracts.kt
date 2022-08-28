@@ -16,8 +16,8 @@ object Contracts {
             this.contracts[contract.id] = contract
         }
         
-        add(Contract("first", listOf(Condition.COMPLETE_TRAINING), Requester.HR, JingleType.GBA, null, 0) { main ->
-            FirstContractGameMode(main)
+        add(Contract("tutorial1", listOf(Condition.COMPLETE_TRAINING), Requester.HR, JingleType.GBA, null, 0) { main ->
+            Tutorial1GameMode(main)
         })
         
         add(Contract("fillbots", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, SongInfo.megamix("Fillbots"), 60) { main ->
