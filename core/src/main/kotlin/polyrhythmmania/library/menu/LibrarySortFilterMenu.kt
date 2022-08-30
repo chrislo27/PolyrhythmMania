@@ -27,7 +27,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu,
                             private val oldSettings: LibrarySortFilter)
     : StandardMenu(menuCol) {
     
-    private var currentSettings: Var<LibrarySortFilter> = Var(oldSettings.copy())
+    private val currentSettings: Var<LibrarySortFilter> = Var(oldSettings.copy())
     
     init {
         this.setSize(MMMenu.WIDTH_LARGE)

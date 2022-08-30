@@ -81,7 +81,9 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         
         this.setSize(percentage = 0.975f)
         this.titleText.bind {
-            Localization.getVar(if (sortFilter.use() == LibrarySortFilter.DEFAULT) "mainMenu.library.title" else "mainMenu.library.title.filtered").use()
+            Localization.getVar(if (sortFilter.use().isNonDefault())
+                "mainMenu.library.title.filtered"
+            else "mainMenu.library.title").use()
         }
         this.showLogo.set(false)
         this.contentPane.bounds.height.set(520f)

@@ -37,6 +37,31 @@ data class LibrarySortFilter(
             filterAlbumYear, filterGenre, filterDifficulty, filterFlashingLightsWarning)
     val enabledFilters: List<Filter> = filters.filter { it.enabled }
     val anyFiltersEnabled: Boolean = enabledFilters.isNotEmpty()
+
+
+    /**
+     * Copies this filter and removes the lists from [FilterOnStringList].
+     */
+    fun copyAndRemoveStringLists(): LibrarySortFilter {
+        return this.copy(
+                filterLevelCreator = filterLevelCreator.copy(list = listOf("")), filterSongName = filterSongName.copy(list = listOf("")),
+                filterSongArtist = filterSongArtist.copy(list = listOf("")), filterAlbumName = filterAlbumName.copy(list = listOf("")),
+                filterGenre = filterGenre.copy(list = listOf("")),
+        )
+    }
+
+    fun isNonDefault(): Boolean {
+        val default = DEFAULT
+
+        if (this.sortDescending != default.sortDescending || this.sortOn != default.sortOn || this.legacyOnTop != default.legacyOnTop) {
+            return true
+        }
+        if (anyFiltersEnabled) {
+            return true
+        }
+
+        return false
+    }
     
     private fun filterFunc(item: LevelEntryData): Boolean {
         if (anyFiltersEnabled) {
@@ -135,5 +160,4 @@ data class LibrarySortFilter(
         
         return if (legacyOnTop) (legacy + modern) else (modern + legacy)
     }
-    
 }
