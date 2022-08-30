@@ -2,12 +2,11 @@ package polyrhythmmania.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import paintbox.util.ColorStack
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollBar
-import paintbox.ui.control.TextLabel
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.SkinFactory
+import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.fillRoundedRect
 import paintbox.util.gdxutils.grey
@@ -17,6 +16,7 @@ object PRManiaSkins {
     
     const val SCROLLBAR_SKIN: String = "PRMania_ScrollBar"
     const val EDITOR_SCROLLBAR_SKIN: String = "PRMania_ScrollBar_editor"
+    const val SCROLLBAR_SKIN_LIGHT: String = "PRMania_ScrollBar_light"
     
     init {
         DefaultSkins.register(SCROLLBAR_SKIN, SkinFactory { element: ScrollBar ->
@@ -25,6 +25,15 @@ object PRManiaSkins {
         DefaultSkins.register(EDITOR_SCROLLBAR_SKIN, SkinFactory { element: ScrollBar ->
             ScrollBar.ScrollBarSkin(element).also { skin ->
                 skin.bgColor.set(Color().grey(0.1f, 1f))
+                skin.incrementColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
+                skin.disabledColor.set(Color(0.31f, 0.31f, 0.31f, 1f))
+                skin.thumbColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
+                skin.thumbHoveredColor.set(Color(0.70f, 0.70f, 0.70f, 1f))
+                skin.thumbPressedColor.set(Color(0.50f, 0.64f, 0.64f, 1f))
+            }
+        })
+        DefaultSkins.register(SCROLLBAR_SKIN_LIGHT, SkinFactory { element: ScrollBar ->
+            PRMScrollBarSkin(element).also { skin ->
                 skin.incrementColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
                 skin.disabledColor.set(Color(0.31f, 0.31f, 0.31f, 1f))
                 skin.thumbColor.set(Color(0.64f, 0.64f, 0.64f, 1f))
@@ -103,14 +112,14 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
         when (element.orientation) {
             ScrollBar.Orientation.HORIZONTAL -> {
                 batch.fillRoundedRect(rectX + thumbBounds.x.get()
-                        + (if (element.orientation == ScrollBar.Orientation.HORIZONTAL) (currentValue / scrollableThumbArea * (thumbBounds.width.get() - thumbW)) else 0f),
+                            + (currentValue / scrollableThumbArea * (thumbBounds.width.get() - thumbW)),
                         rectY - rectH + thumbBounds.y.get(),
                         thumbW, thumbH, thumbH / 2f)
             }
             ScrollBar.Orientation.VERTICAL -> {
                 batch.fillRoundedRect(rectX + thumbBounds.x.get(),
                         rectY - rectH + thumbBounds.y.get() + (thumbBounds.height.get() - thumbH)
-                                - (if (element.orientation == ScrollBar.Orientation.VERTICAL) (currentValue / scrollableThumbArea * (thumbBounds.height.get() - thumbH)) else 0f),
+                                - (currentValue / scrollableThumbArea * (thumbBounds.height.get() - thumbH)),
                         thumbW, thumbH, thumbW / 2f)
             }
         }

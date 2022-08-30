@@ -97,7 +97,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         this.disabled.set(true)
                         this.tooltipElement.set(Tooltip("No functionality yet"))
                     }
-                    this += Button("Test contracts screen with everything unlocked").apply {
+                    this += Button("Test contracts/desk screen").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             Gdx.app.postRunnable {
