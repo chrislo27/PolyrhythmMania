@@ -85,8 +85,6 @@ class StoryAsmGameModeBouncyRoad2(main: PRManiaGame)
             palette.aliasAsmLaneTop.color.getOrCompute().set(0xBA, 0x7C, 0xE2).mul(0.975f, 0.975f, 0.975f, 1f)
         }.applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
-
-        engine.autoInputs = true // FIXME remove
     }
 
     private fun newBouncePatternSkips(startBeat: Float, startOnLeft: Boolean, numBouncesInclFire: Int,
