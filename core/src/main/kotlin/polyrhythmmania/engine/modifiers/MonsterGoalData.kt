@@ -1,7 +1,6 @@
 package polyrhythmmania.engine.modifiers
 
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.MathUtils
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyBooleanVar
@@ -89,6 +88,9 @@ class MonsterGoalData(parent: EngineModifiers) : ModifierModule(parent) {
     private val isMonsterGoalActive: ReadOnlyBooleanVar = BooleanVar { 
         this@MonsterGoalData.enabled.use() && passiveCountdownRate.use() > 0f && canStartCountingDown.use() && activeDuration.use() > 0f && untilGameOver.use() > 0f
     }
+    /**
+     * Beat when the last monster ace SFX was played.
+     */
     private val lastMonsterAceSfx: FloatVar = FloatVar(-1f)
     
     
@@ -138,11 +140,18 @@ class MonsterGoalData(parent: EngineModifiers) : ModifierModule(parent) {
             untilGameOver.set((untilGameOver.get() + countdownReplenishOnAce.get()).coerceIn(0f, 1f))
             
             if (!silent) {
-                val volume = MathUtils.lerp(0.5f, 1f, ((engine.seconds - lastMonsterAceSfx.get()) / engine.playbackSpeed / 0.85f).coerceIn(0f, 1f))
+                val engineBeat = engine.beat
+                val beatsSinceLastAce = (engineBeat - lastMonsterAceSfx.get()).coerceIn(0f, 4f)
+                val volume: Float = when {
+                    beatsSinceLastAce < 0.75f -> 1f
+                    beatsSinceLastAce >= 0.75f && beatsSinceLastAce < 2f -> 0.35f
+                    beatsSinceLastAce >= 2f && beatsSinceLastAce < 3f -> 0.62f
+                    else -> 1f
+                }
                 engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_monster_goal_ace"), SoundInterface.SFXType.NORMAL) { player ->
                     player.gain = volume
                 }
-                lastMonsterAceSfx.set(engine.seconds)
+                lastMonsterAceSfx.set(engineBeat)
             }
         }
     }
