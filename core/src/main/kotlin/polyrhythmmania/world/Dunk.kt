@@ -372,8 +372,7 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         if (!collision.collidedWithWall && (currentIndexFloat - currentIndex) >= 0.80f && currentIndex >= -1) {
             val nextIndex = currentIndex + 1
 
-            // ULTRA HACKY!
-            if (nextIndex == 0) { // Dunk piston
+            if (nextIndex == 0 && !inputWasSuccessful) { // Dunk piston
                 val next = dunkPiston
                 val heightOfNext = next.collisionHeight
                 if (next.active && prevPosY in next.position.y..(next.position.y + heightOfNext - (1f / 32f))) {
