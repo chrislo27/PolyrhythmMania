@@ -488,8 +488,10 @@ class StoryPlayScreen(
         engine.inputter.areInputsLocked = false
         cancelIntroCard()
         closeScoreCard()
-        listOf(StoryAssets.get<Sound>("score_jingle_pass"), StoryAssets.get<Sound>("score_jingle_tryagain"),
-                StoryAssets.get<Sound>("score_jingle_pass_hard")).forEach { it.stop() }
+        Gdx.app.postRunnable {
+            listOf(StoryAssets.get<Sound>("score_jingle_pass"), StoryAssets.get<Sound>("score_jingle_tryagain"),
+                    StoryAssets.get<Sound>("score_jingle_pass_hard")).forEach { it.stop() }
+        }
     }
 
     fun initializeIntroCard() {
