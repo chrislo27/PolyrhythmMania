@@ -14,6 +14,7 @@ import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
 import polyrhythmmania.soundsystem.AudioDeviceSettings
 import polyrhythmmania.util.metrics.timeInline
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.sound.sampled.AudioFormat
 import kotlin.concurrent.thread
 import kotlin.math.roundToInt
@@ -38,8 +39,10 @@ class OpenALAudioIO(val audioDeviceSettings: AudioDeviceSettings)
     private inner class Lifecycle(val audioDevice: OpenALAudioDevice) : Disposable {
         val bufferSize: Int = audioDeviceSettings.bufferSize
         val bufferCount: Int = audioDeviceSettings.bufferCount
+        val forceKill: AtomicBoolean = AtomicBoolean(false)
         
         override fun dispose() {
+            forceKill.set(true)
             audioDevice.dispose()
         }
     }
@@ -84,7 +87,7 @@ class OpenALAudioIO(val audioDeviceSettings: AudioDeviceSettings)
             }
         }
         
-        while (context.isRunning) {
+        while (context.isRunning && !lifecycle.forceKill.get()) {
             primeBuffer()
             lifecycle.audioDevice.writeSamples(sampleBuffer, 0, sampleBufferSize)
         }
@@ -134,6 +137,8 @@ class OpenALAudioIO(val audioDeviceSettings: AudioDeviceSettings)
 
     override fun stop(): Boolean {
         super.stop()
+        
+        this.lifecycleInstance?.forceKill?.set(true)
         while (audioThread != null) {
             Thread.sleep(10L)
         }
