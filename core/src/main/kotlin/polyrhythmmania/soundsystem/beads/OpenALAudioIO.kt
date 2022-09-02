@@ -65,6 +65,9 @@ class OpenALAudioIO(val audioDeviceSettings: AudioDeviceSettings)
         val lifecycle = Lifecycle(newAudioDevice)
         this.lifecycleInstance = lifecycle
         
+        // FIXME Remove once libgdx issue #6977 is resolved
+        newAudioDevice.writeSamples(FloatArray(2) { 0f }, 0, 2) // This grabs a new AL source on the same thread (GL thread hopefully)
+        
         return lifecycle
     }
 
