@@ -122,12 +122,15 @@ class OpenALAudioIO(val audioDeviceSettings: AudioDeviceSettings)
         return true
     }
 
+    @Synchronized
     override fun start(): Boolean {
-        while (audioThread != null) {
+        while (audioThread != null) { // Wait for audio thread to die if any
+            this.lifecycleInstance?.forceKill?.set(true)
             Thread.sleep(10L)
         }
+        
+        create()
         audioThread = thread(start = true, isDaemon = true, name = "OpenALAudioIO", priority = threadPriority) {
-            create()
             runRealTime()
             destroy()
             audioThread = null
