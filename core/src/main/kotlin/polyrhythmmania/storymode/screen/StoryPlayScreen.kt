@@ -751,6 +751,10 @@ class StoryPlayScreen(
     }
 
     override fun keyDown(keycode: Int): Boolean {
+        if (this.inIntroCard.get()) {
+            return false
+        }
+        
         var consumed = false
         if (main.screen === this && !isPaused.get() && showingScoreCard.get()) {
             when (keycode) {
@@ -783,6 +787,7 @@ class StoryPlayScreen(
                 return true
             }
         }
+        
         return super.keyDown(keycode)
     }
 
