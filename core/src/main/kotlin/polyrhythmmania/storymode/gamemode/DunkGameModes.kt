@@ -3,6 +3,7 @@ package polyrhythmmania.storymode.gamemode
 import com.badlogic.gdx.Gdx
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.BlockEndState
+import polyrhythmmania.editor.block.BlockSkillStar
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
@@ -236,7 +237,6 @@ class StoryDunkGameModeHoleInOne(main: PRManiaGame)
                 newDunkPattern(143.0f),
                 newDunkPattern(144.0f),
                 newDunkPattern(148.0f),
-                newDunkPattern(149.0f),
                 newDunkPattern(155.0f),
                 newDunkPattern(160.5f),
                 newDunkPattern(163.0f),
@@ -248,6 +248,9 @@ class StoryDunkGameModeHoleInOne(main: PRManiaGame)
         ).onEach { block ->
             block.beat += 5f
             block.beat += globalBeatOffset
+        })
+        container.addBlock(BlockSkillStar(engine).apply {
+            this.beat = 154f + globalBeatOffset
         })
         container.addBlock(BlockEndState(engine).apply {
             this.beat = 200f + globalBeatOffset
@@ -361,6 +364,9 @@ class StoryDunkGameModeFruitBasket2(main: PRManiaGame)
                 ).onEach { block ->
             block.beat += 4f
             block.beat += globalBeatOffset
+        })
+        container.addBlock(BlockSkillStar(engine).apply { 
+            this.beat = 190f + globalBeatOffset
         })
         container.addBlock(BlockEndState(engine).apply {
             this.beat = 252f + globalBeatOffset
