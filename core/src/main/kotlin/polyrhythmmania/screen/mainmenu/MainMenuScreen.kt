@@ -30,10 +30,7 @@ import paintbox.ui.layout.VBox
 import paintbox.util.MathHelper
 import paintbox.util.Version
 import paintbox.util.WindowSize
-import paintbox.util.gdxutils.NestedFrameBuffer
-import paintbox.util.gdxutils.disposeQuietly
-import paintbox.util.gdxutils.fillRect
-import paintbox.util.gdxutils.grey
+import paintbox.util.gdxutils.*
 import paintbox.util.settableLazy
 import paintbox.util.viewport.ExtendNoOversizeViewport
 import polyrhythmmania.Localization
@@ -716,12 +713,9 @@ playerPos: ${soundSys.musicPlayer.position}
         }
         
         fun fadeMusicToSilent() {
-            Gdx.app.postRunnable {
-                musicPlayer.gain = 0.5f
-                Gdx.app.postRunnable {
-                    musicPlayer.gain = 0f
-                }
-            }
+            Gdx.app.postRunnable(GdxRunnableTransition(musicPlayer.gain.coerceIn(0f, 1f), 0f, 0.15f) { value, _ -> 
+                musicPlayer.gain = value
+            })
         }
 
         override fun dispose() {
