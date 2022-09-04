@@ -18,6 +18,15 @@ data class SongNameAndSource(val songName: String, val songSourceMaterial: Strin
     }
 }
 
+/**
+ * Attribution rules:
+ * - Primary [songNameAndSource] is the first instance of the song
+ * - Places where the song appears in future installments with a different name can be put in [otherAliases]
+ * - From a RH installment, the source should be one of [SRC_TENGOKU], [SRC_DS], [SRC_FEVER], or [SRC_MEGAMIX],
+ * using the North American name with the console in parentheses
+ * - For any names with no officially NA-English translation, the original Japanese name is used first and then
+ * the colloquial English transliteration ("Rhythm Tengoku", "Toss Boys", etc) in parentheses
+ */
 data class SongInfo(
         val songNameAndSource: SongNameAndSource,
         val songArtist: String,

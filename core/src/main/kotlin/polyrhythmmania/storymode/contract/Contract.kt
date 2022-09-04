@@ -17,7 +17,7 @@ data class Contract(
 
         val requester: Requester,
         val jingleType: JingleType,
-        val song: SongInfo?,
+        val attribution: Attribution?,
         /**
          * Minimum score to pass. If less than or equal to 0, the level is immediately passed when you get to the end.
          */
@@ -29,11 +29,11 @@ data class Contract(
     val immediatePass: Boolean get() = minimumScore <= 0
     
     constructor(
-            id: String, conditions: List<Condition>, requester: Requester, jingleType: JingleType, song: SongInfo?,
+            id: String, conditions: List<Condition>, requester: Requester, jingleType: JingleType, attribution: Attribution?,
             minimumScore: Int, gamemodeFactory: (main: PRManiaGame) -> GameMode
     ) : this(
             id, StoryL10N.getVar("contract.name.$id"), StoryL10N.getVar("contract.desc.$id"),
-            StoryL10N.getVar("contract.tagline.$id"), conditions, requester, jingleType, song, minimumScore, gamemodeFactory
+            StoryL10N.getVar("contract.tagline.$id"), conditions, requester, jingleType, attribution, minimumScore, gamemodeFactory
     )
 
 }
