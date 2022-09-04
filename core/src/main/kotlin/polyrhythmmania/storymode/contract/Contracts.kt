@@ -125,6 +125,9 @@ object Contracts {
         add(Contract("built_to_scale_ds", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, SongInfo.ds("Built to Scale"), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/built_to_scale_ds.prmproj"))
         })
+        add(Contract("fruit_basket_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, SongInfo.megamix("Fruit Basket 2"), 60) { main ->
+            StoryDunkGameModeFruitBasket2(main)
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)

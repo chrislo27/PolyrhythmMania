@@ -254,3 +254,116 @@ class StoryDunkGameModeHoleInOne(main: PRManiaGame)
         })
     }
 }
+
+class StoryDunkGameModeFruitBasket2(main: PRManiaGame)
+    : AbstractStoryDunkGameMode(main) {
+
+    override fun initialize() {
+        super.initialize()
+
+        val globalBeatOffset = 0f
+
+        engine.tempos.addTempoChange(TempoChange(0f, 163f))
+        engine.musicData.volumeMap.addMusicVolume(MusicVolume(0f, 0f, 65))
+
+        val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("story/levels/music/fruit_basket_2.ogg"), null)
+        val musicData = engine.musicData
+        musicData.musicSyncPointBeat = 0f + globalBeatOffset
+        musicData.firstBeatSec = 0.031f
+        musicData.beadsMusic = music
+        musicData.update()
+
+        addDunkPatternBlocks(listOf(
+                newDunkPattern(0.0f),
+                newDunkPattern(1.0f),
+                newDunkPattern(2.0f),
+                newDunkPattern(8.0f),
+                newDunkPattern(14.0f),
+                newDunkPattern(16.0f),
+                newDunkPattern(20.0f),
+                newDunkPattern(22.0f),
+                newDunkPattern(28.0f),
+                newDunkPattern(30.0f),
+                newDunkPattern(31.5f),
+                newDunkPattern(36.0f),
+                newDunkPattern(38.0f),
+                newDunkPattern(40.0f),
+                newDunkPattern(46.0f),
+                newDunkPattern(47.5f),
+                newDunkPattern(52.0f),
+                newDunkPattern(53.5f),
+                newDunkPattern(56.0f),
+                newDunkPattern(57.0f),
+                newDunkPattern(58.0f),
+                newDunkPattern(63.0f),
+                newDunkPattern(68.0f),
+                newDunkPattern(70.0f),
+                newDunkPattern(71.5f),
+                newDunkPattern(76.0f),
+                newDunkPattern(81.0f),
+                newDunkPattern(85.0f),
+                newDunkPattern(87.0f),
+                newDunkPattern(88.5f),
+                newDunkPattern(92.0f),
+                newDunkPattern(96.0f),
+                newDunkPattern(100.0f),
+                newDunkPattern(102.0f),
+                newDunkPattern(110.0f),
+                newDunkPattern(112.0f),
+                newDunkPattern(113.5f),
+                newDunkPattern(115.0f),
+                newDunkPattern(120.0f),
+                newDunkPattern(121.0f),
+                newDunkPattern(122.0f),
+                newDunkPattern(126.0f),
+                newDunkPattern(132.0f),
+                newDunkPattern(134.0f),
+                newDunkPattern(135.5f),
+                newDunkPattern(141.0f),
+                newDunkPattern(143.0f),
+                newDunkPattern(145.0f),
+                newDunkPattern(148.0f),
+                newDunkPattern(152.0f),
+                newDunkPattern(153.0f),
+                newDunkPattern(154.0f),
+                newDunkPattern(157.0f),
+                newDunkPattern(159.0f),
+                newDunkPattern(164.0f),
+                newDunkPattern(166.0f),
+                newDunkPattern(167.0f),
+                newDunkPattern(168.0f),
+                newDunkPattern(172.0f),
+                newDunkPattern(174.0f),
+                newDunkPattern(180.0f),
+                newDunkPattern(181.0f),
+                newDunkPattern(182.0f),
+                newDunkPattern(183.0f),
+                newDunkPattern(185.0f),
+                newDunkPattern(186.0f),
+                newDunkPattern(190.0f),
+                newDunkPattern(196.0f),
+                newDunkPattern(198.0f),
+                newDunkPattern(199.5f),
+                newDunkPattern(204.0f),
+                newDunkPattern(206.0f),
+                newDunkPattern(207.5f),
+                newDunkPattern(212.0f),
+                newDunkPattern(214.0f),
+                newDunkPattern(216.0f),
+                newDunkPattern(217.5f),
+                newDunkPattern(222.0f),
+                newDunkPattern(224.0f),
+                newDunkPattern(226.0f),
+                newDunkPattern(232.0f),
+                newDunkPattern(233.5f),
+                newDunkPattern(234.5f),
+                newDunkPattern(239.0f),
+                ).onEach { block ->
+            block.beat += 4f
+            block.beat += globalBeatOffset
+        })
+        container.addBlock(BlockEndState(engine).apply {
+            this.beat = 252f + globalBeatOffset
+        })
+    }
+}
