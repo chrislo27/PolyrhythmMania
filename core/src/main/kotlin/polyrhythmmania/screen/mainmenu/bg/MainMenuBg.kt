@@ -186,7 +186,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
 
         for (x in 0 until 7) {
             for (z in -2..0) {
-                world.addEntity(EntityCube(world, withLine = false, withBorder = z == 0).apply {
+                world.addEntity(EntityCubeMM(withBorder = z == 0, showLeftVerticalEdge = z == -2).apply {
                     this.position.set(x.toFloat(), 0f, z.toFloat())
                 })
             }
@@ -226,7 +226,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
 
         for (x in 0 until 7) {
             for (z in -2..0) {
-                world.addEntity(EntityCube(world, withLine = false, withBorder = z == 0).apply {
+                world.addEntity(EntityCubeMM(withBorder = z == 0, showLeftVerticalEdge = z == -2).apply {
                     this.position.set(x.toFloat(), 0f, z.toFloat())
                 })
             }
