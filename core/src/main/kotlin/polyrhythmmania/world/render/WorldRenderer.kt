@@ -194,9 +194,12 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             
             world.sortEntitiesByRenderOrder()
             world.entities.forEach { entity ->
-                entity.setCullingRect(tmpEntityRect, tmpEntityVec)
+                val cullingInEffect = entity.shouldApplyRenderCulling()
+                if (cullingInEffect) {
+                    entity.setCullingRect(tmpEntityRect, tmpEntityVec)
+                }
                 // Only render entities that are in scene
-                if (tmpEntityRect.intersects(visibleAreaRect)) {
+                if (!cullingInEffect || tmpEntityRect.intersects(visibleAreaRect)) {
                     entitiesRendered++
                     entity.render(this, batch, currentTileset)
                 }
@@ -253,8 +256,11 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                             batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
                             entity.renderBlockingEffectAfterLighting(this, batch, currentTileset)
                         } else {
-                            entity.setCullingRect(tmpEntityRect, tmpEntityVec)
-                            if (tmpEntityRect.intersects(visibleAreaRect)) {
+                            val cullingInEffect = entity.shouldApplyRenderCulling()
+                            if (cullingInEffect) {
+                                entity.setCullingRect(tmpEntityRect, tmpEntityVec)
+                            }
+                            if (!cullingInEffect || tmpEntityRect.intersects(visibleAreaRect)) {
                                 // Not a light emitter, so just render the blocking effect using Entity.render
                                 batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
                                 entity.render(this, batch, currentTileset)

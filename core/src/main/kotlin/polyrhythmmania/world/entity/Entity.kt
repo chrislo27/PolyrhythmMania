@@ -45,5 +45,10 @@ open class Entity(val world: World) {
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec3.set(this.position))
         rect.set(convertedVec.x, convertedVec.y, this.renderWidth, this.renderHeight)
     }
+
+    /**
+     * True if render culling is in effect. Only should be false for certain entities, like [EntityBackgroundImg].
+     */
+    open fun shouldApplyRenderCulling(): Boolean = true
     
 }
