@@ -33,4 +33,7 @@ class EntityBackgroundImg(world: World, val layer: Layer)
         batch.setColor(1f, 1f, 1f, 1f)
     }
 
+    override fun shouldApplyRenderCulling(): Boolean {
+        return false
+    }
 }
