@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.inbox
 
+import paintbox.Paintbox
 import polyrhythmmania.storymode.contract.Contracts
 
 
@@ -19,9 +20,12 @@ object InboxDB {
         addItem(InboxItem.Memo("first_memo0", 0))
         addItem(InboxItem.ContractDoc(Contracts["tutorial1"], 0))
 
-        // FIXME debug contracts
-        Contracts.contracts.forEach { (key, contract) ->
-            addItem(InboxItem.ContractDoc(contract, 200, id = "debugcontr_${contract.id}"))
+        run {
+            // FIXME debug contracts
+            Contracts.contracts.forEach { (key, contract) ->
+                addItem(InboxItem.ContractDoc(contract, 200, id = "debugcontr_${contract.id}"))
+            }
+            Paintbox.LOGGER.debug("Added ${Contracts.contracts.size} debug contracts", "InboxDB")
         }
     }
 
