@@ -128,6 +128,9 @@ object Contracts {
         add(Contract("fruit_basket_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Fruit Basket 2"), listOf("J-D")), 60) { main ->
             StoryDunkGameModeFruitBasket2(main)
         })
+        add(Contract("air_rally_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.fever("Air Rally", listOf(SongNameAndSource.megamix("Air Rally 2"))), listOf("GENERIC")), 60) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally_2.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
