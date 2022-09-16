@@ -97,11 +97,11 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         this.disabled.set(true)
                         this.tooltipElement.set(Tooltip("No functionality yet"))
                     }
-                    this += Button("Test contracts/desk screen").apply {
+                    this += Button("Test \"desktop\" screen").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             Gdx.app.postRunnable {
-                                val titleScreen = TestStoryContractsScreen(main, this@TestStoryGimmickDebugScreen)
+                                val titleScreen = TestStoryDesktopScreen(main, this@TestStoryGimmickDebugScreen)
                                 main.screen = TransitionScreen(main, main.screen, titleScreen,
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }

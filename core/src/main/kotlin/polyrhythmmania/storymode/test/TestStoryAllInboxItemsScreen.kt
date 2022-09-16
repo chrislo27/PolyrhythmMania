@@ -43,7 +43,7 @@ import kotlin.math.sqrt
 
 /**
  * Original all inbox items screen. Do not modify, just keeping as a reference.
- * (Replaced with [TestStoryContractsScreen])
+ * (Replaced with [TestStoryDesktopScreen])
  */
 class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
     : PRManiaScreen(main) {

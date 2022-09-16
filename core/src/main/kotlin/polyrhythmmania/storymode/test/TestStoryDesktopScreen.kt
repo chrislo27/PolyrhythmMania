@@ -42,7 +42,7 @@ import polyrhythmmania.ui.PRManiaSkins
 import kotlin.math.sqrt
 
 
-class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
+class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
     : PRManiaScreen(main) {
     
     val batch: SpriteBatch = main.batch
@@ -73,9 +73,11 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
 
         val frame = ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame"))).apply {
             this.bounds.x.set(16f * 4)
-            this.bounds.y.set(16f * 4)
-            this.bounds.width.set(84f * 4)
-            this.bounds.height.set(148f * 4)
+            this.bounds.y.set(14f * 4)
+//            this.bounds.width.set(84f * 4)
+//            this.bounds.height.set(148f * 4)
+            this.bounds.width.set(86f * 4)
+            this.bounds.height.set(152f * 4)
             this.doClipping.set(true) // Safety clipping so nothing exceeds the overall frame
         }
         bg += frame
@@ -83,8 +85,16 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
             this.doClipping.set(true)
         }
         frame += Pane().apply {// Extra pane is so that the frameChildArea is the one that clips properly internally
-            this.margin.set(Insets(3f * 4, 3f * 4, 0f, 0f))
+            this.margin.set(Insets(7f * 4, 5f * 4, 1f * 4, 1f * 4))
             this += frameChildArea
+        }
+        frame += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame_cap_top"))).apply {
+            Anchor.TopLeft.configure(this, offsetY = 1f * 4)
+            this.bounds.height.set(7f * 4)
+        }
+        frame += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame_cap_bottom"))).apply {
+            Anchor.BottomLeft.configure(this, offsetY = -1f * 4)
+            this.bounds.height.set(7f * 4)
         }
         val frameScrollPane = ScrollPane().apply { 
             this.contentPane.doClipping.set(false)
@@ -121,12 +131,11 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
         // Test items vbox
         val itemsVbox = VBox().apply {
             this.spacing.set(0f)
-            this.margin.set(Insets(0f, 1f * 4, 0f, 0f))
             this.autoSizeToChildren.set(true)
         }
         frameScrollPane.setContent(itemsVbox)
         val itemToggleGroup = ToggleGroup()
-        class InboxItemTestObj : ActionablePane(), Toggle {
+        class InboxItemTestObj(val type: Int) : ActionablePane(), Toggle {
             override val selectedState: BooleanVar = BooleanVar(false)
             override val toggleGroup: Var<ToggleGroup?> = Var(null)
             
@@ -141,7 +150,13 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                 }
                 this += pane
 
-                pane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_available"))).apply {
+                pane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_${when (type) {
+                    0 -> "unavailable"
+                    1 -> "available"
+                    2 -> "cleared"
+                    3 -> "skipped"
+                    else -> "unavailable"
+                }}"))).apply {
                     this.bounds.x.set(1f * 4)
                     this.bounds.y.set(1f * 4)
                     this.bounds.width.set(76f * 4)
@@ -157,7 +172,8 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                 }
                 
                 this.setOnAction { 
-                    this.selectedState.invert()
+                    if (type != 0)
+                        this.selectedState.invert()
                 }
             }
         }
@@ -165,15 +181,15 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
             itemsVbox += obj
             itemToggleGroup.addToggle(obj)
         }
-        addObj(InboxItemTestObj())
-        addObj(InboxItemTestObj())
-        addObj(InboxItemTestObj())
-        addObj(InboxItemTestObj())
-        addObj(InboxItemTestObj())
-        addObj(InboxItemTestObj())
-        addObj(InboxItemTestObj())
-        addObj(InboxItemTestObj())
-        addObj(InboxItemTestObj())
+        addObj(InboxItemTestObj(2))
+        addObj(InboxItemTestObj(2))
+        addObj(InboxItemTestObj(3))
+        addObj(InboxItemTestObj(1))
+        addObj(InboxItemTestObj(1))
+        addObj(InboxItemTestObj(0))
+        addObj(InboxItemTestObj(0))
+        addObj(InboxItemTestObj(0))
+        addObj(InboxItemTestObj(0))
 
 
         
@@ -200,7 +216,6 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
 //        
 //        columns[0] += RectElement(Color(0f, 0f, 0f, 0.5f)).apply { 
 //            this.bindHeightToParent(multiplier = 0.4f)
-//            // TODO
 //        }
 //        val currentInboxFolder: Var<InboxItem?> = Var(null)
 //        columns[1] += RectElement(Color(0f, 0f, 0f, 0.5f)).apply {  
@@ -483,7 +498,7 @@ class TestStoryContractsScreen(main: PRManiaGame, val prevScreen: Screen)
                                         main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                                         val gameMode = item.contract.gamemodeFactory(main)
                                         val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
-                                                main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryContractsScreen)
+                                                main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryDesktopScreen)
                                         main.screen = TransitionScreen(main, main.screen, playScreen,
                                                 FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
                                             this.onEntryEnd = {
