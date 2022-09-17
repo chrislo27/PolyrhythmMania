@@ -15,15 +15,15 @@ object InboxDB {
             this.allItems[inboxItem.id] = inboxItem
         }
 
-        addItem(InboxItem.IndexCard("test_indexcard", -1))
+        addItem(InboxItem.IndexCard("test_indexcard", UnlockReqs.ALWAYS_AVAILABLE))
 
-        addItem(InboxItem.Memo("first_memo0", 0))
-        addItem(InboxItem.ContractDoc(Contracts["tutorial1"], 0))
+        addItem(InboxItem.Memo("first_memo0", UnlockReqs.ALWAYS_AVAILABLE))
+        addItem(InboxItem.ContractDoc(Contracts["tutorial1"], UnlockReqs.ALWAYS_AVAILABLE))
 
         run {
             // FIXME debug contracts
             Contracts.contracts.forEach { (key, contract) ->
-                addItem(InboxItem.ContractDoc(contract, 200, id = "debugcontr_${contract.id}"))
+                addItem(InboxItem.ContractDoc(contract, UnlockReqs.ALWAYS_AVAILABLE, itemID = "debugcontr_${contract.id}"))
             }
             Paintbox.LOGGER.debug("Added ${Contracts.contracts.size} debug contracts", "InboxDB")
         }

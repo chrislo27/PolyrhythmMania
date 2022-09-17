@@ -102,7 +102,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                     this.setContent(VBox().apply { 
                         this.spacing.set(2f)
                         this.temporarilyDisableLayouts { 
-                            InboxDB.allItems.values.sortedBy { it.fpPrereq }.forEach { inboxItem ->
+                            InboxDB.allItems.values.forEach { inboxItem ->
                                 this += ActionablePane().apply {
                                     this.bounds.height.set(48f)
                                     this += RectElement().apply {

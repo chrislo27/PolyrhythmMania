@@ -30,6 +30,9 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.isAltDown
+import paintbox.util.gdxutils.isControlDown
+import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
@@ -47,7 +50,7 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
     
     val batch: SpriteBatch = main.batch
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
-        this.setToOrtho(false, 1280f, 720f) // 320x180 is 4x smaller
+        this.setToOrtho(false, 1280f, 720f) // 320x180 is 4x smaller. Needs to be 1280x720 for font scaling
         this.update()
     }
     val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
@@ -74,8 +77,6 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
         val frame = ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame"))).apply {
             this.bounds.x.set(16f * 4)
             this.bounds.y.set(14f * 4)
-//            this.bounds.width.set(84f * 4)
-//            this.bounds.height.set(148f * 4)
             this.bounds.width.set(86f * 4)
             this.bounds.height.set(152f * 4)
             this.doClipping.set(true) // Safety clipping so nothing exceeds the overall frame
@@ -114,7 +115,8 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
             this.minimum.set(0f)
             this.maximum.set(100f)
             this.disabled.eagerBind { frameScrollPane.vBar.maximum.use() <= 0f } // Uses the contentHeightDiff internally in ScrollPane
-            this.visibleAmount.bind { (17f / 148f) * (maximum.use() - minimum.use()) }
+            this.visibleAmount.bind { (17f / 148f) * (maximum.use() - minimum.use()) } // Thumb size
+            this.blockIncrement.eagerBind { (1f / (9 - 7) /* TODO this is hardcoded to 1/(numElements - numVisible) */) * (maximum.use() - minimum.use()) } // One item at a time
             
             // Remove up/down arrow buttons
             this.removeChild(this.increaseButton)
@@ -126,11 +128,25 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
             -vbar.value.use() / (vbar.maximum.use() - vbar.minimum.use()) * frameScrollPane.contentHeightDiff.use()
         }
         bg += vbar
+        val scrollListener = InputEventListener { event ->
+            if (event is Scrolled && !Gdx.input.isControlDown() && !Gdx.input.isAltDown()) {
+                val shift = Gdx.input.isShiftDown()
+                val vBarAmount = if (shift) event.amountX else event.amountY
+
+                if (vBarAmount != 0f && vbar.apparentVisibility.get() && !vbar.apparentDisabledState.get()) {
+                    if (vBarAmount > 0) vbar.incrementBlock() else vbar.decrementBlock()
+                }
+            }
+            false
+        }
+        vbar.addInputEventListener(scrollListener)
+        frameScrollPane.addInputEventListener(scrollListener)
         
         
         // Test items vbox
         val itemsVbox = VBox().apply {
             this.spacing.set(0f)
+            this.margin.set(Insets(0f, 1f * 4, 0f, 0f))
             this.autoSizeToChildren.set(true)
         }
         frameScrollPane.setContent(itemsVbox)
