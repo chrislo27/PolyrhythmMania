@@ -173,14 +173,14 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                             this.bindWidthToParent(adjustBinding = { -leftRule.use() })
                             this.padding.set(Insets(0f, 0f, 3f, 15f))
 
-                            this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc")).apply {
-                                this.markup.set(Markup(mapOf(Markup.DEFAULT_FONT_NAME to main.fontHandwriting2),
-                                        TextRun(main.fontHandwriting2, "", lineHeightScale = 0.865f),
-                                        styles = Markup.FontStyles.ALL_USING_DEFAULT_FONT))
-                                this.renderAlign.set(RenderAlign.topLeft)
-                                this.doLineWrapping.set(true)
-                                this.bounds.y.set(3f)
-                            }
+//                            this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc")).apply {
+//                                this.markup.set(Markup(mapOf(Markup.DEFAULT_FONT_NAME to main.fontHandwriting2),
+//                                        TextRun(main.fontHandwriting2, "", lineHeightScale = 0.865f),
+//                                        styles = Markup.FontStyles.ALL_USING_DEFAULT_FONT))
+//                                this.renderAlign.set(RenderAlign.topLeft)
+//                                this.doLineWrapping.set(true)
+//                                this.bounds.y.set(3f)
+//                            }
                         }
                     }
                 }

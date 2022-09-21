@@ -3,7 +3,6 @@ package polyrhythmmania.credits
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import polyrhythmmania.Localization
-import java.util.*
 
 
 object Credits : CreditsBase() {
@@ -57,8 +56,6 @@ object Credits : CreditsBase() {
                     "Leland",
                     "Roboto",
                     "Rodin",
-                    "Caveat",
-                    "Covered By Your Grace",
                     "Roboto Mono",
                     "Roboto Slab",
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },

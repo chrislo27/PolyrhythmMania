@@ -826,20 +826,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     size = 20
                     borderWidth = 0f
                 }).setAfterLoad(defaultAfterLoad)
-        cache["Caveat"] = PaintboxFontFreeType(
-                PaintboxFontParams(Gdx.files.internal("fonts/Caveat/Caveat-SemiBold.ttf"), 24, 0f, true, WindowSize(1280, 720)),
-                makeParam().apply {
-                    hinting = FreeTypeFontGenerator.Hinting.Slight
-                    size = 24
-                    borderWidth = 0f
-                }).setAfterLoad(defaultAfterLoad)
-        cache["CoveredByYourGrace"] = PaintboxFontFreeType(
-                PaintboxFontParams(Gdx.files.internal("fonts/CoveredByYourGrace/CoveredByYourGrace-Regular.ttf"), 24, 0f, true, WindowSize(1280, 720)),
-                makeParam().apply {
-                    hinting = FreeTypeFontGenerator.Hinting.Slight
-                    size = 24
-                    borderWidth = 0f
-                }).setAfterLoad(defaultAfterLoad)
     }
 
 
@@ -889,9 +875,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     
     val fontSlab: PaintboxFont get() = fontCache["RobotoSlab"]
     val fontSlabBold: PaintboxFont get() = fontCache["RobotoSlab_BOLD"]
-    
-    val fontHandwriting1: PaintboxFont get() = fontCache["Caveat"]
-    val fontHandwriting2: PaintboxFont get() = fontCache["CoveredByYourGrace"]
 
     
     private fun generateColourPickerTextures() {
