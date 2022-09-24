@@ -5,9 +5,9 @@ import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.TextLabel
-import paintbox.ui.control.ToggleGroup
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import polyrhythmmania.LocalePicker
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
@@ -60,35 +60,15 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)
                 this.setScaleXY(0.75f)
             }
-            
-            val toggleGroup = ToggleGroup()
-            Localization.bundles.getOrCompute().forEachIndexed { index, bundle ->
-                val name = bundle.namedLocale.name
-                val locale = bundle.namedLocale.locale
-                val (pane, button) = createRadioButtonOption({ name }, toggleGroup)
-                button.setOnAction { 
-                    button.checkedState.set(true)
-                    val currentBundles = Localization.bundles.getOrCompute()
-                    Localization.currentBundle.set(currentBundles.find { it.namedLocale.locale == locale } ?: currentBundles.first())
-                    settings.locale.set("${locale.language}_${locale.country}_${locale.variant}")
-                }
-                vbox += pane
-                button.textLabel.margin.set(Insets(0f, 0f, 10f, 0f))
-                
-                if (bundle == Localization.currentBundle.getOrCompute() || index == 0) {
-                    button.selectedState.set(true)
-                }
-            }
 
-            // TODO remove me when another language is added
-            vbox += TextLabel("More languages (hopefully) coming soon!").apply {
-                this.markup.set(this@LanguageMenu.markup)
-                this.bounds.height.set(70f)
-                this.renderAlign.set(Align.left)
-                this.doLineWrapping.set(true)
-                this.textColor.set(LongButtonSkin.TEXT_COLOR)
-                this.setScaleXY(1f)
+            val locales = LocalePicker.namedLocales
+            val (comboboxPane, combobox) = createComboboxOption(locales, LocalePicker.currentLocale.getOrCompute(), {
+                Localization.getVar("mainMenu.language.title").use()
+            }, itemToString = { it.name }, percentageContent = 0.6f)
+            combobox.onItemSelected = { newItem ->
+                LocalePicker.currentLocale.set(newItem)
             }
+            vbox += comboboxPane
         }
         
         vbox.sizeHeightToChildren(100f)
