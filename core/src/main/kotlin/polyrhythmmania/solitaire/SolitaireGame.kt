@@ -15,10 +15,12 @@ import paintbox.binding.FloatVar
 import paintbox.packing.PackedSheet
 import paintbox.ui.*
 import paintbox.util.ColorStack
-import paintbox.util.gdxutils.*
+import paintbox.util.gdxutils.fillRect
+import paintbox.util.gdxutils.maxX
+import paintbox.util.gdxutils.maxY
+import paintbox.util.gdxutils.scaleMul
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.statistics.GlobalStats
-import polyrhythmmania.util.Semitones
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -647,7 +649,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
         }
         
         // Show all cards debug
-        if (SHOW_ALL_CARDS_DEBUG && Paintbox.stageOutlines.getOrCompute() == Paintbox.StageOutlineMode.ONLY_VISIBLE) {
+        if (SHOW_ALL_CARDS_DEBUG && Paintbox.uiDebugOutlines.getOrCompute() == Paintbox.UIDebugOutlineMode.ONLY_VISIBLE) {
             batch.fillRect(x, y - h, w, h)
             
             val deck = Card.STANDARD_DECK
