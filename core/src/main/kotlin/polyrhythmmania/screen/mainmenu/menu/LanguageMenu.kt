@@ -83,7 +83,7 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 when (currentLocale.locale.language) {
                     "", "en" -> {
                         // Note: This text is intentionally not localized
-                         "This is the default language for the game. Did you know there are ${NumberFormat.getIntegerInstance(currentLocale.locale).format(numBaseKeys)} strings in the game that can be translated? That's a lot!"
+                        "This is the default language for the game. Did you know there are ${NumberFormat.getIntegerInstance(currentLocale.locale).format(numBaseKeys)} strings in the game that can be translated? That's a lot!"
                     }
                     else -> {
                         val numKeys = main.allLocalizations.sumOf { locBase ->
@@ -98,7 +98,7 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 percentageInt, numKeys, numBaseKeys,
                                 (Credits.languageCredits[currentLocale.locale]?.let { 
                                     it.primaryLocalizers + it.secondaryLocalizers
-                                } ?: emptyList()).joinToString(separator = ", ")
+                                } ?: listOf("<missing language credit>")).joinToString(separator = ", ")
                         )).use()
                     }
                 }
