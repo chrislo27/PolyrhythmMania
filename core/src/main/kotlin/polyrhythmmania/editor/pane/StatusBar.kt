@@ -31,7 +31,7 @@ class StatusBar(val editorPane: EditorPane) : Pane() {
         
         val parent: UIElement = bg
         
-        label = TextLabel("", font = editor.main.mainFont).apply {
+        label = TextLabel("", font = editor.main.fontEditor).apply {
             this.renderAlign.set(Align.left)
             this.textAlign.set(TextAlign.LEFT)
             this.doXCompression.set(true)

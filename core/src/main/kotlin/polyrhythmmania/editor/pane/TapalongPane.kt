@@ -57,7 +57,7 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
                 c.set(TEXT_COLOR).lerp(FLASH_TEXT_COLOR, alpha)
                 c
             }
-            hbox.addChild(TextLabel("♩=", font = editorPane.main.fontRodinFixed).apply {
+            hbox.addChild(TextLabel("♩=", font = editorPane.main.fontEditorRodin).apply {
                 this.bounds.width.set(32f)
                 this.renderAlign.set(Align.right)
                 this.textAlign.set(TextAlign.RIGHT)
@@ -70,28 +70,28 @@ class TapalongPane(val toolbar: Toolbar) : Pane() {
                     Localization.getValue("tapalong.first")
                 else
                     DecimalFormats.format("0.0", averageBpm.use())
-            }, font = editorPane.main.mainFontBold).apply {
+            }, font = editorPane.main.fontEditorBold).apply {
                 this.bounds.width.set(64f)
                 this.renderAlign.set(Align.left)
                 this.textAlign.set(TextAlign.LEFT)
                 this.textColor.bind { flashTextColor.use() }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("tapalong.bpmLabel")))
             })
-            hbox.addChild(TextLabel("n=", font = editorPane.main.fontRodinFixed).apply {
+            hbox.addChild(TextLabel("n=", font = editorPane.main.fontEditorRodin).apply {
                 this.bounds.width.set(32f)
                 this.renderAlign.set(Align.right)
                 this.textAlign.set(TextAlign.RIGHT)
                 this.textColor.set(Color.WHITE)
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("tapalong.countLabel")))
             })
-            hbox.addChild(TextLabel(binding = { "${count.use()}" }, font = editorPane.main.mainFontBold).apply {
+            hbox.addChild(TextLabel(binding = { "${count.use()}" }, font = editorPane.main.fontEditorBold).apply {
                 this.bounds.width.set(40f)
                 this.renderAlign.set(Align.left)
                 this.textAlign.set(TextAlign.LEFT)
                 this.textColor.bind { flashTextColor.use() }
                 this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("tapalong.countLabel")))
             })
-            hbox.addChild(Button(binding = { Localization.getVar("tapalong.reset").use() }, font = editorPane.main.mainFont).apply {
+            hbox.addChild(Button(binding = { Localization.getVar("tapalong.reset").use() }, font = editorPane.main.fontEditor).apply {
                 this.bounds.width.set(108f)
                 this.setOnAction {
                     reset()

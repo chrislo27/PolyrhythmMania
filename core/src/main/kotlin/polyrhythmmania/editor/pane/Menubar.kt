@@ -230,7 +230,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
         }
         rightBox.temporarilyDisableLayouts {
             if (editor.flags.isNotEmpty()) {
-                rightBox += TextLabel("(!) Special Editor Flags: ${editor.flags}", font = editor.main.mainFontBordered).apply {
+                rightBox += TextLabel("(!) Special Editor Flags: ${editor.flags}", font = editor.main.fontEditorBordered).apply {
                     this.bounds.width.set(500f)
                     this.textColor.set(Color.RED)
                     this.renderAlign.set(Align.right)

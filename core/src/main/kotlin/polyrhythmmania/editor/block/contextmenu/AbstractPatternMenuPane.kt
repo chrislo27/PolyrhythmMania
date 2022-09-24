@@ -55,7 +55,7 @@ abstract class AbstractPatternMenuPane<E : CubeTypeLike, Data : AbstractPatternB
                 pane.bounds.width.set(blockSize * (data.rowCount + 3))
                 pane.bounds.height.set(blockSize)
 
-                pane.addChild(TextLabel(label, font = editorPane.palette.main.fontRodinFixed).also { label ->
+                pane.addChild(TextLabel(label, font = editorPane.palette.main.fontEditorRodin).also { label ->
                     label.bounds.x.set(0f)
                     label.bounds.y.set(0 * blockSize)
                     label.bounds.width.set(blockSize * 1)
@@ -86,7 +86,7 @@ abstract class AbstractPatternMenuPane<E : CubeTypeLike, Data : AbstractPatternB
                 pane.addChild(Pane().apply {
                     this.bounds.x.set((data.rowCount + 1) * blockSize)
                     this.bounds.width.set(blockSize * 2)
-                    this.addChild(Button(binding = { clearL10NStr.use() }, font = editorPane.main.mainFont).apply {
+                    this.addChild(Button(binding = { clearL10NStr.use() }, font = editorPane.main.fontEditor).apply {
                         Anchor.Centre.configure(this)
                         this.bounds.width.set(blockSize * 1.5f)
                         this.bounds.height.set(blockSize * 0.75f)
@@ -135,7 +135,7 @@ abstract class AbstractPatternMenuPane<E : CubeTypeLike, Data : AbstractPatternB
                 }
                 this.sizeHeightToChildren(1f)
                 
-                this += Button(Localization.getVar("blockContextMenu.spawnPattern.swap"), font = editorPane.main.mainFont).apply {
+                this += Button(Localization.getVar("blockContextMenu.spawnPattern.swap"), font = editorPane.main.fontEditor).apply {
                     Anchor.CentreRight.configure(this)
                     this.bounds.width.set(blockSize * 1.5f)
                     this.bounds.height.set(blockSize * 0.75f)

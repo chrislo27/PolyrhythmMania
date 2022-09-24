@@ -117,7 +117,7 @@ class SpotlightEditDialog(
                 this.align.set(HBox.Align.CENTRE)
                 
                 fun addIndentedButton(target: LightSelection, text: String): IndentedButton {
-                    return IndentedButton(text, font = main.mainFontBoldBordered).apply {
+                    return IndentedButton(text, font = main.fontEditorBoldBordered).apply {
                         this.bindWidthToSelfHeight()
                         editorPane.styleIndentedButton(this)
                         this.padding.set(Insets.ZERO)
@@ -205,7 +205,7 @@ class SpotlightEditDialog(
                         box.spacing.set(2f)
                         box.align.set(HBox.Align.LEFT)
 
-                        box += TextLabel("${if (rowIndex == 0) RodinSpecialChars.BORDERED_DPAD else RodinSpecialChars.BORDERED_A}:", font = editorPane.palette.main.fontRodinFixed).also { label ->
+                        box += TextLabel("${if (rowIndex == 0) RodinSpecialChars.BORDERED_DPAD else RodinSpecialChars.BORDERED_A}:", font = editorPane.palette.main.fontEditorRodin).also { label ->
                             label.bindWidthToSelfHeight()
                             label.padding.set(Insets(2f, 0f, 2f, 4f))
                             label.renderAlign.set(Align.right)

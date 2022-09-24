@@ -139,7 +139,7 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
                             this.border.set(Insets(1f))
                             this.borderStyle.set(SolidBorder(Color.WHITE))
                             this.padding.set(Insets(2f))
-                            this += TextField(font = editor.main.fontRodinFixed).apply {
+                            this += TextField(font = editor.main.fontEditorRodin).apply {
                                 this.textColor.set(Color(1f, 1f, 1f, 1f))
                                 this.text.set(this@BlockSongInfoCard.customText)
                                 this.canInputNewlines.set(true)

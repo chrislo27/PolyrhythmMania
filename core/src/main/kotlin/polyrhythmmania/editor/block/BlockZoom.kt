@@ -93,7 +93,7 @@ class BlockZoom(engine: Engine)
                                     this.bounds.width.set(50f)
                                     this.tooltipElement.set(editor.editorPane.createDefaultTooltip(Localization.getValue("blockContextMenu.zoomBlock.valueTooltip")))
                                 }
-                                this += Button(Localization.getVar("common.reset"), font = editor.editorPane.main.mainFont).apply {
+                                this += Button(Localization.getVar("common.reset"), font = editor.editorPane.main.fontEditor).apply {
                                     this.bounds.width.set(64f)
                                     this.setOnAction {
                                         varr.set(DEFAULT_ZOOM)
@@ -113,7 +113,7 @@ class BlockZoom(engine: Engine)
                         this += end.first
 
 
-                        this += Button(Localization.getVar("blockContextMenu.spawnPattern.swap"), font = editor.editorPane.main.mainFont).apply {
+                        this += Button(Localization.getVar("blockContextMenu.spawnPattern.swap"), font = editor.editorPane.main.fontEditor).apply {
                             Anchor.CentreRight.configure(this)
                             this.bounds.width.set(64f)
                             this.bounds.height.set(32f)

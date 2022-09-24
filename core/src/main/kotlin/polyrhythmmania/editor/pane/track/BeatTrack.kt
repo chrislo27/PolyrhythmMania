@@ -99,7 +99,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
         secondsBox += secLabel
         bpmLabel = TextLabel(binding = {
             bpmTextVar.use()
-        }, font = editorPane.main.fontRodinFixed).apply {
+        }, font = editorPane.main.fontEditorRodin).apply {
             Anchor.CentreLeft.configure(this)
             this.textAlign.set(TextAlign.LEFT)
             this.renderAlign.set(Align.left)

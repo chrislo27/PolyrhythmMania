@@ -254,7 +254,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val overallWavePane = OverallWavePane(this)
         val overallWaveformLabels = Pane().apply {
             this.bounds.height.set(28f)
-            this.addChild(TextLabel(convertMsToTimestamp(0f), font = editor.main.mainFont).also { label ->
+            this.addChild(TextLabel(convertMsToTimestamp(0f), font = editor.main.fontEditor).also { label ->
                 Anchor.TopLeft.configure(label)
                 label.margin.set(Insets(0f, 2f, 0f, 0f))
                 label.bounds.width.set(120f)
@@ -311,7 +311,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val zoomedWaveformLabels = Pane().apply {
             this.bounds.height.set(32f)
             this.addChild(TextLabel(binding = { convertMsToTimestamp(window.x.use() * 1000) },
-                    font = editor.main.mainFont).also { label ->
+                    font = editor.main.fontEditor).also { label ->
                 Anchor.TopLeft.configure(label)
                 label.margin.set(Insets(0f, 2f, 0f, 0f))
                 label.bounds.width.set(120f)
@@ -320,7 +320,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 label.textColor.set(Color.WHITE)
             })
             this.addChild(TextLabel(binding = { convertMsToTimestamp((window.x.use() + window.widthSec.use()) * 1000) },
-                    font = editor.main.mainFont).also { label ->
+                    font = editor.main.fontEditor).also { label ->
                 Anchor.TopRight.configure(label)
                 label.margin.set(Insets(0f, 2f, 0f, 0f))
                 label.bounds.width.set(120f)

@@ -137,7 +137,7 @@ class ManageCustomTexPackDialog(
                                 this.font.bind {
                                     val s = currentState.use()
                                     if ((s is State.SwapWith && s.fromID == id) || (s is State.CopyTo && s.fromID == id)) {
-                                        main.mainFontItalic
+                                        main.fontEditorItalic
                                     } else editorPane.palette.musicDialogFontBold
                                 }
                                 

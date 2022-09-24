@@ -124,7 +124,7 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
                 return HBox().apply {
                     this.bounds.height.set(labelHeight)
                     this.spacing.set(4f)
-                    this += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.mainFontBold).apply {
+                    this += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.fontEditorBold).apply {
                         this.bounds.width.set(textLabelWidth)
                         this.renderAlign.set(Align.right)
                         this.textColor.set(Color.WHITE)
@@ -141,7 +141,7 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
                 }
             }
             
-            val fieldLabelMarkup = Markup(mapOf(), TextRun(editorPane.main.mainFontBold, ""), Markup.FontStyles.ALL_USING_DEFAULT_FONT)
+            val fieldLabelMarkup = Markup(mapOf(), TextRun(editorPane.main.fontEditorBold, ""), Markup.FontStyles.ALL_USING_DEFAULT_FONT)
             fun addTextField(labelText: String, charLimit: Int, 
                              getter: (LevelMetadata) -> String,
                              allowNewlines: Boolean = false,
@@ -215,7 +215,7 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
             }
 
             fun addYearField(hbox: HBox, labelText: String, getter: (LevelMetadata) -> Int) {
-                hbox += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.mainFontBold).apply {
+                hbox += TextLabel(binding = { Localization.getVar(labelText).use() }, font = editorPane.main.fontEditorBold).apply {
                     this.padding.set(Insets(0f, 0f, 4f, 4f))
                     this.margin.set(Insets(0f, 0f, 10f, 4f))
                     this.resizeBoundsToContent(affectWidth = true, affectHeight = false)

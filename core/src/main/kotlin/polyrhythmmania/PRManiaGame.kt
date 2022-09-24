@@ -362,7 +362,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         @Suppress("ConstantConditionIf")
         if (PRMania.enableEarlyAccessMessage) {
             batch.setColor(1f, 1f, 1f, 1f)
-            val paintboxFont = fontRodinFixedBordered
+            val paintboxFont = fontEditorRodinBordered
             paintboxFont.useFont { font ->
                 val isEditor = this.getScreen() is EditorScreen
                 val height = if (!isEditor) (cam.viewportHeight - 10f) else (48f)
@@ -624,12 +624,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             }
         }
 
-
-        addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight)
-
-        addFontFamily(fontIDPrefix = "editor_status", familyName = "Roboto", fontSize = 16,
-                hinting = FreeTypeFontGenerator.Hinting.Slight, generateBordered = false)
-
         cache["prmania_icons"] = PaintboxFontBitmap(
                 PaintboxFontParams(Gdx.files.internal("fonts/prmania_icons/prmania_icons.fnt"), 16, 0f, false, WindowSize(1280, 720)),
                 BitmapFont(Gdx.files.internal("fonts/prmania_icons/prmania_icons.fnt"), Gdx.files.internal("fonts/prmania_icons/prmania_icons.png"), false, true).apply {
@@ -639,6 +633,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 },
                 true
         )
+
+        addFontFamily(fontIDPrefix = "editor_Roboto", familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight)
+        addFontFamily(fontIDPrefix = "editor_status", familyName = "Roboto", fontSize = 16,
+                hinting = FreeTypeFontGenerator.Hinting.Slight, generateBordered = false)
         // Effectively the same as "editor_instantiator_summary"
 //        cache["editor_beat_time"] = PaintboxFontFreeType(
 //                PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Medium.ttf"), 1, 1f, false, WindowSize(1280, 720)),
@@ -688,14 +686,14 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 })
 //        addFontFamily(fontIDPrefix = "editor_help", familyName = "Roboto", fontSize = 20,
 //                hinting = FreeTypeFontGenerator.Hinting.Slight, generateBordered = false,)
-        cache["rodin_fixed"] = PaintboxFontFreeType(
+        cache["editor_rodin_fixed"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 1, 0f, false, WindowSize(1280, 720)),
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = defaultFontSize
                     borderWidth = 0f
                 }).setAfterLoad(defaultAfterLoad)
-        cache["rodin_fixed_BORDERED"] = PaintboxFontFreeType(
+        cache["editor_rodin_fixed_BORDERED"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 1, 1.5f, false, WindowSize(1280, 720)),
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
@@ -831,16 +829,17 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
 
     val fontIcons: PaintboxFont get() = fontCache["prmania_icons"]
-    val mainFont: PaintboxFont get() = fontCache["Roboto"]
-    val mainFontBold: PaintboxFont get() = fontCache["Roboto_BOLD"]
-    val mainFontItalic: PaintboxFont get() = fontCache["Roboto_ITALIC"]
-    val mainFontBoldItalic: PaintboxFont get() = fontCache["Roboto_BOLD_ITALIC"]
-    val mainFontBordered: PaintboxFont get() = fontCache["Roboto_BORDERED"]
-    val mainFontBoldBordered: PaintboxFont get() = fontCache["Roboto_BOLD_BORDERED"]
-    val mainFontItalicBordered: PaintboxFont get() = fontCache["Roboto_ITALIC_BORDERED"]
-    val mainFontBoldItalicBordered: PaintboxFont get() = fontCache["Roboto_BOLD_ITALIC_BORDERED"]
-    val fontRodinFixed: PaintboxFont get() = fontCache["rodin_fixed"]
-    val fontRodinFixedBordered: PaintboxFont get() = fontCache["rodin_fixed_BORDERED"]
+    
+    val fontEditor: PaintboxFont get() = fontCache["editor_Roboto"]
+    val fontEditorBold: PaintboxFont get() = fontCache["editor_Roboto_BOLD"]
+    val fontEditorItalic: PaintboxFont get() = fontCache["editor_Roboto_ITALIC"]
+    val fontEditorBoldItalic: PaintboxFont get() = fontCache["editor_Roboto_BOLD_ITALIC"]
+    val fontEditorBordered: PaintboxFont get() = fontCache["editor_Roboto_BORDERED"]
+    val fontEditorBoldBordered: PaintboxFont get() = fontCache["editor_Roboto_BOLD_BORDERED"]
+    val fontEditorItalicBordered: PaintboxFont get() = fontCache["editor_Roboto_ITALIC_BORDERED"]
+    val fontEditorBoldItalicBordered: PaintboxFont get() = fontCache["editor_Roboto_BOLD_ITALIC_BORDERED"]
+    val fontEditorRodin: PaintboxFont get() = fontCache["editor_rodin_fixed"]
+    val fontEditorRodinBordered: PaintboxFont get() = fontCache["editor_rodin_fixed_BORDERED"]
     
     val fontEditorBeatTime: PaintboxFont get() = fontCache["editor_instantiator_summary"] // fontCache["editor_beat_time"]
     val fontEditorBeatTrack: PaintboxFont get() = fontCache["editor_beat_track"]

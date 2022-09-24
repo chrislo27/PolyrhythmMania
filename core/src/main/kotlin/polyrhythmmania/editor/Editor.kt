@@ -136,12 +136,12 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
 
     // Default markup used for blocks, bold is inverted
     val blockMarkup: Markup = Markup(mapOf(
-            Markup.FONT_NAME_BOLD to main.mainFontBordered,
-            Markup.FONT_NAME_ITALIC to main.mainFontItalicBordered,
-            Markup.FONT_NAME_BOLDITALIC to main.mainFontBoldItalicBordered,
-            "rodin" to main.fontRodinFixedBordered,
+            Markup.FONT_NAME_BOLD to main.fontEditorBordered,
+            Markup.FONT_NAME_ITALIC to main.fontEditorItalicBordered,
+            Markup.FONT_NAME_BOLDITALIC to main.fontEditorBoldItalicBordered,
+            "rodin" to main.fontEditorRodinBordered,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.mainFontBoldBordered, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
+    ), TextRun(main.fontEditorBoldBordered, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
 
     val tracks: List<Track> = when {
         EditorSpecialFlags.STORY_MODE in flags -> STORY_TRACKS
