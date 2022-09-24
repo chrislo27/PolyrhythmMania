@@ -53,11 +53,12 @@ object Credits : CreditsBase() {
                     "world-flags-sprite",
                     "glsl-fast-gaussian-blur",
             ).toVars() + abcSorted(
-                    "Kurokane",
-                    "Leland",
                     "Roboto",
                     "Rodin",
+                    "Kurokane",
+                    "Leland",
                     "Roboto Mono",
+                    "Roboto Condensed",
                     "Roboto Slab",
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
