@@ -10,7 +10,10 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.LocalePicker
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
+import polyrhythmmania.credits.Credits
 import polyrhythmmania.ui.PRManiaSkins
+import java.text.NumberFormat
+import kotlin.math.roundToInt
 
 
 class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
@@ -48,13 +51,13 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         val vbox = VBox().apply {
             Anchor.TopLeft.configure(this)
-            this.spacing.set(0f)
+            this.spacing.set(16f)
             this.bindHeightToParent(-40f)
         }
         vbox.temporarilyDisableLayouts {
             vbox += TextLabel(binding = { Localization.getVar("mainMenu.language.inaccuracy").use() }).apply {
                 this.markup.set(this@LanguageMenu.markup)
-                this.bounds.height.set(55f)
+                this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
                 this.renderAlign.set(Align.topLeft)
                 this.doLineWrapping.set(true)
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)
@@ -69,6 +72,45 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 LocalePicker.currentLocale.set(newItem)
             }
             vbox += comboboxPane
+            
+            vbox += TextLabel(binding = { 
+                val numBaseKeys = main.allLocalizations.sumOf { locBase ->
+                    locBase.bundles.use().find { b -> 
+                        b.namedLocale.locale.language == ""
+                    }?.allKeys?.size ?: 0
+                }
+                val currentLocale = LocalePicker.currentLocale.use()
+                when (currentLocale.locale.language) {
+                    "", "en" -> {
+                        // Note: This text is intentionally not localized
+                         "This is the default language for the game. Did you know there are ${NumberFormat.getIntegerInstance(currentLocale.locale).format(numBaseKeys)} strings in the game that can be translated? That's a lot!"
+                    }
+                    else -> {
+                        val numKeys = main.allLocalizations.sumOf { locBase ->
+                            val bundle = locBase.bundlesMap.use()[currentLocale]?.takeIf { 
+                                it.namedLocale.locale.language == it.bundle.locale.language
+                            }
+                            bundle?.allKeys?.size ?: 0
+                        }
+                        val percentageDec = numKeys.toFloat() / numBaseKeys
+                        val percentageInt = if (percentageDec > 0f && percentageDec < 0.01f) 1 else (percentageDec * 100).roundToInt()
+                        Localization.getVar("mainMenu.language.stats", listOf(
+                                percentageInt, numKeys, numBaseKeys,
+                                (Credits.languageCredits[currentLocale.locale]?.let { 
+                                    it.primaryLocalizers + it.secondaryLocalizers
+                                } ?: emptyList()).joinToString(separator = ", ")
+                        )).use()
+                    }
+                }
+            }).apply {
+                this.markup.set(this@LanguageMenu.markup)
+                this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
+                this.renderAlign.set(Align.topLeft)
+                this.doLineWrapping.set(true)
+                this.textColor.set(LongButtonSkin.TEXT_COLOR)
+                this.margin.set(Insets(8f, 0f, 0f, 0f))
+                this.setScaleXY(0.75f)
+            }
         }
         
         vbox.sizeHeightToChildren(100f)

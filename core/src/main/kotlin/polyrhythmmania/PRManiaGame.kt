@@ -128,6 +128,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     }
     
     val httpClient: CloseableHttpClient by lazy { HttpClients.createMinimal() }
+    val allLocalizations: List<LocalizationBase> get() = this.reloadableLocalizationInstances
     
     private var discordCallbackDelta: Float = 0f
     private val hasLevelRecoveryHookBeenRun: AtomicBoolean = AtomicBoolean(false)
@@ -224,8 +225,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         })
         
         if (PRMania.logMissingLocalizations) {
-            this.reloadableLocalizationInstances.forEach(LocalizationBase::logMissingLocalizations)
-            
+            this.reloadableLocalizationInstances.forEach { it.logMissingLocalizations(false) }
+
             // Check for missing localizations in statistics and achievement names/descs
             val testInt = IntVar(42)
             GlobalStats.statMap.values.forEach { stat ->

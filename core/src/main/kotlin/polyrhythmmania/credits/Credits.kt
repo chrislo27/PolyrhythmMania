@@ -3,6 +3,7 @@ package polyrhythmmania.credits
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import polyrhythmmania.Localization
+import java.util.*
 
 
 object Credits : CreditsBase() {
@@ -60,5 +61,9 @@ object Credits : CreditsBase() {
                     "Roboto Slab",
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
+    
+    val languageCredits: Map<Locale, LanguageCredit> = listOf(
+            LanguageCredit(Locale("es", "", ""), listOf("J-D"), listOf()),
+    ).associateBy { it.locale }
     
 }
