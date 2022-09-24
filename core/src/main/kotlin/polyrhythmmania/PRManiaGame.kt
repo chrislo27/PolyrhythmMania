@@ -744,7 +744,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 22
                 }).setAfterLoad(defaultScaledFontAfterLoad)
-        cache["pausemenu_title"] = PaintboxFontFreeType(
+        cache["game_pausemenu_title"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/kurokane/kurokanestd.otf"), 100, 10f, true, WindowSize(1280, 720)),
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
@@ -788,13 +788,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     spaceX = -2
                     borderWidth = 4f
                 }).setAfterLoad(defaultScaledKurokaneAfterLoad)
-        cache["results_main"] = PaintboxFontFreeType(
+        cache["game_results_main"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 32, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 32
                 }).setAfterLoad(defaultScaledFontAfterLoad)
-        cache["results_score"] = PaintboxFontFreeType(
+        cache["game_results_score"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/kurokane/kurokanestd.otf"), 72, 6f, true, WindowSize(1280, 720)),
                 makeParam().apply {
                     hinting = FreeTypeFontGenerator.Hinting.Slight
@@ -806,7 +806,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             font.setFixedWidthGlyphs("0123456789")
         }
         
-        addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, fontIDPrefix = "Roboto_scaled", generateBordered = false)
+        addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         addFontFamily(familyName = "RobotoMono", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         cache["RobotoSlab"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/RobotoSlab/RobotoSlab-Regular.ttf"), 20, 0f, true, WindowSize(1280, 720)),
@@ -855,26 +855,25 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontMainMenuHeading: PaintboxFont get() = fontCache["mainmenu_heading"]
     val fontMainMenuRodin: PaintboxFont get() = fontCache["mainmenu_rodin"]
     
-    val fontPauseMenuTitle: PaintboxFont get() = fontCache["pausemenu_title"]
+    val fontPauseMenuTitle: PaintboxFont get() = fontCache["game_pausemenu_title"]
     val fontGameTextbox: PaintboxFont get() = fontCache["game_textbox"]
     val fontGameMoreTimes: PaintboxFont get() = fontCache["game_more_times"]
     val fontGameUIText: PaintboxFont get() = fontCache["game_ui_text"]
     val fontGamePracticeClear: PaintboxFont get() = fontCache["game_practice_clear"]
     val fontGameGoForPerfect: PaintboxFont get() = fontCache["game_go_for_perfect"]
-    val fontResultsMain: PaintboxFont get() = fontCache["results_main"]
-    val fontResultsScore: PaintboxFont get() = fontCache["results_score"]
+    val fontResultsMain: PaintboxFont get() = fontCache["game_results_main"]
+    val fontResultsScore: PaintboxFont get() = fontCache["game_results_score"]
 
-    val robotoFont: PaintboxFont get() = fontCache["Roboto_scaled"]
-    val robotoFontBold: PaintboxFont get() = fontCache["Roboto_scaled_BOLD"]
-    val robotoFontItalic: PaintboxFont get() = fontCache["Roboto_scaled_ITALIC"]
-    val robotoFontBoldItalic: PaintboxFont get() = fontCache["Roboto_scaled_BOLD_ITALIC"]
-    val robotoMonoFont: PaintboxFont get() = fontCache["RobotoMono"]
-    val robotoMonoFontBold: PaintboxFont get() = fontCache["RobotoMono_BOLD"]
-    val robotoMonoFontItalic: PaintboxFont get() = fontCache["RobotoMono_ITALIC"]
-    val robotoMonoFontBoldItalic: PaintboxFont get() = fontCache["RobotoMono_BOLD_ITALIC"]
-    
-    val fontSlab: PaintboxFont get() = fontCache["RobotoSlab"]
-    val fontSlabBold: PaintboxFont get() = fontCache["RobotoSlab_BOLD"]
+    val fontRoboto: PaintboxFont get() = fontCache["Roboto"]
+    val fontRobotoBold: PaintboxFont get() = fontCache["Roboto_BOLD"]
+    val fontRobotoItalic: PaintboxFont get() = fontCache["Roboto_ITALIC"]
+    val fontRobotoBoldItalic: PaintboxFont get() = fontCache["Roboto_BOLD_ITALIC"]
+    val fontRobotoMono: PaintboxFont get() = fontCache["RobotoMono"]
+    val fontRobotoMonoBold: PaintboxFont get() = fontCache["RobotoMono_BOLD"]
+    val fontRobotoMonoItalic: PaintboxFont get() = fontCache["RobotoMono_ITALIC"]
+    val fontRobotoMonoBoldItalic: PaintboxFont get() = fontCache["RobotoMono_BOLD_ITALIC"]
+    val fontRobotoSlab: PaintboxFont get() = fontCache["RobotoSlab"]
+    val fontRobotoSlabBold: PaintboxFont get() = fontCache["RobotoSlab_BOLD"]
 
     
     private fun generateColourPickerTextures() {

@@ -57,7 +57,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
-    private val slabMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.fontSlabBold), TextRun(main.fontSlab, ""), Markup.FontStyles(Markup.FONT_NAME_BOLD, Markup.DEFAULT_FONT_NAME, Markup.DEFAULT_FONT_NAME))
+    private val slabMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.fontRobotoSlabBold), TextRun(main.fontRobotoSlab, ""), Markup.FontStyles(Markup.FONT_NAME_BOLD, Markup.DEFAULT_FONT_NAME, Markup.DEFAULT_FONT_NAME))
     
     init {
         val bg = RectElement(PRManiaColors.debugColor).apply {
@@ -209,13 +209,13 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     fun addField(index: Int, type: String, valueField: String, valueMarkup: Markup? = null) {
                                         this[index] += Pane().apply {
                                             this.margin.set(Insets(2f))
-                                            this += TextLabel(StoryL10N.getVar("inboxItem.memo.${type}"), font = main.robotoFontBold).apply {
+                                            this += TextLabel(StoryL10N.getVar("inboxItem.memo.${type}"), font = main.fontRobotoBold).apply {
                                                 this.textColor.set(Color.BLACK)
                                                 this.renderAlign.set(Align.left)
                                                 this.padding.set(Insets(2f, 2f, 0f, 10f))
                                                 this.bounds.width.set(90f)
                                             }
-                                            this += TextLabel(valueField, font = main.fontSlab).apply {
+                                            this += TextLabel(valueField, font = main.fontRobotoSlab).apply {
                                                 this.textColor.set(Color.BLACK)
                                                 this.renderAlign.set(Align.left)
                                                 this.padding.set(Insets(2f, 2f, 4f, 0f))
@@ -276,13 +276,13 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     fun addField(index: Int, type: String, valueField: String, valueMarkup: Markup? = null) {
                                         this[index] += Pane().apply {
                                             this.margin.set(Insets(2f))
-                                            this += TextLabel(StoryL10N.getVar("inboxItem.contract.${type}"), font = main.robotoFontBold).apply {
+                                            this += TextLabel(StoryL10N.getVar("inboxItem.contract.${type}"), font = main.fontRobotoBold).apply {
                                                 this.textColor.set(Color.BLACK)
                                                 this.renderAlign.set(Align.right)
                                                 this.padding.set(Insets(2f, 2f, 0f, 4f))
                                                 this.bounds.width.set(96f)
                                             }
-                                            this += TextLabel(valueField, font = main.fontSlab).apply {
+                                            this += TextLabel(valueField, font = main.fontRobotoSlab).apply {
                                                 this.textColor.set(Color.BLACK)
                                                 this.renderAlign.set(Align.left)
                                                 this.padding.set(Insets(2f, 2f, 4f, 0f))
@@ -299,7 +299,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     addField(1, "requester", item.contract.requester.localizedName.getOrCompute())
                                     this[2] += Pane().apply {
                                         this.margin.set(Insets(2f))
-                                        this += TextLabel(item.contract.tagline.getOrCompute(), font = main.fontSlab).apply {
+                                        this += TextLabel(item.contract.tagline.getOrCompute(), font = main.fontRobotoSlab).apply {
                                             this.textColor.set(Color.BLACK)
                                             this.renderAlign.set(Align.center)
                                             this.padding.set(Insets(2f, 2f, 4f, 0f))
@@ -321,14 +321,14 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                                 }
 
                                 if (item.contract.conditions.isNotEmpty()) {
-                                    this += TextLabel(StoryL10N.getValue("inboxItem.contract.conditions"), font = main.robotoFontBold).apply {
+                                    this += TextLabel(StoryL10N.getValue("inboxItem.contract.conditions"), font = main.fontRobotoBold).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.bottomLeft)
                                         this.padding.set(Insets(0f, 6f, 4f, 0f))
                                         this.bounds.height.set(32f)
                                     }
                                     item.contract.conditions.forEach { condition ->
-                                        this += TextLabel("• " + condition.name.getOrCompute(), font = main.fontSlab).apply {
+                                        this += TextLabel("• " + condition.name.getOrCompute(), font = main.fontRobotoSlab).apply {
                                             this.textColor.set(Color.BLACK)
                                             this.renderAlign.set(Align.left)
                                             this.padding.set(Insets(2f, 2f, 16f, 0f))
