@@ -20,10 +20,10 @@ object Contracts {
             Tutorial1GameMode(main)
         })
         
-        add(Contract("fillbots", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Fillbots"), listOf("J-D")), 60) { main ->
+        add(Contract("fillbots", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Fillbots"), listOf("J-D Thunder")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/fillbots.prmproj"))
         })
-        add(Contract("fillbots2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.ds("Fillbots", listOf(SongNameAndSource.megamix("Fillbots 2"))), listOf("J-D")), 60) { main ->
+        add(Contract("fillbots2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.ds("Fillbots", listOf(SongNameAndSource.megamix("Fillbots 2"))), listOf("J-D Thunder")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/fillbots2.prmproj"))
         })
         add(Contract("screwbots", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.fever("Screwbot Factory"), listOf("Kievit")), 60) { main ->
@@ -47,7 +47,7 @@ object Contracts {
         add(Contract("bunny_hop", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Bunny Hop"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/bunny_hop.prmproj"))
         })
-        add(Contract("tram_and_pauline", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("トランとポリン (Tram and Pauline)"), listOf("J-D")), 60) { main ->
+        add(Contract("tram_and_pauline", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("トランとポリン (Tram and Pauline)"), listOf("J-D Thunder")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tram_and_pauline.prmproj"))
         })
         add(Contract("air_rally", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Air Rally"), listOf("Kievit")), 60) { main ->
@@ -104,7 +104,7 @@ object Contracts {
         add(Contract("super_samurai_slice", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Super Samurai Slice"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/super_samurai_slice.prmproj"))
         })
-        add(Contract("bouncy_road", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("J-D")), 60) { main ->
+        add(Contract("bouncy_road", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("J-D Thunder")), 60) { main ->
             StoryAsmGameModeBouncyRoad(main)
         })
         add(Contract("bouncy_road_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("chrislo27")), 60) { main ->
@@ -116,7 +116,7 @@ object Contracts {
         add(Contract("rhythm_rally", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Rhythm Rally"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_rally.prmproj"))
         })
-        add(Contract("hole_in_one", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.fever("Hole in One"), listOf("J-D")), 60) { main ->
+        add(Contract("hole_in_one", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.fever("Hole in One"), listOf("J-D Thunder")), 60) { main ->
             StoryDunkGameModeHoleInOne(main)
         })
         add(Contract("rhythm_rally_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.ARCADE, Attribution(SongInfo.ds("Rhythm Rally", listOf(SongNameAndSource.megamix("Rhythm Rally 2"))), listOf("Kievit")), 60) { main ->
@@ -125,7 +125,7 @@ object Contracts {
         add(Contract("built_to_scale_ds", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.ds("Built to Scale"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/built_to_scale_ds.prmproj"))
         })
-        add(Contract("fruit_basket_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Fruit Basket 2"), listOf("J-D")), 60) { main ->
+        add(Contract("fruit_basket_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Fruit Basket 2"), listOf("J-D Thunder")), 60) { main ->
             StoryDunkGameModeFruitBasket2(main)
         })
         add(Contract("air_rally_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.fever("Air Rally", listOf(SongNameAndSource.megamix("Air Rally 2"))), listOf("GENERIC")), 60) { main ->
