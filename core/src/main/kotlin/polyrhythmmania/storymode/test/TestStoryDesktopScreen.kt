@@ -17,6 +17,7 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
+import paintbox.font.PaintboxFont
 import paintbox.font.TextRun
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeToOpaque
@@ -59,7 +60,7 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
 
     private val monoMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.fontRobotoMonoBold, Markup.FONT_NAME_ITALIC to main.fontRobotoMonoItalic, Markup.FONT_NAME_BOLDITALIC to main.fontRobotoMonoBoldItalic), TextRun(main.fontRobotoMono, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     private val slabMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.fontRobotoSlabBold), TextRun(main.fontRobotoSlab, ""), Markup.FontStyles(Markup.FONT_NAME_BOLD, Markup.DEFAULT_FONT_NAME, Markup.DEFAULT_FONT_NAME))
-    
+    private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
     
     init {
         val bg: UIElement = ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg"))).apply {
@@ -153,6 +154,7 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
         }
         frameScrollPane.setContent(itemsVbox)
         
+        // FIXME
         val itemToggleGroup = ToggleGroup()
         fun addObj(obj: InboxItemTestObj) {
             itemsVbox += obj
@@ -163,7 +165,7 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
         }
 
 
-        
+        // TODO use this
         val inboxItemDisplayPane: UIElement = VBox().apply {
             this.bounds.x.set(104f * 4)
             this.bounds.width.set(128f * 4)
@@ -398,18 +400,40 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
             this.bounds.width.set(78f * 4)
             this.bounds.height.set(20f * 4)
 
-            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_${when (type) {
+            val contentPane = Pane().apply {
+                this.margin.set(Insets(1f * 4, 0f * 4, 1f * 4, 1f * 4))
+            }
+            this += contentPane
+            
+            contentPane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_${when (type) {
                 0 -> "unavailable"
                 1 -> "available"
                 2 -> "cleared"
                 3 -> "skipped"
                 else -> "unavailable"
-            }}"))).apply {
-                this.bounds.x.set(1f * 4)
+            }}")))
+            val titleAreaPane = Pane().apply {
+                this.bounds.x.set((1f + 2) * 4)
                 this.bounds.y.set(1f * 4)
-                this.bounds.width.set(76f * 4)
-                this.bounds.height.set(19f * 4)
+                this.bounds.width.set(64f * 4)
+                this.bounds.height.set(11f * 4)
+                this.padding.set(Insets(1f * 4))
             }
+            contentPane += titleAreaPane
+            val bottomAreaPane = Pane().apply {
+                this.bounds.x.set(3f * 4)
+                this.bounds.y.set(13f * 4)
+                this.bounds.width.set(62f * 4)
+                this.bounds.height.set(5f * 4)
+//                this.padding.set(Insets(0f * 4, 0f * 4, 1f * 4, 1f * 4))
+            }
+            contentPane += bottomAreaPane
+            
+            titleAreaPane += TextLabel(inboxItem.listingName, font = inboxItemTitleFont).apply {
+                
+            }
+            
+            // Selector outline/ring
             this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_selected"))).apply {
                 this.bounds.x.set(-3f * 4)
                 this.bounds.y.set(-1f * 4)

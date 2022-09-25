@@ -818,7 +818,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         addFontFamily(familyName = "RobotoMono", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         addFontFamily(familyName = "RobotoCondensed", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         addFontFamily(familyName = "Lexend", normalItalicFilename = "", boldItalicFilename = "",
-                hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
+                hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false) {font ->
+            font.data.setLineHeight(font.data.lineHeight * 0.75f)
+        }
         cache["RobotoSlab"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/RobotoSlab/RobotoSlab-Regular.ttf"), 20, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {

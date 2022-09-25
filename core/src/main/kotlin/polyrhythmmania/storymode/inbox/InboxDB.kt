@@ -1,6 +1,7 @@
 package polyrhythmmania.storymode.inbox
 
 import paintbox.Paintbox
+import paintbox.binding.asReadOnlyVar
 import polyrhythmmania.storymode.contract.Contracts
 
 
@@ -15,7 +16,7 @@ object InboxDB {
             this.allItems[inboxItem.id] = inboxItem
         }
 
-        addItem(InboxItem.Memo("first_memo0", UnlockReqs.ALWAYS_AVAILABLE))
+        addItem(InboxItem.Memo("first_memo0", "first_memo0".asReadOnlyVar(), UnlockReqs.ALWAYS_AVAILABLE))
         addItem(InboxItem.ContractDoc(Contracts["tutorial1"], UnlockReqs.ALWAYS_AVAILABLE))
 
         run {
