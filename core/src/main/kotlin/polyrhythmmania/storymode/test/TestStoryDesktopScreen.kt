@@ -14,7 +14,6 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.binding.BooleanVar
-import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
@@ -39,6 +38,7 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 import polyrhythmmania.ui.PRManiaSkins
@@ -60,6 +60,7 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
     private val monoMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.fontRobotoMonoBold, Markup.FONT_NAME_ITALIC to main.fontRobotoMonoItalic, Markup.FONT_NAME_BOLDITALIC to main.fontRobotoMonoBoldItalic), TextRun(main.fontRobotoMono, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
     private val slabMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.fontRobotoSlabBold), TextRun(main.fontRobotoSlab, ""), Markup.FontStyles(Markup.FONT_NAME_BOLD, Markup.DEFAULT_FONT_NAME, Markup.DEFAULT_FONT_NAME))
     
+    
     init {
         val bg: UIElement = ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg"))).apply {
             this += Button(Localization.getVar("common.back")).apply {
@@ -74,29 +75,32 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
         sceneRoot += bg
 
 
-        val frame = ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame"))).apply {
+        val frameImg = ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame"))).apply {
             this.bounds.x.set(16f * 4)
             this.bounds.y.set(14f * 4)
             this.bounds.width.set(86f * 4)
             this.bounds.height.set(152f * 4)
             this.doClipping.set(true) // Safety clipping so nothing exceeds the overall frame
         }
-        bg += frame
+        bg += frameImg
+        val frameNoCaps = Pane().apply {// Extra pane is so that the frameChildArea is the one that clips properly internally
+            this.margin.set(Insets(7f * 4, 5f * 4, 1f * 4, 1f * 4))
+        }
         val frameChildArea = Pane().apply {
             this.doClipping.set(true)
+            this.padding.set(Insets(0f * 4, 0f * 4, 3f * 4, 3f * 4))
         }
-        frame += Pane().apply {// Extra pane is so that the frameChildArea is the one that clips properly internally
-            this.margin.set(Insets(7f * 4, 5f * 4, 1f * 4, 1f * 4))
-            this += frameChildArea
-        }
-        frame += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame_cap_top"))).apply {
+        frameNoCaps += frameChildArea
+        frameImg += frameNoCaps
+        frameImg += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame_cap_top"))).apply {
             Anchor.TopLeft.configure(this, offsetY = 1f * 4)
             this.bounds.height.set(7f * 4)
         }
-        frame += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame_cap_bottom"))).apply {
+        frameImg += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame_cap_bottom"))).apply {
             Anchor.BottomLeft.configure(this, offsetY = -1f * 4)
             this.bounds.height.set(7f * 4)
         }
+        
         val frameScrollPane = ScrollPane().apply { 
             this.contentPane.doClipping.set(false)
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
@@ -142,217 +146,34 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
         vbar.addInputEventListener(scrollListener)
         frameScrollPane.addInputEventListener(scrollListener)
         
-        
-        // Test items vbox
         val itemsVbox = VBox().apply {
             this.spacing.set(0f)
             this.margin.set(Insets(0f, 1f * 4, 0f, 0f))
             this.autoSizeToChildren.set(true)
         }
         frameScrollPane.setContent(itemsVbox)
+        
         val itemToggleGroup = ToggleGroup()
-        class InboxItemTestObj(val type: Int) : ActionablePane(), Toggle {
-            override val selectedState: BooleanVar = BooleanVar(false)
-            override val toggleGroup: Var<ToggleGroup?> = Var(null)
-            
-            init {
-                this.bounds.width.set(78f * 4)
-                this.bounds.height.set(20f * 4)
-//                this.bounds.width.set(84f * 4)
-//                this.bounds.height.set(23f * 4)
-
-                val pane = Pane().apply { 
-                    this.margin.set(Insets(0f, 0f, 3f * 4, 3f * 4))
-                }
-                this += pane
-
-                pane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_${when (type) {
-                    0 -> "unavailable"
-                    1 -> "available"
-                    2 -> "cleared"
-                    3 -> "skipped"
-                    else -> "unavailable"
-                }}"))).apply {
-                    this.bounds.x.set(1f * 4)
-                    this.bounds.y.set(1f * 4)
-                    this.bounds.width.set(76f * 4)
-                    this.bounds.height.set(19f * 4)
-                }
-                this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_selected"))).apply {
-//                    this.bounds.x.set(-3f * 4)
-                    this.bounds.x.set(0f * 4)
-                    this.bounds.y.set(-1f * 4)
-                    this.bounds.width.set(84f * 4)
-                    this.bounds.height.set(23f * 4) 
-                    this.visible.bind { selectedState.use() }
-                }
-                
-                this.setOnAction { 
-                    if (type != 0)
-                        this.selectedState.invert()
-                }
-            }
-        }
         fun addObj(obj: InboxItemTestObj) {
             itemsVbox += obj
             itemToggleGroup.addToggle(obj)
         }
-        addObj(InboxItemTestObj(2))
-        addObj(InboxItemTestObj(2))
-        addObj(InboxItemTestObj(3))
-        addObj(InboxItemTestObj(1))
-        addObj(InboxItemTestObj(1))
-        addObj(InboxItemTestObj(0))
-        addObj(InboxItemTestObj(0))
-        addObj(InboxItemTestObj(0))
-        addObj(InboxItemTestObj(0))
+        InboxDB.allItems.values.forEach { ii ->
+            addObj(InboxItemTestObj(1, ii))
+        }
 
 
         
         val inboxItemDisplayPane: UIElement = VBox().apply {
-            this.bounds.x.set(101f * 4)
+            this.bounds.x.set(104f * 4)
             this.bounds.width.set(128f * 4)
             this.align.set(VBox.Align.CENTRE)
         }
         bg += inboxItemDisplayPane
-        
-//        val pane = HBox().apply {
-//            Anchor.BottomLeft.configure(this, offsetX = 16f, offsetY = -20f)
-//            this.bounds.width.set(1280f - 16f * 2)
-//            this.bounds.height.set(600f)
-//            this.spacing.set(24f)
-//        }
-//        bg += pane
-//        
-//        val columns = ColumnarPane(listOf(72, 250), false).apply {
-//            Anchor.TopLeft.configure(this)
-//            this.bounds.width.set(380f)
-//        }
-//        pane += columns
-//        
-//        columns[0] += RectElement(Color(0f, 0f, 0f, 0.5f)).apply { 
-//            this.bindHeightToParent(multiplier = 0.4f)
-//        }
-//        val currentInboxFolder: Var<InboxItem?> = Var(null)
-//        columns[1] += RectElement(Color(0f, 0f, 0f, 0.5f)).apply {  
-//            this += TextLabel(StoryL10N.getVar("desk.inbox"), font = main.fontMainMenuHeading).apply {
-//                this.bounds.height.set(64f)
-//                this.bindVarToSelfHeight(this.bounds.y, multiplier = -1f)
-//                this.textColor.set(Color.WHITE)
-//                this.renderAlign.set(Align.bottomLeft)
-//                this.bgPadding.set(Insets(18f, 18f, 16f, 32f))
-//                this.renderBackground.set(true)
-//                this.backgroundColor.set(Color(0f, 0f, 0f, 0.5f))
-//            }
-//            this += Pane().apply {                 
-//                this += ScrollPane().apply { 
-//                    this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.ALWAYS)
-//                    this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
-//                    this.hBar.skinID.set(PRManiaSkins.SCROLLBAR_SKIN_LIGHT)
-//                    this.vBar.skinID.set(PRManiaSkins.SCROLLBAR_SKIN_LIGHT)
-//                    
-//                    this.setContent(VBox().apply { 
-//                        this.spacing.set(2f)
-//                        this.temporarilyDisableLayouts { 
-//                            InboxDB.allItems.values.sortedBy { it.fpPrereq }.forEach { inboxItem ->
-//                                this += ActionablePane().apply {
-//                                    this.bounds.height.set(48f)
-//                                    this += RectElement().apply {
-//                                        this.color.bind { 
-//                                            if (currentInboxFolder.use() == inboxItem) {
-//                                                Color(0f, 1f, 1f, 0.2f)
-//                                            } else Color(1f, 1f, 1f, 0.2f)
-//                                        }
-//                                        this.padding.set(Insets(4f))
-//                                        this += TextLabel("Item: ${inboxItem.id}", font = main.fontMainMenuMain).apply {
-//                                            this.renderAlign.set(RenderAlign.topLeft)
-//                                            this.setScaleXY(0.85f)
-//                                        }
-//                                    }
-//                                    this.setOnAction { 
-//                                        if (currentInboxFolder.getOrCompute() == inboxItem) {
-//                                            currentInboxFolder.set(null)
-//                                        } else {
-//                                            currentInboxFolder.set(inboxItem)
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        this.autoSizeToChildren.set(true)
-//                    })
-//                }
-//            }
-//        }
-//        
-//        val itemPane = Pane().apply { 
-//            this.bounds.width.set(550f)
-//        }
-//        pane += itemPane
-//        
-//        var currentItemUIElement: UIElement? = null
-//        currentInboxFolder.addListener { varr ->
-//            val lastCurrentEle = currentItemUIElement
-//            if (lastCurrentEle != null) {
-//                itemPane.removeChild(lastCurrentEle)
-//                currentItemUIElement = null
-//            }
-//            
-//            val newItem = varr.getOrCompute()
-//            if (newItem != null) {
-//                val newEle = createInboxItemUI(newItem).apply { 
-//                    Anchor.Centre.configure(this)
-//                }
-//                
-//                currentItemUIElement = newEle
-//                itemPane.addChild(newEle)
-//            }
-//        }
     }
 
     private fun createInboxItemUI(item: InboxItem): UIElement {
         return when (item) {
-            is InboxItem.IndexCard -> {
-                RectElement(Color.valueOf("FFF9EE")).apply {
-                    this.doClipping.set(true)
-                    this.border.set(Insets(1f))
-                    this.borderStyle.set(SolidBorder(Color.valueOf("E5D58B")))
-                    this.bindHeightToSelfWidth(multiplier = 3f / 5f)
-
-                    // Rules, 1 main red one and 10 light blue ones
-                    val spaces = (1 + 10) + 2
-                    val spacing = 1f / spaces
-                    val red = Color(1f, 0f, 0f, 0.5f)
-                    val blue = Color(0.2f, 0.7f, 1f, 0.5f)
-                    for (i in 0 until (1 + 10)) {
-                        this += RectElement(if (i == 0) red else blue).apply {
-                            this.bounds.height.set(1.5f)
-                            this.bounds.y.bind { (parent.use()?.contentZone?.height?.use() ?: 0f) * (spacing * (i + 2)) }
-                        }
-                    }
-                    val leftRule = FloatVar { (parent.use()?.contentZone?.width?.use() ?: 0f) * 0.125f }
-                    this += RectElement(red).apply {
-                        this.bounds.width.set(1.5f)
-                        this.bounds.x.bind { leftRule.use() }
-                    }
-
-                    this += Pane().apply {
-                        Anchor.BottomRight.configure(this)
-                        this.bindHeightToParent(multiplier = 1f - spacing * 2, adjust = -5f)
-                        this.bindWidthToParent(adjustBinding = { -leftRule.use() })
-                        this.padding.set(Insets(0f, 0f, 3f, 15f))
-
-//                        this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc")).apply {
-//                            this.markup.set(Markup(mapOf(Markup.DEFAULT_FONT_NAME to main.fontHandwriting2),
-//                                    TextRun(main.fontHandwriting2, "", lineHeightScale = 0.8f),
-//                                    styles = Markup.FontStyles.ALL_USING_DEFAULT_FONT))
-//                            this.renderAlign.set(RenderAlign.topLeft)
-//                            this.doLineWrapping.set(true)
-//                            this.bounds.y.set(-1f)
-//                        }
-                    }
-                }
-            }
             is InboxItem.Memo -> {
                 RectElement(Color.WHITE).apply {
                     this.doClipping.set(true)
@@ -566,5 +387,41 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
     }
 
     override fun dispose() {
+    }
+    
+    
+    inner class InboxItemTestObj(val type: Int, val inboxItem: InboxItem) : ActionablePane(), Toggle {
+        override val selectedState: BooleanVar = BooleanVar(false)
+        override val toggleGroup: Var<ToggleGroup?> = Var(null)
+
+        init {
+            this.bounds.width.set(78f * 4)
+            this.bounds.height.set(20f * 4)
+
+            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_${when (type) {
+                0 -> "unavailable"
+                1 -> "available"
+                2 -> "cleared"
+                3 -> "skipped"
+                else -> "unavailable"
+            }}"))).apply {
+                this.bounds.x.set(1f * 4)
+                this.bounds.y.set(1f * 4)
+                this.bounds.width.set(76f * 4)
+                this.bounds.height.set(19f * 4)
+            }
+            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_selected"))).apply {
+                this.bounds.x.set(-3f * 4)
+                this.bounds.y.set(-1f * 4)
+                this.bounds.width.set(84f * 4)
+                this.bounds.height.set(23f * 4)
+                this.visible.bind { selectedState.use() }
+            }
+
+            this.setOnAction {
+                if (type != 0)
+                    this.selectedState.invert()
+            }
+        }
     }
 }
