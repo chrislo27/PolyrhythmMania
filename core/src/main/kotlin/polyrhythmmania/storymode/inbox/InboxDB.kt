@@ -15,8 +15,6 @@ object InboxDB {
             this.allItems[inboxItem.id] = inboxItem
         }
 
-        addItem(InboxItem.IndexCard("test_indexcard", UnlockReqs.ALWAYS_AVAILABLE))
-
         addItem(InboxItem.Memo("first_memo0", UnlockReqs.ALWAYS_AVAILABLE))
         addItem(InboxItem.ContractDoc(Contracts["tutorial1"], UnlockReqs.ALWAYS_AVAILABLE))
 

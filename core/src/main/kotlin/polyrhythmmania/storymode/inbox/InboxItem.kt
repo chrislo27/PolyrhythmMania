@@ -9,9 +9,6 @@ sealed class InboxItem(
         val unlockReqs: UnlockReqs,
 ) {
     
-    class IndexCard(id: String, unlockReqs: UnlockReqs)
-        : InboxItem(id, unlockReqs)
-    
     class Memo(id: String, unlockReqs: UnlockReqs)
         : InboxItem(id, unlockReqs)
     

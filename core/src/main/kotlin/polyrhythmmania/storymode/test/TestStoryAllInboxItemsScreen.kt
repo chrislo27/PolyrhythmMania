@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
@@ -142,48 +141,6 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
         
         fun createInboxItemUI(item: InboxItem): UIElement {
             return when (item) {
-                is InboxItem.IndexCard -> {
-                    RectElement(Color.valueOf("FFF9EE")).apply {
-                        this.doClipping.set(true)
-                        this.border.set(Insets(1f))
-                        this.borderStyle.set(SolidBorder(Color.valueOf("E5D58B")))
-                        this.bindWidthToParent(multiplier = 0.85f)
-                        this.bindHeightToSelfWidth(multiplier = 3f / 5f)
-
-                        // Rules, 1 main red one and 10 light blue ones
-                        val spaces = (1 + 10) + 2
-                        val spacing = 1f / spaces
-                        val red = Color(1f, 0f, 0f, 0.5f)
-                        val blue = Color(0.2f, 0.7f, 1f, 0.5f)
-                        for (i in 0 until (1 + 10)) {
-                            this += RectElement(if (i == 0) red else blue).apply {
-                                this.bounds.height.set(1.5f)
-                                this.bounds.y.bind { (parent.use()?.contentZone?.height?.use() ?: 0f) * (spacing * (i + 2)) }
-                            }
-                        }
-                        val leftRule = FloatVar { (parent.use()?.contentZone?.width?.use() ?: 0f) * 0.125f }
-                        this += RectElement(red).apply {
-                            this.bounds.width.set(1.5f)
-                            this.bounds.x.bind { leftRule.use() }
-                        }
-
-                        this += Pane().apply {
-                            Anchor.BottomRight.configure(this)
-                            this.bindHeightToParent(multiplier = 1f - spacing * 2, adjust = -5f)
-                            this.bindWidthToParent(adjustBinding = { -leftRule.use() })
-                            this.padding.set(Insets(0f, 0f, 3f, 15f))
-
-//                            this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc")).apply {
-//                                this.markup.set(Markup(mapOf(Markup.DEFAULT_FONT_NAME to main.fontHandwriting2),
-//                                        TextRun(main.fontHandwriting2, "", lineHeightScale = 0.865f),
-//                                        styles = Markup.FontStyles.ALL_USING_DEFAULT_FONT))
-//                                this.renderAlign.set(RenderAlign.topLeft)
-//                                this.doLineWrapping.set(true)
-//                                this.bounds.y.set(3f)
-//                            }
-                        }
-                    }
-                }
                 is InboxItem.Memo -> {
                     RectElement(Color.WHITE).apply {
                         this.doClipping.set(true)
