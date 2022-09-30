@@ -30,6 +30,7 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_bg", "story/textures/desk/bg.png")
         StoryAssets.loadAsset<Texture>("desk_contract_envelope", "story/textures/desk/contract_envelope.png")
         StoryAssets.loadAsset<Texture>("desk_contract_paper", "story/textures/desk/contract_paper.png")
+        StoryAssets.loadAsset<Texture>("desk_contract_full", "story/textures/desk/contract_full.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_frame", "story/textures/desk/inboxitem/frame.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_frame_cap_top", "story/textures/desk/inboxitem/frame_cap_top.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_frame_cap_bottom", "story/textures/desk/inboxitem/frame_cap_bottom.png")

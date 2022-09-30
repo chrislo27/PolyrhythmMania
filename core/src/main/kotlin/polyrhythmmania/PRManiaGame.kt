@@ -774,7 +774,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         addFontFamily(familyName = "RobotoMono", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         addFontFamily(familyName = "RobotoCondensed", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
-        addFontFamily(familyName = "MerriweatherSans", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
+        addFontFamily(familyName = "OpenSans", hinting = FreeTypeFontGenerator.Hinting.Full, scaleToReferenceSize = true, generateBordered = false)
         addFontFamily(familyName = "Lexend", fontFamilies = listOf(FontFamily.REGULAR, FontFamily.BOLD),
                 hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false) {font ->
             font.data.setLineHeight(font.data.lineHeight * 0.75f)
@@ -847,10 +847,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontRobotoCondensedBold: PaintboxFont get() = fontCache["RobotoCondensed_BOLD"]
     val fontRobotoCondensedItalic: PaintboxFont get() = fontCache["RobotoCondensed_ITALIC"]
     val fontRobotoCondensedBoldItalic: PaintboxFont get() = fontCache["RobotoCondensed_BOLD_ITALIC"]
-    val fontMerriweather: PaintboxFont get() = fontCache["MerriweatherSans"]
-    val fontMerriweatherBold: PaintboxFont get() = fontCache["MerriweatherSans_BOLD"]
-    val fontMerriweatherItalic: PaintboxFont get() = fontCache["MerriweatherSans_ITALIC"]
-    val fontMerriweatherBoldItalic: PaintboxFont get() = fontCache["MerriweatherSans_BOLD_ITALIC"]
+    val fontOpenSans: PaintboxFont get() = fontCache["OpenSans"]
+    val fontOpenSansBold: PaintboxFont get() = fontCache["OpenSans_BOLD"]
+    val fontOpenSansItalic: PaintboxFont get() = fontCache["OpenSans_ITALIC"]
+    val fontOpenSansBoldItalic: PaintboxFont get() = fontCache["OpenSans_BOLD_ITALIC"]
     val fontRobotoSlab: PaintboxFont get() = fontCache["RobotoSlab"]
     val fontRobotoSlabBold: PaintboxFont get() = fontCache["RobotoSlab_BOLD"]
     val fontLexend: PaintboxFont get() = fontCache["Lexend"]
