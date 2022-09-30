@@ -60,6 +60,8 @@ object Credits : CreditsBase() {
                     "Roboto Mono",
                     "Roboto Condensed",
                     "Roboto Slab",
+                    "Merriweather Sans",
+                    "Lexend",
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
     
