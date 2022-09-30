@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -344,7 +345,9 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
                                             main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                                             val gameMode = item.contract.gamemodeFactory(main)
                                             val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
-                                                    main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryDesktopScreen)
+                                                    main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryDesktopScreen) {
+                                                Paintbox.LOGGER.debug("ExitReason: $it")
+                                            }
                                             main.screen = TransitionScreen(main, main.screen, playScreen,
                                                     FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
                                                 this.onEntryEnd = {

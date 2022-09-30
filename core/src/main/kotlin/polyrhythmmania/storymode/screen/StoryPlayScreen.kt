@@ -67,6 +67,7 @@ class StoryPlayScreen(
         gameMode: GameMode?,
         val contract: Contract,
         val exitToScreen: PaintboxScreen,
+        val exitCallback: ExitCallback,
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
 
     override val pauseMenuHandler: PauseMenuHandler = TengokuBgPauseMenuHandler(this).apply { // FIXME new pause menu
@@ -111,6 +112,8 @@ class StoryPlayScreen(
     
     private val canPauseGame: ReadOnlyBooleanVar = BooleanVar(eager = true) { !(inIntroCard.use() || showingScoreCard.use()) }
     
+    private lateinit var successExitReason: ExitReason
+    
     init {
         val optionList = mutableListOf<PauseOption>()
         optionList += PauseOption("play.pause.resume", true) {
@@ -120,7 +123,7 @@ class StoryPlayScreen(
             startOverPauseAction()
         }
         optionList += PauseOption(StoryL10N.getVar("play.pause.quit"), true) {
-            quitPauseAction()
+            quitPauseAction(ExitReason.Quit)
         }
         this.pauseOptions.set(optionList)
     }
@@ -261,15 +264,15 @@ class StoryPlayScreen(
         failScoreCardOptions = listOf(
                 PauseOption("play.pause.startOver", true) { startOverPauseAction() },
                 PauseOption(StoryL10N.getVar("play.pause.skipThisLevel"), false) {
-                    // TODO
+                    quitPauseAction(ExitReason.Skipped)
                 },
-                PauseOption(StoryL10N.getVar("play.pause.quit"), true) { quitPauseAction() },
+                PauseOption(StoryL10N.getVar("play.pause.quit"), true) { quitPauseAction(ExitReason.Quit) },
         )
         successScoreCardOptions = listOf(
                 PauseOption(StoryL10N.getVar("play.pause.continue"), true) {
-                    quitPauseAction() // TODO
+                    quitPauseAction(successExitReason)
                 },
-                PauseOption("play.pause.startOver", true) { startOverPauseAction() },
+//                PauseOption("play.pause.startOver", true) { startOverPauseAction() }, // TODO Callback problem: Starting over with a passing score means it doesn't get reflected back in the callback
         )
         
         val failPane = VBox().apply { 
@@ -476,8 +479,9 @@ class StoryPlayScreen(
         }
     }
     
-    private fun quitPauseAction() {
+    private fun quitPauseAction(exitReason: ExitReason) {
         quitToScreen(exitToScreen)
+        exitCallback.onExit(exitReason)
         Gdx.app.postRunnable {
             playMenuSound("sfx_pause_exit")
         }
@@ -659,6 +663,8 @@ class StoryPlayScreen(
             
             if (contract.immediatePass) {
                 // Just a delay, then show Pass! with hit + music, options
+                successExitReason = ExitReason.Passed(100)
+                
                 animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, 0f, 100f, delay).apply {
                     this.onComplete = {
                         playMenuSound(StoryAssets.get<Sound>("score_finish"))
@@ -679,6 +685,8 @@ class StoryPlayScreen(
                     inputScore.weight
                 } / nInputs) * 100))
                 val score: Int = rawScore.roundToInt().coerceIn(0, 100)
+                
+                successExitReason = ExitReason.Passed(score)
 
                 animationHandler.enqueueAnimation(Animation(Interpolation.linear, (145f / 60f) * (score / 100f), 0f, score.toFloat(), delay).apply {
                     val fillingSound = StoryAssets.get<Sound>("score_filling")
