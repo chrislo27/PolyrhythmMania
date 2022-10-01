@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
+import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
 import paintbox.util.*
 import paintbox.util.gdxutils.NestedFrameBuffer
@@ -194,14 +195,19 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             
             world.sortEntitiesByRenderOrder()
             world.entities.forEach { entity ->
-                val cullingInEffect = entity.shouldApplyRenderCulling()
-                if (cullingInEffect) {
-                    entity.setCullingRect(tmpEntityRect, tmpEntityVec)
-                }
-                // Only render entities that are in scene
-                if (!cullingInEffect || tmpEntityRect.intersects(visibleAreaRect)) {
-                    entitiesRendered++
-                    entity.render(this, batch, currentTileset)
+                try {
+                    val cullingInEffect = entity.shouldApplyRenderCulling()
+                    if (cullingInEffect) {
+                        entity.setCullingRect(tmpEntityRect, tmpEntityVec)
+                    }
+                    // Only render entities that are in scene
+                    if (!cullingInEffect || tmpEntityRect.intersects(visibleAreaRect)) {
+                        entitiesRendered++
+                        entity.render(this, batch, currentTileset)
+                    }
+                } catch (e: Exception) {
+                    Paintbox.LOGGER.error("Exception while normally rendering entity ${e.javaClass.name} $e", "WorldRenderer", throwable = e)
+                    throw e
                 }
             }
             
@@ -246,25 +252,30 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                 if (world.entities.any { it is HasLightingRender }) {
 //                    world.sortEntitiesByRenderOrder(WorldRenderer.comparatorRenderOrderLighting)
                     world.entities.forEach { entity ->
-                        if (entity is HasLightingRender) {
-                            batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
-                            entity.renderBlockingEffectBeforeLighting(this, batch, currentTileset)
-
-                            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
-                            entity.renderLightingEffect(this, batch, currentTileset)
-
-                            batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
-                            entity.renderBlockingEffectAfterLighting(this, batch, currentTileset)
-                        } else {
-                            val cullingInEffect = entity.shouldApplyRenderCulling()
-                            if (cullingInEffect) {
-                                entity.setCullingRect(tmpEntityRect, tmpEntityVec)
-                            }
-                            if (!cullingInEffect || tmpEntityRect.intersects(visibleAreaRect)) {
-                                // Not a light emitter, so just render the blocking effect using Entity.render
+                        try {
+                            if (entity is HasLightingRender) {
                                 batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
-                                entity.render(this, batch, currentTileset)
+                                entity.renderBlockingEffectBeforeLighting(this, batch, currentTileset)
+
+                                batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+                                entity.renderLightingEffect(this, batch, currentTileset)
+
+                                batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                                entity.renderBlockingEffectAfterLighting(this, batch, currentTileset)
+                            } else {
+                                val cullingInEffect = entity.shouldApplyRenderCulling()
+                                if (cullingInEffect) {
+                                    entity.setCullingRect(tmpEntityRect, tmpEntityVec)
+                                }
+                                if (!cullingInEffect || tmpEntityRect.intersects(visibleAreaRect)) {
+                                    // Not a light emitter, so just render the blocking effect using Entity.render
+                                    batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                                    entity.render(this, batch, currentTileset)
+                                }
                             }
+                        } catch (e: Exception) {
+                            Paintbox.LOGGER.error("Exception while lighting buffer rendering entity ${e.javaClass.name} $e", "WorldRenderer", throwable = e)
+                            throw e
                         }
                     }
                 }
