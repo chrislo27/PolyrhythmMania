@@ -3,12 +3,9 @@ package polyrhythmmania.world
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Vector3
 import paintbox.binding.BooleanVar
 import paintbox.registry.AssetRegistry
-import paintbox.util.Vector3Stack
 import polyrhythmmania.container.Container
 import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.engine.*

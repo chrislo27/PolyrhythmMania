@@ -3,7 +3,6 @@ package polyrhythmmania.editor.block.storymode
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector3
-import paintbox.util.Vector3Stack
 import polyrhythmmania.container.Container
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
@@ -42,6 +41,10 @@ class Event8BallCameraPan(engine: Engine, startBeat: Float, width: Float) : Even
     private lateinit var camera: OrthographicCamera
     private val originalCameraPos: Vector3 = Vector3()
     
+    // These don't use Vector3Stack due to threading issues with the ResourceStack
+    private val tmpVec1: Vector3 = Vector3()
+    private val tmpVec2: Vector3 = Vector3()
+    
     init {
         this.beat = startBeat
         this.width = width
@@ -59,19 +62,15 @@ class Event8BallCameraPan(engine: Engine, startBeat: Float, width: Float) : Even
         val progress = ((currentBeat - this.beat) / width.coerceAtLeast(0.1f)).coerceIn(0f, 1f)
         val interpolated = Interpolation.smooth2.apply(progress)
 
-        val targetPosVec = Vector3Stack.getAndPush()
+        val targetPosVec = tmpVec1
         val dist = 24f
         targetPosVec.set(originalCameraPos)
         targetPosVec.x += dist / 2
         targetPosVec.y += dist / 4
 
-        val tmpVec = Vector3Stack.getAndPush()
-                .set(originalCameraPos)
+        val tmpVecPos = tmpVec2.set(originalCameraPos)
                 .lerp(targetPosVec, interpolated)
-        camera.position.set(tmpVec)
-
-        Vector3Stack.pop()
-        Vector3Stack.pop()
+        camera.position.set(tmpVecPos)
     }
 
     override fun onEndContainer(container: Container, currentBeat: Float) {
