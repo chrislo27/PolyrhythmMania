@@ -58,7 +58,7 @@ class StoryAsmGameModeBouncyRoad(main: PRManiaGame)
                 newBouncePattern(85f, startOnLeft = false, 6),
                 newBouncePattern(92f, startOnLeft = true, 3),
                 newBouncePattern(96f, startOnLeft = true, 9),
-                newBouncePattern(106f, startOnLeft = true, 1, firstBeatsPerBounce = 2f), // May start from left or right
+                newBouncePattern(107f, startOnLeft = true, 1, firstBeatsPerBounce = 2f), // May start from left or right
         ))
         container.addBlock(BlockSkillStar(engine).apply { 
             this.beat = 74.5f
@@ -157,6 +157,99 @@ class StoryAsmGameModeBouncyRoad2(main: PRManiaGame)
 
         container.addBlock(BlockEndState(engine).apply {
             this.beat = 128f
+        })
+    }
+}
+
+class StoryAsmGameModeMonkeyWatch(main: PRManiaGame)
+    : AbstractStoryAsmGameMode(main) {
+
+    init {
+        TilesetPalette.createAssembleTilesetPalette().also { palette ->
+            palette.cubeBorder.color.getOrCompute().set(0xEE, 0x64, 0x38).mul(0.9f, 0.9f, 0.9f, 1f)
+            palette.cubeBorderZ.color.getOrCompute().set(0xCC, 0x48, 0x2E).mul(0.9f, 0.9f, 0.9f, 1f)
+            palette.cubeFaceY.color.getOrCompute().set(0xFE, 0x94, 0x52).mul(0.9f, 0.9f, 0.9f, 1f)
+            palette.cubeFaceZ.color.getOrCompute().set(0xFE, 0x7B, 0x2F).mul(0.9f, 0.9f, 0.9f, 1f)
+            palette.cubeFaceX.color.getOrCompute().set(0xFE, 0x7B, 0x2F).mul(0.9f, 0.9f, 0.9f, 1f)
+//            palette.cubeBorder.color.getOrCompute().set(0x53, 0x42, 0x2A).mul(0.9f, 0.9f, 0.9f, 1f)
+//            palette.cubeBorderZ.color.getOrCompute().set(0x53, 0x42, 0x2A).mul(0.9f, 0.9f, 0.9f, 1f)
+//            palette.cubeFaceY.color.getOrCompute().set(0xFE, 0x94, 0x52).mul(0.9f, 0.9f, 0.9f, 1f)
+//            palette.cubeFaceZ.color.getOrCompute().set(0xFE, 0x7B, 0x2F).mul(0.9f, 0.9f, 0.9f, 1f)
+//            palette.cubeFaceX.color.getOrCompute().set(0xFE, 0x7B, 0x2F).mul(0.9f, 0.9f, 0.9f, 1f)
+
+            palette.aliasAsmLaneBorder.color.getOrCompute().set(0x53, 0x42, 0x2A).mul(0.975f, 0.975f, 0.975f, 1f)
+            palette.aliasAsmLaneTop.color.getOrCompute().set(0xFF, 0xFF, 0xDD).mul(0.975f, 0.975f, 0.975f, 1f)
+//            palette.aliasAsmLaneBorder.color.getOrCompute().set(0x53, 0x42, 0x2A).mul(0.975f, 0.975f, 0.975f, 1f)
+//            palette.aliasAsmLaneTop.color.getOrCompute().set(0xFF, 0xFF, 0xDD).mul(0.975f, 0.975f, 0.975f, 1f)
+        }.applyTo(container.renderer.tileset)
+        container.world.tilesetPalette.copyFrom(container.renderer.tileset)
+    }
+
+    override fun initialize() {
+        super.initialize()
+
+        engine.tempos.addTempoChange(TempoChange(0f, 160f))
+        engine.musicData.volumeMap.addMusicVolume(MusicVolume(0f, 0f, 50))
+
+        val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("story/levels/music/monkey_watch.ogg"), null)
+        val musicData = engine.musicData
+        musicData.musicSyncPointBeat = 0f
+        musicData.firstBeatSec = 0.354f
+        musicData.beadsMusic = music
+        musicData.update()
+
+        var currentRodID: Int = 1000
+        @Suppress("UNUSED_CHANGED_VALUE")
+        addBouncePatternsToContainer(listOf(
+                newBouncePattern(3f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(8f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(16f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(21f, startOnLeft = true, 3, rodID = currentRodID++),
+                newBouncePattern(24f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(32f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(35.5f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(41f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(49f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(49f, startOnLeft = false, 8, beatsPerBounce = 2f, rodID = currentRodID++),
+                newBouncePattern(64f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(69f, startOnLeft = true, 3, rodID = currentRodID++),
+                newBouncePattern(72f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(80f, startOnLeft = true, 3, rodID = currentRodID++),
+                newBouncePattern(83.5f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(88f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(96f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(105.5f, startOnLeft = true, 3, rodID = currentRodID++),
+                newBouncePattern(104f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(105f, startOnLeft = true, 27, beatsPerBounce = 2f, rodID = currentRodID++),
+                newBouncePattern(112.5f, startOnLeft = true, 3, rodID = currentRodID++),
+                newBouncePattern(115.5f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(120f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(128f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(138.5f, startOnLeft = false, 6, rodID = currentRodID++),
+                newBouncePattern(145f, startOnLeft = true, 15, rodID = currentRodID++),
+                newBouncePattern(160f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(167.5f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(172.5f, startOnLeft = true, 3, rodID = currentRodID++),
+                newBouncePattern(176f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(184f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(189f, startOnLeft = true, 3, rodID = currentRodID++),
+                newBouncePattern(192f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(200f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(203.5f, startOnLeft = true, 5, rodID = currentRodID++),
+                newBouncePattern(209f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(217f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(217f, startOnLeft = false, 8, beatsPerBounce = 2f, rodID = currentRodID++),
+                newBouncePattern(232.5f, startOnLeft = false, 8, rodID = currentRodID++),
+                newBouncePattern(240f, startOnLeft = true, 13, beatsPerBounce = 2f, indices = listOf(
+                        0, 1, 2, 3, 2, 1, 0, 1, 2, 3, 2, 1, 0, -999
+                ), rodID = currentRodID++), // Custom, doesn't end with fire
+        ))
+//        container.addBlock(BlockSkillStar(engine).apply { // TODO add skill star for Monkey Watch assemble
+//            this.beat = 74.5f
+//        })
+
+        container.addBlock(BlockEndState(engine).apply {
+            this.beat = 274f
         })
     }
 }

@@ -131,6 +131,9 @@ object Contracts {
         add(Contract("air_rally_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.fever("Air Rally", listOf(SongNameAndSource.megamix("Air Rally 2"))), listOf("GENERIC")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally_2.prmproj"))
         })
+        add(Contract("monkey_watch", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.fever("Monkey Watch"), listOf("Kievit")), 60) { main ->
+            StoryAsmGameModeMonkeyWatch(main)
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)

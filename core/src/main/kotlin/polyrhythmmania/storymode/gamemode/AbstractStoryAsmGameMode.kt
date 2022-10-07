@@ -32,8 +32,8 @@ abstract class AbstractStoryAsmGameMode(
     
     protected fun newBouncePattern(startBeat: Float, startOnLeft: Boolean, numBouncesInclFire: Int,
                                    beatsPerBounce: Float = 1f, firstBeatsPerBounce: Float = beatsPerBounce,
-                                   rodID: Int = -1): BouncePattern {
-        val indices: List<Int> = buildList {
+                                   rodID: Int = -1, indices: List<Int>? = null): BouncePattern {
+        val indices: List<Int> = indices ?: buildList {
             var goingRight = startOnLeft
             var next: Int = if (numBouncesInclFire == 1) 2 else (if (startOnLeft) 0 else 3)
             
@@ -87,7 +87,7 @@ abstract class AbstractStoryAsmGameMode(
                 prevIndex = targetIndex
             }
 
-            val startBeat = this.beat - 1
+            val startBeat = this.beat - firstBeatsPerBounce
             list.onEach { it.beat += startBeat }
             if (endsWithPlayer) {
                 val inputBeat = bounceIndices.size * beatsPerBounce
