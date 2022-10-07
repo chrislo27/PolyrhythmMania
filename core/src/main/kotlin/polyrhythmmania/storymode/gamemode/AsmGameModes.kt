@@ -126,7 +126,7 @@ class StoryAsmGameModeBouncyRoad2(main: PRManiaGame)
 
         val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("story/levels/music/bouncy_road.ogg"), null)
         val musicData = engine.musicData
-        musicData.musicSyncPointBeat = 4f
+        musicData.musicSyncPointBeat = 1 + 4f
         musicData.firstBeatSec = 0.800f
         musicData.beadsMusic = music
         musicData.update()
@@ -134,27 +134,27 @@ class StoryAsmGameModeBouncyRoad2(main: PRManiaGame)
         var currentRodID: Int = 1000
         @Suppress("UNUSED_CHANGED_VALUE")
         addBouncePatternsToContainer(listOf(
-                newBouncePattern(0f, startOnLeft = true, 15, beatsPerBounce = 1f, firstBeatsPerBounce = 60f / 154f, rodID = currentRodID++),
-                newBouncePattern(8f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
-                newBouncePattern(24f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
-                newBouncePattern(40f, startOnLeft = true, 15, beatsPerBounce = 2f, rodID = currentRodID++),
-                newBouncePattern(42f + 2/3f, startOnLeft = true, 15, beatsPerBounce = 2/3f, rodID = currentRodID++),
-                newBouncePattern(64f, startOnLeft = false, 2, beatsPerBounce = 1f, rodID = currentRodID++),
-                newBouncePattern(72.5f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
-                newBouncePattern(74f, startOnLeft = true, 15, beatsPerBounce = 0.5f, rodID = currentRodID++),
-                newBouncePattern(88f, startOnLeft = true, 15, beatsPerBounce = 2f, rodID = currentRodID++),
-                newBouncePattern(90.5f, startOnLeft = true, 3, beatsPerBounce = 0.5f, rodID = currentRodID++),
-                newBouncePattern(95f, startOnLeft = false, 2, beatsPerBounce = 1f, rodID = currentRodID++),
-                newBouncePattern(100f, startOnLeft = true, 3, beatsPerBounce = 1f, rodID = currentRodID++),
-                BlockAsmBouncePattern(108f, 999, listOf(3, 0, 2), beatsPerBounce = 1f, rodID = currentRodID++).let { BouncePattern(it, it.getNumInputs()) },
-                newBouncePattern(119f, startOnLeft = true, 1, firstBeatsPerBounce = 2f, rodID = currentRodID++),
+                newBouncePattern(1 + 0f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
+                newBouncePattern(1 + 8f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
+                newBouncePattern(1 + 24f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
+                newBouncePattern(1 + 41f, startOnLeft = true, 15, beatsPerBounce = 2f, rodID = currentRodID++),
+                newBouncePattern(1 + 42f + 1/3f, startOnLeft = true, 15, beatsPerBounce = 2/3f, rodID = currentRodID++),
+                newBouncePattern(1 + 64f, startOnLeft = false, 2, beatsPerBounce = 1f, rodID = currentRodID++),
+                newBouncePattern(1 + 72.5f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
+                newBouncePattern(1 + 73.5f, startOnLeft = true, 15, beatsPerBounce = 0.5f, rodID = currentRodID++),
+                newBouncePattern(1 + 89f, startOnLeft = true, 15, beatsPerBounce = 2f, rodID = currentRodID++),
+                newBouncePattern(1 + 90f, startOnLeft = true, 3, beatsPerBounce = 0.5f, rodID = currentRodID++),
+                newBouncePattern(1 + 95f, startOnLeft = false, 2, beatsPerBounce = 1f, rodID = currentRodID++),
+                newBouncePattern(1 + 100f, startOnLeft = true, 3, beatsPerBounce = 1f, rodID = currentRodID++),
+                BlockAsmBouncePattern(1 + 108f, 999, listOf(3, 0, 2), beatsPerBounce = 1f, rodID = currentRodID++).let { BouncePattern(it, it.getNumInputs()) },
+                newBouncePattern(1 + 120f, startOnLeft = true, 1, firstBeatsPerBounce = 2f, rodID = currentRodID++),
         ))
         container.addBlock(BlockSkillStar(engine).apply {
-            this.beat = 86.5f
+            this.beat = 1 + 86.5f
         })
 
         container.addBlock(BlockEndState(engine).apply {
-            this.beat = 128f
+            this.beat = 1 + 128f
         })
     }
 }
@@ -169,16 +169,9 @@ class StoryAsmGameModeMonkeyWatch(main: PRManiaGame)
             palette.cubeFaceY.color.getOrCompute().set(0xFE, 0x94, 0x52).mul(0.9f, 0.9f, 0.9f, 1f)
             palette.cubeFaceZ.color.getOrCompute().set(0xFE, 0x7B, 0x2F).mul(0.9f, 0.9f, 0.9f, 1f)
             palette.cubeFaceX.color.getOrCompute().set(0xFE, 0x7B, 0x2F).mul(0.9f, 0.9f, 0.9f, 1f)
-//            palette.cubeBorder.color.getOrCompute().set(0x53, 0x42, 0x2A).mul(0.9f, 0.9f, 0.9f, 1f)
-//            palette.cubeBorderZ.color.getOrCompute().set(0x53, 0x42, 0x2A).mul(0.9f, 0.9f, 0.9f, 1f)
-//            palette.cubeFaceY.color.getOrCompute().set(0xFE, 0x94, 0x52).mul(0.9f, 0.9f, 0.9f, 1f)
-//            palette.cubeFaceZ.color.getOrCompute().set(0xFE, 0x7B, 0x2F).mul(0.9f, 0.9f, 0.9f, 1f)
-//            palette.cubeFaceX.color.getOrCompute().set(0xFE, 0x7B, 0x2F).mul(0.9f, 0.9f, 0.9f, 1f)
 
             palette.aliasAsmLaneBorder.color.getOrCompute().set(0x53, 0x42, 0x2A).mul(0.975f, 0.975f, 0.975f, 1f)
             palette.aliasAsmLaneTop.color.getOrCompute().set(0xFF, 0xFF, 0xDD).mul(0.975f, 0.975f, 0.975f, 1f)
-//            palette.aliasAsmLaneBorder.color.getOrCompute().set(0x53, 0x42, 0x2A).mul(0.975f, 0.975f, 0.975f, 1f)
-//            palette.aliasAsmLaneTop.color.getOrCompute().set(0xFF, 0xFF, 0xDD).mul(0.975f, 0.975f, 0.975f, 1f)
         }.applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
     }
