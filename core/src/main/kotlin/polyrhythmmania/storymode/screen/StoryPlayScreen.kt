@@ -104,6 +104,7 @@ class StoryPlayScreen(
     private val showingScoreCard: BooleanVar = BooleanVar(false)
     private val lastResultFlag: ReadOnlyVar<ResultFlag> = Var.eagerBind { engine.resultFlag.use() }
     private val scoreBar: FloatVar = FloatVar(0f)
+    private val showScoreOnScoreCard: BooleanVar = BooleanVar(false) // Blank out score before hit
     
     private val failScoreCardOptions: List<PauseOption>
     private val successScoreCardOptions: List<PauseOption>
@@ -384,7 +385,7 @@ class StoryPlayScreen(
                                 if (contract.immediatePass) {
                                     if (progress.use() < 100f) "" else StoryL10N.getValue("play.scoreCard.pass")
                                 } else {
-                                    progress.use().toInt().toString()
+                                    if (!showScoreOnScoreCard.use()) "" else progress.use().toInt().toString()
                                 }
                             }, font = main.fontResultsScore).apply {
                                 this.renderAlign.set(RenderAlign.center)
@@ -529,6 +530,7 @@ class StoryPlayScreen(
     
     fun openScoreCard() {
         showingScoreCard.set(true)
+        showScoreOnScoreCard.set(false)
         animationHandler.cancelAnimationFor(scoreCardTransition)
         scoreCardTransition.set(1f)
         animationHandler.enqueueAnimation(Animation(Interpolation.linear, scoreCardTransitionTime, 1f, 0f), scoreCardTransition)
@@ -694,6 +696,7 @@ class StoryPlayScreen(
 
                     this.onStart = {
                         fillingSoundID = playMenuSound(fillingSound).second
+                        showScoreOnScoreCard.set(true)
                     }
                     this.onComplete = {
                         val passed = score >= contract.minimumScore
