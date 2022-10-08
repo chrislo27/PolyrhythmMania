@@ -38,6 +38,29 @@ object InputThresholds {
                     engine.inputter.onButtonPressed(false, t)
                     engine.inputter.onButtonPressed(true, t)
                 }
+                when (mode.worldType) {
+                    is WorldType.Polyrhythm -> {
+                        world.rows.forEach { row ->
+                            row.rowBlocks.forEach { rb ->
+                                rb.spawn(0f)
+                                rb.spawn(1f)
+                                rb.fullyExtend(engine, 0f)
+                                rb.despawn(0f)
+                                rb.despawn(1f)
+                            }
+                        }
+                    }
+                    WorldType.Dunk -> {
+                        world.dunkPiston.fullyExtend(engine, 0f)
+                    }
+                    WorldType.Assemble -> {
+                        world.asmPistons.forEach { 
+                            it.fullyExtend(engine, 0f, 1f, true)
+                            it.chargeUp(0f)
+                            it.uncharge(0f)
+                        }
+                    }
+                }
                 (engine.timingProvider as SimpleTimingProvider).seconds += 1 / 60f
             }
         }

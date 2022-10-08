@@ -2,6 +2,7 @@ package polyrhythmmania.gamemodes
 
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
+import paintbox.registry.AssetRegistry
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
@@ -17,6 +18,7 @@ import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
+import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.LoopParams
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
@@ -34,11 +36,11 @@ class AssembleMode(main: PRManiaGame)
 
     init {
         container.world.worldMode = WorldMode(WorldType.Assemble)
-        
+
         container.texturePackSource.set(TexturePackSource.StockGBA)
         TilesetPalette.createAssembleTilesetPalette().applyTo(container.renderer.tileset)
         container.world.tilesetPalette.copyFrom(container.renderer.tileset)
-        
+
         container.resultsText = ResultsText(
                 Localization.getValue("play.results.assemble.title"),
                 Localization.getValue("play.results.assemble.ok"),
@@ -88,10 +90,8 @@ class AssembleMode(main: PRManiaGame)
         musicData.loopParams = LoopParams(SamplePlayer.LoopType.NO_LOOP_FORWARDS, 0.0, music.musicSample.lengthMs)
         musicData.beadsMusic = music
         musicData.update()
-        
+
         engine.musicData.volumeMap.addMusicVolume(MusicVolume(0f, 0f, 100))
-        
-        SidemodeAssets.assembleSfx // Call get to load
 
         addInitialBlocks()
     }
@@ -102,8 +102,8 @@ class AssembleMode(main: PRManiaGame)
         blocks += InitializationBlock().apply {
             this.beat = 0f
         }
-        
-        blocks += BlockEndState(engine).apply { 
+
+        blocks += BlockEndState(engine).apply {
             this.beat = 142f
         }
 
@@ -111,7 +111,7 @@ class AssembleMode(main: PRManiaGame)
     }
 
     inner class InitializationBlock : Block(engine, EnumSet.allOf(BlockType::class.java)) {
-        
+
         override fun compileIntoEvents(): List<Event> {
             fun patternA(startBeat: Float): List<Event> {
                 val list = mutableListOf<Event>()
@@ -128,9 +128,10 @@ class AssembleMode(main: PRManiaGame)
                 list += EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 7f)
                 list += EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 8f)
                 list += EventAsmPrepareSfx(engine, startBeat + 6f)
-                
+
                 return list
             }
+
             fun patternAHalf(startBeat: Float, halvesAreHalf: Boolean = true): List<Event> {
                 val list = mutableListOf<Event>()
                 list += EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 8f, beatsPerUnit = if (halvesAreHalf) 0.5f else 1f)
@@ -153,9 +154,10 @@ class AssembleMode(main: PRManiaGame)
                 list += EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 7f)
                 list += EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 8f)
                 list += EventAsmPrepareSfx(engine, startBeat + 6f)
-                
+
                 return list
             }
+
             fun patternAHalfSlow(startBeat: Float): List<Event> {
                 val list = mutableListOf<Event>()
                 list += EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 8f, beatsPerUnit = 1f)
@@ -176,7 +178,7 @@ class AssembleMode(main: PRManiaGame)
                 list += EventAsmPistonSpringCharge(engine, world.asmPlayerPiston, startBeat + 7f)
                 list += EventAsmPistonSpringUncharge(engine, world.asmPlayerPiston, startBeat + 8f)
                 list += EventAsmPrepareSfx(engine, startBeat + 6f)
-                
+
                 return list
             }
 
@@ -195,6 +197,7 @@ class AssembleMode(main: PRManiaGame)
 
                 return list
             }
+
             fun patternBHalf(startBeat: Float, halvesAreHalf: Boolean = true): List<Event> {
                 val list = mutableListOf<Event>()
                 list += EventAsmSpawnWidgetHalves(engine, 0f, startBeat + 5f, beatsPerUnit = if (halvesAreHalf) 0.5f else 1f)
@@ -233,7 +236,8 @@ class AssembleMode(main: PRManiaGame)
                 return patternA(startBeat) + patternB(startBeat + 8f)
             }
 
-            val patterns = listOf( // 98, 104, 112, 132, 98, 60, 132, 160
+            val patterns = listOf(
+                    // 98, 104, 112, 132, 98, 60, 132, 160
                     patternBoth(7f + 0 * 16f), // 98 Normal
 
                     patternBoth(7f + 1 * 16f), // 104 Normal + C
@@ -264,7 +268,7 @@ class AssembleMode(main: PRManiaGame)
             val playerPistonIndex = world.asmPistons.indexOf(world.asmPlayerPiston)
             val minInputs = patterns.count { it is EventAsmRodBounce && it.toIndex == playerPistonIndex }
             engine.inputter.minimumInputCount = minInputs
-            
+
             return patterns
         }
 
@@ -297,11 +301,11 @@ class BlockAsmReset(engine: Engine) : Block(engine, EnumSet.allOf(BlockType::cla
 }
 
 abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float, val targetRodID: Int) : AudioEvent(engine) {
-    
+
     init {
         this.beat = startBeat
     }
-    
+
     abstract fun onStartRod(currentBeat: Float, rod: EntityRodAsm)
 
     override fun onStart(currentBeat: Float) {
@@ -315,10 +319,10 @@ abstract class AbstractEventAsmRod(engine: Engine, startBeat: Float, val targetR
 
 /**
  * The core event of Assemble mode.
- * 
+ *
  * If the [fromIndex] is out of bounds, a new rod is spawned and the bounce is applied only to it.
  * If the [fromIndex] is in bounds and is NOT the player index, then the piston extend animation is also played.
- * 
+ *
  * If the [toIndex] is the player index, an expected input is scheduled for the next beat.
  * If the [fromIndex] is the player index, then a conditional bounce is scheduled,
  * requiring the previous input to be hit for the bounce to succeed.
@@ -354,22 +358,24 @@ class EventAsmRodBounce(
     override fun onAudioStart(atBeat: Float, actualBeat: Float) {
         val world = engine.world
         val pistons = world.asmPistons
-        
-        if (fromIndex in pistons.indices && !engine.world.entities.any { e -> e is EntityRodAsm && e.acceptingInputs }) {
+
+        if (fromIndex in pistons.indices && !engine.world.entities.any { e ->
+                    e is EntityRodAsm && e.acceptingInputs && e.rodID == this.targetRodID
+                }) {
             return
         }
-        
+
         val playerIndex = pistons.indexOf(world.asmPlayerPiston)
-        
+
         if (fromIndex != playerIndex || engine.autoInputs) {
             if (toIndex == playerIndex) {
                 if (nextInputIsFire) {
-                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_compress"), SoundInterface.SFXType.NORMAL)
+                    engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_asm_compress"), SoundInterface.SFXType.NORMAL)
                 }
             }
 
             if (fromIndex in (0 until pistons.size)) {
-                engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue(when (fromIndex) {
+                engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>(when (fromIndex) {
                     0 -> "sfx_asm_left"
                     1 -> "sfx_asm_middle_left"
                     2 -> "sfx_asm_middle_right"
@@ -389,13 +395,13 @@ class EventAsmRodBounce(
         val toPos = rod.getPistonPosition(engine, toIndex)
         var bounce = EntityRodAsm.BounceAsm(this.beat, timePerBounce, toPos.y + 1f + (if (nextInputIsFire) 4.5f else 3.5f),
                 fromPos.x, fromPos.y + 1f, toPos.x, toPos.y + 1f, rod.bounce)
-        
+
         if (nextInputIsFire || toIndex !in 0 until pistons.size) {
             bounce = EntityRodAsm.BounceAsm(this.beat + bounce.duration, 1f, bounce.endY - 5f,
                     bounce.endX, bounce.endY,
                     bounce.endX + (bounce.endX - bounce.startX).sign * 3f, bounce.endY - 11f, bounce)
         }
-        
+
         if (fromIndex == playerIndex && !engine.autoInputs) {
             // Have a conditional bounce. Bounce will only happen if the PREVIOUSLY hit input was at the same time and was successful
             rod.expectedInputs.lastOrNull()?.addConditionalBounce(rod, bounce)
@@ -409,10 +415,10 @@ class EventAsmRodBounce(
             } else if (toIndex !in 0 until pistons.size) {
                 rod.disableInputs = true
             }
-            
+
             // Bounce the rod
             rod.bounce = bounce
-            
+
             if (fromIndex in pistons.indices) {
                 // Play piston extend animation
                 world.asmPistons[fromIndex].fullyExtend(engine, this.beat, timePerBounce, doWiggle = true)
@@ -423,7 +429,7 @@ class EventAsmRodBounce(
 }
 
 class EventAsmPistonRetractAll(engine: Engine, startBeat: Float) : Event(engine) {
-    
+
     init {
         this.beat = startBeat
     }
@@ -484,14 +490,14 @@ class EventAsmSpawnWidgetHalves(engine: Engine, startBeat: Float, val combineBea
 }
 
 class EventAsmPrepareSfx(engine: Engine, startBeat: Float) : AudioEvent(engine) {
-    
+
     init {
         this.beat = startBeat
     }
 
     override fun onAudioStart(atBeat: Float, actualBeat: Float) {
         super.onAudioStart(atBeat, actualBeat)
-        val beadsSound = SidemodeAssets.assembleSfx.getValue("sfx_asm_prepare")
+        val beadsSound = AssetRegistry.get<BeadsSound>("sfx_asm_prepare")
         engine.soundInterface.playAudio(beadsSound, SoundInterface.SFXType.NORMAL) { player ->
             player.pitch = engine.tempos.tempoAtBeat(this.beat) / 98f
         }
@@ -526,7 +532,7 @@ class EventAsmAssemble(engine: Engine, val combineBeat: Float)
             })
             val score = engine.modifiers.endlessScore.score
             score.set(score.get() + 1)
-            
+
             if (engine.areStatisticsEnabled) {
                 GlobalStats.widgetsAssembledAssemble.increment()
             }

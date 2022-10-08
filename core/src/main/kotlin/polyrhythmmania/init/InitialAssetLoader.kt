@@ -180,6 +180,9 @@ class InitialAssetLoader : IAssetLoader {
         listOf("fail_music_hi", "fail_music_nohi").forEach {
             AssetRegistry.loadAsset<LazySound>("sfx_$it", "sounds/${it}.ogg")
         }
+        listOf("prepare", "compress", "shoot", "left", "middle_left", "middle_right", "right", "collide").forEach {
+            AssetRegistry.loadAsset<BeadsSound>("sfx_asm_$it", "sounds/assemble/${it}.ogg")
+        }
         AssetRegistry.loadAsset<LazySound>("sfx_reset_achievements", "sounds/menu/reset_achievements.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_challenge_complete", "sounds/menu/challenge_complete.ogg")
         AssetRegistry.loadAsset<Sound>("sfx_silence", "sounds/silence.wav") // DEBUG

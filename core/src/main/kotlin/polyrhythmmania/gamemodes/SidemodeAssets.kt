@@ -3,9 +3,7 @@ package polyrhythmmania.gamemodes
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.StreamUtils
-import paintbox.registry.AssetRegistry
 import polyrhythmmania.soundsystem.BeadsMusic
-import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 
 /**
@@ -24,11 +22,6 @@ object SidemodeAssets : Disposable {
     val polyrhythmTheme: BeadsMusic by lazy { GdxAudioReader.newMusic(Gdx.files.internal("music/Polyrhythm.ogg"), null) }
     
     val assembleTheme: BeadsMusic by lazy { GdxAudioReader.newMusic(Gdx.files.internal("music/assemble.ogg"), null) }
-    val assembleSfx: Map<String, BeadsSound> by lazy {
-        listOf("prepare", "compress", "shoot", "left", "middle_left", "middle_right", "right", "collide").associate {
-            "sfx_asm_$it" to GdxAudioReader.newSound(Gdx.files.internal("sounds/assemble/${it}.ogg"))
-        }
-    }
 
     override fun dispose() {
         if ((this::practiceTheme.getDelegate() as Lazy<*>).isInitialized()) {

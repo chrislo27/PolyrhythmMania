@@ -9,7 +9,6 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.practice.PracticeData
 import polyrhythmmania.engine.modifiers.EngineModifiers
-import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.*
@@ -308,7 +307,7 @@ class EngineInputter(val engine: Engine) {
                 if (animation is EntityPistonAsm.Animation.Neutral) {
                     asmPlayerPiston.fullyExtend(engine, atBeat, hitDuration, doWiggle = hit)
                     if (!hit) {
-                        engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_middle_right"), SoundInterface.SFXType.PLAYER_INPUT) {
+                        engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_asm_middle_right"), SoundInterface.SFXType.PLAYER_INPUT) {
                             it.pitch = 1.5f
                         }
                     }
@@ -317,7 +316,7 @@ class EngineInputter(val engine: Engine) {
                     val piston = world.asmPlayerPiston
                     piston.animation = EntityPistonAsm.Animation.Fire(piston, atBeat)
                     piston.retract()
-                    engine.soundInterface.playAudioNoOverlap(SidemodeAssets.assembleSfx.getValue("sfx_asm_shoot"), SoundInterface.SFXType.PLAYER_INPUT)
+                    engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>("sfx_asm_shoot"), SoundInterface.SFXType.PLAYER_INPUT)
 
                     for (entity in engine.world.entities) {
                         if (entity !is EntityRodAsm || !entity.acceptingInputs) continue

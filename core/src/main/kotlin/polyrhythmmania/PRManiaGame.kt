@@ -196,10 +196,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             permanentScreens.add(mainMenuScreen)
         }
         setScreen(AssetRegistryLoadingScreen(this).apply {
-            onStart = {
-                InputThresholds.initInputClasses()
-            }
+            onStart = {}
             onAssetLoadingComplete = {
+                InputThresholds.initInputClasses()
+                
                 DiscordRichPresence // Initialize discord-gamesdk
                 DiscordRichPresence.enableRichPresence.bind { use(settings.discordRichPresence) }
                 
