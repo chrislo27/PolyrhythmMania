@@ -3,17 +3,17 @@ package polyrhythmmania.storymode.inbox.state
 import java.time.LocalDateTime
 
 
-sealed class UnlockState {
+sealed class InboxItemUnlockState {
     
-    object Unavailable : UnlockState()
+    object Unavailable : InboxItemUnlockState()
     
-    data class Available(val newIndicator: Boolean) : UnlockState()
+    data class Available(val newIndicator: Boolean) : InboxItemUnlockState()
 
-    object Skipped : UnlockState()
+    object Skipped : InboxItemUnlockState()
 
     data class Completed(
-            val stageCompletionData: StageCompletionData?
-    ) : UnlockState() {
+            val stageCompletionData: StageCompletionData? // TODO doesn't apply to memos
+    ) : InboxItemUnlockState() {
         
         data class StageCompletionData(
                 /**

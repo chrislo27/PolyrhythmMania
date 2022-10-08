@@ -16,13 +16,16 @@ object InboxDB {
             this.allItems[inboxItem.id] = inboxItem
         }
 
-        addItem(InboxItem.Memo("first_memo0", "first_memo0".asReadOnlyVar(), UnlockReqs.ALWAYS_AVAILABLE))
-        addItem(InboxItem.ContractDoc(Contracts["tutorial1"], UnlockReqs.ALWAYS_AVAILABLE))
+        addItem(InboxItem.Memo("first_memo0", "first_memo0".asReadOnlyVar()))
+        addItem(InboxItem.ContractDoc(Contracts["tutorial1"]))
 
         run {
             // FIXME debug contracts
-            Contracts.contracts.forEach { (key, contract) ->
-                addItem(InboxItem.ContractDoc(contract, UnlockReqs.ALWAYS_AVAILABLE, itemID = "debugcontr_${contract.id}"))
+            for ((id, contract) in Contracts.contracts) {
+                if (id == "tutorial1") {
+                    continue
+                }
+                addItem(InboxItem.ContractDoc(contract, itemID = "${contract.id}"))
             }
             Paintbox.LOGGER.debug("Added ${Contracts.contracts.size} debug contracts", "InboxDB")
         }

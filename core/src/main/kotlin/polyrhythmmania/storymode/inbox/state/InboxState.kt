@@ -32,26 +32,26 @@ class InboxState {
         private fun inboxItemStateFromJson(obj: JsonObject, version: Int): InboxItemState {
             val itemID = obj.get("id").asString()
             val unlockStateObj = obj.get("unlockState").asObject()
-            val unlockState: UnlockState = when (val type = unlockStateObj.get("type").asString()) {
+            val unlockState: InboxItemUnlockState = when (val type = unlockStateObj.get("type").asString()) {
                 "available" -> {
-                    UnlockState.Available(unlockStateObj.getBoolean("new", true))
+                    InboxItemUnlockState.Available(unlockStateObj.getBoolean("new", true))
                 }
                 "complete" -> {
                     val stageCompletionDataObj = unlockStateObj.get("stageCompletionData")
-                    val stageCompletionData: UnlockState.Completed.StageCompletionData? = if (stageCompletionDataObj.isObject) {
+                    val stageCompletionData: InboxItemUnlockState.Completed.StageCompletionData? = if (stageCompletionDataObj.isObject) {
                         // Default to current time
                         val firstClearTime = LocalDateTime.ofEpochSecond(unlockStateObj.getLong("firstClearTime", System.currentTimeMillis() / 1000), 0, ZoneOffset.UTC)
-                        UnlockState.Completed.StageCompletionData(firstClearTime)
+                        InboxItemUnlockState.Completed.StageCompletionData(firstClearTime)
                     } else {
                         null
                     }
-                    UnlockState.Completed(stageCompletionData)
+                    InboxItemUnlockState.Completed(stageCompletionData)
                 }
-                "skipped" -> UnlockState.Skipped
-                "unavailable" -> UnlockState.Unavailable
+                "skipped" -> InboxItemUnlockState.Skipped
+                "unavailable" -> InboxItemUnlockState.Unavailable
                 else -> {
                     Paintbox.LOGGER.warn("Unknown unlock state for version $version: $type")
-                    UnlockState.Unavailable
+                    InboxItemUnlockState.Unavailable
                 }
             }
             return InboxItemState(itemID, unlockState)
@@ -63,16 +63,16 @@ class InboxState {
                 obj.add("unlockState", Json.`object`().also { unlockObj ->
                     val unlockState = this.unlockState
                     unlockObj.add("type", when (unlockState) {
-                        is UnlockState.Available -> "available"
-                        is UnlockState.Completed -> "complete"
-                        UnlockState.Skipped -> "skipped"
-                        UnlockState.Unavailable -> "unavailable"
+                        is InboxItemUnlockState.Available -> "available"
+                        is InboxItemUnlockState.Completed -> "complete"
+                        InboxItemUnlockState.Skipped -> "skipped"
+                        InboxItemUnlockState.Unavailable -> "unavailable"
                     })
                     when (unlockState) {
-                        is UnlockState.Available -> {
+                        is InboxItemUnlockState.Available -> {
                             unlockObj.add("new", unlockState.newIndicator)
                         }
-                        is UnlockState.Completed -> {
+                        is InboxItemUnlockState.Completed -> {
                             val stageCompletionData = unlockState.stageCompletionData
                             if (stageCompletionData != null) {
                                 unlockObj.add("stageCompletionData", Json.`object`().also { o ->
@@ -82,15 +82,15 @@ class InboxState {
                                 unlockObj.add("stageCompletionData", Json.NULL)
                             }
                         }
-                        UnlockState.Skipped -> {}
-                        UnlockState.Unavailable -> {}
+                        InboxItemUnlockState.Skipped -> {}
+                        InboxItemUnlockState.Unavailable -> {}
                     }
                 })
             }
         }
     }
 
-    data class InboxItemState(val itemID: String, val unlockState: UnlockState)
+    data class InboxItemState(val itemID: String, val unlockState: InboxItemUnlockState)
 
     
     val itemStates: Map<String, InboxItemState> = mutableMapOf()

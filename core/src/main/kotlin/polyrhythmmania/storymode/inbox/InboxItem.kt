@@ -8,15 +8,14 @@ sealed class InboxItem(
         val id: String,
         
         val listingName: ReadOnlyVar<String>,
-        val unlockReqs: UnlockReqs,
 ) {
     
-    class Memo(id: String, listingName: ReadOnlyVar<String>, unlockReqs: UnlockReqs)
-        : InboxItem(id, listingName, unlockReqs)
+    class Memo(id: String, listingName: ReadOnlyVar<String>)
+        : InboxItem(id, listingName)
     
     class ContractDoc(
-            val contract: Contract, unlockReqs: UnlockReqs, itemID: String = "contract_${contract.id}",
+            val contract: Contract, itemID: String = "contract_${contract.id}",
             listingName: ReadOnlyVar<String>? = null,
-    ) : InboxItem(itemID, listingName ?: contract.name, unlockReqs)
+    ) : InboxItem(itemID, listingName ?: contract.name)
 
 }

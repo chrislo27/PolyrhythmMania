@@ -117,6 +117,16 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             }
                         }
                     }
+                    this += Button("Test \"progression overview\" screen").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            Gdx.app.postRunnable {
+                                val titleScreen = TestStoryProgressionOverviewScreen(main, this@TestStoryGimmickDebugScreen)
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
                     this += separator()
                     this += Button("Polyrhythm 2 no changes").apply {
                         this.bounds.height.set(32f)
