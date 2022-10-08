@@ -16,6 +16,7 @@ object EditorHelpData {
                 "texture_packs" to EditorHelpDocTexturePacks(),
                 "exporting" to EditorHelpDocExporting(),
                 "prmproj" to EditorHelpDocPrmproj(),
+                "spotlights" to EditorHelpDocSpotlights(),
         ))
     }
     
@@ -35,6 +36,11 @@ class EditorHelpDocRoot : HelpDocument(
                         LayerButton("editorHelp.music_sync.title", "music_sync", false),
                         LayerButtonWithNewIndicator("editorHelp.exporting.title", "exporting", false, PRManiaGame.instance.settings.newIndicatorEditorHelpExporting),
                         LayerButtonWithNewIndicator("editorHelp.texture_packs.title", "texture_packs", false, PRManiaGame.instance.settings.newIndicatorEditorHelpTexpack),
+                ),
+                LayerCol3(
+                        LayerButtonWithNewIndicator("editorHelp.spotlights.title", "spotlights", false, PRManiaGame.instance.settings.newIndicatorEditorHelpSpotlights),
+                        null,
+                        null
                 ),
         )
 )
@@ -157,5 +163,20 @@ class EditorHelpDocPrmproj : HelpDocument(
                         LayerButton("editorHelp.exporting.title", "exporting", false),
                         null
                 ),
+        )
+)
+
+class EditorHelpDocSpotlights : HelpDocument(
+        "editorHelp.spotlights.title",
+        listOf(
+                LayerParagraph("editorHelp.spotlights.pp0", 60f),
+                LayerParagraph("editorHelp.spotlights.pp1", 50f),
+                LayerImage("textures/help/spotlights/light_switch.png", 250f),
+                LayerParagraph("editorHelp.spotlights.pp2", 130f),
+                LayerParagraph("editorHelp.spotlights.pp3", 120f, padding = Insets(0f, 0f, 48f, 0f)),
+                LayerParagraph("editorHelp.spotlights.pp4", 80f), // Intentionally a lot of space on the bottom
+                LayerParagraph("editorHelp.spotlights.pp5", 30f),
+                LayerImage("textures/help/spotlights/advanced_spotlights.png", 360f),
+                LayerParagraph("editorHelp.spotlights.pp6", 320f),
         )
 )

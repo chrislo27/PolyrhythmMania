@@ -28,6 +28,7 @@ import polyrhythmmania.PreferenceKeys.LAST_UPDATE_NOTES
 import polyrhythmmania.PreferenceKeys.LAST_VERSION
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_EXPORTING
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_PRMPROJ
+import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_SPOTLIGHTS
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EDITORHELP_TEXPACK
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_ENDLESS_MODE_HELP
 import polyrhythmmania.PreferenceKeys.NEW_INDICATOR_EXTRAS_ASM
@@ -205,6 +206,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     val newIndicatorEditorHelpTexpack: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_TEXPACK, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorEditorHelpExporting: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_EXPORTING, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorEditorHelpPrmproj: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_PRMPROJ, Version(1, 1, 0), newEvenIfFirstPlay = false)
+    val newIndicatorEditorHelpSpotlights: NewIndicator = NewIndicator(NEW_INDICATOR_EDITORHELP_SPOTLIGHTS, Version(2, 0, 0), newEvenIfFirstPlay = false)
     val newIndicatorExtrasAssemble: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_ASM, Version(1, 1, 0), newEvenIfFirstPlay = false)
     val newIndicatorExtrasSolitaire: NewIndicator = NewIndicator(NEW_INDICATOR_EXTRAS_SOLITAIRE, Version(1, 2, 0), newEvenIfFirstPlay = false)
     val newIndicatorStoryMode: NewIndicator = NewIndicator(NEW_INDICATOR_STORY_MODE, Version(2, 0, 0), newEvenIfFirstPlay = true)

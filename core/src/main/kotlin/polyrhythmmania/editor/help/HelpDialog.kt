@@ -20,7 +20,6 @@ import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
@@ -228,7 +227,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                     this.textAlign.set(layer.textAlign)
                     this.textColor.set(Color.WHITE)
                     this.doLineWrapping.set(true)
-                    this.padding.set(layer.padding ?: Insets(4f, 4f, 8f, 8f))
+                    this.padding.set(Insets(4f, 4f, 8f, 8f) + (layer.padding ?: Insets.ZERO))
                     this.bounds.height.set(layer.allocatedHeight)
                 }
             }

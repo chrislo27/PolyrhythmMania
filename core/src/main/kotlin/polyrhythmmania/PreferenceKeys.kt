@@ -11,6 +11,7 @@ object PreferenceKeys {
     val NEW_INDICATOR_EDITORHELP_TEXPACK = "newIndicator_editorHelp_texturePack"
     val NEW_INDICATOR_EDITORHELP_EXPORTING = "newIndicator_editorHelp_exporting"
     val NEW_INDICATOR_EDITORHELP_PRMPROJ = "newIndicator_editorHelp_prmproj"
+    val NEW_INDICATOR_EDITORHELP_SPOTLIGHTS = "newIndicator_editorHelp_spotlights"
     val NEW_INDICATOR_EXTRAS_ASM = "newIndicator_extras_assemble"
     val NEW_INDICATOR_EXTRAS_SOLITAIRE = "newIndicator_extras_solitaire"
     val NEW_INDICATOR_STORY_MODE = "newIndicator_storyMode"
