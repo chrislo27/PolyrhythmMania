@@ -129,23 +129,32 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                                             this.border.set(Insets(1f))
                                             this.borderStyle.set(SolidBorder(Color.BLACK))
                                             this.bounds.height.set(32f)
+
+                                            val item = (InboxDB.allItems["debugcontr_$id"] as? InboxItem.ContractDoc) ?: (InboxDB.allItems["contract_$id"] as? InboxItem.ContractDoc) ?: (InboxDB.allItems[id] as? InboxItem.ContractDoc)
+                                            if (item == null) {
+                                                this.disabled.set(true)
+                                                this.tooltipElement.set(Tooltip("This is not a level, but another inbox item"))
+                                            } else {
+                                                this.tooltipElement.set(Tooltip("Inbox Item ID: ${item.id}\nContract ID: ${item.contract.id}"))
+                                            }
                                             this.setOnAction {
-                                                val item = InboxDB.allItems.getValue(id) as InboxItem.ContractDoc
-                                                main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                                                val gameMode = item.contract.gamemodeFactory(main)
-                                                val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
-                                                        main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryProgressionOverviewScreen) {
-                                                    Paintbox.LOGGER.debug("ExitReason: $it")
-                                                }
-                                                if (Gdx.input.isShiftDown()) {
-                                                    playScreen.container.engine.autoInputs = true
-                                                }
-                                                main.screen = TransitionScreen(main, main.screen, playScreen,
-                                                        FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
-                                                    this.onEntryEnd = {
-                                                        gameMode.prepareFirstTime()
-                                                        playScreen.resetAndUnpause()
-                                                        playScreen.initializeIntroCard()
+                                                if (item != null) {
+                                                    main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+                                                    val gameMode = item.contract.gamemodeFactory(main)
+                                                    val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
+                                                            main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryProgressionOverviewScreen) {
+                                                        Paintbox.LOGGER.debug("ExitReason: $it")
+                                                    }
+                                                    if (Gdx.input.isShiftDown()) {
+                                                        playScreen.container.engine.autoInputs = true
+                                                    }
+                                                    main.screen = TransitionScreen(main, main.screen, playScreen,
+                                                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+                                                        this.onEntryEnd = {
+                                                            gameMode.prepareFirstTime()
+                                                            playScreen.resetAndUnpause()
+                                                            playScreen.initializeIntroCard()
+                                                        }
                                                     }
                                                 }
                                             }
@@ -178,6 +187,10 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                 }
                 
                 this.temporarilyDisableLayouts {
+                    this += createHBox(TextLabel("RED are required levels/inbox items to pass, BLUE is optional").apply {
+                        this.bounds.width.set(400f)
+                        this.bounds.height.set(32f)
+                    })
                     progression.stages.flatMapIndexed { index, unlockStage ->
                         listOf(
                                 createHBox(createStageBox(unlockStage)),

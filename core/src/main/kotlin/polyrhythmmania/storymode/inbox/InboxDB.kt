@@ -25,7 +25,7 @@ object InboxDB {
                 if (id == "tutorial1") {
                     continue
                 }
-                addItem(InboxItem.ContractDoc(contract, itemID = "${contract.id}"))
+                addItem(InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}"))
             }
             Paintbox.LOGGER.debug("Added ${Contracts.contracts.size} debug contracts", "InboxDB")
         }
