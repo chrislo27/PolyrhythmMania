@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.Disposable
 import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
-import paintbox.font.TextRun
 import paintbox.ui.SceneRoot
 import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
@@ -135,13 +134,11 @@ class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
     val inputKeymapKeyboard: InputKeymapKeyboard = settings.inputKeymapKeyboard.getOrCompute()
 
     // Default markup used for blocks, bold is inverted
-    val blockMarkup: Markup = Markup(mapOf(
-            Markup.FONT_NAME_BOLD to main.fontEditorBordered,
-            Markup.FONT_NAME_ITALIC to main.fontEditorItalicBordered,
-            Markup.FONT_NAME_BOLDITALIC to main.fontEditorBoldItalicBordered,
+    val blockMarkup: Markup = Markup.createWithBoldItalic(main.fontEditorBoldBordered, main.fontEditorBordered,
+            main.fontEditorItalicBordered, main.fontEditorBoldItalicBordered, additionalMappings = mapOf(
             "rodin" to main.fontEditorRodinBordered,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.fontEditorBoldBordered, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
+    ))
 
     val tracks: List<Track> = when {
         EditorSpecialFlags.STORY_MODE in flags -> STORY_TRACKS

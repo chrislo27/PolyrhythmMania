@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.font.Markup
-import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
@@ -141,7 +140,7 @@ class LevelMetadataDialog(editorPane: EditorPane, val afterDialogClosed: () -> U
                 }
             }
             
-            val fieldLabelMarkup = Markup(mapOf(), TextRun(editorPane.main.fontEditorBold, ""), Markup.FontStyles.ALL_USING_DEFAULT_FONT)
+            val fieldLabelMarkup = Markup.createWithSingleFont(editorPane.main.fontEditorBold)
             fun addTextField(labelText: String, charLimit: Int, 
                              getter: (LevelMetadata) -> String,
                              allowNewlines: Boolean = false,

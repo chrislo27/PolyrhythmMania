@@ -403,7 +403,7 @@ duration: ${monster.activeDuration.get()} sec
                 this.text.bind { locVar.use() }
                 this.renderAlign.set(Align.right)
                 this.margin.set(Insets(0f, 16f, 0f, 16f))
-                this.markup.set(Markup(emptyMap(), TextRun(PRManiaGame.instance.fontGameMoreTimes, "")))
+                this.markup.set(Markup.createWithSingleFont(PRManiaGame.instance.fontGameMoreTimes))
                 this.bounds.width.set(510f)
                 this.bounds.height.set(86f)
                 this.textColor.set(Color.WHITE)

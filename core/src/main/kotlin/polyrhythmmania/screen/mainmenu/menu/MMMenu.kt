@@ -11,7 +11,6 @@ import paintbox.binding.Var
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
-import paintbox.font.TextRun
 import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.*
@@ -27,10 +26,10 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.InputKeymapKeyboard
+import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
 import polyrhythmmania.screen.play.regular.EnginePlayScreenBase
 import polyrhythmmania.screen.play.regular.ResultsBehaviour
-import polyrhythmmania.gamemodes.GameMode
 
 
 /**
@@ -161,13 +160,11 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
     val main: PRManiaGame get() = mainMenu.main
     val font: PaintboxFont = main.fontMainMenuMain
-    protected val markup: Markup = Markup(mapOf(
-            Markup.FONT_NAME_ITALIC to main.fontMainMenuItalic,
-            Markup.FONT_NAME_BOLDITALIC to main.fontMainMenuItalic,
+    protected val markup: Markup = Markup.createWithBoldItalic(font, null, main.fontMainMenuItalic, main.fontMainMenuItalic, additionalMappings = mapOf(
             "prmania_icons" to main.fontIcons,
             "rodin" to main.fontMainMenuRodin,
-            "thin" to main.fontMainMenuThin
-    ), TextRun(font, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
+            "thin" to main.fontMainMenuThin,
+    ))
     protected val titleHeight: Float = 64f
     protected val grey: Color = Color().grey(0.8f, 1f)
     protected val blipSoundListener: (MouseEntered?) -> Unit = {

@@ -20,7 +20,6 @@ import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.TextAlign
-import paintbox.font.TextRun
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
@@ -236,10 +235,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     }
 
     init {
-        val markup = Markup(mapOf(
-                Markup.FONT_NAME_ITALIC to main.fontMainMenuItalic,
-                Markup.FONT_NAME_BOLDITALIC to main.fontMainMenuItalic,
-        ), TextRun(main.fontMainMenuMain, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
+        val markup = Markup.createWithBoldItalic(main.fontMainMenuMain, null, main.fontMainMenuItalic, main.fontMainMenuItalic)
         val leftPane = Pane().apply {
             this.margin.set(Insets(64f))
         }

@@ -15,7 +15,6 @@ import paintbox.Paintbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
-import paintbox.font.TextRun
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeToOpaque
 import paintbox.transition.FadeToTransparent
@@ -58,7 +57,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
-    private val slabMarkup: Markup = Markup(mapOf(Markup.FONT_NAME_BOLD to main.fontRobotoSlabBold), TextRun(main.fontRobotoSlab, ""), Markup.FontStyles(Markup.FONT_NAME_BOLD, Markup.DEFAULT_FONT_NAME, Markup.DEFAULT_FONT_NAME))
+    private val slabMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoSlab, main.fontRobotoSlabBold, null, null)
     
     init {
         val bg = RectElement(PRManiaColors.debugColor).apply {

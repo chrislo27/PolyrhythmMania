@@ -56,7 +56,6 @@ open class Palette(val main: PRManiaGame) {
     val beatMarkerFont: PaintboxFont = main.fontEditorMarker
     val instantiatorNameFont: PaintboxFont = main.fontEditorInstantiatorName
     val instantiatorSummaryFont: PaintboxFont = main.fontEditorInstantiatorSummary
-    val instantiatorDescFont: PaintboxFont = main.fontEditorInstantiatorSummary
     val exitDialogFont: PaintboxFont = main.fontEditor
     val musicDialogFont: PaintboxFont = main.fontEditor
     val musicDialogFontBold: PaintboxFont = main.fontEditorBold
@@ -66,45 +65,33 @@ open class Palette(val main: PRManiaGame) {
     val rodinBorderedDialogFont: PaintboxFont = main.fontEditorRodinBordered
 
     // Markup
-    val markup: Markup = Markup(mapOf(
-            Markup.FONT_NAME_BOLD to main.fontEditorBold,
-            Markup.FONT_NAME_ITALIC to main.fontEditorItalic,
-            Markup.FONT_NAME_BOLDITALIC to main.fontEditorBoldItalic,
+    val markup: Markup = Markup.createWithBoldItalic(main.fontEditor, main.fontEditorBold, main.fontEditorItalic,
+            main.fontEditorBoldItalic, additionalMappings = mapOf(
             "rodin" to main.fontEditorRodin,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.fontEditor, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
-    val markupBordered: Markup = Markup(mapOf(
-            Markup.FONT_NAME_BOLD to main.fontEditorBoldBordered,
-            Markup.FONT_NAME_ITALIC to main.fontEditorItalicBordered,
-            Markup.FONT_NAME_BOLDITALIC to main.fontEditorBoldItalicBordered,
+    ))
+    val markupBordered: Markup = Markup.createWithBoldItalic(main.fontEditorBordered, main.fontEditorBoldBordered,
+            main.fontEditorItalicBordered, main.fontEditorBoldItalicBordered, additionalMappings = mapOf(
             "rodin" to main.fontEditorRodinBordered,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.fontEditorBordered, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
+    ))
     val markupInstantiatorSummary: Markup = Markup(mapOf(
             "rodin" to main.fontEditorRodin,
             "prmania_icons" to main.fontIcons,
     ), TextRun(instantiatorSummaryFont, ""), Markup.FontStyles.ALL_USING_DEFAULT_FONT)
-    val markupInstantiatorDesc: Markup = Markup(mapOf(
-            Markup.FONT_NAME_BOLD to main.fontCache["editor_instantiator_desc_BOLD"],
-            Markup.FONT_NAME_ITALIC to main.fontCache["editor_instantiator_desc_ITALIC"],
-            Markup.FONT_NAME_BOLDITALIC to main.fontCache["editor_instantiator_desc_BOLD_ITALIC"],
+    val markupInstantiatorDesc: Markup = Markup.createWithBoldItalic(main.fontCache["editor_instantiator_desc"],
+            main.fontCache["editor_instantiator_desc_BOLD"], main.fontCache["editor_instantiator_desc_ITALIC"],
+            main.fontCache["editor_instantiator_desc_BOLD_ITALIC"], additionalMappings = mapOf(
             "rodin" to main.fontEditorRodin,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.fontCache["editor_instantiator_desc"], ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
-    val markupStatusBar: Markup = Markup(mapOf(
-            Markup.FONT_NAME_BOLD to main.fontCache["editor_status_BOLD"],
-            Markup.FONT_NAME_ITALIC to main.fontCache["editor_status_ITALIC"],
-            Markup.FONT_NAME_BOLDITALIC to main.fontCache["editor_status_BOLD_ITALIC"],
+    ))
+    val markupStatusBar: Markup = Markup.createWithBoldItalic(main.fontCache["editor_status"],
+            main.fontCache["editor_status_BOLD"], main.fontCache["editor_status_ITALIC"],
+            main.fontCache["editor_status_BOLD_ITALIC"], additionalMappings = mapOf(
             "rodin" to main.fontEditorRodin,
             "prmania_icons" to main.fontIcons,
-    ), TextRun(main.fontCache["editor_status"], ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
-    val markupHelp: Markup = markupInstantiatorDesc /*Markup(mapOf(
-            Markup.FONT_NAME_BOLD to main.fontCache["editor_help_BOLD"],
-            Markup.FONT_NAME_ITALIC to main.fontCache["editor_help_ITALIC"],
-            Markup.FONT_NAME_BOLDITALIC to main.fontCache["editor_help_BOLD_ITALIC"],
-            "rodin" to main.fontRodinFixed,
-            "prmania_icons" to main.fontIcons,
-    ), TextRun(main.fontCache["editor_help"], ""), Markup.FontStyles("bold", "italic", "bolditalic"))*/
+    ))
+    val markupHelp: Markup = markupInstantiatorDesc
 
     // Textures
     val blockFlatTexture: Texture by lazy { AssetRegistry.get<Texture>("ui_icon_block_flat") }

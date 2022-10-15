@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
-import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
@@ -97,14 +96,12 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         
         val percentFormat = DecimalFormats["#0.#"]
-        val headingMarkup = Markup(mapOf(), TextRun(main.fontMainMenuHeading, ""), Markup.FontStyles.ALL_USING_DEFAULT_FONT)
-        val descMarkup = Markup(mapOf(
-                Markup.FONT_NAME_ITALIC to main.fontMainMenuItalic,
-                Markup.FONT_NAME_BOLDITALIC to main.fontMainMenuItalic,
+        val headingMarkup = Markup.createWithSingleFont(main.fontMainMenuHeading)
+        val descMarkup = Markup.createWithBoldItalic(font, null, main.fontMainMenuItalic, main.fontMainMenuItalic, additionalMappings = mapOf(
                 "prmania_icons" to main.fontIcons,
                 "rodin" to main.fontMainMenuRodin,
-                "thin" to main.fontMainMenuThin
-        ), TextRun(font, ""), Markup.FontStyles.ALL_USING_BOLD_ITALIC)
+                "thin" to main.fontMainMenuThin,
+        ))
         val statProgressColor = "9FD677"
         val completedTextureReg = TextureRegion(AssetRegistry.get<Texture>("achievements_completed_mark"))
 //        panePerCategory = linkedMapOf()

@@ -4,11 +4,13 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
-import paintbox.binding.*
+import paintbox.binding.FloatVar
+import paintbox.binding.IntVar
+import paintbox.binding.ReadOnlyIntVar
+import paintbox.binding.Var
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
-import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
@@ -67,7 +69,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
             val s = score.use()
             s.line1 + (if (s.line2.isNotEmpty()) "\n\n${s.line2}" else "")
         }, font = resultsFont).apply {
-            this.markup.set(Markup(mapOf(), TextRun(resultsFont, ""), Markup.FontStyles.ALL_USING_DEFAULT_FONT, lenientMode = true))
+            this.markup.set(Markup.createWithSingleFont(resultsFont, lenientMode = true))
             this.textColor.set(Color.WHITE)
             this.renderAlign.set(Align.top)
             this.textAlign.set(TextAlign.LEFT)

@@ -8,14 +8,21 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import com.eclipsesource.json.Json
+import com.eclipsesource.json.JsonObject
+import com.eclipsesource.json.WriterConfig
 import paintbox.Paintbox
+import paintbox.binding.FloatVar
+import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeToOpaque
 import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.*
+import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
@@ -45,6 +52,31 @@ import polyrhythmmania.storymode.screen.StoryPlayScreen
 class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Screen)
     : PRManiaScreen(main) {
     
+    companion object {
+        private fun Progression.toJson(): JsonObject {
+            return Json.`object`().also { o ->
+                o.add("list", Json.array().also { arr ->
+                    this.stages.forEach { stage ->
+                        arr.add(Json.`object`().also { so ->
+                            so.add("required", Json.array().also { a -> 
+                                stage.requiredInboxItems.forEach { a.add(it) }
+                            })
+                            if (stage.optionalInboxItems.isNotEmpty()) {
+                                so.add("optional", Json.array().also { a ->
+                                    stage.optionalInboxItems.forEach { a.add(it) }
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+        }
+        
+        private fun loadProgressionJson(json: JsonObject): Progression {
+            TODO()
+        }
+    }
+    
     val batch: SpriteBatch = main.batch
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
@@ -54,31 +86,26 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
-    val progression: Progression = StoryModeProgression(InboxState())
+    private val inboxState: InboxState = InboxState()
+    private val progression: Var<Progression> = Var(StoryModeProgression(inboxState))
     
     init {
         val bg = RectElement(PRManiaColors.debugColor).apply {
-            this.padding.set(Insets(8f))    
-            this += Button("Back").apply {
-                this.bounds.width.set(100f)
-                this.bounds.height.set(32f)    
-                this.setOnAction { 
-                    main.screen = prevScreen
-                }
-            }
+            this.padding.set(Insets(8f))
         }
         sceneRoot += bg
         
-        bg += TextLabel("Progression Overview (debug)", font = main.fontMainMenuHeading).apply { 
-            this.bounds.width.set(500f)
+        val title = TextLabel("Progression Overview (debug)", font = main.fontMainMenuHeading).apply { 
+            this.bounds.width.set(600f)
             this.bounds.height.set(60f)
             Anchor.TopCentre.configure(this)
             this.renderAlign.set(RenderAlign.center)
         }
+        bg += title
 
         val pane = Pane().apply {
             Anchor.BottomCentre.configure(this)
-            this.bounds.width.set(1100f)
+            this.bounds.width.set(1000f)
             this.bounds.height.set(640f)
         }
         bg += pane
@@ -130,7 +157,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                                             this.borderStyle.set(SolidBorder(Color.BLACK))
                                             this.bounds.height.set(32f)
 
-                                            val item = (InboxDB.allItems["debugcontr_$id"] as? InboxItem.ContractDoc) ?: (InboxDB.allItems["contract_$id"] as? InboxItem.ContractDoc) ?: (InboxDB.allItems[id] as? InboxItem.ContractDoc)
+                                            val item = getContractDoc(id)
                                             if (item == null) {
                                                 this.disabled.set(true)
                                                 this.tooltipElement.set(Tooltip("This is not a level, but another inbox item"))
@@ -186,24 +213,82 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                     }
                 }
                 
-                this.temporarilyDisableLayouts {
-                    this += createHBox(TextLabel("RED are required levels/inbox items to pass, BLUE is optional").apply {
-                        this.bounds.width.set(400f)
-                        this.bounds.height.set(32f)
-                    })
-                    progression.stages.flatMapIndexed { index, unlockStage ->
-                        listOf(
-                                createHBox(createStageBox(unlockStage)),
-                                createHBox(createLine())
-                        )
-                    }.dropLast(1).forEach { this += it }
+                fun reload(progression: Progression) {
+                    this.removeAllChildren()
+                    this.temporarilyDisableLayouts {
+                        this += createHBox(TextLabel("RED are required levels/inbox items to pass, BLUE is optional").apply {
+                            this.bounds.width.set(500f)
+                            this.bounds.height.set(32f)
+                            this.renderAlign.set(RenderAlign.center)
+                        })
+                        progression.stages.flatMapIndexed { index, unlockStage ->
+                            listOf(
+                                    createHBox(createStageBox(unlockStage)),
+                                    createHBox(createLine())
+                            )
+                        }.dropLast(1).forEach { this += it }
+                    }
+                }
+                reload(progression.getOrCompute())
+                progression.addListener {
+                    reload(it.getOrCompute())
                 }
             }
             this.sizeHeightToChildren()
         }
         scrollPane.setContent(vbox)
         pane += scrollPane
-        
+
+
+        bg += VBox().apply {
+            this.bounds.width.set(100f)
+            this.spacing.set(8f)
+            this.temporarilyDisableLayouts {
+                this += Button("Back").apply {
+                    this.bounds.height.set(32f)
+                    this.setOnAction {
+                        main.screen = prevScreen
+                    }
+                }
+                this += RectElement(Color.BLACK).apply { this.bounds.height.set(2f) }
+                this += Button("").apply {
+                    this.bounds.height.set(72f)
+                    this.markup.set(main.debugMarkup)
+                    
+                    val normalText = "Copy DEFAULT\nJSON to\nclipboard"
+                    this.text.set(normalText)
+                    
+                    val timer = FloatVar(0f)
+                    this.setOnAction {
+                        Gdx.app.clipboard.contents = StoryModeProgression(InboxState()).toJson().toString(WriterConfig.PRETTY_PRINT)
+                        text.set("Copied to\nclipboard!")
+                        this@TestStoryProgressionOverviewScreen.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 5f, 0f, 1f).apply { 
+                            this.onComplete = {
+                                text.set(normalText)
+                                timer.set(0f)
+                            }
+                        }, timer)
+                    }
+                }
+                this += RectElement(Color.BLACK).apply { this.bounds.height.set(2f) }
+                this += Button("").apply {
+                    this.bounds.height.set(96f)
+                    this.markup.set(main.debugMarkup)
+                    
+                    val normalText = "Load JSON\ndata from\nclipboard"
+                    this.text.set(normalText)
+                    
+                    val timer = FloatVar(0f)
+                    this.setOnAction {
+                        // TODO
+                    }
+                }
+            }
+        }
+    }
+    
+    private fun getContractDoc(id: String): InboxItem.ContractDoc? {
+        return (InboxDB.allItems["debugcontr_$id"] as? InboxItem.ContractDoc) ?: (InboxDB.allItems["contract_$id"] as? InboxItem.ContractDoc) ?: (InboxDB.allItems[id] as? InboxItem.ContractDoc)
     }
     
     override fun render(delta: Float) {
