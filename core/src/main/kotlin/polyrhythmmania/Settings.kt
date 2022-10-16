@@ -215,6 +215,14 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
             newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorExtrasAssemble,
             newIndicatorExtrasSolitaire, newIndicatorStoryMode, newIndicatorEndlessModeHelp)
 
+    
+    init {
+        LocalePicker.currentLocale.addListener {
+            val locale = it.getOrCompute()
+            this.locale.set(locale.locale.toString())
+        }
+    }
+    
     @Suppress("UNCHECKED_CAST")
     fun load() {
         val prefs = this.prefs
