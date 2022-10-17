@@ -176,16 +176,22 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
     var animation: Animation = Animation.Neutral(this)
     var retractAfterBeats: Float = Float.POSITIVE_INFINITY
     private var extendWiggleAlpha: Float = 0f
+    // True if the last fullyExtend call successfully inputted some rods. Reset to false on retract.
+    var didSuccessfulInputOnExtension: Boolean = false
+        private set
     
     init {
         this.type = Type.PISTON_DPAD
     }
 
-    fun fullyExtend(engine: Engine, beat: Float, retractAfterBeats: Float, doWiggle: Boolean) {
+    fun fullyExtend(engine: Engine, beat: Float, retractAfterBeats: Float, doWiggle: Boolean, didASuccessfulInput: Boolean) {
         super.fullyExtend(engine, beat)
         this.retractAfterBeats = beat + retractAfterBeats
         if (doWiggle) {
             this.extendWiggleAlpha = 1f
+        }
+        if (didASuccessfulInput) {
+            didSuccessfulInputOnExtension = true
         }
     }
     
@@ -196,6 +202,11 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
     
     fun uncharge(beat: Float) {
         animation = Animation.Uncharged(this, beat)
+    }
+
+    override fun retract(): Boolean {
+        didSuccessfulInputOnExtension = false
+        return super.retract()
     }
 
     override fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {
@@ -464,7 +475,7 @@ class EntityRodAsm(world: World, deployBeat: Float, val rodID: Int) : EntityRod(
 
             val asmPlayerPiston = world.asmPlayerPiston
             if (asmPlayerPiston.animation is EntityPistonAsm.Animation.Neutral) {
-                asmPlayerPiston.fullyExtend(engine, expected.inputBeat, 1f, true)
+                asmPlayerPiston.fullyExtend(engine, expected.inputBeat, 1f, doWiggle = true, didASuccessfulInput = true)
             }
         }
 

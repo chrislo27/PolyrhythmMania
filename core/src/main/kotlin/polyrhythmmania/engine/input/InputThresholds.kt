@@ -55,7 +55,7 @@ object InputThresholds {
                     }
                     WorldType.Assemble -> {
                         world.asmPistons.forEach { 
-                            it.fullyExtend(engine, 0f, 1f, true)
+                            it.fullyExtend(engine, 0f, 1f, true, true)
                             it.chargeUp(0f)
                             it.uncharge(0f)
                         }
