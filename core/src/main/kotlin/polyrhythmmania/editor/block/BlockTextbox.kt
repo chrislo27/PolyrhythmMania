@@ -162,6 +162,8 @@ class BlockTextbox(engine: Engine)
         this.text = obj.getString("text", "")
         this.requireInput.set(obj.getBoolean("requireInput", false))
         this.duration = obj.getFloat("duration", 2f)
-        this.style = TextBoxStyle.JSON_MAPPING[obj.getInt("style", 0)] ?: DEFAULT_STYLE
+        this.style = TextBoxStyle.JSON_MAPPING[obj.getInt("style", 0)]?.takeIf { 
+            it.requiredEditorFlags.isEmpty() || editorFlags.containsAll(it.requiredEditorFlags)
+        } ?: DEFAULT_STYLE
     }
 }
