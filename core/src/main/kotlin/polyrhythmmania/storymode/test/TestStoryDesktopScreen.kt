@@ -66,12 +66,18 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
     private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
     
     init {
-        val bg: UIElement = ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg"))).apply {
+        sceneRoot += NoInputPane().apply {
+            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg")))
+            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pistons")))
+            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pipes_lower")))
+            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pipes_upper")))
+        }
+        val bg: UIElement = Pane().apply {
             this += Button(Localization.getVar("common.back")).apply {
                 this.bounds.width.set(64f)
                 this.bounds.height.set(32f)
                 Anchor.TopLeft.configure(this, offsetX = 8f, offsetY = 8f)
-                this.setOnAction { 
+                this.setOnAction {
                     main.screen = prevScreen
                 }
             }
