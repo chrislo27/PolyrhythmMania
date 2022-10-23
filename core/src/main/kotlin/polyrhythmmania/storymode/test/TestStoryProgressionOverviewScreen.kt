@@ -77,13 +77,15 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
 
         private fun loadProgressionJson(json: JsonObject, inboxState: InboxState): Progression {
             val array = json["list"].asArray()
-            return Progression(inboxState, array.mapIndexed { index, value ->
+            return Progression(array.mapIndexed { index, value ->
                 val obj = value.asObject()
                 val requiredInboxItems = obj["required"].asArray().map { it.asString() }
                 UnlockStage("stage_$index", { true }, requiredInboxItems,
                         obj["optional"]?.asArray()?.map { it.asString() } ?: emptyList(),
                         obj["minRequiredToComplete"]?.asInt() ?: requiredInboxItems.size)
-            })
+            }).apply { 
+                this.checkAll(inboxState)
+            }
         }
     }
 
@@ -97,7 +99,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
     private val processor: InputProcessor = sceneRoot.inputSystem
 
     private val inboxState: InboxState = InboxState()
-    private val progression: Var<Progression> = Var(StoryModeProgression(inboxState))
+    private val progression: Var<Progression> = Var(StoryModeProgression())
 
     init {
         val bg = RectElement(PRManiaColors.debugColor).apply {
@@ -273,7 +275,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
 
                     val timer = FloatVar(0f)
                     this.setOnAction {
-                        Gdx.app.clipboard.contents = StoryModeProgression(InboxState()).toJson().toString(WriterConfig.PRETTY_PRINT)
+                        Gdx.app.clipboard.contents = StoryModeProgression().toJson().toString(WriterConfig.PRETTY_PRINT)
                         text.set("Copied to\nclipboard!")
                         this@TestStoryProgressionOverviewScreen.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 5f, 0f, 1f).apply {
                             this.onComplete = {
@@ -293,7 +295,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                     val timer = FloatVar(0f)
                     this.setOnAction {
                         text.set("Done!")
-                        this@TestStoryProgressionOverviewScreen.progression.set(StoryModeProgression(inboxState))
+                        this@TestStoryProgressionOverviewScreen.progression.set(StoryModeProgression())
                         this@TestStoryProgressionOverviewScreen.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 5f, 0f, 1f).apply {
                             this.onComplete = {
                                 text.set(normalText)
@@ -341,7 +343,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                                             for ((type, list) in listOf("required" to stage.requiredInboxItems, "optional" to stage.optionalInboxItems)) {
                                                 for ((idIndex, id) in list.withIndex()) {
                                                     val contractDoc = getContractDoc(id)
-                                                    if (contractDoc == null && InboxDB.allItems[id] == null) {
+                                                    if (contractDoc == null && InboxDB.mapByID[id] == null) {
                                                         text.set("ERR: Unknown ID\n\"${id}\"\nin stage #${stageIndex}\n${type} #${idIndex}")
                                                         successful = false
                                                         break@outer
@@ -374,9 +376,9 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
     }
 
     private fun getContractDoc(id: String): InboxItem.ContractDoc? {
-        return (InboxDB.allItems["debugcontr_$id"] as? InboxItem.ContractDoc)
-                ?: (InboxDB.allItems["contract_$id"] as? InboxItem.ContractDoc)
-                ?: (InboxDB.allItems[id] as? InboxItem.ContractDoc)
+        return (InboxDB.mapByID["debugcontr_$id"] as? InboxItem.ContractDoc)
+                ?: (InboxDB.mapByID["contract_$id"] as? InboxItem.ContractDoc)
+                ?: (InboxDB.mapByID[id] as? InboxItem.ContractDoc)
     }
 
     override fun render(delta: Float) {

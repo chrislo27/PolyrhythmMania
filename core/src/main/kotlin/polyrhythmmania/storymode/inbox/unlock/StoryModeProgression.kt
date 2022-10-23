@@ -1,9 +1,8 @@
 package polyrhythmmania.storymode.inbox.unlock
 
-import polyrhythmmania.storymode.inbox.state.InboxState
 import polyrhythmmania.storymode.inbox.unlock.UnlockStageChecker.Companion.stageCompleted
 
-class StoryModeProgression(inboxState: InboxState) : Progression(inboxState, listOf(
+class StoryModeProgression() : Progression(listOf(
         UnlockStage.singleItem("tutorial1") { true /* First level, always unlocked */ },
         UnlockStage.singleItem("fillbots", stageCompleted("tutorial1")),
         UnlockStage.singleItem("shootemup", stageCompleted("fillbots")),

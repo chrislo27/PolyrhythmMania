@@ -5,19 +5,13 @@ import paintbox.binding.asReadOnlyVar
 import polyrhythmmania.storymode.contract.Contracts
 
 
-object InboxDB {
-    
-    val allItems: Map<String, InboxItem>
+object InboxDB : InboxItems() {
 
     init {
-        this.allItems = mutableMapOf()
+        val toAdd = mutableListOf<InboxItem>()
 
-        fun addItem(inboxItem: InboxItem) {
-            this.allItems[inboxItem.id] = inboxItem
-        }
-
-        addItem(InboxItem.Memo("first_memo0", "first_memo0".asReadOnlyVar()))
-        addItem(InboxItem.ContractDoc(Contracts["tutorial1"]))
+        toAdd += InboxItem.Memo("first_memo0", "first_memo0".asReadOnlyVar())
+        toAdd += InboxItem.ContractDoc(Contracts["tutorial1"])
 
         run {
             // FIXME debug contracts
@@ -25,10 +19,12 @@ object InboxDB {
                 if (id == "tutorial1") {
                     continue
                 }
-                addItem(InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}"))
+                toAdd += InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}")
             }
             Paintbox.LOGGER.debug("Added ${Contracts.contracts.size} debug contracts", "InboxDB")
         }
+        
+        this.setItems(toAdd)
     }
 
 }

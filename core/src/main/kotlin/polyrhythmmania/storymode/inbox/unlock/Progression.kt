@@ -3,16 +3,13 @@ package polyrhythmmania.storymode.inbox.unlock
 import polyrhythmmania.storymode.inbox.state.InboxState
 
 
-open class Progression(val inboxState: InboxState, val stages: List<UnlockStage>) {
+open class Progression(val stages: List<UnlockStage>) {
     
     val stagesByID: Map<String, UnlockStage> = stages.associateBy { it.id }
     val unlocked: MutableMap<UnlockStage, StageUnlockState> = stages.associateWith { StageUnlockState.LOCKED }.toMutableMap()
     
-    init {
-        checkAll()
-    }
     
-    fun checkAll() {
+    fun checkAll(inboxState: InboxState) {
         stages.forEach { unlocked[it] = StageUnlockState.LOCKED }
         stages.forEach { stage ->
             if (stage.unlockReqs.test(this)) {
