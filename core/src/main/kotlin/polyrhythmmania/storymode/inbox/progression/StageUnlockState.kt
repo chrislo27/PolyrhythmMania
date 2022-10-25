@@ -1,4 +1,4 @@
-package polyrhythmmania.storymode.inbox.unlock
+package polyrhythmmania.storymode.inbox.progression
 
 
 enum class StageUnlockState {

@@ -39,10 +39,10 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
-import polyrhythmmania.storymode.inbox.state.InboxState
-import polyrhythmmania.storymode.inbox.unlock.Progression
-import polyrhythmmania.storymode.inbox.unlock.StoryModeProgression
-import polyrhythmmania.storymode.inbox.unlock.UnlockStage
+import polyrhythmmania.storymode.inbox.InboxState
+import polyrhythmmania.storymode.inbox.progression.Progression
+import polyrhythmmania.storymode.inbox.progression.StoryModeProgression
+import polyrhythmmania.storymode.inbox.progression.UnlockStage
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 
 

@@ -1,8 +1,8 @@
 package polyrhythmmania.storymode.screen.desktop
 
 import polyrhythmmania.storymode.inbox.InboxItems
-import polyrhythmmania.storymode.inbox.state.InboxState
-import polyrhythmmania.storymode.inbox.unlock.Progression
+import polyrhythmmania.storymode.inbox.InboxState
+import polyrhythmmania.storymode.inbox.progression.Progression
 
 
 data class DesktopScenario(

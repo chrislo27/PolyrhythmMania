@@ -8,9 +8,12 @@ import paintbox.binding.ReadOnlyVar
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.storymode.inbox.InboxItem
+import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.inbox.InboxItems
-import polyrhythmmania.storymode.inbox.state.InboxState
-import polyrhythmmania.storymode.inbox.unlock.Progression
+import polyrhythmmania.storymode.inbox.InboxState
+import polyrhythmmania.storymode.inbox.progression.Progression
+import polyrhythmmania.storymode.inbox.progression.UnlockStage
+import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
 import polyrhythmmania.storymode.screen.desktop.DesktopScenario
 import polyrhythmmania.storymode.screen.desktop.DesktopUI
 
@@ -20,19 +23,32 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
 
     val batch: SpriteBatch = main.batch
 
+    private val inboxItems: InboxItems = InboxItems(listOf(
+            InboxItem.Memo("memo0", ReadOnlyVar.const("memo0")),
+            InboxItem.Memo("memo1", ReadOnlyVar.const("memo1")),
+            InboxItem.Memo("memo2", ReadOnlyVar.const("memo2")),
+            InboxItem.Memo("memo3", ReadOnlyVar.const("memo3")),
+            InboxItem.Memo("memo4", ReadOnlyVar.const("memo4")),
+    ))
     val scenario: DesktopScenario = DesktopScenario(
-            InboxItems(listOf(
-                    InboxItem.Memo("memo0", ReadOnlyVar.const("memo0")),
-                    InboxItem.Memo("memo1", ReadOnlyVar.const("memo1")),
-                    InboxItem.Memo("memo2", ReadOnlyVar.const("memo2")),
-                    InboxItem.Memo("memo3", ReadOnlyVar.const("memo3")),
-            )),
-            Progression(listOf(
-                    // TODO
-            )),
+            inboxItems,
+            Progression(inboxItems.items.map { UnlockStage.singleItem(it.id, UnlockStageChecker.alwaysUnlocked()) }),
+//            Progression(listOf(
+//                    // TODO
+//            )),
             InboxState()
     )
     private val desktopUI: DesktopUI = DesktopUI(scenario, this)
+    
+    init {
+        scenario.inboxState.putItemState(inboxItems.items[0], InboxItemState.Completed(null))
+        scenario.inboxState.putItemState(inboxItems.items[1], InboxItemState.Skipped)
+        scenario.inboxState.putItemState(inboxItems.items[2], InboxItemState.Available(false))
+        scenario.inboxState.putItemState(inboxItems.items[3], InboxItemState.Available(true))
+        scenario.inboxState.putItemState(inboxItems.items[4], InboxItemState.Unavailable)
+
+        scenario.progression.checkAll(scenario.inboxState)
+    }
 
 
     override fun render(delta: Float) {

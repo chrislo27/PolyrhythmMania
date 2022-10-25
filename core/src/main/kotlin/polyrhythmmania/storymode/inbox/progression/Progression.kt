@@ -1,6 +1,6 @@
-package polyrhythmmania.storymode.inbox.unlock
+package polyrhythmmania.storymode.inbox.progression
 
-import polyrhythmmania.storymode.inbox.state.InboxState
+import polyrhythmmania.storymode.inbox.InboxState
 
 
 open class Progression(val stages: List<UnlockStage>) {
@@ -12,7 +12,7 @@ open class Progression(val stages: List<UnlockStage>) {
     fun checkAll(inboxState: InboxState) {
         stages.forEach { unlocked[it] = StageUnlockState.LOCKED }
         stages.forEach { stage ->
-            if (stage.unlockReqs.test(this)) {
+            if (stage.unlockReqs.testShouldBeUnlocked(this)) {
                 unlocked[stage] = StageUnlockState.UNLOCKED
             }
             if (stage.isCompleted(inboxState)) {

@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
 import paintbox.binding.BooleanVar
+import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
@@ -29,6 +30,7 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
+import paintbox.util.MathHelper
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
@@ -38,6 +40,7 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.inbox.InboxItem
+import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 import polyrhythmmania.storymode.test.TestStoryDesktopScreen
 import polyrhythmmania.ui.PRManiaSkins
@@ -65,9 +68,13 @@ class DesktopUI(
     private val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
     private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
 
+    private val blinker: ReadOnlyBooleanVar = BooleanVar {
+        MathHelper.getTriangleWave(0.75f * 2) > 0.5f
+    }
+    private val currentInboxItem: ReadOnlyVar<InboxItem?>
     val bg: UIElement
-
-    init {
+    
+    init { // Background, base settings
         sceneRoot.debugOutlineColor.set(Color(1f, 0f, 0f, 1f))
 
         sceneRoot += NoInputPane().apply {
@@ -75,6 +82,15 @@ class DesktopUI(
             this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pistons")))
             this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pipes_lower")))
             this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pipes_upper")))
+            
+            this += object : Pane() {
+                override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+                    blinker.invalidate()
+                }
+            }.apply { 
+                this.bounds.width.set(0f)
+                this.bounds.height.set(0f)
+            }
         }
         bg = Pane().apply {
             this += Button(Localization.getVar("common.back")).apply {
@@ -87,8 +103,9 @@ class DesktopUI(
             }
         }
         sceneRoot += bg
+    }
 
-
+    init { // Left scroll area and inbox item view
         val frameImg = ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame"))).apply {
             this.bounds.x.set(16f * 4)
             this.bounds.y.set(14f * 4)
@@ -168,15 +185,18 @@ class DesktopUI(
         }
         frameScrollPane.setContent(itemsVbox)
 
-        // FIXME
         val itemToggleGroup = ToggleGroup()
+        currentInboxItem = Var.eagerBind {
+            val newToggle = itemToggleGroup.activeToggle.use() as? InboxItemTestObj
+            newToggle?.inboxItem
+        }
         fun addObj(obj: InboxItemTestObj) {
             itemsVbox += obj
             itemToggleGroup.addToggle(obj)
         }
         scenario.inboxItems.items.forEach { ii ->
             // TODO link InboxItem to an UnlockStage; check UnlockStage state
-            addObj(InboxItemTestObj(1, ii))
+            addObj(InboxItemTestObj(ii))
         }
 
 
@@ -187,13 +207,17 @@ class DesktopUI(
         }
         bg += inboxItemDisplayPane
 
-        itemToggleGroup.activeToggle.addListener { t ->
-            val newToggle = t.getOrCompute() as? InboxItemTestObj
+        currentInboxItem.addListener {
+            val inboxItem = it.getOrCompute()
             inboxItemDisplayPane.removeAllChildren()
-            if (newToggle != null) {
-                inboxItemDisplayPane.addChild(createInboxItemUI(newToggle.inboxItem))
+            if (inboxItem != null) {
+                inboxItemDisplayPane.addChild(createInboxItemUI(inboxItem))
             }
         }
+    }
+    
+    init {
+        // Bottom-right UI panel
     }
 
     private fun createInboxItemUI(item: InboxItem): UIElement {
@@ -399,9 +423,15 @@ class DesktopUI(
     override fun dispose() {
     }
 
-    inner class InboxItemTestObj(val type: Int, val inboxItem: InboxItem) : ActionablePane(), Toggle {
+    inner class InboxItemTestObj(val inboxItem: InboxItem) : ActionablePane(), Toggle {
         override val selectedState: BooleanVar = BooleanVar(false)
         override val toggleGroup: Var<ToggleGroup?> = Var(null)
+        
+        private val currentInboxItemState: ReadOnlyVar<InboxItemState> = Var.bind {
+            val inboxState = scenario.inboxState
+            inboxState.onItemStatesChanged.use()
+            inboxState.getItemState(inboxItem) ?: InboxItemState.Unavailable
+        }
 
         init {
             this.bounds.width.set(78f * 4)
@@ -412,15 +442,20 @@ class DesktopUI(
             }
             this += contentPane
 
-            contentPane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_${
-                when (type) {
-                    0 -> "unavailable"
-                    1 -> "available"
-                    2 -> "cleared"
-                    3 -> "skipped"
-                    else -> "unavailable"
+            contentPane += ImageNode().apply { 
+                this.textureRegion.sideEffecting(TextureRegion()) {reg ->
+                    val state = currentInboxItemState.use()
+                    reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_${
+                        when (state) {
+                            is InboxItemState.Unavailable -> "unavailable"
+                            is InboxItemState.Available -> if (blinker.use()) "available" else "off"
+                            is InboxItemState.Completed -> "cleared"
+                            is InboxItemState.Skipped -> "skipped"
+                        }
+                    }"))
+                    reg
                 }
-            }")))
+            }
             val titleAreaPane = Pane().apply {
                 this.bounds.x.set((1f + 2) * 4)
                 this.bounds.y.set(1f * 4)
@@ -452,8 +487,9 @@ class DesktopUI(
             }
 
             this.setOnAction {
-                if (type != 0)
+                if (currentInboxItemState.getOrCompute() != InboxItemState.Unavailable) {
                     this.selectedState.invert()
+                }
             }
         }
     }
