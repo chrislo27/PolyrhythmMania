@@ -287,7 +287,6 @@ class DesktopUI(
                     }
                 }
             }
-
             is InboxItem.ContractDoc -> {
                 ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_contract_full")), ImageRenderingMode.FULL).apply {
                     this.bounds.width.set(112f * 4)
@@ -403,6 +402,126 @@ class DesktopUI(
                     }
                 }
             }
+            is InboxItem.Debug -> {
+                RectElement(Color.WHITE).apply {
+                    this.doClipping.set(true)
+                    this.border.set(Insets(2f))
+                    this.borderStyle.set(SolidBorder(Color.YELLOW))
+                    this.bounds.height.set(600f)
+                    this.bindWidthToSelfHeight(multiplier = 1f / sqrt(2f))
+
+                    this.padding.set(Insets(16f))
+
+                    this += VBox().apply {
+                        this.spacing.set(6f)
+                        this.temporarilyDisableLayouts {
+                            this += TextLabel("DEBUG ITEM", font = main.fontMainMenuHeading).apply {
+                                this.bounds.height.set(40f)
+                                this.textColor.set(Color.BLACK)
+                                this.renderAlign.set(Align.top)
+                                this.padding.set(Insets(0f, 8f, 0f, 8f))
+                            }
+                            this += RectElement(Color.BLACK).apply {
+                                this.bounds.height.set(2f)
+                            }
+                            this += ColumnarPane(3, true).apply {
+                                this.bounds.height.set(32f * this.numRealColumns)
+
+                                fun addField(index: Int, key: String, valueField: ReadOnlyVar<String>,
+                                             valueMarkup: Markup? = null) {
+                                    this[index] += Pane().apply {
+                                        this.margin.set(Insets(2f))
+                                        this += TextLabel(key, font = main.fontRobotoBold).apply {
+                                            this.textColor.set(Color.BLACK)
+                                            this.renderAlign.set(Align.left)
+                                            this.padding.set(Insets(2f, 2f, 0f, 10f))
+                                            this.bounds.width.set(90f)
+                                        }
+                                        this += TextLabel(valueField, font = main.fontRoboto).apply {
+                                            this.textColor.set(Color.BLACK)
+                                            this.renderAlign.set(Align.left)
+                                            this.padding.set(Insets(2f, 2f, 4f, 0f))
+                                            this.bounds.x.set(90f)
+                                            this.bindWidthToParent(adjust = -90f)
+                                            if (valueMarkup != null) {
+                                                this.markup.set(valueMarkup)
+                                            }
+                                        }
+                                    }
+                                }
+                                fun addField(index: Int, key: String, valueField: String,
+                                             valueMarkup: Markup? = null) {
+                                    addField(index, key, ReadOnlyVar.const(valueField), valueMarkup)
+                                }
+
+                                addField(0, "Type", "${item.subtype}")
+                                addField(1, "ID", item.id)
+                                addField(2, "ItemState", Var.bind {
+                                    val inboxState = scenario.inboxState
+                                    inboxState.onItemStatesChanged.use()
+                                    (inboxState.getItemState(item) ?: InboxItemState.Unavailable).toString()
+                                })
+                            }
+                            this += RectElement(Color.BLACK).apply {
+                                this.bounds.height.set(2f)
+                            }
+
+                            this += TextLabel(item.description).apply {
+                                this.markup.set(slabMarkup)
+                                this.textColor.set(Color.BLACK)
+                                this.renderAlign.set(Align.topLeft)
+                                this.padding.set(Insets(8f, 0f, 0f, 0f))
+                                this.bounds.height.set(150f)
+                                this.doLineWrapping.set(true)
+                            }
+
+                            this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+                                this.bounds.height.set(48f)
+                                this.padding.set(Insets(8f))
+                                this += Button("Mark Available (w/ flashing)").apply {
+                                    this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
+                                    this.setOnAction {
+                                        scenario.inboxState.putItemState(item, InboxItemState.Available(true))
+                                        scenario.updateProgression()
+                                        scenario.updateInboxItemAvailability()
+                                    }
+                                }
+                                this += Button("Mark Available (w/o flashing)").apply {
+                                    this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
+                                    Anchor.TopRight.configure(this)
+                                    this.setOnAction {
+                                        scenario.inboxState.putItemState(item, InboxItemState.Available(false))
+                                        scenario.updateProgression()
+                                        scenario.updateInboxItemAvailability()
+                                    }
+                                }
+                            }
+                            this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+                                this.bounds.height.set(48f)
+                                this.padding.set(Insets(8f))
+                                this += Button("Mark Skipped").apply {
+                                    this.setOnAction {
+                                        scenario.inboxState.putItemState(item, InboxItemState.Skipped)
+                                        scenario.updateProgression()
+                                        scenario.updateInboxItemAvailability()
+                                    }
+                                }
+                            }
+                            this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+                                this.bounds.height.set(48f)
+                                this.padding.set(Insets(8f))
+                                this += Button("Mark Completed").apply {
+                                    this.setOnAction {
+                                        scenario.inboxState.putItemState(item, InboxItemState.Completed(null))
+                                        scenario.updateProgression()
+                                        scenario.updateInboxItemAvailability()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -448,7 +567,7 @@ class DesktopUI(
                     reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_${
                         when (state) {
                             is InboxItemState.Unavailable -> "unavailable"
-                            is InboxItemState.Available -> if (blinker.use()) "available" else "off"
+                            is InboxItemState.Available -> if (!state.newIndicator || blinker.use()) "available" else "off"
                             is InboxItemState.Completed -> "cleared"
                             is InboxItemState.Skipped -> "skipped"
                         }

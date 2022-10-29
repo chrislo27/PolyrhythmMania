@@ -9,6 +9,10 @@ sealed class InboxItemState {
         override fun shouldCountAsCompleted(): Boolean {
             return false
         }
+
+        override fun toString(): String {
+            return "Unavailable"
+        }
     }
     
     data class Available(val newIndicator: Boolean) : InboxItemState() {
@@ -20,6 +24,10 @@ sealed class InboxItemState {
     object Skipped : InboxItemState() {
         override fun shouldCountAsCompleted(): Boolean {
             return true
+        }
+
+        override fun toString(): String {
+            return "Skipped"
         }
     }
 

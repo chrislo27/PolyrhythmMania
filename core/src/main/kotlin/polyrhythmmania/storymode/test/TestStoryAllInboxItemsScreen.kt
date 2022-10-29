@@ -325,6 +325,16 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                         }
                     }
                 }
+                is InboxItem.Debug -> {
+                    RectElement(Color.WHITE).apply {
+                        this += TextLabel("Not supported in this screen, only in Desktop test", font = main.fontRobotoSlab).apply {
+                            this.textColor.set(Color.BLACK)
+                            this.renderAlign.set(Align.left)
+                            this.padding.set(Insets(2f, 2f, 16f, 0f))
+                            this.bounds.height.set(20f)
+                        }
+                    }
+                }
             }
         }
         

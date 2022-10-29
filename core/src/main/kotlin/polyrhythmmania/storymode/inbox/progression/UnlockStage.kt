@@ -13,8 +13,8 @@ data class UnlockStage(
 ) {
     
     companion object {
-        fun singleItem(inboxItemID: String, unlockReqs: UnlockStageChecker): UnlockStage {
-            return UnlockStage(inboxItemID, unlockReqs, listOf(inboxItemID))
+        fun singleItem(inboxItemID: String, unlockReqs: UnlockStageChecker, stageID: String = inboxItemID): UnlockStage {
+            return UnlockStage(stageID, unlockReqs, listOf(inboxItemID))
         }
     }
     

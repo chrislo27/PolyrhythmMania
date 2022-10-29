@@ -84,7 +84,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                         obj["optional"]?.asArray()?.map { it.asString() } ?: emptyList(),
                         obj["minRequiredToComplete"]?.asInt() ?: requiredInboxItems.size)
             }).apply { 
-                this.checkAll(inboxState)
+                this.updateUnlockStages(inboxState)
             }
         }
     }
