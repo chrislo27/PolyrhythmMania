@@ -456,10 +456,9 @@ class DesktopUI(
 
                                 addField(0, "Type", "${item.subtype}")
                                 addField(1, "ID", item.id)
+                                val itemStateVar = scenario.inboxState.itemStateVar(item.id)
                                 addField(2, "ItemState", Var.bind {
-                                    val inboxState = scenario.inboxState
-                                    inboxState.onItemStatesChanged.use()
-                                    (inboxState.getItemState(item) ?: InboxItemState.Unavailable).toString()
+                                    (itemStateVar.use() ?: InboxItemState.Unavailable).toString()
                                 })
                             }
                             this += RectElement(Color.BLACK).apply {
@@ -546,11 +545,7 @@ class DesktopUI(
         override val selectedState: BooleanVar = BooleanVar(false)
         override val toggleGroup: Var<ToggleGroup?> = Var(null)
         
-        private val currentInboxItemState: ReadOnlyVar<InboxItemState> = Var.bind {
-            val inboxState = scenario.inboxState
-            inboxState.onItemStatesChanged.use()
-            inboxState.getItemState(inboxItem) ?: InboxItemState.Unavailable
-        }
+        private val currentInboxItemState: ReadOnlyVar<InboxItemState> = scenario.inboxState.itemStateVarOrUnavailable(inboxItem.id)
 
         init {
             this.bounds.width.set(78f * 4)

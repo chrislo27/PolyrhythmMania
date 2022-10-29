@@ -5,6 +5,8 @@ import com.eclipsesource.json.JsonObject
 import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyBooleanVar
+import paintbox.binding.ReadOnlyVar
+import paintbox.binding.Var
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -92,7 +94,7 @@ class InboxState {
     }
 
     
-    private val itemStates: Map<String, InboxItemState> = mutableMapOf()
+    private val itemStates: Map<String, Var<InboxItemState>> = mutableMapOf()
 
     /**
      * Changed whenever an item state changes.
@@ -100,7 +102,7 @@ class InboxState {
     val onItemStatesChanged: ReadOnlyBooleanVar = BooleanVar(false)
     
     
-    fun getItemState(itemID: String): InboxItemState? = itemStates[itemID]
+    fun getItemState(itemID: String): InboxItemState? = itemStates[itemID]?.getOrCompute()
     fun getItemState(item: InboxItem): InboxItemState? = getItemState(item.id)
 
     /**
@@ -108,10 +110,14 @@ class InboxState {
      */
     fun putItemState(itemID: String, inboxItemState: InboxItemState): InboxItemState? {
         itemStates as MutableMap
-        val old = itemStates.put(itemID, inboxItemState)
+        val v = itemStates[itemID]
+        val old = v?.getOrCompute()
+        
+        v?.set(inboxItemState) ?: itemStates.put(itemID, Var(inboxItemState))
         if (old != inboxItemState) {
             (onItemStatesChanged as BooleanVar).invert()
         }
+        
         return old
     }
     /**
@@ -121,7 +127,7 @@ class InboxState {
     
     
     fun removeItemState(itemID: String): InboxItemState? {
-        val old = (itemStates as MutableMap).remove(itemID)
+        val old = (itemStates as MutableMap).remove(itemID)?.getOrCompute()
         if (old != null) {
             (onItemStatesChanged as BooleanVar).invert()
         }
@@ -129,13 +135,30 @@ class InboxState {
     }
     fun removeItemState(item: InboxItem): InboxItemState? = removeItemState(item.id)
     
+    
+    fun itemStateVar(itemID: String): ReadOnlyVar<InboxItemState?> {
+        return Var.bind {
+            val inboxItemStateVar = itemStates[itemID]
+            if (inboxItemStateVar != null) {
+                inboxItemStateVar.use()
+            } else {
+                onItemStatesChanged.use()
+                null
+            }
+        }
+    }
+    fun itemStateVarOrUnavailable(itemID: String): ReadOnlyVar<InboxItemState> {
+        val v = itemStateVar(itemID) // This should be cached so a new var doesn't get made each time
+        return Var.bind { v.use() ?: InboxItemState.Unavailable }
+    }
+    
     fun toJson(): JsonObject {
         val obj = Json.`object`()
         obj.add("version", JSON_VERSION)
         
         obj.add("items", Json.array().also { arr ->
             itemStates.forEach { (itemID, state) ->
-                arr.add(inboxItemStateToJson(itemID, state))
+                arr.add(inboxItemStateToJson(itemID, state.getOrCompute()))
             }
         })
         

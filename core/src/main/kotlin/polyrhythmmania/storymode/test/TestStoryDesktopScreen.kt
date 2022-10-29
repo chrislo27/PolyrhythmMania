@@ -44,12 +44,6 @@ class TestStoryDesktopScreen(main: PRManiaGame, val prevScreen: Screen)
     private val desktopUI: DesktopUI = DesktopUI(scenario, this)
     
     init {
-//        scenario.inboxState.putItemState(inboxItems.items[0], InboxItemState.Completed(null))
-//        scenario.inboxState.putItemState(inboxItems.items[1], InboxItemState.Skipped)
-//        scenario.inboxState.putItemState(inboxItems.items[2], InboxItemState.Available(false))
-//        scenario.inboxState.putItemState(inboxItems.items[3], InboxItemState.Available(true))
-//        scenario.inboxState.putItemState(inboxItems.items[4], InboxItemState.Unavailable)
-
         scenario.updateProgression()
         scenario.updateInboxItemAvailability()
     }
