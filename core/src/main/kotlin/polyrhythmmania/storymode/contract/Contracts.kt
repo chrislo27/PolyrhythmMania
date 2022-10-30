@@ -143,6 +143,9 @@ object Contracts {
         add(Contract("tap_trial_2", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tap_trial_2.prmproj"))
         })
+        add(Contract("fork_lifter", listOf(Condition.PASS_THE_LEVEL), Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 60) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/fork_lifter.prmproj"))
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
