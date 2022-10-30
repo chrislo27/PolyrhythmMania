@@ -2,7 +2,9 @@ package polyrhythmmania.world.texturepack
 
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.TextureData
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.PixmapTextureData
 import com.badlogic.gdx.utils.Disposable
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
@@ -191,6 +193,18 @@ class CustomTexturePack(id: String, fallbackID: String)
                 tgaWriter.write(null, IIOImage(bufImg, null, null), param)
             } ?: error("Failed to create ImageOutputStream")
         }
+
+        /**
+         * Creates a special [Texture] that correctly disposes its internal [TextureData] when it is disposed.
+         */
+        fun createSafeTextureFromPixmap(pixmap: Pixmap): Texture {
+            return object : Texture(PixmapTextureData(pixmap, null, false, false)) {
+                override fun dispose() {
+                    super.dispose()
+                    (this.textureData as? PixmapTextureData)?.consumePixmap()?.dispose()
+                }
+            }
+        }
     }
 
     class ReadResult(val id: String, val fallbackID: String, val formatVersion: Int, val programVersion: Version?,
@@ -208,7 +222,7 @@ class CustomTexturePack(id: String, fallbackID: String)
         fun createAndLoadTextures(): CustomTexturePack {
             return CustomTexturePack(id, fallbackID).also { ctp ->
                 val allTextures = textures.associate { tmd ->
-                    tmd.id to Texture(tmd.pixmap).also { tex ->
+                    tmd.id to createSafeTextureFromPixmap(tmd.pixmap).also { tex ->
                         tex.setFilter(tmd.minFilter, tmd.magFilter)
                     }
                 }

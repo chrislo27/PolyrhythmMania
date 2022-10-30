@@ -3,6 +3,7 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
@@ -567,7 +568,8 @@ class TexturePackEditDialog(
 
                 // Load in as a texture and tileset region.
                 val baseRegion: PackTexRegion = basePack[regionID]
-                val newTexture = Texture(FileHandle(toImportFile))
+                val pixmap = Pixmap(FileHandle(toImportFile))
+                val newTexture: Texture = CustomTexturePack.createSafeTextureFromPixmap(pixmap)
                 val newRegion = PackTexRegion(baseRegion.id, TextureRegion(newTexture), baseRegion.spacing)
                 toApply += newRegion
 
