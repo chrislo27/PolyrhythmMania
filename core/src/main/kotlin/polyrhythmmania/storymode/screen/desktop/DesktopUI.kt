@@ -588,7 +588,9 @@ class DesktopUI(
             contentPane += bottomAreaPane
 
             titleAreaPane += TextLabel(inboxItem.listingName, font = inboxItemTitleFont).apply {
-
+                this.font.bind { 
+                    if (currentInboxItemState.use() == InboxItemState.Unavailable) main.fontFlowCircular else inboxItemTitleFont
+                }
             }
 
             // Selector outline/ring

@@ -796,6 +796,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     size = 20
                     borderWidth = 0f
                 }).setAfterLoad(defaultAfterLoad)
+        cache["FlowCircular"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/FlowCircular/FlowCircular-Regular.ttf"), 20, 0f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 20
+                    borderWidth = 0f
+                }).setAfterLoad(defaultAfterLoad)
     }
 
 
@@ -855,6 +862,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontRobotoSlabBold: PaintboxFont get() = fontCache["RobotoSlab_BOLD"]
     val fontLexend: PaintboxFont get() = fontCache["Lexend"]
     val fontLexendBold: PaintboxFont get() = fontCache["Lexend_BOLD"]
+    val fontFlowCircular: PaintboxFont get() = fontCache["FlowCircular"]
 
     
     private fun generateColourPickerTextures() {

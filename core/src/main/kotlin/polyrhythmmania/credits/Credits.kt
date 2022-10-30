@@ -62,6 +62,7 @@ object Credits : CreditsBase() {
                     "Roboto Slab",
                     "Lexend",
                     "Open Sans",
+                    "Flow Circular",
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
     
