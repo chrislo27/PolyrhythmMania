@@ -358,23 +358,6 @@ class DesktopUI(
                                     this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
                                 }
 
-                                if (item.contract.conditions.isNotEmpty()) {
-                                    this += TextLabel(StoryL10N.getValue("inboxItem.contract.conditions"), font = main.fontRobotoBold).apply {
-                                        this.textColor.set(Color.BLACK)
-                                        this.renderAlign.set(Align.bottomLeft)
-                                        this.padding.set(Insets(0f, 6f, 4f, 0f))
-                                        this.bounds.height.set(32f)
-                                    }
-                                    item.contract.conditions.forEach { condition ->
-                                        this += TextLabel("• " + condition.name.getOrCompute(), font = main.fontRobotoSlab).apply {
-                                            this.textColor.set(Color.BLACK)
-                                            this.renderAlign.set(Align.left)
-                                            this.padding.set(Insets(2f, 2f, 16f, 0f))
-                                            this.bounds.height.set(20f)
-                                        }
-                                    }
-                                }
-
                                 this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
                                     this.bounds.height.set(48f)
                                     this.padding.set(Insets(8f))

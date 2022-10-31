@@ -13,8 +13,6 @@ data class Contract(
         val desc: ReadOnlyVar<String>,
         val tagline: ReadOnlyVar<String>,
 
-        val conditions: List<Condition>,
-
         val requester: Requester,
         val jingleType: JingleType,
         val attribution: Attribution?,
@@ -29,11 +27,11 @@ data class Contract(
     val immediatePass: Boolean get() = minimumScore <= 0
     
     constructor(
-            id: String, conditions: List<Condition>, requester: Requester, jingleType: JingleType, attribution: Attribution?,
+            id: String, requester: Requester, jingleType: JingleType, attribution: Attribution?,
             minimumScore: Int, gamemodeFactory: (main: PRManiaGame) -> GameMode
     ) : this(
             id, StoryL10N.getVar("contract.name.$id"), StoryL10N.getVar("contract.desc.$id"),
-            StoryL10N.getVar("contract.tagline.$id"), conditions, requester, jingleType, attribution, minimumScore, gamemodeFactory
+            StoryL10N.getVar("contract.tagline.$id"), requester, jingleType, attribution, minimumScore, gamemodeFactory
     )
 
 }
