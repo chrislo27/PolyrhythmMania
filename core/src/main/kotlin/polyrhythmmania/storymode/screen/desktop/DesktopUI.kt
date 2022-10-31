@@ -474,46 +474,50 @@ class DesktopUI(
                                 this.doLineWrapping.set(true)
                             }
 
-                            this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
-                                this.bounds.height.set(48f)
-                                this.padding.set(Insets(8f))
-                                this += Button("Mark Available (w/ flashing)").apply {
-                                    this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
-                                    this.setOnAction {
-                                        scenario.inboxState.putItemState(item, InboxItemState.Available(true))
-                                        scenario.updateProgression()
-                                        scenario.updateInboxItemAvailability()
+                            when (item.subtype) {
+                                InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER -> {
+                                    this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+                                        this.bounds.height.set(48f)
+                                        this.padding.set(Insets(8f))
+                                        this += Button("Mark Available (w/ flashing)").apply {
+                                            this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
+                                            this.setOnAction {
+                                                scenario.inboxState.putItemState(item, InboxItemState.Available(true))
+                                                scenario.updateProgression()
+                                                scenario.updateInboxItemAvailability()
+                                            }
+                                        }
+                                        this += Button("Mark Available (w/o flashing)").apply {
+                                            this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
+                                            Anchor.TopRight.configure(this)
+                                            this.setOnAction {
+                                                scenario.inboxState.putItemState(item, InboxItemState.Available(false))
+                                                scenario.updateProgression()
+                                                scenario.updateInboxItemAvailability()
+                                            }
+                                        }
                                     }
-                                }
-                                this += Button("Mark Available (w/o flashing)").apply {
-                                    this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
-                                    Anchor.TopRight.configure(this)
-                                    this.setOnAction {
-                                        scenario.inboxState.putItemState(item, InboxItemState.Available(false))
-                                        scenario.updateProgression()
-                                        scenario.updateInboxItemAvailability()
+                                    this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+                                        this.bounds.height.set(48f)
+                                        this.padding.set(Insets(8f))
+                                        this += Button("Mark Skipped").apply {
+                                            this.setOnAction {
+                                                scenario.inboxState.putItemState(item, InboxItemState.Skipped)
+                                                scenario.updateProgression()
+                                                scenario.updateInboxItemAvailability()
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                            this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
-                                this.bounds.height.set(48f)
-                                this.padding.set(Insets(8f))
-                                this += Button("Mark Skipped").apply {
-                                    this.setOnAction {
-                                        scenario.inboxState.putItemState(item, InboxItemState.Skipped)
-                                        scenario.updateProgression()
-                                        scenario.updateInboxItemAvailability()
-                                    }
-                                }
-                            }
-                            this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
-                                this.bounds.height.set(48f)
-                                this.padding.set(Insets(8f))
-                                this += Button("Mark Completed").apply {
-                                    this.setOnAction {
-                                        scenario.inboxState.putItemState(item, InboxItemState.Completed(null))
-                                        scenario.updateProgression()
-                                        scenario.updateInboxItemAvailability()
+                                    this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+                                        this.bounds.height.set(48f)
+                                        this.padding.set(Insets(8f))
+                                        this += Button("Mark Completed").apply {
+                                            this.setOnAction {
+                                                scenario.inboxState.putItemState(item, InboxItemState.Completed(null))
+                                                scenario.updateProgression()
+                                                scenario.updateInboxItemAvailability()
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -603,8 +607,12 @@ class DesktopUI(
             }
 
             this.setOnAction {
-                if (currentInboxItemState.getOrCompute() != InboxItemState.Unavailable) {
+                val currentState = currentInboxItemState.getOrCompute()
+                if (currentState != InboxItemState.Unavailable) {
                     this.selectedState.invert()
+                    if (currentState is InboxItemState.Available && currentState.newIndicator) {
+                        scenario.inboxState.putItemState(inboxItem, currentState.copy(newIndicator = false))
+                    }
                 }
             }
         }
