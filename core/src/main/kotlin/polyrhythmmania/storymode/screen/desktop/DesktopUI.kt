@@ -292,57 +292,44 @@ class DesktopUI(
                     this.bounds.width.set(112f * 4)
                     this.bounds.height.set(150f * 4)
 
-                    this += Pane().apply {
-                        this.margin.set(Insets(2f * 4, 2f * 4, (2f + 2f) * 4, (2f + 2f) * 4) + Insets(4f * 4))
+                    this += Pane().apply {// Paper part
+                        this.bounds.height.set(102f * 4)
+                        this.margin.set(Insets((2f + 4f) * 4, 0f * 4, (4f + 4f) * 4, (4f + 4f) * 4))
 
                         this += VBox().apply {
                             this.spacing.set(6f)
                             this.temporarilyDisableLayouts {
-                                this += TextLabel(ReadOnlyVar.const("Contract"), font = main.fontMainMenuHeading).apply {
-                                    this.bounds.height.set(40f)
-                                    this.textColor.set(Color.BLACK)
-                                    this.renderAlign.set(Align.top)
-                                    this.padding.set(Insets(0f, 8f, 0f, 8f))
+                                this += Pane().apply {
+                                    this.bounds.height.set(12f * 4)
+                                    this.margin.set(Insets(0f, 2.5f * 4, 0f, 0f))
+
+                                    this += TextLabel(ReadOnlyVar.const("Contract"), font = main.fontMainMenuHeading).apply {
+                                        this.bindWidthToParent(multiplier = 0.45f)
+                                        this.padding.set(Insets(0f, 0f, 0f, 1f * 4))
+                                        this.textColor.set(Color.BLACK)
+                                        this.renderAlign.set(Align.left)
+                                    }
+                                    this += TextLabel(item.contract.name, font = main.fontRobotoMonoBold).apply {
+                                        Anchor.TopRight.configure(this)
+                                        this.bindWidthToParent(multiplier = 0.5f)
+                                        this.textColor.set(Color.BLACK)
+                                        this.renderAlign.set(Align.topRight)
+                                    }
+                                    this += TextLabel(item.contract.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
+                                        Anchor.TopRight.configure(this)
+                                        this.bindWidthToParent(multiplier = 0.5f)
+                                        this.textColor.set(Color.BLACK)
+                                        this.renderAlign.set(Align.bottomRight)
+                                    }
                                 }
                                 this += RectElement(Color.BLACK).apply {
                                     this.bounds.height.set(2f)
                                 }
-                                this += ColumnarPane(3, true).apply {
-                                    this.bounds.height.set(28f * 3)
-
-                                    fun addField(index: Int, type: String, valueField: String,
-                                                 valueMarkup: Markup? = null) {
-                                        this[index] += Pane().apply {
-                                            this.margin.set(Insets(2f))
-                                            this += TextLabel(StoryL10N.getVar("inboxItem.contract.${type}"), font = main.fontRobotoBold).apply {
-                                                this.textColor.set(Color.BLACK)
-                                                this.renderAlign.set(Align.right)
-                                                this.padding.set(Insets(2f, 2f, 0f, 4f))
-                                                this.bounds.width.set(96f)
-                                            }
-                                            this += TextLabel(valueField, font = main.fontRobotoCondensed).apply {
-                                                this.textColor.set(Color.BLACK)
-                                                this.renderAlign.set(Align.left)
-                                                this.padding.set(Insets(2f, 2f, 4f, 0f))
-                                                this.bounds.x.set(96f)
-                                                this.bindWidthToParent(adjust = -96f)
-                                                if (valueMarkup != null) {
-                                                    this.markup.set(valueMarkup)
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    addField(0, "title", item.contract.name.getOrCompute())
-                                    addField(1, "requester", item.contract.requester.localizedName.getOrCompute())
-                                    this[2] += Pane().apply {
-                                        this.margin.set(Insets(2f))
-                                        this += TextLabel(item.contract.tagline.getOrCompute(), font = main.fontLexend).apply {
-                                            this.textColor.set(Color.BLACK)
-                                            this.renderAlign.set(Align.center)
-                                            this.padding.set(Insets(2f, 2f, 4f, 0f))
-                                        }
-                                    }
+                                this += TextLabel(item.contract.tagline.getOrCompute(), font = main.fontLexend).apply {
+                                    this.bounds.height.set(10f * 4)
+                                    this.textColor.set(Color.BLACK)
+                                    this.renderAlign.set(Align.center)
+                                    this.padding.set(Insets(1f * 4, 1f * 4, 1f * 4, 0f))
                                 }
                                 this += RectElement(Color.BLACK).apply {
                                     this.bounds.height.set(2f)
@@ -357,26 +344,33 @@ class DesktopUI(
                                     this.doLineWrapping.set(true)
                                     this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
                                 }
+                            }
+                        }
+                    }
+                    this += Pane().apply {// Envelope part
+                        this.margin.set(Insets(0f * 4, 6f * 4))
+                        this.bounds.height.set(48f * 4)
+                        this.bounds.y.set(102f * 4)
+                        
+                        this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
+                            this.bounds.y.set(29f * 4)
+                            this.bounds.height.set(16f * 4)
+                            this.padding.set(Insets(8f))
 
-                                this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
-                                    this.bounds.height.set(48f)
-                                    this.padding.set(Insets(8f))
-                                    this += Button("Play Level").apply {
-                                        this.setOnAction {
-                                            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                                            val gameMode = item.contract.gamemodeFactory(main)
-                                            val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
-                                                    main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, rootScreen) {
-                                                Paintbox.LOGGER.debug("ExitReason: $it")
-                                            }
-                                            main.screen = TransitionScreen(main, main.screen, playScreen,
-                                                    FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
-                                                this.onEntryEnd = {
-                                                    gameMode.prepareFirstTime()
-                                                    playScreen.resetAndUnpause()
-                                                    playScreen.initializeIntroCard()
-                                                }
-                                            }
+                            this += Button("Play Level").apply {
+                                this.setOnAction {
+                                    main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+                                    val gameMode = item.contract.gamemodeFactory(main)
+                                    val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
+                                            main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, rootScreen) {
+                                        Paintbox.LOGGER.debug("ExitReason: $it")
+                                    }
+                                    main.screen = TransitionScreen(main, main.screen, playScreen,
+                                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+                                        this.onEntryEnd = {
+                                            gameMode.prepareFirstTime()
+                                            playScreen.resetAndUnpause()
+                                            playScreen.initializeIntroCard()
                                         }
                                     }
                                 }

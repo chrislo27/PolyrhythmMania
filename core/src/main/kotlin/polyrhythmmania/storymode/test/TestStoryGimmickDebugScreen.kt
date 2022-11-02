@@ -127,7 +127,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             }
                         }
                     }
-                    this += Button("Debug \"desktop\" screen with working progressoin").apply {
+                    this += Button("Debug \"desktop\" screen with working progression").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             val inboxItems = InboxItems(listOf(
