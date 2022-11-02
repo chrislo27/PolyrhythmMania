@@ -27,6 +27,16 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.contract.Contract
+import polyrhythmmania.storymode.contract.Contracts
+import polyrhythmmania.storymode.contract.JingleType
+import polyrhythmmania.storymode.contract.Requester
+import polyrhythmmania.storymode.inbox.InboxItem
+import polyrhythmmania.storymode.inbox.InboxItems
+import polyrhythmmania.storymode.inbox.progression.Progression
+import polyrhythmmania.storymode.inbox.progression.UnlockStage
+import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
 import polyrhythmmania.storymode.screen.StoryLoadingScreen
 import polyrhythmmania.storymode.screen.StoryTitleScreen
 import polyrhythmmania.storymode.test.gamemode.*
@@ -34,7 +44,7 @@ import java.util.*
 
 
 class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
-    
+
     val batch: SpriteBatch = main.batch
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
@@ -44,11 +54,11 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
-    
+
     init {
         sceneRoot += RectElement(PRManiaColors.debugColor).apply {
-            this.padding.set(Insets(32f, 10f, 12f, 12f))    
-            this += VBox().apply { 
+            this.padding.set(Insets(32f, 10f, 12f, 12f))
+            this += VBox().apply {
                 this.spacing.set(4f)
                 this.bindWidthToParent(multiplier = 0.5f)
                 this.temporarilyDisableLayouts {
@@ -58,8 +68,8 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             this.margin.set(Insets(4f, 4f, 0f, 0f))
                         }
                     }
-                    
-                    this += Button("Back to Main Menu").apply { 
+
+                    this += Button("Back to Main Menu").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_deselect"))
@@ -80,7 +90,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             Gdx.app.postRunnable {
                                 val editorScreen = EditorScreen(main, EnumSet.of(EditorSpecialFlags.STORY_MODE))
                                 main.screen = TransitionScreen(main, main.screen, editorScreen,
-                                    FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
                         }
                     }
@@ -97,17 +107,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         this.disabled.set(true)
                         this.tooltipElement.set(Tooltip("No functionality yet"))
                     }
-                    this += Button("Test \"desktop\" screen").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            Gdx.app.postRunnable {
-                                val titleScreen = TestStoryDesktopScreen(main, this@TestStoryGimmickDebugScreen)
-                                main.screen = TransitionScreen(main, main.screen, titleScreen,
-                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-                            }
-                        }
-                    }
-                    this += Button("Test \"all inbox items\" screen").apply {
+                    this += Button("Debug \"all inbox items\" screen").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             Gdx.app.postRunnable {
@@ -117,11 +117,38 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             }
                         }
                     }
-                    this += Button("Test \"progression overview\" screen").apply {
+                    this += Button("Debug \"progression overview\" screen").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             Gdx.app.postRunnable {
                                 val titleScreen = TestStoryProgressionOverviewScreen(main, this@TestStoryGimmickDebugScreen)
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
+                    this += Button("Debug \"desktop\" screen with working progressoin").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            val inboxItems = InboxItems(listOf(
+                                    InboxItem.Debug("debug0", "1st item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This item is always unlocked to start. This will unlock the 2nd item once COMPLETED"),
+                                    InboxItem.Debug("debug1", "2nd item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This will unlock both the 3rd and 4th items once COMPLETED"),
+                                    InboxItem.Debug("debug2a", "3rd item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 4th item are COMPLETED"),
+                                    InboxItem.Debug("debug2b", "4th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 3rd item are COMPLETED"),
+                                    InboxItem.Debug("debug3", "5th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER),
+                                    InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, Contracts["fillbots"].gamemodeFactory))
+//                                  InboxItem.Debug("debug4", "item4", DebugSubtype.PROGRESSION_ADVANCER),
+                            ))
+                            val progression = Progression(listOf(
+                                    UnlockStage.singleItem("debug0", UnlockStageChecker.alwaysUnlocked(), stageID = "stage0"),
+                                    UnlockStage.singleItem("debug1", UnlockStageChecker.stageToBeCompleted("stage0"), stageID = "stage1"),
+                                    UnlockStage("stage2", UnlockStageChecker.stageToBeCompleted("stage1"), listOf("debug2a", "debug2b")),
+                                    UnlockStage.singleItem("debug3", UnlockStageChecker.stageToBeCompleted("stage2"), stageID = "stage3"),
+                                    UnlockStage.singleItem("contract_debugcontract_1", UnlockStageChecker.alwaysUnlocked(), stageID = "stage_debugcontract_1"),
+                            ))
+                            
+                            Gdx.app.postRunnable {
+                                val titleScreen = TestStoryDesktopScreen(main, this@TestStoryGimmickDebugScreen, inboxItems, progression)
                                 main.screen = TransitionScreen(main, main.screen, titleScreen,
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
@@ -182,7 +209,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         }
     }
-    
+
     private fun enterGimmickGameMode(gameMode: TestStoryGameMode) {
         main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
         val playScreen = TestStoryGimmickPlayScreen(main, Challenges.NO_CHANGES, main.settings.inputCalibration.getOrCompute(), gameMode)
@@ -194,7 +221,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
             }
         }
     }
-    
+
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -204,9 +231,9 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
         val camera = uiCamera
         batch.projectionMatrix = camera.combined
         batch.begin()
-        
+
         sceneRoot.renderAsRoot(batch)
-        
+
         batch.end()
     }
 
