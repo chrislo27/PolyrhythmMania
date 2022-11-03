@@ -187,16 +187,16 @@ class DesktopUI(
 
         val itemToggleGroup = ToggleGroup()
         currentInboxItem = Var.eagerBind {
-            val newToggle = itemToggleGroup.activeToggle.use() as? InboxItemTestObj
+            val newToggle = itemToggleGroup.activeToggle.use() as? InboxItemListingObj
             newToggle?.inboxItem
         }
-        fun addObj(obj: InboxItemTestObj) {
+        fun addObj(obj: InboxItemListingObj) {
             itemsVbox += obj
             itemToggleGroup.addToggle(obj)
         }
         scenario.inboxItems.items.forEach { ii ->
             // TODO link InboxItem to an UnlockStage; check UnlockStage state
-            addObj(InboxItemTestObj(ii))
+            addObj(InboxItemListingObj(ii))
         }
 
 
@@ -522,11 +522,12 @@ class DesktopUI(
     override fun dispose() {
     }
 
-    inner class InboxItemTestObj(val inboxItem: InboxItem) : ActionablePane(), Toggle {
+    inner class InboxItemListingObj(val inboxItem: InboxItem) : ActionablePane(), Toggle {
         override val selectedState: BooleanVar = BooleanVar(false)
         override val toggleGroup: Var<ToggleGroup?> = Var(null)
         
         private val currentInboxItemState: ReadOnlyVar<InboxItemState> = scenario.inboxState.itemStateVarOrUnavailable(inboxItem.id)
+        private val useFlowFont: ReadOnlyBooleanVar = BooleanVar { currentInboxItemState.use() == InboxItemState.Unavailable }
 
         init {
             this.bounds.width.set(78f * 4)
@@ -568,9 +569,15 @@ class DesktopUI(
             }
             contentPane += bottomAreaPane
 
-            titleAreaPane += TextLabel(inboxItem.listingName, font = inboxItemTitleFont).apply {
+            titleAreaPane += TextLabel("", font = inboxItemTitleFont).apply {
+                this.text.bind {
+                    val listingName = inboxItem.listingName.use()
+                    if (useFlowFont.use()) {
+                        listingName.replace('-', ' ')
+                    } else listingName
+                }
                 this.font.bind { 
-                    if (currentInboxItemState.use() == InboxItemState.Unavailable) main.fontFlowCircular else inboxItemTitleFont
+                    if (useFlowFont.use()) main.fontFlowCircular else inboxItemTitleFont
                 }
             }
 
