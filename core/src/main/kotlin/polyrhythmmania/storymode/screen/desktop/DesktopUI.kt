@@ -217,167 +217,170 @@ class DesktopUI(
     }
     
     init {
-        // Bottom-right UI panel
+        // TODO Bottom-right UI panel
     }
 
     private fun createInboxItemUI(item: InboxItem): UIElement {
+        class Paper(val root: ImageNode, val paperPane: Pane, val envelopePane: Pane)
+        
+        fun createPaperTemplate(textureID: String = "desk_contract_full"): Paper {
+            val root = ImageNode(TextureRegion(StoryAssets.get<Texture>(textureID)), ImageRenderingMode.FULL).apply {
+                this.bounds.width.set(112f * 4)
+                this.bounds.height.set(150f * 4)
+            }
+            val paperPane = Pane().apply {// Paper part
+                this.bounds.height.set(102f * 4)
+                this.margin.set(Insets((2f + 4f) * 4, 0f * 4, (4f + 4f) * 4, (4f + 4f) * 4))
+            }
+            root += paperPane
+            val envelopePane = Pane().apply {// Envelope part
+                this.margin.set(Insets(0f * 4, 6f * 4))
+                this.bounds.height.set(48f * 4)
+                this.bounds.y.set(102f * 4)
+            }
+            root += envelopePane
+            
+            return Paper(root, paperPane, envelopePane)
+        }
+        
         return when (item) {
             is InboxItem.Memo -> {
-                RectElement(Color.WHITE).apply {
-                    this.doClipping.set(true)
-                    this.border.set(Insets(2f))
-                    this.borderStyle.set(SolidBorder(Color.valueOf("7FC9FF")))
-                    this.bounds.height.set(600f)
-                    this.bindWidthToSelfHeight(multiplier = 1f / sqrt(2f))
-
-                    this.padding.set(Insets(16f))
-
-                    this += VBox().apply {
-                        this.spacing.set(6f)
-                        this.temporarilyDisableLayouts {
-                            this += TextLabel(StoryL10N.getVar("inboxItem.memo.title"), font = main.fontMainMenuHeading).apply {
-                                this.bounds.height.set(40f)
-                                this.textColor.set(Color.BLACK)
-                                this.renderAlign.set(Align.topLeft)
-                                this.padding.set(Insets(0f, 8f, 0f, 8f))
-                            }
-                            this += ColumnarPane(3, true).apply {
-                                this.bounds.height.set(32f * 3)
-
-                                fun addField(index: Int, type: String, valueField: String,
-                                             valueMarkup: Markup? = null) {
-                                    this[index] += Pane().apply {
-                                        this.margin.set(Insets(2f))
-                                        this += TextLabel(StoryL10N.getVar("inboxItem.memo.${type}"), font = main.fontRobotoBold).apply {
-                                            this.textColor.set(Color.BLACK)
-                                            this.renderAlign.set(Align.left)
-                                            this.padding.set(Insets(2f, 2f, 0f, 10f))
-                                            this.bounds.width.set(90f)
-                                        }
-                                        this += TextLabel(valueField, font = main.fontRobotoSlab).apply {
-                                            this.textColor.set(Color.BLACK)
-                                            this.renderAlign.set(Align.left)
-                                            this.padding.set(Insets(2f, 2f, 4f, 0f))
-                                            this.bounds.x.set(90f)
-                                            this.bindWidthToParent(adjust = -90f)
-                                            if (valueMarkup != null) {
-                                                this.markup.set(valueMarkup)
-                                            }
-                                        }
-                                    }
-                                }
-
-                                addField(0, "to", StoryL10N.getValue("inboxItemDetails.${item.id}.to"))
-                                addField(1, "from", StoryL10N.getValue("inboxItemDetails.${item.id}.from"))
-                                addField(2, "subject", StoryL10N.getValue("inboxItemDetails.${item.id}.subject"))
-                            }
-                            this += RectElement(Color.BLACK).apply {
-                                this.bounds.height.set(2f)
-                            }
-
-                            this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc")).apply {
-                                this.markup.set(slabMarkup)
-                                this.textColor.set(Color.BLACK)
-                                this.renderAlign.set(Align.topLeft)
-                                this.padding.set(Insets(8f, 0f, 0f, 0f))
-                                this.bounds.height.set(400f)
-                                this.doLineWrapping.set(true)
-                            }
+                val paper = createPaperTemplate("desk_contract_paper")
+                paper.paperPane += VBox().apply {
+                    this.spacing.set(1f * 4)
+                    this.temporarilyDisableLayouts {
+                        this += TextLabel(StoryL10N.getVar("inboxItem.memo.title"), font = main.fontMainMenuHeading).apply {
+                            this.bounds.height.set(40f)
+                            this.textColor.set(Color.BLACK)
+                            this.renderAlign.set(Align.topLeft)
+                            this.padding.set(Insets(0f, 8f, 0f, 8f))
                         }
-                    }
-                }
-            }
-            is InboxItem.ContractDoc -> {
-                ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_contract_full")), ImageRenderingMode.FULL).apply {
-                    this.bounds.width.set(112f * 4)
-                    this.bounds.height.set(150f * 4)
+                        this += ColumnarPane(3, true).apply {
+                            this.bounds.height.set(32f * 3)
 
-                    this += Pane().apply {// Paper part
-                        this.bounds.height.set(102f * 4)
-                        this.margin.set(Insets((2f + 4f) * 4, 0f * 4, (4f + 4f) * 4, (4f + 4f) * 4))
-
-                        this += VBox().apply {
-                            this.spacing.set(6f)
-                            this.temporarilyDisableLayouts {
-                                this += Pane().apply {
-                                    this.bounds.height.set(12f * 4)
-                                    this.margin.set(Insets(0f, 2.5f * 4, 0f, 0f))
-
-                                    this += TextLabel(ReadOnlyVar.const("Contract"), font = main.fontMainMenuHeading).apply {
-                                        this.bindWidthToParent(multiplier = 0.45f)
-                                        this.padding.set(Insets(0f, 0f, 0f, 1f * 4))
+                            fun addField(index: Int, fieldName: String, valueField: String, valueMarkup: Markup? = null) {
+                                this[index] += Pane().apply {
+                                    this.margin.set(Insets(2f))
+                                    this += TextLabel(StoryL10N.getVar("inboxItem.memo.${fieldName}"), font = main.fontRobotoBold).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.left)
+                                        this.padding.set(Insets(2f, 2f, 0f, 10f))
+                                        this.bounds.width.set(90f)
                                     }
-                                    this += TextLabel(item.contract.name, font = main.fontRobotoMonoBold).apply {
-                                        Anchor.TopRight.configure(this)
-                                        this.bindWidthToParent(multiplier = 0.5f)
+                                    this += TextLabel(valueField, font = main.fontRoboto).apply {
                                         this.textColor.set(Color.BLACK)
-                                        this.renderAlign.set(Align.topRight)
-                                    }
-                                    this += TextLabel(item.contract.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
-                                        Anchor.TopRight.configure(this)
-                                        this.bindWidthToParent(multiplier = 0.5f)
-                                        this.textColor.set(Color.BLACK)
-                                        this.renderAlign.set(Align.bottomRight)
-                                    }
-                                }
-                                this += RectElement(Color.BLACK).apply {
-                                    this.bounds.height.set(2f)
-                                }
-                                this += TextLabel(item.contract.tagline.getOrCompute(), font = main.fontLexend).apply {
-                                    this.bounds.height.set(10f * 4)
-                                    this.textColor.set(Color.BLACK)
-                                    this.renderAlign.set(Align.center)
-                                    this.padding.set(Insets(1f * 4, 1f * 4, 1f * 4, 0f))
-                                }
-                                this += RectElement(Color.BLACK).apply {
-                                    this.bounds.height.set(2f)
-                                }
-
-                                this += TextLabel(item.contract.desc.getOrCompute()).apply {
-                                    this.markup.set(openSansMarkup)
-                                    this.textColor.set(Color.BLACK)
-                                    this.renderAlign.set(Align.topLeft)
-                                    this.padding.set(Insets(8f, 4f, 0f, 0f))
-                                    this.bounds.height.set(400f)
-                                    this.doLineWrapping.set(true)
-                                    this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
-                                }
-                            }
-                        }
-                    }
-                    this += Pane().apply {// Envelope part
-                        this.margin.set(Insets(0f * 4, 6f * 4))
-                        this.bounds.height.set(48f * 4)
-                        this.bounds.y.set(102f * 4)
-                        
-                        this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
-                            this.bounds.y.set(29f * 4)
-                            this.bounds.height.set(16f * 4)
-                            this.padding.set(Insets(8f))
-
-                            this += Button("Play Level").apply {
-                                this.setOnAction {
-                                    main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                                    val gameMode = item.contract.gamemodeFactory(main)
-                                    val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
-                                            main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, rootScreen) {
-                                        Paintbox.LOGGER.debug("ExitReason: $it")
-                                    }
-                                    main.screen = TransitionScreen(main, main.screen, playScreen,
-                                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
-                                        this.onEntryEnd = {
-                                            gameMode.prepareFirstTime()
-                                            playScreen.resetAndUnpause()
-                                            playScreen.initializeIntroCard()
+                                        this.renderAlign.set(Align.left)
+                                        this.padding.set(Insets(2f, 2f, 4f, 0f))
+                                        this.bounds.x.set(90f)
+                                        this.bindWidthToParent(adjust = -90f)
+                                        if (valueMarkup != null) {
+                                            this.markup.set(valueMarkup)
                                         }
                                     }
+                                }
+                            }
+
+                            addField(0, "to", StoryL10N.getValue("inboxItemDetails.${item.id}.to"))
+                            addField(1, "from", StoryL10N.getValue("inboxItemDetails.${item.id}.from"))
+                            addField(2, "subject", StoryL10N.getValue("inboxItemDetails.${item.id}.subject"))
+                        }
+                        this += RectElement(Color.BLACK).apply {
+                            this.bounds.height.set(2f)
+                        }
+
+                        this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc")).apply {
+                            this.markup.set(openSansMarkup)
+                            this.textColor.set(Color.BLACK)
+                            this.renderAlign.set(Align.topLeft)
+                            this.padding.set(Insets(8f, 0f, 0f, 0f))
+                            this.bounds.height.set(400f)
+                            this.doLineWrapping.set(true)
+                        }
+                    }
+                }
+                
+                paper.root
+            }
+            is InboxItem.ContractDoc -> {
+                val paper = createPaperTemplate()
+                
+                paper.paperPane += VBox().apply {
+                    this.spacing.set(1f * 4)
+                    this.temporarilyDisableLayouts {
+                        this += Pane().apply {
+                            this.bounds.height.set(12f * 4)
+                            this.margin.set(Insets(0f, 2.5f * 4, 0f, 0f))
+
+                            this += TextLabel(ReadOnlyVar.const("Contract"), font = main.fontMainMenuHeading).apply {
+                                this.bindWidthToParent(multiplier = 0.45f)
+                                this.padding.set(Insets(0f, 0f, 0f, 1f * 4))
+                                this.textColor.set(Color.BLACK)
+                                this.renderAlign.set(Align.left)
+                            }
+                            this += TextLabel(item.contract.name, font = main.fontRobotoMonoBold).apply {
+                                Anchor.TopRight.configure(this)
+                                this.bindWidthToParent(multiplier = 0.5f)
+                                this.textColor.set(Color.BLACK)
+                                this.renderAlign.set(Align.topRight)
+                            }
+                            this += TextLabel(item.contract.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
+                                Anchor.TopRight.configure(this)
+                                this.bindWidthToParent(multiplier = 0.5f)
+                                this.textColor.set(Color.BLACK)
+                                this.renderAlign.set(Align.bottomRight)
+                            }
+                        }
+                        this += RectElement(Color.BLACK).apply {
+                            this.bounds.height.set(2f)
+                        }
+                        this += TextLabel(item.contract.tagline.getOrCompute(), font = main.fontLexend).apply {
+                            this.bounds.height.set(10f * 4)
+                            this.textColor.set(Color.BLACK)
+                            this.renderAlign.set(Align.center)
+                            this.padding.set(Insets(1f * 4, 1f * 4, 1f * 4, 0f))
+                        }
+                        this += RectElement(Color.BLACK).apply {
+                            this.bounds.height.set(2f)
+                        }
+
+                        this += TextLabel(item.contract.desc.getOrCompute()).apply {
+                            this.markup.set(openSansMarkup)
+                            this.textColor.set(Color.BLACK)
+                            this.renderAlign.set(Align.topLeft)
+                            this.padding.set(Insets(8f, 4f, 0f, 0f))
+                            this.bounds.height.set(400f)
+                            this.doLineWrapping.set(true)
+                            this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
+                        }
+                    }
+                }
+                
+                paper.envelopePane += RectElement(Color(0f, 0f, 0f, 0.75f)).apply { // FIXME this is a temp button
+                    this.bounds.y.set(29f * 4)
+                    this.bounds.height.set(16f * 4)
+                    this.padding.set(Insets(8f))
+
+                    this += Button("Play Level").apply {
+                        this.setOnAction {
+                            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+                            val gameMode = item.contract.gamemodeFactory(main)
+                            val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
+                                    main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, rootScreen) {
+                                Paintbox.LOGGER.debug("ExitReason: $it")
+                            }
+                            main.screen = TransitionScreen(main, main.screen, playScreen,
+                                    FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+                                this.onEntryEnd = {
+                                    gameMode.prepareFirstTime()
+                                    playScreen.resetAndUnpause()
+                                    playScreen.initializeIntroCard()
                                 }
                             }
                         }
                     }
                 }
+                
+                paper.root
             }
             is InboxItem.Debug -> {
                 RectElement(Color.WHITE).apply {
