@@ -11,6 +11,6 @@ class Requester(val id: String) {
         val HR: Requester = Requester("hr")
     }
     
-    val localizedName: ReadOnlyVar<String> by lazy { StoryL10N.getVar("contract.requester.$id") }
+    val localizedName: ReadOnlyVar<String> by lazy { StoryL10N.getVar("inboxItem.contract.requester.$id") }
     
 }

@@ -12,6 +12,7 @@ sealed class InboxItem(
 
     class Debug(id: String, listingName: String, val subtype: DebugSubtype, val description: String = "<no desc>")
         : InboxItem(id, ReadOnlyVar.const(listingName)) {
+        
         enum class DebugSubtype {
             PROGRESSION_ADVANCER,
         }
@@ -22,7 +23,14 @@ sealed class InboxItem(
 
     class ContractDoc(
             val contract: Contract, itemID: String = "contract_${contract.id}",
-            listingName: ReadOnlyVar<String>? = null,
-    ) : InboxItem(itemID, listingName ?: contract.name)
+            listingName: ReadOnlyVar<String> = contract.name,
+            val subtype: ContractSubtype = ContractSubtype.NORMAL,
+    ) : InboxItem(itemID, listingName) {
+        
+        enum class ContractSubtype(val headingL10NKey: String) {
+            NORMAL("inboxItem.contract.heading.normal"), 
+            TRAINING("inboxItem.contract.heading.training"),
+        }
+    }
 
 }

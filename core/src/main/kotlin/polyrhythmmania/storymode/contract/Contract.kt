@@ -30,8 +30,8 @@ data class Contract(
             id: String, requester: Requester, jingleType: JingleType, attribution: Attribution?,
             minimumScore: Int, gamemodeFactory: (main: PRManiaGame) -> GameMode
     ) : this(
-            id, StoryL10N.getVar("contract.name.$id"), StoryL10N.getVar("contract.desc.$id"),
-            StoryL10N.getVar("contract.tagline.$id"), requester, jingleType, attribution, minimumScore, gamemodeFactory
+            id, StoryL10N.getVar("contract.$id.name"), StoryL10N.getVar("contract.$id.desc"),
+            StoryL10N.getVar("contract.$id.tagline"), requester, jingleType, attribution, minimumScore, gamemodeFactory
     )
 
 }

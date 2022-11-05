@@ -19,7 +19,9 @@ import paintbox.ui.Tooltip
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
+import paintbox.ui.control.ComboBox
 import paintbox.ui.element.RectElement
+import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaColors
@@ -128,7 +130,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             }
                         }
                     }
-                    this += Button("Debug \"desktop\" screen with working progression").apply {
+                    this += Button("Debug \"desktop\" screen with progression logic").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             val inboxItems = InboxItems(listOf(
@@ -161,6 +163,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         this.setOnAction {
                             val inboxItems = InboxItems(listOf(
                                     InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, Contracts["fillbots"].gamemodeFactory)),
+                                    InboxItem.ContractDoc(Contract("debugcontract_2", "TRAINING-099".asReadOnlyVar(), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, Contracts["fillbots"].gamemodeFactory), subtype = InboxItem.ContractDoc.ContractSubtype.TRAINING),
                                     InboxItem.Memo("test_memo", "Test Memo".asReadOnlyVar())
                             ))
                             val progression = Progression(listOf(
@@ -175,41 +178,28 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         }
                     }
                     this += separator()
-                    this += Button("Polyrhythm 2 no changes").apply {
+                    class GamemodeTest(val name: String, val gamemodeFactory: () -> TestStoryGameMode)
+                    val gamemodes: List<GamemodeTest> = listOf(
+                            GamemodeTest("Polyrhythm 2 no changes") { object : TestStoryGameMode(main) {} },
+                            GamemodeTest("Aces Only PR2") { TestStoryAcesOnlyGameMode(main) },
+                            GamemodeTest("No Barelies PR2") { TestStoryNoBarelyGameMode(main) },
+                            GamemodeTest("Continuous (8-ball) PR2") { TestStory8BallGameMode(main) },
+                            GamemodeTest("PR2 with lives") { TestStoryLivesGameMode(main) },
+                            GamemodeTest("All Defective Rods PR2") { TestStoryDefectiveGameMode(main) },
+                    )
+                    this += HBox().apply { 
                         this.bounds.height.set(32f)
-                        this.setOnAction {
-                            enterGimmickGameMode(object : TestStoryGameMode(main) {
-                            })
+                        this.spacing.set(8f)
+                        val combobox = ComboBox(gamemodes, gamemodes.first()).apply { 
+                            this.bindWidthToParent(multiplier = 0.7f)
+                            this.itemStringConverter.set { it.name }
                         }
-                    }
-                    this += Button("Aces Only PR2").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            enterGimmickGameMode(TestStoryAcesOnlyGameMode(main))
-                        }
-                    }
-                    this += Button("No Barelies PR2").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            enterGimmickGameMode(TestStoryNoBarelyGameMode(main))
-                        }
-                    }
-                    this += Button("Continuous (8-ball) PR2").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            enterGimmickGameMode(TestStory8BallGameMode(main))
-                        }
-                    }
-                    this += Button("PR2 with lives").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            enterGimmickGameMode(TestStoryLivesGameMode(main))
-                        }
-                    }
-                    this += Button("All Defective Rods PR2").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            enterGimmickGameMode(TestStoryDefectiveGameMode(main))
+                        this += combobox
+                        this += Button("Play Selected").apply {
+                            this.bindWidthToParent(multiplier = 0.3f, adjust = -8f)
+                            this.setOnAction {
+                                enterGimmickGameMode(combobox.selectedItem.getOrCompute().gamemodeFactory())
+                            }
                         }
                     }
                     this += separator()

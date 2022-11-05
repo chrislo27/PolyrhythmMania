@@ -249,7 +249,7 @@ class DesktopUI(
                 paper.paperPane += VBox().apply {
                     this.spacing.set(1f * 4)
                     this.temporarilyDisableLayouts {
-                        this += TextLabel(StoryL10N.getVar("inboxItem.memo.title"), font = main.fontMainMenuHeading).apply {
+                        this += TextLabel(StoryL10N.getVar("inboxItem.memo.heading"), font = main.fontMainMenuHeading).apply {
                             this.bounds.height.set(40f)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
@@ -280,15 +280,15 @@ class DesktopUI(
                                 }
                             }
 
-                            addField(0, "to", StoryL10N.getValue("inboxItemDetails.${item.id}.to"))
-                            addField(1, "from", StoryL10N.getValue("inboxItemDetails.${item.id}.from"))
-                            addField(2, "subject", StoryL10N.getValue("inboxItemDetails.${item.id}.subject"))
+                            addField(0, "to", StoryL10N.getValue("inboxItemDetails.memo.${item.id}.to"))
+                            addField(1, "from", StoryL10N.getValue("inboxItemDetails.memo.${item.id}.from"))
+                            addField(2, "subject", StoryL10N.getValue("inboxItemDetails.memo.${item.id}.subject"))
                         }
                         this += RectElement(Color.BLACK).apply {
                             this.bounds.height.set(2f)
                         }
 
-                        this += TextLabel(StoryL10N.getValue("inboxItemDetails.${item.id}.desc")).apply {
+                        this += TextLabel(StoryL10N.getValue("inboxItemDetails.memo.${item.id}.desc")).apply {
                             this.markup.set(openSansMarkup)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
@@ -311,23 +311,24 @@ class DesktopUI(
                             this.bounds.height.set(12f * 4)
                             this.margin.set(Insets(0f, 2.5f * 4, 0f, 0f))
 
-                            this += TextLabel(ReadOnlyVar.const("Contract"), font = main.fontMainMenuHeading).apply {
-                                this.bindWidthToParent(multiplier = 0.45f)
+                            this += TextLabel(StoryL10N.getVar(item.subtype.headingL10NKey), font = main.fontMainMenuHeading).apply {
+                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * 4)
                                 this.padding.set(Insets(0f, 0f, 0f, 1f * 4))
                                 this.textColor.set(Color.BLACK)
                                 this.renderAlign.set(Align.left)
                             }
-                            this += TextLabel(item.contract.name, font = main.fontRobotoMonoBold).apply {
+                            this += Pane().apply {
                                 Anchor.TopRight.configure(this)
-                                this.bindWidthToParent(multiplier = 0.5f)
-                                this.textColor.set(Color.BLACK)
-                                this.renderAlign.set(Align.topRight)
-                            }
-                            this += TextLabel(item.contract.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
-                                Anchor.TopRight.configure(this)
-                                this.bindWidthToParent(multiplier = 0.5f)
-                                this.textColor.set(Color.BLACK)
-                                this.renderAlign.set(Align.bottomRight)
+                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * 4)
+
+                                this += TextLabel(item.contract.name, font = main.fontRobotoMonoBold).apply {
+                                    this.textColor.set(Color.BLACK)
+                                    this.renderAlign.set(Align.topRight)
+                                }
+                                this += TextLabel(item.contract.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
+                                    this.textColor.set(Color.BLACK)
+                                    this.renderAlign.set(Align.bottomRight)
+                                }
                             }
                         }
                         this += RectElement(Color.BLACK).apply {
