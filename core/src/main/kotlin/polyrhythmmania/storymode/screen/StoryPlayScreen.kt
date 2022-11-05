@@ -176,11 +176,12 @@ class StoryPlayScreen(
             this.topLeftOffsetV.set(1f)
             this.topRightOffsetV.set(slantAmount)
         }
-        // Title
+        // Title and tagline
         introCardSceneRoot += TextLabel(contract.name.getOrCompute(), font = PRManiaGame.instance.fontGamePracticeClear).apply { 
-//            this.bindYToParentHeight(multiplier = 0.3f)
-            Anchor.CentreLeft.configure(this)
-            this.bindHeightToParent(multiplier = 0.25f)
+            Anchor.CentreLeft.configure(this, offsetY = {
+                -(bounds.height.use() / 2f)
+            })
+            this.bindHeightToParent(multiplier = 0.125f)
             
             this.margin.set(Insets(0f, 0f, 50f, 50f))
             this.renderAlign.set(RenderAlign.center)
@@ -189,6 +190,32 @@ class StoryPlayScreen(
             this.bounds.x.bind {
                 val parentW = parent.use()?.bounds?.width?.use() ?: 0f    
                 MathUtils.lerp(-(bounds.width.use()), parentW, textSlide.textSlideAmount.use())
+            }
+        }
+        introCardSceneRoot += TextLabel(contract.tagline.getOrCompute(), font = PRManiaGame.instance.fontGamePracticeClear).apply {
+            Anchor.CentreLeft.configure(this, offsetY = {
+                (bounds.height.use() / 2f)
+            })
+            this.bindHeightToParent(multiplier = 0.2f)
+            
+            this.margin.set(Insets(0f, 0f, 50f, 50f))
+            this.renderAlign.set(RenderAlign.center)
+            this.textColor.set(Color.WHITE.cpy())
+            this.setScaleXY(0.75f)
+            
+            this.opacity.bind {
+                val time = textSlide.textSlideAmount.use()
+                when {
+                    time < 0.25f -> 0f
+                    time in 0.25f..0.4f -> (time - 0.25f) / 0.15f
+                    time in 0.4f..0.75f -> 1f
+                    time > 0.75f -> 1f - ((time - 0.75f) / 0.25f)
+                    else -> 0f
+                }
+            }
+            this.bounds.x.bind {
+                val parentW = parent.use()?.bounds?.width?.use() ?: 0f
+                MathUtils.lerp(-1f, 0.5f, textSlide.textSlideAmount.use()) * (parentW * 0.1f)
             }
         }
     }
