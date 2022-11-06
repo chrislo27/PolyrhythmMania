@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.*
 import paintbox.font.Markup
+import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.font.TextRun
 import paintbox.packing.PackedSheet
@@ -79,7 +80,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     val forceUseOfMainFramebuffer: BooleanVar = BooleanVar(false)
 
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
-    private val baseMarkup: Markup = Markup(mapOf(
+    private val markupFontMapping: Map<String, PaintboxFont> = mapOf(
             "prmania_icons" to PRManiaGame.instance.fontIcons,
             "moretimes" to PRManiaGame.instance.fontGameMoreTimes,
             "bordered" to PRManiaGame.instance.fontGameUIText,
@@ -88,7 +89,10 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             "mainmenu_thin" to PRManiaGame.instance.fontMainMenuThin,
             "mainmenu_heading" to PRManiaGame.instance.fontMainMenuHeading,
             "mainmenu_rodin" to PRManiaGame.instance.fontMainMenuRodin,
-    ), TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
+    )
+    private val baseMarkup: Markup = Markup(markupFontMapping, TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
+    private val textboxMonoMarkup: Markup = Markup(markupFontMapping + Pair("regular", PRManiaGame.instance.fontGameTextbox),
+            TextRun(PRManiaGame.instance.fontGameTextboxMono, ""), lenientMode = true)
     
     val endlessModeRendering: EndlessModeRendering
     private val livesModeRendering: LivesModeRendering
@@ -103,6 +107,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     private val allInnerRenderers: List<InnerRendering>
 
     init {
+        uiSceneRoot.debugOutlineColor.set(Color.RED)
+        
         this.endlessModeRendering = this.EndlessModeRendering()
         uiSceneRoot += this.endlessModeRendering.uiElement
         
@@ -267,9 +273,11 @@ duration: ${monster.activeDuration.get()} sec
 
         private val textBoxSuperpane: Pane
         private val textBoxDialoguePane: TextboxPane = TextboxPane()
-        private val textBoxBlackPane: RectElement = RectElement(Color(0f, 0f, 0f, 0.5f))
+        private val textBoxBannerPane: RectElement = RectElement(Color(0f, 0f, 0f, 0.5f))
+        private val textBoxRobotPane: Pane
         private val textBoxLabel: TextLabel = TextLabel("")
         private val textBoxInputLabel: TextLabel = TextLabel(RodinSpecialChars.BORDERED_A, font = PRManiaGame.instance.fontGameTextbox)
+        private val buttonPromptOffsetX: FloatVar = FloatVar(-10f)
         
         override val uiElement: UIElement get() = textBoxSuperpane
         
@@ -278,7 +286,38 @@ duration: ${monster.activeDuration.get()} sec
                 Anchor.TopCentre.configure(this, offsetY = 64f)
                 this.bounds.height.set(150f)
             }
-            textBoxSuperpane += textBoxBlackPane
+            textBoxSuperpane += textBoxBannerPane
+            textBoxRobotPane = Pane().apply {
+                Anchor.Centre.configure(this)
+                val borderSize = 20f
+                this.bindHeightToParent(adjust = borderSize * 2)
+                this.bindWidthToParent(adjust = borderSize * 2)
+                
+
+                val bgColor = Color(0f, 48f / 255, 7f / 255, 250f / 255)
+//                val bgColorClear = bgColor.cpy().apply { a *= 0.75f }
+                this += Pane().apply {
+                    Anchor.TopCentre.configure(this)
+                    this.bounds.width.set(1000f)
+                    
+                    this.border.set(Insets(1f))
+                    this.borderStyle.set(SolidBorder(Color.BLACK))
+                    
+                    this += RectElement(bgColor).apply {
+                        this.border.set(Insets(borderSize))
+                        this.borderStyle.set(SolidBorder(Color.valueOf("F9EFDB")))
+                    }
+                }
+//                this += QuadElement(bgColorClear, bgColor, bgColorClear, bgColor).apply {
+//                    Anchor.TopLeft.configure(this)
+//                    this.bounds.width.set((1280f - 1000f) / 2)
+//                }
+//                this += QuadElement(bgColor, bgColorClear, bgColor, bgColorClear).apply {
+//                    Anchor.TopRight.configure(this)
+//                    this.bounds.width.set((1280f - 1000f) / 2)
+//                }
+            }
+            textBoxSuperpane += textBoxRobotPane
 
             textBoxSuperpane += Pane().apply {
                 Anchor.TopCentre.configure(this)
@@ -295,7 +334,7 @@ duration: ${monster.activeDuration.get()} sec
                     this.renderAlign.set(Align.right)
                     this.bounds.width.set(48f)
                     this.bounds.height.set(48f)
-                    Anchor.BottomRight.configure(this, offsetX = -10f, offsetY = -6f)
+                    Anchor.BottomRight.configure(this, offsetX = { buttonPromptOffsetX.use() }, offsetY = { -6f })
                 }
             }
         }
@@ -307,12 +346,26 @@ duration: ${monster.activeDuration.get()} sec
             textBoxSuperpane.visible.set(textBox != null)
             if (textBox != null) {
                 val style = textBox.textBox.style
-                textBoxBlackPane.visible.set(style == TextBoxStyle.BANNER)
                 textBoxDialoguePane.visible.set(style == TextBoxStyle.DIALOGUE)
+                textBoxBannerPane.visible.set(style == TextBoxStyle.BANNER)
+                textBoxRobotPane.visible.set(style == TextBoxStyle.SM_ROBOT)
+                
+                buttonPromptOffsetX.set(when (style) {
+                    TextBoxStyle.DIALOGUE, TextBoxStyle.BANNER -> -10f
+                    TextBoxStyle.SM_ROBOT -> -28f
+                })
 
+                textBoxLabel.markup.set(when (style) {
+                    TextBoxStyle.SM_ROBOT -> textboxMonoMarkup
+                    else -> baseMarkup
+                })
                 textBoxLabel.text.set(textBox.textBox.text)
                 textBoxLabel.textAlign.set(textBox.textBox.align)
-                val textColor = if (style == TextBoxStyle.BANNER) Color.WHITE else Color.BLACK
+                val textColor = when (style) {
+                    TextBoxStyle.DIALOGUE -> Color.BLACK
+                    TextBoxStyle.BANNER -> Color.WHITE
+                    TextBoxStyle.SM_ROBOT -> Color.GREEN
+                }
                 textBoxLabel.textColor.set(textColor)
                 textBoxInputLabel.text.set(if (textBox.secondsTimer > 0f) "" else {
                     if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f)

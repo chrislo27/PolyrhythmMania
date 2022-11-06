@@ -6,6 +6,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockTextbox
 import polyrhythmmania.engine.EventCowbellSFX
+import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.engine.input.EventLockInputs
 import polyrhythmmania.engine.input.InputKeymapKeyboard
 import polyrhythmmania.engine.input.InputType
@@ -72,36 +73,43 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat, 4f, 0))
 
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 0f
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text1a")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 1f
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text1b")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 2f
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text1c")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 3f
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text1d")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 4f
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text1e")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 5f
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text1f")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 6f
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text2", keyboardKeymap.toDpadString())
@@ -144,11 +152,13 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat, 4f, 0))
 
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text3")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text4")
@@ -204,11 +214,13 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat, 4f, 0))
 
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text5")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text6")
@@ -269,11 +281,13 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             engine.musicData.volumeMap.addMusicVolume(MusicVolume(startBeat, 4f, 0))
 
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text7")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
+                this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text8")
@@ -302,11 +316,13 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             this.beat = 0f
         }
         blocks += BlockTextbox(engine).apply {
+            this.style = TextBoxStyle.SM_ROBOT
             this.beat = 0f
             this.requireInput.set(true)
             this.text = StoryL10N.getValue("textbox.tutorial1.text0", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += BlockTextbox(engine).apply {
+            this.style = TextBoxStyle.SM_ROBOT
             this.beat = 1f
             this.requireInput.set(true)
             this.text = StoryL10N.getValue("textbox.tutorial1.text1", Input.Keys.toString(keyboardKeymap.buttonA))

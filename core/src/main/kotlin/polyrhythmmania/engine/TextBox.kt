@@ -11,11 +11,14 @@ enum class TextBoxStyle(
 ) {
     
     DIALOGUE(0),
-    BANNER(1);
+    BANNER(1),
+    
+    SM_ROBOT(1000, EnumSet.of(EditorSpecialFlags.STORY_MODE))
+    ;
     
     companion object {
         val VALUES: List<TextBoxStyle> = values().toList()
-        val JSON_MAPPING: Map<Int, TextBoxStyle> = VALUES.associate { it.jsonId to it }
+        val JSON_MAPPING: Map<Int, TextBoxStyle> = VALUES.associateBy { it.jsonId }
     }
 }
 

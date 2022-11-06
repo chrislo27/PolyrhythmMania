@@ -85,8 +85,12 @@ class BlockTextbox(engine: Engine)
             ))
 
             ctxmenu.addMenuItem(SeparatorMenuItem())
-            
-            val combobox = ComboBox(TextBoxStyle.VALUES, style).also { combobox ->
+
+            val editorFlags = editor.flags
+            val allowedStyles = TextBoxStyle.values().filter {
+                it.requiredEditorFlags.isEmpty() || editorFlags.containsAll(it.requiredEditorFlags)
+            }
+            val combobox = ComboBox(allowedStyles, style).also { combobox ->
                 combobox.markup.set(editor.editorPane.palette.markup)
                 combobox.itemStringConverter.set { 
                     Localization.getValue("blockContextMenu.textbox.style.${it.name.lowercase(Locale.ROOT)}")
