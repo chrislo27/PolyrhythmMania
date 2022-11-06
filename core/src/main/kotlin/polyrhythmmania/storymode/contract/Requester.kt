@@ -8,7 +8,7 @@ class Requester(val id: String) {
 
     companion object {
         val DEBUG: Requester = Requester("debug")
-        val HR: Requester = Requester("hr")
+        val POLYRHYTHM_INC: Requester = Requester("polyrhythm_inc")
     }
     
     val localizedName: ReadOnlyVar<String> by lazy { StoryL10N.getVar("inboxItem.contract.requester.$id") }

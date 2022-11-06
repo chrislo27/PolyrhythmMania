@@ -69,7 +69,7 @@ class DesktopUI(
     private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
 
     private val blinker: ReadOnlyBooleanVar = BooleanVar {
-        MathHelper.getTriangleWave(0.75f * 2) > 0.5f
+        MathHelper.getTriangleWave(0.75f * 2 /* Multiply by 2 because of doubled period length */) > 0.5f
     }
     private val currentInboxItem: ReadOnlyVar<InboxItem?>
     val bg: UIElement
@@ -250,29 +250,34 @@ class DesktopUI(
                     this.spacing.set(1f * 4)
                     this.temporarilyDisableLayouts {
                         this += TextLabel(StoryL10N.getVar("inboxItem.memo.heading"), font = main.fontMainMenuHeading).apply {
-                            this.bounds.height.set(40f)
+                            this.bounds.height.set(9f * 4)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(0f, 8f, 0f, 8f))
+                            this.padding.set(Insets(0f, 2f * 4, 0f, 2f * 4))
                         }
-                        this += ColumnarPane(3, true).apply {
-                            this.bounds.height.set(32f * 3)
+                        val fields: List<Pair<String, ReadOnlyVar<String>>> = listOfNotNull(
+                                if (item.hasToField) ("to" to item.to) else null,
+                                "from" to item.from,
+                                "subject" to item.subject
+                        )
+                        this += ColumnarPane(fields.size, true).apply {
+                            this.bounds.height.set((7f * 4) * fields.size)
 
                             fun addField(index: Int, fieldName: String, valueField: String, valueMarkup: Markup? = null) {
                                 this[index] += Pane().apply {
-                                    this.margin.set(Insets(2f))
+                                    this.margin.set(Insets(0.5f * 4, 0f))
                                     this += TextLabel(StoryL10N.getVar("inboxItem.memo.${fieldName}"), font = main.fontRobotoBold).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.left)
                                         this.padding.set(Insets(2f, 2f, 0f, 10f))
-                                        this.bounds.width.set(90f)
+                                        this.bounds.width.set(22.5f * 4)
                                     }
                                     this += TextLabel(valueField, font = main.fontRoboto).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.left)
                                         this.padding.set(Insets(2f, 2f, 4f, 0f))
                                         this.bounds.x.set(90f)
-                                        this.bindWidthToParent(adjust = -90f)
+                                        this.bindWidthToParent(adjust = -(22.5f * 4))
                                         if (valueMarkup != null) {
                                             this.markup.set(valueMarkup)
                                         }
@@ -280,20 +285,72 @@ class DesktopUI(
                                 }
                             }
 
-                            addField(0, "to", StoryL10N.getValue("inboxItemDetails.memo.${item.id}.to"))
-                            addField(1, "from", StoryL10N.getValue("inboxItemDetails.memo.${item.id}.from"))
-                            addField(2, "subject", StoryL10N.getValue("inboxItemDetails.memo.${item.id}.subject"))
+                            fields.forEachIndexed { i, (key, value) -> 
+                                addField(i, key, value.getOrCompute())
+                            }
                         }
                         this += RectElement(Color.BLACK).apply {
                             this.bounds.height.set(2f)
                         }
 
-                        this += TextLabel(StoryL10N.getValue("inboxItemDetails.memo.${item.id}.desc")).apply {
+                        this += TextLabel(item.desc.getOrCompute()).apply {
                             this.markup.set(openSansMarkup)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(8f, 0f, 0f, 0f))
-                            this.bounds.height.set(400f)
+                            this.padding.set(Insets(3f * 4, 0f, 0f, 0f))
+                            this.bounds.height.set(100f * 4)
+                            this.doLineWrapping.set(true)
+                        }
+                    }
+                }
+                
+                paper.root
+            }
+            is InboxItem.InfoMaterial -> {
+                val paper = createPaperTemplate("desk_contract_paper")
+                paper.paperPane += VBox().apply {
+                    this.spacing.set(1f * 4)
+                    this.temporarilyDisableLayouts {
+                        this += TextLabel(StoryL10N.getVar("inboxItem.infoMaterial.heading"), font = main.fontMainMenuHeading).apply {
+                            this.bounds.height.set(9f * 4)
+                            this.textColor.set(Color.BLACK)
+                            this.renderAlign.set(Align.top)
+                            this.padding.set(Insets(0f, 2f * 4, 0f, 0f))
+                        }
+                        val fields: List<Pair<String, ReadOnlyVar<String>>> = listOfNotNull(
+                                "topic" to item.topic,
+                                "audience" to item.audience,
+                        )
+                        this += VBox().apply {
+                            val rowHeight = 7f * 4
+                            this.bounds.height.set(rowHeight * fields.size)
+                            this.temporarilyDisableLayouts {
+                                fields.forEachIndexed { i, (key, value) ->
+                                    this += Pane().apply {
+                                        this.bounds.height.set(rowHeight)
+                                        this.margin.set(Insets(0.5f * 4, 0f))
+                                        this += TextLabel({
+                                            "[b]${StoryL10N.getVar("inboxItem.infoMaterial.${key}").use()}[] ${value.use()}"
+                                        }, font = main.fontRobotoBold).apply {
+                                            this.markup.set(slabMarkup)
+                                            this.textColor.set(Color.BLACK)
+                                            this.renderAlign.set(Align.center)
+                                            this.padding.set(Insets(2f, 2f, 0f, 10f))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        this += RectElement(Color.BLACK).apply {
+                            this.bounds.height.set(2f)
+                        }
+
+                        this += TextLabel(item.desc.getOrCompute()).apply {
+                            this.markup.set(robotoCondensedMarkup)
+                            this.textColor.set(Color.BLACK)
+                            this.renderAlign.set(Align.topLeft)
+                            this.padding.set(Insets(3f * 4, 0f, 0f, 0f))
+                            this.bounds.height.set(100f * 4)
                             this.doLineWrapping.set(true)
                         }
                     }
@@ -311,7 +368,7 @@ class DesktopUI(
                             this.bounds.height.set(12f * 4)
                             this.margin.set(Insets(0f, 2.5f * 4, 0f, 0f))
 
-                            this += TextLabel(StoryL10N.getVar(item.subtype.headingL10NKey), font = main.fontMainMenuHeading).apply {
+                            this += TextLabel(item.headingText, font = main.fontMainMenuHeading).apply {
                                 this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * 4)
                                 this.padding.set(Insets(0f, 0f, 0f, 1f * 4))
                                 this.textColor.set(Color.BLACK)

@@ -16,7 +16,7 @@ object Contracts {
             this.contracts[contract.id] = contract
         }
         
-        add(Contract("tutorial1", Requester.HR, JingleType.GBA, null, 0) { main ->
+        add(Contract("tutorial1", Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0) { main ->
             Tutorial1GameMode(main)
         })
         

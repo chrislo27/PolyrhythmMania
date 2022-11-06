@@ -775,7 +775,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         addFontFamily(familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         addFontFamily(familyName = "RobotoMono", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
         addFontFamily(familyName = "RobotoCondensed", hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false)
-        addFontFamily(familyName = "OpenSans", hinting = FreeTypeFontGenerator.Hinting.Full, scaleToReferenceSize = true, generateBordered = false)
+        addFontFamily(familyName = "OpenSans", hinting = FreeTypeFontGenerator.Hinting.Full, scaleToReferenceSize = true, generateBordered = false, afterLoadFunc = { font ->
+            defaultAfterLoad.invoke(this, font)
+            font.data.blankLineScale = 0.25f
+        })
         addFontFamily(familyName = "Lexend", fontFamilies = listOf(FontFamily.REGULAR, FontFamily.BOLD),
                 hinting = FreeTypeFontGenerator.Hinting.Slight, scaleToReferenceSize = true, generateBordered = false) {font ->
             font.data.setLineHeight(font.data.lineHeight * 0.75f)
@@ -788,7 +791,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     borderWidth = 0f
                 }).setAfterLoad { font ->
             defaultAfterLoad.invoke(this, font)
-            font.data.blankLineScale = 0.25f
+            font.data.blankLineScale = 0.875f
         }
         cache["RobotoSlab_BOLD"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/RobotoSlab/RobotoSlab-Bold.ttf"), 20, 0f, true, WindowSize(1280, 720)),

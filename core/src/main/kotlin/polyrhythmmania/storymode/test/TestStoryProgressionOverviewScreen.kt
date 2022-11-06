@@ -99,7 +99,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
     private val processor: InputProcessor = sceneRoot.inputSystem
 
     private val inboxState: InboxState = InboxState()
-    private val progression: Var<Progression> = Var(StoryModeProgression())
+    private val progression: Var<Progression> = Var(StoryModeProgression.contractsOnly())
 
     init {
         val bg = RectElement(PRManiaColors.debugColor).apply {
@@ -275,7 +275,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
 
                     val timer = FloatVar(0f)
                     this.setOnAction {
-                        Gdx.app.clipboard.contents = StoryModeProgression().toJson().toString(WriterConfig.PRETTY_PRINT)
+                        Gdx.app.clipboard.contents = StoryModeProgression.contractsOnly().toJson().toString(WriterConfig.PRETTY_PRINT)
                         text.set("Copied to\nclipboard!")
                         this@TestStoryProgressionOverviewScreen.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 5f, 0f, 1f).apply {
                             this.onComplete = {
@@ -295,7 +295,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                     val timer = FloatVar(0f)
                     this.setOnAction {
                         text.set("Done!")
-                        this@TestStoryProgressionOverviewScreen.progression.set(StoryModeProgression())
+                        this@TestStoryProgressionOverviewScreen.progression.set(StoryModeProgression.contractsOnly())
                         this@TestStoryProgressionOverviewScreen.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 5f, 0f, 1f).apply {
                             this.onComplete = {
                                 text.set(normalText)
