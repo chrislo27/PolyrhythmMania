@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.Paintbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import paintbox.binding.asReadOnlyVar
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.registry.AssetRegistry
@@ -38,6 +39,7 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.contract.IHasContractTextInfo
 import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemState
@@ -296,8 +298,17 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
 
                     paper.root
                 }
-                is InboxItem.ContractDoc -> {
+                is InboxItem.ContractDoc, is InboxItem.PlaceholderContract -> {
+                    item as IHasContractTextInfo
                     val paper = createPaperTemplate()
+
+                    val headingText: ReadOnlyVar<String> = if (item is InboxItem.ContractDoc) {
+                        item.headingText
+                    } else if (item is InboxItem.PlaceholderContract) {
+                        item.headingText
+                    } else {
+                        "<missing heading text>".asReadOnlyVar()
+                    }
 
                     paper.paperPane += VBox().apply {
                         this.spacing.set(1f * 4)
@@ -306,7 +317,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                                 this.bounds.height.set(12f * 4)
                                 this.margin.set(Insets(0f, 2.5f * 4, 0f, 0f))
 
-                                this += TextLabel(item.headingText, font = main.fontMainMenuHeading).apply {
+                                this += TextLabel(headingText, font = main.fontMainMenuHeading).apply {
                                     this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * 4)
                                     this.padding.set(Insets(0f, 0f, 0f, 1f * 4))
                                     this.textColor.set(Color.BLACK)
@@ -316,11 +327,11 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     Anchor.TopRight.configure(this)
                                     this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * 4)
 
-                                    this += TextLabel(item.contract.name, font = main.fontRobotoMonoBold).apply {
+                                    this += TextLabel(item.name, font = main.fontRobotoMonoBold).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.topRight)
                                     }
-                                    this += TextLabel(item.contract.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
+                                    this += TextLabel(item.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.bottomRight)
                                     }
@@ -329,7 +340,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                             this += RectElement(Color.BLACK).apply {
                                 this.bounds.height.set(2f)
                             }
-                            this += TextLabel(item.contract.tagline.getOrCompute(), font = main.fontLexend).apply {
+                            this += TextLabel(item.tagline.getOrCompute(), font = main.fontLexend).apply {
                                 this.bounds.height.set(10f * 4)
                                 this.textColor.set(Color.BLACK)
                                 this.renderAlign.set(Align.center)
@@ -339,7 +350,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                                 this.bounds.height.set(2f)
                             }
 
-                            this += TextLabel(item.contract.desc.getOrCompute()).apply {
+                            this += TextLabel(item.desc.getOrCompute()).apply {
                                 this.markup.set(openSansMarkup)
                                 this.textColor.set(Color.BLACK)
                                 this.renderAlign.set(Align.topLeft)
@@ -351,25 +362,27 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                         }
                     }
 
-                    paper.envelopePane += RectElement(Color(0f, 0f, 0f, 0.75f)).apply { // FIXME this is a temp button
-                        this.bounds.y.set(29f * 4)
-                        this.bounds.height.set(16f * 4)
-                        this.padding.set(Insets(8f))
+                    if (item is InboxItem.ContractDoc) {
+                        paper.envelopePane += RectElement(Color(0f, 0f, 0f, 0.75f)).apply { // FIXME this is a temp button
+                            this.bounds.y.set(29f * 4)
+                            this.bounds.height.set(16f * 4)
+                            this.padding.set(Insets(8f))
 
-                        this += Button("Play Level").apply {
-                            this.setOnAction {
-                                main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                                val gameMode = item.contract.gamemodeFactory(main)
-                                val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
-                                        main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryAllInboxItemsScreen) {
-                                    Paintbox.LOGGER.debug("ExitReason: $it")
-                                }
-                                main.screen = TransitionScreen(main, main.screen, playScreen,
-                                        FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
-                                    this.onEntryEnd = {
-                                        gameMode.prepareFirstTime()
-                                        playScreen.resetAndUnpause()
-                                        playScreen.initializeIntroCard()
+                            this += Button("Play Level").apply {
+                                this.setOnAction {
+                                    main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+                                    val gameMode = item.contract.gamemodeFactory(main)
+                                    val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
+                                            main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryAllInboxItemsScreen) {
+                                        Paintbox.LOGGER.debug("ExitReason: $it")
+                                    }
+                                    main.screen = TransitionScreen(main, main.screen, playScreen,
+                                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+                                        this.onEntryEnd = {
+                                            gameMode.prepareFirstTime()
+                                            playScreen.resetAndUnpause()
+                                            playScreen.initializeIntroCard()
+                                        }
                                     }
                                 }
                             }

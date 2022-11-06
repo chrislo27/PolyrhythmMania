@@ -14,7 +14,15 @@ object InboxDB : InboxItems() {
         toAdd += InboxItem.ContractDoc(Contracts["tutorial1"], subtype = ContractSubtype.TRAINING)
         toAdd += InboxItem.Memo("intern_memo2", hasToField = false, hasSeparateListingName = false)
         toAdd += InboxItem.InfoMaterial("info_on_contracts", hasSeparateListingName = true)
-        
+        // TODO first contract
+        toAdd += InboxItem.PlaceholderContract("placeholdercontr_intern1", 1)
+        toAdd += InboxItem.Memo("intern_memo3", hasToField = false, hasSeparateListingName = false)
+        // TODO second contract
+        toAdd += InboxItem.PlaceholderContract("placeholdercontr_intern2", 2)
+        // TODO third contract
+        toAdd += InboxItem.PlaceholderContract("placeholdercontr_intern3", 3)
+        toAdd += InboxItem.Memo("intern_done", hasToField = false, hasSeparateListingName = false)
+        // TODO possibly another "offer letter"? Separate inbox item type?
         
         
         run {// FIXME debug contracts

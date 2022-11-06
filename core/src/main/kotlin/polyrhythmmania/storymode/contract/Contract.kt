@@ -9,11 +9,11 @@ import polyrhythmmania.storymode.StoryL10N
 data class Contract(
         val id: String,
 
-        val name: ReadOnlyVar<String>,
-        val desc: ReadOnlyVar<String>,
-        val tagline: ReadOnlyVar<String>,
+        override val name: ReadOnlyVar<String>,
+        override val desc: ReadOnlyVar<String>,
+        override val tagline: ReadOnlyVar<String>,
 
-        val requester: Requester,
+        override val requester: Requester,
         val jingleType: JingleType,
         val attribution: Attribution?,
         /**
@@ -22,7 +22,7 @@ data class Contract(
         val minimumScore: Int,
 
         val gamemodeFactory: (main: PRManiaGame) -> GameMode
-) {
+) : IHasContractTextInfo {
 
     val immediatePass: Boolean get() = minimumScore <= 0
     
