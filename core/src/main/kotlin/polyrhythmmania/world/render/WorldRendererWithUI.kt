@@ -159,8 +159,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         if (forceUseOfMainFramebuffer.get()) {
             return true
         }
-//        return engine.modifiers.monsterGoal.enabled.get() // TODO reenable this after one snapshot
-        return true
+        return engine.modifiers.monsterGoal.enabled.get()
     }
 
     override fun render(batch: SpriteBatch) {
