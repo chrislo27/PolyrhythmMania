@@ -347,7 +347,7 @@ class EngineInputter(val engine: Engine) {
         val inputTracker = rod.inputTracker
 
         val numExpected = inputTracker.expected.count { it is EntityRodPR.ExpectedInput.Expected }
-        val validResults = inputTracker.results.filter { !inputChallenge.isInputScoreMiss(it.inputScore) }
+        val validResults: List<InputResult> = if (rod.exploded) emptyList() else inputTracker.results.filter { !inputChallenge.isInputScoreMiss(it.inputScore) }
 
         totalExpectedInputs += numExpected
         val endlessScore = modifiers.endlessScore
