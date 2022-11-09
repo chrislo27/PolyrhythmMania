@@ -3,6 +3,8 @@ package polyrhythmmania.storymode.contract
 import com.badlogic.gdx.Gdx
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.storymode.gamemode.*
+import polyrhythmmania.storymode.inbox.InboxItem
+import polyrhythmmania.storymode.inbox.InboxItems
 
 
 object Contracts {
@@ -150,4 +152,20 @@ object Contracts {
     
     operator fun get(id: String): Contract = contracts.getValue(id)
     
+    
+    object DebugInboxItems : InboxItems() {
+        init {
+            val toAdd = mutableListOf<InboxItem>()
+
+            for ((id, contract) in Contracts.contracts) {
+                if (id == "tutorial1") {
+                    continue
+                }
+                toAdd += InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}")
+            }
+
+            this.setItems(toAdd)
+        }
+    }
+
 }

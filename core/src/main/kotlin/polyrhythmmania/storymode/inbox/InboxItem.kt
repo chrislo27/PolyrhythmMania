@@ -53,14 +53,17 @@ sealed class InboxItem(
     
     class PlaceholderContract(
             itemID: String, placeholderNumber: Int,
-            override val name: ReadOnlyVar<String> = "PLACEHOLDER-${placeholderNumber.toString().padStart(3, '0')}".asReadOnlyVar(),
-            override val desc: ReadOnlyVar<String> = "Placeholder contract desc".asReadOnlyVar(),
-            override val tagline: ReadOnlyVar<String> = "Make up a tagline later!".asReadOnlyVar(),
+            name: String = "PLACEHOLDER-${placeholderNumber.toString().padStart(3, '0')}",
+            desc: String = "",
+            tagline: String = "Make up a tagline later!",
             override val requester: Requester = Requester.DEBUG,
-            listingName: ReadOnlyVar<String> = name,
+            listingName: ReadOnlyVar<String> = name.asReadOnlyVar(),
             val subtype: ContractDoc.ContractSubtype = ContractDoc.ContractSubtype.NORMAL,
     ) : InboxItem(itemID, listingName), IHasContractTextInfo {
 
+        override val name: ReadOnlyVar<String> = name.asReadOnlyVar()
+        override val desc: ReadOnlyVar<String> = "Placeholder contract desc\n\n$desc".asReadOnlyVar()
+        override val tagline: ReadOnlyVar<String> = tagline.asReadOnlyVar()
         val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
     }
 

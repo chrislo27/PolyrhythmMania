@@ -178,7 +178,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                             }
                         }
                     }
-                    this += Button("Debug \"desktop\" screen with all inbox items (InboxDB)").apply {
+                    this += Button("Debug \"desktop\" screen with main inbox items (InboxDB)").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             val inboxItems: InboxItems = InboxDB

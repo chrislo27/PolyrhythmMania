@@ -40,7 +40,6 @@ import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.IHasContractTextInfo
-import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.screen.StoryPlayScreen
@@ -112,7 +111,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                     this.setContent(VBox().apply { 
                         this.spacing.set(2f)
                         this.temporarilyDisableLayouts { 
-                            InboxDB.mapByID.values.forEach { inboxItem ->
+                            DebugAllInboxItemsDB.mapByID.values.forEach { inboxItem ->
                                 this += ActionablePane().apply {
                                     this.bounds.height.set(48f)
                                     this += RectElement().apply {
