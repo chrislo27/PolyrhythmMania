@@ -136,7 +136,7 @@ object Contracts {
         add(Contract("monkey_watch", Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.fever("Monkey Watch"), listOf("Kievit")), 60) { main ->
             StoryAsmGameModeMonkeyWatch(main)
         })
-        add(Contract("flock_step", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.fever("Flock Step"), listOf("Kievit")), 60) { main ->
+        add(Contract("flock_step", Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.fever("Flock Step"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/flock_step.prmproj"))
         })
         add(Contract("tap_trial", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial"), listOf("Kievit")), 60) { main ->
