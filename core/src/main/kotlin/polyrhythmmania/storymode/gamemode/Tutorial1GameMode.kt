@@ -94,17 +94,11 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 3f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text1d")
-            }.compileIntoEvents())
-            engine.addEvents(BlockTextbox(engine).apply {
-                this.style = TextBoxStyle.SM_ROBOT
-                this.beat = startBeat + 4f + 4f
-                this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text1e")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.style = TextBoxStyle.SM_ROBOT
-                this.beat = startBeat + 4f + 5f
+                this.beat = startBeat + 4f + 4f
                 this.requireInput.set(true)
                 this.text = StoryL10N.getValue("textbox.tutorial1.text1f")
             }.compileIntoEvents())
@@ -319,16 +313,23 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             this.style = TextBoxStyle.SM_ROBOT
             this.beat = 0f
             this.requireInput.set(true)
-            this.text = StoryL10N.getValue("textbox.tutorial1.text0", Input.Keys.toString(keyboardKeymap.buttonA))
+            this.text = StoryL10N.getValue("textbox.tutorial1.text0a", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += BlockTextbox(engine).apply {
             this.style = TextBoxStyle.SM_ROBOT
             this.beat = 1f
             this.requireInput.set(true)
+            // Needed since the first char is an icon, messes up the height computation due to scaling
+            this.text = "[font=regular color=#00000000 scalex=0.1]_[]" + StoryL10N.getValue("textbox.tutorial1.text0b")
+        }
+        blocks += BlockTextbox(engine).apply {
+            this.style = TextBoxStyle.SM_ROBOT
+            this.beat = 2f
+            this.requireInput.set(true)
             this.text = StoryL10N.getValue("textbox.tutorial1.text1", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += practiceSection1.apply {
-            this.beat = 3f
+            this.beat = 4f
         }
 
         container.addBlocks(blocks)
