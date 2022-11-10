@@ -273,7 +273,10 @@ duration: ${monster.activeDuration.get()} sec
         private val textBoxSuperpane: Pane
         private val textBoxDialoguePane: TextboxPane = TextboxPane()
         private val textBoxBannerPane: RectElement = RectElement(Color(0f, 0f, 0f, 0.5f))
-        private val textBoxRobotPane: Pane
+        private val textBoxRobotPane: TextboxPane = TextboxPane().apply { 
+            this.textureToUse = { AssetRegistry["ui_robot_textbox"] }
+            this.cornerSize.set(64)
+        }
         private val textBoxLabel: TextLabel = TextLabel("")
         private val textBoxInputLabel: TextLabel = TextLabel(RodinSpecialChars.BORDERED_A, font = PRManiaGame.instance.fontGameTextbox)
         private val buttonPromptOffsetX: FloatVar = FloatVar(-10f)
@@ -286,43 +289,16 @@ duration: ${monster.activeDuration.get()} sec
                 this.bounds.height.set(150f)
             }
             textBoxSuperpane += textBoxBannerPane
-            textBoxRobotPane = Pane().apply {
-                Anchor.Centre.configure(this)
-                val borderSize = 20f
-                this.bindHeightToParent(adjust = borderSize * 2)
-                this.bindWidthToParent(adjust = borderSize * 2)
-                
-
-                val bgColor = Color(0f, 48f / 255, 7f / 255, 250f / 255)
-//                val bgColorClear = bgColor.cpy().apply { a *= 0.75f }
-                this += Pane().apply {
-                    Anchor.TopCentre.configure(this)
-                    this.bounds.width.set(1000f)
-                    
-                    this.border.set(Insets(1f))
-                    this.borderStyle.set(SolidBorder(Color.BLACK))
-                    
-                    this += RectElement(bgColor).apply {
-                        this.border.set(Insets(borderSize))
-                        this.borderStyle.set(SolidBorder(Color.valueOf("F9EFDB")))
-                    }
-                }
-//                this += QuadElement(bgColorClear, bgColor, bgColorClear, bgColor).apply {
-//                    Anchor.TopLeft.configure(this)
-//                    this.bounds.width.set((1280f - 1000f) / 2)
-//                }
-//                this += QuadElement(bgColor, bgColorClear, bgColor, bgColorClear).apply {
-//                    Anchor.TopRight.configure(this)
-//                    this.bounds.width.set((1280f - 1000f) / 2)
-//                }
-            }
-            textBoxSuperpane += textBoxRobotPane
 
             textBoxSuperpane += Pane().apply {
                 Anchor.TopCentre.configure(this)
                 this.bounds.width.set(1000f)
 
                 this += textBoxDialoguePane
+                this += textBoxRobotPane.apply { 
+                    Anchor.Centre.configure(this)
+                    this.bindHeightToParent(multiplier = 1.2f)
+                }
                 this += textBoxLabel.apply {
                     Anchor.TopCentre.configure(this)
                     this.markup.set(baseMarkup)
