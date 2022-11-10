@@ -40,6 +40,9 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_inboxitem_frame_cap_bottom", "story/textures/desk/inboxitem/frame_cap_bottom.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_selected", "story/textures/desk/inboxitem/selected.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_available", "story/textures/desk/inboxitem/available.png")
+        (0..4).forEach { i ->
+            StoryAssets.loadAsset<Texture>("desk_inboxitem_available_blink_$i", "story/textures/desk/inboxitem/available_blink/blink_$i.png")
+        }
         StoryAssets.loadAsset<Texture>("desk_inboxitem_unavailable", "story/textures/desk/inboxitem/unavailable.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_cleared", "story/textures/desk/inboxitem/cleared.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_skipped", "story/textures/desk/inboxitem/skipped.png")

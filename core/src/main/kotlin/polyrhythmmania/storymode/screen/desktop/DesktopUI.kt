@@ -67,8 +67,14 @@ class DesktopUI(
     private val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
     private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
 
-    private val blinker: ReadOnlyBooleanVar = BooleanVar {
-        MathHelper.getTriangleWave(0.75f * 2 /* Multiply by 2 because of doubled period length */) > 0.5f
+    private val availableBlinkTexRegs: List<TextureRegion> = run {
+        val numFrames = 5
+        (0 until numFrames).map { i -> TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_available_blink_$i")) }
+    }
+    private val blinkFrameIndex: ReadOnlyIntVar = IntVar {
+        val secPerFrame = 0.15f
+        val frames = availableBlinkTexRegs.size
+        (MathHelper.getTriangleWave(secPerFrame * frames * 2) * frames).toInt().coerceIn(0, frames - 1)
     }
     private val currentInboxItem: ReadOnlyVar<InboxItem?>
     val bg: UIElement
@@ -84,7 +90,7 @@ class DesktopUI(
             
             this += object : Pane() {
                 override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-                    blinker.invalidate()
+                    blinkFrameIndex.invalidate()
                 }
             }.apply { 
                 this.bounds.width.set(0f)
@@ -614,14 +620,18 @@ class DesktopUI(
             contentPane += ImageNode().apply { 
                 this.textureRegion.sideEffecting(TextureRegion()) {reg ->
                     val state = currentInboxItemState.use()
-                    reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_${
-                        when (state) {
-                            is InboxItemState.Unavailable -> "unavailable"
-                            is InboxItemState.Available -> if (!state.newIndicator || blinker.use()) "available" else "off"
-                            is InboxItemState.Completed -> "cleared"
-                            is InboxItemState.Skipped -> "skipped"
-                        }
-                    }"))
+                    if (state is InboxItemState.Available && state.newIndicator) {
+                        reg!!.setRegion(availableBlinkTexRegs[blinkFrameIndex.use()])
+                    } else {
+                        reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_${
+                            when (state) {
+                                is InboxItemState.Unavailable -> "unavailable"
+                                is InboxItemState.Available -> "available"
+                                is InboxItemState.Completed -> "cleared"
+                                is InboxItemState.Skipped -> "skipped"
+                            }
+                        }"))
+                    }
                     reg
                 }
             }
