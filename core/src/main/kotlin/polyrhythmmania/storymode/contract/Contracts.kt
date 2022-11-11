@@ -121,7 +121,7 @@ object Contracts {
         add(Contract("tap_trial_2", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tap_trial_2.prmproj"))
         })
-        add(Contract("fork_lifter", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 60) { main ->
+        add(Contract("fork_lifter", Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.fever("Fork Lifter"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/fork_lifter.prmproj"))
         })
         
