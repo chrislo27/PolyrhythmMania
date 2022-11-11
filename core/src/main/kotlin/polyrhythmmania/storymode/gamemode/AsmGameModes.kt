@@ -235,9 +235,9 @@ class StoryAsmGameModeMonkeyWatch(main: PRManiaGame)
                         0, 1, 2, 3, 2, 1, 0, 1, 2, 3, 2, 1, 0, -999
                 ), rodID = currentRodID++), // Custom, doesn't end with fire
         ))
-//        container.addBlock(BlockSkillStar(engine).apply { // TODO add skill star for Monkey Watch assemble
-//            this.beat = 74.5f
-//        })
+        container.addBlock(BlockSkillStar(engine).apply {
+            this.beat = 157f
+        })
 
         container.addBlock(BlockEndState(engine).apply {
             this.beat = 274f
