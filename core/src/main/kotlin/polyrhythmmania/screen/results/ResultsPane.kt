@@ -20,14 +20,14 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.engine.input.Ranking
-import polyrhythmmania.engine.input.Score
+import polyrhythmmania.engine.input.score.Ranking
+import polyrhythmmania.screen.play.regular.ScoreWithResults
 import polyrhythmmania.ui.TextboxPane
 
 
-class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
+class ResultsPane(main: PRManiaGame, initialScore: ScoreWithResults) : Pane() {
 
-    val score: Var<Score> = Var(initialScore)
+    val score: Var<ScoreWithResults> = Var(initialScore)
     
     val titleLabel: TextLabel
     val linesLabel: TextLabel
@@ -115,7 +115,7 @@ class ResultsPane(main: PRManiaGame, initialScore: Score) : Pane() {
         bonusStatsPane += TextLabel(binding = {
             val sc = score.use()
             val noMiss = sc.noMiss
-            val skillStar = sc.skillStar
+            val skillStar = sc.skillStar ?: false
             val newHighScore = sc.newHighScore
             val list = mutableListOf<String>()
             list += Localization.getValue("play.results.nInputs", sc.inputsHit, sc.nInputs)

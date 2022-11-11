@@ -12,7 +12,10 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import paintbox.registry.AssetRegistry
-import paintbox.transition.*
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
+import paintbox.transition.TransitionScreen
+import paintbox.transition.WipeTransitionHead
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
@@ -27,11 +30,10 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.engine.input.Ranking
-import polyrhythmmania.engine.input.Score
-import polyrhythmmania.library.score.LevelScoreAttempt
+import polyrhythmmania.engine.input.score.Ranking
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.practice.AbstractPolyrhythmPractice
+import polyrhythmmania.library.score.LevelScoreAttempt
 import polyrhythmmania.screen.results.ResultsPane
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.WorldType
@@ -41,7 +43,7 @@ import kotlin.properties.Delegates
  * Results screen for non-story gamemodes, like tutorials, Library levels, and extras.
  */
 class ResultsScreen(
-        main: PRManiaGame, val score: Score, val container: Container, val gameMode: GameMode?,
+        main: PRManiaGame, val score: ScoreWithResults, val container: Container, val gameMode: GameMode?,
         val startOverFactory: () -> EnginePlayScreenBase,
         private val keyboardKeybinds: InputKeymapKeyboard,
         val levelScoreAttempt: LevelScoreAttempt,
@@ -160,7 +162,7 @@ class ResultsScreen(
             soundEndLine = Gdx.audio.newSound(Gdx.files.internal("sounds/results/results_end.ogg"))
             soundRanking = Gdx.audio.newSound(Gdx.files.internal(score.ranking.sfxFile))
             soundFilling = Gdx.audio.newSound(Gdx.files.internal("sounds/results/score_filling.ogg"))
-            soundFinish = Gdx.audio.newSound(Gdx.files.internal(if (score.noMiss || score.skillStar) "sounds/results/score_finish_nhs.ogg" else "sounds/results/score_finish.ogg"))
+            soundFinish = Gdx.audio.newSound(Gdx.files.internal(if (score.noMiss || score.skillStar == true) "sounds/results/score_finish_nhs.ogg" else "sounds/results/score_finish.ogg"))
             soundsInited = true
             currentStage = this.SkipFrame(WaitFor(1f) { this.Title() }, framesToWait = 2)
         } else {

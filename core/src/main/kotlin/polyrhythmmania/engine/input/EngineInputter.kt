@@ -5,9 +5,11 @@ import com.badlogic.gdx.math.MathUtils
 import paintbox.Paintbox
 import paintbox.binding.BooleanVar
 import paintbox.registry.AssetRegistry
+import paintbox.util.sumOfFloat
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.practice.PracticeData
+import polyrhythmmania.engine.input.score.ScoreBase
 import polyrhythmmania.engine.modifiers.EngineModifiers
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
@@ -433,6 +435,18 @@ class EngineInputter(val engine: Engine) {
                 GlobalStats.inputsGottenLate.increment(lates)
             }
         }
+    }
+    
+    fun computeScore(): ScoreBase {
+        val nInputs = max(totalExpectedInputs, minimumInputCount)
+        val inputsHit = inputResults.count { it.inputScore != InputScore.MISS }
+        val rawScore: Float = (if (nInputs <= 0) 0f else {
+            (inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
+                inputScore.weight
+            } / nInputs) * 100
+        })
+        
+        return ScoreBase(rawScore, inputsHit, nInputs, noMiss, if (!skillStarBeat.isFinite()) null else skillStarGotten.get())
     }
 
 }

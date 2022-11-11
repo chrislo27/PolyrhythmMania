@@ -1,6 +1,7 @@
 package polyrhythmmania.engine.input
 
 import polyrhythmmania.engine.Engine
+import polyrhythmmania.engine.input.score.Ranking
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.world.World
@@ -21,7 +22,6 @@ object InputThresholds {
         InputResult(0f, InputType.A, 0f, 0f, 0)
         InputScore.ACE
         Ranking.SUPERB
-        Score(0, 0f, 0, 1, false, false, Challenges.NO_CHANGES, "", "")
         AbstractEnginePlayScreen
         
         // Warm up input-related code paths

@@ -27,7 +27,8 @@ import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.engine.input.ResultsText
-import polyrhythmmania.engine.input.Score
+import polyrhythmmania.engine.input.score.ScoreBase
+import polyrhythmmania.screen.play.regular.ScoreWithResults
 import polyrhythmmania.screen.results.ResultsPane
 
 
@@ -208,14 +209,15 @@ class ResultsTextDialog(editorPane: EditorPane)
             this.update()
         }
         private val innerSceneRoot: SceneRoot = SceneRoot(camera)
-        private val scoreObj: Var<Score> = Var {
+        private val scoreObj: Var<ScoreWithResults> = Var {
             val resultsText = resultsText.use()
             val scoreInt = testScoreValue.use().toInt()
             val lines: Pair<String, String> = resultsText.generateLinesOfText(scoreInt, false, false)
             val noMiss = testScoreNoMiss.use()
             val skillStar = testScoreSkillStar.use()
-            Score(scoreInt, scoreInt.toFloat(), if (noMiss) 8 else 7, 8,
-                    skillStar, noMiss,
+            val nInputs = 8
+            val scoreBase = ScoreBase(scoreInt.toFloat(), if (noMiss) nInputs else (nInputs - 1), nInputs, noMiss, skillStar)
+            ScoreWithResults(scoreBase,
                     Challenges.NO_CHANGES,
                     resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                     lines.first, lines.second

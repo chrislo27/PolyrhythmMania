@@ -39,7 +39,7 @@ import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.container.manifest.ExportStatistics
 import polyrhythmmania.container.manifest.LibraryRelevantData
 import polyrhythmmania.engine.input.Challenges
-import polyrhythmmania.engine.input.Ranking
+import polyrhythmmania.engine.input.score.Ranking
 import polyrhythmmania.library.LevelEntry
 import polyrhythmmania.library.score.GlobalScoreCache
 import polyrhythmmania.library.score.LevelScoreAttempt

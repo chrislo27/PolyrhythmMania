@@ -11,7 +11,8 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.InputCalibration
-import polyrhythmmania.engine.input.*
+import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.gamemodes.AbstractEndlessMode
 import polyrhythmmania.gamemodes.DunkMode
 import polyrhythmmania.gamemodes.GameMode
@@ -28,8 +29,6 @@ import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.WorldType
 import java.time.*
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.roundToInt
 
 
 /**
@@ -194,15 +193,11 @@ class EnginePlayScreenBase(
     
     private fun transitionToResults(resultsBehaviour: ResultsBehaviour.ShowResults) {
         val inputter = engine.inputter
-        val inputsHit = inputter.inputResults.count { it.inputScore != InputScore.MISS }
-        val nInputs = max(inputter.totalExpectedInputs, inputter.minimumInputCount)
-        val rawScore: Float = (if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
-            inputScore.weight
-        } / nInputs) * 100))
-        val score: Int = rawScore.roundToInt().coerceIn(0, 100)
+        val scoreBase = inputter.computeScore()
+        val score = scoreBase.scoreInt
+        val ranking = scoreBase.ranking
 
         val resultsText = container.resultsText
-        val ranking = Ranking.getRanking(score)
         val leftResults = inputter.inputResults.filter { it.inputType == InputType.DPAD_ANY }
         val rightResults = inputter.inputResults.filter { it.inputType == InputType.A }
         val badLeftGoodRight = leftResults.isNotEmpty() && rightResults.isNotEmpty()
@@ -236,8 +231,7 @@ class EnginePlayScreenBase(
             }
         }
 
-        val scoreObj = Score(score, rawScore, inputsHit, nInputs,
-                inputter.skillStarGotten.get() && inputter.skillStarBeat.isFinite(), inputter.noMiss,
+        val scoreObj = ScoreWithResults(scoreBase,
                 challenges,
                 resultsText.title ?: Localization.getValue("play.results.defaultTitle"),
                 lines.first, lines.second,
@@ -263,11 +257,11 @@ class EnginePlayScreenBase(
         transitionAway(ResultsScreen(main, scoreObj, container, gameMode, {
             copyThisScreenForResultsStartOver(scoreObj, resultsBehaviour)
         }, keyboardKeybinds,
-                LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar, scoreObj.challenges),
+                LevelScoreAttempt(System.currentTimeMillis(), scoreObj.scoreInt, scoreObj.noMiss, scoreObj.skillStar ?: false, scoreObj.challenges),
                 resultsBehaviour.onRankingRevealed), disposeContainer = false) {}
     }
     
-    private fun copyThisScreenForResultsStartOver(scoreObj: Score, resultsBehaviour: ResultsBehaviour): EnginePlayScreenBase {
+    private fun copyThisScreenForResultsStartOver(scoreObj: ScoreWithResults, resultsBehaviour: ResultsBehaviour): EnginePlayScreenBase {
         return EnginePlayScreenBase(main, playTimeType, container, challenges, inputCalibration, gameMode,
                 if (resultsBehaviour is ResultsBehaviour.ShowResults) {
                     val prevHi = resultsBehaviour.previousHighScore
