@@ -33,7 +33,6 @@ import paintbox.util.WindowSize
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
-import paintbox.util.sumOfFloat
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
@@ -709,15 +708,12 @@ class StoryPlayScreen(
             } else {
                 // Delay, roll up score, hit+music, options
                 val inputter = engine.inputter
-                val nInputs = max(inputter.totalExpectedInputs, inputter.minimumInputCount)
-                val rawScore: Float = (if (nInputs <= 0) 0f else ((inputter.inputResults.map { it.inputScore }.sumOfFloat { inputScore ->
-                    inputScore.weight
-                } / nInputs) * 100))
-                val score: Int = rawScore.roundToInt().coerceIn(0, 100)
+                val scoreBase = inputter.computeScore()
+                val scoreInt: Int = scoreBase.scoreInt
                 
-                successExitReason = ExitReason.Passed(score)
+                successExitReason = ExitReason.Passed(scoreInt)
 
-                animationHandler.enqueueAnimation(Animation(Interpolation.linear, (145f / 60f) * (score / 100f), 0f, score.toFloat(), delay).apply {
+                animationHandler.enqueueAnimation(Animation(Interpolation.linear, (145f / 60f) * (scoreInt / 100f), 0f, scoreInt.toFloat(), delay).apply {
                     val fillingSound = StoryAssets.get<Sound>("score_filling")
                     var fillingSoundID = -1L
 
@@ -726,13 +722,13 @@ class StoryPlayScreen(
                         showScoreOnScoreCard.set(true)
                     }
                     this.onComplete = {
-                        val passed = score >= contract.minimumScore
+                        val passed = scoreInt >= contract.minimumScore
                         
                         fillingSound.stop(fillingSoundID)
                         playMenuSound(StoryAssets.get<Sound>("score_finish"))
                         playMenuSound(StoryAssets.get<Sound>(if (passed) "score_jingle_pass" else "score_jingle_tryagain"))
 
-                        animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, score.toFloat(), score.toFloat(), 0.5f).apply {
+                        animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, scoreInt.toFloat(), scoreInt.toFloat(), 0.5f).apply {
                             this.onComplete = {
                                 currentScoreCardOptions.set(if (passed) successScoreCardOptions else failScoreCardOptions)
                             }
