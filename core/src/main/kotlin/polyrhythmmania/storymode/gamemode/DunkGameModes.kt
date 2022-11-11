@@ -54,6 +54,9 @@ class StoryDunkGameModeFruitBasket(main: PRManiaGame)
                 newDunkPattern(108f),
                 newDunkPattern(115f),
         ))
+        container.addBlock(BlockSkillStar(engine).apply {
+            this.beat = 104f
+        })
         container.addBlock(BlockEndState(engine).apply {
             this.beat = 126f
         })
@@ -165,6 +168,9 @@ class StoryDunkGameModeHoleInOne2(main: PRManiaGame)
                 newDunkPattern(216.5f),
         ).onEach { block ->
             block.beat += globalBeatOffset
+        })
+        container.addBlock(BlockSkillStar(engine).apply {
+            this.beat = 174.5f + globalBeatOffset
         })
         container.addBlock(BlockEndState(engine).apply {
             this.beat = 228f + globalBeatOffset
