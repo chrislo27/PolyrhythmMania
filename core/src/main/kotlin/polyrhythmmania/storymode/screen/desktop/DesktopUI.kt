@@ -36,9 +36,9 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
-import polyrhythmmania.storymode.contract.IHasContractTextInfo
+import polyrhythmmania.storymode.inbox.IContractDoc
+import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
 import polyrhythmmania.storymode.inbox.InboxItem
-import polyrhythmmania.storymode.inbox.InboxItem.ContractDoc.ContractSubtype
 import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 import polyrhythmmania.storymode.test.TestStoryDesktopScreen
@@ -364,31 +364,41 @@ class DesktopUI(
                 paper.root
             }
             is InboxItem.ContractDoc, is InboxItem.PlaceholderContract -> {
-                item as IHasContractTextInfo
+                item as IContractDoc
                 val subtype: ContractSubtype = if (item is InboxItem.ContractDoc) item.subtype else if (item is InboxItem.PlaceholderContract) item.subtype else ContractSubtype.NORMAL
                 val paper = createPaperTemplate(when (subtype) {
                     ContractSubtype.NORMAL -> "desk_contract_full"
                     ContractSubtype.TRAINING -> "desk_contract_paper"
                 })
                 
-                val headingText: ReadOnlyVar<String> = if (item is InboxItem.ContractDoc) {
-                    item.headingText
-                } else if (item is InboxItem.PlaceholderContract) {
-                    item.headingText
-                } else "<missing heading text>".asReadOnlyVar()
+                val headingText: ReadOnlyVar<String> = when (item) {
+                    is InboxItem.ContractDoc -> item.headingText
+                    is InboxItem.PlaceholderContract -> item.headingText
+                    else -> "<missing heading text>".asReadOnlyVar()
+                }
                 
                 paper.paperPane += VBox().apply {
                     this.spacing.set(1f * 4)
                     this.temporarilyDisableLayouts {
+                        val useLongCompanyName = item.hasLongCompanyName
                         this += Pane().apply {
-                            this.bounds.height.set(12f * 4)
+                            if (useLongCompanyName) {
+                                this.bounds.height.set(13f * 4)
+                            } else {
+                                this.bounds.height.set(12f * 4)
+                            }
                             this.margin.set(Insets(0f, 2.5f * 4, 0f, 0f))
 
                             this += TextLabel(headingText, font = main.fontMainMenuHeading).apply {
                                 this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * 4)
                                 this.padding.set(Insets(0f, 0f, 0f, 1f * 4))
                                 this.textColor.set(Color.BLACK)
-                                this.renderAlign.set(Align.left)
+                                if (useLongCompanyName) {
+                                    this.renderAlign.set(Align.topLeft)
+                                    this.setScaleXY(0.6f)
+                                } else {
+                                    this.renderAlign.set(Align.left)
+                                }
                             }
                             this += Pane().apply {
                                 Anchor.TopRight.configure(this)
@@ -398,9 +408,19 @@ class DesktopUI(
                                     this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(Align.topRight)
                                 }
+                                if (!useLongCompanyName) { // Right-aligned company name
+                                    this += TextLabel(item.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
+                                        this.textColor.set(Color.BLACK)
+                                        this.renderAlign.set(Align.bottomRight)
+                                    }
+                                }
+                            }
+                            
+                            if (useLongCompanyName) {
+                                // Centred long company name
                                 this += TextLabel(item.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
                                     this.textColor.set(Color.BLACK)
-                                    this.renderAlign.set(Align.bottomRight)
+                                    this.renderAlign.set(Align.bottom)
                                 }
                             }
                         }

@@ -11,7 +11,7 @@ object DebugAllInboxItemsDB : InboxItems() {
     init {
         val toAdd = mutableListOf<InboxItem>()
 
-        toAdd.addAll(InboxDB.items)
+        toAdd.addAll(InboxDB().items)
         toAdd.addAll(Contracts.DebugInboxItems.items)
 
         this.setItems(toAdd)

@@ -55,30 +55,6 @@ object Contracts {
         add(Contract("air_rally", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Air Rally"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj"))
         })
-        add(Contract("air_rally_one_life", Requester.DEBUG, JingleType.GBA, null, 0) { main ->
-            // FIXME this is a debug contract
-            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply { 
-                val lives = this.engine.modifiers.livesMode
-                lives.maxLives.set(1)
-                lives.enabled.set(true)
-            }
-        })
-        add(Contract("air_rally_early_end", Requester.DEBUG, JingleType.GBA, null, 0) { main ->
-            // FIXME this is a debug contract
-            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply { 
-                this.container.addBlock(BlockEndState(this.engine).apply { 
-                    this.beat = 16f
-                })
-            }
-        })
-        add(Contract("air_rally_early_end2", Requester.DEBUG, JingleType.GBA, null, 50) { main ->
-            // FIXME this is a debug contract
-            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply { 
-                this.container.addBlock(BlockEndState(this.engine).apply { 
-                    this.beat = 16f
-                })
-            }
-        })
         add(Contract("first_contact", Requester.DEBUG, JingleType.ARCADE, Attribution(SongInfo.megamix("First Contact"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/first_contact.prmproj"))
         })
@@ -97,7 +73,7 @@ object Contracts {
         add(Contract("rhythm_tweezers_2", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_tweezers_2.prmproj"))
         })
-        add(Contract("crop_stomp", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 60) { main ->
+        add(Contract("crop_stomp", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/crop_stomp.prmproj"))
         })
         add(Contract("boosted_tweezers", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 60) { main ->
@@ -148,6 +124,33 @@ object Contracts {
         add(Contract("fork_lifter", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/fork_lifter.prmproj"))
         })
+        
+        
+        // Debug contracts
+        add(Contract("air_rally_one_life", Requester.DEBUG, JingleType.GBA, null, 0) { main ->
+            // FIXME this is a debug contract
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply {
+                val lives = this.engine.modifiers.livesMode
+                lives.maxLives.set(1)
+                lives.enabled.set(true)
+            }
+        })
+        add(Contract("air_rally_earlyend_instantpass", Requester.DEBUG, JingleType.GBA, null, 0) { main ->
+            // FIXME this is a debug contract
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply {
+                this.container.addBlock(BlockEndState(this.engine).apply {
+                    this.beat = 16f
+                })
+            }
+        })
+        add(Contract("air_rally_earlyend_50pass", Requester.DEBUG, JingleType.GBA, null, 50) { main ->
+            // FIXME this is a debug contract
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply {
+                this.container.addBlock(BlockEndState(this.engine).apply {
+                    this.beat = 16f
+                })
+            }
+        })
     }
     
     operator fun get(id: String): Contract = contracts.getValue(id)
@@ -157,8 +160,8 @@ object Contracts {
         init {
             val toAdd = mutableListOf<InboxItem>()
 
-            for ((id, contract) in Contracts.contracts) {
-                if (id == "tutorial1") {
+            for (contract in Contracts.contracts.values.sortedBy { it.id }) {
+                if (contract.id == "tutorial1") {
                     continue
                 }
                 toAdd += InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}")

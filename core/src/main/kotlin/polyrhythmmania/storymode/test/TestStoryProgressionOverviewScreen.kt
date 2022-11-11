@@ -39,6 +39,7 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
+import polyrhythmmania.storymode.inbox.InboxItems
 import polyrhythmmania.storymode.inbox.InboxState
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.inbox.progression.StoryModeProgression
@@ -98,6 +99,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
+    private val inboxDB: InboxItems = InboxDB()
     private val inboxState: InboxState = InboxState()
     private val progression: Var<Progression> = Var(StoryModeProgression.contractsOnly())
 
@@ -343,7 +345,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                                             for ((type, list) in listOf("required" to stage.requiredInboxItems, "optional" to stage.optionalInboxItems)) {
                                                 for ((idIndex, id) in list.withIndex()) {
                                                     val contractDoc = getContractDoc(id)
-                                                    if (contractDoc == null && InboxDB.mapByID[id] == null) {
+                                                    if (contractDoc == null && inboxDB.mapByID[id] == null) {
                                                         text.set("ERR: Unknown ID\n\"${id}\"\nin stage #${stageIndex}\n${type} #${idIndex}")
                                                         successful = false
                                                         break@outer
@@ -376,9 +378,9 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
     }
 
     private fun getContractDoc(id: String): InboxItem.ContractDoc? {
-        return (InboxDB.mapByID["debugcontr_$id"] as? InboxItem.ContractDoc)
-                ?: (InboxDB.mapByID["contract_$id"] as? InboxItem.ContractDoc)
-                ?: (InboxDB.mapByID[id] as? InboxItem.ContractDoc)
+        return (inboxDB.mapByID["debugcontr_$id"] as? InboxItem.ContractDoc)
+                ?: (inboxDB.mapByID["contract_$id"] as? InboxItem.ContractDoc)
+                ?: (inboxDB.mapByID[id] as? InboxItem.ContractDoc)
     }
 
     override fun render(delta: Float) {

@@ -6,6 +6,7 @@ import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.contract.IHasContractTextInfo
 import polyrhythmmania.storymode.contract.Requester
+import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
 
 
 sealed class InboxItem(
@@ -38,14 +39,14 @@ sealed class InboxItem(
     ) : InboxItem(id, if (hasSeparateListingName) StoryL10N.getVar("inboxItemDetails.infoMaterial.$id.listing") else topic)
 
     class ContractDoc(
-            val contract: Contract, itemID: String = "contract_${contract.id}",
+            val contract: Contract, itemID: String = getDefaultContractDoc(contract),
             listingName: ReadOnlyVar<String> = contract.name,
-            val subtype: ContractSubtype = ContractSubtype.NORMAL,
-    ) : InboxItem(itemID, listingName), IHasContractTextInfo by contract {
-
-        enum class ContractSubtype(val headingL10NKey: String) {
-            NORMAL("inboxItem.contract.heading.normal"),
-            TRAINING("inboxItem.contract.heading.training"),
+            override val subtype: ContractSubtype = ContractSubtype.NORMAL,
+            override val hasLongCompanyName: Boolean = false,
+    ) : InboxItem(itemID, listingName), IContractDoc, IHasContractTextInfo by contract {
+        
+        companion object {
+            fun getDefaultContractDoc(contract: Contract): String = "contract_${contract.id}"
         }
 
         val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
@@ -58,8 +59,9 @@ sealed class InboxItem(
             tagline: String = "Make up a tagline later!",
             override val requester: Requester = Requester.DEBUG,
             listingName: ReadOnlyVar<String> = name.asReadOnlyVar(),
-            val subtype: ContractDoc.ContractSubtype = ContractDoc.ContractSubtype.NORMAL,
-    ) : InboxItem(itemID, listingName), IHasContractTextInfo {
+            override val subtype: ContractSubtype = ContractSubtype.NORMAL,
+            override val hasLongCompanyName: Boolean = false,
+    ) : InboxItem(itemID, listingName), IContractDoc {
 
         override val name: ReadOnlyVar<String> = name.asReadOnlyVar()
         override val desc: ReadOnlyVar<String> = "Placeholder contract desc\n\n$desc".asReadOnlyVar()

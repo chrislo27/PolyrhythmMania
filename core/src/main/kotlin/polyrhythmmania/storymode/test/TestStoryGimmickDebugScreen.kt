@@ -35,6 +35,7 @@ import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.contract.JingleType
 import polyrhythmmania.storymode.contract.Requester
+import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
 import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItems
@@ -164,7 +165,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         this.setOnAction {
                             val inboxItems = InboxItems(listOf(
                                     InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, Contracts["fillbots"].gamemodeFactory)),
-                                    InboxItem.ContractDoc(Contract("debugcontract_2", "TRAINING-099".asReadOnlyVar(), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, Contracts["fillbots"].gamemodeFactory), subtype = InboxItem.ContractDoc.ContractSubtype.TRAINING),
+                                    InboxItem.ContractDoc(Contract("debugcontract_2", "TRAINING-099".asReadOnlyVar(), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, Contracts["fillbots"].gamemodeFactory), subtype = ContractSubtype.TRAINING),
                                     InboxItem.Memo("test_memo", true, true)
                             ))
                             val progression = Progression(listOf(
@@ -181,7 +182,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                     this += Button("Debug \"desktop\" screen with main inbox items (InboxDB)").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            val inboxItems: InboxItems = InboxDB
+                            val inboxItems: InboxItems = InboxDB()
                             val progression = Progression(listOf(
                                     UnlockStage("all", UnlockStageChecker.alwaysUnlocked(), inboxItems.items.map { it.id })
                             ))
