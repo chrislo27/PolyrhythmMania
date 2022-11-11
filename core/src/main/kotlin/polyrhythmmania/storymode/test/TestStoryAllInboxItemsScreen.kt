@@ -33,6 +33,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
@@ -374,6 +375,9 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                                     val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
                                             main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, this@TestStoryAllInboxItemsScreen) {
                                         Paintbox.LOGGER.debug("ExitReason: $it")
+                                    }
+                                    if (Gdx.input.isShiftDown()) {
+                                        gameMode.engine.autoInputs = true
                                     }
                                     main.screen = TransitionScreen(main, main.screen, playScreen,
                                             FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
