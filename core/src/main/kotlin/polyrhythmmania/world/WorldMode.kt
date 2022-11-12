@@ -10,7 +10,7 @@ sealed class WorldType(val defaultBackground: WorldBackground) {
         // Not an object to retain compatibility
     }
     
-    object Dunk : WorldType(DunkWorldBackground)
+    object Dunk : WorldType(DunkWorldBackground.Default)
     
     object Assemble : WorldType(AssembleWorldBackground)
     

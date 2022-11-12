@@ -8,10 +8,16 @@ import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
+import polyrhythmmania.storymode.StoryAssets
+import polyrhythmmania.world.DunkWorldBackground
 
 
 class StoryDunkGameModeFruitBasket(main: PRManiaGame)
     : AbstractStoryDunkGameMode(main) {
+    
+    init {
+        this.container.renderer.worldBackground = DunkWorldBackground { StoryAssets["dunk_background_fruit_basket_1"] }
+    }
     
     override fun initialize() {
         super.initialize()
@@ -65,6 +71,10 @@ class StoryDunkGameModeFruitBasket(main: PRManiaGame)
 
 class StoryDunkGameModeHoleInOne2(main: PRManiaGame)
     : AbstractStoryDunkGameMode(main) {
+
+    init {
+        this.container.renderer.worldBackground = DunkWorldBackground { StoryAssets["dunk_background_hole_in_one_2"] }
+    }
 
     override fun initialize() {
         super.initialize()
@@ -181,6 +191,10 @@ class StoryDunkGameModeHoleInOne2(main: PRManiaGame)
 class StoryDunkGameModeHoleInOne(main: PRManiaGame)
     : AbstractStoryDunkGameMode(main) {
 
+    init {
+        this.container.renderer.worldBackground = DunkWorldBackground { StoryAssets["dunk_background_hole_in_one_1"] }
+    }
+
     override fun initialize() {
         super.initialize()
 
@@ -266,6 +280,10 @@ class StoryDunkGameModeHoleInOne(main: PRManiaGame)
 
 class StoryDunkGameModeFruitBasket2(main: PRManiaGame)
     : AbstractStoryDunkGameMode(main) {
+
+    init {
+        this.container.renderer.worldBackground = DunkWorldBackground { StoryAssets["dunk_background_fruit_basket_2"] }
+    }
 
     override fun initialize() {
         super.initialize()

@@ -549,9 +549,12 @@ class EntityDunkStarParticle(world: World, val beatStarted: Float, val startPos:
 }
 
 
-object DunkWorldBackground : WorldBackground() {
+open class DunkWorldBackground(val textureGetter: () -> Texture) : WorldBackground() {
+    
+    object Default : DunkWorldBackground({ AssetRegistry["dunk_background"] })
+    
     override fun render(batch: SpriteBatch, world: World, camera: OrthographicCamera) {
-        val tex: Texture = AssetRegistry["dunk_background"]
+        val tex: Texture = textureGetter()
         batch.draw(tex, camera.position.x - camera.viewportWidth / 2f, camera.position.y - camera.viewportHeight / 2f, camera.viewportWidth, camera.viewportHeight)
     }
 }

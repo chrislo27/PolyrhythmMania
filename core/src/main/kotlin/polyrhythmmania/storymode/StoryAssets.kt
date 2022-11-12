@@ -48,6 +48,11 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_inboxitem_skipped", "story/textures/desk/inboxitem/skipped.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_off", "story/textures/desk/inboxitem/led_off.png")
         
+        StoryAssets.loadAsset<Texture>("dunk_background_fruit_basket_1", "story/textures/world/dunk/fruit_basket_1.jpg", linearTexture())
+        StoryAssets.loadAsset<Texture>("dunk_background_fruit_basket_2", "story/textures/world/dunk/fruit_basket_2.jpg", linearTexture())
+        StoryAssets.loadAsset<Texture>("dunk_background_hole_in_one_1", "story/textures/world/dunk/hole_in_one_1.jpg", linearTexture())
+        StoryAssets.loadAsset<Texture>("dunk_background_hole_in_one_2", "story/textures/world/dunk/hole_in_one_2.jpg", linearTexture())
+        
         StoryAssets.loadAsset<Sound>("jingle_gba", "story/sounds/intro/jingle_gba.ogg")
         StoryAssets.loadAsset<Sound>("jingle_arcade", "story/sounds/intro/jingle_arcade.ogg")
         StoryAssets.loadAsset<Sound>("jingle_modern", "story/sounds/intro/jingle_modern.ogg")
