@@ -467,14 +467,14 @@ class StoryPlayScreen(
         fadeInPane += TextLabel(this.keyboardKeybinds.toKeyboardString(detailedDpad = true, withNewline = false), font = main.fontMainMenuRodin).apply {
             Anchor.BottomRight.configure(this)
             this.textColor.set(Color.WHITE)
-            this.bounds.width.set(600f)
-            this.bounds.height.set(40f)
+            this.bounds.width.set(640f)
+            this.bounds.height.set(48f)
             this.bgPadding.set(Insets(10f))
             this.renderAlign.set(Align.bottomRight)
             this.textAlign.set(TextAlign.LEFT)
             this.backgroundColor.set(Color(0f, 0f, 0f, 0.75f))
             this.renderBackground.set(true)
-            this.setScaleXY(0.75f)
+            this.setScaleXY(0.875f)
             this.opacity.set(0f)
             currentScoreCardOptions.addListener {
                 val l = it.getOrCompute()
