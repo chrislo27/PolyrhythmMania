@@ -1,19 +1,19 @@
 package polyrhythmmania.storymode.contract
 
 
-data class SongNameAndSource(val songName: String, val songSourceMaterial: String?) {
+data class SongNameAndSource(val songName: String, val songSourceMaterial: String?, val songNameWithLineBreaks: String = songName) {
     companion object {
-        fun tengoku(songName: String): SongNameAndSource {
-            return SongNameAndSource(songName, SongInfo.SRC_TENGOKU)
+        fun tengoku(songName: String, songNameWithLineBreaks: String = songName): SongNameAndSource {
+            return SongNameAndSource(songName, SongInfo.SRC_TENGOKU, songNameWithLineBreaks)
         }
-        fun ds(songName: String): SongNameAndSource {
-            return SongNameAndSource(songName, SongInfo.SRC_DS)
+        fun ds(songName: String, songNameWithLineBreaks: String = songName): SongNameAndSource {
+            return SongNameAndSource(songName, SongInfo.SRC_DS, songNameWithLineBreaks)
         }
-        fun fever(songName: String): SongNameAndSource {
-            return SongNameAndSource(songName, SongInfo.SRC_FEVER)
+        fun fever(songName: String, songNameWithLineBreaks: String = songName): SongNameAndSource {
+            return SongNameAndSource(songName, SongInfo.SRC_FEVER, songNameWithLineBreaks)
         }
-        fun megamix(songName: String): SongNameAndSource {
-            return SongNameAndSource(songName, SongInfo.SRC_MEGAMIX)
+        fun megamix(songName: String, songNameWithLineBreaks: String = songName): SongNameAndSource {
+            return SongNameAndSource(songName, SongInfo.SRC_MEGAMIX, songNameWithLineBreaks)
         }
     }
 }
@@ -39,17 +39,17 @@ data class SongInfo(
         const val SRC_FEVER: String = "Rhythm Heaven Fever (Wii)"
         const val SRC_MEGAMIX: String = "Rhythm Heaven Megamix (3DS)"
         
-        fun tengoku(songName: String, otherAliases: List<SongNameAndSource> = emptyList()): SongInfo {
-            return SongInfo(SongNameAndSource.tengoku(songName), ARTIST_NINTENDO, otherAliases)
+        fun tengoku(songName: String, otherAliases: List<SongNameAndSource> = emptyList(), songNameWithLineBreaks: String = songName): SongInfo {
+            return SongInfo(SongNameAndSource.tengoku(songName, songNameWithLineBreaks), ARTIST_NINTENDO, otherAliases)
         }
-        fun ds(songName: String, otherAliases: List<SongNameAndSource> = emptyList()): SongInfo {
-            return SongInfo(SongNameAndSource.ds(songName), ARTIST_NINTENDO, otherAliases)
+        fun ds(songName: String, otherAliases: List<SongNameAndSource> = emptyList(), songNameWithLineBreaks: String = songName): SongInfo {
+            return SongInfo(SongNameAndSource.ds(songName, songNameWithLineBreaks), ARTIST_NINTENDO, otherAliases)
         }
-        fun fever(songName: String, otherAliases: List<SongNameAndSource> = emptyList()): SongInfo {
-            return SongInfo(SongNameAndSource.fever(songName), ARTIST_NINTENDO, otherAliases)
+        fun fever(songName: String, otherAliases: List<SongNameAndSource> = emptyList(), songNameWithLineBreaks: String = songName): SongInfo {
+            return SongInfo(SongNameAndSource.fever(songName, songNameWithLineBreaks), ARTIST_NINTENDO, otherAliases)
         }
-        fun megamix(songName: String, otherAliases: List<SongNameAndSource> = emptyList()): SongInfo {
-            return SongInfo(SongNameAndSource.megamix(songName), ARTIST_NINTENDO, otherAliases)
+        fun megamix(songName: String, otherAliases: List<SongNameAndSource> = emptyList(), songNameWithLineBreaks: String = songName): SongInfo {
+            return SongInfo(SongNameAndSource.megamix(songName, songNameWithLineBreaks), ARTIST_NINTENDO, otherAliases)
         }
     }
 }

@@ -121,7 +121,7 @@ object Contracts {
         add(Contract("toss_boys", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("トスボーイズ (Toss Boys)"), listOf("Dream Top")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/toss_boys.prmproj"))
         })
-        add(Contract("tram_and_pauline", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("トランとポリン (Tram and Pauline)"), listOf("J-D Thunder")), 60) { main ->
+        add(Contract("tram_and_pauline", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("トランとポリン (Tram and Pauline)", songNameWithLineBreaks = "トランとポリン\n(Tram and Pauline)"), listOf("J-D Thunder")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tram_and_pauline.prmproj"))
         })
         add(Contract("working_dough_2", Requester.DEBUG, JingleType.MODERN, Attribution(SongInfo.fever("Working Dough 2"), listOf("Kievit")), 60) { main ->

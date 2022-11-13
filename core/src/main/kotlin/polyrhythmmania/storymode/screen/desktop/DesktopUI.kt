@@ -28,6 +28,7 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
 import paintbox.util.MathHelper
+import paintbox.util.gdxutils.grey
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
@@ -223,6 +224,176 @@ class DesktopUI(
     
     init {
         // TODO Bottom-right UI panel
+        val globalVbox = VBox().apply {
+            this.bounds.x.set(240f * 4)
+            this.bounds.width.set(72f * 4)
+            this.margin.set(Insets(15f * 4, 0f))
+            this.align.set(VBox.Align.BOTTOM)
+            this.bottomToTop.set(true)
+            this.spacing.set(4f * 4)
+        }
+        bg += globalVbox
+        
+        fun addPanel(title: ReadOnlyVar<String>, height: Float): VBox {
+            val panel = RectElement(Color().grey(0f, 0.85f)).apply {
+                Anchor.Centre.configure(this)
+                this.border.set(Insets(2f * 4))
+                this.borderStyle.set(SolidBorder(Color.WHITE).apply {
+                    this.roundedCorners.set(true)
+                })
+                this.bounds.height.set(height)
+                this.padding.set(Insets(4f * 4))
+            }
+            val vbox = VBox().apply {
+                this.spacing.set(1f * 4)
+                this.temporarilyDisableLayouts {
+                    this += TextLabel(title, font = main.fontMainMenuHeading).apply {
+                        this.bounds.height.set(8f * 4)
+                        this.textColor.set(Color.WHITE)
+                        this.renderAlign.set(RenderAlign.center)
+                        this.margin.set(Insets(1f, 1f, 4f, 4f))
+                        this.setScaleXY(0.75f)
+                    }
+                }
+            }
+            panel += vbox
+            globalVbox += panel
+            return vbox
+        }
+        
+        
+        fun updateForInboxItem(inboxItem: InboxItem) {
+            when (inboxItem) {
+                is InboxItem.ContractDoc ->  {
+                    val contract = inboxItem.contract
+                    val attribution = contract.attribution
+                    
+                    addPanel("Contract".asReadOnlyVar(), 48f * 4).apply {
+                        this.temporarilyDisableLayouts {
+                            this += TextLabel("High score info", font = main.fontRoboto).apply {
+                                this.bounds.height.set(8f * 4)
+                                this.textColor.set(Color.WHITE)
+                                this.renderAlign.set(RenderAlign.center)
+                                this.margin.set(Insets(1f, 1f, 4f, 4f))
+                            }
+                            this += Button("Start Contract", font = main.fontRoboto).apply {
+                                this.bounds.height.set(8f * 4)
+                            }
+                        }
+                    }
+                    
+                    if (attribution != null) {
+                        val songInfo = attribution.song
+                        if (songInfo != null) {
+                            addPanel("Music Info".asReadOnlyVar(), (36f + (if ('\n' in songInfo.songNameAndSource.songNameWithLineBreaks) 6 else 0)) * 4).apply {
+                                this.temporarilyDisableLayouts {
+                                    val markupNormal = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold,
+                                            main.fontRobotoItalic, main.fontRobotoBoldItalic,
+                                            additionalMappings = mapOf("rodin" to main.fontMainMenuRodin), lenientMode = false)
+                                    val markupCondensed = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold,
+                                            main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic,
+                                            additionalMappings = mapOf("rodin" to main.fontMainMenuRodin), lenientMode = false)
+                                    fun parseNonlatin(builder: Markup.Builder, text: String) {
+                                        if (text.isEmpty()) return
+                                        
+                                        fun Char.isLatin() = this in 0.toChar()..127.toChar()
+
+                                        var currentlyLatin = text[0].isLatin()
+                                        var current = ""
+
+                                        fun startTag() {
+                                            builder.startTag()
+                                            if (!currentlyLatin) {
+                                                builder.font("rodin").bold(false)
+                                            }
+                                        }
+                                        fun endTag() = builder.text(current).endTag()
+
+                                        startTag()
+                                        for (c in text) {
+                                            val cLatin = c.isLatin()
+                                            if (cLatin != currentlyLatin) {
+                                                endTag()
+                                                currentlyLatin = cLatin
+                                                current = "$c"
+                                                startTag()
+                                            } else {
+                                                current += c
+                                            }
+                                        }
+                                        endTag()
+                                    }
+                                    
+                                    val primarySourceMaterial = songInfo.songNameAndSource.songSourceMaterial
+                                    this += TextLabel(songInfo.songNameAndSource.songNameWithLineBreaks, font = main.fontRobotoBold).apply {
+                                        this.markup.set(markupNormal)
+                                        this.bounds.height.bind {
+                                            6f * 4 * (if ('\n' in text.use()) 2 else 1)
+                                        }
+                                        this.textColor.set(Color.WHITE)
+                                        this.renderAlign.set(RenderAlign.center)
+                                        this.internalTextBlock.bind {
+                                            val builder = markup.use()!!.Builder()
+                                            
+                                            // Song name
+                                            builder.startTag().bold()
+                                            parseNonlatin(builder, text.use())
+                                            builder.endTag()
+                                            
+                                            builder.build()
+                                        }
+                                    }
+                                    if (primarySourceMaterial != null) {
+                                        this += TextLabel("", font = main.fontRobotoBold).apply {
+                                            this.markup.set(markupCondensed)
+                                            this.bounds.height.set(4f * 4)
+                                            this.textColor.set(Color.WHITE)
+                                            this.renderAlign.set(RenderAlign.center)
+                                            this.internalTextBlock.bind {
+                                                val builder = markup.use()!!.Builder()
+
+                                                // Song source (game)
+                                                // Make sure to switch to Rodin for non-latin text
+                                                val src = primarySourceMaterial
+                                                builder.scale(0.75f).startTag()
+                                                parseNonlatin(builder, src)
+                                                builder.endTag()
+
+                                                builder.build()
+                                            }
+                                        }
+                                    }
+                                    this += TextLabel(songInfo.songArtist, font = main.fontRobotoBold).apply {
+                                        this.markup.set(markupNormal)
+                                        this.bounds.height.set(4f * 4)
+                                        this.textColor.set(Color.WHITE)
+                                        this.renderAlign.set(RenderAlign.center)
+                                        this.internalTextBlock.bind {
+                                            val builder = markup.use()!!.Builder()
+                                            
+                                            // Song artist
+                                            builder.scale(0.75f).text(text.use()).endTag()
+                                            
+                                            builder.build()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else -> {}
+            }
+        }
+        
+        currentInboxItem.addListener {
+            val inboxItem = it.getOrCompute()
+            globalVbox.removeAllChildren()
+            
+            if (inboxItem != null) {
+                updateForInboxItem(inboxItem)
+            }
+        }
     }
 
     private fun createInboxItemUI(item: InboxItem): UIElement {
