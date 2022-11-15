@@ -1,10 +1,11 @@
 package polyrhythmmania.storymode.inbox.progression
 
+import polyrhythmmania.storymode.inbox.InboxItems
 import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker.Companion.alwaysUnlocked
 import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker.Companion.stageToBeCompleted
 
 class StoryModeProgression private constructor(stages: List<UnlockStage>) : Progression(stages) {
-    
+
     companion object {
         fun contractsOnly(): StoryModeProgression {
             return StoryModeProgression(listOf(
@@ -29,11 +30,19 @@ class StoryModeProgression private constructor(stages: List<UnlockStage>) : Prog
                     // TBD
             ))
         }
-        
-        fun storyMode(): StoryModeProgression {
-            return StoryModeProgression(listOf(
-                    // TODO
-            ))
+
+        fun storyMode(inboxItems: InboxItems): StoryModeProgression {
+            val stages = mutableListOf<UnlockStage>()
+            
+            // FIXME this is temporary, just all of them in order
+            var prevStageID = ""
+            inboxItems.items.forEachIndexed { index, inboxItem -> 
+                val newStage = UnlockStage.singleItem(inboxItem.id, if (index == 0) alwaysUnlocked() else stageToBeCompleted(prevStageID))
+                stages += newStage
+                prevStageID = newStage.id
+            }
+            
+            return StoryModeProgression(stages)
         }
     }
 }

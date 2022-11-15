@@ -44,7 +44,6 @@ class StoryTitleScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val savefiles: List<StorySavefile.LoadedState> = (1..3).map(StorySavefile.Companion::attemptLoad)
     
     init {
-        // FIXME
         sceneRoot += RectElement(PRManiaColors.debugColor).apply { 
             this += ColumnarPane(listOf(5, 5), true).apply {
                 this.spacing.set(48f)
@@ -70,7 +69,7 @@ class StoryTitleScreen(main: PRManiaGame) : PRManiaScreen(main) {
                                 }
                                 
                                 this.setOnAction { 
-                                    
+                                    // TODO
                                 }
                             }
                         }
