@@ -127,6 +127,10 @@ class TilesetAssetLoader : IAssetLoader {
         ).map { Packable(it, "textures/world/gba/title/$it.png") },
                 PackedSheet.Config(padding = 1, maxSize = 128, duplicateBorder = false,)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_hd", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                "background_back",
+                "background_middle",
+                "background_fore",
+        ).map { Packable(it, "textures/world/hd/parts/$it.png") } + listOf(
                 "cube_border",
                 "cube_border_platform",
                 "cube_border_z",
