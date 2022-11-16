@@ -12,7 +12,7 @@ object Credits : CreditsBase() {
             Localization.getVar("credits.projectLead") to listOf("chrislo27").toVars(),
             Localization.getVar("credits.programming") to listOf("chrislo27", "[font=rodin](◉.◉)☂[]").toVars(),
             Localization.getVar("credits.graphicDesign") to abcSorted(
-                    "garbo", "snow krow", "GENERIC", "Merch_Andise", "Kievit"
+                    "garbo", "snow krow", "GENERIC", "Merch_Andise", "Kievit", "Luxury",
             ).toVars(),
             Localization.getVar("credits.music") to listOf(
                     Var("GENERIC"), Localization.getVar("credits.rhSoundtrack")
