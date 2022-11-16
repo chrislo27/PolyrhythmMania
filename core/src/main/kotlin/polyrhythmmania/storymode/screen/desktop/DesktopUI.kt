@@ -28,7 +28,9 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
 import paintbox.util.MathHelper
-import paintbox.util.gdxutils.*
+import paintbox.util.gdxutils.isAltDown
+import paintbox.util.gdxutils.isControlDown
+import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.input.Challenges
@@ -49,7 +51,7 @@ class DesktopUI(
 ) : Disposable {
     
     companion object {
-        private const val UI_SCALE: Int = 4
+        const val UI_SCALE: Int = 4
     }
 
     private val main: PRManiaGame = rootScreen.main
@@ -626,21 +628,17 @@ class DesktopUI(
     
     
     private fun addRightSidePanel(title: ReadOnlyVar<String>, height: Float): VBox {
-        val panel = RectElement(Color().grey(0f, 0.85f)).apply {
+        val panel: UIElement = DesktopPane().apply {
             Anchor.Centre.configure(this)
-            this.border.set(Insets(2f * UI_SCALE))
-            this.borderStyle.set(SolidBorder(Color().set(41, 99, 255)).apply {
-                this.roundedCorners.set(true)
-            })
             this.bounds.height.set(height)
-            this.padding.set(Insets(4f * UI_SCALE))
+            this.padding.set(Insets(7f * UI_SCALE, 4f * UI_SCALE, 5f * UI_SCALE, 5f * UI_SCALE))
         }
         val vbox = VBox().apply {
             this.spacing.set(1f * UI_SCALE)
             this.temporarilyDisableLayouts {
                 this += TextLabel(title, font = main.fontMainMenuHeading).apply {
                     this.bounds.height.set(8f * UI_SCALE)
-                    this.textColor.set(Color.WHITE)
+                    this.textColor.set(Color.BLACK)
                     this.renderAlign.set(RenderAlign.center)
                     this.margin.set(Insets(1f, 1f, 4f, 4f))
                     this.setScaleXY(0.75f)
@@ -662,7 +660,7 @@ class DesktopUI(
                     this.temporarilyDisableLayouts {
                         this += TextLabel("High score info", font = main.fontRoboto).apply {
                             this.bounds.height.set(8f * UI_SCALE)
-                            this.textColor.set(Color.WHITE)
+                            this.textColor.set(Color.BLACK)
                             this.renderAlign.set(RenderAlign.center)
                             this.margin.set(Insets(1f, 1f, 4f, 4f))
                         }
@@ -720,7 +718,7 @@ class DesktopUI(
                                     this.bounds.height.bind {
                                         6f * UI_SCALE * (if ('\n' in text.use()) 2 else 1)
                                     }
-                                    this.textColor.set(Color.WHITE)
+                                    this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(RenderAlign.center)
                                     this.internalTextBlock.bind {
                                         val builder = markup.use()!!.Builder()
@@ -737,7 +735,7 @@ class DesktopUI(
                                     this += TextLabel("", font = main.fontRobotoBold).apply {
                                         this.markup.set(markupCondensed)
                                         this.bounds.height.set(4f * UI_SCALE)
-                                        this.textColor.set(Color.WHITE)
+                                        this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(RenderAlign.center)
                                         this.internalTextBlock.bind {
                                             val builder = markup.use()!!.Builder()
@@ -754,7 +752,7 @@ class DesktopUI(
                                 }
                                 this += TextLabel(songInfo.songArtist, font = main.fontMainMenuRodin).apply {
                                     this.bounds.height.set(4f * UI_SCALE)
-                                    this.textColor.set(Color.WHITE)
+                                    this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(RenderAlign.center)
                                     this.setScaleXY(0.65f)
                                 }

@@ -40,10 +40,7 @@ import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.modifiers.DefectiveRodsMode
 import polyrhythmmania.engine.modifiers.LivesMode
 import polyrhythmmania.engine.modifiers.MonsterGoalData
-import polyrhythmmania.ui.ArrowRectBox
-import polyrhythmmania.ui.ExplosionFX
-import polyrhythmmania.ui.TextSlideInterp
-import polyrhythmmania.ui.TextboxPane
+import polyrhythmmania.ui.*
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
 import polyrhythmmania.world.tileset.Tileset
@@ -273,7 +270,7 @@ duration: ${monster.activeDuration.get()} sec
         private val textBoxSuperpane: Pane
         private val textBoxDialoguePane: TextboxPane = TextboxPane()
         private val textBoxBannerPane: RectElement = RectElement(Color(0f, 0f, 0f, 0.5f))
-        private val textBoxRobotPane: TextboxPane = TextboxPane().apply { 
+        private val textBoxRobotPane: NinepatchPane = NinepatchPane().apply { 
             this.textureToUse = { AssetRegistry["ui_robot_textbox"] }
             this.cornerSize.set(64)
         }
