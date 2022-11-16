@@ -47,12 +47,16 @@ class DesktopUI(
         val scenario: DesktopScenario,
         val rootScreen: TestStoryDesktopScreen, // TODO remove this?
 ) : Disposable {
+    
+    companion object {
+        private const val UI_SCALE: Int = 4
+    }
 
     private val main: PRManiaGame = rootScreen.main
     private val batch: SpriteBatch = rootScreen.batch
     
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
-        this.setToOrtho(false, 320f * 4, 180f * 4) // 320x180 is the virtual resolution. Needs to be 4x (1280x720) for font scaling
+        this.setToOrtho(false, 320f * UI_SCALE, 180f * UI_SCALE) // 320x180 is the virtual resolution. Needs to be 4x (1280x720) for font scaling
         this.update()
     }
     val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
@@ -111,29 +115,29 @@ class DesktopUI(
 
     init { // Left scroll area and inbox item view
         val frameImg = ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame"))).apply {
-            this.bounds.x.set(16f * 4)
-            this.bounds.y.set(14f * 4)
-            this.bounds.width.set(86f * 4)
-            this.bounds.height.set(152f * 4)
+            this.bounds.x.set(16f * UI_SCALE)
+            this.bounds.y.set(14f * UI_SCALE)
+            this.bounds.width.set(86f * UI_SCALE)
+            this.bounds.height.set(152f * UI_SCALE)
             this.doClipping.set(true) // Safety clipping so nothing exceeds the overall frame
         }
         bg += frameImg
         val frameNoCaps = Pane().apply {// Extra pane is so that the frameChildArea is the one that clips properly internally
-            this.margin.set(Insets(7f * 4, 5f * 4, 1f * 4, 1f * 4))
+            this.margin.set(Insets(7f * UI_SCALE, 5f * UI_SCALE, 1f * UI_SCALE, 1f * UI_SCALE))
         }
         val frameChildArea = Pane().apply {
             this.doClipping.set(true)
-            this.padding.set(Insets(0f * 4, 0f * 4, 3f * 4, 3f * 4))
+            this.padding.set(Insets(0f * UI_SCALE, 0f * UI_SCALE, 3f * UI_SCALE, 3f * UI_SCALE))
         }
         frameNoCaps += frameChildArea
         frameImg += frameNoCaps
         frameImg += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame_cap_top"))).apply {
-            Anchor.TopLeft.configure(this, offsetY = 1f * 4)
-            this.bounds.height.set(7f * 4)
+            Anchor.TopLeft.configure(this, offsetY = 1f * UI_SCALE)
+            this.bounds.height.set(7f * UI_SCALE)
         }
         frameImg += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_frame_cap_bottom"))).apply {
-            Anchor.BottomLeft.configure(this, offsetY = -1f * 4)
-            this.bounds.height.set(7f * 4)
+            Anchor.BottomLeft.configure(this, offsetY = -1f * UI_SCALE)
+            this.bounds.height.set(7f * UI_SCALE)
         }
 
         val frameScrollPane = ScrollPane().apply {
@@ -145,10 +149,10 @@ class DesktopUI(
         frameChildArea += frameScrollPane
 
         val vbar = ScrollBar(ScrollBar.Orientation.VERTICAL).apply {
-            this.bounds.x.set(2f * 4)
-            this.bounds.y.set(16f * 4)
-            this.bounds.width.set(13f * 4)
-            this.bounds.height.set(148f * 4)
+            this.bounds.x.set(2f * UI_SCALE)
+            this.bounds.y.set(16f * UI_SCALE)
+            this.bounds.width.set(13f * UI_SCALE)
+            this.bounds.height.set(148f * UI_SCALE)
             this.skinID.set(PRManiaSkins.SCROLLBAR_SKIN_STORY_DESK)
 
             this.minimum.set(0f)
@@ -184,7 +188,7 @@ class DesktopUI(
 
         val itemsVbox = VBox().apply {
             this.spacing.set(0f)
-            this.margin.set(Insets(0f, 1f * 4, 0f, 0f))
+            this.margin.set(Insets(0f, 1f * UI_SCALE, 0f, 0f))
             this.autoSizeToChildren.set(true)
         }
         frameScrollPane.setContent(itemsVbox)
@@ -205,8 +209,8 @@ class DesktopUI(
 
 
         val inboxItemDisplayPane: UIElement = VBox().apply {
-            this.bounds.x.set(104f * 4)
-            this.bounds.width.set(128f * 4)
+            this.bounds.x.set(104f * UI_SCALE)
+            this.bounds.width.set(128f * UI_SCALE)
             this.align.set(VBox.Align.CENTRE)
         }
         bg += inboxItemDisplayPane
@@ -222,12 +226,12 @@ class DesktopUI(
     
     init {
         rightSideVbox = VBox().apply {
-            this.bounds.x.set(240f * 4)
-            this.bounds.width.set(72f * 4)
-            this.margin.set(Insets(15f * 4, 0f))
+            this.bounds.x.set(240f * UI_SCALE)
+            this.bounds.width.set(72f * UI_SCALE)
+            this.margin.set(Insets(15f * UI_SCALE, 0f))
             this.align.set(VBox.Align.BOTTOM)
             this.bottomToTop.set(true)
-            this.spacing.set(4f * 4)
+            this.spacing.set(4f * UI_SCALE)
         }
         bg += rightSideVbox
         
@@ -246,18 +250,18 @@ class DesktopUI(
         
         fun createPaperTemplate(textureID: String = "desk_contract_full"): Paper {
             val root = ImageNode(TextureRegion(StoryAssets.get<Texture>(textureID)), ImageRenderingMode.FULL).apply {
-                this.bounds.width.set(112f * 4)
-                this.bounds.height.set(150f * 4)
+                this.bounds.width.set(112f * UI_SCALE)
+                this.bounds.height.set(150f * UI_SCALE)
             }
             val paperPane = Pane().apply {// Paper part
-                this.bounds.height.set(102f * 4)
-                this.margin.set(Insets((2f + 4f) * 4, 0f * 4, (4f + 4f) * 4, (4f + 4f) * 4))
+                this.bounds.height.set(102f * UI_SCALE)
+                this.margin.set(Insets((2f + 4f) * UI_SCALE, 0f * UI_SCALE, (4f + 4f) * UI_SCALE, (4f + 4f) * UI_SCALE))
             }
             root += paperPane
             val envelopePane = Pane().apply {// Envelope part
-                this.margin.set(Insets(0f * 4, 6f * 4))
-                this.bounds.height.set(48f * 4)
-                this.bounds.y.set(102f * 4)
+                this.margin.set(Insets(0f * UI_SCALE, 6f * UI_SCALE))
+                this.bounds.height.set(48f * UI_SCALE)
+                this.bounds.y.set(102f * UI_SCALE)
             }
             root += envelopePane
             
@@ -268,13 +272,13 @@ class DesktopUI(
             is InboxItem.Memo -> {
                 val paper = createPaperTemplate("desk_contract_paper")
                 paper.paperPane += VBox().apply {
-                    this.spacing.set(1f * 4)
+                    this.spacing.set(1f * UI_SCALE)
                     this.temporarilyDisableLayouts {
                         this += TextLabel(StoryL10N.getVar("inboxItem.memo.heading"), font = main.fontMainMenuHeading).apply {
-                            this.bounds.height.set(9f * 4)
+                            this.bounds.height.set(9f * UI_SCALE)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(0f, 2f * 4, 0f, 2f * 4))
+                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 2f * UI_SCALE))
                         }
                         val fields: List<Pair<String, ReadOnlyVar<String>>> = listOfNotNull(
                                 if (item.hasToField) ("to" to item.to) else null,
@@ -282,23 +286,23 @@ class DesktopUI(
                                 "subject" to item.subject
                         )
                         this += ColumnarPane(fields.size, true).apply {
-                            this.bounds.height.set((7f * 4) * fields.size)
+                            this.bounds.height.set((7f * UI_SCALE) * fields.size)
 
                             fun addField(index: Int, fieldName: String, valueField: String, valueMarkup: Markup? = null) {
                                 this[index] += Pane().apply {
-                                    this.margin.set(Insets(0.5f * 4, 0f))
+                                    this.margin.set(Insets(0.5f * UI_SCALE, 0f))
                                     this += TextLabel(StoryL10N.getVar("inboxItem.memo.${fieldName}"), font = main.fontRobotoBold).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.left)
                                         this.padding.set(Insets(2f, 2f, 0f, 10f))
-                                        this.bounds.width.set(22.5f * 4)
+                                        this.bounds.width.set(22.5f * UI_SCALE)
                                     }
                                     this += TextLabel(valueField, font = main.fontRoboto).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.left)
                                         this.padding.set(Insets(2f, 2f, 4f, 0f))
                                         this.bounds.x.set(90f)
-                                        this.bindWidthToParent(adjust = -(22.5f * 4))
+                                        this.bindWidthToParent(adjust = -(22.5f * UI_SCALE))
                                         if (valueMarkup != null) {
                                             this.markup.set(valueMarkup)
                                         }
@@ -318,8 +322,8 @@ class DesktopUI(
                             this.markup.set(openSansMarkup)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(3f * 4, 0f, 0f, 0f))
-                            this.bounds.height.set(100f * 4)
+                            this.padding.set(Insets(3f * UI_SCALE, 0f, 0f, 0f))
+                            this.bounds.height.set(100f * UI_SCALE)
                             this.doLineWrapping.set(true)
                         }
                     }
@@ -330,26 +334,26 @@ class DesktopUI(
             is InboxItem.InfoMaterial -> {
                 val paper = createPaperTemplate("desk_contract_paper")
                 paper.paperPane += VBox().apply {
-                    this.spacing.set(1f * 4)
+                    this.spacing.set(1f * UI_SCALE)
                     this.temporarilyDisableLayouts {
                         this += TextLabel(StoryL10N.getVar("inboxItem.infoMaterial.heading"), font = main.fontMainMenuHeading).apply {
-                            this.bounds.height.set(9f * 4)
+                            this.bounds.height.set(9f * UI_SCALE)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.top)
-                            this.padding.set(Insets(0f, 2f * 4, 0f, 0f))
+                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 0f))
                         }
                         val fields: List<Pair<String, ReadOnlyVar<String>>> = listOfNotNull(
                                 "topic" to item.topic,
                                 "audience" to item.audience,
                         )
                         this += VBox().apply {
-                            val rowHeight = 7f * 4
+                            val rowHeight = 7f * UI_SCALE
                             this.bounds.height.set(rowHeight * fields.size)
                             this.temporarilyDisableLayouts {
                                 fields.forEachIndexed { i, (key, value) ->
                                     this += Pane().apply {
                                         this.bounds.height.set(rowHeight)
-                                        this.margin.set(Insets(0.5f * 4, 0f))
+                                        this.margin.set(Insets(0.5f * UI_SCALE, 0f))
                                         this += TextLabel({
                                             "[b]${StoryL10N.getVar("inboxItem.infoMaterial.${key}").use()}[] ${value.use()}"
                                         }, font = main.fontRobotoBold).apply {
@@ -370,8 +374,8 @@ class DesktopUI(
                             this.markup.set(robotoCondensedMarkup)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(3f * 4, 0f, 0f, 0f))
-                            this.bounds.height.set(100f * 4)
+                            this.padding.set(Insets(3f * UI_SCALE, 0f, 0f, 0f))
+                            this.bounds.height.set(100f * UI_SCALE)
                             this.doLineWrapping.set(true)
                         }
                     }
@@ -394,20 +398,20 @@ class DesktopUI(
                 }
                 
                 paper.paperPane += VBox().apply {
-                    this.spacing.set(1f * 4)
+                    this.spacing.set(1f * UI_SCALE)
                     this.temporarilyDisableLayouts {
                         val useLongCompanyName = item.hasLongCompanyName
                         this += Pane().apply {
                             if (useLongCompanyName) {
-                                this.bounds.height.set(13f * 4)
+                                this.bounds.height.set(13f * UI_SCALE)
                             } else {
-                                this.bounds.height.set(12f * 4)
+                                this.bounds.height.set(12f * UI_SCALE)
                             }
-                            this.margin.set(Insets(0f, 2.5f * 4, 0f, 0f))
+                            this.margin.set(Insets(0f, 2.5f * UI_SCALE, 0f, 0f))
 
                             this += TextLabel(headingText, font = main.fontMainMenuHeading).apply {
-                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * 4)
-                                this.padding.set(Insets(0f, 0f, 0f, 1f * 4))
+                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * UI_SCALE)
+                                this.padding.set(Insets(0f, 0f, 0f, 1f * UI_SCALE))
                                 this.textColor.set(Color.BLACK)
                                 if (useLongCompanyName) {
                                     this.renderAlign.set(Align.topLeft)
@@ -418,7 +422,7 @@ class DesktopUI(
                             }
                             this += Pane().apply {
                                 Anchor.TopRight.configure(this)
-                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * 4)
+                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * UI_SCALE)
 
                                 this += TextLabel(item.name, font = main.fontRobotoMonoBold).apply {
                                     this.textColor.set(Color.BLACK)
@@ -444,10 +448,10 @@ class DesktopUI(
                             this.bounds.height.set(2f)
                         }
                         this += TextLabel(item.tagline.getOrCompute(), font = main.fontLexend).apply {
-                            this.bounds.height.set(10f * 4)
+                            this.bounds.height.set(10f * UI_SCALE)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.center)
-                            this.padding.set(Insets(1f * 4, 1f * 4, 1f * 4, 0f))
+                            this.padding.set(Insets(1f * UI_SCALE, 1f * UI_SCALE, 1f * UI_SCALE, 0f))
                         }
                         this += RectElement(Color.BLACK).apply {
                             this.bounds.height.set(2f)
@@ -467,8 +471,8 @@ class DesktopUI(
                 
                 if (item is InboxItem.ContractDoc) {
                     paper.envelopePane += RectElement(Color(0f, 0f, 0f, 0.75f)).apply { // FIXME this is a temp button
-                        this.bounds.y.set(29f * 4)
-                        this.bounds.height.set(16f * 4)
+                        this.bounds.y.set(29f * UI_SCALE)
+                        this.bounds.height.set(16f * UI_SCALE)
                         this.padding.set(Insets(8f))
 
                         this += Button("Play Level").apply {
@@ -624,18 +628,18 @@ class DesktopUI(
     private fun addRightSidePanel(title: ReadOnlyVar<String>, height: Float): VBox {
         val panel = RectElement(Color().grey(0f, 0.85f)).apply {
             Anchor.Centre.configure(this)
-            this.border.set(Insets(2f * 4))
+            this.border.set(Insets(2f * UI_SCALE))
             this.borderStyle.set(SolidBorder(Color().set(41, 99, 255)).apply {
                 this.roundedCorners.set(true)
             })
             this.bounds.height.set(height)
-            this.padding.set(Insets(4f * 4))
+            this.padding.set(Insets(4f * UI_SCALE))
         }
         val vbox = VBox().apply {
-            this.spacing.set(1f * 4)
+            this.spacing.set(1f * UI_SCALE)
             this.temporarilyDisableLayouts {
                 this += TextLabel(title, font = main.fontMainMenuHeading).apply {
-                    this.bounds.height.set(8f * 4)
+                    this.bounds.height.set(8f * UI_SCALE)
                     this.textColor.set(Color.WHITE)
                     this.renderAlign.set(RenderAlign.center)
                     this.margin.set(Insets(1f, 1f, 4f, 4f))
@@ -654,16 +658,16 @@ class DesktopUI(
                 val contract = inboxItem.contract
                 val attribution = contract.attribution
 
-                addRightSidePanel("Contract".asReadOnlyVar(), 48f * 4).apply {
+                addRightSidePanel("Contract".asReadOnlyVar(), 48f * UI_SCALE).apply {
                     this.temporarilyDisableLayouts {
                         this += TextLabel("High score info", font = main.fontRoboto).apply {
-                            this.bounds.height.set(8f * 4)
+                            this.bounds.height.set(8f * UI_SCALE)
                             this.textColor.set(Color.WHITE)
                             this.renderAlign.set(RenderAlign.center)
                             this.margin.set(Insets(1f, 1f, 4f, 4f))
                         }
                         this += Button("Start Contract", font = main.fontRoboto).apply {
-                            this.bounds.height.set(8f * 4)
+                            this.bounds.height.set(8f * UI_SCALE)
                         }
                     }
                 }
@@ -671,7 +675,7 @@ class DesktopUI(
                 if (attribution != null) {
                     val songInfo = attribution.song
                     if (songInfo != null) {
-                        addRightSidePanel("Music Info".asReadOnlyVar(), (36f + (if ('\n' in songInfo.songNameAndSource.songNameWithLineBreaks) 6 else 0)) * 4).apply {
+                        addRightSidePanel("Music Info".asReadOnlyVar(), (36f + (if ('\n' in songInfo.songNameAndSource.songNameWithLineBreaks) 6 else 0)) * UI_SCALE).apply {
                             this.temporarilyDisableLayouts {
                                 val markupNormal = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold,
                                         main.fontRobotoItalic, main.fontRobotoBoldItalic,
@@ -714,7 +718,7 @@ class DesktopUI(
                                 this += TextLabel(songInfo.songNameAndSource.songNameWithLineBreaks, font = main.fontRobotoBold).apply {
                                     this.markup.set(markupNormal)
                                     this.bounds.height.bind {
-                                        6f * 4 * (if ('\n' in text.use()) 2 else 1)
+                                        6f * UI_SCALE * (if ('\n' in text.use()) 2 else 1)
                                     }
                                     this.textColor.set(Color.WHITE)
                                     this.renderAlign.set(RenderAlign.center)
@@ -732,7 +736,7 @@ class DesktopUI(
                                 if (primarySourceMaterial != null) {
                                     this += TextLabel("", font = main.fontRobotoBold).apply {
                                         this.markup.set(markupCondensed)
-                                        this.bounds.height.set(4f * 4)
+                                        this.bounds.height.set(4f * UI_SCALE)
                                         this.textColor.set(Color.WHITE)
                                         this.renderAlign.set(RenderAlign.center)
                                         this.internalTextBlock.bind {
@@ -749,7 +753,7 @@ class DesktopUI(
                                     }
                                 }
                                 this += TextLabel(songInfo.songArtist, font = main.fontMainMenuRodin).apply {
-                                    this.bounds.height.set(4f * 4)
+                                    this.bounds.height.set(4f * UI_SCALE)
                                     this.textColor.set(Color.WHITE)
                                     this.renderAlign.set(RenderAlign.center)
                                     this.setScaleXY(0.65f)
@@ -788,11 +792,11 @@ class DesktopUI(
         private val useFlowFont: ReadOnlyBooleanVar = BooleanVar { currentInboxItemState.use() == InboxItemState.Unavailable }
 
         init {
-            this.bounds.width.set(78f * 4)
-            this.bounds.height.set(20f * 4)
+            this.bounds.width.set(78f * UI_SCALE)
+            this.bounds.height.set(20f * UI_SCALE)
 
             val contentPane = Pane().apply {
-                this.margin.set(Insets(1f * 4, 0f * 4, 1f * 4, 1f * 4))
+                this.margin.set(Insets(1f * UI_SCALE, 0f * UI_SCALE, 1f * UI_SCALE, 1f * UI_SCALE))
             }
             this += contentPane
 
@@ -815,19 +819,19 @@ class DesktopUI(
                 }
             }
             val titleAreaPane = Pane().apply {
-                this.bounds.x.set((1f + 2) * 4)
-                this.bounds.y.set(1f * 4)
-                this.bounds.width.set(62f * 4)
-                this.bounds.height.set(11f * 4)
-                this.padding.set(Insets(1f * 4))
+                this.bounds.x.set((1f + 2) * UI_SCALE)
+                this.bounds.y.set(1f * UI_SCALE)
+                this.bounds.width.set(62f * UI_SCALE)
+                this.bounds.height.set(11f * UI_SCALE)
+                this.padding.set(Insets(1f * UI_SCALE))
             }
             contentPane += titleAreaPane
             val bottomAreaPane = Pane().apply {
-                this.bounds.x.set(3f * 4)
-                this.bounds.y.set(13f * 4)
-                this.bounds.width.set(62f * 4)
-                this.bounds.height.set(5f * 4)
-//                this.padding.set(Insets(0f * 4, 0f * 4, 1f * 4, 1f * 4))
+                this.bounds.x.set(3f * UI_SCALE)
+                this.bounds.y.set(13f * UI_SCALE)
+                this.bounds.width.set(62f * UI_SCALE)
+                this.bounds.height.set(5f * UI_SCALE)
+//                this.padding.set(Insets(0f * UI_SCALE, 0f * UI_SCALE, 1f * UI_SCALE, 1f * UI_SCALE))
             }
             contentPane += bottomAreaPane
 
@@ -845,10 +849,10 @@ class DesktopUI(
 
             // Selector outline/ring
             this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_selected"))).apply {
-                this.bounds.x.set(-3f * 4)
-                this.bounds.y.set(-1f * 4)
-                this.bounds.width.set(84f * 4)
-                this.bounds.height.set(23f * 4)
+                this.bounds.x.set(-3f * UI_SCALE)
+                this.bounds.y.set(-1f * UI_SCALE)
+                this.bounds.width.set(84f * UI_SCALE)
+                this.bounds.height.set(23f * UI_SCALE)
                 this.visible.bind { selectedState.use() }
             }
 
