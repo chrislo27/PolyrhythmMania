@@ -676,12 +676,13 @@ class DesktopUI(
                         val numNewlines = songInfo.songNameAndSource.songNameWithLineBreaks.count { it == '\n' }
                         addRightSidePanel("Music Info".asReadOnlyVar(), (36f + (numNewlines * 6)) * UI_SCALE).apply {
                             this.temporarilyDisableLayouts {
+                                val additionalMappings = mapOf("rodin" to main.fontMainMenuRodin)
                                 val markupNormal = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold,
                                         main.fontRobotoItalic, main.fontRobotoBoldItalic,
-                                        additionalMappings = mapOf("rodin" to main.fontMainMenuRodin), lenientMode = false)
+                                        additionalMappings = additionalMappings, lenientMode = false)
                                 val markupCondensed = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold,
                                         main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic,
-                                        additionalMappings = mapOf("rodin" to main.fontMainMenuRodin), lenientMode = false)
+                                        additionalMappings = additionalMappings, lenientMode = false)
                                 fun parseNonlatin(builder: Markup.Builder, text: String) {
                                     if (text.isEmpty()) return
 

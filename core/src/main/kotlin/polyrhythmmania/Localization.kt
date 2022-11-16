@@ -1,15 +1,24 @@
 package polyrhythmmania
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import paintbox.i18n.LocalePickerBase
 import paintbox.i18n.LocalizationBase
 
 
 object LocalePicker
-    : LocalePickerBase(LocalePickerBase.DEFAULT_LANG_DEFINITION_FILE)
+    : LocalePickerBase(
+        if (PRMania.isDevVersion || PRMania.isPrereleaseVersion)
+            Gdx.files.internal("localization/langs.json")
+        else Gdx.files.internal("localization/langs_en-only.json")
+)
+
+
+abstract class PRManiaLocalizationBase(baseHandle: FileHandle, localePicker: LocalePickerBase)
+    : LocalizationBase(baseHandle, localePicker)
 
 object Localization
-    : LocalizationBase(LocalizationBase.DEFAULT_BASE_HANDLE, LocalePicker)
+    : PRManiaLocalizationBase(LocalizationBase.DEFAULT_BASE_HANDLE, LocalePicker)
 
 object UpdateNotesL10N
-    : LocalizationBase(Gdx.files.internal("localization/update_notes"), LocalePicker)
+    : PRManiaLocalizationBase(Gdx.files.internal("localization/update_notes"), LocalePicker)
