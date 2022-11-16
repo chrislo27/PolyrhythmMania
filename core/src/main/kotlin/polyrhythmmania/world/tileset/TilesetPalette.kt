@@ -122,7 +122,7 @@ class TilesetPalette {
     val pistonAFaceZ: ColorMapping = ColorMapping("pistonAFaceZ", { it.pistonAFaceZColor }, fallbackIDs = setOf("pistonFaceZ"))
     val pistonDpadFaceX: ColorMapping = ColorMapping("pistonDpadFaceX", { it.pistonDpadFaceXColor }, fallbackIDs = setOf("pistonFaceX"))
     val pistonDpadFaceZ: ColorMapping = ColorMapping("pistonDpadFaceZ", { it.pistonDpadFaceZColor }, fallbackIDs = setOf("pistonFaceZ"))
-    val signShadow: ColorMapping = ColorMapping("signShadow", { it.signShadowColor })
+    val signShadow: ColorMapping = ColorMapping("signShadow", { it.signShadowColor }, canAdjustAlpha = true)
     val rodABorder: ColorMapping = ColorMapping("rodABorder", { it.rodABorderColor }, fallbackIDs = setOf("rodBorder"))
     val rodAFill: ColorMapping = ColorMapping("rodAFill", { it.rodAFillColor }, fallbackIDs = setOf("rodFill"))
     val rodDpadBorder: ColorMapping = ColorMapping("rodDpadBorder", { it.rodDpadBorderColor }, fallbackIDs = setOf("rodBorder"))
