@@ -570,6 +570,8 @@ class TexturePackEditDialog(
                 val baseRegion: PackTexRegion = basePack[regionID]
                 val pixmap = Pixmap(FileHandle(toImportFile))
                 val newTexture: Texture = CustomTexturePack.createSafeTextureFromPixmap(pixmap)
+                val texFilter = baseRegion.texture?.magFilter ?: Texture.TextureFilter.Nearest
+                newTexture.setFilter(texFilter, texFilter)
                 val newRegion = PackTexRegion(baseRegion.id, TextureRegion(newTexture), baseRegion.spacing)
                 toApply += newRegion
 
