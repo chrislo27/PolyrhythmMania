@@ -673,7 +673,8 @@ class DesktopUI(
                 if (attribution != null) {
                     val songInfo = attribution.song
                     if (songInfo != null) {
-                        addRightSidePanel("Music Info".asReadOnlyVar(), (36f + (if ('\n' in songInfo.songNameAndSource.songNameWithLineBreaks) 6 else 0)) * UI_SCALE).apply {
+                        val numNewlines = songInfo.songNameAndSource.songNameWithLineBreaks.count { it == '\n' }
+                        addRightSidePanel("Music Info".asReadOnlyVar(), (36f + (numNewlines * 6)) * UI_SCALE).apply {
                             this.temporarilyDisableLayouts {
                                 val markupNormal = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold,
                                         main.fontRobotoItalic, main.fontRobotoBoldItalic,
@@ -716,7 +717,7 @@ class DesktopUI(
                                 this += TextLabel(songInfo.songNameAndSource.songNameWithLineBreaks, font = main.fontRobotoBold).apply {
                                     this.markup.set(markupNormal)
                                     this.bounds.height.bind {
-                                        6f * UI_SCALE * (if ('\n' in text.use()) 2 else 1)
+                                        6f * UI_SCALE * (numNewlines + 1)
                                     }
                                     this.textColor.set(Color.BLACK)
                                     this.renderAlign.set(RenderAlign.center)
