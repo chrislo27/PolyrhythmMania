@@ -11,7 +11,7 @@ import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.ui.LoadingIconRod
 
 
-class StoryLoadingScreen(main: PRManiaGame, val unload: Boolean, val doAfterLoad: () -> Unit)
+class StoryAssetsLoadingScreen(main: PRManiaGame, val unload: Boolean, val doAfterLoad: () -> Unit)
     : SimpleLoadingScreen(main) {
 
     private var isReadyToContinue: Boolean = false

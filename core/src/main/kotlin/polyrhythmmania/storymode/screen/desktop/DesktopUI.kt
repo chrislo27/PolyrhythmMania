@@ -12,14 +12,10 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.registry.AssetRegistry
-import paintbox.transition.FadeToOpaque
-import paintbox.transition.FadeToTransparent
-import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -33,20 +29,19 @@ import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
-import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.inbox.IContractDoc
 import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemState
-import polyrhythmmania.storymode.screen.StoryPlayScreen
 import polyrhythmmania.storymode.test.TestStoryDesktopScreen
 import polyrhythmmania.ui.PRManiaSkins
 import kotlin.math.sqrt
 
 class DesktopUI(
         val scenario: DesktopScenario,
+        val controller: DesktopController,
         val rootScreen: TestStoryDesktopScreen, // TODO remove this?
 ) : Disposable {
     
@@ -54,8 +49,7 @@ class DesktopUI(
         const val UI_SCALE: Int = 4
     }
 
-    private val main: PRManiaGame = rootScreen.main
-    private val batch: SpriteBatch = rootScreen.batch
+    val main: PRManiaGame = rootScreen.main
     
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 320f * UI_SCALE, 180f * UI_SCALE) // 320x180 is the virtual resolution. Needs to be 4x (1280x720) for font scaling
@@ -387,7 +381,7 @@ class DesktopUI(
             }
             is InboxItem.ContractDoc, is InboxItem.PlaceholderContract -> {
                 item as IContractDoc
-                val subtype: ContractSubtype = if (item is InboxItem.ContractDoc) item.subtype else if (item is InboxItem.PlaceholderContract) item.subtype else ContractSubtype.NORMAL
+                val subtype: ContractSubtype = item.subtype
                 val paper = createPaperTemplate(when (subtype) {
                     ContractSubtype.NORMAL -> "desk_contract_full"
                     ContractSubtype.TRAINING -> "desk_contract_paper"
@@ -467,33 +461,6 @@ class DesktopUI(
                             this.bounds.height.set(400f)
                             this.doLineWrapping.set(true)
                             this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
-                        }
-                    }
-                }
-                
-                if (item is InboxItem.ContractDoc) {
-                    paper.envelopePane += RectElement(Color(0f, 0f, 0f, 0.75f)).apply { // FIXME this is a temp button
-                        this.bounds.y.set(29f * UI_SCALE)
-                        this.bounds.height.set(16f * UI_SCALE)
-                        this.padding.set(Insets(8f))
-
-                        this += Button("Play Level").apply {
-                            this.setOnAction {
-                                main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                                val gameMode = item.contract.gamemodeFactory(main)
-                                val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
-                                        main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, rootScreen) {
-                                    Paintbox.LOGGER.debug("ExitReason: $it")
-                                }
-                                main.screen = TransitionScreen(main, main.screen, playScreen,
-                                        FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
-                                    this.onEntryEnd = {
-                                        gameMode.prepareFirstTime()
-                                        playScreen.resetAndUnpause()
-                                        playScreen.initializeIntroCard()
-                                    }
-                                }
-                            }
                         }
                     }
                 }
@@ -666,6 +633,12 @@ class DesktopUI(
                         }
                         this += Button("Start Contract", font = main.fontRoboto).apply {
                             this.bounds.height.set(8f * UI_SCALE)
+                            
+                            this.setOnAction {
+                                main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+
+                                controller.playLevel(inboxItem.contract)
+                            }
                         }
                     }
                 }

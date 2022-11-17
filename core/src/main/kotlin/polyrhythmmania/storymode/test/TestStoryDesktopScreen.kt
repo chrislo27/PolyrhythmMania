@@ -9,6 +9,7 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.storymode.inbox.InboxItems
 import polyrhythmmania.storymode.inbox.InboxState
 import polyrhythmmania.storymode.inbox.progression.Progression
+import polyrhythmmania.storymode.screen.desktop.DebugDesktopController
 import polyrhythmmania.storymode.screen.desktop.DesktopScenario
 import polyrhythmmania.storymode.screen.desktop.DesktopUI
 
@@ -26,9 +27,12 @@ class TestStoryDesktopScreen(
             progression,
             InboxState() // Blank state intentionally
     )
-    private val desktopUI: DesktopUI = DesktopUI(scenario, this)
+    private val desktopController: DebugDesktopController = DebugDesktopController()
+    private val desktopUI: DesktopUI = DesktopUI(scenario, desktopController, this)
 
     init {
+        desktopController.desktopUI = desktopUI
+        
         scenario.updateProgression()
         scenario.updateInboxItemAvailability()
     }

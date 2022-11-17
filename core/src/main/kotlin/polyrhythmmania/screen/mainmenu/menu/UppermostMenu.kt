@@ -22,7 +22,7 @@ import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.SimpleLoadingScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.storymode.screen.StoryLoadingScreen
+import polyrhythmmania.storymode.screen.StoryAssetsLoadingScreen
 import polyrhythmmania.storymode.test.TestStoryGimmickDebugScreen
 import polyrhythmmania.util.Semitones
 
@@ -156,7 +156,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                         }
                     }
 
-                    main.screen = TransitionScreen(main, main.screen, StoryLoadingScreen(main, false, doAfterLoad),
+                    main.screen = TransitionScreen(main, main.screen, StoryAssetsLoadingScreen(main, false, doAfterLoad),
                             FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
                 }
             }

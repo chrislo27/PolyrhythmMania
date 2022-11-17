@@ -41,7 +41,7 @@ import polyrhythmmania.storymode.inbox.InboxItems
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.inbox.progression.UnlockStage
 import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
-import polyrhythmmania.storymode.screen.StoryLoadingScreen
+import polyrhythmmania.storymode.screen.StoryAssetsLoadingScreen
 import polyrhythmmania.storymode.screen.StoryTitleScreen
 import polyrhythmmania.storymode.test.gamemode.*
 import java.util.*
@@ -83,7 +83,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
 
                                 main.screen = TransitionScreen(main, main.screen, mainMenu, FadeToOpaque(0.125f, Color.BLACK), null)
                             }
-                            main.screen = TransitionScreen(main, main.screen, StoryLoadingScreen(main, true, doAfterUnload),
+                            main.screen = TransitionScreen(main, main.screen, StoryAssetsLoadingScreen(main, true, doAfterUnload),
                                     FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
                         }
                     }
