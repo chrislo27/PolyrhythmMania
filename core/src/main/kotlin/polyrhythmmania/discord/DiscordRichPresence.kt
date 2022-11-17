@@ -58,7 +58,7 @@ object DiscordRichPresence : Disposable {
                         LogLevel.WARN, null -> Logger.LogLevel.WARN
                         LogLevel.INFO -> Logger.LogLevel.INFO
                         LogLevel.DEBUG -> Logger.LogLevel.DEBUG
-                    }, msg ?: "null", tag = "[DiscordRichPresence]")
+                    }, msg ?: "null", tag = "DiscordRichPresence")
                 }
             }
 
