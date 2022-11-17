@@ -91,10 +91,13 @@ abstract class AbstractPlayScreen(
     
     /**
      * Reinitializes the game and unpauses (without playing a sound).
+     * If [unpause] is false, then you should call [unpauseGameNoSound] later.
      */
-    fun resetAndUnpause() {
+    fun resetAndUnpause(unpause: Boolean = true) {
         initializeGameplay()
-        unpauseGame(false)
+        if (unpause) {
+            unpauseGame(false)
+        }
     }
     
     /**
@@ -198,6 +201,13 @@ abstract class AbstractPlayScreen(
         }
         
         pauseMenuHandler.onUnpaused()
+    }
+
+    /**
+     * Used for deferred loading only
+     */
+    fun unpauseGameNoSound() {
+        unpauseGame(false)
     }
     
 
