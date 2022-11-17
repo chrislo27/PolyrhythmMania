@@ -71,18 +71,18 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
         val renderH = renderHeight
         val offsetX = this.offsetX
         val offsetY = this.offsetY
-        val regionBorder: TintedRegion = if (!isInAir) {
-            getGroundBorderAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
-        } else {
-            getAerialBorderAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
-        }
-        drawTintedRegion(batch, vec, tileset, regionBorder, offsetX, offsetY, renderW, renderH, tintColor = getTintColorOverrideBorder(regionBorder))
         val regionFill: TintedRegion = if (!isInAir) {
             getGroundFillAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         } else {
             getAerialFillAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
         }
         drawTintedRegion(batch, vec, tileset, regionFill, offsetX, offsetY, renderW, renderH, tintColor = getTintColorOverrideFill(regionFill))
+        val regionBorder: TintedRegion = if (!isInAir) {
+            getGroundBorderAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
+        } else {
+            getAerialBorderAnimations(tileset)[(animationAlpha * TexturePack.rodFrameCount).toInt().coerceIn(0, TexturePack.rodFrameCount - 1)]
+        }
+        drawTintedRegion(batch, vec, tileset, regionBorder, offsetX, offsetY, renderW, renderH, tintColor = getTintColorOverrideBorder(regionBorder))
 
         batch.setColor(1f, 1f, 1f, 1f)
 
