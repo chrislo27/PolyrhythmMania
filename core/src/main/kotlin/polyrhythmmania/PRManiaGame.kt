@@ -64,6 +64,7 @@ import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
 import polyrhythmmania.util.TempFileUtils
+import polyrhythmmania.world.render.PreloadWorldScene
 import java.io.File
 import java.time.Duration
 import java.time.temporal.ChronoUnit
@@ -205,6 +206,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 
                 initializeScreens()
                 
+                val preloadScene = PreloadWorldScene(this@PRManiaGame)
+                preloadScene.render()
+                preloadScene.disposeQuietly()
+                
                 enableAchievementsUI = true
                 Achievements.checkAllStatTriggeredAchievements()
                 
@@ -215,10 +220,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 }
             }
             nextScreenProducer = {
-//                polyrhythmmania.world.render.test.TestWorldRenderScreen(this@PRManiaGame)
-//                EditorScreen(this@PRManiaGame, debugMode = true)
-//                polyrhythmmania.world.render.test.TestWorldDunkScreen(this@PRManiaGame)
-//                polyrhythmmania.world.render.test.TestWorldAsmScreen(this@PRManiaGame)
                 TransitionScreen(this@PRManiaGame, this@PRManiaGame.getScreen(), mainMenuScreen.prepareShow(doFlipAnimation = true),
                         FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f)))
             }

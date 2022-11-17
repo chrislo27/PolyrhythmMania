@@ -17,7 +17,6 @@ import paintbox.ui.border.SolidBorder
 import paintbox.ui.element.RectElement
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
-import polyrhythmmania.ui.LoadingIconRod
 
 class AssetRegistryLoadingScreen(main: PRManiaGame)
     : PRManiaScreen(main) {
@@ -84,8 +83,23 @@ class AssetRegistryLoadingScreen(main: PRManiaGame)
             0f
         } else AssetRegistry.load(delta)
         this.loadingBarProgress.set(progress)
+        
+        if (progress >= 1f) {
+            if (substate == Substate.LOADING_ASSETS) {
+                substate = Substate.FINISHED_ASSETS
+                onAssetLoadingComplete()
+                val nextScreenRes = nextScreenProducer.invoke()
+                Gdx.app.postRunnable {
+                    Gdx.app.postRunnable { // Delay by 2 frames
+                        main.screen = nextScreenRes
+                    }
+                }
+            }
+        }
+        
 
         // Start of rendering -------------------------------------------------------------------------------------
+        
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         
@@ -101,19 +115,6 @@ class AssetRegistryLoadingScreen(main: PRManiaGame)
         batch.end()
 
         // End of rendering ---------------------------------------------------------------------------------------
-
-        if (progress >= 1f) {
-            if (substate == Substate.LOADING_ASSETS) {
-                substate = Substate.FINISHED_ASSETS
-                onAssetLoadingComplete()
-                val nextScreenRes = nextScreenProducer.invoke()
-                Gdx.app.postRunnable {
-                    Gdx.app.postRunnable { // Delay by 2 frames
-                        main.screen = nextScreenRes
-                    }
-                }
-            }
-        }
     }
 
     override fun resize(width: Int, height: Int) {
