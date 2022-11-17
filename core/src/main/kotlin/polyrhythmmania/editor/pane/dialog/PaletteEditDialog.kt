@@ -698,7 +698,10 @@ class PaletteEditDialog(
 
         override fun applyTo(tileset: Tileset) {
             val thisColor = this.color.getOrCompute()
-            affectsMappings.forEach { cm -> cm.color.set(thisColor.cpy()) }
+            affectsMappings.forEach { cm ->
+                cm.color.set(thisColor.cpy())
+                cm.applyTo(tileset)
+            }
         }
     }
     
