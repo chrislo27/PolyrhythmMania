@@ -46,7 +46,7 @@ class DebugDesktopController : DesktopController {
         }.apply {
             this.minimumShowTime = 0f    
             this.minWaitTimeBeforeLoadStart = 0.25f
-            this.minWaitTimeAfterLoadFinish = 0.125f
+            this.minWaitTimeAfterLoadFinish = 0f
         }
         
         main.screen = TransitionScreen(main, main.screen, loadingScreen,
