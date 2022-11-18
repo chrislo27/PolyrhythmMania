@@ -20,7 +20,7 @@ object Credits : CreditsBase() {
             Localization.getVar("credits.qa") to abcSorted(
                     "Lvl100Feraligatr", "Gosh", "GENERIC", "snow krow", "Kievit", "Chloe", "GrueKun", "Huebird",
                     "RedCrowNose", "J-D Thunder", "garbo", "Conn", "Merch_Andise", "Turtike",
-                    "The Eggo55",
+                    "The Eggo55", "Luxury",
             ).toVars() + listOf(
                     Localization.getVar("credits.tourneycord"),
             ),
