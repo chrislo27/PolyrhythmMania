@@ -42,7 +42,7 @@ import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.IHasContractTextInfo
 import polyrhythmmania.storymode.inbox.InboxItem
-import polyrhythmmania.storymode.inbox.InboxItemState
+import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 import kotlin.math.sqrt
 
@@ -448,9 +448,9 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
 
                                     addField(0, "Type", "${item.subtype}")
                                     addField(1, "ID", item.id)
-                                    addField(2, "ItemState", Var.bind {
+                                    addField(2, "InboxItemCompletion", Var.bind {
                                         // Always unavailable in debug screen
-                                        InboxItemState.Unavailable.toString()
+                                        InboxItemCompletion.UNAVAILABLE.toString()
                                     })
                                 }
                                 this += RectElement(Color.BLACK).apply {

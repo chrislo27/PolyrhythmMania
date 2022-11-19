@@ -1,6 +1,6 @@
 package polyrhythmmania.storymode.inbox.progression
 
-import polyrhythmmania.storymode.inbox.InboxItemState
+import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxState
 
 
@@ -20,8 +20,8 @@ data class UnlockStage(
     
     fun isCompleted(inboxState: InboxState): Boolean {
         val numReqCompleted: Int = requiredInboxItems.count { itemID ->
-            val inboxItemState = inboxState.getItemState(itemID) ?: InboxItemState.Unavailable
-            inboxItemState is InboxItemState.Completed || inboxItemState is InboxItemState.Skipped
+            val completion = inboxState.getItemState(itemID)?.completion ?: InboxItemCompletion.UNAVAILABLE
+            completion.shouldCountAsCompleted()
         }
         return numReqCompleted >= minRequiredToComplete.coerceAtMost(requiredInboxItems.size)
     }

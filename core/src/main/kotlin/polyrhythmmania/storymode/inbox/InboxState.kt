@@ -7,8 +7,6 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 
 
 /**
@@ -35,60 +33,27 @@ class InboxState {
         }
         
         private fun inboxItemStateFromJson(obj: JsonObject, version: Int): InboxItemState {
-            val unlockStateObj = obj.get("unlockState").asObject()
-            val unlockState: InboxItemState = when (val type = unlockStateObj.get("type").asString()) {
-                "available" -> {
-                    InboxItemState.Available(unlockStateObj.getBoolean("new", true))
-                }
-                "complete" -> {
-                    val stageCompletionDataObj = unlockStateObj.get("stageCompletionData")
-                    val stageCompletionData: InboxItemState.Completed.StageCompletionData? = if (stageCompletionDataObj.isObject) {
-                        // Default to current time
-                        val firstClearTime = LocalDateTime.ofEpochSecond(unlockStateObj.getLong("firstClearTime", System.currentTimeMillis() / 1000), 0, ZoneOffset.UTC)
-                        InboxItemState.Completed.StageCompletionData(firstClearTime)
-                    } else {
-                        null
-                    }
-                    InboxItemState.Completed(stageCompletionData)
-                }
-                "skipped" -> InboxItemState.Skipped
-                "unavailable" -> InboxItemState.Unavailable
-                else -> {
-                    Paintbox.LOGGER.warn("Unknown unlock state for version $version: $type")
-                    InboxItemState.Unavailable
-                }
+            val completionStr = obj.get("completion").asString()
+            val completionState: InboxItemCompletion = InboxItemCompletion.JSON_MAPPING[completionStr] ?: run {
+                Paintbox.LOGGER.warn("Unknown inbox item completion state for version $version: $completionStr")
+                InboxItemCompletion.UNAVAILABLE
             }
-            return unlockState
+            val newIndicator = obj.getBoolean("new", InboxItemState.DEFAULT_UNAVAILABLE.newIndicator)
+            val stageCompletionData = obj.get("stageCompletionData")?.takeIf { it.isObject }?.let { 
+                StageCompletionData.fromJson(it.asObject())
+            }
+            
+            return InboxItemState(completionState, newIndicator, stageCompletionData)
         }
         
         private fun inboxItemStateToJson(itemID: String, itemState: InboxItemState): JsonObject {
             return Json.`object`().also { obj ->
                 obj.add("id", itemID)
-                obj.add("unlockState", Json.`object`().also { unlockObj ->
-                    unlockObj.add("type", when (itemState) {
-                        is InboxItemState.Available -> "available"
-                        is InboxItemState.Completed -> "complete"
-                        InboxItemState.Skipped -> "skipped"
-                        InboxItemState.Unavailable -> "unavailable"
-                    })
-                    when (itemState) {
-                        is InboxItemState.Available -> {
-                            unlockObj.add("new", itemState.newIndicator)
-                        }
-                        is InboxItemState.Completed -> {
-                            val stageCompletionData = itemState.stageCompletionData
-                            if (stageCompletionData != null) {
-                                unlockObj.add("stageCompletionData", Json.`object`().also { o ->
-                                    o.add("firstClearTime", stageCompletionData.firstClearTime.toEpochSecond(ZoneOffset.UTC))
-                                })
-                            } else {
-                                unlockObj.add("stageCompletionData", Json.NULL)
-                            }
-                        }
-                        InboxItemState.Skipped -> {}
-                        InboxItemState.Unavailable -> {}
-                    }
-                })
+                
+                obj.add("completion", itemState.completion.jsonID)
+                obj.add("new", itemState.newIndicator)
+                val stageCompletionData = itemState.stageCompletionData
+                obj.add("stageCompletionData", stageCompletionData?.toJson() ?: Json.NULL)
             }
         }
     }
@@ -149,7 +114,7 @@ class InboxState {
     }
     fun itemStateVarOrUnavailable(itemID: String): ReadOnlyVar<InboxItemState> {
         val v = itemStateVar(itemID) // This should be cached so a new var doesn't get made each time
-        return Var.bind { v.use() ?: InboxItemState.Unavailable }
+        return Var.bind { v.use() ?: InboxItemState.DEFAULT_UNAVAILABLE }
     }
     
     fun toJson(): JsonObject {

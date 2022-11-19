@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.screen.desktop
 
+import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.inbox.InboxItems
 import polyrhythmmania.storymode.inbox.InboxState
@@ -12,6 +13,10 @@ data class DesktopScenario(
         val progression: Progression,
         val inboxState: InboxState,
 ) {
+    
+    companion object {
+        private fun createNewInboxItemState(): InboxItemState = InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = true)
+    }
 
     fun updateProgression() {
         progression.updateUnlockStages(inboxState)
@@ -22,9 +27,9 @@ data class DesktopScenario(
                 .filter { progression.getStageStateByID(it.id) != StageUnlockState.LOCKED }
                 .forEach { stage ->
                     (stage.requiredInboxItems + stage.optionalInboxItems).forEach { itemID ->
-                        val oldState = inboxState.getItemState(itemID) ?: InboxItemState.Unavailable
-                        if (oldState == InboxItemState.Unavailable) {
-                            inboxState.putItemState(itemID, InboxItemState.Available(true))
+                        val oldStateCompletion = inboxState.getItemState(itemID)?.completion ?: InboxItemCompletion.UNAVAILABLE
+                        if (oldStateCompletion == InboxItemCompletion.UNAVAILABLE) {
+                            inboxState.putItemState(itemID, createNewInboxItemState())
                         }
                     }
                 }

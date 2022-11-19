@@ -34,6 +34,7 @@ import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.inbox.IContractDoc
 import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
 import polyrhythmmania.storymode.inbox.InboxItem
+import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.test.TestStoryDesktopScreen
 import polyrhythmmania.ui.PRManiaSkins
@@ -522,8 +523,8 @@ class DesktopUI(
                                 addField(0, "Type", "${item.subtype}")
                                 addField(1, "ID", item.id)
                                 val itemStateVar = scenario.inboxState.itemStateVar(item.id)
-                                addField(2, "ItemState", Var.bind {
-                                    (itemStateVar.use() ?: InboxItemState.Unavailable).toString()
+                                addField(2, "InboxItemCompletion", Var.bind {
+                                    (itemStateVar.use()?.completion ?: InboxItemCompletion.UNAVAILABLE).toString()
                                 })
                             }
                             this += RectElement(Color.BLACK).apply {
@@ -547,7 +548,7 @@ class DesktopUI(
                                         this += Button("Mark Available (w/ flashing)").apply {
                                             this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
                                             this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState.Available(true))
+                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = true))
                                                 scenario.updateProgression()
                                                 scenario.updateInboxItemAvailability()
                                             }
@@ -556,7 +557,7 @@ class DesktopUI(
                                             this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
                                             Anchor.TopRight.configure(this)
                                             this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState.Available(false))
+                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = false))
                                                 scenario.updateProgression()
                                                 scenario.updateInboxItemAvailability()
                                             }
@@ -567,7 +568,7 @@ class DesktopUI(
                                         this.padding.set(Insets(8f))
                                         this += Button("Mark Skipped").apply {
                                             this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState.Skipped)
+                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.SKIPPED))
                                                 scenario.updateProgression()
                                                 scenario.updateInboxItemAvailability()
                                             }
@@ -578,7 +579,7 @@ class DesktopUI(
                                         this.padding.set(Insets(8f))
                                         this += Button("Mark Completed").apply {
                                             this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState.Completed(null))
+                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.COMPLETED))
                                                 scenario.updateProgression()
                                                 scenario.updateInboxItemAvailability()
                                             }
@@ -762,7 +763,7 @@ class DesktopUI(
         override val toggleGroup: Var<ToggleGroup?> = Var(null)
         
         private val currentInboxItemState: ReadOnlyVar<InboxItemState> = scenario.inboxState.itemStateVarOrUnavailable(inboxItem.id)
-        private val useFlowFont: ReadOnlyBooleanVar = BooleanVar { currentInboxItemState.use() == InboxItemState.Unavailable }
+        private val useFlowFont: ReadOnlyBooleanVar = BooleanVar { currentInboxItemState.use().completion == InboxItemCompletion.UNAVAILABLE }
 
         init {
             this.bounds.width.set(78f * UI_SCALE)
@@ -776,15 +777,15 @@ class DesktopUI(
             contentPane += ImageNode().apply { 
                 this.textureRegion.sideEffecting(TextureRegion()) {reg ->
                     val state = currentInboxItemState.use()
-                    if (state is InboxItemState.Available && state.newIndicator) {
+                    if (state.completion == InboxItemCompletion.AVAILABLE && state.newIndicator) {
                         reg!!.setRegion(availableBlinkTexRegs[blinkFrameIndex.use()])
                     } else {
                         reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_${
-                            when (state) {
-                                is InboxItemState.Unavailable -> "unavailable"
-                                is InboxItemState.Available -> "available"
-                                is InboxItemState.Completed -> "cleared"
-                                is InboxItemState.Skipped -> "skipped"
+                            when (state.completion) {
+                                InboxItemCompletion.UNAVAILABLE -> "unavailable"
+                                InboxItemCompletion.AVAILABLE -> "available"
+                                InboxItemCompletion.COMPLETED -> "cleared"
+                                InboxItemCompletion.SKIPPED -> "skipped"
                             }
                         }"))
                     }
@@ -831,9 +832,9 @@ class DesktopUI(
 
             this.setOnAction {
                 val currentState = currentInboxItemState.getOrCompute()
-                if (currentState != InboxItemState.Unavailable) {
+                if (currentState.completion != InboxItemCompletion.UNAVAILABLE) {
                     this.selectedState.invert()
-                    if (currentState is InboxItemState.Available && currentState.newIndicator) {
+                    if (currentState.completion == InboxItemCompletion.AVAILABLE && currentState.newIndicator) {
                         scenario.inboxState.putItemState(inboxItem, currentState.copy(newIndicator = false))
                     }
                 }
