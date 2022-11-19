@@ -2,27 +2,20 @@ package polyrhythmmania.storymode.screen.desktop
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
-import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
-import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.*
-import paintbox.ui.element.RectElement
-import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.isAltDown
@@ -31,16 +24,11 @@ import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.StoryL10N
-import polyrhythmmania.storymode.inbox.*
-import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
-import polyrhythmmania.storymode.screen.ExitCallback
-import polyrhythmmania.storymode.screen.ExitReason
+import polyrhythmmania.storymode.inbox.InboxItem
+import polyrhythmmania.storymode.inbox.InboxItemCompletion
+import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.test.TestStoryDesktopScreen
 import polyrhythmmania.ui.PRManiaSkins
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import kotlin.math.sqrt
 
 class DesktopUI(
         val scenario: DesktopScenario,
@@ -61,12 +49,7 @@ class DesktopUI(
     val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
-
-    private val monoMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoMono, main.fontRobotoMonoBold, main.fontRobotoMonoItalic, main.fontRobotoMonoBoldItalic)
-    private val slabMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoSlab, main.fontRobotoSlabBold, null, null)
-    private val robotoCondensedMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold, main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic)
-    private val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
-    private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
+    
     private val availableBlinkTexRegs: List<TextureRegion> = run {
         val numFrames = 5
         (0 until numFrames).map { i -> TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_available_blink_$i")) }
@@ -77,10 +60,17 @@ class DesktopUI(
         (MathHelper.getTriangleWave(secPerFrame * frames * 2) * frames).toInt().coerceIn(0, frames - 1)
     }
     
-    private val currentInboxItem: ReadOnlyVar<InboxItem?>
-    private val currentInboxItemState: ReadOnlyVar<InboxItemState>
+    val monoMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoMono, main.fontRobotoMonoBold, main.fontRobotoMonoItalic, main.fontRobotoMonoBoldItalic)
+    val slabMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoSlab, main.fontRobotoSlabBold, null, null)
+    val robotoCondensedMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold, main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic)
+    val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
+    val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
+    
+    val currentInboxItem: ReadOnlyVar<InboxItem?>
+    val currentInboxItemState: ReadOnlyVar<InboxItemState>
     val bg: UIElement
-    val rightSideVbox: VBox
+    val rightSideInfoPane: DesktopInfoPane
+    val inboxItemRenderer: InboxItemRenderer = InboxItemRenderer(this)
     
     init { // Background, base settings
         sceneRoot.debugOutlineColor.set(Color(1f, 0f, 0f, 1f))
@@ -227,13 +217,13 @@ class DesktopUI(
             val inboxItem = it.getOrCompute()
             inboxItemDisplayPane.removeAllChildren()
             if (inboxItem != null) {
-                inboxItemDisplayPane.addChild(createInboxItemUI(inboxItem))
+                inboxItemDisplayPane.addChild(inboxItemRenderer.createInboxItemUI(inboxItem))
             }
         }
     }
     
     init {
-        rightSideVbox = VBox().apply {
+        rightSideInfoPane = DesktopInfoPane(this).apply {
             this.bounds.x.set(240f * UI_SCALE)
             this.bounds.width.set(72f * UI_SCALE)
             this.margin.set(Insets(15f * UI_SCALE, 0f))
@@ -241,583 +231,17 @@ class DesktopUI(
             this.bottomToTop.set(true)
             this.spacing.set(4f * UI_SCALE)
         }
-        bg += rightSideVbox
+        bg += rightSideInfoPane
         
         currentInboxItem.addListener {
             val inboxItem = it.getOrCompute()
-            rightSideVbox.removeAllChildren()
+            rightSideInfoPane.removeAllChildren()
             
             if (inboxItem != null) {
-                updateRightPanelForInboxItem(inboxItem)
+                rightSideInfoPane.updateForInboxItem(inboxItem)
             }
         }
     }
-
-    private fun createInboxItemUI(item: InboxItem): UIElement {
-        class Paper(val root: ImageNode, val paperPane: Pane, val envelopePane: Pane)
-        
-        fun createPaperTemplate(textureID: String = "desk_contract_full"): Paper {
-            val root = ImageNode(TextureRegion(StoryAssets.get<Texture>(textureID)), ImageRenderingMode.FULL).apply {
-                this.bounds.width.set(112f * UI_SCALE)
-                this.bounds.height.set(150f * UI_SCALE)
-            }
-            val paperPane = Pane().apply {// Paper part
-                this.bounds.height.set(102f * UI_SCALE)
-                this.margin.set(Insets((2f + 4f) * UI_SCALE, 0f * UI_SCALE, (4f + 4f) * UI_SCALE, (4f + 4f) * UI_SCALE))
-            }
-            root += paperPane
-            val envelopePane = Pane().apply {// Envelope part
-                this.margin.set(Insets(0f * UI_SCALE, 6f * UI_SCALE))
-                this.bounds.height.set(48f * UI_SCALE)
-                this.bounds.y.set(102f * UI_SCALE)
-            }
-            root += envelopePane
-            
-            return Paper(root, paperPane, envelopePane)
-        }
-        
-        return when (item) {
-            is InboxItem.Memo -> {
-                val paper = createPaperTemplate("desk_contract_paper")
-                paper.paperPane += VBox().apply {
-                    this.spacing.set(1f * UI_SCALE)
-                    this.temporarilyDisableLayouts {
-                        this += TextLabel(StoryL10N.getVar("inboxItem.memo.heading"), font = main.fontMainMenuHeading).apply {
-                            this.bounds.height.set(9f * UI_SCALE)
-                            this.textColor.set(Color.BLACK)
-                            this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 2f * UI_SCALE))
-                        }
-                        val fields: List<Pair<String, ReadOnlyVar<String>>> = listOfNotNull(
-                                if (item.hasToField) ("to" to item.to) else null,
-                                "from" to item.from,
-                                "subject" to item.subject
-                        )
-                        this += ColumnarPane(fields.size, true).apply {
-                            this.bounds.height.set((7f * UI_SCALE) * fields.size)
-
-                            fun addField(index: Int, fieldName: String, valueField: String, valueMarkup: Markup? = null) {
-                                this[index] += Pane().apply {
-                                    this.margin.set(Insets(0.5f * UI_SCALE, 0f))
-                                    this += TextLabel(StoryL10N.getVar("inboxItem.memo.${fieldName}"), font = main.fontRobotoBold).apply {
-                                        this.textColor.set(Color.BLACK)
-                                        this.renderAlign.set(Align.left)
-                                        this.padding.set(Insets(2f, 2f, 0f, 10f))
-                                        this.bounds.width.set(22.5f * UI_SCALE)
-                                    }
-                                    this += TextLabel(valueField, font = main.fontRoboto).apply {
-                                        this.textColor.set(Color.BLACK)
-                                        this.renderAlign.set(Align.left)
-                                        this.padding.set(Insets(2f, 2f, 4f, 0f))
-                                        this.bounds.x.set(90f)
-                                        this.bindWidthToParent(adjust = -(22.5f * UI_SCALE))
-                                        if (valueMarkup != null) {
-                                            this.markup.set(valueMarkup)
-                                        }
-                                    }
-                                }
-                            }
-
-                            fields.forEachIndexed { i, (key, value) -> 
-                                addField(i, key, value.getOrCompute())
-                            }
-                        }
-                        this += RectElement(Color.BLACK).apply {
-                            this.bounds.height.set(2f)
-                        }
-
-                        this += TextLabel(item.desc.getOrCompute()).apply {
-                            this.markup.set(openSansMarkup)
-                            this.textColor.set(Color.BLACK)
-                            this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(3f * UI_SCALE, 0f, 0f, 0f))
-                            this.bounds.height.set(100f * UI_SCALE)
-                            this.doLineWrapping.set(true)
-                        }
-                    }
-                }
-                
-                paper.root
-            }
-            is InboxItem.InfoMaterial -> {
-                val paper = createPaperTemplate("desk_contract_paper")
-                paper.paperPane += VBox().apply {
-                    this.spacing.set(1f * UI_SCALE)
-                    this.temporarilyDisableLayouts {
-                        this += TextLabel(StoryL10N.getVar("inboxItem.infoMaterial.heading"), font = main.fontMainMenuHeading).apply {
-                            this.bounds.height.set(9f * UI_SCALE)
-                            this.textColor.set(Color.BLACK)
-                            this.renderAlign.set(Align.top)
-                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 0f))
-                        }
-                        val fields: List<Pair<String, ReadOnlyVar<String>>> = listOfNotNull(
-                                "topic" to item.topic,
-                                "audience" to item.audience,
-                        )
-                        this += VBox().apply {
-                            val rowHeight = 7f * UI_SCALE
-                            this.bounds.height.set(rowHeight * fields.size)
-                            this.temporarilyDisableLayouts {
-                                fields.forEachIndexed { i, (key, value) ->
-                                    this += Pane().apply {
-                                        this.bounds.height.set(rowHeight)
-                                        this.margin.set(Insets(0.5f * UI_SCALE, 0f))
-                                        this += TextLabel({
-                                            "[b]${StoryL10N.getVar("inboxItem.infoMaterial.${key}").use()}[] ${value.use()}"
-                                        }, font = main.fontRobotoBold).apply {
-                                            this.markup.set(slabMarkup)
-                                            this.textColor.set(Color.BLACK)
-                                            this.renderAlign.set(Align.center)
-                                            this.padding.set(Insets(2f, 2f, 0f, 10f))
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        this += RectElement(Color.BLACK).apply {
-                            this.bounds.height.set(2f)
-                        }
-
-                        this += TextLabel(item.desc.getOrCompute()).apply {
-                            this.markup.set(robotoCondensedMarkup)
-                            this.textColor.set(Color.BLACK)
-                            this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(3f * UI_SCALE, 0f, 0f, 0f))
-                            this.bounds.height.set(100f * UI_SCALE)
-                            this.doLineWrapping.set(true)
-                        }
-                    }
-                }
-                
-                paper.root
-            }
-            is InboxItem.ContractDoc, is InboxItem.PlaceholderContract -> {
-                item as IContractDoc
-                val subtype: ContractSubtype = item.subtype
-                val paper = createPaperTemplate(when (subtype) {
-                    ContractSubtype.NORMAL -> "desk_contract_full"
-                    ContractSubtype.TRAINING -> "desk_contract_paper"
-                })
-                
-                val headingText: ReadOnlyVar<String> = when (item) {
-                    is InboxItem.ContractDoc -> item.headingText
-                    is InboxItem.PlaceholderContract -> item.headingText
-                    else -> "<missing heading text>".asReadOnlyVar()
-                }
-                
-                paper.paperPane += VBox().apply {
-                    this.spacing.set(1f * UI_SCALE)
-                    this.temporarilyDisableLayouts {
-                        val useLongCompanyName = item.hasLongCompanyName
-                        this += Pane().apply {
-                            if (useLongCompanyName) {
-                                this.bounds.height.set(13f * UI_SCALE)
-                            } else {
-                                this.bounds.height.set(12f * UI_SCALE)
-                            }
-                            this.margin.set(Insets(0f, 2.5f * UI_SCALE, 0f, 0f))
-
-                            this += TextLabel(headingText, font = main.fontMainMenuHeading).apply {
-                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * UI_SCALE)
-                                this.padding.set(Insets(0f, 0f, 0f, 1f * UI_SCALE))
-                                this.textColor.set(Color.BLACK)
-                                if (useLongCompanyName) {
-                                    this.renderAlign.set(Align.topLeft)
-                                    this.setScaleXY(0.6f)
-                                } else {
-                                    this.renderAlign.set(Align.left)
-                                }
-                            }
-                            this += Pane().apply {
-                                Anchor.TopRight.configure(this)
-                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * UI_SCALE)
-
-                                this += TextLabel(item.name, font = main.fontRobotoMonoBold).apply {
-                                    this.textColor.set(Color.BLACK)
-                                    this.renderAlign.set(Align.topRight)
-                                }
-                                if (!useLongCompanyName) { // Right-aligned company name
-                                    this += TextLabel(item.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
-                                        this.textColor.set(Color.BLACK)
-                                        this.renderAlign.set(Align.bottomRight)
-                                    }
-                                }
-                            }
-                            
-                            if (useLongCompanyName) {
-                                // Centred long company name
-                                this += TextLabel(item.requester.localizedName, font = main.fontRobotoCondensedItalic).apply {
-                                    this.textColor.set(Color.BLACK)
-                                    this.renderAlign.set(Align.bottom)
-                                }
-                            }
-                        }
-                        this += RectElement(Color.BLACK).apply {
-                            this.bounds.height.set(2f)
-                        }
-                        this += TextLabel(item.tagline.getOrCompute(), font = main.fontLexend).apply {
-                            this.bounds.height.set(10f * UI_SCALE)
-                            this.textColor.set(Color.BLACK)
-                            this.renderAlign.set(Align.center)
-                            this.padding.set(Insets(1f * UI_SCALE, 1f * UI_SCALE, 1f * UI_SCALE, 0f))
-                        }
-                        this += RectElement(Color.BLACK).apply {
-                            this.bounds.height.set(2f)
-                        }
-
-                        this += TextLabel(item.desc.getOrCompute()).apply {
-                            this.markup.set(openSansMarkup)
-                            this.textColor.set(Color.BLACK)
-                            this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(8f, 4f, 0f, 0f))
-                            this.bounds.height.set(400f)
-                            this.doLineWrapping.set(true)
-                            this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
-                        }
-                    }
-                }
-                
-                paper.root
-            }
-            is InboxItem.Debug -> {
-                RectElement(Color.WHITE).apply {
-                    this.doClipping.set(true)
-                    this.border.set(Insets(2f))
-                    this.borderStyle.set(SolidBorder(Color.YELLOW))
-                    this.bounds.height.set(600f)
-                    this.bindWidthToSelfHeight(multiplier = 1f / sqrt(2f))
-
-                    this.padding.set(Insets(16f))
-
-                    this += VBox().apply {
-                        this.spacing.set(6f)
-                        this.temporarilyDisableLayouts {
-                            this += TextLabel("DEBUG ITEM", font = main.fontMainMenuHeading).apply {
-                                this.bounds.height.set(40f)
-                                this.textColor.set(Color.BLACK)
-                                this.renderAlign.set(Align.top)
-                                this.padding.set(Insets(0f, 8f, 0f, 8f))
-                            }
-                            this += RectElement(Color.BLACK).apply {
-                                this.bounds.height.set(2f)
-                            }
-                            this += ColumnarPane(3, true).apply {
-                                this.bounds.height.set(32f * this.numRealColumns)
-
-                                fun addField(index: Int, key: String, valueField: ReadOnlyVar<String>,
-                                             valueMarkup: Markup? = null) {
-                                    this[index] += Pane().apply {
-                                        this.margin.set(Insets(2f))
-                                        this += TextLabel(key, font = main.fontRobotoBold).apply {
-                                            this.textColor.set(Color.BLACK)
-                                            this.renderAlign.set(Align.left)
-                                            this.padding.set(Insets(2f, 2f, 0f, 10f))
-                                            this.bounds.width.set(90f)
-                                        }
-                                        this += TextLabel(valueField, font = main.fontRoboto).apply {
-                                            this.textColor.set(Color.BLACK)
-                                            this.renderAlign.set(Align.left)
-                                            this.padding.set(Insets(2f, 2f, 4f, 0f))
-                                            this.bounds.x.set(90f)
-                                            this.bindWidthToParent(adjust = -90f)
-                                            if (valueMarkup != null) {
-                                                this.markup.set(valueMarkup)
-                                            }
-                                        }
-                                    }
-                                }
-                                fun addField(index: Int, key: String, valueField: String,
-                                             valueMarkup: Markup? = null) {
-                                    addField(index, key, ReadOnlyVar.const(valueField), valueMarkup)
-                                }
-
-                                addField(0, "Type", "${item.subtype}")
-                                addField(1, "ID", item.id)
-                                val itemStateVar = scenario.inboxState.itemStateVar(item.id)
-                                addField(2, "InboxItemCompletion", Var.bind {
-                                    (itemStateVar.use()?.completion ?: InboxItemCompletion.UNAVAILABLE).toString()
-                                })
-                            }
-                            this += RectElement(Color.BLACK).apply {
-                                this.bounds.height.set(2f)
-                            }
-
-                            this += TextLabel(item.description).apply {
-                                this.markup.set(slabMarkup)
-                                this.textColor.set(Color.BLACK)
-                                this.renderAlign.set(Align.topLeft)
-                                this.padding.set(Insets(8f, 0f, 0f, 0f))
-                                this.bounds.height.set(150f)
-                                this.doLineWrapping.set(true)
-                            }
-
-                            when (item.subtype) {
-                                InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER -> {
-                                    this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
-                                        this.bounds.height.set(48f)
-                                        this.padding.set(Insets(8f))
-                                        this += Button("Mark Available (w/ flashing)").apply {
-                                            this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
-                                            this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = true))
-                                                scenario.updateProgression()
-                                                scenario.updateInboxItemAvailability()
-                                            }
-                                        }
-                                        this += Button("Mark Available (w/o flashing)").apply {
-                                            this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
-                                            Anchor.TopRight.configure(this)
-                                            this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = false))
-                                                scenario.updateProgression()
-                                                scenario.updateInboxItemAvailability()
-                                            }
-                                        }
-                                    }
-                                    this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
-                                        this.bounds.height.set(48f)
-                                        this.padding.set(Insets(8f))
-                                        this += Button("Mark Skipped").apply {
-                                            this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.SKIPPED))
-                                                scenario.updateProgression()
-                                                scenario.updateInboxItemAvailability()
-                                            }
-                                        }
-                                    }
-                                    this += RectElement(Color(0f, 0f, 0f, 0.75f)).apply {
-                                        this.bounds.height.set(48f)
-                                        this.padding.set(Insets(8f))
-                                        this += Button("Mark Completed").apply {
-                                            this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.COMPLETED))
-                                                scenario.updateProgression()
-                                                scenario.updateInboxItemAvailability()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    
-    private fun addRightSidePanel(title: ReadOnlyVar<String>, height: Float): VBox {
-        val panel: UIElement = DesktopPane().apply {
-            Anchor.Centre.configure(this)
-            this.bounds.height.set(height)
-            this.padding.set(Insets(7f * UI_SCALE, 4f * UI_SCALE, 5f * UI_SCALE, 5f * UI_SCALE))
-        }
-        val vbox = VBox().apply {
-            this.spacing.set(1f * UI_SCALE)
-            this.temporarilyDisableLayouts {
-                this += TextLabel(title, font = main.fontMainMenuHeading).apply {
-                    this.bounds.height.set(7f * UI_SCALE)
-                    this.textColor.set(Color.BLACK)
-                    this.renderAlign.set(RenderAlign.center)
-                    this.margin.set(Insets(1f, 1f, 4f, 4f))
-                    this.setScaleXY(0.6f)
-                }
-            }
-        }
-        panel += vbox
-        rightSideVbox += panel
-        return vbox
-    }
-
-    private fun updateRightPanelForInboxItem(inboxItem: InboxItem) {
-        when (inboxItem) {
-            is InboxItem.ContractDoc ->  {
-                val inboxItemState = scenario.inboxState.getItemState(inboxItem) ?: InboxItemState.DEFAULT_UNAVAILABLE
-                val contract = inboxItem.contract
-                val attribution = contract.attribution
-
-                addRightSidePanel("".asReadOnlyVar(), 20f * UI_SCALE).apply {
-                    this.removeAllChildren()
-                    this += Button(StoryL10N.getVar("desktop.pane.startContract"), font = main.fontRobotoBold).apply {
-                        this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
-                        this.bounds.height.set(8f * UI_SCALE)
-
-                        this.setOnAction {
-                            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-
-                            val exitCallback = ExitCallback { exitReason ->
-                                Paintbox.LOGGER.debug("ExitReason: $exitReason")
-                                val inboxState = scenario.inboxState
-                                var newState = inboxItemState
-                                newState = newState.copy(playedBefore = true)
-
-                                when (exitReason) {
-                                    is ExitReason.Passed -> {
-                                        val now = LocalDateTime.now(ZoneOffset.UTC)
-                                        if (newState.completion != InboxItemCompletion.COMPLETED) {
-                                            newState = newState.copy(completion = InboxItemCompletion.COMPLETED,
-                                                    stageCompletionData = StageCompletionData(now, now, exitReason.score,
-                                                            exitReason.skillStar ?: false, exitReason.noMiss))
-                                        } else {
-                                            val oldCompletion = newState.stageCompletionData
-                                            if (oldCompletion != null) {
-                                                if (exitReason.isBetterThan(ExitReason.Passed(oldCompletion.score, oldCompletion.skillStar, oldCompletion.noMiss))) {
-                                                    val scd = StageCompletionData(oldCompletion.firstClearTime, now,
-                                                            exitReason.score, exitReason.skillStar
-                                                            ?: false, exitReason.noMiss)
-                                                    newState = newState.copy(stageCompletionData = scd)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    ExitReason.Skipped -> {
-                                        if (!newState.completion.shouldCountAsCompleted()) {
-                                            newState = newState.copy(completion = InboxItemCompletion.SKIPPED)
-                                        }
-                                    }
-                                    ExitReason.Quit -> {}
-                                }
-
-                                inboxState.putItemState(inboxItem, newState)
-
-                                currentInboxItem.invalidate()
-                                currentInboxItem.getOrCompute()
-                            }
-
-                            controller.playLevel(inboxItem.contract, inboxItem, inboxItemState, exitCallback)
-                        }
-                    }
-                }
-                addRightSidePanel(StoryL10N.getVar("desktop.pane.performance"), 40f * UI_SCALE).apply {
-                    this.temporarilyDisableLayouts {
-                        // FIXME
-                        val completionData = inboxItemState.stageCompletionData ?: StageCompletionData(LocalDateTime.now(), LocalDateTime.now(), 70, true, true)
-                        if (completionData != null) {
-                            this += TextLabel(binding = {
-                                if (contract.immediatePass) StoryL10N.getVar("play.scoreCard.pass").use() else "${completionData.score}"                        
-                            }, font = main.fontResultsScore).apply {
-                                this.bounds.height.set(11f * UI_SCALE)
-                                this.textColor.set(Color.LIGHT_GRAY)
-                                this.renderAlign.set(RenderAlign.center)
-                                this.setScaleXY(0.5f)
-                                this.margin.set(Insets(1f, 1f, 4f, 4f))
-                            }
-                            val tmpListFeatures = listOfNotNull(if (completionData.skillStar) "Skill Star!" else null, if (completionData.noMiss) "No Miss!" else null)
-                            this += TextLabel("[TMP!] " + tmpListFeatures.joinToString(separator = " "), font = main.fontRoboto).apply {
-                                this.bounds.height.set(8f * UI_SCALE)
-                                this.textColor.set(Color.BLACK)
-                                this.renderAlign.set(RenderAlign.center)
-                                this.margin.set(Insets(1f, 1f, 4f, 4f))
-                            }
-                        } else {
-                            this += TextLabel(StoryL10N.getVar("desktop.pane.performance.noInfo"), font = main.fontRobotoItalic).apply {
-                                this.bounds.height.set(16f * UI_SCALE)
-                                this.textColor.set(Color.BLACK)
-                                this.renderAlign.set(RenderAlign.center)
-                                this.doLineWrapping.set(true)
-                                this.margin.set(Insets(1f, 1f, 4f, 4f))
-                            }
-                        }
-                    }
-                }
-
-                if (inboxItemState.playedBefore && attribution != null) {
-                    val songInfo = attribution.song
-                    if (songInfo != null) {
-                        val numNewlines = songInfo.songNameAndSource.songNameWithLineBreaks.count { it == '\n' }
-                        addRightSidePanel(StoryL10N.getVar("desktop.pane.musicInfo"), (36f + (numNewlines * 6)) * UI_SCALE).apply {
-                            this.temporarilyDisableLayouts {
-                                val additionalMappings = mapOf("rodin" to main.fontMainMenuRodin)
-                                val markupNormal = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold,
-                                        main.fontRobotoItalic, main.fontRobotoBoldItalic,
-                                        additionalMappings = additionalMappings, lenientMode = false)
-                                val markupCondensed = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold,
-                                        main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic,
-                                        additionalMappings = additionalMappings, lenientMode = false)
-                                fun parseNonlatin(builder: Markup.Builder, text: String) {
-                                    if (text.isEmpty()) return
-
-                                    fun Char.isLatin() = this in 0.toChar()..127.toChar()
-
-                                    var currentlyLatin = text[0].isLatin()
-                                    var current = ""
-
-                                    fun startTag() {
-                                        builder.startTag()
-                                        if (!currentlyLatin) {
-                                            builder.font("rodin").bold(false)
-                                        }
-                                    }
-                                    fun endTag() = builder.text(current).endTag()
-
-                                    startTag()
-                                    for (c in text) {
-                                        val cLatin = c.isLatin()
-                                        if (cLatin != currentlyLatin) {
-                                            endTag()
-                                            currentlyLatin = cLatin
-                                            current = "$c"
-                                            startTag()
-                                        } else {
-                                            current += c
-                                        }
-                                    }
-                                    endTag()
-                                }
-
-                                val primarySourceMaterial = songInfo.songNameAndSource.songSourceMaterial
-                                this += TextLabel(songInfo.songNameAndSource.songNameWithLineBreaks, font = main.fontRobotoBold).apply {
-                                    this.markup.set(markupNormal)
-                                    this.bounds.height.bind {
-                                        6f * UI_SCALE * (numNewlines + 1)
-                                    }
-                                    this.textColor.set(Color.BLACK)
-                                    this.renderAlign.set(RenderAlign.center)
-                                    this.internalTextBlock.bind {
-                                        val builder = markup.use()!!.Builder()
-
-                                        // Song name
-                                        builder.startTag().bold()
-                                        parseNonlatin(builder, text.use())
-                                        builder.endTag()
-
-                                        builder.build()
-                                    }
-                                }
-                                if (primarySourceMaterial != null) {
-                                    this += TextLabel("", font = main.fontRobotoBold).apply {
-                                        this.markup.set(markupCondensed)
-                                        this.bounds.height.set(4f * UI_SCALE)
-                                        this.textColor.set(Color.BLACK)
-                                        this.renderAlign.set(RenderAlign.center)
-                                        this.internalTextBlock.bind {
-                                            val builder = markup.use()!!.Builder()
-
-                                            // Song source (game)
-                                            // Make sure to switch to Rodin for non-latin text
-                                            builder.scale(0.75f).startTag()
-                                            parseNonlatin(builder, primarySourceMaterial)
-                                            builder.endTag()
-
-                                            builder.build()
-                                        }
-                                    }
-                                }
-                                this += TextLabel(songInfo.songArtist, font = main.fontMainMenuRodin).apply {
-                                    this.bounds.height.set(4f * UI_SCALE)
-                                    this.textColor.set(Color.BLACK)
-                                    this.renderAlign.set(RenderAlign.center)
-                                    this.setScaleXY(0.65f)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else -> {}
-        }
-    }
-
 
     fun onResize(width: Int, height: Int) {
         uiViewport.update(width, height)

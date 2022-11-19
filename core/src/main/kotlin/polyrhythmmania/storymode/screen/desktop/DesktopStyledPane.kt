@@ -5,7 +5,7 @@ import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.ui.NinepatchPane
 
 
-class DesktopPane : NinepatchPane() {
+class DesktopStyledPane : NinepatchPane() {
     companion object {
         val DEFAULT_TEXTURE_TO_USE: () -> Texture = { StoryAssets["desk_ui_pane"] }
     }
