@@ -12,13 +12,20 @@ data class StageCompletionData(
          */
         val firstClearTime: LocalDateTime,
 
-        // TODO put score-related things here; score, skill star, no miss etc
+        val bestClearTime: LocalDateTime,
+        val score: Int,
+        val skillStar: Boolean,
+        val noMiss: Boolean,
 ) {
 
     companion object {
         fun fromJson(obj: JsonObject): StageCompletionData {
             return StageCompletionData(
-                    LocalDateTime.ofEpochSecond(obj.getLong("firstClearTime", System.currentTimeMillis() / 1000), 0, ZoneOffset.UTC)
+                    LocalDateTime.ofEpochSecond(obj.getLong("firstClearTime", System.currentTimeMillis() / 1000), 0, ZoneOffset.UTC),
+                    LocalDateTime.ofEpochSecond(obj.getLong("bestClearTime", System.currentTimeMillis() / 1000), 0, ZoneOffset.UTC),
+                    obj.getInt("score", 0),
+                    obj.getBoolean("skillStar", false),
+                    obj.getBoolean("noMiss", false),
             )
         }
     }
@@ -26,6 +33,10 @@ data class StageCompletionData(
     fun toJson(): JsonObject {
         return Json.`object`().also { o ->
             o.add("firstClearTime", firstClearTime.toEpochSecond(ZoneOffset.UTC))
+            o.add("bestClearTime", bestClearTime.toEpochSecond(ZoneOffset.UTC))
+            o.add("score", score)
+            o.add("skillStar", skillStar)
+            o.add("noMiss", noMiss)
         }        
     }
 

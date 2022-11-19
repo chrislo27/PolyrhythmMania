@@ -65,7 +65,6 @@ class DesktopUI(
     private val robotoCondensedMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold, main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic)
     private val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
     private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
-
     private val availableBlinkTexRegs: List<TextureRegion> = run {
         val numFrames = 5
         (0 until numFrames).map { i -> TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_available_blink_$i")) }
@@ -75,7 +74,9 @@ class DesktopUI(
         val frames = availableBlinkTexRegs.size
         (MathHelper.getTriangleWave(secPerFrame * frames * 2) * frames).toInt().coerceIn(0, frames - 1)
     }
+    
     private val currentInboxItem: ReadOnlyVar<InboxItem?>
+    private val currentInboxItemState: ReadOnlyVar<InboxItemState>
     val bg: UIElement
     val rightSideVbox: VBox
     
@@ -194,6 +195,14 @@ class DesktopUI(
         currentInboxItem = Var.eagerBind {
             val newToggle = itemToggleGroup.activeToggle.use() as? InboxItemListingObj
             newToggle?.inboxItem
+        }
+        currentInboxItemState = Var.eagerBind {
+            val ii = currentInboxItem.use()
+            if (ii == null) {
+                InboxItemState.DEFAULT_UNAVAILABLE
+            } else {
+                scenario.inboxState.itemStateVarOrUnavailable(ii.id).use()
+            }
         }
         fun addObj(obj: InboxItemListingObj) {
             itemsVbox += obj
@@ -621,34 +630,42 @@ class DesktopUI(
     private fun updateRightPanelForInboxItem(inboxItem: InboxItem) {
         when (inboxItem) {
             is InboxItem.ContractDoc ->  {
+                val inboxItemState = scenario.inboxState.getItemState(inboxItem) ?: InboxItemState.DEFAULT_UNAVAILABLE
                 val contract = inboxItem.contract
                 val attribution = contract.attribution
 
-                addRightSidePanel("Contract".asReadOnlyVar(), 48f * UI_SCALE).apply {
+                addRightSidePanel(StoryL10N.getVar("desktop.pane.contractInfo"), 48f * UI_SCALE).apply {
                     this.temporarilyDisableLayouts {
-                        this += TextLabel("High score info", font = main.fontRoboto).apply {
-                            this.bounds.height.set(8f * UI_SCALE)
-                            this.textColor.set(Color.BLACK)
-                            this.renderAlign.set(RenderAlign.center)
-                            this.margin.set(Insets(1f, 1f, 4f, 4f))
+                        val completionData = inboxItemState.stageCompletionData
+                        if (completionData != null) {
+                            this += TextLabel("TODO High score info\n${if (contract.immediatePass) "Pass!" else completionData.score}", font = main.fontRoboto).apply {
+                                this.bounds.height.set(8f * UI_SCALE * 2)
+                                this.textColor.set(Color.BLACK)
+                                this.renderAlign.set(RenderAlign.center)
+                                this.margin.set(Insets(1f, 1f, 4f, 4f))
+                            }
                         }
-                        this += Button("Start Contract", font = main.fontRoboto).apply {
+                        this += Button(StoryL10N.getVar("desktop.pane.contractInfo.startContract"), font = main.fontRoboto).apply {
+                            this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
                             this.bounds.height.set(8f * UI_SCALE)
                             
                             this.setOnAction {
                                 main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
 
-                                controller.playLevel(inboxItem.contract)
+                                controller.playLevel(inboxItem.contract, inboxItem, inboxItemState) { reason ->
+                                    currentInboxItem.invalidate()
+                                    currentInboxItem.getOrCompute()
+                                }
                             }
                         }
                     }
                 }
 
-                if (attribution != null) {
+                if (inboxItemState.playedBefore && attribution != null) {
                     val songInfo = attribution.song
                     if (songInfo != null) {
                         val numNewlines = songInfo.songNameAndSource.songNameWithLineBreaks.count { it == '\n' }
-                        addRightSidePanel("Music Info".asReadOnlyVar(), (36f + (numNewlines * 6)) * UI_SCALE).apply {
+                        addRightSidePanel(StoryL10N.getVar("desktop.pane.musicInfo"), (36f + (numNewlines * 6)) * UI_SCALE).apply {
                             this.temporarilyDisableLayouts {
                                 val additionalMappings = mapOf("rodin" to main.fontMainMenuRodin)
                                 val markupNormal = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold,

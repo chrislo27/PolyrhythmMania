@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.ui.area.Insets
+import paintbox.ui.control.Button
+import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.ScrollBar
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.SkinFactory
@@ -13,6 +15,7 @@ import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.fillRoundedRect
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.storymode.StoryAssets
+import polyrhythmmania.storymode.screen.desktop.DesktopUI
 
 
 object PRManiaSkins {
@@ -21,6 +24,7 @@ object PRManiaSkins {
     const val EDITOR_SCROLLBAR_SKIN: String = "PRMania_ScrollBar_editor"
     const val SCROLLBAR_SKIN_LIGHT: String = "PRMania_ScrollBar_light"
     const val SCROLLBAR_SKIN_STORY_DESK: String = "PRMania_ScrollBar_storyDesk"
+    const val BUTTON_SKIN_STORY_DARK: String = "PRMania_Button_storyDark"
     
     init {
         DefaultSkins.register(SCROLLBAR_SKIN, SkinFactory { element: ScrollBar ->
@@ -47,6 +51,23 @@ object PRManiaSkins {
         })
         DefaultSkins.register(SCROLLBAR_SKIN_STORY_DESK, SkinFactory { element: ScrollBar ->
             PRMScrollBarStoryDeskSkin(element)
+        })
+        DefaultSkins.register(BUTTON_SKIN_STORY_DARK, SkinFactory { element: Button ->
+            ButtonSkin(element).apply { 
+                this.defaultTextColor.set(Color(1f, 1f, 1f, 1f))
+                this.hoveredTextColor.set(Color(1f, 1f, 1f, 1f))
+                this.pressedTextColor.set(Color(1f, 1f, 1f, 1f))
+                this.pressedAndHoveredTextColor.set(Color(1f, 1f, 1f, 1f))
+                this.disabledTextColor.set(Color().grey(0f))
+                
+                this.defaultBgColor.set(Color(0f, 0f, 0f, 0.9f))
+                this.hoveredBgColor.set(Color().grey(0.25f, a = 0.9f))
+                this.pressedBgColor.set(Color(0f, 0.3f, 0.3f, 0.9f))
+                this.pressedAndHoveredBgColor.set(Color(0f, 0.45f, 0.45f, 0.9f))
+                this.disabledBgColor.set(Color().grey(0.4f, a = 1f))
+                
+                this.roundedRadius.set(3 * DesktopUI.UI_SCALE)
+            }
         })
     }
 }

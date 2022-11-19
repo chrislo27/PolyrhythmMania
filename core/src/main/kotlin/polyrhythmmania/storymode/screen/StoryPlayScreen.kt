@@ -690,8 +690,10 @@ class StoryPlayScreen(
             val delay = scoreCardTransitionTime + 0.25f
             
             if (contract.immediatePass) {
+                val inputter = engine.inputter
+                val scoreBase = inputter.computeScore()
                 // Just a delay, then show Pass! with hit + music, options
-                successExitReason = ExitReason.Passed(100)
+                successExitReason = ExitReason.Passed(scoreBase.scoreInt, scoreBase.skillStar, scoreBase.noMiss)
                 
                 animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, 0f, 100f, delay).apply {
                     this.onComplete = {
@@ -711,7 +713,7 @@ class StoryPlayScreen(
                 val scoreBase = inputter.computeScore()
                 val scoreInt: Int = scoreBase.scoreInt
                 
-                successExitReason = ExitReason.Passed(scoreInt)
+                successExitReason = ExitReason.Passed(scoreInt, scoreBase.skillStar, scoreBase.noMiss)
 
                 animationHandler.enqueueAnimation(Animation(Interpolation.linear, (145f / 60f) * (scoreInt / 100f), 0f, scoreInt.toFloat(), delay).apply {
                     val fillingSound = StoryAssets.get<Sound>("score_filling")
