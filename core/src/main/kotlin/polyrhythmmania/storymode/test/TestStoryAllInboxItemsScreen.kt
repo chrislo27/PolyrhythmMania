@@ -3,6 +3,7 @@ package polyrhythmmania.storymode.test
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -10,8 +11,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import paintbox.Paintbox
 import paintbox.binding.Var
 import paintbox.font.Markup
+import paintbox.registry.AssetRegistry
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
+import paintbox.transition.TransitionScreen
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
@@ -21,14 +27,18 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxState
 import polyrhythmmania.storymode.inbox.progression.Progression
+import polyrhythmmania.storymode.screen.StoryPlayScreen
 import polyrhythmmania.storymode.screen.desktop.DesktopScenario
 import polyrhythmmania.storymode.screen.desktop.InboxItemRenderer
+import polyrhythmmania.ui.PRManiaSkins
 
 
 /**
@@ -134,7 +144,38 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
             this.visible.bind { currentInboxFolder.use() != null }
         }
         columns[1] += contentScrollPane
-        
+
+
+        bg += Button("Play Contract").apply {
+            Anchor.BottomCentre.configure(this)
+            this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
+            this.bounds.width.set(300f)
+            this.bounds.height.set(40f)
+            this.visible.bind { currentInboxFolder.use() is InboxItem.ContractDoc }
+            this.setOnAction {
+                val newItem = currentInboxFolder.getOrCompute()
+                if (newItem is InboxItem.ContractDoc) {
+                    val contract = newItem.contract
+                    main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+                    val gameMode = contract.gamemodeFactory(main)
+                    val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
+                            main.settings.inputCalibration.getOrCompute(), gameMode, contract, this@TestStoryAllInboxItemsScreen) {
+                        Paintbox.LOGGER.debug("ExitReason: $it")
+                    }
+                    if (Gdx.input.isShiftDown()) {
+                        gameMode.engine.autoInputs = true
+                    }
+                    main.screen = TransitionScreen(main, main.screen, playScreen,
+                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+                        this.onEntryEnd = {
+                            gameMode.prepareFirstTime()
+                            playScreen.resetAndUnpause()
+                            playScreen.initializeIntroCard()
+                        }
+                    }
+                }
+            }
+        }
         
         currentInboxFolder.addListener { varr ->
             val newItem = varr.getOrCompute()
