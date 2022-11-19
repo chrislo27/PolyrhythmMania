@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
@@ -31,13 +32,14 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
-import polyrhythmmania.storymode.inbox.IContractDoc
+import polyrhythmmania.storymode.inbox.*
 import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
-import polyrhythmmania.storymode.inbox.InboxItem
-import polyrhythmmania.storymode.inbox.InboxItemCompletion
-import polyrhythmmania.storymode.inbox.InboxItemState
+import polyrhythmmania.storymode.screen.ExitCallback
+import polyrhythmmania.storymode.screen.ExitReason
 import polyrhythmmania.storymode.test.TestStoryDesktopScreen
 import polyrhythmmania.ui.PRManiaSkins
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import kotlin.math.sqrt
 
 class DesktopUI(
@@ -614,11 +616,11 @@ class DesktopUI(
             this.spacing.set(1f * UI_SCALE)
             this.temporarilyDisableLayouts {
                 this += TextLabel(title, font = main.fontMainMenuHeading).apply {
-                    this.bounds.height.set(8f * UI_SCALE)
+                    this.bounds.height.set(7f * UI_SCALE)
                     this.textColor.set(Color.BLACK)
                     this.renderAlign.set(RenderAlign.center)
                     this.margin.set(Insets(1f, 1f, 4f, 4f))
-                    this.setScaleXY(0.75f)
+                    this.setScaleXY(0.6f)
                 }
             }
         }
@@ -634,28 +636,86 @@ class DesktopUI(
                 val contract = inboxItem.contract
                 val attribution = contract.attribution
 
-                addRightSidePanel(StoryL10N.getVar("desktop.pane.contractInfo"), 48f * UI_SCALE).apply {
+                addRightSidePanel("".asReadOnlyVar(), 20f * UI_SCALE).apply {
+                    this.removeAllChildren()
+                    this += Button(StoryL10N.getVar("desktop.pane.startContract"), font = main.fontRobotoBold).apply {
+                        this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
+                        this.bounds.height.set(8f * UI_SCALE)
+
+                        this.setOnAction {
+                            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+
+                            val exitCallback = ExitCallback { exitReason ->
+                                Paintbox.LOGGER.debug("ExitReason: $exitReason")
+                                val inboxState = scenario.inboxState
+                                var newState = inboxItemState
+                                newState = newState.copy(playedBefore = true)
+
+                                when (exitReason) {
+                                    is ExitReason.Passed -> {
+                                        val now = LocalDateTime.now(ZoneOffset.UTC)
+                                        if (newState.completion != InboxItemCompletion.COMPLETED) {
+                                            newState = newState.copy(completion = InboxItemCompletion.COMPLETED,
+                                                    stageCompletionData = StageCompletionData(now, now, exitReason.score,
+                                                            exitReason.skillStar ?: false, exitReason.noMiss))
+                                        } else {
+                                            val oldCompletion = newState.stageCompletionData
+                                            if (oldCompletion != null) {
+                                                if (exitReason.isBetterThan(ExitReason.Passed(oldCompletion.score, oldCompletion.skillStar, oldCompletion.noMiss))) {
+                                                    val scd = StageCompletionData(oldCompletion.firstClearTime, now,
+                                                            exitReason.score, exitReason.skillStar
+                                                            ?: false, exitReason.noMiss)
+                                                    newState = newState.copy(stageCompletionData = scd)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    ExitReason.Skipped -> {
+                                        if (!newState.completion.shouldCountAsCompleted()) {
+                                            newState = newState.copy(completion = InboxItemCompletion.SKIPPED)
+                                        }
+                                    }
+                                    ExitReason.Quit -> {}
+                                }
+
+                                inboxState.putItemState(inboxItem, newState)
+
+                                currentInboxItem.invalidate()
+                                currentInboxItem.getOrCompute()
+                            }
+
+                            controller.playLevel(inboxItem.contract, inboxItem, inboxItemState, exitCallback)
+                        }
+                    }
+                }
+                addRightSidePanel(StoryL10N.getVar("desktop.pane.performance"), 40f * UI_SCALE).apply {
                     this.temporarilyDisableLayouts {
-                        val completionData = inboxItemState.stageCompletionData
+                        // FIXME
+                        val completionData = inboxItemState.stageCompletionData ?: StageCompletionData(LocalDateTime.now(), LocalDateTime.now(), 70, true, true)
                         if (completionData != null) {
-                            this += TextLabel("TODO High score info\n${if (contract.immediatePass) "Pass!" else completionData.score}", font = main.fontRoboto).apply {
-                                this.bounds.height.set(8f * UI_SCALE * 2)
+                            this += TextLabel(binding = {
+                                if (contract.immediatePass) StoryL10N.getVar("play.scoreCard.pass").use() else "${completionData.score}"                        
+                            }, font = main.fontResultsScore).apply {
+                                this.bounds.height.set(11f * UI_SCALE)
+                                this.textColor.set(Color.LIGHT_GRAY)
+                                this.renderAlign.set(RenderAlign.center)
+                                this.setScaleXY(0.5f)
+                                this.margin.set(Insets(1f, 1f, 4f, 4f))
+                            }
+                            val tmpListFeatures = listOfNotNull(if (completionData.skillStar) "Skill Star!" else null, if (completionData.noMiss) "No Miss!" else null)
+                            this += TextLabel("[TMP!] " + tmpListFeatures.joinToString(separator = " "), font = main.fontRoboto).apply {
+                                this.bounds.height.set(8f * UI_SCALE)
                                 this.textColor.set(Color.BLACK)
                                 this.renderAlign.set(RenderAlign.center)
                                 this.margin.set(Insets(1f, 1f, 4f, 4f))
                             }
-                        }
-                        this += Button(StoryL10N.getVar("desktop.pane.contractInfo.startContract"), font = main.fontRoboto).apply {
-                            this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
-                            this.bounds.height.set(8f * UI_SCALE)
-                            
-                            this.setOnAction {
-                                main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-
-                                controller.playLevel(inboxItem.contract, inboxItem, inboxItemState) { reason ->
-                                    currentInboxItem.invalidate()
-                                    currentInboxItem.getOrCompute()
-                                }
+                        } else {
+                            this += TextLabel(StoryL10N.getVar("desktop.pane.performance.noInfo"), font = main.fontRobotoItalic).apply {
+                                this.bounds.height.set(16f * UI_SCALE)
+                                this.textColor.set(Color.BLACK)
+                                this.renderAlign.set(RenderAlign.center)
+                                this.doLineWrapping.set(true)
+                                this.margin.set(Insets(1f, 1f, 4f, 4f))
                             }
                         }
                     }
