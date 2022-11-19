@@ -8,7 +8,6 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.binding.asReadOnlyVar
 import paintbox.font.Markup
-import paintbox.font.PaintboxFont
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -27,20 +26,20 @@ import polyrhythmmania.storymode.inbox.InboxItemState
 import kotlin.math.sqrt
 
 
-class InboxItemRenderer(val desktopUI: DesktopUI) {
+class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
     
     private class Paper(val root: ImageNode, val paperPane: Pane, val envelopePane: Pane)
     
-    private val main: PRManiaGame get() = desktopUI.main
-    private val scenario: DesktopScenario = desktopUI.scenario
+
+    val monoMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoMono, main.fontRobotoMonoBold, main.fontRobotoMonoItalic, main.fontRobotoMonoBoldItalic)
+    val slabMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoSlab, main.fontRobotoSlabBold, null, null)
+    val robotoCondensedMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold, main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic)
+    val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
+
     
-    private val monoMarkup: Markup get() = desktopUI.monoMarkup
-    private val slabMarkup: Markup get() = desktopUI.slabMarkup
-    private val robotoCondensedMarkup: Markup get() = desktopUI.robotoCondensedMarkup
-    private val openSansMarkup: Markup get() = desktopUI.openSansMarkup
-    private val inboxItemTitleFont: PaintboxFont get() = desktopUI.inboxItemTitleFont
-
-
+    constructor(desktopUI: DesktopUI) : this(desktopUI.main, desktopUI.scenario)
+    
+    
     private fun createPaperTemplate(textureID: String = "desk_contract_full"): Paper {
         val root = ImageNode(TextureRegion(StoryAssets.get<Texture>(textureID)), ImageRenderingMode.FULL).apply {
             this.bounds.width.set(112f * DesktopUI.UI_SCALE)

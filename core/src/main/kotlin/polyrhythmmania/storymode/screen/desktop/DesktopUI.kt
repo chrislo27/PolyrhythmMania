@@ -60,17 +60,17 @@ class DesktopUI(
         (MathHelper.getTriangleWave(secPerFrame * frames * 2) * frames).toInt().coerceIn(0, frames - 1)
     }
     
-    val monoMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoMono, main.fontRobotoMonoBold, main.fontRobotoMonoItalic, main.fontRobotoMonoBoldItalic)
-    val slabMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoSlab, main.fontRobotoSlabBold, null, null)
-    val robotoCondensedMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold, main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic)
-    val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
-    val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
+    val inboxItemRenderer: InboxItemRenderer = InboxItemRenderer(this)
+    private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
+    private val monoMarkup: Markup get() = inboxItemRenderer.monoMarkup
+    private val slabMarkup: Markup get() = inboxItemRenderer.slabMarkup
+    private val robotoCondensedMarkup: Markup get() = inboxItemRenderer.robotoCondensedMarkup
+    private val openSansMarkup: Markup get() = inboxItemRenderer.openSansMarkup
     
     val currentInboxItem: ReadOnlyVar<InboxItem?>
     val currentInboxItemState: ReadOnlyVar<InboxItemState>
     val bg: UIElement
     val rightSideInfoPane: DesktopInfoPane
-    val inboxItemRenderer: InboxItemRenderer = InboxItemRenderer(this)
     
     init { // Background, base settings
         sceneRoot.debugOutlineColor.set(Color(1f, 0f, 0f, 1f))
