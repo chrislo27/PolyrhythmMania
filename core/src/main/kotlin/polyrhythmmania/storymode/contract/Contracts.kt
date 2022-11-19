@@ -46,10 +46,10 @@ object Contracts {
         add(Contract("crop_stomp", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/crop_stomp.prmproj"))
         })
-        add(Contract("fillbots", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.megamix("Fillbots"), listOf("J-D Thunder")), 60) { main ->
+        add(Contract("fillbots", Requester.BUILDROID, JingleType.GBA, Attribution(SongInfo.megamix("Fillbots"), listOf("J-D Thunder")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/fillbots.prmproj"))
         })
-        add(Contract("fillbots2", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.ds("Fillbots", listOf(SongNameAndSource.megamix("Fillbots 2"))), listOf("J-D Thunder")), 60) { main ->
+        add(Contract("fillbots2", Requester.BUILDROID, JingleType.GBA, Attribution(SongInfo.ds("Fillbots", listOf(SongNameAndSource.megamix("Fillbots 2"))), listOf("J-D Thunder")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/fillbots2.prmproj"))
         })
         add(Contract("first_contact", Requester.DEBUG, JingleType.ARCADE, Attribution(SongInfo.megamix("First Contact"), listOf("Kievit")), 60) { main ->

@@ -9,6 +9,7 @@ class Requester(val id: String) {
     companion object {
         val DEBUG: Requester = Requester("debug")
         val POLYRHYTHM_INC: Requester = Requester("polyrhythm_inc")
+        val BUILDROID: Requester = Requester("buildroid")
         
         val STOMP_CHOMP_AGRI: Requester = Requester("stomp_chomp_agri")
     }
