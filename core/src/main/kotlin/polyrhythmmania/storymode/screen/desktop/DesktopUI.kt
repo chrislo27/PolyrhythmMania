@@ -38,6 +38,7 @@ class DesktopUI(
     
     companion object {
         const val UI_SCALE: Int = 4
+        private const val ITEMS_VISIBLE_AT_ONCE: Int = 7
     }
 
     val main: PRManiaGame = rootScreen.main
@@ -71,6 +72,9 @@ class DesktopUI(
     val currentInboxItemState: ReadOnlyVar<InboxItemState>
     val bg: UIElement
     val rightSideInfoPane: DesktopInfoPane
+    
+    private val vbar: ScrollBar
+    private val inboxItemListingObjs: List<InboxItemListingObj>
     
     init { // Background, base settings
         sceneRoot.debugOutlineColor.set(Color(1f, 0f, 0f, 1f))
@@ -138,7 +142,7 @@ class DesktopUI(
         }
         frameChildArea += frameScrollPane
 
-        val vbar = ScrollBar(ScrollBar.Orientation.VERTICAL).apply {
+        vbar = ScrollBar(ScrollBar.Orientation.VERTICAL).apply {
             this.bounds.x.set(2f * UI_SCALE)
             this.bounds.y.set(16f * UI_SCALE)
             this.bounds.width.set(13f * UI_SCALE)
@@ -148,9 +152,8 @@ class DesktopUI(
             this.minimum.set(0f)
             this.maximum.set(100f)
             this.disabled.eagerBind { frameScrollPane.vBar.maximum.use() <= 0f } // Uses the contentHeightDiff internally in ScrollPane
-            this.visibleAmount.bind { (17f / 148f) * (maximum.use() - minimum.use()) } // Thumb size
-            /* TODO this is hardcoded to 1/(numElements - numVisible) */
-            this.blockIncrement.eagerBind { (1f / (scenario.inboxItems.items.size - 7).coerceAtLeast(1)) * (maximum.use() - minimum.use()) } // One item at a time
+            this.visibleAmount.bind { (17f / 148f) * (maximum.use() - minimum.use()) } // Based on thumb icon height
+            this.blockIncrement.eagerBind { (1f / (scenario.inboxItems.items.size - ITEMS_VISIBLE_AT_ONCE).coerceAtLeast(1)) * (maximum.use() - minimum.use()) } // One item at a time
 
             // Remove up/down arrow buttons
             this.removeChild(this.increaseButton)
@@ -200,10 +203,11 @@ class DesktopUI(
             itemsVbox += obj
             itemToggleGroup.addToggle(obj)
         }
-        scenario.inboxItems.items.forEach { ii ->
+        inboxItemListingObjs = scenario.inboxItems.items.map { ii ->
             // TODO link InboxItem to an UnlockStage; check UnlockStage state
-            addObj(InboxItemListingObj(ii))
+            InboxItemListingObj(ii)
         }
+        inboxItemListingObjs.forEach { addObj(it) }
 
 
         val inboxItemDisplayPane: UIElement = VBox().apply {
@@ -241,6 +245,26 @@ class DesktopUI(
                 rightSideInfoPane.updateForInboxItem(inboxItem)
             }
         }
+    }
+    
+    fun getTargetVbarValueForInboxItem(inboxItem: InboxItem): Float {
+        val min = vbar.minimum.get()
+        val max = vbar.maximum.get()
+        val currentValue = vbar.value.get()
+        val totalArea = max - min
+        val itemObjs = inboxItemListingObjs
+        val objIndex = itemObjs.indexOfFirst { it.inboxItem == inboxItem }.takeUnless { it == -1 } ?: return currentValue
+
+        val currentVisiblePercent = currentValue / totalArea // Represents top edge of scroll area
+        val maxScrollItems = (itemObjs.size - ITEMS_VISIBLE_AT_ONCE).toFloat()
+        val objIndexUpperPercentage = objIndex / maxScrollItems // If the obj is above the currentVisiblePercent
+        val objIndexLowerPercentage = (objIndex - (ITEMS_VISIBLE_AT_ONCE - 1)) / maxScrollItems // If the obj is below the bottom edge (currentVisiblePercent + ITEMS_VISIBLE_AT_ONCE - 1)
+        
+        return if (objIndexUpperPercentage < currentVisiblePercent) {
+            objIndexUpperPercentage * totalArea + min
+        } else if (objIndexLowerPercentage > currentVisiblePercent) {
+            objIndexLowerPercentage * totalArea + min
+        } else currentValue
     }
 
     fun onResize(width: Int, height: Int) {
