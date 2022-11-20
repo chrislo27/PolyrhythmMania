@@ -34,7 +34,7 @@ class TestStoryDesktopScreen(
         desktopController.desktopUI = desktopUI
         
         scenario.updateProgression()
-        scenario.updateInboxItemAvailability()
+        scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
     }
 
 

@@ -1,7 +1,6 @@
 package polyrhythmmania.storymode.screen.desktop
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -29,6 +28,7 @@ import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.test.TestStoryDesktopScreen
 import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.ui.TogglableInputProcessor
 
 class DesktopUI(
         val scenario: DesktopScenario,
@@ -49,7 +49,7 @@ class DesktopUI(
     }
     val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
-    private val processor: InputProcessor = sceneRoot.inputSystem
+    private val inputProcessor: TogglableInputProcessor = TogglableInputProcessor(sceneRoot.inputSystem)
     
     private val availableBlinkTexRegs: List<TextureRegion> = run {
         val numFrames = 5
@@ -272,11 +272,13 @@ class DesktopUI(
     }
 
     fun enableInputs() {
+        val processor = this.inputProcessor
         main.inputMultiplexer.removeProcessor(processor)
         main.inputMultiplexer.addProcessor(processor)
     }
 
     fun disableInputs() {
+        val processor = this.inputProcessor
         main.inputMultiplexer.removeProcessor(processor)
     }
 
@@ -362,6 +364,8 @@ class DesktopUI(
                     if (currentState.completion == InboxItemCompletion.AVAILABLE && currentState.newIndicator) {
                         scenario.inboxState.putItemState(inboxItem, currentState.copy(newIndicator = false))
                     }
+                    
+                    controller.playSFX(DesktopController.SFXType.CLICK_INBOX_ITEM)
                 }
             }
         }

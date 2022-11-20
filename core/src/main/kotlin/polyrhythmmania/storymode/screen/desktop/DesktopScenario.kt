@@ -1,11 +1,9 @@
 package polyrhythmmania.storymode.screen.desktop
 
-import polyrhythmmania.storymode.inbox.InboxItemCompletion
-import polyrhythmmania.storymode.inbox.InboxItemState
-import polyrhythmmania.storymode.inbox.InboxItems
-import polyrhythmmania.storymode.inbox.InboxState
+import polyrhythmmania.storymode.inbox.*
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.inbox.progression.StageUnlockState
+import polyrhythmmania.storymode.inbox.progression.UnlockStage
 
 
 data class DesktopScenario(
@@ -15,24 +13,38 @@ data class DesktopScenario(
 ) {
     
     companion object {
-        private fun createNewInboxItemState(): InboxItemState = InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = true)
+        private fun createNewAvailableInboxItemState(): InboxItemState {
+            return InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = true)
+        }
     }
 
-    fun updateProgression() {
-        progression.updateUnlockStages(inboxState)
+    
+    fun updateProgression(): Map<StageUnlockState, List<UnlockStage>> {
+        return progression.updateUnlockStages(inboxState)
     }
 
-    fun updateInboxItemAvailability() {
-        progression.stages
-                .filter { progression.getStageStateByID(it.id) != StageUnlockState.LOCKED }
-                .forEach { stage ->
-                    (stage.requiredInboxItems + stage.optionalInboxItems).forEach { itemID ->
+    /**
+     * Returns a list of inbox item IDs that became available
+     */
+    fun checkItemsThatWillBecomeAvailable(): List<InboxItem> {
+        return progression.stages
+                .filter { stage -> progression.getStageStateByID(stage.id) != StageUnlockState.LOCKED }
+                .flatMap { stage ->
+                    (stage.requiredInboxItems + stage.optionalInboxItems).mapNotNull { itemID ->
                         val oldStateCompletion = inboxState.getItemState(itemID)?.completion ?: InboxItemCompletion.UNAVAILABLE
                         if (oldStateCompletion == InboxItemCompletion.UNAVAILABLE) {
-                            inboxState.putItemState(itemID, createNewInboxItemState())
-                        }
+                            itemID
+                        } else null
                     }
                 }
+                .distinct()
+                .mapNotNull { k -> inboxItems.mapByID[k] }
+    }
+
+    fun updateInboxItemAvailability(newAvailable: List<InboxItem>) {
+        newAvailable.forEach { item ->
+            inboxState.putItemState(item, createNewAvailableInboxItemState())
+        }
     }
 
 }

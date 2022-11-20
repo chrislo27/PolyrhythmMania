@@ -1,12 +1,10 @@
 package polyrhythmmania.storymode.screen.desktop
 
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import paintbox.Paintbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.asReadOnlyVar
 import paintbox.font.Markup
-import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.RenderAlign
 import paintbox.ui.UIElement
@@ -72,7 +70,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                         this.bounds.height.set(8f * DesktopUI.UI_SCALE)
 
                         this.setOnAction {
-                            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+                            desktopUI.controller.playSFX(DesktopController.SFXType.ENTER_LEVEL)
 
                             val exitCallback = ExitCallback { exitReason ->
                                 Paintbox.LOGGER.debug("ExitReason: $exitReason")

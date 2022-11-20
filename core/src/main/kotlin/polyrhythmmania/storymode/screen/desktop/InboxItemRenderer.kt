@@ -346,7 +346,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                             this.setOnAction {
                                                 scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = true))
                                                 scenario.updateProgression()
-                                                scenario.updateInboxItemAvailability()
+                                                scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                                             }
                                         }
                                         this += Button("Mark Available (w/o flashing)").apply {
@@ -355,7 +355,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                             this.setOnAction {
                                                 scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = false))
                                                 scenario.updateProgression()
-                                                scenario.updateInboxItemAvailability()
+                                                scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                                             }
                                         }
                                     }
@@ -366,7 +366,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                             this.setOnAction {
                                                 scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.SKIPPED))
                                                 scenario.updateProgression()
-                                                scenario.updateInboxItemAvailability()
+                                                scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                                             }
                                         }
                                     }
@@ -377,7 +377,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                             this.setOnAction {
                                                 scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.COMPLETED))
                                                 scenario.updateProgression()
-                                                scenario.updateInboxItemAvailability()
+                                                scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                                             }
                                         }
                                     }
