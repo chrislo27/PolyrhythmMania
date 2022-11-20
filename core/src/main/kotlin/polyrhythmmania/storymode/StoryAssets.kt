@@ -57,6 +57,7 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Sound>("jingle_gba", "story/sounds/intro/jingle_gba.ogg")
         StoryAssets.loadAsset<Sound>("jingle_arcade", "story/sounds/intro/jingle_arcade.ogg")
         StoryAssets.loadAsset<Sound>("jingle_modern", "story/sounds/intro/jingle_modern.ogg")
+        StoryAssets.loadAsset<Sound>("sfx_desk_unlocked", "story/sounds/item_unlocked.ogg")
         StoryAssets.loadAsset<Sound>("score_filling", "sounds/results/score_filling.ogg")
         StoryAssets.loadAsset<Sound>("score_finish", "sounds/results/score_finish.ogg")
         StoryAssets.loadAsset<Sound>("score_finish_nhs", "sounds/results/score_finish_nhs.ogg")
