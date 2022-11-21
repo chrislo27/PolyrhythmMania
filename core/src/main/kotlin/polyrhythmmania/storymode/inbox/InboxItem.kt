@@ -50,6 +50,8 @@ sealed class InboxItem(
         }
 
         val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
+
+        override fun isCompletedWhenRead(): Boolean = false
     }
     
     class PlaceholderContract(
@@ -67,6 +69,11 @@ sealed class InboxItem(
         override val desc: ReadOnlyVar<String> = "Placeholder contract desc\n\n$desc".asReadOnlyVar()
         override val tagline: ReadOnlyVar<String> = tagline.asReadOnlyVar()
         val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
+        
+        override fun isCompletedWhenRead(): Boolean = true // There is no contract to play
     }
+    
+    
+    open fun isCompletedWhenRead(): Boolean = true
 
 }

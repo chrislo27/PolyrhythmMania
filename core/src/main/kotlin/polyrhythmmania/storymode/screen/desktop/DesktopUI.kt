@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
@@ -13,6 +14,7 @@ import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.ui.*
+import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.VBox
@@ -32,7 +34,7 @@ import polyrhythmmania.ui.TogglableInputProcessor
 
 class DesktopUI(
         val scenario: DesktopScenario,
-        val controller: DesktopController,
+        private val controllerFactory: (DesktopUI) -> DesktopController,
         val rootScreen: TestStoryDesktopScreen, // TODO remove this?
 ) : Disposable {
     
@@ -50,6 +52,9 @@ class DesktopUI(
     val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val inputProcessor: TogglableInputProcessor = TogglableInputProcessor(sceneRoot.inputSystem)
+    
+    val controller: DesktopController by lazy { controllerFactory(this) }
+    val animations: DesktopAnimations = DesktopAnimations(this, inputProcessor)
     
     private val availableBlinkTexRegs: List<TextureRegion> = run {
         val numFrames = 5
@@ -73,7 +78,7 @@ class DesktopUI(
     val bg: UIElement
     val rightSideInfoPane: DesktopInfoPane
     
-    private val vbar: ScrollBar
+    val inboxItemListScrollbar: ScrollBar
     private val inboxItemListingObjs: List<InboxItemListingObj>
     
     init { // Background, base settings
@@ -88,6 +93,7 @@ class DesktopUI(
             this += object : Pane() {
                 override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
                     blinkFrameIndex.invalidate()
+                    animations.frameUpdate(Gdx.graphics.deltaTime)
                 }
             }.apply { 
                 this.bounds.width.set(0f)
@@ -142,7 +148,7 @@ class DesktopUI(
         }
         frameChildArea += frameScrollPane
 
-        vbar = ScrollBar(ScrollBar.Orientation.VERTICAL).apply {
+        inboxItemListScrollbar = ScrollBar(ScrollBar.Orientation.VERTICAL).apply {
             this.bounds.x.set(2f * UI_SCALE)
             this.bounds.y.set(16f * UI_SCALE)
             this.bounds.width.set(13f * UI_SCALE)
@@ -162,21 +168,21 @@ class DesktopUI(
             this.thumbArea.bindHeightToParent()
         }
         frameScrollPane.contentPane.contentOffsetY.eagerBind {
-            -vbar.value.use() / (vbar.maximum.use() - vbar.minimum.use()) * frameScrollPane.contentHeightDiff.use()
+            -inboxItemListScrollbar.value.use() / (inboxItemListScrollbar.maximum.use() - inboxItemListScrollbar.minimum.use()) * frameScrollPane.contentHeightDiff.use()
         }
-        bg += vbar
+        bg += inboxItemListScrollbar
         val scrollListener = InputEventListener { event ->
             if (event is Scrolled && !Gdx.input.isControlDown() && !Gdx.input.isAltDown()) {
                 val shift = Gdx.input.isShiftDown()
                 val vBarAmount = if (shift) event.amountX else event.amountY
 
-                if (vBarAmount != 0f && vbar.apparentVisibility.get() && !vbar.apparentDisabledState.get()) {
-                    if (vBarAmount > 0) vbar.incrementBlock() else vbar.decrementBlock()
+                if (vBarAmount != 0f && inboxItemListScrollbar.apparentVisibility.get() && !inboxItemListScrollbar.apparentDisabledState.get()) {
+                    if (vBarAmount > 0) inboxItemListScrollbar.incrementBlock() else inboxItemListScrollbar.decrementBlock()
                 }
             }
             false
         }
-        vbar.addInputEventListener(scrollListener)
+        inboxItemListScrollbar.addInputEventListener(scrollListener)
         frameScrollPane.addInputEventListener(scrollListener)
 
         val itemsVbox = VBox().apply {
@@ -234,6 +240,24 @@ class DesktopUI(
             this.align.set(VBox.Align.BOTTOM)
             this.bottomToTop.set(true)
             this.spacing.set(4f * UI_SCALE)
+            
+            inputProcessor.enabled.addListener { 
+                if (it.getOrCompute()) {
+                    if (!visible.get()) {
+                        visible.set(true)
+                        this@DesktopUI.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 0f, 1f), opacity)
+                    }
+                } else {
+                    if (visible.get()) {
+                        visible.set(false)
+//                        this@DesktopUI.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 1f, 0f).apply {
+//                            this.onComplete = {
+//                                visible.set(false)
+//                            }                                                                                                    
+//                        }, opacity)
+                    }
+                }
+            }
         }
         bg += rightSideInfoPane
         
@@ -248,9 +272,9 @@ class DesktopUI(
     }
     
     fun getTargetVbarValueForInboxItem(inboxItem: InboxItem): Float {
-        val min = vbar.minimum.get()
-        val max = vbar.maximum.get()
-        val currentValue = vbar.value.get()
+        val min = inboxItemListScrollbar.minimum.get()
+        val max = inboxItemListScrollbar.maximum.get()
+        val currentValue = inboxItemListScrollbar.value.get()
         val totalArea = max - min
         val itemObjs = inboxItemListingObjs
         val objIndex = itemObjs.indexOfFirst { it.inboxItem == inboxItem }.takeUnless { it == -1 } ?: return currentValue
@@ -265,6 +289,30 @@ class DesktopUI(
         } else if (objIndexLowerPercentage > currentVisiblePercent) {
             objIndexLowerPercentage * totalArea + min
         } else currentValue
+    }
+    
+    fun updateAndShowNewlyAvailableInboxItems(lockInputs: Boolean = false) {
+        scenario.updateProgression()
+        
+        val futureItems = scenario.checkItemsThatWillBecomeAvailable()
+        if (futureItems.isNotEmpty() || lockInputs) {
+            if (lockInputs) {
+                animations.enqueueAnimation(animations.AnimLockInputs(true))
+            }
+            
+            futureItems.forEach { item ->
+                animations.enqueueAnimation(DesktopAnimations.AnimDelay(0.5f))
+                animations.enqueueAnimation(DesktopAnimations.AnimGeneric(0f) { _, _ -> 
+                    scenario.updateInboxItemAvailability(listOf(item))
+                    controller.playSFX(DesktopController.SFXType.INBOX_ITEM_UNLOCKED)
+                })
+                animations.enqueueAnimation(animations.AnimScrollBar(0.25f, getTargetVbarValueForInboxItem(item)))
+            }
+            
+            animations.enqueueAnimation(DesktopAnimations.AnimDelay(0.5f))
+            animations.enqueueAnimation(animations.AnimScrollBar(0.25f, getTargetVbarValueForInboxItem(futureItems.first())))
+            animations.enqueueAnimation(animations.AnimLockInputs(false))
+        }
     }
 
     fun onResize(width: Int, height: Int) {
@@ -284,6 +332,7 @@ class DesktopUI(
 
     override fun dispose() {
     }
+    
 
     inner class InboxItemListingObj(val inboxItem: InboxItem) : ActionablePane(), Toggle {
         override val selectedState: BooleanVar = BooleanVar(false)
@@ -361,8 +410,14 @@ class DesktopUI(
                 val currentState = currentInboxItemState.getOrCompute()
                 if (currentState.completion != InboxItemCompletion.UNAVAILABLE) {
                     this.selectedState.invert()
-                    if (currentState.completion == InboxItemCompletion.AVAILABLE && currentState.newIndicator) {
-                        scenario.inboxState.putItemState(inboxItem, currentState.copy(newIndicator = false))
+                    if (currentState.completion == InboxItemCompletion.AVAILABLE) {
+                        if (inboxItem.isCompletedWhenRead()) {
+                            scenario.inboxState.putItemState(inboxItem, currentState.copy(completion = InboxItemCompletion.COMPLETED, newIndicator = false))
+                            updateAndShowNewlyAvailableInboxItems()
+                        } else if (currentState.newIndicator) {
+                            scenario.inboxState.putItemState(inboxItem, currentState.copy(newIndicator = false))
+                            updateAndShowNewlyAvailableInboxItems()
+                        }
                     }
                     
                     controller.playSFX(DesktopController.SFXType.CLICK_INBOX_ITEM)
