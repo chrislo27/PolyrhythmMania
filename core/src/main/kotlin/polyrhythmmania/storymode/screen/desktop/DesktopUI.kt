@@ -298,6 +298,7 @@ class DesktopUI(
         if (futureItems.isNotEmpty() || lockInputs) {
             if (lockInputs) {
                 animations.enqueueAnimation(animations.AnimLockInputs(true))
+                animations.enqueueAnimation(DesktopAnimations.AnimDelay(0.5f))
             }
             
             futureItems.forEach { item ->
