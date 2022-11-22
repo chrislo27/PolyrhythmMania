@@ -311,7 +311,9 @@ class DesktopUI(
             }
             
             animations.enqueueAnimation(DesktopAnimations.AnimDelay(0.5f))
-            animations.enqueueAnimation(animations.AnimScrollBar(0.25f, getTargetVbarValueForInboxItem(futureItems.first())))
+            if (futureItems.isNotEmpty()) {
+                animations.enqueueAnimation(animations.AnimScrollBar(0.25f, getTargetVbarValueForInboxItem(futureItems.first())))
+            }
             animations.enqueueAnimation(animations.AnimLockInputs(false))
         }
     }
