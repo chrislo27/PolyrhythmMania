@@ -118,8 +118,12 @@ object Contracts {
         add(Contract("tap_trial_2", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tap_trial_2.prmproj"))
         })
-        add(Contract("toss_boys", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("トスボーイズ (Toss Boys)"), listOf("Dream Top")), 60) { main ->
-            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/toss_boys.prmproj"))
+        add(Contract("toss_boys", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("トスボーイズ (Toss Boys)"), listOf("Dream Top")), 0) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/toss_boys.prmproj")).apply { 
+                val livesMode = this.container.engine.modifiers.livesMode
+                livesMode.maxLives.set(3)
+                livesMode.enabled.set(true)
+            }
         })
         add(Contract("tram_and_pauline", Requester.DEBUG, JingleType.GBA, Attribution(SongInfo.tengoku("トランとポリン (Tram and Pauline)", songNameWithLineBreaks = "トランとポリン\n(Tram and Pauline)"), listOf("J-D Thunder")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tram_and_pauline.prmproj"))
