@@ -110,7 +110,7 @@ class TengokuBgPauseMenuHandler(screen: AbstractPlayScreen) : PauseMenuHandler(s
         fun createTextLabelOption(option: PauseOption, index: Int, allOptions: List<PauseOption>): TextLabel {
             return TextLabel(binding = { option.text.use() }, font = main.fontMainMenuMain).apply {
                 Anchor.TopLeft.configure(this)
-                this.disabled.set(!option.enabled)
+                this.disabled.bind { !option.enabled.use() }
                 this.textColor.bind {
                     if (apparentDisabledState.use()) {
                         Color.GRAY

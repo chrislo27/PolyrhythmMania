@@ -75,7 +75,8 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
             val gameMode = contract.gamemodeFactory(main)
             val exitCallback = createExitCallback(contract, inboxItem, inboxItemState)
             val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
-                    main.settings.inputCalibration.getOrCompute(), gameMode, contract, desktopUI.rootScreen, exitCallback)
+                    main.settings.inputCalibration.getOrCompute(), gameMode, contract,
+                    inboxItemState?.completion != InboxItemCompletion.COMPLETED, desktopUI.rootScreen, exitCallback)
 
             gameMode.prepareFirstTime()
             playScreen.resetAndUnpause(unpause = false)

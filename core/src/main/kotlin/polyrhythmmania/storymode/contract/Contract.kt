@@ -21,17 +21,29 @@ data class Contract(
          */
         val minimumScore: Int,
 
+        /**
+         * Number of failures to have before being allowed to skip. If non-positive, you cannot skip it.
+         */
+        val skipAfterNFailures: Int = DEFAULT_SKIP_TIME,
+
         val gamemodeFactory: (main: PRManiaGame) -> GameMode
 ) : IHasContractTextInfo {
+    
+    companion object {
+        val DEFAULT_SKIP_TIME: Int = 3
+        val NOT_ALLOWED_TO_SKIP: Int = -1
+    }
 
     val immediatePass: Boolean get() = minimumScore <= 0
+    val canSkipLevel: Boolean get() = skipAfterNFailures > 0
     
     constructor(
             id: String, requester: Requester, jingleType: JingleType, attribution: Attribution?,
-            minimumScore: Int, gamemodeFactory: (main: PRManiaGame) -> GameMode
+            minimumScore: Int, skipAfterNFailures: Int = DEFAULT_SKIP_TIME, gamemodeFactory: (main: PRManiaGame) -> GameMode
     ) : this(
             id, StoryL10N.getVar("contract.$id.name"), StoryL10N.getVar("contract.$id.desc"),
-            StoryL10N.getVar("contract.$id.tagline"), requester, jingleType, attribution, minimumScore, gamemodeFactory
+            StoryL10N.getVar("contract.$id.tagline"), requester, jingleType, attribution, minimumScore,
+            skipAfterNFailures, gamemodeFactory
     )
 
 }

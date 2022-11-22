@@ -222,7 +222,7 @@ abstract class AbstractPlayScreen(
                     }
                     keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown -> {
                         val options = this.pauseOptions.getOrCompute()
-                        if (options.isNotEmpty() && !options.all { !it.enabled }) {
+                        if (options.isNotEmpty() && !options.all { !it.enabled.get() }) {
                             val maxSelectionSize = options.size
                             val incrementAmt = if (keycode == keyboardKeybinds.buttonDpadUp) -1 else 1
                             val currentSelected = this.selectedPauseOption.getOrCompute()
@@ -290,13 +290,13 @@ abstract class AbstractPlayScreen(
 
     fun attemptSelectCurrentPauseOption() {
         val pauseOp = selectedPauseOption.getOrCompute()
-        if (pauseOp != null && pauseOp.enabled) {
+        if (pauseOp != null && pauseOp.enabled.get()) {
             pauseOp.action()
         }
     }
 
     fun changePauseSelectionTo(option: PauseOption): Boolean {
-        if (selectedPauseOption.getOrCompute() != option && option.enabled) {
+        if (selectedPauseOption.getOrCompute() != option && option.enabled.get()) {
             selectedPauseOption.set(option)
             playMenuSound("sfx_menu_blip")
             return true

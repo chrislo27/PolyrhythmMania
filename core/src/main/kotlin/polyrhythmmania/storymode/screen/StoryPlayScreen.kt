@@ -65,6 +65,7 @@ class StoryPlayScreen(
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: GameMode?,
         val contract: Contract,
+        val allowSkipping: Boolean,
         val exitToScreen: PaintboxScreen,
         val exitCallback: ExitCallback,
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
@@ -85,6 +86,7 @@ class StoryPlayScreen(
     private val animationHandler: AnimationHandler = AnimationHandler()
     
     private val engineBeat: FloatVar = FloatVar(0f)
+    private var failureCount: IntVar = IntVar(0)
     
     // Intro card
     private val introCardDefaultDuration: Float = 3f
@@ -252,7 +254,7 @@ class StoryPlayScreen(
             val unselectedLabelColor = Color(1f, 1f, 1f, 1f)
             return TextLabel(binding = { option.text.use() }, font = main.fontMainMenuMain).apply {
                 Anchor.TopLeft.configure(this)
-                this.disabled.set(!option.enabled)
+                this.disabled.bind { !option.enabled.use() }
                 this.textColor.bind {
                     if (apparentDisabledState.use()) {
                         Color.GRAY
@@ -292,6 +294,10 @@ class StoryPlayScreen(
                 PauseOption("play.pause.startOver", true) { startOverPauseAction() },
                 PauseOption(StoryL10N.getVar("play.pause.skipThisLevel"), false) {
                     quitPauseAction(ExitReason.Skipped)
+                }.apply { 
+                    if (allowSkipping && contract.canSkipLevel) {
+                        this.enabled.bind { failureCount.use() >= contract.skipAfterNFailures }
+                    }
                 },
                 PauseOption(StoryL10N.getVar("play.pause.quit"), true) { quitPauseAction(ExitReason.Quit) },
         )
@@ -681,6 +687,7 @@ class StoryPlayScreen(
         animationHandler.enqueueAnimation(Animation(Interpolation.smoother, 0.25f, 0f, 1f), blurStrength)
         
         if (engine.resultFlag.getOrCompute() is ResultFlag.Fail) {
+            failureCount.incrementAndGet()
             currentScoreCardOptions.set(failScoreCardOptions)
         } else {
             engine.resultFlag.set(ResultFlag.None)
@@ -725,6 +732,10 @@ class StoryPlayScreen(
                     }
                     this.onComplete = {
                         val passed = scoreInt >= contract.minimumScore
+                        
+                        if (!passed) {
+                            failureCount.incrementAndGet()
+                        }
                         
                         fillingSound.stop(fillingSoundID)
                         playMenuSound(StoryAssets.get<Sound>("score_finish"))
@@ -774,13 +785,13 @@ class StoryPlayScreen(
 
     private fun attemptSelectCurrentScoreCardOption() {
         val pauseOp = selectedScoreCardOption.getOrCompute()
-        if (pauseOp != null && pauseOp.enabled) {
+        if (pauseOp != null && pauseOp.enabled.get()) {
             pauseOp.action()
         }
     }
 
     private fun changeScoreCardSelectionTo(option: PauseOption): Boolean {
-        if (selectedScoreCardOption.getOrCompute() != option && option.enabled) {
+        if (selectedScoreCardOption.getOrCompute() != option && option.enabled.get()) {
             selectedScoreCardOption.set(option)
             playMenuSound("sfx_menu_blip")
             return true
@@ -798,7 +809,7 @@ class StoryPlayScreen(
             when (keycode) {
                 keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown -> {
                     val options = this.currentScoreCardOptions.getOrCompute()
-                    if (options.isNotEmpty() && !options.all { !it.enabled }) {
+                    if (options.isNotEmpty() && !options.all { !it.enabled.get() }) {
                         val maxSelectionSize = options.size
                         val incrementAmt = if (keycode == keyboardKeybinds.buttonDpadUp) -1 else 1
                         val currentSelected = this.selectedScoreCardOption.getOrCompute()
