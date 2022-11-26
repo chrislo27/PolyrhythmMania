@@ -1,6 +1,9 @@
 package polyrhythmmania.storymode.screen.desktop
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -22,20 +25,19 @@ import paintbox.util.MathHelper
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
-import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
+import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxItemState
-import polyrhythmmania.storymode.test.TestStoryDesktopScreen
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.ui.TogglableInputProcessor
 
 class DesktopUI(
         val scenario: DesktopScenario,
         private val controllerFactory: (DesktopUI) -> DesktopController,
-        val rootScreen: TestStoryDesktopScreen, // TODO remove this?
+        val rootScreen: AbstractDesktopScreen,
 ) : Disposable {
     
     companion object {
@@ -51,10 +53,12 @@ class DesktopUI(
     }
     val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
-    private val inputProcessor: TogglableInputProcessor = TogglableInputProcessor(sceneRoot.inputSystem)
+    private val keystrokeInputProcessor: KeystrokeInputProcessor = this.KeystrokeInputProcessor()
+    private val inputProcessor: TogglableInputProcessor = TogglableInputProcessor(InputMultiplexer(sceneRoot.inputSystem, keystrokeInputProcessor))
     
     val controller: DesktopController by lazy { controllerFactory(this) }
     val animations: DesktopAnimations = DesktopAnimations(this, inputProcessor)
+    val dialogHandler: DesktopDialogHandler by lazy { DesktopDialogHandler(this) }
     
     private val availableBlinkTexRegs: List<TextureRegion> = run {
         val numFrames = 5
@@ -68,10 +72,11 @@ class DesktopUI(
     
     val inboxItemRenderer: InboxItemRenderer = InboxItemRenderer(this)
     private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
-    private val monoMarkup: Markup get() = inboxItemRenderer.monoMarkup
-    private val slabMarkup: Markup get() = inboxItemRenderer.slabMarkup
-    private val robotoCondensedMarkup: Markup get() = inboxItemRenderer.robotoCondensedMarkup
-    private val openSansMarkup: Markup get() = inboxItemRenderer.openSansMarkup
+    val monoMarkup: Markup get() = inboxItemRenderer.monoMarkup
+    val slabMarkup: Markup get() = inboxItemRenderer.slabMarkup
+    val robotoRegularMarkup: Markup get() = inboxItemRenderer.robotoRegularMarkup
+    val robotoCondensedMarkup: Markup get() = inboxItemRenderer.robotoCondensedMarkup
+    val openSansMarkup: Markup get() = inboxItemRenderer.openSansMarkup
     
     val currentInboxItem: ReadOnlyVar<InboxItem?>
     val currentInboxItemState: ReadOnlyVar<InboxItemState>
@@ -90,10 +95,9 @@ class DesktopUI(
             this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pipes_lower")))
             this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pipes_upper")))
             
-            this += object : Pane() {
+            this += object : Pane() { // renderUpdate hook
                 override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-                    blinkFrameIndex.invalidate()
-                    animations.frameUpdate(Gdx.graphics.deltaTime)
+                    renderUpdate()
                 }
             }.apply { 
                 this.bounds.width.set(0f)
@@ -101,12 +105,13 @@ class DesktopUI(
             }
         }
         bg = Pane().apply {
-            this += Button(Localization.getVar("common.back")).apply {
-                this.bounds.width.set(64f)
-                this.bounds.height.set(32f)
-                Anchor.TopLeft.configure(this, offsetX = 8f, offsetY = 8f)
+            this += Button(StoryL10N.getVar("desktop.menu"), font = main.fontRobotoBold).apply {
+                this.bounds.width.set(24f * UI_SCALE)
+                this.bounds.height.set(11f * UI_SCALE)
+                this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
+                Anchor.TopLeft.configure(this, offsetX = 2f * UI_SCALE, offsetY = 2f * UI_SCALE)
                 this.setOnAction {
-                    main.screen = rootScreen.prevScreen
+                    openMenuDialog()
                 }
             }
         }
@@ -319,6 +324,16 @@ class DesktopUI(
             animations.enqueueAnimation(animations.AnimLockInputs(false))
         }
     }
+    
+    private fun renderUpdate() {
+        blinkFrameIndex.invalidate()
+        animations.frameUpdate(Gdx.graphics.deltaTime)
+    }
+
+    private fun openMenuDialog() {
+        controller.playSFX(DesktopController.SFXType.PAUSE_ENTER)
+        dialogHandler.openDialog(DesktopDialogMenu(this@DesktopUI))
+    }
 
     fun onResize(width: Int, height: Int) {
         uiViewport.update(width, height)
@@ -338,6 +353,30 @@ class DesktopUI(
     override fun dispose() {
     }
     
+    
+    inner class KeystrokeInputProcessor : InputAdapter() {
+        override fun keyDown(keycode: Int): Boolean {
+            if (keycode == Keys.ESCAPE) {
+                val currentInboxItem = currentInboxItem.getOrCompute()
+                if (dialogHandler.isDialogOpen()) {
+                    val currentDialog = dialogHandler.getActiveDialog() ?: return false
+                    if (currentDialog !is DesktopDialog) {
+                        dialogHandler.closeDialog()
+                    } else if (currentDialog.canCloseWithEscKey()) {
+                        currentDialog.attemptClose()
+                    }
+                } else if (currentInboxItem != null) {
+                    inboxItemListingObjs.find { it.inboxItem == currentInboxItem }?.action(false)
+                } else {
+                    openMenuDialog()
+                }
+                
+                return true
+            }
+            
+            return false
+        }
+    }
 
     inner class InboxItemListingObj(val inboxItem: InboxItem) : ActionablePane(), Toggle {
         override val selectedState: BooleanVar = BooleanVar(false)
@@ -412,21 +451,29 @@ class DesktopUI(
             }
 
             this.setOnAction {
-                val currentState = currentInboxItemState.getOrCompute()
-                if (currentState.completion != InboxItemCompletion.UNAVAILABLE) {
-                    this.selectedState.invert()
-                    if (currentState.completion == InboxItemCompletion.AVAILABLE) {
-                        if (inboxItem.isCompletedWhenRead()) {
-                            scenario.inboxState.putItemState(inboxItem, currentState.copy(completion = InboxItemCompletion.COMPLETED, newIndicator = false))
-                            updateAndShowNewlyAvailableInboxItems()
-                        } else if (currentState.newIndicator) {
-                            scenario.inboxState.putItemState(inboxItem, currentState.copy(newIndicator = false))
-                            updateAndShowNewlyAvailableInboxItems()
-                        }
-                    }
-                    
-                    controller.playSFX(DesktopController.SFXType.CLICK_INBOX_ITEM)
+                action(null)
+            }
+        }
+        
+        fun action(setStateTo: Boolean?) {
+            val currentState = currentInboxItemState.getOrCompute()
+            if (currentState.completion != InboxItemCompletion.UNAVAILABLE) {
+                when (setStateTo) {
+                    null -> this.selectedState.invert()
+                    else -> this.selectedState.set(setStateTo)
                 }
+                
+                if (currentState.completion == InboxItemCompletion.AVAILABLE) {
+                    if (inboxItem.isCompletedWhenRead()) {
+                        scenario.inboxState.putItemState(inboxItem, currentState.copy(completion = InboxItemCompletion.COMPLETED, newIndicator = false))
+                        updateAndShowNewlyAvailableInboxItems()
+                    } else if (currentState.newIndicator) {
+                        scenario.inboxState.putItemState(inboxItem, currentState.copy(newIndicator = false))
+                        updateAndShowNewlyAvailableInboxItems()
+                    }
+                }
+
+                controller.playSFX(DesktopController.SFXType.CLICK_INBOX_ITEM)
             }
         }
     }

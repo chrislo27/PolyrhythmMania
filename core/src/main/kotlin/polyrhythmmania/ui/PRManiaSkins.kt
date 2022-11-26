@@ -24,6 +24,7 @@ object PRManiaSkins {
     const val EDITOR_SCROLLBAR_SKIN: String = "PRMania_ScrollBar_editor"
     const val SCROLLBAR_SKIN_LIGHT: String = "PRMania_ScrollBar_light"
     const val SCROLLBAR_SKIN_STORY_DESK: String = "PRMania_ScrollBar_storyDesk"
+    const val BUTTON_SKIN_STORY_LIGHT: String = "PRMania_Button_storyLight"
     const val BUTTON_SKIN_STORY_DARK: String = "PRMania_Button_storyDark"
     
     init {
@@ -51,6 +52,11 @@ object PRManiaSkins {
         })
         DefaultSkins.register(SCROLLBAR_SKIN_STORY_DESK, SkinFactory { element: ScrollBar ->
             PRMScrollBarStoryDeskSkin(element)
+        })
+        DefaultSkins.register(BUTTON_SKIN_STORY_LIGHT, SkinFactory { element: Button ->
+            ButtonSkin(element).apply {
+                this.roundedRadius.set(3 * DesktopUI.UI_SCALE)
+            }
         })
         DefaultSkins.register(BUTTON_SKIN_STORY_DARK, SkinFactory { element: Button ->
             ButtonSkin(element).apply { 

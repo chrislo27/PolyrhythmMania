@@ -93,4 +93,6 @@ class EditorScreen(
     override fun dispose() {
         editor.dispose()
     }
+
+    override fun shouldMakeTextTransparent(): Boolean = true
 }

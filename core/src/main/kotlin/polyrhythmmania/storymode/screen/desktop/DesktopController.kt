@@ -9,7 +9,7 @@ import polyrhythmmania.storymode.screen.ExitCallback
 interface DesktopController {
 
     enum class SFXType {
-        ENTER_LEVEL, CLICK_INBOX_ITEM, INBOX_ITEM_UNLOCKED, 
+        ENTER_LEVEL, CLICK_INBOX_ITEM, INBOX_ITEM_UNLOCKED, PAUSE_ENTER, PAUSE_EXIT,
     }
     
     

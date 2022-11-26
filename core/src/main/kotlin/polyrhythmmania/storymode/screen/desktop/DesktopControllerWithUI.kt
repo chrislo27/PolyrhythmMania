@@ -103,6 +103,8 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
             DesktopController.SFXType.ENTER_LEVEL -> AssetRegistry["sfx_menu_enter_game"]
             DesktopController.SFXType.CLICK_INBOX_ITEM -> AssetRegistry["sfx_menu_blip"]
             DesktopController.SFXType.INBOX_ITEM_UNLOCKED -> StoryAssets["sfx_desk_unlocked"]
+            DesktopController.SFXType.PAUSE_ENTER -> AssetRegistry["sfx_pause_enter"]
+            DesktopController.SFXType.PAUSE_EXIT -> AssetRegistry["sfx_pause_exit"]
         } ?: return
         
         main.playMenuSfx(sound)
