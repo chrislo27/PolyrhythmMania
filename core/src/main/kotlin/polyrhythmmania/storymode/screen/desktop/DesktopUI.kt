@@ -241,14 +241,17 @@ class DesktopUI(
             this.bottomToTop.set(true)
             this.spacing.set(4f * UI_SCALE)
             
-            inputProcessor.enabled.addListener { 
+            inputProcessor.enabled.addListener {
+                val animations = this@DesktopUI.sceneRoot.animations
                 if (it.getOrCompute()) {
                     if (!visible.get()) {
                         visible.set(true)
-                        this@DesktopUI.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 0f, 1f), opacity)
+                        opacity.set(0f)
+                        animations.enqueueAnimation(Animation(Interpolation.linear, 0.4f, 0f, 1f), opacity)
                     }
                 } else {
                     if (visible.get()) {
+                        animations.cancelAnimationFor(opacity)
                         visible.set(false)
 //                        this@DesktopUI.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 1f, 0f).apply {
 //                            this.onComplete = {
