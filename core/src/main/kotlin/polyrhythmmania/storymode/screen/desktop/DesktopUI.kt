@@ -314,12 +314,12 @@ class DesktopUI(
                     scenario.updateInboxItemAvailability(listOf(item))
                     controller.playSFX(DesktopController.SFXType.INBOX_ITEM_UNLOCKED)
                 })
-                animations.enqueueAnimation(animations.AnimScrollBar(0.25f, getTargetVbarValueForInboxItem(item)))
+                animations.enqueueAnimation(animations.AnimScrollBar(getTargetVbarValueForInboxItem(item)))
             }
             
             animations.enqueueAnimation(DesktopAnimations.AnimDelay(0.5f))
             if (futureItems.isNotEmpty()) {
-                animations.enqueueAnimation(animations.AnimScrollBar(0.25f, getTargetVbarValueForInboxItem(futureItems.first())))
+                animations.enqueueAnimation(animations.AnimScrollBar(getTargetVbarValueForInboxItem(futureItems.first())))
             }
             animations.enqueueAnimation(animations.AnimLockInputs(false))
         }
@@ -356,25 +356,54 @@ class DesktopUI(
     
     inner class KeystrokeInputProcessor : InputAdapter() {
         override fun keyDown(keycode: Int): Boolean {
-            if (keycode == Keys.ESCAPE) {
-                val currentInboxItem = currentInboxItem.getOrCompute()
-                if (dialogHandler.isDialogOpen()) {
-                    val currentDialog = dialogHandler.getActiveDialog() ?: return false
-                    if (currentDialog !is DesktopDialog) {
-                        dialogHandler.closeDialog()
-                    } else if (currentDialog.canCloseWithEscKey()) {
-                        currentDialog.attemptClose()
-                    }
-                } else if (currentInboxItem != null) {
-                    inboxItemListingObjs.find { it.inboxItem == currentInboxItem }?.action(false)
-                } else {
-                    openMenuDialog()
+            val currentInboxItem = currentInboxItem.getOrCompute()
+            when (keycode) {
+                Keys.ESCAPE -> {
+                    onEscapePressed(currentInboxItem)
+                    return true
                 }
-                
-                return true
+                Keys.UP, Keys.DOWN -> {
+                    val dir = if (keycode == Keys.UP) -1 else 1
+                    if (currentInboxItem != null) {
+                        selectNextInboxItem(currentInboxItem, dir)
+                    }
+                }
             }
             
             return false
+        }
+        
+        private fun selectNextInboxItem(currentInboxItem: InboxItem, dir: Int) {
+            val indexOfCurrent = inboxItemListingObjs.indexOfFirst { it.inboxItem == currentInboxItem }
+            if (indexOfCurrent != -1) {
+                var i = indexOfCurrent + dir
+
+                while (i in 0 until inboxItemListingObjs.size) {
+                    val obj = inboxItemListingObjs[i]
+                    if (obj.myInboxItemState.getOrCompute().completion != InboxItemCompletion.UNAVAILABLE) {
+                        obj.action(true)
+                        animations.cancelAnimations { it is DesktopAnimations.AnimScrollBar }
+                        animations.enqueueAnimation(animations.AnimScrollBar(getTargetVbarValueForInboxItem(obj.inboxItem)))
+                        break
+                    }
+                    i += dir
+                }
+            }
+        }
+        
+        private fun onEscapePressed(currentInboxItem: InboxItem?) {
+            if (dialogHandler.isDialogOpen()) {
+                val currentDialog = dialogHandler.getActiveDialog() ?: return
+                if (currentDialog !is DesktopDialog) {
+                    dialogHandler.closeDialog()
+                } else if (currentDialog.canCloseWithEscKey()) {
+                    currentDialog.attemptClose()
+                }
+            } else if (currentInboxItem != null) {
+                inboxItemListingObjs.find { it.inboxItem == currentInboxItem }?.action(false)
+            } else {
+                openMenuDialog()
+            }
         }
     }
 
@@ -382,8 +411,8 @@ class DesktopUI(
         override val selectedState: BooleanVar = BooleanVar(false)
         override val toggleGroup: Var<ToggleGroup?> = Var(null)
         
-        private val currentInboxItemState: ReadOnlyVar<InboxItemState> = scenario.inboxState.itemStateVarOrUnavailable(inboxItem.id)
-        private val useFlowFont: ReadOnlyBooleanVar = BooleanVar { currentInboxItemState.use().completion == InboxItemCompletion.UNAVAILABLE }
+        val myInboxItemState: ReadOnlyVar<InboxItemState> = scenario.inboxState.itemStateVarOrUnavailable(inboxItem.id)
+        private val useFlowFont: ReadOnlyBooleanVar = BooleanVar { myInboxItemState.use().completion == InboxItemCompletion.UNAVAILABLE }
 
         init {
             this.bounds.width.set(78f * UI_SCALE)
@@ -396,7 +425,7 @@ class DesktopUI(
 
             contentPane += ImageNode().apply { 
                 this.textureRegion.sideEffecting(TextureRegion()) {reg ->
-                    val state = currentInboxItemState.use()
+                    val state = myInboxItemState.use()
                     if (state.completion == InboxItemCompletion.AVAILABLE && state.newIndicator) {
                         reg!!.setRegion(availableBlinkTexRegs[blinkFrameIndex.use()])
                     } else {
@@ -456,7 +485,7 @@ class DesktopUI(
         }
         
         fun action(setStateTo: Boolean?) {
-            val currentState = currentInboxItemState.getOrCompute()
+            val currentState = myInboxItemState.getOrCompute()
             if (currentState.completion != InboxItemCompletion.UNAVAILABLE) {
                 when (setStateTo) {
                     null -> this.selectedState.invert()

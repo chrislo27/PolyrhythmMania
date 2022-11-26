@@ -1,14 +1,19 @@
 package polyrhythmmania.storymode.screen.desktop
 
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import polyrhythmmania.ui.TogglableInputProcessor
+import java.util.function.Predicate
 
 
 class DesktopAnimations(val desktopUI: DesktopUI, private val inputProcessor: TogglableInputProcessor) {
     
     abstract class Anim(val duration: Float) {
+        
         private var progressSec: Float = 0f
         private var progressPercent: Float = 0f
+        var isCancelled: Boolean = false
+            private set
         
         protected abstract fun onUpdate(progressSec: Float, progressPercent: Float) 
         
@@ -26,9 +31,13 @@ class DesktopAnimations(val desktopUI: DesktopUI, private val inputProcessor: To
             }
         }
         
-        fun isDone(): Boolean = progressPercent >= 1f
+        fun isDone(): Boolean = isCancelled || progressPercent >= 1f
         
-        protected fun finishNow() {
+        fun cancel() {
+            isCancelled = true
+        }
+        
+        fun finishNow() {
             progressSec = duration
             progressPercent = 1f
         }
@@ -52,7 +61,7 @@ class DesktopAnimations(val desktopUI: DesktopUI, private val inputProcessor: To
         }
     }
 
-    inner class AnimScrollBar(duration: Float, val targetPos: Float) : Anim(duration) {
+    inner class AnimScrollBar(val targetPos: Float, duration: Float = 0.25f) : Anim(duration) {
         
         private var oldPos: Float = -1f
         
@@ -61,7 +70,7 @@ class DesktopAnimations(val desktopUI: DesktopUI, private val inputProcessor: To
             
             if (oldPos < 0f) {
                 oldPos = scrollbar.value.get()
-                if (oldPos == targetPos) {
+                if (MathUtils.isEqual(oldPos, targetPos)) {
                     finishNow()
                     return
                 }
@@ -79,12 +88,23 @@ class DesktopAnimations(val desktopUI: DesktopUI, private val inputProcessor: To
         animationQueue += animation
     }
     
+    fun finishAnimations(predicate: Predicate<Anim>) {
+        animationQueue.toList().forEach { if (predicate.test(it)) it.finishNow() }
+    }
+    
+    fun cancelAnimations(predicate: Predicate<Anim>) {
+        animationQueue.toList().forEach { if (predicate.test(it)) it.cancel() }
+    }
+    
     fun frameUpdate(delta: Float) {
         if (animationQueue.isNotEmpty()) {
             var remainingDelta = delta
             while (remainingDelta > 0f && animationQueue.isNotEmpty()) {
+                var leftover = remainingDelta
                 val anim = animationQueue.first()
-                val leftover = anim.frameUpdate(remainingDelta)
+                if (!anim.isCancelled) {
+                    leftover = anim.frameUpdate(remainingDelta)
+                }
                 if (anim.isDone()) {
                     remainingDelta = leftover
                     animationQueue.removeFirst()
