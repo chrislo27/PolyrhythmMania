@@ -65,7 +65,7 @@ class StoryPlayScreen(
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: GameMode?,
         val contract: Contract,
-        val allowSkipping: Boolean,
+        private val allowSkipping: Boolean,
         val exitToScreen: PaintboxScreen,
         val exitCallback: ExitCallback,
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
@@ -113,6 +113,7 @@ class StoryPlayScreen(
     private val selectedScoreCardOption: Var<PauseOption?> = Var(null)
     
     private val canPauseGame: ReadOnlyBooleanVar = BooleanVar(eager = true) { !(inIntroCard.use() || showingScoreCard.use()) }
+    private val couldSkipLevelEventually: Boolean = allowSkipping && contract.canSkipLevel
     
     private lateinit var successExitReason: ExitReason
     
@@ -290,14 +291,12 @@ class StoryPlayScreen(
         }
         mainPane += dialog
 
-        failScoreCardOptions = listOf(
+        failScoreCardOptions = listOfNotNull(
                 PauseOption("play.pause.startOver", true) { startOverPauseAction() },
-                PauseOption(StoryL10N.getVar("play.pause.skipThisLevel"), false) {
+                if (!couldSkipLevelEventually) null else PauseOption(StoryL10N.getVar("play.pause.skipThisLevel"), false) {
                     quitPauseAction(ExitReason.Skipped)
-                }.apply { 
-                    if (allowSkipping && contract.canSkipLevel) {
-                        this.enabled.bind { failureCount.use() >= contract.skipAfterNFailures }
-                    }
+                }.apply {
+                    this.enabled.bind { failureCount.use() >= contract.skipAfterNFailures }
                 },
                 PauseOption(StoryL10N.getVar("play.pause.quit"), true) { quitPauseAction(ExitReason.Quit) },
         )
