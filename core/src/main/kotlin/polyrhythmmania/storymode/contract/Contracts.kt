@@ -1,6 +1,7 @@
 package polyrhythmmania.storymode.contract
 
 import com.badlogic.gdx.Gdx
+import paintbox.binding.asReadOnlyVar
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.storymode.contract.Contract.Companion.NOT_ALLOWED_TO_SKIP
 import polyrhythmmania.storymode.gamemode.*
@@ -175,7 +176,7 @@ object Contracts {
                 if (contract.id == "tutorial1") {
                     continue
                 }
-                toAdd += InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}")
+                toAdd += InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}",  listingName = contract.id.asReadOnlyVar())
             }
 
             this.setItems(toAdd)
