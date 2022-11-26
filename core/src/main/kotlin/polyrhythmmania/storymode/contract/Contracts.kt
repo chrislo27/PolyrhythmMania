@@ -2,6 +2,7 @@ package polyrhythmmania.storymode.contract
 
 import com.badlogic.gdx.Gdx
 import polyrhythmmania.editor.block.BlockEndState
+import polyrhythmmania.storymode.contract.Contract.Companion.NOT_ALLOWED_TO_SKIP
 import polyrhythmmania.storymode.gamemode.*
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItems
@@ -18,7 +19,7 @@ object Contracts {
             this.contracts[contract.id] = contract
         }
         
-        add(Contract("tutorial1", Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0) { main ->
+        add(Contract("tutorial1", Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             Tutorial1GameMode(main)
         })
         
@@ -43,10 +44,10 @@ object Contracts {
         add(Contract("bunny_hop", Requester.MOON_BUNNY, JingleType.GBA, Attribution(SongInfo.tengoku("Bunny Hop"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/bunny_hop.prmproj"))
         })
-        add(Contract("crop_stomp", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 60) { main ->
+        add(Contract("crop_stomp", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 60, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/crop_stomp.prmproj"))
         })
-        add(Contract("fillbots", Requester.BUILDROID, JingleType.GBA, Attribution(SongInfo.megamix("Fillbots"), listOf("J-D Thunder")), 60) { main ->
+        add(Contract("fillbots", Requester.BUILDROID, JingleType.GBA, Attribution(SongInfo.megamix("Fillbots"), listOf("J-D Thunder")), 60, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/fillbots.prmproj"))
         })
         add(Contract("fillbots2", Requester.BUILDROID, JingleType.GBA, Attribution(SongInfo.ds("Fillbots", listOf(SongNameAndSource.megamix("Fillbots 2"))), listOf("J-D Thunder")), 60) { main ->
@@ -82,7 +83,7 @@ object Contracts {
         add(Contract("rhythm_rally_2", Requester.GOOD_SPORTS, JingleType.ARCADE, Attribution(SongInfo.ds("Rhythm Rally", listOf(SongNameAndSource.megamix("Rhythm Rally 2"))), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_rally_2.prmproj"))
         })
-        add(Contract("rhythm_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.megamix("Rhythm Tweezers"), listOf("Kievit")), 60) { main ->
+        add(Contract("rhythm_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.megamix("Rhythm Tweezers"), listOf("Kievit")), 60, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_tweezers.prmproj"))
         })
         add(Contract("rhythm_tweezers_2", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 60) { main ->
@@ -100,7 +101,7 @@ object Contracts {
         add(Contract("second_contact", Requester.ALIENS, JingleType.ARCADE, Attribution(SongInfo.megamix("Second Contact"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/second_contact.prmproj"))
         })
-        add(Contract("shootemup", Requester.LOCKSTEP_MARTIAN, JingleType.ARCADE, Attribution(SongInfo.megamix("Shoot-'em-up"), listOf("Huebird")), 60) { main ->
+        add(Contract("shootemup", Requester.LOCKSTEP_MARTIAN, JingleType.ARCADE, Attribution(SongInfo.megamix("Shoot-'em-up"), listOf("Huebird")), 60, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/shootemup.prmproj"))
         })
         add(Contract("spaceball", Requester.ALIENS, JingleType.GBA, Attribution(SongInfo.tengoku("Spaceball"), listOf("spoopster")), 60) { main ->
