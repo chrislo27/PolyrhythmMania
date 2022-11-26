@@ -18,7 +18,7 @@ open class InboxDB : InboxItems() {
         toAdd += InboxItem.ContractDoc(Contracts["shootemup"])
         toAdd += InboxItem.ContractDoc(Contracts["rhythm_tweezers"])
         toAdd += InboxItem.Memo("intern_final_contract", hasToField = false, hasSeparateListingName = false)
-        toAdd += InboxItem.ContractDoc(Contracts["crop_stomp"], hasLongCompanyName = true)
+        toAdd += InboxItem.ContractDoc(Contracts["crop_stomp"])
         toAdd += InboxItem.Memo("intern_done", hasToField = false, hasSeparateListingName = false)
         // TODO possibly another "offer letter"? Separate inbox item type?
 

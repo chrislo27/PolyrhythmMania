@@ -42,7 +42,7 @@ sealed class InboxItem(
             val contract: Contract, itemID: String = getDefaultContractDoc(contract),
             listingName: ReadOnlyVar<String> = contract.name,
             override val subtype: ContractSubtype = ContractSubtype.NORMAL,
-            override val hasLongCompanyName: Boolean = false,
+            override val hasLongCompanyName: Boolean = contract.requester.isNameLong,
     ) : InboxItem(itemID, listingName), IContractDoc, IHasContractTextInfo by contract {
         
         companion object {
@@ -62,7 +62,7 @@ sealed class InboxItem(
             override val requester: Requester = Requester.DEBUG,
             listingName: ReadOnlyVar<String> = name.asReadOnlyVar(),
             override val subtype: ContractSubtype = ContractSubtype.NORMAL,
-            override val hasLongCompanyName: Boolean = false,
+            override val hasLongCompanyName: Boolean = requester.isNameLong,
     ) : InboxItem(itemID, listingName), IContractDoc {
 
         override val name: ReadOnlyVar<String> = name.asReadOnlyVar()

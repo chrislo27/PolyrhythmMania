@@ -195,11 +195,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                     this.temporarilyDisableLayouts {
                         val useLongCompanyName = item.hasLongCompanyName
                         this += Pane().apply {
-                            if (useLongCompanyName) {
-                                this.bounds.height.set(13f * DesktopUI.UI_SCALE)
-                            } else {
-                                this.bounds.height.set(12f * DesktopUI.UI_SCALE)
-                            }
+                            this.bounds.height.set(13f * DesktopUI.UI_SCALE)
                             this.margin.set(Insets(0f, 2.5f * DesktopUI.UI_SCALE, 0f, 0f))
 
                             this += TextLabel(headingText, font = main.fontMainMenuHeading).apply {
