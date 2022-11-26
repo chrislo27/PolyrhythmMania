@@ -1,29 +1,25 @@
 package polyrhythmmania.editor
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowListener
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import paintbox.ui.SceneRoot
 import paintbox.ui.UIElement
-import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.storymode.screen.EarlyAccessMsgOnBottom
 import java.util.*
 
 
 class EditorScreen(
     main: PRManiaGame,
     val editorFlags: EnumSet<EditorSpecialFlags> = EnumSet.noneOf(EditorSpecialFlags::class.java),
-) : PRManiaScreen(main) {
+) : PRManiaScreen(main), EarlyAccessMsgOnBottom {
 
     val batch: SpriteBatch = main.batch
     val editor: Editor = Editor(main, editorFlags)

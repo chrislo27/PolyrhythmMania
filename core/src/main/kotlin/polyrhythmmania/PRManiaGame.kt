@@ -60,6 +60,7 @@ import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.storymode.StoryAssetLoader
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.screen.EarlyAccessMsgOnBottom
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
 import polyrhythmmania.util.LelandSpecialChars
@@ -365,14 +366,13 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             batch.setColor(1f, 1f, 1f, 1f)
             val paintboxFont = fontEditorRodinBordered
             paintboxFont.useFont { font ->
-                val isEditor = this.getScreen() is EditorScreen
-                val height = if (!isEditor) (cam.viewportHeight - 10f) else (48f)
-                val alpha = if (cam.getInputY() in (height - font.capHeight)..(height) || isEditor) 0.2f else 1f
+                val currentScreen = this.getScreen()
+                val putMsgOnBottom = currentScreen is EarlyAccessMsgOnBottom && currentScreen.shouldPutMsgOnBottom()
+                val height = if (!putMsgOnBottom) (cam.viewportHeight - 10f) else (48f)
+                val alpha = if (cam.getInputY() in (height - font.capHeight)..(height) || putMsgOnBottom) 0.2f else 1f
+                val text = "Pre-release version ${PRMania.VERSION}. Content subject to change. Do not share screenshots or videos without express permission; do not redistribute."
                 font.setColor(1f, 1f, 1f, alpha)
-                font.drawCompressed(batch, "Pre-release version ${PRMania.VERSION}. Content subject to change. Do not share screenshots or videos without express permission; do not redistribute.",
-                        2f,
-                        height,
-                        cam.viewportWidth - 4f, Align.center)
+                font.drawCompressed(batch, text, 2f, height, cam.viewportWidth - 4f, Align.center)
                 font.setColor(1f, 1f, 1f, 1f)
             }
         }

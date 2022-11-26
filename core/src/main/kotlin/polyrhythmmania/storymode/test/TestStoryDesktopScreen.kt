@@ -9,6 +9,7 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.storymode.inbox.InboxItems
 import polyrhythmmania.storymode.inbox.InboxState
 import polyrhythmmania.storymode.inbox.progression.Progression
+import polyrhythmmania.storymode.screen.EarlyAccessMsgOnBottom
 import polyrhythmmania.storymode.screen.desktop.DesktopControllerWithUI
 import polyrhythmmania.storymode.screen.desktop.DesktopScenario
 import polyrhythmmania.storymode.screen.desktop.DesktopUI
@@ -18,7 +19,7 @@ class TestStoryDesktopScreen(
         main: PRManiaGame, val prevScreen: Screen,
         private val inboxItems: InboxItems,
         private val progression: Progression
-) : PRManiaScreen(main) {
+) : PRManiaScreen(main), EarlyAccessMsgOnBottom {
 
     val batch: SpriteBatch = main.batch
 
