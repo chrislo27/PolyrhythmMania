@@ -368,8 +368,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             paintboxFont.useFont { font ->
                 val currentScreen = this.getScreen()
                 val putMsgOnBottom = currentScreen is EarlyAccessMsgOnBottom && currentScreen.shouldPutMsgOnBottom()
+                val forceTransparent = currentScreen is EarlyAccessMsgOnBottom && currentScreen.shouldMakeTextTransparent()
                 val height = if (!putMsgOnBottom) (cam.viewportHeight - 10f) else (48f)
-                val alpha = if (cam.getInputY() in (height - font.capHeight)..(height) || putMsgOnBottom) 0.2f else 1f
+                val alpha = if (cam.getInputY() in (height - font.capHeight)..(height) || forceTransparent) 0.2f else 1f
                 val text = "Pre-release version ${PRMania.VERSION}. Content subject to change. Do not share screenshots or videos without express permission; do not redistribute."
                 font.setColor(1f, 1f, 1f, alpha)
                 font.drawCompressed(batch, text, 2f, height, cam.viewportWidth - 4f, Align.center)
