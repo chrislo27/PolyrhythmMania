@@ -418,11 +418,12 @@ class DesktopUI(
             this.bounds.width.set(78f * UI_SCALE)
             this.bounds.height.set(20f * UI_SCALE)
 
-            val contentPane = Pane().apply {
+            val contentPane = NoInputPane().apply {
                 this.margin.set(Insets(1f * UI_SCALE, 0f * UI_SCALE, 1f * UI_SCALE, 1f * UI_SCALE))
             }
             this += contentPane
 
+            contentPane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_blank")))
             contentPane += ImageNode().apply { 
                 this.textureRegion.sideEffecting(TextureRegion()) {reg ->
                     val state = myInboxItemState.use()
@@ -454,7 +455,6 @@ class DesktopUI(
                 this.bounds.y.set(13f * UI_SCALE)
                 this.bounds.width.set(62f * UI_SCALE)
                 this.bounds.height.set(5f * UI_SCALE)
-//                this.padding.set(Insets(0f * UI_SCALE, 0f * UI_SCALE, 1f * UI_SCALE, 1f * UI_SCALE))
             }
             contentPane += bottomAreaPane
 
@@ -471,7 +471,7 @@ class DesktopUI(
             }
 
             // Selector outline/ring
-            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_selected"))).apply {
+            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_selected_outline"))).apply {
                 this.bounds.x.set(-3f * UI_SCALE)
                 this.bounds.y.set(-1f * UI_SCALE)
                 this.bounds.width.set(84f * UI_SCALE)
