@@ -16,6 +16,7 @@ import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.SongInfo
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemState
+import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
 import polyrhythmmania.ui.PRManiaSkins
 
 
@@ -28,13 +29,13 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         val panel: UIElement = DesktopStyledPane().apply {
             Anchor.Centre.configure(this)
             this.bounds.height.set(height)
-            this.padding.set(Insets(7f * DesktopUI.UI_SCALE, 4f * DesktopUI.UI_SCALE, 5f * DesktopUI.UI_SCALE, 5f * DesktopUI.UI_SCALE))
+            this.padding.set(Insets(7f * UI_SCALE, 4f * UI_SCALE, 5f * UI_SCALE, 5f * UI_SCALE))
         }
         val vbox = VBox().apply {
-            this.spacing.set(1f * DesktopUI.UI_SCALE)
+            this.spacing.set(1f * UI_SCALE)
             this.temporarilyDisableLayouts {
                 this += TextLabel(title, font = main.fontMainMenuHeading).apply {
-                    this.bounds.height.set(7f * DesktopUI.UI_SCALE)
+                    this.bounds.height.set(7f * UI_SCALE)
                     this.textColor.set(Color.BLACK)
                     this.renderAlign.set(RenderAlign.center)
                     this.margin.set(Insets(1f, 1f, 4f, 4f))
@@ -64,6 +65,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         val attribution = contract.attribution
 
         addStartContractPanel(inboxItem, inboxItemState)
+        addContractConditionsPanel(inboxItem)
         addContractScorePanel(inboxItem, inboxItemState)
         if (inboxItemState.playedBefore && attribution != null) {
             val songInfo = attribution.song
@@ -74,11 +76,11 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     }
 
     private fun addStartContractPanel(inboxItem: InboxItem.ContractDoc, inboxItemState: InboxItemState) {
-        addRightSidePanel("".asReadOnlyVar(), 20f * DesktopUI.UI_SCALE).apply {
+        addRightSidePanel("".asReadOnlyVar(), 20f * UI_SCALE).apply {
             this.removeAllChildren()
             this += Button(StoryL10N.getVar("desktop.pane.startContract"), font = main.fontRobotoBold).apply {
                 this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
-                this.bounds.height.set(8f * DesktopUI.UI_SCALE)
+                this.bounds.height.set(8f * UI_SCALE)
 
                 this.setOnAction {
                     desktopUI.controller.playSFX(DesktopController.SFXType.ENTER_LEVEL)
@@ -90,14 +92,14 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
 
     private fun addContractScorePanel(inboxItem: InboxItem.ContractDoc, inboxItemState: InboxItemState) {
         val contract = inboxItem.contract
-        addRightSidePanel(StoryL10N.getVar("desktop.pane.performance"), 40f * DesktopUI.UI_SCALE).apply {
+        addRightSidePanel(StoryL10N.getVar("desktop.pane.performance"), 40f * UI_SCALE).apply {
             this.temporarilyDisableLayouts {
                 val completionData = inboxItemState.stageCompletionData // TODO remove me: ?: StageCompletionData(LocalDateTime.now(), LocalDateTime.now(), 70, true, true)
                 if (completionData != null) {
                     this += TextLabel(binding = {
                         if (contract.immediatePass) StoryL10N.getVar("play.scoreCard.pass").use() else "${completionData.score}"
                     }, font = main.fontResultsScore).apply {
-                        this.bounds.height.set(11f * DesktopUI.UI_SCALE)
+                        this.bounds.height.set(11f * UI_SCALE)
                         this.textColor.set(Color.LIGHT_GRAY)
                         this.renderAlign.set(RenderAlign.center)
                         this.setScaleXY(0.5f)
@@ -105,14 +107,14 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                     }
                     val tmpListFeatures = listOfNotNull(if (completionData.skillStar) "Skill Star!" else null, if (completionData.noMiss) "No Miss!" else null)
                     this += TextLabel("[TMP!] " + tmpListFeatures.joinToString(separator = " "), font = main.fontRoboto).apply {
-                        this.bounds.height.set(8f * DesktopUI.UI_SCALE)
+                        this.bounds.height.set(8f * UI_SCALE)
                         this.textColor.set(Color.BLACK)
                         this.renderAlign.set(RenderAlign.center)
                         this.margin.set(Insets(1f, 1f, 4f, 4f))
                     }
                 } else {
                     this += TextLabel(StoryL10N.getVar("desktop.pane.performance.noInfo"), font = main.fontRobotoItalic).apply {
-                        this.bounds.height.set(16f * DesktopUI.UI_SCALE)
+                        this.bounds.height.set(19f * UI_SCALE)
                         this.textColor.set(Color.BLACK)
                         this.renderAlign.set(RenderAlign.center)
                         this.doLineWrapping.set(true)
@@ -125,7 +127,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
 
     private fun addSongInfoPanel(songInfo: SongInfo) {
         val numNewlines = songInfo.songNameAndSource.songNameWithLineBreaks.count { it == '\n' }
-        addRightSidePanel(StoryL10N.getVar("desktop.pane.musicInfo"), (36f + (numNewlines * 6)) * DesktopUI.UI_SCALE).apply {
+        addRightSidePanel(StoryL10N.getVar("desktop.pane.musicInfo"), (36f + (numNewlines * 6)) * UI_SCALE).apply {
             this.temporarilyDisableLayouts {
                 val additionalMappings = mapOf("rodin" to main.fontMainMenuRodin)
                 val markupNormal = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold,
@@ -171,7 +173,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                 this += TextLabel(songInfo.songNameAndSource.songNameWithLineBreaks, font = main.fontRobotoBold).apply {
                     this.markup.set(markupNormal)
                     this.bounds.height.bind {
-                        6f * DesktopUI.UI_SCALE * (numNewlines + 1)
+                        6f * UI_SCALE * (numNewlines + 1)
                     }
                     this.textColor.set(Color.BLACK)
                     this.renderAlign.set(RenderAlign.center)
@@ -189,7 +191,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                 if (primarySourceMaterial != null) {
                     this += TextLabel("", font = main.fontRobotoBold).apply {
                         this.markup.set(markupCondensed)
-                        this.bounds.height.set(4f * DesktopUI.UI_SCALE)
+                        this.bounds.height.set(4f * UI_SCALE)
                         this.textColor.set(Color.BLACK)
                         this.renderAlign.set(RenderAlign.center)
                         this.internalTextBlock.bind {
@@ -206,12 +208,18 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                     }
                 }
                 this += TextLabel(songInfo.songArtist, font = main.fontMainMenuRodin).apply {
-                    this.bounds.height.set(4f * DesktopUI.UI_SCALE)
+                    this.bounds.height.set(4f * UI_SCALE)
                     this.textColor.set(Color.BLACK)
                     this.renderAlign.set(RenderAlign.center)
                     this.setScaleXY(0.65f)
                 }
             }
+        }
+    }
+    
+    private fun addContractConditionsPanel(inboxItem: InboxItem.ContractDoc) {
+        addRightSidePanel(StoryL10N.getVar("desktop.pane.conditions"), 36f * UI_SCALE).apply { 
+            // TODO
         }
     }
 

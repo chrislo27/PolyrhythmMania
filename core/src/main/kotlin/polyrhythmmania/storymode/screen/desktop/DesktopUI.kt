@@ -244,7 +244,7 @@ class DesktopUI(
             this.margin.set(Insets(15f * UI_SCALE, 0f))
             this.align.set(VBox.Align.BOTTOM)
             this.bottomToTop.set(true)
-            this.spacing.set(4f * UI_SCALE)
+            this.spacing.set(3f * UI_SCALE)
             
             inputProcessor.enabled.addListener {
                 val animations = this@DesktopUI.sceneRoot.animations

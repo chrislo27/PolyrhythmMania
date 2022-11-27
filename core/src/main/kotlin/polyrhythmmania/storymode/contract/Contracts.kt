@@ -139,7 +139,7 @@ object Contracts {
         
         
         // Debug contracts
-        add(Contract("air_rally_one_life", Requester.DEBUG, JingleType.GBA, null, 0) { main ->
+        add(Contract("air_rally_one_life", Requester.DEBUG, JingleType.GBA, contracts["air_rally"]?.attribution, 0) { main ->
             // FIXME this is a debug contract
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply {
                 val lives = this.engine.modifiers.livesMode
@@ -147,7 +147,7 @@ object Contracts {
                 lives.enabled.set(true)
             }
         })
-        add(Contract("air_rally_earlyend_instantpass", Requester.DEBUG, JingleType.GBA, null, 0) { main ->
+        add(Contract("air_rally_earlyend_instantpass", Requester.DEBUG, JingleType.GBA, contracts["air_rally"]?.attribution, 0) { main ->
             // FIXME this is a debug contract
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply {
                 this.container.addBlock(BlockEndState(this.engine).apply {
@@ -155,7 +155,7 @@ object Contracts {
                 })
             }
         })
-        add(Contract("air_rally_earlyend_50pass", Requester.DEBUG, JingleType.GBA, null, 50) { main ->
+        add(Contract("air_rally_earlyend_50pass", Requester.DEBUG, JingleType.GBA, contracts["air_rally"]?.attribution, 50) { main ->
             // FIXME this is a debug contract
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply {
                 this.container.addBlock(BlockEndState(this.engine).apply {
