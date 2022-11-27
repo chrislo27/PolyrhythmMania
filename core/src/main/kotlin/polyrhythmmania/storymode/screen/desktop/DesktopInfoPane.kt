@@ -218,8 +218,15 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     }
     
     private fun addContractConditionsPanel(inboxItem: InboxItem.ContractDoc) {
-        addRightSidePanel(StoryL10N.getVar("desktop.pane.conditions"), 36f * UI_SCALE).apply { 
-            // TODO
+        val contract = inboxItem.contract
+        addRightSidePanel(StoryL10N.getVar("desktop.pane.conditions"), 30f * UI_SCALE).apply {
+            val scoreClearKey = if (contract.immediatePass) StoryL10N.getVar("desktop.pane.conditions.noMinScore") else StoryL10N.getVar("desktop.pane.conditions.minScore", listOf(contract.minimumScore))
+            this += TextLabel(scoreClearKey, font = main.fontRobotoItalic).apply {
+                this.bounds.height.set(10f * UI_SCALE)
+                this.textColor.set(Color.BLACK)
+                this.renderAlign.set(RenderAlign.center)
+                this.margin.set(Insets(1f, 1f, 4f, 4f))
+            }
         }
     }
 

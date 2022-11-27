@@ -20,6 +20,7 @@ data class Contract(
          * Minimum score to pass. If less than or equal to 0, the level is immediately passed when you get to the end.
          */
         val minimumScore: Int,
+        val extraConditions: List<Condition> = emptyList(),
 
         /**
          * Number of failures to have before being allowed to skip. If non-positive, you cannot skip it.
@@ -39,10 +40,11 @@ data class Contract(
     
     constructor(
             id: String, requester: Requester, jingleType: JingleType, attribution: Attribution?,
-            minimumScore: Int, skipAfterNFailures: Int = DEFAULT_SKIP_TIME, gamemodeFactory: (main: PRManiaGame) -> GameMode
+            minimumScore: Int, extraConditions: List<Condition> = emptyList(), 
+            skipAfterNFailures: Int = DEFAULT_SKIP_TIME, gamemodeFactory: (main: PRManiaGame) -> GameMode
     ) : this(
             id, StoryL10N.getVar("contract.$id.name"), StoryL10N.getVar("contract.$id.desc"),
-            StoryL10N.getVar("contract.$id.tagline"), requester, jingleType, attribution, minimumScore,
+            StoryL10N.getVar("contract.$id.tagline"), requester, jingleType, attribution, minimumScore, extraConditions,
             skipAfterNFailures, gamemodeFactory
     )
 
