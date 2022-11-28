@@ -64,6 +64,7 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
                 inboxState.putItemState(inboxItem, newState)
                 currentInboxItem.invalidate()
                 currentInboxItem.getOrCompute()
+                desktopUI.background.resetAll()
                 desktopUI.updateAndShowNewlyAvailableInboxItems(lockInputs = true)
             }
         }

@@ -276,6 +276,17 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame) : PRManiaScreen(main) {
                         }
                     }
                     this += separator()
+                    this += Button("Debug \"desktop\" screen background only").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            Gdx.app.postRunnable {
+                                val titleScreen = TestStoryDesktopBgScreen(main, this@TestStoryGimmickDebugScreen)
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
+                    this += separator()
                     class GamemodeTest(val name: String, val gamemodeFactory: () -> TestStoryGameMode)
                     val gamemodes: List<GamemodeTest> = listOf(
                             GamemodeTest("Polyrhythm 2 no changes") { object : TestStoryGameMode(main) {} },

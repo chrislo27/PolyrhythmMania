@@ -59,6 +59,7 @@ class DesktopUI(
     val controller: DesktopController by lazy { controllerFactory(this) }
     val animations: DesktopAnimations = DesktopAnimations(this, inputProcessor)
     val dialogHandler: DesktopDialogHandler by lazy { DesktopDialogHandler(this) }
+    val background: DesktopBackground by lazy { DesktopBackground(this.uiCamera) }
     
     private val availableBlinkTexRegs: List<TextureRegion> = run {
         val numFrames = 5
@@ -80,7 +81,7 @@ class DesktopUI(
     
     val currentInboxItem: ReadOnlyVar<InboxItem?>
     val currentInboxItemState: ReadOnlyVar<InboxItemState>
-    val bg: UIElement
+    val bgElement: UIElement
     val rightSideInfoPane: DesktopInfoPane
     
     val inboxItemListScrollbar: ScrollBar
@@ -90,11 +91,6 @@ class DesktopUI(
         sceneRoot.debugOutlineColor.set(Color(1f, 0f, 0f, 1f))
 
         sceneRoot += NoInputPane().apply {
-            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg")))
-            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pistons")))
-            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pipes_lower")))
-            this += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_bg_pipes_upper")))
-            
             this += object : Pane() { // renderUpdate hook
                 override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
                     renderUpdate()
@@ -104,7 +100,7 @@ class DesktopUI(
                 this.bounds.height.set(0f)
             }
         }
-        bg = Pane().apply {
+        bgElement = Pane().apply {
             this += Button(StoryL10N.getVar("desktop.menu"), font = main.fontRobotoBold).apply {
                 this.bounds.width.set(24f * UI_SCALE)
                 this.bounds.height.set(11f * UI_SCALE)
@@ -115,7 +111,7 @@ class DesktopUI(
                 }
             }
         }
-        sceneRoot += bg
+        sceneRoot += bgElement
     }
 
     init { // Left scroll area and inbox item view
@@ -126,7 +122,7 @@ class DesktopUI(
             this.bounds.height.set(152f * UI_SCALE)
             this.doClipping.set(true) // Safety clipping so nothing exceeds the overall frame
         }
-        bg += frameImg
+        bgElement += frameImg
         val frameNoCaps = Pane().apply {// Extra pane is so that the frameChildArea is the one that clips properly internally
             this.margin.set(Insets(7f * UI_SCALE, 5f * UI_SCALE, 1f * UI_SCALE, 1f * UI_SCALE))
         }
@@ -175,7 +171,7 @@ class DesktopUI(
         frameScrollPane.contentPane.contentOffsetY.eagerBind {
             -inboxItemListScrollbar.value.use() / (inboxItemListScrollbar.maximum.use() - inboxItemListScrollbar.minimum.use()) * frameScrollPane.contentHeightDiff.use()
         }
-        bg += inboxItemListScrollbar
+        bgElement += inboxItemListScrollbar
         val scrollListener = InputEventListener { event ->
             if (event is Scrolled && !Gdx.input.isControlDown() && !Gdx.input.isAltDown()) {
                 val shift = Gdx.input.isShiftDown()
@@ -226,7 +222,7 @@ class DesktopUI(
             this.bounds.width.set(128f * UI_SCALE)
             this.align.set(VBox.Align.CENTRE)
         }
-        bg += inboxItemDisplayPane
+        bgElement += inboxItemDisplayPane
 
         currentInboxItem.addListener {
             val inboxItem = it.getOrCompute()
@@ -267,7 +263,7 @@ class DesktopUI(
                 }
             }
         }
-        bg += rightSideInfoPane
+        bgElement += rightSideInfoPane
         
         currentInboxItem.addListener {
             val inboxItem = it.getOrCompute()
@@ -277,6 +273,14 @@ class DesktopUI(
                 rightSideInfoPane.updateForInboxItem(inboxItem)
             }
         }
+    }
+    
+    fun render(batch: SpriteBatch) {
+        batch.projectionMatrix = this.uiCamera.combined
+        batch.begin()
+        background.render(batch)
+        this.sceneRoot.renderAsRoot(batch)
+        batch.end()
     }
     
     fun getTargetVbarValueForInboxItem(inboxItem: InboxItem): Float {
@@ -313,6 +317,7 @@ class DesktopUI(
                 animations.enqueueAnimation(DesktopAnimations.AnimGeneric(0f) { _, _ -> 
                     scenario.updateInboxItemAvailability(listOf(item))
                     controller.playSFX(DesktopController.SFXType.INBOX_ITEM_UNLOCKED)
+                    background.sendEnvelope()
                 })
                 animations.enqueueAnimation(animations.AnimScrollBar(getTargetVbarValueForInboxItem(item)))
             }

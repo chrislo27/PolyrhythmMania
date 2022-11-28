@@ -20,7 +20,7 @@ abstract class AbstractDesktopScreen(
         scenario.updateProgression()
         scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
     }
-
+    
 
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
@@ -29,11 +29,7 @@ abstract class AbstractDesktopScreen(
         super.render(delta)
 
         // Render desktop UI components
-        val camera = desktopUI.uiCamera
-        batch.projectionMatrix = camera.combined
-        batch.begin()
-        desktopUI.sceneRoot.renderAsRoot(batch)
-        batch.end()
+        desktopUI.render(batch)
     }
 
     override fun resize(width: Int, height: Int) {
