@@ -93,10 +93,10 @@ object Contracts {
         add(Contract("ringside", Requester.KRIQ, JingleType.MODERN, Attribution(SongInfo.fever("Ringside"), listOf("Dream Top")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/ringside.prmproj"))
         })
-        add(Contract("screwbots", Requester.BUILDROID, JingleType.GBA, Attribution(SongInfo.fever("Screwbot Factory"), listOf("Kievit")), 60) { main ->
+        add(Contract("screwbots", Requester.BUILDROID, JingleType.GBA, Attribution(SongInfo.fever("Screwbot Factory"), listOf("Kievit")), 75) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/screwbots.prmproj"))
         })
-        add(Contract("screwbots2", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.fever("Screwbot Factory 2"), listOf("Kievit")), 60) { main ->
+        add(Contract("screwbots2", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.fever("Screwbot Factory 2"), listOf("Kievit")), 75) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/screwbots2.prmproj"))
         })
         add(Contract("second_contact", Requester.ALIENS, JingleType.ARCADE, Attribution(SongInfo.megamix("Second Contact"), listOf("Kievit")), 60) { main ->
