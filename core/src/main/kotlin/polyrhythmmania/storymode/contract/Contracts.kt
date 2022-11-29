@@ -30,7 +30,7 @@ object Contracts {
         add(Contract("air_rally_2", Requester.SHIPSTEERING, JingleType.MODERN, Attribution(SongInfo.fever("Air Rally", listOf(SongNameAndSource.megamix("Air Rally 2"))), listOf("GENERIC")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally_2.prmproj"))
         })
-        add(Contract("boosted_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 60) { main ->
+        add(Contract("boosted_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 75) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/boosted_tweezers.prmproj"))
         })
         add(Contract("bouncy_road", Requester.POLYRHYTHM_INC, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("J-D Thunder")), 60) { main ->
@@ -84,10 +84,10 @@ object Contracts {
         add(Contract("rhythm_rally_2", Requester.GOOD_SPORTS, JingleType.ARCADE, Attribution(SongInfo.ds("Rhythm Rally", listOf(SongNameAndSource.megamix("Rhythm Rally 2"))), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_rally_2.prmproj"))
         })
-        add(Contract("rhythm_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.megamix("Rhythm Tweezers"), listOf("Kievit")), 60, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+        add(Contract("rhythm_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.megamix("Rhythm Tweezers"), listOf("Kievit")), 75, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_tweezers.prmproj"))
         })
-        add(Contract("rhythm_tweezers_2", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 60) { main ->
+        add(Contract("rhythm_tweezers_2", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 75) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_tweezers_2.prmproj"))
         })
         add(Contract("ringside", Requester.KRIQ, JingleType.MODERN, Attribution(SongInfo.fever("Ringside"), listOf("Dream Top")), 60) { main ->
