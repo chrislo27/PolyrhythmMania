@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
@@ -31,8 +32,10 @@ import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxItemState
+import polyrhythmmania.storymode.inbox.StageCompletionData
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.ui.TogglableInputProcessor
+import java.time.LocalDateTime
 
 class DesktopUI(
         val scenario: DesktopScenario,
@@ -46,6 +49,7 @@ class DesktopUI(
     }
 
     val main: PRManiaGame = rootScreen.main
+    var debugFeaturesEnabled: Boolean = false
     
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 320f * UI_SCALE, 180f * UI_SCALE) // 320x180 is the virtual resolution. Needs to be 4x (1280x720) for font scaling
@@ -486,6 +490,14 @@ class DesktopUI(
 
             this.setOnAction {
                 action(null)
+            }
+            this.setOnAltAction { 
+                if (debugFeaturesEnabled && Paintbox.debugMode.get()) {
+                    val currentState = myInboxItemState.getOrCompute()
+
+                    scenario.inboxState.putItemState(inboxItem, currentState.copy(completion = InboxItemCompletion.COMPLETED, newIndicator = false, stageCompletionData = StageCompletionData(LocalDateTime.now(), LocalDateTime.now(), 100, Gdx.input.isShiftDown(), true)))
+                    updateAndShowNewlyAvailableInboxItems()
+                }
             }
         }
         

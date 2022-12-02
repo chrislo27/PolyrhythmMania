@@ -42,8 +42,8 @@ import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItems
 import polyrhythmmania.storymode.inbox.InboxState
 import polyrhythmmania.storymode.inbox.progression.Progression
-import polyrhythmmania.storymode.inbox.progression.StoryModeProgression
 import polyrhythmmania.storymode.inbox.progression.UnlockStage
+import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 
 
@@ -81,7 +81,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
             return Progression(array.mapIndexed { index, value ->
                 val obj = value.asObject()
                 val requiredInboxItems = obj["required"].asArray().map { it.asString() }
-                UnlockStage("stage_$index", { true }, requiredInboxItems,
+                UnlockStage("stage_$index", UnlockStageChecker.alwaysUnlocked(), requiredInboxItems,
                         obj["optional"]?.asArray()?.map { it.asString() } ?: emptyList(),
                         obj["minRequiredToComplete"]?.asInt() ?: requiredInboxItems.size)
             }).apply { 
@@ -101,7 +101,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
 
     private val inboxDB: InboxItems = InboxDB()
     private val inboxState: InboxState = InboxState()
-    private val progression: Var<Progression> = Var(StoryModeProgression.contractsOnly())
+    private val progression: Var<Progression> = Var((inboxDB as? InboxDB)?.progression ?: Progression(emptyList()))
 
     init {
         val bg = RectElement(PRManiaColors.debugColor).apply {
@@ -277,7 +277,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
 
                     val timer = FloatVar(0f)
                     this.setOnAction {
-                        Gdx.app.clipboard.contents = StoryModeProgression.contractsOnly().toJson().toString(WriterConfig.PRETTY_PRINT)
+                        Gdx.app.clipboard.contents = InboxDB().progression.toJson().toString(WriterConfig.PRETTY_PRINT)
                         text.set("Copied to\nclipboard!")
                         this@TestStoryProgressionOverviewScreen.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 5f, 0f, 1f).apply {
                             this.onComplete = {
@@ -297,7 +297,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                     val timer = FloatVar(0f)
                     this.setOnAction {
                         text.set("Done!")
-                        this@TestStoryProgressionOverviewScreen.progression.set(StoryModeProgression.contractsOnly())
+                        this@TestStoryProgressionOverviewScreen.progression.set(InboxDB().progression)
                         this@TestStoryProgressionOverviewScreen.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 5f, 0f, 1f).apply {
                             this.onComplete = {
                                 text.set(normalText)

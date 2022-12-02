@@ -18,4 +18,9 @@ class TestStoryDesktopScreen(
         inboxItems,
         progression,
         InboxState() // Blank state intentionally
-)), EarlyAccessMsgOnBottom
+)), EarlyAccessMsgOnBottom {
+    
+    init {
+        this.desktopUI.debugFeaturesEnabled = true
+    }
+}
