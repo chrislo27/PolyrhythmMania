@@ -43,10 +43,7 @@ import polyrhythmmania.gamemodes.ChangeMusicVolMultiplierEvent
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
-import polyrhythmmania.screen.play.pause.ArrowNode
-import polyrhythmmania.screen.play.pause.PauseMenuHandler
-import polyrhythmmania.screen.play.pause.PauseOption
-import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
+import polyrhythmmania.screen.play.pause.*
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
@@ -71,11 +68,7 @@ class StoryPlayScreen(
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
 
     override val pauseMenuHandler: PauseMenuHandler = TengokuBgPauseMenuHandler(this).apply { // FIXME new pause menu
-        this.pauseBg.also {
-            it.cycleSpeed = 0f
-            it.topColor.set(PRManiaColors.debugColor)
-            it.bottomColor.set(PRManiaColors.debugColor)
-        }
+        this.pauseBg.gradientRenderer = TengokuPauseBackground.DebugColorGradientRenderer
     }
 
     private var disableCatchingCursorOnHide: Boolean = false

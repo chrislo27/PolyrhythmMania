@@ -25,6 +25,7 @@ import polyrhythmmania.screen.play.AbstractEnginePlayScreen
 import polyrhythmmania.screen.play.pause.PauseMenuHandler
 import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
+import polyrhythmmania.screen.play.pause.TengokuPauseBackground
 import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.WorldType
 import java.time.*
@@ -59,11 +60,8 @@ class EnginePlayScreenBase(
                 && engine.world.worldMode.worldType is WorldType.Polyrhythm
                 && endlessScore.maxLives.get() == 1) { // Daredevil mode in endless
             (pauseMenuHandler as? TengokuBgPauseMenuHandler)?.also { handler ->
-                val hex = "DB2323"
-                val bg = handler.pauseBg
-                bg.cycleSpeed = 0f
-                bg.topColor.set(Color.valueOf(hex))
-                bg.bottomColor.set(Color.valueOf(hex))
+                val red = Color.valueOf("DB2323")
+                handler.pauseBg.gradientRenderer = TengokuPauseBackground.SingleColorGradientRenderer(red)
             }
         }
     }

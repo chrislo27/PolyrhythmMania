@@ -5,13 +5,13 @@ import com.badlogic.gdx.graphics.Color
 import paintbox.binding.ReadOnlyVar
 import paintbox.transition.*
 import paintbox.util.gdxutils.disposeQuietly
-import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
 import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
+import polyrhythmmania.screen.play.pause.TengokuPauseBackground
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 
 
@@ -26,11 +26,7 @@ open class TestStoryGimmickPlayScreen(
     private var disableCatchingCursorOnHide: Boolean = false
     
     init {
-        pauseMenuHandler.pauseBg.also { 
-            it.cycleSpeed = 0f
-            it.topColor.set(PRManiaColors.debugColor)
-            it.bottomColor.set(PRManiaColors.debugColor)
-        }
+        pauseMenuHandler.pauseBg.gradientRenderer = TengokuPauseBackground.DebugColorGradientRenderer
     }
     
     init {
