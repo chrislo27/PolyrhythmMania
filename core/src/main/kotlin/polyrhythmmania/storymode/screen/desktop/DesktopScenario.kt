@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.screen.desktop
 
+import polyrhythmmania.storymode.StorySavefile
 import polyrhythmmania.storymode.inbox.*
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.inbox.progression.StageUnlockState
@@ -9,7 +10,7 @@ import polyrhythmmania.storymode.inbox.progression.UnlockStage
 data class DesktopScenario(
         val inboxItems: InboxItems,
         val progression: Progression,
-        val inboxState: InboxState,
+        val savefile: StorySavefile,
 ) {
     
     companion object {
@@ -17,6 +18,8 @@ data class DesktopScenario(
             return InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = true)
         }
     }
+    
+    val inboxState: InboxState get() = savefile.inboxState
 
     
     fun updateProgression(): Map<StageUnlockState, List<UnlockStage>> {

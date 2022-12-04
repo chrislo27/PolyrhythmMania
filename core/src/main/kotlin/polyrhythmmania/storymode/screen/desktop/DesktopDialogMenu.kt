@@ -1,6 +1,9 @@
 package polyrhythmmania.storymode.screen.desktop
 
 import com.badlogic.gdx.graphics.Color
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
+import paintbox.transition.TransitionScreen
 import paintbox.ui.RenderAlign
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
@@ -50,7 +53,12 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
                 this.bounds.height.set(16f * UI_SCALE)
                 this.setOnAction {
                     desktopUI.controller.playSFX(DesktopController.SFXType.PAUSE_EXIT)
-                    main.screen = desktopUI.rootScreen.prevScreen // TODO transition
+                    
+                    desktopUI.storySession.attemptSave()
+                    
+                    val nextScreen = desktopUI.rootScreen.prevScreen()
+                    main.screen = TransitionScreen(main, main.screen, nextScreen,
+                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                 }
             }
         }

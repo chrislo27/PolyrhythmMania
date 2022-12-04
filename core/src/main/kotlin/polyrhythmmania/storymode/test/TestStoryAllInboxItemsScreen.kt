@@ -32,9 +32,9 @@ import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.storymode.StorySavefile
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.inbox.InboxItem
-import polyrhythmmania.storymode.inbox.InboxState
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 import polyrhythmmania.storymode.screen.desktop.DesktopScenario
@@ -58,7 +58,8 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val storySession: StorySes
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val processor: InputProcessor = sceneRoot.inputSystem
 
-    private val desktopScenario: DesktopScenario = DesktopScenario(DebugAllInboxItemsDB, Progression(emptyList()), InboxState())
+    private val desktopScenario: DesktopScenario = DesktopScenario(DebugAllInboxItemsDB, Progression(emptyList()),
+            storySession.currentSavefile ?: StorySavefile.newDebugSaveFile())
     private val inboxItemRenderer: InboxItemRenderer = InboxItemRenderer(main, desktopScenario)
     private val monoMarkup: Markup get() = inboxItemRenderer.monoMarkup
     private val slabMarkup: Markup get() = inboxItemRenderer.slabMarkup

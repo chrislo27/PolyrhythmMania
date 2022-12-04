@@ -2,9 +2,9 @@ package polyrhythmmania.storymode.test
 
 import com.badlogic.gdx.Screen
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.storymode.StorySavefile
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.inbox.InboxItems
-import polyrhythmmania.storymode.inbox.InboxState
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.screen.EarlyAccessMsgOnBottom
 import polyrhythmmania.storymode.screen.desktop.AbstractDesktopScreen
@@ -15,13 +15,16 @@ class TestStoryDesktopScreen(
         main: PRManiaGame, storySession: StorySession, prevScreen: Screen,
         private val inboxItems: InboxItems,
         private val progression: Progression
-) : AbstractDesktopScreen(main, storySession, prevScreen, DesktopScenario(
+) : AbstractDesktopScreen(main, storySession, { prevScreen }, DesktopScenario(
         inboxItems,
         progression,
-        InboxState() // Blank state intentionally
+        storySession.currentSavefile ?: StorySavefile.newDebugSaveFile()
 )), EarlyAccessMsgOnBottom {
     
     init {
+        scenario.updateProgression()
+        scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
+        
         this.desktopUI.debugFeaturesEnabled = true
     }
 }

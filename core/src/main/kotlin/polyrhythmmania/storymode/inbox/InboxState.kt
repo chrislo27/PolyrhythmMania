@@ -17,8 +17,9 @@ class InboxState {
     companion object {
         const val JSON_VERSION: Int = 1
         
-        fun fromJson(rootObj: JsonObject): InboxState {
-            val inboxState = InboxState()
+        fun fromJson(rootObj: JsonObject, inboxState: InboxState = InboxState()): InboxState {
+            inboxState.clear()
+            
             val version = rootObj.get("version").asInt()
             
             val items = rootObj.get("items").asArray()
@@ -115,6 +116,10 @@ class InboxState {
     fun itemStateVarOrUnavailable(itemID: String): ReadOnlyVar<InboxItemState> {
         val v = itemStateVar(itemID) // This should be cached so a new var doesn't get made each time
         return Var.bind { v.use() ?: InboxItemState.DEFAULT_UNAVAILABLE }
+    }
+    
+    fun clear() {
+        itemStates.keys.toList().forEach(this::removeItemState)
     }
     
     fun toJson(): JsonObject {

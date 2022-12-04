@@ -13,11 +13,31 @@ import polyrhythmmania.storymode.screen.StoryAssetsLoadingScreen
  */
 class StorySession {
     
+    var currentSavefile: StorySavefile? = null
+        private set
+    
     // TODO add music handler
     
     fun renderUpdate() {
         GlobalStats.updateTotalStoryModePlayTime()
-        // TODO if a save file is active, update its play time also (call StorySavefile.updatePlayTime)
+        currentSavefile?.updatePlayTime()
+    }
+
+    /**
+     * Attempts to save the game. Will never throw an exception.
+     */
+    fun attemptSave() {
+        val savefile = currentSavefile ?: return
+        savefile.persist()
+    }
+    
+    fun stopUsingSavefile() {
+        currentSavefile = null
+    }
+    
+    fun useSavefile(savefile: StorySavefile) {
+        stopUsingSavefile()
+        currentSavefile = savefile
     }
     
     fun createEntryLoadingScreen(main: PRManiaGame, doAfterLoad: () -> Unit): StoryAssetsLoadingScreen {
@@ -27,6 +47,7 @@ class StorySession {
 
     fun createExitLoadingScreen(main: PRManiaGame, doAfterUnload: () -> Unit): StoryAssetsLoadingScreen {
         DiscordRichPresence.updateActivity(DefaultPresences.idle())
+        attemptSave()
         return StoryAssetsLoadingScreen(main, true, doAfterUnload)
     }
 }

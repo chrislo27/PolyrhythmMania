@@ -11,17 +11,12 @@ import polyrhythmmania.storymode.StorySession
 
 abstract class AbstractDesktopScreen(
         main: PRManiaGame, val storySession: StorySession,
-        val prevScreen: Screen, val scenario: DesktopScenario,
+        val prevScreen: () -> Screen, val scenario: DesktopScenario,
 ) : PRManiaScreen(main) {
     
     protected val batch: SpriteBatch = main.batch
     
     val desktopUI: DesktopUI by lazy { DesktopUI(scenario, { dt -> DesktopControllerWithUI(dt) }, this) }
-
-    init {
-        scenario.updateProgression()
-        scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
-    }
     
 
     override fun render(delta: Float) {

@@ -29,6 +29,9 @@ import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySavefile
 import polyrhythmmania.storymode.StorySession
+import polyrhythmmania.storymode.inbox.InboxDB
+import polyrhythmmania.storymode.screen.desktop.DesktopAnimations
+import polyrhythmmania.storymode.screen.desktop.DesktopScenario
 
 
 class StoryTitleScreen(main: PRManiaGame, val storySession: StorySession) : PRManiaScreen(main) {
@@ -61,16 +64,48 @@ class StoryTitleScreen(main: PRManiaGame, val storySession: StorySession) : PRMa
                         Anchor.Centre.configure(this)
                         this.spacing.set(10f)
 
-                        this.columnBoxes.zip(savefiles).forEachIndexed { index, (pane, savefile) ->
-                            pane += Button("File ${savefile.number}\n\n${savefile.javaClass.simpleName}").apply {
+                        this.columnBoxes.zip(savefiles).forEachIndexed { index, (pane, savefileState) ->
+                            pane += Button("File ${savefileState.number}\n\n${savefileState.javaClass.simpleName}").apply {
                                 Anchor.Centre.configure(this)
                                 this.bindWidthToSelfHeight()
-                                if (savefile is StorySavefile.LoadedState.FailedToLoad) {
+                                if (savefileState is StorySavefile.LoadedState.FailedToLoad) {
                                     this.disabled.set(true)
                                 }
                                 
-                                this.setOnAction { 
-                                    // TODO
+                                this.setOnAction {
+                                    val isBrandNew = savefileState is StorySavefile.LoadedState.NoSavefile
+                                    val savefile = when (savefileState) {
+                                        is StorySavefile.LoadedState.FailedToLoad -> return@setOnAction
+                                        is StorySavefile.LoadedState.Loaded -> savefileState.savefile
+                                        is StorySavefile.LoadedState.NoSavefile -> savefileState.blankFile
+                                    }
+                                    
+                                    storySession.useSavefile(savefile)
+                                    
+                                    val inboxDB = InboxDB()
+                                    val desktopScreen = StoryDesktopScreen(main, storySession, {
+                                        storySession.stopUsingSavefile()
+                                        StoryTitleScreen(main, storySession)
+                                    }, DesktopScenario(inboxDB, inboxDB.progression, savefile), isBrandNew)
+                                    
+                                    if (isBrandNew) {
+                                        val desktopUI = desktopScreen.desktopUI
+                                        val animations = desktopUI.animations
+
+                                        main.screen = TransitionScreen(main, main.screen, desktopScreen,
+                                                FadeToOpaque(2.5f, Color.BLACK), FadeToTransparent(0.5f, Color.BLACK)).apply {
+                                            this.onDestEnd = {
+                                                animations.enqueueAnimation(animations.AnimLockInputs(true))
+                                                animations.enqueueAnimation(DesktopAnimations.AnimDelay(1f))
+                                                animations.enqueueAnimation(DesktopAnimations.AnimGeneric(0f) { _, _ ->
+                                                    desktopUI.updateAndShowNewlyAvailableInboxItems(lockInputs = true)
+                                                })
+                                            }
+                                        }
+                                    } else {
+                                        main.screen = TransitionScreen(main, main.screen, desktopScreen,
+                                                FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))   
+                                    }
                                 }
                             }
                         }
