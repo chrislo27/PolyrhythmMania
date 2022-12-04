@@ -11,7 +11,7 @@ object StoryCredits : CreditsBase() {
     override val credits: Map<ReadOnlyVar<String>, List<ReadOnlyVar<String>>> = linkedMapOf(
             Localization.getVar("credits.story.levelCreators") to getLevelCreators().toVars(),
             Localization.getVar("credits.story.writing") to abcSorted(
-                    "sp00pster", "chrislo27", "J-D Thunder", "Conn", "garbo"
+                    "sp00pster", "chrislo27", "J-D Thunder", "Conn", "garbo", "Luxury",
             ).toVars(),
     )
 
