@@ -42,10 +42,13 @@ import polyrhythmmania.gamemodes.ChangeMusicVolMultiplierEvent
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
-import polyrhythmmania.screen.play.pause.*
-import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.screen.play.pause.ArrowNode
+import polyrhythmmania.screen.play.pause.PauseMenuHandler
+import polyrhythmmania.screen.play.pause.PauseOption
+import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.ui.TextSlideInterp
 import polyrhythmmania.util.FrameBufferManager
@@ -57,6 +60,7 @@ import kotlin.math.roundToInt
 
 class StoryPlayScreen(
         main: PRManiaGame,
+        val storySession: StorySession,
         container: Container,
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: GameMode?,
@@ -747,11 +751,7 @@ class StoryPlayScreen(
 
     override fun renderUpdate() {
         super.renderUpdate()
-        
-        if (!isPaused.get()) {
-            // TODO increment play time for save file, call StorySavefile.updatePlayTime
-            GlobalStats.updateTotalStoryModePlayTime()
-        }
+        storySession.renderUpdate()
     }
 
     private fun pauseGameNoCheck(playSound: Boolean) {

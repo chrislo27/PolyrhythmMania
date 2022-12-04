@@ -530,7 +530,7 @@ class EntityRodAsm(world: World, deployBeat: Float, val rodID: Int) : EntityRod(
             val oldLives = endlessScore.lives.get()
             endlessScore.triggerEndlessLifeLost(engine.inputter) // This intentionally does not normally automatically trigger in EndlessScore
             if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
-//                GlobalStats.livesLostAssemble.increment() // TODO
+//                GlobalStats.livesLostAssemble.increment() // TODO if lives are implemented into assemble
             }
         }
     }

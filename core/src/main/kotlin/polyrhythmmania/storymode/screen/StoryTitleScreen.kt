@@ -28,9 +28,10 @@ import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySavefile
+import polyrhythmmania.storymode.StorySession
 
 
-class StoryTitleScreen(main: PRManiaGame) : PRManiaScreen(main) {
+class StoryTitleScreen(main: PRManiaGame, val storySession: StorySession) : PRManiaScreen(main) {
     
     val batch: SpriteBatch = main.batch
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
@@ -108,6 +109,11 @@ class StoryTitleScreen(main: PRManiaGame) : PRManiaScreen(main) {
         sceneRoot.renderAsRoot(batch)
         
         batch.end()
+    }
+
+    override fun renderUpdate() {
+        super.renderUpdate()
+        storySession.renderUpdate()
     }
 
     override fun resize(width: Int, height: Int) {

@@ -70,8 +70,10 @@ import kotlin.concurrent.thread
 import kotlin.math.ceil
 
 
-class Editor(val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>)
-    : ActionHistory<Editor>(), InputProcessor, Disposable, Lwjgl3WindowListener {
+class Editor(
+        val main: PRManiaGame, val flags: EnumSet<EditorSpecialFlags>,
+        val editorSpecialParams: EditorSpecialParams,
+) : ActionHistory<Editor>(), InputProcessor, Disposable, Lwjgl3WindowListener {
 
     companion object {
         val DEFAULT_TRACKS_INPUT: List<Track> = listOf(

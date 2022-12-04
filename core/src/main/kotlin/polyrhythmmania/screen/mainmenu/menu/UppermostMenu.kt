@@ -22,7 +22,7 @@ import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.screen.SimpleLoadingScreen
 import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.storymode.screen.StoryAssetsLoadingScreen
+import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.test.TestStoryGimmickDebugScreen
 import polyrhythmmania.util.Semitones
 
@@ -145,8 +145,9 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
 
                     val main = mainMenu.main
+                    val storySession = StorySession()
                     val doAfterLoad: () -> Unit = {
-                        val newScreen = TestStoryGimmickDebugScreen(main)
+                        val newScreen = TestStoryGimmickDebugScreen(main, storySession)
                         Gdx.app.postRunnable {
                             newScreen.render(1 / 60f)
                             Gdx.app.postRunnable {
@@ -156,7 +157,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                         }
                     }
 
-                    main.screen = TransitionScreen(main, main.screen, StoryAssetsLoadingScreen(main, false, doAfterLoad),
+                    main.screen = TransitionScreen(main, main.screen, storySession.createEntryLoadingScreen(main, doAfterLoad),
                             FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
                 }
             }

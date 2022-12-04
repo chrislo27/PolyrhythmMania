@@ -114,7 +114,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         musicDialog = MusicDialog(this)
         exitConfirmDialog = ExitConfirmDialog(this) {
             if (EditorSpecialFlags.STORY_MODE in editor.flags) {
-                TestStoryGimmickDebugScreen(main)
+                TestStoryGimmickDebugScreen(main, editor.editorSpecialParams.storySession ?: error("No StorySession passed in through editorSpecialParams even though STORY_MODE is in editor special flags"))
             } else {
                 main.mainMenuScreen.prepareShow(doFlipAnimation = true)
             }

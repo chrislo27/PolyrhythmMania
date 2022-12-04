@@ -29,6 +29,7 @@ import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxItemState
@@ -49,6 +50,7 @@ class DesktopUI(
     }
 
     val main: PRManiaGame = rootScreen.main
+    val storySession: StorySession get() = rootScreen.storySession
     var debugFeaturesEnabled: Boolean = false
     
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {

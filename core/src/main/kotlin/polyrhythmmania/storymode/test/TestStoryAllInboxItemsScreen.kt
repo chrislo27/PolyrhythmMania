@@ -32,6 +32,7 @@ import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxState
 import polyrhythmmania.storymode.inbox.progression.Progression
@@ -45,7 +46,7 @@ import polyrhythmmania.ui.PRManiaSkins
  * Original all inbox items screen. Do not modify, just keeping as a reference.
  * (Replaced with [TestStoryDesktopScreen])
  */
-class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
+class TestStoryAllInboxItemsScreen(main: PRManiaGame, val storySession: StorySession, val prevScreen: Screen)
     : PRManiaScreen(main) {
     
     val batch: SpriteBatch = main.batch
@@ -158,7 +159,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val prevScreen: Screen)
                     val contract = newItem.contract
                     main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                     val gameMode = contract.gamemodeFactory(main)
-                    val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
+                    val playScreen = StoryPlayScreen(main, storySession, gameMode.container, Challenges.NO_CHANGES,
                             main.settings.inputCalibration.getOrCompute(), gameMode, contract, true, this@TestStoryAllInboxItemsScreen) {
                         Paintbox.LOGGER.debug("ExitReason: $it")
                     }

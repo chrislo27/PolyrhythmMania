@@ -11,10 +11,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.EditorScreen
-import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.ui.BasicDialog
-import java.util.*
 
 
 class NewDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
@@ -58,7 +55,8 @@ class NewDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             }
             this.setOnAction {
                 val currentScreen = main.screen
-                val newScreen = EditorScreen(main, (currentScreen as? EditorScreen)?.editorFlags ?: EnumSet.noneOf(EditorSpecialFlags::class.java))
+                val currentEditorScreen = currentScreen as? EditorScreen
+                val newScreen = if (currentEditorScreen == null) EditorScreen(main) else EditorScreen(main, currentEditorScreen.editorFlags, currentEditorScreen.editorSpecialParams)
                 if (currentScreen is EditorScreen) {
                     Gdx.app.postRunnable {
                         main.screen = null

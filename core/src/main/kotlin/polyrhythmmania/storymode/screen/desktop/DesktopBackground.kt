@@ -87,7 +87,6 @@ class DesktopBackground(val camera: OrthographicCamera) {
         batch.draw(StoryAssets.get<Texture>("desk_bg_tube_1"), 0f, 0f, width, height)
         batch.draw(StoryAssets.get<Texture>("desk_bg_piston_background"), 0f, 0f, width, height)
         
-        // TODO draw envelope in tube
         val delta = Gdx.graphics.deltaTime
         envelopes.forEach { 
             it.update(delta)

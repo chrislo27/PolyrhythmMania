@@ -6,10 +6,12 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
+import polyrhythmmania.storymode.StorySession
 
 
 abstract class AbstractDesktopScreen(
-        main: PRManiaGame, val prevScreen: Screen, val scenario: DesktopScenario,
+        main: PRManiaGame, val storySession: StorySession,
+        val prevScreen: Screen, val scenario: DesktopScenario,
 ) : PRManiaScreen(main) {
     
     protected val batch: SpriteBatch = main.batch
@@ -30,6 +32,11 @@ abstract class AbstractDesktopScreen(
 
         // Render desktop UI components
         desktopUI.render(batch)
+    }
+
+    override fun renderUpdate() {
+        super.renderUpdate()
+        storySession.renderUpdate()
     }
 
     override fun resize(width: Int, height: Int) {

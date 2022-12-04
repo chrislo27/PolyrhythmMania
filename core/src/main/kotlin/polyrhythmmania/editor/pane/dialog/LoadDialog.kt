@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.Var
 import paintbox.filechooser.FileExtFilter
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -15,7 +16,6 @@ import paintbox.ui.ImageNode
 import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
-import paintbox.filechooser.TinyFDWrapper
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PreferenceKeys
@@ -23,10 +23,8 @@ import polyrhythmmania.container.Container
 import polyrhythmmania.container.ExternalResource
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.EditorScreen
-import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.pane.EditorPane
 import java.io.File
-import java.util.*
 import kotlin.concurrent.thread
 
 
@@ -181,7 +179,8 @@ class LoadDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         descLabel.text.set(Localization.getValue("editor.dialog.load.loading"))
         substate.set(Substate.LOADING)
 
-        val newEditorScreen = EditorScreen(main, (main.screen as? EditorScreen)?.editorFlags ?: EnumSet.noneOf(EditorSpecialFlags::class.java))
+        val currentEditorScreen = main.screen as? EditorScreen
+        val newEditorScreen = if (currentEditorScreen == null) EditorScreen(main) else EditorScreen(main, currentEditorScreen.editorFlags, currentEditorScreen.editorSpecialParams)
         val newEditor: Editor = newEditorScreen.editor
         val newContainer: Container = newEditor.container
 

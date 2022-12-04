@@ -1026,7 +1026,7 @@ duration: ${monster.activeDuration.get()} sec
         
     }
 
-    inner class DefectiveRodsModeRendering : InnerRendering() { // FIXME
+    inner class DefectiveRodsModeRendering : InnerRendering() {
 
         private val mainPane: Pane
 

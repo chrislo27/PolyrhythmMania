@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle
 import paintbox.Paintbox
 import polyrhythmmania.PRMania
 import polyrhythmmania.engine.input.EngineInputter
+import polyrhythmmania.storymode.StorySession
 import java.util.concurrent.atomic.AtomicBoolean
 
 
@@ -11,7 +12,7 @@ object GlobalStats : Stats() {
 
     private val storageLoc: FileHandle by lazy { FileHandle(PRMania.MAIN_FOLDER.resolve("prefs/statistics.json")) }
 
-    // Register statistics
+    // Start registering statistics
     
     // Play time -------------------------------------------------------------------------------------------------------
     
@@ -23,6 +24,11 @@ object GlobalStats : Stats() {
      * Total time while the editor is active.
      */
     val editorTime: Stat = register(Stat("editorTime", DurationStatFormatter.DEFAULT))
+    /**
+     * Total time playing story mode. See [StorySession].
+     * Time tracking for the save file itself is handled separately in [StorySession].
+     */
+    val totalStoryModePlayTime: Stat = register(Stat("totalStoryModePlayTime", DurationStatFormatter.DEFAULT))
     /**
      * Total time playing regular Polyrhythm (includes practice and PR1+2).
      */
@@ -47,12 +53,7 @@ object GlobalStats : Stats() {
      * Total time playing solitaire extra mode.
      */
     val solitairePlayTime: Stat = register(Stat("solitairePlayTime", DurationStatFormatter.DEFAULT))
-    /**
-     * Total time playing story mode in any save file, while the save file is loaded.
-     * Time tracking for the save file itself is handled separately.
-     */
-    val totalStoryModePlayTime: Stat = register(Stat("totalStoryModePlayTime", DurationStatFormatter.DEFAULT))
-
+    
     
     
     // Counters for entering modes (times played) ----------------------------------------------------------------------

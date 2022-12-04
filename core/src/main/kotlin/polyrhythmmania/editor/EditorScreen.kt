@@ -18,15 +18,18 @@ import java.util.*
 
 class EditorScreen(
     main: PRManiaGame,
-    val editorFlags: EnumSet<EditorSpecialFlags> = EnumSet.noneOf(EditorSpecialFlags::class.java),
+    val editorFlags: EnumSet<EditorSpecialFlags>,
+    val editorSpecialParams: EditorSpecialParams,
 ) : PRManiaScreen(main), EarlyAccessMsgOnBottom {
 
     val batch: SpriteBatch = main.batch
-    val editor: Editor = Editor(main, editorFlags)
+    val editor: Editor = Editor(main, editorFlags, editorSpecialParams)
     private val sceneRoot: SceneRoot = editor.sceneRoot
     private val processor: InputProcessor = editor
 
     private var lastWindowListener: Lwjgl3WindowListener? = null
+    
+    constructor(main: PRManiaGame) : this(main, EnumSet.noneOf(EditorSpecialFlags::class.java), EditorSpecialParams())
     
     init {
         editor.resize()

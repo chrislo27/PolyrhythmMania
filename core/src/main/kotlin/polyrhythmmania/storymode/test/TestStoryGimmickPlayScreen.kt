@@ -12,11 +12,12 @@ import polyrhythmmania.screen.play.AbstractEnginePlayScreen
 import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
 import polyrhythmmania.screen.play.pause.TengokuPauseBackground
+import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 
 
 open class TestStoryGimmickPlayScreen(
-        main: PRManiaGame,
+        main: PRManiaGame, val storySession: StorySession,
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: AbstractStoryGameMode
 ) : AbstractEnginePlayScreen(main, null, gameMode.container, challenges, inputCalibration, gameMode)  {
@@ -62,7 +63,7 @@ open class TestStoryGimmickPlayScreen(
     private fun quitToDebugMenu() {
         val currentScreen = main.screen
         Gdx.app.postRunnable {
-            val mainMenu = TestStoryGimmickDebugScreen(main)
+            val mainMenu = TestStoryGimmickDebugScreen(main, storySession)
             main.screen = TransitionScreen(main, currentScreen, mainMenu,
                     FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {

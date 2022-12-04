@@ -37,6 +37,7 @@ import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItems
@@ -50,7 +51,7 @@ import polyrhythmmania.storymode.screen.StoryPlayScreen
 /**
  * Progression overview debug screen
  */
-class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Screen)
+class TestStoryProgressionOverviewScreen(main: PRManiaGame, val storySession: StorySession, val prevScreen: Screen)
     : PRManiaScreen(main) {
 
     companion object {
@@ -182,7 +183,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val prevScreen: Scre
                                             if (item != null) {
                                                 main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                                                 val gameMode = item.contract.gamemodeFactory(main)
-                                                val playScreen = StoryPlayScreen(main, gameMode.container, Challenges.NO_CHANGES,
+                                                val playScreen = StoryPlayScreen(main, storySession, gameMode.container, Challenges.NO_CHANGES,
                                                         main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, true, this@TestStoryProgressionOverviewScreen) {
                                                     Paintbox.LOGGER.debug("ExitReason: $it")
                                                 }
