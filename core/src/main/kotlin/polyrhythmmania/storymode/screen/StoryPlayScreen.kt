@@ -33,7 +33,6 @@ import paintbox.util.WindowSize
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
-import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.InputCalibration
@@ -67,8 +66,8 @@ class StoryPlayScreen(
         val exitCallback: ExitCallback,
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
 
-    override val pauseMenuHandler: PauseMenuHandler = TengokuBgPauseMenuHandler(this).apply { // FIXME new pause menu
-        this.pauseBg.gradientRenderer = TengokuPauseBackground.DebugColorGradientRenderer
+    override val pauseMenuHandler: PauseMenuHandler = TengokuBgPauseMenuHandler(this).apply { 
+        this.pauseBg.gradientRenderer = StoryPlayGradientRenderer()
     }
 
     private var disableCatchingCursorOnHide: Boolean = false
