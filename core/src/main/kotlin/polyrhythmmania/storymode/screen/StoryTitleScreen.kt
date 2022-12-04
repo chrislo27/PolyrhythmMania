@@ -87,7 +87,7 @@ class StoryTitleScreen(main: PRManiaGame, val storySession: StorySession) : PRMa
 
                                 main.screen = TransitionScreen(main, main.screen, mainMenu, FadeToOpaque(0.125f, Color.BLACK), null)
                             }
-                            main.screen = TransitionScreen(main, main.screen, StoryAssetsLoadingScreen(main, true, doAfterUnload),
+                            main.screen = TransitionScreen(main, main.screen, storySession.createExitLoadingScreen(main, doAfterUnload),
                                     FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
                         }
                     }
