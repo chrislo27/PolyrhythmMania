@@ -8,6 +8,7 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.binding.asReadOnlyVar
 import paintbox.font.Markup
+import paintbox.font.TextAlign
 import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
@@ -24,6 +25,7 @@ import polyrhythmmania.storymode.inbox.IContractDoc
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxItemState
+import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
 import kotlin.math.sqrt
 
 
@@ -45,18 +47,18 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
     
     private fun createPaperTemplate(textureID: String = "desk_contract_full"): Paper {
         val root = ImageNode(TextureRegion(StoryAssets.get<Texture>(textureID)), ImageRenderingMode.FULL).apply {
-            this.bounds.width.set(112f * DesktopUI.UI_SCALE)
-            this.bounds.height.set(150f * DesktopUI.UI_SCALE)
+            this.bounds.width.set(112f * UI_SCALE)
+            this.bounds.height.set(150f * UI_SCALE)
         }
         val paperPane = Pane().apply {// Paper part
-            this.bounds.height.set(102f * DesktopUI.UI_SCALE)
-            this.margin.set(Insets((2f + 4f) * DesktopUI.UI_SCALE, 0f * DesktopUI.UI_SCALE, (4f + 4f) * DesktopUI.UI_SCALE, (4f + 4f) * DesktopUI.UI_SCALE))
+            this.bounds.height.set(102f * UI_SCALE)
+            this.margin.set(Insets((2f + 4f) * UI_SCALE, 0f * UI_SCALE, (4f + 4f) * UI_SCALE, (4f + 4f) * UI_SCALE))
         }
         root += paperPane
         val envelopePane = Pane().apply {// Envelope part
-            this.margin.set(Insets(0f * DesktopUI.UI_SCALE, 6f * DesktopUI.UI_SCALE))
-            this.bounds.height.set(48f * DesktopUI.UI_SCALE)
-            this.bounds.y.set(102f * DesktopUI.UI_SCALE)
+            this.margin.set(Insets(0f * UI_SCALE, 6f * UI_SCALE))
+            this.bounds.height.set(48f * UI_SCALE)
+            this.bounds.y.set(102f * UI_SCALE)
         }
         root += envelopePane
 
@@ -68,13 +70,13 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
             is InboxItem.Memo -> {
                 val paper = createPaperTemplate("desk_contract_paper")
                 paper.paperPane += VBox().apply {
-                    this.spacing.set(1f * DesktopUI.UI_SCALE)
+                    this.spacing.set(1f * UI_SCALE)
                     this.temporarilyDisableLayouts {
                         this += TextLabel(StoryL10N.getVar("inboxItem.memo.heading"), font = main.fontMainMenuHeading).apply {
-                            this.bounds.height.set(9f * DesktopUI.UI_SCALE)
+                            this.bounds.height.set(9f * UI_SCALE)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(0f, 2f * DesktopUI.UI_SCALE, 0f, 2f * DesktopUI.UI_SCALE))
+                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 2f * UI_SCALE))
                         }
                         val fields: List<Pair<String, ReadOnlyVar<String>>> = listOfNotNull(
                                 if (item.hasToField) ("to" to item.to) else null,
@@ -82,23 +84,23 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                 "subject" to item.subject
                         )
                         this += ColumnarPane(fields.size, true).apply {
-                            this.bounds.height.set((7f * DesktopUI.UI_SCALE) * fields.size)
+                            this.bounds.height.set((7f * UI_SCALE) * fields.size)
 
                             fun addField(index: Int, fieldName: String, valueField: String, valueMarkup: Markup? = null) {
                                 this[index] += Pane().apply {
-                                    this.margin.set(Insets(0.5f * DesktopUI.UI_SCALE, 0f))
+                                    this.margin.set(Insets(0.5f * UI_SCALE, 0f))
                                     this += TextLabel(StoryL10N.getVar("inboxItem.memo.${fieldName}"), font = main.fontRobotoBold).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.left)
                                         this.padding.set(Insets(2f, 2f, 0f, 10f))
-                                        this.bounds.width.set(22.5f * DesktopUI.UI_SCALE)
+                                        this.bounds.width.set(22.5f * UI_SCALE)
                                     }
                                     this += TextLabel(valueField, font = main.fontRoboto).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.left)
                                         this.padding.set(Insets(2f, 2f, 4f, 0f))
                                         this.bounds.x.set(90f)
-                                        this.bindWidthToParent(adjust = -(22.5f * DesktopUI.UI_SCALE))
+                                        this.bindWidthToParent(adjust = -(22.5f * UI_SCALE))
                                         if (valueMarkup != null) {
                                             this.markup.set(valueMarkup)
                                         }
@@ -118,8 +120,8 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                             this.markup.set(openSansMarkup)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(3f * DesktopUI.UI_SCALE, 0f, 0f, 0f))
-                            this.bounds.height.set(100f * DesktopUI.UI_SCALE)
+                            this.padding.set(Insets(3f * UI_SCALE, 0f, 0f, 0f))
+                            this.bounds.height.set(100f * UI_SCALE)
                             this.doLineWrapping.set(true)
                         }
                     }
@@ -130,26 +132,26 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
             is InboxItem.InfoMaterial -> {
                 val paper = createPaperTemplate("desk_contract_paper")
                 paper.paperPane += VBox().apply {
-                    this.spacing.set(1f * DesktopUI.UI_SCALE)
+                    this.spacing.set(1f * UI_SCALE)
                     this.temporarilyDisableLayouts {
                         this += TextLabel(StoryL10N.getVar("inboxItem.infoMaterial.heading"), font = main.fontMainMenuHeading).apply {
-                            this.bounds.height.set(9f * DesktopUI.UI_SCALE)
+                            this.bounds.height.set(9f * UI_SCALE)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.top)
-                            this.padding.set(Insets(0f, 2f * DesktopUI.UI_SCALE, 0f, 0f))
+                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 0f))
                         }
                         val fields: List<Pair<String, ReadOnlyVar<String>>> = listOfNotNull(
                                 "topic" to item.topic,
                                 "audience" to item.audience,
                         )
                         this += VBox().apply {
-                            val rowHeight = 7f * DesktopUI.UI_SCALE
+                            val rowHeight = 7f * UI_SCALE
                             this.bounds.height.set(rowHeight * fields.size)
                             this.temporarilyDisableLayouts {
                                 fields.forEachIndexed { i, (key, value) ->
                                     this += Pane().apply {
                                         this.bounds.height.set(rowHeight)
-                                        this.margin.set(Insets(0.5f * DesktopUI.UI_SCALE, 0f))
+                                        this.margin.set(Insets(0.5f * UI_SCALE, 0f))
                                         this += TextLabel({
                                             "[b]${StoryL10N.getVar("inboxItem.infoMaterial.${key}").use()}[] ${value.use()}"
                                         }, font = main.fontRobotoBold).apply {
@@ -170,8 +172,8 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                             this.markup.set(robotoCondensedMarkup)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(3f * DesktopUI.UI_SCALE, 0f, 0f, 0f))
-                            this.bounds.height.set(100f * DesktopUI.UI_SCALE)
+                            this.padding.set(Insets(3f * UI_SCALE, 0f, 0f, 0f))
+                            this.bounds.height.set(100f * UI_SCALE)
                             this.doLineWrapping.set(true)
                         }
                     }
@@ -194,16 +196,16 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                 }
 
                 paper.paperPane += VBox().apply {
-                    this.spacing.set(1f * DesktopUI.UI_SCALE)
+                    this.spacing.set(1f * UI_SCALE)
                     this.temporarilyDisableLayouts {
                         val useLongCompanyName = item.hasLongCompanyName
                         this += Pane().apply {
-                            this.bounds.height.set(13f * DesktopUI.UI_SCALE)
-                            this.margin.set(Insets(0f, 2.5f * DesktopUI.UI_SCALE, 0f, 0f))
+                            this.bounds.height.set(13f * UI_SCALE)
+                            this.margin.set(Insets(0f, 2.5f * UI_SCALE, 0f, 0f))
 
                             this += TextLabel(headingText, font = main.fontMainMenuHeading).apply {
-                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * DesktopUI.UI_SCALE)
-                                this.padding.set(Insets(0f, 0f, 0f, 1f * DesktopUI.UI_SCALE))
+                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * UI_SCALE)
+                                this.padding.set(Insets(0f, 0f, 0f, 1f * UI_SCALE))
                                 this.textColor.set(Color.BLACK)
                                 if (useLongCompanyName) {
                                     this.renderAlign.set(Align.topLeft)
@@ -214,7 +216,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                             }
                             this += Pane().apply {
                                 Anchor.TopRight.configure(this)
-                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * DesktopUI.UI_SCALE)
+                                this.bindWidthToParent(multiplier = 0.5f, adjust = -2f * UI_SCALE)
 
                                 this += TextLabel(item.name, font = main.fontRobotoMonoBold).apply {
                                     this.textColor.set(Color.BLACK)
@@ -240,23 +242,35 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                             this.bounds.height.set(2f)
                         }
                         this += TextLabel(item.tagline.getOrCompute(), font = main.fontLexend).apply {
-                            this.bounds.height.set(10f * DesktopUI.UI_SCALE)
+                            this.bounds.height.set(10f * UI_SCALE)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.center)
-                            this.padding.set(Insets(1f * DesktopUI.UI_SCALE, 1f * DesktopUI.UI_SCALE, 1f * DesktopUI.UI_SCALE, 0f))
+                            this.padding.set(Insets(1f * UI_SCALE, 1f * UI_SCALE, 1f * UI_SCALE, 0f))
                         }
                         this += RectElement(Color.BLACK).apply {
                             this.bounds.height.set(2f)
                         }
 
                         this += TextLabel(item.desc.getOrCompute()).apply {
-                            this.markup.set(if (item.requester == Requester.ALIENS) robotoMonoMarkup else openSansMarkup)
+                            this.markup.set(openSansMarkup)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
-                            this.padding.set(Insets(8f, 4f, 0f, 0f))
+                            this.padding.set(Insets(3f * UI_SCALE, 1f * UI_SCALE, 0f, 0f))
                             this.bounds.height.set(400f)
                             this.doLineWrapping.set(true)
                             this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.HEIGHT_ONLY))
+                            
+                            when (item.requester) {
+                                Requester.ALIENS -> {
+                                    this.markup.set(robotoMonoMarkup)
+                                    this.renderAlign.set(Align.center)
+                                    this.textAlign.set(TextAlign.LEFT)
+                                }
+                                Requester.GAME_DEV -> {
+                                    this.renderAlign.set(Align.center)
+                                    this.textAlign.set(TextAlign.CENTRE)
+                                }
+                            }
                         }
                     }
                 }
