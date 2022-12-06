@@ -62,15 +62,15 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
 
     init {
         sceneRoot += RectElement(PRManiaColors.debugColor).apply {
-            this.padding.set(Insets(32f, 10f, 12f, 12f))
+            this.padding.set(Insets(24f, 10f, 12f, 12f))
             this += VBox().apply {
                 this.spacing.set(4f)
                 this.bindWidthToParent(multiplier = 0.5f)
                 this.temporarilyDisableLayouts {
                     fun separator(): UIElement {
                         return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
-                            this.bounds.height.set(10f)
-                            this.margin.set(Insets(4f, 4f, 0f, 0f))
+                            this.bounds.height.set(6f)
+                            this.margin.set(Insets(2f, 2f, 0f, 0f))
                         }
                     }
 
@@ -105,6 +105,35 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                         this.setOnAction {
                             Gdx.app.postRunnable {
                                 val titleScreen = StoryTitleScreen(main, storySession)
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
+                    this += separator()
+                    this += Button("Debug \"desktop\" screen with main inbox items (all unlocked)").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            val inboxItems: InboxItems = InboxDB()
+                            val progression = Progression(listOf(
+                                    UnlockStage("all", UnlockStageChecker.alwaysUnlocked(), inboxItems.items.map { it.id })
+                            ))
+
+                            Gdx.app.postRunnable {
+                                val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
+                    this += Button("Debug \"desktop\" screen with main inbox items (progression)").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            val inboxItems = InboxDB()
+                            val progression = inboxItems.progression
+
+                            Gdx.app.postRunnable {
+                                val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)
                                 main.screen = TransitionScreen(main, main.screen, titleScreen,
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
@@ -146,6 +175,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                             }
                         }
                     }
+                    this += separator()
                     this += Button("Debug \"progression overview\" screen").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
@@ -156,7 +186,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                             }
                         }
                     }
-                    this += Button("Debug \"desktop\" screen with progression logic").apply {
+                    this += Button("Debug \"desktop\" screen with complex progression logic").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             val inboxItems = InboxItems(listOf(
@@ -184,7 +214,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                             }
                         }
                     }
-                    this += Button("Debug \"desktop\" screen with progression logic 2").apply {
+                    this += Button("Debug \"desktop\" screen with straight-down progression logic").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             val inboxItems = InboxItems((0 until 30).map { i ->
@@ -199,7 +229,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                             }
                         }
                     }
-                    this += Button("Debug \"desktop\" screen with progression logic 3").apply {
+                    this += Button("Debug \"desktop\" screen with zig-zag progression logic").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             val inboxItems = InboxItems((0 until 20).map { i ->
@@ -252,34 +282,6 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                             val progression = Progression(listOf(
                                     UnlockStage("all", UnlockStageChecker.alwaysUnlocked(), inboxItems.items.map { it.id })
                             ))
-                            
-                            Gdx.app.postRunnable {
-                                val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)
-                                main.screen = TransitionScreen(main, main.screen, titleScreen,
-                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-                            }
-                        }
-                    }
-                    this += Button("Debug \"desktop\" screen with main inbox items (all unlocked)").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            val inboxItems: InboxItems = InboxDB()
-                            val progression = Progression(listOf(
-                                    UnlockStage("all", UnlockStageChecker.alwaysUnlocked(), inboxItems.items.map { it.id })
-                            ))
-                            
-                            Gdx.app.postRunnable {
-                                val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)
-                                main.screen = TransitionScreen(main, main.screen, titleScreen,
-                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-                            }
-                        }
-                    }
-                    this += Button("Debug \"desktop\" screen with main inbox items (progression)").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            val inboxItems = InboxDB()
-                            val progression = inboxItems.progression
                             
                             Gdx.app.postRunnable {
                                 val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)

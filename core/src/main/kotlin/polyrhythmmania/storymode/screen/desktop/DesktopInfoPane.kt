@@ -94,7 +94,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         val contract = inboxItem.contract
         addRightSidePanel(StoryL10N.getVar("desktop.pane.performance"), 40f * UI_SCALE).apply {
             this.temporarilyDisableLayouts {
-                val completionData = inboxItemState.stageCompletionData // TODO remove me: ?: StageCompletionData(LocalDateTime.now(), LocalDateTime.now(), 70, true, true)
+                val completionData = inboxItemState.stageCompletionData
                 if (completionData != null) {
                     this += TextLabel(binding = {
                         if (contract.immediatePass) StoryL10N.getVar("play.scoreCard.pass").use() else "${completionData.score}"
@@ -106,7 +106,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                         this.margin.set(Insets(1f, 1f, 4f, 4f))
                     }
                     val tmpListFeatures = listOfNotNull(if (completionData.skillStar) "Skill Star!" else null, if (completionData.noMiss) "No Miss!" else null)
-                    this += TextLabel("[TMP!] " + tmpListFeatures.joinToString(separator = " "), font = main.fontRoboto).apply {
+                    this += TextLabel(tmpListFeatures.joinToString(separator = " "), font = main.fontRoboto).apply {
                         this.bounds.height.set(8f * UI_SCALE)
                         this.textColor.set(Color.BLACK)
                         this.renderAlign.set(RenderAlign.center)
