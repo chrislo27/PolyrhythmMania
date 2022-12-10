@@ -66,12 +66,16 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
                 currentInboxItem.getOrCompute()
                 desktopUI.background.resetAll()
                 desktopUI.updateAndShowNewlyAvailableInboxItems(lockInputs = true)
+                desktopUI.storySession.attemptSave()
             }
         }
     }
 
     override fun playLevel(contract: Contract, inboxItem: InboxItem?, inboxItemState: InboxItemState?) {
         val main = desktopUI.main
+        
+        desktopUI.storySession.musicHandler.fadeOut(0.25f)
+        
         val loadingScreen = StoryLoadingScreen<StoryPlayScreen>(main, {
             val gameMode = contract.gamemodeFactory(main)
             val exitCallback = createExitCallback(contract, inboxItem, inboxItemState)

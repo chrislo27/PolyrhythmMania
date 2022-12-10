@@ -39,14 +39,15 @@ sealed class InboxItem(
     ) : InboxItem(id, if (hasSeparateListingName) StoryL10N.getVar("inboxItemDetails.infoMaterial.$id.listing") else topic)
 
     class ContractDoc(
-            val contract: Contract, itemID: String = getDefaultContractDoc(contract),
+            val contract: Contract, itemID: String = getDefaultContractDocID(contract),
             listingName: ReadOnlyVar<String> = contract.name,
             override val subtype: ContractSubtype = ContractSubtype.NORMAL,
             override val hasLongCompanyName: Boolean = contract.requester.isNameLong,
     ) : InboxItem(itemID, listingName), IContractDoc, IHasContractTextInfo by contract {
         
         companion object {
-            fun getDefaultContractDoc(contract: Contract): String = "contract_${contract.id}"
+            fun getDefaultContractDocID(contractID: String): String = "contract_${contractID}"
+            fun getDefaultContractDocID(contract: Contract): String = getDefaultContractDocID(contract.id)
         }
 
         val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)

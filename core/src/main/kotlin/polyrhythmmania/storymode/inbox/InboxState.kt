@@ -61,6 +61,14 @@ class InboxState {
 
     
     private val itemStates: Map<String, Var<InboxItemState>> = mutableMapOf()
+    
+    val anyAvailable: ReadOnlyBooleanVar = BooleanVar { 
+        onItemStatesChanged.use()
+        itemStates.values.any { 
+            val state = it.getOrCompute()
+            state.newIndicator && state.completion == InboxItemCompletion.AVAILABLE
+        }
+    }
 
     /**
      * Changed whenever an item state changes.

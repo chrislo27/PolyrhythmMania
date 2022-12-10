@@ -53,8 +53,11 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
                 this.bounds.height.set(16f * UI_SCALE)
                 this.setOnAction {
                     desktopUI.controller.playSFX(DesktopController.SFXType.PAUSE_EXIT)
-                    
-                    desktopUI.storySession.attemptSave()
+
+                    val storySession = desktopUI.storySession
+                    storySession.attemptSave()
+                    storySession.stopUsingSavefile()
+                    storySession.musicHandler.transitionToTitleMix()
                     
                     val nextScreen = desktopUI.rootScreen.prevScreen()
                     main.screen = TransitionScreen(main, main.screen, nextScreen,

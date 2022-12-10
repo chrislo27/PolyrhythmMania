@@ -11,6 +11,8 @@ import polyrhythmmania.storymode.inbox.InboxItems
 
 object Contracts {
     
+    const val ID_TUTORIAL1: String = "tutorial1"
+    
     val contracts: Map<String, Contract>
     
     init {
@@ -20,7 +22,7 @@ object Contracts {
             this.contracts[contract.id] = contract
         }
         
-        add(Contract("tutorial1", Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+        add(Contract(ID_TUTORIAL1, Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             Tutorial1GameMode(main)
         })
         

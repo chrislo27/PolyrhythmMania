@@ -25,5 +25,9 @@ class StoryDesktopScreen(
             this.desktopUI.inboxItemListScrollbar.setValue(this.desktopUI.getTargetVbarValueForInboxItem(lastScrollableItem))
         }
     }
-    
+
+    override fun show() {
+        super.show()
+        storySession.musicHandler.transitionToDesktopMix()
+    }
 }

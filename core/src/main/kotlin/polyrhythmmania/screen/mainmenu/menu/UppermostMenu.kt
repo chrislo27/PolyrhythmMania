@@ -107,25 +107,28 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 this.setOnAction {
                     mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
 
-                    mainMenu.transitionAway {
-                        val main = mainMenu.main
-                        val storySession = StorySession()
-                        val doAfterLoad: () -> Unit = {
-                            val newScreen = StoryTitleScreen(main, storySession)
+                    val main = mainMenu.main
+                    val storySession = StorySession()
+                    val doAfterLoad: () -> Unit = {
+                        val newScreen = StoryTitleScreen(main, storySession)
+                        Gdx.app.postRunnable {
+                            newScreen.render(1 / 60f)
                             Gdx.app.postRunnable {
-                                newScreen.render(1 / 60f)
-                                Gdx.app.postRunnable {
-                                    main.screen = TransitionScreen(main, main.screen, newScreen,
-                                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                                main.screen = TransitionScreen(main, main.screen, newScreen,
+                                        FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+                                    this.onDestEnd = {
+                                        val musicHandler = storySession.musicHandler
+                                        musicHandler.transitionToStemMix(musicHandler.getTitleStemMix(), 0f, delaySec = 0f)
+                                    }
                                 }
                             }
                         }
+                    }
 
-                        main.screen = TransitionScreen(main, main.screen, storySession.createEntryLoadingScreen(main, doAfterLoad),
-                                null, FadeToTransparent(0.25f, Color.BLACK)).apply {
-                            this.onDestEnd = {
-                                mainMenu.backgroundType = BgType.NORMAL // TODO add a new background type for story mode?
-                            }
+                    main.screen = TransitionScreen(main, main.screen, storySession.createEntryLoadingScreen(main, doAfterLoad),
+                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+                        this.onDestEnd = {
+                            mainMenu.backgroundType = BgType.NORMAL // TODO add a new background type for story mode?
                         }
                     }
 

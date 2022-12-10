@@ -84,6 +84,7 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                 }
 
                                 this.setOnAction {
+                                    // TODO move out
                                     val isBrandNew = savefileState is StorySavefile.LoadedState.NoSavefile
                                     val savefile = when (savefileState) {
                                         is StorySavefile.LoadedState.FailedToLoad -> return@setOnAction
@@ -103,6 +104,8 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                         val desktopUI = desktopScreen.desktopUI
                                         val animations = desktopUI.animations
 
+                                        storySession.musicHandler.transitionToDesktopMix()
+                                        
                                         main.screen = TransitionScreen(main, main.screen, desktopScreen,
                                                 FadeToOpaque(2.5f, Color.BLACK), FadeToTransparent(0.5f, Color.BLACK)).apply {
                                             this.onDestEnd = {
@@ -114,6 +117,7 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                             }
                                         }
                                     } else {
+                                        storySession.musicHandler.transitionToDesktopMix()
                                         main.screen = TransitionScreen(main, main.screen, desktopScreen,
                                                 FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                                     }
@@ -141,6 +145,7 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
 
                                 main.screen = TransitionScreen(main, main.screen, mainMenu, FadeToOpaque(0.125f, Color.BLACK), null)
                             }
+                            storySession.musicHandler.fadeOutAndDispose(0.375f)
                             main.screen = TransitionScreen(main, main.screen, storySession.createExitLoadingScreen(main, doAfterUnload),
                                     FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
                         }

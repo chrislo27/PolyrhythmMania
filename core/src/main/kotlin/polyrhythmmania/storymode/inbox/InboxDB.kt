@@ -9,6 +9,11 @@ import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
 
 open class InboxDB : InboxItems() {
     
+    companion object {
+        const val FIRST_MAINGAME_ITEM: String = "welcome_back"
+        const val FIRST_POSTGAME_ITEM: String = "welcome_back_postgame"
+    }
+    
     enum class Category {
         INTERNSHIP, MAIN, POSTGAME,
     }
@@ -21,7 +26,7 @@ open class InboxDB : InboxItems() {
         val instructions = mutableListOf<Instruction>()
 
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_memo1", hasToField = false, hasSeparateListingName = false)))
-        instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.ContractDoc(Contracts["tutorial1"], subtype = ContractSubtype.TRAINING)))
+        instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.ContractDoc(Contracts[Contracts.ID_TUTORIAL1], subtype = ContractSubtype.TRAINING)))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_memo2", hasToField = false, hasSeparateListingName = false)))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.InfoMaterial("info_on_contracts", hasSeparateListingName = true)))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.ContractDoc(Contracts["fillbots"])))
@@ -72,6 +77,9 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["monkey_watch"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["screwbots2"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
+        
+        // Postgame
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo(FIRST_POSTGAME_ITEM, hasToField = false, hasSeparateListingName = false)))
         
         
         // Parse instructions

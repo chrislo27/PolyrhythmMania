@@ -84,6 +84,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
 
                                 main.screen = TransitionScreen(main, main.screen, mainMenu, FadeToOpaque(0.125f, Color.BLACK), null)
                             }
+                            storySession.musicHandler.fadeOutAndDispose(0.375f)
                             main.screen = TransitionScreen(main, main.screen, storySession.createExitLoadingScreen(main, doAfterUnload),
                                     FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
                         }
@@ -150,26 +151,26 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                             }
                         }
                     }
-                    this += Button("Debug \"all inbox items\" screen (new desktop UI) (progression)").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            Gdx.app.postRunnable {
-                                val inboxItems = DebugAllInboxItemsDB
-                                val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, Progression.debugItemsInOrder(inboxItems))
-                                main.screen = TransitionScreen(main, main.screen, titleScreen,
-                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-                            }
-                        }
-                    }
                     this += Button("Debug \"all inbox items\" screen (new desktop UI) (all unlocked)").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             Gdx.app.postRunnable {
                                 val inboxItems = DebugAllInboxItemsDB
                                 val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems,
-                                        Progression(inboxItems.items.map { 
+                                        Progression(inboxItems.items.map {
                                             UnlockStage.singleItem(it.id, UnlockStageChecker.alwaysUnlocked())
                                         }))
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
+                    this += Button("Debug \"all inbox items\" screen (new desktop UI) (progression)").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            Gdx.app.postRunnable {
+                                val inboxItems = DebugAllInboxItemsDB
+                                val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, Progression.debugItemsInOrder(inboxItems))
                                 main.screen = TransitionScreen(main, main.screen, titleScreen,
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }

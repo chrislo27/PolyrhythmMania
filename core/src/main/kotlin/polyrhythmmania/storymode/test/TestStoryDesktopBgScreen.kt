@@ -27,7 +27,7 @@ class TestStoryDesktopBgScreen(
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     
     val bg: DesktopBackground = DesktopBackground(uiCamera)
-
+    var isItemAvailable: Boolean = false
 
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
@@ -39,7 +39,7 @@ class TestStoryDesktopBgScreen(
         val camera = uiCamera
         batch.projectionMatrix = camera.combined
         batch.begin()
-        bg.render(batch)
+        bg.render(batch, isItemAvailable)
         sceneRoot.renderAsRoot(batch)
         batch.end()
     }
@@ -57,6 +57,8 @@ class TestStoryDesktopBgScreen(
         } else if (Gdx.input.isKeyJustPressed(Keys.R)) {
             bg.resetPistons()
             bg.removeAllEnvelopes()
+        } else if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
+            isItemAvailable = !isItemAvailable
         }
     }
 

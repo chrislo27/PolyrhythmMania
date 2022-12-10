@@ -26,5 +26,7 @@ class TestStoryDesktopScreen(
         scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
         
         this.desktopUI.debugFeaturesEnabled = true
+        
+        storySession.musicHandler.transitionToDesktopMix(scenario.inboxState)
     }
 }

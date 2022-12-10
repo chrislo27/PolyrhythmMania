@@ -284,7 +284,7 @@ class DesktopUI(
     fun render(batch: SpriteBatch) {
         batch.projectionMatrix = this.uiCamera.combined
         batch.begin()
-        background.render(batch)
+        background.render(batch, scenario.inboxState.anyAvailable.get())
         this.sceneRoot.renderAsRoot(batch)
         batch.end()
     }
@@ -334,6 +334,8 @@ class DesktopUI(
             }
             animations.enqueueAnimation(animations.AnimLockInputs(false))
         }
+
+        storySession.musicHandler.transitionToDesktopMix(if (this.debugFeaturesEnabled) scenario.inboxState else null)
     }
     
     private fun renderUpdate() {

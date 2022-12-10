@@ -42,6 +42,12 @@ class SoundSystem(val realtimeOutput: RealtimeOutput,
             val mixer = mixerHandler.recommendedMixer
             return SoundSystem(RealtimeOutput.JavaSound(mixer), initBufferSize, settings)
         }
+        
+        fun createDefaultSoundSystemOpenAL(initCtxBufferSize: Int = AudioContext.DEFAULT_BUFFER_SIZE,
+                                           settings: SoundSystemSettings = SoundSystemSettings()): SoundSystem {
+            val gameSettings = PRManiaGame.instance.settings
+            return SoundSystem(RealtimeOutput.OpenAL(gameSettings.audioDeviceSettings.getOrCompute()), initCtxBufferSize, settings)
+        }
     }
     
     data class SoundSystemSettings(val ioAudioFormat: IOAudioFormat = DEFAULT_AUDIO_FORMAT)
