@@ -58,7 +58,9 @@ class DesktopUI(
         this.update()
     }
     val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
-    val sceneRoot: SceneRoot = SceneRoot(uiViewport)
+    val sceneRoot: SceneRoot = SceneRoot(uiViewport).apply { 
+        this.doClipping.set(true)
+    }
     private val keystrokeInputProcessor: KeystrokeInputProcessor = this.KeystrokeInputProcessor()
     private val inputProcessor: TogglableInputProcessor = TogglableInputProcessor(InputMultiplexer(sceneRoot.inputSystem, keystrokeInputProcessor))
     
@@ -284,6 +286,7 @@ class DesktopUI(
     fun render(batch: SpriteBatch) {
         batch.projectionMatrix = this.uiCamera.combined
         batch.begin()
+        uiViewport.apply()
         background.render(batch, scenario.inboxState.anyAvailable.get())
         this.sceneRoot.renderAsRoot(batch)
         batch.end()

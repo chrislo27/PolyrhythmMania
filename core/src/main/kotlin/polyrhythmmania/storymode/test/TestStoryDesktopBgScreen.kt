@@ -39,6 +39,7 @@ class TestStoryDesktopBgScreen(
         val camera = uiCamera
         batch.projectionMatrix = camera.combined
         batch.begin()
+        uiViewport.apply()
         bg.render(batch, isItemAvailable)
         sceneRoot.renderAsRoot(batch)
         batch.end()
