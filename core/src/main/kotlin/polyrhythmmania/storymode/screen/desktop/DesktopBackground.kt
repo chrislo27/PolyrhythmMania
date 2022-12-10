@@ -79,7 +79,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
     private var envelopeOffsetNum: Int = 0
     private var pistonIndex: Int = 0
     
-    fun render(batch: SpriteBatch) {
+    fun render(batch: SpriteBatch, isItemAvailable: Boolean) {
         val width = camera.viewportWidth
         val height = camera.viewportHeight
         
@@ -101,7 +101,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
         
         batch.draw(StoryAssets.get<Texture>("desk_bg_tube_2"), 0f, 0f, width, height)
         batch.draw(StoryAssets.get<Texture>("desk_bg_tube_3"), 0f, 0f, width, height)
-        batch.draw(StoryAssets.get<Texture>("desk_bg_inbox"), 0f, 0f, width, height)
+        batch.draw(StoryAssets.get<Texture>(if (isItemAvailable) "desk_bg_inbox_available" else "desk_bg_inbox"), 0f, 0f, width, height)
     }
     
     fun sendEnvelope() {
