@@ -7,6 +7,7 @@ import net.beadsproject.beads.ugens.*
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.engine.tempo.TempoUtils
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
@@ -22,6 +23,8 @@ class StoryMusicHandler(val storySession: StorySession) {
     companion object {
         private const val LOOP_SAMPLES_START: Int = 0
         private const val LOOP_SAMPLES_END: Int = 2_373_981
+        private const val BPM: Float = 107f
+        private const val DURATION_BEATS: Float = 96f
     }
     
     private class StemPlayer(val stemID: String, val stem: Stem, val player: MusicSamplePlayer) : Plug(player.context, player.outs) {
@@ -71,6 +74,8 @@ class StoryMusicHandler(val storySession: StorySession) {
     private val menuMusicVolume: ReadOnlyFloatVar = FloatVar { use(PRManiaGame.instance.settings.menuMusicVolume) / 100f }
     
     private var targetStemMix: StemMix = StemMix.NONE
+    
+    val currentBeat: ReadOnlyFloatVar = FloatVar(0f)
 
     init {
         audioContext.out.addInput(playerInput)
@@ -78,6 +83,11 @@ class StoryMusicHandler(val storySession: StorySession) {
         updateMainGain()
         
         startSounds()
+    }
+    
+    fun frameUpdate() {
+        val currentPosMs = stemPlayers.values.firstOrNull { !it.player.isPaused }?.player?.position?.toFloat() ?: 0f
+        (currentBeat as FloatVar).set(TempoUtils.secondsToBeats(currentPosMs / 1000f, BPM) % DURATION_BEATS)
     }
     
     fun transitionToStemMix(stemMix: StemMix, durationSec: Float, delaySec: Float = 0f, startGain: Float = -1f) {
