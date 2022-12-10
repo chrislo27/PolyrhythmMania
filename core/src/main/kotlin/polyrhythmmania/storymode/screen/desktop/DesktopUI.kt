@@ -394,9 +394,13 @@ class DesktopUI(
                 while (i in 0 until inboxItemListingObjs.size) {
                     val obj = inboxItemListingObjs[i]
                     if (obj.myInboxItemState.getOrCompute().completion != InboxItemCompletion.UNAVAILABLE) {
+                        val targetPos = getTargetVbarValueForInboxItem(obj.inboxItem)
+                        if (inboxItemListScrollbar.value.get() != targetPos) {
+                            animations.cancelAnimations { it is DesktopAnimations.AnimScrollBar }
+                            animations.enqueueAnimation(animations.AnimScrollBar(targetPos))
+                        }
+                        
                         obj.action(true)
-                        animations.cancelAnimations { it is DesktopAnimations.AnimScrollBar }
-                        animations.enqueueAnimation(animations.AnimScrollBar(getTargetVbarValueForInboxItem(obj.inboxItem)))
                         break
                     }
                     i += dir
