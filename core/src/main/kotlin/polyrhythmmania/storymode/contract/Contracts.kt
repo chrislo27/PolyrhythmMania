@@ -122,7 +122,7 @@ object Contracts {
         add(Contract("tap_trial_2", Requester.ANIMAL_ACROBATICS, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tap_trial_2.prmproj"))
         })
-        add(Contract("toss_boys", Requester.TOSS_BOYS, JingleType.GBA, Attribution(SongInfo.tengoku("トスボーイズ (Toss Boys)"), listOf("Dream Top")), 75) { main ->
+        add(Contract("toss_boys", Requester.TOSS_BOYS, JingleType.GBA, Attribution(SongInfo.tengoku("トスボーイズ (Toss Boys)"), listOf("Dream Top")), 0) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/toss_boys.prmproj")).apply { 
                 val livesMode = this.container.engine.modifiers.livesMode
                 livesMode.maxLives.set(3)
