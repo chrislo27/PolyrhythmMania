@@ -21,6 +21,8 @@ class StorySession {
         private set
     
     fun renderUpdate() {
+        musicHandler.frameUpdate()
+        
         GlobalStats.updateTotalStoryModePlayTime()
         currentSavefile?.updatePlayTime()
     }

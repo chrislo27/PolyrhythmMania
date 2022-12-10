@@ -75,6 +75,7 @@ class InboxState {
      */
     val onItemStatesChanged: ReadOnlyBooleanVar = BooleanVar(false)
     
+    fun getAllItemStates(): List<Pair<String, InboxItemState>> = itemStates.entries.map { it.key to it.value.getOrCompute() }
     
     fun getItemState(itemID: String): InboxItemState? = itemStates[itemID]?.getOrCompute()
     fun getItemState(item: InboxItem): InboxItemState? = getItemState(item.id)

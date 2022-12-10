@@ -12,5 +12,4 @@ class TitleLogic(val main: PRManiaGame, val storySession: StorySession) {
 
     val fullTitle: BooleanVar = BooleanVar(true)
     
-
 }
