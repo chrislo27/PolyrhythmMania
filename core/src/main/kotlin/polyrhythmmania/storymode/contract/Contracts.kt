@@ -129,7 +129,7 @@ object Contracts {
                 livesMode.enabled.set(true)
             }
         })
-        add(Contract("tram_and_pauline", Requester.ANIMAL_ACROBATICS, JingleType.GBA, Attribution(SongInfo.tengoku("トランとポリン (Tram and Pauline)", songNameWithLineBreaks = "トランとポリン\n(Tram and Pauline)"), listOf("J-D Thunder")), 60) { main ->
+        add(Contract("tram_and_pauline", Requester.ANIMAL_ACROBATICS, JingleType.GBA, Attribution(SongInfo.tengoku("トランとポリン (Tram and Pauline)", songNameWithLineBreaks = "トランとポリン\n(Tram and Pauline)"), listOf("J-D Thunder", "Conn")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tram_and_pauline.prmproj"))
         })
         add(Contract("working_dough", Requester.DOUGH, JingleType.MODERN, Attribution(SongInfo.fever("Working Dough"), listOf("J-D Thunder")), 60) { main ->
