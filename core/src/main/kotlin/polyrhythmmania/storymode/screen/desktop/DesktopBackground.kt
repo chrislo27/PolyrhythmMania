@@ -88,13 +88,28 @@ class DesktopBackground(val camera: OrthographicCamera) {
         batch.draw(StoryAssets.get<Texture>("desk_bg_piston_background"), 0f, 0f, width, height)
         
         val delta = Gdx.graphics.deltaTime
-        envelopes.forEach { 
+        var highestEnvelopeOffsetNum = -1
+        var anyNeedDeleting = false
+        envelopes.forEach {
+            if (it.offset > highestEnvelopeOffsetNum) {
+                highestEnvelopeOffsetNum = it.offset
+            }
+            
             it.update(delta)
+            if (it.shouldDelete) {
+                anyNeedDeleting = true
+            }
+            
             val tex = StoryAssets.get<Texture>("desk_bg_envelope_${getEnvelopeFrameNum(it.offset)}")
             val offset = tex.width / 2f
             batch.draw(tex, (it.x - offset) * UI_SCALE, height - (it.y + offset) * UI_SCALE, tex.width * UI_SCALE * 1f, tex.height * UI_SCALE * 1f)
         }
-        envelopes.removeIf { it.shouldDelete }
+        if (anyNeedDeleting) {
+            if (envelopes.any { it.offset == highestEnvelopeOffsetNum && it.shouldDelete }) {
+                resetPistons()
+            }
+            envelopes.removeIf { it.shouldDelete }
+        }
         
         val pistonFrame = pistonIndex + 1
         batch.draw(StoryAssets.get<Texture>("desk_bg_pistons_$pistonFrame"), 0f, 0f, width, height)
