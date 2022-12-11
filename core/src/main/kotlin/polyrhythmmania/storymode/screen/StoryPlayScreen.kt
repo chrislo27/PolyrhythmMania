@@ -751,13 +751,17 @@ class StoryPlayScreen(
                         }
 
                         animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, scoreInt.toFloat(), scoreInt.toFloat(), 0.5f).apply {
+                            this.onStart = {
+                                if (skippableScoreBarAnimation == null) {
+                                    skippableScoreBarAnimation = this
+                                }
+                            }
                             this.onComplete = {
                                 currentScoreCardOptions.set(if (passed) successScoreCardOptions else failScoreCardOptions)
                             }
                         }, scoreBar)
                     }
                 }
-                skippableScoreBarAnimation = animation
                 animationHandler.enqueueAnimation(animation, scoreBar)
             }
             
