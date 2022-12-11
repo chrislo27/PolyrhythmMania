@@ -59,6 +59,8 @@ class DefectiveRodsMode(parent: EngineModifiers) : ModifierModule(parent) {
         engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_perfect_fail"), SoundInterface.SFXType.NORMAL) { player ->
             player.gain = 0.4f
         }
+        
+        engine.inputter.missed()
 
         if (oldLives > 0 && newLives == 0) {
             onAllLivesLost(engine.inputter)

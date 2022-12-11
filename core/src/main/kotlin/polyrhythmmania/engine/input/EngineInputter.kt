@@ -138,8 +138,8 @@ class EngineInputter(val engine: Engine) {
                     if (nextBlockIndex !in 0 until entity.row.length) continue // Not in range
                     if (inputTracker.expected[nextBlockIndex] !is EntityRodPR.ExpectedInput.Expected) continue // Not an expected input
                     if (nextBlockIndex != activeIndex) { // Not the current active index
-//                    Paintbox.LOGGER.debug("$rod: Skipping input because nextBlockIndex != activeIndex (${nextBlockIndex} >= ${activeIndex})")
-                        if (activeIndex < nextBlockIndex) {
+//                        Paintbox.LOGGER.debug("$rod: Skipping input because nextBlockIndex != activeIndex (${nextBlockIndex} >= ${activeIndex})")
+                        if (activeIndex < nextBlockIndex && !rod.isDefective) {
                             missed()
                         }
                         continue
@@ -202,7 +202,9 @@ class EngineInputter(val engine: Engine) {
                             attemptSkillStar(perfectBeats)
                         }
                     } else {
-                        missed()
+                        if (!rod.isDefective) {
+                            missed()
+                        }
                     }
                 }
 

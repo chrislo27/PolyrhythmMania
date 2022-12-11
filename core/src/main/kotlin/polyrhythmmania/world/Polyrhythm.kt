@@ -626,7 +626,7 @@ class EntityRodPR private constructor(
     }
 
     private fun registerMiss(inputter: EngineInputter) {
-        if (!registeredMiss) {
+        if (!registeredMiss && !this.isDefective) {
             registeredMiss = true
             inputter.missed()
         }
