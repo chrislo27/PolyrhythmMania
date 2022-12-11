@@ -111,6 +111,7 @@ class StoryPlayScreen(
     
     private val canPauseGame: ReadOnlyBooleanVar = BooleanVar(eager = true) { !(inIntroCard.use() || showingScoreCard.use()) }
     private val couldSkipLevelEventually: Boolean = isNotCompletedYet && contract.canSkipLevel
+    private var skippableScoreBarAnimation: Animation? = null
     
     private lateinit var successExitReason: ExitReason
     
@@ -570,6 +571,7 @@ class StoryPlayScreen(
         showingScoreCard.set(false)
         scoreCardTransition.set(0f)
         animationHandler.cancelAnimationFor(scoreBar)
+        skippableScoreBarAnimation = null
     }
     
     override fun renderGameplay(delta: Float) {
@@ -721,7 +723,7 @@ class StoryPlayScreen(
                 
                 successExitReason = ExitReason.Passed(scoreInt, scoreBase.skillStar, scoreBase.noMiss)
 
-                animationHandler.enqueueAnimation(Animation(Interpolation.linear, (145f / 60f) * (scoreInt / 100f), 0f, scoreInt.toFloat(), delay).apply {
+                val animation = Animation(Interpolation.linear, (145f / 60f) * (scoreInt / 100f), 0f, scoreInt.toFloat(), delay).apply {
                     val fillingSound = StoryAssets.get<Sound>("score_filling")
                     var fillingSoundID = -1L
 
@@ -730,16 +732,20 @@ class StoryPlayScreen(
                         showScoreOnScoreCard.set(true)
                     }
                     this.onComplete = {
-                        val passed = scoreInt >= contract.minimumScore
+                        if (skippableScoreBarAnimation === this) {
+                            skippableScoreBarAnimation = null
+                        }
                         
+                        val passed = scoreInt >= contract.minimumScore
+
                         if (!passed) {
                             incrementFailureCount()
                         }
-                        
+
                         fillingSound.stop(fillingSoundID)
                         playMenuSound(StoryAssets.get<Sound>("score_finish"))
                         playMenuSound(StoryAssets.get<Sound>(if (passed) "score_jingle_pass" else "score_jingle_tryagain"))
-                        
+
                         if (passed) {
                             storySession.musicHandler.transitionToPostResultsMix()
                         }
@@ -750,7 +756,9 @@ class StoryPlayScreen(
                             }
                         }, scoreBar)
                     }
-                }, scoreBar)
+                }
+                skippableScoreBarAnimation = animation
+                animationHandler.enqueueAnimation(animation, scoreBar)
             }
             
         }
@@ -790,6 +798,11 @@ class StoryPlayScreen(
         val pauseOp = selectedScoreCardOption.getOrCompute()
         if (pauseOp != null && pauseOp.enabled.get()) {
             pauseOp.action()
+        } else {
+            val animation = skippableScoreBarAnimation
+            if (animation != null) {
+                animationHandler.cancelAnimation(animation)
+            }
         }
     }
 
