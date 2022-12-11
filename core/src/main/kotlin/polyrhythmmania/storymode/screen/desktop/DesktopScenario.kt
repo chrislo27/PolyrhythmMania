@@ -15,7 +15,7 @@ data class DesktopScenario(
     
     companion object {
         private fun createNewAvailableInboxItemState(): InboxItemState {
-            return InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = true)
+            return InboxItemState.BRAND_NEW.copy(completion = InboxItemCompletion.AVAILABLE, newIndicator = true)
         }
     }
     

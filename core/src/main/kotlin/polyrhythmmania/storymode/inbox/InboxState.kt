@@ -43,8 +43,10 @@ class InboxState {
             val stageCompletionData = obj.get("stageCompletionData")?.takeIf { it.isObject }?.let { 
                 StageCompletionData.fromJson(it.asObject())
             }
+            val playedBefore = obj.getBoolean("playedBefore", completionState.shouldCountAsCompleted())
+            val failureCount = obj.getInt("failureCount", 0).coerceAtLeast(0) // Strictly optional and must default to 0
             
-            return InboxItemState(completionState, newIndicator, stageCompletionData)
+            return InboxItemState(completionState, newIndicator, stageCompletionData, playedBefore, failureCount)
         }
         
         private fun inboxItemStateToJson(itemID: String, itemState: InboxItemState): JsonObject {
@@ -55,6 +57,10 @@ class InboxState {
                 obj.add("new", itemState.newIndicator)
                 val stageCompletionData = itemState.stageCompletionData
                 obj.add("stageCompletionData", stageCompletionData?.toJson() ?: Json.NULL)
+                obj.add("playedBefore", itemState.playedBefore)
+                if (itemState.failureCount > 0) {
+                    obj.add("failureCount", itemState.failureCount)
+                }
             }
         }
     }

@@ -184,7 +184,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val storySession: St
                                                 main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                                                 val gameMode = item.contract.gamemodeFactory(main)
                                                 val playScreen = StoryPlayScreen(main, storySession, gameMode.container, Challenges.NO_CHANGES,
-                                                        main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, true, this@TestStoryProgressionOverviewScreen) {
+                                                        main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, true, 0, this@TestStoryProgressionOverviewScreen) {
                                                     Paintbox.LOGGER.debug("ExitReason: $it")
                                                 }
                                                 if (Gdx.input.isShiftDown()) {

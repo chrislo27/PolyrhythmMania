@@ -23,7 +23,7 @@ data class StageCompletionData(
             return StageCompletionData(
                     LocalDateTime.ofEpochSecond(obj.getLong("firstClearTime", System.currentTimeMillis() / 1000), 0, ZoneOffset.UTC),
                     LocalDateTime.ofEpochSecond(obj.getLong("bestClearTime", System.currentTimeMillis() / 1000), 0, ZoneOffset.UTC),
-                    obj.getInt("score", 0),
+                    obj.getInt("score", 0).coerceIn(0, 100),
                     obj.getBoolean("skillStar", false),
                     obj.getBoolean("noMiss", false),
             )

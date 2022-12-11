@@ -357,7 +357,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                         this += Button("Mark Available (w/ flashing)").apply {
                                             this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
                                             this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = true))
+                                                scenario.inboxState.putItemState(item, InboxItemState.BRAND_NEW.copy(completion = InboxItemCompletion.AVAILABLE, newIndicator = true))
                                                 scenario.updateProgression()
                                                 scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                                             }
@@ -366,7 +366,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                             this.bindWidthToParent(multiplier = 0.5f, adjust = -2f)
                                             Anchor.TopRight.configure(this)
                                             this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.AVAILABLE, newIndicator = false))
+                                                scenario.inboxState.putItemState(item, InboxItemState.BRAND_NEW.copy(completion = InboxItemCompletion.AVAILABLE, newIndicator = false))
                                                 scenario.updateProgression()
                                                 scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                                             }
@@ -377,7 +377,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                         this.padding.set(Insets(8f))
                                         this += Button("Mark Skipped").apply {
                                             this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.SKIPPED))
+                                                scenario.inboxState.putItemState(item, InboxItemState.BRAND_NEW.copy(completion = InboxItemCompletion.SKIPPED))
                                                 scenario.updateProgression()
                                                 scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                                             }
@@ -388,7 +388,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                         this.padding.set(Insets(8f))
                                         this += Button("Mark Completed").apply {
                                             this.setOnAction {
-                                                scenario.inboxState.putItemState(item, InboxItemState(completion = InboxItemCompletion.COMPLETED))
+                                                scenario.inboxState.putItemState(item, InboxItemState.BRAND_NEW.copy(completion = InboxItemCompletion.COMPLETED))
                                                 scenario.updateProgression()
                                                 scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                                             }

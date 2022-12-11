@@ -5,11 +5,9 @@ package polyrhythmmania.storymode.screen
 sealed class ExitReason {
     
     /**
-     * The player quit the level 
+     * The player quit the level. We record the number of failures for skipping.
      */
-    object Quit : ExitReason() {
-        override fun toString(): String = "Quit"
-    }
+    data class Quit(val timesFailed: Int) : ExitReason()
 
     /**
      * The player is choosing to skip this level

@@ -58,7 +58,11 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
                             newState = newState.copy(completion = InboxItemCompletion.SKIPPED)
                         }
                     }
-                    ExitReason.Quit -> {}
+                    is ExitReason.Quit -> {
+                        if (exitReason.timesFailed > 0) {
+                            newState = newState.copy(failureCount = newState.failureCount + exitReason.timesFailed)
+                        }
+                    }
                 }
 
                 inboxState.putItemState(inboxItem, newState)
@@ -81,7 +85,8 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
             val exitCallback = createExitCallback(contract, inboxItem, inboxItemState)
             val playScreen = StoryPlayScreen(main, desktopUI.storySession, gameMode.container, Challenges.NO_CHANGES,
                     main.settings.inputCalibration.getOrCompute(), gameMode, contract,
-                    inboxItemState?.completion != InboxItemCompletion.COMPLETED, desktopUI.rootScreen, exitCallback)
+                    inboxItemState?.completion != InboxItemCompletion.COMPLETED, inboxItemState?.failureCount ?: 0,
+                    desktopUI.rootScreen, exitCallback)
 
             gameMode.prepareFirstTime()
             playScreen.resetAndUnpause(unpause = false)

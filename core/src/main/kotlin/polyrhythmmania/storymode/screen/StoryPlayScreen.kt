@@ -65,7 +65,8 @@ class StoryPlayScreen(
         challenges: Challenges, inputCalibration: InputCalibration,
         gameMode: GameMode?,
         val contract: Contract,
-        private val allowSkipping: Boolean,
+        isNotCompletedYet: Boolean,
+        previousFailureCount: Int,
         val exitToScreen: PaintboxScreen,
         val exitCallback: ExitCallback,
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
@@ -82,7 +83,7 @@ class StoryPlayScreen(
     private val animationHandler: AnimationHandler = AnimationHandler()
     
     private val engineBeat: FloatVar = FloatVar(0f)
-    private var failureCount: IntVar = IntVar(0)
+    private var failureCount: IntVar = IntVar(previousFailureCount.coerceAtLeast(0))
     
     // Intro card
     private val introCardDefaultDuration: Float = 3f
@@ -109,7 +110,7 @@ class StoryPlayScreen(
     private val selectedScoreCardOption: Var<PauseOption?> = Var(null)
     
     private val canPauseGame: ReadOnlyBooleanVar = BooleanVar(eager = true) { !(inIntroCard.use() || showingScoreCard.use()) }
-    private val couldSkipLevelEventually: Boolean = allowSkipping && contract.canSkipLevel
+    private val couldSkipLevelEventually: Boolean = isNotCompletedYet && contract.canSkipLevel
     
     private lateinit var successExitReason: ExitReason
     
@@ -122,7 +123,7 @@ class StoryPlayScreen(
             startOverPauseAction()
         }
         optionList += PauseOption(StoryL10N.getVar("play.pause.quit"), true) {
-            quitPauseAction(ExitReason.Quit)
+            quitPauseAction(ExitReason.Quit(failureCount.get()))
         }
         this.pauseOptions.set(optionList)
     }
@@ -294,7 +295,9 @@ class StoryPlayScreen(
                 }.apply {
                     this.enabled.bind { failureCount.use() >= contract.skipAfterNFailures }
                 },
-                PauseOption(StoryL10N.getVar("play.pause.quit"), true) { quitPauseAction(ExitReason.Quit) },
+                PauseOption(StoryL10N.getVar("play.pause.quit"), true) {
+                    quitPauseAction(ExitReason.Quit(failureCount.get()))
+                },
         )
         successScoreCardOptions = listOf(
                 PauseOption(StoryL10N.getVar("play.pause.continue"), true) {
@@ -682,7 +685,7 @@ class StoryPlayScreen(
         animationHandler.enqueueAnimation(Animation(Interpolation.smoother, 0.25f, 0f, 1f), blurStrength)
         
         if (engine.resultFlag.getOrCompute() is ResultFlag.Fail) {
-            failureCount.incrementAndGet()
+            incrementFailureCount()
             currentScoreCardOptions.set(failScoreCardOptions)
         } else {
             engine.resultFlag.set(ResultFlag.None)
@@ -730,7 +733,7 @@ class StoryPlayScreen(
                         val passed = scoreInt >= contract.minimumScore
                         
                         if (!passed) {
-                            failureCount.incrementAndGet()
+                            incrementFailureCount()
                         }
                         
                         fillingSound.stop(fillingSoundID)
@@ -757,6 +760,10 @@ class StoryPlayScreen(
     override fun renderUpdate() {
         super.renderUpdate()
         storySession.renderUpdate()
+    }
+    
+    private fun incrementFailureCount() {
+        failureCount.incrementAndGet()
     }
 
     private fun pauseGameNoCheck(playSound: Boolean) {
