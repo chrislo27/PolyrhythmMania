@@ -157,6 +157,7 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val storySession: StorySes
             this.setOnAction {
                 val newItem = currentInboxFolder.getOrCompute()
                 if (newItem is InboxItem.ContractDoc) {
+                    storySession.musicHandler.fadeOut(0f)
                     val contract = newItem.contract
                     main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
                     val gameMode = contract.gamemodeFactory(main)
