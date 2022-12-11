@@ -3,14 +3,14 @@ package polyrhythmmania.engine
 import com.codahale.metrics.*
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
+import paintbox.util.DecimalFormats
 import polyrhythmmania.PRMania
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.input.EngineInputter
+import polyrhythmmania.engine.modifiers.EngineModifiers
 import polyrhythmmania.engine.timesignature.TimeSignatureMap
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
-import paintbox.util.DecimalFormats
-import polyrhythmmania.engine.modifiers.EngineModifiers
 import polyrhythmmania.util.metrics.timeInline
 import polyrhythmmania.world.World
 import java.util.concurrent.CopyOnWriteArrayList
@@ -262,7 +262,7 @@ class Engine(timingProvider: TimingProvider,
         return """TimingProvider: ${DecimalFormats.format("0.000", timingProvider.seconds)} s
 Time: ${DecimalFormats.format("0.000", this.beat)} b / ${DecimalFormats.format("0.000", this.seconds)} s / BPM ${DecimalFormats.format("0.00", tempos.tempoAtBeat(this.beat))} / Rate ${DecimalFormats.format("0.##", playbackSpeed * 100)}%
 Events: ${events.size}
-Inputs: ${if (inputter.areInputsLocked) "locked" else "unlocked"} | results: ${inputter.inputResults.size} | totalExpected: ${inputter.totalExpectedInputs}
+Inputs: ${if (inputter.areInputsLocked) "locked" else "unlocked"} | results: ${inputter.inputResults.size} | totalExpected: ${inputter.totalExpectedInputs} | noMiss: ${inputter.noMiss}
 Practice: ${if (inputter.practice.practiceModeEnabled) "enabled" else "disabled"} | ${inputter.practice.moreTimes} more times | [${inputter.practice.requiredInputs.joinToString(separator = ", ") { "${it.beat} ${it.inputType}${if (it.wasHit) "!" else ""}" }}]
 Music: vol: ${musicData.volumeMap.volumeAtBeat(this.beat)}
 """.dropLast(1)
