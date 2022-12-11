@@ -47,7 +47,7 @@ object Contracts {
         add(Contract("bunny_hop", Requester.MOON_BUNNY, JingleType.GBA, Attribution(SongInfo.tengoku("Bunny Hop"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/bunny_hop.prmproj"))
         })
-        add(Contract("crop_stomp", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 70, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+        add(Contract("crop_stomp", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 75, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/crop_stomp.prmproj"))
         })
         add(Contract("fillbots", Requester.BUILDROID, JingleType.GBA, Attribution(SongInfo.megamix("Fillbots"), listOf("J-D Thunder")), 60, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
@@ -86,7 +86,7 @@ object Contracts {
         add(Contract("rhythm_rally_2", Requester.GOOD_SPORTS, JingleType.ARCADE, Attribution(SongInfo.ds("Rhythm Rally", listOf(SongNameAndSource.megamix("Rhythm Rally 2"))), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_rally_2.prmproj"))
         })
-        add(Contract("rhythm_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.megamix("Rhythm Tweezers"), listOf("Kievit")), 75, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+        add(Contract("rhythm_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.megamix("Rhythm Tweezers"), listOf("Kievit")), 70, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_tweezers.prmproj"))
         })
         add(Contract("rhythm_tweezers_2", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 75) { main ->
