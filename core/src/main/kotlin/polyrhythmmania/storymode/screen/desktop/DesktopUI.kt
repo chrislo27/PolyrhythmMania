@@ -84,6 +84,7 @@ class DesktopUI(
     val monoMarkup: Markup get() = inboxItemRenderer.monoMarkup
     val slabMarkup: Markup get() = inboxItemRenderer.slabMarkup
     val robotoRegularMarkup: Markup get() = inboxItemRenderer.robotoRegularMarkup
+    val robotoBoldMarkup: Markup get() = inboxItemRenderer.robotoBoldMarkup
     val robotoCondensedMarkup: Markup get() = inboxItemRenderer.robotoCondensedMarkup
     val openSansMarkup: Markup get() = inboxItemRenderer.openSansMarkup
     

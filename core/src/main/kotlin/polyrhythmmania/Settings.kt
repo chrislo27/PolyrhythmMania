@@ -80,6 +80,9 @@ import kotlin.math.roundToInt
 class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this predates PaintboxPreferences
     
     companion object {
+        const val DEFAULT_MASTER_VOLUME: Int = 100
+        const val DEFAULT_SPECIFIC_VOLUME: Int = 50
+        
         private fun determineMaxRefreshRate(): Int {
             return try {
                 Gdx.graphics.displayMode.refreshRate.coerceAtLeast(24)
@@ -103,10 +106,10 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
         private set
 
     private val kv_locale: KeyValue<String> = KeyValue(SETTINGS_LOCALE, "")
-    private val kv_masterVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MASTER_VOLUME, 100)
-    private val kv_gameplayVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_GAMEPLAY_VOLUME, 50)
-    private val kv_menuMusicVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_MUSIC_VOLUME, 50)
-    private val kv_menuSfxVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, 50)
+    private val kv_masterVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MASTER_VOLUME, DEFAULT_MASTER_VOLUME)
+    private val kv_gameplayVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_GAMEPLAY_VOLUME, DEFAULT_SPECIFIC_VOLUME)
+    private val kv_menuMusicVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_MUSIC_VOLUME, DEFAULT_SPECIFIC_VOLUME)
+    private val kv_menuSfxVolumeSetting: KeyValue<Int> = KeyValue(SETTINGS_MENU_SFX_VOLUME, DEFAULT_SPECIFIC_VOLUME)
     private val kv_windowedResolution: KeyValue<WindowSize> = KeyValue(SETTINGS_WINDOWED_RESOLUTION, PRMania.DEFAULT_SIZE)
     private val kv_fullscreen: KeyValue<Boolean> = KeyValue(SETTINGS_FULLSCREEN, true)
     private val kv_fullscreenMonitor: KeyValue<MonitorInfo?> = KeyValue(SETTINGS_FULLSCREEN_MONITOR, null)
