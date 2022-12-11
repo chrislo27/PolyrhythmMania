@@ -263,6 +263,7 @@ class SpotlightEditDialog(
                             val sel = selection.getOrCompute()
                             sel.lightColor.color.set(sel.lightColor.resetColor)
                             setUIElementsFromLightColor()
+                            genericUpdateTrigger.invert()
                         }
                     }
                 }
@@ -288,6 +289,7 @@ class SpotlightEditDialog(
                             val sel = selection.getOrCompute()
                             sel.lightColor.strength = sel.lightColor.defaultStrength
                             setUIElementsFromLightColor()
+                            genericUpdateTrigger.invert()
                         }
                     }
                 }
