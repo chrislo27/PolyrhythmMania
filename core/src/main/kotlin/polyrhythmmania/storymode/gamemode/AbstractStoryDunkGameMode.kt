@@ -1,12 +1,14 @@
 package polyrhythmmania.storymode.gamemode
 
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Event
 import polyrhythmmania.gamemodes.EventDeployRodDunk
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldType
+import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.*
@@ -41,5 +43,9 @@ abstract class AbstractStoryDunkGameMode(
     }
 
     override fun initialize() {
+    }
+
+    override fun createGlobalContainerSettings(): GlobalContainerSettings {
+        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA)
     }
 }
