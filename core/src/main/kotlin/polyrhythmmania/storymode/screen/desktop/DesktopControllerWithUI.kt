@@ -37,19 +37,20 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
                 when (exitReason) {
                     is ExitReason.Passed -> {
                         val now = LocalDateTime.now(ZoneOffset.UTC)
-                        if (newState.completion != InboxItemCompletion.COMPLETED) {
+                        val oldCompletion = newState.stageCompletionData
+                        
+                        if (newState.completion != InboxItemCompletion.COMPLETED || oldCompletion == null) {
+                            // Was not previously completed or old data is missing
                             newState = newState.copy(completion = InboxItemCompletion.COMPLETED,
                                     stageCompletionData = StageCompletionData(now, now, exitReason.score,
                                             exitReason.skillStar ?: false, exitReason.noMiss))
                         } else {
-                            val oldCompletion = newState.stageCompletionData
-                            if (oldCompletion != null) {
-                                if (exitReason.isBetterThan(ExitReason.Passed(oldCompletion.score, oldCompletion.skillStar, oldCompletion.noMiss))) {
-                                    val scd = StageCompletionData(oldCompletion.firstClearTime, now,
-                                            exitReason.score, exitReason.skillStar
-                                            ?: false, exitReason.noMiss)
-                                    newState = newState.copy(stageCompletionData = scd)
-                                }
+                            val oldScore = ExitReason.Passed(oldCompletion.score, oldCompletion.skillStar, oldCompletion.noMiss)
+                            if (exitReason.isBetterThan(oldScore)) {
+                                val mergedScore = oldScore.createHighScore(exitReason)
+                                val scd = StageCompletionData(oldCompletion.firstClearTime, now,
+                                        mergedScore.score, mergedScore.skillStar ?: false, mergedScore.noMiss)
+                                newState = newState.copy(stageCompletionData = scd)
                             }
                         }
                     }
