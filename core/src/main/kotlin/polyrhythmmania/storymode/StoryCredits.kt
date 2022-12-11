@@ -13,6 +13,9 @@ object StoryCredits : CreditsBase() {
             Localization.getVar("credits.story.writing") to abcSorted(
                     "sp00pster", "chrislo27", "J-D Thunder", "Conn", "garbo", "Luxury",
             ).toVars(),
+            Localization.getVar("credits.graphicDesign") to abcSorted(
+                    "garbo", "snow krow", "GENERIC", "Luxury",
+            ).toVars(),
     )
 
     /**
