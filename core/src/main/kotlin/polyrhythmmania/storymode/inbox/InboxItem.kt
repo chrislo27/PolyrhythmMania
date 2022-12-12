@@ -51,6 +51,8 @@ sealed class InboxItem(
         }
 
         val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
+        val ignoreNoMiss: Boolean get() = subtype == ContractSubtype.TRAINING
+        val ignoreSkillStar: Boolean get() = subtype == ContractSubtype.TRAINING
 
         override fun isCompletedWhenRead(): Boolean = false
     }

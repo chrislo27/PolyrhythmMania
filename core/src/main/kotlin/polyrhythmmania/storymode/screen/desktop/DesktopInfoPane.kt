@@ -105,7 +105,11 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                         this.setScaleXY(0.5f)
                         this.margin.set(Insets(1f, 1f, 4f, 4f))
                     }
-                    val tmpListFeatures = listOfNotNull(if (completionData.skillStar) "Skill Star!" else null, if (completionData.noMiss) "No Miss!" else null)
+                    
+                    val tmpListFeatures = listOfNotNull(
+                            if (completionData.skillStar && !inboxItem.ignoreSkillStar) "Skill Star!" else null,
+                            if (completionData.noMiss && !inboxItem.ignoreNoMiss) "No Miss!" else null,
+                    )
                     this += TextLabel(tmpListFeatures.joinToString(separator = " "), font = main.fontRoboto).apply {
                         this.bounds.height.set(8f * UI_SCALE)
                         this.textColor.set(Color.BLACK)
