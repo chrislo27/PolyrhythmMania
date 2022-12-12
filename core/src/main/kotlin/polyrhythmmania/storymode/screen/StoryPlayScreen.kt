@@ -66,7 +66,7 @@ class StoryPlayScreen(
         gameMode: GameMode?,
         val contract: Contract,
         isNotCompletedYet: Boolean,
-        previousFailureCount: Int,
+        private val previousFailureCount: Int,
         val exitToScreen: PaintboxScreen,
         val exitCallback: ExitCallback,
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
@@ -83,7 +83,7 @@ class StoryPlayScreen(
     private val animationHandler: AnimationHandler = AnimationHandler()
     
     private val engineBeat: FloatVar = FloatVar(0f)
-    private var failureCount: IntVar = IntVar(previousFailureCount.coerceAtLeast(0))
+    private val currentFailureCount: IntVar = IntVar(0)
     
     // Intro card
     private val introCardDefaultDuration: Float = 3f
@@ -124,7 +124,7 @@ class StoryPlayScreen(
             startOverPauseAction()
         }
         optionList += PauseOption(StoryL10N.getVar("play.pause.quit"), true) {
-            quitPauseAction(ExitReason.Quit(failureCount.get()))
+            quitPauseAction(ExitReason.Quit(currentFailureCount.get()))
         }
         this.pauseOptions.set(optionList)
     }
@@ -294,10 +294,10 @@ class StoryPlayScreen(
                 if (!couldSkipLevelEventually) null else PauseOption(StoryL10N.getVar("play.pause.skipThisLevel"), false) {
                     quitPauseAction(ExitReason.Skipped)
                 }.apply {
-                    this.enabled.bind { failureCount.use() >= contract.skipAfterNFailures }
+                    this.enabled.bind { previousFailureCount + currentFailureCount.use() >= contract.skipAfterNFailures }
                 },
                 PauseOption(StoryL10N.getVar("play.pause.quit"), true) {
-                    quitPauseAction(ExitReason.Quit(failureCount.get()))
+                    quitPauseAction(ExitReason.Quit(currentFailureCount.get()))
                 },
         )
         successScoreCardOptions = listOf(
@@ -687,7 +687,7 @@ class StoryPlayScreen(
         animationHandler.enqueueAnimation(Animation(Interpolation.smoother, 0.25f, 0f, 1f), blurStrength)
         
         if (engine.resultFlag.getOrCompute() is ResultFlag.Fail) {
-            incrementFailureCount()
+            incrementCurrentFailureCount()
             currentScoreCardOptions.set(failScoreCardOptions)
         } else {
             engine.resultFlag.set(ResultFlag.None)
@@ -739,7 +739,7 @@ class StoryPlayScreen(
                         val passed = scoreInt >= contract.minimumScore
 
                         if (!passed) {
-                            incrementFailureCount()
+                            incrementCurrentFailureCount()
                         }
 
                         fillingSound.stop(fillingSoundID)
@@ -774,8 +774,8 @@ class StoryPlayScreen(
         storySession.renderUpdate()
     }
     
-    private fun incrementFailureCount() {
-        failureCount.incrementAndGet()
+    private fun incrementCurrentFailureCount() {
+        currentFailureCount.incrementAndGet()
     }
 
     private fun pauseGameNoCheck(playSound: Boolean) {

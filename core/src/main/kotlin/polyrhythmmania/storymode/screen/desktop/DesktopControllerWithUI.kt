@@ -60,8 +60,8 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
                         }
                     }
                     is ExitReason.Quit -> {
-                        if (exitReason.timesFailed > 0) {
-                            newState = newState.copy(failureCount = newState.failureCount + exitReason.timesFailed)
+                        if (exitReason.timesFailedThisTime > 0) {
+                            newState = newState.copy(failureCount = newState.failureCount + exitReason.timesFailedThisTime)
                         }
                     }
                 }

@@ -8,7 +8,7 @@ sealed class ExitReason {
     /**
      * The player quit the level. We record the number of failures for skipping.
      */
-    data class Quit(val timesFailed: Int) : ExitReason()
+    data class Quit(val timesFailedThisTime: Int) : ExitReason()
 
     /**
      * The player is choosing to skip this level
