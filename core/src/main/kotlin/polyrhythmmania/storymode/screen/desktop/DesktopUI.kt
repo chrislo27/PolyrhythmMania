@@ -26,6 +26,7 @@ import paintbox.util.MathHelper
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
+import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
@@ -81,6 +82,7 @@ class DesktopUI(
     
     val inboxItemRenderer: InboxItemRenderer = InboxItemRenderer(this)
     private val inboxItemTitleFont: PaintboxFont = main.fontLexendBold
+    private val inboxItemSubtitleFont: PaintboxFont = main.fontLexend
     val monoMarkup: Markup get() = inboxItemRenderer.monoMarkup
     val slabMarkup: Markup get() = inboxItemRenderer.slabMarkup
     val robotoRegularMarkup: Markup get() = inboxItemRenderer.robotoRegularMarkup
@@ -434,6 +436,13 @@ class DesktopUI(
         
         val myInboxItemState: ReadOnlyVar<InboxItemState> = scenario.inboxState.itemStateVarOrUnavailable(inboxItem.id)
         private val useFlowFont: ReadOnlyBooleanVar = BooleanVar { myInboxItemState.use().completion == InboxItemCompletion.UNAVAILABLE }
+        
+        private val contractListingName: ReadOnlyVar<String?> = Var.bind {
+            if (inboxItem is InboxItem.ContractDoc 
+                    && (myInboxItemState.use().playedBefore || (Paintbox.debugMode.use() && PRMania.enableEarlyAccessMessage))) {
+                inboxItem.contractListingName?.use() 
+            } else null
+        }
 
         init {
             this.bounds.width.set(78f * UI_SCALE)
@@ -481,13 +490,29 @@ class DesktopUI(
 
             titleAreaPane += TextLabel("", font = inboxItemTitleFont).apply {
                 this.text.bind {
-                    val listingName = inboxItem.listingName.use()
+                    val listingName = if (inboxItem is InboxItem.ContractDoc && contractListingName.use() == null) {
+                        // Show contract code if music info is not available
+                        inboxItem.name.use()
+                    } else inboxItem.listingName.use()
+                    
                     if (useFlowFont.use()) {
                         listingName.replace('-', ' ')
                     } else listingName
                 }
                 this.font.bind { 
                     if (useFlowFont.use()) main.fontFlowCircular else inboxItemTitleFont
+                }
+            }
+            
+            if (inboxItem is InboxItem.ContractDoc) {
+                bottomAreaPane += TextLabel("", font = inboxItemSubtitleFont).apply {
+                    this.text.bind {
+                        if (contractListingName.use() != null) inboxItem.name.use() else ""
+                    }
+                    this.renderAlign.set(RenderAlign.left)
+                    this.textColor.set(Color.DARK_GRAY.cpy())
+                    this.margin.set(Insets(0f, 0f, 1f * UI_SCALE, 1f * UI_SCALE))
+                    this.setScaleXY(0.8f)
                 }
             }
 

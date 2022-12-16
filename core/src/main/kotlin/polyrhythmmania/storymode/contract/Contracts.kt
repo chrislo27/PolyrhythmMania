@@ -22,7 +22,7 @@ object Contracts {
             this.contracts[contract.id] = contract
         }
         
-        add(Contract(ID_TUTORIAL1, Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+        add(Contract(ID_TUTORIAL1, Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0, noListingName = true, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             Tutorial1GameMode(main)
         })
         

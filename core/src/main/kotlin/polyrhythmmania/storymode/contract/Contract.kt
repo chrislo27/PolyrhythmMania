@@ -10,6 +10,7 @@ data class Contract(
         val id: String,
 
         override val name: ReadOnlyVar<String>,
+        override val listingName: ReadOnlyVar<String>?,
         override val desc: ReadOnlyVar<String>,
         override val tagline: ReadOnlyVar<String>,
 
@@ -41,11 +42,14 @@ data class Contract(
     constructor(
             id: String, requester: Requester, jingleType: JingleType, attribution: Attribution?,
             minimumScore: Int, extraConditions: List<Condition> = emptyList(), 
-            skipAfterNFailures: Int = DEFAULT_SKIP_TIME, gamemodeFactory: (main: PRManiaGame) -> GameMode
+            skipAfterNFailures: Int = DEFAULT_SKIP_TIME,
+            noListingName: Boolean = false,
+            gamemodeFactory: (main: PRManiaGame) -> GameMode
     ) : this(
-            id, StoryL10N.getVar("contract.$id.name"), StoryL10N.getVar("contract.$id.desc"),
-            StoryL10N.getVar("contract.$id.tagline"), requester, jingleType, attribution, minimumScore, extraConditions,
-            skipAfterNFailures, gamemodeFactory
+            id, StoryL10N.getVar("contract.$id.name"), 
+            if (noListingName) null else StoryL10N.getVar("contract.$id.listingName"),
+            StoryL10N.getVar("contract.$id.desc"), StoryL10N.getVar("contract.$id.tagline"),
+            requester, jingleType, attribution, minimumScore, extraConditions, skipAfterNFailures, gamemodeFactory
     )
 
 }

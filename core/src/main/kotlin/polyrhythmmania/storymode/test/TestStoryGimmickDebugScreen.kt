@@ -196,8 +196,8 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                                     InboxItem.Debug("debug2a", "3rd item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 4th item are COMPLETED"),
                                     InboxItem.Debug("debug2b", "4th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 3rd item are COMPLETED"),
                                     InboxItem.Debug("debug3", "5th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER),
-                                    InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
-                                    InboxItem.ContractDoc(Contract("debugcontract_2", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
+                                    InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
+                                    InboxItem.ContractDoc(Contract("debugcontract_2", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
                             ))
                             val progression = Progression(listOf(
                                     UnlockStage.singleItem("debug0", UnlockStageChecker.alwaysUnlocked(), stageID = "stage0"),
@@ -276,8 +276,8 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             val inboxItems = InboxItems(listOf(
-                                    InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
-                                    InboxItem.ContractDoc(Contract("debugcontract_2", "TRAINING-099".asReadOnlyVar(), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory), subtype = ContractSubtype.TRAINING),
+                                    InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
+                                    InboxItem.ContractDoc(Contract("debugcontract_2", "TRAINING-099".asReadOnlyVar(), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory), subtype = ContractSubtype.TRAINING),
                                     InboxItem.Memo("test_memo", true, true)
                             ))
                             val progression = Progression(listOf(

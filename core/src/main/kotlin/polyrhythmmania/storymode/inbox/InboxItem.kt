@@ -40,10 +40,10 @@ sealed class InboxItem(
 
     class ContractDoc(
             val contract: Contract, itemID: String = getDefaultContractDocID(contract),
-            listingName: ReadOnlyVar<String> = contract.name,
+            listingName: ReadOnlyVar<String>? = contract.listingName,
             override val subtype: ContractSubtype = ContractSubtype.NORMAL,
             override val hasLongCompanyName: Boolean = contract.requester.isNameLong,
-    ) : InboxItem(itemID, listingName), IContractDoc, IHasContractTextInfo by contract {
+    ) : InboxItem(itemID, listingName ?: contract.name), IContractDoc, IHasContractTextInfo {
         
         companion object {
             fun getDefaultContractDocID(contractID: String): String = "contract_${contractID}"
@@ -54,6 +54,12 @@ sealed class InboxItem(
         val ignoreNoMiss: Boolean get() = subtype == ContractSubtype.TRAINING
         val ignoreSkillStar: Boolean get() = subtype == ContractSubtype.TRAINING
 
+        override val name: ReadOnlyVar<String> get() = contract.name
+        override val desc: ReadOnlyVar<String> get() = contract.desc
+        override val tagline: ReadOnlyVar<String> get() = contract.tagline
+        override val requester: Requester get() = contract.requester
+        val contractListingName: ReadOnlyVar<String>? get() = contract.listingName
+        
         override fun isCompletedWhenRead(): Boolean = false
     }
     
