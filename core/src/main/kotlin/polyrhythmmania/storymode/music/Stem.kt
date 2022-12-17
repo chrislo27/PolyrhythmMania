@@ -8,7 +8,7 @@ import paintbox.binding.ReadOnlyBooleanVar
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSample
-import kotlin.concurrent.thread
+import kotlin.system.measureNanoTime
 
 class Stem(val file: FileHandle) {
     
@@ -35,10 +35,13 @@ class Stem(val file: FileHandle) {
                         }
                     }
                 })
-        thread(start = true, isDaemon = true, name = "StoryMusicHandler Stem music decoder for $file", priority = 7) {
+        
+        StemLoader.enqueue {
             Paintbox.LOGGER.debug("Starting story music handler stem decode for $file")
-            handler.decode()
-            Paintbox.LOGGER.debug("Finished story music handler stem decode for $file")
+            val nano = measureNanoTime {
+                handler.decode()
+            }
+            Paintbox.LOGGER.debug("Finished story music handler stem decode for $file - took ${(nano / 1_000_000.0).toFloat()} ms")
         }
         
         this.sample = sample

@@ -46,7 +46,7 @@ class StorySession {
     
     fun createEntryLoadingScreen(main: PRManiaGame, doAfterLoad: () -> Unit): StoryAssetsLoadingScreen {
         DiscordRichPresence.updateActivity(DefaultPresences.playingStoryMode())
-        StoryMusicAssets.init()
+        StoryMusicAssets.initTitleStems()
         return StoryAssetsLoadingScreen(main, false, doAfterLoad)
     }
 

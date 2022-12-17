@@ -12,7 +12,7 @@ object StoryMusicAssets {
     const val STEM_ID_DESKTOP_PERC: String = "desktop_perc"
     
     
-    val stems: Map<String, Stem> by lazy {
+    val titleStems: Map<String, Stem> by lazy {
         mapOf(
                 STEM_ID_TITLE_FULL1 to Stem(Gdx.files.internal("story/music/title/full1.ogg")),
                 STEM_ID_TITLE_PERC1 to Stem(Gdx.files.internal("story/music/title/perc1.ogg")),
@@ -22,7 +22,7 @@ object StoryMusicAssets {
         )
     }
     
-    fun init() {
-        stems
+    fun initTitleStems() {
+        titleStems
     }
 }

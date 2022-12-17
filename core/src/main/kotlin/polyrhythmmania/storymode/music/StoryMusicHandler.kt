@@ -154,7 +154,7 @@ class StoryMusicHandler(val storySession: StorySession) {
 
     private fun getStemPlayer(stemID: String): StemPlayer {
         return stemPlayers.getOrPut(stemID) {
-            val stem = StoryMusicAssets.stems[stemID] ?: error("No stem found with ID $stemID")
+            val stem = StoryMusicAssets.titleStems[stemID] ?: error("No stem found with ID $stemID")
             createNewStemPlayer(stemID, stem, stem.sample).apply {
                 playerInput.addInput(this)
             }
