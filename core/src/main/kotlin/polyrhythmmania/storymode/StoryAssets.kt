@@ -22,7 +22,7 @@ object StoryAssets : AssetRegistryInstance() {
 
 class StoryAssetLoader : IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
-        StoryAssets.loadAsset<Texture>("logo", "story/textures/logo_2lines_story.png", linearTexture())
+        StoryAssets.loadAsset<Texture>("logo", "story/textures/logo.png", linearTexture())
         
         StoryAssets.loadAsset<Texture>("desk_ui_scrollbar_back", "story/textures/desk/ui/scrollbar_back.png")
         StoryAssets.loadAsset<Texture>("desk_ui_scrollbar_thumb_active", "story/textures/desk/ui/scrollbar_thumb_active.png")
