@@ -1352,19 +1352,21 @@ class Editor(
     fun getDebugString(): String {
         val click = this.click.getOrCompute()
         val clickDebugString = click.getDebugString()
-        return """timing: ${timing.seconds}
-
+        return """
 Click: ${click.javaClass.simpleName}${if (clickDebugString.isNotEmpty()) "\n$clickDebugString" else ""}
 engine.events: ${engine.events.size}
 autosave: ${DecimalFormats.format("0.0", timeUntilAutosave)}
 trackView: ${trackView.beat.get()} | ${trackView.renderScale.get()} @ (${trackView.pxPerBeat.get()} px/beat)
-path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { "${it::class.java.simpleName}" }}
+path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { it::class.java.simpleName }}
 cameraOffsetCurrent: ${cameraOffset.current}
 cameraOffsetTarget: ${cameraOffset.target}
 suggest: $suggestPanCameraDir
 musicSec: ${engine.musicData.getCorrectMusicPlayerPositionAt(engine.seconds) / 1000}
 lastBlockPos: ${container.lastBlockPosition.get()}
 endBlockPos: ${container.endBlockPosition.get()}
+
+Engine:
+${engine.getDebugString()}
 
 WorldRenderer:
 ${renderer.getDebugString()}
