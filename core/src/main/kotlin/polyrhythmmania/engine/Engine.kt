@@ -264,7 +264,7 @@ Time: ${DecimalFormats.format("0.000", this.beat)} b / ${DecimalFormats.format("
 Events: ${events.size}
 Inputs: ${if (inputter.areInputsLocked) "locked" else "unlocked"} | results: ${inputter.inputResults.size} | totalExpected: ${inputter.totalExpectedInputs} | noMiss: ${inputter.noMiss}
 Practice: ${if (inputter.practice.practiceModeEnabled) "enabled" else "disabled"} | ${inputter.practice.moreTimes} more times | [${inputter.practice.requiredInputs.joinToString(separator = ", ") { "${it.beat} ${it.inputType}${if (it.wasHit) "!" else ""}" }}]
-Music: vol: ${musicData.volumeMap.volumeAtBeat(this.beat)}
+Music: vol: ${musicData.volumeMap.volumeAtBeat(this.beat)} | Desync: ${DecimalFormats.format("+00.000;-00.000", musicData.getCurrentDesyncMs())} ms
 """.dropLast(1)
     }
 

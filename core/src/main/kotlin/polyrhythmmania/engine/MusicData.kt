@@ -2,7 +2,6 @@ package polyrhythmmania.engine
 
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
-import paintbox.binding.FloatVar
 import polyrhythmmania.engine.music.MusicVolMap
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
@@ -51,14 +50,24 @@ class MusicData(val engine: Engine) {
             if (!player.isPaused && !player.context.out.isPaused) {
                 // Player desync correction
                 val currentSeconds = engine.seconds
-                val correctPosition = getCorrectMusicPlayerPositionAt(currentSeconds)
                 val currentPosition = player.position
+                val correctPosition = getCorrectMusicPlayerPositionAt(currentSeconds)
                 if (!MathUtils.isEqual(correctPosition.toFloat(), currentPosition.toFloat(), 50f /* ms */)) {
                     player.position = correctPosition
-//                    Paintbox.LOGGER.debug("[MusicData] Manually adjusted player due to desync: was $currentPosition, now $correctPosition")
+//                    Paintbox.LOGGER.debug("[MusicData] Manually adjusted player due to desync: was $currentPosition, should be $correctPosition (delta ${correctPosition - currentPosition} ms)")
                 }
             }
         }
+    }
+    
+    fun getCurrentDesyncMs(): Double {
+        val music = this.beadsMusic
+        val player = engine.soundInterface.getCurrentMusicPlayer(music)
+        return if (player != null && !player.isPaused && !player.context.out.isPaused) {
+            val currentPosition = player.position
+            val correctPosition = getCorrectMusicPlayerPositionAt(engine.seconds)
+            correctPosition - currentPosition
+        } else 0.0
     }
     
     fun setMusicPlayerPositionToCurrentSec() {
