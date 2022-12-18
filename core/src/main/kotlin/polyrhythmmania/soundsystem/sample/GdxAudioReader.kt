@@ -19,6 +19,8 @@ import java.nio.channels.FileChannel
 
 object GdxAudioReader {
     
+    const val TEMP_FILE_NAME: String = "GdxAudioReader-dec"
+    
     fun interface AudioLoadListener {
         fun progress(bytesReadSoFar: Long, bytesReadThisChunk: Int)
         
@@ -94,7 +96,7 @@ object GdxAudioReader {
     fun newSound(handle: FileHandle, listener: AudioLoadListener? = null): BeadsSound {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec")
+        val tempFile = TempFileUtils.createTempFile(TEMP_FILE_NAME)
         val bufferSize = 4096 * 4
         // TODO: Can we optimize this by immediately decoding and deinterleaving without writing to a tmp file first?
         val bytesRead = musicToPCMFile(music, tempFile, bufferSize, listener)
@@ -140,7 +142,7 @@ object GdxAudioReader {
     fun newMusic(handle: FileHandle, listener: AudioLoadListener? = null): BeadsMusic {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec")
+        val tempFile = TempFileUtils.createTempFile(TEMP_FILE_NAME)
         val bytesRead = musicToPCMFile(music, tempFile, listener = listener)
         val musicSample: MusicSample = FullMusicSample(tempFile.toPath(), music.rate.toFloat(), music.channels)
 
@@ -150,7 +152,7 @@ object GdxAudioReader {
     fun newDecodingMusicSample(handle: FileHandle, listener: AudioLoadListener? = null): Pair<DecodingMusicSample, DecodingHandler> {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = TempFileUtils.createTempFile("GdxAudioReader-dec")
+        val tempFile = TempFileUtils.createTempFile(TEMP_FILE_NAME)
         
         return newDecodingMusic(music, tempFile, listener = listener)
     }

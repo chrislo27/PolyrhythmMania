@@ -1,5 +1,6 @@
 package polyrhythmmania.util
 
+import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import java.io.File
 import java.time.Duration
 import kotlin.time.DurationUnit
@@ -30,7 +31,7 @@ object TempFileUtils {
     fun clearTempFolder(minAge: Duration) {
         TEMP_FOLDER.walkBottomUp().filter { f ->
             val age = (System.currentTimeMillis() - f.lastModified()).coerceAtLeast(0L).toDuration(DurationUnit.MILLISECONDS).toJavaDuration()
-            age > minAge
+            age > minAge || GdxAudioReader.TEMP_FILE_NAME in f.nameWithoutExtension
         }.forEach { f ->
             f.delete()
         }
