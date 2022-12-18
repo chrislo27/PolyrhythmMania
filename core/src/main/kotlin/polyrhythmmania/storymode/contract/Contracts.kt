@@ -5,6 +5,7 @@ import paintbox.binding.asReadOnlyVar
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.storymode.contract.Contract.Companion.NOT_ALLOWED_TO_SKIP
 import polyrhythmmania.storymode.gamemode.*
+import polyrhythmmania.storymode.gamemode.boss.StoryBossGameMode
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItems
 
@@ -25,6 +26,7 @@ object Contracts {
         add(Contract(ID_TUTORIAL1, Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0, noListingName = true, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             Tutorial1GameMode(main)
         })
+        add(Contract("boss", Requester.POLYBUILD, JingleType.NONE, null /* TODO add attribution */, 0, gamemodeFactory = StoryBossGameMode.getFactory()))
         
         add(Contract("air_rally", Requester.SHIPSTEERING, JingleType.GBA, Attribution(SongInfo.megamix("Air Rally"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj"))
@@ -178,7 +180,8 @@ object Contracts {
                 if (contract.id == "tutorial1") {
                     continue
                 }
-                toAdd += InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}",  listingName = contract.id.asReadOnlyVar())
+                val listingName = contract.id.asReadOnlyVar()
+                toAdd += InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}", listingName = listingName, name = listingName)
             }
 
             this.setItems(toAdd)

@@ -12,7 +12,6 @@ class StoryGameModeFromFile(main: PRManiaGame, val file: FileHandle)
     : AbstractStoryGameMode(main) {
 
     init {
-        // FIXME tmp file copy should probably be elsewhere, like a loading screen
         val tmpFile = TempFileUtils.createTempFile("storylevel")
         file.read().buffered().use { input ->
             tmpFile.outputStream().buffered().use { output ->

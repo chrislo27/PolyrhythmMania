@@ -32,10 +32,7 @@ import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeToOpaque
 import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
-import paintbox.util.MonitorInfo
-import paintbox.util.ResolutionSetting
-import paintbox.util.Version
-import paintbox.util.WindowSize
+import paintbox.util.*
 import paintbox.util.gdxutils.*
 import polyrhythmmania.achievements.AchievementCategory
 import polyrhythmmania.achievements.AchievementRank
@@ -60,6 +57,7 @@ import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.storymode.StoryAssetLoader
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.music.StoryMusicAssets
 import polyrhythmmania.storymode.screen.EarlyAccessMsgOnBottom
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.util.DumpPackedSheets
@@ -313,6 +311,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
             s.disposeQuietly()
         }
         (screen as? Disposable)?.disposeQuietly()
+        StoryMusicAssets.closeQuietly()
         
         try {
             val expiry = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)

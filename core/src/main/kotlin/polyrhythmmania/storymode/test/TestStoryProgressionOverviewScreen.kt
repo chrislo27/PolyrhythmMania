@@ -37,7 +37,9 @@ import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.storymode.StorySession
+import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItems
@@ -182,7 +184,11 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val storySession: St
                                         this.setOnAction {
                                             if (item != null) {
                                                 main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                                                val gameMode = item.contract.gamemodeFactory(main)
+                                                val gameMode: GameMode
+                                                do {
+                                                    gameMode = item.contract.gamemodeFactory.load(1f / 60, main) ?: continue
+                                                    break
+                                                } while (true)
                                                 val playScreen = StoryPlayScreen(main, storySession, gameMode.container, Challenges.NO_CHANGES,
                                                         main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, true, 0, this@TestStoryProgressionOverviewScreen) {
                                                     Paintbox.LOGGER.debug("ExitReason: $it")
@@ -194,6 +200,9 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val storySession: St
                                                         FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
                                                     this.onEntryEnd = {
                                                         gameMode.prepareFirstTime()
+                                                        if (gameMode is AbstractStoryGameMode) {
+                                                            gameMode.prepareFirstTimeWithStoryPlayScreen(playScreen)
+                                                        }
                                                         playScreen.resetAndUnpause()
                                                         playScreen.initializeIntroCard()
                                                     }

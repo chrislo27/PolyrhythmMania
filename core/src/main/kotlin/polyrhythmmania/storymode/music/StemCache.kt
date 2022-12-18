@@ -1,7 +1,10 @@
 package polyrhythmmania.storymode.music
 
+import com.badlogic.gdx.utils.StreamUtils
+import java.io.Closeable
 
-class StemCache(map: Map<String, () -> Stem>) {
+
+class StemCache(map: Map<String, () -> Stem>) : Closeable {
 
     private val factory: Map<String, () -> Stem> = map.toMap()
     
@@ -30,5 +33,11 @@ class StemCache(map: Map<String, () -> Stem>) {
     }
     
     operator fun get(id: String): Stem? = getOrLoad(id)
-    
+
+    override fun close() {
+        for (key in keys) {
+            val loadedStem = loaded.remove(key) ?: continue
+            StreamUtils.closeQuietly(loadedStem.sample)
+        }
+    }
 }

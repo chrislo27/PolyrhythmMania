@@ -50,6 +50,7 @@ import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.contract.Contract
+import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.ui.TextSlideInterp
 import polyrhythmmania.util.FrameBufferManager
 import polyrhythmmania.util.FrameBufferMgrSettings
@@ -87,6 +88,7 @@ class StoryPlayScreen(
     
     // Intro card
     private val introCardDefaultDuration: Float = 3f
+    var introCardDuration: Float = introCardDefaultDuration
     private val introCardUnblurDuration: Float = 0.5f
     private val introCardSceneRoot: SceneRoot = SceneRoot(uiViewport)
     private val introCardTime: FloatVar = FloatVar(0f) // Goes linearly from 1 to 0 when transitioning
@@ -134,10 +136,10 @@ class StoryPlayScreen(
         
         blackBarsAmount = FloatVar {
             val effectInLastSec = 0.5f // Effect only in the first and last few seconds
-            val time = introCardTime.use() * introCardDefaultDuration // Counts down from duration to 0.0 sec
+            val time = introCardTime.use() * introCardDuration // Counts down from duration to 0.0 sec
             
             val interpolation = Interpolation.smoother
-            val firstThreshold = introCardDefaultDuration - effectInLastSec
+            val firstThreshold = introCardDuration - effectInLastSec
             when {
                 time <= 0f -> 0f
                 time > firstThreshold -> {
@@ -248,7 +250,7 @@ class StoryPlayScreen(
         scoreCardSceneRoot += mainPane
         scoreCardSceneRoot += staticPane
         
-        fun createTextLabelOption(option: PauseOption, index: Int): TextLabel {
+        fun createTextLabelOption(option: PauseOption): TextLabel {
             val selectedLabelColor = Color(0f, 1f, 1f, 1f)
             val unselectedLabelColor = Color(1f, 1f, 1f, 1f)
             return TextLabel(binding = { option.text.use() }, font = main.fontMainMenuMain).apply {
@@ -363,8 +365,8 @@ class StoryPlayScreen(
                 }
 
                 val allOptions = failScoreCardOptions
-                allOptions.forEachIndexed { i, opt ->
-                    this += createTextLabelOption(opt, i).apply {
+                allOptions.forEach { opt ->
+                    this += createTextLabelOption(opt).apply {
                         Anchor.TopCentre.xConfigure(this, offsetX = 48f)    
                         this.bindWidthToParent(multiplier = 0.5f)
                     }
@@ -432,14 +434,14 @@ class StoryPlayScreen(
             val optionsFade = FloatVar(1f)
             val successOptions: List<UIElement> = listOf(Pane().apply { 
                 this.bounds.height.set(16f)
-            }) + successScoreCardOptions.mapIndexed { i, opt ->
-                createTextLabelOption(opt, i).apply {
+            }) + successScoreCardOptions.map { opt ->
+                createTextLabelOption(opt).apply {
                     Anchor.TopCentre.xConfigure(this, offsetX = 48f)
                     this.bindWidthToParent(multiplier = 0.5f)
                 }
             }
-            val failOptions: List<UIElement> = failScoreCardOptions.mapIndexed { i, opt ->
-                createTextLabelOption(opt, i).apply {
+            val failOptions: List<UIElement> = failScoreCardOptions.map { opt ->
+                createTextLabelOption(opt).apply {
                     Anchor.TopCentre.xConfigure(this, offsetX = 48f)
                     this.bindWidthToParent(multiplier = 0.5f)
                 }
@@ -530,20 +532,35 @@ class StoryPlayScreen(
         }
     }
 
+    override fun getSecondsToDelayAtStart(): Float {
+        return (gameMode as? AbstractStoryGameMode)?.getSecondsToDelayAtStartOverride() ?: super.getSecondsToDelayAtStart()
+    }
+    
+    private fun shouldPauseDuringIntroCard(): Boolean {
+        return (gameMode as? AbstractStoryGameMode)?.shouldPauseWhileInIntroCardOverride() ?: true
+    }
+
     fun initializeIntroCard() {
         introCardTime.set(1f)
         blurStrength.set(1f)
         animationHandler.cancelAnimationFor(blurStrength)
-        animationHandler.enqueueAnimation(Animation(Interpolation.pow2Out, 0.5f, 1f, 0f, delay = introCardDefaultDuration - introCardUnblurDuration), blurStrength)
+        animationHandler.enqueueAnimation(Animation(Interpolation.pow2Out, 0.5f, 1f, 0f, delay = introCardDuration - introCardUnblurDuration), blurStrength)
         
-        shouldUpdateTiming.set(false)
-        soundSystem.setPaused(true)
+        if (shouldPauseDuringIntroCard()) {
+            shouldUpdateTiming.set(false)
+            soundSystem.setPaused(true)
+        } else {
+            shouldUpdateTiming.set(true)
+            soundSystem.setPaused(false)
+        }
         
         // Play jingle
-        val jingle: Sound = StoryAssets.get<Sound>(contract.jingleType.soundID)
-        playMenuSound(jingle)
+        val jingleID = contract.jingleType.soundID
+        if (jingleID != null) {
+            playMenuSound(StoryAssets.get<Sound>(jingleID))
+        }
 
-        animationHandler.enqueueAnimation(Animation(Interpolation.linear, introCardDefaultDuration, 1f, 0f).apply { 
+        animationHandler.enqueueAnimation(Animation(Interpolation.linear, introCardDuration, 1f, 0f).apply { 
             this.onComplete = {
                 cancelIntroCard()
             }                                                                                                     

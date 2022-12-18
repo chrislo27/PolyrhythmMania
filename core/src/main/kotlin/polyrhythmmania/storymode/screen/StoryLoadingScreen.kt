@@ -8,7 +8,7 @@ import polyrhythmmania.screen.SimpleLoadingScreen
 import polyrhythmmania.ui.LoadingIconRod
 
 
-open class StoryLoadingScreen<T>(main: PRManiaGame, val load: (delta: Float) -> LoadResult<T>?, val doAfterLoad: (T) -> Unit)
+open class StoryLoadingScreen<T>(main: PRManiaGame, val loadFunc: LoadFunction<T>, val doAfterLoad: (T) -> Unit)
     : SimpleLoadingScreen(main) {
     
     class LoadResult<T>(val result: T) {
@@ -16,6 +16,15 @@ open class StoryLoadingScreen<T>(main: PRManiaGame, val load: (delta: Float) -> 
             val SIGNAL: LoadResult<Nothing?> = LoadResult(null)
         }
     }
+    
+    fun interface LoadFunction<T> {
+        /**
+         * Called each frame to load. When a non-null [LoadResult] is returned, the loading is finished. Otherwise,
+         * a null result will continue the loading.
+         */
+        fun load(delta: Float): LoadResult<T>?
+    }
+    
 
     var minimumShowTime: Float = 0.25f
     var minWaitTimeBeforeLoadStart: Float = 0f
@@ -62,7 +71,7 @@ open class StoryLoadingScreen<T>(main: PRManiaGame, val load: (delta: Float) -> 
             } else {
                 minWaitTimeBeforeLoadStart -= delta
                 if (minWaitTimeBeforeLoadStart <= 0f) {
-                    val res = load(delta)
+                    val res = loadFunc.load(delta)
                     if (res != null) {
                         loadResult = res
                         isReadyToContinue = true

@@ -1,13 +1,8 @@
 package polyrhythmmania.storymode.screen.desktop
 
 import com.badlogic.gdx.audio.Sound
-import com.badlogic.gdx.graphics.Color
 import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
-import paintbox.transition.FadeToOpaque
-import paintbox.transition.FadeToTransparent
-import paintbox.transition.TransitionScreen
-import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.inbox.InboxItem
@@ -16,12 +11,10 @@ import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.inbox.StageCompletionData
 import polyrhythmmania.storymode.screen.ExitCallback
 import polyrhythmmania.storymode.screen.ExitReason
-import polyrhythmmania.storymode.screen.StoryLoadingScreen
-import polyrhythmmania.storymode.screen.StoryPlayScreen
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
+class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopControllerWithPlayLevel() {
 
     override fun createExitCallback(contract: Contract, inboxItem: InboxItem?, inboxItemState: InboxItemState?): ExitCallback {
         return ExitCallback { exitReason ->
@@ -77,35 +70,7 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopController {
     }
 
     override fun playLevel(contract: Contract, inboxItem: InboxItem?, inboxItemState: InboxItemState?) {
-        val main = desktopUI.main
-        
-        desktopUI.storySession.musicHandler.fadeOut(0.25f)
-        
-        val loadingScreen = StoryLoadingScreen<StoryPlayScreen>(main, {
-            val gameMode = contract.gamemodeFactory(main)
-            val exitCallback = createExitCallback(contract, inboxItem, inboxItemState)
-            val playScreen = StoryPlayScreen(main, desktopUI.storySession, gameMode.container, Challenges.NO_CHANGES,
-                    main.settings.inputCalibration.getOrCompute(), gameMode, contract,
-                    inboxItemState?.completion != InboxItemCompletion.COMPLETED, inboxItemState?.failureCount ?: 0,
-                    desktopUI.rootScreen, exitCallback)
-
-            gameMode.prepareFirstTime()
-            playScreen.resetAndUnpause(unpause = false)
-
-            StoryLoadingScreen.LoadResult(playScreen)
-        }) { playScreen ->
-            playScreen.unpauseGameNoSound()
-            playScreen.initializeIntroCard()
-            main.screen = TransitionScreen(main, main.screen, playScreen,
-                    FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
-        }.apply {
-            this.minimumShowTime = 0f
-            this.minWaitTimeBeforeLoadStart = 0.25f
-            this.minWaitTimeAfterLoadFinish = 0f
-        }
-
-        main.screen = TransitionScreen(main, main.screen, loadingScreen,
-                FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
+        playLevel(contract, inboxItem, inboxItemState, desktopUI.main, desktopUI.storySession, desktopUI.rootScreen)
     }
 
     override fun playSFX(sfx: DesktopController.SFXType) {

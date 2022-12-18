@@ -249,6 +249,8 @@ abstract class MusicSample(val fileChannel: FileChannel,
                 // Convert the bytes to floats and map them to the correct channel/sample
                 // Repeat until this buffer's data is full or we hit EoF
                 // Set size and position properties accordingly
+                
+                if (!fileChannel.isOpen) return
 
                 val bytesPerSampleChannel = nChannels * bytesPerSample
                 val startBytePos: Long = 1L * startAtSample * bytesPerSampleChannel

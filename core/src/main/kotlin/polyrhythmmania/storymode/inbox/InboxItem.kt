@@ -43,6 +43,8 @@ sealed class InboxItem(
             listingName: ReadOnlyVar<String>? = contract.listingName,
             override val subtype: ContractSubtype = ContractSubtype.NORMAL,
             override val hasLongCompanyName: Boolean = contract.requester.isNameLong,
+            
+            override val name: ReadOnlyVar<String> = contract.name
     ) : InboxItem(itemID, listingName ?: contract.name), IContractDoc, IHasContractTextInfo {
         
         companion object {
@@ -54,7 +56,6 @@ sealed class InboxItem(
         val ignoreNoMiss: Boolean get() = subtype == ContractSubtype.TRAINING
         val ignoreSkillStar: Boolean get() = subtype == ContractSubtype.TRAINING
 
-        override val name: ReadOnlyVar<String> get() = contract.name
         override val desc: ReadOnlyVar<String> get() = contract.desc
         override val tagline: ReadOnlyVar<String> get() = contract.tagline
         override val requester: Requester get() = contract.requester

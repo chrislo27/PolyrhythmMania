@@ -28,12 +28,22 @@ data class Contract(
          */
         val skipAfterNFailures: Int = DEFAULT_SKIP_TIME,
 
-        val gamemodeFactory: (main: PRManiaGame) -> GameMode
+        val gamemodeFactory: GamemodeFactory
 ) : IHasContractTextInfo {
     
     companion object {
         val DEFAULT_SKIP_TIME: Int = 3
         val NOT_ALLOWED_TO_SKIP: Int = -1
+    }
+    
+    fun interface GamemodeFactory {
+        fun load(delta: Float, main: PRManiaGame): GameMode?
+    }
+    
+    fun interface GamemodeFactoryInstant : GamemodeFactory {
+        fun load(main: PRManiaGame): GameMode?
+        
+        override fun load(delta: Float, main: PRManiaGame): GameMode? = load(main)
     }
 
     val immediatePass: Boolean get() = minimumScore <= 0
@@ -44,12 +54,21 @@ data class Contract(
             minimumScore: Int, extraConditions: List<Condition> = emptyList(), 
             skipAfterNFailures: Int = DEFAULT_SKIP_TIME,
             noListingName: Boolean = false,
-            gamemodeFactory: (main: PRManiaGame) -> GameMode
+            gamemodeFactory: GamemodeFactory
     ) : this(
             id, StoryL10N.getVar("contract.$id.name"), 
             if (noListingName) null else StoryL10N.getVar("contract.$id.listingName"),
             StoryL10N.getVar("contract.$id.desc"), StoryL10N.getVar("contract.$id.tagline"),
             requester, jingleType, attribution, minimumScore, extraConditions, skipAfterNFailures, gamemodeFactory
     )
+
+    constructor(
+            id: String, requester: Requester, jingleType: JingleType, attribution: Attribution?,
+            minimumScore: Int, extraConditions: List<Condition> = emptyList(),
+            skipAfterNFailures: Int = DEFAULT_SKIP_TIME,
+            noListingName: Boolean = false,
+            gamemodeFactory: GamemodeFactoryInstant
+    ) : this(id, requester, jingleType, attribution, minimumScore, extraConditions, skipAfterNFailures, noListingName,
+            gamemodeFactory as GamemodeFactory)
 
 }

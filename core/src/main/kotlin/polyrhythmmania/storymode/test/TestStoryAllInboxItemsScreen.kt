@@ -32,8 +32,10 @@ import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.storymode.StorySavefile
 import polyrhythmmania.storymode.StorySession
+import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.screen.StoryPlayScreen
@@ -160,7 +162,13 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val storySession: StorySes
                     storySession.musicHandler.fadeOut(0f)
                     val contract = newItem.contract
                     main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
-                    val gameMode = contract.gamemodeFactory(main)
+                    
+                    val gameMode: GameMode
+                    do {
+                        gameMode = contract.gamemodeFactory.load(1f / 60, main) ?: continue
+                        break
+                    } while (true)
+                    
                     val playScreen = StoryPlayScreen(main, storySession, gameMode.container, Challenges.NO_CHANGES,
                             main.settings.inputCalibration.getOrCompute(), gameMode, contract, true, 0, this@TestStoryAllInboxItemsScreen) {
                         Paintbox.LOGGER.debug("ExitReason: $it")
@@ -172,6 +180,9 @@ class TestStoryAllInboxItemsScreen(main: PRManiaGame, val storySession: StorySes
                             FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
                         this.onEntryEnd = {
                             gameMode.prepareFirstTime()
+                            if (gameMode is AbstractStoryGameMode) {
+                                gameMode.prepareFirstTimeWithStoryPlayScreen(playScreen)
+                            }
                             playScreen.resetAndUnpause()
                             playScreen.initializeIntroCard()
                         }

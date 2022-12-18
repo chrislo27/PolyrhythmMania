@@ -80,7 +80,7 @@ abstract class AbstractEnginePlayScreen(
         engine.inputCalibration = this.inputCalibration
         
         // Set timing and music
-        timing.seconds = -(1f + max(0f, this.inputCalibration.audioOffsetMs / 1000f))
+        timing.seconds = -(getSecondsToDelayAtStart() + max(0f, this.inputCalibration.audioOffsetMs / 1000f))
         engine.seconds = timing.seconds
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) { // Set music player position
@@ -104,6 +104,8 @@ abstract class AbstractEnginePlayScreen(
             gameMode?.renderUpdate()
         }
     }
+    
+    protected open fun getSecondsToDelayAtStart(): Float = 1f
     
     protected fun submitAllRodPRInputs() {
         container.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
