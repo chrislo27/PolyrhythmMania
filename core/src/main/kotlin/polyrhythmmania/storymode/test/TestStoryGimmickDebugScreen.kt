@@ -94,6 +94,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             Gdx.app.postRunnable {
+                                storySession.musicHandler.fadeOut(0f)
                                 val editorScreen = EditorScreen(main, EnumSet.of(EditorSpecialFlags.STORY_MODE), EditorSpecialParams(storySession))
                                 main.screen = TransitionScreen(main, main.screen, editorScreen,
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
