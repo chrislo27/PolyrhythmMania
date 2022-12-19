@@ -9,10 +9,7 @@ import net.beadsproject.beads.data.Sample
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.util.TempFileUtils
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.RandomAccessFile
+import java.io.*
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
@@ -59,26 +56,39 @@ object GdxAudioReader {
         }
     }
 
-    private fun musicToPCMFile(music: OpenALMusic, file: File, bufferSize: Int = 4096 * 4, listener: AudioLoadListener? = null): Long {
-        file.createNewFile()
-
+    private fun musicToOutputStream(music: OpenALMusic, outputStream: OutputStream, bufferSize: Int = 4096 * 4, listener: AudioLoadListener? = null): Long {
         val audioBytes = ByteArray(bufferSize)
-        val fileOutStream = FileOutputStream(file)
         var currentLength = 0L
 
         music.reset()
         while (true) {
             val length = music.read(audioBytes)
             if (length <= 0) break
-            
+
             currentLength += length
             listener?.progress(currentLength, length)
-            fileOutStream.write(audioBytes, 0, length)
+            outputStream.write(audioBytes, 0, length)
         }
-        StreamUtils.closeQuietly(fileOutStream)
+        StreamUtils.closeQuietly(outputStream)
         listener?.onFinished(currentLength)
 
         return currentLength
+    }
+
+    private fun musicToPCMFile(music: OpenALMusic, file: File, bufferSize: Int = 4096 * 4, listener: AudioLoadListener? = null): Long {
+        file.createNewFile()
+
+        val fileOutStream = FileOutputStream(file)
+
+        return musicToOutputStream(music, fileOutStream, bufferSize, listener)
+    }
+
+    private fun musicToByteArray(music: OpenALMusic, bufferSize: Int = 4096 * 4, listener: AudioLoadListener? = null): Pair<ByteArray, Long> {
+        val baos = ByteArrayOutputStream(bufferSize) // At least bufferSize-sized to start
+
+        val length = musicToOutputStream(music, baos, bufferSize, listener)
+        
+        return Pair(baos.toByteArray(), length)
     }
 
     private fun newDecodingMusic(music: OpenALMusic, file: File, bufferSize: Int = 4096 * 8,
@@ -96,19 +106,17 @@ object GdxAudioReader {
     fun newSound(handle: FileHandle, listener: AudioLoadListener? = null): BeadsSound {
         val music = Gdx.audio.newMusic(handle) as OpenALMusic
         music.reset()
-        val tempFile = TempFileUtils.createTempFile(TEMP_FILE_NAME)
-        val bufferSize = 4096 * 4
-        // TODO: Can we optimize this by immediately decoding and deinterleaving without writing to a tmp file first?
-        val bytesRead = musicToPCMFile(music, tempFile, bufferSize, listener)
+        val bufferSizeBytes = 4096 * 4
+        val (byteArray, bytesRead) = musicToByteArray(music, bufferSizeBytes, listener)
 
-        val audioBytesBuffer = ByteArray(bufferSize)
+        val audioBytesBuffer = ByteArray(bufferSizeBytes)
         val nFrames = bytesRead / (2 * music.channels)
         val sample = Sample(0.0, music.channels, music.rate.toFloat())
         sample.resize(nFrames) // WARNING: this could throw OutOfMemoryError
-        val interleaved = FloatArray(music.channels * (bufferSize / (2 * music.channels)))
+        val interleaved = FloatArray(music.channels * (bufferSizeBytes / (2 * music.channels)))
         val sampleData = Array(music.channels) { FloatArray(interleaved.size / music.channels) }
 
-        val bufStream = tempFile.inputStream()
+        val bufStream = ByteArrayInputStream(byteArray)
         var currentFrame = 0
         var currentLength = 0L
         while (true) {
@@ -129,12 +137,6 @@ object GdxAudioReader {
         }
         StreamUtils.closeQuietly(bufStream)
         listener?.onFinished(currentLength)
-
-        try {
-            tempFile.delete()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
 
         return BeadsSound(sample)
     }
