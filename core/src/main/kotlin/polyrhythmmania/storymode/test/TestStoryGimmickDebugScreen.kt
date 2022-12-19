@@ -382,6 +382,8 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
         super.show()
         main.inputMultiplexer.removeProcessor(processor)
         main.inputMultiplexer.addProcessor(processor)
+
+        storySession.musicHandler.fadeOut(0f)
     }
 
     override fun hide() {
