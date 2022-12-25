@@ -6,6 +6,7 @@ import polyrhythmmania.util.metrics.timeInline
 import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import java.nio.channels.SeekableByteChannel
 import kotlin.math.floor
 
 
@@ -20,11 +21,12 @@ import kotlin.math.floor
  *
  * The PCM data file shall have interleaved float information (ch0_0, ch1_0, ch0_1, ch1_1, ch0_2, ch1_2, etc for a 2-channel sample).
  *
- * This [MusicSample] should be [close]d after it is no longer needed to free the FileChannel in use.
+ * This [MusicSample] should be [close]d after it is no longer needed to free the [byteChannel] in use (which may be a [FileChannel]).
  */
-abstract class MusicSample(val fileChannel: FileChannel,
-                           val sampleRate: Float = 44_100f, val nChannels: Int = 2)
-    : Closeable {
+abstract class MusicSample(
+        val byteChannel: SeekableByteChannel,
+        val sampleRate: Float = 44_100f, val nChannels: Int = 2
+) : Closeable {
 
     companion object {
         val DEFAULT_START_BUFFER_MS: Double = 500.0
@@ -34,10 +36,10 @@ abstract class MusicSample(val fileChannel: FileChannel,
     private val interpCurrent: FloatArray = FloatArray(nChannels)
     private val interpNext: FloatArray = FloatArray(nChannels)
 
-    protected open val fileSize: Long = synchronized(fileChannel) { fileChannel.size() }
+    protected open val fileSize: Long = synchronized(byteChannel) { byteChannel.size() }
 
-    open val lengthMs: Double get() = (fileSize / 2 /*2 bytes per float*/ / nChannels / sampleRate * 1000.0)
-    open val nFrames: Long get() = msToSamples(lengthMs).toLong()
+    open val nFrames: Long get() = (fileSize / 2 /*2 bytes per float*/ / nChannels)
+    open val lengthMs: Double get() = (nFrames / sampleRate * 1000.0)
 
     protected val startBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_START_BUFFER_MS).toInt()) }
     protected val playbackBuffer: Buffer by lazy(LazyThreadSafetyMode.PUBLICATION) { Buffer(this, msToSamples(DEFAULT_PLAYBACK_BUFFER_MS).toInt()) }
@@ -52,7 +54,7 @@ abstract class MusicSample(val fileChannel: FileChannel,
     }
     
     override fun close() {
-        StreamUtils.closeQuietly(fileChannel)
+        StreamUtils.closeQuietly(byteChannel)
     }
 
     /**
@@ -243,23 +245,21 @@ abstract class MusicSample(val fileChannel: FileChannel,
             if (bytesPerSample != 2)
                 error("n != 2 bytes per sample is not supported yet (n = $bytesPerSample)")
 
-            val fileChannel = musicSample.fileChannel
-            synchronized(fileChannel) {
+            val byteChannel = musicSample.byteChannel
+            synchronized(byteChannel) {
                 // Read a chunk of bytes at a time
                 // Convert the bytes to floats and map them to the correct channel/sample
                 // Repeat until this buffer's data is full or we hit EoF
                 // Set size and position properties accordingly
-                
-                if (!fileChannel.isOpen) return
 
                 val bytesPerSampleChannel = nChannels * bytesPerSample
                 val startBytePos: Long = 1L * startAtSample * bytesPerSampleChannel
                 var lastBytePos: Long = startBytePos
-                fileChannel.position(startBytePos)
+                byteChannel.position(startBytePos)
 
                 var samplesRead: Int = 0
                 tmpBuffer.rewind()
-                var bytesRead: Int = fileChannel.read(tmpBuffer)
+                var bytesRead: Int = byteChannel.read(tmpBuffer)
                 while (bytesRead > 0) {
                     val samplesReadable = (bytesRead / bytesPerSampleChannel).coerceAtMost(samples - samplesRead)
                     if (samplesReadable == 0) break
@@ -273,11 +273,11 @@ abstract class MusicSample(val fileChannel: FileChannel,
                     }
 
                     lastBytePos += samplesReadable * bytesPerSampleChannel
-                    fileChannel.position(lastBytePos)
+                    byteChannel.position(lastBytePos)
 
                     samplesRead += samplesReadable
                     tmpBuffer.rewind()
-                    bytesRead = fileChannel.read(tmpBuffer)
+                    bytesRead = byteChannel.read(tmpBuffer)
                 }
 
                 position = startAtSample

@@ -34,17 +34,17 @@ object StoryMusicAssets : Closeable {
             STEM_ID_DESKTOP_PERC to { Stem(Gdx.files.internal("story/music/desktop/perc.ogg")) },
     ))
     val bossStems: StemCache = StemCache(mapOf(
-            STEM_ID_BOSS_1_INTRO to { Stem(Gdx.files.internal("story/music/boss/boss1_intro.ogg")) },
-            STEM_ID_BOSS_1_A1 to { Stem(Gdx.files.internal("story/music/boss/boss1_a1.ogg")) },
-            STEM_ID_BOSS_1_A2 to { Stem(Gdx.files.internal("story/music/boss/boss1_a2.ogg")) },
-            STEM_ID_BOSS_1_B1 to { Stem(Gdx.files.internal("story/music/boss/boss1_b1_pat0.ogg")) },
-            STEM_ID_BOSS_1_B2 to { Stem(Gdx.files.internal("story/music/boss/boss1_b2_pat0.ogg")) },
-            STEM_ID_BOSS_1_C to { Stem(Gdx.files.internal("story/music/boss/boss1_c_pat0.ogg")) },
-            STEM_ID_BOSS_1_D to { Stem(Gdx.files.internal("story/music/boss/boss1_d_pat0.ogg")) },
-            STEM_ID_BOSS_1_E1 to { Stem(Gdx.files.internal("story/music/boss/boss1_e1.ogg")) },
-            STEM_ID_BOSS_1_E2 to { Stem(Gdx.files.internal("story/music/boss/boss1_e2.ogg")) },
-            STEM_ID_BOSS_1_F to { Stem(Gdx.files.internal("story/music/boss/boss1_f_pat0.ogg")) },
-            STEM_ID_BOSS_2 to { Stem(Gdx.files.internal("story/music/boss/boss2.ogg")) },
+            STEM_ID_BOSS_1_INTRO to { Stem(Gdx.files.internal("story/music/boss/boss1_intro.ogg"), inMemory = true) },
+            STEM_ID_BOSS_1_A1 to { Stem(Gdx.files.internal("story/music/boss/boss1_a1.ogg"), inMemory = true) },
+            STEM_ID_BOSS_1_A2 to { Stem(Gdx.files.internal("story/music/boss/boss1_a2.ogg"), inMemory = true) },
+            STEM_ID_BOSS_1_B1 to { Stem(Gdx.files.internal("story/music/boss/boss1_b1_pat0.ogg"), inMemory = true) },
+            STEM_ID_BOSS_1_B2 to { Stem(Gdx.files.internal("story/music/boss/boss1_b2_pat0.ogg"), inMemory = true) },
+            STEM_ID_BOSS_1_C to { Stem(Gdx.files.internal("story/music/boss/boss1_c_pat0.ogg"), inMemory = true) },
+            STEM_ID_BOSS_1_D to { Stem(Gdx.files.internal("story/music/boss/boss1_d_pat0.ogg"), inMemory = true) },
+            STEM_ID_BOSS_1_E1 to { Stem(Gdx.files.internal("story/music/boss/boss1_e1.ogg"), inMemory = true) },
+            STEM_ID_BOSS_1_E2 to { Stem(Gdx.files.internal("story/music/boss/boss1_e2.ogg"), inMemory = true) },
+            STEM_ID_BOSS_1_F to { Stem(Gdx.files.internal("story/music/boss/boss1_f_pat0.ogg"), inMemory = true) },
+            STEM_ID_BOSS_2 to { Stem(Gdx.files.internal("story/music/boss/boss2.ogg"), inMemory = true) },
     ))
     
     fun initTitleStems() {

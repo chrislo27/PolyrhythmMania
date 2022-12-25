@@ -1,9 +1,7 @@
 package polyrhythmmania.soundsystem.sample
 
 import net.beadsproject.beads.core.AudioContext
-import net.beadsproject.beads.core.UGen
 import net.beadsproject.beads.ugens.SamplePlayer
-import net.beadsproject.beads.ugens.Static
 
 
 class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
@@ -20,7 +18,7 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
      * Only loop types [SamplePlayer.LoopType.NO_LOOP_FORWARDS] and [SamplePlayer.LoopType.LOOP_FORWARDS]
      * are supported. All other loop types will cause this [MusicSamplePlayer] to not do anything.
      */
-    override var loopType: SamplePlayer.LoopType = SamplePlayer.LoopType.LOOP_FORWARDS // SamplePlayer.LoopType.NO_LOOP_FORWARDS
+    override var loopType: SamplePlayer.LoopType = SamplePlayer.LoopType.NO_LOOP_FORWARDS
     override var loopStartMs: Float = 0f
     override var loopEndMs: Float = 0f
 

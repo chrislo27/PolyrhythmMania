@@ -5,6 +5,7 @@ import net.beadsproject.beads.ugens.SamplePlayer
 import polyrhythmmania.engine.music.MusicVolMap
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
+import polyrhythmmania.soundsystem.sample.PlayerLike
 
 
 class MusicData(val engine: Engine) {
@@ -37,15 +38,14 @@ class MusicData(val engine: Engine) {
     fun resetState() {
         this.musicVolumeMultiplier = 1f
     }
-    
+
     fun update() {
         val currentBeat = engine.beat
         val music = this.beadsMusic
         val player = engine.soundInterface.getCurrentMusicPlayer(music)
         if (player != null) {
             val volume: Int = volumeMap.volumeAtBeat(currentBeat)
-            player.gain = (volume / 100f) * this.musicVolumeMultiplier
-            player.pitch = this.rate * engine.playbackSpeed
+            updatePlayerWithVolumeAndRate(player, volume, this.rate)
 
             if (!player.isPaused && !player.context.out.isPaused) {
                 // Player desync correction
@@ -58,6 +58,11 @@ class MusicData(val engine: Engine) {
                 }
             }
         }
+    }
+    
+    fun updatePlayerWithVolumeAndRate(player: PlayerLike, volume: Int = volumeMap.volumeAtBeat(engine.beat), rate: Float = this.rate) {
+        player.gain = (volume / 100f) * this.musicVolumeMultiplier
+        player.pitch = rate * engine.playbackSpeed
     }
     
     fun getCurrentDesyncMs(): Double {

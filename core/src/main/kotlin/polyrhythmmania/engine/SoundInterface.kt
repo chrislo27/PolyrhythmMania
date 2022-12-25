@@ -17,7 +17,7 @@ sealed class SoundInterface {
     }
     
     enum class SFXType {
-        NORMAL, PLAYER_INPUT
+        NORMAL, PLAYER_INPUT, DYNAMIC_MUSIC
     }
     
     class Impl(val soundSystem: SoundSystem, val engine: Engine) : SoundInterface() {
@@ -76,6 +76,8 @@ sealed class SoundInterface {
             }
         }
 
+        override fun getPlayer(id: Long): PlayerLike? = soundSystem.getPlayer(id)
+
         override fun setPaused(paused: Boolean) {
             soundSystem.setPaused(paused)
         }
@@ -105,6 +107,8 @@ sealed class SoundInterface {
 
         override fun clearAllNonMusicAudio() {
         }
+
+        override fun getPlayer(id: Long): PlayerLike? = null
     }
     
     open var disableSounds: Boolean = false
@@ -126,6 +130,8 @@ sealed class SoundInterface {
     abstract fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float)
     
     abstract fun clearAllNonMusicAudio()
+    
+    abstract fun getPlayer(id: Long): PlayerLike?
     
     fun playMenuSfx(sound: Sound, volume: Float) = playMenuSfx(sound, volume, 1f, 0f)
     fun playMenuSfx(sound: Sound) = playMenuSfx(sound, 1f, 1f, 0f)

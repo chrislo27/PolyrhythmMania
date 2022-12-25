@@ -4,11 +4,13 @@ import com.badlogic.gdx.Gdx
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.Bead
 import net.beadsproject.beads.ugens.*
+import paintbox.Paintbox
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyFloatVar
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.tempo.TempoUtils
 import polyrhythmmania.soundsystem.SoundSystem
+import polyrhythmmania.soundsystem.sample.InMemoryMusicSample
 import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.storymode.StorySession
@@ -154,8 +156,12 @@ class StoryMusicHandler(val storySession: StorySession) {
 
     private fun getStemPlayer(stemID: String): StemPlayer {
         return stemPlayers.getOrPut(stemID) {
-            val stem = StoryMusicAssets.titleStems[stemID] ?: error("No stem found with ID $stemID")
-            createNewStemPlayer(stemID, stem, stem.sample).apply {
+            val stem = StoryMusicAssets.titleStems.getOrLoad(stemID) ?: error("No stem found with ID $stemID")
+            val sample: MusicSample = if (stem.isSampleAccessible.get()) stem.sample else {
+                Paintbox.LOGGER.error("Attempted to get sample for stem ${stem.file} before it was accessible!", tag = "StoryMusicHandler")
+                InMemoryMusicSample(ByteArray(2), nChannels = 1) // Blank sample
+            }
+            createNewStemPlayer(stemID, stem, sample).apply {
                 playerInput.addInput(this)
             }
         }

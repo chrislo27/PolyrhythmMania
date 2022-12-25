@@ -13,7 +13,7 @@ class StemCache(map: Map<String, () -> Stem>) : Closeable {
     
     
     fun loadAll() {
-        keys.forEach(this::get)
+        keys.forEach(this::getOrLoad)
     }
     
     fun evict(id: String) {
@@ -32,12 +32,12 @@ class StemCache(map: Map<String, () -> Stem>) : Closeable {
         return loaded.getOrPut(id, factory)
     }
     
-    operator fun get(id: String): Stem? = getOrLoad(id)
+//    operator fun get(id: String): Stem? = getOrLoad(id)
 
     override fun close() {
         for (key in keys) {
             val loadedStem = loaded.remove(key) ?: continue
-            StreamUtils.closeQuietly(loadedStem.sample)
+            StreamUtils.closeQuietly(loadedStem)
         }
     }
 }

@@ -158,4 +158,12 @@ object GdxAudioReader {
         
         return newDecodingMusic(music, tempFile, listener = listener)
     }
+
+    fun newInMemoryMusicSample(handle: FileHandle, listener: AudioLoadListener? = null): InMemoryMusicSample {
+        val music = Gdx.audio.newMusic(handle) as OpenALMusic
+        music.reset()
+        val (byteArray, _) = musicToByteArray(music, listener = listener)
+        
+        return InMemoryMusicSample(byteArray, music.rate.toFloat(), music.channels)
+    }
 }
