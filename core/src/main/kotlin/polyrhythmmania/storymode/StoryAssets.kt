@@ -29,6 +29,8 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_ui_scrollbar_thumb_inactive", "story/textures/desk/ui/scrollbar_thumb_inactive.png")
         StoryAssets.loadAsset<Texture>("desk_ui_pane", "story/textures/desk/ui/pane.9patch.png")
         StoryAssets.loadAsset<Texture>("desk_ui_pane_dark", "story/textures/desk/ui/pane_dark.9patch.png")
+        StoryAssets.loadAsset<Texture>("desk_ui_icon_nomiss", "story/textures/desk/ui/icon/nomiss.png")
+        StoryAssets.loadAsset<Texture>("desk_ui_icon_skillstar", "story/textures/desk/ui/icon/skillstar.png")
         StoryAssets.loadAsset<Texture>("desk_bg_background", "story/textures/desk/bg/background.png")
         StoryAssets.loadAsset<Texture>("desk_bg_envelope_1", "story/textures/desk/bg/envelope_1.png")
         StoryAssets.loadAsset<Texture>("desk_bg_envelope_2", "story/textures/desk/bg/envelope_2.png")

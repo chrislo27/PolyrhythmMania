@@ -1,17 +1,22 @@
 package polyrhythmmania.storymode.screen.desktop
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.asReadOnlyVar
 import paintbox.font.Markup
 import paintbox.ui.Anchor
+import paintbox.ui.ImageIcon
 import paintbox.ui.RenderAlign
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
+import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.SongInfo
 import polyrhythmmania.storymode.inbox.InboxItem
@@ -106,15 +111,22 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                         this.margin.set(Insets(1f, 1f, 4f, 4f))
                     }
                     
-                    val tmpListFeatures = listOfNotNull(
-                            if (completionData.skillStar && !inboxItem.ignoreSkillStar) "Skill Star!" else null,
-                            if (completionData.noMiss && !inboxItem.ignoreNoMiss) "No Miss!" else null,
-                    )
-                    this += TextLabel(tmpListFeatures.joinToString(separator = " "), font = main.fontRoboto).apply {
+                    this += HBox().apply {
                         this.bounds.height.set(8f * UI_SCALE)
-                        this.textColor.set(Color.BLACK)
-                        this.renderAlign.set(RenderAlign.center)
+                        this.align.set(HBox.Align.CENTRE)
                         this.margin.set(Insets(1f, 1f, 4f, 4f))
+                        this.spacing.set(2f * UI_SCALE)
+                        
+                        if (completionData.skillStar && !inboxItem.ignoreSkillStar) {
+                            this += ImageIcon(TextureRegion(StoryAssets.get<Texture>("desk_ui_icon_skillstar"))).apply { 
+                                this.bounds.width.set(8f * UI_SCALE)
+                            }
+                        }
+                        if (completionData.noMiss && !inboxItem.ignoreNoMiss) {
+                            this += ImageIcon(TextureRegion(StoryAssets.get<Texture>("desk_ui_icon_nomiss"))).apply { 
+                                this.bounds.width.set(8f * UI_SCALE)
+                            }
+                        }
                     }
                 } else {
                     this += TextLabel(StoryL10N.getVar("desktop.pane.performance.noInfo"), font = main.fontRobotoItalic).apply {
