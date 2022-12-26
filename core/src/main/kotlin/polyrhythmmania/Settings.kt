@@ -53,6 +53,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_MUSIC_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MENU_SFX_VOLUME
 import polyrhythmmania.PreferenceKeys.SETTINGS_MIXER
 import polyrhythmmania.PreferenceKeys.SETTINGS_ONLY_DEFAULT_PALETTE_OLD
+import polyrhythmmania.PreferenceKeys.SETTINGS_REDUCED_MOTION
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_INPUT_FEEDBACK_BAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_SHOW_SKILL_STAR
 import polyrhythmmania.PreferenceKeys.SETTINGS_USE_LEGACY_SOUND
@@ -128,6 +129,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     private val kv_maxFramerate: KeyValue<Int> = KeyValue(SETTINGS_MAX_FPS, determineMaxRefreshRate())
     private val kv_forceTexturePack: KeyValue<ForceTexturePack> = KeyValue(SETTINGS_FORCE_TEXTURE_PACK, ForceTexturePack.NO_FORCE)
     private val kv_forceTilesetPalette: KeyValue<ForceTilesetPalette> = KeyValue(SETTINGS_FORCE_TILESET_PALETTE, ForceTilesetPalette.NO_FORCE)
+    private val kv_reducedMotion: KeyValue<Boolean> = KeyValue(SETTINGS_REDUCED_MOTION, false)
     private val kv_lastUpdateNotes: KeyValue<String> = KeyValue(LAST_UPDATE_NOTES, "")
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
@@ -176,6 +178,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     val maxFramerate: Var<Int> = kv_maxFramerate.value
     val forceTexturePack: Var<ForceTexturePack> = kv_forceTexturePack.value
     val forceTilesetPalette: Var<ForceTilesetPalette> = kv_forceTilesetPalette.value
+    val reducedMotion: Var<Boolean> = kv_reducedMotion.value
     val lastUpdateNotes: Var<String> = kv_lastUpdateNotes.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
@@ -259,6 +262,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
         } else {
             prefs.getForceTilesetPalette(kv_forceTilesetPalette)
         }
+        prefs.getBoolean(kv_reducedMotion)
         prefs.getString(kv_lastUpdateNotes)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
@@ -311,6 +315,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
                 .putInt(kv_maxFramerate)
                 .putForceTexturePack(kv_forceTexturePack)
                 .putForceTilesetPalette(kv_forceTilesetPalette)
+                .putBoolean(kv_reducedMotion)
                 .putString(kv_lastUpdateNotes)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)

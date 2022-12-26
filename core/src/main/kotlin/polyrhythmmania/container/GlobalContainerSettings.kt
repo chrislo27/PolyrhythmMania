@@ -5,7 +5,11 @@ import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.tileset.TilesetPalette
 
 
-data class GlobalContainerSettings(val forceTexturePack: ForceTexturePack, val forceTilesetPalette: ForceTilesetPalette) {
+data class GlobalContainerSettings(
+        val forceTexturePack: ForceTexturePack, 
+        val forceTilesetPalette: ForceTilesetPalette,
+        val reducedMotion: Boolean,
+) {
 
     fun applyForcedTilesetPaletteSettings(container: Container) {
         when (container.globalSettings.forceTilesetPalette) {

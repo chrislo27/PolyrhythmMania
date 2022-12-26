@@ -45,7 +45,9 @@ abstract class GameMode(val main: PRManiaGame, val playTimeType: PlayTimeType?) 
     open fun renderUpdate() {}
 
     protected open fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.forceTilesetPalette.getOrCompute())
+        return GlobalContainerSettings(forceTexturePack = main.settings.forceTexturePack.getOrCompute(),
+                forceTilesetPalette = main.settings.forceTilesetPalette.getOrCompute(),
+                reducedMotion = main.settings.reducedMotion.getOrCompute())
     }
 
     override fun dispose() {

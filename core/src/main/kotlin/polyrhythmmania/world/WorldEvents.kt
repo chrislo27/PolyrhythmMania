@@ -7,13 +7,13 @@ import com.badlogic.gdx.math.MathUtils
 import paintbox.binding.BooleanVar
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
-import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.engine.*
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.world.tileset.PaletteTransition
 import polyrhythmmania.world.tileset.TilesetPalette
 import kotlin.math.min
@@ -356,17 +356,24 @@ class EventZoomCamera(
         this.beat = startBeat
         this.width = transition.duration
     }
+    
+    
 
     override fun onStartContainer(container: Container, currentBeat: Float) {
         super.onStartContainer(container, currentBeat)
         this.camera = container.renderer.camera
-        this.camera.zoom = this.startZoom
+        
+        if (!container.globalSettings.reducedMotion) {
+            this.camera.zoom = this.startZoom
+        }
     }
 
     override fun onUpdateContainer(container: Container, currentBeat: Float) {
         super.onUpdateContainer(container, currentBeat)
 
-        val percentage = this.transition.translatePercentage(getBeatPercentage(currentBeat)).coerceIn(0f, 1f)
-        this.camera.zoom = MathUtils.lerp(this.startZoom, this.endZoom, percentage)
+        if (!container.globalSettings.reducedMotion) {
+            val percentage = this.transition.translatePercentage(getBeatPercentage(currentBeat)).coerceIn(0f, 1f)
+            this.camera.zoom = MathUtils.lerp(this.startZoom, this.endZoom, percentage)
+        }
     }
 }

@@ -125,9 +125,13 @@ class Editor(
     val timing: TimingProvider = SimpleTimingProvider {
         Gdx.app.postRunnable { throw it }
         true
-    } //soundSystem
-    val container: Container = Container(this.soundSystem, this.timing,
-            GlobalContainerSettings(forceTexturePack = ForceTexturePack.NO_FORCE, forceTilesetPalette = ForceTilesetPalette.NO_FORCE))
+    }
+    val globalContainerSettings: GlobalContainerSettings = GlobalContainerSettings(
+            forceTexturePack = ForceTexturePack.NO_FORCE,
+            forceTilesetPalette = ForceTilesetPalette.NO_FORCE,
+            reducedMotion = false
+    )
+    val container: Container = Container(this.soundSystem, this.timing, globalContainerSettings)
 
     val world: World get() = container.world
     val engine: Engine get() = container.engine

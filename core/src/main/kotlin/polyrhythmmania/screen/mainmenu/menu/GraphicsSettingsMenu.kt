@@ -105,6 +105,14 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             forcePalettePane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceTilesetPalette.tooltip")))
             vbox += forcePalettePane
+
+            val (reducedMotionPane, reducedMotionCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.reducedMotion").use() })
+            reducedMotionCheck.selectedState.set(main.settings.reducedMotion.getOrCompute())
+            reducedMotionCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.reducedMotion.tooltip")))
+            reducedMotionCheck.onCheckChanged = {
+                main.settings.reducedMotion.set(it)
+            }
+            vbox += reducedMotionPane
         }
 
         hbox.temporarilyDisableLayouts {

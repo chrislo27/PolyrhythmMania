@@ -381,7 +381,7 @@ class LoadSavedLevelMenu(
                 throw it
             }
             true
-        }, GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.forceTilesetPalette.getOrCompute()))
+        }, GlobalContainerSettings(main.settings.forceTexturePack.getOrCompute(), main.settings.forceTilesetPalette.getOrCompute(), main.settings.reducedMotion.getOrCompute()))
 
         try {
             val loadMetadata = newContainer.readFromFile(newFile, EnumSet.noneOf(EditorSpecialFlags::class.java))

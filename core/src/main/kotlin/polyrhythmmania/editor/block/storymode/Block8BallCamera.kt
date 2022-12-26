@@ -52,29 +52,38 @@ class Event8BallCameraPan(engine: Engine, startBeat: Float, width: Float) : Even
 
     override fun onStartContainer(container: Container, currentBeat: Float) {
         super.onStartContainer(container, currentBeat)
+        
         this.camera = container.renderer.camera
-        this.originalCameraPos.set(Vector3(camera.viewportWidth / 2, camera.viewportHeight / 2, camera.position.z))
+        
+        if (!container.globalSettings.reducedMotion) {
+            this.originalCameraPos.set(Vector3(camera.viewportWidth / 2, camera.viewportHeight / 2, camera.position.z))
+        }
     }
 
     override fun onUpdateContainer(container: Container, currentBeat: Float) {
         super.onUpdateContainer(container, currentBeat)
-        
-        val progress = ((currentBeat - this.beat) / width.coerceAtLeast(0.1f)).coerceIn(0f, 1f)
-        val interpolated = Interpolation.smooth2.apply(progress)
 
-        val targetPosVec = tmpVec1
-        val dist = 24f
-        targetPosVec.set(originalCameraPos)
-        targetPosVec.x += dist / 2
-        targetPosVec.y += dist / 4
+        if (!container.globalSettings.reducedMotion) {
+            val progress = ((currentBeat - this.beat) / width.coerceAtLeast(0.1f)).coerceIn(0f, 1f)
+            val interpolated = Interpolation.smooth2.apply(progress)
 
-        val tmpVecPos = tmpVec2.set(originalCameraPos)
-                .lerp(targetPosVec, interpolated)
-        camera.position.set(tmpVecPos)
+            val targetPosVec = tmpVec1
+            val dist = 24f
+            targetPosVec.set(originalCameraPos)
+            targetPosVec.x += dist / 2
+            targetPosVec.y += dist / 4
+
+            val tmpVecPos = tmpVec2.set(originalCameraPos)
+                    .lerp(targetPosVec, interpolated)
+            camera.position.set(tmpVecPos)
+        }
     }
 
     override fun onEndContainer(container: Container, currentBeat: Float) {
         super.onEndContainer(container, currentBeat)
-        camera.position.set(originalCameraPos)
+
+        if (!container.globalSettings.reducedMotion) {
+            camera.position.set(originalCameraPos)
+        }
     }
 }
