@@ -1,16 +1,20 @@
 package polyrhythmmania.world.render
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
+import paintbox.PaintboxGame
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
@@ -26,11 +30,10 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.ColorStack
 import paintbox.util.MathHelper
-import paintbox.util.gdxutils.NestedFrameBuffer
-import paintbox.util.gdxutils.drawCompressed
-import paintbox.util.gdxutils.grey
-import paintbox.util.gdxutils.scaleMul
+import paintbox.util.Matrix4Stack
+import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
@@ -44,6 +47,7 @@ import polyrhythmmania.ui.*
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
 import polyrhythmmania.world.tileset.Tileset
+import space.earlygrey.shapedrawer.ShapeDrawer
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -75,6 +79,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     }
     val renderUI: BooleanVar = BooleanVar(true)
     val forceUseOfMainFramebuffer: BooleanVar = BooleanVar(false)
+    
+    private var shapeDrawer: ShapeDrawer? = null
 
     private val uiSceneRoot: SceneRoot = SceneRoot(uiCamera)
     private val markupFontMapping: Map<String, PaintboxFont> = mapOf(
@@ -158,8 +164,17 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
         return engine.modifiers.monsterGoal.enabled.get()
     }
+    
+    private fun ensureShapeDrawerReady(batch: Batch) {
+        if (shapeDrawer == null || shapeDrawer?.batch !== batch) {
+            val region = TextureRegion(PaintboxGame.fillTexture)
+            shapeDrawer = ShapeDrawer(batch, region)
+        }
+    }
 
     override fun render(batch: SpriteBatch) {
+        ensureShapeDrawerReady(batch)
+        
         super.render(batch)
         
         val mainFb: NestedFrameBuffer? = if (shouldUseMainFb()) this.mainFrameBuffer else null
@@ -450,7 +465,8 @@ duration: ${monster.activeDuration.get()} sec
                 val normalScale = 1f
                 val transitionEnd = 0.15f
                 val transitionStart = 0.2f
-                val scale: Float = when (val progress = 1f - clearText) {
+                val progress = 1f - clearText
+                val scale: Float = when (progress) {
                     in 0f..transitionStart -> {
                         Interpolation.exp10Out.apply(normalScale * 2f, normalScale, progress / transitionStart)
                     }
@@ -459,7 +475,7 @@ duration: ${monster.activeDuration.get()} sec
                     }
                     else -> normalScale
                 }
-                val alpha: Float = when (val progress = 1f - clearText) {
+                val alpha: Float = when (progress) {
                     in 0f..transitionStart -> {
                         Interpolation.exp10Out.apply(0f, 1f, progress / transitionStart)
                     }
@@ -468,19 +484,66 @@ duration: ${monster.activeDuration.get()} sec
                     }
                     else -> 1f
                 }
-                val white: Float = when (val progress = 1f - clearText) {
+                val white: Float = when (progress) {
                     in 0f..transitionStart * 0.75f -> {
                         Interpolation.linear.apply(1f, 0f, progress / (transitionStart * 0.75f))
                     }
                     else -> 0f
                 }
 
-                val paintboxFont = PRManiaGame.instance.fontGamePracticeClear
+                val main = PRManiaGame.instance
+                val viewportWidth = uiCam.viewportWidth
+                val viewportHeight = uiCam.viewportHeight
+                val centreX = viewportWidth / 2f
+                val centreY = viewportHeight / 2f
+
+                val shapeDrawer = shapeDrawer
+                if (shapeDrawer != null) {
+                    // Prepare shape renderer
+                    val shapeRenderer = main.shapeRenderer
+                    val oldProjMtx = Matrix4Stack.getAndPush().set(shapeRenderer.projectionMatrix)
+                    shapeRenderer.projectionMatrix = batch.projectionMatrix
+                    
+                    val maxSquareSize = 350f
+                    val prog = (progress / (1f - (transitionStart + transitionEnd))).coerceIn(0f, 1f)
+                    
+                    shapeRenderer.prepareStencilMask(batch, inverted = true) {
+                        val delayedProgress = (prog * 1.1f).coerceAtMost(1f)
+                        val hollowSize = Interpolation.pow5.apply(0f, maxSquareSize, delayedProgress)
+                        this.begin(ShapeRenderer.ShapeType.Filled)
+                        
+                        this.circle(centreX, centreY, hollowSize / 2 + 1, 100)
+                        
+                        this.end()
+                    }
+                    batch.useStencilMask {
+                        val interpolation = Interpolation.pow5Out
+                        val squareSize = interpolation.apply(0f, maxSquareSize, prog)
+                        
+                        val lastPackedColor = batch.packedColor
+                        val tmpColor = ColorStack.getAndPush()
+                        tmpColor.set(Color.YELLOW)
+                        
+                        tmpColor.a = alpha
+                        batch.color = tmpColor
+                        
+                        batch.draw(AssetRegistry.get<Texture>("big_circle_ui"), centreX - squareSize / 2, centreY - squareSize / 2, squareSize, squareSize)
+                        
+                        batch.packedColor = lastPackedColor
+                        ColorStack.pop()
+                    }
+
+                    // End using shape renderer
+                    shapeRenderer.projectionMatrix.set(oldProjMtx)
+                    Matrix4Stack.pop()
+                }
+
+                val paintboxFont = main.fontGamePracticeClear
                 paintboxFont.useFont { font ->
                     font.scaleMul(scale)
                     font.setColor(1f, 1f, MathUtils.lerp(0.125f, 1f, white), alpha)
                     font.drawCompressed(batch, Localization.getValue("practice.clear"),
-                            0f, uiCam.viewportHeight / 2f + font.capHeight / 2, uiCam.viewportWidth, Align.center)
+                            0f, viewportHeight / 2f + font.capHeight / 2, viewportWidth, Align.center)
                     font.scaleMul(1f / scale)
                 }
 

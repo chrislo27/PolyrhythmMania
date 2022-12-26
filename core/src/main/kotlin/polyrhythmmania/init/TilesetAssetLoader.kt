@@ -30,6 +30,7 @@ class TilesetAssetLoader : IAssetLoader {
                         padding = 1, maxSize = 512, duplicateBorder = false,
                         atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear
                 )))
+        AssetRegistry.loadAsset<Texture>("big_circle_ui", "textures/world/ui/big_circle.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("endless_lives_ui", "textures/world/ui/endless_lives.png")
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui_lives", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "heart",
