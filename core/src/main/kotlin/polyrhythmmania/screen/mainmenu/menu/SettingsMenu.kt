@@ -16,7 +16,7 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private val settings: Settings = menuCol.main.settings
     
     init {
-        this.setSize(MMMenu.WIDTH_EXTRA_SMALL)
+        this.setSize(0.35f)
         this.titleText.bind { Localization.getVar("mainMenu.settings.title").use() }
         this.contentPane.bounds.height.set(320f)
         
