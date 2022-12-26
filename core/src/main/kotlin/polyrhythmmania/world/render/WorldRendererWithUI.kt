@@ -484,8 +484,7 @@ duration: ${monster.activeDuration.get()} sec
                     font.scaleMul(1f / scale)
                 }
 
-                val newValue = (clearText - Gdx.graphics.deltaTime / 1.5f).coerceAtLeast(0f)
-                inputter.practice.clearText = newValue
+                inputter.practice.updateClearText(Gdx.graphics.deltaTime)
             }
         }
     }

@@ -180,7 +180,7 @@ class EngineInputter(val engine: Engine) {
                                 practice.moreTimes.set(newValue)
                                 if (newValue == 0) {
                                     engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_2"), SoundInterface.SFXType.NORMAL)
-                                    practice.clearText = 1f
+                                    practice.triggerClearText()
                                 } else {
                                     engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_practice_moretimes_1"), SoundInterface.SFXType.NORMAL)
                                 }
