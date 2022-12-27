@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
@@ -38,6 +39,7 @@ import polyrhythmmania.storymode.inbox.StageCompletionData
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.ui.TogglableInputProcessor
 import java.time.LocalDateTime
+import kotlin.math.absoluteValue
 
 class DesktopUI(
         val scenario: DesktopScenario,
@@ -97,6 +99,8 @@ class DesktopUI(
     
     val inboxItemListScrollbar: ScrollBar
     private val inboxItemListingObjs: List<InboxItemListingObj>
+    private val frameScrollPane: ScrollPane
+    private val itemsVbox: VBox
     
     init { // Background, base settings
         sceneRoot.debugOutlineColor.set(Color(1f, 0f, 0f, 1f))
@@ -152,7 +156,7 @@ class DesktopUI(
             this.bounds.height.set(7f * UI_SCALE)
         }
 
-        val frameScrollPane = ScrollPane().apply {
+        frameScrollPane = ScrollPane().apply {
             this.contentPane.doClipping.set(false)
             this.hBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
             this.vBarPolicy.set(ScrollPane.ScrollBarPolicy.NEVER)
@@ -197,7 +201,7 @@ class DesktopUI(
         inboxItemListScrollbar.addInputEventListener(scrollListener)
         frameScrollPane.addInputEventListener(scrollListener)
 
-        val itemsVbox = VBox().apply {
+        itemsVbox = VBox().apply {
             this.spacing.set(0f)
             this.margin.set(Insets(0f, 1f * UI_SCALE, 0f, 0f))
             this.autoSizeToChildren.set(true)
@@ -294,25 +298,51 @@ class DesktopUI(
         this.sceneRoot.renderAsRoot(batch)
         batch.end()
     }
-    
-    fun getTargetVbarValueForInboxItem(inboxItem: InboxItem): Float {
-        val min = inboxItemListScrollbar.minimum.get()
-        val max = inboxItemListScrollbar.maximum.get()
-        val currentValue = inboxItemListScrollbar.value.get()
-        val totalArea = max - min
-        val itemObjs = inboxItemListingObjs
-        val objIndex = itemObjs.indexOfFirst { it.inboxItem == inboxItem }.takeUnless { it == -1 } ?: return currentValue
 
-        val currentVisiblePercent = currentValue / totalArea // Represents top edge of scroll area
-        val maxScrollItems = (itemObjs.size - ITEMS_VISIBLE_AT_ONCE).toFloat()
-        val objIndexUpperPercentage = objIndex / maxScrollItems // If the obj is above the currentVisiblePercent
-        val objIndexLowerPercentage = (objIndex - (ITEMS_VISIBLE_AT_ONCE - 1)) / maxScrollItems // If the obj is below the bottom edge (currentVisiblePercent + ITEMS_VISIBLE_AT_ONCE - 1)
+    fun getTargetVbarValueForInboxItem(inboxItem: InboxItem): Float {
+        val currentValue = inboxItemListScrollbar.value.get()
+        val vbox = itemsVbox
+        val listingObj: InboxItemListingObj = vbox.children.find {
+            it is InboxItemListingObj && it.inboxItem == inboxItem
+        } as? InboxItemListingObj ?: return currentValue
         
-        return if (objIndexUpperPercentage < currentVisiblePercent) {
-            objIndexUpperPercentage * totalArea + min
-        } else if (objIndexLowerPercentage > currentVisiblePercent) {
-            objIndexLowerPercentage * totalArea + min
-        } else currentValue
+        return getTargetVbarValueForListingItem(listingObj)
+    }
+    
+    fun getTargetVbarValueForListingItem(listingObj: UIElement): Float {
+        val scrollBar = inboxItemListScrollbar
+        val currentValue = scrollBar.value.get()
+        
+        val listingTop = listingObj.bounds.y.get()
+        val listingSize = listingObj.bounds.height.get()
+        val listingBottom = listingTop + listingSize
+
+        val scrollPane = frameScrollPane
+        val contentPane = scrollPane.contentPane
+        val windowTop = contentPane.contentOffsetY.get().absoluteValue
+        val windowSize = scrollPane.contentPaneHeight.get()
+        val windowBottom = windowTop + windowSize
+        
+        // Check if listing is fully within view: top >= windowTop AND bottom <= windowBottom
+        if (listingTop >= windowTop && listingBottom <= windowBottom) {
+            // No changes needed
+            return currentValue
+        }
+        
+        // Note: If the listing item is bigger than the window size, then default to scrolling to the top of that item
+        val newWindowTop: Float = if ((listingTop < windowTop) || (listingSize > windowSize)) {
+            // Scroll to top edge
+            listingTop
+        } else {
+            // Scroll to bottom edge
+            listingBottom - windowSize
+        }
+        
+        // Map newWindowTop to a scrollbar position
+        val contentHeightDiff = scrollPane.contentHeightDiff.get()
+        val newWindowTopPercentage = (newWindowTop / contentHeightDiff).coerceIn(0f, 1f)
+
+        return MathUtils.lerp(scrollBar.minimum.get(), scrollBar.maximum.get(), newWindowTopPercentage)
     }
     
     fun updateAndShowNewlyAvailableInboxItems(lockInputs: Boolean = false) {
