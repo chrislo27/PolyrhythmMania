@@ -3,6 +3,7 @@ package polyrhythmmania.storymode.contract
 import com.badlogic.gdx.Gdx
 import paintbox.binding.asReadOnlyVar
 import polyrhythmmania.editor.block.BlockEndState
+import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.storymode.contract.Contract.Companion.NOT_ALLOWED_TO_SKIP
 import polyrhythmmania.storymode.gamemode.*
 import polyrhythmmania.storymode.gamemode.boss.StoryBossGameMode
@@ -165,6 +166,24 @@ object Contracts {
                 this.container.addBlock(BlockEndState(this.engine).apply {
                     this.beat = 16f
                 })
+            }
+        })
+        add(Contract("air_rally_2_monster", Requester.DEBUG, JingleType.GBA, contracts["air_rally_2"]?.attribution, 60) { main ->
+            // FIXME this is a debug contract
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally_2.prmproj")).apply {
+                val monsterGoal = this.container.engine.modifiers.monsterGoal
+                monsterGoal.enabled.set(true)
+            }
+        })
+        add(Contract("air_rally_2_monster_superhard", Requester.DEBUG, JingleType.GBA, contracts["air_rally_2"]?.attribution, 60) { main ->
+            // FIXME this is a debug contract
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally_2.prmproj")).apply {
+                this.engine.tempos.addTempoChange(TempoChange(0f, 182f * 2))
+                this.engine.tempos.addTempoChange(TempoChange(4f, 182f))
+                
+                val monsterGoal = this.container.engine.modifiers.monsterGoal
+                monsterGoal.difficulty.set(150f)
+                monsterGoal.enabled.set(true)
             }
         })
     }

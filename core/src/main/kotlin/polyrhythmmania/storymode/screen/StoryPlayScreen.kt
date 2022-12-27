@@ -35,6 +35,7 @@ import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
+import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.ResultFlag
 import polyrhythmmania.engine.input.Challenges
@@ -686,12 +687,46 @@ class StoryPlayScreen(
             
             val currentBeat = engine.beat
             val currentSec = engine.seconds
-            val endAfterSec = 1.5f
-            val silentAfterSec = endAfterSec / 2f
-            val endBeat = engine.tempos.secondsToBeats(currentSec + endAfterSec, disregardSwing = true)
-            val silentBeat = engine.tempos.secondsToBeats(currentSec + silentAfterSec, disregardSwing = true)
-            engine.addEvent(EventEndState(engine, endBeat))
-            engine.addEvent(ChangeMusicVolMultiplierEvent(engine, 1f, 0f, currentBeat, silentBeat - currentBeat))
+            
+            val endAfterSec: Float
+            val silentAfterSec: Float
+            if (flag is ResultFlag.Fail.MonsterGoal) {
+                silentAfterSec = 0.25f
+                endAfterSec = 1.75f
+            } else {
+                endAfterSec = 1.5f
+                silentAfterSec = endAfterSec / 2f
+            }
+
+
+            val endAtBeat = engine.tempos.secondsToBeats(currentSec + endAfterSec, disregardSwing = true)
+            val silentAtBeat = engine.tempos.secondsToBeats(currentSec + silentAfterSec, disregardSwing = true)
+
+            engine.addEvent(EventEndState(engine, endAtBeat))
+            engine.addEvent(ChangeMusicVolMultiplierEvent(engine, 1f, 0f, currentBeat, silentAtBeat - currentBeat))
+
+            // Special handling for monster goal failure
+            if (flag is ResultFlag.Fail.MonsterGoal) {
+                val startCrushAfterSec = 0.5f
+                val fadeOutDurationSec = worldRenderer.monsterGoalRendering.crushDurationSec
+                val crushAfterBeat = engine.tempos.secondsToBeats(currentSec + startCrushAfterSec, disregardSwing = true)
+                val finishFadeOutAtBeat = engine.tempos.secondsToBeats(currentSec + startCrushAfterSec + fadeOutDurationSec, disregardSwing = true)
+
+                engine.addEvent(object : Event(engine) {
+                    override fun onStart(currentBeat: Float) {
+                        worldRenderer.monsterGoalRendering.startCrush()
+                        playMenuSound("sfx_monster_goal_fail", volume = 0.9f) // This is a menu SFX b/c it has to play even after the end event is fired
+                    }
+
+                    override fun onUpdate(currentBeat: Float) {
+                        val percentage = if (this.width <= 0f) 1f else ((currentBeat - this.beat) / this.width).coerceIn(0f, 1f)
+                        this.engine.soundInterface.setGlobalGain(1f - percentage)
+                    }
+                }.apply { 
+                    this.beat = crushAfterBeat
+                    this.width = finishFadeOutAtBeat - this.beat
+                })
+            }
         }
     }
 

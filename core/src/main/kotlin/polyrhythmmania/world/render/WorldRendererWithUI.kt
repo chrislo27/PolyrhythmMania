@@ -1,7 +1,6 @@
 package polyrhythmmania.world.render
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -105,7 +104,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     val songCardRendering: SongCardRendering
     private val skillStarRendering: SkillStarRendering
     private val textboxRendering: TextBoxRendering
-    private val monsterGoalRendering: MonsterGoalRendering
+    val monsterGoalRendering: MonsterGoalRendering
     
     private val allInnerRenderers: List<InnerRendering>
 
@@ -195,7 +194,16 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             if (scaling == 1f) {
                 batch.draw(fbTex, 0f, 0f, w, h, 0, 0, fbTex.width, fbTex.height, false, true)
             } else {
-                batch.draw(fbTex, (w - w * scaling) / 2, (h - h * scaling) / 2, w * scaling, h * scaling, 0, 0, fbTex.width, fbTex.height, false, true)
+                val renderWidth = w * scaling
+                var renderHeight = h * scaling
+                
+                val crushPercentage = monsterGoalRendering.getCrushPercentage()
+                if (crushPercentage > 0f && crushPercentage <= 1f) {
+                    renderHeight *= Interpolation.linear.apply(1f - crushPercentage)
+                }
+                
+                batch.draw(fbTex, (w - renderWidth) / 2, (h - renderHeight) / 2, renderWidth, renderHeight,
+                        0, 0, fbTex.width, fbTex.height, false, true)
             }
 
             batch.end()
@@ -1249,22 +1257,38 @@ duration: ${monster.activeDuration.get()} sec
             this.bounds.height.set(0f)
         }
 
+        val crushDurationSec: Float = 0.125f
         val scaling: FloatVar = FloatVar(1f)
+        val crush: FloatVar = FloatVar(-1f)
 
         override fun renderUI(batch: SpriteBatch) {
             val monster = engine.modifiers.monsterGoal
             if (monster.enabled.get()) {
-                val transitionTime = Gdx.graphics.deltaTime / 0.15f
+                val delta = Gdx.graphics.deltaTime
+                val transitionTime = delta / 0.15f
                 val zoom = MonsterGoalData.computeCameraZoom(monster.untilGameOver.get())
                 scaling.set(MathUtils.lerp(scaling.get(), 1f / zoom, transitionTime))
+                
+                val crushValue = crush.get()
+                if (crushValue >= 0f && crushValue < 1f) {
+                    crush.set((crushValue + delta / crushDurationSec).coerceIn(0f, 1f))
+                }
             } else {
                 scaling.set(1f)
+                crush.set(-1f)
             }
         }
 
         override fun onWorldReset(world: World) {
             super.onWorldReset(world)
             scaling.set(1f)
+            crush.set(-1f)
+        }
+        
+        fun getCrushPercentage(): Float = crush.get().coerceIn(0f, 1f)
+        
+        fun startCrush() {
+            if (crush.get() < 0f) crush.set(0f)
         }
     }
     

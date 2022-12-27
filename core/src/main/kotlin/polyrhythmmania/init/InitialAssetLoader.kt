@@ -162,6 +162,7 @@ class InitialAssetLoader : IAssetLoader {
         listOf("perfect_fail", "monster_goal_ace",).forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_$it", "sounds/${it}.ogg")
         }
+        AssetRegistry.loadAsset<Sound>("sfx_monster_goal_fail", "sounds/monster_goal_fail.ogg")
         listOf("moretimes_1", "moretimes_2",).forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_practice_$it", "sounds/practice/${it}.ogg")
         }

@@ -78,7 +78,7 @@ class Engine(timingProvider: TimingProvider,
         this.inputter.resetState()
         this.modifiers.resetState()
         this.musicData.resetState()
-        this.soundInterface.clearAllNonMusicAudio()
+        this.soundInterface.resetMutableState()
         this.removeActiveTextbox(unpauseSoundInterface = false, runTextboxOnComplete = false)
         this.resetEndSignal()
     }
