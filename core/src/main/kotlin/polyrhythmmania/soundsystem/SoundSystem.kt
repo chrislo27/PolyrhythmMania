@@ -3,6 +3,7 @@ package polyrhythmmania.soundsystem
 import com.badlogic.gdx.utils.Disposable
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.IOAudioFormat
+import net.beadsproject.beads.core.UGen
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.soundsystem.beads.toBeadsAudioFormat
 import polyrhythmmania.soundsystem.javasound.MixerHandler
@@ -101,8 +102,12 @@ class SoundSystem(val realtimeOutput: RealtimeOutput,
     }
 
     private fun obtainSoundID(): Long = ++currentSoundID
-    
-    fun playAudio(beadsAudio: BeadsAudio, callback: (player: PlayerLike) -> Unit = {}): Long {
+
+    /**
+     * Plays audio and returns the sound ID.
+     * @param addInputTo If null, defaults to [audioContext].out
+     */
+    fun playAudio(beadsAudio: BeadsAudio, addInputTo: UGen? = null, callback: (player: PlayerLike) -> Unit = {}): Long {
         val id = obtainSoundID()
         val player = beadsAudio.createPlayer(audioContext)
         player.killListeners += {
@@ -110,7 +115,7 @@ class SoundSystem(val realtimeOutput: RealtimeOutput,
         }
         callback.invoke(player)
         activePlayers[id] = player
-        audioContext.out.addInput(player)
+        (addInputTo ?: audioContext.out).addInput(player)
         return id
     }
     

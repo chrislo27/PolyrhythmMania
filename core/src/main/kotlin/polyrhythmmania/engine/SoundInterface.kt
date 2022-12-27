@@ -2,6 +2,8 @@ package polyrhythmmania.engine
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
+import net.beadsproject.beads.core.UGen
+import net.beadsproject.beads.ugens.Gain
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.soundsystem.BeadsAudio
 import polyrhythmmania.soundsystem.BeadsMusic
@@ -21,29 +23,36 @@ sealed class SoundInterface {
     }
     
     class Impl(val soundSystem: SoundSystem, val engine: Engine) : SoundInterface() {
+        private val globalGain: Gain = Gain(soundSystem.audioContext, soundSystem.audioContext.out.outs)
+        
         private var currentAudio: BeadsMusic? = null
         private var currentMusicPlayer: MusicSamplePlayer? = null
+        
+        init {
+            globalGain.gain = 1f
+            soundSystem.audioContext.out.addInput(globalGain)
+        }
 
         @Synchronized override fun getCurrentMusicPlayer(audio: BeadsMusic?): MusicSamplePlayer? {
             if (audio == currentAudio) return currentMusicPlayer
+
+            val ugenToAddTo: UGen = globalGain
             
             // Dispose current player
             val currentPlayer = this.currentMusicPlayer
             if (currentPlayer != null) {
                 currentPlayer.pause(true)
-                val out = soundSystem.audioContext.out
-                for (i in 0 until out.ins) {
-                    out.removeConnection(i, currentPlayer, i % currentPlayer.outs)
+                for (i in 0 until ugenToAddTo.ins) {
+                    ugenToAddTo.removeConnection(i, currentPlayer, i % currentPlayer.outs)
                 }
                 this.currentMusicPlayer = null
             }
             
             this.currentAudio = audio
             if (audio != null) {
-                val out = soundSystem.audioContext.out
                 val newPlayer = audio.createPlayer(soundSystem.audioContext)
                 newPlayer.pause(true)
-                out.addInput(newPlayer)
+                ugenToAddTo.addInput(newPlayer)
                 this.currentMusicPlayer = newPlayer
             }
             
@@ -58,7 +67,7 @@ sealed class SoundInterface {
                 return -1L
             }
             
-            return soundSystem.playAudio(audio, callback)
+            return soundSystem.playAudio(audio, globalGain, callback)
         }
 
         override fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float) {
@@ -69,11 +78,15 @@ sealed class SoundInterface {
 
         override fun clearAllNonMusicAudio() {
             val currentMusic = currentMusicPlayer
-            val out = soundSystem.audioContext.out
+            val out = globalGain
             out.clearInputConnections()
             if (currentMusic != null) {
                 out.addInput(currentMusic)
             }
+        }
+
+        override fun setGlobalGain(gain: Float) {
+            globalGain.gain = gain
         }
 
         override fun getPlayer(id: Long): PlayerLike? = soundSystem.getPlayer(id)
@@ -109,6 +122,9 @@ sealed class SoundInterface {
         }
 
         override fun getPlayer(id: Long): PlayerLike? = null
+        
+        override fun setGlobalGain(gain: Float) {
+        }
     }
     
     open var disableSounds: Boolean = false
@@ -133,6 +149,8 @@ sealed class SoundInterface {
     
     abstract fun getPlayer(id: Long): PlayerLike?
     
+    abstract fun setGlobalGain(gain: Float)
+    
     fun playMenuSfx(sound: Sound, volume: Float) = playMenuSfx(sound, volume, 1f, 0f)
     fun playMenuSfx(sound: Sound) = playMenuSfx(sound, 1f, 1f, 0f)
 
@@ -146,6 +164,11 @@ sealed class SoundInterface {
         if (audioPlayedLastFrame.isNotEmpty()) {
             audioPlayedLastFrame.clear()
         }
+    }
+    
+    open fun resetMutableState() {
+        this.clearAllNonMusicAudio()
+        this.setGlobalGain(1f)
     }
     
     abstract fun setPaused(paused: Boolean)
