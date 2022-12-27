@@ -86,7 +86,7 @@ object Contracts {
         add(Contract("rhythm_rally", Requester.GOOD_SPORTS, JingleType.GBA, Attribution(SongInfo.megamix("Rhythm Rally"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_rally.prmproj"))
         })
-        add(Contract("rhythm_rally_2", Requester.GOOD_SPORTS, JingleType.ARCADE, Attribution(SongInfo.ds("Rhythm Rally", listOf(SongNameAndSource.megamix("Rhythm Rally 2"))), listOf("Kievit")), 60) { main ->
+        add(Contract("rhythm_rally_2", Requester.GOOD_SPORTS, JingleType.ARCADE, Attribution(SongInfo.ds("Rhythm Rally", listOf(SongNameAndSource.megamix("Rhythm Rally 2"))), listOf("Kievit")), 60, listOf(Condition.DefectiveRods(3))) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_rally_2.prmproj"))
         })
         add(Contract("rhythm_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.megamix("Rhythm Tweezers"), listOf("Kievit")), 70, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
@@ -125,7 +125,7 @@ object Contracts {
         add(Contract("tap_trial_2", Requester.ANIMAL_ACROBATICS, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tap_trial_2.prmproj"))
         })
-        add(Contract("toss_boys", Requester.TOSS_BOYS, JingleType.GBA, Attribution(SongInfo.tengoku("トスボーイズ (Toss Boys)"), listOf("Dream Top")), 0) { main ->
+        add(Contract("toss_boys", Requester.TOSS_BOYS, JingleType.GBA, Attribution(SongInfo.tengoku("トスボーイズ (Toss Boys)"), listOf("Dream Top")), 0, listOf(Condition.Lives(3))) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/toss_boys.prmproj")).apply { 
                 val livesMode = this.container.engine.modifiers.livesMode
                 livesMode.maxLives.set(3)
@@ -144,7 +144,7 @@ object Contracts {
         
         
         // Debug contracts
-        add(Contract("air_rally_one_life", Requester.DEBUG, JingleType.GBA, contracts["air_rally"]?.attribution, 0) { main ->
+        add(Contract("air_rally_one_life", Requester.DEBUG, JingleType.GBA, contracts["air_rally"]?.attribution, 0, listOf(Condition.Lives(1))) { main ->
             // FIXME this is a debug contract
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj")).apply {
                 val lives = this.engine.modifiers.livesMode
@@ -168,14 +168,14 @@ object Contracts {
                 })
             }
         })
-        add(Contract("air_rally_2_monster", Requester.DEBUG, JingleType.GBA, contracts["air_rally_2"]?.attribution, 60) { main ->
+        add(Contract("air_rally_2_monster", Requester.DEBUG, JingleType.GBA, contracts["air_rally_2"]?.attribution, 60, listOf(Condition.MonsterGoal)) { main ->
             // FIXME this is a debug contract
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally_2.prmproj")).apply {
                 val monsterGoal = this.container.engine.modifiers.monsterGoal
                 monsterGoal.enabled.set(true)
             }
         })
-        add(Contract("air_rally_2_monster_superhard", Requester.DEBUG, JingleType.GBA, contracts["air_rally_2"]?.attribution, 60) { main ->
+        add(Contract("air_rally_2_monster_superhard", Requester.DEBUG, JingleType.GBA, contracts["air_rally_2"]?.attribution, 60, listOf(Condition.MonsterGoal)) { main ->
             // FIXME this is a debug contract
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally_2.prmproj")).apply {
                 this.engine.tempos.addTempoChange(TempoChange(0f, 182f * 2))

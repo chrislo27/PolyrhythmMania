@@ -110,20 +110,20 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                         this.setScaleXY(0.5f)
                         this.margin.set(Insets(1f, 1f, 4f, 4f))
                     }
-                    
+
                     this += HBox().apply {
                         this.bounds.height.set(8f * UI_SCALE)
                         this.align.set(HBox.Align.CENTRE)
                         this.margin.set(Insets(1f, 1f, 4f, 4f))
                         this.spacing.set(2f * UI_SCALE)
-                        
+
                         if (completionData.skillStar && !inboxItem.ignoreSkillStar) {
-                            this += ImageIcon(TextureRegion(StoryAssets.get<Texture>("desk_ui_icon_skillstar"))).apply { 
+                            this += ImageIcon(TextureRegion(StoryAssets.get<Texture>("desk_ui_icon_skillstar"))).apply {
                                 this.bounds.width.set(8f * UI_SCALE)
                             }
                         }
                         if (completionData.noMiss && !inboxItem.ignoreNoMiss) {
-                            this += ImageIcon(TextureRegion(StoryAssets.get<Texture>("desk_ui_icon_nomiss"))).apply { 
+                            this += ImageIcon(TextureRegion(StoryAssets.get<Texture>("desk_ui_icon_nomiss"))).apply {
                                 this.bounds.width.set(8f * UI_SCALE)
                             }
                         }
@@ -232,13 +232,31 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
             }
         }
     }
-    
+
     private fun addContractConditionsPanel(inboxItem: InboxItem.ContractDoc) {
         val contract = inboxItem.contract
-        addRightSidePanel(StoryL10N.getVar("desktop.pane.conditions"), 30f * UI_SCALE).apply {
-            val scoreClearKey = if (contract.immediatePass) StoryL10N.getVar("desktop.pane.conditions.noMinScore") else StoryL10N.getVar("desktop.pane.conditions.minScore", listOf(contract.minimumScore))
-            this += TextLabel(scoreClearKey, font = main.fontRobotoItalic).apply {
-                this.bounds.height.set(10f * UI_SCALE)
+
+        val primaryText = if (contract.immediatePass) 
+            StoryL10N.getValue("desktop.pane.conditions.primary.noMinScore") 
+        else StoryL10N.getValue("desktop.pane.conditions.primary.minScore", contract.minimumScore)
+        
+        var clearText = primaryText
+        val ellipse = StoryL10N.getValue("desktop.pane.conditions.ellipsis")
+        val conjunction1 = StoryL10N.getValue("desktop.pane.conditions.conjunction.1")
+        val conjunction2 = StoryL10N.getValue("desktop.pane.conditions.conjunction.2")
+        val extras: List<String> = contract.extraConditions.sorted().map { c -> c.text.getOrCompute() }
+        if (extras.isNotEmpty()) {
+            clearText += extras.withIndex().joinToString(separator = "\n", prefix = "\n") { (index, s) ->
+                val conjunction = if (index == 0) "" else "${if (index % 2 == 0) conjunction2 else conjunction1} "
+                "${ellipse}${conjunction}${s}"
+            }
+        }
+
+        val numNewlines = clearText.count { c -> c == '\n' }
+        val addHeightDueToNl = 5f * UI_SCALE * numNewlines
+        addRightSidePanel(StoryL10N.getVar("desktop.pane.conditions"), 30f * UI_SCALE + addHeightDueToNl).apply {
+            this += TextLabel(clearText, font = main.fontRobotoItalic).apply {
+                this.bounds.height.set(10f * UI_SCALE + addHeightDueToNl)
                 this.textColor.set(Color.BLACK)
                 this.renderAlign.set(RenderAlign.center)
                 this.margin.set(Insets(1f, 1f, 4f, 4f))
