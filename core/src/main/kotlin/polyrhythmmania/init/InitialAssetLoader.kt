@@ -103,6 +103,8 @@ class InitialAssetLoader : IAssetLoader {
         AssetRegistry.loadAsset<Texture>("ui_icon_block_flat", "textures/ui/icon/block_flat.png")
         AssetRegistry.loadAsset<Texture>("ui_rounded_textbox", "textures/ui/textbox.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("ui_robot_textbox", "textures/ui/textbox_robot.png")
+        AssetRegistry.loadAsset<Texture>("ui_monstergoal_spikes", "textures/world/spikes.png")
+        AssetRegistry.loadAsset<Texture>("ui_monstergoal_spikes_black", "textures/world/spikes_black.png")
         AssetRegistry.loadAsset<Texture>("results_score_bar", "textures/results/score_bar.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("results_score_bar_border", "textures/results/score_bar_border.png", linearTexture())
         AssetRegistry.loadAssetNoFile<PackedSheet>("results_ranking", PackedSheetLoader.PackedSheetLoaderParam(listOf(

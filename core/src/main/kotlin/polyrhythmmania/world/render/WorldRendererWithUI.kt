@@ -174,9 +174,10 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     override fun render(batch: SpriteBatch) {
         ensureShapeDrawerReady(batch)
         
+        val mainFb: NestedFrameBuffer? = if (shouldUseMainFb()) this.mainFrameBuffer else null
+        
         super.render(batch)
         
-        val mainFb: NestedFrameBuffer? = if (shouldUseMainFb()) this.mainFrameBuffer else null
         if (mainFb != null) {
             Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -184,16 +185,19 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             val scaling = monsterGoalRendering.scaling.get()
             
             // Render main fb
-            batch.projectionMatrix = fbRenderCamera.combined
+            val cam = fbRenderCamera
+            batch.projectionMatrix = cam.combined
             batch.begin()
 
             batch.setColor(1f, 1f, 1f, 1f)
             val fbTex = mainFb.colorBufferTexture
-            val w = fbRenderCamera.viewportWidth
-            val h = fbRenderCamera.viewportHeight
+            val w = cam.viewportWidth
+            val h = cam.viewportHeight
             if (scaling == 1f) {
                 batch.draw(fbTex, 0f, 0f, w, h, 0, 0, fbTex.width, fbTex.height, false, true)
             } else {
+                monsterGoalRendering.renderBehindGame(batch, cam)
+                
                 val renderWidth = w * scaling
                 var renderHeight = h * scaling
                 
@@ -1278,7 +1282,42 @@ duration: ${monster.activeDuration.get()} sec
                 crush.set(-1f)
             }
         }
+        
+        fun renderBehindGame(batch: SpriteBatch, cam: OrthographicCamera) {
+            val lastPackedColor = batch.packedColor
+            val spikesTex = AssetRegistry.get<Texture>("ui_monstergoal_spikes")
+            val spikesTexBlack = AssetRegistry.get<Texture>("ui_monstergoal_spikes_black")
+            
+            val viewportWidth = cam.viewportWidth
+            val viewportHeight = cam.viewportHeight
+            val scale = viewportWidth / spikesTex.width
+            
+            val crushPercentage = getCrushPercentage()
 
+            val w = spikesTex.width * scale
+            val h = spikesTex.height * scale
+            val viewportScaling = scaling.get()
+            val offsetY = (-(19 - 12) * scale) - h + (viewportHeight * (1f - viewportScaling) / 2f)
+            
+            val spikesTexColorGrey = Interpolation.linear.apply(1f, 0f, crushPercentage)
+            batch.setColor(spikesTexColorGrey, spikesTexColorGrey, spikesTexColorGrey, 1f)
+            batch.draw(spikesTex, 0f, 0f + offsetY, w, h)
+            batch.draw(spikesTex, 0f, viewportHeight - (offsetY), w, -h)
+            batch.setColor(1f, 1f, 1f, 1f)
+            
+            if (crushPercentage > 0f) {
+                batch.setColor(1f, 1f, 1f, 1f)
+                val upperInterlockOffsetX = (spikesTexBlack.width - spikesTex.width) * scale
+                val w = spikesTexBlack.width * scale
+                val h = spikesTexBlack.height * scale
+                val offsetY = Interpolation.linear.apply(-h, viewportHeight / 2f - h + (29f * scale), crushPercentage)
+                batch.draw(spikesTexBlack, 0f, offsetY, w, h)
+                batch.draw(spikesTexBlack, -upperInterlockOffsetX, viewportHeight - offsetY, w, -h)
+            }
+            
+            batch.packedColor = lastPackedColor
+        }
+        
         override fun onWorldReset(world: World) {
             super.onWorldReset(world)
             scaling.set(1f)
