@@ -1297,7 +1297,7 @@ duration: ${monster.activeDuration.get()} sec
             val w = spikesTex.width * scale
             val h = spikesTex.height * scale
             val viewportScaling = scaling.get()
-            val offsetY = (-(19 - 12) * scale) - h + (viewportHeight * (1f - viewportScaling) / 2f)
+            val offsetY = (-7 * scale) - h + (viewportHeight * (1f - viewportScaling) / 2f)
             
             val spikesTexColorGrey = Interpolation.linear.apply(1f, 0f, crushPercentage)
             batch.setColor(spikesTexColorGrey, spikesTexColorGrey, spikesTexColorGrey, 1f)
@@ -1306,13 +1306,20 @@ duration: ${monster.activeDuration.get()} sec
             batch.setColor(1f, 1f, 1f, 1f)
             
             if (crushPercentage > 0f) {
-                batch.setColor(1f, 1f, 1f, 1f)
                 val upperInterlockOffsetX = (spikesTexBlack.width - spikesTex.width) * scale
                 val w = spikesTexBlack.width * scale
                 val h = spikesTexBlack.height * scale
                 val offsetY = Interpolation.linear.apply(-h, viewportHeight / 2f - h + (29f * scale), crushPercentage)
+                
+                batch.setColor(1f, 1f, 1f, 1f)
                 batch.draw(spikesTexBlack, 0f, offsetY, w, h)
                 batch.draw(spikesTexBlack, -upperInterlockOffsetX, viewportHeight - offsetY, w, -h)
+                
+                // Black rectangles to improve hiding
+                val hidingRectHeight = h
+                batch.setColor(0f, 0f, 0f, 1f)
+                batch.fillRect(0f, offsetY - hidingRectHeight, w, hidingRectHeight)
+                batch.fillRect(-upperInterlockOffsetX, viewportHeight - offsetY, w, hidingRectHeight)
             }
             
             batch.packedColor = lastPackedColor
