@@ -1286,6 +1286,7 @@ duration: ${monster.activeDuration.get()} sec
         fun renderBehindGame(batch: SpriteBatch, cam: OrthographicCamera) {
             val lastPackedColor = batch.packedColor
             val spikesTex = AssetRegistry.get<Texture>("ui_monstergoal_spikes")
+            val spikesTexTop = AssetRegistry.get<Texture>("ui_monstergoal_spikes_top")
             val spikesTexBlack = AssetRegistry.get<Texture>("ui_monstergoal_spikes_black")
             
             val viewportWidth = cam.viewportWidth
@@ -1302,7 +1303,7 @@ duration: ${monster.activeDuration.get()} sec
             val spikesTexColorGrey = Interpolation.linear.apply(1f, 0f, crushPercentage)
             batch.setColor(spikesTexColorGrey, spikesTexColorGrey, spikesTexColorGrey, 1f)
             batch.draw(spikesTex, 0f, 0f + offsetY, w, h)
-            batch.draw(spikesTex, 0f, viewportHeight - (offsetY), w, -h)
+            batch.draw(spikesTexTop, 0f, viewportHeight - (offsetY) - h, w, h)
             batch.setColor(1f, 1f, 1f, 1f)
             
             if (crushPercentage > 0f) {
