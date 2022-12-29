@@ -25,6 +25,7 @@ class VideoSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 75,
                 120,
                 144,
+                160,
                 240,
                 360,
                 0,
