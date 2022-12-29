@@ -69,7 +69,7 @@ class TengokuPauseBackground {
     }
     
     fun randomizeSeed() {
-        seed = random.nextInt(100_000_000)
+        seed = random.nextInt(32_000)
     }
     
     fun render(delta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
