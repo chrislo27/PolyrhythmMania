@@ -780,13 +780,13 @@ class StoryPlayScreen(
                     var fillingSoundID = -1L
 
                     this.onStart = {
+                        skippableScoreBarAnimation = this
+                        
                         fillingSoundID = playMenuSound(fillingSound).second
                         showScoreOnScoreCard.set(true)
                     }
                     this.onComplete = {
-                        if (skippableScoreBarAnimation === this) {
-                            skippableScoreBarAnimation = null
-                        }
+                        skippableScoreBarAnimation = null
                         
                         val passed = scoreInt >= contract.minimumScore
 
@@ -803,11 +803,6 @@ class StoryPlayScreen(
                         }
 
                         animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, scoreInt.toFloat(), scoreInt.toFloat(), 0.5f).apply {
-                            this.onStart = {
-                                if (skippableScoreBarAnimation == null) {
-                                    skippableScoreBarAnimation = this
-                                }
-                            }
                             this.onComplete = {
                                 currentScoreCardOptions.set(if (passed) successScoreCardOptions else failScoreCardOptions)
                             }
