@@ -233,9 +233,7 @@ class EngineInputter(val engine: Engine) {
                     Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                 }
 
-                if (!modifiers.endlessScore.enabled.get()) {
-                    (inputResults as MutableList).add(inputResult)
-                }
+                addInputToResults(inputResult)
 
                 val inputFeedbackIndex: Int = getInputFeedbackIndex(inputResult.inputScore, inputResult.accuracySec < 0f)
                 if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
@@ -284,9 +282,7 @@ class EngineInputter(val engine: Engine) {
                         Paintbox.LOGGER.debug("${rod.toString().substringAfter("polyrhythmmania.world.Entity")}: Input ${type}: ${if (differenceSec < 0) "EARLY" else if (differenceSec > 0) "LATE" else "PERFECT"} ${inputResult.inputScore} \t | perfectBeat=$perfectBeats, perfectSec=$perfectSeconds, diffSec=$differenceSec, minmaxSec=[$minSec, $maxSec], actualSec=$atSeconds")
                     }
 
-                    if (!modifiers.endlessScore.enabled.get()) {
-                        (inputResults as MutableList).add(inputResult)
-                    }
+                    addInputToResults(inputResult)
 
                     val inputFeedbackIndex: Int = getInputFeedbackIndex(inputResult.inputScore, inputResult.accuracySec < 0f)
                     if (inputFeedbackIndex in inputFeedbackFlashes.indices) {
@@ -347,7 +343,7 @@ class EngineInputter(val engine: Engine) {
         if (rod.isDefective) {
             return
         }
-        
+
         val inputTracker = rod.inputTracker
 
         val numExpected = inputTracker.expected.count { it is EntityRodPR.ExpectedInput.Expected }
@@ -368,7 +364,7 @@ class EngineInputter(val engine: Engine) {
                 inputCountStats.late += validResults.count { it.inputScore != InputScore.ACE && it.accuracyPercent > 0f }
             }
         } else {
-            (inputResults as MutableList).addAll(validResults)
+            addInputsToResults(validResults)
             (expectedInputsPr as MutableList).addAll(inputTracker.expected.filterIsInstance<EntityRodPR.ExpectedInput.Expected>())
             if (engine.areStatisticsEnabled && !rod.exploded && numExpected > 0 && validResults.size == numExpected) {
                 GlobalStats.rodsFerriedPolyrhythm.increment()
@@ -379,6 +375,18 @@ class EngineInputter(val engine: Engine) {
             if ((rod.exploded && numExpected > 0) || (numExpected > validResults.size) || inputTracker.results.any { inputChallenge.isInputScoreMiss(it.inputScore) }) {
                 missed()
             }
+        }
+    }
+
+    private fun addInputToResults(input: InputResult) {
+        if (!modifiers.endlessScore.enabled.get()) {
+            (inputResults as MutableList).add(input)
+        }
+    }
+
+    private fun addInputsToResults(input: Collection<InputResult>) {
+        if (!modifiers.endlessScore.enabled.get()) {
+            (inputResults as MutableList).addAll(input)
         }
     }
 
@@ -438,7 +446,7 @@ class EngineInputter(val engine: Engine) {
             }
         }
     }
-    
+
     fun computeScore(): ScoreBase {
         val nInputs = max(totalExpectedInputs, minimumInputCount)
         val inputsHit = inputResults.count { it.inputScore != InputScore.MISS }
@@ -447,7 +455,7 @@ class EngineInputter(val engine: Engine) {
                 inputScore.weight
             } / nInputs) * 100
         })
-        
+
         return ScoreBase(rawScore, inputsHit, nInputs, noMiss, if (!skillStarBeat.isFinite()) null else skillStarGotten.get())
     }
 
