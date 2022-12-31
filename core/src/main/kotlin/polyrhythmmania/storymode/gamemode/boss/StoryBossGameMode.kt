@@ -2,14 +2,16 @@ package polyrhythmmania.storymode.gamemode.boss
 
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
-import polyrhythmmania.editor.block.GenericBlock
+import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.gamemodes.GameMode
+import polyrhythmmania.gamemodes.LoopingEvent
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.music.StemCache
 import polyrhythmmania.storymode.music.StoryMusicAssets
+import java.util.*
 
 
 class StoryBossGameMode(main: PRManiaGame)
@@ -18,6 +20,9 @@ class StoryBossGameMode(main: PRManiaGame)
     companion object {
         private const val INTRO_CARD_TIME_SEC: Float = 2.5f // Duration of intro segment
         const val BPM: Float = 186f
+
+        private const val SEGMENT_BEATS_PER_MEASURE: Int = 4
+        private const val SEGMENT_DURATION_MEASURES: Int = 8
 
         fun getFactory(): Contract.GamemodeFactory = object : Contract.GamemodeFactory {
             private var firstCall = true
@@ -48,33 +53,10 @@ class StoryBossGameMode(main: PRManiaGame)
         addInitialBlocks()
     }
 
-    private fun createMusicEvent(stemID: String, beat: Float, measures: Int): BossMusicEvent =
-            BossMusicEvent(engine, stems, stemID, beat, (measures * 4).toFloat())
-
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
-//        blocks += InitializationBlock().apply {
-//            this.beat = 0f
-//        }
-
-        // FIXME debug
-        blocks += GenericBlock(engine) {
-            listOf<Event>(
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_INTRO, 0f, 6),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_A1, 6 * 4f, 8),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_B2, (6 + 1 * 8) * 4f, 8),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_C, (6 + 2 * 8) * 4f, 8),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_B1, (6 + 3 * 8) * 4f, 8),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_B2, (6 + 4 * 8) * 4f, 8),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_D, (6 + 5 * 8) * 4f, 8),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_E1, (6 + 6 * 8) * 4f, 8),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_E2, (6 + 7 * 8) * 4f, 8),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_F, (6 + 8 * 8) * 4f, 8),
-                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_A2, (6 + 9 * 8) * 4f, 8),
-            ).onEach {
-                it.beat = this.beat + it.beat
-            }
-        }.apply {
+        
+        blocks += MusicInitializationBlock().apply {
             this.beat = 0f
         }
 
@@ -91,5 +73,59 @@ class StoryBossGameMode(main: PRManiaGame)
 
     override fun shouldPauseWhileInIntroCardOverride(): Boolean {
         return false
+    }
+
+    // Blocks and events below
+
+    private fun createMusicEvent(stemID: String, beat: Int, measures: Int): BossMusicEvent =
+            BossMusicEvent(engine, stems, stemID, beat.toFloat(), (measures * 4).toFloat())
+
+    private fun createMusicLoopingEvent(offsetBeat: Float): LoopingEvent {
+        val stemIDs = listOf(
+                StoryMusicAssets.STEM_ID_BOSS_1_C,
+                StoryMusicAssets.STEM_ID_BOSS_1_B1,
+                StoryMusicAssets.STEM_ID_BOSS_1_B2,
+                StoryMusicAssets.STEM_ID_BOSS_1_D,
+                StoryMusicAssets.STEM_ID_BOSS_1_E1,
+                StoryMusicAssets.STEM_ID_BOSS_1_E2,
+                StoryMusicAssets.STEM_ID_BOSS_1_F,
+                StoryMusicAssets.STEM_ID_BOSS_1_A2,
+        )
+        val loopDurationBeats = stemIDs.size * SEGMENT_DURATION_MEASURES * SEGMENT_BEATS_PER_MEASURE
+        return LoopingEvent(engine, loopDurationBeats.toFloat(), { engine ->
+            true
+        }) { engine, startBeat ->
+            val events = stemIDs.map { id ->
+                createMusicEvent(id, 0, SEGMENT_DURATION_MEASURES)
+            }
+
+            events.fold(startBeat - offsetBeat) { acc, evt ->
+                evt.beat = acc
+                acc + evt.width
+            }
+
+            engine.addEvents(events)
+        }.apply { 
+            this.beat = offsetBeat
+        }
+    }
+
+    private abstract inner class AbstractBlock : Block(engine, EnumSet.allOf(BlockType::class.java)) {
+        final override fun copy(): Block = throw NotImplementedError()
+    }
+
+    private inner class MusicInitializationBlock : AbstractBlock() {
+        override fun compileIntoEvents(): List<Event> {
+            var startBeat = 0f
+            return listOf(
+                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_INTRO, beat = 0, measures = 6),
+                    createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_A1, beat = 0, measures = SEGMENT_DURATION_MEASURES),
+
+                    createMusicLoopingEvent(-(SEGMENT_BEATS_PER_MEASURE).toFloat())
+            ).onEach { evt ->
+                evt.beat += startBeat
+                startBeat += evt.width
+            }
+        }
     }
 }

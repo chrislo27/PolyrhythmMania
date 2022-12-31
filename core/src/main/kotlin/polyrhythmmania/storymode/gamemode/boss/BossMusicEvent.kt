@@ -28,7 +28,18 @@ class BossMusicEvent(engine: Engine, val stems: StemCache, val stemID: String, b
         } else if (audio == null) {
             Paintbox.LOGGER.warn("BeadsAudio for stem ID $stemID is null")
         } else {
-            val id = engine.soundInterface.playAudio(audio, SoundInterface.SFXType.DYNAMIC_MUSIC)
+            val beatOffset = actualBeat - atBeat
+            val secOffset = engine.tempos.beatsToSeconds(actualBeat) - engine.tempos.beatsToSeconds(atBeat)
+            if (beatOffset > this.width / 2 || secOffset > 2f * engine.playbackSpeed) {
+                // Off by too much
+                return
+            }
+            val id = engine.soundInterface.playAudio(audio, SoundInterface.SFXType.DYNAMIC_MUSIC) { player ->
+                if (secOffset > 0.25f) {
+                    // Adjust player position if off by too much
+                    player.position = secOffset * 1000.0
+                }
+            }
             this.id = id
         }
     }
