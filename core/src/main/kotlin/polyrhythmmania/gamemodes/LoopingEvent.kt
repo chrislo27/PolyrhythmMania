@@ -38,6 +38,6 @@ class LoopingEventBlock(engine: Engine, val duration: Float, val continueLoop: (
     }
 
     override fun copy(): LoopingEventBlock {
-        throw NotImplementedError()
+        return LoopingEventBlock(engine, duration, continueLoop, block)
     }
 }

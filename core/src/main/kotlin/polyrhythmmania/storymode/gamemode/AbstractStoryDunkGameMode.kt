@@ -3,15 +3,13 @@ package polyrhythmmania.storymode.gamemode
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.editor.block.Block
-import polyrhythmmania.editor.block.BlockType
-import polyrhythmmania.engine.Event
+import polyrhythmmania.editor.block.GenericBlock
 import polyrhythmmania.gamemodes.EventDeployRodDunk
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.world.tileset.TilesetPalette
-import java.util.*
 
 
 abstract class AbstractStoryDunkGameMode(
@@ -26,12 +24,8 @@ abstract class AbstractStoryDunkGameMode(
     }
     
     protected open fun newDunkPattern(startBeat: Float): Block {
-        return object : Block(engine, EnumSet.noneOf(BlockType::class.java)) {
-            override fun compileIntoEvents(): List<Event> {
-                return listOf(EventDeployRodDunk(this.engine, this.beat))
-            }
-
-            override fun copy(): Block = throw NotImplementedError()
+        return GenericBlock(engine) {
+            listOf(EventDeployRodDunk(this.engine, this.beat))
         }.apply { 
             this.beat = startBeat - 2
         }
