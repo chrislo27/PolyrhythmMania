@@ -18,17 +18,17 @@ import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.music.StemCache
 import polyrhythmmania.storymode.music.StoryMusicAssets
-import polyrhythmmania.world.EntityRodPR
-import polyrhythmmania.world.EventDeployRod
-import polyrhythmmania.world.EventMoveCameraRelative
-import polyrhythmmania.world.EventRowBlockDespawn
+import polyrhythmmania.world.*
+import polyrhythmmania.world.entity.Entity
+import polyrhythmmania.world.entity.EntityCube
+import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.tileset.PaletteTransition
 import polyrhythmmania.world.tileset.TransitionCurve
 import java.util.*
 
 
 class StoryBossGameMode(main: PRManiaGame)
-    : AbstractStoryGameMode(main) {
+    : AbstractStoryGameMode(main), World.WorldResetListener {
 
     companion object {
         private const val INTRO_CARD_TIME_SEC: Float = 2.5f // Duration of intro segment
@@ -63,6 +63,10 @@ class StoryBossGameMode(main: PRManiaGame)
     private val checkForRodsThatCollidedWithBossRunnable = CheckForRodsThatCollidedWithBossRunnable()
     
     init {
+        world.worldMode = WorldMode(WorldType.Polyrhythm())
+        world.showInputFeedback = true
+        world.worldResetListeners += this as World.WorldResetListener
+        
         engine.postRunnable(checkForRodsThatCollidedWithBossRunnable)
     }
 
@@ -71,13 +75,28 @@ class StoryBossGameMode(main: PRManiaGame)
         addInitialBlocks()
     }
 
+    override fun onWorldReset(world: World) {
+        val list = mutableListOf<Entity>()
+        // This part is necessary for the story mode boss level (zooms way out) 
+        for (x in 9..13) {
+            for (z in -11 downTo -13) {
+                val ent: Entity = EntityCube(world, false)
+                list += ent.apply {
+                    this.position.set(x.toFloat(), 3f, z.toFloat())
+                }
+            }
+        }
+        
+        list.forEach(world::addEntity)
+    }
+
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
 
         val zoomTransition = PaletteTransition.DEFAULT.copy(duration = 4f, transitionCurve = TransitionCurve.SMOOTHER)
         blocks += BlockZoom(engine).apply {
             this.startZoom.set(1f)    
-            this.endZoom.set(1.3f * 3 / 3)
+            this.endZoom.set(1.3f)
             this.transitionData.paletteTransition.set(zoomTransition)
             this.beat = 0f
         }
@@ -94,10 +113,12 @@ class StoryBossGameMode(main: PRManiaGame)
         container.addBlocks(blocks)
     }
     
+    
+    
     private fun checkForRodsThatCollidedWithBoss() {
         val blocksAheadOfStart = 11.125f
-        val rods = world.entities.filterAndIsInstance<EntityRodPR> { 
-            it.position.x > (it.row.startX + blocksAheadOfStart)
+        val rods = world.entities.filterAndIsInstance<EntityRodPR> { rod ->
+            !rod.exploded && rod.position.x > (rod.row.startX + blocksAheadOfStart)
         }
         rods.forEach { rod ->
             rod.explode(engine, shouldCountAsMiss = false)
@@ -130,7 +151,7 @@ class StoryBossGameMode(main: PRManiaGame)
     }
 
     override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(reducedMotion = false)
+        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, reducedMotion = false)
     }
 
     //endregion
@@ -169,6 +190,9 @@ class StoryBossGameMode(main: PRManiaGame)
             this.beat = offsetBeat
         }
     }
+    
+    private fun createRowBlockDespawnEvents(row: Row, startBeat: Float): List<EventRowBlockDespawn> =
+            (0 until 10).map { idx -> EventRowBlockDespawn(engine, row, idx, startBeat, affectThisIndexAndForward = false) }
 
     private fun createRandomPatternLoopingEvent(offsetBeat: Float): LoopingEvent {
         val patternDuration = 8f
@@ -182,13 +206,16 @@ class StoryBossGameMode(main: PRManiaGame)
             
             val anyA = pattern.rowA.row.isNotEmpty()
             val anyDpad = pattern.rowDpad.row.isNotEmpty()
+            val despawnStartBeat = patternStart + patternDuration - 0.25f
             if (anyA) {
                 engine.addEvent(EventDeployRod(engine, world.rowA, patternStart))
-                engine.addEvent(EventRowBlockDespawn(engine, world.rowA, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))
+//                engine.addEvents(createRowBlockDespawnEvents(world.rowA, despawnStartBeat))
+                engine.addEvent(EventRowBlockDespawn(engine, world.rowA, 0, despawnStartBeat, affectThisIndexAndForward = true))
             }
             if (anyDpad) {
                 engine.addEvent(EventDeployRod(engine, world.rowDpad, patternStart))
-                engine.addEvent(EventRowBlockDespawn(engine, world.rowDpad, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))
+//                engine.addEvents(createRowBlockDespawnEvents(world.rowDpad, despawnStartBeat))
+                engine.addEvent(EventRowBlockDespawn(engine, world.rowDpad, 0, despawnStartBeat, affectThisIndexAndForward = true))
             }
             
             engine.addEvent(ClearInputsEvent(engine, patternDuration).apply { 

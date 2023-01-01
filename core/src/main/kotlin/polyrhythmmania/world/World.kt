@@ -133,14 +133,16 @@ class World {
         fun getNewEntities(): List<Entity> {
             val list = mutableListOf<Entity>()
             
+            fun showRedLine(x: Int): Boolean = x == 4
+            
             // Main floor
             for (x in -3..20) {
                 for (z in -6 until 3) {
-                    val ent: Entity = if (z == 0 || z == -3) {
-                        EntityPlatform(this, x == 4)
-                    } else if (z == 1 || z == -2) {
-                        EntityCube(this, withBorder = true, withLine = x == 4)
-                    } else EntityCube(this, x == 4)
+                    val ent: Entity = when (z) {
+                        0, -3 -> EntityPlatform(this, false)
+                        1, -2 -> EntityCube(this, withBorder = true, withLine = showRedLine(x))
+                        else -> EntityCube(this, showRedLine(x))
+                    }
                     list += ent.apply {
                         this.position.set(x.toFloat(), 1f, z.toFloat())
                     }
@@ -150,7 +152,7 @@ class World {
             // Raised platforms at beginning
             for (x in -3..4) {
                 for (zMul in 0..1) {
-                    val ent: Entity = EntityPlatform(this, x == 4)
+                    val ent: Entity = EntityPlatform(this, showRedLine(x))
                     list += ent.apply {
                         this.position.set(x.toFloat(), 2f, zMul * -3f)
                     }
@@ -160,7 +162,7 @@ class World {
             // Bottom floor
             for (x in -3..20) {
                 for (z in 3..9) {
-                    val ent: Entity = EntityCube(this, x == 4)
+                    val ent: Entity = EntityCube(this, showRedLine(x))
                     list += ent.apply {
                         this.position.set(x.toFloat(), 0f, z.toFloat())
                     }
@@ -170,18 +172,9 @@ class World {
             // Upper steps
             for (x in -3..20) {
                 for (z in -7 downTo -11) {
-                    val ent: Entity = EntityCube(this, x == 4)
+                    val ent: Entity = EntityCube(this, showRedLine(x))
                     list += ent.apply {
                         this.position.set(x.toFloat(), if (z == -7) 2f else 3f, z.toFloat())
-                    }
-                }
-            }
-            // This part is necessary for the story mode boss level (zooms way out) 
-            for (x in 9..13) {
-                for (z in -11 downTo -13) {
-                    val ent: Entity = EntityCube(this, false)
-                    list += ent.apply {
-                        this.position.set(x.toFloat(), 3f, z.toFloat())
                     }
                 }
             }
