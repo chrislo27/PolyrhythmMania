@@ -138,10 +138,25 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         this.world.worldResetListeners += this as World.WorldResetListener
     }
 
-    override fun onWorldReset(world: World) {
-        val cam = camera
+    open fun setupCameraWithDefaultValues(cam: OrthographicCamera) {
         cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0f) // Ignore zoom value
         cam.zoom = 1f
+
+        cam.update()
+    }
+    
+    open fun cameraRenderUpdate(camera: OrthographicCamera) {
+        if (world.worldMode.worldType == WorldType.Dunk) {
+            camera.position.x = camera.zoom * camera.viewportWidth / 2f
+            camera.position.y = camera.zoom * camera.viewportHeight / 2f
+            camera.position.x -= 2f
+            camera.position.y += 0.125f
+        }
+    }
+
+    override fun onWorldReset(world: World) {
+        val cam = camera
+        setupCameraWithDefaultValues(cam)
         cam.update()
     }
     
@@ -154,13 +169,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         frameBufferManager.frameUpdate()
         
         val camera = this.camera
-        // TODO better camera controls and refactoring
-        if (world.worldMode.worldType == WorldType.Dunk) {
-            camera.position.x = camera.zoom * camera.viewportWidth / 2f
-            camera.position.y = camera.zoom * camera.viewportHeight / 2f
-            camera.position.x -= 2f
-            camera.position.y += 0.125f
-        }
+        cameraRenderUpdate(camera)
         camera.update()
         
         val mainFb: NestedFrameBuffer? = if (shouldUseMainFb()) this.mainFrameBuffer else null
