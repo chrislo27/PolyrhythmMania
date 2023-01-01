@@ -3,7 +3,9 @@ package polyrhythmmania.world
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector3
 import paintbox.binding.BooleanVar
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
@@ -356,8 +358,6 @@ class EventZoomCamera(
         this.beat = startBeat
         this.width = transition.duration
     }
-    
-    
 
     override fun onStartContainer(container: Container, currentBeat: Float) {
         super.onStartContainer(container, currentBeat)
@@ -374,6 +374,56 @@ class EventZoomCamera(
         if (!container.globalSettings.reducedMotion) {
             val percentage = this.transition.translatePercentage(getBeatPercentage(currentBeat)).coerceIn(0f, 1f)
             this.camera.zoom = MathUtils.lerp(this.startZoom, this.endZoom, percentage)
+        }
+    }
+}
+
+
+class EventMoveCameraRelative(
+        engine: Engine, startBeat: Float, val transition: PaletteTransition,
+        val endPosRelative: Vector3
+) : Event(engine) {
+
+    private lateinit var camera: OrthographicCamera
+    private val originalCameraPos: Vector3 = Vector3()
+
+    // These don't use Vector3Stack due to threading issues with the ResourceStack
+    private val tmpVec1: Vector3 = Vector3()
+    private val tmpVec2: Vector3 = Vector3()
+
+    init {
+        this.beat = startBeat
+        this.width = transition.duration
+    }
+
+    override fun onStartContainer(container: Container, currentBeat: Float) {
+        super.onStartContainer(container, currentBeat)
+
+        this.camera = container.renderer.camera
+
+        if (!container.globalSettings.reducedMotion) {
+            this.originalCameraPos.set(Vector3(camera.viewportWidth / 2, camera.viewportHeight / 2, camera.position.z))
+        }
+    }
+
+    override fun onUpdateContainer(container: Container, currentBeat: Float) {
+        super.onUpdateContainer(container, currentBeat)
+
+        if (!container.globalSettings.reducedMotion) {
+            val progress = ((currentBeat - this.beat) / width.coerceAtLeast(0.1f)).coerceIn(0f, 1f)
+            val interpolated = Interpolation.smooth2.apply(progress)
+
+            val tmpVecPos = tmpVec1.set(originalCameraPos)
+                    .lerp(tmpVec2.set(originalCameraPos).add(endPosRelative), interpolated)
+            camera.position.set(tmpVecPos)
+        }
+    }
+
+    override fun onEndContainer(container: Container, currentBeat: Float) {
+        super.onEndContainer(container, currentBeat)
+
+        if (!container.globalSettings.reducedMotion) {
+            camera.position.set(originalCameraPos).add(endPosRelative)
         }
     }
 }
