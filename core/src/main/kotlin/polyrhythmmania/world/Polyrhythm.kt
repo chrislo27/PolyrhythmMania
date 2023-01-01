@@ -297,7 +297,7 @@ class EntityRodPR private constructor(
         return index / this.xUnitsPerBeat + this.deployBeat + 4f
     }
 
-    fun explode(engine: Engine) {
+    fun explode(engine: Engine, shouldCountAsMiss: Boolean) {
         if (isKilled || exploded) return
         
         val inputter = engine.inputter
@@ -308,7 +308,9 @@ class EntityRodPR private constructor(
         })
         playSfxExplosion(engine)
         
-        registerMiss(inputter)
+        if (shouldCountAsMiss) {
+            registerMiss(inputter)
+        }
 
         if (engine.areStatisticsEnabled) {
             GlobalStats.rodsExploded.increment()
@@ -423,7 +425,7 @@ class EntityRodPR private constructor(
         this.visualPosition.z = this.position.z
         
         if (seconds >= explodeAtSec && !exploded) {
-            explode(engine)
+            explode(engine, true)
         } else if ((beat - deployBeat) >= killAfterBeats && !isKilled) {
             kill()
         }
