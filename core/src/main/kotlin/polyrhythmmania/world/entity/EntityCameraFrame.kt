@@ -11,21 +11,23 @@ import polyrhythmmania.world.tileset.Tileset
 
 
 /**
- * Debug entity that shows the normal zoom frame.
+ * Debug entity that shows the normal zoom frame. Zoom can be changed by editing [zoom].
  */
 class EntityCameraFrame(world: World, color: Color, val lockToCamera: Boolean = false) : SimpleRenderedEntity(world) {
 
     private val color: Color = color.cpy()
     
-    override val renderHeight: Float = 5f
-    override val renderWidth: Float get() = renderHeight * (16f / 9)
+    var zoom: Float = 1f
+    
+    override val renderHeight: Float = 5f * zoom
+    override val renderWidth: Float get() = renderHeight * (16f / 9) * zoom
 
     override val renderSortOffsetZ: Float get() = if (lockToCamera) 9999f else 9000f
 
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val camera = renderer.camera
-        val camW = camera.viewportWidth
-        val camH = camera.viewportHeight
+        val camW = camera.viewportWidth * zoom
+        val camH = camera.viewportHeight * zoom
 
         val renderX = if (lockToCamera) camera.position.x - camW / 2 else vec.x
         val renderY = if (lockToCamera) camera.position.y - camH / 2 else vec.y
