@@ -141,17 +141,18 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     open fun setupCameraWithDefaultValues(cam: OrthographicCamera) {
         cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0f) // Ignore zoom value
         cam.zoom = 1f
+        
+        if (world.worldMode.worldType == WorldType.Dunk) {
+            cam.position.x = cam.zoom * cam.viewportWidth / 2f
+            cam.position.y = cam.zoom * cam.viewportHeight / 2f
+            cam.position.x -= 2f
+            cam.position.y += 0.125f
+        }
 
         cam.update()
     }
     
     open fun cameraRenderUpdate(camera: OrthographicCamera) {
-        if (world.worldMode.worldType == WorldType.Dunk) {
-            camera.position.x = camera.zoom * camera.viewportWidth / 2f
-            camera.position.y = camera.zoom * camera.viewportHeight / 2f
-            camera.position.x -= 2f
-            camera.position.y += 0.125f
-        }
     }
 
     override fun onWorldReset(world: World) {
