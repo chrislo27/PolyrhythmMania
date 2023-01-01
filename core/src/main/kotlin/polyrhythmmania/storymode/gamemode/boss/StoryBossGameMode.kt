@@ -1,8 +1,13 @@
 package polyrhythmmania.storymode.gamemode.boss
 
+import com.badlogic.gdx.math.Vector3
+import paintbox.util.filterAndIsInstance
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
+import polyrhythmmania.editor.block.BlockZoom
+import polyrhythmmania.editor.block.GenericBlock
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.tempo.TempoChange
@@ -13,8 +18,12 @@ import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.music.StemCache
 import polyrhythmmania.storymode.music.StoryMusicAssets
+import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.EventDeployRod
+import polyrhythmmania.world.EventMoveCameraRelative
 import polyrhythmmania.world.EventRowBlockDespawn
+import polyrhythmmania.world.tileset.PaletteTransition
+import polyrhythmmania.world.tileset.TransitionCurve
 import java.util.*
 
 
@@ -51,6 +60,11 @@ class StoryBossGameMode(main: PRManiaGame)
     }
 
     private val stems: StemCache = StoryMusicAssets.bossStems
+    private val checkForRodsThatCollidedWithBossRunnable = CheckForRodsThatCollidedWithBossRunnable()
+    
+    init {
+        engine.postRunnable(checkForRodsThatCollidedWithBossRunnable)
+    }
 
     override fun initialize() {
         engine.tempos.addTempoChange(TempoChange(0f, BPM))
@@ -60,12 +74,48 @@ class StoryBossGameMode(main: PRManiaGame)
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
 
+        val zoomTransition = PaletteTransition.DEFAULT.copy(duration = 4f, transitionCurve = TransitionCurve.SMOOTHER)
+        blocks += BlockZoom(engine).apply {
+            this.startZoom.set(1f)    
+            this.endZoom.set(1.3f * 3 / 3)
+            this.transitionData.paletteTransition.set(zoomTransition)
+            this.beat = 0f
+        }
+        blocks += GenericBlock(engine) {
+            listOf(EventMoveCameraRelative(engine, this.beat, zoomTransition, Vector3(1f, 1f, 0f)))
+        }.apply { 
+            this.beat = 0f
+        }
+        
         blocks += MusicInitializationBlock().apply {
             this.beat = 0f
         }
 
         container.addBlocks(blocks)
     }
+    
+    private fun checkForRodsThatCollidedWithBoss() {
+        val blocksAheadOfStart = 11.125f
+        val rods = world.entities.filterAndIsInstance<EntityRodPR> { 
+            it.position.x > (it.row.startX + blocksAheadOfStart)
+        }
+        rods.forEach { rod ->
+            rod.explode(engine, shouldCountAsMiss = false)
+        }
+    }
+    
+    private inner class CheckForRodsThatCollidedWithBossRunnable : Runnable {
+        var cancel: Boolean = false
+        
+        override fun run() {
+            checkForRodsThatCollidedWithBoss()
+            if (!cancel) {
+                engine.postRunnable(this)
+            }
+        }
+    }
+    
+    //region GameMode overrides
 
     override fun getIntroCardTimeOverride(): Float {
         return INTRO_CARD_TIME_SEC
@@ -79,7 +129,13 @@ class StoryBossGameMode(main: PRManiaGame)
         return false
     }
 
-    // Blocks and events below
+    override fun createGlobalContainerSettings(): GlobalContainerSettings {
+        return super.createGlobalContainerSettings().copy(reducedMotion = false)
+    }
+
+    //endregion
+
+    //region Blocks and events
 
     private fun createMusicEvent(stemID: String, beat: Int, measures: Int): BossMusicEvent =
             BossMusicEvent(engine, stems, stemID, beat.toFloat(), (measures * 4).toFloat())
@@ -171,4 +227,6 @@ class StoryBossGameMode(main: PRManiaGame)
             )
         }
     }
+
+    //endregion
 }

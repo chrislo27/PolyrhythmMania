@@ -176,6 +176,15 @@ class World {
                     }
                 }
             }
+            // This part is necessary for the story mode boss level (zooms way out) 
+            for (x in 9..13) {
+                for (z in -11 downTo -13) {
+                    val ent: Entity = EntityCube(this, false)
+                    list += ent.apply {
+                        this.position.set(x.toFloat(), 3f, z.toFloat())
+                    }
+                }
+            }
 
             // Button signs
             val signs = mutableListOf<EntitySign>()
