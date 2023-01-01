@@ -228,10 +228,10 @@ class Engine(timingProvider: TimingProvider,
         val currentSeconds = this.seconds
         val currentBeat = this.beat
         
-        if (queuedRunnables.isNotEmpty()) {
-            val toList = queuedRunnables.toList()
-            toList.forEach { it.run() }
+        val runnablesToRun = queuedRunnables.toList()
+        if (runnablesToRun.isNotEmpty()) {
             queuedRunnables.clear()
+            runnablesToRun.forEach(Runnable::run)
         }
 
         soundInterface.update(delta)
