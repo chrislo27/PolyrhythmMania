@@ -315,9 +315,6 @@ class EntityRodPR private constructor(
         if (engine.areStatisticsEnabled) {
             GlobalStats.rodsExploded.increment()
             GlobalStats.rodsExplodedPolyrhythm.increment()
-            if (this.isDefective) {
-                GlobalStats.defectiveRodsExploded.increment()
-            }
         }
         
         val endlessScore = engine.modifiers.endlessScore
