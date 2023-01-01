@@ -3,14 +3,18 @@ package polyrhythmmania.storymode.gamemode.boss
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
+import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.LoopingEvent
+import polyrhythmmania.gamemodes.endlessmode.EndlessPatterns
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.music.StemCache
 import polyrhythmmania.storymode.music.StoryMusicAssets
+import polyrhythmmania.world.EventDeployRod
+import polyrhythmmania.world.EventRowBlockDespawn
 import java.util.*
 
 
@@ -55,7 +59,7 @@ class StoryBossGameMode(main: PRManiaGame)
 
     private fun addInitialBlocks() {
         val blocks = mutableListOf<Block>()
-        
+
         blocks += MusicInitializationBlock().apply {
             this.beat = 0f
         }
@@ -105,8 +109,43 @@ class StoryBossGameMode(main: PRManiaGame)
             }
 
             engine.addEvents(events)
-        }.apply { 
+        }.apply {
             this.beat = offsetBeat
+        }
+    }
+
+    private fun createRandomPatternLoopingEvent(offsetBeat: Float): LoopingEvent {
+        val patternDuration = 8f
+        return LoopingEvent(engine, patternDuration, { engine ->
+            true
+        }) { engine, startBeat ->
+            val pattern = EndlessPatterns.allPatterns.random()
+            val patternStart = startBeat - offsetBeat
+            
+            engine.addEvents(pattern.toEvents(engine, patternStart))
+            
+            val anyA = pattern.rowA.row.isNotEmpty()
+            val anyDpad = pattern.rowDpad.row.isNotEmpty()
+            if (anyA) {
+                engine.addEvent(EventDeployRod(engine, world.rowA, patternStart))
+                engine.addEvent(EventRowBlockDespawn(engine, world.rowA, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))
+            }
+            if (anyDpad) {
+                engine.addEvent(EventDeployRod(engine, world.rowDpad, patternStart))
+                engine.addEvent(EventRowBlockDespawn(engine, world.rowDpad, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))
+            }
+            
+            engine.addEvent(ClearInputsEvent(engine, patternDuration).apply { 
+                this.beat = patternStart
+            })
+        }.apply {
+            this.beat = offsetBeat
+        }
+    }
+    
+    private class ClearInputsEvent(engine: Engine, val patternDuration: Float) : Event(engine) {
+        override fun onStart(currentBeat: Float) {
+            engine.inputter.clearInputs(this.beat - patternDuration)
         }
     }
 
@@ -121,11 +160,15 @@ class StoryBossGameMode(main: PRManiaGame)
                     createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_INTRO, beat = 0, measures = 6),
                     createMusicEvent(StoryMusicAssets.STEM_ID_BOSS_1_A1, beat = 0, measures = SEGMENT_DURATION_MEASURES),
 
-                    createMusicLoopingEvent(-(SEGMENT_BEATS_PER_MEASURE).toFloat())
+                    createMusicLoopingEvent(-(SEGMENT_BEATS_PER_MEASURE).toFloat()),
             ).onEach { evt ->
                 evt.beat += startBeat
                 startBeat += evt.width
-            }
+            } + listOf(
+                    createRandomPatternLoopingEvent(-2f).apply {
+                        this.beat += 8f
+                    }
+            )
         }
     }
 }
