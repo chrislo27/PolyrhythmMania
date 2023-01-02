@@ -7,7 +7,7 @@ import polyrhythmmania.engine.input.InputterListener
 
 
 class EngineModifiers(val engine: Engine) : InputterListener {
-    
+
     private val inputter: EngineInputter = engine.inputter
 
     val perfectChallenge: PerfectChallengeData = PerfectChallengeData(this)
@@ -15,13 +15,21 @@ class EngineModifiers(val engine: Engine) : InputterListener {
     val livesMode: LivesMode = LivesMode(this)
     val defectiveRodsMode: DefectiveRodsMode = DefectiveRodsMode(this)
     val monsterGoal: MonsterGoalData = MonsterGoalData(this)
-    
-    private val allModules: List<ModifierModule> = listOf(perfectChallenge, endlessScore, livesMode, defectiveRodsMode, monsterGoal)
+
+    private val allModules: MutableList<ModifierModule> = mutableListOf(perfectChallenge, endlessScore, livesMode, defectiveRodsMode, monsterGoal)
 
     init {
         inputter.inputterListeners += this
     }
-    
+
+    fun addModifierModule(module: ModifierModule) {
+        allModules += module
+    }
+
+    fun removeModifierModule(module: ModifierModule) {
+        allModules -= module
+    }
+
     fun resetState() {
         allModules.forEach(ModifierModule::resetState)
     }
@@ -32,9 +40,9 @@ class EngineModifiers(val engine: Engine) : InputterListener {
         }
     }
 
-    
-    // InputterListener overrides
-    
+
+    //region InputterListener overrides
+
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
         allModules.forEach { it.onMissed(inputter, firstMiss) }
     }
@@ -46,4 +54,6 @@ class EngineModifiers(val engine: Engine) : InputterListener {
     override fun onSkillStarHit(beat: Float) {
         allModules.forEach { it.onSkillStarHit(beat) }
     }
+
+    //endregion
 }
