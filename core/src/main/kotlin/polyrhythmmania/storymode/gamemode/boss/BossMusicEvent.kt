@@ -1,13 +1,14 @@
 package polyrhythmmania.storymode.gamemode.boss
 
 import paintbox.Paintbox
+import polyrhythmmania.engine.AudioEvent
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.storymode.music.Stem
 import polyrhythmmania.storymode.music.StemCache
 
 
-class BossMusicEvent(engine: Engine, val stems: StemCache, val stemID: String, beat: Float, duration: Float) : BossAudioEvent(engine) {
+class BossMusicEvent(engine: Engine, val stems: StemCache, val stemID: String, beat: Float, duration: Float) : AudioEvent(engine) {
 
     private val stem: Stem? get() = stems.getOrLoad(stemID)?.takeIf { it.isSampleAccessible.get() }
     private var id: Long = -1L
