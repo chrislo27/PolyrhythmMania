@@ -4,6 +4,7 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputterListener
+import polyrhythmmania.world.EntityRodPR
 
 
 class EngineModifiers(val engine: Engine) : InputterListener {
@@ -29,6 +30,11 @@ class EngineModifiers(val engine: Engine) : InputterListener {
     fun removeModifierModule(module: ModifierModule) {
         allModules -= module
     }
+    
+    fun getAllModifierModules(): List<ModifierModule> = allModules
+    
+    inline fun <reified M : ModifierModule> getModifierModuleByType(): M? =
+            getAllModifierModules().find { it is M } as? M
 
     fun resetState() {
         allModules.forEach(ModifierModule::resetState)
@@ -53,6 +59,10 @@ class EngineModifiers(val engine: Engine) : InputterListener {
 
     override fun onSkillStarHit(beat: Float) {
         allModules.forEach { it.onSkillStarHit(beat) }
+    }
+
+    override fun onRodPRExploded(rod: EntityRodPR, inputter: EngineInputter, countedAsMiss: Boolean) {
+        allModules.forEach { it.onRodPRExploded(rod, inputter, countedAsMiss) }
     }
 
     //endregion

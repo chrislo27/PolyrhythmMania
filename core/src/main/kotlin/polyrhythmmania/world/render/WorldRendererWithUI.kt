@@ -1069,7 +1069,7 @@ duration: ${monster.activeDuration.get()} sec
                             sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(silhouetteTime)
                             shakeTime.set(1f)
                         }
-                    } else if (l >= lifeNum) {
+                    } else {
                         if (alreadyBroken) {
                             alreadyBroken = false
                             sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, 1f, 1f, 0f), silhouetteTime)
@@ -1223,7 +1223,7 @@ duration: ${monster.activeDuration.get()} sec
                             sceneRoot.getOrCompute()?.animations?.cancelAnimationFor(silhouetteTime)
                             shakeTime.set(1f)
                         }
-                    } else if (l >= lifeNum) {
+                    } else {
                         if (alreadyBroken) {
                             alreadyBroken = false
                             sceneRoot.getOrCompute()?.animations?.enqueueAnimation(Animation(Interpolation.linear, 1f, 1f, 0f), silhouetteTime)

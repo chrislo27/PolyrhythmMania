@@ -5,6 +5,7 @@ import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.input.InputResult
 import polyrhythmmania.engine.input.InputterListener
+import polyrhythmmania.world.EntityRodPR
 
 
 /**
@@ -36,5 +37,8 @@ abstract class ModifierModule(val parent: EngineModifiers) : InputterListener {
     }
 
     override fun onSkillStarHit(beat: Float) {
+    }
+
+    override fun onRodPRExploded(rod: EntityRodPR, inputter: EngineInputter, countedAsMiss: Boolean) {
     }
 }

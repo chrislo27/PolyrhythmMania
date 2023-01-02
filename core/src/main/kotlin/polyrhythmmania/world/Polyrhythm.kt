@@ -317,21 +317,7 @@ class EntityRodPR private constructor(
             GlobalStats.rodsExplodedPolyrhythm.increment()
         }
         
-        val endlessScore = engine.modifiers.endlessScore
-        if (endlessScore.enabled.get()) {
-            val lifeLostVar = this.lifeLost
-            if (lifeLostVar != null && shouldCountAsMiss) {
-                if (!lifeLostVar.get()) {
-                    lifeLostVar.set(true)
-                    
-                    val oldLives = endlessScore.lives.get()
-                    endlessScore.triggerEndlessLifeLost(inputter) // This intentionally does not normally automatically trigger in EndlessScore
-                    if (engine.areStatisticsEnabled && endlessScore.lives.get() < oldLives) {
-                        GlobalStats.livesLostEndless.increment()
-                    }
-                }
-            }
-        }
+        engine.modifiers.onRodPRExploded(this, inputter, shouldCountAsMiss)
 
         if (this.isDefective) {
             if (!this.defectiveRodEscaped) {

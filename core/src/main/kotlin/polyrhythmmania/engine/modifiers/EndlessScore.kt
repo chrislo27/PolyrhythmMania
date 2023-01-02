@@ -8,6 +8,8 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.gamemodes.ChangeMusicVolMultiplierEvent
+import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.EventEndState
 import polyrhythmmania.world.WorldType
 
@@ -46,7 +48,21 @@ class EndlessScore(parent: EngineModifiers) : ModifierModule(parent) {
 
     override fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
     }
-    
+
+    override fun onRodPRExploded(rod: EntityRodPR, inputter: EngineInputter, countedAsMiss: Boolean) {
+        val lifeLostVar = rod.lifeLost
+        if (lifeLostVar != null && countedAsMiss) {
+            if (!lifeLostVar.get()) {
+                lifeLostVar.set(true)
+
+                val oldLives = this.lives.get()
+                this.triggerEndlessLifeLost(inputter)
+                if (engine.areStatisticsEnabled && this.lives.get() < oldLives) {
+                    GlobalStats.livesLostEndless.increment()
+                }
+            }
+        }
+    }
 
     /**
      * Triggers a life to be lost.
