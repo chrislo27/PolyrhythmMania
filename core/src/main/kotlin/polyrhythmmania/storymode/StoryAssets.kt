@@ -69,6 +69,12 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_inboxitem_cleared", "story/textures/desk/inboxitem/cleared.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_skipped", "story/textures/desk/inboxitem/skipped.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_off", "story/textures/desk/inboxitem/led_off.png")
+        StoryAssets.loadAsset<Texture>("desk_inboxitem_signed_blue", "story/textures/desk/inboxitem/employment_contract/signed_blue.png")
+        StoryAssets.loadAsset<Texture>("desk_inboxitem_signed_green", "story/textures/desk/inboxitem/employment_contract/signed_green.png")
+        StoryAssets.loadAsset<Texture>("desk_inboxitem_signed_red", "story/textures/desk/inboxitem/employment_contract/signed_red.png")
+        StoryAssets.loadAsset<Texture>("desk_inboxitem_unsigned_blue", "story/textures/desk/inboxitem/employment_contract/unsigned_blue.png")
+        StoryAssets.loadAsset<Texture>("desk_inboxitem_unsigned_green", "story/textures/desk/inboxitem/employment_contract/unsigned_green.png")
+        StoryAssets.loadAsset<Texture>("desk_inboxitem_unsigned_red", "story/textures/desk/inboxitem/employment_contract/unsigned_red.png")
         
         StoryAssets.loadAsset<Texture>("dunk_background_fruit_basket_1", "story/textures/world/dunk/fruit_basket_1.jpg", linearTexture())
         StoryAssets.loadAsset<Texture>("dunk_background_fruit_basket_2", "story/textures/world/dunk/fruit_basket_2.jpg", linearTexture())
