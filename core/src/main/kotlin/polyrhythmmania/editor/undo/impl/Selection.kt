@@ -10,15 +10,13 @@ class SelectionAction(val previousSelection: Set<Block>, val newSelection: Set<B
     : ReversibleAction<Editor> {
     
     override fun redo(context: Editor) {
-        val selection = context.selectedBlocks as MutableMap
-        selection.clear()
-        newSelection.forEach { selection[it] = true }
+        context.clearBlockSelection()
+        newSelection.forEach(context::addBlockSelection)
     }
 
     override fun undo(context: Editor) {
-        val selection = context.selectedBlocks as MutableMap
-        selection.clear()
-        previousSelection.forEach { selection[it] = true }
+        context.clearBlockSelection()
+        previousSelection.forEach(context::addBlockSelection)
     }
 }
 

@@ -190,7 +190,7 @@ class Editor(
     val engineBeat: FloatVar = FloatVar(engine.beat)
 
     /**
-     * Call Var<Boolean>.invert() to force the status to be updated. Used when an undo or redo takes place.
+     * Call BooleanVar.invert() to force the status to be updated. Used when an undo or redo takes place.
      */
     private val forceUpdateStatus: BooleanVar = BooleanVar(false)
     val editorPane: EditorPane
@@ -546,6 +546,13 @@ class Editor(
         }
     }
 
+    fun attemptSelectRange(range: SelectionRange) {
+        if (allowedToEdit.get() && tool.getOrCompute() == Tool.SELECTION) {
+            val currentSelection = selectedBlocks
+            forceUpdateStatus.invert()
+        }
+    }
+
     fun attemptOpenSettingsDialog() {
         if (allowedToEdit.get()) {
             editorPane.openDialog(editorPane.editorSettingsDialog)
@@ -819,7 +826,7 @@ class Editor(
 
     fun removeBlock(block: Block) {
         container.removeBlock(block)
-        (this.selectedBlocks as MutableMap).remove(block)
+        removeBlockSelection(block)
         if (block.ownedContextMenu != null) {
             if (sceneRoot.isContextMenuActive())
                 sceneRoot.hideRootContextMenu()
@@ -829,15 +836,26 @@ class Editor(
 
     fun removeBlocks(blocksToAdd: List<Block>) {
         container.removeBlocks(blocksToAdd)
-        this.selectedBlocks as MutableMap
         blocksToAdd.forEach { block ->
-            this.selectedBlocks.remove(block)
+            removeBlockSelection(block)
             if (block.ownedContextMenu != null) {
                 if (sceneRoot.isContextMenuActive())
                     sceneRoot.hideRootContextMenu()
                 block.ownedContextMenu = null
             }
         }
+    }
+    
+    fun addBlockSelection(blockToSelect: Block) {
+        (selectedBlocks as MutableMap)[blockToSelect] = true
+    }
+    
+    fun removeBlockSelection(blockToDeselect: Block) {
+        (selectedBlocks as MutableMap).remove(blockToDeselect)
+    }
+    
+    fun clearBlockSelection() {
+        (selectedBlocks as MutableMap).clear()
     }
 
     private fun bindStatusBar(msg: Var<String>) {
@@ -1421,4 +1439,8 @@ ${renderer.getDebugString()}
     }
 
     data class BeatLines(var active: Boolean = false, var fromBeat: Int = 0, var toBeat: Int = 0)
+    
+    enum class SelectionRange {
+        ALL, LEFT_OF_PLAYBACK, RIGHT_OF_PLAYBACK,
+    }
 }
