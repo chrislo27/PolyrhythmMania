@@ -8,6 +8,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.gamemodes.ChangeMusicVolMultiplierEvent
+import polyrhythmmania.gamemodes.endlessmode.EntityRodPREndless
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.EventEndState
@@ -15,7 +16,7 @@ import polyrhythmmania.world.WorldType
 
 /**
  * Designed for Endless Mode/Daily Challenge.
- * 
+ *
  * Not compatible with [LivesMode].
  */
 class EndlessScore(parent: EngineModifiers) : ModifierModule(parent) {
@@ -24,9 +25,10 @@ class EndlessScore(parent: EngineModifiers) : ModifierModule(parent) {
     var showNewHighScoreAtEnd: Boolean = true // Hidden for something like Daily Challenge
     var hideHighScoreText: Boolean = false // The label that shows the Prev. High Score or daily challenge seed, etc
     var flashHudRedWhenLifeLost: Boolean = false // Only used in Endless Polyrhythm
-    
+
     val maxLives: IntVar = IntVar(0)
     val startingLives: IntVar = IntVar { maxLives.use() }
+
     /**
      * Will be set when the [score] is higher than this [highScore].
      */
@@ -50,10 +52,12 @@ class EndlessScore(parent: EngineModifiers) : ModifierModule(parent) {
     }
 
     override fun onRodPRExploded(rod: EntityRodPR, inputter: EngineInputter, countedAsMiss: Boolean) {
+        if (rod !is EntityRodPREndless) return
+        
         val lifeLostVar = rod.lifeLost
-        if (lifeLostVar != null && countedAsMiss) {
-            if (!lifeLostVar.get()) {
-                lifeLostVar.set(true)
+        if (countedAsMiss) {
+            if (!lifeLostVar.lifeLost) {
+                lifeLostVar.markLifeLost()
 
                 val oldLives = this.lives.get()
                 this.triggerEndlessLifeLost(inputter)
@@ -129,5 +133,5 @@ class EndlessScore(parent: EngineModifiers) : ModifierModule(parent) {
             this.width = 0.5f
         })
     }
-    
+
 }

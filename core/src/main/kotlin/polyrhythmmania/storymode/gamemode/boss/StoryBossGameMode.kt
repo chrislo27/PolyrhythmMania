@@ -1,7 +1,6 @@
 package polyrhythmmania.storymode.gamemode.boss
 
 import com.badlogic.gdx.math.Vector3
-import paintbox.util.filterAndIsInstance
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.editor.block.Block
@@ -14,6 +13,7 @@ import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.LoopingEvent
 import polyrhythmmania.gamemodes.endlessmode.EndlessPatterns
+import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.music.StemCache
@@ -62,12 +62,17 @@ class StoryBossGameMode(main: PRManiaGame)
     private val stems: StemCache = StoryMusicAssets.bossStems
     private val checkForRodsThatCollidedWithBossRunnable = CheckForRodsThatCollidedWithBossRunnable()
     
+    private val modifierModule: BossModifierModule
+    
     init {
         world.worldMode = WorldMode(WorldType.Polyrhythm())
         world.showInputFeedback = true
         world.worldResetListeners += this as World.WorldResetListener
         
         engine.postRunnable(checkForRodsThatCollidedWithBossRunnable)
+        
+        modifierModule = BossModifierModule(engine.modifiers, this)
+        engine.modifiers.addModifierModule(modifierModule)
     }
 
     override fun initialize() {
@@ -114,22 +119,11 @@ class StoryBossGameMode(main: PRManiaGame)
     }
     
     
-    
-    private fun checkForRodsThatCollidedWithBoss() {
-        val blocksAheadOfStart = 11.125f
-        val rods = world.entities.filterAndIsInstance<EntityRodPR> { rod ->
-            !rod.exploded && rod.position.x > (rod.row.startX + blocksAheadOfStart)
-        }
-        rods.forEach { rod ->
-            rod.explode(engine, shouldCountAsMiss = false)
-        }
-    }
-    
     private inner class CheckForRodsThatCollidedWithBossRunnable : Runnable {
         var cancel: Boolean = false
         
         override fun run() {
-            checkForRodsThatCollidedWithBoss()
+            modifierModule.checkForRodsThatCollidedWithBoss()
             if (!cancel) {
                 engine.postRunnable(this)
             }
@@ -206,14 +200,16 @@ class StoryBossGameMode(main: PRManiaGame)
             
             val anyA = pattern.rowA.row.isNotEmpty()
             val anyDpad = pattern.rowDpad.row.isNotEmpty()
+            val bossDamageMultiplier = if (anyA && anyDpad) 1 else 2
+            val damageTakenVar = EntityRodPRStoryBoss.PlayerDamageTaken()
             val despawnStartBeat = patternStart + patternDuration - 0.25f
             if (anyA) {
-                engine.addEvent(EventDeployRod(engine, world.rowA, patternStart))
+                engine.addEvent(EventDeployRodBoss(world.rowA, patternStart, damageTakenVar, bossDamageMultiplier))
 //                engine.addEvents(createRowBlockDespawnEvents(world.rowA, despawnStartBeat))
                 engine.addEvent(EventRowBlockDespawn(engine, world.rowA, 0, despawnStartBeat, affectThisIndexAndForward = true))
             }
             if (anyDpad) {
-                engine.addEvent(EventDeployRod(engine, world.rowDpad, patternStart))
+                engine.addEvent(EventDeployRodBoss(world.rowDpad, patternStart, damageTakenVar, bossDamageMultiplier))
 //                engine.addEvents(createRowBlockDespawnEvents(world.rowDpad, despawnStartBeat))
                 engine.addEvent(EventRowBlockDespawn(engine, world.rowDpad, 0, despawnStartBeat, affectThisIndexAndForward = true))
             }
@@ -252,6 +248,27 @@ class StoryBossGameMode(main: PRManiaGame)
                         this.beat += 8f
                     }
             )
+        }
+    }
+
+    private inner class EventDeployRodBoss(
+            val row: Row, startBeat: Float,
+            val damageTakenVar: EntityRodPRStoryBoss.PlayerDamageTaken, val bossDamageMultiplier: Int
+    ) : Event(engine) {
+        
+        init {
+            this.beat = startBeat
+        }
+
+        override fun onStart(currentBeat: Float) {
+            super.onStart(currentBeat)
+            val rod = EntityRodPRStoryBoss(engine.world, this.beat, row, damageTakenVar, bossDamageMultiplier)
+            engine.world.addEntity(rod)
+
+            if (engine.areStatisticsEnabled) {
+                GlobalStats.rodsDeployed.increment()
+                GlobalStats.rodsDeployedPolyrhythm.increment()
+            }
         }
     }
 

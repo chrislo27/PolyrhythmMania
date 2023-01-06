@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
-import paintbox.binding.BooleanVar
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.engine.Engine
@@ -177,20 +176,10 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
 
 }
 
-class EntityRodPR private constructor(
+open class EntityRodPR(
         world: World, deployBeat: Float, val row: Row,
-        val lifeLost: BooleanVar?,
         val isDefective: Boolean,
 ) : EntityRod(world, deployBeat) {
-    
-    companion object {
-        fun createRod(world: World, deployBeat: Float, row: Row, isDefective: Boolean): EntityRodPR {
-            return EntityRodPR(world, deployBeat, row, lifeLost = null, isDefective = isDefective)
-        }
-        fun createRodForEndless(world: World, deployBeat: Float, row: Row, lifeLost: BooleanVar): EntityRodPR {
-            return EntityRodPR(world, deployBeat, row, lifeLost = lifeLost, isDefective = false)
-        }
-    }
 
     data class InputTracker(
             val totalResultCount: Int,

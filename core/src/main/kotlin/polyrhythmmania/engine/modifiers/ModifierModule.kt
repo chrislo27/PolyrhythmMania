@@ -12,23 +12,23 @@ import polyrhythmmania.world.EntityRodPR
  * Represents an engine modifier.
  */
 abstract class ModifierModule(val parent: EngineModifiers) : InputterListener {
-    
+
     protected val engine: Engine = parent.engine
-    
+
     val enabled: BooleanVar = BooleanVar(false)
-    
+
 
     /**
      * Resets this modifier's internal state to a blank state.
-     * 
+     *
      * Does NOT change any settings.
      */
     abstract fun resetState()
-    
+
     abstract fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float)
 
 
-    // InputterListener overrides
+    //region InputterListener overrides
 
     override fun onMissed(inputter: EngineInputter, firstMiss: Boolean) {
     }
@@ -41,4 +41,6 @@ abstract class ModifierModule(val parent: EngineModifiers) : InputterListener {
 
     override fun onRodPRExploded(rod: EntityRodPR, inputter: EngineInputter, countedAsMiss: Boolean) {
     }
+
+    //endregion
 }

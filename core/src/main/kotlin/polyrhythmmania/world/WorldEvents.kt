@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
-import paintbox.binding.BooleanVar
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.*
@@ -207,7 +206,7 @@ class EventDeployRod(
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        engine.world.addEntity(EntityRodPR.createRod(engine.world, this.beat, row, this.isDefective).also(after))
+        engine.world.addEntity(EntityRodPR(engine.world, this.beat, row, this.isDefective).also(after))
         
         if (engine.areStatisticsEnabled) {
             GlobalStats.rodsDeployed.increment()
@@ -215,23 +214,6 @@ class EventDeployRod(
             if (this.isDefective) {
                 GlobalStats.defectiveRodsDeployed.increment()
             }
-        }
-    }
-}
-
-class EventDeployRodEndless(engine: Engine, val row: Row, startBeat: Float, val lifeLostVar: BooleanVar)
-    : Event(engine) {
-    init {
-        this.beat = startBeat
-    }
-
-    override fun onStart(currentBeat: Float) {
-        super.onStart(currentBeat)
-        engine.world.addEntity(EntityRodPR.createRodForEndless(engine.world, this.beat, row, lifeLostVar))
-
-        if (engine.areStatisticsEnabled) {
-            GlobalStats.rodsDeployed.increment()
-            GlobalStats.rodsDeployedPolyrhythm.increment()
         }
     }
 }

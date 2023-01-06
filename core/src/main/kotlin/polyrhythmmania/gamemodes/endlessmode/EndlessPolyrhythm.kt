@@ -3,13 +3,16 @@ package polyrhythmmania.gamemodes.endlessmode
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
-import paintbox.binding.*
+import paintbox.binding.FloatVar
+import paintbox.binding.IntVar
+import paintbox.binding.ReadOnlyIntVar
+import paintbox.binding.Var
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievements
-import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.editor.block.RowSetting
+import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.EventConditionalOnRods
 import polyrhythmmania.engine.EventPlaySFX
@@ -24,6 +27,7 @@ import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.util.Semitones
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
+import polyrhythmmania.world.texturepack.TexturePackSource
 import polyrhythmmania.world.tileset.PaletteTransition
 import polyrhythmmania.world.tileset.TilesetPalette
 import polyrhythmmania.world.tileset.TransitionCurve
@@ -208,6 +212,25 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
             }
         }
     }
+
+    class EventDeployRodEndless(engine: Engine, val row: Row, startBeat: Float, val lifeLostVar: EntityRodPREndless.LifeLost)
+        : Event(engine) {
+        
+        init {
+            this.beat = startBeat
+        }
+
+        override fun onStart(currentBeat: Float) {
+            super.onStart(currentBeat)
+            val rod = EntityRodPREndless(engine.world, this.beat, row, lifeLostVar)
+            engine.world.addEntity(rod)
+
+            if (engine.areStatisticsEnabled) {
+                GlobalStats.rodsDeployed.increment()
+                GlobalStats.rodsDeployedPolyrhythm.increment()
+            }
+        }
+    }
     
     inner class ChangeInPatternFlagEvent(startBeat: Float, val newValue: Boolean) : Event(engine) {
         init {
@@ -275,7 +298,7 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
             
             val anyA = pattern.rowA.row.isNotEmpty()
             val anyDpad = pattern.rowDpad.row.isNotEmpty()
-            val lifeLostVar = BooleanVar(false)
+            val lifeLostVar = EntityRodPREndless.LifeLost()
             if (anyA) {
                 engine.addEvent(EventDeployRodEndless(engine, world.rowA, patternStart, lifeLostVar))
                 engine.addEvent(EventRowBlockDespawn(engine, world.rowA, 0, patternStart + patternDuration - 0.25f, affectThisIndexAndForward = true))
