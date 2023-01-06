@@ -5,7 +5,6 @@ import paintbox.util.filterAndIsInstance
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.modifiers.EngineModifiers
 import polyrhythmmania.engine.modifiers.ModifierModule
-import polyrhythmmania.gamemodes.endlessmode.EntityRodPREndless
 import polyrhythmmania.world.EntityRodPR
 
 
@@ -57,20 +56,22 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
     }
 
     override fun onRodPRExploded(rod: EntityRodPR, inputter: EngineInputter, countedAsMiss: Boolean) {
-        if (rod !is EntityRodPREndless) return
+        if (rod !is EntityRodPRStoryBoss) return
         
         val playerHP = playerHealth.currentHP
         if (playerHP.get() <= 0) return
         
-        val lifeLost = rod.lifeLost
+        val dmgTaken = rod.playerDamageTaken
         if (rod.position.x < BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE) {
-            if (!lifeLost.lifeLost && countedAsMiss) {
-                lifeLost.markLifeLost()
+            if (!dmgTaken.damageTaken && countedAsMiss) {
+                dmgTaken.markDamageTaken()
                 playerHP.decrementAndGet()
             }
         } else {
-            if (bossHealth.currentHP.get() > 0) {
-                bossHealth.currentHP.decrementAndGet()
+            val currentBossHP = bossHealth.currentHP.get()
+            if (currentBossHP > 0) {
+                val baseDamage = 1
+                bossHealth.currentHP.set((currentBossHP - (baseDamage * rod.bossDamageMultiplier)).coerceAtLeast(0))
             }
         }
     }
