@@ -547,9 +547,20 @@ class Editor(
     }
 
     fun attemptSelectRange(range: SelectionRange) {
-        if (allowedToEdit.get() && tool.getOrCompute() == Tool.SELECTION) {
-            val currentSelection = selectedBlocks
-            forceUpdateStatus.invert()
+        if (allowedToEdit.get()) {
+            val playbackPosition = playbackStart.get()
+            
+            val currentSelection = selectedBlocks.keys.toSet()
+            val newSelection: Set<Block> = when (range) {
+                SelectionRange.ALL -> blocks
+                SelectionRange.LEFT_OF_PLAYBACK -> blocks.filter { b -> b.beat + b.width <= playbackPosition }
+                SelectionRange.RIGHT_OF_PLAYBACK -> blocks.filter { b -> b.beat >= playbackPosition }
+            }.toSet()
+            
+            if (currentSelection != newSelection) {
+                this.mutate(SelectionAction(currentSelection, newSelection))
+                forceUpdateStatus.invert()
+            }
         }
     }
 
@@ -966,7 +977,7 @@ class Editor(
             }
         }
         if (!inputConsumed && !contextMenuActive && !dialogActive) {
-            if (keycode in MOVE_WINDOW_KEYCODES) {
+            if (keycode in MOVE_WINDOW_KEYCODES && !ctrl && !alt) {
                 pressedButtons += keycode
                 inputConsumed = true
             } else {
@@ -1079,6 +1090,29 @@ class Editor(
                         if (ctrl && !shift && !alt) {
                             attemptNewLevel()
                             inputConsumed = true
+                        }
+                    }
+                }
+                
+                if (!inputConsumed && tool.getOrCompute() == Tool.SELECTION) {
+                    when (keycode) {
+                        Input.Keys.A -> { // CTRL+A: Select all
+                            if (ctrl && !shift && !alt) {
+                                attemptSelectRange(SelectionRange.ALL)
+                                inputConsumed = true
+                            }
+                        }
+                        Input.Keys.R -> { // CTRL+R: Select before playback start (R for pReceding)
+                            if (ctrl && !shift && !alt) {
+                                attemptSelectRange(SelectionRange.LEFT_OF_PLAYBACK)
+                                inputConsumed = true
+                            }
+                        }
+                        Input.Keys.F -> { // CTRL+F: Select after playback start (F for following)
+                            if (ctrl && !shift && !alt) {
+                                attemptSelectRange(SelectionRange.RIGHT_OF_PLAYBACK)
+                                inputConsumed = true
+                            }
                         }
                     }
                 }

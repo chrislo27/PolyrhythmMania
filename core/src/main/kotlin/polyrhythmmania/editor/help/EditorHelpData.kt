@@ -59,8 +59,8 @@ class EditorHelpDocControls : HelpDocument(
                 ),
                 LayerParagraph("editorHelp.controls.heading.selectionTool", 20f),
                 LayerCol2(
-                        LayerParagraph("editorHelp.controls.keybinds.selectionTool.keys", 220f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
-                        LayerParagraph("editorHelp.controls.keybinds.selectionTool.desc", 220f),
+                        LayerParagraph("editorHelp.controls.keybinds.selectionTool.keys", 280f, renderAlign = Align.topRight, padding = keybindsKeysPadding),
+                        LayerParagraph("editorHelp.controls.keybinds.selectionTool.desc", 280f),
                         leftProportion = 0.275f
                 ),
                 LayerParagraph("editorHelp.controls.heading.tempoChangeTool", 20f),
@@ -84,7 +84,7 @@ class EditorHelpDocControls : HelpDocument(
         )
 ) {
     companion object {
-        private val keybindsKeysPadding: Insets = Insets(4f, 4f, 8f, 0f)
+        private val keybindsKeysPadding: Insets = Insets(0f, 4f, 8f, 0f)
     }
 }
 
