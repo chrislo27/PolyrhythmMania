@@ -1,6 +1,8 @@
 package polyrhythmmania.storymode.gamemode.boss
 
+import paintbox.binding.FloatVar
 import paintbox.binding.IntVar
+import paintbox.binding.ReadOnlyFloatVar
 import paintbox.util.filterAndIsInstance
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.modifiers.EngineModifiers
@@ -23,6 +25,9 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
         
         // Data
         val currentHP: IntVar = IntVar(startingHP.get())
+        
+        // Readonly
+        val hpPercentage: ReadOnlyFloatVar = FloatVar { currentHP.use().toFloat() / (maxHP.use()).coerceAtLeast(1) }
         
         fun resetState() {
             currentHP.set(startingHP.get())

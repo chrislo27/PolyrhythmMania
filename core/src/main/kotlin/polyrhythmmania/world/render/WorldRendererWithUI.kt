@@ -42,6 +42,7 @@ import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.modifiers.DefectiveRodsMode
 import polyrhythmmania.engine.modifiers.LivesMode
 import polyrhythmmania.engine.modifiers.MonsterGoalData
+import polyrhythmmania.storymode.gamemode.boss.BossModifierModule
 import polyrhythmmania.ui.*
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.World
@@ -105,6 +106,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     private val skillStarRendering: SkillStarRendering
     private val textboxRendering: TextBoxRendering
     val monsterGoalRendering: MonsterGoalRendering
+    private val storyBossRendering: StoryBossRendering
     
     private val allInnerRenderers: List<InnerRendering>
 
@@ -113,6 +115,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         
         this.endlessModeRendering = this.EndlessModeRendering()
         uiSceneRoot += this.endlessModeRendering.uiElement
+        
+        this.storyBossRendering = this.StoryBossRendering()
+        uiSceneRoot += this.storyBossRendering.uiElement
         
         this.livesModeRendering = this.LivesModeRendering()
         uiSceneRoot += this.livesModeRendering.uiElement
@@ -144,7 +149,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         
         this.allInnerRenderers = listOf(endlessModeRendering, livesModeRendering, defectiveRodsModeRendering,
                 practiceRendering, perfectRendering, songCardRendering, skillStarRendering, textboxRendering,
-                monsterGoalRendering)
+                monsterGoalRendering, storyBossRendering)
     }
 
     override fun onWorldReset(world: World) {
@@ -237,10 +242,12 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         defectiveRodsModeRendering.renderUI(batch)
         monsterGoalRendering.renderUI(batch)
         endlessModeRendering.renderUI(batch)
+        storyBossRendering.renderUI(batch)
 
         uiSceneRoot.renderAsRoot(batch)
 
         endlessModeRendering.renderRedHud(batch)
+        storyBossRendering.renderRedHud(batch)
     }
 
     private fun renderSongInfoCard(batch: SpriteBatch, font: BitmapFont,
@@ -777,7 +784,7 @@ duration: ${monster.activeDuration.get()} sec
                     batch.setColor(1f, 1f, 1f, 1f)
                 }
 
-                endlessModeRendering.hudRedFlash = (hudRedFlash - (Gdx.graphics.deltaTime / 0.75f)).coerceAtLeast(0f)
+                this.hudRedFlash = (hudRedFlash - (Gdx.graphics.deltaTime / 0.75f)).coerceAtLeast(0f)
             }
         }
         
@@ -1336,6 +1343,91 @@ duration: ${monster.activeDuration.get()} sec
         
         fun startCrush() {
             if (crush.get() < 0f) crush.set(0f)
+        }
+    }
+    
+    inner class StoryBossRendering : InnerRendering() {
+
+        private val superpane: Pane = Pane()
+
+        private val currentPlayerHealth: IntVar = IntVar(0)
+        private val currentPlayerHealthPercentage: FloatVar = FloatVar(0f)
+        private val currentBossHealthPercentage: FloatVar = FloatVar(0f)
+
+        override val uiElement: UIElement get() = superpane
+
+        var hudRedFlash: Float = 0f
+        
+        init {
+            val black = Color(0f, 0f, 0f, 0.5f)
+            
+            val vbox = VBox().apply {
+                Anchor.TopLeft.configure(this, offsetX = 0f, offsetY = 32f)
+                this.bindWidthToParent(adjust = -64f)
+                this.bounds.height.set(200f) 
+                this.spacing.set(24f)
+            }
+            superpane += vbox
+
+            val bossHealthHbox = HBox().apply {
+                this.bounds.width.set(800f)
+                this += Pane().apply {
+                    this.margin.set(Insets(12f, 0f))
+                    
+                    this += RectElement(Color.RED)
+                    this += RectElement(Color.GREEN).apply {
+                        this.bindWidthToParent(multiplierBinding = { currentBossHealthPercentage.use() }, adjustBinding = { 0f })
+                    }
+                }
+            }
+            vbox += ArrowRectBox(bossHealthHbox, black).apply {
+                this.bounds.height.set(44f)
+            }
+            val playerHealthHbox = HBox().apply { 
+                this.bounds.width.set(300f)
+                this += Pane().apply {
+                    this.margin.set(Insets(12f, 0f))
+                    
+                    this += RectElement(Color.RED)
+                    this += RectElement(Color.GREEN).apply {
+                        this.bindWidthToParent(multiplierBinding = { currentPlayerHealthPercentage.use() }, adjustBinding = { 0f })
+                    }
+                }
+            }
+            vbox += ArrowRectBox(playerHealthHbox, black).apply {
+                this.bounds.height.set(44f)
+            }
+        }
+
+        override fun renderUI(batch: SpriteBatch) {
+            val bossModifier = engine.modifiers.getModifierModuleByType<BossModifierModule>()
+            if (bossModifier != null) {
+                val oldPlayerHP = currentPlayerHealth.get()
+                val newPlayerHP = bossModifier.playerHealth.currentHP.get()
+                currentPlayerHealth.set(newPlayerHP)
+                if (newPlayerHP < oldPlayerHP) {
+                    hudRedFlash = 1f
+                }
+                
+                currentPlayerHealthPercentage.set(bossModifier.playerHealth.hpPercentage.get())
+                currentBossHealthPercentage.set(bossModifier.bossHealth.hpPercentage.get())
+            }
+        }
+
+        override fun onWorldReset(world: World) {
+            super.onWorldReset(world)
+            hudRedFlash = 0f
+        }
+
+        fun renderRedHud(batch: SpriteBatch) {
+            val uiCam = this@WorldRendererWithUI.uiCamera
+            if (hudRedFlash > 0f) {
+                batch.setColor(1f, 0f, 0f, hudRedFlash)
+                batch.draw(AssetRegistry.get<Texture>("hud_vignette"), 0f, 0f, uiCam.viewportWidth, uiCam.viewportHeight)
+                batch.setColor(1f, 1f, 1f, 1f)
+
+                this.hudRedFlash = (hudRedFlash - (Gdx.graphics.deltaTime / 0.75f)).coerceAtLeast(0f)
+            }
         }
     }
     
