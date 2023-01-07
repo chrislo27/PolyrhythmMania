@@ -9,26 +9,26 @@ project.ext.assetsDir = new File("../core/assets")
 
 
 task run(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
+    mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
-    ignoreExitValue = true
+    ignoreExitValue(true)
 }
 
 task debug(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
+    mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
-    ignoreExitValue = true
+    ignoreExitValue(true)
     debug = true
 }
 
 shadowJar {
     archiveBaseName = "PolyrhythmMania"
-    classifier = "distribution"
-    archiveVersion = this.version
+    archiveClassifier = "distribution"
+    archiveVersion = this.version.toString()
 }
 
 jar {
