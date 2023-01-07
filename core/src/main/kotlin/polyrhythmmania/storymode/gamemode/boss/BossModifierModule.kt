@@ -4,6 +4,7 @@ import paintbox.binding.FloatVar
 import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyFloatVar
 import paintbox.util.filterAndIsInstance
+import polyrhythmmania.engine.ResultFlag
 import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.engine.modifiers.EngineModifiers
 import polyrhythmmania.engine.modifiers.ModifierModule
@@ -70,7 +71,7 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
         if (rod.position.x < BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE) {
             if (!dmgTaken.damageTaken && countedAsMiss) {
                 dmgTaken.markDamageTaken()
-                playerHP.decrementAndGet()
+                triggerPlayerHPDown(inputter)
             }
         } else {
             val currentBossHP = bossHealth.currentHP.get()
@@ -79,5 +80,22 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
                 bossHealth.currentHP.set((currentBossHP - (baseDamage * rod.bossDamageMultiplier)).coerceAtLeast(0))
             }
         }
+    }
+    
+    private fun triggerPlayerHPDown(inputter: EngineInputter) {
+        val playerHP = playerHealth.currentHP
+        if (playerHP.get() <= 0) return
+        
+        playerHP.decrementAndGet()
+        if (playerHP.get() == 0) {
+            onGameOver(inputter)
+        }
+    }
+
+    private fun onGameOver(inputter: EngineInputter) {
+        val engine = inputter.engine
+
+        engine.playbackSpeed = 1f
+        engine.resultFlag.set(ResultFlag.Fail.Generic)
     }
 }
