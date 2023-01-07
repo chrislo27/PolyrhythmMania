@@ -1001,7 +1001,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         
         return if (uuid != null && levelMetadata != null && exportStatistics != null) {
             if (libraryRelevantData.isAutosave || libraryRelevantData.isProject) return null
-            LevelEntry.Modern(libraryRelevantData.levelUUID, file, containerVersion, programVersion, levelMetadata, exportStatistics)
+            LevelEntry.Modern(uuid, file, containerVersion, programVersion, levelMetadata, exportStatistics)
         } else {
             LevelEntry.Legacy(file, containerVersion, programVersion)
         }

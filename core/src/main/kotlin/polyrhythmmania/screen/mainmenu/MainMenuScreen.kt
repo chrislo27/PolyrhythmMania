@@ -245,7 +245,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             this.bounds.height.set(175f)
             this.bounds.y.set(24f)
             this.renderAlign.set(Align.topLeft)
-            this.visible.bind { (menuCollection.activeMenu.use() as? MMMenu)?.showLogo?.use() != false }
+            this.visible.bind { menuCollection.activeMenu.use()?.showLogo?.use() != false }
         }
         leftPane.addChild(logoImage)
         menuPane.apply {

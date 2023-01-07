@@ -480,26 +480,29 @@ class TexturePackEditDialog(
             this.bindWidthToParent(multiplierBinding = { 1f - scrollPaneWidthProportion }, adjustBinding = { -8f * 2 - bounds.height.use() })
             this.bounds.x.bind { (parent.use()?.bounds?.width?.use() ?: 0f) * 0.4f + 8f }
         }
+
+        val basePackSource: TexturePackSource = StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute())
+                ?: TexturePackSource.StockGBA
+        texPackSelectorPane = TexPackSrcSelectorMenuPane(editorPane, basePackSource,
+                legalValues = TexturePackSource.VALUES_NON_CUSTOM) { src ->
+            baseTexturePack.set(StockTexturePacks.getPackFromSource(src) ?: StockTexturePacks.gba)
+            onTexturePackUpdated.invert()
+        }.apply {
+            Anchor.BottomLeft.configure(this)
+            this.bindHeightToParent(multiplier = 0.6f, adjust = -1f)
+            this.bindWidthToParent(multiplier = 0.9f)
+        }
+
         bottomRightHbox.temporarilyDisableLayouts {
             bottomRightHbox += Pane().apply {
                 this.bounds.width.set(340f)
-                
+
                 this += TextLabel(binding = { Localization.getVar("editor.dialog.texturePack.stock").use() },
                         font = editorPane.palette.musicDialogFont).apply {
                     this.bindHeightToParent(multiplier = 0.4f, adjust = -1f)
                     this.markup.set(editorPane.palette.markup)
                     this.textColor.set(Color.WHITE.cpy())
                     this.renderAlign.set(RenderAlign.topLeft)
-                }
-                val basePackSource: TexturePackSource = StockTexturePacks.getTexturePackSource(baseTexturePack.getOrCompute()) ?: TexturePackSource.StockGBA
-                texPackSelectorPane = TexPackSrcSelectorMenuPane(editorPane, basePackSource,
-                        legalValues = TexturePackSource.VALUES_NON_CUSTOM) { src ->
-                    baseTexturePack.set(StockTexturePacks.getPackFromSource(src) ?: StockTexturePacks.gba)
-                    onTexturePackUpdated.invert()
-                }.apply {
-                    Anchor.BottomLeft.configure(this)
-                    this.bindHeightToParent(multiplier = 0.6f, adjust = -1f)
-                    this.bindWidthToParent(multiplier = 0.9f)
                 }
                 this += texPackSelectorPane
             }
