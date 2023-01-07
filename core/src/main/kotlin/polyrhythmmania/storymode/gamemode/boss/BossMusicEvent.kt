@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.gamemode.boss
 
+import net.beadsproject.beads.ugens.Glide
 import paintbox.Paintbox
 import polyrhythmmania.engine.AudioEvent
 import polyrhythmmania.engine.Engine
@@ -49,6 +50,19 @@ class BossMusicEvent(engine: Engine, val stems: StemCache, val stemID: String, b
         val musicData = engine.musicData
         engine.soundInterface.getPlayer(this.id)?.apply {
             musicData.updatePlayerWithVolumeAndRate(this, volume = musicData.volumeMap.volumeAtBeat(atBeat))
+        }
+    }
+
+    override fun onAudioEnd(atBeat: Float, actualBeat: Float) {
+        engine.soundInterface.getPlayer(this.id)?.apply { 
+            this.addDependent(object : Glide(this.context, this.gain, 100f){
+                override fun calculateBuffer() {
+                    super.calculateBuffer()
+                    this@apply.gain = this.value
+                }
+            }.apply { 
+                this.value = 0f
+            })
         }
     }
 }
