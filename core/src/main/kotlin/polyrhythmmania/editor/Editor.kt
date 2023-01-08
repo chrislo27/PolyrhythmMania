@@ -210,8 +210,8 @@ class Editor(
         engine.inputCalibration = main.settings.inputCalibration.getOrCompute()
         engine.autoInputs = true
         engine.endSignalReceived.addListener { endSignal ->
-            if (endSignal.getOrCompute() && playState.getOrCompute() == PlayState.PLAYING) {
-                changePlayState(PlayState.STOPPED)
+            if (endSignal.getOrCompute()) {
+                onEndStateSignalled()
             }
         }
         engine.soundInterface.disableSounds = true
@@ -406,6 +406,12 @@ class Editor(
         val trackView = this.trackView
         val panSpeed = 7f * delta * (if (fast) 10f else 1f)
         trackView.beat.set((trackView.beat.get() + panSpeed * dir / trackView.renderScale.get()).coerceAtLeast(0f))
+    }
+    
+    private fun onEndStateSignalled() {
+        if (playState.getOrCompute() == PlayState.PLAYING) {
+            changePlayState(PlayState.STOPPED)
+        }
     }
 
     /**
@@ -720,6 +726,7 @@ class Editor(
             lastPlacedMetronomeBeat = -1
             populateMetronomeTicks(engine.beat + 8)
         } else if (newState == PlayState.STOPPED) {
+            editorPane.playtestDialog.onPlayStateStopped.invert() // Note: this has to trigger before inputter state is reset
             resetWorldEntitiesAndEngineModules()
             val newSeconds = engine.tempos.beatsToSeconds(this.playbackStart.get())
             timing.seconds = newSeconds

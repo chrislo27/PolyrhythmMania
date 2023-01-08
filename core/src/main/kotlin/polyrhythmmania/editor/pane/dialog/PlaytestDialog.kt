@@ -3,26 +3,45 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.ui.Anchor
 import paintbox.ui.ImageNode
+import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
+import paintbox.ui.element.RectElement
+import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.DecimalFormats
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.pane.EditorPane
+import polyrhythmmania.engine.input.score.ScoreBase
+import polyrhythmmania.world.EntityRodPR
 
 
 class PlaytestDialog(editorPane: EditorPane) : EditorDialog(editorPane, mergeTopAndContent = true) {
 
+    val onPlayStateStopped: BooleanVar = BooleanVar(false) // Note: this triggers before inputter state is reset
     private val previewTr: TextureRegion = editor.previewTextureRegion
+    private var score: ScoreBase = editor.engine.inputter.computeScore()
+    
+    init {
+        onPlayStateStopped.addListener {
+            val engine = editor.engine
+            val inputter = engine.inputter
+            editor.world.entities.filterIsInstance<EntityRodPR>().forEach { rod ->
+                inputter.submitInputsFromRod(rod)
+            }
+            score = inputter.computeScore()
+        }
+    }
     
     init {
         this.titleLabel.text.bind { Localization.getVar("editor.dialog.playtest.title").use() }
@@ -65,12 +84,42 @@ class PlaytestDialog(editorPane: EditorPane) : EditorDialog(editorPane, mergeTop
             }
         }
         
-        contentPane += TextLabel(editor.inputKeymapKeyboard.toKeyboardString(detailedDpad = true, withNewline = false),
-                font = editorPane.palette.rodinDialogFont).apply { 
-            Anchor.BottomCentre.configure(this)
+        contentPane += ColumnarPane(2, false).apply {
+            Anchor.BottomLeft.configure(this)
             this.bounds.height.set(32f)
-            this.textColor.set(Color.WHITE)
-            this.renderAlign.set(Align.center)
+            this.bindVarToSelfHeight(this.spacing)
+            this.setAllSpacers {
+                Pane().apply {
+                    this += RectElement(Color.GRAY).apply {
+                        Anchor.Centre.configure(this)
+                        this.bounds.width.set(2f)
+                    }
+                }
+            }
+
+            this[0] += TextLabel(editor.inputKeymapKeyboard.toKeyboardString(detailedDpad = true, withNewline = false),
+                    font = editorPane.palette.rodinDialogFont).apply {
+                this.textColor.set(Color.WHITE)
+                this.renderAlign.set(Align.right)
+            }
+            this[1] += TextLabel(binding = {
+                val score = score
+                val playState = editor.playState.use()
+                val texts = mutableListOf<String>()
+                if (playState == PlayState.STOPPED) {
+                    texts += "${Localization.getVar("editor.dialog.resultsText.score").use()} [b]${"${score.scoreInt}"}[]"
+                    if (score.noMiss) {
+                        texts += Localization.getVar("editor.dialog.resultsText.noMiss").use()
+                    }
+                } else {
+                    texts += "${Localization.getVar("editor.dialog.resultsText.score").use()} --"
+                }
+                texts.joinToString(separator = " | ")
+            }).apply {
+                this.textColor.set(Color.WHITE)
+                this.renderAlign.set(Align.left)
+                this.markup.set(editorPane.palette.markup)
+            }
         }
 
         val hbox = HBox().apply {
