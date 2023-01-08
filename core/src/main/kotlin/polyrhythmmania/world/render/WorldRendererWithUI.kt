@@ -1412,6 +1412,7 @@ duration: ${monster.activeDuration.get()} sec
                 currentPlayerHealthPercentage.set(bossModifier.playerHealth.hpPercentage.get())
                 currentBossHealthPercentage.set(bossModifier.bossHealth.hpPercentage.get())
             }
+            this.superpane.visible.set(bossModifier != null)
         }
 
         override fun onWorldReset(world: World) {
