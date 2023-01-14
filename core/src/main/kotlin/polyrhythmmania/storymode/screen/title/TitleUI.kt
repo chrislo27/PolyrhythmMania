@@ -18,10 +18,8 @@ import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
-import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import polyrhythmmania.Localization
-import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StorySavefile
@@ -53,7 +51,6 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
         val titleSmallHeight = 0.55f
         
         sceneRoot += NoInputPane().apply {
-            this += RectElement(PRManiaColors.debugColor)
             this += ImageIcon(TextureRegion(StoryAssets.get<Texture>("logo"))).apply {
                 Anchor.TopCentre.configure(this)
                 this.margin.set(Insets(4f))

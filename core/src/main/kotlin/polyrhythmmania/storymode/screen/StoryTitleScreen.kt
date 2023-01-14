@@ -11,12 +11,13 @@ import paintbox.ui.SceneRoot
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.storymode.StorySession
+import polyrhythmmania.storymode.screen.title.TitleBackground
 import polyrhythmmania.storymode.screen.title.TitleLogic
 import polyrhythmmania.storymode.screen.title.TitleUI
 
 
 class StoryTitleScreen(main: PRManiaGame, val storySession: StorySession) : PRManiaScreen(main) {
-    
+
     val batch: SpriteBatch = main.batch
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         this.setToOrtho(false, 1280f, 720f)
@@ -28,7 +29,8 @@ class StoryTitleScreen(main: PRManiaGame, val storySession: StorySession) : PRMa
 
     private val logic: TitleLogic = TitleLogic(main, storySession)
     private val ui: TitleUI = TitleUI(logic, sceneRoot)
-    
+    private val background: TitleBackground = TitleBackground()
+
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -36,11 +38,15 @@ class StoryTitleScreen(main: PRManiaGame, val storySession: StorySession) : PRMa
         super.render(delta)
 
         val camera = uiCamera
+        val batch = this.batch
         batch.projectionMatrix = camera.combined
         batch.begin()
-        
+
+        uiViewport.apply()
+        background.render(batch)
+        batch.setColor(1f, 1f, 1f, 1f)
         sceneRoot.renderAsRoot(batch)
-        
+
         batch.end()
     }
 
@@ -56,8 +62,11 @@ class StoryTitleScreen(main: PRManiaGame, val storySession: StorySession) : PRMa
 
     override fun show() {
         super.show()
+
         main.inputMultiplexer.removeProcessor(processor)
         main.inputMultiplexer.addProcessor(processor)
+
+        background.resetMsOffset()
     }
 
     override fun hide() {

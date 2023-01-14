@@ -2,6 +2,7 @@ package polyrhythmmania.storymode
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import paintbox.registry.AssetRegistryInstance
@@ -23,7 +24,12 @@ object StoryAssets : AssetRegistryInstance() {
 class StoryAssetLoader : IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
         StoryAssets.loadAsset<Texture>("logo", "story/textures/logo.png", linearTexture())
-        
+
+        StoryAssets.loadAsset<Texture>("title_checkerboard", "story/textures/title/checkerboard.png", TextureLoader.TextureParameter().apply {
+            this.wrapU = Texture.TextureWrap.Repeat
+            this.wrapV = Texture.TextureWrap.Repeat
+        })
+
         StoryAssets.loadAsset<Texture>("desk_ui_scrollbar_back", "story/textures/desk/ui/scrollbar_back.png")
         StoryAssets.loadAsset<Texture>("desk_ui_scrollbar_thumb_active", "story/textures/desk/ui/scrollbar_thumb_active.png")
         StoryAssets.loadAsset<Texture>("desk_ui_scrollbar_thumb_inactive", "story/textures/desk/ui/scrollbar_thumb_inactive.png")
