@@ -41,7 +41,7 @@ class BlockTexPackChange(engine: Engine)
     override fun copy(): BlockTexPackChange {
         return BlockTexPackChange(engine).also { 
             this.copyBaseInfoTo(it)
-            it.texPackSrcData.texPackSrc.set(texPackSrcData.texPackSrc.getOrCompute())
+            it.texPackSrcData.copyFrom(texPackSrcData)
         }
     }
 

@@ -70,6 +70,11 @@ open class Palette(val main: PRManiaGame) {
             "rodin" to main.fontEditorRodin,
             "prmania_icons" to main.fontIcons,
     ))
+    val markupInvertedItalics: Markup = Markup.createWithBoldItalic(main.fontEditorItalic, main.fontEditorBoldItalic, main.fontEditor,
+            main.fontEditorBold, additionalMappings = mapOf(
+            "rodin" to main.fontEditorRodin,
+            "prmania_icons" to main.fontIcons,
+    ))
     val markupBordered: Markup = Markup.createWithBoldItalic(main.fontEditorBordered, main.fontEditorBoldBordered,
             main.fontEditorItalicBordered, main.fontEditorBoldItalicBordered, additionalMappings = mapOf(
             "rodin" to main.fontEditorRodinBordered,

@@ -14,19 +14,23 @@ class TexPackSrcSelectorMenuPane(
         val changeListener: (TexturePackSource) -> Unit
 ) : Pane() {
     
-    val combobox: ComboBox<TexturePackSource> = ComboBox(legalValues, currentSource).also { combobox ->
-        combobox.markup.set(editorPane.palette.markup)
-        combobox.onItemSelected = { src ->
-            changeListener(src)
-        }
-        combobox.itemStringConverter.set(StringConverter { src ->
+    companion object {
+        val TEXTURE_PACK_SOURCE_STRING_CONVERTER: StringConverter<TexturePackSource> = StringConverter { src ->
             when (src) {
                 TexturePackSource.StockGBA -> Localization.getValue("editor.dialog.texturePack.stock.gba")
                 TexturePackSource.StockHD -> Localization.getValue("editor.dialog.texturePack.stock.hd")
                 TexturePackSource.StockArcade -> Localization.getValue("editor.dialog.texturePack.stock.arcade")
                 is TexturePackSource.Custom -> Localization.getValue("editor.dialog.texturePack.stock.custom", src.id)
             }
-        })
+        }
+    }
+    
+    val combobox: ComboBox<TexturePackSource> = ComboBox(legalValues, currentSource).also { combobox ->
+        combobox.markup.set(editorPane.palette.markup)
+        combobox.onItemSelected = { src ->
+            changeListener(src)
+        }
+        combobox.itemStringConverter.set(TEXTURE_PACK_SOURCE_STRING_CONVERTER)
     }
 
     init {
