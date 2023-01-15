@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
-import paintbox.binding.FloatVar
+import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -17,11 +17,14 @@ import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
+import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.ColumnarPane
+import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
+import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySavefile
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.inbox.InboxDB
@@ -31,9 +34,24 @@ import polyrhythmmania.storymode.screen.StoryDesktopScreen
 import polyrhythmmania.storymode.screen.StoryTitleScreen
 import polyrhythmmania.storymode.screen.desktop.DesktopAnimations
 import polyrhythmmania.storymode.screen.desktop.DesktopScenario
+import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
+import polyrhythmmania.ui.PRManiaSkins
 
 
 class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
+
+    private sealed class Operation {
+        interface IHasFromTarget {
+            val from: StorySavefile.LoadedState
+        }
+
+        object None : Operation()
+        data class Copy(override val from: StorySavefile.LoadedState) : Operation(), IHasFromTarget
+        data class Move(override val from: StorySavefile.LoadedState) : Operation(), IHasFromTarget
+        data class Delete(val target: StorySavefile.LoadedState) : Operation(), IHasFromTarget {
+            override val from: StorySavefile.LoadedState get() = this.target
+        }
+    }
 
     private val main: PRManiaGame = titleLogic.main
     private val storySession: StorySession = titleLogic.storySession
@@ -46,47 +64,49 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
     private val titleScaleAnimation: FloatVar = FloatVar(fullTitleTransition.get())
     private val panelAnimation: FloatVar = FloatVar(1f - fullTitleTransition.get())
 
+    private val currentOperation: Var<Operation> = Var(Operation.None)
+
     init {
         val titleFullHeight = 0.75f
         val titleSmallHeight = 0.55f
-        
+
         sceneRoot += NoInputPane().apply {
             this += ImageIcon(TextureRegion(StoryAssets.get<Texture>("logo"))).apply {
                 Anchor.TopCentre.configure(this)
-                this.margin.set(Insets(4f))
+                this.margin.set(Insets(10f, 0f, 4f, 4f))
                 this.bindHeightToParent(multiplierBinding = {
                     MathUtils.lerp(titleSmallHeight, titleFullHeight, titleScaleAnimation.use())
                 }, adjustBinding = { 0f })
                 this.bindWidthToParent(multiplier = 0.8f)
             }
-            
+
             this += Pane().apply {
                 Anchor.BottomCentre.configure(this)
                 this.bindHeightToParent(multiplier = 1f - titleFullHeight)
-                this.opacity.bind { Interpolation.smoother.apply(0f, 1f, fullTitleTransition.use()) }
-                
-                this += TextLabel("Click anywhere to continue", font = main.fontMainMenuHeading).apply {
+                this.opacity.bind { Interpolation.exp10.apply(0f, 1f, fullTitleTransition.use()) }
+
+                this += TextLabel(StoryL10N.getVar("titleScreen.clickAnywhereToContinue"), font = main.fontMainMenuHeadingBordered).apply {
                     Anchor.Centre.configure(this)
                     this.renderAlign.set(RenderAlign.center)
                     this.bounds.height.set(64f)
+                    this.textColor.set(Color.WHITE.cpy())
                     this.bindWidthToParent(multiplier = 0.75f)
                 }
             }
         }
 
         val overallPane = ActionablePane()
-        val mainPane = Pane().apply {
-            this.bindHeightToParent(multiplier = 1f - titleSmallHeight)
-            this.bounds.y.bind { (parent.use()?.bounds?.height?.use() ?: 0f) - (bounds.height.use() * panelAnimation.use()) }
-        }
-        
+
         with(overallPane) {
-            this += mainPane
-            
             this += Button("").apply {
                 Anchor.TopRight.configure(this)
                 this.bounds.width.set(64f)
                 this.bounds.height.set(64f)
+                (this.skin.getOrCompute() as ButtonSkin).apply {
+                    this.roundedRadius.set(4)
+                    this.roundedCorners.clear()
+                    this.roundedCorners.add(Corner.BOTTOM_LEFT)
+                }
                 this.setOnAction {
                     quitToMainMenu()
                 }
@@ -95,75 +115,312 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                     this.tint.set(Color.BLACK.cpy())
                 }
             }
-//            this += Button("Toggle").apply {
-//                Anchor.TopLeft.configure(this)
-//                this.bounds.width.set(64f)
-//                this.bounds.height.set(64f)
-//                this.setOnAction {
-//                    titleLogic.fullTitle.invert()
-//                }
-//            }
-            
+
             this.onAction = {
                 if (titleLogic.fullTitle.get()) {
                     titleLogic.fullTitle.set(false)
+                    main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_select"))
                     true
                 } else false
             }
         }
         sceneRoot += overallPane
-        
-        with(mainPane) {
-            this += ColumnarPane(listOf(1, 50), true).apply {
-                this.spacing.set(32f)
-                this.columnBoxes.forEach { pane ->
-                    pane.margin.set(Insets(4f))
-                }
-                this[1] += ColumnarPane(listOf(6, 4), true).apply {
-                    this[0] += ColumnarPane(savefiles.size, false).apply {
-                        this.bindWidthToParent(multiplier = 0.6f)
-                        this.bindHeightToParent(multiplier = 0.875f)
-                        Anchor.Centre.configure(this)
-                        this.spacing.set(32f)
 
-                        val inboxItemIDsThatAreContracts = InboxDB().items
-                                .filterIsInstance<InboxItem.ContractDoc>()
-                                .map { it.id }
-                                .toSet()
-                        
-                        this.columnBoxes.zip(savefiles).forEach { (pane, savefileState) ->
-                            var buttonText = "[b]File ${savefileState.number}[][scale=0.4]\n[]\n"
-                            buttonText += when (savefileState) {
+        val mainPane = Pane().apply {
+            this.bindHeightToParent(multiplier = 1f - titleSmallHeight)
+            this.bounds.y.bind {
+                (parent.use()?.bounds?.height?.use() ?: 0f) - (bounds.height.use() * panelAnimation.use())
+            }
+        }
+        overallPane += mainPane
+        with(mainPane) {
+            this += ColumnarPane(listOf(6, 4), true).apply {
+                this[0] += ColumnarPane(savefiles.size, false).apply {
+                    this.bindWidthToParent(multiplier = 0.8f)
+                    Anchor.Centre.configure(this)
+                    this.spacing.set(32f)
+
+                    val inboxItemIDsThatAreContracts = InboxDB().items
+                            .filterIsInstance<InboxItem.ContractDoc>()
+                            .map { it.id }
+                            .toSet()
+
+                    this.columnBoxes.zip(savefiles).forEach { (pane, savefileState) ->
+                        pane += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_file_blank"))).apply {
+                            Anchor.Centre.configure(this)
+                            this.bounds.width.set(76f * UI_SCALE)
+                            this.bounds.height.set(48f * UI_SCALE)
+
+                            val isInFailedState = savefileState is StorySavefile.LoadedState.FailedToLoad
+                            val isOperationOnMe: ReadOnlyBooleanVar = BooleanVar {
+                                val op = currentOperation.use()
+                                op is Operation.IHasFromTarget && op.from == savefileState
+                            }
+                            val isOperationNotOnMe: ReadOnlyBooleanVar = BooleanVar {
+                                val op = currentOperation.use()
+                                op is Operation.IHasFromTarget && op.from != savefileState
+                            }
+
+                            val filePane = Pane()
+                            this += filePane
+                            filePane += TextLabel(StoryL10N.getVar("titleScreen.file.fileNumber", listOf(savefileState.number)), main.fontRobotoBold).apply {
+                                this.bounds.x.set(3f * UI_SCALE)
+                                this.bounds.y.set(2f * UI_SCALE)
+                                this.bounds.width.set(21f * UI_SCALE)
+                                this.bounds.height.set(8f * UI_SCALE)
+
+                                this.textColor.set(Color.BLACK.cpy())
+                                this.renderAlign.set(RenderAlign.center)
+                                this.setScaleXY(1.1f)
+                            }
+
+                            val regularLabelText: ReadOnlyVar<String> = when (savefileState) {
                                 is StorySavefile.LoadedState.Loaded -> {
                                     val numContractsCompleted = savefileState.savefile.inboxState.getAllItemStates().count { (itemID, state) ->
                                         state.completion == InboxItemCompletion.COMPLETED && itemID in inboxItemIDsThatAreContracts
                                     }
-                                    "$numContractsCompleted Contracts\ncompleted"
+                                    StoryL10N.getVar("titleScreen.file.contractsCompleted", listOf(numContractsCompleted))
                                 }
-                                is StorySavefile.LoadedState.FailedToLoad -> "[i]Failed to load![]"
-                                is StorySavefile.LoadedState.NoSavefile -> "[i]No data[]"
+                                is StorySavefile.LoadedState.FailedToLoad -> StoryL10N.getVar("titleScreen.file.failedToLoad")
+                                is StorySavefile.LoadedState.NoSavefile -> StoryL10N.getVar("titleScreen.file.noData")
                             }
-                            pane += Button(buttonText).apply {
-                                Anchor.Centre.configure(this)
+                            filePane += TextLabel(binding = {
+                                when (val op = currentOperation.use()) {
+                                    is Operation.Copy -> {
+                                        if (op.from == savefileState) {
+                                            StoryL10N.getVar("titleScreen.file.operation.copy.source").use()
+                                        } else {
+                                            val canCopyHere = savefileState is StorySavefile.LoadedState.NoSavefile
+                                            if (!canCopyHere) {
+                                                StoryL10N.getVar("titleScreen.file.operation.copy.dest.cannot").use()
+                                            } else regularLabelText.use()
+                                        }
+                                    }
+                                    is Operation.Delete -> {
+                                        if (op.from == savefileState) {
+                                            StoryL10N.getVar("titleScreen.file.operation.delete.confirm").use()
+                                        } else ""
+                                    }
+                                    is Operation.Move -> {
+                                        if (op.from == savefileState) {
+                                            StoryL10N.getVar("titleScreen.file.operation.move.source").use()
+                                        } else {
+                                            val isThisEmpty = savefileState is StorySavefile.LoadedState.NoSavefile
+                                            StoryL10N.getVar(if (isThisEmpty) "titleScreen.file.operation.move.dest.doesNotExist" else "titleScreen.file.operation.move.dest.exists").use()
+                                        }
+                                    }
+                                    Operation.None -> regularLabelText.use()
+                                }
+                            }).apply {
+                                this.bounds.x.set(3f * UI_SCALE)
+                                this.bounds.y.set(14f * UI_SCALE)
+                                this.bounds.width.set(70f * UI_SCALE)
+                                this.bounds.height.set(19f * UI_SCALE)
+
                                 this.markup.set(robotoMarkup)
-                                
+                                this.textColor.set(Color.BLACK.cpy())
+                                this.renderAlign.set(RenderAlign.center)
+                            }
+
+                            fun Button.applyBottomButtonStyling() {
+                                this.bounds.width.set(34f * UI_SCALE)
+                                this.bounds.height.set(9f * UI_SCALE)
+                                this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
+                            }
+
+                            val playButton = Button(StoryL10N.getVar(when (savefileState) {
+                                is StorySavefile.LoadedState.NoSavefile -> "titleScreen.file.start"
+                                else -> "titleScreen.file.play"
+                            }), main.fontRobotoBold).apply {
+                                this.bounds.x.set(21f * UI_SCALE)
+                                this.bounds.y.set(37f * UI_SCALE)
+                                this.applyBottomButtonStyling()
+
                                 if (savefileState is StorySavefile.LoadedState.FailedToLoad) {
-                                    this.disabled.set(true)
+                                    this.visible.set(false)
+                                } else {
+                                    this.visible.bind {
+                                        currentOperation.use() == Operation.None
+                                    }
                                 }
 
                                 this.setOnAction {
                                     launchSavefile(savefileState)
                                 }
                             }
+                            filePane += playButton
+                            val cancelOperationButton = Button(Localization.getVar("common.cancel"), main.fontRobotoItalic).apply {
+                                this.bounds.x.set(21f * UI_SCALE)
+                                this.bounds.y.set(37f * UI_SCALE)
+                                this.applyBottomButtonStyling()
+
+                                this.visible.bind {
+                                    val op = currentOperation.use()
+                                    op is Operation.IHasFromTarget && op.from == savefileState && op !is Operation.Delete
+                                }
+
+                                this.setOnAction {
+                                    currentOperation.set(Operation.None)
+                                }
+                            }
+                            filePane += cancelOperationButton
+                            val copyHereOperationButton = Button(StoryL10N.getVar("titleScreen.file.operation.copy.action"), main.fontRobotoBoldItalic).apply {
+                                this.bounds.x.set(21f * UI_SCALE)
+                                this.bounds.y.set(37f * UI_SCALE)
+                                this.applyBottomButtonStyling()
+
+                                this.visible.bind {
+                                    val op = currentOperation.use()
+                                    op is Operation.Copy && op.from != savefileState && savefileState is StorySavefile.LoadedState.NoSavefile
+                                }
+
+                                this.setOnAction {
+                                    // TODO impl copy here
+                                }
+                            }
+                            filePane += copyHereOperationButton
+                            val moveHereOperationButton = Button(binding = {
+                                StoryL10N.getVar(if (savefileState is StorySavefile.LoadedState.NoSavefile)
+                                    "titleScreen.file.operation.move.action.move" 
+                                else "titleScreen.file.operation.move.action.swap").use()
+                            }, main.fontRobotoBoldItalic).apply {
+                                this.bounds.x.set(21f * UI_SCALE)
+                                this.bounds.y.set(37f * UI_SCALE)
+                                this.applyBottomButtonStyling()
+
+                                this.visible.bind {
+                                    val op = currentOperation.use()
+                                    op is Operation.Move && op.from != savefileState
+                                }
+
+                                this.setOnAction {
+                                    // TODO impl move/swap here
+                                }
+                            }
+                            filePane += moveHereOperationButton
+                            val deleteOperationsHBox = HBox().apply {
+                                this.bounds.x.set(8f * UI_SCALE)
+                                this.bounds.y.set(37f * UI_SCALE)
+                                this.bounds.width.set(58f * UI_SCALE)
+                                this.bounds.height.set(9f * UI_SCALE)
+
+                                this.spacing.set(2f * UI_SCALE)
+                                this.align.set(HBox.Align.CENTRE)
+
+                                this.visible.bind {
+                                    val op = currentOperation.use()
+                                    op is Operation.Delete && op.from == savefileState
+                                }
+
+                                this += Button(Localization.getVar("common.cancel"), main.fontRobotoItalic).apply {
+                                    this.applyBottomButtonStyling()
+                                    this.bounds.width.set(28f * UI_SCALE)
+
+                                    this.setOnAction {
+                                        currentOperation.set(Operation.None)
+                                    }
+                                }
+                                this += Button(StoryL10N.getVar("titleScreen.file.operation.delete.action"), main.fontRobotoBoldItalic).apply {
+                                    this.applyBottomButtonStyling()
+                                    this.bounds.width.set(28f * UI_SCALE)
+
+                                    this.setOnAction {
+                                        // TODO delete this file
+                                    }
+                                }
+                            }
+                            filePane += deleteOperationsHBox
+
+                            // Operations (copy/move/delete)
+                            filePane += HBox().apply {
+                                this.bounds.x.set(33f * UI_SCALE)
+                                this.bounds.y.set(3f * UI_SCALE)
+                                this.bounds.width.set(40f * UI_SCALE)
+                                this.bounds.height.set(8f * UI_SCALE)
+
+                                this.spacing.set(1f * UI_SCALE)
+                                this.align.set(HBox.Align.RIGHT)
+
+                                this.temporarilyDisableLayouts {
+                                    val showContext = BooleanVar(false)
+                                    this += Button("").apply {
+                                        this.bounds.width.set(8f * UI_SCALE)
+                                        this.bounds.height.set(8f * UI_SCALE)
+                                        this.visible.bind { showContext.use() && !isInFailedState && !isOperationNotOnMe.use() }
+
+                                        this += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_icon_copy")))
+
+                                        this.setOnAction {
+                                            if (currentOperation.getOrCompute() is Operation.Copy) {
+                                                currentOperation.set(Operation.None)
+                                            } else {
+                                                currentOperation.set(Operation.Copy(savefileState))
+                                            }
+                                        }
+                                    }
+                                    this += Button("").apply {
+                                        this.bounds.width.set(8f * UI_SCALE)
+                                        this.bounds.height.set(8f * UI_SCALE)
+                                        this.visible.bind { showContext.use() && !isInFailedState && !isOperationNotOnMe.use() }
+
+                                        this += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_icon_move")))
+
+                                        this.setOnAction {
+                                            if (currentOperation.getOrCompute() is Operation.Move) {
+                                                currentOperation.set(Operation.None)
+                                            } else {
+                                                currentOperation.set(Operation.Move(savefileState))
+                                            }
+                                        }
+                                    }
+                                    this += Button("").apply {
+                                        this.bounds.width.set(8f * UI_SCALE)
+                                        this.bounds.height.set(8f * UI_SCALE)
+                                        this.visible.bind { showContext.use() && !isOperationNotOnMe.use() }
+
+                                        this += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_icon_delete")))
+
+                                        this.setOnAction {
+                                            if (currentOperation.getOrCompute() is Operation.Delete) {
+                                                currentOperation.set(Operation.None)
+                                            } else {
+                                                currentOperation.set(Operation.Delete(savefileState))
+                                            }
+                                        }
+                                    }
+                                    this += Button("").apply {
+                                        this.bounds.width.set(8f * UI_SCALE)
+                                        this.bounds.height.set(8f * UI_SCALE)
+                                        this.disabled.bind { isOperationOnMe.use() }
+                                        this.visible.bind { !isOperationNotOnMe.use() }
+
+                                        this += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_icon_dotdotdot")))
+
+                                        this.setOnAction {
+                                            if (showContext.invert()) {
+                                                main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_select"))
+                                            } else {
+                                                main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_deselect"))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                    this[1] += Button(Localization.getVar("common.back"), font = main.fontRobotoBold).apply {
-                        Anchor.Centre.configure(this)
-                        this.bounds.width.set(200f)
-                        this.bounds.height.set(64f)
-                        this.setOnAction {
-                            titleLogic.fullTitle.set(true)
-                        }
+                }
+
+                this[1] += Button(Localization.getVar("common.back"), font = main.fontRobotoBold).apply {
+                    Anchor.Centre.configure(this)
+                    this.bounds.width.set(200f)
+                    this.bounds.height.set(64f)
+                    (this.skin.getOrCompute() as ButtonSkin).apply {
+                        this.roundedRadius.set(8)
+                    }
+                    this.disabled.bind { currentOperation.use() != Operation.None }
+                    this.setOnAction {
+                        titleLogic.fullTitle.set(true)
+                        main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_deselect"))
                     }
                 }
             }
@@ -184,8 +441,8 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
             sceneRoot.animations.enqueueAnimation(Animation(Interpolation.pow3Out, 0.25f, if (value) 1f else 0f, if (value) 0f else 1f), panelAnimation)
         }
     }
-    
-    
+
+
     private fun quitToMainMenu() {
         main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_deselect"))
 
@@ -198,7 +455,7 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
         main.screen = TransitionScreen(main, main.screen, storySession.createExitLoadingScreen(main, doAfterUnload),
                 FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
     }
-    
+
     private fun launchSavefile(savefileState: StorySavefile.LoadedState) {
         val isBrandNew = savefileState is StorySavefile.LoadedState.NoSavefile
         val savefile = when (savefileState) {

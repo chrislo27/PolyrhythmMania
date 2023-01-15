@@ -729,6 +729,14 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                     hinting = FreeTypeFontGenerator.Hinting.Slight
                     size = 40
                 }).setAfterLoad(defaultScaledFontAfterLoad)
+        cache["mainmenu_heading_bordered"] = PaintboxFontFreeType(
+                PaintboxFontParams(Gdx.files.internal("fonts/Roboto/Roboto-Bold.ttf"), 40, 0f, true, WindowSize(1280, 720)),
+                makeParam().apply {
+                    hinting = FreeTypeFontGenerator.Hinting.Slight
+                    size = 40
+                    spaceX = -3
+                    borderWidth = 4f
+                }).setAfterLoad(defaultScaledFontAfterLoad)
         cache["mainmenu_rodin"] = PaintboxFontFreeType(
                 PaintboxFontParams(Gdx.files.internal("fonts/rodin/rodin_lat_cy_ja_ko_spec.ttf"), 22, 0f, true, WindowSize(1280, 720)),
                 makeParam().apply {
@@ -866,6 +874,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     val fontMainMenuItalic: PaintboxFont get() = fontCache["mainmenu_ITALIC"]
     val fontMainMenuThin: PaintboxFont get() = fontCache["mainmenu_thin"]
     val fontMainMenuHeading: PaintboxFont get() = fontCache["mainmenu_heading"]
+    val fontMainMenuHeadingBordered: PaintboxFont get() = fontCache["mainmenu_heading_bordered"]
     val fontMainMenuRodin: PaintboxFont get() = fontCache["mainmenu_rodin"]
     
     val fontPauseMenuTitle: PaintboxFont get() = fontCache["game_pausemenu_title"]
