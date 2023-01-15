@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
+import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.binding.asReadOnlyVar
@@ -44,10 +45,10 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
 
     
     constructor(desktopUI: DesktopUI) : this(desktopUI.main, desktopUI.scenario)
-    
-    
-    private fun createPaperTemplate(textureID: String = "desk_contract_full"): Paper {
-        val root = ImageNode(TextureRegion(StoryAssets.get<Texture>(textureID)), ImageRenderingMode.FULL).apply {
+
+
+    private fun createPaperTemplate(textureID: ReadOnlyVar<String>): Paper {
+        val root = ImageNode(binding = { TextureRegion(StoryAssets.get<Texture>(textureID.use())) }, ImageRenderingMode.FULL).apply {
             this.bounds.width.set(112f * UI_SCALE)
             this.bounds.height.set(150f * UI_SCALE)
         }
@@ -65,6 +66,9 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
 
         return Paper(root, paperPane, envelopePane)
     }
+
+    private fun createPaperTemplate(textureID: String = "desk_contract_full"): Paper =
+            createPaperTemplate(textureID.asReadOnlyVar())
     
     fun createInboxItemUI(item: InboxItem): UIElement {
         return when (item) {
@@ -272,6 +276,65 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                     this.textAlign.set(TextAlign.CENTRE)
                                 }
                             }
+                        }
+                    }
+                }
+
+                paper.root
+            }
+            is InboxItem.EmploymentContract -> {
+                val itemStateVar = scenario.inboxState.itemStateVar(item.id)
+                val paper = createPaperTemplate(Var.bind { 
+                    if (itemStateVar.use()?.completion == InboxItemCompletion.COMPLETED) "desk_contract_employment_signed" else "desk_contract_employment_blank"
+                })
+                paper.paperPane += VBox().apply {
+                    this.spacing.set(1f * UI_SCALE)
+                    this.temporarilyDisableLayouts { 
+                        this += TextLabel(StoryL10N.getVar("inboxItem.employmentContract.heading"), font = main.fontMainMenuHeading).apply {
+                            this.bounds.height.set(9f * UI_SCALE)
+                            this.textColor.set(Color.BLACK)
+                            this.renderAlign.set(Align.top)
+                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 0f))
+                        }
+                        // TODO add potentially more text
+                    }
+                }
+                paper.envelopePane += RectElement(Color.CLEAR).apply {
+                    this.visible.bind {
+                        itemStateVar.use()?.completion != InboxItemCompletion.COMPLETED
+                    }
+
+                    val isHovered = BooleanVar(false)
+
+                    this.border.set(Insets(1f * UI_SCALE))
+                    this.borderStyle.set(SolidBorder().apply {
+                        this.color.bind {
+                            if (isHovered.use()) {
+                                Color.YELLOW.cpy().lerp(Color.ORANGE, 0.75f)
+                            } else {
+                                Color.YELLOW.cpy().lerp(Color.ORANGE, 0.25f).apply {
+                                    this.a = 0.9f
+                                }
+                            }
+                        }
+                    })
+
+                    this.bounds.x.set(17f * UI_SCALE)
+                    this.bounds.y.set(14f * UI_SCALE)
+                    this.bounds.width.set(46f * UI_SCALE)
+                    this.bounds.height.set(13f * UI_SCALE)
+
+                    this += ActionablePane().apply {
+                        this.setOnHoverStart {
+                            isHovered.set(true)
+                        }
+                        this.setOnHoverEnd {
+                            isHovered.set(false)
+                        }
+                        this.setOnAction {
+                            scenario.inboxState.putItemState(item, InboxItemState.BRAND_NEW.copy(completion = InboxItemCompletion.COMPLETED))
+                            scenario.updateProgression()
+                            scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                         }
                     }
                 }

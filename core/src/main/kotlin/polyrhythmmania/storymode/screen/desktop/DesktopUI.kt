@@ -483,7 +483,31 @@ class DesktopUI(
             }
             this += contentPane
 
-            contentPane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_blank")))
+            // Base texture
+            if (inboxItem is InboxItem.EmploymentContract) {
+                contentPane += ImageNode().apply { 
+                    this.textureRegion.sideEffecting(TextureRegion()) { reg ->
+                        val state = myInboxItemState.use()
+                        if (state.completion == InboxItemCompletion.UNAVAILABLE) {
+                            reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_blank"))
+                        } else {
+                            reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_employment_${
+                                when (state.completion) {
+                                    InboxItemCompletion.AVAILABLE -> "unsigned_blue"
+                                    InboxItemCompletion.COMPLETED -> "signed_green"
+                                    InboxItemCompletion.SKIPPED -> "signed_red"
+                                    else -> throw IllegalStateException("Unhandled impossible employment contract inbox item state completion: ${state.completion}")
+                                }
+                            }"))
+                        }
+
+                        reg
+                    }
+                }
+            } else {
+                contentPane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_blank")))
+            }
+            // LED indicator
             contentPane += ImageNode().apply { 
                 this.textureRegion.sideEffecting(TextureRegion()) {reg ->
                     val state = myInboxItemState.use()
@@ -500,6 +524,13 @@ class DesktopUI(
                         }"))
                     }
                     reg
+                }
+                this.visible.bind {
+                    if (inboxItem is InboxItem.EmploymentContract) {
+                        val state = myInboxItemState.use()
+                        // When completed, the checkmark on the base texture replaces the LED
+                        !state.completion.shouldCountAsCompleted()
+                    } else true
                 }
             }
             val titleAreaPane = Pane().apply {
@@ -518,19 +549,21 @@ class DesktopUI(
             }
             contentPane += bottomAreaPane
 
-            titleAreaPane += TextLabel("", font = inboxItemTitleFont).apply {
-                this.text.bind {
-                    val listingName = if (inboxItem is InboxItem.ContractDoc && contractListingName.use() == null) {
-                        // Show contract code if music info is not available
-                        inboxItem.name.use()
-                    } else inboxItem.listingName.use()
-                    
-                    if (useFlowFont.use()) {
-                        listingName.replace('-', ' ')
-                    } else listingName
-                }
-                this.font.bind { 
-                    if (useFlowFont.use()) main.fontFlowCircular else inboxItemTitleFont
+            if (inboxItem !is InboxItem.EmploymentContract) {
+                titleAreaPane += TextLabel("", font = inboxItemTitleFont).apply {
+                    this.text.bind {
+                        val listingName = if (inboxItem is InboxItem.ContractDoc && contractListingName.use() == null) {
+                            // Show contract code if music info is not available
+                            inboxItem.name.use()
+                        } else inboxItem.listingName.use()
+
+                        if (useFlowFont.use()) {
+                            listingName.replace('-', ' ')
+                        } else listingName
+                    }
+                    this.font.bind {
+                        if (useFlowFont.use()) main.fontFlowCircular else inboxItemTitleFont
+                    }
                 }
             }
             

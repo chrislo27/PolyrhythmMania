@@ -82,6 +82,10 @@ sealed class InboxItem(
         
         override fun isCompletedWhenRead(): Boolean = true // There is no contract to play
     }
+
+    class EmploymentContract(id: String) : InboxItem(id, "".asReadOnlyVar()) {
+        override fun isCompletedWhenRead(): Boolean = false
+    }
     
     
     open fun isCompletedWhenRead(): Boolean = true

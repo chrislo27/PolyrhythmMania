@@ -185,7 +185,7 @@ class StoryMusicHandler(val storySession: StorySession) {
         
         return when {
             inboxState.getItemState(InboxDB.FIRST_POSTGAME_ITEM)?.completion?.shouldCountAsCompleted() == true -> StemMixes.desktopPost
-            inboxState.getItemState(InboxDB.FIRST_MAINGAME_ITEM)?.completion?.shouldCountAsCompleted() == true -> StemMixes.desktopMain
+            inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_MAIN_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true -> StemMixes.desktopMain
             inboxState.getItemState(tutorial1InboxItemID)?.completion?.shouldCountAsCompleted() == true -> StemMixes.desktopInternship
             else -> StemMixes.desktopPreTraining101
         }

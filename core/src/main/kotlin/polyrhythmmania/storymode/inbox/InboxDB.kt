@@ -10,7 +10,7 @@ import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
 open class InboxDB : InboxItems() {
     
     companion object {
-        const val FIRST_MAINGAME_ITEM: String = "welcome_back"
+        const val ITEM_TO_TRIGGER_MAIN_MUSIC_MIX: String = "intern_employment_contract"
         const val FIRST_POSTGAME_ITEM: String = "welcome_back_postgame"
     }
     
@@ -36,6 +36,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_final_contract", hasToField = false, hasSeparateListingName = false)))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.ContractDoc(Contracts["crop_stomp"])))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_done", hasToField = false, hasSeparateListingName = false)))
+        instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.EmploymentContract("intern_employment_contract")))
 
         // Post-internship
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("welcome_back", hasToField = false, hasSeparateListingName = false)))
@@ -79,7 +80,8 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
         
         // Postgame
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo(FIRST_POSTGAME_ITEM, hasToField = false, hasSeparateListingName = false)))
+        // TODO replace the ID for this item with a string literal
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(FIRST_POSTGAME_ITEM, hasToField = false, hasSeparateListingName = false)))
         
         
         // Parse instructions
