@@ -479,25 +479,49 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        val res = super.keyDown(keycode)
-        if (!res) {
-            if (!Gdx.input.isControlDown() && !Gdx.input.isAltDown()) {
-                if (keycode == Input.Keys.F11 && !blockResolutionChanges) {
-                    if (!Gdx.input.isShiftDown()) {
-                        if (Gdx.graphics.isFullscreen) {
-                            attemptEndFullscreen()
-                        } else {
-                            attemptFullscreen()
-                        }
-                    } else {
-                        attemptResetWindow()
-                    }
-//                    persistWindowSettings()
-                    return true
-                }
+        val processed = super.keyDown(keycode)
+        if (!processed && !blockResolutionChanges) {
+            if (handleFullscreenKeybinds(keycode)) {
+                return true
             }
         }
-        return res
+        return processed
+    }
+
+    private fun handleFullscreenKeybinds(keycode: Int): Boolean {
+        // Fullscreen shortcuts:
+        // F11 - Toggle fullscreen
+        // Shift+F11 - Reset window to defaults (see PRMania constants)
+        // Alt+Enter - Toggle fullscreen
+        val ctrl = Gdx.input.isControlDown()
+        val shift = Gdx.input.isShiftDown()
+        val alt = Gdx.input.isAltDown()
+        if (!ctrl) {
+            val currentlyFullscreen = Gdx.graphics.isFullscreen
+            if (!alt && keycode == Input.Keys.F11) {
+                if (!shift) {
+                    if (currentlyFullscreen) {
+                        attemptEndFullscreen()
+                    } else {
+                        attemptFullscreen()
+                    }
+                } else {
+                    attemptResetWindow()
+                }
+
+                return true
+            } else if (!shift && alt && keycode == Input.Keys.ENTER) {
+                if (currentlyFullscreen) {
+                    attemptEndFullscreen()
+                } else {
+                    attemptFullscreen()
+                }
+
+                return true
+            }
+        }
+
+        return false
     }
     
     fun playMenuSfx(sound: Sound, volume: Float, pitch: Float, pan: Float): Long {
