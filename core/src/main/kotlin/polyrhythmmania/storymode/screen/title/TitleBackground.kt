@@ -18,33 +18,27 @@ class TitleBackground {
     private val blue: Color = Color().set(181, 183, 240, a = 255)
     private val green: Color = Color().set(187, 249, 191, a = 255)
     private val red: Color = Color().set(240, 152, 168, a = 255)
-    private var msOffset: Long = System.currentTimeMillis()
-    
-    fun resetMsOffset() {
-        msOffset = System.currentTimeMillis()
-    }
 
     fun render(batch: SpriteBatch) {
         val checkerboardTex: Texture = StoryAssets["title_checkerboard"]
         
         val isReducedMotionOn = PRManiaGame.instance.settings.reducedMotion.getOrCompute()
-        val reducedMotionMultiplier = if (isReducedMotionOn) 0f else 1f
 
-        val time = System.currentTimeMillis() - msOffset
-        val checkerboardScroll = MathHelper.getSawtoothWave(time, 5f) * reducedMotionMultiplier
-        val colourTransition = ((MathHelper.getSineWave(time, 15f) - 0.5f) / 0.5f) * reducedMotionMultiplier
+        val time = if (isReducedMotionOn) 0L else System.currentTimeMillis()
+        val checkerboardScroll = MathHelper.getSawtoothWave(time, 5f)
+        val colourTransition = ((MathHelper.getSineWave(time, 15f) - 0.5f) / 0.5f)
         val color = ColorStack.getAndPush().set(green).lerp(if (colourTransition < 0f) red else blue, colourTransition.absoluteValue)
 
         batch.color = color
         batch.fillRect(0f, 0f, 1280f, 720f)
 
-        val squareSize = 50f
+        val squareSize = 50f / 24f
         val u = checkerboardScroll
-        val v = -checkerboardScroll
+        val v = checkerboardScroll
         color.mul(0.9f)
         color.a = 1f
         batch.color = color
-        batch.draw(checkerboardTex, 0f, 0f, 1280f, 720f, u, v, u + (1280 / squareSize) / checkerboardTex.width, v + (720 / squareSize) / checkerboardTex.height)
+        batch.draw(checkerboardTex, 0f, 0f, 1280f, 720f, u, v, u + (1280 / squareSize) / checkerboardTex.width, v - (720 / squareSize) / checkerboardTex.height)
 
         // Reset
         batch.flush()

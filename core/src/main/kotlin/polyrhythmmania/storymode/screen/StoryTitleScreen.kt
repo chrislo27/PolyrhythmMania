@@ -65,8 +65,6 @@ class StoryTitleScreen(main: PRManiaGame, val storySession: StorySession) : PRMa
 
         main.inputMultiplexer.removeProcessor(processor)
         main.inputMultiplexer.addProcessor(processor)
-
-        background.resetMsOffset()
     }
 
     override fun hide() {
