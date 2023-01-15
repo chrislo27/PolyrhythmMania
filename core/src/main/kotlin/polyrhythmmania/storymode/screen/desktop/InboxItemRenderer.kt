@@ -34,6 +34,8 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
     
     private class Paper(val root: ImageNode, val paperPane: Pane, val envelopePane: Pane)
     
+    
+    private var desktopUI: DesktopUI? = null
 
     val monoMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoMono, main.fontRobotoMonoBold, main.fontRobotoMonoItalic, main.fontRobotoMonoBoldItalic)
     val slabMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoSlab, main.fontRobotoSlabBold, null, null)
@@ -44,7 +46,9 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
     val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
 
     
-    constructor(desktopUI: DesktopUI) : this(desktopUI.main, desktopUI.scenario)
+    constructor(desktopUI: DesktopUI) : this(desktopUI.main, desktopUI.scenario) {
+        this.desktopUI = desktopUI
+    }
 
 
     private fun createPaperTemplate(textureID: ReadOnlyVar<String>): Paper {
@@ -333,8 +337,16 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                         }
                         this.setOnAction {
                             scenario.inboxState.putItemState(item, InboxItemState.BRAND_NEW.copy(completion = InboxItemCompletion.COMPLETED))
-                            scenario.updateProgression()
-                            scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
+                            
+                            // TODO play scribble SFX
+                            
+                            val desktopUI = desktopUI
+                            if (desktopUI != null) {
+                                desktopUI.updateAndShowNewlyAvailableInboxItems()
+                            } else {
+                                scenario.updateProgression()
+                                scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
+                            }
                         }
                     }
                 }
