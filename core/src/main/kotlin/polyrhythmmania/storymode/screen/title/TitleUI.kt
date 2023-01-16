@@ -34,6 +34,7 @@ import polyrhythmmania.storymode.screen.StoryDesktopScreen
 import polyrhythmmania.storymode.screen.StoryTitleScreen
 import polyrhythmmania.storymode.screen.desktop.DesktopAnimations
 import polyrhythmmania.storymode.screen.desktop.DesktopScenario
+import polyrhythmmania.storymode.screen.desktop.DesktopStyledPane
 import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
 import polyrhythmmania.ui.PRManiaSkins
 
@@ -112,7 +113,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                 this.bounds.width.set(64f)
                 this.bounds.height.set(64f)
                 (this.skin.getOrCompute() as ButtonSkin).apply {
-                    this.roundedRadius.set(4)
+                    this.roundedRadius.set(8)
                     this.roundedCorners.clear()
                     this.roundedCorners.add(Corner.BOTTOM_LEFT)
                 }
@@ -159,17 +160,22 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                     }
                 }
 
-                this[1] += Button(Localization.getVar("common.back"), font = main.fontRobotoBold).apply {
+                this[1] += DesktopStyledPane().apply {
                     Anchor.Centre.configure(this)
-                    this.bounds.width.set(200f)
-                    this.bounds.height.set(64f)
-                    (this.skin.getOrCompute() as ButtonSkin).apply {
-                        this.roundedRadius.set(8)
-                    }
-                    this.disabled.bind { currentOperation.use() != Operation.None }
-                    this.setOnAction {
-                        titleLogic.fullTitle.set(true)
-                        main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_deselect"))
+                    this.textureToUse = DesktopStyledPane.DEFAULT_TEXTURE_TO_USE_DARK
+                    this.bounds.width.set(46f * UI_SCALE)
+                    this.bounds.height.set(22f * UI_SCALE)
+                    this.padding.set(Insets(7f * UI_SCALE, 5f * UI_SCALE, 6f * UI_SCALE, 6f * UI_SCALE))
+
+                    this += Button(Localization.getVar("common.back"), font = main.fontRobotoBold).apply {
+                        (this.skin.getOrCompute() as ButtonSkin).apply {
+                            this.roundedRadius.set(8)
+                        }
+                        this.disabled.bind { currentOperation.use() != Operation.None }
+                        this.setOnAction {
+                            titleLogic.fullTitle.set(true)
+                            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_deselect"))
+                        }
                     }
                 }
             }
