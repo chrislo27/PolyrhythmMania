@@ -42,21 +42,21 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
 
     private sealed class Operation {
         interface IHasFromTarget {
-            val from: StorySavefile.LoadedState
+            val from: Var<StorySavefile.LoadedState>
+            val fromNumber: Int get() = from.getOrCompute().number
+            val originalShowContext: BooleanVar
         }
 
         object None : Operation()
-        data class Copy(override val from: StorySavefile.LoadedState) : Operation(), IHasFromTarget
-        data class Move(override val from: StorySavefile.LoadedState) : Operation(), IHasFromTarget
-        data class Delete(val target: StorySavefile.LoadedState) : Operation(), IHasFromTarget {
-            override val from: StorySavefile.LoadedState get() = this.target
-        }
+        data class Copy(override val from: Var<StorySavefile.LoadedState>, override val originalShowContext: BooleanVar) : Operation(), IHasFromTarget
+        data class Move(override val from: Var<StorySavefile.LoadedState>, override val originalShowContext: BooleanVar) : Operation(), IHasFromTarget
+        data class Delete(override val from: Var<StorySavefile.LoadedState>, override val originalShowContext: BooleanVar) : Operation(), IHasFromTarget
     }
 
     private val main: PRManiaGame = titleLogic.main
     private val storySession: StorySession = titleLogic.storySession
 
-    private val savefiles: List<StorySavefile.LoadedState> = titleLogic.savefiles
+    private val savefiles: List<Var<StorySavefile.LoadedState>> = titleLogic.savefiles
 
     private val robotoMarkup: Markup = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold, main.fontRobotoItalic, main.fontRobotoBoldItalic)
 
@@ -145,25 +145,30 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                             .map { it.id }
                             .toSet()
 
-                    this.columnBoxes.zip(savefiles).forEach { (pane, savefileState) ->
+                    this.columnBoxes.zip(savefiles).forEach { (pane, savefileStateVar) ->
                         pane += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_file_blank"))).apply {
                             Anchor.Centre.configure(this)
                             this.bounds.width.set(76f * UI_SCALE)
                             this.bounds.height.set(48f * UI_SCALE)
 
-                            val isInFailedState = savefileState is StorySavefile.LoadedState.FailedToLoad
+                            val showContext = BooleanVar(false)
+                            val isInFailedState = BooleanVar {
+                                savefileStateVar.use() is StorySavefile.LoadedState.FailedToLoad
+                            }.asReadOnly()
                             val isOperationOnMe: ReadOnlyBooleanVar = BooleanVar {
                                 val op = currentOperation.use()
-                                op is Operation.IHasFromTarget && op.from == savefileState
+                                op is Operation.IHasFromTarget && op.fromNumber == savefileStateVar.use().number
                             }
                             val isOperationNotOnMe: ReadOnlyBooleanVar = BooleanVar {
                                 val op = currentOperation.use()
-                                op is Operation.IHasFromTarget && op.from != savefileState
+                                op is Operation.IHasFromTarget && op.fromNumber != savefileStateVar.use().number
                             }
 
                             val filePane = Pane()
                             this += filePane
-                            filePane += TextLabel(StoryL10N.getVar("titleScreen.file.fileNumber", listOf(savefileState.number)), main.fontRobotoBold).apply {
+                            filePane += TextLabel(StoryL10N.getVar("titleScreen.file.fileNumber", Var { 
+                                listOf(savefileStateVar.use().number) 
+                            }), main.fontRobotoBold).apply {
                                 this.bounds.x.set(3f * UI_SCALE)
                                 this.bounds.y.set(2f * UI_SCALE)
                                 this.bounds.width.set(21f * UI_SCALE)
@@ -174,38 +179,40 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                 this.setScaleXY(1.1f)
                             }
 
-                            val regularLabelText: ReadOnlyVar<String> = when (savefileState) {
-                                is StorySavefile.LoadedState.Loaded -> {
-                                    val numContractsCompleted = savefileState.savefile.inboxState.getAllItemStates().count { (itemID, state) ->
-                                        state.completion == InboxItemCompletion.COMPLETED && itemID in inboxItemIDsThatAreContracts
+                            val regularLabelText: ReadOnlyVar<String> = Var {
+                                when (val savefileState = savefileStateVar.use()) {
+                                    is StorySavefile.LoadedState.Loaded -> {
+                                        val numContractsCompleted = savefileState.savefile.inboxState.getAllItemStates().count { (itemID, state) ->
+                                            state.completion == InboxItemCompletion.COMPLETED && itemID in inboxItemIDsThatAreContracts
+                                        }
+                                        StoryL10N.getVar("titleScreen.file.contractsCompleted", listOf(numContractsCompleted))
                                     }
-                                    StoryL10N.getVar("titleScreen.file.contractsCompleted", listOf(numContractsCompleted))
-                                }
-                                is StorySavefile.LoadedState.FailedToLoad -> StoryL10N.getVar("titleScreen.file.failedToLoad")
-                                is StorySavefile.LoadedState.NoSavefile -> StoryL10N.getVar("titleScreen.file.noData")
+                                    is StorySavefile.LoadedState.FailedToLoad -> StoryL10N.getVar("titleScreen.file.failedToLoad")
+                                    is StorySavefile.LoadedState.NoSavefile -> StoryL10N.getVar("titleScreen.file.noData")
+                                }.use()
                             }
                             filePane += TextLabel(binding = {
                                 when (val op = currentOperation.use()) {
                                     is Operation.Copy -> {
-                                        if (op.from == savefileState) {
+                                        if (op.fromNumber == savefileStateVar.use().number) {
                                             StoryL10N.getVar("titleScreen.file.operation.copy.source").use()
                                         } else {
-                                            val canCopyHere = savefileState is StorySavefile.LoadedState.NoSavefile
+                                            val canCopyHere = savefileStateVar.use() is StorySavefile.LoadedState.NoSavefile
                                             if (!canCopyHere) {
                                                 StoryL10N.getVar("titleScreen.file.operation.copy.dest.cannot").use()
                                             } else regularLabelText.use()
                                         }
                                     }
                                     is Operation.Delete -> {
-                                        if (op.from == savefileState) {
+                                        if (op.fromNumber == savefileStateVar.use().number) {
                                             StoryL10N.getVar("titleScreen.file.operation.delete.confirm").use()
                                         } else ""
                                     }
                                     is Operation.Move -> {
-                                        if (op.from == savefileState) {
+                                        if (op.fromNumber == savefileStateVar.use().number) {
                                             StoryL10N.getVar("titleScreen.file.operation.move.source").use()
                                         } else {
-                                            val isThisEmpty = savefileState is StorySavefile.LoadedState.NoSavefile
+                                            val isThisEmpty = savefileStateVar.use() is StorySavefile.LoadedState.NoSavefile
                                             StoryL10N.getVar(if (isThisEmpty) "titleScreen.file.operation.move.dest.doesNotExist" else "titleScreen.file.operation.move.dest.exists").use()
                                         }
                                     }
@@ -228,24 +235,24 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                 this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
                             }
 
-                            val playButton = Button(StoryL10N.getVar(when (savefileState) {
-                                is StorySavefile.LoadedState.NoSavefile -> "titleScreen.file.start"
-                                else -> "titleScreen.file.play"
-                            }), main.fontRobotoBold).apply {
+                            val playButton = Button(binding = {
+                                StoryL10N.getVar(when (savefileStateVar.use()) {
+                                    is StorySavefile.LoadedState.NoSavefile -> "titleScreen.file.start"
+                                    else -> "titleScreen.file.play"
+                                }).use()
+                            }, main.fontRobotoBold).apply {
                                 this.bounds.x.set(21f * UI_SCALE)
                                 this.bounds.y.set(37f * UI_SCALE)
                                 this.applyBottomButtonStyling()
 
-                                if (savefileState is StorySavefile.LoadedState.FailedToLoad) {
-                                    this.visible.set(false)
-                                } else {
-                                    this.visible.bind {
-                                        currentOperation.use() == Operation.None
-                                    }
+                                this.visible.bind {
+                                    if (savefileStateVar.use() is StorySavefile.LoadedState.FailedToLoad) {
+                                        false
+                                    } else currentOperation.use() == Operation.None
                                 }
 
                                 this.setOnAction {
-                                    launchSavefile(savefileState)
+                                    launchSavefile(savefileStateVar.getOrCompute())
                                 }
                             }
                             filePane += playButton
@@ -256,7 +263,7 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
 
                                 this.visible.bind {
                                     val op = currentOperation.use()
-                                    op is Operation.IHasFromTarget && op.from == savefileState && op !is Operation.Delete
+                                    op is Operation.IHasFromTarget && op.fromNumber == savefileStateVar.use().number && op !is Operation.Delete
                                 }
 
                                 this.setOnAction {
@@ -271,16 +278,28 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
 
                                 this.visible.bind {
                                     val op = currentOperation.use()
-                                    op is Operation.Copy && op.from != savefileState && savefileState is StorySavefile.LoadedState.NoSavefile
+                                    op is Operation.Copy && op.fromNumber != savefileStateVar.use().number && savefileStateVar.use() is StorySavefile.LoadedState.NoSavefile
                                 }
 
                                 this.setOnAction {
-                                    // TODO impl copy here
+                                    val op = currentOperation.getOrCompute() as? Operation.Copy
+                                    val thisSavefile = savefileStateVar.getOrCompute()
+                                    val savefileNum = thisSavefile.number
+                                    if (op != null && op.fromNumber != savefileNum && thisSavefile is StorySavefile.LoadedState.NoSavefile) {
+                                        val src = op.from.getOrCompute()
+                                        if (src is StorySavefile.LoadedState.Loaded) {
+                                            src.savefile.persistTo(thisSavefile.storageLoc)
+                                            savefileStateVar.set(StorySavefile.attemptLoad(savefileNum))
+                                        }
+                                        op.originalShowContext.set(false)
+                                        showContext.set(false)
+                                    }
+                                    currentOperation.set(Operation.None)
                                 }
                             }
                             filePane += copyHereOperationButton
                             val moveHereOperationButton = Button(binding = {
-                                StoryL10N.getVar(if (savefileState is StorySavefile.LoadedState.NoSavefile)
+                                StoryL10N.getVar(if (savefileStateVar.use() is StorySavefile.LoadedState.NoSavefile)
                                     "titleScreen.file.operation.move.action.move" 
                                 else "titleScreen.file.operation.move.action.swap").use()
                             }, main.fontRobotoBoldItalic).apply {
@@ -290,10 +309,37 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
 
                                 this.visible.bind {
                                     val op = currentOperation.use()
-                                    op is Operation.Move && op.from != savefileState
+                                    op is Operation.Move && op.fromNumber != savefileStateVar.use().number
                                 }
 
                                 this.setOnAction {
+                                    val op = currentOperation.getOrCompute() as? Operation.Move
+                                    val thisSavefile = savefileStateVar.getOrCompute()
+                                    val savefileNum = thisSavefile.number
+                                    if (op != null && op.fromNumber != savefileNum) {
+                                        val src = op.from.getOrCompute()
+                                        val srcLoc = src.storageLoc
+                                        val dst = thisSavefile
+                                        val dstLoc = dst.storageLoc
+                                        
+                                        if (src is StorySavefile.LoadedState.Loaded) {
+                                            // Source can only be Loaded, cannot be NoSavefile
+                                            src.savefile.persistTo(dstLoc)
+                                        }
+                                        
+                                        if (dst is StorySavefile.LoadedState.Loaded) {
+                                            dst.savefile.persistTo(srcLoc)
+                                        } else if (dst is StorySavefile.LoadedState.NoSavefile) {
+                                            src.storageLoc.delete()
+                                        }
+
+                                        savefileStateVar.set(StorySavefile.attemptLoad(savefileNum))
+                                        op.from.set(StorySavefile.attemptLoad(op.fromNumber))
+
+                                        op.originalShowContext.set(false)
+                                        showContext.set(false)
+                                    }
+                                    currentOperation.set(Operation.None)
                                     // TODO impl move/swap here
                                 }
                             }
@@ -309,7 +355,7 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
 
                                 this.visible.bind {
                                     val op = currentOperation.use()
-                                    op is Operation.Delete && op.from == savefileState
+                                    op is Operation.Delete && op.fromNumber == savefileStateVar.use().number
                                 }
 
                                 this += Button(Localization.getVar("common.cancel"), main.fontRobotoItalic).apply {
@@ -325,7 +371,15 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                     this.bounds.width.set(28f * UI_SCALE)
 
                                     this.setOnAction {
-                                        // TODO delete this file
+                                        val savefile = savefileStateVar.getOrCompute()
+                                        val fh = savefile.storageLoc
+                                        if (fh.exists()) {
+                                            fh.delete()
+                                        }
+                                        val savefileNum = savefile.number
+                                        savefileStateVar.set(StorySavefile.LoadedState.NoSavefile(savefileNum, StorySavefile.newSaveFile(savefileNum)))
+                                        currentOperation.set(Operation.None)
+                                        showContext.set(false)
                                     }
                                 }
                             }
@@ -342,11 +396,12 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                 this.align.set(HBox.Align.RIGHT)
 
                                 this.temporarilyDisableLayouts {
-                                    val showContext = BooleanVar(false)
                                     this += Button("").apply {
                                         this.bounds.width.set(8f * UI_SCALE)
                                         this.bounds.height.set(8f * UI_SCALE)
-                                        this.visible.bind { showContext.use() && !isInFailedState && !isOperationNotOnMe.use() }
+                                        this.visible.bind {
+                                            showContext.use() && !isInFailedState.use() && !isOperationNotOnMe.use() && savefileStateVar.use() !is StorySavefile.LoadedState.NoSavefile
+                                        }
 
                                         this += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_icon_copy")))
 
@@ -354,14 +409,16 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                             if (currentOperation.getOrCompute() is Operation.Copy) {
                                                 currentOperation.set(Operation.None)
                                             } else {
-                                                currentOperation.set(Operation.Copy(savefileState))
+                                                currentOperation.set(Operation.Copy(savefileStateVar, showContext))
                                             }
                                         }
                                     }
                                     this += Button("").apply {
                                         this.bounds.width.set(8f * UI_SCALE)
                                         this.bounds.height.set(8f * UI_SCALE)
-                                        this.visible.bind { showContext.use() && !isInFailedState && !isOperationNotOnMe.use() }
+                                        this.visible.bind { 
+                                            showContext.use() && !isInFailedState.use() && !isOperationNotOnMe.use() && savefileStateVar.use() !is StorySavefile.LoadedState.NoSavefile
+                                        }
 
                                         this += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_icon_move")))
 
@@ -369,14 +426,16 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                             if (currentOperation.getOrCompute() is Operation.Move) {
                                                 currentOperation.set(Operation.None)
                                             } else {
-                                                currentOperation.set(Operation.Move(savefileState))
+                                                currentOperation.set(Operation.Move(savefileStateVar, showContext))
                                             }
                                         }
                                     }
                                     this += Button("").apply {
                                         this.bounds.width.set(8f * UI_SCALE)
                                         this.bounds.height.set(8f * UI_SCALE)
-                                        this.visible.bind { showContext.use() && !isOperationNotOnMe.use() }
+                                        this.visible.bind { 
+                                            showContext.use() && !isOperationNotOnMe.use() && savefileStateVar.use() !is StorySavefile.LoadedState.NoSavefile
+                                        }
 
                                         this += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_icon_delete")))
 
@@ -384,7 +443,7 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                             if (currentOperation.getOrCompute() is Operation.Delete) {
                                                 currentOperation.set(Operation.None)
                                             } else {
-                                                currentOperation.set(Operation.Delete(savefileState))
+                                                currentOperation.set(Operation.Delete(savefileStateVar, showContext))
                                             }
                                         }
                                     }
@@ -392,7 +451,9 @@ class TitleUI(val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                                         this.bounds.width.set(8f * UI_SCALE)
                                         this.bounds.height.set(8f * UI_SCALE)
                                         this.disabled.bind { isOperationOnMe.use() }
-                                        this.visible.bind { !isOperationNotOnMe.use() }
+                                        this.visible.bind { 
+                                            !isOperationNotOnMe.use() && savefileStateVar.use() !is StorySavefile.LoadedState.NoSavefile
+                                        }
 
                                         this += ImageNode(TextureRegion(StoryAssets.get<Texture>("title_icon_dotdotdot")))
 

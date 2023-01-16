@@ -14,9 +14,12 @@ import polyrhythmmania.storymode.inbox.InboxState
 class StorySavefile private constructor(val saveNumber: Int) {
 
     companion object {
-        
         const val NUM_FILES: Int = 3
         const val SAVE_FILE_VERSION: Int = 0
+        
+        fun getStorageLocForSaveNumber(saveNumber: Int): FileHandle {
+            return FileHandle(PRMania.MAIN_FOLDER.resolve("prefs/storymode_save_${saveNumber}.json"))
+        }
         
         fun newSaveFile(saveNumber: Int, disableSaving: Boolean = false): StorySavefile {
             return StorySavefile(saveNumber).apply { 
@@ -48,19 +51,19 @@ class StorySavefile private constructor(val saveNumber: Int) {
                 }
             } catch (e: Exception) {
                 Paintbox.LOGGER.error("Failed to load story mode savefile $saveNumber", throwable = e)
-                LoadedState.FailedToLoad(saveNumber, e)
+                LoadedState.FailedToLoad(saveNumber, e, getStorageLocForSaveNumber(saveNumber))
             }
         }
     }
 
-    sealed class LoadedState(val number: Int) {
-        class NoSavefile(number: Int, val blankFile: StorySavefile) : LoadedState(number)
-        class FailedToLoad(number: Int, val exception: Exception) : LoadedState(number)
-        class Loaded(number: Int, val savefile: StorySavefile) : LoadedState(number)
+    sealed class LoadedState(val number: Int, val storageLoc: FileHandle) {
+        class NoSavefile(number: Int, val blankFile: StorySavefile) : LoadedState(number, blankFile.storageLoc)
+        class FailedToLoad(number: Int, val exception: Exception, storageLoc: FileHandle) : LoadedState(number, storageLoc)
+        class Loaded(number: Int, val savefile: StorySavefile) : LoadedState(number, savefile.storageLoc)
     }
     
 
-    val storageLoc: FileHandle by lazy { FileHandle(PRMania.MAIN_FOLDER.resolve("prefs/storymode_save_${saveNumber}.json")) }
+    val storageLoc: FileHandle by lazy { getStorageLocForSaveNumber(this.saveNumber) }
     /**
      * Disables saving. The [persist] function will not do anything if true.
      */
@@ -97,19 +100,27 @@ class StorySavefile private constructor(val saveNumber: Int) {
         InboxState.fromJson(inboxStateObj, inboxState)
     }
     
+    fun toJsonString(): String {
+        return Json.`object`().also { obj ->
+            toJson(obj)
+        }.toString()
+    }
+    
     fun persist() {
+        persistTo(this.storageLoc)
+    }
+    
+    fun persistTo(loc: FileHandle) {
         try {
             // Intentionally build the string here, even if disableSaving == true.
-            val jsonString = Json.`object`().also { obj ->
-                toJson(obj)
-            }.toString()
+            val jsonString = toJsonString()
 
             if (disableSaving) {
                 Paintbox.LOGGER.debug("Not actually persisting due to disableSaving flag", tag = "StorySavefile")
                 return
             }
             
-            storageLoc.writeString(jsonString, false, "UTF-8")
+            loc.writeString(jsonString, false, "UTF-8")
         } catch (e: Exception) {
             e.printStackTrace()
         }
