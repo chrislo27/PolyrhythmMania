@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import paintbox.util.ColorStack
-import paintbox.util.MathHelper
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.set
+import paintbox.util.wave.WaveUtils
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import kotlin.math.absoluteValue
@@ -25,8 +25,8 @@ class TitleBackground {
         val isReducedMotionOn = PRManiaGame.instance.settings.reducedMotion.getOrCompute()
 
         val time = if (isReducedMotionOn) 0L else System.currentTimeMillis()
-        val checkerboardScroll = MathHelper.getSawtoothWave(time, 5f)
-        val colourTransition = ((MathHelper.getSineWave(time, 15f) - 0.5f) / 0.5f)
+        val checkerboardScroll = WaveUtils.getSawtoothWave(5f, timeMs = time)
+        val colourTransition = ((WaveUtils.getSineWave(15f, time) - 0.5f) / 0.5f)
         val color = ColorStack.getAndPush().set(green).lerp(if (colourTransition < 0f) red else blue, colourTransition.absoluteValue)
 
         batch.color = color

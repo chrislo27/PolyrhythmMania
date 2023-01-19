@@ -7,9 +7,9 @@ import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.font.TextBlock
 import paintbox.ui.contextmenu.ContextMenu
-import paintbox.util.MathHelper
 import paintbox.util.gdxutils.drawRect
 import paintbox.util.gdxutils.fillRect
+import paintbox.util.wave.WaveUtils
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.TrackView
@@ -17,7 +17,6 @@ import polyrhythmmania.editor.pane.track.EditorTrackArea
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import java.util.*
-import kotlin.Comparator
 
 
 
@@ -99,7 +98,7 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
             }
             
             if (ownedContextMenu != null) {
-                batch.setColor(MathHelper.getSineWave(0.5f), 1f, 1f, 1f)
+                batch.setColor(WaveUtils.getSineWave(0.5f), 1f, 1f, 1f)
             } else {
                 batch.setColor(1f, 1f, 1f, 1f)
             }
@@ -119,7 +118,7 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
             }
 
             if (ownedContextMenu != null) {
-                batch.setColor(MathHelper.getSineWave(0.5f), 1f, 1f, 1f)
+                batch.setColor(WaveUtils.getSineWave(0.5f), 1f, 1f, 1f)
             } else {
                 batch.setColor(1f, 1f, 1f, 1f)
             }

@@ -26,12 +26,12 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabelSkin
 import paintbox.ui.layout.VBox
-import paintbox.util.MathHelper
 import paintbox.util.Version
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import paintbox.util.settableLazy
 import paintbox.util.viewport.ExtendNoOversizeViewport
+import paintbox.util.wave.WaveUtils
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
@@ -519,7 +519,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     override fun renderUpdate() {
         super.renderUpdate()
         
-        newVersionFloaterAnimation.set(MathHelper.getCosineWave(1.5f))
+        newVersionFloaterAnimation.set(WaveUtils.getCosineWave(1.5f))
         
 //        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
 //            crossFade.fadeTo(musicPlayer, 1000f)

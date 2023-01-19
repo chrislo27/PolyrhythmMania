@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import paintbox.binding.Var
 import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.PressedState
-import paintbox.util.MathHelper
 import paintbox.util.gdxutils.grey
 import paintbox.util.gdxutils.set
+import paintbox.util.wave.WaveUtils
 
 
 class LibraryEntryButtonSkin(override val element: LibraryEntryButton) : ButtonSkin(element) {
@@ -96,7 +96,7 @@ class LibraryEntryButtonSkin(override val element: LibraryEntryButton) : ButtonS
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-        val alpha = MathHelper.getCosineWave(System.currentTimeMillis() - element.selectedTimeMs, 60f / 112.0f)
+        val alpha = WaveUtils.getCosineWave(60f / 112.0f, offsetMs = -element.selectedTimeMs)
         selectedBgColor.set(SELECTED_BG_FROM).lerp(SELECTED_BG_TO, alpha)
         
         super.renderSelf(originX, originY, batch)

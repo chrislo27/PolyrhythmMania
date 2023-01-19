@@ -30,9 +30,9 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.ColorStack
-import paintbox.util.MathHelper
 import paintbox.util.Matrix4Stack
 import paintbox.util.gdxutils.*
+import paintbox.util.wave.WaveUtils
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
@@ -374,7 +374,7 @@ duration: ${monster.activeDuration.get()} sec
                 }
                 textBoxLabel.textColor.set(textColor)
                 textBoxInputLabel.text.set(if (textBox.secondsTimer > 0f) "" else {
-                    if (textBox.isADown || MathHelper.getSawtoothWave(1.25f) < 0.25f)
+                    if (textBox.isADown || WaveUtils.getSawtoothWave(1.25f) < 0.25f)
                         RodinSpecialChars.FILLED_A else RodinSpecialChars.BORDERED_A
                 })
                 textBoxInputLabel.textColor.set(textColor)

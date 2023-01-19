@@ -27,6 +27,7 @@ import paintbox.util.MathHelper
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
+import paintbox.util.wave.WaveUtils
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
@@ -79,7 +80,7 @@ class DesktopUI(
     private val blinkFrameIndex: ReadOnlyIntVar = IntVar {
         val secPerFrame = 0.15f
         val frames = availableBlinkTexRegs.size
-        (MathHelper.getTriangleWave(secPerFrame * frames * 2) * frames).toInt().coerceIn(0, frames - 1)
+        (WaveUtils.getTriangleWave(secPerFrame * frames * 2) * frames).toInt().coerceIn(0, frames - 1)
     }
     
     val inboxItemRenderer: InboxItemRenderer = InboxItemRenderer(this)

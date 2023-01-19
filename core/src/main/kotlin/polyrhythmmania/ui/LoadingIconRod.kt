@@ -9,9 +9,8 @@ import paintbox.binding.IntVar
 import paintbox.registry.AssetRegistry
 import paintbox.ui.ImageNode
 import paintbox.ui.ImageRenderingMode
-import paintbox.util.MathHelper
 import paintbox.util.gdxutils.set
-
+import paintbox.util.wave.WaveUtils
 
 
 class LoadingIconRod : ImageNode(null, renderingMode = ImageRenderingMode.MAINTAIN_ASPECT_RATIO) {
@@ -39,8 +38,8 @@ class LoadingIconRod : ImageNode(null, renderingMode = ImageRenderingMode.MAINTA
     }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
-        val time = System.currentTimeMillis() + (animationDuration * animationTimeOffset * 1000).toInt()
-        animationFrame.set((MathHelper.getSawtoothWave(time, animationDuration) * regions.size).toInt().coerceIn(0, 5))
+        val offsetMs = (animationDuration * animationTimeOffset * 1000).toLong()
+        animationFrame.set((WaveUtils.getSawtoothWave(animationDuration, offsetMs = offsetMs) * regions.size).toInt().coerceIn(0, 5))
         super.renderSelf(originX, originY, batch)
     }
 }

@@ -8,9 +8,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import paintbox.registry.AssetRegistry
-import paintbox.util.MathHelper
 import paintbox.util.gdxutils.drawQuad
 import paintbox.util.gdxutils.fillRect
+import paintbox.util.wave.WaveUtils
 import java.util.*
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -84,11 +84,11 @@ class TengokuPauseBackground {
         for (i in 0 until squareCount) {
             val alpha = i / squareCount.toFloat()
             val size = Interpolation.circleIn.apply(20f, 80f, alpha) * 1.5f
-            val rotation = MathHelper.getSawtoothWave(currentMsTime + (273L * alpha * 2).roundToLong(),
-                    Interpolation.circleOut.apply(0.65f, 1.15f, alpha) * 0.75f) * (if (i % 2 == 0) -1 else 1)
+            val rotation = WaveUtils.getSawtoothWave(Interpolation.circleOut.apply(0.65f, 1.15f, alpha) * 0.75f,
+                    offsetMs = (273L * alpha * 2).roundToLong())* (if (i % 2 == 0) -1 else 1)
 
             val yInterval = Interpolation.circleOut.apply(8f, 5f, alpha)
-            val yAlpha = 1f - MathHelper.getSawtoothWave(currentMsTime + (562L * alpha * 2).roundToLong(), yInterval)
+            val yAlpha = 1f - WaveUtils.getSawtoothWave(yInterval, offsetMs = (562L * alpha * 2).roundToLong())
             val x = MathUtils.lerp(width * -0.1f, width * 1.1f, yAlpha)
             val y = (width * 1.4142135f * (i + 23) * (alpha + seed) + (yAlpha * yInterval).roundToInt()) % (width * 1.25f)
 

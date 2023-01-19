@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
-import paintbox.util.MathHelper
+import paintbox.util.wave.WaveUtils
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
 import kotlin.math.sqrt
@@ -146,7 +146,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
     
     private fun getEnvelopeFrameNum(offset: Int = 0, speed: Float = 0.1f): Int {
         val count = ENVELOPE_FRAMES.size
-        return ENVELOPE_FRAMES[((MathHelper.getSawtoothWave(speed / ((count * 2 - 1) / count)) * count).toInt() + offset) % count]
+        return ENVELOPE_FRAMES[((WaveUtils.getSawtoothWave(speed / ((count * 2 - 1) / count)) * count).toInt() + offset) % count]
     }
     
 }
