@@ -23,10 +23,10 @@ import polyrhythmmania.storymode.inbox.InboxState
 class StoryMusicHandler(val storySession: StorySession) {
 
     companion object {
-        private const val LOOP_SAMPLES_START: Int = 0
-        private const val LOOP_SAMPLES_END: Int = 2_373_981
-        private const val BPM: Float = 107f
-        private const val DURATION_BEATS: Float = 96f
+        const val LOOP_SAMPLES_START: Int = 0
+        const val LOOP_SAMPLES_END: Int = 2_373_981
+        const val BPM: Float = 107f
+        const val DURATION_BEATS: Float = 96f
     }
     
     private class StemPlayer(val stemID: String, val stem: Stem, val player: MusicSamplePlayer) : Plug(player.context, player.outs) {

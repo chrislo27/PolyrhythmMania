@@ -188,86 +188,106 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                             }
                         }
                     }
-                    this += Button("Debug \"desktop\" screen with complex progression logic").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            val inboxItems = InboxItems(listOf(
-                                    InboxItem.Debug("debug0", "1st item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This item is always unlocked to start. This will unlock the 2nd item once COMPLETED"),
-                                    InboxItem.Debug("debug1", "2nd item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This will unlock both the 3rd and 4th items once COMPLETED"),
-                                    InboxItem.Debug("debug2a", "3rd item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 4th item are COMPLETED"),
-                                    InboxItem.Debug("debug2b", "4th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 3rd item are COMPLETED"),
-                                    InboxItem.Debug("debug3", "5th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER),
-                                    InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
-                                    InboxItem.ContractDoc(Contract("debugcontract_2", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
-                            ))
-                            val progression = Progression(listOf(
-                                    UnlockStage.singleItem("debug0", UnlockStageChecker.alwaysUnlocked(), stageID = "stage0"),
-                                    UnlockStage.singleItem("debug1", UnlockStageChecker.stageToBeCompleted("stage0"), stageID = "stage1"),
-                                    UnlockStage("stage2", UnlockStageChecker.stageToBeCompleted("stage1"), listOf("debug2a", "debug2b")),
-                                    UnlockStage.singleItem("debug3", UnlockStageChecker.stageToBeCompleted("stage2"), stageID = "stage3"),
-                                    UnlockStage.singleItem("contract_debugcontract_1", UnlockStageChecker.alwaysUnlocked(), stageID = "stage_debugcontract_1"),
-                                    UnlockStage.singleItem("contract_debugcontract_2", UnlockStageChecker.stageToBeCompleted("stage_debugcontract_1"), stageID = "stage_debugcontract_2"),
-                            ))
-                            
-                            Gdx.app.postRunnable {
-                                val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)
-                                main.screen = TransitionScreen(main, main.screen, titleScreen,
-                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-                            }
-                        }
-                    }
-                    this += Button("Debug \"desktop\" screen with straight-down progression logic").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            val inboxItems = InboxItems((0 until 30).map { i ->
-                                InboxItem.Debug("debug$i", "item #$i", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "no desc")
-                            })
-                            val progression = Progression.debugItemsInOrder(inboxItems)
-                            
-                            Gdx.app.postRunnable {
-                                val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)
-                                main.screen = TransitionScreen(main, main.screen, titleScreen,
-                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-                            }
-                        }
-                    }
-                    this += Button("Debug \"desktop\" screen with zig-zag progression logic").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            val inboxItems = InboxItems((0 until 20).map { i ->
-                                InboxItem.Debug("debug$i", "item #$i", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "no desc")
-                            })
-//                            val progression = Progression(inboxItems.items.subList(0, 15).map {
-//                                UnlockStage.singleItem(it.id, UnlockStageChecker.alwaysUnlocked())
-//                            } + (0 until inboxItems.items.size / 2).map { i ->
-//                                UnlockStage.singleItem(inboxItems.items[30 - i - 1].id, UnlockStageChecker.stageToBeCompleted(inboxItems.items[i].id))
-//                            })
-                            val progression = Progression(listOf(
-                                    UnlockStage.singleItem("debug0", UnlockStageChecker.alwaysUnlocked()),
-                                    
-                                    UnlockStage.singleItem("debug19", UnlockStageChecker.stageToBeCompleted("debug0")),
-                                    UnlockStage.singleItem("debug1", UnlockStageChecker.stageToBeCompleted("debug19")),
-                                    UnlockStage.singleItem("debug18", UnlockStageChecker.stageToBeCompleted("debug1")),
-                                    UnlockStage.singleItem("debug2", UnlockStageChecker.stageToBeCompleted("debug18")),
-                                    UnlockStage.singleItem("debug17", UnlockStageChecker.stageToBeCompleted("debug2")),
-                                    UnlockStage.singleItem("debug3", UnlockStageChecker.stageToBeCompleted("debug17")),
-                                    UnlockStage.singleItem("debug16", UnlockStageChecker.stageToBeCompleted("debug3")),
-                                    UnlockStage.singleItem("debug4", UnlockStageChecker.stageToBeCompleted("debug16")),
-                                    UnlockStage.singleItem("debug15", UnlockStageChecker.stageToBeCompleted("debug4")),
-                                    UnlockStage.singleItem("debug5", UnlockStageChecker.stageToBeCompleted("debug15")),
-                                    UnlockStage.singleItem("debug14", UnlockStageChecker.stageToBeCompleted("debug5")),
-                                    UnlockStage.singleItem("debug6", UnlockStageChecker.stageToBeCompleted("debug14")),
-                                    UnlockStage.singleItem("debug13", UnlockStageChecker.stageToBeCompleted("debug6")),
-                                    UnlockStage.singleItem("debug7", UnlockStageChecker.stageToBeCompleted("debug13")),
-                                    UnlockStage.singleItem("debug12", UnlockStageChecker.stageToBeCompleted("debug7")),
-                                    UnlockStage.singleItem("debug8", UnlockStageChecker.stageToBeCompleted("debug12")),
-                                    UnlockStage.singleItem("debug11", UnlockStageChecker.stageToBeCompleted("debug8")),
-                                    UnlockStage.singleItem("debug9", UnlockStageChecker.stageToBeCompleted("debug11")),
-                                    UnlockStage.singleItem("debug10", UnlockStageChecker.stageToBeCompleted("debug9")),
-                            ))
+                    class ProgressionTest(val name: String, val inboxProgressionFactory: () -> Pair<InboxItems, Progression>)
+                    val progressions: List<ProgressionTest> = listOf(
+                            ProgressionTest("Complex progression logic") {
+                                val inboxItems = InboxItems(listOf(
+                                        InboxItem.Debug("debug0", "1st item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This item is always unlocked to start. This will unlock the 2nd item once COMPLETED"),
+                                        InboxItem.Debug("debug1", "2nd item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This will unlock both the 3rd and 4th items once COMPLETED"),
+                                        InboxItem.Debug("debug2a", "3rd item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 4th item are COMPLETED"),
+                                        InboxItem.Debug("debug2b", "4th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 3rd item are COMPLETED"),
+                                        InboxItem.Debug("debug3", "5th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER),
+                                        InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
+                                        InboxItem.ContractDoc(Contract("debugcontract_2", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
+                                ))
+                                val progression = Progression(listOf(
+                                        UnlockStage.singleItem("debug0", UnlockStageChecker.alwaysUnlocked(), stageID = "stage0"),
+                                        UnlockStage.singleItem("debug1", UnlockStageChecker.stageToBeCompleted("stage0"), stageID = "stage1"),
+                                        UnlockStage("stage2", UnlockStageChecker.stageToBeCompleted("stage1"), listOf("debug2a", "debug2b")),
+                                        UnlockStage.singleItem("debug3", UnlockStageChecker.stageToBeCompleted("stage2"), stageID = "stage3"),
+                                        UnlockStage.singleItem("contract_debugcontract_1", UnlockStageChecker.alwaysUnlocked(), stageID = "stage_debugcontract_1"),
+                                        UnlockStage.singleItem("contract_debugcontract_2", UnlockStageChecker.stageToBeCompleted("stage_debugcontract_1"), stageID = "stage_debugcontract_2"),
+                                ))
+                                Pair(inboxItems, progression)
+                            },
+                            ProgressionTest("Straight-down progression logic") {
+                                val inboxItems = InboxItems((0 until 30).map { i ->
+                                    InboxItem.Debug("debug$i", "item #$i", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "no desc")
+                                })
+                                val progression = Progression.debugItemsInOrder(inboxItems)
+                                Pair(inboxItems, progression)
+                            },
+                            ProgressionTest("Zig-zag progression logic") {
+                                val inboxItems = InboxItems((0 until 20).map { i ->
+                                    InboxItem.Debug("debug$i", "item #$i", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "no desc")
+                                })
+//                                val progression = Progression(inboxItems.items.subList(0, 15).map {
+//                                    UnlockStage.singleItem(it.id, UnlockStageChecker.alwaysUnlocked())
+//                                } + (0 until inboxItems.items.size / 2).map { i ->
+//                                    UnlockStage.singleItem(inboxItems.items[30 - i - 1].id, UnlockStageChecker.stageToBeCompleted(inboxItems.items[i].id))
+//                                })
+                                val progression = Progression(listOf(
+                                        UnlockStage.singleItem("debug0", UnlockStageChecker.alwaysUnlocked()),
 
+                                        UnlockStage.singleItem("debug19", UnlockStageChecker.stageToBeCompleted("debug0")),
+                                        UnlockStage.singleItem("debug1", UnlockStageChecker.stageToBeCompleted("debug19")),
+                                        UnlockStage.singleItem("debug18", UnlockStageChecker.stageToBeCompleted("debug1")),
+                                        UnlockStage.singleItem("debug2", UnlockStageChecker.stageToBeCompleted("debug18")),
+                                        UnlockStage.singleItem("debug17", UnlockStageChecker.stageToBeCompleted("debug2")),
+                                        UnlockStage.singleItem("debug3", UnlockStageChecker.stageToBeCompleted("debug17")),
+                                        UnlockStage.singleItem("debug16", UnlockStageChecker.stageToBeCompleted("debug3")),
+                                        UnlockStage.singleItem("debug4", UnlockStageChecker.stageToBeCompleted("debug16")),
+                                        UnlockStage.singleItem("debug15", UnlockStageChecker.stageToBeCompleted("debug4")),
+                                        UnlockStage.singleItem("debug5", UnlockStageChecker.stageToBeCompleted("debug15")),
+                                        UnlockStage.singleItem("debug14", UnlockStageChecker.stageToBeCompleted("debug5")),
+                                        UnlockStage.singleItem("debug6", UnlockStageChecker.stageToBeCompleted("debug14")),
+                                        UnlockStage.singleItem("debug13", UnlockStageChecker.stageToBeCompleted("debug6")),
+                                        UnlockStage.singleItem("debug7", UnlockStageChecker.stageToBeCompleted("debug13")),
+                                        UnlockStage.singleItem("debug12", UnlockStageChecker.stageToBeCompleted("debug7")),
+                                        UnlockStage.singleItem("debug8", UnlockStageChecker.stageToBeCompleted("debug12")),
+                                        UnlockStage.singleItem("debug11", UnlockStageChecker.stageToBeCompleted("debug8")),
+                                        UnlockStage.singleItem("debug9", UnlockStageChecker.stageToBeCompleted("debug11")),
+                                        UnlockStage.singleItem("debug10", UnlockStageChecker.stageToBeCompleted("debug9")),
+                                ))
+                                Pair(inboxItems, progression)
+                            }
+                    )
+                    this += HBox().apply {
+                        this.bounds.height.set(32f)
+                        this.spacing.set(8f)
+                        val combobox = ComboBox(progressions, progressions.first()).apply {
+                            this.bindWidthToParent(multiplier = 0.7f)
+                            this.itemStringConverter.set { it.name }
+                        }
+                        this += combobox
+                        this += Button("Open Selected").apply {
+                            this.bindWidthToParent(multiplier = 0.3f, adjust = -8f)
+                            this.setOnAction {
+                                val (inboxItems, progression) = combobox.selectedItem.getOrCompute().inboxProgressionFactory()
+                                Gdx.app.postRunnable {
+                                    val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)
+                                    main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                            FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                                }
+                            }
+                        }
+                    }
+                    this += separator()
+                    this += Button("Debug \"desktop\" screen background only").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
                             Gdx.app.postRunnable {
-                                val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)
+                                val titleScreen = TestStoryDesktopBgScreen(main, this@TestStoryGimmickDebugScreen)
+                                main.screen = TransitionScreen(main, main.screen, titleScreen,
+                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
+                    this += Button("Debug story mode desktop music stems").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            Gdx.app.postRunnable {
+                                val titleScreen = TestStoryMusicScreen(main, this@TestStoryGimmickDebugScreen)
                                 main.screen = TransitionScreen(main, main.screen, titleScreen,
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
@@ -284,20 +304,9 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                             val progression = Progression(listOf(
                                     UnlockStage("all", UnlockStageChecker.alwaysUnlocked(), inboxItems.items.map { it.id })
                             ))
-                            
+
                             Gdx.app.postRunnable {
                                 val titleScreen = TestStoryDesktopScreen(main, storySession, this@TestStoryGimmickDebugScreen, inboxItems, progression)
-                                main.screen = TransitionScreen(main, main.screen, titleScreen,
-                                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-                            }
-                        }
-                    }
-                    this += separator()
-                    this += Button("Debug \"desktop\" screen background only").apply {
-                        this.bounds.height.set(32f)
-                        this.setOnAction {
-                            Gdx.app.postRunnable {
-                                val titleScreen = TestStoryDesktopBgScreen(main, this@TestStoryGimmickDebugScreen)
                                 main.screen = TransitionScreen(main, main.screen, titleScreen,
                                         FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                             }
