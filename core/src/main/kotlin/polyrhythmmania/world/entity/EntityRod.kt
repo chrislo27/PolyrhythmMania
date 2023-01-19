@@ -9,7 +9,7 @@ import paintbox.registry.AssetRegistry
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.soundsystem.BeadsSound
-import polyrhythmmania.util.WaveUtils
+import polyrhythmmania.util.BounceWave
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.texturepack.TexturePack
@@ -136,9 +136,9 @@ abstract class EntityRod(world: World, val deployBeat: Float)
 //                MathUtils.lerp(startY, endY, WaveUtils.getBounceWave(alpha * 0.5f))
 //            } else {
             return if (alpha <= 0.5f) {
-                MathUtils.lerp(startY, peakHeight, WaveUtils.getBounceWave(alpha))
+                MathUtils.lerp(startY, peakHeight, BounceWave.getBounceWave(alpha))
             } else {
-                MathUtils.lerp(endY, peakHeight, WaveUtils.getBounceWave(alpha))
+                MathUtils.lerp(endY, peakHeight, BounceWave.getBounceWave(alpha))
             }
 //            }
         }

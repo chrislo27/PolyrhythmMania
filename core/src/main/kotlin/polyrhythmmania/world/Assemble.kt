@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawQuad
-import polyrhythmmania.animation.Animation
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
 import polyrhythmmania.engine.input.InputResult
@@ -20,7 +19,7 @@ import polyrhythmmania.engine.input.InputType
 import polyrhythmmania.gamemodes.EventAsmAssemble
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.statistics.GlobalStats
-import polyrhythmmania.util.WaveUtils
+import polyrhythmmania.util.BounceWave
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityRod
 import polyrhythmmania.world.entity.SpriteEntity
@@ -314,9 +313,9 @@ class EntityRodAsm(world: World, deployBeat: Float, val rodID: Int) : EntityRod(
             }
             val alpha = ((beat - startBeat) / (duration)).coerceIn(0f, 1f)
             return if (alpha <= 0.5f) {
-                MathUtils.lerp(startY, peakHeight, WaveUtils.getBounceWave(alpha))
+                MathUtils.lerp(startY, peakHeight, BounceWave.getBounceWave(alpha))
             } else {
-                MathUtils.lerp(endY, peakHeight, WaveUtils.getBounceWave(alpha))
+                MathUtils.lerp(endY, peakHeight, BounceWave.getBounceWave(alpha))
             }
         }
     }
