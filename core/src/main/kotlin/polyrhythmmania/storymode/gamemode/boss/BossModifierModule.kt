@@ -38,6 +38,7 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
     // Settings
     
     // Data
+    val uiOpacity: FloatVar = FloatVar(0f)
     
     // Health
     val playerHealth: HealthBar = HealthBar(PLAYER_HEALTH)
@@ -46,9 +47,21 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
     override fun resetState() {
         playerHealth.resetState()
         bossHealth.resetState()
+        uiOpacity.set(0f)
+    }
+    
+    fun triggerUIShow() {
+        if (uiOpacity.get() <= 0f) {
+            uiOpacity.set(0.01f)
+        }
     }
 
     override fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
+        val currentOpacity = uiOpacity.get()
+        if (currentOpacity > 0f && currentOpacity < 1f) {
+            val transitionDuration = 0.5f
+            uiOpacity.set((currentOpacity + deltaSec / transitionDuration).coerceAtMost(1f))
+        }
     }
 
     fun checkForRodsThatCollidedWithBoss() {

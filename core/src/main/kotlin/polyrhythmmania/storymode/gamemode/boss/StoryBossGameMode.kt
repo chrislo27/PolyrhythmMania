@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.gamemode.boss
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
@@ -105,7 +106,7 @@ class StoryBossGameMode(main: PRManiaGame)
             this.transitionData.paletteTransition.set(zoomTransition)
             this.beat = 0f
         }
-        blocks += GenericBlock(engine) {
+        blocks += GenericBlock(engine, shouldOffsetEventsByThisBlockBeat = false) {
             listOf(EventMoveCameraRelative(engine, this.beat, zoomTransition, Vector3(1f, 1f, 0f)))
         }.apply { 
             this.beat = 0f
@@ -113,6 +114,17 @@ class StoryBossGameMode(main: PRManiaGame)
         
         blocks += MusicInitializationBlock().apply {
             this.beat = 0f
+        }
+        blocks += GenericBlock(engine, shouldOffsetEventsByThisBlockBeat = true) {
+            listOf(object : Event(engine) {
+                override fun onStart(currentBeat: Float) {
+                    Gdx.app.postRunnable {
+                        modifierModule.triggerUIShow()
+                    }
+                }
+            })
+        }.apply {
+            this.beat = 8f
         }
 
         container.addBlocks(blocks)

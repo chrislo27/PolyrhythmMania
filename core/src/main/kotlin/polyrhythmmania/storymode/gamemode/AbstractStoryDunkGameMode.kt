@@ -24,7 +24,7 @@ abstract class AbstractStoryDunkGameMode(
     }
     
     protected open fun newDunkPattern(startBeat: Float): Block {
-        return GenericBlock(engine) {
+        return GenericBlock(engine, shouldOffsetEventsByThisBlockBeat = false) {
             listOf(EventDeployRodDunk(this.engine, this.beat))
         }.apply { 
             this.beat = startBeat - 2

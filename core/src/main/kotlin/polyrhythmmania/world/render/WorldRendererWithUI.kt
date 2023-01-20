@@ -1411,6 +1411,10 @@ duration: ${monster.activeDuration.get()} sec
                 
                 currentPlayerHealthPercentage.set(bossModifier.playerHealth.hpPercentage.get())
                 currentBossHealthPercentage.set(bossModifier.bossHealth.hpPercentage.get())
+
+                val uiOpacity = bossModifier.uiOpacity.get()
+                superpane.opacity.set(Interpolation.smoother.apply(uiOpacity))
+                superpane.contentOffsetX.set(Interpolation.smoother.apply(-32f, 0f, uiOpacity))
             }
             this.superpane.visible.set(bossModifier != null)
         }
