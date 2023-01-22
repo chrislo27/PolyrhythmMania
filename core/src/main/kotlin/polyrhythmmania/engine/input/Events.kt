@@ -21,3 +21,9 @@ class EventSkillStar(engine: Engine, val atBeat: Float) : Event(engine) {
         engine.inputter.skillStarBeat = atBeat
     }
 }
+
+class EventClearInputs(engine: Engine, val patternDuration: Float) : Event(engine) {
+    override fun onStart(currentBeat: Float) {
+        engine.inputter.clearInputs(this.beat - patternDuration)
+    }
+}

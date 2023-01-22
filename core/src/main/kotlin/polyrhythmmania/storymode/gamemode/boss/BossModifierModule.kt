@@ -52,7 +52,7 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
     
     fun triggerUIShow() {
         if (uiOpacity.get() <= 0f) {
-            uiOpacity.set(0.01f)
+            uiOpacity.set(0.001f)
         }
     }
 

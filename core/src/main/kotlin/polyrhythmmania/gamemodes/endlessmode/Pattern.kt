@@ -10,6 +10,9 @@ data class RowPattern(val row: List<CubeType>, val delay: Float = 0f)
 data class Pattern(val rowA: RowPattern, val rowDpad: RowPattern, val difficulty: Difficulty,
                    val flippable: Boolean) {
     
+    val anyA: Boolean get() = rowA.row.isNotEmpty()
+    val anyDpad: Boolean get() = rowDpad.row.isNotEmpty()
+    
     fun toBlock(engine: Engine, beat: Float): BlockSpawnPattern {
         return BlockSpawnPattern(engine).apply {
             this.beat = beat

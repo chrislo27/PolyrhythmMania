@@ -296,8 +296,8 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
                 }
             }
             
-            val anyA = pattern.rowA.row.isNotEmpty()
-            val anyDpad = pattern.rowDpad.row.isNotEmpty()
+            val anyA = pattern.anyA
+            val anyDpad = pattern.anyDpad
             val lifeLostVar = EntityRodPREndless.LifeLost()
             if (anyA) {
                 engine.addEvent(EventDeployRodEndless(engine, world.rowA, patternStart, lifeLostVar))
