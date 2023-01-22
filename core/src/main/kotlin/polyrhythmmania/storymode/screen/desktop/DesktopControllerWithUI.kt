@@ -81,6 +81,7 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopControllerWithP
             DesktopController.SFXType.INBOX_ITEM_UNLOCKED -> StoryAssets["sfx_desk_unlocked"]
             DesktopController.SFXType.PAUSE_ENTER -> AssetRegistry["sfx_pause_enter"]
             DesktopController.SFXType.PAUSE_EXIT -> AssetRegistry["sfx_pause_exit"]
+            DesktopController.SFXType.CONTRACT_SIGNATURE -> StoryAssets["sfx_desk_signature"]
         } ?: return
         
         main.playMenuSfx(sound)

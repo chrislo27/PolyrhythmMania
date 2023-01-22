@@ -23,6 +23,7 @@ interface DesktopController {
 
     enum class SFXType {
         ENTER_LEVEL, CLICK_INBOX_ITEM, INBOX_ITEM_UNLOCKED, PAUSE_ENTER, PAUSE_EXIT,
+        CONTRACT_SIGNATURE,
     }
     
     

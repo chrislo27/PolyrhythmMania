@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.screen.desktop
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -18,6 +19,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.GdxRunnableTransition
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
@@ -293,15 +295,16 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                 })
                 paper.paperPane += VBox().apply {
                     this.spacing.set(1f * UI_SCALE)
-                    this.temporarilyDisableLayouts { 
-                        this += TextLabel(StoryL10N.getVar("inboxItem.employmentContract.heading"), font = main.fontMainMenuHeading).apply {
-                            this.bounds.height.set(9f * UI_SCALE)
-                            this.textColor.set(Color.BLACK)
-                            this.renderAlign.set(Align.top)
-                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 0f))
-                        }
-                        // TODO add potentially more text
-                    }
+//                    this.temporarilyDisableLayouts { 
+//                        this += TextLabel(StoryL10N.getVar("inboxItem.employmentContract.heading"), font = main.fontMainMenuHeading).apply {
+//                            this.bounds.height.set(9f * UI_SCALE)
+//                            this.textColor.set(Color.BLACK)
+//                            this.renderAlign.set(Align.top)
+//                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 0f))
+//                            
+//                            this.visible.set(false)
+//                        }
+//                    }
                 }
                 paper.envelopePane += RectElement(Color.CLEAR).apply {
                     this.visible.bind {
@@ -323,9 +326,9 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                         }
                     })
 
-                    this.bounds.x.set(17f * UI_SCALE)
+                    this.bounds.x.set(0f * UI_SCALE)
                     this.bounds.y.set(14f * UI_SCALE)
-                    this.bounds.width.set(46f * UI_SCALE)
+                    this.bounds.width.set(100f * UI_SCALE)
                     this.bounds.height.set(13f * UI_SCALE)
 
                     this += ActionablePane().apply {
@@ -338,11 +341,16 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                         this.setOnAction {
                             scenario.inboxState.putItemState(item, InboxItemState.BRAND_NEW.copy(completion = InboxItemCompletion.COMPLETED))
                             
-                            // TODO play scribble SFX
+                            desktopUI?.controller?.playSFX(DesktopController.SFXType.CONTRACT_SIGNATURE)
                             
                             val desktopUI = desktopUI
                             if (desktopUI != null) {
-                                desktopUI.updateAndShowNewlyAvailableInboxItems()
+                                val delaySec = 1f
+                                Gdx.app.postRunnable(GdxRunnableTransition(0f, 1f, delaySec) { _, progress ->
+                                    if (progress == 1f) {
+                                        desktopUI.updateAndShowNewlyAvailableInboxItems()
+                                    }
+                                })
                             } else {
                                 scenario.updateProgression()
                                 scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
