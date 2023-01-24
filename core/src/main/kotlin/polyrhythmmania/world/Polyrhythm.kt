@@ -319,21 +319,23 @@ open class EntityRodPR(
         }
     }
 
-    fun bounce(startIndex: Int, endIndex: Int) {
+    fun bounce(startIndex: Int, endIndex: Int, peakHeightOffset: Float = 0f) {
         val difference = endIndex - startIndex
         if (difference <= 0) return
 
         fun indexToX(index: Int): Float = index + row.startX + 0.25f
 
         val prevBounce = collision.bounce
+        val endY = row.startY + 1f
+        val peakHeight = endY + difference + peakHeightOffset
         if (prevBounce != null) {
-            collision.bounce = Bounce(this, row.startY + 1f + difference, indexToX(startIndex), row.startY + 1f, indexToX(endIndex), row.startY + 1f, prevBounce)
+            collision.bounce = Bounce(this, peakHeight, indexToX(startIndex), endY, indexToX(endIndex), endY, prevBounce)
         } else {
-            collision.bounce = Bounce(this, row.startY + 1f + difference, this.position.x, this.position.y, indexToX(endIndex), row.startY + 1f, null)
+            collision.bounce = Bounce(this, peakHeight, this.position.x, this.position.y, indexToX(endIndex), endY, null)
         }
     }
 
-    fun bounce(startIndex: Int) {
+    open fun bounce(startIndex: Int) {
         if (startIndex in 0 until row.length) {
             val lookahead = getLookaheadIndex(startIndex)
             bounce(startIndex, lookahead)

@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
+import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
-import polyrhythmmania.world.render.WorldRenderer
 
 
 open class EntityPiston(world: World)
@@ -16,10 +16,10 @@ open class EntityPiston(world: World)
         val FULL_EXTENSION_TIME_BEATS: Float = 0.05f
     }
 
-    enum class Type(val renderHeight: Float) {
-        PLATFORM(1f),
-        PISTON_A(1.25f),
-        PISTON_DPAD(1.25f)
+    enum class Type(val renderHeight: Float, val isPiston: Boolean) {
+        PLATFORM(1f, false),
+        PISTON_A(1.25f, true),
+        PISTON_DPAD(1.25f, true)
     }
 
     enum class PistonState {
