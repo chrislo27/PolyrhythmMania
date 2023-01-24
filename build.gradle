@@ -1,4 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 buildscript {
     repositories {
@@ -45,10 +46,10 @@ allprojects {
     dependencies {
     }
 
-    tasks.withType(KotlinCompile).configureEach {
-        kotlinOptions {
-            jvmTarget = "11"
-            freeCompilerArgs += "-opt-in=kotlin.ExperimentalUnsignedTypes"
+    tasks.withType(KotlinCompilationTask).configureEach {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+            freeCompilerArgs.add("-opt-in=kotlin.ExperimentalUnsignedTypes")
         }
     }
 }
