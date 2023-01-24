@@ -10,10 +10,7 @@ import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import net.lingala.zip4j.ZipFile
 import paintbox.Paintbox
-import paintbox.binding.BooleanVar
-import paintbox.binding.ReadOnlyBooleanVar
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
+import paintbox.binding.*
 import paintbox.filechooser.TinyFDWrapper
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
@@ -233,7 +230,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 this.spacing.set(spacing)
                 this.temporarilyDisableLayouts {
-                    fun createRodinTooltip(binding: Var.Context.() -> String): Tooltip {
+                    fun createRodinTooltip(binding: ContextBinding<String>): Tooltip {
                         return Tooltip(binding = binding, font = main.fontMainMenuRodin).apply { 
                             setScaleXY(0.9f)
                         }

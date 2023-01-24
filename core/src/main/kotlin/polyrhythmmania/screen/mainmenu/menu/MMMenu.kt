@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
+import paintbox.binding.ContextBinding
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.Markup
@@ -202,7 +203,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         this.setSize(MMMenu.WIDTH_MEDIUM) // Default size
     }
     
-    protected fun createTooltip(binding: Var.Context.() -> String): Tooltip {
+    protected fun createTooltip(binding: ContextBinding<String>): Tooltip {
         return Tooltip(binding).apply { 
             this.markup.set(this@StandardMenu.markup)
         }
@@ -214,7 +215,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    protected fun createLongButton(binding: Var.Context.() -> String): Button {
+    protected fun createLongButton(binding: ContextBinding<String>): Button {
         return Button(binding, font = font).apply {
             this.skinID.set(BUTTON_LONG_SKIN_ID)
             this.padding.set(Insets(4f, 4f, 12f, 12f))
@@ -226,7 +227,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    protected fun createLongButtonWithIcon(icon: TextureRegion?, binding: Var.Context.() -> String): Button {
+    protected fun createLongButtonWithIcon(icon: TextureRegion?, binding: ContextBinding<String>): Button {
         return createLongButton(binding).apply {
             if (icon != null) {
                 val existingPadding = this.padding.getOrCompute()
@@ -241,7 +242,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
 
     protected fun createLongButtonWithNewIndicator(newIndicator: Settings.NewIndicator, icon: TextureRegion? = null,
-                                                   binding: Var.Context.() -> String): Button {
+                                                   binding: ContextBinding<String>): Button {
         return createLongButtonWithIcon(icon) {
             (if (newIndicator.value.use())
                 (Localization.getVar("common.newIndicator").use() + " ")
@@ -249,7 +250,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    protected fun createSmallButton(binding: Var.Context.() -> String): Button = Button(binding, font = font).apply {
+    protected fun createSmallButton(binding: ContextBinding<String>): Button = Button(binding, font = font).apply {
         this.skinID.set(BUTTON_SMALL_SKIN_ID)
         this.padding.set(Insets(2f))
         this.textAlign.set(TextAlign.CENTRE)
@@ -258,7 +259,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 //        this.setOnHoverStart(blipSoundListener)
     }
     
-    protected fun createSettingsOption(labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
+    protected fun createSettingsOption(labelText: ContextBinding<String>, font: PaintboxFont = this.font,
                                        percentageContent: Float = 0.5f, twoRowsTall: Boolean = false): SettingsOptionPane {
         return SettingsOptionPane(labelText, font, percentageContent, twoRowsTall).apply {
             this.bounds.height.set(36f * (if (twoRowsTall) 2 else 1))
@@ -272,14 +273,14 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
     
     protected fun createSliderPane(slider: Slider, percentageContent: Float = 0.5f,
-                                   labelText: Var.Context.() -> String): SettingsOptionPane {
+                                   labelText: ContextBinding<String>): SettingsOptionPane {
         return createSettingsOption(labelText, percentageContent = percentageContent).apply {
             this.content.addChild(slider)
             Anchor.CentreRight.configure(slider)
         }
     }
     
-    protected fun createCheckboxOption(labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
+    protected fun createCheckboxOption(labelText: ContextBinding<String>, font: PaintboxFont = this.font,
                                      percentageContent: Float = 1f): Pair<SettingsOptionPane, CheckBox> {
         val settingsOptionPane = createSettingsOption({""}, font, percentageContent)
         val checkBox = CheckBox(binding = labelText, font = font).apply { 
@@ -301,7 +302,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         return settingsOptionPane to checkBox
     }
 
-    protected fun createRadioButtonOption(labelText: Var.Context.() -> String, toggleGroup: ToggleGroup,
+    protected fun createRadioButtonOption(labelText: ContextBinding<String>, toggleGroup: ToggleGroup,
                                           font: PaintboxFont = this.font,
                                           percentageContent: Float = 1f): Pair<SettingsOptionPane, RadioButton> {
         val settingsOptionPane = createSettingsOption({ "" }, font, percentageContent)
@@ -319,7 +320,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
 
     protected fun <T> createCycleOption(items: List<T>, firstItem: T,
-                                        labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
+                                        labelText: ContextBinding<String>, font: PaintboxFont = this.font,
                                         percentageContent: Float = 0.5f, twoRowsTall: Boolean = false,
                                         itemToString: (T) -> String = { it.toString() }): Pair<SettingsOptionPane, CycleControl<T>> {
         val settingsOptionPane = createSettingsOption(labelText, font, percentageContent, twoRowsTall = twoRowsTall)
@@ -330,7 +331,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
     }
 
     protected fun <T> createComboboxOption(items: List<T>, firstItem: T,
-                                           labelText: Var.Context.() -> String, font: PaintboxFont = this.font,
+                                           labelText: ContextBinding<String>, font: PaintboxFont = this.font,
                                            percentageContent: Float = 0.5f, twoRowsTall: Boolean = false,
                                            itemToString: (T) -> String = { it.toString() }): Pair<SettingsOptionPane, ComboBox<T>> {
         val settingsOptionPane = createSettingsOption(labelText, font, percentageContent, twoRowsTall = twoRowsTall)
@@ -378,7 +379,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
     }
 
-    open class SettingsOptionPane(labelText: Var.Context.() -> String, val font: PaintboxFont,
+    open class SettingsOptionPane(labelText: ContextBinding<String>, val font: PaintboxFont,
                                   percentageContent: Float = 0.5f, val twoRowsTall: Boolean = false)
         : Pane(), HasPressedState by HasPressedState.DefaultImpl() {
 

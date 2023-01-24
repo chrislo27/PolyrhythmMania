@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import paintbox.Paintbox
-import paintbox.binding.Var
+import paintbox.binding.ContextBinding
 import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
@@ -338,7 +338,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                 }
             }
             is LayerButton -> {
-                val textBinding: Var.Context.() -> String = if (layer is LayerButtonWithNewIndicator) {
+                val textBinding: ContextBinding<String> = if (layer is LayerButtonWithNewIndicator) {
                     {
                         (if (layer.newIndicator.value.use())
                                 (Localization.getVar("common.newIndicator").use() + " ")

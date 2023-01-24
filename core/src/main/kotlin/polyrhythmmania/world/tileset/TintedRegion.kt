@@ -1,6 +1,7 @@
 package polyrhythmmania.world.tileset
 
 import com.badlogic.gdx.graphics.Color
+import paintbox.binding.ContextBinding
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 
@@ -21,7 +22,7 @@ open class TintedRegion(val regionID: String) {
         (color as? Var)?.set(Color(1f, 1f, 1f, 1f).set(initColor))
     }
 
-    constructor(regionID: String, binding: Var.Context.() -> Color)
+    constructor(regionID: String, binding: ContextBinding<Color>)
             : this(regionID) {
         @Suppress("LeakingThis")
         (color as? Var)?.bind(binding)

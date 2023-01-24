@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
+import paintbox.binding.ContextBinding
 import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.Pane
@@ -193,7 +194,7 @@ class InputSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
 
-        private fun createKeyboardInput(labelText: Var.Context.() -> String, setter: (code: Int) -> Unit, getter: () -> Int): SettingsOptionPane {
+        private fun createKeyboardInput(labelText: ContextBinding<String>, setter: (code: Int) -> Unit, getter: () -> Int): SettingsOptionPane {
             val inwardArrows = BooleanVar(false)
             val skinFactory: SkinFactory<Button, ButtonSkin, Button> = SkinFactory { button: Button ->
                 object : ButtonSkin(button) {

@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntIntMap
 import paintbox.Paintbox
+import paintbox.binding.ContextBinding
 import paintbox.binding.FloatVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
@@ -199,7 +200,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         }
     }
 
-    fun createDefaultTooltip(binding: Var.Context.() -> String): Tooltip {
+    fun createDefaultTooltip(binding: ContextBinding<String>): Tooltip {
         return Tooltip(binding = binding).apply {
             this.markup.set(palette.markup)
             this.backgroundColor.set(Color(2 / 255f, 6 / 255f, 16 / 255f, 0.95f))

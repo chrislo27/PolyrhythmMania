@@ -29,8 +29,10 @@ import polyrhythmmania.ui.PRManiaSkins
 import kotlin.math.max
 
 
-class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
+typealias ItemToStringBinding<T> = Var.Context.(item: T) -> String
 
+class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
+    
     val settings: Settings = editorPane.main.settings
     
     private val uiScaleListener: VarChangedListener<Int> = VarChangedListener {
@@ -132,7 +134,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                                   items: List<T>,
                                   font: PaintboxFont = editorPane.palette.musicDialogFont,
                                   percentageContent: Float = 0.5f,
-                                  itemToStringBinding: (Var.Context.(item: T) -> String)? = null): Pair<Pane, CycleControl<T>> {
+                                  itemToStringBinding: ItemToStringBinding<T>? = null): Pair<Pane, CycleControl<T>> {
             val bindingVar: Var<T> = keyValue.value
             val cycle = CycleControl(items, bindingVar, itemToStringBinding)
             @Suppress("MoveLambdaOutsideParentheses")
@@ -221,7 +223,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     }
 
     private inner class CycleControl<T>(val list: List<T>, bindingVar: Var<T>,
-                                        itemToStringBinding: (Var.Context.(item: T) -> String)? = null)
+                                        itemToStringBinding: ItemToStringBinding<T>? = null)
         : Pane(), HasPressedState by HasPressedState.DefaultImpl() {
 
         val left: Button

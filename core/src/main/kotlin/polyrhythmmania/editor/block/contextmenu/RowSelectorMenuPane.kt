@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.block.contextmenu
 
-import paintbox.PaintboxGame
-import paintbox.binding.Var
+import paintbox.binding.ContextBinding
 import paintbox.font.PaintboxFont
 import paintbox.ui.Pane
 import paintbox.ui.UIElement
@@ -46,7 +45,7 @@ class RowSelectorMenuPane(editorPane: EditorPane, currentRowSetting: RowSetting,
     }
 
     inner class RowSettingRadioButton(val rowSetting: RowSetting,
-                                      binding: Var.Context.() -> String,
+                                      binding: ContextBinding<String>,
                                       font: PaintboxFont = UIElement.defaultFont)
         : RadioButton(binding, font) {
 

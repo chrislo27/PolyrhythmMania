@@ -1,8 +1,8 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Color
-import paintbox.PaintboxGame
 import paintbox.binding.BooleanVar
+import paintbox.binding.ContextBinding
 import paintbox.binding.Var
 import paintbox.font.PaintboxFont
 import paintbox.ui.UIElement
@@ -24,7 +24,7 @@ class IndentedButton : Button, Toggle {
     
     constructor(text: String, font: PaintboxFont = UIElement.defaultFont)
             : super(text, font)
-    constructor(binding: Var.Context.() -> String, font: PaintboxFont = UIElement.defaultFont)
+    constructor(binding: ContextBinding<String>, font: PaintboxFont = UIElement.defaultFont)
             : super(binding, font)
     
     init {

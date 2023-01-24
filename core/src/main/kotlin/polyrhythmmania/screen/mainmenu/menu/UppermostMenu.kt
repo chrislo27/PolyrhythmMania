@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
-import paintbox.binding.Var
+import paintbox.binding.ContextBinding
 import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeToOpaque
@@ -81,7 +81,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
         val font = mainMenu.main.fontMainMenuMain
         val buttonHeight = 40f
-        fun createButton(binding: Var.Context.() -> String): Button = Button(binding, font = font).apply {
+        fun createButton(binding: ContextBinding<String>): Button = Button(binding, font = font).apply {
             this.skinID.set(BUTTON_SKIN_ID)
             this.padding.set(Insets(4f, 4f, 16f, 16f))
             this.bounds.height.set(buttonHeight)
