@@ -345,7 +345,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                             
                             val desktopUI = desktopUI
                             if (desktopUI != null) {
-                                val delaySec = 1f
+                                val delaySec = 1.25f
                                 Gdx.app.postRunnable(GdxRunnableTransition(0f, 1f, delaySec) { _, progress ->
                                     if (progress == 1f) {
                                         desktopUI.updateAndShowNewlyAvailableInboxItems()
