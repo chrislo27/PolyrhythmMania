@@ -1,7 +1,7 @@
 package polyrhythmmania.storymode.inbox
 
 import paintbox.binding.ReadOnlyVar
-import paintbox.binding.asReadOnlyVar
+import paintbox.binding.toConstVar
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.contract.IHasContractTextInfo
@@ -27,7 +27,7 @@ sealed class InboxItem(
             id: String, val hasToField: Boolean, hasSeparateListingName: Boolean,
             val subject: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.subject"),
             val from: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.from"),
-            val to: ReadOnlyVar<String> = if (hasToField) StoryL10N.getVar("inboxItemDetails.memo.$id.to") else "".asReadOnlyVar(),
+            val to: ReadOnlyVar<String> = if (hasToField) StoryL10N.getVar("inboxItemDetails.memo.$id.to") else "".toConstVar(),
             val desc: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.desc"),
     ) : InboxItem(id, if (hasSeparateListingName) StoryL10N.getVar("inboxItemDetails.memo.$id.listing") else subject)
     
@@ -70,20 +70,20 @@ sealed class InboxItem(
             desc: String = "",
             tagline: String = "Make up a tagline later!",
             override val requester: Requester = Requester.DEBUG,
-            listingName: ReadOnlyVar<String> = name.asReadOnlyVar(),
+            listingName: ReadOnlyVar<String> = name.toConstVar(),
             override val subtype: ContractSubtype = ContractSubtype.NORMAL,
             override val hasLongCompanyName: Boolean = requester.isNameLong,
     ) : InboxItem(itemID, listingName), IContractDoc {
 
-        override val name: ReadOnlyVar<String> = name.asReadOnlyVar()
-        override val desc: ReadOnlyVar<String> = "Placeholder contract desc\n\n$desc".asReadOnlyVar()
-        override val tagline: ReadOnlyVar<String> = tagline.asReadOnlyVar()
+        override val name: ReadOnlyVar<String> = name.toConstVar()
+        override val desc: ReadOnlyVar<String> = "Placeholder contract desc\n\n$desc".toConstVar()
+        override val tagline: ReadOnlyVar<String> = tagline.toConstVar()
         val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
         
         override fun isCompletedWhenRead(): Boolean = true // There is no contract to play
     }
 
-    class EmploymentContract(id: String) : InboxItem(id, "".asReadOnlyVar()) {
+    class EmploymentContract(id: String) : InboxItem(id, "".toConstVar()) {
         override fun isCompletedWhenRead(): Boolean = false
     }
     

@@ -1,7 +1,7 @@
 package polyrhythmmania.storymode.contract
 
 import com.badlogic.gdx.Gdx
-import paintbox.binding.asReadOnlyVar
+import paintbox.binding.toConstVar
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.storymode.contract.Contract.Companion.NOT_ALLOWED_TO_SKIP
@@ -12,23 +12,23 @@ import polyrhythmmania.storymode.inbox.InboxItems
 
 
 object Contracts {
-    
+
     const val ID_TUTORIAL1: String = "tutorial1"
-    
+
     val contracts: Map<String, Contract>
-    
+
     init {
         this.contracts = mutableMapOf()
-        
+
         fun add(contract: Contract) {
             this.contracts[contract.id] = contract
         }
-        
+
         add(Contract(ID_TUTORIAL1, Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0, noListingName = true, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             Tutorial1GameMode(main)
         })
         add(Contract("boss", Requester.POLYBUILD, JingleType.NONE, null /* TODO add attribution */, 0, gamemodeFactory = StoryBossGameMode.getFactory()))
-        
+
         add(Contract("air_rally", Requester.SHIPSTEERING, JingleType.GBA, Attribution(SongInfo.megamix("Air Rally"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj"))
         })
@@ -126,7 +126,7 @@ object Contracts {
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/tap_trial_2.prmproj"))
         })
         add(Contract("toss_boys", Requester.TOSS_BOYS, JingleType.GBA, Attribution(SongInfo.tengoku("トスボーイズ (Toss Boys)"), listOf("Dream Top")), 0, listOf(Condition.Lives(3))) { main ->
-            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/toss_boys.prmproj")).apply { 
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/toss_boys.prmproj")).apply {
                 val livesMode = this.container.engine.modifiers.livesMode
                 livesMode.maxLives.set(3)
                 livesMode.enabled.set(true)
@@ -141,8 +141,8 @@ object Contracts {
         add(Contract("working_dough_2", Requester.DOUGH, JingleType.MODERN, Attribution(SongInfo.fever("Working Dough 2"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/working_dough_2.prmproj"))
         })
-        
-        
+
+
         // Debug contracts
         add(Contract("air_rally_one_life", Requester.DEBUG, JingleType.GBA, contracts["air_rally"]?.attribution, 0, listOf(Condition.Lives(1))) { main ->
             // FIXME this is a debug contract
@@ -180,17 +180,17 @@ object Contracts {
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally_2.prmproj")).apply {
                 this.engine.tempos.addTempoChange(TempoChange(0f, 182f * 2))
                 this.engine.tempos.addTempoChange(TempoChange(4f, 182f))
-                
+
                 val monsterGoal = this.container.engine.modifiers.monsterGoal
                 monsterGoal.difficulty.set(150f)
                 monsterGoal.enabled.set(true)
             }
         })
     }
-    
+
     operator fun get(id: String): Contract = contracts.getValue(id)
-    
-    
+
+
     object DebugInboxItems : InboxItems() {
         init {
             val toAdd = mutableListOf<InboxItem>()
@@ -199,7 +199,7 @@ object Contracts {
                 if (contract.id == "tutorial1") {
                     continue
                 }
-                val listingName = contract.id.asReadOnlyVar()
+                val listingName = contract.id.toConstVar()
                 toAdd += InboxItem.ContractDoc(contract, itemID = "debugcontr_${contract.id}", listingName = listingName, name = listingName)
             }
 

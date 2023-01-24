@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.binding.ReadOnlyVar
-import paintbox.binding.asReadOnlyVar
+import paintbox.binding.toConstVar
 import paintbox.font.Markup
 import paintbox.ui.Anchor
 import paintbox.ui.ImageIcon
@@ -81,7 +81,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     }
 
     private fun addStartContractPanel(inboxItem: InboxItem.ContractDoc, inboxItemState: InboxItemState) {
-        addRightSidePanel("".asReadOnlyVar(), 20f * UI_SCALE).apply {
+        addRightSidePanel("".toConstVar(), 20f * UI_SCALE).apply {
             this.removeAllChildren()
             this += Button(StoryL10N.getVar("desktop.pane.startContract"), font = main.fontRobotoBold).apply {
                 this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)

@@ -261,7 +261,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
             val showContext = BooleanVar(false)
             val isInFailedState = BooleanVar {
                 savefileStateVar.use() is StorySavefile.LoadedState.FailedToLoad
-            }.asReadOnly()
+            }.asReadOnlyVar()
             val isOperationOnMe: ReadOnlyBooleanVar = BooleanVar {
                 val op = currentOperation.use()
                 op is Operation.IHasFromTarget && op.fromNumber == savefileStateVar.use().number

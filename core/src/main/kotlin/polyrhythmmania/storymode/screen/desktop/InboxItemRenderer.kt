@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
-import paintbox.binding.asReadOnlyVar
+import paintbox.binding.toConstVar
 import paintbox.font.Markup
 import paintbox.font.TextAlign
 import paintbox.ui.*
@@ -74,7 +74,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
     }
 
     private fun createPaperTemplate(textureID: String = "desk_contract_full"): Paper =
-            createPaperTemplate(textureID.asReadOnlyVar())
+            createPaperTemplate(textureID.toConstVar())
     
     fun createInboxItemUI(item: InboxItem): UIElement {
         return when (item) {
@@ -203,7 +203,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                 val headingText: ReadOnlyVar<String> = when (item) {
                     is InboxItem.ContractDoc -> item.headingText
                     is InboxItem.PlaceholderContract -> item.headingText
-                    else -> "<missing heading text>".asReadOnlyVar()
+                    else -> "<missing heading text>".toConstVar()
                 }
 
                 paper.paperPane += VBox().apply {
@@ -313,17 +313,18 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
 
                     val isHovered = BooleanVar(false)
 
-                    this.border.set(Insets(1f * UI_SCALE))
-                    this.borderStyle.set(SolidBorder().apply {
-                        this.color.bind {
-                            if (isHovered.use()) {
-                                Color.YELLOW.cpy().lerp(Color.ORANGE, 0.75f)
-                            } else {
-                                Color.YELLOW.cpy().lerp(Color.ORANGE, 0.25f).apply {
-                                    this.a = 0.9f
-                                }
+                    val color = Var {
+                        if (isHovered.use()) {
+                            Color.YELLOW.cpy().lerp(Color.ORANGE, 0.75f)
+                        } else {
+                            Color.YELLOW.cpy().lerp(Color.ORANGE, 0.25f).apply {
+                                this.a = 0.9f
                             }
                         }
+                    }.asReadOnlyVar()
+                    this.border.set(Insets(1f * UI_SCALE))
+                    this.borderStyle.set(SolidBorder().apply {
+                        this.color.bind { color.use() }
                     })
 
                     this.bounds.x.set(0f * UI_SCALE)

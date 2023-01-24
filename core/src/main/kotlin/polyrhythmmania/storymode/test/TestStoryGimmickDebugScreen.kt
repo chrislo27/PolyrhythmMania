@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import paintbox.binding.asReadOnlyVar
+import paintbox.binding.toConstVar
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeToOpaque
 import paintbox.transition.FadeToTransparent
@@ -298,7 +298,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                         this.setOnAction {
                             val inboxItems = InboxItems(listOf(
                                     InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
-                                    InboxItem.ContractDoc(Contract("debugcontract_2", "TRAINING-099".asReadOnlyVar(), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory), subtype = ContractSubtype.TRAINING),
+                                    InboxItem.ContractDoc(Contract("debugcontract_2", "TRAINING-099".toConstVar(), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory), subtype = ContractSubtype.TRAINING),
                                     InboxItem.Memo("test_memo", true, true)
                             ))
                             val progression = Progression(listOf(
