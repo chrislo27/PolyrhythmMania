@@ -296,16 +296,18 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                 })
                 paper.paperPane += VBox().apply {
                     this.spacing.set(1f * UI_SCALE)
-//                    this.temporarilyDisableLayouts { 
-//                        this += TextLabel(StoryL10N.getVar("inboxItem.employmentContract.heading"), font = main.fontMainMenuHeading).apply {
-//                            this.bounds.height.set(9f * UI_SCALE)
-//                            this.textColor.set(Color.BLACK)
-//                            this.renderAlign.set(Align.top)
-//                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 0f))
-//                            
-//                            this.visible.set(false)
-//                        }
-//                    }
+                    this.temporarilyDisableLayouts { 
+                        this += RectElement(Color.WHITE).apply {
+                            this.bounds.height.set(12f * UI_SCALE)
+                            this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 0f))
+
+                            this += TextLabel(StoryL10N.getVar("inboxItem.employmentContract.heading"), font = main.fontMainMenuHeading).apply {
+                                this.textColor.set(Color.BLACK)
+                                this.renderAlign.set(Align.bottom)
+                                this.setScaleXY(0.8f)
+                            }
+                        }
+                    }
                 }
                 paper.envelopePane += RectElement(Color.CLEAR).apply {
                     this.visible.bind {
