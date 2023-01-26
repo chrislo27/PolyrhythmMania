@@ -562,17 +562,31 @@ class DesktopUI(
                     }
                 }
             }
-            
-            if (inboxItem is InboxItem.ContractDoc) {
-                bottomAreaPane += TextLabel("", font = inboxItemSubtitleFont).apply {
-                    this.text.bind {
-                        if (contractListingName.use() != null) inboxItem.name.use() else ""
+
+            bottomAreaPane += TextLabel("", font = inboxItemSubtitleFont).apply {
+                this.text.bind {
+                    when (inboxItem) {
+                        is InboxItem.ContractDoc -> {
+                            if (contractListingName.use() != null) inboxItem.name.use() else ""
+                        }
+
+                        is InboxItem.Memo -> {
+                            if (!myInboxItemState.use().newIndicator) {
+                                StoryL10N.getVar("inboxItem.memo.listingSubtitle", Var {
+                                    listOf(inboxItem.shortFrom.use())
+                                }).use()
+                            } else ""
+                        }
+                        
+                        is InboxItem.InfoMaterial -> StoryL10N.getVar("inboxItem.infoMaterial.heading").use()
+
+                        else -> ""
                     }
-                    this.renderAlign.set(RenderAlign.left)
-                    this.textColor.set(Color.DARK_GRAY.cpy())
-                    this.margin.set(Insets(0f, 0f, 1f * UI_SCALE, 1f * UI_SCALE))
-                    this.setScaleXY(0.8f)
                 }
+                this.renderAlign.set(RenderAlign.left)
+                this.textColor.set(Color.DARK_GRAY.cpy())
+                this.margin.set(Insets(0f, 0f, 1f * UI_SCALE, 1f * UI_SCALE))
+                this.setScaleXY(0.8f)
             }
 
             // Selector outline/ring

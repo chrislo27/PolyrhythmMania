@@ -112,9 +112,10 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                         this.padding.set(Insets(2f, 2f, 4f, 0f))
                                         this.bounds.x.set(90f)
                                         this.bindWidthToParent(adjust = -(22.5f * UI_SCALE))
-                                        if (valueMarkup != null) {
-                                            this.markup.set(valueMarkup)
-                                        }
+                                        this.markup.set(valueMarkup ?: robotoRegularMarkup)
+//                                        if (valueMarkup != null) {
+//                                            this.markup.set(valueMarkup)
+//                                        }
                                     }
                                 }
                             }

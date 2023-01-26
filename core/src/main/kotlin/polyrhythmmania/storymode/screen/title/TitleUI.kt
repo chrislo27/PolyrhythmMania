@@ -150,7 +150,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                     Anchor.Centre.configure(this)
                     this.spacing.set(32f)
 
-                    val inboxItemIDsThatAreContracts = InboxDB().items
+                    val inboxItemIDsThatAreContracts = getInboxDB().items
                             .filterIsInstance<InboxItem.ContractDoc>()
                             .map { it.id }
                             .toSet()
@@ -210,6 +210,8 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
         main.screen = TransitionScreen(main, main.screen, storySession.createExitLoadingScreen(main, doAfterUnload),
                 FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
     }
+    
+    private fun getInboxDB(): InboxDB = InboxDB()
 
     private fun launchSavefile(savefileState: StorySavefile.LoadedState) {
         val isBrandNew = savefileState is StorySavefile.LoadedState.NoSavefile
@@ -221,7 +223,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
 
         storySession.useSavefile(savefile)
 
-        val inboxDB = InboxDB()
+        val inboxDB = getInboxDB()
         val desktopScreen = StoryDesktopScreen(main, storySession, {
             storySession.stopUsingSavefile()
             StoryTitleScreen(main, storySession)

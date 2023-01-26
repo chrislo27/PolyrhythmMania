@@ -24,11 +24,14 @@ sealed class InboxItem(
     }
 
     class Memo(
-            id: String, val hasToField: Boolean, hasSeparateListingName: Boolean,
+            id: String,
+            val hasToField: Boolean, hasSeparateListingName: Boolean, 
+            hasDifferentShortFrom: Boolean = false,
             val subject: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.subject"),
             val from: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.from"),
             val to: ReadOnlyVar<String> = if (hasToField) StoryL10N.getVar("inboxItemDetails.memo.$id.to") else "".toConstVar(),
             val desc: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.desc"),
+            val shortFrom: ReadOnlyVar<String> = if (hasDifferentShortFrom) StoryL10N.getVar("inboxItemDetails.memo.$id.from.short") else from,
     ) : InboxItem(id, if (hasSeparateListingName) StoryL10N.getVar("inboxItemDetails.memo.$id.listing") else subject)
     
     class InfoMaterial(
