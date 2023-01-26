@@ -23,7 +23,6 @@ import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.VBox
-import paintbox.util.MathHelper
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
@@ -527,11 +526,7 @@ class DesktopUI(
                     reg
                 }
                 this.visible.bind {
-                    if (inboxItem is InboxItem.EmploymentContract) {
-                        val state = myInboxItemState.use()
-                        // When completed, the checkmark on the base texture replaces the LED
-                        !state.completion.shouldCountAsCompleted()
-                    } else true
+                    inboxItem !is InboxItem.EmploymentContract
                 }
             }
             val titleAreaPane = Pane().apply {
