@@ -3,6 +3,7 @@ package polyrhythmmania.storymode.music
 import com.badlogic.gdx.Gdx
 import net.beadsproject.beads.core.AudioContext
 import net.beadsproject.beads.core.Bead
+import net.beadsproject.beads.core.UGen
 import net.beadsproject.beads.ugens.*
 import paintbox.Paintbox
 import paintbox.binding.FloatVar
@@ -23,20 +24,23 @@ import polyrhythmmania.storymode.inbox.InboxState
 class StoryMusicHandler(val storySession: StorySession) {
 
     companion object {
+
         const val LOOP_SAMPLES_START: Int = 0
         const val LOOP_SAMPLES_END: Int = 2_373_981
         const val BPM: Float = 107f
         const val DURATION_BEATS: Float = 96f
+
     }
-    
-    private class StemPlayer(val stemID: String, val stem: Stem, val player: MusicSamplePlayer) : Plug(player.context, player.outs) {
-        
+
+    private class StemPlayer(val stemID: String, val stem: Stem, val player: MusicSamplePlayer) :
+        Plug(player.context, player.outs) {
+
         private var envelope: Envelope? = null
-        
+
         init {
             this.addInput(player)
         }
-        
+
         fun fadeTo(gain: Float, seconds: Float, delaySec: Float, startGain: Float = -1f) {
             val oldEnvelope = this.envelope
             if (oldEnvelope != null) {
@@ -44,7 +48,7 @@ class StoryMusicHandler(val storySession: StorySession) {
                 this.removeDependent(oldEnvelope)
                 this.envelope = null
             }
-            
+
             val oldGain = player.gain
             val newEnvelope = object : Envelope(this.context, oldGain) {
                 override fun calculateBuffer() {
@@ -57,7 +61,7 @@ class StoryMusicHandler(val storySession: StorySession) {
                         player.pause(false)
                     }
                 }
-            }.apply { 
+            }.apply {
                 if (delaySec > 0f) {
                     this.addSegment(if (startGain < 0f) oldGain else startGain, delaySec * 1000)
                 }
@@ -70,64 +74,79 @@ class StoryMusicHandler(val storySession: StorySession) {
 
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystemOpenAL()
     private val audioContext: AudioContext = soundSystem.audioContext
-    private val playerInput: Gain = Gain(soundSystem.audioContext, 2, 1f)
+    private val playerInput: Gain = Gain(audioContext, 2, 1f)
+    private val bandpass: UGen = Muffled(audioContext, playerInput.outs)
+    private val crossFade: CrossFade = CrossFade(soundSystem.audioContext, playerInput)
+    private var shouldBeBandpass: Boolean = false
 
     private val stemPlayers: MutableMap<String, StemPlayer> = mutableMapOf()
-    private val menuMusicVolume: ReadOnlyFloatVar = FloatVar { use(PRManiaGame.instance.settings.menuMusicVolume) / 100f }
-    
+    private val menuMusicVolume: ReadOnlyFloatVar =
+        FloatVar { use(PRManiaGame.instance.settings.menuMusicVolume) / 100f }
+
     private var targetStemMix: StemMix = StemMix.NONE
-    
+
     val currentBeat: ReadOnlyFloatVar = FloatVar(0f)
 
     init {
-        audioContext.out.addInput(playerInput)
+        bandpass.addInput(playerInput)
+        audioContext.out.addInput(crossFade)
+
         menuMusicVolume.addListener { updateMainGain() }
         updateMainGain()
-        
+
         startSounds()
     }
-    
+
+    fun transitionToBandpass(bandpass: Boolean, durationMs: Float = 250f) {
+        if (shouldBeBandpass == bandpass) return
+        shouldBeBandpass = bandpass
+
+        crossFade.fadeTo(if (bandpass) this.bandpass else playerInput, durationMs)
+    }
+
     fun frameUpdate() {
         val currentPosMs = stemPlayers.values.firstOrNull { !it.player.isPaused }?.player?.position?.toFloat() ?: 0f
         (currentBeat as FloatVar).set(TempoUtils.secondsToBeats(currentPosMs / 1000f, BPM) % DURATION_BEATS)
     }
-    
+
     fun transitionToStemMix(stemMix: StemMix, durationSec: Float, delaySec: Float = 0f, startGain: Float = -1f) {
         val oldTarget = targetStemMix
         val shouldRestart = stemPlayers.values.all { it.player.isPaused }
-        
+
         targetStemMix = stemMix
-        
+
         val stemsToBeRemoved = oldTarget.stemIDs - targetStemMix.stemIDs
         stemsToBeRemoved.forEach { stemID ->
             stemPlayers[stemID]?.fadeTo(0f, durationSec, delaySec)
         }
-        
+
         val stemsToBeAdded = targetStemMix.stemIDs
-        val restartPosition = if (shouldRestart) 0.0 else (stemPlayers.values.firstOrNull { !it.player.isPaused }?.player?.position ?: 0.0)
+        val restartPosition =
+            if (shouldRestart) 0.0 else (stemPlayers.values.firstOrNull { !it.player.isPaused }?.player?.position
+                ?: 0.0)
         stemsToBeAdded.forEach { stemID ->
             val stemPlayer = getStemPlayer(stemID)
             stemPlayer.player.position = restartPosition
             stemPlayer.fadeTo(1f, durationSec, delaySec, startGain)
         }
     }
-    
+
     fun transitionToTitleMix() {
         transitionToStemMix(getTitleStemMix(), 1f)
     }
-    
+
     fun transitionToPostResultsMix() {
         transitionToStemMix(getPostResultsStemMix(), 1.675f, delaySec = 2.54f, startGain = 0.3f)
     }
-    
+
     fun transitionToDesktopMix(inboxState: InboxState? = null) {
         transitionToStemMix(getDesktopStemMix(inboxState), 1f)
     }
-    
+
     fun fadeOut(durationSec: Float) {
         transitionToStemMix(StemMix.NONE, durationSec)
     }
-    
+
     fun fadeOutAndDispose(durationSec: Float) {
         fadeOut(durationSec)
         audioContext.out.addDependent(DelayTrigger(audioContext, durationSec * 1000.0, object : Bead() {
@@ -158,7 +177,10 @@ class StoryMusicHandler(val storySession: StorySession) {
         return stemPlayers.getOrPut(stemID) {
             val stem = StoryMusicAssets.titleStems.getOrLoad(stemID) ?: error("No stem found with ID $stemID")
             val sample: MusicSample = if (stem.isSampleAccessible.get()) stem.sample else {
-                Paintbox.LOGGER.error("Attempted to get sample for stem ${stem.file} before it was accessible!", tag = "StoryMusicHandler")
+                Paintbox.LOGGER.error(
+                    "Attempted to get sample for stem ${stem.file} before it was accessible!",
+                    tag = "StoryMusicHandler"
+                )
                 InMemoryMusicSample(ByteArray(2), nChannels = 1) // Blank sample
             }
             createNewStemPlayer(stemID, stem, sample).apply {
@@ -171,18 +193,19 @@ class StoryMusicHandler(val storySession: StorySession) {
         this.audioContext.out.gain = menuMusicVolume.get()
     }
 
-    
+
     fun getCurrentlyActiveStemMix(): StemMix = this.targetStemMix
-    
+
     fun getTitleStemMix(): StemMix = StemMixes.titleMain
 
     fun getPostResultsStemMix(): StemMix = StemMixes.desktopResults
 
     fun getDesktopStemMix(inboxState: InboxState?): StemMix {
-        val inboxState = inboxState ?: storySession.currentSavefile?.inboxState ?: return StemMixes.desktopPreTraining101
+        val inboxState =
+            inboxState ?: storySession.currentSavefile?.inboxState ?: return StemMixes.desktopPreTraining101
 
         val tutorial1InboxItemID = InboxItem.ContractDoc.getDefaultContractDocID(Contracts.ID_TUTORIAL1)
-        
+
         return when {
             inboxState.getItemState(InboxDB.FIRST_POSTGAME_ITEM)?.completion?.shouldCountAsCompleted() == true -> StemMixes.desktopPost
             inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_MAIN_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true -> StemMixes.desktopMain

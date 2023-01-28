@@ -382,6 +382,7 @@ class DesktopUI(
     private fun openMenuDialog() {
         controller.playSFX(DesktopController.SFXType.PAUSE_ENTER)
         dialogHandler.openDialog(DesktopDialogMenu(this@DesktopUI))
+        storySession.musicHandler.transitionToBandpass(true)
     }
 
     fun onResize(width: Int, height: Int) {

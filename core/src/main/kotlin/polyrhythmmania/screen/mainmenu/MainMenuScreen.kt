@@ -693,13 +693,13 @@ playerPos: ${soundSys.musicPlayer.position}
         fun fadeToBandpass(durationMs: Float = 1000f) {
             if (shouldBeBandpass) return
             shouldBeBandpass = true
-            crossFade.fadeTo(bandpassGain, durationMs) // Reimplement bandpass when needed.
+            crossFade.fadeTo(bandpassGain, durationMs)
         }
         
         fun fadeToNormal(durationMs: Float = 1000f) {
             if (!shouldBeBandpass) return
             shouldBeBandpass = false
-            crossFade.fadeTo(musicPlayer, durationMs) // Reimplement bandpass when needed.
+            crossFade.fadeTo(musicPlayer, durationMs)
         }
         
         fun resetMusic() {

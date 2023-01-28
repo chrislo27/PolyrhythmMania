@@ -76,6 +76,7 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
                 this.bounds.height.set(14f * UI_SCALE)
                 this.setOnAction {
                     desktopUI.controller.playSFX(DesktopController.SFXType.PAUSE_EXIT)
+                    removeBandpassFromMusic()
 
                     val storySession = desktopUI.storySession
                     storySession.attemptSave()
@@ -154,6 +155,7 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
                 this.bounds.height.set(10f * UI_SCALE)
                 this.setOnAction {
                     desktopUI.controller.playSFX(DesktopController.SFXType.PAUSE_ENTER)
+                    removeBandpassFromMusic() // Music should not be muffled while these settings are open. These settings never close, though
                     vbox.removeChild(this)
                     vbox.temporarilyDisableLayouts {
                         addAudioSettings()
@@ -168,5 +170,10 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
 
     override fun onCloseDialog() {
         desktopUI.controller.playSFX(DesktopController.SFXType.PAUSE_EXIT)
+        removeBandpassFromMusic()
+    }
+    
+    private fun removeBandpassFromMusic() {
+        desktopUI.storySession.musicHandler.transitionToBandpass(false)
     }
 }
