@@ -43,6 +43,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
     val slabMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoSlab, main.fontRobotoSlabBold, null, null)
     val robotoRegularMarkup: Markup = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold, main.fontRobotoItalic, main.fontRobotoBoldItalic)
     val robotoBoldMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoBold, main.fontRobotoBold, main.fontRobotoBoldItalic, main.fontRobotoItalic)
+    val robotoItalicMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoItalic, main.fontRobotoBoldItalic, main.fontRobotoItalic, main.fontRobotoBold)
     val robotoCondensedMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold, main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic)
     val robotoMonoMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoMono, main.fontRobotoMonoBold, main.fontRobotoMonoItalic, main.fontRobotoMonoBoldItalic)
     val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
@@ -309,13 +310,17 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                         }
                     }
                 }
-                paper.envelopePane += RectElement(Color.CLEAR).apply {
+                paper.envelopePane += Pane().apply {
+                    this.bounds.x.set(0f * UI_SCALE)
+                    this.bounds.y.set(14f * UI_SCALE)
+                    this.bounds.width.set(100f * UI_SCALE)
+                    this.bounds.height.set(13f * UI_SCALE)
+
                     this.visible.bind {
                         itemStateVar.use()?.completion != InboxItemCompletion.COMPLETED
                     }
 
                     val isHovered = BooleanVar(false)
-
                     val color = Var {
                         if (isHovered.use()) {
                             Color.YELLOW.cpy().lerp(Color.ORANGE, 0.75f)
@@ -325,16 +330,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                             }
                         }
                     }.asReadOnlyVar()
-                    this.border.set(Insets(1f * UI_SCALE))
-                    this.borderStyle.set(SolidBorder().apply {
-                        this.color.bind { color.use() }
-                    })
-
-                    this.bounds.x.set(0f * UI_SCALE)
-                    this.bounds.y.set(14f * UI_SCALE)
-                    this.bounds.width.set(100f * UI_SCALE)
-                    this.bounds.height.set(13f * UI_SCALE)
-
+                    
                     this += ActionablePane().apply {
                         this.setOnHoverStart {
                             isHovered.set(true)
@@ -344,9 +340,9 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                         }
                         this.setOnAction {
                             scenario.inboxState.putItemState(item, InboxItemState.BRAND_NEW.copy(completion = InboxItemCompletion.COMPLETED))
-                            
+
                             desktopUI?.controller?.playSFX(DesktopController.SFXType.CONTRACT_SIGNATURE)
-                            
+
                             val desktopUI = desktopUI
                             if (desktopUI != null) {
                                 val delaySec = 1.25f
@@ -359,6 +355,24 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                 scenario.updateProgression()
                                 scenario.updateInboxItemAvailability(scenario.checkItemsThatWillBecomeAvailable())
                             }
+                        }
+                        
+                        this += RectElement(Color.CLEAR).apply {
+                            this.border.set(Insets(1f * UI_SCALE))
+                            this.borderStyle.set(SolidBorder().apply {
+                                this.color.bind { color.use() }
+                            })
+                        }
+                        this += TextLabel(StoryL10N.getVar("inboxItem.employmentContract.clickToSign")).apply {
+                            Anchor.TopCentre.configure(this, offsetY = { bounds.height.use() })
+                            this.visible.bind { isHovered.use() }
+                            this.markup.set(robotoItalicMarkup)
+                            this.textColor.set(Color.BLACK)
+                            this.backgroundColor.bind { color.use() }
+                            this.bgPadding.set(Insets(2f * UI_SCALE))
+                            this.renderAlign.set(RenderAlign.top)
+                            this.renderBackground.set(true)
+                            this.setScaleXY(0.75f)
                         }
                     }
                 }
