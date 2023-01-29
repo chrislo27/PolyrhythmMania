@@ -1354,8 +1354,11 @@ duration: ${monster.activeDuration.get()} sec
         private val superpane: Pane = Pane()
 
         private val currentPlayerHealth: IntVar = IntVar(0)
+        
         private val currentPlayerHealthPercentage: FloatVar = FloatVar(0f)
         private val currentBossHealthPercentage: FloatVar = FloatVar(0f)
+        private val currentPlayerHealthDrainPercentage: FloatVar = FloatVar(0f)
+        private val currentBossHealthDrainPercentage: FloatVar = FloatVar(0f)
 
         override val uiElement: UIElement get() = superpane
 
@@ -1372,30 +1375,31 @@ duration: ${monster.activeDuration.get()} sec
             }
             superpane += vbox
 
-            val bossHealthHbox = HBox().apply {
-                this.bounds.width.set(600f)
-                this += Pane().apply {
-                    this.margin.set(Insets(12f, 0f))
-                    
-                    this += RectElement(Color.RED)
-                    this += RectElement(Color.GREEN).apply {
-                        this.bindWidthToParent(multiplierBinding = { currentBossHealthPercentage.use() }, adjustBinding = { 0f })
+            fun createHealthHbox(percentage: ReadOnlyFloatVar, drainPercentage: ReadOnlyFloatVar): HBox {
+                return HBox().apply {
+                    this.bounds.width.set(600f)
+                    this += Pane().apply {
+                        this.margin.set(Insets(12f, 0f))
+
+                        this += RectElement(Color.RED)
+                        this += RectElement(Color.WHITE).apply {
+                            this.bindWidthToParent(multiplierBinding = { drainPercentage.use() }, adjustBinding = { 0f })
+                        }
+                        this += RectElement(Color.GREEN).apply {
+                            this.bindWidthToParent(multiplierBinding = { percentage.use() }, adjustBinding = { 0f })
+                        }
                     }
                 }
+            }
+            
+            val bossHealthHbox = createHealthHbox(currentBossHealthPercentage, currentBossHealthDrainPercentage).apply {
+                this.bounds.width.set(600f)
             }
             vbox += ArrowRectBox(bossHealthHbox, black).apply {
                 this.bounds.height.set(44f)
             }
-            val playerHealthHbox = HBox().apply { 
+            val playerHealthHbox = createHealthHbox(currentPlayerHealthPercentage, currentPlayerHealthDrainPercentage).apply {
                 this.bounds.width.set(300f)
-                this += Pane().apply {
-                    this.margin.set(Insets(12f, 0f))
-                    
-                    this += RectElement(Color.RED)
-                    this += RectElement(Color.GREEN).apply {
-                        this.bindWidthToParent(multiplierBinding = { currentPlayerHealthPercentage.use() }, adjustBinding = { 0f })
-                    }
-                }
             }
             vbox += ArrowRectBox(playerHealthHbox, black).apply {
                 this.bounds.height.set(44f)
@@ -1412,14 +1416,24 @@ duration: ${monster.activeDuration.get()} sec
                     hudRedFlash = 1f
                 }
                 
-                currentPlayerHealthPercentage.set(bossModifier.playerHealth.hpPercentage.get())
-                currentBossHealthPercentage.set(bossModifier.bossHealth.hpPercentage.get())
+                setHealthValues(bossModifier)
 
                 val uiOpacity = bossModifier.uiOpacity.get()
                 superpane.opacity.set(Interpolation.smoother.apply(uiOpacity))
                 superpane.contentOffsetX.set(Interpolation.smoother.apply(-32f, 0f, uiOpacity))
             }
             this.superpane.visible.set(bossModifier != null)
+        }
+        
+        private fun setHealthValues(bossModifier: BossModifierModule) {
+            setHealthValueFor(currentPlayerHealthPercentage, currentPlayerHealthDrainPercentage, bossModifier.playerHealth)
+            setHealthValueFor(currentBossHealthPercentage, currentBossHealthDrainPercentage, bossModifier.bossHealth)
+        }
+        
+        private fun setHealthValueFor(percentage: FloatVar, drainPercentage: FloatVar, health: BossModifierModule.HealthBar) {
+            val maxHP = health.maxHP.get()
+            percentage.set(health.visualHP.get() / maxHP)
+            drainPercentage.set(health.hpDrainEffect.get() / maxHP)
         }
 
         override fun onWorldReset(world: World) {
