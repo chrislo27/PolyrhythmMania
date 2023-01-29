@@ -516,46 +516,49 @@ duration: ${monster.activeDuration.get()} sec
                 val centreX = viewportWidth / 2f
                 val centreY = viewportHeight / 2f
 
-                val shapeDrawer = shapeDrawer
-                if (shapeDrawer != null) {
-                    // Prepare shape renderer
-                    val shapeRenderer = main.shapeRenderer
-                    val oldProjMtx = Matrix4Stack.getAndPush().set(shapeRenderer.projectionMatrix)
-                    shapeRenderer.projectionMatrix = batch.projectionMatrix
-                    
-                    val maxSquareSize = 350f
-                    val prog = (progress / (1f - (transitionStart + transitionEnd))).coerceIn(0f, 1f)
-                    
-                    shapeRenderer.prepareStencilMask(batch, inverted = true) {
-                        val delayedProgress = (prog * 1.1f).coerceAtMost(1f)
-                        val hollowSize = Interpolation.pow5.apply(0f, maxSquareSize, delayedProgress)
-                        this.begin(ShapeRenderer.ShapeType.Filled)
-                        
-                        this.circle(centreX, centreY, hollowSize / 2 + 1, 100)
-                        
-                        this.end()
-                    }
-                    batch.useStencilMask {
-                        val interpolation = Interpolation.pow5Out
-                        val squareSize = interpolation.apply(0f, maxSquareSize, prog)
-                        
-                        val lastPackedColor = batch.packedColor
-                        val tmpColor = ColorStack.getAndPush()
-                        tmpColor.set(Color.YELLOW)
-                        
-                        tmpColor.a = alpha
-                        batch.color = tmpColor
-                        
-                        batch.draw(AssetRegistry.get<Texture>("big_circle_ui"), centreX - squareSize / 2, centreY - squareSize / 2, squareSize, squareSize)
-                        
-                        batch.packedColor = lastPackedColor
-                        ColorStack.pop()
-                    }
+                // Prepare shape renderer
+                val shapeRenderer = main.shapeRenderer
+                val oldProjMtx = Matrix4Stack.getAndPush().set(shapeRenderer.projectionMatrix)
+                shapeRenderer.projectionMatrix = batch.projectionMatrix
 
-                    // End using shape renderer
-                    shapeRenderer.projectionMatrix.set(oldProjMtx)
-                    Matrix4Stack.pop()
+                val maxSquareSize = 350f
+                val prog = (progress / (1f - (transitionStart + transitionEnd))).coerceIn(0f, 1f)
+
+                shapeRenderer.prepareStencilMask(batch, inverted = true) {
+                    val delayedProgress = (prog * 1.1f).coerceAtMost(1f)
+                    val hollowSize = Interpolation.pow5.apply(0f, maxSquareSize, delayedProgress)
+                    this.begin(ShapeRenderer.ShapeType.Filled)
+
+                    this.circle(centreX, centreY, hollowSize / 2 + 1, 100)
+
+                    this.end()
                 }
+                batch.useStencilMask {
+                    val interpolation = Interpolation.pow5Out
+                    val squareSize = interpolation.apply(0f, maxSquareSize, prog)
+
+                    val lastPackedColor = batch.packedColor
+                    val tmpColor = ColorStack.getAndPush()
+                    tmpColor.set(Color.YELLOW)
+
+                    tmpColor.a = alpha
+                    batch.color = tmpColor
+
+                    batch.draw(
+                        AssetRegistry.get<Texture>("big_circle_ui"),
+                        centreX - squareSize / 2,
+                        centreY - squareSize / 2,
+                        squareSize,
+                        squareSize
+                    )
+
+                    batch.packedColor = lastPackedColor
+                    ColorStack.pop()
+                }
+
+                // End using shape renderer
+                shapeRenderer.projectionMatrix.set(oldProjMtx)
+                Matrix4Stack.pop()
 
                 val paintboxFont = main.fontGamePracticeClear
                 paintboxFont.useFont { font ->

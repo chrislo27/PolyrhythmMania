@@ -17,7 +17,7 @@ import kotlin.math.roundToInt
 
 data class FrameBufferMgrSettings(
         val format: Pixmap.Format = Pixmap.Format.RGBA8888,
-        val hasDepth: Boolean = false, val hasStencil: Boolean = false,
+        val hasDepth: Boolean = true, val hasStencil: Boolean = false,
         val minFilter: Texture.TextureFilter = Texture.TextureFilter.Linear,
         val magFilter: Texture.TextureFilter = Texture.TextureFilter.Linear,
 )
