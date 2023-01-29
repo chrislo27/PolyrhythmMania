@@ -7,6 +7,6 @@ import polyrhythmmania.soundsystem.beads.ugen.UGenSeq
 
 class Muffled(context: AudioContext, inouts: Int) : UGenSeq(
     context, inouts, listOf(
-        BiquadFilter(context, inouts, BiquadFilter.Type.BESSEL_LP).setFrequency(500f),
+        BiquadFilter(context, inouts, BiquadFilter.Type.BESSEL_LP).setFrequency(350f),
     )
 )
