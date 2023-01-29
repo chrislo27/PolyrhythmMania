@@ -88,9 +88,9 @@ class StoryBossGameMode(main: PRManiaGame) : AbstractStoryGameMode(main), World.
         list.addAll(createExtraBlockEntities())
 
         val bossPosition = Vector3(5 + 11f, 1f + (14 / 32f), -3f)
-        list += EntityBossRobotUpside(world, bossPosition)
-        list += EntityBossRobotMiddle(world, bossPosition)
-        list += EntityBossRobotDownside(world, bossPosition)
+        list += EntityBossRobotUpside(world, this, bossPosition)
+        list += EntityBossRobotMiddle(world, this, bossPosition)
+        list += EntityBossRobotDownside(world, this, bossPosition)
 
         list.forEach(world::addEntity)
 

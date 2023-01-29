@@ -26,12 +26,26 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
         
         // Data
         val currentHP: IntVar = IntVar(startingHP.get())
+        val hurtFlash: FloatVar = FloatVar(0f)
         
         // Readonly
         val hpPercentage: ReadOnlyFloatVar = FloatVar { currentHP.use().toFloat() / (maxHP.use()).coerceAtLeast(1) }
         
         fun resetState() {
             currentHP.set(startingHP.get())
+            hurtFlash.set(0f)
+        }
+        
+        fun triggerHurtFlash() {
+            hurtFlash.set(1f)
+        }
+
+        fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
+            val currentHurtFlash = hurtFlash.get()
+            if (currentHurtFlash > 0f) {
+                val transitionDuration = 0.333f
+                hurtFlash.set((currentHurtFlash - deltaSec / transitionDuration).coerceIn(0f, 1f))
+            }
         }
     }
     
@@ -62,12 +76,15 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
             val transitionDuration = 0.5f
             uiOpacity.set((currentOpacity + deltaSec / transitionDuration).coerceAtMost(1f))
         }
+        
+        playerHealth.engineUpdate(beat, seconds, deltaSec)
+        bossHealth.engineUpdate(beat, seconds, deltaSec)
     }
 
     fun checkForRodsThatCollidedWithBoss() {
         val blocksAheadOfStart = BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE
-        val rods = gamemode.world.entities.filterAndIsInstance<EntityRodPR> { rod ->
-            !rod.exploded && rod.position.x > (rod.row.startX + blocksAheadOfStart)
+        val rods = gamemode.world.entities.filterAndIsInstance<EntityRodPRStoryBoss> { rod ->
+            !rod.exploded && rod.position.x > (rod.row.startX + blocksAheadOfStart) && rod.didLastBounce
         }
         rods.forEach { rod ->
             rod.explode(engine, shouldCountAsMiss = false)
@@ -87,11 +104,7 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
                 triggerPlayerHPDown(inputter)
             }
         } else {
-            val currentBossHP = bossHealth.currentHP.get()
-            if (currentBossHP > 0) {
-                val baseDamage = 1
-                bossHealth.currentHP.set((currentBossHP - (baseDamage * rod.bossDamageMultiplier)).coerceAtLeast(0))
-            }
+            triggerBossHPDown(rod)
         }
     }
     
@@ -100,8 +113,18 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
         if (playerHP.get() <= 0) return
         
         playerHP.decrementAndGet()
+        playerHealth.triggerHurtFlash()
         if (playerHP.get() == 0) {
             onGameOver(inputter)
+        }
+    }
+    
+    private fun triggerBossHPDown(rod: EntityRodPRStoryBoss) {
+        val currentBossHP = bossHealth.currentHP.get()
+        if (currentBossHP > 0) {
+            val baseDamage = 1
+            bossHealth.currentHP.set((currentBossHP - (baseDamage * rod.bossDamageMultiplier)).coerceAtLeast(0))
+            bossHealth.triggerHurtFlash()
         }
     }
 

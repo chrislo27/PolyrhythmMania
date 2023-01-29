@@ -14,6 +14,7 @@ import polyrhythmmania.world.tileset.Tileset
 
 abstract class AbstractEntityBossRobot(
     world: World,
+    val bossGameMode: StoryBossGameMode,
     val textureID: String,
     initialPosition: Vector3, val sortOffsetPx: Float, val sortOffsetPy: Float,
 ) : SimpleRenderedEntity(world), TemporaryEntity {
@@ -36,6 +37,9 @@ abstract class AbstractEntityBossRobot(
         val oldPackedColor = batch.packedColor
         val tmpColor = ColorStack.getAndPush()
             .set(1f, 1f, 1f, 1f)
+        
+        val hurtFlash = bossGameMode.modifierModule.bossHealth.hurtFlash.get()
+        tmpColor.lerp(1f, 0.35f, 0.35f, 1f, hurtFlash)
 
         batch.color = tmpColor
         batch.draw(StoryAssets.get<Texture>(textureID), vec.x, vec.y, renderWidth, renderHeight)
@@ -47,12 +51,12 @@ abstract class AbstractEntityBossRobot(
 
 }
 
-class EntityBossRobotUpside(world: World, initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, "boss_robot_upside", initialPosition, 0f, 21f)
+class EntityBossRobotUpside(world: World, bossGameMode: StoryBossGameMode,initialPosition: Vector3) :
+    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_upside", initialPosition, 0f, 21f)
 
-class EntityBossRobotMiddle(world: World, initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, "boss_robot_middle", initialPosition, 32f, 32f)
+class EntityBossRobotMiddle(world: World, bossGameMode: StoryBossGameMode,initialPosition: Vector3) :
+    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_middle", initialPosition, 32f, 32f)
 
-class EntityBossRobotDownside(world: World, initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, "boss_robot_downside", initialPosition, 48f, 0f)
+class EntityBossRobotDownside(world: World, bossGameMode: StoryBossGameMode,initialPosition: Vector3) :
+    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_downside", initialPosition, 48f, 0f)
 

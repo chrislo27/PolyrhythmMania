@@ -206,7 +206,7 @@ open class EntityRodPR(
         }
     }
 
-    private val killAfterBeats: Float 
+    protected open val killAfterBeats: Float 
         get() = 4f + row.length / xUnitsPerBeat + 1 // 4 prior to first index 0 + rowLength/xUnitsPerBeat + 1 buffer
     private val defectiveEscapeIndexThreshold: Int = 10 // Index at which this defective rod has escaped
 
@@ -218,7 +218,8 @@ open class EntityRodPR(
     private var lastCurrentIndex: Float = -10000f
     var registeredMiss: Boolean = false
         private set
-    private var defectiveRodEscaped: Boolean = false // Set to true if this rod is defective and has "escaped"
+    var defectiveRodEscaped: Boolean = false // Set to true if this rod is defective and has "escaped"
+        protected set
 
     val inputTracker: InputTracker = InputTracker(row.length)
     val acceptingInputs: Boolean
@@ -574,7 +575,8 @@ open class EntityRodPR(
             }
         } else {
             // Set to row height when not in the block area
-            this.position.y = row.startY.toFloat() + 1
+            val shouldOffsetUp = currentIndex < 0 || (world.worldMode.worldType as? WorldType.Polyrhythm)?.showRaisedPlatformsRepeated == true
+            this.position.y = row.startY.toFloat() + (if (shouldOffsetUp) 1 else 0)
             this.visualPosition.y = this.position.y
             this.collision.velocityY = 0f
         }
