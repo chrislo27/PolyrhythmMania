@@ -666,7 +666,7 @@ class StoryPlayScreen(
     override fun renderAfterGameplay(delta: Float, camera: OrthographicCamera) {
         super.renderAfterGameplay(delta, camera)
 
-        animationHandler.frameUpdate()
+        animationHandler.frameUpdate(delta)
         
         if (inIntroCard.get()) {
             introCardSceneRoot.renderAsRoot(batch)
