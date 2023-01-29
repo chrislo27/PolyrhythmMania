@@ -8,7 +8,7 @@ class EntityRodPRStoryBoss(
     world: World, deployBeat: Float, row: Row,
     val lastPistonIndex: Int,
     val playerDamageTaken: PlayerDamageTaken, val bossDamageMultiplier: Int,
-) : EntityRodPR(world, deployBeat, row, false) {
+) : EntityRodPR(world, deployBeat, row, isDefective = true) {
 
     class PlayerDamageTaken {
 
@@ -27,7 +27,7 @@ class EntityRodPRStoryBoss(
             val rowBlock = rowBlocks[startIndex]
             if (rowBlock.type.isPiston && startIndex == lastPistonIndex) {
                 // Note that peakHeight is computed via: row.startY + 1f + (endIndex - startIndex) + manualOffset
-                bounce(startIndex, startIndex + 5, 3f) // TODO
+                bounce(startIndex, 11, 1f)
                 return
             }
 

@@ -1373,7 +1373,7 @@ duration: ${monster.activeDuration.get()} sec
             superpane += vbox
 
             val bossHealthHbox = HBox().apply {
-                this.bounds.width.set(800f)
+                this.bounds.width.set(600f)
                 this += Pane().apply {
                     this.margin.set(Insets(12f, 0f))
                     

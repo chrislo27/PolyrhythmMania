@@ -63,6 +63,7 @@ data class Pattern(
 
         return BlockSpawnPatternStoryMode(engine, xUnitsPerBeat).apply {
             this.beat = beat
+            this.disableTailEnd.set(true)
 
             val patternData = this.patternData
             val patternDataTypes = if (isUpside) patternData.rowDpadTypes else patternData.rowATypes
@@ -76,6 +77,9 @@ data class Pattern(
 
             for (i in 0 until patternData.rowCount) {
                 patternDataTypes[i] = row.getOrNull(i) ?: defaultCubeType
+            }
+            for (i in 9 until patternData.rowCount) {
+                patternDataTypes[i] = CubeType.NONE
             }
         }
     }

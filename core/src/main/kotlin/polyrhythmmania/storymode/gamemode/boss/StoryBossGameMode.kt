@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.gamemode.boss
 
+import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.editor.block.Block
@@ -24,10 +25,10 @@ import polyrhythmmania.world.render.ForceTexturePack
 import java.util.*
 
 
-class StoryBossGameMode(main: PRManiaGame)
-    : AbstractStoryGameMode(main), World.WorldResetListener {
+class StoryBossGameMode(main: PRManiaGame) : AbstractStoryGameMode(main), World.WorldResetListener {
 
     companion object {
+
         private const val INTRO_CARD_TIME_SEC: Float = 2.5f // Duration of intro segment
         const val BPM: Float = 186f
 
@@ -57,7 +58,7 @@ class StoryBossGameMode(main: PRManiaGame)
     }
 
     private val checkForRodsThatCollidedWithBossRunnable = CheckForRodsThatCollidedWithBossRunnable()
-    
+
     val stems: StemCache = StoryMusicAssets.bossStems
     val modifierModule: BossModifierModule
 
@@ -65,13 +66,13 @@ class StoryBossGameMode(main: PRManiaGame)
     val patternPools: BossPatternPools = BossPatternPools(random)
 
     init {
-        world.worldMode = WorldMode(WorldType.Polyrhythm())
+        world.worldMode = WorldMode(WorldType.Polyrhythm(showRaisedPlatformsRepeated = false))
         world.showInputFeedback = true
         world.worldResetListeners += this as World.WorldResetListener
-        
+
         modifierModule = BossModifierModule(engine.modifiers, this)
         engine.modifiers.addModifierModule(modifierModule)
-        
+
         engine.postRunnable(checkForRodsThatCollidedWithBossRunnable)
     }
 
@@ -82,21 +83,49 @@ class StoryBossGameMode(main: PRManiaGame)
 
     override fun onWorldReset(world: World) {
         val list = mutableListOf<Entity>()
-        // This part is necessary for the story mode boss level (zooms way out) 
-        for (x in 9..13) {
-            for (z in -11 downTo -13) {
-                val ent: Entity = EntityCube(world, false)
-                list += ent.apply {
-                    this.position.set(x.toFloat(), 3f, z.toFloat())
-                }
-            }
-        }
-        
+
+        // Extra blocks due to more extreme zoom-out
+        list.addAll(createExtraBlockEntities())
+
+        val bossPosition = Vector3(5 + 11f, 1f + (14 / 32f), -3f)
+        list += EntityBossRobotUpside(world, bossPosition)
+        list += EntityBossRobotMiddle(world, bossPosition)
+        list += EntityBossRobotDownside(world, bossPosition)
+
         list.forEach(world::addEntity)
 
         patternPools.allPools.forEach { pool ->
             pool.resetAndShuffle()
         }
+    }
+
+    private fun createExtraBlockEntities(): List<Entity> {
+        val list = mutableListOf<Entity>()
+        
+        fun addCube(x: Int, y: Int, z: Int) {
+            list += EntityCube(world, false).apply {
+                this.position.set(x.toFloat(), y.toFloat(), z.toFloat())
+            }
+        }
+
+        for (x in 8..15) addCube(x, 3, -11)
+        for (x in 8..15) addCube(x, 3, -12)
+        for (x in 9..14) addCube(x, 3, -13)
+        for (x in 10..13) addCube(x, 3, -14)
+        for (x in 11..12) addCube(x, 3, -15)
+        
+        for (x in 11..14) addCube(x, 0, 10)
+        for (x in 12..13) addCube(x, 0, 11)
+        
+//        for (x in 8..13) {
+//            for (z in -12 downTo -13) {
+//                list += EntityCube(world, false).apply {
+//                    this.position.set(x.toFloat(), 3f, z.toFloat())
+//                }
+//            }
+//        }
+
+        return list
     }
 
     private fun addInitialBlocks() {
@@ -106,11 +135,12 @@ class StoryBossGameMode(main: PRManiaGame)
 
         container.addBlocks(blocks)
     }
-    
-    
+
+
     private inner class CheckForRodsThatCollidedWithBossRunnable : Runnable {
+
         var cancel: Boolean = false
-        
+
         override fun run() {
             modifierModule.checkForRodsThatCollidedWithBoss()
             if (!cancel) {
@@ -118,7 +148,7 @@ class StoryBossGameMode(main: PRManiaGame)
             }
         }
     }
-    
+
     //region GameMode overrides
 
     override fun getIntroCardTimeOverride(): Float {
@@ -134,28 +164,31 @@ class StoryBossGameMode(main: PRManiaGame)
     }
 
     override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings().copy(forceTexturePack = ForceTexturePack.FORCE_GBA, reducedMotion = false)
+        return super.createGlobalContainerSettings()
+            .copy(forceTexturePack = ForceTexturePack.FORCE_GBA, reducedMotion = false)
     }
 
     //endregion
 
     //region Init blocks
-    
+
     private fun onScriptCreated(script: Script) {
         val func: ScriptFunction = BossScriptIntro(this, script)
         script.addEventsToQueue(func.getEvents())
     }
 
     private abstract inner class AbstractBlock : Block(engine, EnumSet.allOf(BlockType::class.java)) {
+
         final override fun copy(): Block = throw NotImplementedError()
     }
-    
+
     private inner class InitScriptBlock : AbstractBlock() {
+
         override fun compileIntoEvents(): List<Event> {
             val script = Script(0f, this@StoryBossGameMode, 5f) // 1 + 4, 4 for deploy rods
 
             this@StoryBossGameMode.onScriptCreated(script)
-            
+
             return listOf(script)
         }
     }

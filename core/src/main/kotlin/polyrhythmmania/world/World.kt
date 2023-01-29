@@ -130,7 +130,7 @@ class World {
     private fun populateRegularScene() {
         clearEntities()
         
-        fun getNewEntities(): List<Entity> {
+        fun getNewEntities(showRaisedPlatformsAtBeginning: Boolean): List<Entity> {
             val list = mutableListOf<Entity>()
             
             fun showRedLine(x: Int): Boolean = x == 4
@@ -150,11 +150,13 @@ class World {
             }
 
             // Raised platforms at beginning
-            for (x in -3..4) {
-                for (zMul in 0..1) {
-                    val ent: Entity = EntityPlatform(this, showRedLine(x))
-                    list += ent.apply {
-                        this.position.set(x.toFloat(), 2f, zMul * -3f)
+            if (showRaisedPlatformsAtBeginning) {
+                for (x in -3..4) {
+                    for (zMul in 0..1) {
+                        val ent: Entity = EntityPlatform(this, showRedLine(x))
+                        list += ent.apply {
+                            this.position.set(x.toFloat(), 2f, zMul * -3f)
+                        }
                     }
                 }
             }
@@ -241,13 +243,13 @@ class World {
             return list
         }
         
-        getNewEntities().forEach(this::addEntity)
+        getNewEntities(true).forEach(this::addEntity)
         
         val worldType = this.worldMode.worldType
         if (worldType is WorldType.Polyrhythm) {
             // Extra entities for continuous mode
             
-            val ents = getNewEntities().toMutableList()
+            val ents = getNewEntities(worldType.showRaisedPlatformsRepeated).toMutableList()
 
             // Last 6 raised platforms
             for (x in -3..4) {

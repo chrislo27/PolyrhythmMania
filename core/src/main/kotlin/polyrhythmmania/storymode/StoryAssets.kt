@@ -94,6 +94,10 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("dunk_background_hole_in_one_1", "story/textures/world/dunk/hole_in_one_1.jpg", linearTexture())
         StoryAssets.loadAsset<Texture>("dunk_background_hole_in_one_2", "story/textures/world/dunk/hole_in_one_2.jpg", linearTexture())
         
+        StoryAssets.loadAsset<Texture>("boss_robot_upside", "story/textures/world/boss/robot_upside.png")
+        StoryAssets.loadAsset<Texture>("boss_robot_downside", "story/textures/world/boss/robot_downside.png")
+        StoryAssets.loadAsset<Texture>("boss_robot_middle", "story/textures/world/boss/robot_middle.png")
+        
         StoryAssets.loadAsset<Sound>("jingle_gba", "story/sounds/intro/jingle_gba.ogg")
         StoryAssets.loadAsset<Sound>("jingle_arcade", "story/sounds/intro/jingle_arcade.ogg")
         StoryAssets.loadAsset<Sound>("jingle_modern", "story/sounds/intro/jingle_modern.ogg")

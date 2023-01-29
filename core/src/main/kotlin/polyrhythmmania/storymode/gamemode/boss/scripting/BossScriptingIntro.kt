@@ -16,8 +16,7 @@ class BossScriptIntro(gamemode: StoryBossGameMode, script: Script) : BossScriptF
     private fun MutableList<Event>.moveCamera(): MutableList<Event> {
         val zoomTransition = PaletteTransition.DEFAULT.copy(duration = 4f, transitionCurve = TransitionCurve.SMOOTHER)
         val startZoom = 1f
-        val endZoom = 1.3f
-
+        val endZoom = 1.55f
         this += EventZoomCamera(engine, 0f, zoomTransition, startZoom, endZoom)
         this += EventMoveCameraRelative(engine, 0f, zoomTransition, Vector3(1f, 1f, 0f))
 
