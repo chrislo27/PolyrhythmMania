@@ -5,6 +5,7 @@ import polyrhythmmania.storymode.gamemode.boss.StoryBossGameMode
 
 
 class BossScriptPhase2(gamemode: StoryBossGameMode, script: Script) : BossScriptFunction(gamemode, script) {
+
     override fun getEvents(): List<Event> {
         /*
     run boss1_a1;       // (duration = 32.0)

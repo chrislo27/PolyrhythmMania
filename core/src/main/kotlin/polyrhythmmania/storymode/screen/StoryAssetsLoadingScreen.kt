@@ -4,7 +4,7 @@ import paintbox.Paintbox
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.solitaire.SolitaireAssets
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.gamemode.boss.BossInputPatterns
+import polyrhythmmania.storymode.gamemode.boss.pattern.BossPatterns
 
 
 class StoryAssetsLoadingScreen(main: PRManiaGame, unloadAssets: Boolean, doAfterLoad: () -> Unit)
@@ -25,7 +25,7 @@ class StoryAssetsLoadingScreen(main: PRManiaGame, unloadAssets: Boolean, doAfter
         private fun loadAction(delta: Float): Boolean {
             return if (StoryAssets.load(delta) >= 1f) {
                 SolitaireAssets.loadBlocking()
-                BossInputPatterns
+                BossPatterns
 
                 true
             } else false

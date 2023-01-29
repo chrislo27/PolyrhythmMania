@@ -21,27 +21,27 @@ abstract class ScriptFunction(val script: Script) {
     }
 
     fun MutableList<Event>.addFunctionAsEvent(func: ScriptFunction): MutableList<Event> =
-            this.addEvent(object : Event(this@ScriptFunction.engine) {
-                init {
-                    this.beat = -script.beatRunahead
-                }
+        this.addEvent(object : Event(this@ScriptFunction.engine) {
+            init {
+                this.beat = -script.beatRunahead
+            }
 
-                override fun onStart(currentBeat: Float) {
-                    script.addEventsToQueue(func.getEvents())
-                }
-            })
+            override fun onStart(currentBeat: Float) {
+                script.addEventsToQueue(func.getEvents())
+            }
+        })
 
     fun MutableList<Event>.rest(duration: Float): MutableList<Event> =
-            this.addEvent(Rest(duration, this@ScriptFunction.engine))
+        this.addEvent(Rest(duration, this@ScriptFunction.engine))
 
     fun MutableList<Event>.todo(desc: String): MutableList<Event> =
-            this.addEvent(object : Event(engine) {
-                override fun onStart(currentBeat: Float) {
-                    Paintbox.LOGGER.debug("Unimplemented event: $desc", "BossScriptFunction")
-                }
-            })
+        this.addEvent(object : Event(engine) {
+            override fun onStart(currentBeat: Float) {
+                Paintbox.LOGGER.debug("Unimplemented event: $desc", "BossScriptFunction")
+            }
+        })
 
     @Suppress("UNUSED_PARAMETER")
     fun MutableList<Event>.note(note: String): MutableList<Event> = this
-    
+
 }

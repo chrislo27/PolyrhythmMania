@@ -7,9 +7,10 @@ import polyrhythmmania.world.Row
 
 
 class EventDeployRodBoss(
-        engine: Engine,
-        val row: Row, startBeat: Float,
-        val damageTakenVar: EntityRodPRStoryBoss.PlayerDamageTaken, val bossDamageMultiplier: Int
+    engine: Engine,
+    val row: Row, startBeat: Float,
+    val xUnitsPerBeat: Float, val lastPistonIndex: Int,
+    val damageTakenVar: EntityRodPRStoryBoss.PlayerDamageTaken, val bossDamageMultiplier: Int,
 ) : Event(engine) {
 
     init {
@@ -18,7 +19,13 @@ class EventDeployRodBoss(
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        val rod = EntityRodPRStoryBoss(engine.world, this.beat, row, damageTakenVar, bossDamageMultiplier)
+
+        val rod = EntityRodPRStoryBoss(
+            engine.world, this.beat, row, lastPistonIndex,
+            damageTakenVar, bossDamageMultiplier
+        )
+        rod.xUnitsPerBeat = this.xUnitsPerBeat
+
         engine.world.addEntity(rod)
 
         if (engine.areStatisticsEnabled) {

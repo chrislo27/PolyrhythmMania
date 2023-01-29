@@ -138,6 +138,8 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
      */
     var nextActiveIndex: Int = -1
         private set
+    
+    val name: String = if (isDpad) "D-pad" else "A"
 
     fun onWorldReset() {
         rowBlocks.forEach {

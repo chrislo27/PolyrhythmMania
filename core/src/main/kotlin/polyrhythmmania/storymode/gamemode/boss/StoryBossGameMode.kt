@@ -7,16 +7,14 @@ import polyrhythmmania.editor.block.BlockType
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.gamemodes.GameMode
-import polyrhythmmania.gamemodes.endlessmode.Difficulty
-import polyrhythmmania.gamemodes.endlessmode.Pattern
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
+import polyrhythmmania.storymode.gamemode.boss.pattern.BossPatternPools
 import polyrhythmmania.storymode.gamemode.boss.scripting.BossScriptIntro
 import polyrhythmmania.storymode.gamemode.boss.scripting.Script
 import polyrhythmmania.storymode.gamemode.boss.scripting.ScriptFunction
 import polyrhythmmania.storymode.music.StemCache
 import polyrhythmmania.storymode.music.StoryMusicAssets
-import polyrhythmmania.util.RandomBagIterator
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldType
@@ -64,9 +62,7 @@ class StoryBossGameMode(main: PRManiaGame)
     val modifierModule: BossModifierModule
 
     val random: Random = Random()
-    val difficultyBags: Map<Difficulty, RandomBagIterator<Pattern>> = BossInputPatterns.patternsByDifficulty.entries.associate {
-        it.key to RandomBagIterator(it.value, random, RandomBagIterator.ExhaustionBehaviour.SHUFFLE_EXCLUDE_LAST)
-    }
+    val patternPools: BossPatternPools = BossPatternPools(random)
 
     init {
         world.worldMode = WorldMode(WorldType.Polyrhythm())
@@ -98,13 +94,8 @@ class StoryBossGameMode(main: PRManiaGame)
         
         list.forEach(world::addEntity)
 
-        difficultyBags.entries.forEach { (difficulty, iter) ->
-            iter.resetToOriginalOrder()
-            if (difficulty == Difficulty.EASY) {
-                iter.shuffleAndExclude(BossInputPatterns.firstPattern)
-            } else {
-                iter.shuffle()
-            }
+        patternPools.allPools.forEach { pool ->
+            pool.resetAndShuffle()
         }
     }
 

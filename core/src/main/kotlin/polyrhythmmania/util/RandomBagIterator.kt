@@ -1,7 +1,6 @@
 package polyrhythmmania.util
 
 import java.util.*
-import kotlin.NoSuchElementException
 
 
 /**
@@ -10,9 +9,11 @@ import kotlin.NoSuchElementException
  *
  * This is similar to Tetris's "Random Generator" but you can force the items between the "seams" to not be the same.
  */
-class RandomBagIterator<T>(container: List<T>, val random: Random,
-                           val exhaustionBehaviour: ExhaustionBehaviour = ExhaustionBehaviour.SHUFFLE_EXCLUDE_LAST)
-    : Iterator<T> {
+class RandomBagIterator<T>(
+    container: List<T>,
+    val random: Random,
+    val exhaustionBehaviour: ExhaustionBehaviour = ExhaustionBehaviour.SHUFFLE_EXCLUDE_LAST,
+) : Iterator<T> {
     
     enum class ExhaustionBehaviour {
         DO_NOTHING,

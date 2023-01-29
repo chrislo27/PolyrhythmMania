@@ -8,17 +8,19 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 
 class Script(
-        val startBeat: Float,
-        val gamemode: StoryBossGameMode,
+    val startBeat: Float,
+    val gamemode: StoryBossGameMode,
 
-        /** The amount of time early to place events.
-         * Note that the event start beat will still be accurate,
-         * but it will be added to the [Engine] this many beats earlier. */
-        val beatRunahead: Float
+    /** The amount of time early to place events.
+     * Note that the event start beat will still be accurate,
+     * but it will be added to the [Engine] this many beats earlier. */
+    val beatRunahead: Float,
 ) : Event(gamemode.engine) {
-    
+
     companion object {
+
         private const val LOGGER_TAG: String = "Script"
+
     }
 
     val modifierModule: BossModifierModule = gamemode.modifierModule
@@ -51,7 +53,7 @@ class Script(
         if (currentBeat < restUntilEngineBeat) {
             return
         }
-        
+
         val beatOrigin = this.startBeat
 
         val eventIterator = eventQueue.iterator()

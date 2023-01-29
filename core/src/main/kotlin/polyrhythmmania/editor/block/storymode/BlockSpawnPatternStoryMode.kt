@@ -22,7 +22,16 @@ import java.util.*
 
 class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
 
-    private var xUnitsPerBeat: Float = EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT
+    companion object {
+
+        const val DEFAULT_X_UNITS_PER_BEAT: Float = EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT
+    }
+
+    private var xUnitsPerBeat: Float = DEFAULT_X_UNITS_PER_BEAT
+    
+    constructor(engine: Engine, xUnitsPerBeat: Float) : this(engine) {
+        this.xUnitsPerBeat = xUnitsPerBeat
+    }
     
     init {
         this.width = 4f
