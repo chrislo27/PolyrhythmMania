@@ -78,8 +78,12 @@ data class Pattern(
             for (i in 0 until patternData.rowCount) {
                 patternDataTypes[i] = row.getOrNull(i) ?: defaultCubeType
             }
-            for (i in 9 until patternData.rowCount) {
-                patternDataTypes[i] = CubeType.NONE
+            
+            val lastIndexOfPiston = getLastPistonIndex(patternDataTypes)
+            if (lastIndexOfPiston >= 0) {
+                for (i in (lastIndexOfPiston + 1) until patternData.rowCount) {
+                    patternDataTypes[i] = CubeType.NONE
+                }
             }
         }
     }
