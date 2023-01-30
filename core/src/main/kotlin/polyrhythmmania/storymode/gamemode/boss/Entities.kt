@@ -16,18 +16,15 @@ abstract class AbstractEntityBossRobot(
     world: World,
     val bossGameMode: StoryBossGameMode,
     val textureID: String,
-    initialPosition: Vector3, val sortOffsetPx: Float, val sortOffsetPy: Float,
+    initialPosition: Vector3,
+    override val renderSortOffsetX: Float,
+    override val renderSortOffsetY: Float,
+    override val renderSortOffsetZ: Float,
 ) : SimpleRenderedEntity(world), TemporaryEntity {
 
     override val renderWidth: Float get() = 105f / 32f
     override val renderHeight: Float get() = 122f / 32f
 
-    override val renderSortOffsetX: Float
-        get() = sortOffsetPx / 32f
-    override val renderSortOffsetY: Float
-        get() = sortOffsetPx / 32f + sortOffsetPy / 32f
-    override val renderSortOffsetZ: Float
-        get() = sortOffsetPx / 32f * 2f
 
     init {
         this.position.set(initialPosition)
@@ -41,6 +38,9 @@ abstract class AbstractEntityBossRobot(
         val hurtFlash = bossGameMode.modifierModule.bossHealth.hurtFlash.get()
         tmpColor.lerp(1f, 0.35f, 0.35f, 1f, hurtFlash)
 
+//        batch.setColor(1f, 0f, 0f, 0.25f)
+//        batch.fillRect(vec.x, vec.y, renderWidth, renderHeight)
+        
         batch.color = tmpColor
         batch.draw(StoryAssets.get<Texture>(textureID), vec.x, vec.y, renderWidth, renderHeight)
         batch.packedColor = oldPackedColor
@@ -52,11 +52,11 @@ abstract class AbstractEntityBossRobot(
 }
 
 class EntityBossRobotUpside(world: World, bossGameMode: StoryBossGameMode,initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_upside", initialPosition, 0f, 21f)
+    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_upside", initialPosition, 0f, 1f, 0f)
 
 class EntityBossRobotMiddle(world: World, bossGameMode: StoryBossGameMode,initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_middle", initialPosition, 32f, 32f)
+    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_middle", initialPosition, 1f, 2f, 2f)
 
 class EntityBossRobotDownside(world: World, bossGameMode: StoryBossGameMode,initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_downside", initialPosition, 48f, 0f)
+    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_downside", initialPosition, 0f, 1f, 3f)
 

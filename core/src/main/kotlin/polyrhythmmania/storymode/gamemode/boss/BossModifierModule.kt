@@ -18,7 +18,7 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
 
     companion object {
 
-        const val BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE: Float = 11.125f
+        const val BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE: Float = 11.2f
         private const val PLAYER_HEALTH: Int = 10
         private const val BOSS_HEALTH: Int = 50
     }
@@ -134,7 +134,7 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
     fun checkForRodsThatCollidedWithBoss() {
         val blocksAheadOfStart = BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE
         val rods = gamemode.world.entities.filterAndIsInstance<EntityRodPRStoryBoss> { rod ->
-            !rod.exploded && rod.position.x > (rod.row.startX + blocksAheadOfStart) && rod.didLastBounce
+            !rod.exploded && !rod.registeredMiss && rod.position.x > (rod.row.startX + blocksAheadOfStart) && rod.didLastBounce
         }
         rods.forEach { rod ->
             rod.explode(engine, shouldCountAsMiss = false)
