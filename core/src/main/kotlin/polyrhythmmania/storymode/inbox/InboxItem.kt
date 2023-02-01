@@ -90,6 +90,7 @@ sealed class InboxItem(
         override fun isCompletedWhenRead(): Boolean = false
     }
     
+    open var heading: Heading? = null
     
     open fun isCompletedWhenRead(): Boolean = true
 

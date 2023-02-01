@@ -23,6 +23,7 @@ import paintbox.ui.animation.Animation
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.grey
 import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
@@ -32,10 +33,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
-import polyrhythmmania.storymode.inbox.InboxItem
-import polyrhythmmania.storymode.inbox.InboxItemCompletion
-import polyrhythmmania.storymode.inbox.InboxItemState
-import polyrhythmmania.storymode.inbox.StageCompletionData
+import polyrhythmmania.storymode.inbox.*
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.ui.TogglableInputProcessor
 import java.time.LocalDateTime
@@ -221,13 +219,19 @@ class DesktopUI(
                 scenario.inboxState.itemStateVarOrUnavailable(ii.id).use()
             }
         }
+        inboxItemListingObjs = scenario.inboxItems.items.map { ii ->
+            InboxItemListingObj(ii)
+        }
         fun addObj(obj: InboxItemListingObj) {
+            val inboxItem = obj.inboxItem
+            
+            val heading = inboxItem.heading
+            if (heading != null) {
+                itemsVbox += InboxItemHeadingObj(heading, inboxItem)
+            }
+
             itemsVbox += obj
             itemToggleGroup.addToggle(obj)
-        }
-        inboxItemListingObjs = scenario.inboxItems.items.map { ii ->
-            // TODO link InboxItem to an UnlockStage; check UnlockStage state
-            InboxItemListingObj(ii)
         }
         inboxItemListingObjs.forEach { addObj(it) }
 
@@ -490,7 +494,7 @@ class DesktopUI(
                     this.textureRegion.sideEffecting(TextureRegion()) { reg ->
                         val state = myInboxItemState.use()
                         if (state.completion == InboxItemCompletion.UNAVAILABLE) {
-                            reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_blank"))
+                            reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_unavailable"))
                         } else {
                             reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_employment_${
                                 when (state.completion) {
@@ -584,6 +588,7 @@ class DesktopUI(
                         else -> ""
                     }
                 }
+                this.visible.bind { myInboxItemState.use().completion != InboxItemCompletion.UNAVAILABLE }
                 this.renderAlign.set(RenderAlign.left)
                 this.textColor.set(Color.DARK_GRAY.cpy())
                 this.margin.set(Insets(0f, 0f, 1f * UI_SCALE, 1f * UI_SCALE))
@@ -631,6 +636,52 @@ class DesktopUI(
                 }
 
                 controller.playSFX(DesktopController.SFXType.CLICK_INBOX_ITEM)
+            }
+        }
+    }
+
+    inner class InboxItemHeadingObj(val heading: Heading, val followingInboxItem: InboxItem) : Pane() {
+
+        val followingInboxItemState: ReadOnlyVar<InboxItemState> = scenario.inboxState.itemStateVarOrUnavailable(followingInboxItem.id)
+        private val isFollowingAvailable: ReadOnlyBooleanVar = BooleanVar { followingInboxItemState.use().completion != InboxItemCompletion.UNAVAILABLE }
+
+        init {
+            this.bounds.width.set(78f * UI_SCALE)
+            this.bounds.height.set(30f * UI_SCALE)
+
+            val contentPane = NoInputPane().apply {
+                this.margin.set(Insets(2f * UI_SCALE, 4f * UI_SCALE))
+            }
+            this += contentPane
+
+            val grey = Color().grey(232 / 255f, a = 1f).toConstVar()
+            val image = ImageNode(binding = {
+                TextureRegion(heading.getTexture())
+            }).apply {
+                this.tint.bind {
+                    Color(grey.use()).apply {
+                        this.a *= 0.8f
+                    }
+                }
+                this.renderAlign.set(RenderAlign.bottomRight)
+                this.opacity.set(if (isFollowingAvailable.get()) 1f else 0f) // Not bound, will be animated
+            }
+            contentPane += image
+            contentPane += TextLabel(binding = {
+                "[lineheight=0.9]${(if (isFollowingAvailable.use()) heading.text else StoryL10N.getVar("inboxItem.heading.notUnlockedYet")).use()}[]"
+            }).apply {
+                this.markup.set(Markup.createWithSingleFont(main.fontMainMenuHeading, lenientMode = true))
+                this.bindWidthToParent(multiplier = 0.75f)
+                this.textColor.bind { grey.use() }
+                this.renderAlign.set(RenderAlign.bottomLeft)
+                this.doLineWrapping.set(true)
+                this.setScaleXY(0.9f)
+            }
+            
+            isFollowingAvailable.addListener {
+                if (it.getOrCompute() && image.opacity.get() < 1f) {
+                    this@DesktopUI.sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 0f, 1f), image.opacity)
+                } else image.opacity.set(0f)
             }
         }
     }

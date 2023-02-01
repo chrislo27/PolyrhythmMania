@@ -9,6 +9,7 @@ import paintbox.registry.AssetRegistryInstance
 import paintbox.registry.IAssetLoader
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.storymode.inbox.Heading
 
 
 object StoryAssets : AssetRegistryInstance() {
@@ -64,6 +65,9 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_bg_tube_1", "story/textures/desk/bg/tube_1.png")
         StoryAssets.loadAsset<Texture>("desk_bg_tube_2", "story/textures/desk/bg/tube_2.png")
         StoryAssets.loadAsset<Texture>("desk_bg_tube_3", "story/textures/desk/bg/tube_3.png")
+        Heading.values().forEach { heading ->
+            StoryAssets.loadAsset<Texture>(heading.textureID, "story/textures/desk/heading/${heading.id}.png")
+        }
         StoryAssets.loadAsset<Texture>("desk_contract_envelope", "story/textures/desk/contract_envelope.png")
         StoryAssets.loadAsset<Texture>("desk_contract_paper", "story/textures/desk/contract_paper.png")
         StoryAssets.loadAsset<Texture>("desk_contract_full", "story/textures/desk/contract_full.png")
