@@ -668,14 +668,14 @@ class DesktopUI(
             }
             contentPane += image
             contentPane += TextLabel(binding = {
-                "[lineheight=0.9]${(if (isFollowingAvailable.use()) heading.text else StoryL10N.getVar("inboxItem.heading.notUnlockedYet")).use()}[]"
-            }).apply {
-                this.useSingleFontMarkup(lenientMode = true)
+                (if (isFollowingAvailable.use()) heading.text else StoryL10N.getVar("inboxItem.heading.notUnlockedYet")).use()
+            }, font = main.fontMainMenuHeading).apply {
                 this.bindWidthToParent(multiplier = 0.75f)
                 this.textColor.bind { grey.use() }
                 this.renderAlign.set(RenderAlign.bottomLeft)
                 this.doLineWrapping.set(true)
                 this.setScaleXY(0.9f)
+                this.lineSpacingMultiplier.set(0.9f)
             }
             
             isFollowingAvailable.addListener {
