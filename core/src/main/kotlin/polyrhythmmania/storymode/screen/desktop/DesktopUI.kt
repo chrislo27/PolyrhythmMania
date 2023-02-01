@@ -670,7 +670,7 @@ class DesktopUI(
             contentPane += TextLabel(binding = {
                 "[lineheight=0.9]${(if (isFollowingAvailable.use()) heading.text else StoryL10N.getVar("inboxItem.heading.notUnlockedYet")).use()}[]"
             }).apply {
-                this.markup.set(Markup.createWithSingleFont(main.fontMainMenuHeading, lenientMode = true))
+                this.useSingleFontMarkup(lenientMode = true)
                 this.bindWidthToParent(multiplier = 0.75f)
                 this.textColor.bind { grey.use() }
                 this.renderAlign.set(RenderAlign.bottomLeft)
