@@ -51,7 +51,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
             
             if (pathAlpha >= 1f) {
                 if (to.pistonIndex > -1) {
-                    triggerPiston(to.pistonIndex, false)
+                    triggerPiston(to.pistonIndex)
                 }
                 
                 nextPath(toIndex)
@@ -77,14 +77,15 @@ class DesktopBackground(val camera: OrthographicCamera) {
     )
     private val envelopes: MutableList<Envelope> = mutableListOf()
     private var envelopeOffsetNum: Int = 0
-    private var pistonIndex: Int = 0
+    private var pistonFrame: Int = 0
+    private var incrementPistonFrameAfterSec: Float = 0f
     
     fun render(batch: SpriteBatch, isItemAvailable: Boolean) {
         val width = camera.viewportWidth
         val height = camera.viewportHeight
         
         batch.draw(StoryAssets.get<Texture>("desk_bg_background"), 0f, 0f, width, height)
-        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_1"), 0f, 0f, width, height)
+//        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_1"), 0f, 0f, width, height)
         batch.draw(StoryAssets.get<Texture>("desk_bg_piston_background"), 0f, 0f, width, height)
         
         val delta = Gdx.graphics.deltaTime
@@ -111,23 +112,34 @@ class DesktopBackground(val camera: OrthographicCamera) {
             envelopes.removeIf { it.shouldDelete }
         }
         
-        val pistonFrame = pistonIndex + 1
-        batch.draw(StoryAssets.get<Texture>("desk_bg_pistons_$pistonFrame"), 0f, 0f, width, height)
+        batch.draw(StoryAssets.get<Texture>("desk_bg_pistons_${this.pistonFrame + 1}"), 0f, 0f, width, height)
         
-        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_2"), 0f, 0f, width, height)
-        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_3"), 0f, 0f, width, height)
+//        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_2"), 0f, 0f, width, height)
+//        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_3"), 0f, 0f, width, height)
         batch.draw(StoryAssets.get<Texture>(if (isItemAvailable) "desk_bg_inbox_available" else "desk_bg_inbox"), 0f, 0f, width, height)
+        
+        if (incrementPistonFrameAfterSec > 0) {
+            incrementPistonFrameAfterSec -= delta
+            if (incrementPistonFrameAfterSec <= 0f) {
+                incrementPistonFrameAfterSec = 0f
+                pistonFrame++
+            }
+        }
     }
     
     fun sendEnvelope() {
         envelopes += Envelope(envelopeOffsetNum++)
     }
-    
-    fun triggerPiston(pistonIndex: Int, middle: Boolean) {
-        // TODO middle doesn't work because sprites are incorrect
-        val newIndex = (pistonIndex + 1) * 2 // (if (middle) 1 else 0)
-        if (this.pistonIndex < newIndex && newIndex in 0 until PISTON_FRAMES) {
-            this.pistonIndex = newIndex
+
+    /**
+     * @param pistonIndex 0-indexed piston. NOT the frame number!
+     */
+    fun triggerPiston(pistonIndex: Int) {
+        // pistonIndex = 0, middle = false = index 1
+        val newIndex = (pistonIndex * 2) + 1
+        if (this.pistonFrame < newIndex && newIndex in 0 until PISTON_FRAMES) {
+            this.pistonFrame = newIndex
+            this.incrementPistonFrameAfterSec = 1f / 10 // TODO 1/30
         }
     }
     
@@ -137,7 +149,8 @@ class DesktopBackground(val camera: OrthographicCamera) {
     }
     
     fun resetPistons() {
-        pistonIndex = 0
+        this.pistonFrame = 0
+        this.incrementPistonFrameAfterSec = 0f
     }
     
     fun removeAllEnvelopes() {
