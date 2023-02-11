@@ -2,6 +2,7 @@ package polyrhythmmania.storymode.gamemode.boss.scripting
 
 import polyrhythmmania.engine.Event
 import polyrhythmmania.storymode.gamemode.boss.StoryBossGameMode
+import polyrhythmmania.storymode.music.StemID
 import polyrhythmmania.storymode.music.StoryMusicAssets
 
 
@@ -55,11 +56,11 @@ class BossScriptPhase1(gamemode: StoryBossGameMode, script: Script) : BossScript
     }
              */
             
-            class PlaceholderMusicStem(val stem: String) : AbstractBossScriptPhase1Part(this@BossScriptPhase1) {
+            class PlaceholderMusicStem(val stemID: StemID) : AbstractBossScriptPhase1Part(this@BossScriptPhase1) {
 
                 override fun getEvents(): List<Event> {
                     return mutableListOf<Event>()
-                        .music(stem, 8)
+                        .music(stemID, 8 + EXTRA_MEASURES_SPACING)
                         .rest(32.0f)
                 }
             }
@@ -119,7 +120,7 @@ class BossScriptPhase1A1(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Par
 
         val list = mutableListOf<Event>()
 
-        list.music(StoryMusicAssets.STEM_ID_BOSS_1_A1, 8)
+        list.music(StoryMusicAssets.STEM_ID_BOSS_1_A1, 8 + EXTRA_MEASURES_SPACING)
 
         repeat(2) {
             var pattern = patternPools.boss1_a1_patterns.iter.next()
@@ -173,7 +174,7 @@ class BossScriptPhase1A2(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Par
 
         val list = mutableListOf<Event>()
 
-        list.music(StoryMusicAssets.STEM_ID_BOSS_1_A2, 8)
+        list.music(StoryMusicAssets.STEM_ID_BOSS_1_A2, 8 + EXTRA_MEASURES_SPACING)
 
         repeat(2) {
             var pattern = patternPools.boss1_a2_patterns.iter.next()
@@ -248,7 +249,7 @@ Script boss1_b2 = {
         val pattern2 = patternPool.iter.next()
         val pattern3 = patternPool.iter.next()
 
-        list.music(StoryMusicAssets.STEM_ID_BOSS_1_B2, 8)
+        list.music(StoryMusicAssets.STEM_ID_BOSS_1_B2, 8 + EXTRA_MEASURES_SPACING)
         
         list
             .rest(1.0f)

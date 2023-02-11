@@ -5,12 +5,18 @@ import polyrhythmmania.engine.input.EventClearInputs
 import polyrhythmmania.storymode.gamemode.boss.*
 import polyrhythmmania.storymode.gamemode.boss.pattern.BossPatternPools
 import polyrhythmmania.storymode.gamemode.boss.pattern.Pattern
+import polyrhythmmania.storymode.music.StemID
 import polyrhythmmania.world.EventRowBlockDespawn
 import polyrhythmmania.world.EventRowBlockRetract
 import polyrhythmmania.world.World
 
 
 abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Script) : ScriptFunction(script) {
+    
+    companion object {
+        @JvmStatic
+        protected val EXTRA_MEASURES_SPACING: Int = 1
+    }
 
     protected val world: World get() = engine.world
     protected val modifierModule: BossModifierModule = gamemode.modifierModule
@@ -18,6 +24,21 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
 
     protected fun MutableList<Event>.music(stemID: String, measures: Int): MutableList<Event> =
         this.addEvent(BossMusicEvent(engine, gamemode.stems, stemID, 0f, (measures * 4).toFloat()))
+
+    protected fun MutableList<Event>.music(
+        stemID: StemID,
+        measures: Int,
+        specificVariant: Int? = null,
+    ): MutableList<Event> =
+        this.addEvent(
+            BossMusicEvent(
+                engine,
+                gamemode.stems,
+                if (specificVariant != null) stemID.getID(specificVariant) else stemID.getRandomID(gamemode.random),
+                0f,
+                (measures * 4).toFloat()
+            )
+        )
 
 
     protected fun MutableList<Event>.spawnPattern(pattern: Pattern): MutableList<Event> {

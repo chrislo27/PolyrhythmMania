@@ -13,17 +13,17 @@ object StoryMusicAssets : Closeable {
     const val STEM_ID_DESKTOP_MAIN: String = "desktop_main"
     const val STEM_ID_DESKTOP_PERC: String = "desktop_perc"
     
-    const val STEM_ID_BOSS_1_INTRO: String = "boss1_intro"
-    const val STEM_ID_BOSS_1_A1: String = "boss1_a1"
-    const val STEM_ID_BOSS_1_A2: String = "boss1_a2"
-    const val STEM_ID_BOSS_1_B1: String = "boss1_b1"
-    const val STEM_ID_BOSS_1_B2: String = "boss1_b2"
-    const val STEM_ID_BOSS_1_C: String = "boss1_c"
-    const val STEM_ID_BOSS_1_D: String = "boss1_d"
-    const val STEM_ID_BOSS_1_E1: String = "boss1_e1"
-    const val STEM_ID_BOSS_1_E2: String = "boss1_e2"
-    const val STEM_ID_BOSS_1_F: String = "boss1_f"
-    const val STEM_ID_BOSS_2: String = "boss2"
+    val STEM_ID_BOSS_1_INTRO: StemID = StemID("boss1_intro")
+    val STEM_ID_BOSS_1_A1: StemID = StemID("boss1_a1")
+    val STEM_ID_BOSS_1_A2: StemID = StemID("boss1_a2")
+    val STEM_ID_BOSS_1_B1: StemID = StemID("boss1_b1")
+    val STEM_ID_BOSS_1_B2: StemID = StemID("boss1_b2")
+    val STEM_ID_BOSS_1_C: StemID = StemID("boss1_c", variants = 3)
+    val STEM_ID_BOSS_1_D: StemID = StemID("boss1_d", variants = 3)
+    val STEM_ID_BOSS_1_E1: StemID = StemID("boss1_e1")
+    val STEM_ID_BOSS_1_E2: StemID = StemID("boss1_e2")
+    val STEM_ID_BOSS_1_F: StemID = StemID("boss1_f", variants = 3)
+    val STEM_ID_BOSS_2: StemID = StemID("boss2")
     
 
     val titleStems: StemCache = StemCache(mapOf(
@@ -33,19 +33,35 @@ object StoryMusicAssets : Closeable {
             STEM_ID_DESKTOP_MAIN to { Stem(Gdx.files.internal("story/music/desktop/main.ogg")) },
             STEM_ID_DESKTOP_PERC to { Stem(Gdx.files.internal("story/music/desktop/perc.ogg")) },
     ))
-    val bossStems: StemCache = StemCache(mapOf(
-            STEM_ID_BOSS_1_INTRO to { Stem(Gdx.files.internal("story/music/boss/boss1_intro.ogg"), inMemory = true) },
-            STEM_ID_BOSS_1_A1 to { Stem(Gdx.files.internal("story/music/boss/boss1_a1.ogg"), inMemory = true) },
-            STEM_ID_BOSS_1_A2 to { Stem(Gdx.files.internal("story/music/boss/boss1_a2.ogg"), inMemory = true) },
-            STEM_ID_BOSS_1_B1 to { Stem(Gdx.files.internal("story/music/boss/boss1_b1_pat0.ogg"), inMemory = true) },
-            STEM_ID_BOSS_1_B2 to { Stem(Gdx.files.internal("story/music/boss/boss1_b2_pat0.ogg"), inMemory = true) },
-            STEM_ID_BOSS_1_C to { Stem(Gdx.files.internal("story/music/boss/boss1_c_pat0.ogg"), inMemory = true) },
-            STEM_ID_BOSS_1_D to { Stem(Gdx.files.internal("story/music/boss/boss1_d_pat0.ogg"), inMemory = true) },
-            STEM_ID_BOSS_1_E1 to { Stem(Gdx.files.internal("story/music/boss/boss1_e1.ogg"), inMemory = true) },
-            STEM_ID_BOSS_1_E2 to { Stem(Gdx.files.internal("story/music/boss/boss1_e2.ogg"), inMemory = true) },
-            STEM_ID_BOSS_1_F to { Stem(Gdx.files.internal("story/music/boss/boss1_f_pat0.ogg"), inMemory = true) },
-            STEM_ID_BOSS_2 to { Stem(Gdx.files.internal("story/music/boss/boss2.ogg"), inMemory = true) },
-    ))
+    val bossStems: StemCache = run {
+        val fileExt = "ogg"
+        val stemIDsToPathBase: List<Pair<StemID, String>> = listOf(
+            STEM_ID_BOSS_1_INTRO to "story/music/boss/boss1_intro",
+            STEM_ID_BOSS_1_A1 to "story/music/boss/boss1_a1",
+            STEM_ID_BOSS_1_A2 to "story/music/boss/boss1_a2",
+            STEM_ID_BOSS_1_B1 to "story/music/boss/boss1_b1",
+            STEM_ID_BOSS_1_B2 to "story/music/boss/boss1_b2",
+            STEM_ID_BOSS_1_C to "story/music/boss/boss1_c",
+            STEM_ID_BOSS_1_D to "story/music/boss/boss1_d",
+            STEM_ID_BOSS_1_E1 to "story/music/boss/boss1_e1",
+            STEM_ID_BOSS_1_E2 to "story/music/boss/boss1_e2",
+            STEM_ID_BOSS_1_F to "story/music/boss/boss1_f",
+            STEM_ID_BOSS_2 to "story/music/boss/boss2",
+        )
+        val stemIDsWithVariantsToPath: List<Pair<String, String>> = stemIDsToPathBase.flatMap { (stemID, pathBase) ->
+            if (stemID.hasNoVariants) {
+                listOf(stemID.getID(StemID.NO_VARIANT) to "${pathBase}.${fileExt}")
+            } else {
+                stemID.getAllIDsWithVariant().map { (variant, id) ->
+                    id to "${pathBase}_var${variant}.${fileExt}"
+                }
+            }
+        }
+
+        StemCache(stemIDsWithVariantsToPath.associate { (id, filename) ->
+            id to { Stem(Gdx.files.internal(filename), inMemory = true) }
+        })
+    }
     
     fun initTitleStems() {
         titleStems.loadAll()

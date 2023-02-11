@@ -46,7 +46,7 @@ class BossScriptIntro(gamemode: StoryBossGameMode, script: Script) : BossScriptF
         val pattern = patternPools.introPattern
 
         return mutableListOf<Event>()
-            .music(StoryMusicAssets.STEM_ID_BOSS_1_INTRO, 6)
+            .music(StoryMusicAssets.STEM_ID_BOSS_1_INTRO, 6 + EXTRA_MEASURES_SPACING)
             .moveCamera()
             .note("boss_title_appear") // Handled by title card separately
             .todo("boss_appear")
