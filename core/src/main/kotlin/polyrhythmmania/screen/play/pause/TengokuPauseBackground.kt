@@ -11,6 +11,7 @@ import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.drawQuad
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.wave.WaveUtils
+import polyrhythmmania.PRManiaColors
 import java.util.*
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -54,7 +55,7 @@ class TengokuPauseBackground {
         }
     }
     
-    object DebugColorGradientRenderer : SingleColorGradientRenderer(Color.valueOf("DB2323"))
+    object DebugColorGradientRenderer : SingleColorGradientRenderer(PRManiaColors.debugColor)
     
     private val random = Random()
     var seed: Int = 0
