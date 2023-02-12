@@ -1,16 +1,17 @@
 package polyrhythmmania.editor.pane
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
+import paintbox.binding.ReadOnlyBooleanVar
 import paintbox.binding.Var
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.Anchor
-import paintbox.ui.ImageNode
-import paintbox.ui.Pane
-import paintbox.ui.UIElement
+import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.*
@@ -18,6 +19,7 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.util.DecimalFormats
+import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.EditorSpecialFlags
@@ -33,6 +35,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
 
     val editorPane: EditorPane = upperPane.editorPane
     val editor: Editor = editorPane.editor
+    
+    private val isShiftDown: ReadOnlyBooleanVar = BooleanVar(false)
 
     val previewSection: Pane
     val mainSection: Pane
@@ -69,8 +73,15 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
             this.align.set(HBox.Align.LEFT)
         }
         leftPreviewHbox.temporarilyDisableLayouts {
-            leftPreviewHbox += Pane().apply {
+            leftPreviewHbox += ActionablePane().apply {
                 this.bounds.width.set(150f)
+                
+                val setSpeeds: List<Float> = listOf(0.25f, 0.30f, 0.35f, 0.40f, 0.45f, 0.50f, 0.60f, 0.70f, 0.75f, 0.80f, 0.85f, 0.90f, 0.95f,
+                    1f,
+                    1.10f, 1.25f, 1.50f, 1.75f, 2.00f, 2.25f, 2.50f, 2.75f, 3.00f, 4.00f).sorted()
+                val oneIndex: Int = setSpeeds.indexOf(1f)
+                if (oneIndex == -1) error("Didn't find index of speed 1.0 for playback speed slider")
+                
                 val labelVar = Localization.getVar("editor.playbackSpeed", Var {
                     listOf(DecimalFormats.format("0.0#", editor.playbackSpeed.use()))
                 })
@@ -82,26 +93,27 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     this.markup.set(editorPane.palette.markup)
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.playbackSpeed.tooltip")))
                 }
-                this += Slider().apply {
-                    val setSpeeds: List<Float> = listOf(0.25f, 0.30f, 0.35f, 0.40f, 0.45f, 0.50f, 0.60f, 0.70f, 0.75f, 0.80f, 0.85f, 0.90f, 0.95f,
-                            1f,
-                            1.10f, 1.25f, 1.50f, 1.75f, 2.00f, 2.25f, 2.50f, 2.75f, 3.00f, 4.00f).sorted()
-                    val oneIndex: Int = setSpeeds.indexOf(1f)
-                    if (oneIndex == -1) error("Didn't find index of speed 1.0 for playback speed slider")
-
+                val slider = Slider().apply {
                     Anchor.BottomLeft.configure(this)
                     this.bindHeightToParent(multiplier = 0.5f)
                     this.padding.set(Insets(1f))
                     this.minimum.set(0f)
-                    this.maximum.set((setSpeeds.size - 1).toFloat())
-                    this.tickUnit.set(1f)
+                    this.maximum.set((setSpeeds.size - 1).toFloat()) // max = last index of setSpeeds
+                    this.tickUnit.bind { if (isShiftDown.use()) 0f else 1f }
                     this.setValue(oneIndex.toFloat())
                     this.value.addListener { v ->
-                        editor.playbackSpeed.set(setSpeeds.getOrNull(v.getOrCompute().toInt()) ?: 1f)
+                        val sliderValueIndex = v.getOrCompute()
+                        val lowerBound = setSpeeds.getOrNull(sliderValueIndex.toInt()) ?: 1f
+                        val upperBound = setSpeeds.getOrNull(sliderValueIndex.toInt() + 1) ?: setSpeeds.last()
+                        val newSpeed = MathUtils.lerp(lowerBound, upperBound, sliderValueIndex - sliderValueIndex.toInt())
+                        
+                        editor.playbackSpeed.set(newSpeed)
                     }
-                    this.setOnRightClick {
-                        this.setValue(oneIndex.toFloat())
-                    }
+                }
+                this += slider
+                
+                this.setOnRightClick {
+                    slider.setValue(oneIndex.toFloat())
                 }
             }
         }
@@ -604,4 +616,9 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         return playbackButtonPane
     }
 
+    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        (isShiftDown as BooleanVar).set(Gdx.input.isShiftDown())
+        
+        super.renderSelf(originX, originY, batch)
+    }
 }
