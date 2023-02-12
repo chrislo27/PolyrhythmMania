@@ -116,76 +116,6 @@ class SpotlightEditDialog(
                 this.spacing.set(16f)
                 this.align.set(HBox.Align.CENTRE)
                 
-                fun addIndentedButton(target: LightSelection, text: String): IndentedButton {
-                    return IndentedButton(text, font = main.fontEditorBoldBordered).apply {
-                        this.bindWidthToSelfHeight()
-                        editorPane.styleIndentedButton(this)
-                        this.padding.set(Insets.ZERO)
-                        (this.skin.getOrCompute() as ButtonSkin).also { skin ->
-                            skin.roundedRadius.set(0)
-                            listOf(skin.defaultTextColor, skin.disabledTextColor, skin.hoveredTextColor, skin.pressedAndHoveredTextColor, skin.pressedTextColor).forEach { 
-                                it.set(it.getOrCompute().cpy().apply { 
-                                    r = 1f - r
-                                    g = 1f - g
-                                    b = 1f - b
-                                })
-                            }
-                            skin.defaultBgColor.sideEffectingAndRetain { color ->
-                                genericUpdateTrigger.use()
-                                color.set(target.lightColor.color)
-                                color
-                            }
-                            skin.defaultTextColor.sideEffectingAndRetain { c ->
-                                genericUpdateTrigger.use()
-                                if (target.lightColor.enabled) {
-                                    c.set(Color.WHITE).lerp(Color.YELLOW, target.lightColor.strength)
-                                } else {
-                                    c.set(Color.GRAY)
-                                }
-                                c
-                            }
-                            skin.disabledTextColor.bind { 
-                                indentedButtonBorderColor.use()
-                            }
-                        }
-                        this.indentedButtonBorder.set(Insets(4f))
-                        this.border.set(Insets(1f))
-                        this.borderStyle.set(SolidBorder(Color.WHITE))
-                        this.indentedButtonBorderColor.bind {
-                            val sel = selection.use()
-                            if (sel == target) {
-                                palette.toolbarIndentedButtonBorderTint.use()
-                            } else {
-                                Color.BLUE
-                            }
-                        }
-                        this.selectedState.eagerBind { 
-                            val sel = selection.use()
-                            val isCopying = inCopyOp.use()
-                            if (isCopying) {
-                                sel == target || target in copyTargets.use()
-                            } else (sel == target)
-                        }
-                        
-                        this.disabled.eagerBind {
-                            val sel = selection.use()
-                            inCopyOp.use() && sel == target
-                        }
-                        this.setOnAction {
-                            if (inCopyOp.get()) {
-                                val targets = copyTargets.getOrCompute()
-                                if (target in targets) {
-                                    copyTargets.set(targets - target)
-                                } else {
-                                    copyTargets.set(targets + target)
-                                }
-                            } else {
-                                selection.set(target)
-                            }
-                        }
-                    }
-                }
-                
                 this += addIndentedButton(ambientSelection, Localization.getValue("editor.dialog.spotlightsAdvanced.light.ambient")).apply {
                     this.bindWidthToSelfHeight(multiplier = 2f)
                 }
@@ -499,4 +429,98 @@ class SpotlightEditDialog(
         editor.updatePaletteAndTexPackChangesState()
     }
     
+    private fun addIndentedButton(target: LightSelection, text: String): IndentedButton {
+        val palette = editorPane.palette
+
+        return IndentedButton(text, font = main.fontEditorBoldBordered).apply {
+            this.bindWidthToSelfHeight()
+
+            editorPane.styleIndentedButton(this)
+
+            this.skinFactory.set { _ ->
+                LightSelectionButtonSkin(target, this)
+            }
+
+            this.padding.set(Insets.ZERO)
+            this.border.set(Insets(1f))
+            this.borderStyle.set(SolidBorder(Color.WHITE))
+
+            this.indentedButtonBorder.set(Insets(4f))
+            this.indentedButtonBorderColor.bind {
+                val sel = selection.use()
+                if (sel == target) {
+                    palette.toolbarIndentedButtonBorderTint.use()
+                } else {
+                    Color.BLUE
+                }
+            }
+
+            this.selectedState.eagerBind {
+                val sel = selection.use()
+                val isCopying = inCopyOp.use()
+                if (isCopying) {
+                    sel == target || target in copyTargets.use()
+                } else (sel == target)
+            }
+
+            this.disabled.eagerBind {
+                val sel = selection.use()
+                inCopyOp.use() && sel == target
+            }
+
+            this.setOnAction {
+                if (inCopyOp.get()) {
+                    val targets = copyTargets.getOrCompute()
+                    if (target in targets) {
+                        copyTargets.set(targets - target)
+                    } else {
+                        copyTargets.set(targets + target)
+                    }
+                } else {
+                    selection.set(target)
+                }
+            }
+        }
+    }
+
+    private inner class LightSelectionButtonSkin(
+        target: LightSelection,
+        element: IndentedButton,
+    ) : ButtonSkin(element) {
+
+        init {
+            val skin = this
+            skin.roundedRadius.set(0)
+            listOf(
+                skin.defaultTextColor,
+                skin.disabledTextColor,
+                skin.hoveredTextColor,
+                skin.pressedAndHoveredTextColor,
+                skin.pressedTextColor
+            ).forEach {
+                it.set(it.getOrCompute().cpy().apply {
+                    r = 1f - r
+                    g = 1f - g
+                    b = 1f - b
+                })
+            }
+            skin.defaultBgColor.sideEffectingAndRetain { color ->
+                genericUpdateTrigger.use()
+                color.set(target.lightColor.color)
+                color
+            }
+            skin.defaultTextColor.sideEffectingAndRetain { c ->
+                genericUpdateTrigger.use()
+                if (target.lightColor.enabled) {
+                    c.set(Color.WHITE).lerp(Color.YELLOW, target.lightColor.strength)
+                } else {
+                    c.set(Color.GRAY)
+                }
+                c
+            }
+            skin.disabledTextColor.bind {
+                element.indentedButtonBorderColor.use()
+            }
+        }
+    }
 }
