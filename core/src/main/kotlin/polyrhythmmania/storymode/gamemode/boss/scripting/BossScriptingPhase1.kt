@@ -129,7 +129,7 @@ class BossScriptPhase1A1(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Par
                 .rest(1.0f)
                 .despawnPattern()
                 .rest(3.0f)
-                .spawnPattern(pattern)
+                .spawnPattern(pattern, flipChance = NO_FLIP_CHANCE)
                 .rest(4.0f)
 
                 .spawnRods()
