@@ -139,7 +139,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
         val newIndex = (pistonIndex * 2) + 1
         if (this.pistonFrame < newIndex && newIndex in 0 until PISTON_FRAMES) {
             this.pistonFrame = newIndex
-            this.incrementPistonFrameAfterSec = 1f / 10 // TODO 1/30
+            this.incrementPistonFrameAfterSec = 1f / 10 // TODO 1/20
         }
     }
     

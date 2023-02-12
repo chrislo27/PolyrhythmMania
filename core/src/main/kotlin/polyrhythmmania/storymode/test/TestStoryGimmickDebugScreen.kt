@@ -20,8 +20,8 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.ComboBox
 import paintbox.ui.element.RectElement
+import paintbox.ui.layout.ColumnarVBox
 import paintbox.ui.layout.HBox
-import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
@@ -30,12 +30,14 @@ import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.EditorSpecialParams
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.contract.JingleType
 import polyrhythmmania.storymode.contract.Requester
+import polyrhythmmania.storymode.gamemode.boss.StoryBossGameMode
 import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
 import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
@@ -43,6 +45,7 @@ import polyrhythmmania.storymode.inbox.InboxItems
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.inbox.progression.UnlockStage
 import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
+import polyrhythmmania.storymode.screen.StoryLoadingScreen
 import polyrhythmmania.storymode.screen.StoryTitleScreen
 import polyrhythmmania.storymode.test.gamemode.*
 import java.util.*
@@ -63,17 +66,21 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
     init {
         sceneRoot += RectElement(PRManiaColors.debugColor).apply {
             this.padding.set(Insets(24f, 10f, 12f, 12f))
-            this += VBox().apply {
+            val columns = ColumnarVBox(2, false).apply { 
+                this.spacing.set(16f)
+            }
+            this += columns
+            
+            fun separator(): UIElement {
+                return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
+                    this.bounds.height.set(6f)
+                    this.margin.set(Insets(2f, 2f, 0f, 0f))
+                }
+            }
+            
+            columns[0].apply {
                 this.spacing.set(4f)
-                this.bindWidthToParent(multiplier = 0.5f)
                 this.temporarilyDisableLayouts {
-                    fun separator(): UIElement {
-                        return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
-                            this.bounds.height.set(6f)
-                            this.margin.set(Insets(2f, 2f, 0f, 0f))
-                        }
-                    }
-
                     this += Button("Back to Main Menu").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
@@ -352,10 +359,21 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                     }
                 }
             }
+            columns[1].apply {
+                this.spacing.set(4f)
+                this.temporarilyDisableLayouts {
+                    this += Button("Boss fight from beginning").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGameMode(StoryBossGameMode.getFactory())
+                        }
+                    }
+                }
+            }
         }
     }
 
-    private fun enterGimmickGameMode(gameMode: TestStoryGameMode) {
+    private fun enterGimmickGameMode(gameMode: GameMode) {
         main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
         val playScreen = TestStoryGimmickPlayScreen(main, storySession, Challenges.NO_CHANGES, main.settings.inputCalibration.getOrCompute(), gameMode)
         main.screen = TransitionScreen(main, main.screen, playScreen,
@@ -364,6 +382,42 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                 gameMode.prepareFirstTime()
                 playScreen.resetAndUnpause()
             }
+        }
+    }
+
+    private fun enterGameMode(gamemodeFactory: Contract.GamemodeFactory) {
+        val main = this.main
+        val gamemode: GameMode? = gamemodeFactory.load(1 / 30f, main)
+        
+        if (gamemode != null) {
+            // Go immediately
+            enterGimmickGameMode(gamemode)
+        } else {
+            // Go to loading screen to finish loading
+            val loadingScreen = StoryLoadingScreen<TestStoryGimmickPlayScreen>(main, { delta ->
+                val gameMode: GameMode? = gamemodeFactory.load(delta, main)
+
+                if (gameMode != null) {
+                    val playScreen = TestStoryGimmickPlayScreen(main, storySession, Challenges.NO_CHANGES, main.settings.inputCalibration.getOrCompute(), gameMode)
+
+                    gameMode.prepareFirstTime()
+                    playScreen.resetAndUnpause()
+
+                    StoryLoadingScreen.LoadResult(playScreen)
+                } else null
+            }) { playScreen ->
+                playScreen.unpauseGameNoSound()
+                main.screen = TransitionScreen(main, main.screen, playScreen,
+                    FadeToOpaque(0.1f, Color.BLACK), FadeToTransparent(0.1f, Color.BLACK))
+            }.apply {
+                this.minimumShowTime = 0f
+                this.minWaitTimeBeforeLoadStart = 0f
+                this.minWaitTimeAfterLoadFinish = 0f
+            }
+
+            main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"))
+            main.screen = TransitionScreen(main, main.screen, loadingScreen,
+                FadeToOpaque(0.1f, Color.BLACK), FadeToTransparent(0.1f, Color.BLACK))
         }
     }
 

@@ -8,6 +8,7 @@ import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.screen.play.AbstractEnginePlayScreen
 import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
@@ -19,7 +20,7 @@ import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 open class TestStoryGimmickPlayScreen(
         main: PRManiaGame, val storySession: StorySession,
         challenges: Challenges, inputCalibration: InputCalibration,
-        gameMode: AbstractStoryGameMode
+        gameMode: GameMode
 ) : AbstractEnginePlayScreen(main, null, gameMode.container, challenges, inputCalibration, gameMode)  {
 
     override val pauseMenuHandler: TengokuBgPauseMenuHandler = TengokuBgPauseMenuHandler(this)
@@ -58,6 +59,10 @@ open class TestStoryGimmickPlayScreen(
             quitToDebugMenu()
         }
         this.pauseOptions.set(optionList)
+    }
+
+    override fun getSecondsToDelayAtStart(): Float {
+        return (gameMode as? AbstractStoryGameMode)?.getSecondsToDelayAtStartOverride() ?: super.getSecondsToDelayAtStart()
     }
     
     private fun quitToDebugMenu() {
