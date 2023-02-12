@@ -22,6 +22,8 @@ class IndentedButton : Button, Toggle {
     val indentedButtonBorder: Var<Insets> = Var(Insets(2f))
     val indentedButtonBorderColor: Var<Color> = Var(Color.BLACK)
     
+    val borderIndentElement: RectElement
+    
     constructor(text: String, font: PaintboxFont = UIElement.defaultFont)
             : super(text, font)
     constructor(binding: ContextBinding<String>, font: PaintboxFont = UIElement.defaultFont)
@@ -29,7 +31,7 @@ class IndentedButton : Button, Toggle {
     
     init {
         // Faux pas: users may add more buttons not into this element.
-        this += RectElement(Color(1f, 1f, 1f, 0f)).apply {
+        borderIndentElement = RectElement(Color(1f, 1f, 1f, 0f)).apply {
             this.borderStyle.set(SolidBorder().apply {
                 this.color.bind {
                     indentedButtonBorderColor.use()
@@ -39,6 +41,7 @@ class IndentedButton : Button, Toggle {
                 if (selectedState.use()) indentedButtonBorder.use() else Insets.ZERO
             }
         }
+        this += borderIndentElement
         
         this.setOnAction {
             selectedState.invert()

@@ -1,9 +1,11 @@
 package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
+import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
@@ -20,6 +22,10 @@ import paintbox.ui.layout.ColumnarHBox
 import paintbox.ui.layout.ColumnarVBox
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.ui.skin.Skin
+import paintbox.util.ColorStack
+import paintbox.util.gdxutils.drawRect
+import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.block.data.SpotlightsColorData
 import polyrhythmmania.editor.block.data.SwitchedLightColor
@@ -28,6 +34,7 @@ import polyrhythmmania.editor.pane.IndentedButton
 import polyrhythmmania.ui.ColourPicker
 import polyrhythmmania.util.RodinSpecialChars
 import polyrhythmmania.world.spotlights.Spotlights
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 
@@ -441,10 +448,11 @@ class SpotlightEditDialog(
                 LightSelectionButtonSkin(target, this)
             }
 
-            this.padding.set(Insets.ZERO)
+            this.padding.set(Insets(6f))
             this.border.set(Insets(1f))
             this.borderStyle.set(SolidBorder(Color.WHITE))
 
+            this.borderIndentElement.visible.set(false) // Note: Indent done via the LightSelectionButtonSkin
             this.indentedButtonBorder.set(Insets(4f))
             this.indentedButtonBorderColor.bind {
                 val sel = selection.use()
@@ -454,6 +462,8 @@ class SpotlightEditDialog(
                     Color.BLUE
                 }
             }
+            
+            this.renderAlign.set(RenderAlign.topLeft)
 
             this.selectedState.eagerBind {
                 val sel = selection.use()
@@ -484,43 +494,135 @@ class SpotlightEditDialog(
     }
 
     private inner class LightSelectionButtonSkin(
-        target: LightSelection,
-        element: IndentedButton,
-    ) : ButtonSkin(element) {
+        val target: LightSelection,
+        override val element: IndentedButton,
+    ) : Skin<Button>(element) {
 
-        init {
-            val skin = this
-            skin.roundedRadius.set(0)
-            listOf(
-                skin.defaultTextColor,
-                skin.disabledTextColor,
-                skin.hoveredTextColor,
-                skin.pressedAndHoveredTextColor,
-                skin.pressedTextColor
-            ).forEach {
-                it.set(it.getOrCompute().cpy().apply {
-                    r = 1f - r
-                    g = 1f - g
-                    b = 1f - b
-                })
+        val defaultTextColor: Var<Color> = Var.sideEffecting(Color(1f, 1f, 1f, 1f)) { c ->
+            genericUpdateTrigger.use()
+            if (target.lightColor.enabled) {
+                c.set(Color.WHITE).lerp(Color.YELLOW, target.lightColor.strength)
+            } else {
+                c.set(Color.GRAY)
             }
-            skin.defaultBgColor.sideEffectingAndRetain { color ->
-                genericUpdateTrigger.use()
-                color.set(target.lightColor.color)
-                color
-            }
-            skin.defaultTextColor.sideEffectingAndRetain { c ->
-                genericUpdateTrigger.use()
-                if (target.lightColor.enabled) {
-                    c.set(Color.WHITE).lerp(Color.YELLOW, target.lightColor.strength)
-                } else {
-                    c.set(Color.GRAY)
+            c
+        }
+        val defaultBgColor: Var<Color> = Var.sideEffecting(Color(1f, 1f, 1f, 1f)) { color ->
+            genericUpdateTrigger.use()
+            color.set(target.lightColor.color)
+            color
+        }
+        val hoveredTextColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
+        val hoveredBgColor: Var<Color> = Var(Color(0.95f, 0.95f, 0.95f, 1f))
+        val pressedTextColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
+        val pressedBgColor: Var<Color> = Var(Color(0.75f, 0.95f, 0.95f, 1f))
+        val pressedAndHoveredTextColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
+        val pressedAndHoveredBgColor: Var<Color> = Var(Color(0.75f, 1f, 1f, 1f))
+        val disabledTextColor: Var<Color> = Var.bind {
+            element.indentedButtonBorderColor.use()
+        }
+        val disabledBgColor: Var<Color> = Var(Color(0.8f, 0.8f, 0.8f, 1f))
+
+        val textColorToUse: ReadOnlyVar<Color> = Var {
+            val pressedState = element.pressedState.use()
+            if (element.apparentDisabledState.use()) {
+                disabledTextColor.use()
+            } else {
+                when (pressedState) {
+                    PressedState.NONE -> defaultTextColor.use()
+                    PressedState.HOVERED -> hoveredTextColor.use()
+                    PressedState.PRESSED -> pressedTextColor.use()
+                    PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredTextColor.use()
                 }
-                c
             }
-            skin.disabledTextColor.bind {
-                element.indentedButtonBorderColor.use()
+        }
+        val bgColorToUse: ReadOnlyVar<Color> = Var {
+            val pressedState = element.pressedState.use()
+            if (element.apparentDisabledState.use()) {
+                disabledBgColor.use()
+            } else {
+                when (pressedState) {
+                    PressedState.NONE -> defaultBgColor.use()
+                    PressedState.HOVERED -> hoveredBgColor.use()
+                    PressedState.PRESSED -> pressedBgColor.use()
+                    PressedState.PRESSED_AND_HOVERED -> pressedAndHoveredBgColor.use()
+                }
             }
+        }
+
+        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+            val paddingBounds = element.paddingZone
+            val rectX = paddingBounds.x.get() + originX
+            val rectY = originY - paddingBounds.y.get()
+            val rectW = paddingBounds.width.get()
+            val rectH = paddingBounds.height.get()
+            val lastPackedColor = batch.packedColor
+            val opacity = element.apparentOpacity.get()
+
+            val rectColor: Color = ColorStack.getAndPush()
+            rectColor.set(bgColorToUse.getOrCompute())
+            rectColor.a *= opacity
+            batch.color = rectColor
+
+            batch.fillRect(rectX, rectY - rectH, rectW, rectH)
+            
+            if (element.selectedState.get()) {
+                batch.color = element.indentedButtonBorderColor.getOrCompute()
+                val borderInsets = element.indentedButtonBorder.getOrCompute()
+                batch.drawRect(rectX, rectY - rectH, rectW, rectH, borderInsets.topAndBottom() / 2, borderInsets.leftAndRight() / 2)
+            }
+            
+            batch.packedColor = lastPackedColor
+            ColorStack.pop()
+
+            val text = element.internalTextBlock.getOrCompute()
+            if (text.runs.isNotEmpty()) {
+                val textBounds = element.contentZone
+                val textX = textBounds.x.get() + originX
+                val textY = originY - textBounds.y.get()
+                val textW = textBounds.width.get()
+                val textH = textBounds.height.get()
+
+                val tmpColor = ColorStack.getAndPush()
+                tmpColor.set(batch.color).mul(textColorToUse.getOrCompute())
+                tmpColor.a *= opacity
+
+                if (text.isRunInfoInvalid()) {
+                    // Prevents flickering when drawing on first frame due to bounds not being computed yet
+                    text.computeLayouts()
+                }
+
+                val compressX = element.doXCompression.get()
+                val align = element.renderAlign.get()
+                val scaleX = element.scaleX.get()
+                val scaleY = element.scaleY.get()
+                val textWidth = text.width * scaleX
+                val textHeight = text.height * scaleY
+                val xOffset: Float = when {
+                    Align.isLeft(align) -> 0f
+                    Align.isRight(align) -> (textW - ((if (compressX) (min(textWidth, textW)) else textWidth)))
+                    else -> (textW - (if (compressX) min(textWidth, textW) else textWidth)) / 2f
+                }
+                val firstCapHeight = text.firstCapHeight * scaleY
+                val yOffset: Float = when {
+                    Align.isTop(align) -> textH - firstCapHeight
+                    Align.isBottom(align) -> 0f + (textHeight - firstCapHeight)
+                    else -> ((textH + textHeight) / 2 - firstCapHeight)
+                }
+
+                batch.color = tmpColor // Sets the text colour and opacity
+                text.drawCompressed(
+                    batch, textX + xOffset, textY - textH + yOffset,
+                    if (compressX) (textW) else 0f, element.textAlign.getOrCompute(), scaleX, scaleY
+                )
+                ColorStack.pop()
+            }
+
+            batch.packedColor = lastPackedColor
+        }
+
+        override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+            // NO-OP
         }
     }
 }
