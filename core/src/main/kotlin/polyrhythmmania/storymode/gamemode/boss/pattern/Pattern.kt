@@ -13,8 +13,6 @@ data class Pattern(
     val rowUpside: List<CubeType>,
     val rowDownside: List<CubeType>,
 
-    val flippable: Boolean = FLIPPABLE_BY_DEFAULT,
-
     // rodXside = Rod speed multiplier to xUnitsPerBeat
     val rodUpside: Float = 1f,
     val rodDownside: Float = 1f,
@@ -26,7 +24,6 @@ data class Pattern(
 
     companion object {
 
-        private const val FLIPPABLE_BY_DEFAULT: Boolean = false
         const val DEFAULT_X_UNITS_PER_BEAT: Float = BlockSpawnPatternStoryMode.DEFAULT_X_UNITS_PER_BEAT
 
         private fun String.parsePattern(): List<CubeType> {
@@ -43,7 +40,6 @@ data class Pattern(
     constructor(
         rowUpside: String,
         rowDownside: String,
-        flippable: Boolean = FLIPPABLE_BY_DEFAULT,
         rodUpside: Float = 1f,
         rodDownside: Float = 1f,
         delayUpside: Float = 0f,
@@ -51,7 +47,6 @@ data class Pattern(
     ) : this(
         rowUpside.parsePattern(),
         rowDownside.parsePattern(),
-        flippable,
         rodUpside,
         rodDownside,
         delayUpside,
