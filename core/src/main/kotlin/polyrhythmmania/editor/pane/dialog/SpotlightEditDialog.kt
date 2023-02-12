@@ -1,6 +1,7 @@
 package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
@@ -560,14 +561,27 @@ class SpotlightEditDialog(
             val opacity = element.apparentOpacity.get()
 
             val rectColor: Color = ColorStack.getAndPush()
+
+            rectColor.set(1f, 1f, 1f, 1f)
+            rectColor.a *= opacity
+            batch.color = rectColor
+            batch.draw(main.colourPickerTransparencyGrid, rectX, rectY - rectH, rectW, rectH, 0, 0, rectW.roundToInt(), rectH.roundToInt(), false, false)
+            
             rectColor.set(bgColorToUse.getOrCompute())
             rectColor.a *= opacity
             batch.color = rectColor
-
             batch.fillRect(rectX, rectY - rectH, rectW, rectH)
+
+            rectColor.set(Color.BLACK).lerp(Color.WHITE, target.lightColor.strength)
+            rectColor.a *= opacity
+            batch.color = rectColor
+            val rightTri = AssetRegistry.get<Texture>("ui_triangle_right")
+            batch.draw(rightTri, rectX, rectY - rectH, rectW, rectH, 0, 0, rightTri.width, rightTri.height, false, true)
             
             if (element.selectedState.get()) {
-                batch.color = element.indentedButtonBorderColor.getOrCompute()
+                rectColor.set(element.indentedButtonBorderColor.getOrCompute())
+                rectColor.a *= opacity
+                batch.color = rectColor
                 val borderInsets = element.indentedButtonBorder.getOrCompute()
                 batch.drawRect(rectX, rectY - rectH, rectW, rectH, borderInsets.topAndBottom() / 2, borderInsets.leftAndRight() / 2)
             }
