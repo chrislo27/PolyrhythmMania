@@ -63,9 +63,8 @@ class BossScriptIntro(gamemode: StoryBossGameMode, script: Script) : BossScriptF
 
             .spawnPattern(pattern)
             .rest(4.0f)
-            .spawnRods(pattern)
+            .spawnRods()
             .rest(4.0f)
-            .retractPistons()
 
             .addFunctionAsEvent(BossScriptPhase1(gamemode, script))
     }

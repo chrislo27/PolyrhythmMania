@@ -123,10 +123,7 @@ class BossScriptPhase1A1(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Par
         list.music(StoryMusicAssets.STEM_ID_BOSS_1_A1, 8 + EXTRA_MEASURES_SPACING)
 
         repeat(2) {
-            var pattern = patternPools.boss1_a1_patterns.iter.next()
-            if (pattern.flippable && gamemode.random.nextBoolean()) {
-                pattern = pattern.flip()
-            }
+            val pattern = patternPools.boss1_a1_patterns.iter.next()
 
             list
                 .rest(1.0f)
@@ -135,11 +132,11 @@ class BossScriptPhase1A1(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Par
                 .spawnPattern(pattern)
                 .rest(4.0f)
 
-                .spawnRods(pattern)
+                .spawnRods()
                 .rest(3.75f)
                 .retractPistons()
                 .rest(0.25f)
-                .spawnRods(pattern)
+                .spawnRods()
                 .rest(4.0f)
 
                 .retractPistons()
@@ -177,10 +174,7 @@ class BossScriptPhase1A2(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Par
         list.music(StoryMusicAssets.STEM_ID_BOSS_1_A2, 8 + EXTRA_MEASURES_SPACING)
 
         repeat(2) {
-            var pattern = patternPools.boss1_a2_patterns.iter.next()
-            if (pattern.flippable && gamemode.random.nextBoolean()) {
-                pattern = pattern.flip()
-            }
+            val pattern = patternPools.boss1_a2_patterns.iter.next()
 
             list
                 .rest(1.0f)
@@ -189,11 +183,11 @@ class BossScriptPhase1A2(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Par
                 .spawnPattern(pattern)
                 .rest(4.0f)
 
-                .spawnRods(pattern)
+                .spawnRods()
                 .rest(3.75f)
                 .retractPistons()
                 .rest(0.25f)
-                .spawnRods(pattern)
+                .spawnRods()
                 .rest(4.0f)
 
                 .retractPistons()
@@ -258,7 +252,7 @@ Script boss1_b2 = {
             .spawnPattern(pattern1)
             .rest(4.0f)
             
-            .spawnRods(pattern1)
+            .spawnRods()
             .rest(4.0f)
             .rest(2.0f)
             .retractPistons()
@@ -268,14 +262,14 @@ Script boss1_b2 = {
         
             .spawnPattern(pattern2)
             .rest(4.0f)
-            .spawnRods(pattern2)
+            .spawnRods()
             .rest(3.75f)
             .despawnPattern()
             .rest(0.25f)
             
             .spawnPattern(pattern3)
             .rest(4.0f)
-            .spawnRods(pattern3)
+            .spawnRods()
             .rest(4.0f)
         
             .retractPistons()

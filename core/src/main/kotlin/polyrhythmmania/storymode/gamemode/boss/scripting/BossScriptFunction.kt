@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.gamemode.boss.scripting
 
+import paintbox.Paintbox
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.input.EventClearInputs
 import polyrhythmmania.storymode.gamemode.boss.*
@@ -9,18 +10,52 @@ import polyrhythmmania.storymode.music.StemID
 import polyrhythmmania.world.EventRowBlockDespawn
 import polyrhythmmania.world.EventRowBlockRetract
 import polyrhythmmania.world.World
+import java.util.*
 
 
 abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Script) : ScriptFunction(script) {
     
     companion object {
+
+        private const val LOGGER_TAG = "BossScriptFunction"
+
         @JvmStatic
         protected val EXTRA_MEASURES_SPACING: Int = 1
+
+        @JvmStatic
+        protected val SIDE_UPSIDE: Boolean = true
+
+        @JvmStatic
+        protected val SIDE_DOWNSIDE: Boolean = false
+
+        @JvmStatic
+        protected val DEFAULT_FLIP_CHANCE: Float = 1f / 6
+
+        @JvmStatic
+        protected val NO_FLIP_CHANCE: Float = 0f
+
+        @JvmStatic
+        protected val ALWAYS_FLIP_CHANCE: Float = 1f
     }
 
     protected val world: World get() = engine.world
     protected val modifierModule: BossModifierModule = gamemode.modifierModule
+    protected val random: Random get() = gamemode.random
     protected val patternPools: BossPatternPools get() = gamemode.patternPools
+    
+    private var currentPattern: Pattern? = null
+
+    /**
+     * Gets the [currentPattern], or a blank pattern with a warning logged.
+     */
+    protected fun fetchCurrentPattern(): Pattern {
+        return currentPattern ?: run {
+            val logMsg = "MISSING currentPattern in BossScriptFunction"
+            Paintbox.LOGGER.debug(logMsg, LOGGER_TAG)
+            IllegalStateException(logMsg).printStackTrace()
+            Pattern("--------", "--------")
+        }
+    }
 
     protected fun MutableList<Event>.music(stemID: String, measures: Int): MutableList<Event> =
         this.addEvent(BossMusicEvent(engine, gamemode.stems, stemID, 0f, (measures * 4).toFloat()))
@@ -34,24 +69,30 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
             BossMusicEvent(
                 engine,
                 gamemode.stems,
-                if (specificVariant != null) stemID.getID(specificVariant) else stemID.getRandomID(gamemode.random),
+                if (specificVariant != null) stemID.getID(specificVariant) else stemID.getRandomID(random),
                 0f,
                 (measures * 4).toFloat()
             )
         )
 
 
-    protected fun MutableList<Event>.spawnPattern(pattern: Pattern): MutableList<Event> {
+    protected fun MutableList<Event>.spawnPattern(pattern: Pattern, flipChance: Float = DEFAULT_FLIP_CHANCE): MutableList<Event> {
+        var patternToUse = pattern
+        if (random.nextFloat() < flipChance) {
+            patternToUse = pattern.flip()
+        }
+        
         val patternStart = 0f // Will be offset by Script, so should be zero
 
-        this.addAll(pattern.toEvents(engine, patternStart))
+        currentPattern = patternToUse
+        this.addAll(patternToUse.toEvents(engine, patternStart))
 
         return this
     }
 
-    protected fun MutableList<Event>.spawnRods(pattern: Pattern): MutableList<Event> {
+    protected fun MutableList<Event>.spawnRods(): MutableList<Event> {
         val patternStart = -4f
-
+        val pattern = fetchCurrentPattern()
         val anyA = pattern.anyA
         val anyDpad = pattern.anyDpad
         val bossDamageMultiplier = if (anyA && anyDpad) 1 else 2
@@ -72,6 +113,38 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
                 EventDeployRodBoss(
                     engine, world.rowDpad, patternStart + pattern.delayUpside,
                     Pattern.DEFAULT_X_UNITS_PER_BEAT * pattern.rodUpside,
+                    pattern.getLastPistonIndexUpside(),
+                    damageTakenVar, bossDamageMultiplier
+                )
+            )
+        }
+
+        return this
+    }
+
+    protected fun MutableList<Event>.spawnOneRod(
+        side: Boolean,
+        damageTakenVar: EntityRodPRStoryBoss.PlayerDamageTaken,
+        bossDamageMultiplier: Int,
+        speedMultiplier: Float = 1f,
+    ): MutableList<Event> {
+        val patternStart = -4f
+        val pattern = fetchCurrentPattern()
+
+        if (side == SIDE_DOWNSIDE) {
+            this.add(
+                EventDeployRodBoss(
+                    engine, world.rowA, patternStart,
+                    Pattern.DEFAULT_X_UNITS_PER_BEAT * speedMultiplier,
+                    pattern.getLastPistonIndexDownside(),
+                    damageTakenVar, bossDamageMultiplier
+                )
+            )
+        } else {
+            this.add(
+                EventDeployRodBoss(
+                    engine, world.rowDpad, patternStart,
+                    Pattern.DEFAULT_X_UNITS_PER_BEAT * speedMultiplier,
                     pattern.getLastPistonIndexUpside(),
                     damageTakenVar, bossDamageMultiplier
                 )
