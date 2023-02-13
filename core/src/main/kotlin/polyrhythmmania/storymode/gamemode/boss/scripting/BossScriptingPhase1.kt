@@ -10,28 +10,28 @@ class BossScriptPhase1(gamemode: StoryBossGameMode, script: Script) : BossScript
 
     override fun getEvents(): List<Event> {
         /*
-    run boss1_a1;       // (duration = 32.0)
+    run boss1_a1;
 
     while (true) {
-        run boss1_b2;   // (duration = 32.0)
-        run boss1_c;    // (duration = 32.0)
-        run boss1_b1;   // (duration = 32.0)
-        run boss1_b2;   // (duration = 32.0)
-        run boss1_d;    // (duration = 32.0)
-        run boss1_e1;   // (duration = 32.0)
-        run boss1_e2;   // (duration = 32.0)
-        run boss1_f;    // (duration = 32.0)
-        run boss1_a2;   // (duration = 32.0)
+        run boss1_b2;
+        run boss1_c;
+        run boss1_b1;
+        run boss1_b2;
+        run boss1_d;
+        run boss1_e1;
+        run boss1_e2;
+        run boss1_f;
+        run boss1_a2;
     }
 
     interrupt_boss1_defeated:
-        boss_music1_stop();
-        boss_defeat1();
+        boss1_music_stop();
+        boss1_defeat();
         rest 2.0;
         despawn_pattern();
         rest 6.0;
 
-    run boss2_main;
+    return;
          */
 
         return mutableListOf<Event>()
@@ -42,39 +42,43 @@ class BossScriptPhase1(gamemode: StoryBossGameMode, script: Script) : BossScript
     private inner class LoopingSegment : BossScriptFunction(gamemode, script) {
 
         override fun getEvents(): List<Event> {
-            /*
-    while (true) {
-        run boss1_b2;   // (duration = 32.0)
-        run boss1_c;    // (duration = 32.0)
-        run boss1_b1;   // (duration = 32.0)
-        run boss1_b2;   // (duration = 32.0)
-        run boss1_d;    // (duration = 32.0)
-        run boss1_e1;   // (duration = 32.0)
-        run boss1_e2;   // (duration = 32.0)
-        run boss1_f;    // (duration = 32.0)
-        run boss1_a2;   // (duration = 32.0)
-    }
-             */
             
             class PlaceholderMusicStem(val stemID: StemID) : AbstractBossScriptPhase1Part(this@BossScriptPhase1) {
 
                 override fun getEvents(): List<Event> {
                     return mutableListOf<Event>()
-                        .music(stemID, 8 + EXTRA_MEASURES_SPACING)
+                        .music(stemID, 8, extraBeatDuration = EXTRA_BEATS_SPACING)
+                        .todo("StemID: ${stemID.baseID}")
                         .rest(32.0f)
                 }
             }
 
+            /*
+
+    while (true) {
+        run boss1_b2;
+        run boss1_c;
+        run boss1_b1;
+        run boss1_b2;
+        run boss1_d;
+        run boss1_e1;
+        run boss1_e2;
+        run boss1_f;
+        run boss1_a2;
+    }
+
+             */
+            
             val stemList = listOf(
                 BossScriptPhase1B2(this@BossScriptPhase1),
-                PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_C),
-                PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_B1),
-                PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_B2),
-                PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_D),
+                BossScriptPhase1C(this@BossScriptPhase1),
+                BossScriptPhase1B1(this@BossScriptPhase1),
+                BossScriptPhase1B2(this@BossScriptPhase1),
+                BossScriptPhase1D(this@BossScriptPhase1),
                 PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_E1),
                 PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_E2),
                 PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_F),
-                PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_A2),
+                BossScriptPhase1A2(this@BossScriptPhase1)
             )
 
             val list = mutableListOf<Event>()
@@ -95,185 +99,3 @@ abstract class AbstractBossScriptPhase1Part(val phase1: BossScriptPhase1) : Boss
     phase1.script
 )
 
-class BossScriptPhase1A1(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Part(phase1) {
-
-    override fun getEvents(): List<Event> {
-        /*
-    set_music(mus_story_boss1_a1);
-
-    rest 1.0;
-    despawn_pattern();
-    rest 3.0;
-    spawn_pattern(endless_easy[random()]);
-    rest 4.0;
-
-    spawn_rods();
-    rest 3.75;
-    retract_pistons();
-    rest 0.25;
-    spawn_rods();
-    rest 4.0;
-
-    retract_pistons();
-    return;
-         */
-
-        val list = mutableListOf<Event>()
-
-        list.music(StoryMusicAssets.STEM_ID_BOSS_1_A1, 8 + EXTRA_MEASURES_SPACING)
-
-        repeat(2) {
-            val pattern = patternPools.boss1_a1_patterns.iter.next()
-
-            list
-                .rest(1.0f)
-                .despawnPattern()
-                .rest(3.0f)
-                .spawnPattern(pattern, flipChance = NO_FLIP_CHANCE)
-                .rest(4.0f)
-
-                .spawnRods()
-                .rest(3.75f)
-                .retractPistons()
-                .rest(0.25f)
-                .spawnRods()
-                .rest(4.0f)
-
-                .retractPistons()
-        }
-
-        return list
-    }
-}
-
-class BossScriptPhase1A2(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Part(phase1) {
-
-    override fun getEvents(): List<Event> {
-        /*
-    set_music(mus_story_boss1_a2);
-
-    rest 1.0;
-    despawn_pattern();
-    rest 3.0;
-    spawn_pattern(endless_medium[random()]);
-    rest 4.0;
-
-    spawn_rods();
-    rest 3.75;
-    retract_pistons();
-    rest 0.25;
-    spawn_rods();
-    rest 4.0;
-
-    retract_pistons();
-    return;
-         */
-
-        val list = mutableListOf<Event>()
-
-        list.music(StoryMusicAssets.STEM_ID_BOSS_1_A2, 8 + EXTRA_MEASURES_SPACING)
-
-        repeat(2) {
-            val pattern = patternPools.boss1_a2_patterns.iter.next()
-
-            list
-                .rest(1.0f)
-                .despawnPattern()
-                .rest(3.0f)
-                .spawnPattern(pattern)
-                .rest(4.0f)
-
-                .spawnRods()
-                .rest(3.75f)
-                .retractPistons()
-                .rest(0.25f)
-                .spawnRods()
-                .rest(4.0f)
-
-                .retractPistons()
-        }
-
-        return list
-    }
-}
-
-
-class BossScriptPhase1B2(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Part(phase1) {
-
-    override fun getEvents(): List<Event> {
-        /*
-Script boss1_b2 = {
-    set_music(mus_story_boss1_b2);
-
-    rest 1.0;
-    despawn_pattern();
-    rest 3.0;
-    spawn_pattern(boss1_b2_patterns[random()]);
-    rest 4.0;
-
-    spawn_rods();
-    rest 4.0;
-    rest 2.0;
-    retract_pistons();
-    rest 1.0;
-    despawn_pattern();
-    rest 1.0;
-
-    spawn_pattern(boss1_b2_patterns[random()]);
-    rest 4.0;
-    spawn_rods();
-    rest 3.75;
-    despawn_pattern();
-    rest 0.25;
-
-    spawn_pattern(boss1_b2_patterns[random()]);
-    rest 4.0;
-    spawn_rods();
-    rest 4.0;
-
-    retract_pistons();
-    return;
-};
- */
-
-        val list = mutableListOf<Event>()
-
-        val patternPool = patternPools.boss1_b2_patterns
-        val pattern1 = patternPool.iter.next()
-        val pattern2 = patternPool.iter.next()
-        val pattern3 = patternPool.iter.next()
-
-        list.music(StoryMusicAssets.STEM_ID_BOSS_1_B2, 8 + EXTRA_MEASURES_SPACING)
-        
-        list
-            .rest(1.0f)
-            .despawnPattern()
-            .rest(3.0f)
-            .spawnPattern(pattern1)
-            .rest(4.0f)
-            
-            .spawnRods()
-            .rest(4.0f)
-            .rest(2.0f)
-            .retractPistons()
-            .rest(1.0f)
-            .despawnPattern()
-            .rest(1.0f)
-        
-            .spawnPattern(pattern2)
-            .rest(4.0f)
-            .spawnRods()
-            .rest(3.75f)
-            .despawnPattern()
-            .rest(0.25f)
-            
-            .spawnPattern(pattern3)
-            .rest(4.0f)
-            .spawnRods()
-            .rest(4.0f)
-        
-            .retractPistons()
-
-        return list
-    }
-}

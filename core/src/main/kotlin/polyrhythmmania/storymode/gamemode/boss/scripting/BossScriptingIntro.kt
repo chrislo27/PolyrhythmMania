@@ -43,10 +43,8 @@ class BossScriptIntro(gamemode: StoryBossGameMode, script: Script) : BossScriptF
     run boss1_main;
          */
 
-        val pattern = patternPools.introPattern
-
         return mutableListOf<Event>()
-            .music(StoryMusicAssets.STEM_ID_BOSS_1_INTRO, 6 + EXTRA_MEASURES_SPACING)
+            .music(StoryMusicAssets.STEM_ID_BOSS_1_INTRO, 6, extraBeatDuration = EXTRA_BEATS_SPACING)
             .moveCamera()
             .note("boss_title_appear") // Handled by title card separately
             .todo("boss_appear")
@@ -61,7 +59,7 @@ class BossScriptIntro(gamemode: StoryBossGameMode, script: Script) : BossScriptF
             .todo("bg_scroll_start")
             .rest(8.0f)
 
-            .spawnPattern(pattern)
+            .spawnPattern(patternPools.introPattern, flipChance = NO_FLIP_CHANCE)
             .rest(4.0f)
             .spawnRods()
             .rest(4.0f)

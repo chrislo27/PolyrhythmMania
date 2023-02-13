@@ -73,32 +73,74 @@ object BossPatterns {
     )
 
 
-    val boss1_c_mus0_pat0 = Pattern(
-        rowUpside = "#P-#P-P-##",
+    val boss1_c_var1_pat0 = Pattern(
+        rowUpside   = "#P-#P-P-##",
         rowDownside = "P-P-P-P-##",
     )
-    val boss1_c_mus0_pat1 = Pattern(
-        rowUpside = "#P-#P-P-##",
+    val boss1_c_var1_pat1 = Pattern(
+        rowUpside   = "#P-#P-P-##",
         rowDownside = "P---P---##",
     )
-
-    val boss1_d_mus0_pat0 = Pattern(
-        rowUpside = "####P-P-P-",
-        rowDownside = "P-P-P-P-P-",
-        rodUpside = 1.5f,
-        rodDownside = 1.5f,
-        delayUpside = 0.5f,
-        delayDownside = 0.5f
+    val boss1_c_var1_pat2 = Pattern(
+        rowUpside   = "#P-#P-P-##",
+        rowDownside = "P--PP--###",
     )
-    val boss1_d_mus0_pat1 = Pattern(
-        rowUpside = "P-##P-##P-",
-        rowDownside = "P-P-P-P-P-",
-        rodUpside = 1.5f,
-        rodDownside = 1.5f,
-        delayUpside = 0.5f,
-        delayDownside = 0.5f
+    
+    val boss1_c_var2_pat0 = Pattern(
+        rowUpside   = "#P-P-#P-##",
+        rowDownside = "P-P-##P-##",
+    )
+    val boss1_c_var2_pat1 = Pattern(
+        rowUpside   = "#P-P-#P-##",
+        rowDownside = "P-P-#PP-##",
+    )
+    val boss1_c_var2_pat2 = Pattern(
+        rowUpside   = "#P-P-#P-##",
+        rowDownside = "P-PP-#P-##",
+    )
+    
+    val boss1_c_var3_pat0 = Pattern(
+        rowUpside   = "P--P--P--#",
+        rowDownside = "P--P--P--#",
+    )
+    val boss1_c_var3_pat1 = Pattern(
+        rowUpside   = "P--P--P--#",
+        rowDownside = "P-P-#P-###",
+    )
+    val boss1_c_var3_pat2 = Pattern(
+        rowUpside   = "P--P--P--#",
+        rowDownside = "P-P-P-P-##",
     )
 
+
+    val boss1_d_var1_pat0 = Pattern(
+        rowUpside   = "#####P-P-P-",
+        rowDownside = "#P-P-P-P-P-",
+    )
+    val boss1_d_var1_pat1 = Pattern(
+        rowUpside   = "#P---P---P-",
+        rowDownside = "#P-P-P-P-P-",
+    )
+    
+    val boss1_d_var2_pat0 = Pattern(
+        rowUpside   = "##P-##P-P-",
+        rowDownside = "P-P-P-P-P-",
+    )
+    val boss1_d_var2_pat1 = Pattern(
+        rowUpside   = "##P-P-##P-",
+        rowDownside = "P-P-P-P-P-",
+    )
+    
+    val boss1_d_var3_pat0 = Pattern(
+        rowUpside   = "#####P-P-P-",
+        rowDownside = "P-P-P-P-##",
+    )
+    val boss1_d_var3_pat1 = Pattern(
+        rowUpside   = "#P-##P-P-P-",
+        rowDownside = "P-P-P-#P-#",
+    )
+
+    
     val endlessEasy: List<Pattern> = listOf(
         Pattern(rowUpside = "##P---P---", rowDownside = "P---P---"), // This should stay first
         Pattern(rowUpside = "P--PP-P-#", rowDownside = ""),

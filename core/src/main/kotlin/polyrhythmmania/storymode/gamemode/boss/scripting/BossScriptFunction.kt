@@ -20,7 +20,7 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
         private const val LOGGER_TAG = "BossScriptFunction"
 
         @JvmStatic
-        protected val EXTRA_MEASURES_SPACING: Int = 1
+        protected val EXTRA_BEATS_SPACING: Int = 4
 
         @JvmStatic
         protected val SIDE_UPSIDE: Boolean = true
@@ -57,23 +57,30 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
         }
     }
 
-    protected fun MutableList<Event>.music(stemID: String, measures: Int): MutableList<Event> =
+    protected fun MutableList<Event>.music(stemID: String, measures: Int): MutableList<Event> {
+        this.todo("Starting music, stemID ${stemID} for ${measures} measures")
         this.addEvent(BossMusicEvent(engine, gamemode.stems, stemID, 0f, (measures * 4).toFloat()))
+        return this
+    }
 
     protected fun MutableList<Event>.music(
         stemID: StemID,
         measures: Int,
+        extraBeatDuration: Int = 0,
         specificVariant: Int? = null,
-    ): MutableList<Event> =
+    ): MutableList<Event> {
+        this.todo("Starting music, stemID ${stemID} (variant $specificVariant) for ${measures} measures")
         this.addEvent(
             BossMusicEvent(
                 engine,
                 gamemode.stems,
                 if (specificVariant != null) stemID.getID(specificVariant) else stemID.getRandomID(random),
                 0f,
-                (measures * 4).toFloat()
+                ((measures * 4) + extraBeatDuration).toFloat()
             )
         )
+        return this
+    }
 
 
     protected fun MutableList<Event>.spawnPattern(pattern: Pattern, flipChance: Float = DEFAULT_FLIP_CHANCE): MutableList<Event> {
