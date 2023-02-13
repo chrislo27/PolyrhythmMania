@@ -13,9 +13,9 @@ data class Pattern(
     val rowUpside: List<CubeType>,
     val rowDownside: List<CubeType>,
 
-    // rodXside = Rod speed multiplier to xUnitsPerBeat
-    val rodUpside: Float = 1f,
-    val rodDownside: Float = 1f,
+    // rodXside = Beats per block (= 1 / xUnitsPerBeat), default 0.5
+    val rodUpside: Float = DEFAULT_BEATS_PER_BLOCK,
+    val rodDownside: Float = DEFAULT_BEATS_PER_BLOCK,
 
     // delayXside = Delay for everything in beats (pattern and rods)
     val delayUpside: Float = 0f,
@@ -24,8 +24,10 @@ data class Pattern(
 
     companion object {
 
-        const val DEFAULT_X_UNITS_PER_BEAT: Float = BlockSpawnPatternStoryMode.DEFAULT_X_UNITS_PER_BEAT
+        const val DEFAULT_BEATS_PER_BLOCK: Float = 1f / BlockSpawnPatternStoryMode.DEFAULT_X_UNITS_PER_BEAT
 
+        private fun beatsPerBlockToXUnits(beatsPerBlock: Float): Float = 1f / beatsPerBlock
+        
         private fun String.parsePattern(): List<CubeType> {
             return this.map { c ->
                 CubeType.CHAR_MAP[c]
@@ -40,8 +42,8 @@ data class Pattern(
     constructor(
         rowUpside: String,
         rowDownside: String,
-        rodUpside: Float = 1f,
-        rodDownside: Float = 1f,
+        rodUpside: Float = DEFAULT_BEATS_PER_BLOCK,
+        rodDownside: Float = DEFAULT_BEATS_PER_BLOCK,
         delayUpside: Float = 0f,
         delayDownside: Float = 0f,
     ) : this(
@@ -54,7 +56,7 @@ data class Pattern(
     )
 
     private fun toBlock(engine: Engine, beat: Float, isUpside: Boolean): BlockSpawnPattern {
-        val xUnitsPerBeat = DEFAULT_X_UNITS_PER_BEAT * (if (isUpside) rodUpside else rodDownside)
+        val xUnitsPerBeat = beatsPerBlockToXUnits(if (isUpside) rodUpside else rodDownside)
 
         return BlockSpawnPatternStoryMode(engine, xUnitsPerBeat).apply {
             this.beat = beat

@@ -10,6 +10,7 @@ import polyrhythmmania.storymode.music.StemID
 import polyrhythmmania.world.EventRowBlockDespawn
 import polyrhythmmania.world.EventRowBlockRetract
 import polyrhythmmania.world.World
+import polyrhythmmania.world.entity.EntityRodDecor
 import java.util.*
 
 
@@ -109,7 +110,7 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
             this.add(
                 EventDeployRodBoss(
                     engine, world.rowA, patternStart + pattern.delayDownside,
-                    Pattern.DEFAULT_X_UNITS_PER_BEAT * pattern.rodDownside,
+                    1f / pattern.rodDownside,
                     pattern.getLastPistonIndexDownside(),
                     damageTakenVar, bossDamageMultiplier
                 )
@@ -119,7 +120,7 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
             this.add(
                 EventDeployRodBoss(
                     engine, world.rowDpad, patternStart + pattern.delayUpside,
-                    Pattern.DEFAULT_X_UNITS_PER_BEAT * pattern.rodUpside,
+                    1f / pattern.rodUpside,
                     pattern.getLastPistonIndexUpside(),
                     damageTakenVar, bossDamageMultiplier
                 )
@@ -133,7 +134,7 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
         side: Boolean,
         damageTakenVar: EntityRodPRStoryBoss.PlayerDamageTaken,
         bossDamageMultiplier: Int,
-        speedMultiplier: Float = 1f,
+        beatsPerBlock: Float = 1f / EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT,
     ): MutableList<Event> {
         val patternStart = -4f
         val pattern = fetchCurrentPattern()
@@ -142,7 +143,7 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
             this.add(
                 EventDeployRodBoss(
                     engine, world.rowA, patternStart,
-                    Pattern.DEFAULT_X_UNITS_PER_BEAT * speedMultiplier,
+                    1f / beatsPerBlock,
                     pattern.getLastPistonIndexDownside(),
                     damageTakenVar, bossDamageMultiplier
                 )
@@ -151,7 +152,7 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
             this.add(
                 EventDeployRodBoss(
                     engine, world.rowDpad, patternStart,
-                    Pattern.DEFAULT_X_UNITS_PER_BEAT * speedMultiplier,
+                    1f / beatsPerBlock,
                     pattern.getLastPistonIndexUpside(),
                     damageTakenVar, bossDamageMultiplier
                 )

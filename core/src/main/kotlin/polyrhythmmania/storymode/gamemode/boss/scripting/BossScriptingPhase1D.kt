@@ -16,14 +16,14 @@ class BossScriptPhase1D(phase1: BossScriptPhase1, val variantIndex: Int? = null)
     override fun getEvents(): List<Event> {
         /*
 
-Script boss1_c_variants[] = {
-    boss1_c_var1,
-    boss1_c_var2,
-    boss1_c_var3
+Script boss1_d_variants[] = {
+    boss1_d_var1,
+    boss1_d_var2,
+    boss1_d_var3
 };
 
-Script boss1_c = {
-    run boss1_c_variants[random()];
+Script boss1_d = {
+    run boss1_d_variants[random()];
     return;
 };
 
@@ -98,11 +98,15 @@ private class BossScriptPhase1DVar1(phase1: BossScriptPhase1) : AbstractBossScri
         run {
             val damageVar = EntityRodPRStoryBoss.PlayerDamageTaken()
             list
-                .spawnPattern(variantPatternPool.iter.next(), flipChance = NO_FLIP_CHANCE)
+                .spawnPattern(
+                    variantPatternPool.iter.next()
+                        .copy(rodUpside = 0.375f, rodDownside = 0.375f, delayUpside = 0.125f, delayDownside = 0.125f),
+                    flipChance = NO_FLIP_CHANCE
+                )
                 .rest(4.0f)
                 .rest(0.125f)
-                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, speedMultiplier = 1.5f)
-                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, speedMultiplier = 1.5f)
+                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, beatsPerBlock = 0.375f)
+                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, beatsPerBlock = 0.375f)
                 .rest(0.875f)
                 .rest(3.0f)
                 .despawnPattern()
@@ -121,11 +125,14 @@ private class BossScriptPhase1DVar1(phase1: BossScriptPhase1) : AbstractBossScri
         run {
             val damageVar = EntityRodPRStoryBoss.PlayerDamageTaken()
             list
-                .spawnPattern(variantPatternPool.iter.next())
+                .spawnPattern(
+                    variantPatternPool.iter.next()
+                        .copy(rodUpside = 0.375f, rodDownside = 0.375f, delayUpside = 0.125f, delayDownside = 0.125f)
+                )
                 .rest(4.0f)
                 .rest(0.125f)
-                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, speedMultiplier = 1.5f)
-                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, speedMultiplier = 1.5f)
+                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, beatsPerBlock = 0.375f)
+                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, beatsPerBlock = 0.375f)
                 .rest(0.875f)
                 .rest(3.0f)
                 .despawnPattern()
@@ -190,10 +197,13 @@ private class BossScriptPhase1DVar2(phase1: BossScriptPhase1) : AbstractBossScri
         run {
             val damageVar = EntityRodPRStoryBoss.PlayerDamageTaken()
             list
-                .spawnPattern(variantPatternPool.iter.next(), flipChance = NO_FLIP_CHANCE)
+                .spawnPattern(
+                    variantPatternPool.iter.next().copy(rodUpside = 0.375f, rodDownside = 0.375f),
+                    flipChance = NO_FLIP_CHANCE
+                )
                 .rest(4.0f)
-                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, speedMultiplier = 1.5f)
-                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, speedMultiplier = 1.5f)
+                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, beatsPerBlock = 0.375f)
+                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, beatsPerBlock = 0.375f)
                 .rest(4.0f)
                 .despawnPattern()
         }
@@ -211,10 +221,10 @@ private class BossScriptPhase1DVar2(phase1: BossScriptPhase1) : AbstractBossScri
         run {
             val damageVar = EntityRodPRStoryBoss.PlayerDamageTaken()
             list
-                .spawnPattern(variantPatternPool.iter.next())
+                .spawnPattern(variantPatternPool.iter.next().copy(rodUpside = 0.375f, rodDownside = 0.375f))
                 .rest(4.0f)
-                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, speedMultiplier = 1.5f)
-                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, speedMultiplier = 1.5f)
+                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, beatsPerBlock = 0.375f)
+                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, beatsPerBlock = 0.375f)
                 .rest(4.0f)
                 .despawnPattern()
         }
@@ -282,11 +292,14 @@ private class BossScriptPhase1DVar3(phase1: BossScriptPhase1) : AbstractBossScri
         run {
             val damageVar = EntityRodPRStoryBoss.PlayerDamageTaken()
             list
-                .spawnPattern(variantPatternPool.iter.next(), flipChance = NO_FLIP_CHANCE)
+                .spawnPattern(
+                    variantPatternPool.iter.next().copy(rodUpside = 0.375f, rodDownside = 0.5f, delayUpside = 0.125f),
+                    flipChance = NO_FLIP_CHANCE
+                )
                 .rest(4.0f)
-                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, speedMultiplier = 1.0f)
+                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, beatsPerBlock = 0.5f)
                 .rest(0.125f)
-                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, speedMultiplier = 1.5f)
+                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, beatsPerBlock = 0.375f)
                 .rest(0.875f)
                 .rest(3.0f)
                 .despawnPattern()
@@ -305,11 +318,14 @@ private class BossScriptPhase1DVar3(phase1: BossScriptPhase1) : AbstractBossScri
         run {
             val damageVar = EntityRodPRStoryBoss.PlayerDamageTaken()
             list
-                .spawnPattern(variantPatternPool.iter.next(), flipChance = ALWAYS_FLIP_CHANCE)
+                .spawnPattern(
+                    variantPatternPool.iter.next().copy(rodUpside = 0.375f, rodDownside = 0.5f, delayUpside = 0.125f),
+                    flipChance = ALWAYS_FLIP_CHANCE
+                )
                 .rest(4.0f)
-                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, speedMultiplier = 1.0f)
+                .spawnOneRod(SIDE_UPSIDE, damageVar, 1, beatsPerBlock = 0.5f)
                 .rest(0.125f)
-                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, speedMultiplier = 1.5f)
+                .spawnOneRod(SIDE_DOWNSIDE, damageVar, 1, beatsPerBlock = 0.375f)
                 .rest(0.875f)
                 .rest(3.0f)
                 .despawnPattern()
