@@ -20,6 +20,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
 import paintbox.ui.control.ComboBox
 import paintbox.ui.element.RectElement
+import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.ColumnarVBox
 import paintbox.ui.layout.HBox
 import paintbox.util.gdxutils.grey
@@ -367,6 +368,102 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                         this.setOnAction {
                             enterGameMode(StoryBossGameMode.getFactory())
                         }
+                    }
+                    this += separator()
+                    this += ColumnarPane(2, useRows = false).apply {
+                        this.spacing.set(8f)
+                        this.bounds.height.set(32f)
+                        listOf(
+                            StoryBossGameMode.DebugPhase.A1,
+                            StoryBossGameMode.DebugPhase.A2,
+                        ).forEachIndexed { index, debugPhase ->
+                            this[index] += Button("Boss fight, looping phase A${index + 1}").apply {
+                                this.setOnAction {
+                                    enterGameMode(StoryBossGameMode.getFactory(debugPhase = debugPhase))
+                                }
+                            }
+                        }
+                    }
+                    this += separator()
+                    this += ColumnarPane(2, useRows = false).apply {
+                        this.spacing.set(8f)
+                        this.bounds.height.set(32f)
+                        listOf(
+                            StoryBossGameMode.DebugPhase.B1,
+                            StoryBossGameMode.DebugPhase.B2,
+                        ).forEachIndexed { index, debugPhase ->
+                            this[index] += Button("Boss fight, looping phase B${index + 1}").apply {
+                                this.setOnAction {
+                                    enterGameMode(StoryBossGameMode.getFactory(debugPhase = debugPhase))
+                                }
+                            }
+                        }
+                    }
+                    this += separator()
+                    this += Button("Boss fight, looping phase C (variants 1-3)").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGameMode(StoryBossGameMode.getFactory(debugPhase = StoryBossGameMode.DebugPhase.C))
+                        }
+                    }
+                    this += ColumnarPane(3, useRows = false).apply {
+                        this.spacing.set(8f)
+                        this.bounds.height.set(32f)
+                        listOf(
+                            StoryBossGameMode.DebugPhase.C_VAR1,
+                            StoryBossGameMode.DebugPhase.C_VAR2,
+                            StoryBossGameMode.DebugPhase.C_VAR3
+                        ).forEachIndexed { index, debugPhase ->
+                            this[index] += Button("Looping variant ${index + 1}").apply {
+                                this.setOnAction {
+                                    enterGameMode(StoryBossGameMode.getFactory(debugPhase = debugPhase))
+                                }
+                            }
+                        }
+                    }
+                    this += separator()
+                    this += Button("Boss fight, looping phase D (variants 1-2)").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGameMode(StoryBossGameMode.getFactory(debugPhase = StoryBossGameMode.DebugPhase.D))
+                        }
+                    }
+                    this += ColumnarPane(2, useRows = false).apply {
+                        this.spacing.set(8f)
+                        this.bounds.height.set(32f)
+                        listOf(
+                            StoryBossGameMode.DebugPhase.D_VAR1,
+                            StoryBossGameMode.DebugPhase.D_VAR2,
+                        ).forEachIndexed { index, debugPhase ->
+                            this[index] += Button("Looping variant ${index + 1}").apply {
+                                this.setOnAction {
+                                    enterGameMode(StoryBossGameMode.getFactory(debugPhase = debugPhase))
+                                }
+                            }
+                        }
+                    }
+                    this += separator()
+                    this += Button("Boss fight, looping phase E1").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+//                            enterGameMode(StoryBossGameMode.getFactory(debugPhase = StoryBossGameMode.DebugPhase.E1))
+                        }
+                        this.disabled.set(true)
+                    }
+                    this += Button("Boss fight, looping phase E2").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+//                            enterGameMode(StoryBossGameMode.getFactory(debugPhase = StoryBossGameMode.DebugPhase.E2))
+                        }
+                        this.disabled.set(true)
+                    }
+                    this += separator()
+                    this += Button("Boss fight, looping phase F").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+//                            enterGameMode(StoryBossGameMode.getFactory(debugPhase = StoryBossGameMode.DebugPhase.F))
+                        }
+                        this.disabled.set(true)
                     }
                 }
             }

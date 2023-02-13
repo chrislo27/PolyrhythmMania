@@ -11,7 +11,11 @@ import polyrhythmmania.world.tileset.PaletteTransition
 import polyrhythmmania.world.tileset.TransitionCurve
 
 
-class BossScriptIntro(gamemode: StoryBossGameMode, script: Script) : BossScriptFunction(gamemode, script) {
+class BossScriptIntro(
+    gamemode: StoryBossGameMode,
+    script: Script,
+    val phase1Factory: ((BossScriptIntro) -> BossScriptFunction)?
+) : BossScriptFunction(gamemode, script) {
 
     private fun MutableList<Event>.moveCamera(): MutableList<Event> {
         val zoomTransition = PaletteTransition.DEFAULT.copy(duration = 4f, transitionCurve = TransitionCurve.SMOOTHER)
@@ -64,6 +68,6 @@ class BossScriptIntro(gamemode: StoryBossGameMode, script: Script) : BossScriptF
             .spawnRods()
             .rest(4.0f)
 
-            .addFunctionAsEvent(BossScriptPhase1(gamemode, script))
+            .addFunctionAsEvent(phase1Factory?.invoke(this) ?: BossScriptPhase1(gamemode, script))
     }
 }

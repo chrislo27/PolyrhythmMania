@@ -7,7 +7,7 @@ import polyrhythmmania.storymode.music.StoryMusicAssets
 import kotlin.random.asKotlinRandom
 
 
-class BossScriptPhase1D(phase1: BossScriptPhase1) : AbstractBossScriptPhase1Part(phase1) {
+class BossScriptPhase1D(phase1: BossScriptPhase1, val variantIndex: Int? = null) : AbstractBossScriptPhase1Part(phase1) {
 
     private fun interface VariantFactory {
         fun create(): AbstractBossScriptPhase1DVariant
@@ -37,7 +37,7 @@ Script boss1_c = {
             VariantFactory { BossScriptPhase1DVar3(phase1) },
         )
 
-        val randomVariantFactory = variants.random(this.random.asKotlinRandom())
+        val randomVariantFactory = if (variantIndex != null) variants[variantIndex] else variants.random(this.random.asKotlinRandom())
         list.addAll(randomVariantFactory.create().getEvents())
 
         return list

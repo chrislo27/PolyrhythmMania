@@ -6,7 +6,7 @@ import polyrhythmmania.storymode.music.StemID
 import polyrhythmmania.storymode.music.StoryMusicAssets
 
 
-class BossScriptPhase1(gamemode: StoryBossGameMode, script: Script) : BossScriptFunction(gamemode, script) {
+open class BossScriptPhase1(gamemode: StoryBossGameMode, script: Script) : BossScriptFunction(gamemode, script) {
 
     override fun getEvents(): List<Event> {
         /*
@@ -99,3 +99,42 @@ abstract class AbstractBossScriptPhase1Part(val phase1: BossScriptPhase1) : Boss
     phase1.script
 )
 
+
+class BossScriptPhase1DebugLoop(
+    gamemode: StoryBossGameMode,
+    script: Script,
+    val scriptFunctionFactory: (BossScriptPhase1DebugLoop) -> List<ScriptFunction>
+) : BossScriptPhase1(gamemode, script) {
+
+    override fun getEvents(): List<Event> {
+        return mutableListOf<Event>()
+            .addFunctionAsEvent(LoopingSegment())
+    }
+
+    private inner class LoopingSegment : BossScriptFunction(gamemode, script) {
+
+        override fun getEvents(): List<Event> {
+            val list = mutableListOf<Event>()
+            
+            val scriptFunctions = scriptFunctionFactory(this@BossScriptPhase1DebugLoop)
+            if (scriptFunctions.isEmpty()) error("scriptFunctionFactory cannot return an empty list")
+            
+            scriptFunctions.forEach { scriptFunction ->
+                list.addFunctionAsEvent(object : ScriptFunction(script) {
+                    override fun getEvents(): List<Event> {
+                        val ls = mutableListOf<Event>()
+                        
+                        ls.despawnPattern()
+                        ls.addAll(scriptFunction.getEvents())
+                        
+                        return ls
+                    }
+                }) 
+            }
+
+            list.addFunctionAsEvent(this)
+
+            return list
+        }
+    }
+}

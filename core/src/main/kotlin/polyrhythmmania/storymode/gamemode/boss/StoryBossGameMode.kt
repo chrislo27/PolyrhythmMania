@@ -11,9 +11,7 @@ import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.gamemode.boss.pattern.BossPatternPools
-import polyrhythmmania.storymode.gamemode.boss.scripting.BossScriptIntro
-import polyrhythmmania.storymode.gamemode.boss.scripting.Script
-import polyrhythmmania.storymode.gamemode.boss.scripting.ScriptFunction
+import polyrhythmmania.storymode.gamemode.boss.scripting.*
 import polyrhythmmania.storymode.music.StemCache
 import polyrhythmmania.storymode.music.StoryMusicAssets
 import polyrhythmmania.world.World
@@ -25,7 +23,8 @@ import polyrhythmmania.world.render.ForceTexturePack
 import java.util.*
 
 
-class StoryBossGameMode(main: PRManiaGame) : AbstractStoryGameMode(main), World.WorldResetListener {
+class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPhase.NONE) :
+    AbstractStoryGameMode(main), World.WorldResetListener {
 
     companion object {
 
@@ -35,7 +34,7 @@ class StoryBossGameMode(main: PRManiaGame) : AbstractStoryGameMode(main), World.
         private const val SEGMENT_BEATS_PER_MEASURE: Int = 4
         private const val SEGMENT_DURATION_MEASURES: Int = 8
 
-        fun getFactory(): Contract.GamemodeFactory = object : Contract.GamemodeFactory {
+        fun getFactory(debugPhase: DebugPhase = DebugPhase.NONE): Contract.GamemodeFactory = object : Contract.GamemodeFactory {
             private var firstCall = true
 
             override fun load(delta: Float, main: PRManiaGame): GameMode? {
@@ -51,10 +50,25 @@ class StoryBossGameMode(main: PRManiaGame) : AbstractStoryGameMode(main), World.
                         stem?.musicFinishedLoading?.get() ?: false
                     }
 
-                    if (ready) StoryBossGameMode(main) else null
+                    if (ready) StoryBossGameMode(main, debugPhase) else null
                 }
             }
         }
+    }
+    
+    enum class DebugPhase {
+        NONE,
+        A1,
+        A2,
+        B1,
+        B2,
+        C,
+        C_VAR1,
+        C_VAR2,
+        C_VAR3,
+        D,
+        D_VAR1,
+        D_VAR2,
     }
 
     private val checkForRodsThatCollidedWithBossRunnable = CheckForRodsThatCollidedWithBossRunnable()
@@ -171,9 +185,78 @@ class StoryBossGameMode(main: PRManiaGame) : AbstractStoryGameMode(main), World.
     //endregion
 
     //region Init blocks
-
+    
     private fun onScriptCreated(script: Script) {
-        val func: ScriptFunction = BossScriptIntro(this, script)
+        val phase1Factory =
+            when (this.debugPhase) {
+                DebugPhase.NONE -> null
+                DebugPhase.A1 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(BossScriptPhase1A1(it))
+                    }
+                DebugPhase.A2 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(BossScriptPhase1A2(it))
+                    }
+                DebugPhase.B1 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(BossScriptPhase1B1(it))
+                    }
+                DebugPhase.B2 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(BossScriptPhase1B2(it))
+                    }
+                DebugPhase.C -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1C(it, variantIndex = 0),
+                            BossScriptPhase1C(it, variantIndex = 1),
+                            BossScriptPhase1C(it, variantIndex = 2),
+                        )
+                    }
+                DebugPhase.C_VAR1 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1C(it, variantIndex = 0),
+                        )
+                    }
+                DebugPhase.C_VAR2 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1C(it, variantIndex = 1),
+                        )
+                    }
+                DebugPhase.C_VAR3 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1C(it, variantIndex = 2),
+                        )
+                    }
+                DebugPhase.D -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1D(it, variantIndex = 0),
+                            BossScriptPhase1D(it, variantIndex = 1),
+                        )
+                    }
+                DebugPhase.D_VAR1 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1D(it, variantIndex = 0),
+                        )
+                    }
+                DebugPhase.D_VAR2 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1D(it, variantIndex = 1),
+                        )
+                    }
+            }
+        val func: ScriptFunction = BossScriptIntro(
+            this, 
+            script,
+            phase1Factory
+        )
         script.addEventsToQueue(func.getEvents())
     }
 
