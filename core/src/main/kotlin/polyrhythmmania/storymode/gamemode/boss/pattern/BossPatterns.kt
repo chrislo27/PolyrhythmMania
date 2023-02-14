@@ -139,6 +139,34 @@ object BossPatterns {
         rowUpside   = "#P-##P-P-P-",
         rowDownside = "P-P-P-#P-#",
     )
+    
+    
+    val boss1_f_var1_pat0 = Pattern(
+        rowUpside   = "#P-P-P-P-#",
+        rowDownside = "P--###P--#",
+    )
+    val boss1_f_var1_pat1 = Pattern(
+        rowUpside   = "#P-P-P-P-#",
+        rowDownside = "P--P--P--#",
+    )
+    
+    val boss1_f_var2_pat0 = Pattern(
+        rowUpside   = "##P---P---",
+        rowDownside = "P-#P-P-###",
+    )
+    val boss1_f_var2_pat1 = Pattern(
+        rowUpside   = "##P---P---",
+        rowDownside = "P-#P-P-P-#",
+    )
+    
+    val boss1_f_var3_pat0 = Pattern(
+        rowUpside   = "P--P--P--#",
+        rowDownside = "P-P-P-P-##",
+    )
+    val boss1_f_var3_pat1 = Pattern(
+        rowUpside   = "PP-P--P---",
+        rowDownside = "P-P-P-P-##",
+    )
 
     
     val endlessEasy: List<Pattern> = listOf(

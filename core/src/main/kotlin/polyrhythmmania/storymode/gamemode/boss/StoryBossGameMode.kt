@@ -70,6 +70,10 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
         D_VAR1,
         D_VAR2,
         D_VAR3,
+        F,
+        F_VAR1,
+        F_VAR2,
+        F_VAR3,
     }
 
     private val checkForRodsThatCollidedWithBossRunnable = CheckForRodsThatCollidedWithBossRunnable()
@@ -257,6 +261,32 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
                     BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
                         listOf(
                             BossScriptPhase1D(it, variantIndex = 2),
+                        )
+                    }
+                DebugPhase.F -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1F(it, variantIndex = 0),
+                            BossScriptPhase1F(it, variantIndex = 1),
+                            BossScriptPhase1F(it, variantIndex = 2),
+                        )
+                    }
+                DebugPhase.F_VAR1 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1F(it, variantIndex = 0),
+                        )
+                    }
+                DebugPhase.F_VAR2 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1F(it, variantIndex = 1),
+                        )
+                    }
+                DebugPhase.F_VAR3 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1F(it, variantIndex = 2),
                         )
                     }
             }

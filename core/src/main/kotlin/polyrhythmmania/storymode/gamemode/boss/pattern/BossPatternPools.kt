@@ -117,27 +117,7 @@ class BossPatternPools(val random: Random) {
     ).toPool()
 
     //endregion
-
-
-    //region Phase 1 - F
-
-    // Phase 1 - F (Mus0)
-    val boss1_f_mus0_patterns: PatternPool = listOf<Pattern>(
-        // ...,
-    ).toPool()
-
-    // Phase 1 - F (Mus1)
-    val boss1_f_mus1_patterns: PatternPool = listOf<Pattern>(
-        // ...,
-    ).toPool()
-
-    // Phase 1 - F (Mus2)
-    val boss1_f_mus2_patterns: PatternPool = listOf<Pattern>(
-        // ...,
-    ).toPool()
-
-    //endregion
-
+    
     
     val allPools: List<PatternPool> = listOf(
         boss1_a1_patterns,
@@ -153,9 +133,6 @@ class BossPatternPools(val random: Random) {
         boss1_d_var3_patterns,
         boss1_e1_patterns,
         boss1_e2_patterns,
-        boss1_f_mus0_patterns,
-        boss1_f_mus1_patterns,
-        boss1_f_mus2_patterns,
     )
 
     private fun List<Pattern>.toPool(bannedFirst: Pattern? = null): PatternPool =

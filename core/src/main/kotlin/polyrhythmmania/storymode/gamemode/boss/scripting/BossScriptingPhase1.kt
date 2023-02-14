@@ -77,7 +77,7 @@ open class BossScriptPhase1(gamemode: StoryBossGameMode, script: Script) : BossS
                 BossScriptPhase1D(this@BossScriptPhase1),
                 PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_E1),
                 PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_E2),
-                PlaceholderMusicStem(StoryMusicAssets.STEM_ID_BOSS_1_F),
+                BossScriptPhase1F(this@BossScriptPhase1),
                 BossScriptPhase1A2(this@BossScriptPhase1)
             )
 
