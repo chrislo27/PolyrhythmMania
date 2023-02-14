@@ -512,8 +512,8 @@ private class BossScriptPhase1FVar3(phase1: BossScriptPhase1) : AbstractBossScri
 
             .spawnRods()
             .rest(3.0f)
-            .targetLights(SIDE_UPSIDE, "0--3--6---")
-            .targetLights(SIDE_DOWNSIDE, "0-2-4-6---")
+            .targetLights(SIDE_UPSIDE, "0-----6---")
+            .targetLights(SIDE_DOWNSIDE, "0-----6---")
             .changeLightStrength(LightStrength.DARK2, 1.0f)
             .rest(0.75f)
             .retractPistons()
