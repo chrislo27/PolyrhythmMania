@@ -10,7 +10,7 @@ sealed class WorldType(val defaultBackground: WorldBackground) {
         val showRaisedPlatformsRepeated: Boolean,
     ) : WorldType(NoOpWorldBackground) {
 
-        constructor() : this(showRaisedPlatformsRepeated = false)
+        constructor() : this(showRaisedPlatformsRepeated = true)
 
     }
 
