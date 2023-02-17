@@ -40,7 +40,7 @@ open class InboxDB : InboxItems() {
 
         // Post-internship
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("welcome_back", hasToField = false, hasSeparateListingName = false).apply { 
-            this.heading = Heading.TEST_HEADING
+//            this.heading = Heading.TEST_HEADING
         }))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["air_rally"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["first_contact"])))
