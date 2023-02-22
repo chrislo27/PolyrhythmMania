@@ -43,7 +43,9 @@ class BlockSpotlightAdvanced(engine: Engine) : AbstractBlockSpotlight(engine, Bl
         val timingMode = timingMode.getOrCompute()
         val paletteTransition = transitionData.paletteTransition.getOrCompute()
         val ambientLight = colorData.ambientLight
-        events += EventSpotlightTransition(engine, beat, paletteTransition, spotlights.ambientLight, ambientLight.color, ambientLight.strength)
+        if (ambientLight.enabled) {
+            events += EventSpotlightTransition(engine, beat, paletteTransition, spotlights.ambientLight, ambientLight.color, ambientLight.strength)
+        }
         events.addAll(BlockSpotlightSwitch.createSpotlightEvents(engine, spotlights,
                 colorData.rowA.map(SwitchedLightColor::toPair), colorData.rowDpad.map(SwitchedLightColor::toPair),
                 beat, timingMode, paletteTransition))
