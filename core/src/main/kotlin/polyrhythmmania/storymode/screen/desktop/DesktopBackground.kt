@@ -85,7 +85,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
         val height = camera.viewportHeight
         
         batch.draw(StoryAssets.get<Texture>("desk_bg_background"), 0f, 0f, width, height)
-//        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_1"), 0f, 0f, width, height)
+        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_1"), 0f, 0f, width, height)
         batch.draw(StoryAssets.get<Texture>("desk_bg_piston_background"), 0f, 0f, width, height)
         
         val delta = Gdx.graphics.deltaTime
@@ -114,8 +114,8 @@ class DesktopBackground(val camera: OrthographicCamera) {
         
         batch.draw(StoryAssets.get<Texture>("desk_bg_pistons_${this.pistonFrame + 1}"), 0f, 0f, width, height)
         
-//        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_2"), 0f, 0f, width, height)
-//        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_3"), 0f, 0f, width, height)
+        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_2"), 0f, 0f, width, height)
+        batch.draw(StoryAssets.get<Texture>("desk_bg_tube_3"), 0f, 0f, width, height)
         batch.draw(StoryAssets.get<Texture>(if (isItemAvailable) "desk_bg_inbox_available" else "desk_bg_inbox"), 0f, 0f, width, height)
         
         if (incrementPistonFrameAfterSec > 0) {
@@ -139,7 +139,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
         val newIndex = (pistonIndex * 2) + 1
         if (this.pistonFrame < newIndex && newIndex in 0 until PISTON_FRAMES) {
             this.pistonFrame = newIndex
-            this.incrementPistonFrameAfterSec = 1f / 10 // TODO 1/20
+            this.incrementPistonFrameAfterSec = 1f / 20
         }
     }
     
