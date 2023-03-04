@@ -141,6 +141,93 @@ object BossPatterns {
     )
     
     
+    val boss1_e_samurai_pat0 = Pattern(
+        rowUpside   = "#P-#######",
+        rowDownside = "P-########",
+    )
+    val boss1_e_samurai_pat1 = Pattern(
+        rowUpside   = "#PPPPPPP-#",
+        rowDownside = "P-########",
+    )
+    val boss1_e_stomp_pat0 = Pattern(
+        rowUpside   = "#P--PPP--#",
+        rowDownside = "P--P--P--#",
+    )
+    val boss1_e_bunny_pat0 = Pattern(
+        rowUpside   = "##P--P--##",
+        rowDownside = "##P-P-####",
+    )
+    val boss1_e_tap_pat0 = Pattern(
+        rowUpside   = "##P-P-####",
+        rowDownside = "P-P-P-P-##",
+    )
+    val boss1_e_toss_pat0 = Pattern(
+        rowUpside   = "#P-P-P-P-#",
+        rowDownside = "----------",
+    )
+    val boss1_e_toss_pat1 = Pattern(
+        rowUpside   = "----------",
+        rowDownside = "P-P-P-P-##",
+    )
+    val boss1_e_spaceball_pat0 = Pattern(
+        rowUpside   = "P-P-######",
+        rowDownside = "P-P-######",
+    )
+    val boss1_e_spaceball_ssp_start = Pattern(
+        rowUpside   = "..........",
+        rowUpsideTailEnd = "..",
+        rowDownside = "....####P#",
+        rowDownsideTailEnd = "##",
+        silent = true
+    )
+    val boss1_e_spaceball_ssp_flicker0 = Pattern(
+        rowUpside   = "..........",
+        rowUpsideTailEnd = "..",
+        rowDownside = "........#.",
+        rowDownsideTailEnd = "..",
+        silent = true
+    )
+    val boss1_e_spaceball_ssp_flicker1 = Pattern(
+        rowUpside   = "..........",
+        rowUpsideTailEnd = "..",
+        rowDownside = "........P.",
+        rowDownsideTailEnd = "..",
+        silent = true
+    )
+    val boss1_e_spaceball_ssp_end = Pattern(
+        rowUpside   = "..........",
+        rowUpsideTailEnd = "..",
+        rowDownside = "........P-",
+        rowDownsideTailEnd = "--",
+        silent = false
+    )
+    val boss1_e_badminton_pat0 = Pattern(
+        rowUpside   = "##P---P---",
+        rowDownside = "P-#P-P-###",
+    )
+    val boss1_e_badminton_ssp_start = Pattern(
+        rowUpside   = "..........",
+        rowUpsideTailEnd = "..",
+        rowDownside = "######P---",
+        rowDownsideTailEnd = "..",
+        silent = false
+    )
+    val boss1_e_badminton_ssp_cue = Pattern(
+        rowUpside   = "..........",
+        rowUpsideTailEnd = "..",
+        rowDownside = "......^...",
+        rowDownsideTailEnd = "..",
+        silent = false
+    )
+    val boss1_e_badminton_ssp_end = Pattern(
+        rowUpside   = "..........",
+        rowUpsideTailEnd = "..",
+        rowDownside = "......P...",
+        rowDownsideTailEnd = "..",
+        silent = false
+    )
+    
+    
     val boss1_f_var1_pat0 = Pattern(
         rowUpside   = "#P-P-P-P-#",
         rowDownside = "P--###P--#",

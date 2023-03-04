@@ -1,28 +1,11 @@
 package polyrhythmmania.storymode.gamemode.boss.scripting
 
-import com.badlogic.gdx.graphics.Color
-import polyrhythmmania.editor.block.BlockSpotlightSwitch
-import polyrhythmmania.editor.block.SpotlightTimingMode
-import polyrhythmmania.editor.block.data.SwitchedLightColor
 import polyrhythmmania.engine.Event
 import polyrhythmmania.storymode.gamemode.boss.pattern.BossPatterns
 import polyrhythmmania.storymode.gamemode.boss.scripting.BossScriptPhase1F.VariantFactory
 import polyrhythmmania.storymode.music.StoryMusicAssets
-import polyrhythmmania.world.spotlights.EventSpotlightTransition
-import polyrhythmmania.world.spotlights.Spotlights
-import polyrhythmmania.world.tileset.PaletteTransition
-import polyrhythmmania.world.tileset.TransitionCurve
 import kotlin.random.asKotlinRandom
 
-
-private data class LightStrength(val ambient: Float, val selected: Float) {
-    companion object {
-        val NORMAL: LightStrength = LightStrength(1.0f, 0.0f)
-        val DARK1: LightStrength = LightStrength(0.15f, 1.0f)
-        val DARK2: LightStrength = LightStrength(0.05f, 0.5f)
-        val DARK3: LightStrength = LightStrength(0.0f, 0.25f)
-    }
-}
 
 class BossScriptPhase1F(phase1: BossScriptPhase1, val variantIndex: Int? = null) : AbstractBossScriptPhase1Part(phase1) {
 
@@ -64,68 +47,7 @@ Script boss1_d = {
 private abstract class AbstractBossScriptPhase1FVariant(
     phase1: BossScriptPhase1,
     val stemVariant: Int,
-) : AbstractBossScriptPhase1Part(phase1) {
-    
-    companion object {
-        private fun parseLightIndexSelection(selection: String): Set<Int> {
-            return selection.mapNotNull { c ->
-                if (c in '0'..'9') (c - '0') else null
-            }.toSet()
-        }
-    }
-    
-    protected val lightSelections: MutableMap<Boolean, Set<Int>> =
-        mutableMapOf(SIDE_DOWNSIDE to emptySet(), SIDE_UPSIDE to emptySet())
-
-    protected fun MutableList<Event>.targetLights(side: Boolean, selection: String): MutableList<Event> {
-        val indices = parseLightIndexSelection(selection)
-        
-        lightSelections[side] = indices
-
-        return this
-    }
-
-    protected fun MutableList<Event>.changeLightStrength(
-        lightStrength: LightStrength,
-        duration: Float,
-    ): MutableList<Event> {
-        val startBeat = 0f
-        val spotlights = engine.world.spotlights
-        
-        val timingMode = SpotlightTimingMode.INSTANT
-        val paletteTransition =
-            PaletteTransition(duration, TransitionCurve.SLOW_FAST, pulseMode = false, reverse = false)
-        
-        val ambientLight = SwitchedLightColor(Spotlights.AMBIENT_LIGHT_RESET_COLOR, lightStrength.ambient)
-        this += EventSpotlightTransition(
-            engine,
-            startBeat,
-            paletteTransition,
-            spotlights.ambientLight,
-            ambientLight.color,
-            ambientLight.strength
-        )
-        
-        fun getSwitchedLightColorPairs(side: Boolean): List<Pair<Color?, Float?>> {
-            val onIndices = lightSelections.getValue(side)
-            return (0 until 10).map { i ->
-                Pair(Spotlights.SPOTLIGHT_RESET_COLOR, if (i in onIndices) lightStrength.selected else 0f)
-            }
-        }
-
-        this.addAll(
-            BlockSpotlightSwitch.createSpotlightEvents(
-                engine, spotlights,
-                getSwitchedLightColorPairs(SIDE_DOWNSIDE),
-                getSwitchedLightColorPairs(SIDE_UPSIDE),
-                startBeat, timingMode, paletteTransition
-            )
-        )
-
-        return this
-    }
-
-}
+) : AbstractBossScriptPhase1Part(phase1)
 
 
 private class BossScriptPhase1FVar1(phase1: BossScriptPhase1) : AbstractBossScriptPhase1FVariant(phase1, 1) {

@@ -448,14 +448,13 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                         this.spacing.set(8f)
                         this.bounds.height.set(32f)
                         listOf(
-                            StoryBossGameMode.DebugPhase.A1, // TODO replace with E1
-                            StoryBossGameMode.DebugPhase.A2, // TODO replace with E2
+                            StoryBossGameMode.DebugPhase.E1,
+                            StoryBossGameMode.DebugPhase.E2,
                         ).forEachIndexed { index, debugPhase ->
-                            this[index] += Button("Boss fight, looping phase E${index + 1}").apply {
+                            this[index] += Button("Boss fight, looping phase $debugPhase").apply {
                                 this.setOnAction {
                                     enterGameMode(StoryBossGameMode.getFactory(debugPhase = debugPhase))
                                 }
-                                this.disabled.set(true)
                             }
                         }
                     }

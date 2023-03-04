@@ -70,6 +70,8 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
         D_VAR1,
         D_VAR2,
         D_VAR3,
+        E1,
+        E2,
         F,
         F_VAR1,
         F_VAR2,
@@ -261,6 +263,18 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
                     BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
                         listOf(
                             BossScriptPhase1D(it, variantIndex = 2),
+                        )
+                    }
+                DebugPhase.E1 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1E1(it)
+                        )
+                    }
+                DebugPhase.E2 -> fun(intro: BossScriptIntro) =
+                    BossScriptPhase1DebugLoop(intro.gamemode, intro.script) {
+                        listOf(
+                            BossScriptPhase1E2(it)
                         )
                     }
                 DebugPhase.F -> fun(intro: BossScriptIntro) =

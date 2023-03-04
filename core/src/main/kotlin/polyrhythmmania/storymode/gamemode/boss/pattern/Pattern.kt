@@ -1,6 +1,6 @@
 package polyrhythmmania.storymode.gamemode.boss.pattern
 
-import polyrhythmmania.editor.block.BlockSpawnPattern
+import polyrhythmmania.editor.block.BlockSelectiveSpawnPattern
 import polyrhythmmania.editor.block.CubeType
 import polyrhythmmania.editor.block.storymode.BlockSpawnPatternStoryMode
 import polyrhythmmania.engine.Engine
@@ -20,6 +20,10 @@ data class Pattern(
     // delayXside = Delay for everything in beats (pattern and rods)
     val delayUpside: Float = 0f,
     val delayDownside: Float = 0f,
+    
+    val rowUpsideTailEnd: List<CubeType>? = null,
+    val rowDownsideTailEnd: List<CubeType>? = null,
+    val silentMode: Boolean = false,
 ) {
 
     companion object {
@@ -29,7 +33,10 @@ data class Pattern(
         private fun beatsPerBlockToXUnits(beatsPerBlock: Float): Float = 1f / beatsPerBlock
         
         private fun String.parsePattern(): List<CubeType> {
-            return this.map { c ->
+            return this
+                .replace('.', CubeType.NO_CHANGE.character)
+                .replace('^', CubeType.PISTON_OPEN.character)
+                .map { c ->
                 CubeType.CHAR_MAP[c]
                     ?: error("Unknown CubeType character '${c}', accepted: [${CubeType.VALUES.joinToString(separator = ", ") { "'${it}'" }}]")
             }
@@ -38,6 +45,7 @@ data class Pattern(
 
     val anyA: Boolean get() = rowDownside.isNotEmpty()
     val anyDpad: Boolean get() = rowUpside.isNotEmpty()
+    val useSelectiveSpawn: Boolean get() = rowUpsideTailEnd != null && rowDownsideTailEnd != null
 
     constructor(
         rowUpside: String,
@@ -54,8 +62,23 @@ data class Pattern(
         delayUpside,
         delayDownside
     )
+    
+    // Selective spawn
+    constructor(
+        rowUpside: String,
+        rowUpsideTailEnd: String,
+        rowDownside: String,
+        rowDownsideTailEnd: String,
+        silent: Boolean
+    ) : this(
+        rowUpside = rowUpside.parsePattern(),
+        rowUpsideTailEnd = rowUpsideTailEnd.parsePattern(),
+        rowDownside = rowDownside.parsePattern(),
+        rowDownsideTailEnd = rowDownsideTailEnd.parsePattern(),
+        silentMode = silent
+    )
 
-    private fun toBlock(engine: Engine, beat: Float, isUpside: Boolean): BlockSpawnPattern {
+    private fun toBlock(engine: Engine, beat: Float, isUpside: Boolean): BlockSpawnPatternStoryMode {
         val xUnitsPerBeat = beatsPerBlockToXUnits(if (isUpside) rodUpside else rodDownside)
 
         return BlockSpawnPatternStoryMode(engine, xUnitsPerBeat).apply {
@@ -85,12 +108,32 @@ data class Pattern(
         }
     }
 
+    private fun toSelectiveSpawnBlock(engine: Engine, beat: Float): BlockSelectiveSpawnPattern {
+        return BlockSelectiveSpawnPattern(engine).apply {
+            this.beat = beat
+            this.isSilent.set(silentMode)
+
+            for (i in 0 until patternData.rowCount) {
+                patternData.rowATypes[i] = rowDownside.getOrNull(i) ?: CubeType.NO_CHANGE
+                patternData.rowDpadTypes[i] = rowUpside.getOrNull(i) ?: CubeType.NO_CHANGE
+            }
+            for (i in 0 until tailEndData.rowCount) {
+                tailEndData.rowATypes[i] = rowDownsideTailEnd?.getOrNull(i) ?: CubeType.NO_CHANGE
+                tailEndData.rowDpadTypes[i] = rowUpsideTailEnd?.getOrNull(i) ?: CubeType.NO_CHANGE
+            }
+        }
+    }
+
     fun toEvents(engine: Engine, beat: Float): List<Event> {
-        return listOf(
-            toBlock(engine, beat, true),
-            toBlock(engine, beat, false),
-        ).flatMap { block ->
-            block.compileIntoEvents(delayDownside, delayUpside)
+        return if (useSelectiveSpawn) {
+            toSelectiveSpawnBlock(engine, beat).compileIntoEvents(shouldLastInTailEndAffectAll = false)
+        } else {
+            listOf(
+                toBlock(engine, beat, true),
+                toBlock(engine, beat, false),
+            ).flatMap { block ->
+                block.compileIntoEvents(delayDownside, delayUpside)
+            }
         }
     }
 

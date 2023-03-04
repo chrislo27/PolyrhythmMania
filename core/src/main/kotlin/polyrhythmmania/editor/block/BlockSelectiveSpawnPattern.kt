@@ -12,7 +12,10 @@ import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.block.data.CubePatternData
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import polyrhythmmania.world.*
+import polyrhythmmania.world.EventRowBlockDespawn
+import polyrhythmmania.world.EventRowBlockRetract
+import polyrhythmmania.world.EventRowBlockSpawn
+import polyrhythmmania.world.Row
 import polyrhythmmania.world.entity.EntityPiston
 import java.util.*
 
@@ -37,7 +40,9 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
         this.defaultText.bind { Localization.getVar("block.selectiveSpawn.name").use() }
     }
 
-    override fun compileIntoEvents(): List<Event> {
+    override fun compileIntoEvents(): List<Event> = compileIntoEvents(true)
+
+    fun compileIntoEvents(shouldLastInTailEndAffectAll: Boolean): List<Event> {
         val b = this.beat
         val events = mutableListOf<Event>()
 
@@ -46,8 +51,8 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
         events += compileRow(b, patternData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A, 0, false, silent)
         events += compileRow(b, patternData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD, 0, false, silent)
         
-        events += compileRow(b, tailEndData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A, ROW_COUNT, true, silent)
-        events += compileRow(b, tailEndData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD, ROW_COUNT, true, silent)
+        events += compileRow(b, tailEndData.rowATypes, world.rowA, EntityPiston.Type.PISTON_A, ROW_COUNT, shouldLastInTailEndAffectAll, silent)
+        events += compileRow(b, tailEndData.rowDpadTypes, world.rowDpad, EntityPiston.Type.PISTON_DPAD, ROW_COUNT, shouldLastInTailEndAffectAll, silent)
 
         return events
     }

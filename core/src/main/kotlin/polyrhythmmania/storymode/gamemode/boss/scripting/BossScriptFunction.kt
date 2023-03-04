@@ -171,12 +171,44 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
         return this
     }
 
+    protected fun MutableList<Event>.retractPistonsDownside(): MutableList<Event> {
+        val retractStartBeat = 0f
+
+        this.add(EventRowBlockRetract(engine, world.rowA, 0, retractStartBeat, affectThisIndexAndForward = true))
+
+        return this
+    }
+
+    protected fun MutableList<Event>.retractPistonsUpside(): MutableList<Event> {
+        val retractStartBeat = 0f
+
+        this.add(EventRowBlockRetract(engine, world.rowDpad, 0, retractStartBeat, affectThisIndexAndForward = true))
+
+        return this
+    }
+
     protected fun MutableList<Event>.despawnPattern(): MutableList<Event> {
         val despawnStartBeat = 0f
 
         this.add(EventRowBlockDespawn(engine, world.rowA, 0, despawnStartBeat, affectThisIndexAndForward = true))
         this.add(EventRowBlockDespawn(engine, world.rowDpad, 0, despawnStartBeat, affectThisIndexAndForward = true))
         this.add(EventClearInputs(engine, despawnStartBeat))
+
+        return this
+    }
+
+    protected fun MutableList<Event>.despawnPatternDownside(): MutableList<Event> {
+        val despawnStartBeat = 0f
+
+        this.add(EventRowBlockDespawn(engine, world.rowA, 0, despawnStartBeat, affectThisIndexAndForward = true))
+
+        return this
+    }
+
+    protected fun MutableList<Event>.despawnPatternUpside(): MutableList<Event> {
+        val despawnStartBeat = 0f
+
+        this.add(EventRowBlockDespawn(engine, world.rowDpad, 0, despawnStartBeat, affectThisIndexAndForward = true))
 
         return this
     }
