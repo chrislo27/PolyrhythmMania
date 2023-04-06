@@ -96,7 +96,7 @@ class Container(
         }
     }
 
-    val world: World = World()
+    val world: World = World(globalSettings.numberOfSpotlightsOverride)
     val timing: TimingProvider = timingProvider // Could also be the SoundSystem in theory
     val engine: Engine = Engine(timing, world, soundSystem, this)
     val texturePack: Var<TexturePack> by lazy { Var(StockTexturePacks.gba) } // Lazy due to late init in StockTexturePacks

@@ -8,8 +8,6 @@ import paintbox.ui.contextmenu.MenuItem
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.block.SpotlightActionType
 import polyrhythmmania.editor.block.contextmenu.SpotlightActionMenuPane
-import polyrhythmmania.world.World
-import polyrhythmmania.world.spotlights.Spotlights
 
 
 class SpotlightActionData(rowCount: Int, allowedActionTypes: List<SpotlightActionType>, starting: SpotlightActionType)
@@ -22,7 +20,7 @@ class SpotlightActionData(rowCount: Int, allowedActionTypes: List<SpotlightActio
             if (patternDataObj != null && patternDataObj.isObject) {
                 patternDataObj as JsonObject
                 val rowCount: Int = patternDataObj.getInt("rowCount", 0)
-                if (rowCount > 0 && rowCount <= Spotlights.NUM_ON_ROW) {
+                if (rowCount > 0) {
                     val newPatData = SpotlightActionData(rowCount, allowedActionTypes, allowedActionTypes.first())
                     val a = patternDataObj.get("a")
                     if (a != null && a.isArray) {

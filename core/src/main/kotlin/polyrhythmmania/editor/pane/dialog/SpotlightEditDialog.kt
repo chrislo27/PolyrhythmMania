@@ -34,14 +34,13 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.editor.pane.IndentedButton
 import polyrhythmmania.ui.ColourPicker
 import polyrhythmmania.util.RodinSpecialChars
-import polyrhythmmania.world.spotlights.Spotlights
 import kotlin.math.min
 import kotlin.math.roundToInt
 
 
 class SpotlightEditDialog(
-        editorPane: EditorPane,
-        val colorData: SpotlightsColorData,
+    editorPane: EditorPane,
+    val colorData: SpotlightsColorData,
 ) : EditorDialog(editorPane) {
     
     private enum class CopyProperties(val localizationKey: String) {
@@ -129,7 +128,8 @@ class SpotlightEditDialog(
                 }
                 this += ColumnarHBox(2, useRows = true).apply { 
                     this.spacing.set(2f)
-                    this.bindWidthToSelfHeight(multiplier = (1 + Spotlights.NUM_ON_ROW) / 2f, adjust = this.spacing.get() * Spotlights.NUM_ON_ROW)
+                    val numSpotlightsPerRow = colorData.numSpotlightsPerRow
+                    this.bindWidthToSelfHeight(multiplier = (1 + numSpotlightsPerRow) / 2f, adjust = this.spacing.get() * numSpotlightsPerRow)
 
                     this += TextLabel(Localization.getVar("editor.dialog.spotlightsAdvanced.light.spotlight"), palette.musicDialogFont).apply {
                         Anchor.TopLeft.configure(this, offsetY = -26f)

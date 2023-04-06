@@ -27,7 +27,6 @@ import java.util.*
 class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, BlockSpotlightSwitch.BLOCK_TYPES) {
 
     companion object {
-        const val ROW_COUNT: Int = Spotlights.NUM_ON_ROW
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
         val ALLOWED_ACTION_TYPES: List<SpotlightActionType> by lazy { SpotlightActionType.VALUES }
         
@@ -136,8 +135,10 @@ class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, Bloc
         }
     }
     
+    private val numSpotlightsPerRow: Int get() = engine.world.spotlights.numPerRow
+    
     val ambientLightDarken: BooleanVar = BooleanVar(true)
-    var patternData: SpotlightActionData = SpotlightActionData(ROW_COUNT, ALLOWED_ACTION_TYPES, SpotlightActionType.NO_CHANGE)
+    var patternData: SpotlightActionData = SpotlightActionData(numSpotlightsPerRow, ALLOWED_ACTION_TYPES, SpotlightActionType.NO_CHANGE)
         private set
     val timingMode: Var<SpotlightTimingMode> = Var(SpotlightTimingMode.SPAWN_PATTERN)
 
@@ -181,7 +182,7 @@ class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, Bloc
         return BlockSpotlightSwitch(engine).also {
             this.copyBaseInfoTo(it)
             it.ambientLightDarken.set(this.ambientLightDarken.get())
-            for (i in 0 until ROW_COUNT) {
+            for (i in 0 until numSpotlightsPerRow) {
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }

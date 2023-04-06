@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.gamemode.boss
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
@@ -14,6 +15,7 @@ import polyrhythmmania.storymode.gamemode.boss.pattern.BossPatternPools
 import polyrhythmmania.storymode.gamemode.boss.scripting.*
 import polyrhythmmania.storymode.music.StemCache
 import polyrhythmmania.storymode.music.StoryMusicAssets
+import polyrhythmmania.storymode.screen.StoryPlayScreen
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldType
@@ -102,6 +104,10 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
         addInitialBlocks()
     }
 
+    override fun prepareFirstTimeWithStoryPlayScreen(playScreen: StoryPlayScreen) {
+        super.prepareFirstTimeWithStoryPlayScreen(playScreen)
+    }
+
     override fun onWorldReset(world: World) {
         val list = mutableListOf<Entity>()
 
@@ -118,6 +124,10 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
         patternPools.allPools.forEach { pool ->
             pool.resetAndShuffle()
         }
+
+        val ambientLight = world.spotlights.ambientLight
+        ambientLight.color.set(Color.BLACK)
+        ambientLight.strength = 0f
     }
 
     private fun createExtraBlockEntities(): List<Entity> {
@@ -173,7 +183,7 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
     //region GameMode overrides
 
     override fun getIntroCardTimeOverride(): Float {
-        return INTRO_CARD_TIME_SEC
+        return INTRO_CARD_TIME_SEC * 0
     }
 
     override fun getSecondsToDelayAtStartOverride(): Float {
@@ -185,8 +195,11 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
     }
 
     override fun createGlobalContainerSettings(): GlobalContainerSettings {
-        return super.createGlobalContainerSettings()
-            .copy(forceTexturePack = ForceTexturePack.FORCE_GBA, reducedMotion = false)
+        return super.createGlobalContainerSettings().copy(
+            forceTexturePack = ForceTexturePack.FORCE_GBA, 
+            reducedMotion = false,
+            numberOfSpotlightsOverride = 16
+        )
     }
 
     //endregion

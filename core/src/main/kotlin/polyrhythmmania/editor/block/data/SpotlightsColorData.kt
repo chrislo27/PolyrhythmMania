@@ -23,11 +23,11 @@ class SwitchedLightColor(resetColor: Color, defaultStrength: Float) : LightColor
     }
 }
 
-class SpotlightsColorData {
+class SpotlightsColorData(val numSpotlightsPerRow: Int) {
     
     val ambientLight: SwitchedLightColor = SwitchedLightColor(Spotlights.AMBIENT_LIGHT_RESET_COLOR, 1f)
     val rows: List<List<SwitchedLightColor>> = List(2) { 
-        List(Spotlights.NUM_ON_ROW) { SwitchedLightColor(Spotlights.SPOTLIGHT_RESET_COLOR, 0f) }
+        List(numSpotlightsPerRow) { SwitchedLightColor(Spotlights.SPOTLIGHT_RESET_COLOR, 0f) }
     }
     val rowA: List<SwitchedLightColor> = rows[0]
     val rowDpad: List<SwitchedLightColor> = rows[1]

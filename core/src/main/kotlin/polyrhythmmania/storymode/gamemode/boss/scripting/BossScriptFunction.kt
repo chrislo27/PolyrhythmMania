@@ -1,6 +1,10 @@
 package polyrhythmmania.storymode.gamemode.boss.scripting
 
+import com.badlogic.gdx.graphics.Color
 import paintbox.Paintbox
+import polyrhythmmania.editor.block.BlockSpotlightSwitch
+import polyrhythmmania.editor.block.SpotlightTimingMode
+import polyrhythmmania.editor.block.data.SwitchedLightColor
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.input.EventClearInputs
 import polyrhythmmania.storymode.gamemode.boss.*
@@ -11,6 +15,10 @@ import polyrhythmmania.world.EventRowBlockDespawn
 import polyrhythmmania.world.EventRowBlockRetract
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.EntityRodDecor
+import polyrhythmmania.world.spotlights.EventSpotlightTransition
+import polyrhythmmania.world.spotlights.Spotlights
+import polyrhythmmania.world.tileset.PaletteTransition
+import polyrhythmmania.world.tileset.TransitionCurve
 import java.util.*
 
 
@@ -37,6 +45,13 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
 
         @JvmStatic
         protected val ALWAYS_FLIP_CHANCE: Float = 1f
+        
+        
+        private fun parseLightIndexSelection(selection: String): Set<Int> {
+            return selection.mapNotNull { c ->
+                if (c in '0'..'9') (c - '0') else null
+            }.toSet()
+        }
     }
 
     protected val world: World get() = engine.world
@@ -45,6 +60,8 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
     protected val patternPools: BossPatternPools get() = gamemode.patternPools
     
     private var currentPattern: Pattern? = null
+    protected val lightSelections: MutableMap<Boolean, Set<Int>> =
+        mutableMapOf(SIDE_DOWNSIDE to emptySet(), SIDE_UPSIDE to emptySet())
 
     /**
      * Gets the [currentPattern], or a blank pattern with a warning logged.
@@ -209,6 +226,63 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
         val despawnStartBeat = 0f
 
         this.add(EventRowBlockDespawn(engine, world.rowDpad, 0, despawnStartBeat, affectThisIndexAndForward = true))
+
+        return this
+    }
+
+    protected fun MutableList<Event>.targetLights(side: Boolean, selection: String): MutableList<Event> {
+        val indices = parseLightIndexSelection(selection)
+
+        lightSelections[side] = indices
+
+        return this
+    }
+
+    protected fun MutableList<Event>.targetLights(side: Boolean, indices: Set<Int>): MutableList<Event> {
+        lightSelections[side] = indices
+
+        return this
+    }
+
+    protected fun MutableList<Event>.changeLightStrength(
+        lightStrength: LightStrength,
+        duration: Float,
+        transitionCurve: TransitionCurve = TransitionCurve.SLOW_FAST
+    ): MutableList<Event> {
+        val startBeat = 0f
+        val spotlights = engine.world.spotlights
+
+        val timingMode = SpotlightTimingMode.INSTANT
+        val paletteTransition = PaletteTransition(duration, transitionCurve, pulseMode = false, reverse = false)
+
+        val ambientLight = SwitchedLightColor(
+            lightStrength.ambientLightColorOverride ?: Spotlights.AMBIENT_LIGHT_RESET_COLOR,
+            lightStrength.ambient
+        )
+        this += EventSpotlightTransition(
+            engine,
+            startBeat,
+            paletteTransition,
+            spotlights.ambientLight,
+            ambientLight.color,
+            ambientLight.strength
+        )
+
+        fun getSwitchedLightColorPairs(side: Boolean): List<Pair<Color?, Float?>> {
+            val onIndices = lightSelections.getValue(side)
+            return (0 until spotlights.numPerRow).map { i ->
+                Pair(Spotlights.SPOTLIGHT_RESET_COLOR, if (i in onIndices) lightStrength.selected else 0f)
+            }
+        }
+
+        this.addAll(
+            BlockSpotlightSwitch.createSpotlightEvents(
+                engine, spotlights,
+                getSwitchedLightColorPairs(SIDE_DOWNSIDE),
+                getSwitchedLightColorPairs(SIDE_UPSIDE),
+                startBeat, timingMode, paletteTransition
+            )
+        )
 
         return this
     }

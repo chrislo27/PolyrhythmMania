@@ -28,7 +28,7 @@ class BlockSpotlightAdvanced(engine: Engine) : AbstractBlockSpotlight(engine, Bl
 
     val timingMode: Var<SpotlightTimingMode> = Var(SpotlightTimingMode.SPAWN_PATTERN)
     val transitionData: PaletteTransitionData = PaletteTransitionData(PaletteTransition.INSTANT)
-    val colorData: SpotlightsColorData = SpotlightsColorData()
+    val colorData: SpotlightsColorData = SpotlightsColorData(engine.world.spotlights.numPerRow)
 
     init {
         this.width = 1f

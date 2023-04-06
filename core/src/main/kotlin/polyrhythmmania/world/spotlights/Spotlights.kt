@@ -71,10 +71,9 @@ class Spotlight(val spotlightsParent: Spotlights) {
     }
 }
 
-class Spotlights(val world: World) {
+class Spotlights(val world: World, val numPerRow: Int) {
     
     companion object {
-        const val NUM_ON_ROW: Int = 10
         val AMBIENT_LIGHT_RESET_COLOR: Color = Color(0f, 0f, 0f, 240 / 255f)
         val SPOTLIGHT_RESET_COLOR: Color = Color(1f, 1f, 1f, 1f)
     }
@@ -87,7 +86,7 @@ class Spotlights(val world: World) {
 
     init {
         fun buildRow(z: Float): List<Spotlight> {
-            return (0 until NUM_ON_ROW).map { i ->
+            return (0 until numPerRow).map { i ->
                 Spotlight(this).apply {
                     this.position.set(5f + 0.5f + i, 2f, z + 0.5f)
                 }

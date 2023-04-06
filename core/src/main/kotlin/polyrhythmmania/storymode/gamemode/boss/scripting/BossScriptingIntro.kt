@@ -47,7 +47,38 @@ class BossScriptIntro(
     run boss1_main;
          */
 
-        return mutableListOf<Event>()
+        val events = mutableListOf<Event>()
+        
+        events
+            .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 4.0f)
+            .rest(4.0f)
+
+        
+        fun doLightsAnimation(side: Boolean) {
+            events
+                .targetLights(side, setOf(0))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
+                .rest(2.0f)
+                .targetLights(side, setOf(0, 3))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
+                .rest(0.5f)
+                .targetLights(side, setOf(0, 3, 6))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
+                .rest(0.5f)
+                .targetLights(side, setOf(0, 3, 6, 9))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
+                .rest(0.5f)
+                .targetLights(side, setOf(0, 3, 6, 9, 11))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
+                .rest(4.0f)
+        }
+        doLightsAnimation(SIDE_UPSIDE)
+        doLightsAnimation(SIDE_DOWNSIDE)
+
+        events
+            .changeLightStrength(LightStrength.NORMAL, 1.0f)
+        
+        events
             .music(StoryMusicAssets.STEM_ID_BOSS_1_INTRO, 6, extraBeatDuration = EXTRA_BEATS_SPACING)
             .moveCamera()
             .note("boss_title_appear") // Handled by title card separately
@@ -69,5 +100,7 @@ class BossScriptIntro(
             .rest(4.0f)
 
             .addFunctionAsEvent(phase1Factory?.invoke(this) ?: BossScriptPhase1(gamemode, script))
+        
+        return events
     }
 }

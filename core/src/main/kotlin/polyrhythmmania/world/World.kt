@@ -13,10 +13,11 @@ import polyrhythmmania.world.tileset.TilesetPalette
 import java.util.concurrent.CopyOnWriteArrayList
 
 
-class World {
+class World(numOfSpotlights: Int?) {
     
     companion object {
         const val DEFAULT_ROW_LENGTH: Int = 16
+        private const val DEFAULT_NUM_SPOTLIGHTS_PER_ROW: Int = 10
     }
     
     fun interface WorldResetListener {
@@ -27,7 +28,7 @@ class World {
     var worldMode: WorldMode = WorldMode(WorldType.Polyrhythm())
     
     val entities: List<Entity> = CopyOnWriteArrayList()
-    val spotlights: Spotlights = Spotlights(this)
+    val spotlights: Spotlights = Spotlights(this, numOfSpotlights ?: DEFAULT_NUM_SPOTLIGHTS_PER_ROW)
 
     // Settings
     var showInputFeedback: Boolean = PRManiaGame.instance.settings.showInputFeedbackBar.getOrCompute()
@@ -50,6 +51,7 @@ class World {
         private set
     val asmPlayerPiston: EntityPistonAsm get() = asmPistons[2]
     
+    constructor() : this(DEFAULT_NUM_SPOTLIGHTS_PER_ROW)
     
     init {
         resetWorld()
