@@ -66,6 +66,23 @@ sealed class InboxItem(
         
         override fun isCompletedWhenRead(): Boolean = false
     }
+
+    class RobotTest(
+        itemID: String,
+        override val name: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$itemID.name")
+    ) : InboxItem(itemID, name), IContractDoc {
+
+        override val subtype: ContractSubtype = ContractSubtype.ROBOT_TEST
+        override val requester: Requester = Requester.POLYBUILD_ROBOT_TEST
+        override val hasLongCompanyName: Boolean = true
+
+        override val desc: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$itemID.desc")
+        override val tagline: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$itemID.tagline")
+        
+        val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
+
+        override fun isCompletedWhenRead(): Boolean = true // There is no contract to play
+    }
     
     class PlaceholderContract(
             itemID: String, placeholderNumber: Int,

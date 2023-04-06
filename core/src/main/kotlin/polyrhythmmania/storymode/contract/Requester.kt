@@ -12,6 +12,7 @@ class Requester(val id: String, val isNameLong: Boolean = false) {
         val POLYRHYTHM_INC: Requester = Requester("polyrhythm_inc", false)
         val BUILDROID: Requester = Requester("buildroid", false)
         val POLYBUILD: Requester = Requester("polybuild", false)
+        val POLYBUILD_ROBOT_TEST: Requester = Requester("polybuild_robot_test", false)
         
         val ALIENS: Requester = Requester("aliens", true)
         val ANIMAL_ACROBATICS: Requester = Requester("animal_acrobatics", false)
@@ -26,6 +27,7 @@ class Requester(val id: String, val isNameLong: Boolean = false) {
         val PEAS: Requester = Requester("peas", false)
         val SHIPSTEERING: Requester = Requester("shipsteering", true)
         val STOMP_CHOMP_AGRI: Requester = Requester("stomp_chomp_agri", true)
+        val TIM: Requester = Requester("tim", false)
         val TOSS_BOYS: Requester = Requester("toss_boys", false)
     }
     

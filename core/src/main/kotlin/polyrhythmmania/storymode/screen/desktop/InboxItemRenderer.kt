@@ -194,17 +194,19 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
 
                 paper.root
             }
-            is InboxItem.ContractDoc, is InboxItem.PlaceholderContract -> {
+            is InboxItem.ContractDoc, is InboxItem.RobotTest, is InboxItem.PlaceholderContract -> {
                 item as IContractDoc
                 val subtype: IContractDoc.ContractSubtype = item.subtype
                 val paper = createPaperTemplate(when (subtype) {
                     IContractDoc.ContractSubtype.NORMAL -> "desk_contract_full"
                     IContractDoc.ContractSubtype.TRAINING -> "desk_contract_paper"
+                    IContractDoc.ContractSubtype.ROBOT_TEST -> "desk_contract_paper"
                 })
 
                 val headingText: ReadOnlyVar<String> = when (item) {
                     is InboxItem.ContractDoc -> item.headingText
                     is InboxItem.PlaceholderContract -> item.headingText
+                    is InboxItem.RobotTest -> item.headingText
                     else -> "<missing heading text>".toConstVar()
                 }
 
@@ -282,6 +284,9 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                 Requester.GAME_DEV -> {
                                     this.renderAlign.set(Align.center)
                                     this.textAlign.set(TextAlign.CENTRE)
+                                }
+                                Requester.POLYBUILD_ROBOT_TEST -> {
+                                    this.markup.set(robotoMonoMarkup)
                                 }
                             }
                         }

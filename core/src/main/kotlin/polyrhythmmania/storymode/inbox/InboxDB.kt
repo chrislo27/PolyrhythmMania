@@ -1,7 +1,6 @@
 package polyrhythmmania.storymode.inbox
 
 import polyrhythmmania.storymode.contract.Contracts
-import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.inbox.progression.UnlockStage
 import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
@@ -26,7 +25,7 @@ open class InboxDB : InboxItems() {
         val instructions = mutableListOf<Instruction>()
 
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_memo1", hasToField = false, hasSeparateListingName = false)))
-        instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.ContractDoc(Contracts[Contracts.ID_TUTORIAL1], subtype = ContractSubtype.TRAINING)))
+        instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.ContractDoc(Contracts[Contracts.ID_TUTORIAL1], subtype = IContractDoc.ContractSubtype.TRAINING)))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_memo2", hasToField = false, hasSeparateListingName = false)))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.InfoMaterial("info_on_contracts", hasSeparateListingName = true)))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.ContractDoc(Contracts["fillbots"])))
@@ -85,11 +84,24 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["second_contact"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["hole_in_one_2"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["super_samurai_slice_2"])))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_tim_external", hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["working_dough_2"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["monkey_watch"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["screwbots2"])))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_tim_external", hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
+        
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.RobotTest("robotTestResults_1")), dependsOnStageID = "screwbots2")
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.RobotTest("robotTestResults_2")), dependsOnStageID = "screwbots2")
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.RobotTest("robotTestResults_3")), dependsOnStageID = "screwbots2")
+
+        instructions += NewUnlockStage(UnlockStage("unlock_confidential_docs_memo", { progression, inboxState ->
+            val testResults2StageID = "robotTestResults_2"
+            UnlockStageChecker.stageToBeCompleted(testResults2StageID).testShouldStageBecomeUnlocked(progression, inboxState)
+        }, listOf("robotTestResults_1", "robotTestResults_2", "robotTestResults_3"), minRequiredToComplete = 2))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mmgt_confidential_docs", hasToField = false, hasSeparateListingName = false)), dependsOnStageID = "unlock_confidential_docs_memo")
+        
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_tim_boss_warning", hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["boss"])))
         
         // Postgame
         // TODO replace the ID for this item with a string literal
