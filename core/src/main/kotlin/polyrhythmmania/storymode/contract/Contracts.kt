@@ -27,7 +27,7 @@ object Contracts {
         add(Contract(ID_TUTORIAL1, Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0, noListingName = true, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             Tutorial1GameMode(main)
         })
-        add(Contract("boss", Requester.TIM, JingleType.NONE, null /* TODO add attribution */, 0, gamemodeFactory = StoryBossGameMode.getFactory()))
+        add(Contract("boss", Requester.TIM, JingleType.NONE, null /* TODO add attribution */, 0, skipAfterNFailures = NOT_ALLOWED_TO_SKIP, gamemodeFactory = StoryBossGameMode.getFactory()))
 
         add(Contract("air_rally", Requester.SHIPSTEERING, JingleType.GBA, Attribution(SongInfo.megamix("Air Rally"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj"))
