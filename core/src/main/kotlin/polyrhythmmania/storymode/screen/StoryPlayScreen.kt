@@ -52,6 +52,7 @@ import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
+import polyrhythmmania.storymode.gamemode.boss.BossModifierModule
 import polyrhythmmania.ui.TextSlideInterp
 import polyrhythmmania.util.FrameBufferManager
 import polyrhythmmania.util.FrameBufferMgrSettings
@@ -336,8 +337,16 @@ class StoryPlayScreen(
                     this.align.set(HBox.Align.CENTRE)
                     
                     this.temporarilyDisableLayouts { 
-                        val progress: ReadOnlyIntVar = IntVar(eager = true) { 
-                            (engineBeat.use() / container.stopPosition.use().coerceAtLeast(1f) * 100).roundToInt().coerceIn(0, 99)
+                        val bossModifierModule = engine.modifiers.getModifierModuleByType<BossModifierModule>()
+                        val progress: ReadOnlyIntVar = if (bossModifierModule != null) {
+                            val bossHealth = bossModifierModule.bossHealth
+                            IntVar(eager = true) {
+                                ((1f - (bossHealth.currentHP.use() / bossHealth.maxHP.use().coerceAtLeast(1).toFloat())) * 100)
+                                    .roundToInt().coerceIn(0, 99)
+                            }
+                        } else IntVar(eager = true) {
+                            (engineBeat.use() / container.stopPosition.use().coerceAtLeast(1f) * 100).roundToInt()
+                                .coerceIn(0, 99)
                         }
                         this += TextLabel(StoryL10N.getVar("play.scoreCard.progress"), font = main.fontMainMenuMain).apply {
                             this.bindWidthToParent(multiplier = 0.275f)
