@@ -102,7 +102,7 @@ open class InboxDB : InboxItems() {
         
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_tim_boss_warning", hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts[CONTRACT_ID_BOSS])))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts[CONTRACT_ID_BOSS], subtype = IContractDoc.ContractSubtype.BOSS)))
         
         // Postgame
         // TODO replace the ID for this item with a string literal

@@ -199,6 +199,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                 val subtype: IContractDoc.ContractSubtype = item.subtype
                 val paper = createPaperTemplate(when (subtype) {
                     IContractDoc.ContractSubtype.NORMAL -> "desk_contract_full"
+                    IContractDoc.ContractSubtype.BOSS -> "desk_contract_full"
                     IContractDoc.ContractSubtype.TRAINING -> "desk_contract_paper"
                     IContractDoc.ContractSubtype.ROBOT_TEST -> "desk_contract_paper"
                 })
