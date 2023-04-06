@@ -516,14 +516,23 @@ class DesktopUI(
             contentPane += ImageNode().apply { 
                 this.textureRegion.sideEffecting(TextureRegion()) {reg ->
                     val state = myInboxItemState.use()
-                    if (state.completion == InboxItemCompletion.AVAILABLE && state.newIndicator) {
+                    if (inboxItem.id == InboxItem.ContractDoc.getDefaultContractDocID(InboxDB.CONTRACT_ID_BOSS)) {
+                        reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_${
+                            when (state.completion) {
+                                InboxItemCompletion.AVAILABLE -> "boss_available"
+                                InboxItemCompletion.COMPLETED -> "boss_cleared"
+                                InboxItemCompletion.UNAVAILABLE -> "unavailable"
+                                InboxItemCompletion.SKIPPED -> "skipped"
+                            }
+                        }"))
+                    } else if (state.completion == InboxItemCompletion.AVAILABLE && state.newIndicator) {
                         reg!!.setRegion(availableBlinkTexRegs[blinkFrameIndex.use()])
                     } else {
                         reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_${
                             when (state.completion) {
-                                InboxItemCompletion.UNAVAILABLE -> "unavailable"
                                 InboxItemCompletion.AVAILABLE -> "available"
                                 InboxItemCompletion.COMPLETED -> "cleared"
+                                InboxItemCompletion.UNAVAILABLE -> "unavailable"
                                 InboxItemCompletion.SKIPPED -> "skipped"
                             }
                         }"))

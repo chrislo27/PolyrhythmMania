@@ -10,6 +10,7 @@ open class InboxDB : InboxItems() {
     
     companion object {
         const val ITEM_TO_TRIGGER_MAIN_MUSIC_MIX: String = "intern_employment_contract"
+        const val CONTRACT_ID_BOSS: String = "boss"
         const val FIRST_POSTGAME_ITEM: String = "welcome_back_postgame"
     }
     
@@ -101,7 +102,7 @@ open class InboxDB : InboxItems() {
         
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_tim_boss_warning", hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["boss"])))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts[CONTRACT_ID_BOSS])))
         
         // Postgame
         // TODO replace the ID for this item with a string literal

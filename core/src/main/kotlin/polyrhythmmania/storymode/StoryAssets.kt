@@ -94,6 +94,8 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_inboxitem_cleared", "story/textures/desk/inboxitem/cleared.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_skipped", "story/textures/desk/inboxitem/skipped.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_off", "story/textures/desk/inboxitem/led_off.png")
+        StoryAssets.loadAsset<Texture>("desk_inboxitem_boss_available", "story/textures/desk/inboxitem/boss/available.png")
+        StoryAssets.loadAsset<Texture>("desk_inboxitem_boss_cleared", "story/textures/desk/inboxitem/boss/cleared.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_employment_signed_blue", "story/textures/desk/inboxitem/employment_contract/signed_blue.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_employment_signed_green", "story/textures/desk/inboxitem/employment_contract/signed_green.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_employment_signed_red", "story/textures/desk/inboxitem/employment_contract/signed_red.png")
