@@ -115,6 +115,7 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
         val bossPosition = Vector3(5 + 11f, 1f + (14 / 32f), -3f)
         list += EntityBossRobotUpside(world, this, bossPosition)
         list += EntityBossRobotMiddle(world, this, bossPosition)
+        list += EntityBossRobotFace(world, this, bossPosition)
         list += EntityBossRobotDownside(world, this, bossPosition)
 
         list.forEach(world::addEntity)

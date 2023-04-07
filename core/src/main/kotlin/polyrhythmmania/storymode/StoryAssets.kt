@@ -122,6 +122,9 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("boss_robot_upside", "story/textures/world/boss/robot_upside.png")
         StoryAssets.loadAsset<Texture>("boss_robot_downside", "story/textures/world/boss/robot_downside.png")
         StoryAssets.loadAsset<Texture>("boss_robot_middle", "story/textures/world/boss/robot_middle.png")
+        StoryAssets.loadAsset<Texture>("boss_robot_middle_exploded", "story/textures/world/boss/robot_middle_exploded.png")
+        StoryAssets.loadAsset<Texture>("boss_robot_face_neutral", "story/textures/world/boss/robot_face_neutral.png")
+        StoryAssets.loadAsset<Texture>("boss_robot_face_bsod", "story/textures/world/boss/robot_face_bsod.png")
         StoryAssets.loadAssetNoFile<PackedSheet>("boss_explosion", PackedSheetLoader.PackedSheetLoaderParam((0..16).map { i ->
             Packable("explosion_$i", "story/textures/world/boss/explosion/explosion_$i.png")
         }, PackedSheet.Config(padding = 0, maxSize = 512, duplicateBorder = false)))
