@@ -23,7 +23,6 @@ object StoryMusicAssets : Closeable {
     val STEM_ID_BOSS_1_E1: StemID = StemID("boss1_e1")
     val STEM_ID_BOSS_1_E2: StemID = StemID("boss1_e2")
     val STEM_ID_BOSS_1_F: StemID = StemID("boss1_f", variants = 3)
-    val STEM_ID_BOSS_2: StemID = StemID("boss2")
     
 
     val titleStems: StemCache = StemCache(mapOf(
@@ -46,7 +45,6 @@ object StoryMusicAssets : Closeable {
             STEM_ID_BOSS_1_E1 to "story/music/boss/boss1_e1",
             STEM_ID_BOSS_1_E2 to "story/music/boss/boss1_e2",
             STEM_ID_BOSS_1_F to "story/music/boss/boss1_f",
-            STEM_ID_BOSS_2 to "story/music/boss/boss2",
         )
         val stemIDsWithVariantsToPath: List<Pair<String, String>> = stemIDsToPathBase.flatMap { (stemID, pathBase) ->
             if (stemID.hasNoVariants) {
