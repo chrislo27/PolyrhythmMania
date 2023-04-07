@@ -99,7 +99,7 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
         engine.postRunnable(checkForRodsThatCollidedWithBossRunnable)
     }
     
-    private fun shouldShowLightsIntro(): Boolean = !alreadySawLightsIntro
+    private fun shouldShowLightsIntro(): Boolean = debugPhase == DebugPhase.NONE && !alreadySawLightsIntro
 
     override fun initialize() {
         engine.tempos.addTempoChange(TempoChange(0f, BPM))
