@@ -10,6 +10,10 @@ class EntityRodPRStoryBoss(
     val lastPistonIndex: Int,
     val playerDamageTaken: PlayerDamageTaken, val bossDamageMultiplier: Int,
 ) : EntityRodPR(world, deployBeat, row, isDefective = true) {
+    
+    companion object {
+        private const val INDEX_OF_BOSS: Int = 11
+    }
 
     class PlayerDamageTaken {
 
@@ -37,15 +41,24 @@ class EntityRodPRStoryBoss(
             val rowBlocks = row.rowBlocks
             val rowBlock = rowBlocks[startIndex]
             if (rowBlock.type.isPiston && startIndex == lastPistonIndex) {
-                didLastBounce = true
-
-                // Note that peakHeight is computed via: row.startY + 1f + (endIndex - startIndex) + manualOffset
-                bounce(startIndex, 11, MathUtils.random(-0.5f, 0.5f))
+                bounceToBoss(startIndex)
                 return
             }
 
             val lookahead = getLookaheadIndex(startIndex)
-            bounce(startIndex, lookahead)
+            if (lastPistonIndex == -1 && lookahead > INDEX_OF_BOSS) {
+                // Happens in cases where the patterns are disjoint, so information is lost about the other side.
+                // We assume if the lookahead is ahead of the boss that it should hit the boss in this case
+                bounceToBoss(startIndex)
+            } else {
+                bounce(startIndex, lookahead)
+            }
         }
+    }
+    
+    private fun bounceToBoss(startIndex: Int) {
+        didLastBounce = true
+        // Note that peakHeight is computed via: row.startY + 1f + (endIndex - startIndex) + manualOffset
+        bounce(startIndex, INDEX_OF_BOSS, MathUtils.random(-0.5f, 0.5f))
     }
 }
