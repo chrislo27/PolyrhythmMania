@@ -119,6 +119,11 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("dunk_background_hole_in_one_1", "story/textures/world/dunk/hole_in_one_1.jpg", linearTexture())
         StoryAssets.loadAsset<Texture>("dunk_background_hole_in_one_2", "story/textures/world/dunk/hole_in_one_2.jpg", linearTexture())
         
+        StoryAssets.loadAsset<Texture>("cutscene_postboss_1", "story/textures/cutscene/postboss/1.png")
+        StoryAssets.loadAsset<Texture>("cutscene_postboss_2", "story/textures/cutscene/postboss/2.png")
+        StoryAssets.loadAsset<Texture>("cutscene_postboss_3", "story/textures/cutscene/postboss/3.png")
+        StoryAssets.loadAsset<Texture>("cutscene_postboss_4", "story/textures/cutscene/postboss/4.png")
+        
         StoryAssets.loadAsset<Texture>("boss_robot_upside", "story/textures/world/boss/robot_upside.png")
         StoryAssets.loadAsset<Texture>("boss_robot_downside", "story/textures/world/boss/robot_downside.png")
         StoryAssets.loadAsset<Texture>("boss_robot_middle", "story/textures/world/boss/robot_middle.png")
@@ -140,6 +145,8 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Sound>("score_jingle_tryagain", "story/sounds/results/jingle_tryagain.ogg")
         StoryAssets.loadAsset<Sound>("score_jingle_pass", "story/sounds/results/jingle_ok2.ogg")
         StoryAssets.loadAsset<Sound>("score_jingle_pass_hard", "story/sounds/results/jingle_superb.ogg")
+        StoryAssets.loadAsset<Sound>("sfx_cutscene_postboss_knocking", "story/sounds/cutscene/postboss/knocking.ogg")
+        StoryAssets.loadAsset<Sound>("sfx_cutscene_postboss_page_open", "story/sounds/cutscene/postboss/page_open.ogg")
         StoryAssets.loadAsset<BeadsSound>("sfx_boss_explosion", "story/sounds/boss/explosion.ogg")
         StoryAssets.loadAsset<BeadsSound>("sfx_boss_spotlight", "story/sounds/boss/spotlight.ogg")
         StoryAssets.loadAsset<BeadsSound>("sfx_boss_spotlight_short", "story/sounds/boss/spotlight_short.ogg")
