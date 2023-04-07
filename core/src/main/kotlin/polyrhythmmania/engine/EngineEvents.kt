@@ -1,5 +1,6 @@
 package polyrhythmmania.engine
 
+import com.badlogic.gdx.audio.Sound
 import paintbox.registry.AssetRegistry
 import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.engine.input.InputScore
@@ -58,6 +59,22 @@ open class EventPlaySFX(
         } else {
             engine.soundInterface.playAudioNoOverlap(beadsSound, SoundInterface.SFXType.NORMAL, callback)
         }
+    }
+}
+
+open class EventPlayMenuSFX(
+    engine: Engine, startBeat: Float,
+    val volume: Float = 1f, val pitch: Float = 1f, val pan: Float = 0f,
+    val soundGetter: () -> Sound,
+) : AudioEvent(engine) {
+
+    init {
+        this.beat = startBeat
+    }
+
+    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+        val sound = soundGetter()
+        engine.soundInterface.playMenuSfx(sound, volume, pitch, pan)
     }
 }
 

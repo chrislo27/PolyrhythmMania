@@ -1,12 +1,15 @@
 package polyrhythmmania.storymode.gamemode.boss.scripting
 
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import paintbox.Paintbox
 import polyrhythmmania.editor.block.BlockSpotlightSwitch
 import polyrhythmmania.editor.block.SpotlightTimingMode
 import polyrhythmmania.editor.block.data.SwitchedLightColor
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.EventPlayMenuSFX
 import polyrhythmmania.engine.EventPlaySFX
+import polyrhythmmania.engine.TextBox
 import polyrhythmmania.engine.input.EventClearInputs
 import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.storymode.gamemode.boss.*
@@ -15,6 +18,7 @@ import polyrhythmmania.storymode.gamemode.boss.pattern.Pattern
 import polyrhythmmania.storymode.music.StemID
 import polyrhythmmania.world.EventRowBlockDespawn
 import polyrhythmmania.world.EventRowBlockRetract
+import polyrhythmmania.world.EventTextbox
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.EntityRodDecor
 import polyrhythmmania.world.spotlights.EventSpotlightTransition
@@ -232,6 +236,12 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
         return this
     }
 
+    protected fun MutableList<Event>.textBox(textbox: TextBox, duration: Float): MutableList<Event> {
+        this.add(EventTextbox(engine, 0f, duration, textbox))
+
+        return this
+    }
+
     protected fun MutableList<Event>.targetLights(side: Boolean, selection: String): MutableList<Event> {
         val indices = parseLightIndexSelection(selection)
 
@@ -291,6 +301,12 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
 
     protected fun MutableList<Event>.playSfx(sound: BeadsSound): MutableList<Event> {
         this += EventPlaySFX(engine, 0f, { sound })
+
+        return this
+    }
+
+    protected fun MutableList<Event>.playMenuSfx(sound: Sound): MutableList<Event> {
+        this += EventPlayMenuSFX(engine, 0f) { sound }
 
         return this
     }
