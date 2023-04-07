@@ -48,31 +48,35 @@ class BossScriptIntro(
             .rest(2.0f)
 
 
-        fun doLightsAnimation(side: Boolean) {
+        fun doLightsAnimation() {
             events
-                .targetLights(side, setOf(0))
+                .targetLights(SIDE_UPSIDE, setOf(0))
+                .targetLights(SIDE_DOWNSIDE, setOf(0))
                 .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 1.0f, transitionCurve = TransitionCurve.BOUNCE_OUT)
                 .playSpotlightSfx()
                 .rest(2.0f)
-                .targetLights(side, setOf(0, 3))
+                .targetLights(SIDE_UPSIDE, setOf(0, 3))
+                .targetLights(SIDE_DOWNSIDE, setOf(0, 3))
                 .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
                 .playSpotlightSfxShort()
                 .rest(0.5f)
-                .targetLights(side, setOf(0, 3, 6))
+                .targetLights(SIDE_UPSIDE, setOf(0, 3, 6))
+                .targetLights(SIDE_DOWNSIDE, setOf(0, 3, 6))
                 .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
                 .playSpotlightSfxShort()
                 .rest(0.5f)
-                .targetLights(side, setOf(0, 3, 6, 9))
+                .targetLights(SIDE_UPSIDE, setOf(0, 3, 6, 9))
+                .targetLights(SIDE_DOWNSIDE, setOf(0, 3, 6, 9))
                 .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
                 .playSpotlightSfxShort()
                 .rest(0.5f)
-                .targetLights(side, setOf(0, 3, 6, 9, 11))
+                .targetLights(SIDE_UPSIDE, setOf(0, 3, 6, 9, 11))
+                .targetLights(SIDE_DOWNSIDE, setOf(0, 3, 6, 9, 11))
                 .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
                 .playSpotlightSfxShort()
                 .rest(3.0f)
         }
-        doLightsAnimation(SIDE_UPSIDE)
-        doLightsAnimation(SIDE_DOWNSIDE)
+        doLightsAnimation()
     }
     
     override fun getEvents(): List<Event> {
