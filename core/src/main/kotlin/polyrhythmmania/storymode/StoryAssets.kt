@@ -5,6 +5,9 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
+import paintbox.packing.Packable
+import paintbox.packing.PackedSheet
+import paintbox.packing.PackedSheetLoader
 import paintbox.registry.AssetRegistryInstance
 import paintbox.registry.IAssetLoader
 import paintbox.util.gdxutils.disposeQuietly
@@ -111,6 +114,9 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("boss_robot_upside", "story/textures/world/boss/robot_upside.png")
         StoryAssets.loadAsset<Texture>("boss_robot_downside", "story/textures/world/boss/robot_downside.png")
         StoryAssets.loadAsset<Texture>("boss_robot_middle", "story/textures/world/boss/robot_middle.png")
+        StoryAssets.loadAssetNoFile<PackedSheet>("boss_explosion", PackedSheetLoader.PackedSheetLoaderParam((0..16).map { i ->
+            Packable("explosion_$i", "story/textures/world/boss/explosion/explosion_$i.png")
+        }, PackedSheet.Config(padding = 0, maxSize = 512, duplicateBorder = false)))
         
         StoryAssets.loadAsset<Sound>("jingle_gba", "story/sounds/intro/jingle_gba.ogg")
         StoryAssets.loadAsset<Sound>("jingle_arcade", "story/sounds/intro/jingle_arcade.ogg")
@@ -123,6 +129,7 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Sound>("score_jingle_tryagain", "story/sounds/results/jingle_tryagain.ogg")
         StoryAssets.loadAsset<Sound>("score_jingle_pass", "story/sounds/results/jingle_ok2.ogg")
         StoryAssets.loadAsset<Sound>("score_jingle_pass_hard", "story/sounds/results/jingle_superb.ogg")
+        StoryAssets.loadAsset<Sound>("sfx_boss_explosion", "story/sounds/boss/explosion.ogg")
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {
