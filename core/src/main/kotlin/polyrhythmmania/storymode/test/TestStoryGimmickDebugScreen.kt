@@ -15,6 +15,7 @@ import paintbox.transition.FadeToOpaque
 import paintbox.transition.FadeToTransparent
 import paintbox.transition.TransitionScreen
 import paintbox.ui.SceneRoot
+import paintbox.ui.Tooltip
 import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
@@ -351,12 +352,21 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                         this.setOnAction {
                             enterGimmickGameMode(TestStoryNoOpEndlessUIGameMode(main))
                         }
+                        this.tooltipElement.set(Tooltip("C - increment score\nShift+C - reset score to 0\nL - decrement lives\nShift+L - increment lives\nHold Ctrl w/ (Shift+)L - change max lives"))
                     }
                     this += Button("Lives UI debug").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             enterGimmickGameMode(TestStoryNoOpLivesUIGameMode(main))
                         }
+                        this.tooltipElement.set(Tooltip("L - increment max lives\nShift+L - decrement max lives\nF - lose a life\nShift+F - gain a life"))
+                    }
+                    this += Button("Boss UI debug").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            enterGimmickGameMode(TestStoryNoOpBossUIGameMode(main))
+                        }
+                        this.tooltipElement.set(Tooltip("B - boss takes 2 damage\nShift+B - boss takes 1 damage\nP - player takes damage\nR - Reset damages"))
                     }
                 }
             }

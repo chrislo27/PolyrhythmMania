@@ -93,7 +93,7 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
         world.showInputFeedback = true
         world.worldResetListeners += this as World.WorldResetListener
 
-        modifierModule = BossModifierModule(engine.modifiers, this)
+        modifierModule = BossModifierModule(engine.modifiers)
         engine.modifiers.addModifierModule(modifierModule)
 
         engine.postRunnable(checkForRodsThatCollidedWithBossRunnable)

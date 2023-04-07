@@ -14,7 +14,7 @@ import polyrhythmmania.engine.modifiers.ModifierModule
 import polyrhythmmania.world.EntityRodPR
 
 
-class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMode) : ModifierModule(parent) {
+class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
 
     companion object {
 
@@ -133,7 +133,7 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
 
     fun checkForRodsThatCollidedWithBoss() {
         val blocksAheadOfStart = BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE
-        val rods = gamemode.world.entities.filterAndIsInstance<EntityRodPRStoryBoss> { rod ->
+        val rods = engine.world.entities.filterAndIsInstance<EntityRodPRStoryBoss> { rod ->
             !rod.exploded && !rod.registeredMiss && rod.position.x > (rod.row.startX + blocksAheadOfStart) && rod.didLastBounce
         }
         rods.forEach { rod ->
