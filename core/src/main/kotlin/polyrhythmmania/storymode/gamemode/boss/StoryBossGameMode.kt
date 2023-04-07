@@ -123,13 +123,13 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
             pool.resetAndShuffle()
         }
 
-        setAmbientLightToBlack()
+        setAmbientLightToBlack(fullDarkness = shouldShowLightsIntro())
     }
     
-    private fun setAmbientLightToBlack() {
+    private fun setAmbientLightToBlack(fullDarkness: Boolean) {
         val ambientLight = world.spotlights.ambientLight
         ambientLight.color.set(Color.BLACK)
-        ambientLight.strength = 0f
+        ambientLight.strength = if (fullDarkness) 0f else (20 / 255f)
     }
 
     private fun createExtraBlockEntities(): List<Entity> {
