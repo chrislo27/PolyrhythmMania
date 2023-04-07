@@ -27,6 +27,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
+import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.ColorStack
@@ -1374,32 +1375,84 @@ duration: ${monster.activeDuration.get()} sec
                 this.spacing.set(24f)
             }
             superpane += vbox
+            
+            val bossHealthHbox = HBox().apply {
+                val percentage = currentBossHealthPercentage
+                val drainPercentage = currentBossHealthDrainPercentage
+                val emptyColor = Color.valueOf("002B00")
+                val drainingColor = Color.WHITE
+                val fullColor = Color.valueOf("90ED52")
+                
+                this.bounds.width.set(600f)
 
-            fun createHealthHbox(percentage: ReadOnlyFloatVar, drainPercentage: ReadOnlyFloatVar): HBox {
-                return HBox().apply {
-                    this.bounds.width.set(600f)
+                this += ImageIcon(AssetRegistry.get<PackedSheet>("tileset_ui_boss")["boss"]).apply {
+                    this.bindWidthToSelfHeight()
+                    this.margin.set(Insets(0f, 0f, 0f, 8f))
+                }
+                
+                this += Pane().apply {
+                    this.margin.set(Insets(6f, 0f))
+                    this.bindWidthToParent(adjustBinding = { -bounds.height.use() })
+                    
                     this += Pane().apply {
-                        this.margin.set(Insets(12f, 0f))
+                        this.border.set(Insets(3f))
+                        this.borderStyle.set(SolidBorder(Color.WHITE))
 
-                        this += RectElement(Color.RED)
-                        this += RectElement(Color.WHITE).apply {
-                            this.bindWidthToParent(multiplierBinding = { drainPercentage.use() }, adjustBinding = { 0f })
-                        }
-                        this += RectElement(Color.GREEN).apply {
-                            this.bindWidthToParent(multiplierBinding = { percentage.use() }, adjustBinding = { 0f })
+                        this += RectElement(emptyColor).apply {
+                            this.padding.set(Insets(4f))
+
+                            this += RectElement(emptyColor)
+                            this += RectElement(drainingColor).apply {
+                                this.bindWidthToParent(multiplierBinding = { drainPercentage.use() }, adjustBinding = { 0f })
+                            }
+                            this += RectElement(fullColor).apply {
+                                this.bindWidthToParent(multiplierBinding = { percentage.use() }, adjustBinding = { 0f })
+                            }
+
+                            this += ColumnarPane(50, false).apply {
+                                this.spacing.set(2f)
+                                this.setAllSpacers {
+                                    RectElement(emptyColor)
+                                }
+                            }
                         }
                     }
                 }
             }
-            
-            val bossHealthHbox = createHealthHbox(currentBossHealthPercentage, currentBossHealthDrainPercentage).apply {
-                this.bounds.width.set(600f)
-            }
             vbox += ArrowRectBox(bossHealthHbox, black).apply {
                 this.bounds.height.set(44f)
             }
-            val playerHealthHbox = createHealthHbox(currentPlayerHealthPercentage, currentPlayerHealthDrainPercentage).apply {
+            
+            val playerHealthHbox = HBox().apply {
+                val percentage = currentPlayerHealthPercentage
+                val drainPercentage = currentPlayerHealthDrainPercentage
+                val emptyColor = Color.RED
+                val drainingColor = Color.WHITE
+                val fullColor = Color.GREEN
+
                 this.bounds.width.set(300f)
+
+                this += ImageIcon(AssetRegistry.get<PackedSheet>("tileset_ui_boss")["player"]).apply {
+                    this.bindWidthToSelfHeight()
+                    this.margin.set(Insets(0f, 0f, 0f, 8f))
+                }
+
+                this += Pane().apply {
+                    this.margin.set(Insets(12f, 0f))
+                    this.bindWidthToParent(adjustBinding = { -bounds.height.use() })
+
+                    this += Pane().apply {
+                        this += RectElement(emptyColor).apply {
+                            this += RectElement(emptyColor)
+                            this += RectElement(drainingColor).apply {
+                                this.bindWidthToParent(multiplierBinding = { drainPercentage.use() }, adjustBinding = { 0f })
+                            }
+                            this += RectElement(fullColor).apply {
+                                this.bindWidthToParent(multiplierBinding = { percentage.use() }, adjustBinding = { 0f })
+                            }
+                        }
+                    }
+                }
             }
             vbox += ArrowRectBox(playerHealthHbox, black).apply {
                 this.bounds.height.set(44f)

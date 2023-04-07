@@ -45,6 +45,14 @@ class TilesetAssetLoader : IAssetLoader {
                         padding = 1, maxSize = 128, duplicateBorder = false,
                         atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest
                 )))
+        AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_ui_boss", PackedSheetLoader.PackedSheetLoaderParam(listOf(
+                "boss",
+                "player",
+        ).map { Packable(it, "textures/world/ui/boss/$it.png") },
+                PackedSheet.Config(
+                        padding = 1, maxSize = 128, duplicateBorder = false,
+                        atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest
+                )))
 
         AssetRegistry.loadAssetNoFile<PackedSheet>("tileset_gba", PackedSheetLoader.PackedSheetLoaderParam(listOf(
                 "background_back",
