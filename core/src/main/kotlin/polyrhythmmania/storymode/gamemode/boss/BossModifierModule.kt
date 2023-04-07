@@ -164,7 +164,9 @@ class BossModifierModule(parent: EngineModifiers, val gamemode: StoryBossGameMod
 
         playerHP.decrementAndGet()
         playerHealth.triggerHurtFlash()
-        if (playerHP.get() == 0) {
+
+        val currentBossHP = bossHealth.currentHP.get()
+        if (playerHP.get() == 0 && currentBossHP > 0) {
             onGameOver(inputter)
         }
     }
