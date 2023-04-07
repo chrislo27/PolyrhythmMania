@@ -3,6 +3,7 @@ package polyrhythmmania.storymode
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.TextureLoader
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import paintbox.packing.Packable
@@ -12,6 +13,10 @@ import paintbox.registry.AssetRegistryInstance
 import paintbox.registry.IAssetLoader
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
+import polyrhythmmania.soundsystem.BeadsMusic
+import polyrhythmmania.soundsystem.BeadsMusicLoader
+import polyrhythmmania.soundsystem.BeadsSound
+import polyrhythmmania.soundsystem.BeadsSoundLoader
 import polyrhythmmania.storymode.inbox.Heading
 
 
@@ -27,6 +32,9 @@ object StoryAssets : AssetRegistryInstance() {
 
 class StoryAssetLoader : IAssetLoader {
     override fun addManagedAssets(manager: AssetManager) {
+        manager.setLoader(BeadsSound::class.java, BeadsSoundLoader(InternalFileHandleResolver()))
+        manager.setLoader(BeadsMusic::class.java, BeadsMusicLoader(InternalFileHandleResolver()))
+        
         StoryAssets.loadAsset<Texture>("logo", "story/textures/logo.png", linearTexture())
 
         StoryAssets.loadAsset<Texture>("title_checkerboard", "story/textures/title/checkerboard.png", TextureLoader.TextureParameter().apply {
@@ -129,7 +137,9 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Sound>("score_jingle_tryagain", "story/sounds/results/jingle_tryagain.ogg")
         StoryAssets.loadAsset<Sound>("score_jingle_pass", "story/sounds/results/jingle_ok2.ogg")
         StoryAssets.loadAsset<Sound>("score_jingle_pass_hard", "story/sounds/results/jingle_superb.ogg")
-        StoryAssets.loadAsset<Sound>("sfx_boss_explosion", "story/sounds/boss/explosion.ogg")
+        StoryAssets.loadAsset<BeadsSound>("sfx_boss_explosion", "story/sounds/boss/explosion.ogg")
+        StoryAssets.loadAsset<BeadsSound>("sfx_boss_spotlight", "story/sounds/boss/spotlight.ogg")
+        StoryAssets.loadAsset<BeadsSound>("sfx_boss_spotlight_short", "story/sounds/boss/spotlight_short.ogg")
     }
 
     override fun addUnmanagedAssets(assets: MutableMap<String, Any>) {

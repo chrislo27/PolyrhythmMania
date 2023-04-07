@@ -6,7 +6,9 @@ import polyrhythmmania.editor.block.BlockSpotlightSwitch
 import polyrhythmmania.editor.block.SpotlightTimingMode
 import polyrhythmmania.editor.block.data.SwitchedLightColor
 import polyrhythmmania.engine.Event
+import polyrhythmmania.engine.EventPlaySFX
 import polyrhythmmania.engine.input.EventClearInputs
+import polyrhythmmania.soundsystem.BeadsSound
 import polyrhythmmania.storymode.gamemode.boss.*
 import polyrhythmmania.storymode.gamemode.boss.pattern.BossPatternPools
 import polyrhythmmania.storymode.gamemode.boss.pattern.Pattern
@@ -283,6 +285,12 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
                 startBeat, timingMode, paletteTransition
             )
         )
+
+        return this
+    }
+
+    protected fun MutableList<Event>.playSfx(sound: BeadsSound): MutableList<Event> {
+        this += EventPlaySFX(engine, 0f, { sound })
 
         return this
     }

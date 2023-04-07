@@ -3,6 +3,7 @@ package polyrhythmmania.storymode.gamemode.boss.scripting
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.engine.Event
+import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.gamemode.boss.StoryBossGameMode
 import polyrhythmmania.storymode.music.StoryMusicAssets
 import polyrhythmmania.world.EventMoveCameraRelative
@@ -14,6 +15,7 @@ import polyrhythmmania.world.tileset.TransitionCurve
 class BossScriptIntro(
     gamemode: StoryBossGameMode,
     script: Script,
+    val shouldShowIntroLights: Boolean,
     val phase1Factory: ((BossScriptIntro) -> BossScriptFunction)?
 ) : BossScriptFunction(gamemode, script) {
 
@@ -27,6 +29,45 @@ class BossScriptIntro(
         return this
     }
 
+    private fun MutableList<Event>.playSpotlightSfx(): MutableList<Event> =
+        this.playSfx(StoryAssets["sfx_boss_spotlight"])
+
+    private fun MutableList<Event>.playSpotlightSfxShort(): MutableList<Event> =
+        this.playSfx(StoryAssets["sfx_boss_spotlight_short"])
+
+    private fun showLightsIntro(events: MutableList<Event>) {
+        events
+            .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 2.0f)
+            .rest(2.0f)
+
+
+        fun doLightsAnimation(side: Boolean) {
+            events
+                .targetLights(side, setOf(0))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 1.0f, transitionCurve = TransitionCurve.BOUNCE_OUT)
+                .playSpotlightSfx()
+                .rest(2.0f)
+                .targetLights(side, setOf(0, 3))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
+                .playSpotlightSfxShort()
+                .rest(0.5f)
+                .targetLights(side, setOf(0, 3, 6))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
+                .playSpotlightSfxShort()
+                .rest(0.5f)
+                .targetLights(side, setOf(0, 3, 6, 9))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
+                .playSpotlightSfxShort()
+                .rest(0.5f)
+                .targetLights(side, setOf(0, 3, 6, 9, 11))
+                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
+                .playSpotlightSfxShort()
+                .rest(3.0f)
+        }
+        doLightsAnimation(SIDE_UPSIDE)
+        doLightsAnimation(SIDE_DOWNSIDE)
+    }
+    
     override fun getEvents(): List<Event> {
         /*
     set_music(mus_story_boss1_intro);
@@ -49,32 +90,10 @@ class BossScriptIntro(
 
         val events = mutableListOf<Event>()
         
-        events
-            .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 4.0f)
-            .rest(4.0f)
-
-        
-        fun doLightsAnimation(side: Boolean) {
-            events
-                .targetLights(side, setOf(0))
-                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
-                .rest(2.0f)
-                .targetLights(side, setOf(0, 3))
-                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
-                .rest(0.5f)
-                .targetLights(side, setOf(0, 3, 6))
-                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
-                .rest(0.5f)
-                .targetLights(side, setOf(0, 3, 6, 9))
-                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
-                .rest(0.5f)
-                .targetLights(side, setOf(0, 3, 6, 9, 11))
-                .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
-                .rest(4.0f)
+        if (shouldShowIntroLights) {
+            showLightsIntro(events)
         }
-        doLightsAnimation(SIDE_UPSIDE)
-        doLightsAnimation(SIDE_DOWNSIDE)
-
+        
         events
             .changeLightStrength(LightStrength.NORMAL, 1.0f)
         

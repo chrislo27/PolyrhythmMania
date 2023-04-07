@@ -1,11 +1,13 @@
 package polyrhythmmania.storymode.gamemode.boss
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockType
+import polyrhythmmania.editor.block.GenericBlock
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.tempo.TempoChange
 import polyrhythmmania.gamemodes.GameMode
@@ -15,7 +17,6 @@ import polyrhythmmania.storymode.gamemode.boss.pattern.BossPatternPools
 import polyrhythmmania.storymode.gamemode.boss.scripting.*
 import polyrhythmmania.storymode.music.StemCache
 import polyrhythmmania.storymode.music.StoryMusicAssets
-import polyrhythmmania.storymode.screen.StoryPlayScreen
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldMode
 import polyrhythmmania.world.WorldType
@@ -32,9 +33,6 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
 
         private const val INTRO_CARD_TIME_SEC: Float = 2.5f // Duration of intro segment
         const val BPM: Float = 186f
-
-        private const val SEGMENT_BEATS_PER_MEASURE: Int = 4
-        private const val SEGMENT_DURATION_MEASURES: Int = 8
 
         fun getFactory(debugPhase: DebugPhase = DebugPhase.NONE): Contract.GamemodeFactory = object : Contract.GamemodeFactory {
             private var firstCall = true
@@ -87,6 +85,8 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
 
     val random: Random = Random()
     val patternPools: BossPatternPools = BossPatternPools(random)
+    
+    private var alreadySawLightsIntro: Boolean = false // Set to true once lights intro shown, for the lifetime of this GameMode
 
     init {
         world.worldMode = WorldMode(WorldType.Polyrhythm(showRaisedPlatformsRepeated = false))
@@ -98,14 +98,12 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
 
         engine.postRunnable(checkForRodsThatCollidedWithBossRunnable)
     }
+    
+    private fun shouldShowLightsIntro(): Boolean = !alreadySawLightsIntro
 
     override fun initialize() {
         engine.tempos.addTempoChange(TempoChange(0f, BPM))
         addInitialBlocks()
-    }
-
-    override fun prepareFirstTimeWithStoryPlayScreen(playScreen: StoryPlayScreen) {
-        super.prepareFirstTimeWithStoryPlayScreen(playScreen)
     }
 
     override fun onWorldReset(world: World) {
@@ -125,6 +123,10 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
             pool.resetAndShuffle()
         }
 
+        setAmbientLightToBlack()
+    }
+    
+    private fun setAmbientLightToBlack() {
         val ambientLight = world.spotlights.ambientLight
         ambientLight.color.set(Color.BLACK)
         ambientLight.strength = 0f
@@ -163,6 +165,12 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
         val blocks = mutableListOf<Block>()
 
         blocks += InitScriptBlock()
+        
+        blocks += GenericBlock(engine, true) {
+            listOf(MarkLightsIntroAsSeenEvent())
+        }.apply { 
+            this.beat = 17f
+        }
 
         container.addBlocks(blocks)
     }
@@ -176,6 +184,15 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
             modifierModule.checkForRodsThatCollidedWithBoss()
             if (!cancel) {
                 engine.postRunnable(this)
+            }
+        }
+    }
+    
+    private inner class MarkLightsIntroAsSeenEvent : Event(engine) {
+
+        override fun onStart(currentBeat: Float) {
+            Gdx.app.postRunnable {
+                alreadySawLightsIntro = true
             }
         }
     }
@@ -320,6 +337,7 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
         val func: ScriptFunction = BossScriptIntro(
             this, 
             script,
+            shouldShowLightsIntro(),
             phase1Factory
         )
         script.addEventsToQueue(func.getEvents())

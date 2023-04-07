@@ -1,7 +1,6 @@
 package polyrhythmmania.engine
 
 import paintbox.registry.AssetRegistry
-import polyrhythmmania.editor.block.BlockSongInfoCard
 import polyrhythmmania.editor.block.RowSetting
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.soundsystem.BeadsSound
@@ -34,17 +33,26 @@ class EventCowbellSFX(engine: Engine, startBeat: Float, val useMeasures: Boolean
     }
 }
 
-open class EventPlaySFX(engine: Engine, startBeat: Float,
-                   val id: String, val allowOverlap: Boolean = false,
-                   val callback: (PlayerLike) -> Unit = {})
-    : AudioEvent(engine) {
+open class EventPlaySFX(
+    engine: Engine, startBeat: Float,
+    val soundGetter: () -> BeadsSound, val allowOverlap: Boolean = false,
+    val callback: (PlayerLike) -> Unit = {},
+) : AudioEvent(engine) {
 
     init {
         this.beat = startBeat
     }
 
+    constructor(
+        engine: Engine,
+        startBeat: Float,
+        id: String,
+        allowOverlap: Boolean = false,
+        callback: (PlayerLike) -> Unit = {},
+    ) : this(engine, startBeat, { AssetRegistry.get<BeadsSound>(id) }, allowOverlap, callback)
+
     override fun onAudioStart(atBeat: Float, actualBeat: Float) {
-        val beadsSound = AssetRegistry.get<BeadsSound>(id)
+        val beadsSound = soundGetter()
         if (allowOverlap) {
             engine.soundInterface.playAudio(beadsSound, SoundInterface.SFXType.NORMAL, callback)
         } else {
