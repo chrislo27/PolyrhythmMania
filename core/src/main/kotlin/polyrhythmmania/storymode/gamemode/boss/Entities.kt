@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.ColorStack
+import paintbox.util.MathHelper
+import paintbox.util.wave.WaveUtils
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.SimpleRenderedEntity
@@ -40,6 +42,15 @@ abstract class AbstractEntityBossRobot(
 
 //        batch.setColor(1f, 0f, 0f, 0.25f)
 //        batch.fillRect(vec.x, vec.y, renderWidth, renderHeight)
+
+        // Movement bobbing
+        vec.y += MathHelper.snapToNearest(
+            (WaveUtils.getSineWave(
+                getMovementPeriod(),
+                offsetMs = getMovementTimeOffset()
+            ) * 2f - 1f) * getMovementAmplitude(),
+            if (isMovementPixelSnapped()) (1 / 32f) else 0f
+        )
         
         batch.color = tmpColor
         batch.draw(StoryAssets.get<Texture>(textureID), vec.x, vec.y, renderWidth, renderHeight)
@@ -49,14 +60,33 @@ abstract class AbstractEntityBossRobot(
 
     override fun shouldApplyRenderCulling(): Boolean = false
 
+    protected open fun getMovementTimeOffset(): Long = 0L
+    protected open fun getMovementPeriod(): Float = 4f
+    protected open fun isMovementPixelSnapped(): Boolean = false
+    protected open fun getMovementAmplitude(): Float = 0.05f
+    
 }
 
 class EntityBossRobotUpside(world: World, bossGameMode: StoryBossGameMode,initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_upside", initialPosition, 0f, 1f, 0f)
+    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_upside", initialPosition, 0f, 1f, 0f) {
+
+    override fun getMovementTimeOffset(): Long {
+        return -500L
+    }
+}
 
 class EntityBossRobotMiddle(world: World, bossGameMode: StoryBossGameMode,initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_middle", initialPosition, 1f, 2f, 2f)
+    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_middle", initialPosition, 1f, 2f, 2f) {
+
+    override fun getMovementTimeOffset(): Long {
+        return 0L
+    }
+}
 
 class EntityBossRobotDownside(world: World, bossGameMode: StoryBossGameMode,initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_downside", initialPosition, 0f, 1f, 3f)
+    AbstractEntityBossRobot(world, bossGameMode, "boss_robot_downside", initialPosition, 0f, 1f, 3f) {
 
+    override fun getMovementTimeOffset(): Long {
+        return 500L
+    }
+}
