@@ -31,6 +31,8 @@ abstract class AbstractEntityBossRobot(
     override val renderWidth: Float get() = 105f / 32f
     override val renderHeight: Float get() = 122f / 32f
 
+    var stopBobbing: Boolean = false
+    private var lastBobYOffset: Float = 0f
 
     init {
         this.position.set(initialPosition)
@@ -48,13 +50,16 @@ abstract class AbstractEntityBossRobot(
 //        batch.fillRect(vec.x, vec.y, renderWidth, renderHeight)
 
         // Movement bobbing
-        vec.y += MathHelper.snapToNearest(
-            (WaveUtils.getSineWave(
-                getMovementPeriod(),
-                offsetMs = getMovementTimeOffset()
-            ) * 2f - 1f) * getMovementAmplitude(),
-            if (isMovementPixelSnapped()) (1 / 32f) else 0f
-        )
+        if (!stopBobbing) {
+            lastBobYOffset = MathHelper.snapToNearest(
+                (WaveUtils.getSineWave(
+                    getMovementPeriod(),
+                    offsetMs = getMovementTimeOffset()
+                ) * 2f - 1f) * getMovementAmplitude(),
+                if (isMovementPixelSnapped()) (1 / 32f) else 0f
+            )
+        }
+        vec.y += lastBobYOffset
         
         batch.color = tmpColor
         val textureID = getTextureID()

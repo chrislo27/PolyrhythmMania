@@ -4,10 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.engine.Event
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.gamemode.boss.EntityBossExplosion
-import polyrhythmmania.storymode.gamemode.boss.EntityBossRobotFace
-import polyrhythmmania.storymode.gamemode.boss.EntityBossRobotMiddle
-import polyrhythmmania.storymode.gamemode.boss.StoryBossGameMode
+import polyrhythmmania.storymode.gamemode.boss.*
 import polyrhythmmania.world.EventEndState
 import polyrhythmmania.world.EventMoveCameraRelative
 import polyrhythmmania.world.EventZoomCamera
@@ -103,6 +100,15 @@ class BossScriptEnd(
         
             .playSfx(StoryAssets["sfx_boss_error"])
             .changeFaceTexture(EntityBossRobotFace.Face.BLUE_SCREEN)
+            .addEvent("stop_movement_bobbing", object : Event(engine) {
+                override fun onStart(currentBeat: Float) {
+                    Gdx.app.postRunnable {
+                        world.entities.filterIsInstance<AbstractEntityBossRobot>().forEach { 
+                            it.stopBobbing = true
+                        }
+                    }
+                }
+            })
             .rest(4.0f)
             
             .changeFaceTexture(EntityBossRobotFace.Face.NONE)
