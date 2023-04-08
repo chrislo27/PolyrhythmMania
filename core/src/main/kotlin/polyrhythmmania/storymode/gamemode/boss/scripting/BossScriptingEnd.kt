@@ -1,6 +1,7 @@
 package polyrhythmmania.storymode.gamemode.boss.scripting
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.engine.Event
 import polyrhythmmania.storymode.StoryAssets
@@ -17,6 +18,7 @@ class BossScriptEnd(
     script: Script,
 ) : BossScriptFunction(gamemode, script) {
     
+    private fun getBossEntities(): List<AbstractEntityBossRobot> = world.entities.filterIsInstance<AbstractEntityBossRobot>()
     private fun getFaceEntities(): List<EntityBossRobotFace> = world.entities.filterIsInstance<EntityBossRobotFace>()
     private fun getMiddleEntities(): List<EntityBossRobotMiddle> = world.entities.filterIsInstance<EntityBossRobotMiddle>()
 
@@ -59,7 +61,7 @@ class BossScriptEnd(
             override fun onStart(currentBeat: Float) {
                 Gdx.app.postRunnable {
                     val pos = StoryBossGameMode.BOSS_POSITION.cpy()
-                    pos.x += 1.5f
+                    pos.x += 0.5f
                     world.addEntity(
                         EntityBossExplosion(
                             world,
@@ -95,15 +97,32 @@ class BossScriptEnd(
                     }
                 }
             })
-            .rest(4.0f)
-            .rest(3.0f)
+            
+            .playSfx(StoryAssets["sfx_boss_whirring"])
+            .addEvent("start_jittering", object : Event(engine) {
+                init {
+                    this.width = 7f
+                }
+
+                override fun onUpdate(currentBeat: Float) {
+                    val progress = getBeatPercentage(currentBeat)
+                    
+                    Gdx.app.postRunnable {
+                        getBossEntities().forEach {
+                            it.jitterAmplitude = Interpolation.pow3.apply(0f, 4f, progress)
+                        }
+                    }
+                }
+            })
+            .rest(7.0f)
         
             .playSfx(StoryAssets["sfx_boss_error"])
             .changeFaceTexture(EntityBossRobotFace.Face.BLUE_SCREEN)
-            .addEvent("stop_movement_bobbing", object : Event(engine) {
+            .addEvent("stop_movement_bobbing_and_jitter", object : Event(engine) {
                 override fun onStart(currentBeat: Float) {
                     Gdx.app.postRunnable {
-                        world.entities.filterIsInstance<AbstractEntityBossRobot>().forEach { 
+                        getBossEntities().forEach {
+                            it.jitterAmplitude = 0f    
                             it.stopBobbing = true
                         }
                     }

@@ -1,5 +1,6 @@
 package polyrhythmmania.storymode.gamemode.boss
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -17,6 +18,7 @@ import polyrhythmmania.world.entity.SimpleRenderedEntity
 import polyrhythmmania.world.entity.TemporaryEntity
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.Tileset
+import kotlin.random.Random
 
 
 abstract class AbstractEntityBossRobot(
@@ -26,19 +28,35 @@ abstract class AbstractEntityBossRobot(
     override val renderSortOffsetX: Float,
     override val renderSortOffsetY: Float,
     override val renderSortOffsetZ: Float,
+    val jitterIndex: Int
 ) : SimpleRenderedEntity(world), TemporaryEntity {
+    
+    companion object {
+        const val JITTER_FPS: Int = 60
+    }
 
     override val renderWidth: Float get() = 105f / 32f
     override val renderHeight: Float get() = 122f / 32f
 
     var stopBobbing: Boolean = false
     private var lastBobYOffset: Float = 0f
+    
+    var jitterAmplitude: Float = 0f
+    private var timeSinceJitterUpdate: Float = 0f
+    private val jitterRandom: Random = Random(13212921L + jitterIndex)
+    private val jitterVec: Vector3 = Vector3()
 
     init {
         this.position.set(initialPosition)
     }
+    
+    private fun getRandomJitter(): Float = jitterRandom.nextFloat() * jitterAmplitude * (if (jitterRandom.nextBoolean()) -1 else 1) * (1f / 32)
 
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+        renderSimple(renderer, batch, tileset, vec, updateOffsets = true)
+    }
+    
+    protected fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3, updateOffsets: Boolean) {
         val oldPackedColor = batch.packedColor
         val tmpColor = ColorStack.getAndPush()
             .set(1f, 1f, 1f, 1f)
@@ -49,17 +67,33 @@ abstract class AbstractEntityBossRobot(
 //        batch.setColor(1f, 0f, 0f, 0.25f)
 //        batch.fillRect(vec.x, vec.y, renderWidth, renderHeight)
 
-        // Movement bobbing
-        if (!stopBobbing) {
-            lastBobYOffset = MathHelper.snapToNearest(
-                (WaveUtils.getSineWave(
-                    getMovementPeriod(),
-                    offsetMs = getMovementTimeOffset()
-                ) * 2f - 1f) * getMovementAmplitude(),
-                if (isMovementPixelSnapped()) (1 / 32f) else 0f
-            )
+        if (updateOffsets) {
+            // Movement bobbing
+            if (!stopBobbing) {
+                lastBobYOffset = MathHelper.snapToNearest(
+                    (WaveUtils.getSineWave(
+                        getMovementPeriod(),
+                        offsetMs = getMovementTimeOffset()
+                    ) * 2f - 1f) * getMovementAmplitude(),
+                    if (isMovementPixelSnapped()) (1 / 32f) else 0f
+                )
+            }
+
+            // Jitter
+            if (jitterAmplitude > 0f) {
+                if (timeSinceJitterUpdate <= 0f) {
+                    timeSinceJitterUpdate = 1f / JITTER_FPS
+                    jitterVec.x = getRandomJitter()
+                    jitterVec.y = getRandomJitter() * 0.25f
+                    jitterVec.z = getRandomJitter()
+                } else {
+                    timeSinceJitterUpdate -= Gdx.graphics.deltaTime
+                }
+            }
         }
+        
         vec.y += lastBobYOffset
+        if (jitterAmplitude > 0f) vec.add(jitterVec)
         
         batch.color = tmpColor
         val textureID = getTextureID()
@@ -87,20 +121,22 @@ open class EntityBossRobotStaticTexture(
     var currentTextureID: String,
     initialPosition: Vector3,
     renderSortOffsetX: Float, renderSortOffsetY: Float, renderSortOffsetZ: Float,
+    jitterIndex: Int
 ) : AbstractEntityBossRobot(
     world,
     bossGameMode,
     initialPosition,
     renderSortOffsetX,
     renderSortOffsetY,
-    renderSortOffsetZ
+    renderSortOffsetZ,
+    jitterIndex
 ) {
 
     override fun getTextureID(): String = this.currentTextureID
 }
 
 class EntityBossRobotUpside(world: World, bossGameMode: StoryBossGameMode, initialPosition: Vector3) :
-    EntityBossRobotStaticTexture(world, bossGameMode, "boss_robot_upside", initialPosition, 0f, 1f, 0f) {
+    EntityBossRobotStaticTexture(world, bossGameMode, "boss_robot_upside", initialPosition, 0f, 1f, 0f, jitterIndex = 1) {
 
     override fun getMovementTimeOffset(): Long {
         return -500L
@@ -108,7 +144,7 @@ class EntityBossRobotUpside(world: World, bossGameMode: StoryBossGameMode, initi
 }
 
 class EntityBossRobotMiddle(world: World, bossGameMode: StoryBossGameMode, initialPosition: Vector3) :
-    EntityBossRobotStaticTexture(world, bossGameMode, "boss_robot_middle", initialPosition, 1f, 2f, 2f) {
+    EntityBossRobotStaticTexture(world, bossGameMode, "boss_robot_middle", initialPosition, 1f, 2f, 2f, jitterIndex = 0) {
 
     override fun getMovementTimeOffset(): Long {
         return 0L
@@ -116,7 +152,7 @@ class EntityBossRobotMiddle(world: World, bossGameMode: StoryBossGameMode, initi
 }
 
 class EntityBossRobotFace(world: World, bossGameMode: StoryBossGameMode, initialPosition: Vector3) :
-    AbstractEntityBossRobot(world, bossGameMode, initialPosition, 1f, 2f, 2f), HasLightingRender {
+    AbstractEntityBossRobot(world, bossGameMode, initialPosition, 1f, 2f, 2f, jitterIndex = 0), HasLightingRender {
     
     enum class Face(val textureID: String?) {
         NONE(null),
@@ -139,7 +175,7 @@ class EntityBossRobotFace(world: World, bossGameMode: StoryBossGameMode, initial
 //        batch.flush()
 //        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         
-        renderSimple(renderer, batch, tileset, convertedVec)
+        renderSimple(renderer, batch, tileset, convertedVec, updateOffsets = false)
 
         Vector3Stack.pop()
         batch.packedColor = packedColor
@@ -155,7 +191,7 @@ class EntityBossRobotFace(world: World, bossGameMode: StoryBossGameMode, initial
 }
 
 class EntityBossRobotDownside(world: World, bossGameMode: StoryBossGameMode, initialPosition: Vector3) :
-    EntityBossRobotStaticTexture(world, bossGameMode, "boss_robot_downside", initialPosition, 0f, 1f, 3f) {
+    EntityBossRobotStaticTexture(world, bossGameMode, "boss_robot_downside", initialPosition, 0f, 1f, 3f, jitterIndex = 2) {
 
     override fun getMovementTimeOffset(): Long {
         return 500L
