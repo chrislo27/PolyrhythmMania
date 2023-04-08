@@ -27,6 +27,7 @@ sealed class ResultFlag {
         class RanOutOfLives(val onlyOne: Boolean) : Fail(Localization.getVar(if (onlyOne) "resultFlag.fail.ranOutOfLives.one" else "resultFlag.fail.ranOutOfLives"))
         object TooManyDefectiveRods : Fail(Localization.getVar("resultFlag.fail.tooManyDefectiveRods"))
         object MonsterGoal : Fail(Localization.getVar("resultFlag.fail.monsterGoal"))
+        object LostToBoss : Fail(Localization.getVar("resultFlag.fail.generic"))
         
     }
     

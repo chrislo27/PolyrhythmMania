@@ -1471,7 +1471,7 @@ duration: ${monster.activeDuration.get()} sec
                 
                 setHealthValues(bossModifier)
 
-                val uiOpacity = bossModifier.uiOpacity.get()
+                val uiOpacity = bossModifier.effectiveUIOpacity.get()
                 superpane.opacity.set(Interpolation.smoother.apply(uiOpacity))
                 superpane.contentOffsetX.set(Interpolation.smoother.apply(-32f, 0f, uiOpacity))
             }

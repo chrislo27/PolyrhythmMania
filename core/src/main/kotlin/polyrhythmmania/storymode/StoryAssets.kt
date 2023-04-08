@@ -147,6 +147,7 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Sound>("score_jingle_pass_hard", "story/sounds/results/jingle_superb.ogg")
         StoryAssets.loadAsset<Sound>("sfx_cutscene_postboss_knocking", "story/sounds/cutscene/postboss/knocking.ogg")
         StoryAssets.loadAsset<Sound>("sfx_cutscene_postboss_page_open", "story/sounds/cutscene/postboss/page_open.ogg")
+        StoryAssets.loadAsset<BeadsSound>("sfx_boss_error", "story/sounds/boss/error.ogg")
         StoryAssets.loadAsset<BeadsSound>("sfx_boss_explosion", "story/sounds/boss/explosion.ogg")
         StoryAssets.loadAsset<BeadsSound>("sfx_boss_spotlight", "story/sounds/boss/spotlight.ogg")
         StoryAssets.loadAsset<BeadsSound>("sfx_boss_spotlight_short", "story/sounds/boss/spotlight_short.ogg")

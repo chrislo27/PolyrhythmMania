@@ -362,8 +362,9 @@ class EventZoomCamera(
 
 
 class EventMoveCameraRelative(
-        engine: Engine, startBeat: Float, val transition: PaletteTransition,
-        val endPosRelative: Vector3
+    engine: Engine, startBeat: Float, val transition: PaletteTransition,
+    val endPosRelative: Vector3,
+    val useOriginalCameraPositionToStart: Boolean = false,
 ) : Event(engine) {
 
     private lateinit var camera: OrthographicCamera
@@ -384,7 +385,11 @@ class EventMoveCameraRelative(
         this.camera = container.renderer.camera
 
         if (!container.globalSettings.reducedMotion) {
-            this.originalCameraPos.set(Vector3(camera.viewportWidth / 2, camera.viewportHeight / 2, camera.position.z))
+            if (useOriginalCameraPositionToStart) {
+                this.originalCameraPos.set(Vector3().set(camera.position))
+            } else {
+                this.originalCameraPos.set(Vector3(camera.viewportWidth / 2, camera.viewportHeight / 2, camera.position.z))
+            }
         }
     }
 

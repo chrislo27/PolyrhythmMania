@@ -1,6 +1,7 @@
 package polyrhythmmania.storymode.gamemode.boss
 
 import com.badlogic.gdx.math.Interpolation
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyFloatVar
@@ -101,6 +102,8 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
 
     // Data
     val uiOpacity: FloatVar = FloatVar(0f)
+    val invertUIOpacity: BooleanVar = BooleanVar(false)
+    val effectiveUIOpacity: ReadOnlyFloatVar = FloatVar { if (invertUIOpacity.use()) (1f - uiOpacity.use()) else uiOpacity.use() }
 
     // Health
     val playerHealth: HealthBar = HealthBar(PLAYER_HEALTH)
@@ -110,10 +113,19 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
         playerHealth.resetState()
         bossHealth.resetState()
         uiOpacity.set(0f)
+        invertUIOpacity.set(false)
     }
 
     fun triggerUIShow() {
         if (uiOpacity.get() <= 0f) {
+            invertUIOpacity.set(false)
+            uiOpacity.set(0.001f)
+        }
+    }
+
+    fun triggerUIHide() {
+        if (uiOpacity.get() >= 1) {
+            invertUIOpacity.set(true)
             uiOpacity.set(0.001f)
         }
     }
@@ -184,6 +196,6 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
         val engine = inputter.engine
 
         engine.playbackSpeed = 1f
-        engine.resultFlag.set(ResultFlag.Fail.Generic)
+        engine.resultFlag.set(ResultFlag.Fail.LostToBoss)
     }
 }

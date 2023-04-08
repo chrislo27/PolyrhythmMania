@@ -39,6 +39,7 @@ import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.InputCalibration
 import polyrhythmmania.engine.ResultFlag
 import polyrhythmmania.engine.input.Challenges
+import polyrhythmmania.gamemodes.CanPreventPausing
 import polyrhythmmania.gamemodes.ChangeMusicVolMultiplierEvent
 import polyrhythmmania.gamemodes.GameMode
 import polyrhythmmania.gamemodes.endlessmode.EndlessPolyrhythm
@@ -113,7 +114,12 @@ class StoryPlayScreen(
     private val currentScoreCardOptions: Var<List<PauseOption>> = Var(listOf())
     private val selectedScoreCardOption: Var<PauseOption?> = Var(null)
     
-    private val canPauseGame: ReadOnlyBooleanVar = BooleanVar(eager = true) { !(inIntroCard.use() || showingScoreCard.use()) }
+    private val gamemodePreventsPausing: ReadOnlyBooleanVar = BooleanVar(eager = true) { 
+        (gameMode as? CanPreventPausing)?.preventPausing?.use() ?: false
+    }
+    private val canPauseGame: ReadOnlyBooleanVar = BooleanVar(eager = true) { 
+        (!gamemodePreventsPausing.use()) && !(inIntroCard.use() || showingScoreCard.use())
+    }
     private val couldSkipLevelEventually: Boolean = isNotCompletedYet && contract.canSkipLevel
     private var skippableScoreBarAnimation: Animation? = null
     
