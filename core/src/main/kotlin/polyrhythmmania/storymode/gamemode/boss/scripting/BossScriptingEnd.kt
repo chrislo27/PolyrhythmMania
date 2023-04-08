@@ -109,13 +109,13 @@ class BossScriptEnd(
                     }
                 }
             })
-            .rest(4.0f)
+            .rest(9.0f)
             
             .changeFaceTexture(EntityBossRobotFace.Face.NONE)
             .setBodyToExploded()
             .playSfx(StoryAssets["sfx_boss_explosion"])
             .addExplosionEntity()
-            .rest(10.0f)
+            .rest(14.0f)
         
             .todo("complete level, no drum beat")
             .addEvent(EventEndState(engine, 0f))
