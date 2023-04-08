@@ -1409,7 +1409,8 @@ duration: ${monster.activeDuration.get()} sec
                                 this.bindWidthToParent(multiplierBinding = { percentage.use() }, adjustBinding = { 0f })
                             }
 
-                            this += ColumnarPane(50, false).apply {
+                            val numSegments = 36
+                            this += ColumnarPane(numSegments, false).apply {
                                 this.spacing.set(2f)
                                 this.setAllSpacers {
                                     RectElement(emptyColor)

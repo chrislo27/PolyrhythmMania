@@ -21,7 +21,7 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
 
         const val BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE: Float = 11.2f
         private const val PLAYER_HEALTH: Int = 10
-        private const val BOSS_HEALTH: Int = 50
+        private const val BOSS_HEALTH: Int = 72
     }
 
     inner class HealthBar(initialMaxHP: Int) {
