@@ -22,6 +22,9 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
         const val BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE: Float = 11.2f
         private const val PLAYER_HEALTH: Int = 10
         private const val BOSS_HEALTH: Int = 72
+        
+        private val DEFAULT_SCORE_OVERRIDE: EngineInputter.ScoreComputationOverride =
+            EngineInputter.ScoreComputationOverride(noMiss = true, skillStar = true)
     }
 
     inner class HealthBar(initialMaxHP: Int) {
@@ -104,16 +107,22 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
     val uiOpacity: FloatVar = FloatVar(0f)
     val invertUIOpacity: BooleanVar = BooleanVar(false)
     val effectiveUIOpacity: ReadOnlyFloatVar = FloatVar { if (invertUIOpacity.use()) (1f - uiOpacity.use()) else uiOpacity.use() }
+    val missed: BooleanVar = BooleanVar(false)
 
     // Health
     val playerHealth: HealthBar = HealthBar(PLAYER_HEALTH)
     val bossHealth: HealthBar = HealthBar(BOSS_HEALTH)
 
+    private var scoreOverride: EngineInputter.ScoreComputationOverride = DEFAULT_SCORE_OVERRIDE
+    
     override fun resetState() {
         playerHealth.resetState()
         bossHealth.resetState()
         uiOpacity.set(0f)
         invertUIOpacity.set(false)
+        missed.set(false)
+        scoreOverride = DEFAULT_SCORE_OVERRIDE
+        updateInputterScoreOverride()
     }
 
     fun triggerUIShow() {
@@ -128,6 +137,18 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
             invertUIOpacity.set(true)
             uiOpacity.set(0.001f)
         }
+    }
+    
+    fun miss() {
+        if (bossHealth.currentHP.get() <= 0 || missed.get()) return
+        
+        missed.set(true)
+        this.scoreOverride = this.scoreOverride.copy(noMiss = false)
+        updateInputterScoreOverride()
+    }
+    
+    private fun updateInputterScoreOverride() {
+        parent.engine.inputter.scoreComputationOverride = this.scoreOverride
     }
 
     override fun engineUpdate(beat: Float, seconds: Float, deltaSec: Float) {
@@ -176,6 +197,9 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
 
         playerHP.decrementAndGet()
         playerHealth.triggerHurtFlash()
+
+        this.scoreOverride = this.scoreOverride.copy(skillStar = false)
+        updateInputterScoreOverride()
 
         val currentBossHP = bossHealth.currentHP.get()
         if (playerHP.get() == 0 && currentBossHP > 0) {

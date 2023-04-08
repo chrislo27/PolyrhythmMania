@@ -605,7 +605,7 @@ open class EntityRodPR(
         if (!exploded) super.render(renderer, batch, tileset)
     }
 
-    private fun registerMiss(inputter: EngineInputter) {
+    protected open fun registerMiss(inputter: EngineInputter) {
         if (!registeredMiss && !this.isDefective) {
             registeredMiss = true
             inputter.missed()

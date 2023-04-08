@@ -135,7 +135,8 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
                     engine, world.rowA, patternStart + pattern.delayDownside,
                     1f / pattern.rodDownside,
                     pattern.getLastPistonIndexDownside(),
-                    damageTakenVar, bossDamageMultiplier
+                    damageTakenVar, bossDamageMultiplier,
+                    modifierModule::miss
                 )
             )
         }
@@ -145,7 +146,8 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
                     engine, world.rowDpad, patternStart + pattern.delayUpside,
                     1f / pattern.rodUpside,
                     pattern.getLastPistonIndexUpside(),
-                    damageTakenVar, bossDamageMultiplier
+                    damageTakenVar, bossDamageMultiplier,
+                    modifierModule::miss
                 )
             )
         }
@@ -168,7 +170,8 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
                     engine, world.rowA, patternStart,
                     1f / beatsPerBlock,
                     pattern.getLastPistonIndexDownside(),
-                    damageTakenVar, bossDamageMultiplier
+                    damageTakenVar, bossDamageMultiplier,
+                    modifierModule::miss
                 )
             )
         } else {
@@ -177,7 +180,8 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
                     engine, world.rowDpad, patternStart,
                     1f / beatsPerBlock,
                     pattern.getLastPistonIndexUpside(),
-                    damageTakenVar, bossDamageMultiplier
+                    damageTakenVar, bossDamageMultiplier,
+                    modifierModule::miss
                 )
             )
         }

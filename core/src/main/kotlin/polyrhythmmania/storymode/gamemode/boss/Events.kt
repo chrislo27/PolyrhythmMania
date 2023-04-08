@@ -11,6 +11,7 @@ class EventDeployRodBoss(
     val row: Row, startBeat: Float,
     val xUnitsPerBeat: Float, val lastPistonIndex: Int,
     val damageTakenVar: EntityRodPRStoryBoss.PlayerDamageTaken, val bossDamageMultiplier: Int,
+    val onMissCallback: (() -> Unit)?,
 ) : Event(engine) {
 
     init {
@@ -22,7 +23,8 @@ class EventDeployRodBoss(
 
         val rod = EntityRodPRStoryBoss(
             engine.world, this.beat, row, lastPistonIndex,
-            damageTakenVar, bossDamageMultiplier
+            damageTakenVar, bossDamageMultiplier,
+            onMissCallback
         )
         rod.xUnitsPerBeat = this.xUnitsPerBeat
 

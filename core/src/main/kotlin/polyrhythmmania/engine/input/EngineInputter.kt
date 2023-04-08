@@ -42,6 +42,8 @@ class EngineInputter(val engine: Engine) {
         const val DEBUG_LOG_INPUTS: Boolean = false
         const val BEAT_EPSILON: Float = 0.01f
     }
+    
+    data class ScoreComputationOverride(val noMiss: Boolean, val skillStar: Boolean?)
 
     private val world: World = engine.world
     private val modifiers: EngineModifiers get() = engine.modifiers // Must be get() because modifiers depends on inputter first
@@ -65,6 +67,8 @@ class EngineInputter(val engine: Engine) {
     val inputResults: List<InputResult> = mutableListOf()
     val expectedInputsPr: List<EntityRodPR.ExpectedInput.Expected> = mutableListOf()
 
+    var scoreComputationOverride: ScoreComputationOverride? = null
+    
     init {
         resetState()
     }
@@ -84,6 +88,7 @@ class EngineInputter(val engine: Engine) {
         skillStarBeat = Float.POSITIVE_INFINITY
         practice.reset()
         inputCountStats.reset()
+        scoreComputationOverride = null
     }
 
     fun onButtonPressed(release: Boolean, type: InputType) {
@@ -456,7 +461,16 @@ class EngineInputter(val engine: Engine) {
             } / nInputs) * 100
         })
 
-        return ScoreBase(rawScore, inputsHit, nInputs, noMiss, if (!skillStarBeat.isFinite()) null else skillStarGotten.get())
+        var noMiss = this.noMiss
+        var skillStar = if (!skillStarBeat.isFinite()) null else skillStarGotten.get()
+        
+        val scoreComputationOverride = this.scoreComputationOverride
+        if (scoreComputationOverride != null) {
+            noMiss = scoreComputationOverride.noMiss
+            skillStar = scoreComputationOverride.skillStar
+        }
+        
+        return ScoreBase(rawScore, inputsHit, nInputs, noMiss, skillStar)
     }
 
 }

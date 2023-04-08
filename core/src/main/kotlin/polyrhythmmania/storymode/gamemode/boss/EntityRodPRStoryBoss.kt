@@ -1,6 +1,7 @@
 package polyrhythmmania.storymode.gamemode.boss
 
 import com.badlogic.gdx.math.MathUtils
+import polyrhythmmania.engine.input.EngineInputter
 import polyrhythmmania.world.EntityRodPR
 import polyrhythmmania.world.Row
 import polyrhythmmania.world.World
@@ -9,6 +10,7 @@ class EntityRodPRStoryBoss(
     world: World, deployBeat: Float, row: Row,
     val lastPistonIndex: Int,
     val playerDamageTaken: PlayerDamageTaken, val bossDamageMultiplier: Int,
+    val onMissCallback: (() -> Unit)?,
 ) : EntityRodPR(world, deployBeat, row, isDefective = true) {
     
     companion object {
@@ -55,7 +57,25 @@ class EntityRodPRStoryBoss(
             }
         }
     }
+
+    override fun onKilled() {
+        super.onKilled()
+
+        checkDidLastBounceForMiss()
+    }
+
+    override fun registerMiss(inputter: EngineInputter) {
+        super.registerMiss(inputter)
+        
+        checkDidLastBounceForMiss()
+    }
     
+    private fun checkDidLastBounceForMiss() {
+        if (!didLastBounce) {
+            onMissCallback?.invoke()
+        }
+    }
+
     private fun bounceToBoss(startIndex: Int) {
         didLastBounce = true
         // Note that peakHeight is computed via: row.startY + 1f + (endIndex - startIndex) + manualOffset
