@@ -66,11 +66,14 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     //region ContractDoc
 
     private fun updateForContractDoc(inboxItem: InboxItem.ContractDoc) {
-        val inboxItemState = scenario.inboxState.getItemState(inboxItem) ?: InboxItemState.DEFAULT_UNAVAILABLE
+        val inboxItemStateGetter: () -> InboxItemState = {
+            scenario.inboxState.getItemState(inboxItem) ?: InboxItemState.DEFAULT_UNAVAILABLE
+        }
+        val inboxItemState = inboxItemStateGetter()
         val contract = inboxItem.contract
         val attribution = contract.attribution
 
-        addStartContractPanel(inboxItem, inboxItemState)
+        addStartContractPanel(inboxItem, inboxItemStateGetter)
         addContractConditionsPanel(inboxItem)
         addContractScorePanel(inboxItem, inboxItemState)
         if (inboxItemState.playedBefore && attribution != null) {
@@ -81,7 +84,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         }
     }
 
-    private fun addStartContractPanel(inboxItem: InboxItem.ContractDoc, inboxItemState: InboxItemState) {
+    private fun addStartContractPanel(inboxItem: InboxItem.ContractDoc, inboxItemState: () -> InboxItemState) {
         addRightSidePanel("".toConstVar(), 20f * UI_SCALE).apply {
             this.removeAllChildren()
             this += Button(StoryL10N.getVar("desktop.pane.startContract"), font = main.fontRobotoBold).apply {
@@ -90,7 +93,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
 
                 this.setOnAction {
                     desktopUI.controller.playSFX(DesktopController.SFXType.ENTER_LEVEL)
-                    desktopUI.controller.playLevel(inboxItem.contract, inboxItem, inboxItemState)
+                    desktopUI.controller.playLevel(inboxItem.contract, inboxItem, inboxItemState())
                 }
             }
         }
