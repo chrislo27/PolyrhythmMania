@@ -169,7 +169,7 @@ class EntityBossExplosion(
 
     companion object {
         const val NUM_FRAMES: Int = 17
-        const val EXPLOSION_DURATION: Float = 100 / 60f
+        const val EXPLOSION_DURATION: Float = 120 / 60f
     }
     
     var duration: Float = EXPLOSION_DURATION
