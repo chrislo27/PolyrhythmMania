@@ -10,7 +10,7 @@ open class InboxDB : InboxItems() {
     
     companion object {
         const val ITEM_TO_TRIGGER_MAIN_MUSIC_MIX: String = "intern_employment_contract"
-        const val CONTRACT_ID_BOSS: String = "boss"
+        const val CONTRACT_ID_BOSS: String = Contracts.ID_BOSS
         const val FIRST_POSTGAME_ITEM: String = "welcome_back_postgame"
     }
     

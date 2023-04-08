@@ -18,6 +18,7 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.contract.SongInfo
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemState
@@ -236,9 +237,11 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     private fun addContractConditionsPanel(inboxItem: InboxItem.ContractDoc) {
         val contract = inboxItem.contract
 
-        val primaryText = if (contract.immediatePass) 
-            StoryL10N.getValue("desktop.pane.conditions.primary.noMinScore") 
-        else StoryL10N.getValue("desktop.pane.conditions.primary.minScore", contract.minimumScore)
+        val primaryText = when {
+            contract.id == Contracts.ID_BOSS -> StoryL10N.getValue("desktop.pane.conditions.primary.secret")
+            contract.immediatePass -> StoryL10N.getValue("desktop.pane.conditions.primary.noMinScore")
+            else -> StoryL10N.getValue("desktop.pane.conditions.primary.minScore", contract.minimumScore)
+        }
         
         var clearText = primaryText
         val ellipse = StoryL10N.getValue("desktop.pane.conditions.ellipsis")

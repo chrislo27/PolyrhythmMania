@@ -16,6 +16,8 @@ sealed class Condition(val text: ReadOnlyVar<String>, val priority: Int) : Compa
     
     data class TempoUp(val tempoChangePercent: Float)
         : Condition(StoryL10N.getVar(if (tempoChangePercent >= 1f) "desktop.pane.conditions.secondary.tempoUp" else "desktop.pane.conditions.secondary.tempoDown"), 4)
+    
+    object Secret : Condition(StoryL10N.getVar("desktop.pane.conditions.secondary.monsterGoal"), 0)
 
     override fun compareTo(other: Condition): Int = this.priority.compareTo(other.priority)
 }
