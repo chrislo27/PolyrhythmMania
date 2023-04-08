@@ -62,6 +62,7 @@ class BossScriptEnd(
                 Gdx.app.postRunnable {
                     val pos = StoryBossGameMode.BOSS_POSITION.cpy()
                     pos.x += 0.5f
+                    pos.y += 0.5f
                     world.addEntity(
                         EntityBossExplosion(
                             world,
