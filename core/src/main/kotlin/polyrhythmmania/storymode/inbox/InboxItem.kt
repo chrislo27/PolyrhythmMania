@@ -78,6 +78,7 @@ sealed class InboxItem(
 
         override val desc: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$itemID.desc")
         override val tagline: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$itemID.tagline")
+        val listingSubtitle: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$id.listing")
         
         val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
 

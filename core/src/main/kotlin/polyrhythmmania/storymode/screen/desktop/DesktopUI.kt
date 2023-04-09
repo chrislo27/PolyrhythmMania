@@ -592,6 +592,14 @@ class DesktopUI(
                                 }).use()
                             } else ""
                         }
+
+                        is InboxItem.RobotTest -> {
+                            if (!myInboxItemState.use().newIndicator) {
+                                StoryL10N.getVar("inboxItem.robotTest.listingSubtitle", Var {
+                                    listOf(inboxItem.listingSubtitle.use())
+                                }).use()
+                            } else ""
+                        }
                         
                         is InboxItem.InfoMaterial -> StoryL10N.getVar("inboxItem.infoMaterial.heading").use()
 

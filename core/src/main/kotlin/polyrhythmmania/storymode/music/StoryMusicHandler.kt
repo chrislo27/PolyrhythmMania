@@ -213,6 +213,8 @@ class StoryMusicHandler(val storySession: StorySession) {
                 StemMixes.desktopPostBossMain
             inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_POSTBOSS_QUIET_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->
                 StemMixes.desktopPostBossQuiet
+            inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_POSTBOSS_MINIMAL_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->
+                StemMixes.desktopPostBossMinimal
             inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_POSTBOSS_SILENT_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->
                 StemMixes.desktopPostBossSilent
             inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_PREBOSS_QUIET_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->

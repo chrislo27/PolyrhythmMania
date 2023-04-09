@@ -12,18 +12,23 @@ open class InboxDB : InboxItems() {
         private const val ITEMID_INTERN_EMPLOYMENT_CONTRACT: String = "intern_employment_contract"
         private const val ITEMID_TIM_BOSS_WARNING: String = "memo_tim_boss_warning"
         private val ITEMID_BOSS: String = InboxItem.ContractDoc.getDefaultContractDocID(Contracts.ID_BOSS)
+        private const val ITEMID_POSTBOSS_LETTER_1: String = "postboss_letter_1"
+        private const val ITEMID_POSTBOSS_LETTER_2: String = "postboss_letter_2"
+        private const val ITEMID_POSTBOSS_LETTER_3: String = "postboss_letter_3"
+        private const val ITEMID_POSTGAME_EMPLOYMENT_CONTRACT: String = "postgame_employment_contract"
         private const val ITEMID_WELCOME_BACK_POSTGAME: String = "debug_welcome_back_postgame" // TODO remove this
         
         const val ITEM_TO_TRIGGER_MAIN_MUSIC_MIX: String = ITEMID_INTERN_EMPLOYMENT_CONTRACT
         const val ITEM_TO_TRIGGER_PREBOSS_QUIET_MUSIC_MIX: String = ITEMID_TIM_BOSS_WARNING
         val ITEM_TO_TRIGGER_POSTBOSS_SILENT_MUSIC_MIX: String = ITEMID_BOSS
-        const val ITEM_TO_TRIGGER_POSTBOSS_QUIET_MUSIC_MIX: String = "TODO put ITEMID_ const here" // TODO
-        const val ITEM_TO_TRIGGER_POSTBOSS_MAIN_MUSIC_MIX: String = "TODO put ITEMID_ const here" // TODO
-        const val ITEM_TO_TRIGGER_POSTGAME_MUSIC_MIX: String = ITEMID_WELCOME_BACK_POSTGAME
+        const val ITEM_TO_TRIGGER_POSTBOSS_MINIMAL_MUSIC_MIX: String = ITEMID_POSTBOSS_LETTER_1
+        const val ITEM_TO_TRIGGER_POSTBOSS_QUIET_MUSIC_MIX: String = ITEMID_POSTBOSS_LETTER_2
+        const val ITEM_TO_TRIGGER_POSTBOSS_MAIN_MUSIC_MIX: String = ITEMID_POSTBOSS_LETTER_3
+        const val ITEM_TO_TRIGGER_POSTGAME_MUSIC_MIX: String = ITEMID_POSTGAME_EMPLOYMENT_CONTRACT
     }
     
     enum class Category {
-        INTERNSHIP, MAIN, POSTGAME,
+        INTERNSHIP, MAIN, POSTBOSS, POSTGAME,
     }
     
     val progression: Progression
@@ -109,11 +114,18 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mmgt_confidential_docs", hasToField = false, hasSeparateListingName = false)), dependsOnStageID = "unlock_confidential_docs_memo")
         
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
+        
+        // Pre-boss, boss
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo(ITEMID_TIM_BOSS_WARNING, hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts[Contracts.ID_BOSS], subtype = IContractDoc.ContractSubtype.BOSS)))
         
+        // Post-boss
+        instructions += SingleStageItem(Item(Category.POSTBOSS, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_1, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
+        instructions += SingleStageItem(Item(Category.POSTBOSS, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_2, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
+        instructions += SingleStageItem(Item(Category.POSTBOSS, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_3, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
+        
         // Postgame
-        // TODO replace the ID for this item with a string literal
+        instructions += SingleStageItem(Item(Category.POSTBOSS, InboxItem.EmploymentContract(ITEMID_POSTGAME_EMPLOYMENT_CONTRACT)))
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_WELCOME_BACK_POSTGAME, hasToField = false, hasSeparateListingName = false)))
         
         

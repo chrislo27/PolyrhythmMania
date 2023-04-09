@@ -17,6 +17,7 @@ object StemMixes {
     val desktopMain: StemMix = StemMix(setOf(STEM_ID_DESKTOP_MAIN, STEM_ID_DESKTOP_HARM, STEM_ID_DESKTOP_PERC))
     val desktopPreBossQuiet: StemMix = StemMix(setOf(STEM_ID_DESKTOP_HARM))
     val desktopPostBossSilent: StemMix = StemMix.NONE
+    val desktopPostBossMinimal: StemMix = desktopPreTraining101
     val desktopPostBossQuiet: StemMix = desktopInternship
     val desktopPostBossMain: StemMix = desktopMain
     val desktopPostGame: StemMix = StemMix(setOf(STEM_ID_DESKTOP_MAIN, STEM_ID_DESKTOP_HARM, STEM_ID_TITLE_PERC1))

@@ -124,7 +124,7 @@ class TestStoryMusicScreen(
                                     musicHandler.transitionToStemMix(StemMixes.desktopMain, 1f)
                                 }
                             }
-                            this += Button("Transition to \"boss quiet\" mix").apply {
+                            this += Button("Transition to \"pre-boss quiet\" mix").apply {
                                 this.bounds.height.set(32f)
                                 this.setOnAction {
                                     musicHandler.transitionToStemMix(StemMixes.desktopPreBossQuiet, 1f)
@@ -134,6 +134,18 @@ class TestStoryMusicScreen(
                                 this.bounds.height.set(32f)
                                 this.setOnAction {
                                     musicHandler.transitionToStemMix(StemMixes.desktopPostBossSilent, 1f)
+                                }
+                            }
+                            this += Button("Transition to \"post-boss minimal\" mix").apply {
+                                this.bounds.height.set(32f)
+                                this.setOnAction {
+                                    musicHandler.transitionToStemMix(StemMixes.desktopPostBossMinimal, 1f)
+                                }
+                            }
+                            this += Button("Transition to \"post-boss quiet\" mix").apply {
+                                this.bounds.height.set(32f)
+                                this.setOnAction {
+                                    musicHandler.transitionToStemMix(StemMixes.desktopPostBossQuiet, 1f)
                                 }
                             }
                             this += Button("Transition to \"post-boss main\" mix").apply {
