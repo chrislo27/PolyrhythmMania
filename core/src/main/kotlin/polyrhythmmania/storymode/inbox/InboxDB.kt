@@ -9,9 +9,17 @@ import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
 open class InboxDB : InboxItems() {
     
     companion object {
-        const val ITEM_TO_TRIGGER_MAIN_MUSIC_MIX: String = "intern_employment_contract"
-        const val CONTRACT_ID_BOSS: String = Contracts.ID_BOSS
-        const val FIRST_POSTGAME_ITEM: String = "welcome_back_postgame"
+        private const val ITEMID_INTERN_EMPLOYMENT_CONTRACT: String = "intern_employment_contract"
+        private const val ITEMID_TIM_BOSS_WARNING: String = "memo_tim_boss_warning"
+        private val ITEMID_BOSS: String = InboxItem.ContractDoc.getDefaultContractDocID(Contracts.ID_BOSS)
+        private const val ITEMID_WELCOME_BACK_POSTGAME: String = "debug_welcome_back_postgame" // TODO remove this
+        
+        const val ITEM_TO_TRIGGER_MAIN_MUSIC_MIX: String = ITEMID_INTERN_EMPLOYMENT_CONTRACT
+        const val ITEM_TO_TRIGGER_PREBOSS_QUIET_MUSIC_MIX: String = ITEMID_TIM_BOSS_WARNING
+        val ITEM_TO_TRIGGER_POSTBOSS_SILENT_MUSIC_MIX: String = ITEMID_BOSS
+        const val ITEM_TO_TRIGGER_POSTBOSS_QUIET_MUSIC_MIX: String = "TODO put ITEMID_ const here" // TODO
+        const val ITEM_TO_TRIGGER_POSTBOSS_MAIN_MUSIC_MIX: String = "TODO put ITEMID_ const here" // TODO
+        const val ITEM_TO_TRIGGER_POSTGAME_MUSIC_MIX: String = ITEMID_WELCOME_BACK_POSTGAME
     }
     
     enum class Category {
@@ -36,7 +44,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_final_contract", hasToField = false, hasSeparateListingName = false)))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.ContractDoc(Contracts["crop_stomp"])))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_done", hasToField = false, hasSeparateListingName = false)))
-        instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.EmploymentContract("intern_employment_contract")))
+        instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.EmploymentContract(ITEMID_INTERN_EMPLOYMENT_CONTRACT)))
 
         // Post-internship
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("welcome_back", hasToField = false, hasSeparateListingName = false).apply { 
@@ -101,12 +109,12 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mmgt_confidential_docs", hasToField = false, hasSeparateListingName = false)), dependsOnStageID = "unlock_confidential_docs_memo")
         
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_tim_boss_warning", hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts[CONTRACT_ID_BOSS], subtype = IContractDoc.ContractSubtype.BOSS)))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo(ITEMID_TIM_BOSS_WARNING, hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts[Contracts.ID_BOSS], subtype = IContractDoc.ContractSubtype.BOSS)))
         
         // Postgame
         // TODO replace the ID for this item with a string literal
-        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(FIRST_POSTGAME_ITEM, hasToField = false, hasSeparateListingName = false)))
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_WELCOME_BACK_POSTGAME, hasToField = false, hasSeparateListingName = false)))
         
         
         // Parse instructions

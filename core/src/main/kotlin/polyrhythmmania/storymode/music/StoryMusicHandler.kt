@@ -200,16 +200,27 @@ class StoryMusicHandler(val storySession: StorySession) {
 
     fun getPostResultsStemMix(): StemMix = StemMixes.desktopResults
 
-    fun getDesktopStemMix(inboxState: InboxState?): StemMix {
+    fun getDesktopStemMix(useInboxState: InboxState?): StemMix {
         val inboxState =
-            inboxState ?: storySession.currentSavefile?.inboxState ?: return StemMixes.desktopPreTraining101
+            useInboxState ?: storySession.currentSavefile?.inboxState ?: return StemMixes.desktopPreTraining101
 
         val tutorial1InboxItemID = InboxItem.ContractDoc.getDefaultContractDocID(Contracts.ID_TUTORIAL1)
 
         return when {
-            inboxState.getItemState(InboxDB.FIRST_POSTGAME_ITEM)?.completion?.shouldCountAsCompleted() == true -> StemMixes.desktopPost
-            inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_MAIN_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true -> StemMixes.desktopMain
-            inboxState.getItemState(tutorial1InboxItemID)?.completion?.shouldCountAsCompleted() == true -> StemMixes.desktopInternship
+            inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_POSTGAME_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->
+                StemMixes.desktopPostGame
+            inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_POSTBOSS_MAIN_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->
+                StemMixes.desktopPostBossMain
+            inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_POSTBOSS_QUIET_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->
+                StemMixes.desktopPostBossQuiet
+            inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_POSTBOSS_SILENT_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->
+                StemMixes.desktopPostBossSilent
+            inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_PREBOSS_QUIET_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->
+                StemMixes.desktopPreBossQuiet
+            inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_MAIN_MUSIC_MIX)?.completion?.shouldCountAsCompleted() == true ->
+                StemMixes.desktopMain
+            inboxState.getItemState(tutorial1InboxItemID)?.completion?.shouldCountAsCompleted() == true ->
+                StemMixes.desktopInternship
             else -> StemMixes.desktopPreTraining101
         }
     }

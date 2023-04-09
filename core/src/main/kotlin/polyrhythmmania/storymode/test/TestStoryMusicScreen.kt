@@ -124,10 +124,28 @@ class TestStoryMusicScreen(
                                     musicHandler.transitionToStemMix(StemMixes.desktopMain, 1f)
                                 }
                             }
+                            this += Button("Transition to \"boss quiet\" mix").apply {
+                                this.bounds.height.set(32f)
+                                this.setOnAction {
+                                    musicHandler.transitionToStemMix(StemMixes.desktopPreBossQuiet, 1f)
+                                }
+                            }
+                            this += Button("Transition to \"post-boss silent\" mix").apply {
+                                this.bounds.height.set(32f)
+                                this.setOnAction {
+                                    musicHandler.transitionToStemMix(StemMixes.desktopPostBossSilent, 1f)
+                                }
+                            }
+                            this += Button("Transition to \"post-boss main\" mix").apply {
+                                this.bounds.height.set(32f)
+                                this.setOnAction {
+                                    musicHandler.transitionToStemMix(StemMixes.desktopPostBossMain, 1f)
+                                }
+                            }
                             this += Button("Transition to \"post-game phase\" mix").apply {
                                 this.bounds.height.set(32f)
                                 this.setOnAction {
-                                    musicHandler.transitionToStemMix(StemMixes.desktopPost, 1f)
+                                    musicHandler.transitionToStemMix(StemMixes.desktopPostGame, 1f)
                                 }
                             }
                         }

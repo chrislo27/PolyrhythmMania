@@ -33,6 +33,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
+import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.inbox.*
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.ui.TogglableInputProcessor
@@ -516,7 +517,7 @@ class DesktopUI(
             contentPane += ImageNode().apply { 
                 this.textureRegion.sideEffecting(TextureRegion()) {reg ->
                     val state = myInboxItemState.use()
-                    if (inboxItem.id == InboxItem.ContractDoc.getDefaultContractDocID(InboxDB.CONTRACT_ID_BOSS)) {
+                    if (inboxItem.id == InboxItem.ContractDoc.getDefaultContractDocID(Contracts.ID_BOSS)) {
                         reg!!.setRegion(StoryAssets.get<Texture>("desk_inboxitem_${
                             when (state.completion) {
                                 InboxItemCompletion.AVAILABLE -> "boss_available"
