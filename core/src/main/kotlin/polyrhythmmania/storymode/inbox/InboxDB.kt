@@ -28,7 +28,7 @@ open class InboxDB : InboxItems() {
     }
     
     enum class Category {
-        INTERNSHIP, MAIN, POSTBOSS, POSTGAME,
+        INTERNSHIP, MAIN, POSTGAME,
     }
     
     val progression: Progression
@@ -107,10 +107,9 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.RobotTest("robotTestResults_2")), dependsOnStageID = "screwbots2")
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.RobotTest("robotTestResults_3")), dependsOnStageID = "screwbots2")
 
-        instructions += NewUnlockStage(UnlockStage("unlock_confidential_docs_memo", { progression, inboxState ->
-            val testResults2StageID = "robotTestResults_2"
-            UnlockStageChecker.stageToBeCompleted(testResults2StageID).testShouldStageBecomeUnlocked(progression, inboxState)
-        }, listOf("robotTestResults_1", "robotTestResults_2", "robotTestResults_3"), minRequiredToComplete = 2))
+        instructions += NewUnlockStage(UnlockStage("unlock_confidential_docs_memo",
+            UnlockStageChecker.stageToBeCompleted("screwbots2"),
+            listOf("robotTestResults_1", "robotTestResults_2", "robotTestResults_3"), minRequiredToComplete = 2))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mmgt_confidential_docs", hasToField = false, hasSeparateListingName = false)), dependsOnStageID = "unlock_confidential_docs_memo")
         
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
@@ -119,13 +118,11 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo(ITEMID_TIM_BOSS_WARNING, hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts[Contracts.ID_BOSS], subtype = IContractDoc.ContractSubtype.BOSS)))
         
-        // Post-boss
-        instructions += SingleStageItem(Item(Category.POSTBOSS, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_1, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
-        instructions += SingleStageItem(Item(Category.POSTBOSS, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_2, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
-        instructions += SingleStageItem(Item(Category.POSTBOSS, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_3, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
-        
-        // Postgame
-        instructions += SingleStageItem(Item(Category.POSTBOSS, InboxItem.EmploymentContract(ITEMID_POSTGAME_EMPLOYMENT_CONTRACT)))
+        // Post-boss/postgame
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_1, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_2, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_3, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.EmploymentContract(ITEMID_POSTGAME_EMPLOYMENT_CONTRACT)))
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_WELCOME_BACK_POSTGAME, hasToField = false, hasSeparateListingName = false)))
         
         
