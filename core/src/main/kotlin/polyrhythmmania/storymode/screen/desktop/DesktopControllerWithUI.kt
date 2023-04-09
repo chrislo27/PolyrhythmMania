@@ -92,11 +92,16 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopControllerWithP
                 )
                 storySession.musicHandler.transitionToDesktopMix()
             }
-            val exitToScreen = PostBossCutsceneScreen(main, storySession, onExit)
+            val cutsceneScreen = PostBossCutsceneScreen(main, storySession, onExit)
             
-            playLevel(contract, inboxItem, inboxItemState, main, storySession, exitToScreen)
+            playLevel(contract, inboxItem, inboxItemState, main, storySession) { exitReason ->
+                when (exitReason) {
+                    is ExitReason.Passed -> cutsceneScreen
+                    else -> rootScreen
+                }
+            }
         } else {
-            playLevel(contract, inboxItem, inboxItemState, main, storySession, rootScreen)
+            playLevel(contract, inboxItem, inboxItemState, main, storySession) { rootScreen }
         }
     }
 

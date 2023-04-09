@@ -72,7 +72,7 @@ class StoryPlayScreen(
         val contract: Contract,
         isNotCompletedYet: Boolean,
         private val previousFailureCount: Int,
-        val exitToScreen: PaintboxScreen,
+        val exitToScreen: (ExitReason) -> PaintboxScreen,
         val exitCallback: ExitCallback,
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
 
@@ -531,7 +531,7 @@ class StoryPlayScreen(
     }
     
     private fun quitPauseAction(exitReason: ExitReason) {
-        quitToScreen(exitToScreen, longTransition = contract.id == Contracts.ID_BOSS)
+        quitToScreen(exitToScreen(exitReason), longTransition = exitReason is ExitReason.Passed && contract.id == Contracts.ID_BOSS)
         exitCallback.onExit(exitReason)
         Gdx.app.postRunnable {
             playMenuSound("sfx_pause_exit")

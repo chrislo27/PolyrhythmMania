@@ -15,6 +15,7 @@ import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.screen.ExitCallback
+import polyrhythmmania.storymode.screen.ExitReason
 import polyrhythmmania.storymode.screen.StoryLoadingScreen
 import polyrhythmmania.storymode.screen.StoryPlayScreen
 
@@ -52,7 +53,7 @@ abstract class DesktopControllerWithPlayLevel
 
     fun playLevel(
             contract: Contract, inboxItem: InboxItem?, inboxItemState: InboxItemState?,
-            main: PRManiaGame, storySession: StorySession, exitToScreen: PaintboxScreen
+            main: PRManiaGame, storySession: StorySession, exitToScreen: (ExitReason) -> PaintboxScreen
     ) {
         storySession.musicHandler.fadeOut(0.25f)
 
