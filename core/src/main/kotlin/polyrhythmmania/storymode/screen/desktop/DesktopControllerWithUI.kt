@@ -1,16 +1,22 @@
 package polyrhythmmania.storymode.screen.desktop
 
 import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.graphics.Color
 import paintbox.Paintbox
 import paintbox.registry.AssetRegistry
+import paintbox.transition.FadeToOpaque
+import paintbox.transition.FadeToTransparent
+import paintbox.transition.TransitionScreen
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.contract.Contract
+import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemCompletion
 import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.inbox.StageCompletionData
 import polyrhythmmania.storymode.screen.ExitCallback
 import polyrhythmmania.storymode.screen.ExitReason
+import polyrhythmmania.storymode.screen.cutscene.PostBossCutsceneScreen
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -65,12 +71,33 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopControllerWithP
                 desktopUI.background.resetAll()
                 desktopUI.updateAndShowNewlyAvailableInboxItems(lockInputs = true)
                 desktopUI.storySession.attemptSave()
+                
+                if (!contract.shouldPlayPostResultsMixOnPass) {
+                    desktopUI.storySession.musicHandler.fadeOut(0f)
+                }
             }
         }
     }
 
     override fun playLevel(contract: Contract, inboxItem: InboxItem?, inboxItemState: InboxItemState?) {
-        playLevel(contract, inboxItem, inboxItemState, desktopUI.main, desktopUI.storySession, desktopUI.rootScreen)
+        val main = desktopUI.main
+        val storySession = desktopUI.storySession
+        val rootScreen = desktopUI.rootScreen
+        if (contract.id == Contracts.ID_BOSS) {
+            val onExit: () -> Unit = {
+                main.screen = TransitionScreen(
+                    main, main.screen, rootScreen,
+                    FadeToOpaque(1f, Color(0f, 0f, 0f, 1f)),
+                    FadeToTransparent(1f, Color(0f, 0f, 0f, 1f))
+                )
+                storySession.musicHandler.transitionToDesktopMix()
+            }
+            val exitToScreen = PostBossCutsceneScreen(main, storySession, onExit)
+            
+            playLevel(contract, inboxItem, inboxItemState, main, storySession, exitToScreen)
+        } else {
+            playLevel(contract, inboxItem, inboxItemState, main, storySession, rootScreen)
+        }
     }
 
     override fun playSFX(sfx: DesktopController.SFXType) {

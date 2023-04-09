@@ -128,12 +128,18 @@ abstract class AbstractEnginePlayScreen(
     }
     
     
-    protected fun quitToScreen(targetScreen: Screen? = main.mainMenuScreen.prepareShow(doFlipAnimation = true)) {
+    protected fun quitToScreen(
+        targetScreen: Screen? = main.mainMenuScreen.prepareShow(doFlipAnimation = true),
+        longTransition: Boolean = false
+    ) {
         val main = this.main
         val currentScreen = this
         Gdx.app.postRunnable {
-            main.screen = TransitionScreen(main, currentScreen, targetScreen,
-                    FadeToOpaque(0.25f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
+            main.screen = TransitionScreen(
+                main, currentScreen, targetScreen,
+                FadeToOpaque(if (!longTransition) 0.25f else 2f, Color(0f, 0f, 0f, 1f)),
+                FadeToTransparent(if (!longTransition) 0.125f else 2f, Color(0f, 0f, 0f, 1f))
+            ).apply {
                 this.onEntryEnd = {
                     currentScreen.dispose()
                     container.disposeQuietly()

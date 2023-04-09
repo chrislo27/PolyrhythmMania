@@ -52,6 +52,7 @@ import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.contract.Contract
+import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.gamemode.boss.BossModifierModule
 import polyrhythmmania.ui.TextSlideInterp
@@ -530,7 +531,7 @@ class StoryPlayScreen(
     }
     
     private fun quitPauseAction(exitReason: ExitReason) {
-        quitToScreen(exitToScreen)
+        quitToScreen(exitToScreen, longTransition = contract.id == Contracts.ID_BOSS)
         exitCallback.onExit(exitReason)
         Gdx.app.postRunnable {
             playMenuSound("sfx_pause_exit")
