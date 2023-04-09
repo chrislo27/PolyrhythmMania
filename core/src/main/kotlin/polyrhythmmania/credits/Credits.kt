@@ -52,6 +52,7 @@ object Credits : CreditsBase() {
                     "Pexels",
                     "world-flags-sprite",
                     "glsl-fast-gaussian-blur",
+                    "Freesound",
             ).toVars() + abcSorted(
                     "Roboto",
                     "Rodin",
