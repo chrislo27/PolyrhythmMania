@@ -777,7 +777,9 @@ class StoryPlayScreen(
                         animationHandler.enqueueAnimation(Animation(Interpolation.linear, 0f, 100f, 100f, 0.5f).apply {
                             this.onComplete = {
                                 currentScoreCardOptions.set(successScoreCardOptions)
-                                storySession.musicHandler.transitionToPostResultsMix()
+                                if (contract.shouldPlayPostResultsMixOnPass) {
+                                    storySession.musicHandler.transitionToPostResultsMix()
+                                }
                             }
                         }, scoreBar)
                     }
@@ -813,7 +815,7 @@ class StoryPlayScreen(
                         playMenuSound(StoryAssets.get<Sound>("score_finish"))
                         playMenuSound(StoryAssets.get<Sound>(if (passed) "score_jingle_pass" else "score_jingle_tryagain"))
 
-                        if (passed) {
+                        if (passed && contract.shouldPlayPostResultsMixOnPass) {
                             storySession.musicHandler.transitionToPostResultsMix()
                         }
 

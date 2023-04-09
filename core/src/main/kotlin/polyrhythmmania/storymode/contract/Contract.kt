@@ -49,6 +49,8 @@ data class Contract(
     val immediatePass: Boolean get() = minimumScore <= 0
     val canSkipLevel: Boolean get() = skipAfterNFailures > 0
     
+    val shouldPlayPostResultsMixOnPass: Boolean = id != Contracts.ID_BOSS
+    
     constructor(
             id: String, requester: Requester, jingleType: JingleType, attribution: Attribution?,
             minimumScore: Int, extraConditions: List<Condition> = emptyList(), 
