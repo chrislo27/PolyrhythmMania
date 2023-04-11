@@ -90,7 +90,9 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopControllerWithP
                     FadeToOpaque(1f, Color(0f, 0f, 0f, 1f)),
                     FadeToTransparent(1f, Color(0f, 0f, 0f, 1f))
                 )
-                storySession.musicHandler.transitionToDesktopMix()
+                
+                val noSavefile = storySession.currentSavefile == null // Only null when debugging
+                storySession.musicHandler.transitionToDesktopMix(if (noSavefile) desktopUI.scenario.inboxState else null)
             }
             val cutsceneScreen = PostBossCutsceneScreen(main, storySession, onExit)
             
