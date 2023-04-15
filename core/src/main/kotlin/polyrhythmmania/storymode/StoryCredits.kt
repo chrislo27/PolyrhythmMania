@@ -22,6 +22,7 @@ object StoryCredits : CreditsBase() {
         ).toVars(),
         Localization.getVar("credits.qa.closedEarlyAccess") to listOf(Localization.getVar("credits.tourneycord")),
         Localization.getVar("credits.story.inspiration") to listOf(
+            "Super Mario Maker 2",
             "Splatoon 2:\nOcto Expansion",
         ).toVars(),
     )
