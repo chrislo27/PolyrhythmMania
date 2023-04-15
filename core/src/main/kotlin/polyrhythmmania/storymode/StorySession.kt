@@ -3,6 +3,7 @@ package polyrhythmmania.storymode
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
+import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.storymode.music.StoryMusicAssets
 import polyrhythmmania.storymode.music.StoryMusicHandler
@@ -46,6 +47,7 @@ class StorySession {
     
     fun createEntryLoadingScreen(main: PRManiaGame, doAfterLoad: () -> Unit): StoryAssetsLoadingScreen {
         DiscordRichPresence.updateActivity(DefaultPresences.playingStoryMode())
+        main.mainMenuScreen.backgroundType = BgType.STORY_MODE
         StoryMusicAssets.initTitleStems()
         return StoryAssetsLoadingScreen(main, false, doAfterLoad)
     }

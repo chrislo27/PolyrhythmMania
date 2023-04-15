@@ -126,11 +126,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     }
 
                     main.screen = TransitionScreen(main, main.screen, storySession.createEntryLoadingScreen(main, doAfterLoad),
-                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
-                        this.onDestEnd = {
-                            mainMenu.backgroundType = BgType.NORMAL // TODO add a new background type for story mode?
-                        }
-                    }
+                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
 
                     val newIndicator = settings.newIndicatorStoryMode
                     if (newIndicator.value.get()) {

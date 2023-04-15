@@ -9,9 +9,7 @@ import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.drawQuad
-import polyrhythmmania.screen.mainmenu.EntityAsmWidgetHovering
-import polyrhythmmania.screen.mainmenu.EntityCubeHovering
-import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.screen.mainmenu.*
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.Entity
 import polyrhythmmania.world.entity.EntityCube
@@ -82,6 +80,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
             BgType.DUNK -> initializeDunk()
             BgType.ENDLESS -> initializeEndless()
             BgType.ASSEMBLE -> initializeAssemble()
+            BgType.STORY_MODE -> initializeStoryMode()
         }
     }
     
@@ -262,6 +261,69 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
         })
         world.addEntity(EntityCubeHovering(world).apply {
             this.position.set(0f, -2f, 1f)
+        })
+    }
+
+    private fun initializeStoryMode() {
+        val world = this.world
+        world.clearEntities()
+
+        for (x in 0 until 3) {
+            for (z in -2..2) {
+                world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = z == -2).apply {
+                    this.position.set(x.toFloat(), 0f, z.toFloat())
+                })
+            }
+        }
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = true).apply {
+            this.position.set(1f, 1f, -2f)
+        })
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = true).apply {
+            this.position.set(1f, 2f, -2f)
+        })
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
+            this.position.set(1f, 1f, -1f)
+        })
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
+            this.position.set(1f, 2f, -1f)
+        })
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
+            this.position.set(1f, 1f, 0f)
+        })
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
+            this.position.set(1f, 2f, 0f)
+        })
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
+            this.position.set(1f, 1f, 1f)
+        })
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
+            this.position.set(1f, 2f, 1f)
+        })
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
+            this.position.set(1f, 1f, 2f)
+        })
+        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
+            this.position.set(1f, 2f, 2f)
+        })
+        
+        world.addEntity(EntityStoryModeDesktopInbox(world).apply {
+            this.position.set(0f, 2f, -1f)
+        })
+        world.addEntity(EntityStoryModeDesktopTube(world).apply {
+            this.position.set(-1f, -1f, 1f)
+        })
+        
+        world.addEntity(EntityStoryModeDesktopPistonHovering(world).apply {
+            this.position.set(-2f, 2f, -3f)
+        })
+        world.addEntity(EntityCubeHovering(world).apply {
+            this.position.set(2f, 2f, -5f)
+        })
+        world.addEntity(EntityCubeHovering(world).apply {
+            this.position.set(6f, 0f, -4f)
+        })
+        world.addEntity(EntityCubeHovering(world).apply {
+            this.position.set(-3.75f, 0.5f, 0f)
         })
     }
     

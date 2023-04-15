@@ -8,5 +8,6 @@ enum class BgType {
     DUNK,
     ENDLESS,
     ASSEMBLE,
+    STORY_MODE,
     
 }
