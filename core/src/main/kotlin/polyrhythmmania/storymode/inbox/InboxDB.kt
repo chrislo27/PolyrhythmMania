@@ -67,7 +67,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["rhythm_rally"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["bouncy_road"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["fillbots2"])))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mmgt_performance", hasToField = false, hasSeparateListingName = false)))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mgmt_performance", hasToField = false, hasSeparateListingName = false)))
         val rt2Instruction = SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["rhythm_tweezers_2"])))
         instructions += rt2Instruction
         instructions += NewItemNoStage(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["boosted_tweezers"])))
@@ -82,12 +82,12 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["fork_lifter"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["working_dough"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial"])))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mmgt_merger", hasToField = true, hasSeparateListingName = true)))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mgmt_merger", hasToField = true, hasSeparateListingName = true)))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["built_to_scale_ds"])))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mmgt_layoffs", hasToField = false, hasSeparateListingName = false)))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mgmt_layoffs", hasToField = false, hasSeparateListingName = false)))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["rhythm_rally_2"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.InfoMaterial("info_on_defective_rods", hasSeparateListingName = true)))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mmgt_late_info_on_defective_rods", hasToField = true, hasSeparateListingName = false)))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mgmt_late_info_on_defective_rods", hasToField = true, hasSeparateListingName = false)))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["flock_step"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["fruit_basket_2"])))
 //        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_tim_gossip2", hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
@@ -110,7 +110,7 @@ open class InboxDB : InboxItems() {
         instructions += NewUnlockStage(UnlockStage("unlock_confidential_docs_memo",
             UnlockStageChecker.stageToBeCompleted("screwbots2"),
             listOf("robotTestResults_1", "robotTestResults_2", "robotTestResults_3"), minRequiredToComplete = 2))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mmgt_confidential_docs", hasToField = false, hasSeparateListingName = false)), dependsOnStageID = "unlock_confidential_docs_memo")
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mgmt_confidential_docs", hasToField = false, hasSeparateListingName = false)), dependsOnStageID = "unlock_confidential_docs_memo")
         
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
         
@@ -123,7 +123,9 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_2, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_3, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.EmploymentContract(ITEMID_POSTGAME_EMPLOYMENT_CONTRACT, useSecondarySignedTexture = true)))
-        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_WELCOME_BACK_POSTGAME, hasToField = false, hasSeparateListingName = false)))
+        
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_WELCOME_BACK_POSTGAME, hasToField = false, hasSeparateListingName = true)))
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.InfoMaterial("info_on_robot_mode", hasSeparateListingName = true)))
         
         
         // Parse instructions
