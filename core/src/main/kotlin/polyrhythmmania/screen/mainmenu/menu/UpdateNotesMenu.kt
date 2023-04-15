@@ -7,9 +7,11 @@ import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
-import paintbox.ui.control.*
+import paintbox.ui.control.CheckBox
+import paintbox.ui.control.ComboBox
+import paintbox.ui.control.ScrollPane
+import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
-import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.UpdateNotesL10N
@@ -21,7 +23,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     companion object {
         private val TEXT_COLOR: Color = LongButtonSkin.TEXT_COLOR
         
-        val updates: List<String> = listOf("v1.1", "v1.2")
+        val updates: List<String> = listOf("v1.1", "v1.2", "v2.0")
         val latestUpdate: String = updates.last()
     }
     
