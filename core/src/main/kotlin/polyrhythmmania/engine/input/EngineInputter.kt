@@ -210,6 +210,9 @@ class EngineInputter(val engine: Engine) {
                         if (!rod.isDefective) {
                             missed()
                         }
+                        if (inputChallenge.isInputScoreMissFromRestriction(inputResult.inputScore)) {
+                            playMissClick()
+                        }
                     }
                 }
 
@@ -252,6 +255,9 @@ class EngineInputter(val engine: Engine) {
                 rod.bounce(engine, inputResult)
                 if (countsAsMiss) { // Explicitly checking for MISS, since rod.bounce returns immediately if it is MISS
                     missed()
+                    if (inputChallenge.isInputScoreMissFromRestriction(inputResult.inputScore)) {
+                        playMissClick()
+                    }
                 } else {
                     if (inputResult.inputScore == InputScore.ACE) {
                         attemptSkillStar(perfectBeats)
@@ -305,6 +311,10 @@ class EngineInputter(val engine: Engine) {
                         }
                         hit = true
                         hitDuration = 1f
+                    } else {
+                        if (inputChallenge.isInputScoreMissFromRestriction(inputResult.inputScore)) {
+                            playMissClick()
+                        }
                     }
                 }
 
@@ -332,6 +342,12 @@ class EngineInputter(val engine: Engine) {
                     }
                 }
             }
+        }
+    }
+    
+    private fun playMissClick() {
+        engine.soundInterface.playAudio(AssetRegistry.get<BeadsSound>("sfx_miss_click"), SoundInterface.SFXType.PLAYER_INPUT) { player ->
+            player.gain = 1.1f
         }
     }
 

@@ -162,7 +162,7 @@ class InitialAssetLoader : IAssetLoader {
                 atlasMinFilter = Texture.TextureFilter.Nearest, atlasMagFilter = Texture.TextureFilter.Nearest)))
         
         listOf("applause", "despawn", "explosion", "input_a", "input_d", "land", "retract", "side_collision",
-                "spawn_a", "spawn_d", "cowbell",).forEach {
+                "spawn_a", "spawn_d", "cowbell", "miss_click").forEach {
             AssetRegistry.loadAsset<BeadsSound>("sfx_$it", "sounds/${it}.wav")
         }
         listOf("perfect_fail", "monster_goal_ace",).forEach {
