@@ -21,6 +21,7 @@ import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.storymode.screen.StoryCreditsScreen
 import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
 import polyrhythmmania.ui.PRManiaSkins
 
@@ -28,8 +29,8 @@ import polyrhythmmania.ui.PRManiaSkins
 class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
     
     companion object {
-        private const val MAIN_PANE_HEIGHT_COLLAPSED: Float = 78f
-        private const val MAIN_PANE_HEIGHT_FULL: Float = 150f
+        private const val MAIN_PANE_HEIGHT_COLLAPSED: Float = 91f
+        private const val MAIN_PANE_HEIGHT_FULL: Float = 163f
     }
     
     private val resetVolumesToggle: BooleanVar = BooleanVar(false)
@@ -86,6 +87,28 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
                     val nextScreen = desktopUI.rootScreen.prevScreen()
                     main.screen = TransitionScreen(main, main.screen, nextScreen,
                             FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                }
+            }
+            this += Button(Localization.getVar("mainMenu.credits.title")).apply {
+                this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_LIGHT)
+                this.markup.set(robotoRegularMarkup)
+                this.bounds.height.set(10f * UI_SCALE)
+                this.setOnAction {
+                    val currentScreen = main.screen
+                    val onExitCredits: () -> Unit = {
+                        addBandpassToMusic()
+                        main.screen = TransitionScreen(
+                            main, main.screen, currentScreen,
+                            FadeToOpaque(0.25f, Color(0f, 0f, 0f, 1f)),
+                            FadeToTransparent(0.25f, Color(0f, 0f, 0f, 1f))
+                        )
+                    }
+                    val creditsScreen = StoryCreditsScreen(main, desktopUI.storySession, onExitCredits)
+
+                    desktopUI.controller.playSFX(DesktopController.SFXType.PAUSE_EXIT)
+                    removeBandpassFromMusic()
+                    main.screen = TransitionScreen(main, main.screen, creditsScreen,
+                        FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                 }
             }
 
@@ -171,6 +194,10 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
     override fun onCloseDialog() {
         desktopUI.controller.playSFX(DesktopController.SFXType.PAUSE_EXIT)
         removeBandpassFromMusic()
+    }
+    
+    private fun addBandpassToMusic() {
+        desktopUI.storySession.musicHandler.transitionToBandpass(true)
     }
     
     private fun removeBandpassFromMusic() {

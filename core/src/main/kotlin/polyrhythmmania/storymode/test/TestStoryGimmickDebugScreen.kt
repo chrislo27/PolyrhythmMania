@@ -47,6 +47,7 @@ import polyrhythmmania.storymode.inbox.InboxItems
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.inbox.progression.UnlockStage
 import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
+import polyrhythmmania.storymode.screen.StoryCreditsScreen
 import polyrhythmmania.storymode.screen.StoryLoadingScreen
 import polyrhythmmania.storymode.screen.StoryTitleScreen
 import polyrhythmmania.storymode.screen.cutscene.PostBossCutsceneScreen
@@ -493,6 +494,21 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                     }
                     this += separator()
                     this += separator()
+                    this += Button("Story Credits").apply {
+                        this.bounds.height.set(32f)
+                        this.setOnAction {
+                            val titleScreen = StoryCreditsScreen(main, storySession) {
+                                main.screen = TransitionScreen(
+                                    main, main.screen, this@TestStoryGimmickDebugScreen,
+                                    FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)
+                                )
+                            }
+                            main.screen = TransitionScreen(
+                                main, main.screen, titleScreen,
+                                FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)
+                            )
+                        }
+                    }
                     this += Button("Post-boss cutscene").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
