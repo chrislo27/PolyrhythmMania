@@ -4,12 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.EditorSpecialFlags
+import polyrhythmmania.editor.block.GenericBlock
+import polyrhythmmania.engine.EventChangePlaybackSpeed
 import polyrhythmmania.util.TempFileUtils
 import java.util.*
 
 
-class StoryGameModeFromFile(main: PRManiaGame, val file: FileHandle)
-    : AbstractStoryGameMode(main) {
+class StoryGameModeFromFile(main: PRManiaGame, val file: FileHandle, val percentSpeed: Int = 100) :
+    AbstractStoryGameMode(main) {
 
     init {
         val tmpFile = TempFileUtils.createTempFile("storylevel")
@@ -24,6 +26,14 @@ class StoryGameModeFromFile(main: PRManiaGame, val file: FileHandle)
     }
 
     override fun initialize() {
-        
+        if (percentSpeed != 100) {
+            container.addBlock(
+                GenericBlock(engine, true) {
+                    listOf(
+                        EventChangePlaybackSpeed(this.engine, percentSpeed / 100f)
+                    )
+                }
+            )
+        }
     }
 }
