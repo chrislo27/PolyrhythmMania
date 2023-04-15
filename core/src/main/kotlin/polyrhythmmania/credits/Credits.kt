@@ -15,7 +15,7 @@ object Credits : CreditsBase() {
                     "garbo", "snow krow", "GENERIC", "Merch_Andise", "Kievit", "Luxury",
             ).toVars(),
             Localization.getVar("credits.music") to listOf(
-                    Var("GENERIC"), Localization.getVar("credits.rhSoundtrack")
+                    ReadOnlyVar.const("GENERIC"), Localization.getVar("credits.rhSoundtrack")
             ),
             Localization.getVar("credits.qa") to abcSorted(
                     "Lvl100Feraligatr", "Gosh", "GENERIC", "snow krow", "Kievit", "Chloe", "GrueKun", "Huebird",

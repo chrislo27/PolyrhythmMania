@@ -16,6 +16,7 @@ import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.achievements.Achievements
 import polyrhythmmania.credits.Credits
+import polyrhythmmania.storymode.StoryCredits
 import polyrhythmmania.ui.PRManiaSkins
 import kotlin.math.max
 
@@ -99,15 +100,33 @@ class CreditsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
 
         vbox.temporarilyDisableLayouts {
+            fun createLeftHeading(text: ReadOnlyVar<String>, italic: Boolean = false): TextLabel {
+                val font = if (italic) main.fontMainMenuHeadingItalic else main.fontMainMenuHeading
+                return TextLabel(text, font = font).apply {
+                    this.bounds.height.set(64f)
+                    this.padding.set(Insets(10f, 20f, 6f, 6f))
+                    this.textColor.set(NAME_TEXT_COLOR)
+                    this.renderAlign.set(Align.left)
+                    this.setScaleXY(0.875f)
+                }
+            }
+            
+            vbox += createLeftHeading(Localization.getVar("credits.polyrhythmMania"))
             Credits.credits.forEach { (header, names) ->
                 vbox += createCreditRow(header, names)
             }
+            
+            vbox += createLeftHeading(Localization.getVar("credits.storyMode"), italic = true)
+            StoryCredits.credits.forEach { (header, names) ->
+                vbox += createCreditRow(header, names)
+            }
+            
             vbox += TextLabel(Localization.getValue("credits.licenseInfo", PRMania.GITHUB), font = font).apply {
                 Anchor.TopLeft.configure(this)
                 this.bindWidthToParent(adjust = 0f, multiplier = 1f)
                 this.bounds.x.set(0f)
                 this.bounds.height.set(128f)
-                this.padding.set(Insets(12f, 8f, 6f, 6f))
+                this.padding.set(Insets(18f, 8f, 6f, 6f))
                 this.markup.set(this@CreditsMenu.markup)
                 this.textColor.set(Color.DARK_GRAY)
                 this.renderAlign.set(Align.topLeft)
