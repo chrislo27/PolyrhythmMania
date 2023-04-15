@@ -233,6 +233,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
         beadsMusic = BeadsMusic(musicSample)
     }
+    
+    init {
+        // Set background to story mode if story mode is still (NEW!)
+        if (main.settings.newIndicatorStoryMode.value.get()) {
+            this.backgroundType = BgType.STORY_MODE
+        }
+    }
 
     init {
         val markup = Markup.createWithBoldItalic(main.fontMainMenuMain, null, main.fontMainMenuItalic, main.fontMainMenuItalic)
