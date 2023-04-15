@@ -4,6 +4,7 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.toConstVar
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Contract
+import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.contract.IHasContractTextInfo
 import polyrhythmmania.storymode.contract.Requester
 import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
@@ -63,6 +64,13 @@ sealed class InboxItem(
         override val tagline: ReadOnlyVar<String> get() = contract.tagline
         override val requester: Requester get() = contract.requester
         val contractListingName: ReadOnlyVar<String>? get() = contract.listingName
+        
+        fun showSongInfo(inboxItemState: InboxItemState): Boolean {
+            if (contract.id == Contracts.ID_BOSS) {
+                return inboxItemState.completion.shouldCountAsCompleted()
+            }
+            return inboxItemState.playedBefore
+        }
         
         override fun isCompletedWhenRead(): Boolean = false
     }

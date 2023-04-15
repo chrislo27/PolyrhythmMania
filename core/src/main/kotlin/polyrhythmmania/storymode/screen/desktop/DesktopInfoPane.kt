@@ -76,7 +76,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         addStartContractPanel(inboxItem, inboxItemStateGetter)
         addContractConditionsPanel(inboxItem)
         addContractScorePanel(inboxItem, inboxItemState)
-        if (inboxItemState.playedBefore && attribution != null) {
+        if (inboxItem.showSongInfo(inboxItemState) && attribution != null) {
             val songInfo = attribution.song
             if (songInfo != null) {
                 addSongInfoPanel(songInfo)
