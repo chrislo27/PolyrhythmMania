@@ -90,6 +90,7 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_contract_envelope", "story/textures/desk/contract_envelope.png")
         StoryAssets.loadAsset<Texture>("desk_contract_paper", "story/textures/desk/contract_paper.png")
         StoryAssets.loadAsset<Texture>("desk_contract_full", "story/textures/desk/contract_full.png")
+        StoryAssets.loadAsset<Texture>("desk_contract_full_red", "story/textures/desk/contract_full_red.png")
         StoryAssets.loadAsset<Texture>("desk_contract_employment_blank", "story/textures/desk/employment_contract_blank.png")
         StoryAssets.loadAsset<Texture>("desk_contract_employment_signed", "story/textures/desk/employment_contract_signed.png")
         StoryAssets.loadAsset<Texture>("desk_contract_employment_signed_2", "story/textures/desk/employment_contract_signed_2.png")
@@ -98,6 +99,7 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_inboxitem_frame_cap_bottom", "story/textures/desk/inboxitem/frame/frame_cap_bottom.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_selected_outline", "story/textures/desk/inboxitem/selected_outline.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_blank", "story/textures/desk/inboxitem/blank.png")
+        StoryAssets.loadAsset<Texture>("desk_inboxitem_blank_red", "story/textures/desk/inboxitem/blank_red.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_unavailable", "story/textures/desk/inboxitem/unavailable.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_available", "story/textures/desk/inboxitem/available.png")
         (0..4).forEach { i ->

@@ -511,7 +511,11 @@ class DesktopUI(
                     }
                 }
             } else {
-                contentPane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_blank")))
+                if (inboxItem is InboxItem.ContractDoc && inboxItem.isSuperHard) {
+                    contentPane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_blank_red")))
+                } else {
+                    contentPane += ImageNode(TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_blank")))
+                }
             }
             // LED indicator
             contentPane += ImageNode().apply { 

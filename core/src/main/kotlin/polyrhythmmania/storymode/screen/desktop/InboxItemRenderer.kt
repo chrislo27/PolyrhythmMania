@@ -197,12 +197,16 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
             is InboxItem.ContractDoc, is InboxItem.RobotTest, is InboxItem.PlaceholderContract -> {
                 item as IContractDoc
                 val subtype: IContractDoc.ContractSubtype = item.subtype
-                val paper = createPaperTemplate(when (subtype) {
-                    IContractDoc.ContractSubtype.NORMAL -> "desk_contract_full"
-                    IContractDoc.ContractSubtype.BOSS -> "desk_contract_full"
-                    IContractDoc.ContractSubtype.TRAINING -> "desk_contract_paper"
-                    IContractDoc.ContractSubtype.ROBOT_TEST -> "desk_contract_paper"
-                })
+                val paper = createPaperTemplate(
+                    if (item is InboxItem.ContractDoc && item.isSuperHard)
+                        "desk_contract_full_red"
+                    else when (subtype) {
+                        IContractDoc.ContractSubtype.NORMAL -> "desk_contract_full"
+                        IContractDoc.ContractSubtype.BOSS -> "desk_contract_full"
+                        IContractDoc.ContractSubtype.TRAINING -> "desk_contract_paper"
+                        IContractDoc.ContractSubtype.ROBOT_TEST -> "desk_contract_paper"
+                    }
+                )
 
                 val headingText: ReadOnlyVar<String> = when (item) {
                     is InboxItem.ContractDoc -> item.headingText
