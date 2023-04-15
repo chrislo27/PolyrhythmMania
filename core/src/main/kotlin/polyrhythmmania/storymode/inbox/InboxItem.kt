@@ -112,7 +112,7 @@ sealed class InboxItem(
         override fun isCompletedWhenRead(): Boolean = true // There is no contract to play
     }
 
-    class EmploymentContract(id: String) : InboxItem(id, "".toConstVar()) {
+    class EmploymentContract(id: String, val useSecondarySignedTexture: Boolean) : InboxItem(id, "".toConstVar()) {
         override fun isCompletedWhenRead(): Boolean = false
     }
     

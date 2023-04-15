@@ -49,7 +49,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_final_contract", hasToField = false, hasSeparateListingName = false)))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.ContractDoc(Contracts["crop_stomp"])))
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.Memo("intern_done", hasToField = false, hasSeparateListingName = false)))
-        instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.EmploymentContract(ITEMID_INTERN_EMPLOYMENT_CONTRACT)))
+        instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.EmploymentContract(ITEMID_INTERN_EMPLOYMENT_CONTRACT, useSecondarySignedTexture = false)))
 
         // Post-internship
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("welcome_back", hasToField = false, hasSeparateListingName = false).apply { 
@@ -122,7 +122,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_1, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_2, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_3, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
-        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.EmploymentContract(ITEMID_POSTGAME_EMPLOYMENT_CONTRACT)))
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.EmploymentContract(ITEMID_POSTGAME_EMPLOYMENT_CONTRACT, useSecondarySignedTexture = true)))
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_WELCOME_BACK_POSTGAME, hasToField = false, hasSeparateListingName = false)))
         
         

@@ -92,6 +92,7 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_contract_full", "story/textures/desk/contract_full.png")
         StoryAssets.loadAsset<Texture>("desk_contract_employment_blank", "story/textures/desk/employment_contract_blank.png")
         StoryAssets.loadAsset<Texture>("desk_contract_employment_signed", "story/textures/desk/employment_contract_signed.png")
+        StoryAssets.loadAsset<Texture>("desk_contract_employment_signed_2", "story/textures/desk/employment_contract_signed_2.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_frame", "story/textures/desk/inboxitem/frame/frame.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_frame_cap_top", "story/textures/desk/inboxitem/frame/frame_cap_top.png")
         StoryAssets.loadAsset<Texture>("desk_inboxitem_frame_cap_bottom", "story/textures/desk/inboxitem/frame/frame_cap_bottom.png")

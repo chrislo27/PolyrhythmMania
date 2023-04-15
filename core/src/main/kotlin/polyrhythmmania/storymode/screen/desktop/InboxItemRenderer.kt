@@ -299,7 +299,11 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
             is InboxItem.EmploymentContract -> {
                 val itemStateVar = scenario.inboxState.itemStateVar(item.id)
                 val paper = createPaperTemplate(Var.bind { 
-                    if (itemStateVar.use()?.completion == InboxItemCompletion.COMPLETED) "desk_contract_employment_signed" else "desk_contract_employment_blank"
+                    if (itemStateVar.use()?.completion == InboxItemCompletion.COMPLETED)
+                        if (item.useSecondarySignedTexture) 
+                            "desk_contract_employment_signed_2"
+                        else "desk_contract_employment_signed"
+                    else "desk_contract_employment_blank"
                 })
                 paper.paperPane += VBox().apply {
                     this.spacing.set(1f * UI_SCALE)
