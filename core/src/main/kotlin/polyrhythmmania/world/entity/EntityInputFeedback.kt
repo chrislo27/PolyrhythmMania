@@ -21,6 +21,7 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
         val GOOD_COLOUR: Color = Color.valueOf("6DE23B")
         val BARELY_COLOUR: Color = Color.valueOf("FF7C26")
         val MISS_COLOUR: Color = Color.valueOf("E82727")
+        val OFF_COLOUR: Color = Color.valueOf("404040")
     }
     
     enum class End {
@@ -36,9 +37,9 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
         val inputter = engine.inputter
         val restriction = inputter.inputChallenge.restriction
         return if (restriction == InputTimingRestriction.ACES_ONLY && this.inputScore != InputScore.ACE) {
-            MISS_COLOUR
+            OFF_COLOUR
         } else if (restriction == InputTimingRestriction.NO_BARELY && this.inputScore == InputScore.BARELY) {
-            MISS_COLOUR
+            OFF_COLOUR
         } else {
             originalColor
         }
