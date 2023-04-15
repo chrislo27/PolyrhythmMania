@@ -102,7 +102,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["working_dough_2"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["monkey_watch"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["screwbots2"])))
-        
+
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.RobotTest("robotTestResults_1")), dependsOnStageID = "screwbots2")
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.RobotTest("robotTestResults_2")), dependsOnStageID = "screwbots2")
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.RobotTest("robotTestResults_3")), dependsOnStageID = "screwbots2")
@@ -111,7 +111,7 @@ open class InboxDB : InboxItems() {
             UnlockStageChecker.stageToBeCompleted("screwbots2"),
             listOf("robotTestResults_1", "robotTestResults_2", "robotTestResults_3"), minRequiredToComplete = 2))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mgmt_confidential_docs", hasToField = false, hasSeparateListingName = false)), dependsOnStageID = "unlock_confidential_docs_memo")
-        
+
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
         
         // Pre-boss, boss
@@ -126,6 +126,31 @@ open class InboxDB : InboxItems() {
         
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_WELCOME_BACK_POSTGAME, hasToField = false, hasSeparateListingName = true)))
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.InfoMaterial("info_on_robot_mode", hasSeparateListingName = true)))
+        
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["crop_stomp_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["first_contact_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["bunny_hop_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["screwbots_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["fillbots2_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["built_to_scale_ds_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["air_rally_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["tap_trial_2_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += NewUnlockStage(
+            UnlockStage(
+                "finish_all_superhard",
+                UnlockStageChecker.stageToBeCompleted(ITEMID_WELCOME_BACK_POSTGAME),
+                listOf(
+                    "air_rally_superhard",
+                    "built_to_scale_ds_superhard",
+                    "bunny_hop_superhard",
+                    "crop_stomp_superhard",
+                    "fillbots2_superhard",
+                    "first_contact_superhard",
+                    "screwbots_superhard",
+                    "tap_trial_2_superhard",
+                ),
+            )
+        )
         
         
         // Parse instructions

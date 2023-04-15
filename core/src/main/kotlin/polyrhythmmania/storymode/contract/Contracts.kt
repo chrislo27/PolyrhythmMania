@@ -143,7 +143,33 @@ object Contracts {
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/working_dough_2.prmproj"))
         })
 
+        // Super Hard! contracts
+        add(Contract("air_rally_superhard", Requester.SHIPSTEERING, JingleType.GBA, Attribution(SongInfo.megamix("Air Rally"), listOf("Kievit")), 35, extraConditions = listOf(Condition.InputRestriction.AcesOnly), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/air_rally.prmproj"), percentSpeed = 100)
+        })
+        add(Contract("built_to_scale_ds_superhard", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.ds("Built to Scale"), listOf("Kievit")), 0, extraConditions = listOf(Condition.TempoUp(125), Condition.Lives(5), Condition.InputRestriction.NoBarelies), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/built_to_scale_ds.prmproj"), percentSpeed = 125)
+        })
+        add(Contract("bunny_hop_superhard", Requester.MOON_BUNNY, JingleType.GBA, Attribution(SongInfo.tengoku("Bunny Hop"), listOf("Kievit")), 0, extraConditions = listOf(Condition.TempoUp(110), Condition.Lives(2)), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/bunny_hop.prmproj"), percentSpeed = 110)
+        })
+        add(Contract("crop_stomp_superhard", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 0, extraConditions = listOf(Condition.TempoUp(150), Condition.MonsterGoal), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/crop_stomp.prmproj"), percentSpeed = 150)
+        })
+        add(Contract("fillbots2_superhard", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.ds("Fillbots", listOf(SongNameAndSource.megamix("Fillbots 2"))), listOf("J-D Thunder", "Kievit")), 0, extraConditions = listOf(Condition.TempoUp(150), Condition.Lives(3)), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/fillbots2.prmproj"), percentSpeed = 150)
+        })
+        add(Contract("first_contact_superhard", Requester.ALIENS, JingleType.ARCADE, Attribution(SongInfo.megamix("First Contact"), listOf("Kievit")), 75, extraConditions = listOf(Condition.TempoUp(125)), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/first_contact.prmproj"), percentSpeed = 125)
+        })
+        add(Contract("screwbots_superhard", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.fever("Screwbot Factory"), listOf("Kievit")), 80, extraConditions = listOf(Condition.TempoUp(125)), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/screwbots.prmproj"), percentSpeed = 125)
+        })
+        add(Contract("tap_trial_2_superhard", Requester.ANIMAL_ACROBATICS, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 0, extraConditions = listOf(Condition.TempoUp(110), Condition.MonsterGoal), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/tap_trial_2.prmproj"), percentSpeed = 110)
+        })
 
+        
         // Debug contracts
         add(Contract("air_rally_one_life", Requester.DEBUG, JingleType.GBA, contracts["air_rally"]?.attribution, 0, listOf(Condition.Lives(1))) { main ->
             // FIXME this is a debug contract
@@ -176,7 +202,7 @@ object Contracts {
                 monsterGoal.enabled.set(true)
             }
         })
-        add(Contract("air_rally_2_monster_superhard", Requester.DEBUG, JingleType.GBA, contracts["air_rally_2"]?.attribution, 60, listOf(Condition.MonsterGoal)) { main ->
+        add(Contract("air_rally_2_monster_super_hard", Requester.DEBUG, JingleType.GBA, contracts["air_rally_2"]?.attribution, 60, listOf(Condition.MonsterGoal)) { main ->
             // FIXME this is a debug contract
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally_2.prmproj")).apply {
                 this.engine.tempos.addTempoChange(TempoChange(0f, 182f * 2))
