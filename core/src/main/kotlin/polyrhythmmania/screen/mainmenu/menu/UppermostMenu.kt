@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.ContextBinding
+import paintbox.font.Markup
 import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
 import paintbox.transition.FadeToOpaque
@@ -80,6 +81,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
         }
 
         val font = mainMenu.main.fontMainMenuMain
+        val markupWithFont = Markup.createWithSingleFont(font, lenientMode = true)
         val buttonHeight = 40f
         fun createButton(binding: ContextBinding<String>): Button = Button(binding, font = font).apply {
             this.skinID.set(BUTTON_SKIN_ID)
@@ -87,6 +89,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             this.bounds.height.set(buttonHeight)
             this.textAlign.set(TextAlign.LEFT)
             this.renderAlign.set(Align.left)
+            this.markup.set(markupWithFont)
             this.setOnHoverStart {
                 menuCol.playBlipSound()
             }
@@ -94,15 +97,8 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
         val settings = menuCol.main.settings
         vbox.temporarilyDisableLayouts {
-            vbox += createButton(binding = { Localization.getVar("mainMenu.main.play").use() }).apply {
-                this.setOnAction {
-                    menuCol.pushNextMenu(menuCol.playMenu)
-                }
-            }
-            vbox += createButton(binding = {
-                (if (settings.newIndicatorStoryMode.value.use())
-                    (Localization.getVar("common.newIndicator").use() + " ")
-                else "") + Localization.getVar("mainMenu.main.storyMode").use()
+            vbox += createButton(binding = {// TODO remove me, test story mode gimmicks
+                "TEST: Story Mode debug screen"
             }).apply {
                 this.setOnAction {
                     mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
@@ -110,8 +106,47 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     val main = mainMenu.main
                     val storySession = StorySession()
                     val doAfterLoad: () -> Unit = {
+                        val newScreen = TestStoryGimmickDebugScreen(main, storySession)
+                        Gdx.app.postRunnable {
+                            newScreen.render(1 / 60f)
+                            Gdx.app.postRunnable {
+                                main.screen = TransitionScreen(main, main.screen, newScreen,
+                                    FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                            }
+                        }
+                    }
+
+                    main.screen = TransitionScreen(main, main.screen, storySession.createEntryLoadingScreen(main, doAfterLoad),
+                        FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
+                }
+            }
+            
+            vbox += createButton(binding = { Localization.getVar("mainMenu.main.play").use() }).apply {
+                this.setOnAction {
+                    menuCol.pushNextMenu(menuCol.playMenu)
+                }
+            }
+            vbox += createButton(binding = {
+                (if (settings.newIndicatorStoryMode.value.use())
+                    ("[color=#4AFF4A]${Localization.getVar("common.newIndicator").use()}[] ")
+                else "") + Localization.getVar("mainMenu.main.storyMode").use()
+            }).apply {
+                this.setOnAction {
+                    mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
+
+                    val main = mainMenu.main
+                    val storySession = StorySession()
+                    val checkNewIndicator: () -> Unit = {
+                        val newIndicator = settings.newIndicatorStoryMode
+                        if (newIndicator.value.get()) {
+                            newIndicator.value.set(false)
+                            settings.persist()
+                        }
+                    }
+                    val doAfterLoad: () -> Unit = {
                         val newScreen = StoryTitleScreen(main, storySession)
                         Gdx.app.postRunnable {
+                            checkNewIndicator()
                             newScreen.render(1 / 60f)
                             Gdx.app.postRunnable {
                                 main.screen = TransitionScreen(main, main.screen, newScreen,
@@ -127,36 +162,6 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
 
                     main.screen = TransitionScreen(main, main.screen, storySession.createEntryLoadingScreen(main, doAfterLoad),
                             FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-
-                    val newIndicator = settings.newIndicatorStoryMode
-                    if (newIndicator.value.get()) {
-                        newIndicator.value.set(false)
-                        settings.persist()
-                    }
-                }
-            }
-
-            vbox += createButton(binding = {// TODO remove me, test story mode gimmicks
-                "TEST: Story Mode debug screen"
-            }).apply {
-                this.setOnAction {
-                    mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
-
-                    val main = mainMenu.main
-                    val storySession = StorySession()
-                    val doAfterLoad: () -> Unit = {
-                        val newScreen = TestStoryGimmickDebugScreen(main, storySession)
-                        Gdx.app.postRunnable {
-                            newScreen.render(1 / 60f)
-                            Gdx.app.postRunnable {
-                                main.screen = TransitionScreen(main, main.screen, newScreen,
-                                        FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
-                            }
-                        }
-                    }
-
-                    main.screen = TransitionScreen(main, main.screen, storySession.createEntryLoadingScreen(main, doAfterLoad),
-                            FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
                 }
             }
 
