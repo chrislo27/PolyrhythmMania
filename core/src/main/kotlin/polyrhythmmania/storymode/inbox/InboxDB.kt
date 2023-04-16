@@ -10,13 +10,15 @@ open class InboxDB : InboxItems() {
     
     companion object {
         private const val ITEMID_INTERN_EMPLOYMENT_CONTRACT: String = "intern_employment_contract"
+        private const val ITEMID_INTERMEDIATE_TECHNICIAN_MEMO: String = "memo_mgmt_performance"
         private const val ITEMID_TIM_BOSS_WARNING: String = "memo_tim_boss_warning"
         private val ITEMID_BOSS: String = InboxItem.ContractDoc.getDefaultContractDocID(Contracts.ID_BOSS)
         private const val ITEMID_POSTBOSS_LETTER_1: String = "postboss_letter_1"
         private const val ITEMID_POSTBOSS_LETTER_2: String = "postboss_letter_2"
         private const val ITEMID_POSTBOSS_LETTER_3: String = "postboss_letter_3"
         private const val ITEMID_POSTGAME_EMPLOYMENT_CONTRACT: String = "postgame_employment_contract"
-        private const val ITEMID_WELCOME_BACK_POSTGAME: String = "debug_welcome_back_postgame" // TODO remove this
+        private const val ITEMID_WELCOME_BACK_POSTGAME: String = "welcome_back_postgame"
+        private const val ITEMID_TIM_POSTGAME_COMPLETED: String = "memo_tim_postgame_completed"
         
         const val ITEM_TO_TRIGGER_MAIN_MUSIC_MIX: String = ITEMID_INTERN_EMPLOYMENT_CONTRACT
         const val ITEM_TO_TRIGGER_PREBOSS_QUIET_MUSIC_MIX: String = ITEMID_TIM_BOSS_WARNING
@@ -25,6 +27,11 @@ open class InboxDB : InboxItems() {
         const val ITEM_TO_TRIGGER_POSTBOSS_QUIET_MUSIC_MIX: String = ITEMID_POSTBOSS_LETTER_2
         const val ITEM_TO_TRIGGER_POSTBOSS_MAIN_MUSIC_MIX: String = ITEMID_POSTBOSS_LETTER_3
         const val ITEM_TO_TRIGGER_POSTGAME_MUSIC_MIX: String = ITEMID_POSTGAME_EMPLOYMENT_CONTRACT
+        
+        const val ITEM_TO_TRIGGER_ACHIEVEMENT_JUNIOR_TECHNICIAN: String = ITEMID_INTERN_EMPLOYMENT_CONTRACT
+        const val ITEM_TO_TRIGGER_ACHIEVEMENT_INTERMEDIATE_TECHNICIAN: String = ITEMID_INTERMEDIATE_TECHNICIAN_MEMO
+        val ITEM_TO_TRIGGER_ACHIEVEMENT_DEFEATED_BOSS: String = ITEMID_BOSS
+        const val ITEM_TO_TRIGGER_ACHIEVEMENT_COMPLETED_POSTGAME: String = ITEMID_TIM_POSTGAME_COMPLETED
     }
     
     enum class Category {
@@ -52,9 +59,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.INTERNSHIP, InboxItem.EmploymentContract(ITEMID_INTERN_EMPLOYMENT_CONTRACT, useSecondarySignedTexture = false)))
 
         // Post-internship
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("welcome_back", hasToField = false, hasSeparateListingName = false).apply { 
-//            this.heading = Heading.TEST_HEADING
-        }))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("welcome_back", hasToField = false, hasSeparateListingName = false)))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["air_rally"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["first_contact"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["fruit_basket"])))
@@ -67,7 +72,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["rhythm_rally"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["bouncy_road"])))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["fillbots2"])))
-        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mgmt_performance", hasToField = false, hasSeparateListingName = false)))
+        instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo(ITEMID_INTERMEDIATE_TECHNICIAN_MEMO, hasToField = false, hasSeparateListingName = false)))
         val rt2Instruction = SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["rhythm_tweezers_2"])))
         instructions += rt2Instruction
         instructions += NewItemNoStage(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["boosted_tweezers"])))
@@ -113,11 +118,11 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo("memo_mgmt_confidential_docs", hasToField = false, hasSeparateListingName = false)), dependsOnStageID = "unlock_confidential_docs_memo")
 
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts["tap_trial_2"])))
-        
+
         // Pre-boss, boss
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.Memo(ITEMID_TIM_BOSS_WARNING, hasToField = false, hasSeparateListingName = false, hasDifferentShortFrom = true)))
         instructions += SingleStageItem(Item(Category.MAIN, InboxItem.ContractDoc(Contracts[Contracts.ID_BOSS], subtype = IContractDoc.ContractSubtype.BOSS)))
-        
+
         // Post-boss/postgame
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_1, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_POSTBOSS_LETTER_2, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
@@ -140,17 +145,18 @@ open class InboxDB : InboxItems() {
                 "finish_all_superhard",
                 UnlockStageChecker.stageToBeCompleted(ITEMID_WELCOME_BACK_POSTGAME),
                 listOf(
-                    "air_rally_superhard",
-                    "built_to_scale_ds_superhard",
-                    "bunny_hop_superhard",
-                    "crop_stomp_superhard",
-                    "fillbots2_superhard",
-                    "first_contact_superhard",
-                    "screwbots_superhard",
-                    "tap_trial_2_superhard",
+                    "contract_air_rally_superhard",
+                    "contract_built_to_scale_ds_superhard",
+                    "contract_bunny_hop_superhard",
+                    "contract_crop_stomp_superhard",
+                    "contract_fillbots2_superhard",
+                    "contract_first_contact_superhard",
+                    "contract_screwbots_superhard",
+                    "contract_tap_trial_2_superhard",
                 ),
             )
         )
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_TIM_POSTGAME_COMPLETED, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
         
         
         // Parse instructions

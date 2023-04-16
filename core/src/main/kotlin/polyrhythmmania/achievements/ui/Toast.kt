@@ -1,7 +1,6 @@
 package polyrhythmmania.achievements.ui
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.packing.PackedSheet
@@ -14,6 +13,7 @@ import paintbox.ui.element.RectElement
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievement
+import polyrhythmmania.achievements.AchievementCategory
 import polyrhythmmania.achievements.AchievementsL10N
 import polyrhythmmania.achievements.Fulfillment
 
@@ -90,7 +90,8 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
     }
     
     init {
-        this.titleLabel.text.set(AchievementsL10N.getValue(achievement.rank.toAchievementLocalizationID(achievement.isHidden)))
+        val shouldSayHidden = achievement.isHidden && achievement.category != AchievementCategory.STORY_MODE
+        this.titleLabel.text.set(AchievementsL10N.getValue(achievement.rank.toAchievementLocalizationID(shouldSayHidden)))
         this.nameLabel.text.set(achievement.getLocalizedName().getOrCompute())
         this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")[achievement.getIconID()]))
     }

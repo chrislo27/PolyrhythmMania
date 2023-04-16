@@ -76,6 +76,14 @@ class StorySavefile private constructor(val saveNumber: Int) {
     val inboxState: InboxState = InboxState()
     
     
+    init {
+        inboxState.onItemStatesChanged.addListener { checkForAchievements() }
+    }
+    
+    fun checkForAchievements() {
+        StoryAchievementsChecker.check(inboxState)
+    }
+    
     fun updatePlayTime() {
         playTimeAccumulator.update()
     }

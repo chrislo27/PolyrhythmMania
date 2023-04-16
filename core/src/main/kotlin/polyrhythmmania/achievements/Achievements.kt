@@ -9,11 +9,11 @@ import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.binding.VarChangedListener
 import polyrhythmmania.PRMania
-import polyrhythmmania.statistics.StatTrigger
 import polyrhythmmania.achievements.Achievement.*
 import polyrhythmmania.achievements.AchievementCategory.*
 import polyrhythmmania.achievements.AchievementRank.*
 import polyrhythmmania.statistics.GlobalStats
+import polyrhythmmania.statistics.StatTrigger
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -118,6 +118,25 @@ object Achievements {
      */
     val playtimeHours10 = register(StatTriggered("playtime_hours_10", STATISTICAL, GENERAL, false, GlobalStats.totalPlayTime, 10 * (60 * 60)))
 
+    
+    // Category STORY_MODE
+    /**
+     * Triggered when you sign your first employment contract.
+     */
+    val storyJuniorTechnician = register(Ordinary("story_junior_technician", OBJECTIVE, STORY_MODE, isHidden = true))
+    /**
+     * Triggered when you read the memo that promotes you to Intermediate Technician.
+     */
+    val storyIntermediateTechnician = register(Ordinary("story_intermediate_technician", OBJECTIVE, STORY_MODE, isHidden = true))
+    /**
+     * Triggered when the boss is defeated.
+     */
+    val storyDefeatedBoss = register(Ordinary("story_defeated_boss", OBJECTIVE, STORY_MODE, isHidden = true))
+    /**
+     * Triggered when all postgame material is complete.
+     */
+    val storyCompletedPostgame = register(Ordinary("story_completed_postgame", CHALLENGE, STORY_MODE, isHidden = true))
+    
     
     // Category ENDLESS_MODE
     /**
