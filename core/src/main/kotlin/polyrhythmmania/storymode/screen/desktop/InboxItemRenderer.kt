@@ -46,7 +46,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
     val robotoItalicMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoItalic, main.fontRobotoBoldItalic, main.fontRobotoItalic, main.fontRobotoBold)
     val robotoCondensedMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoCondensed, main.fontRobotoCondensedBold, main.fontRobotoCondensedItalic, main.fontRobotoCondensedBoldItalic)
     val robotoMonoMarkup: Markup = Markup.createWithBoldItalic(main.fontRobotoMono, main.fontRobotoMonoBold, main.fontRobotoMonoItalic, main.fontRobotoMonoBoldItalic)
-    val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic)
+    val openSansMarkup: Markup = Markup.createWithBoldItalic(main.fontOpenSans, main.fontOpenSansBold, main.fontOpenSansItalic, main.fontOpenSansBoldItalic, additionalMappings = mapOf("rodin" to main.fontMainMenuRodin))
 
     
     constructor(desktopUI: DesktopUI) : this(desktopUI.main, desktopUI.scenario) {
