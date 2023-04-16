@@ -62,6 +62,12 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                 override val from: Var<StorySavefile.LoadedState>, override val originalShowContext: BooleanVar
         ) : Operation(), IHasFromTarget
     }
+    
+    private enum class CompletionMark {
+        NONE,
+        MAINGAME,
+        POSTGAME,
+    }
 
     private val main: PRManiaGame = titleLogic.main
     private val storySession: StorySession = titleLogic.storySession
@@ -150,7 +156,8 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                     Anchor.Centre.configure(this)
                     this.spacing.set(32f)
 
-                    val inboxItemIDsThatAreContracts = getInboxDB().items
+                    val inboxDB = getInboxDB()
+                    val inboxItemIDsThatAreContracts = inboxDB.items
                             .filterIsInstance<InboxItem.ContractDoc>()
                             .map { it.id }
                             .toSet()
@@ -253,8 +260,11 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                     FadeToOpaque(0.5f, Color.BLACK, holdDuration = holdDuration), FadeToTransparent(0.25f, Color.BLACK))
         }
     }
-    
-    private fun createSavefileElement(inboxItemIDsThatAreContracts: Set<String>, savefileStateVar :Var<StorySavefile.LoadedState>): ImageNode {
+
+    private fun createSavefileElement(
+        inboxItemIDsThatAreContracts: Set<String>,
+        savefileStateVar: Var<StorySavefile.LoadedState>,
+    ): ImageNode {
         return ImageNode(TextureRegion(StoryAssets.get<Texture>("title_file_blank"))).apply {
             Anchor.Centre.configure(this)
             this.bounds.width.set(76f * UI_SCALE)
@@ -272,6 +282,20 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                 val op = currentOperation.use()
                 op is Operation.IHasFromTarget && op.fromNumber != savefileStateVar.use().number
             }
+            
+            val completionMark: ReadOnlyVar<CompletionMark> = Var.bind {
+                when (val savefileState = savefileStateVar.use()) {
+                    is StorySavefile.LoadedState.Loaded -> {
+                        val inboxState = savefileState.savefile.inboxState
+                        if (inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_ACHIEVEMENT_COMPLETED_POSTGAME)?.completion == InboxItemCompletion.COMPLETED) {
+                            CompletionMark.POSTGAME
+                        } else if (inboxState.getItemState(InboxDB.ITEM_TO_TRIGGER_ACHIEVEMENT_DEFEATED_BOSS)?.completion == InboxItemCompletion.COMPLETED) {
+                            CompletionMark.MAINGAME
+                        } else CompletionMark.NONE
+                    }
+                    else -> CompletionMark.NONE
+                }
+            }
 
             val filePane = Pane()
             this += filePane
@@ -286,6 +310,18 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                 this.textColor.set(Color.BLACK.cpy())
                 this.renderAlign.set(RenderAlign.center)
                 this.setScaleXY(1.1f)
+            }
+            filePane += ImageIcon(binding = {
+                when (completionMark.use()) {
+                    CompletionMark.NONE -> null
+                    CompletionMark.MAINGAME -> TextureRegion(StoryAssets.get<Texture>("title_icon_complete_silver"))
+                    CompletionMark.POSTGAME -> TextureRegion(StoryAssets.get<Texture>("title_icon_complete_gold"))
+                }
+            }).apply {
+                this.bounds.x.set(24.5f * UI_SCALE)
+                this.bounds.y.set(2f * UI_SCALE)
+                this.bounds.width.set(9f / 2 * UI_SCALE)
+                this.bounds.height.set(8f / 2 * UI_SCALE)
             }
 
             val regularLabelText: ReadOnlyVar<String> = Var {

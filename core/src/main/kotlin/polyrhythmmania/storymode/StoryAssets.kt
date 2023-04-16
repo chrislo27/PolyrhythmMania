@@ -46,6 +46,8 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("title_icon_copy", "story/textures/title/file/icon_copy.png")
         StoryAssets.loadAsset<Texture>("title_icon_move", "story/textures/title/file/icon_move.png")
         StoryAssets.loadAsset<Texture>("title_icon_delete", "story/textures/title/file/icon_delete.png")
+        StoryAssets.loadAsset<Texture>("title_icon_complete_gold", "story/textures/title/file/icon_complete_gold.png")
+        StoryAssets.loadAsset<Texture>("title_icon_complete_silver", "story/textures/title/file/icon_complete_silver.png")
 
         StoryAssets.loadAsset<Texture>("desk_ui_scrollbar_back", "story/textures/desk/ui/scrollbar_back.png")
         StoryAssets.loadAsset<Texture>("desk_ui_scrollbar_thumb_active", "story/textures/desk/ui/scrollbar_thumb_active.png")
