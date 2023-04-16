@@ -15,6 +15,7 @@ object StoryCredits : CreditsBase() {
         ).toVars(),
         Localization.getVar("credits.story.music") to listOf(
             ReadOnlyVar.const("GENERIC"), Localization.getVar("credits.rhSoundtrack"),
+            ReadOnlyVar.const("Freesound.org")
         ),
         Localization.getVar("credits.story.levelCreators") to getLevelCreators().toVars(),
         Localization.getVar("credits.story.writing") to abcSorted(
