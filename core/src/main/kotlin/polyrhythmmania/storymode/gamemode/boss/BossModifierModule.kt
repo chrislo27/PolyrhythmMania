@@ -187,7 +187,9 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
                 triggerPlayerHPDown(inputter)
             }
         } else {
-            triggerBossHPDown(rod)
+            if (rod.didLastBounce) {
+                triggerBossHPDown(rod)
+            }
         }
     }
 
