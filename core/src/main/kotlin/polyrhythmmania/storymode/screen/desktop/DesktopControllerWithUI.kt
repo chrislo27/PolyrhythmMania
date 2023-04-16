@@ -16,7 +16,6 @@ import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.inbox.StageCompletionData
 import polyrhythmmania.storymode.screen.ExitCallback
 import polyrhythmmania.storymode.screen.ExitReason
-import polyrhythmmania.storymode.screen.StoryCreditsScreen
 import polyrhythmmania.storymode.screen.cutscene.PostBossCutsceneScreen
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -97,18 +96,9 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopControllerWithP
             }
             val cutsceneScreen = PostBossCutsceneScreen(main, storySession, onExitCutscene)
             
-            val onExitCredits: () -> Unit = {
-                main.screen = TransitionScreen(
-                    main, main.screen, cutsceneScreen,
-                    FadeToOpaque(1f, Color(0f, 0f, 0f, 1f)),
-                    FadeToTransparent(1f, Color(0f, 0f, 0f, 1f))
-                )
-            }
-            val creditsScreen = StoryCreditsScreen(main, storySession, onExitCredits)
-            
             playLevel(contract, inboxItem, inboxItemState, main, storySession) { exitReason ->
                 when (exitReason) {
-                    is ExitReason.Passed -> creditsScreen
+                    is ExitReason.Passed -> cutsceneScreen
                     else -> rootScreen
                 }
             }
