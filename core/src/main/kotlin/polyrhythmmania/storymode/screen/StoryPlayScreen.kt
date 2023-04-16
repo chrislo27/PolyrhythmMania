@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxScreen
 import paintbox.binding.*
+import paintbox.font.Markup
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -435,12 +436,21 @@ class StoryPlayScreen(
                                 if (contract.immediatePass) {
                                     if (progress.use() < 100f) "" else StoryL10N.getValue("play.scoreCard.pass")
                                 } else {
-                                    if (!showScoreOnScoreCard.use()) "" else progress.use().toInt().toString()
+                                    val minToPass = contract.minimumScore
+                                    val minToPassDenom = "[scale=0.5]/${minToPass}[]"
+                                    if (!showScoreOnScoreCard.use()) {
+                                        ""
+                                    } else {
+                                        // Invisible minToPassDenom on the left so everything is centred still
+                                        // Spaces at end prevent a vertical alignment issue
+                                        " [color=#FFFFFF00]${minToPassDenom}[]${progress.use().toInt()}${minToPassDenom} "
+                                    }
                                 }
-                            }, font = main.fontResultsScore).apply {
+                            }).apply {
                                 this.renderAlign.set(RenderAlign.center)
                                 this.padding.set(Insets(0f, 6f * 0.5f, 16f, 16f))
                                 this.textColor.set(Color.WHITE)
+                                this.markup.set(Markup.createWithSingleFont(main.fontResultsScore, lenientMode = true))
                                 this.setScaleXY(0.5f)
                             }
                         }
