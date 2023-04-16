@@ -196,7 +196,7 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
     }
 
     private fun onBossDefeated() {
-//        preventPausing.set(true) // FIXME uncomment this once ready
+        preventPausing.set(true)
 
         engine.inputter.areInputsLocked = true
         val currentEvents = engine.events.toList()
