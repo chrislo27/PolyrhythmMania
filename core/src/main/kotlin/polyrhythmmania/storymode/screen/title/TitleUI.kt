@@ -330,11 +330,13 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                         val numContractsCompleted = savefileState.savefile.inboxState.getAllItemStates().count { (itemID, state) ->
                             state.completion == InboxItemCompletion.COMPLETED && itemID in inboxItemIDsThatAreContracts
                         }
-                        StoryL10N.getVar("titleScreen.file.contractsCompleted", listOf(numContractsCompleted))
+                        val playTimeStat = savefileState.savefile.playTime
+                        val playTimeFormatted = playTimeStat.formatter.format(playTimeStat.value).use()
+                        "${StoryL10N.getVar("titleScreen.file.contractsCompleted", listOf(numContractsCompleted)).use()}\n[color=#444444 scale=0.875]${playTimeFormatted}[]"
                     }
-                    is StorySavefile.LoadedState.FailedToLoad -> StoryL10N.getVar("titleScreen.file.failedToLoad")
-                    is StorySavefile.LoadedState.NoSavefile -> StoryL10N.getVar("titleScreen.file.noData")
-                }.use()
+                    is StorySavefile.LoadedState.FailedToLoad -> StoryL10N.getVar("titleScreen.file.failedToLoad").use()
+                    is StorySavefile.LoadedState.NoSavefile -> StoryL10N.getVar("titleScreen.file.noData").use()
+                }
             }
             filePane += TextLabel(binding = {
                 when (val op = currentOperation.use()) {
