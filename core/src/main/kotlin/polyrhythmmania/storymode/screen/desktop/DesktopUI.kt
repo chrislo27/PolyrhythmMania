@@ -575,7 +575,7 @@ class DesktopUI(
                         } else inboxItem.listingName.use()
 
                         if (useFlowFont.use()) {
-                            listingName.replace('-', ' ')
+                            listingName.replace('-', ' ').substringBefore('\n')
                         } else listingName
                     }
                     this.font.bind {
