@@ -3,10 +3,7 @@ package polyrhythmmania.storymode.inbox
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.toConstVar
 import polyrhythmmania.storymode.StoryL10N
-import polyrhythmmania.storymode.contract.Contract
-import polyrhythmmania.storymode.contract.Contracts
-import polyrhythmmania.storymode.contract.IHasContractTextInfo
-import polyrhythmmania.storymode.contract.Requester
+import polyrhythmmania.storymode.contract.*
 import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
 
 
@@ -33,7 +30,9 @@ sealed class InboxItem(
             val to: ReadOnlyVar<String> = if (hasToField) StoryL10N.getVar("inboxItemDetails.memo.$id.to") else "".toConstVar(),
             val desc: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.desc"),
             val shortFrom: ReadOnlyVar<String> = if (hasDifferentShortFrom) StoryL10N.getVar("inboxItemDetails.memo.$id.from.short") else from,
-    ) : InboxItem(id, if (hasSeparateListingName) StoryL10N.getVar("inboxItemDetails.memo.$id.listing") else subject)
+    ) : InboxItem(id, if (hasSeparateListingName) StoryL10N.getVar("inboxItemDetails.memo.$id.listing") else subject) {
+        var songInfo: SongInfo? = null
+    }
     
     class InfoMaterial(
             id: String, hasSeparateListingName: Boolean,

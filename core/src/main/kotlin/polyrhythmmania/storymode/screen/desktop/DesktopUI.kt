@@ -70,6 +70,7 @@ class DesktopUI(
     val animations: DesktopAnimations = DesktopAnimations(this, inputProcessor)
     val dialogHandler: DesktopDialogHandler by lazy { DesktopDialogHandler(this) }
     val background: DesktopBackground by lazy { DesktopBackground(this.uiCamera) }
+    val bonusMusic: BonusMusic by lazy { BonusMusic(this) }
     
     private val availableBlinkTexRegs: List<TextureRegion> = run {
         val numFrames = 5
@@ -387,6 +388,7 @@ class DesktopUI(
     private fun openMenuDialog() {
         controller.playSFX(DesktopController.SFXType.PAUSE_ENTER)
         dialogHandler.openDialog(DesktopDialogMenu(this@DesktopUI))
+        bonusMusic.isPlaying.set(false)
         storySession.musicHandler.transitionToBandpass(true)
     }
 

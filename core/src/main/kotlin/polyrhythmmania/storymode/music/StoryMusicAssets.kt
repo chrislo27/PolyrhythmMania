@@ -12,6 +12,7 @@ object StoryMusicAssets : Closeable {
     const val STEM_ID_DESKTOP_HARM: String = "desktop_harm"
     const val STEM_ID_DESKTOP_MAIN: String = "desktop_main"
     const val STEM_ID_DESKTOP_PERC: String = "desktop_perc"
+    const val STEM_ID_BONUS: String = "desktop_bonus"
     
     val STEM_ID_BOSS_1_INTRO: StemID = StemID("boss1_intro")
     val STEM_ID_BOSS_1_A1: StemID = StemID("boss1_a1")
@@ -31,6 +32,9 @@ object StoryMusicAssets : Closeable {
             STEM_ID_DESKTOP_HARM to { Stem(Gdx.files.internal("story/music/desktop/harm.ogg")) },
             STEM_ID_DESKTOP_MAIN to { Stem(Gdx.files.internal("story/music/desktop/main.ogg")) },
             STEM_ID_DESKTOP_PERC to { Stem(Gdx.files.internal("story/music/desktop/perc.ogg")) },
+    ))
+    val bonusMusicStems: StemCache = StemCache(mapOf(
+            STEM_ID_BONUS to { Stem(Gdx.files.internal("story/music/postgame/end_of_the_assembly_line.ogg"), inMemory = true) },
     ))
     val bossStems: StemCache = run {
         val fileExt = "ogg"
@@ -65,12 +69,16 @@ object StoryMusicAssets : Closeable {
         titleStems.loadAll()
     }
     
+    fun initBonusMusicStems() {
+        bonusMusicStems.loadAll()
+    }
+    
     fun initBossStems() {
         bossStems.loadAll()
     }
     
     override fun close() {
-        listOf(titleStems, bossStems).forEach { stemCache ->
+        listOf(titleStems, bonusMusicStems, bossStems).forEach { stemCache ->
             stemCache.closeQuietly()
         }
     }

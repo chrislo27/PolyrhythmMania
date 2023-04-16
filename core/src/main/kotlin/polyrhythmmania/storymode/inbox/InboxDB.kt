@@ -1,6 +1,7 @@
 package polyrhythmmania.storymode.inbox
 
 import polyrhythmmania.storymode.contract.Contracts
+import polyrhythmmania.storymode.contract.SongInfo
 import polyrhythmmania.storymode.inbox.progression.Progression
 import polyrhythmmania.storymode.inbox.progression.UnlockStage
 import polyrhythmmania.storymode.inbox.progression.UnlockStageChecker
@@ -32,6 +33,8 @@ open class InboxDB : InboxItems() {
         const val ITEM_TO_TRIGGER_ACHIEVEMENT_INTERMEDIATE_TECHNICIAN: String = ITEMID_INTERMEDIATE_TECHNICIAN_MEMO
         val ITEM_TO_TRIGGER_ACHIEVEMENT_DEFEATED_BOSS: String = ITEMID_BOSS
         const val ITEM_TO_TRIGGER_ACHIEVEMENT_COMPLETED_POSTGAME: String = ITEMID_TIM_POSTGAME_COMPLETED
+        
+        const val ITEM_WITH_END_OF_THE_ASSEMBLY_LINE_MUSIC: String = ITEMID_TIM_POSTGAME_COMPLETED
     }
     
     enum class Category {
@@ -156,7 +159,9 @@ open class InboxDB : InboxItems() {
                 ),
             )
         )
-        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_TIM_POSTGAME_COMPLETED, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true)))
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.Memo(ITEMID_TIM_POSTGAME_COMPLETED, hasToField = false, hasSeparateListingName = true, hasDifferentShortFrom = true).apply { 
+            this.songInfo = SongInfo.prmaniaGeneric("End of the Assembly Line", songNameWithLineBreaks = "End of the\nAssembly Line")
+        }))
         
         
         // Parse instructions

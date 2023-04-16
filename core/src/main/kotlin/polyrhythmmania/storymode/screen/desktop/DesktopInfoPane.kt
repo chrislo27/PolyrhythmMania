@@ -20,6 +20,7 @@ import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.contract.SongInfo
+import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
@@ -31,9 +32,12 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     private val main: PRManiaGame get() = desktopUI.main
     private val scenario: DesktopScenario get() = desktopUI.scenario
 
-    private fun addRightSidePanel(title: ReadOnlyVar<String>, height: Float): VBox {
+    private fun addRightSidePanel(title: ReadOnlyVar<String>, height: Float, useDarkPane: Boolean = false): VBox {
         val panel: UIElement = DesktopStyledPane().apply {
             Anchor.Centre.configure(this)
+            if (useDarkPane) {
+                this.textureToUse = DesktopStyledPane.DEFAULT_TEXTURE_TO_USE_DARK
+            }
             this.bounds.height.set(height)
             this.padding.set(Insets(7f * UI_SCALE, 4f * UI_SCALE, 5f * UI_SCALE, 5f * UI_SCALE))
         }
@@ -42,7 +46,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
             this.temporarilyDisableLayouts {
                 this += TextLabel(title, font = main.fontMainMenuHeading).apply {
                     this.bounds.height.set(7f * UI_SCALE)
-                    this.textColor.set(Color.BLACK)
+                    this.textColor.set(if (useDarkPane) Color.WHITE else Color.BLACK)
                     this.renderAlign.set(RenderAlign.center)
                     this.margin.set(Insets(1f, 1f, 4f, 4f))
                     this.setScaleXY(0.6f)
@@ -59,6 +63,17 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     fun updateForInboxItem(inboxItem: InboxItem) {
         when (inboxItem) {
             is InboxItem.ContractDoc -> updateForContractDoc(inboxItem)
+            is InboxItem.Memo -> {
+                if (inboxItem.id == InboxDB.ITEM_WITH_END_OF_THE_ASSEMBLY_LINE_MUSIC) {
+                    addPlayBonusMusic(inboxItem)
+                }
+
+                val songInfo = inboxItem.songInfo
+                if (songInfo != null) {
+                    addSongInfoPanel(songInfo)
+                }
+            }
+
             else -> {}
         }
     }
@@ -270,5 +285,33 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         }
     }
 
+    //endregion
+    
+    //region Custom memo handling
+
+    private fun addPlayBonusMusic(inboxItem: InboxItem.Memo) {
+        addRightSidePanel(StoryL10N.getVar("desktop.pane.music"), 29f * UI_SCALE, useDarkPane = true).apply {
+            val bonusMusic = desktopUI.bonusMusic
+            val isPlaying = bonusMusic.isPlaying
+            
+            this += Button(binding = {
+                (if (isPlaying.use()) {
+                    StoryL10N.getVar("desktop.pane.playBonusMusic.stop")
+                } else StoryL10N.getVar("desktop.pane.playBonusMusic.play")).use()
+            }, font = main.fontRobotoBold).apply {
+                this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_LIGHT)
+                
+                Anchor.TopCentre.configure(this)
+                this.bounds.width.set(32f * UI_SCALE)
+                this.bounds.height.set((8f + 1f) * UI_SCALE)
+                this.margin.set(Insets(1f * UI_SCALE, 0f, 0f, 0f))
+
+                this.setOnAction {
+                    isPlaying.invert()
+                }
+            }
+        }
+    }
+    
     //endregion
 }
