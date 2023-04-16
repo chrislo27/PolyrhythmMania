@@ -156,6 +156,7 @@ class InitialAssetLoader : IAssetLoader {
                 Packable("new_grad_gold", "textures/achievements/new_grad_gold.png"),
                 Packable("solitaire", "textures/achievements/solitaire.png"),
                 Packable("solitaire_gold", "textures/achievements/solitaire_gold.png"),
+                Packable("story_mode", "textures/achievements/story_mode.png"),
                 Packable("trophy1", "textures/achievements/trophy1.png"),
                 Packable("trophy2", "textures/achievements/trophy2.png"),
         ), PackedSheet.Config(padding = 2, maxSize = 512, duplicateBorder = false,
