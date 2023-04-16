@@ -23,7 +23,8 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
     override var loopEndMs: Float = 0f
 
     var interpolationType: SamplePlayer.InterpolationType = SamplePlayer.InterpolationType.ADAPTIVE
-
+    override var killOnEnd: Boolean = false
+    
     private val tmpFrame: FloatArray = FloatArray(outs)
 
     init {
@@ -97,6 +98,14 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
             }
             
             position += positionAddition
+        }
+        
+        checkAtEnd()
+    }
+    
+    private fun checkAtEnd() {
+        if (killOnEnd && loopType == SamplePlayer.LoopType.NO_LOOP_FORWARDS && position >= musicSample.lengthMs) {
+            this.kill()
         }
     }
 

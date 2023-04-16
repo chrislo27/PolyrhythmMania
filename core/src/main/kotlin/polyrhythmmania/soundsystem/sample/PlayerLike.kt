@@ -26,6 +26,7 @@ abstract class PlayerLike(context: AudioContext, ins: Int, outs: Int) : UGen(con
     abstract var loopType: SamplePlayer.LoopType
     abstract var loopStartMs: Float
     abstract var loopEndMs: Float
+    abstract var killOnEnd: Boolean
 
     fun useLoopParams(params: LoopParams) {
         this.loopType = params.loopType

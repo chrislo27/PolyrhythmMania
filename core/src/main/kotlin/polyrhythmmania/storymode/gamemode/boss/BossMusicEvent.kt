@@ -37,6 +37,8 @@ class BossMusicEvent(engine: Engine, val stems: StemCache, val stemID: String, b
                 return
             }
             val id = engine.soundInterface.playAudio(audio, SoundInterface.SFXType.DYNAMIC_MUSIC) { player ->
+                player.killOnEnd = true
+                
                 if (secOffset > 0.25f) {
                     // Adjust player position if off by too much
                     player.position = secOffset * 1000.0
