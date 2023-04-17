@@ -45,7 +45,7 @@ object Contracts {
         add(Contract("bouncy_road_2", Requester.POLYBUILD, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("chrislo27")), 60) { main ->
             StoryAsmGameModeBouncyRoad2(main)
         })
-        add(Contract("built_to_scale_ds", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.ds("Built to Scale"), listOf("Kievit")), 60) { main ->
+        add(Contract("built_to_scale_ds", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.ds("Built to Scale"), listOf("Kievit")), 65) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/built_to_scale_ds.prmproj"))
         })
         add(Contract("bunny_hop", Requester.MOON_BUNNY, JingleType.GBA, Attribution(SongInfo.tengoku("Bunny Hop"), listOf("Kievit")), 60) { main ->
