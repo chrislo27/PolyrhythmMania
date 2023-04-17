@@ -20,7 +20,6 @@ import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.contract.SongInfo
-import polyrhythmmania.storymode.inbox.InboxDB
 import polyrhythmmania.storymode.inbox.InboxItem
 import polyrhythmmania.storymode.inbox.InboxItemState
 import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
@@ -64,7 +63,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         when (inboxItem) {
             is InboxItem.ContractDoc -> updateForContractDoc(inboxItem)
             is InboxItem.Memo -> {
-                if (inboxItem.id == InboxDB.ITEM_WITH_END_OF_THE_ASSEMBLY_LINE_MUSIC) {
+                if (inboxItem.hasBonusMusic()) {
                     addPlayBonusMusic(inboxItem)
                 }
 
@@ -81,14 +80,11 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     //region ContractDoc
 
     private fun updateForContractDoc(inboxItem: InboxItem.ContractDoc) {
-        val inboxItemStateGetter: () -> InboxItemState = {
-            scenario.inboxState.getItemState(inboxItem) ?: InboxItemState.DEFAULT_UNAVAILABLE
-        }
-        val inboxItemState = inboxItemStateGetter()
+        val inboxItemState = desktopUI.controller.createInboxItemStateGetter(inboxItem)()
         val contract = inboxItem.contract
         val attribution = contract.attribution
 
-        addStartContractPanel(inboxItem, inboxItemStateGetter)
+        addStartContractPanel(inboxItem)
         addContractConditionsPanel(inboxItem)
         addContractScorePanel(inboxItem, inboxItemState)
         if (inboxItem.showSongInfo(inboxItemState) && attribution != null) {
@@ -99,7 +95,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         }
     }
 
-    private fun addStartContractPanel(inboxItem: InboxItem.ContractDoc, inboxItemState: () -> InboxItemState) {
+    private fun addStartContractPanel(inboxItem: InboxItem.ContractDoc) {
         addRightSidePanel("".toConstVar(), 20f * UI_SCALE).apply {
             this.removeAllChildren()
             this += Button(StoryL10N.getVar("desktop.pane.startContract"), font = main.fontRobotoBold).apply {
@@ -107,8 +103,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                 this.bounds.height.set(8f * UI_SCALE)
 
                 this.setOnAction {
-                    desktopUI.controller.playSFX(DesktopController.SFXType.ENTER_LEVEL)
-                    desktopUI.controller.playLevel(inboxItem.contract, inboxItem, inboxItemState())
+                    desktopUI.controller.startContractButtonAction(inboxItem)
                 }
             }
         }
@@ -307,7 +302,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                 this.margin.set(Insets(1f * UI_SCALE, 0f, 0f, 0f))
 
                 this.setOnAction {
-                    isPlaying.invert()
+                    desktopUI.controller.playBonusMusicButtonAction()
                 }
             }
         }

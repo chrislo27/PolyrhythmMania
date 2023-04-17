@@ -33,7 +33,24 @@ interface DesktopController {
     fun playLevel(contract: Contract, inboxItem: InboxItem?, inboxItemState: InboxItemState?)
     
     fun playSFX(sfx: SFXType)
+    
+    fun createInboxItemStateGetter(inboxItem: InboxItem): () -> InboxItemState
 
+    fun playBonusMusicButtonAction()
+
+    fun startContractButtonAction(inboxItem: InboxItem.ContractDoc) {
+        playSFX(SFXType.ENTER_LEVEL)
+        playLevel(inboxItem.contract, inboxItem, createInboxItemStateGetter(inboxItem)())
+    }
+
+    fun onEnterOnInboxItem(inboxItem: InboxItem) {
+        if (inboxItem is InboxItem.ContractDoc) {
+            this.startContractButtonAction(inboxItem)
+        } else if (inboxItem is InboxItem.Memo && inboxItem.hasBonusMusic()) {
+            this.playBonusMusicButtonAction()
+        }
+    }
+    
 }
 
 object NoOpDesktopController : DesktopController {
@@ -45,6 +62,13 @@ object NoOpDesktopController : DesktopController {
     }
 
     override fun playSFX(sfx: DesktopController.SFXType) {
+    }
+
+    override fun createInboxItemStateGetter(inboxItem: InboxItem): () -> InboxItemState = { 
+        InboxItemState.DEFAULT_UNAVAILABLE
+    }
+
+    override fun playBonusMusicButtonAction() {
     }
 }
 

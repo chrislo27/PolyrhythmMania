@@ -32,6 +32,8 @@ sealed class InboxItem(
             val shortFrom: ReadOnlyVar<String> = if (hasDifferentShortFrom) StoryL10N.getVar("inboxItemDetails.memo.$id.from.short") else from,
     ) : InboxItem(id, if (hasSeparateListingName) StoryL10N.getVar("inboxItemDetails.memo.$id.listing") else subject) {
         var songInfo: SongInfo? = null
+        
+        fun hasBonusMusic(): Boolean = this.id == InboxDB.ITEM_WITH_END_OF_THE_ASSEMBLY_LINE_MUSIC
     }
     
     class InfoMaterial(

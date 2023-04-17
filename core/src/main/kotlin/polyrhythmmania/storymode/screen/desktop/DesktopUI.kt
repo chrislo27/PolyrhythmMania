@@ -414,17 +414,40 @@ class DesktopUI(
     inner class KeystrokeInputProcessor : InputAdapter() {
         override fun keyDown(keycode: Int): Boolean {
             val currentInboxItem = currentInboxItem.getOrCompute()
+            val keymap = main.settings.inputKeymapKeyboard.getOrCompute()
+            
+            fun triggerUp() {
+                if (currentInboxItem != null) {
+                    selectNextInboxItem(currentInboxItem, -1)
+                }
+            }
+
+            fun triggerDown() {
+                if (currentInboxItem != null) {
+                    selectNextInboxItem(currentInboxItem, 1)
+                }
+            }
+
+            fun triggerEnter() {
+                if (currentInboxItem != null) {
+                    controller.onEnterOnInboxItem(currentInboxItem)
+                }
+            }
+            
             when (keycode) {
                 Keys.ESCAPE -> {
                     onEscapePressed(currentInboxItem)
                     return true
                 }
-                Keys.UP, Keys.DOWN -> {
-                    val dir = if (keycode == Keys.UP) -1 else 1
-                    if (currentInboxItem != null) {
-                        selectNextInboxItem(currentInboxItem, dir)
-                    }
-                }
+
+                keymap.buttonDpadUp -> triggerUp()
+                keymap.buttonDpadDown -> triggerDown()
+                keymap.buttonA -> triggerEnter()
+
+                // Note: These defaults are last in case up/down/enter are rebound for some reason
+                Keys.UP -> triggerUp()
+                Keys.DOWN -> triggerDown()
+                Keys.ENTER -> triggerEnter()
             }
             
             return false

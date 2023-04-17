@@ -120,4 +120,12 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopControllerWithP
         
         main.playMenuSfx(sound)
     }
+
+    override fun createInboxItemStateGetter(inboxItem: InboxItem): () -> InboxItemState = {
+        desktopUI.scenario.inboxState.getItemState(inboxItem) ?: InboxItemState.DEFAULT_UNAVAILABLE
+    }
+
+    override fun playBonusMusicButtonAction() {
+        desktopUI.bonusMusic.isPlaying.invert()
+    }
 }
