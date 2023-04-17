@@ -28,7 +28,7 @@ object Contracts {
         add(Contract(ID_TUTORIAL1, Requester.POLYRHYTHM_INC, JingleType.GBA, null, 0, noListingName = true, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             Tutorial1GameMode(main)
         })
-        add(Contract(ID_BOSS, Requester.TIM, JingleType.NONE, Attribution(SongInfo.prmaniaGeneric("MODE: Final Boss"), listOf("GENERIC")), 0, skipAfterNFailures = NOT_ALLOWED_TO_SKIP, gamemodeFactory = StoryBossGameMode.getFactory()))
+        add(Contract(ID_BOSS, Requester.TIM, JingleType.NONE, Attribution(SongInfo.prmaniaGeneric("MODE: Final Boss"), listOf("GENERIC", "chrislo27", "Luxury")), 0, skipAfterNFailures = NOT_ALLOWED_TO_SKIP, gamemodeFactory = StoryBossGameMode.getFactory()))
 
         add(Contract("air_rally", Requester.SHIPSTEERING, JingleType.GBA, Attribution(SongInfo.megamix("Air Rally"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/air_rally.prmproj"))
@@ -63,7 +63,7 @@ object Contracts {
         add(Contract("first_contact", Requester.ALIENS, JingleType.ARCADE, Attribution(SongInfo.megamix("First Contact"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/first_contact.prmproj"))
         })
-        add(Contract("flock_step", Requester.DIYRE, JingleType.MODERN, Attribution(SongInfo.fever("Flock Step"), listOf("Kievit")), 60) { main ->
+        add(Contract("flock_step", Requester.DIYRE, JingleType.MODERN, Attribution(SongInfo.fever("Flock Step"), listOf("Kievit", "Luxury")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/flock_step.prmproj"))
         })
         add(Contract("fork_lifter", Requester.PEAS, JingleType.MODERN, Attribution(SongInfo.fever("Fork Lifter"), listOf("Kievit")), 60) { main ->
@@ -72,13 +72,13 @@ object Contracts {
         add(Contract("fruit_basket", Requester.POLYRHYTHM_INC, JingleType.GBA, Attribution(SongInfo.megamix("Fruit Basket"), listOf("chrislo27")), 60) { main ->
             StoryDunkGameModeFruitBasket(main)
         })
-        add(Contract("fruit_basket_2", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.megamix("Fruit Basket 2"), listOf("J-D Thunder")), 60) { main ->
+        add(Contract("fruit_basket_2", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.megamix("Fruit Basket 2"), listOf("J-D Thunder", "chrislo27")), 60) { main ->
             StoryDunkGameModeFruitBasket2(main)
         })
-        add(Contract("hole_in_one", Requester.POLYRHYTHM_INC, JingleType.GBA, Attribution(SongInfo.fever("Hole in One"), listOf("J-D Thunder")), 60) { main ->
+        add(Contract("hole_in_one", Requester.POLYRHYTHM_INC, JingleType.GBA, Attribution(SongInfo.fever("Hole in One"), listOf("J-D Thunder", "chrislo27")), 60) { main ->
             StoryDunkGameModeHoleInOne(main)
         })
-        add(Contract("hole_in_one_2", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.fever("Hole in One 2"), listOf("Lvl100Feraligatr")), 60) { main ->
+        add(Contract("hole_in_one_2", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.fever("Hole in One 2"), listOf("Lvl100Feraligatr", "chrislo27")), 60) { main ->
             StoryDunkGameModeHoleInOne2(main)
         })
         add(Contract("monkey_watch", Requester.POLYBUILD, JingleType.MODERN, Attribution(SongInfo.fever("Monkey Watch"), listOf("Kievit")), 60) { main ->
