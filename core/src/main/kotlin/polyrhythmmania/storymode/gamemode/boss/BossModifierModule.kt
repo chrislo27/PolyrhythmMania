@@ -181,14 +181,12 @@ class BossModifierModule(parent: EngineModifiers) : ModifierModule(parent) {
         if (playerHP.get() <= 0) return
 
         val dmgTaken = rod.playerDamageTaken
-        if (rod.position.x < BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE) {
+        if (rod.position.x >= BLOCKS_AHEAD_OF_START_COUNTS_FOR_DAMAGE && rod.didLastBounce) {
+            triggerBossHPDown(rod)
+        } else {
             if (!dmgTaken.damageTaken && countedAsMiss) {
                 dmgTaken.markDamageTaken()
                 triggerPlayerHPDown(inputter)
-            }
-        } else {
-            if (rod.didLastBounce) {
-                triggerBossHPDown(rod)
             }
         }
     }
