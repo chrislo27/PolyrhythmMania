@@ -1,6 +1,7 @@
 package polyrhythmmania.storymode.screen
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
@@ -901,30 +902,42 @@ class StoryPlayScreen(
         
         var consumed = false
         if (main.screen === this && !isPaused.get() && showingScoreCard.get()) {
+
+            fun moveArrow(up: Boolean) {
+                val options = this.currentScoreCardOptions.getOrCompute()
+                if (options.isNotEmpty() && !options.all { !it.enabled.get() }) {
+                    val maxSelectionSize = options.size
+                    val incrementAmt = if (up) -1 else 1
+                    val currentSelected = this.selectedScoreCardOption.getOrCompute()
+                    val currentIndex = options.indexOf(currentSelected)
+                    var increment = incrementAmt
+                    var nextIndex: Int
+                    do {
+                        nextIndex = (currentIndex + increment + maxSelectionSize) % maxSelectionSize
+                        if (changeScoreCardSelectionTo(options[nextIndex])) {
+                            consumed = true
+                            break
+                        }
+                        increment += incrementAmt
+                    } while (nextIndex != currentIndex)
+                }
+            }
+
+            fun select() {
+                attemptSelectCurrentScoreCardOption()
+                consumed = true
+            }
+
+
             when (keycode) {
-                keyboardKeybinds.buttonDpadUp, keyboardKeybinds.buttonDpadDown -> {
-                    val options = this.currentScoreCardOptions.getOrCompute()
-                    if (options.isNotEmpty() && !options.all { !it.enabled.get() }) {
-                        val maxSelectionSize = options.size
-                        val incrementAmt = if (keycode == keyboardKeybinds.buttonDpadUp) -1 else 1
-                        val currentSelected = this.selectedScoreCardOption.getOrCompute()
-                        val currentIndex = options.indexOf(currentSelected)
-                        var increment = incrementAmt
-                        var nextIndex: Int
-                        do {
-                            nextIndex = (currentIndex + increment + maxSelectionSize) % maxSelectionSize
-                            if (changeScoreCardSelectionTo(options[nextIndex])) {
-                                consumed = true
-                                break
-                            }
-                            increment += incrementAmt
-                        } while (nextIndex != currentIndex)
-                    }
-                }
-                keyboardKeybinds.buttonA -> {
-                    attemptSelectCurrentScoreCardOption()
-                    consumed = true
-                }
+                keyboardKeybinds.buttonDpadUp -> moveArrow(up = true)
+                keyboardKeybinds.buttonDpadDown -> moveArrow(up = false)
+                keyboardKeybinds.buttonA -> select()
+                
+                // Note: These defaults are last in case up/down/enter are rebound for some reason
+                Keys.UP -> moveArrow(up = true)
+                Keys.DOWN -> moveArrow(up = false)
+                Keys.ENTER -> select()
             }
             
             if (consumed) {
