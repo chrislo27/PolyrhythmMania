@@ -96,7 +96,7 @@ object Contracts {
         add(Contract("rhythm_tweezers_2", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 70) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/rhythm_tweezers_2.prmproj"))
         })
-        add(Contract("ringside", Requester.KRIQ, JingleType.MODERN, Attribution(SongInfo.fever("Ringside"), listOf("Dream Top")), 60) { main ->
+        add(Contract("ringside", Requester.KRIQ, JingleType.MODERN, Attribution(SongInfo.fever("Ringside"), listOf("Dream Top", "Conn")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/ringside.prmproj"))
         })
         add(Contract("screwbots", Requester.BUILDROID, JingleType.GBA, Attribution(SongInfo.fever("Screwbot Factory"), listOf("Kievit")), 75) { main ->
