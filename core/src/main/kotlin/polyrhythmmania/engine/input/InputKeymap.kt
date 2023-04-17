@@ -18,9 +18,11 @@ data class InputKeymapKeyboard(
         const val TEXT_BUTTON_A: String = "${RodinSpecialChars.BORDERED_A}"
         const val TEXT_BUTTON_DPAD_ANY: String = "${RodinSpecialChars.BORDERED_DPAD}"
         const val TEXT_BUTTON_DPAD_UP: String = "${RodinSpecialChars.BORDERED_DPAD}${RodinSpecialChars.BORDERED_JOY_U}"
-        const val TEXT_BUTTON_DPAD_DOWN: String = "${RodinSpecialChars.BORDERED_DPAD}${RodinSpecialChars.BORDERED_JOY_D}"
         const val TEXT_BUTTON_DPAD_LEFT: String = "${RodinSpecialChars.BORDERED_DPAD}${RodinSpecialChars.BORDERED_JOY_L}"
         const val TEXT_BUTTON_DPAD_RIGHT: String = "${RodinSpecialChars.BORDERED_DPAD}${RodinSpecialChars.BORDERED_JOY_R}"
+        const val TEXT_BUTTON_DPAD_DOWN: String = "${RodinSpecialChars.BORDERED_DPAD}${RodinSpecialChars.BORDERED_JOY_D}"
+        const val TEXT_BUTTON_UP: String = "${RodinSpecialChars.BORDERED_JOY_U}"
+        const val TEXT_BUTTON_DOWN: String = "${RodinSpecialChars.BORDERED_JOY_D}"
         
         fun fromJson(obj: JsonObject): InputKeymapKeyboard {
             return InputKeymapKeyboard(
@@ -55,8 +57,13 @@ data class InputKeymapKeyboard(
                     "${TEXT_BUTTON_DPAD_UP}: ${Input.Keys.toString(buttonDpadUp)} | ${TEXT_BUTTON_DPAD_DOWN}: ${Input.Keys.toString(buttonDpadDown)} | ${TEXT_BUTTON_DPAD_LEFT}: ${Input.Keys.toString(buttonDpadLeft)} | ${TEXT_BUTTON_DPAD_RIGHT}: ${Input.Keys.toString(buttonDpadRight)}"
         } else {
             "${TEXT_BUTTON_A}: ${Input.Keys.toString(buttonA)}" + (if (withNewline) "\n" else " | ") +
-                    "${TEXT_BUTTON_DPAD_ANY}: ${Input.Keys.toString(buttonDpadUp)}/${Input.Keys.toString(buttonDpadDown)}/${Input.Keys.toString(buttonDpadLeft)}/${Input.Keys.toString(buttonDpadRight)}"
+                    "${TEXT_BUTTON_DPAD_ANY}: ${toDpadString()}"
         }
+    }
+    
+    fun toScoreCardKeyboardString(): String {
+        val spacing = " ".repeat(5)
+        return "${TEXT_BUTTON_A}: ${Input.Keys.toString(buttonA)}${spacing}${TEXT_BUTTON_UP}: ${Input.Keys.toString(buttonDpadUp)}${spacing}${TEXT_BUTTON_DOWN}: ${Input.Keys.toString(buttonDpadDown)}"
     }
     
     fun toDpadString(): String {

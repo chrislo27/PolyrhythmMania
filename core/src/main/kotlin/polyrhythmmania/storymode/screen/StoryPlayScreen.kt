@@ -498,13 +498,13 @@ class StoryPlayScreen(
         }
         dialog += scorePane
         
-        fadeInPane += TextLabel(this.keyboardKeybinds.toKeyboardString(detailedDpad = true, withNewline = false), font = main.fontMainMenuRodin).apply {
-            Anchor.BottomRight.configure(this)
+        fadeInPane += TextLabel(this.keyboardKeybinds.toScoreCardKeyboardString(), font = main.fontMainMenuRodin).apply {
+            Anchor.BottomCentre.configure(this)
             this.textColor.set(Color.WHITE)
-            this.bounds.width.set(640f)
-            this.bounds.height.set(48f)
+            this.bounds.width.set(300f)
+            this.bounds.height.set(128f)
             this.bgPadding.set(Insets(10f))
-            this.renderAlign.set(Align.bottomRight)
+            this.renderAlign.set(Align.bottom)
             this.textAlign.set(TextAlign.LEFT)
             this.backgroundColor.set(Color(0f, 0f, 0f, 0.75f))
             this.renderBackground.set(true)
