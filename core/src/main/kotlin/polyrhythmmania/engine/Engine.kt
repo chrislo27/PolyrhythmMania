@@ -1,6 +1,9 @@
 package polyrhythmmania.engine
 
-import com.codahale.metrics.*
+import com.codahale.metrics.ConsoleReporter
+import com.codahale.metrics.MetricRegistry
+import com.codahale.metrics.ScheduledReporter
+import com.codahale.metrics.Timer
 import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.util.DecimalFormats
@@ -265,6 +268,7 @@ Events: ${events.size}
 Inputs: ${if (inputter.areInputsLocked) "locked" else "unlocked"} | results: ${inputter.inputResults.size} | totalExpected: ${inputter.totalExpectedInputs} | noMiss: ${inputter.noMiss}
 Practice: ${if (inputter.practice.practiceModeEnabled) "enabled" else "disabled"} | ${inputter.practice.moreTimes} more times | [${inputter.practice.requiredInputs.joinToString(separator = ", ") { "${it.beat} ${it.inputType}${if (it.wasHit) "!" else ""}" }}]
 Music: vol: ${musicData.volumeMap.volumeAtBeat(this.beat)} | Desync: ${DecimalFormats.format("+00.000;-00.000", musicData.getCurrentDesyncMs())} ms
+ResultFlag: ${resultFlag.getOrCompute()}
 """.dropLast(1)
     }
 
