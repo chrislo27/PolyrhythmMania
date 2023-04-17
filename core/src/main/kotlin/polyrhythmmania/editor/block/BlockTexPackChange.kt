@@ -28,7 +28,11 @@ class BlockTexPackChange(engine: Engine)
     }
     
     override fun compileIntoEvents(): List<Event> {
-        return listOf(EventChangeTexturePack(engine, this.beat, texPackSrcData.texPackSrc.getOrCompute()))
+        val sourceNoInherit = texPackSrcData.texPackSrc.getOrCompute()
+        val newSource = if (texPackSrcData.inheritFromStarting.get())
+            engine.container?.texturePackSource?.getOrCompute() ?: sourceNoInherit
+        else sourceNoInherit
+        return listOf(EventChangeTexturePack(engine, this.beat, newSource))
     }
 
     override fun createContextMenu(editor: Editor): ContextMenu {
