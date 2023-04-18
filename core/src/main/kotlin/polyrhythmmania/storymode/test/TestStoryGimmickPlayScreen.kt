@@ -73,7 +73,7 @@ open class TestStoryGimmickPlayScreen(
                     FadeToOpaque(0.125f, Color(0f, 0f, 0f, 1f)), FadeToTransparent(0.125f, Color(0f, 0f, 0f, 1f))).apply {
                 this.onEntryEnd = {
                     currentScreen.dispose()
-                    gameMode?.disposeQuietly()
+                    container.disposeQuietly()
                 }
             }
         }

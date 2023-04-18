@@ -2,8 +2,6 @@ package polyrhythmmania.gamemodes
 
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.utils.Disposable
-import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.GlobalContainerSettings
@@ -14,7 +12,7 @@ import polyrhythmmania.statistics.PlayTimeType
 import polyrhythmmania.world.World
 
 
-abstract class GameMode(val main: PRManiaGame, val playTimeType: PlayTimeType?) : Disposable {
+abstract class GameMode(val main: PRManiaGame, val playTimeType: PlayTimeType?)  {
 
     val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem().apply {
         this.audioContext.out.gain = main.settings.gameplayVolume.getOrCompute() / 100f
@@ -48,10 +46,6 @@ abstract class GameMode(val main: PRManiaGame, val playTimeType: PlayTimeType?) 
         return GlobalContainerSettings(forceTexturePack = main.settings.forceTexturePack.getOrCompute(),
                 forceTilesetPalette = main.settings.forceTilesetPalette.getOrCompute(),
                 reducedMotion = main.settings.reducedMotion.getOrCompute())
-    }
-
-    override fun dispose() {
-        container.disposeQuietly()
     }
     
     open fun getDebugString(): String = ""
