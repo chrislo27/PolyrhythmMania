@@ -189,7 +189,7 @@ class PostBossCutsceneScreen(
         Gdx.input.isCursorCatched = true
         
         if (currentImageIndex.get() == 0) {
-            Gdx.app.postRunnable(GdxRunnableTransition(0f, 1f, 0.75f) { _, progress ->
+            Gdx.app.postRunnable(GdxRunnableTransition(0f, 1f, 1.75f) { _, progress ->
                 if (progress >= 1f) {
                     main.playMenuSfx(StoryAssets["sfx_cutscene_postboss_knocking"])
                     sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 0f, 1f, delay = 0.5f), clickToAdvanceStartOpacity)

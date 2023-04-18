@@ -580,7 +580,7 @@ class StoryPlayScreen(
     }
     
     private fun quitPauseAction(exitReason: ExitReason) {
-        quitToScreen(exitToScreen(exitReason), longTransition = exitReason is ExitReason.Passed && contract.id == Contracts.ID_BOSS)
+        quitToScreen(exitToScreen(exitReason), longStartTransition = exitReason is ExitReason.Passed && contract.id == Contracts.ID_BOSS)
         exitCallback.onExit(exitReason)
         Gdx.app.postRunnable {
             playMenuSound("sfx_pause_exit")
