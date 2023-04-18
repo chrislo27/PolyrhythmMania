@@ -16,6 +16,7 @@ import paintbox.binding.ReadOnlyFloatVar
 import paintbox.binding.Var
 import paintbox.util.Version
 import paintbox.util.WindowSize
+import paintbox.util.closeQuietly
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.PRMania
 import polyrhythmmania.container.manifest.LibraryRelevantData
@@ -784,6 +785,8 @@ class Container(
                 levelBannerFile = tempFile
             }
         }
+        
+        zipFile.closeQuietly()
 
         return LoadMetadata(this, libraryRelevantData, customTexturePacksRead, levelBannerFile)
     }

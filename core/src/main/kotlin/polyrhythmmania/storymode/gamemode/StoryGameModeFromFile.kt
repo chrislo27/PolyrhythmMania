@@ -21,8 +21,10 @@ class StoryGameModeFromFile(main: PRManiaGame, val file: FileHandle, val percent
             }
         }
         val loadMetadata = this.container.readFromFile(tmpFile, EnumSet.of(EditorSpecialFlags.STORY_MODE))
-        Gdx.app.postRunnable { loadMetadata.loadOnGLThread() }
-        tmpFile.deleteOnExit()
+        Gdx.app.postRunnable { 
+            loadMetadata.loadOnGLThread()
+            tmpFile.delete()
+        }
     }
 
     override fun initialize() {
