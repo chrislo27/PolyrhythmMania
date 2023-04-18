@@ -500,7 +500,7 @@ class DesktopUI(
         
         private val contractListingName: ReadOnlyVar<String?> = Var.bind {
             if (inboxItem is InboxItem.ContractDoc 
-                    && (myInboxItemState.use().playedBefore || (Paintbox.debugMode.use() && PRMania.enableEarlyAccessMessage))) {
+                    && (myInboxItemState.use().playedBefore || (Paintbox.debugMode.use() && debugFeaturesEnabled))) {
                 inboxItem.contractListingName?.use() 
             } else null
         }
