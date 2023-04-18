@@ -25,6 +25,7 @@ import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.ColumnarVBox
 import paintbox.ui.layout.HBox
 import paintbox.util.gdxutils.grey
+import paintbox.util.gdxutils.isShiftDown
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
@@ -512,7 +513,7 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                     this += Button("Post-boss cutscene").apply {
                         this.bounds.height.set(32f)
                         this.setOnAction {
-                            val titleScreen = PostBossCutsceneScreen(main, storySession) {
+                            val titleScreen = PostBossCutsceneScreen(main, storySession, Gdx.input.isShiftDown()) {
                                 main.screen = TransitionScreen(
                                     main, main.screen, this@TestStoryGimmickDebugScreen,
                                     FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)

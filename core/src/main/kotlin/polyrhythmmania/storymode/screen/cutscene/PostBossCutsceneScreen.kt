@@ -30,8 +30,16 @@ import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
 
 
-class PostBossCutsceneScreen(main: PRManiaGame, val storySession: StorySession, val onExit: () -> Unit) :
-    PRManiaScreen(main) {
+class PostBossCutsceneScreen(
+    main: PRManiaGame,
+    val storySession: StorySession,
+    val isSkippable: Boolean,
+    val onExit: () -> Unit,
+) : PRManiaScreen(main) {
+    
+    companion object {
+        private const val SKIP_KEY: Int = Input.Keys.ESCAPE
+    }
 
     val batch: SpriteBatch = main.batch
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
@@ -92,7 +100,7 @@ class PostBossCutsceneScreen(main: PRManiaGame, val storySession: StorySession, 
         }
         parent += imageWindow
         
-        parent += TextLabel(StoryL10N.getVar("cutscene.postboss.clickToAdvance"), font = main.fontRobotoItalic).apply { 
+        parent += TextLabel("${StoryL10N.getValue("cutscene.postboss.clickToAdvance")}\n${if (isSkippable) StoryL10N.getValue("cutscene.postboss.skipPrompt", Input.Keys.toString(SKIP_KEY)) else ""}", font = main.fontRobotoItalic).apply { 
             Anchor.BottomCentre.configure(this)
             this.renderAlign.set(RenderAlign.top)
             this.textAlign.set(TextAlign.CENTRE)
@@ -139,6 +147,10 @@ class PostBossCutsceneScreen(main: PRManiaGame, val storySession: StorySession, 
             } else {
                 triggerNextAnimation()
             }
+        }
+        
+        if (isSkippable && Gdx.input.isKeyJustPressed(SKIP_KEY)) {
+            onExit()
         }
     }
 

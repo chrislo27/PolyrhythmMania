@@ -94,7 +94,8 @@ class DesktopControllerWithUI(val desktopUI: DesktopUI) : DesktopControllerWithP
                 val noSavefile = storySession.currentSavefile == null // Only null when debugging
                 storySession.musicHandler.transitionToDesktopMix(if (noSavefile) desktopUI.scenario.inboxState else null)
             }
-            val cutsceneScreen = PostBossCutsceneScreen(main, storySession, onExitCutscene)
+            val isSkippable = inboxItemState?.completion?.shouldCountAsCompleted() == true
+            val cutsceneScreen = PostBossCutsceneScreen(main, storySession, isSkippable, onExitCutscene)
             
             playLevel(contract, inboxItem, inboxItemState, main, storySession) { exitReason ->
                 when (exitReason) {
