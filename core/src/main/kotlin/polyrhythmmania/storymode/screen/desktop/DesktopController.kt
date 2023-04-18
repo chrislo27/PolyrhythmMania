@@ -76,8 +76,8 @@ abstract class DesktopControllerWithPlayLevel
     : DesktopController {
 
     fun playLevel(
-            contract: Contract, inboxItem: InboxItem?, inboxItemState: InboxItemState?,
-            main: PRManiaGame, storySession: StorySession, exitToScreen: (ExitReason) -> PaintboxScreen
+        contract: Contract, inboxItem: InboxItem?, inboxItemState: InboxItemState?,
+        main: PRManiaGame, storySession: StorySession, exitToScreen: (ExitReason) -> PaintboxScreen,
     ) {
         storySession.musicHandler.fadeOut(0.25f)
 
@@ -87,32 +87,43 @@ abstract class DesktopControllerWithPlayLevel
 
             if (gameMode != null) {
                 val exitCallback = createExitCallback(contract, inboxItem, inboxItemState)
-                val playScreen = StoryPlayScreen(main, storySession, gameMode.container, Challenges.NO_CHANGES,
-                        main.settings.inputCalibration.getOrCompute(), gameMode, contract,
-                        inboxItemState?.completion != InboxItemCompletion.COMPLETED, inboxItemState?.failureCount ?: 0,
-                        exitToScreen, exitCallback)
+                
+                val isLevelStrictlyCompleted = inboxItemState?.completion == InboxItemCompletion.COMPLETED
+                val allowSkipping = !isLevelStrictlyCompleted
+                
+                val playScreen = StoryPlayScreen(
+                    main, storySession, gameMode.container, Challenges.NO_CHANGES,
+                    main.settings.inputCalibration.getOrCompute(), gameMode, contract,
+                    allowSkipping, inboxItemState?.failureCount ?: 0,
+                    inboxItemState?.completion?.shouldCountAsCompleted() == true,
+                    exitToScreen, exitCallback
+                )
 
                 gameMode.prepareFirstTime()
                 if (gameMode is AbstractStoryGameMode) {
                     gameMode.prepareFirstTimeWithStoryPlayScreen(playScreen)
                 }
                 playScreen.resetAndUnpause(unpause = false)
-                
+
 
                 StoryLoadingScreen.LoadResult(playScreen)
             } else null
         }) { playScreen ->
             playScreen.unpauseGameNoSound()
             playScreen.initializeIntroCard()
-            main.screen = TransitionScreen(main, main.screen, playScreen,
-                    FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
+            main.screen = TransitionScreen(
+                main, main.screen, playScreen,
+                FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK)
+            )
         }.apply {
             this.minimumShowTime = 0f
             this.minWaitTimeBeforeLoadStart = 0.25f
             this.minWaitTimeAfterLoadFinish = 0f
         }
 
-        main.screen = TransitionScreen(main, main.screen, loadingScreen,
-                FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK))
+        main.screen = TransitionScreen(
+            main, main.screen, loadingScreen,
+            FadeToOpaque(0.125f, Color.BLACK), FadeToTransparent(0.125f, Color.BLACK)
+        )
     }
 }

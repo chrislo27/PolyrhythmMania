@@ -190,7 +190,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val storySession: St
                                                     break
                                                 } while (true)
                                                 val playScreen = StoryPlayScreen(main, storySession, gameMode.container, Challenges.NO_CHANGES,
-                                                        main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, true, 0,
+                                                        main.settings.inputCalibration.getOrCompute(), gameMode, item.contract, true, 0, true,
                                                     { this@TestStoryProgressionOverviewScreen }) {
                                                     Paintbox.LOGGER.debug("ExitReason: $it")
                                                 }

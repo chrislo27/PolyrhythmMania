@@ -74,6 +74,7 @@ class StoryPlayScreen(
         val contract: Contract,
         isNotCompletedYet: Boolean,
         private val previousFailureCount: Int,
+        val showLevelCreatorsInIntroCard: Boolean,
         val exitToScreen: (ExitReason) -> PaintboxScreen,
         val exitCallback: ExitCallback,
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
@@ -229,6 +230,43 @@ class StoryPlayScreen(
             this.bounds.x.bind {
                 val parentW = parent.use()?.bounds?.width?.use() ?: 0f
                 MathUtils.lerp(-1f, 0.5f, textSlide.textSlideAmount.use()) * (parentW * 0.1f)
+            }
+        }
+        
+        val levelCreators = contract.attribution?.creators ?: emptyList()
+        if (showLevelCreatorsInIntroCard && levelCreators.isNotEmpty()) {
+            introCardSceneRoot += TextLabel("").apply {
+                Anchor.BottomCentre.configure(this)
+                this.bindHeightToParent(multiplier = barHeight)
+
+                this.margin.set(Insets(10f, 20f, 50f, 50f))
+                this.renderAlign.set(RenderAlign.bottom)
+                this.textColor.set(Color().grey(229f / 255f, a = 1f))
+                
+                val lexendMarkup = Markup.createWithBoldItalic(
+                    PRManiaGame.instance.fontLexend,
+                    PRManiaGame.instance.fontLexendBold,
+                    null,
+                    null,
+                    lenientMode = true
+                )
+                this.markup.set(lexendMarkup)
+                this.internalTextBlock.set(
+                    lexendMarkup.Builder()
+                        
+                        .bold()
+                        .lineHeight(1.25f)
+                        .text(StoryL10N.getValue("play.introCard.levelCreators"))
+                        .text("\n")
+                        .endTag()
+                        
+                        .text(levelCreators.joinToString(separator = ", "))
+                        .build()
+                )
+
+                this.opacity.bind {
+                    blackBarsAmount.use()
+                }
             }
         }
     }
