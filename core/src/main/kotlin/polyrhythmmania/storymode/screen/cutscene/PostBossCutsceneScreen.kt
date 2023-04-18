@@ -64,6 +64,7 @@ class PostBossCutsceneScreen(
     private val scroll: FloatVar = FloatVar(0f)
     
     private val clickToAdvanceStartOpacity: FloatVar = FloatVar(0f)
+    private var hasInitialWaitPassed: Boolean = false
 
     init {
         val parent = RectElement(Color.BLACK)
@@ -137,7 +138,7 @@ class PostBossCutsceneScreen(
 
         val aKey = main.settings.inputKeymapKeyboard.getOrCompute().buttonA
         val isAnimationStillPlaying = scroll.get() > 0f
-        if (!isAnimationStillPlaying &&
+        if (hasInitialWaitPassed && !isAnimationStillPlaying &&
             (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)
                     || Gdx.input.isKeyJustPressed(aKey)
                     || Gdx.input.isButtonJustPressed(Buttons.LEFT))
@@ -150,6 +151,7 @@ class PostBossCutsceneScreen(
         }
         
         if (isSkippable && Gdx.input.isKeyJustPressed(SKIP_KEY)) {
+            // Note: Skipping is allowed even before the initial wait has passed
             onExit()
         }
     }
@@ -193,6 +195,7 @@ class PostBossCutsceneScreen(
                 if (progress >= 1f) {
                     main.playMenuSfx(StoryAssets["sfx_cutscene_postboss_knocking"])
                     sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 0f, 1f, delay = 0.5f), clickToAdvanceStartOpacity)
+                    hasInitialWaitPassed = true
                 }
             })
         }
