@@ -26,6 +26,8 @@ class EntityStoryModeDesktopInbox(world: World) : SimpleRenderedEntity(world) {
         val oldPackedColor = batch.packedColor
         val tmpColor = ColorStack.getAndPush()
             .set(1f, 1f, 1f, 1f)
+        
+        vec.y += 2f / 32f
 
         batch.color = tmpColor
         batch.draw(AssetRegistry.get<Texture>("mainmenu_bg_storymode_inbox_entity"), vec.x, vec.y, renderWidth, renderHeight)

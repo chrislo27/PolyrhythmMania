@@ -278,14 +278,8 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
         world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = true).apply {
             this.position.set(1f, 1f, -2f)
         })
-        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = true).apply {
-            this.position.set(1f, 2f, -2f)
-        })
         world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
             this.position.set(1f, 1f, -1f)
-        })
-        world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
-            this.position.set(1f, 2f, -1f)
         })
         world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = false).apply {
             this.position.set(1f, 1f, 0f)
