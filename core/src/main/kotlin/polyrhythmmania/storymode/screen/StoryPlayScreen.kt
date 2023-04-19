@@ -94,6 +94,7 @@ class StoryPlayScreen(
     private val currentFailureCount: IntVar = IntVar(0)
     
     // Intro card
+    private val isReducedMotionEnabled: ReadOnlyBooleanVar = BooleanVar { use(main.settings.reducedMotion) }
     private val introCardDefaultDuration: Float = 3f
     var introCardDuration: Float = introCardDefaultDuration
     private val introCardUnblurDuration: Float = 0.5f
@@ -202,8 +203,23 @@ class StoryPlayScreen(
             this.textColor.set(Color.WHITE.cpy())
             
             this.bounds.x.bind {
-                val parentW = parent.use()?.bounds?.width?.use() ?: 0f    
-                MathUtils.lerp(-(bounds.width.use()), parentW, textSlide.textSlideAmount.use())
+                if (isReducedMotionEnabled.use()) {
+                    0f
+                } else {
+                    val parentW = parent.use()?.bounds?.width?.use() ?: 0f
+                    MathUtils.lerp(-(bounds.width.use()), parentW, textSlide.textSlideAmount.use())
+                }
+            }
+            this.opacity.bind {
+                if (isReducedMotionEnabled.use()) {
+                    val time = textSlide.textSlideAmount.use()
+                    when {
+                        time < 0.25f -> time / 0.25f
+                        time in 0.25f..0.75f -> 1f
+                        time > 0.75f -> 1f - ((time - 0.75f) / 0.25f)
+                        else -> 0f
+                    }
+                } else 1f
             }
         }
         introCardSceneRoot += TextLabel(contract.tagline.getOrCompute(), font = PRManiaGame.instance.fontGamePracticeClear).apply {
@@ -228,8 +244,12 @@ class StoryPlayScreen(
                 }
             }
             this.bounds.x.bind {
-                val parentW = parent.use()?.bounds?.width?.use() ?: 0f
-                MathUtils.lerp(-1f, 0.5f, textSlide.textSlideAmount.use()) * (parentW * 0.1f)
+                if (isReducedMotionEnabled.use()) {
+                    0f
+                } else {
+                    val parentW = parent.use()?.bounds?.width?.use() ?: 0f
+                    MathUtils.lerp(-1f, 0.5f, textSlide.textSlideAmount.use()) * (parentW * 0.1f)
+                }
             }
         }
         
