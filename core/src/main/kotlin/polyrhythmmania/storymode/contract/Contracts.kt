@@ -156,11 +156,11 @@ object Contracts {
         add(Contract("crop_stomp_superhard", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 0, extraConditions = listOf(Condition.TempoUp(150), Condition.MonsterGoal), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/crop_stomp.prmproj"), percentSpeed = 150)
         })
-        add(Contract("fillbots2_superhard", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.ds("Fillbots", listOf(SongNameAndSource.megamix("Fillbots 2"))), listOf("J-D Thunder", "Kievit")), 0, extraConditions = listOf(Condition.TempoUp(150), Condition.Lives(3)), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
-            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/fillbots2.prmproj"), percentSpeed = 150)
-        })
+//        add(Contract("fillbots2_superhard", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.ds("Fillbots", listOf(SongNameAndSource.megamix("Fillbots 2"))), listOf("J-D Thunder", "Kievit")), 0, extraConditions = listOf(Condition.TempoUp(150), Condition.Lives(3)), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+//            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/fillbots2.prmproj"), percentSpeed = 150)
+//        })
         add(Contract("fillbots3_superhard", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.ds("Fillbots 2"), listOf("J-D Thunder", "Kievit")), 0, extraConditions = listOf(Condition.TempoUp(150), Condition.Lives(4)), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
-            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/fillbots2.prmproj"), percentSpeed = 150)
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/fillbots3.prmproj"), percentSpeed = 150)
         })
         add(Contract("first_contact_superhard", Requester.ALIENS, JingleType.ARCADE, Attribution(SongInfo.megamix("First Contact"), listOf("Kievit")), 75, extraConditions = listOf(Condition.TempoUp(125)), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/first_contact.prmproj"), percentSpeed = 125)
