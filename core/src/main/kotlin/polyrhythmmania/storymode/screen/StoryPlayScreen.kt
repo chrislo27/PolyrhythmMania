@@ -431,7 +431,8 @@ class StoryPlayScreen(
             }
         }
         dialog += failPane
-        
+
+        val optionsFade = FloatVar(0f)
         val scorePane = VBox().apply {
             this.visible.bind { !failPane.visible.use() }
             this.spacing.set(8f)
@@ -449,55 +450,70 @@ class StoryPlayScreen(
                 }
 
 
-                this += HBox().apply {
-                    this.bounds.height.set(90f)
-                    this.spacing.set(4f)
+                this += VBox().apply {
+                    this.bounds.height.set(110f)
                     this.margin.set(Insets(16f, 18f, 2f, 2f))
-                    this.align.set(HBox.Align.CENTRE)
+                    this.spacing.set(4f)
 
-                    this.temporarilyDisableLayouts {
-                        val progress: ReadOnlyFloatVar = scoreBar
-                        this += Pane().apply {
-                            this.bindWidthToParent(multiplier = 0.85f)
-                            
-                            val borderColor = Color.WHITE
-                            val borderSize = 4f
+                    this += HBox().apply {
+                        this.bounds.height.set(56f)
+                        this.spacing.set(4f)
+                        this.align.set(HBox.Align.CENTRE)
+
+                        this.temporarilyDisableLayouts {
+                            val progress: ReadOnlyFloatVar = scoreBar
                             this += Pane().apply {
-                                this.border.set(Insets(borderSize))
-                                this.borderStyle.set(SolidBorder(borderColor))
-                                this.padding.set(Insets(borderSize * 1.25f))
-                                
-                                this += RectElement(borderColor).apply {
-                                    this.bindWidthToParent(multiplierBinding = { progress.use() / 100f }) { 0f }
-                                }
-                            }
-                            this += TextLabel(binding = {
-                                if (contract.immediatePass) {
-                                    if (progress.use() < 100f) "" else StoryL10N.getValue("play.scoreCard.pass")
-                                } else {
-                                    val minToPass = contract.minimumScore
-                                    val minToPassDenom = "[scale=0.5]/${minToPass}[]"
-                                    if (!showScoreOnScoreCard.use()) {
-                                        ""
-                                    } else {
-                                        // Invisible minToPassDenom on the left so everything is centred still
-                                        // Spaces at end prevent a vertical alignment issue
-                                        " [color=#FFFFFF00]${minToPassDenom}[]${progress.use().toInt()}${minToPassDenom} "
+                                this.bindWidthToParent(multiplier = 0.85f)
+
+                                val borderColor = Color.WHITE
+                                val borderSize = 4f
+                                this += Pane().apply {
+                                    this.border.set(Insets(borderSize))
+                                    this.borderStyle.set(SolidBorder(borderColor))
+                                    this.padding.set(Insets(borderSize * 1.25f))
+
+                                    this += RectElement(borderColor).apply {
+                                        this.bindWidthToParent(multiplierBinding = { progress.use() / 100f }) { 0f }
                                     }
                                 }
-                            }).apply {
-                                this.renderAlign.set(RenderAlign.center)
-                                this.padding.set(Insets(0f, 6f * 0.5f, 16f, 16f))
-                                this.textColor.set(Color.WHITE)
-                                this.markup.set(Markup.createWithSingleFont(main.fontResultsScore, lenientMode = true))
-                                this.setScaleXY(0.5f)
+                                this += TextLabel(binding = {
+                                    if (contract.immediatePass) {
+                                        if (progress.use() < 100f) "" else StoryL10N.getValue("play.scoreCard.pass")
+                                    } else {
+                                        val minToPass = contract.minimumScore
+                                        val minToPassDenom = "[scale=0.5]/${minToPass}[]"
+                                        if (!showScoreOnScoreCard.use()) {
+                                            ""
+                                        } else {
+                                            // Invisible minToPassDenom on the left so everything is centred still
+                                            // Spaces at end prevent a vertical alignment issue
+                                            " [color=#FFFFFF00]${minToPassDenom}[]${progress.use().toInt()}${minToPassDenom} "
+                                        }
+                                    }
+                                }).apply {
+                                    this.renderAlign.set(RenderAlign.center)
+                                    this.padding.set(Insets(0f, 6f * 0.5f, 16f, 16f))
+                                    this.textColor.set(Color.WHITE)
+                                    this.markup.set(Markup.createWithSingleFont(main.fontResultsScore, lenientMode = true))
+                                    this.setScaleXY(0.5f)
+                                }
                             }
+                        }
+                    }
+                    this += TextLabel(StoryL10N.getValue("play.scoreCard.minScore", contract.minimumScore), font = main.fontMainMenuMain).apply {
+                        this.bounds.height.set(20f)
+                        this.margin.set(Insets(4f, 0f, 8f, 8f))
+                        this.renderAlign.set(RenderAlign.bottom)
+                        this.textColor.set(Color.LIGHT_GRAY)
+                        this.setScaleXY(0.75f)
+                        this.opacity.bind { optionsFade.use() }
+                        this.visible.bind {
+                            !contract.immediatePass && scoreBar.use() < contract.minimumScore
                         }
                     }
                 }
             }
 
-            val optionsFade = FloatVar(1f)
             val successOptions: List<UIElement> = listOf(Pane().apply { 
                 this.bounds.height.set(16f)
             }) + successScoreCardOptions.map { opt ->
