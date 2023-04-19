@@ -139,7 +139,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["first_contact_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["bunny_hop_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["screwbots_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
-        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["fillbots2_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["fillbots3_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["air_rally_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["tap_trial_2_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["built_to_scale_ds_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
