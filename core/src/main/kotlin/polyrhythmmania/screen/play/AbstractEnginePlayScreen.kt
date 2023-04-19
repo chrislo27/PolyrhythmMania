@@ -157,6 +157,16 @@ abstract class AbstractEnginePlayScreen(
     override fun unpauseGame(playSound: Boolean) {
         super.unpauseGame(playSound)
         
+        unpauseSoundSystem()
+    }
+    
+    @Suppress("RedundantModalityModifier")
+    protected final fun unpauseGameWithoutAffectingSoundSystem(playSound: Boolean) {
+        // Used for StoryPlayScreen to fix an edge case bug
+        super.unpauseGame(playSound)
+    }
+    
+    protected fun unpauseSoundSystem() {
         val player = engine.soundInterface.getCurrentMusicPlayer(engine.musicData.beadsMusic)
         if (player != null) {
             engine.musicData.setMusicPlayerPositionToCurrentSec()

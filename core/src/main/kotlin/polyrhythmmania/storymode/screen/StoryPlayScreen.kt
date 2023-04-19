@@ -648,6 +648,12 @@ class StoryPlayScreen(
         animationHandler.cancelAnimationFor(scoreCardTransition)
         scoreCardTransition.set(1f)
         animationHandler.enqueueAnimation(Animation(Interpolation.linear, scoreCardTransitionTime, 1f, 0f), scoreCardTransition)
+        
+        Gdx.app.postRunnable { 
+            if (isPaused.get()) {
+                unpauseGameWithoutAffectingSoundSystem(playSound = false)
+            }
+        }
     }
     
     fun closeScoreCard() {
@@ -878,8 +884,8 @@ class StoryPlayScreen(
                 }
                 animationHandler.enqueueAnimation(animation, scoreBar)
             }
-            
         }
+        
         openScoreCard()
     }
 
