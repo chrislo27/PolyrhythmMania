@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
+import paintbox.Paintbox
 import paintbox.binding.ContextBinding
 import paintbox.font.Markup
 import paintbox.font.TextAlign
@@ -18,6 +19,7 @@ import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.SkinFactory
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
+import polyrhythmmania.PRMania
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
@@ -100,6 +102,9 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             vbox += createButton(binding = {// TODO remove me, test story mode gimmicks
                 "TEST: Story Mode debug screen"
             }).apply {
+                this.visible.bind { 
+                    PRMania.isDevVersion || (PRMania.isPrereleaseVersion && Paintbox.debugMode.use())
+                }
                 this.setOnAction {
                     mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
 
