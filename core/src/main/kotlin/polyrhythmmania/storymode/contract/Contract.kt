@@ -50,6 +50,7 @@ data class Contract(
     val canSkipLevel: Boolean get() = skipAfterNFailures > 0
     
     val shouldPlayPostResultsMixOnPass: Boolean = id != Contracts.ID_BOSS
+    val isSuperHard: Boolean = id.endsWith("_superhard")
     
     constructor(
             id: String, requester: Requester, jingleType: JingleType, attribution: Attribution?,

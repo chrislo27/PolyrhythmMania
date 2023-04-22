@@ -66,7 +66,7 @@ sealed class InboxItem(
         override val requester: Requester get() = contract.requester
         val contractListingName: ReadOnlyVar<String>? get() = contract.listingName
         
-        val isSuperHard: Boolean = contract.id.endsWith("_superhard")
+        val isSuperHard: Boolean = contract.isSuperHard
         
         fun showSongInfo(inboxItemState: InboxItemState): Boolean {
             if (contract.id == Contracts.ID_BOSS) {
