@@ -29,6 +29,8 @@ import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.screen.StoryTitleScreen
 import polyrhythmmania.storymode.test.TestStoryGimmickDebugScreen
 import polyrhythmmania.util.Semitones
+import polyrhythmmania.world.render.ForceTexturePack
+import polyrhythmmania.world.render.ForceTilesetPalette
 
 /**
  * The very beginning of the main menu.
@@ -138,7 +140,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
             }).apply {
                 val main = mainMenu.main
                 val newIndicator = settings.newIndicatorStoryMode
-                val action = {
+                val goToStoryModeAction = {
                     main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
 
                     val storySession = StorySession()
@@ -169,13 +171,28 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                         FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
                 }
                 
-                this.setOnAction {
-                    if (settings.menuMusicVolume.getOrCompute() <= 0 && newIndicator.value.get()) {
-                        val warningMenu = StoryModeMusicVolumeWarningMenu(menuCol, action)
+                val checkAccessibilityAction = {
+                    val anyAccessibilityOptionsOn =
+                        settings.forceTexturePack.getOrCompute() != ForceTexturePack.NO_FORCE
+                                || settings.forceTilesetPalette.getOrCompute() != ForceTilesetPalette.NO_FORCE
+                                || settings.reducedMotion.getOrCompute()
+                    
+                    if (anyAccessibilityOptionsOn) {
+                        val warningMenu = StoryModeAccessibilityOptionsWarningMenu(menuCol, goToStoryModeAction)
                         menuCol.addMenu(warningMenu)
                         menuCol.pushNextMenu(warningMenu)
                     } else {
-                        action()
+                        goToStoryModeAction()
+                    }
+                }
+                
+                this.setOnAction {
+                    if (settings.menuMusicVolume.getOrCompute() <= 0 && newIndicator.value.get()) {
+                        val warningMenu = StoryModeMusicVolumeWarningMenu(menuCol, checkAccessibilityAction)
+                        menuCol.addMenu(warningMenu)
+                        menuCol.pushNextMenu(warningMenu)
+                    } else {
+                        checkAccessibilityAction()
                     }
                 }
             }

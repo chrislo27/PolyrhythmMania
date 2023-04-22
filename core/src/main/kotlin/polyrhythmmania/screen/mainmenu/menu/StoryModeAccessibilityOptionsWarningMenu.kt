@@ -1,24 +1,20 @@
 package polyrhythmmania.screen.mainmenu.menu
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.ui.Anchor
-import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.Slider
 import paintbox.ui.control.TextLabel
-import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
 import kotlin.math.roundToInt
 
 
-class StoryModeMusicVolumeWarningMenu(menuCol: MenuCollection, private val continueAction: () -> Unit) : StandardMenu(menuCol) {
+class StoryModeAccessibilityOptionsWarningMenu(menuCol: MenuCollection, private val continueAction: () -> Unit) : StandardMenu(menuCol) {
 
     private val settings: Settings = menuCol.main.settings
     val menuMusicVolSlider: Slider = Slider().apply {
@@ -35,7 +31,7 @@ class StoryModeMusicVolumeWarningMenu(menuCol: MenuCollection, private val conti
     
     init {
         this.setSize(MMMenu.WIDTH_MID)
-        this.titleText.bind { Localization.getVar("mainMenu.storyModeMusicVolumeWarning.title").use() }
+        this.titleText.bind { Localization.getVar("mainMenu.storyModeAccessibilityOptionsWarning.title").use() }
         this.contentPane.bounds.height.set(300f)
         this.deleteWhenPopped.set(true)
 
@@ -68,22 +64,14 @@ class StoryModeMusicVolumeWarningMenu(menuCol: MenuCollection, private val conti
             this.spacing.set(0f)
             this.bindHeightToParent(-40f)
         }
-        fun separator(): UIElement {
-            return RectElement(Color().grey(90f / 255f, 0.8f)).apply {
-                this.bounds.height.set(10f)
-                this.margin.set(Insets(4f, 4f, 0f, 0f))
-            }
-        }
         vbox.temporarilyDisableLayouts {
-            vbox += TextLabel(binding = { Localization.getVar("mainMenu.storyModeMusicVolumeWarning.desc").use() }).apply {
-                this.markup.set(this@StoryModeMusicVolumeWarningMenu.markup)
-                this.bounds.height.set(100f)
+            vbox += TextLabel(binding = { Localization.getVar("mainMenu.storyModeAccessibilityOptionsWarning.desc").use() }).apply {
+                this.markup.set(this@StoryModeAccessibilityOptionsWarningMenu.markup)
+                this.bounds.height.set(200f)
                 this.renderAlign.set(Align.topLeft)
                 this.doLineWrapping.set(true)
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)
             }
-            vbox += separator()
-            vbox += createSliderPane(menuMusicVolSlider, percentageContent = 0.6f) { Localization.getVar("mainMenu.audioSettings.menuMusicVol").use() }
         }
         
         vbox.sizeHeightToChildren(100f)
@@ -96,11 +84,10 @@ class StoryModeMusicVolumeWarningMenu(menuCol: MenuCollection, private val conti
                     menuCol.popLastMenu()
                 }
             }
-            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.storyModeMusicVolumeWarning.continue").use() }).apply {
+            hbox += createSmallButton(binding = { Localization.getVar("mainMenu.storyModeAccessibilityOptionsWarning.continue").use() }).apply {
                 this.bounds.width.set(300f)
                 this.setOnAction {
                     continueAction()
-                    settings.persist()
                 }
             }
         }

@@ -109,15 +109,10 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
         menuPane.removeChild(menu)
     }
     
-    fun resetMenuStack() {
-        val existing = menuStack.toList()
-        existing.forEach {
-            if (it.deleteWhenPopped.get()) {
-                this.removeMenu(it)
-            }
+    fun resetMenuStackToUppermost() {
+        while (menuStack.size > 1 && menuStack.peekFirst() !is UppermostMenu) {
+            popLastMenu(instant = true, playSound = false)
         }
-        menuStack.clear()
-        menuStack.push(uppermostMenu)
     }
     
     fun changeActiveMenu(menu: MMMenu, backOut: Boolean, instant: Boolean = false, playSound: Boolean = !instant) {

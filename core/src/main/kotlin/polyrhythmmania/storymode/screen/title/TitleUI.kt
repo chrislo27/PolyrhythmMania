@@ -208,6 +208,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
 
     private fun quitToMainMenu() {
         main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_deselect"))
+        main.mainMenuScreen.menuCollection.resetMenuStackToUppermost()
 
         val doAfterUnload: () -> Unit = {
             val mainMenu = main.mainMenuScreen.prepareShow(doFlipAnimation = true)
