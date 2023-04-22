@@ -177,7 +177,7 @@ object BossPatterns {
         rowUpside   = "..........",
         rowUpsideTailEnd = "..",
         rowDownside = "....####P#",
-        rowDownsideTailEnd = "##",
+        rowDownsideTailEnd = "#.",
         silent = true
     )
     val boss1_e_spaceball_ssp_flicker0 = Pattern(

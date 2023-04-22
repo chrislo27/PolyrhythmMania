@@ -140,7 +140,8 @@ data class Pattern(
     fun flip(): Pattern = this.copy(
         rowDownside = this.rowUpside, rowUpside = this.rowDownside,
         rodUpside = this.rodDownside, rodDownside = this.rodUpside,
-        delayUpside = this.delayDownside, delayDownside = this.delayUpside
+        delayUpside = this.delayDownside, delayDownside = this.delayUpside,
+        rowUpsideTailEnd = this.rowDownsideTailEnd, rowDownsideTailEnd = this.rowUpsideTailEnd
     )
     
     private fun getLastPistonIndex(list: List<CubeType>): Int {
