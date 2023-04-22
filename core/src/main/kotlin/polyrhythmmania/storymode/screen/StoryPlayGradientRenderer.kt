@@ -9,7 +9,7 @@ import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.screen.play.pause.TengokuPauseBackground
 
 
-class StoryPlayGradientRenderer : TengokuPauseBackground.GradientRenderer {
+class StoryPlayGradientRenderer(cycleSpeedMultiplier: Float = 1f) : TengokuPauseBackground.GradientRenderer {
 
     private val colors: List<Color> = listOf(
             Color.valueOf("4aff4a"), // Green
@@ -18,7 +18,7 @@ class StoryPlayGradientRenderer : TengokuPauseBackground.GradientRenderer {
             Color.valueOf("2963ff"), // Blue
     )
 
-    var cycleSpeed: Float = 1f / ((colors.size + 1) * 1.5f)
+    var cycleSpeed: Float = (1f / ((colors.size + 1) * 1.5f)) * cycleSpeedMultiplier
     private var position: Float = 0f // 0..1
 
     override fun render(delta: Float, batch: SpriteBatch, camera: OrthographicCamera, seed: Int) {

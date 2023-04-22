@@ -80,7 +80,7 @@ class StoryPlayScreen(
 ) : AbstractEnginePlayScreen(main, null, container, challenges, inputCalibration, gameMode) {
 
     override val pauseMenuHandler: PauseMenuHandler = TengokuBgPauseMenuHandler(this).apply { 
-        this.pauseBg.gradientRenderer = StoryPlayGradientRenderer()
+        this.pauseBg.gradientRenderer = StoryPlayGradientRenderer(cycleSpeedMultiplier = if (contract.isSuperHard) 2f else 1f)
     }
 
     private var disableCatchingCursorOnHide: Boolean = false
@@ -171,7 +171,10 @@ class StoryPlayScreen(
         // Black bars: Full is 16:9 = 1.778, cinema is 2.35:1 = 2.35. About 25% less height
         val slantAmount = 1f
         val barHeight = 0.125f * 1.25f
-        introCardSceneRoot += QuadElement(Color.BLACK).apply { 
+        val superHardRed = Color.valueOf("880000").lerp(Color.BLACK, 0.35f)
+        val blackBarsColor = if (contract.isSuperHard) superHardRed else Color.BLACK
+        val blackBarsColorTransparent = blackBarsColor.cpy().apply { this.a *= 0.75f }
+        introCardSceneRoot += QuadElement(blackBarsColor, blackBarsColor, blackBarsColorTransparent, blackBarsColorTransparent).apply { 
             this.bindHeightToParent(multiplier = barHeight * slantAmount)
             Anchor.TopLeft.yConfigure(this) {
                 val h = bounds.height.use()
@@ -181,7 +184,7 @@ class StoryPlayScreen(
             this.bottomLeftOffsetV.set(0f)
             this.bottomRightOffsetV.set(1f - slantAmount)
         }
-        introCardSceneRoot += QuadElement(Color.BLACK).apply { 
+        introCardSceneRoot += QuadElement(blackBarsColorTransparent, blackBarsColorTransparent, blackBarsColor, blackBarsColor).apply { 
             this.bindHeightToParent(multiplier = barHeight * slantAmount)
             Anchor.BottomLeft.yConfigure(this) {
                 val h = bounds.height.use()
@@ -192,6 +195,7 @@ class StoryPlayScreen(
             this.topRightOffsetV.set(slantAmount)
         }
         // Title and tagline
+        val titleAndTaglineTextColor = /*if (contract.isSuperHard) Color.RED.cpy().lerp(Color.WHITE, 0.35f) else*/ Color.WHITE.cpy()
         introCardSceneRoot += TextLabel(contract.name.getOrCompute(), font = PRManiaGame.instance.fontGamePracticeClear).apply { 
             Anchor.CentreLeft.configure(this, offsetY = {
                 -(bounds.height.use() / 2f)
@@ -200,7 +204,7 @@ class StoryPlayScreen(
             
             this.margin.set(Insets(0f, 0f, 50f, 50f))
             this.renderAlign.set(RenderAlign.center)
-            this.textColor.set(Color.WHITE.cpy())
+            this.textColor.set(titleAndTaglineTextColor)
             
             this.bounds.x.bind {
                 if (isReducedMotionEnabled.use()) {
@@ -230,7 +234,7 @@ class StoryPlayScreen(
             
             this.margin.set(Insets(0f, 0f, 50f, 50f))
             this.renderAlign.set(RenderAlign.center)
-            this.textColor.set(Color.WHITE.cpy())
+            this.textColor.set(titleAndTaglineTextColor)
             this.setScaleXY(0.75f)
             
             this.opacity.bind {
