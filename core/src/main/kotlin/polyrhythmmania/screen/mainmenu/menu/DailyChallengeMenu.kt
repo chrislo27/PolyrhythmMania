@@ -18,6 +18,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import paintbox.util.gdxutils.GdxRunnableTransition
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
@@ -569,8 +570,13 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     this.bounds.width.set(200f)
                     this.setOnAction {
                         Gdx.app.postRunnable {
-                            menuCol.popLastMenu(instant = true, playSound = false)
                             onSuccess(null)
+
+                            Gdx.app.postRunnable(GdxRunnableTransition(0f, 1f, 1f) { _, progress ->
+                                if (progress >= 1) {
+                                    menuCol.popLastMenu(instant = true, playSound = false)
+                                }
+                            })
                         }
                     }
                 }

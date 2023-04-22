@@ -65,6 +65,7 @@ class AudioSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         this.setSize(MMMenu.WIDTH_MEDIUM)
         this.titleText.bind { Localization.getVar("mainMenu.audioSettings.title").use() }
         this.contentPane.bounds.height.set(300f)
+        this.deleteWhenPopped.set(true)
         
         val scrollPane = ScrollPane().apply {
             Anchor.TopLeft.configure(this)

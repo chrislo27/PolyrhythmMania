@@ -57,7 +57,9 @@ class SettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += createLongButton { Localization.getVar("mainMenu.settings.audio").use() }.apply {
                 this.setOnAction { 
-                    menuCol.pushNextMenu(menuCol.audioSettingsMenu)
+                    val audioSettingsMenu = AudioSettingsMenu(menuCol)
+                    menuCol.addMenu(audioSettingsMenu)
+                    menuCol.pushNextMenu(audioSettingsMenu)
                 }
             }
             vbox += createLongButton { Localization.getVar("mainMenu.settings.video").use() }.apply {

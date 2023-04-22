@@ -136,13 +136,13 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     ("[color=#4AFF4A]${Localization.getVar("common.newIndicator").use()}[] ")
                 else "") + Localization.getVar("mainMenu.main.storyMode").use()
             }).apply {
-                this.setOnAction {
-                    mainMenu.main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
+                val main = mainMenu.main
+                val newIndicator = settings.newIndicatorStoryMode
+                val action = {
+                    main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_enter_game"), 1f, Semitones.getALPitch(-2), 0f)
 
-                    val main = mainMenu.main
                     val storySession = StorySession()
                     val checkNewIndicator: () -> Unit = {
-                        val newIndicator = settings.newIndicatorStoryMode
                         if (newIndicator.value.get()) {
                             newIndicator.value.set(false)
                             settings.persist()
@@ -155,7 +155,7 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                             newScreen.render(1 / 60f)
                             Gdx.app.postRunnable {
                                 main.screen = TransitionScreen(main, main.screen, newScreen,
-                                        FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
+                                    FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK)).apply {
                                     this.onDestEnd = {
                                         val musicHandler = storySession.musicHandler
                                         musicHandler.transitionToStemMix(musicHandler.getTitleStemMix(), 0f, delaySec = 0f)
@@ -166,7 +166,17 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                     }
 
                     main.screen = TransitionScreen(main, main.screen, storySession.createEntryLoadingScreen(main, doAfterLoad),
-                            FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                        FadeToOpaque(0.25f, Color.BLACK), FadeToTransparent(0.25f, Color.BLACK))
+                }
+                
+                this.setOnAction {
+                    if (settings.menuMusicVolume.getOrCompute() <= 0 && newIndicator.value.get()) {
+                        val warningMenu = StoryModeMusicVolumeWarningMenu(menuCol, action)
+                        menuCol.addMenu(warningMenu)
+                        menuCol.pushNextMenu(warningMenu)
+                    } else {
+                        action()
+                    }
                 }
             }
 
