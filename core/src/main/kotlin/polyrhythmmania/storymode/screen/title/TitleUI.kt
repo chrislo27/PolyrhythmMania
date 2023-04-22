@@ -100,6 +100,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                 Anchor.BottomCentre.configure(this)
                 this.bindHeightToParent(multiplier = 1f - titleFullHeight)
                 this.opacity.bind { Interpolation.exp10.apply(0f, 1f, fullTitleTransition.use()) }
+                this.visible.bind { titleLogic.fullTitle.use() }
 
                 this += TextLabel(StoryL10N.getVar("titleScreen.clickAnywhereToContinue"), font = main.fontMainMenuHeadingBordered).apply {
                     Anchor.Centre.configure(this)
