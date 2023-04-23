@@ -19,7 +19,7 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
-import paintbox.util.gdxutils.GdxRunnableTransition
+import paintbox.util.gdxutils.GdxDelayedRunnable
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
@@ -360,10 +360,8 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                             val desktopUI = desktopUI
                             if (desktopUI != null) {
                                 val delaySec = 1.25f
-                                Gdx.app.postRunnable(GdxRunnableTransition(0f, 1f, delaySec) { _, progress ->
-                                    if (progress == 1f) {
-                                        desktopUI.updateAndShowNewlyAvailableInboxItems()
-                                    }
+                                Gdx.app.postRunnable(GdxDelayedRunnable(delaySec) {
+                                    desktopUI.updateAndShowNewlyAvailableInboxItems()
                                 })
                             } else {
                                 scenario.updateProgression()

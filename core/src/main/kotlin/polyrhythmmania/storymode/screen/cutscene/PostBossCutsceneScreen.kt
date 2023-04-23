@@ -21,7 +21,7 @@ import paintbox.ui.*
 import paintbox.ui.animation.Animation
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
-import paintbox.util.gdxutils.GdxRunnableTransition
+import paintbox.util.gdxutils.GdxDelayedRunnable
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.storymode.StoryAssets
@@ -189,14 +189,15 @@ class PostBossCutsceneScreen(
         main.inputMultiplexer.addProcessor(processor)
 
         Gdx.input.isCursorCatched = true
-        
+
         if (currentImageIndex.get() == 0) {
-            Gdx.app.postRunnable(GdxRunnableTransition(0f, 1f, 1.75f) { _, progress ->
-                if (progress >= 1f) {
-                    main.playMenuSfx(StoryAssets["sfx_cutscene_postboss_knocking"])
-                    sceneRoot.animations.enqueueAnimation(Animation(Interpolation.linear, 0.5f, 0f, 1f, delay = 0.5f), clickToAdvanceStartOpacity)
-                    hasInitialWaitPassed = true
-                }
+            Gdx.app.postRunnable(GdxDelayedRunnable(1.75f) {
+                main.playMenuSfx(StoryAssets["sfx_cutscene_postboss_knocking"])
+                sceneRoot.animations.enqueueAnimation(
+                    Animation(Interpolation.linear, 0.5f, 0f, 1f, delay = 0.5f),
+                    clickToAdvanceStartOpacity
+                )
+                hasInitialWaitPassed = true
             })
         }
     }
