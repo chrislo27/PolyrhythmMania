@@ -168,7 +168,7 @@ object Contracts {
         add(Contract("screwbots_superhard", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.fever("Screwbot Factory"), listOf("Kievit")), 80, extraConditions = listOf(Condition.TempoUp(125)), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/screwbots.prmproj"), percentSpeed = 125)
         })
-        add(Contract("tap_trial_2_superhard", Requester.ANIMAL_ACROBATICS, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit")), 0, extraConditions = listOf(Condition.TempoUp(110), Condition.MonsterGoal), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+        add(Contract("tap_trial_2_superhard", Requester.ANIMAL_ACROBATICS, JingleType.GBA, Attribution(SongInfo.tengoku("Tap Trial 2"), listOf("Kievit", "Conn")), 0, extraConditions = listOf(Condition.TempoUp(110), Condition.MonsterGoal), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/tap_trial_2.prmproj"), percentSpeed = 110)
         })
 
