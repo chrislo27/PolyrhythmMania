@@ -251,7 +251,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         val contract = inboxItem.contract
 
         val primaryText = when {
-            contract.id == Contracts.ID_BOSS -> StoryL10N.getValue("desktop.pane.conditions.primary.secret")
+            contract.id == Contracts.ID_BOSS -> StoryL10N.getValue("desktop.pane.conditions.primary.unknown")
             contract.immediatePass -> StoryL10N.getValue("desktop.pane.conditions.primary.noMinScore")
             else -> StoryL10N.getValue("desktop.pane.conditions.primary.minScore", contract.minimumScore)
         }
@@ -260,9 +260,10 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         val ellipse = StoryL10N.getValue("desktop.pane.conditions.ellipsis")
         val conjunction1 = StoryL10N.getValue("desktop.pane.conditions.conjunction.1")
         val conjunction2 = StoryL10N.getValue("desktop.pane.conditions.conjunction.2")
+        val exclamationSuffix = StoryL10N.getValue("desktop.pane.conditions.exclamationSuffix")
         val extras: List<String> = contract.extraConditions.sorted().map { c -> c.text.getOrCompute() }
         if (extras.isNotEmpty()) {
-            clearText += extras.withIndex().joinToString(separator = "\n", prefix = "\n") { (index, s) ->
+            clearText += extras.withIndex().joinToString(separator = "\n", prefix = "\n", postfix = exclamationSuffix) { (index, s) ->
                 val conjunction = if (index == 0) "" else "${if (index % 2 == 0) conjunction2 else conjunction1} "
                 "${ellipse}${conjunction}${s}"
             }
