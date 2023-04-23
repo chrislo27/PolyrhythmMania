@@ -173,8 +173,11 @@ class StoryPlayScreen(
         val barHeight = 0.125f * 1.25f
         val superHardRed = Color.valueOf("880000").lerp(Color.BLACK, 0.35f)
         val blackBarsColor = if (contract.isSuperHard) superHardRed else Color.BLACK
-        val blackBarsColorTransparent = blackBarsColor.cpy().apply { this.a *= 0.75f }
-        introCardSceneRoot += QuadElement(blackBarsColor, blackBarsColor, blackBarsColorTransparent, blackBarsColorTransparent).apply { 
+        val blackBarsColorOpaque = blackBarsColor.cpy()
+        val blackBarsColorTransparent = blackBarsColor.cpy().apply { this.a *= 0.8f }
+        introCardSceneRoot += QuadElement().apply { // Top 
+            this.topBottomGradient(blackBarsColorOpaque, blackBarsColorTransparent)
+            
             this.bindHeightToParent(multiplier = barHeight * slantAmount)
             Anchor.TopLeft.yConfigure(this) {
                 val h = bounds.height.use()
@@ -184,7 +187,9 @@ class StoryPlayScreen(
             this.bottomLeftOffsetV.set(0f)
             this.bottomRightOffsetV.set(1f - slantAmount)
         }
-        introCardSceneRoot += QuadElement(blackBarsColorTransparent, blackBarsColorTransparent, blackBarsColor, blackBarsColor).apply { 
+        introCardSceneRoot += QuadElement().apply { // Bottom
+            this.topBottomGradient(blackBarsColorTransparent, blackBarsColorOpaque)
+            
             this.bindHeightToParent(multiplier = barHeight * slantAmount)
             Anchor.BottomLeft.yConfigure(this) {
                 val h = bounds.height.use()
