@@ -28,7 +28,6 @@ import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
 import paintbox.util.wave.WaveUtils
-import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
 import polyrhythmmania.storymode.StoryL10N
@@ -356,7 +355,7 @@ class DesktopUI(
         
         val futureItems = scenario.checkItemsThatWillBecomeAvailable()
         if (futureItems.isNotEmpty() || lockInputs) {
-            if (lockInputs) {
+            if (lockInputs || futureItems.size > 1 /* Don't bother locking for just one item when not needed */) {
                 animations.enqueueAnimation(animations.AnimLockInputs(true))
             }
             
