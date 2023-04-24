@@ -12,6 +12,7 @@ object StemMixes {
     val titleMain: StemMix = StemMix(setOf(STEM_ID_TITLE_FULL1))
     
     val desktopResults: StemMix = StemMix(setOf(STEM_ID_DESKTOP_PERC))
+    val desktopResultsSuperHard: StemMix = StemMix(setOf(STEM_ID_TITLE_PERC1))
     val desktopPreTraining101: StemMix = StemMix(setOf(STEM_ID_DESKTOP_PERC))
     val desktopInternship: StemMix = StemMix(setOf(STEM_ID_DESKTOP_PERC, STEM_ID_DESKTOP_HARM))
     val desktopMain: StemMix = StemMix(setOf(STEM_ID_DESKTOP_MAIN, STEM_ID_DESKTOP_HARM, STEM_ID_DESKTOP_PERC))

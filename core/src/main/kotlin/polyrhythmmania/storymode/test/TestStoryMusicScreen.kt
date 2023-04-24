@@ -102,7 +102,13 @@ class TestStoryMusicScreen(
                             this += Button("Transition to \"post-results\" mix").apply {
                                 this.bounds.height.set(32f)
                                 this.setOnAction {
-                                    musicHandler.transitionToStemMix(musicHandler.getPostResultsStemMix(), 1f) // Real function has a delay
+                                    musicHandler.transitionToStemMix(musicHandler.getPostResultsStemMix(isSuperHard = false), 1f) // Real function has a delay
+                                }
+                            }
+                            this += Button("Transition to \"post-results\" mix (Super Hard! contract)").apply {
+                                this.bounds.height.set(32f)
+                                this.setOnAction {
+                                    musicHandler.transitionToStemMix(musicHandler.getPostResultsStemMix(isSuperHard = true), 1f) // Real function has a delay
                                 }
                             }
                             this += separator()

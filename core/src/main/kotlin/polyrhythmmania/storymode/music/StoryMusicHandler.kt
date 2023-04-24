@@ -135,8 +135,8 @@ class StoryMusicHandler(val storySession: StorySession) {
         transitionToStemMix(getTitleStemMix(), 1f)
     }
 
-    fun transitionToPostResultsMix() {
-        transitionToStemMix(getPostResultsStemMix(), 1.675f, delaySec = 2.54f, startGain = 0.3f)
+    fun transitionToPostResultsMix(isSuperHard: Boolean) {
+        transitionToStemMix(getPostResultsStemMix(isSuperHard), 1.675f, delaySec = 2.54f, startGain = 0.3f)
     }
 
     fun transitionToDesktopMix(inboxState: InboxState? = null) {
@@ -198,7 +198,11 @@ class StoryMusicHandler(val storySession: StorySession) {
 
     fun getTitleStemMix(): StemMix = StemMixes.titleMain
 
-    fun getPostResultsStemMix(): StemMix = StemMixes.desktopResults
+    fun getPostResultsStemMix(isSuperHard: Boolean): StemMix =
+        if (isSuperHard) getPostResultsStemMixSuperHard() else getPostResultsStemMixNormal()
+
+    fun getPostResultsStemMixNormal(): StemMix = StemMixes.desktopResults
+    fun getPostResultsStemMixSuperHard(): StemMix = StemMixes.desktopResultsSuperHard
 
     fun getDesktopStemMix(useInboxState: InboxState?): StemMix {
         val inboxState =
