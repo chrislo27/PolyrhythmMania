@@ -13,6 +13,7 @@ built-in level editor and side modes.
 
 ## Features
 * Full re-creation of the Polyrhythm minigame from Rhythm Tengoku, *and more!*
+* A full *Story Mode* with over 40 levels
 * Sort and organize your custom levels using the Library feature
 * Create custom levels with a built-in and intuitive level editor
 * Level effects such as changing the colour palette, adding text boxes, putting Skill Stars, and more
