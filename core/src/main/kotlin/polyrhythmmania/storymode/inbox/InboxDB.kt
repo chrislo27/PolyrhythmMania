@@ -152,7 +152,7 @@ open class InboxDB : InboxItems() {
                     "contract_built_to_scale_ds_superhard",
                     "contract_bunny_hop_superhard",
                     "contract_crop_stomp_superhard",
-                    "contract_fillbots2_superhard",
+                    "contract_fillbots3_superhard",
                     "contract_first_contact_superhard",
                     "contract_screwbots_superhard",
                     "contract_tap_trial_2_superhard",
