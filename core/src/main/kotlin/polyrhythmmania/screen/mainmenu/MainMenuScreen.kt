@@ -306,14 +306,23 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         }
         val versionTooltip = Tooltip(binding = {
             val ver = PRMania.VERSION
-            val verSuffixRegex = """(.+)(_\d{8}(?:.+)?)""".toRegex()
-            val suffixMatch = verSuffixRegex.matchEntire(ver.suffix)
-            val verSuffixNoDate = suffixMatch?.groupValues?.get(1) ?: ver.suffix // Use entire suffix if cannot match _date
-            val verSuffixDate = suffixMatch?.groupValues?.get(2) ?: ""
-            val versionString = "v${ver.major}.${ver.minor}.${ver.patch}${if (ver.suffix.isNotEmpty()) "-${verSuffixNoDate}[scale=0.75]${verSuffixDate}[]" else ""}"
-            if (PRMania.portableMode) Localization.getVar("mainMenu.portableModeVersion", Var {
-                listOf(versionString)
-            }).use() else (versionString)
+            
+            val onlyDateRegex = """(\d{8}(?:.+)?)""".toRegex()
+            val dateMatch = onlyDateRegex.matchEntire(ver.suffix)
+
+            val versionString = if (dateMatch != null) {
+                "v${ver.major}.${ver.minor}.${ver.patch}${if (ver.suffix.isNotEmpty()) "[scale=0.75]-${dateMatch.value}[]" else ""}"
+            } else {
+                val verSuffixRegex = """(.+)(_\d{8}(?:.+)?)""".toRegex()
+                val suffixMatch = verSuffixRegex.matchEntire(ver.suffix)
+                val verSuffixNoDate = suffixMatch?.groupValues?.get(1) ?: ver.suffix // Use entire suffix if cannot match _date
+                val verSuffixDate = suffixMatch?.groupValues?.get(2) ?: ""
+                "v${ver.major}.${ver.minor}.${ver.patch}${if (ver.suffix.isNotEmpty()) "-${verSuffixNoDate}[scale=0.75]${verSuffixDate}[]" else ""}"
+            }
+            
+            if (PRMania.portableMode)
+                Localization.getVar("mainMenu.portableModeVersion", listOf(versionString)).use()
+            else (versionString)
         }, font = main.fontMainMenuMain).apply {
             Anchor.BottomRight.configure(this)
             resizeBoundsToContent()
