@@ -134,6 +134,73 @@ class StoryAsmGameModeBouncyRoad2(main: PRManiaGame)
         var currentRodID: Int = 1000
         @Suppress("UNUSED_CHANGED_VALUE")
         addBouncePatternsToContainer(listOf(
+            newBouncePattern(1 + 0f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
+            newBouncePattern(1 + 8f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
+            newBouncePattern(1 + 24f, startOnLeft = false, 8, beatsPerBounce = 1f, rodID = currentRodID++),
+            newBouncePattern(1 + 32f, startOnLeft = true, 3, beatsPerBounce = 1f, rodID = currentRodID++),
+            newBouncePattern(1 + 34f, startOnLeft = true, 5, beatsPerBounce = 1f, rodID = currentRodID++),
+            newBouncePattern(1 + 40f, startOnLeft = false, 4, beatsPerBounce = 2f, indices = listOf(
+                3, 2, 1, 0, -999
+            ), rodID = currentRodID++), // Custom, doesn't end with fire
+            newBouncePattern(1 + 42f + 2/3f, startOnLeft = true, 15, beatsPerBounce = 2/3f, rodID = currentRodID++),
+            newBouncePattern(1 + 54f, startOnLeft = false, 4, beatsPerBounce = 2f, indices = listOf(
+                3, 2, 1, 0, -999
+            ), rodID = currentRodID++), // Custom, doesn't end with fire
+            newBouncePattern(1 + 56f + 2/3f, startOnLeft = true, 15, beatsPerBounce = 2/3f, rodID = currentRodID++),
+            newBouncePattern(1 + 66f + 2/3f, startOnLeft = true, 3, beatsPerBounce = 2/3f, rodID = currentRodID++),
+            newBouncePattern(1 + 71f, startOnLeft = true, 3, beatsPerBounce = 1f, rodID = currentRodID++),
+            newBouncePattern(1 + 74f, startOnLeft = true, 15, beatsPerBounce = 0.5f, rodID = currentRodID++),
+            newBouncePattern(1 + 81.5f, startOnLeft = false, 8, beatsPerBounce = 1f, rodID = currentRodID++),
+            newBouncePattern(1 + 89f, startOnLeft = true, 15, beatsPerBounce = 2f, rodID = currentRodID++),
+            newBouncePattern(1 + 90f, startOnLeft = true, 3, beatsPerBounce = 0.5f, rodID = currentRodID++),
+            newBouncePattern(1 + 95f, startOnLeft = false, 2, beatsPerBounce = 1f, rodID = currentRodID++),
+            newBouncePattern(1 + 100f, startOnLeft = true, 3, beatsPerBounce = 1f, rodID = currentRodID++),
+            BlockAsmBouncePattern(1 + 108f, 999, listOf(3, 0, 2), beatsPerBounce = 1f, rodID = currentRodID++).let { BouncePattern(it, it.getNumInputs()) },
+            newBouncePattern(1 + 121f, startOnLeft = true, 1, firstBeatsPerBounce = 2f, rodID = currentRodID++),
+        ))
+        container.addBlock(BlockSkillStar(engine).apply {
+            this.beat = 1 + 88.5f
+        })
+
+        container.addBlock(BlockEndState(engine).apply {
+            this.beat = 1 + 128f
+        })
+    }
+}
+
+class StoryAsmGameModeBouncyRoad2Hard(main: PRManiaGame)
+    : AbstractStoryAsmGameMode(main) {
+
+    init {
+        TilesetPalette.createAssembleTilesetPalette().also { palette ->
+            palette.cubeBorder.color.getOrCompute().set(0x55, 0x00, 0x9B).mul(0.9f, 0.9f, 0.9f, 1f)
+            palette.cubeBorderZ.color.getOrCompute().set(0x41, 0x00, 0x7A).mul(0.9f, 0.9f, 0.9f, 1f)
+            palette.cubeFaceY.color.getOrCompute().set(0x7A, 0x00, 0xC6).mul(0.9f, 0.9f, 0.9f, 1f)
+            palette.cubeFaceZ.color.getOrCompute().set(0x65, 0x00, 0xAD).mul(0.9f, 0.9f, 0.9f, 1f)
+            palette.cubeFaceX.color.getOrCompute().set(0x5F, 0x00, 0xA5).mul(0.9f, 0.9f, 0.9f, 1f)
+
+            palette.aliasAsmLaneBorder.color.getOrCompute().set(0x33, 0x00, 0x60).mul(0.975f, 0.975f, 0.975f, 1f)
+            palette.aliasAsmLaneTop.color.getOrCompute().set(0xBA, 0x7C, 0xE2).mul(0.975f, 0.975f, 0.975f, 1f)
+        }.applyTo(container.renderer.tileset)
+        container.world.tilesetPalette.copyFrom(container.renderer.tileset)
+    }
+
+    override fun initialize() {
+        super.initialize()
+
+        engine.tempos.addTempoChange(TempoChange(0f, 154f))
+        engine.musicData.volumeMap.addMusicVolume(MusicVolume(0f, 0f, 100))
+
+        val music: BeadsMusic = GdxAudioReader.newMusic(Gdx.files.internal("story/levels/music/bouncy_road.ogg"), null)
+        val musicData = engine.musicData
+        musicData.musicSyncPointBeat = 1 + 4f
+        musicData.firstBeatSec = 0.800f
+        musicData.beadsMusic = music
+        musicData.update()
+
+        var currentRodID: Int = 1000
+        @Suppress("UNUSED_CHANGED_VALUE")
+        addBouncePatternsToContainer(listOf(
                 newBouncePattern(1 + 0f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
                 newBouncePattern(1 + 8f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),
                 newBouncePattern(1 + 24f, startOnLeft = true, 15, beatsPerBounce = 1f, rodID = currentRodID++),

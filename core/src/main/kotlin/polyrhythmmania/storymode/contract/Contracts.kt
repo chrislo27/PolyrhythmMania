@@ -42,7 +42,7 @@ object Contracts {
         add(Contract("bouncy_road", Requester.POLYRHYTHM_INC, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("J-D Thunder", "Kievit")), 60) { main ->
             StoryAsmGameModeBouncyRoad(main)
         })
-        add(Contract("bouncy_road_2", Requester.POLYBUILD, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("chrislo27")), 60) { main ->
+        add(Contract("bouncy_road_2", Requester.POLYBUILD, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("chrislo27", "Kievit")), 60) { main ->
             StoryAsmGameModeBouncyRoad2(main)
         })
         add(Contract("built_to_scale_ds", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.ds("Built to Scale"), listOf("Kievit")), 65) { main ->
