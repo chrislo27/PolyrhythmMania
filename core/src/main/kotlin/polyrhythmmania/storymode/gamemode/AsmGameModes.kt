@@ -209,7 +209,7 @@ class StoryAsmGameModeMonkeyWatch(main: PRManiaGame)
                 newBouncePattern(83.5f, startOnLeft = true, 5, rodID = currentRodID++),
                 newBouncePattern(88f, startOnLeft = false, 8, rodID = currentRodID++),
                 newBouncePattern(96f, startOnLeft = true, 5, rodID = currentRodID++),
-                newBouncePattern(105.5f, startOnLeft = true, 3, rodID = currentRodID++),
+                newBouncePattern(100.5f, startOnLeft = true, 3, rodID = currentRodID++),
                 newBouncePattern(104f, startOnLeft = false, 8, rodID = currentRodID++),
                 newBouncePattern(105f, startOnLeft = true, 27, beatsPerBounce = 2f, rodID = currentRodID++),
                 newBouncePattern(112.5f, startOnLeft = true, 3, rodID = currentRodID++),
