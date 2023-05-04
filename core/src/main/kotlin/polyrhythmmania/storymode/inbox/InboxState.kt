@@ -15,7 +15,7 @@ import paintbox.binding.Var
 class InboxState {
     
     companion object {
-        const val JSON_VERSION: Int = 1
+        const val CURRENT_JSON_VERSION: Int = 2
         
         fun fromJson(rootObj: JsonObject, inboxState: InboxState = InboxState()): InboxState {
             inboxState.clear()
@@ -29,6 +29,8 @@ class InboxState {
                 val itemID = o.get("id").asString()
                 inboxState.putItemState(itemID, state)
             }
+            
+            InboxStateDatafixes.runDatafix(version, inboxState)
             
             return inboxState
         }
@@ -139,7 +141,7 @@ class InboxState {
     
     fun toJson(): JsonObject {
         val obj = Json.`object`()
-        obj.add("version", JSON_VERSION)
+        obj.add("version", CURRENT_JSON_VERSION)
         
         obj.add("items", Json.array().also { arr ->
             itemStates.forEach { (itemID, state) ->

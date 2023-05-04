@@ -29,24 +29,16 @@ class StorySavefile private constructor(val saveNumber: Int) {
         
         fun newDebugSaveFile(): StorySavefile = newSaveFile(0, disableSaving = true)
         
-        fun loadFromSave(saveNumber: Int): StorySavefile? {
-            return try {
-                StorySavefile(saveNumber).apply {
-                    loadFromStorageLoc()
-                }
-            } catch (e: Exception) {
-                Paintbox.LOGGER.error("Failed to load story mode savefile $saveNumber", throwable = e)
-                null
-            }
-        }
-        
         fun attemptLoad(saveNumber: Int): LoadedState {
             return try {
                 val s = StorySavefile(saveNumber)
                 if (s.doesSavefileExist()) {
+                    Paintbox.LOGGER.info("Loading story mode savefile $saveNumber")
                     s.loadFromStorageLoc()
+                    Paintbox.LOGGER.info("Loaded story mode savefile $saveNumber")
                     LoadedState.Loaded(saveNumber, s)
                 } else {
+                    Paintbox.LOGGER.info("No story mode savefile $saveNumber, treating as brand new")
                     LoadedState.NoSavefile(saveNumber, s)
                 }
             } catch (e: Exception) {
