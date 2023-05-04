@@ -39,7 +39,7 @@ object Contracts {
         add(Contract("boosted_tweezers", Requester.CUBE_ROOT, JingleType.GBA, Attribution(SongInfo.tengoku("Rhythm Tweezers", listOf(SongNameAndSource.megamix("Rhythm Tweezers 2"))), listOf("Kievit")), 75) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/boosted_tweezers.prmproj"))
         })
-        add(Contract("bouncy_road", Requester.POLYRHYTHM_INC, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("J-D Thunder")), 60) { main ->
+        add(Contract("bouncy_road", Requester.POLYRHYTHM_INC, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("J-D Thunder", "Kievit")), 60) { main ->
             StoryAsmGameModeBouncyRoad(main)
         })
         add(Contract("bouncy_road_2", Requester.POLYBUILD, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("chrislo27")), 60) { main ->

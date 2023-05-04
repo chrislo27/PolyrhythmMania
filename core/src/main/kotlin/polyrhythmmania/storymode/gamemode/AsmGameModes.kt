@@ -56,7 +56,7 @@ class StoryAsmGameModeBouncyRoad(main: PRManiaGame)
                 newBouncePattern(93f, startOnLeft = false, 6),
                 newBouncePattern(100f, startOnLeft = true, 3),
                 newBouncePattern(104f, startOnLeft = true, 9),
-                newBouncePattern(115f, startOnLeft = true, 1, firstBeatsPerBounce = 2f), // May start from left or right
+                newBouncePattern(117f, startOnLeft = true, 1, firstBeatsPerBounce = 2f), // May start from left or right
         ))
         container.addBlock(BlockSkillStar(engine).apply { 
             this.beat = 82.5f
