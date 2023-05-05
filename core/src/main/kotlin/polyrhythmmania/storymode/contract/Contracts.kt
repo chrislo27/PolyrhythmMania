@@ -51,6 +51,9 @@ object Contracts {
         add(Contract("bunny_hop", Requester.MOON_BUNNY, JingleType.GBA, Attribution(SongInfo.tengoku("Bunny Hop"), listOf("Kievit")), 60) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/bunny_hop.prmproj"))
         })
+        add(Contract("catchy_tune", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.megamix("Catchy Tune"), listOf("Kievit")), 60, listOf(Condition.DefectiveRods(2))) { main ->
+            StoryGameModeFromFile(main, Gdx.files.internal("story/levels/catchy_tune.prmproj"))
+        })
         add(Contract("crop_stomp", Requester.STOMP_CHOMP_AGRI, JingleType.GBA, Attribution(SongInfo.ds("Crop Stomp"), listOf("Kievit")), 75, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/crop_stomp.prmproj"))
         })
