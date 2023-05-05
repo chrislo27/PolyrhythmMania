@@ -147,6 +147,9 @@ object Contracts {
         add(Contract("air_rally_superhard", Requester.SHIPSTEERING, JingleType.GBA, Attribution(SongInfo.megamix("Air Rally"), listOf("Kievit")), 35, extraConditions = listOf(Condition.InputRestriction.AcesOnly), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/air_rally.prmproj"), percentSpeed = 100)
         })
+        add(Contract("bouncy_road_2_superhard", Requester.POLYBUILD, JingleType.MODERN, Attribution(SongInfo.tengoku("Bouncy Road"), listOf("chrislo27", "Kievit")), 70, skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
+            StoryAsmGameModeBouncyRoad2Hard(main)
+        })
         add(Contract("built_to_scale_ds_superhard", Requester.POLYBUILD, JingleType.GBA, Attribution(SongInfo.ds("Built to Scale"), listOf("Kievit")), 0, extraConditions = listOf(Condition.TempoUp(125), Condition.Lives(5), Condition.InputRestriction.NoBarelies), skipAfterNFailures = NOT_ALLOWED_TO_SKIP) { main ->
             StoryGameModeFromFile(main, Gdx.files.internal("story/levels/superhard/built_to_scale_ds.prmproj"), percentSpeed = 125)
         })

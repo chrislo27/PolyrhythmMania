@@ -140,6 +140,7 @@ open class InboxDB : InboxItems() {
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["bunny_hop_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["screwbots_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["fillbots3_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
+        instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["bouncy_road_2_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["air_rally_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["tap_trial_2_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
         instructions += SingleStageItem(Item(Category.POSTGAME, InboxItem.ContractDoc(Contracts["built_to_scale_ds_superhard"])), dependsOnStageID = ITEMID_WELCOME_BACK_POSTGAME)
@@ -149,6 +150,7 @@ open class InboxDB : InboxItems() {
                 UnlockStageChecker.stageToBeCompleted(ITEMID_WELCOME_BACK_POSTGAME),
                 listOf(
                     "contract_air_rally_superhard",
+                    "contract_bouncy_road_2_superhard",
                     "contract_built_to_scale_ds_superhard",
                     "contract_bunny_hop_superhard",
                     "contract_crop_stomp_superhard",
