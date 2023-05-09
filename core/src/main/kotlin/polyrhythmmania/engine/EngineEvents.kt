@@ -66,13 +66,14 @@ open class EventPlayMenuSFX(
     engine: Engine, startBeat: Float,
     val volume: Float = 1f, val pitch: Float = 1f, val pan: Float = 0f,
     val soundGetter: () -> Sound,
-) : AudioEvent(engine) {
+) : Event(engine) {
 
     init {
         this.beat = startBeat
     }
 
-    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+    override fun onStart(currentBeat: Float) {
+        super.onStart(currentBeat)
         val sound = soundGetter()
         engine.soundInterface.playMenuSfx(sound, volume, pitch, pan)
     }
