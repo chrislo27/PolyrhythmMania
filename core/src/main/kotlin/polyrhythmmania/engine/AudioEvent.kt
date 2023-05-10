@@ -9,7 +9,7 @@ open class AudioEvent(engine: Engine) : Event(engine) {
     
     var audioUpdateCompletion: UpdateCompletion = UpdateCompletion.PENDING
 
-    open fun onAudioStart(atBeat: Float, actualBeat: Float) {
+    open fun onAudioStart(atBeat: Float, actualBeat: Float, inputCalibration: InputCalibration) {
     }
 
     open fun onAudioUpdate(atBeat: Float, actualBeat: Float) {

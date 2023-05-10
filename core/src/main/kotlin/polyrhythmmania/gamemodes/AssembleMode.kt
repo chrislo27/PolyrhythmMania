@@ -10,10 +10,7 @@ import polyrhythmmania.container.GlobalContainerSettings
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockEndState
 import polyrhythmmania.editor.block.BlockType
-import polyrhythmmania.engine.AudioEvent
-import polyrhythmmania.engine.Engine
-import polyrhythmmania.engine.Event
-import polyrhythmmania.engine.SoundInterface
+import polyrhythmmania.engine.*
 import polyrhythmmania.engine.input.ResultsText
 import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.tempo.TempoChange
@@ -355,7 +352,7 @@ class EventAsmRodBounce(
         }
     }
 
-    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+    override fun onAudioStart(atBeat: Float, actualBeat: Float, inputCalibration: InputCalibration) {
         val world = engine.world
         val pistons = world.asmPistons
 
@@ -495,8 +492,7 @@ class EventAsmPrepareSfx(engine: Engine, startBeat: Float) : AudioEvent(engine) 
         this.beat = startBeat
     }
 
-    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
-        super.onAudioStart(atBeat, actualBeat)
+    override fun onAudioStart(atBeat: Float, actualBeat: Float, inputCalibration: InputCalibration) {
         val beadsSound = AssetRegistry.get<BeadsSound>("sfx_asm_prepare")
         engine.soundInterface.playAudio(beadsSound, SoundInterface.SFXType.NORMAL) { player ->
             player.pitch = engine.tempos.tempoAtBeat(this.beat) / 98f

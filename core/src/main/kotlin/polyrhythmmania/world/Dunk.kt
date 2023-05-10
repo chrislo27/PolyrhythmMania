@@ -323,9 +323,9 @@ class EntityRodDunk(world: World, deployBeat: Float) : EntityRod(world, deployBe
         if (!isKilled && !playedDunkSfx) {
             playedDunkSfx = true
             engine.addEvent(object : EventPlaySFX(engine, deployBeat + 2f, "sfx_dunk_dunk_callout") {
-                override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+                override fun onAudioStart(atBeat: Float, actualBeat: Float, inputCalibration: InputCalibration) {
                     if (!this@EntityRodDunk.isKilled) {
-                        super.onAudioStart(atBeat, actualBeat)
+                        super.onAudioStart(atBeat, actualBeat, inputCalibration)
                     }
                 }
             })

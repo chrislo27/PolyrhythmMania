@@ -18,7 +18,7 @@ class EventCowbellSFX(engine: Engine, startBeat: Float, val useMeasures: Boolean
         this.beat = startBeat
     }
 
-    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+    override fun onAudioStart(atBeat: Float, actualBeat: Float, inputCalibration: InputCalibration) {
         if (useMeasures) {
             val measurePart = engine.timeSignatures.getMeasurePart(this.beat)
             val pitch = if (measurePart <= -1) 1f else if (measurePart == 0) Semitones.getALPitch(8) else Semitones.getALPitch(3)
@@ -52,7 +52,7 @@ open class EventPlaySFX(
         callback: (PlayerLike) -> Unit = {},
     ) : this(engine, startBeat, { AssetRegistry.get<BeadsSound>(id) }, allowOverlap, callback)
 
-    override fun onAudioStart(atBeat: Float, actualBeat: Float) {
+    override fun onAudioStart(atBeat: Float, actualBeat: Float, inputCalibration: InputCalibration) {
         val beadsSound = soundGetter()
         if (allowOverlap) {
             engine.soundInterface.playAudio(beadsSound, SoundInterface.SFXType.NORMAL, callback)

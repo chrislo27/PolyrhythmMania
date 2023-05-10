@@ -142,6 +142,7 @@ class Engine(timingProvider: TimingProvider,
         val eventEndBeat = eventBeat + eventWidth
         
         if (event is AudioEvent) {
+            val inputCalibration = this.inputCalibration
             val msOffset = inputCalibration.audioOffsetMs
             val actualBeat = atBeat
             @Suppress("NAME_SHADOWING")
@@ -151,13 +152,13 @@ class Engine(timingProvider: TimingProvider,
                 Event.UpdateCompletion.PENDING -> {
                     if (atBeat >= eventEndBeat) {
                         // Do all three updates and jump to COMPLETED
-                        event.onAudioStart(atBeat, actualBeat)
+                        event.onAudioStart(atBeat, actualBeat, inputCalibration)
                         event.onAudioUpdate(atBeat, actualBeat)
                         event.onAudioEnd(atBeat, actualBeat)
                         event.audioUpdateCompletion = Event.UpdateCompletion.COMPLETED
                     } else if (atBeat > eventBeat) {
                         // Now inside the event. Call onStart and onUpdate
-                        event.onAudioStart(atBeat, actualBeat)
+                        event.onAudioStart(atBeat, actualBeat, inputCalibration)
                         event.onAudioUpdate(atBeat, actualBeat)
                         event.audioUpdateCompletion = Event.UpdateCompletion.UPDATING
                     }

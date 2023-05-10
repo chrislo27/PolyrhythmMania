@@ -248,7 +248,12 @@ class StoryBossGameMode(main: PRManiaGame, val debugPhase: DebugPhase = DebugPha
     }
 
     override fun getSecondsToDelayAtStartOverride(): Float {
-        return 0f
+        return if (shouldShowLightsIntro()) {
+            0f
+        } else {
+            // This fixes negative audioOffset causing desyncing at the start (issue #53)
+            ((engine.inputCalibration.audioOffsetMs / 1000f * -1) + 0.1f).coerceIn(0f, 1f)
+        }
     }
 
     override fun shouldPauseWhileInIntroCardOverride(): Boolean {
