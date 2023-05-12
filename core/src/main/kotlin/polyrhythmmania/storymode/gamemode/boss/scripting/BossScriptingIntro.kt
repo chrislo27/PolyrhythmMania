@@ -43,11 +43,11 @@ class BossScriptIntro(
         events
             .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
             .rest(3.0f)
-            .textBox(TextBox(StoryL10N.getValue("textbox.boss.start.0"), true, style = TextBoxStyle.SM_ROBOT), 0.0f)
             .playMenuSfx(AssetRegistry["sfx_pause_robot_on"])
+            .textBox(TextBox(StoryL10N.getValue("textbox.boss.start.0"), true, style = TextBoxStyle.SM_ROBOT), 0.0f)
             .rest(2.0f)
-            .textBox(TextBox(StoryL10N.getValue("textbox.boss.start.1"), true, style = TextBoxStyle.SM_ROBOT), 0.0f)
             .playMenuSfx(AssetRegistry["sfx_pause_robot_off"])
+            .textBox(TextBox(StoryL10N.getValue("textbox.boss.start.1"), true, style = TextBoxStyle.SM_ROBOT), 0.0f)
             .rest(2.0f)
             .rest(1.0f)
 
