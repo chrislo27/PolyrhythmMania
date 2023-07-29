@@ -21,7 +21,7 @@ import kotlin.math.roundToInt
 
 /**
  * This is an implementation of [AudioIO] that sends audio data to a [AudioDevice].
- * Note there there is a rough warmup time of as much [latency][AudioDevice.getLatency] in milliseconds
+ * Note there there is a rough warmup time of as much [latency][AudioDevice.getLatency] in samples
  * where there may be OpenAL buffer underflows, i.e. unpredictable timings. It is best to not immediately play any audio
  * until that very brief period has elapsed.
  * 

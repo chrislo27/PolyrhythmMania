@@ -23,8 +23,8 @@ allprojects {
     ext {
         appName = "PolyrhythmMania"
         
-        paintboxVersion = "0.9.1"
-        useLocalPaintbox = false
+        paintboxVersion = "0.10.0"
+        useLocalPaintbox = true
     }
     
     java {
@@ -82,6 +82,6 @@ project(":desktop") {
             implementation "com.github.chrislo27.paintbox:paintbox-desktop:${paintboxVersion}"
         }
         
-        implementation "com.badlogicgames.gdx:gdx-lwjgl3-glfw-awt-macos:1.11.0"
+        implementation "com.badlogicgames.gdx:gdx-lwjgl3-glfw-awt-macos:${libgdx_version}"
     }
 }
