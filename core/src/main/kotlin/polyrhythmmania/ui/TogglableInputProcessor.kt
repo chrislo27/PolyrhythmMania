@@ -55,4 +55,10 @@ class TogglableInputProcessor(val delegate: InputProcessor) : InputProcessor {
             delegate.scrolled(amountX, amountY)
         } else false
     }
+
+    override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return if (enabled.get()) {
+            delegate.touchCancelled(screenX, screenY, pointer, button)
+        } else false
+    }
 }

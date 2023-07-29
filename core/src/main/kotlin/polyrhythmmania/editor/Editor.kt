@@ -1412,6 +1412,10 @@ class Editor(
         return sceneRoot.inputSystem.scrolled(amountX, amountY)
     }
 
+    override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return sceneRoot.inputSystem.touchCancelled(screenX, screenY, pointer, button)
+    }
+
     fun getDebugString(): String {
         val click = this.click.getOrCompute()
         val clickDebugString = click.getDebugString()
