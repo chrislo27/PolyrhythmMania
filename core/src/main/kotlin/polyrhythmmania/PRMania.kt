@@ -16,9 +16,9 @@ object PRMania {
     const val HOMEPAGE = "https://polyrhythmmania.rhre.dev"
     const val DONATE_LINK = "https://www.paypal.com/donate/?hosted_button_id=9JLGHKZNWLLQ8"
     val VERSION: Version = Version(2, 1, 0, "dev_20230805a")
-    const val WIDTH: Int = 1280
-    const val HEIGHT: Int = 720
-    val DEFAULT_SIZE: WindowSize = WindowSize(WIDTH, HEIGHT)
+    private const val DEFAULT_WIDTH: Int = 1280
+    private const val DEFAULT_HEIGHT: Int = 720
+    val DEFAULT_SIZE: WindowSize = WindowSize(DEFAULT_WIDTH, DEFAULT_HEIGHT)
     val MINIMUM_SIZE: WindowSize = WindowSize(1152, 648)
     
     var portableMode: Boolean = false
