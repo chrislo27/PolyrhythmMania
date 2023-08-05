@@ -15,7 +15,7 @@ object PRMania {
     const val GITHUB = "https://github.com/chrislo27/PolyrhythmMania"
     const val HOMEPAGE = "https://polyrhythmmania.rhre.dev"
     const val DONATE_LINK = "https://www.paypal.com/donate/?hosted_button_id=9JLGHKZNWLLQ8"
-    val VERSION: Version = Version(2, 1, 0, "dev_20230729a")
+    val VERSION: Version = Version(2, 1, 0, "dev_20230805a")
     const val WIDTH: Int = 1280
     const val HEIGHT: Int = 720
     val DEFAULT_SIZE: WindowSize = WindowSize(WIDTH, HEIGHT)
@@ -39,21 +39,7 @@ object PRMania {
             if (!this.exists()) {
                 mkdirs()
                 try {
-                    val exampleLevelFolder = File("example_levels/Level/")
-                    if (exampleLevelFolder.exists() && exampleLevelFolder.isDirectory) {
-                        Paintbox.LOGGER.info("Copying example levels to default levels folder")
-                        exampleLevelFolder.listFiles { f: File -> f.isFile && f.extension == Container.LEVEL_FILE_EXTENSION }?.forEach { file ->
-                            try {
-                                val target = this.resolve(file.name)
-                                if (!target.exists()) {
-                                    file.copyTo(target, overwrite = false)
-                                }
-                            } catch (ignored: FileAlreadyExistsException) {
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-                    }
+                    this.copyExampleLevelsToDefaultLocation()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -83,5 +69,26 @@ object PRMania {
     var dumpPackedSheets: Boolean = false
     var enableMetrics: Boolean = false
     var audioDeviceSettings: AudioDeviceSettings? = null
+    
+    
+    private fun File.copyExampleLevelsToDefaultLocation() {
+        val exampleLevelFolder = File("example_levels/Level/")
+        if (exampleLevelFolder.exists() && exampleLevelFolder.isDirectory) {
+            Paintbox.LOGGER.info("Copying example levels to default levels folder")
+            exampleLevelFolder.listFiles { f: File -> 
+                f.isFile && f.extension == Container.LEVEL_FILE_EXTENSION
+            }?.forEach { file ->
+                try {
+                    val target = this.resolve(file.name)
+                    if (!target.exists()) {
+                        file.copyTo(target, overwrite = false)
+                    }
+                } catch (ignored: FileAlreadyExistsException) {
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
     
 }
