@@ -3,46 +3,24 @@ package polyrhythmmania.world.entity
 import polyrhythmmania.world.World
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
-import kotlin.math.roundToInt
 
 
 class EntityPlatform(world: World, val withLine: Boolean = false) : SpriteEntity(world) {
+
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return if (withLine) tileset.platformWithLine else tileset.platform
     }
 }
 
-open class EntityCube(world: World, val withLine: Boolean = false, val withBorder: Boolean = false)
-    : SpriteEntity(world) {
-    
-    companion object {
-        fun createCubemapIndex(x: Int, y: Int, z: Int): Long {
-            val overflow = x !in Short.MIN_VALUE..Short.MAX_VALUE || y !in Short.MIN_VALUE..Short.MAX_VALUE || z !in Short.MIN_VALUE..Short.MAX_VALUE
-
-            return 0L or (if (overflow) (1L shl 63) else 0L).toLong() or (
-                    x.toShort().toLong() or (y.toShort().toLong() shl 16) or (z.toShort().toLong() shl 32)
-                    )
-        }
-    }
+open class EntityCube(
+    world: World,
+    val withLine: Boolean = false,
+    val withBorder: Boolean = false,
+) : SpriteEntity(world) {
 
     override val numLayers: Int = 6
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {
-        // Uncomment if cube map culling is to be used
-//        val cubeOccludesX = world.cubeMap[createCubemapIndex(this.position.x.roundToInt() - 1, this.position.y.roundToInt(), this.position.z.roundToInt())] != null
-//        val cubeOccludesY = world.cubeMap[createCubemapIndex(this.position.x.roundToInt(), this.position.y.roundToInt() + 1, this.position.z.roundToInt())] != null
-//        val cubeOccludesZ = world.cubeMap[createCubemapIndex(this.position.x.roundToInt(), this.position.y.roundToInt(), this.position.z.roundToInt() + 1)] != null
-//
-//        return when (index) { // Update when with non-culling
-//            0 -> tileset.cubeBorder
-//            1 -> if (cubeOccludesZ) null else tileset.cubeBorderZ
-//            2 -> if (cubeOccludesX) null else tileset.cubeFaceX
-//            3 -> if (cubeOccludesY) null else tileset.cubeFaceY
-//            4 -> if (cubeOccludesZ) null else tileset.cubeFaceZ
-//            5 -> if (withLine) tileset.redLine else null
-//            6 -> if (withBorder) tileset.platformBorder else null
-//            else -> null
-//        }
         return when (index) {
             0 -> if (withBorder) tileset.cubeBorderPlatform else tileset.cubeBorder
             1 -> tileset.cubeBorderZ
@@ -53,20 +31,17 @@ open class EntityCube(world: World, val withLine: Boolean = false, val withBorde
             else -> null
         }
     }
-    
-    fun getCubemapIndex(): Long {
-        return createCubemapIndex(this.position.x.roundToInt(), this.position.y.roundToInt(), this.position.z.roundToInt())
-    }
 }
 
 class EntitySign(world: World, val type: Type) : SpriteEntity(world) {
-    
+
     companion object {
+
         // Should have an X, Z offset of 12/32, 8/32
         private val apparentWorldXOffset: Float = 12 / 32f
         private val apparentWorldZOffset: Float = 8 / 32f
     }
-    
+
     enum class Type {
         SYMBOL_A,
         SYMBOL_DPAD,
@@ -78,7 +53,7 @@ class EntitySign(world: World, val type: Type) : SpriteEntity(world) {
     override val numLayers: Int = 2
     override val renderWidth: Float = 0.5f
     override val renderHeight: Float = 0.5f
-    
+
     override val pxOffsetX: Float = (apparentWorldXOffset + apparentWorldZOffset) / 2f
     override val pxOffsetY: Float = (apparentWorldXOffset - apparentWorldZOffset) / 4f
 
