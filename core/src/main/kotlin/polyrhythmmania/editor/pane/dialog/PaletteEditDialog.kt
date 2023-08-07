@@ -532,19 +532,19 @@ class PaletteEditDialog(
 
             // Button signs
             val signs = mutableListOf<EntitySign>()
-            signs += EntitySign(world, EntitySign.Type.A).apply {
+            signs += EntitySign(world, EntitySign.Type.SYMBOL_A).apply {
                 this.position.set(5f, 2f, -3f)
             }
-            signs += EntitySign(world, EntitySign.Type.DPAD).apply {
+            signs += EntitySign(world, EntitySign.Type.SYMBOL_DPAD).apply {
                 this.position.set(6f, 2f, -3f)
             }
-            signs += EntitySign(world, EntitySign.Type.BO).apply {
+            signs += EntitySign(world, EntitySign.Type.JP_BO).apply {
                 this.position.set(4f, 2f, -2f)
             }
-            signs += EntitySign(world, EntitySign.Type.TA).apply {
+            signs += EntitySign(world, EntitySign.Type.JP_TA).apply {
                 this.position.set(5f, 2f, -2f)
             }
-            signs += EntitySign(world, EntitySign.Type.N).apply {
+            signs += EntitySign(world, EntitySign.Type.JP_N).apply {
                 this.position.set(6f, 2f, -2f)
             }
             signs.forEach { sign ->

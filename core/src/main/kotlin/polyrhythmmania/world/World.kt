@@ -185,28 +185,28 @@ class World(numOfSpotlights: Int?) {
 
             // Button signs
             val signs = mutableListOf<EntitySign>()
-            signs += EntitySign(this, EntitySign.Type.A).apply {
+            signs += EntitySign(this, EntitySign.Type.SYMBOL_A).apply {
                 this.position.set(7f, 2f, 1f)
             }
-            signs += EntitySign(this, EntitySign.Type.BO).apply {
+            signs += EntitySign(this, EntitySign.Type.JP_BO).apply {
                 this.position.set(8f, 2f, 1f)
             }
-            signs += EntitySign(this, EntitySign.Type.TA).apply {
+            signs += EntitySign(this, EntitySign.Type.JP_TA).apply {
                 this.position.set(9f, 2f, 1f)
             }
-            signs += EntitySign(this, EntitySign.Type.N).apply {
+            signs += EntitySign(this, EntitySign.Type.JP_N).apply {
                 this.position.set(10f, 2f, 1f)
             }
-            signs += EntitySign(this, EntitySign.Type.DPAD).apply {
+            signs += EntitySign(this, EntitySign.Type.SYMBOL_DPAD).apply {
                 this.position.set(7f, 2f, -2f)
             }
-            signs += EntitySign(this, EntitySign.Type.BO).apply {
+            signs += EntitySign(this, EntitySign.Type.JP_BO).apply {
                 this.position.set(8f, 2f, -2f)
             }
-            signs += EntitySign(this, EntitySign.Type.TA).apply {
+            signs += EntitySign(this, EntitySign.Type.JP_TA).apply {
                 this.position.set(9f, 2f, -2f)
             }
-            signs += EntitySign(this, EntitySign.Type.N).apply {
+            signs += EntitySign(this, EntitySign.Type.JP_N).apply {
                 this.position.set(10f, 2f, -2f)
             }
             signs.forEach { sign ->
@@ -325,16 +325,16 @@ class World(numOfSpotlights: Int?) {
 
         // Button signs
         val signs = mutableListOf<EntitySign>()
-        signs += EntitySign(this, EntitySign.Type.A).apply {
+        signs += EntitySign(this, EntitySign.Type.SYMBOL_A).apply {
             this.position.set(3f, 2f, 0f)
         }
-        signs += EntitySign(this, EntitySign.Type.BO).apply {
+        signs += EntitySign(this, EntitySign.Type.JP_BO).apply {
             this.position.set(4f, 2f, 0f)
         }
-        signs += EntitySign(this, EntitySign.Type.TA).apply {
+        signs += EntitySign(this, EntitySign.Type.JP_TA).apply {
             this.position.set(5f, 2f, 0f)
         }
-        signs += EntitySign(this, EntitySign.Type.N).apply {
+        signs += EntitySign(this, EntitySign.Type.JP_N).apply {
             this.position.set(6f, 2f, 0f)
         }
         signs.forEach { sign ->

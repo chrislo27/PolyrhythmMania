@@ -68,7 +68,11 @@ class EntitySign(world: World, val type: Type) : SpriteEntity(world) {
     }
     
     enum class Type {
-        A, DPAD, BO, TA, N;
+        SYMBOL_A,
+        SYMBOL_DPAD,
+        JP_BO,
+        JP_TA,
+        JP_N,
     }
 
     override val numLayers: Int = 2
@@ -80,11 +84,11 @@ class EntitySign(world: World, val type: Type) : SpriteEntity(world) {
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion {
         return when (type) {
-            Type.A -> if (index == 0) tileset.signAShadow else tileset.signA
-            Type.DPAD -> if (index == 0) tileset.signDpadShadow else tileset.signDpad
-            Type.BO -> if (index == 0) tileset.signBoShadow else tileset.signBo
-            Type.TA -> if (index == 0) tileset.signTaShadow else tileset.signTa
-            Type.N -> if (index == 0) tileset.signNShadow else tileset.signN
+            Type.SYMBOL_A -> if (index == 0) tileset.signAShadow else tileset.signA
+            Type.SYMBOL_DPAD -> if (index == 0) tileset.signDpadShadow else tileset.signDpad
+            Type.JP_BO -> if (index == 0) tileset.signBoShadow else tileset.signBo
+            Type.JP_TA -> if (index == 0) tileset.signTaShadow else tileset.signTa
+            Type.JP_N -> if (index == 0) tileset.signNShadow else tileset.signN
         }
     }
 }
