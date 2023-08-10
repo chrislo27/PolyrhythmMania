@@ -139,7 +139,6 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         this.reloadableLocalizationInstances = listOf(Localization, EditorHelpLocalization, AchievementsL10N, UpdateNotesL10N, StoryL10N)
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
-//        GLFW.glfwSetWindowAspectRatio(windowHandle, 3, 2)
         
         if (PRMania.enableMetrics) {
             metricsReporter.start(10L, TimeUnit.SECONDS)

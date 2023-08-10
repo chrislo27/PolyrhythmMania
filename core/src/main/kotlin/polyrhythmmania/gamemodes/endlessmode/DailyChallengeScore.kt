@@ -36,7 +36,7 @@ typealias DailyLeaderboard = Map<LocalDate, List<DailyLeaderboardScore>>
 object DailyChallengeUtils {
     
     private const val ROOT_URL: String = "https://api.rhre.dev/prmania"
-    const val MIN_SCORE_TO_UNLOCK: Int = 10
+    const val MIN_SCORE_TO_UNLOCK: Int = 10 // Daily Challenge is initially locked until a score of 10 in Endless Mode
     
     val allowedNameChars: Set<Char> = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_".toSet()
 
