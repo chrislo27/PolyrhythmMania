@@ -125,7 +125,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 .build()
     }
     
-    val httpClient: CloseableHttpClient by lazy { HttpClients.createMinimal() }
+    val httpClient: CloseableHttpClient by lazy { HttpClients.createDefault() }
     val allLocalizations: List<LocalizationBase> get() = this.reloadableLocalizationInstances
     
     private var discordCallbackDelta: Float = 0f
