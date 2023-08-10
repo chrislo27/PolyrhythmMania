@@ -116,11 +116,13 @@ class EnginePlayScreenBase(
     }
     
     init {
+        val isDailyChallenge = gameMode is EndlessPolyrhythm && gameMode.dailyChallenge != null
         val optionList = mutableListOf<PauseOption>()
+        
         optionList += PauseOption(if (engine.autoInputs) "play.pause.resume.robotMode" else "play.pause.resume", true) {
             unpauseGame(true)
         }
-        optionList += PauseOption("play.pause.startOver", !(gameMode is EndlessPolyrhythm && gameMode.dailyChallenge != null)) {
+        optionList += PauseOption("play.pause.startOver", !isDailyChallenge) {
             playMenuSound("sfx_menu_enter_game")
 
             val thisScreen: EnginePlayScreenBase = this
@@ -137,7 +139,7 @@ class EnginePlayScreenBase(
                 onEntryEnd = resetAction
             }
         }
-        optionList += PauseOption("play.pause.quitToMainMenu", true) {
+        optionList += PauseOption(if (isDailyChallenge) "play.pause.abandonDailyChallenge" else "play.pause.quitToMainMenu", true) {
             quitToScreen()
             Gdx.app.postRunnable {
                 playMenuSound("sfx_pause_exit")
