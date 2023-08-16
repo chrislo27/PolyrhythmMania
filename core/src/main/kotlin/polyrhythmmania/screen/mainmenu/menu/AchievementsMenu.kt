@@ -40,8 +40,8 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
     
     private sealed class ViewType {
-        object AllByCategory : ViewType()
-        object AllTogether : ViewType()
+        data object AllByCategory : ViewType()
+        data object AllTogether : ViewType()
         class Category(val category: AchievementCategory) : ViewType()
     }
     

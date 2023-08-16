@@ -14,9 +14,9 @@ sealed class WorldType(val defaultBackground: WorldBackground) {
 
     }
 
-    object Dunk : WorldType(DunkWorldBackground.Default)
+    data object Dunk : WorldType(DunkWorldBackground.Default)
 
-    object Assemble : WorldType(AssembleWorldBackground)
+    data object Assemble : WorldType(AssembleWorldBackground)
 
 }
 

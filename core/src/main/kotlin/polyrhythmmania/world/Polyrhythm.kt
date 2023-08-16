@@ -190,9 +190,9 @@ open class EntityRodPR(
     )
     
     sealed class ExpectedInput {
-        object Unknown : ExpectedInput()
-        object Skipped : ExpectedInput()
-        object InAir : ExpectedInput()
+        data object Unknown : ExpectedInput()
+        data object Skipped : ExpectedInput()
+        data object InAir : ExpectedInput()
         class Expected(
                 val thisIndex: Int, val nextJumpIndex: Int,
                 override val perfectBeat: Float, override val inputType: InputType

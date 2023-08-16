@@ -98,7 +98,7 @@ sealed class SoundInterface {
         override fun isPaused(): Boolean = soundSystem.isPaused
     }
 
-    object NoOp : SoundInterface() {
+    data object NoOp : SoundInterface() {
         private var pausedState: Boolean = false
 
         override fun setPaused(paused: Boolean) {

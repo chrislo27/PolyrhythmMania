@@ -25,9 +25,9 @@ sealed class TexturePackSource(val jsonId: Int, val isCustom: Boolean) {
         }
     }
 
-    object StockGBA : TexturePackSource(0, false)
-    object StockHD : TexturePackSource(1, false)
-    object StockArcade : TexturePackSource(2, false)
+    data object StockGBA : TexturePackSource(0, false)
+    data object StockHD : TexturePackSource(1, false)
+    data object StockArcade : TexturePackSource(2, false)
     
     class Custom(/** 1-indexed. */ val id: Int) : TexturePackSource(-id, true)
 }

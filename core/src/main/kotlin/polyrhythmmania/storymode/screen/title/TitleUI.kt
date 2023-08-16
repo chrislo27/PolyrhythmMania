@@ -48,7 +48,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
             val originalShowContext: BooleanVar
         }
 
-        object None : Operation()
+        data object None : Operation()
 
         data class Copy(
                 override val from: Var<StorySavefile.LoadedState>, override val originalShowContext: BooleanVar

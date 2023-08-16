@@ -56,10 +56,10 @@ class LoadSavedLevelMenu(
 ) : StandardMenu(menuCol) {
 
     private sealed class Substate {
-        object FileDialogOpen : Substate()
-        object Loading : Substate()
+        data object FileDialogOpen : Substate()
+        data object Loading : Substate()
         class Loaded(val loadMetadata: Container.LoadMetadata, val needsFlashingLightsWarning: Boolean) : Substate()
-        object LoadError : Substate()
+        data object LoadError : Substate()
     }
 
     private val substate: Var<Substate> = Var(if (immediateLoad == null) Substate.FileDialogOpen else Substate.Loading)

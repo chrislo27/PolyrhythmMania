@@ -20,7 +20,7 @@ sealed class Click {
      */
     interface PansCameraOnDrag
     
-    object None : Click()
+    data object None : Click()
 
     class CreateSelection(val editor: Editor, val startBeat: Float, val startTrack: Float,
                           val previousSelection: Set<Block>)

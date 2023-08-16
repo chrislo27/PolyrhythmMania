@@ -205,7 +205,7 @@ open class InboxDB : InboxItems() {
     private data class Item(val category: Category, val inboxItem: InboxItem)
     
     private sealed class Instruction
-    private object NullInstruction : Instruction()
+    private data object NullInstruction : Instruction()
     private class SingleStageItem(val item: Item, val dependsOnStageID: String? = null) : Instruction()
     private class NewItemNoStage(val item: Item) : Instruction()
     private class NewUnlockStage(val unlockStage: UnlockStage) : Instruction()

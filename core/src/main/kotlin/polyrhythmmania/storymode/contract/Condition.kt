@@ -14,11 +14,11 @@ sealed class Condition(val text: ReadOnlyVar<String>, val priority: Int) : Compa
     )
 
     sealed class InputRestriction(text: ReadOnlyVar<String>) : Condition(text, 2) {
-        object AcesOnly : InputRestriction(StoryL10N.getVar("desktop.pane.conditions.secondary.inputRestriction.acesOnly"))
-        object NoBarelies : InputRestriction(StoryL10N.getVar("desktop.pane.conditions.secondary.inputRestriction.noBarelies"))
+        data object AcesOnly : InputRestriction(StoryL10N.getVar("desktop.pane.conditions.secondary.inputRestriction.acesOnly"))
+        data object NoBarelies : InputRestriction(StoryL10N.getVar("desktop.pane.conditions.secondary.inputRestriction.noBarelies"))
     }
 
-    object MonsterGoal : Condition(StoryL10N.getVar("desktop.pane.conditions.secondary.monsterGoal"), 3)
+    data object MonsterGoal : Condition(StoryL10N.getVar("desktop.pane.conditions.secondary.monsterGoal"), 3)
 
     data class DefectiveRods(val maxLives: Int) : Condition(
         StoryL10N.getVar(

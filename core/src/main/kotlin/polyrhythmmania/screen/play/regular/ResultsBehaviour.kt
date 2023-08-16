@@ -8,7 +8,7 @@ import paintbox.binding.Var
  */
 sealed class ResultsBehaviour {
     
-    object NoResults : ResultsBehaviour()
+    data object NoResults : ResultsBehaviour()
     
     data class ShowResults(
             val onRankingRevealed: OnRankingRevealed?, // Used to update GlobalScoreCache
@@ -16,7 +16,7 @@ sealed class ResultsBehaviour {
     ) : ResultsBehaviour()
 
     sealed class PreviousHighScore {
-        object None : PreviousHighScore()
+        data object None : PreviousHighScore()
         class NumberOnly(val previousHigh: Int) : PreviousHighScore()
         class Persisted(val scoreVar: Var<Int>) : PreviousHighScore()
     }

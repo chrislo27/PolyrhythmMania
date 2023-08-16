@@ -13,9 +13,7 @@ sealed class ExitReason {
     /**
      * The player is choosing to skip this level
      */
-    object Skipped : ExitReason() {
-        override fun toString(): String = "Skipped"
-    }
+    data object Skipped : ExitReason()
 
     data class Passed(
             val score: Int, val skillStar: Boolean?, val noMiss: Boolean,

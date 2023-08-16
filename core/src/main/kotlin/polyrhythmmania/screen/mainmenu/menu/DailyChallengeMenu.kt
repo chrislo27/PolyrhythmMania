@@ -468,8 +468,8 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
         
         private sealed class NonceValue {
-            object None : NonceValue()
-            object Errored : NonceValue()
+            data object None : NonceValue()
+            data object Errored : NonceValue()
             class Success(val uuid: UUID) : NonceValue()
         }
         
