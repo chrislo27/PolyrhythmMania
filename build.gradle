@@ -24,7 +24,7 @@ allprojects {
         appName = "PolyrhythmMania"
         
         paintboxVersion = "0.11.0"
-        useLocalPaintbox = true
+        useLocalPaintbox = false
     }
     
     java {
