@@ -38,7 +38,7 @@ class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
             musicData.update()
             musicData.setMusicPlayerPositionToCurrentSec()
             
-            for (i in 0 until 4) {
+            for (i in 0..<4) {
                 engine.addEvent(EventCowbellSFX(engine, startBeat + 2 + i, false))
             }
 
@@ -90,7 +90,7 @@ class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
             musicData.update()
             musicData.setMusicPlayerPositionToCurrentSec()
 
-            for (i in 0 until 4) {
+            for (i in 0..<4) {
                 engine.addEvent(EventCowbellSFX(engine, startBeat + 2 + i, false))
             }
 
@@ -140,7 +140,7 @@ class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
             musicData.update()
             musicData.setMusicPlayerPositionToCurrentSec()
 
-            for (i in 0 until 4) {
+            for (i in 0..<4) {
                 engine.addEvent(EventCowbellSFX(engine, startBeat + 2 + i, false))
             }
 
@@ -208,7 +208,7 @@ class PracticeTutorial2(main: PRManiaGame, val keyboardKeymap: InputKeymapKeyboa
             musicData.update()
             musicData.setMusicPlayerPositionToCurrentSec()
 
-            for (i in 0 until 4) {
+            for (i in 0..<4) {
                 engine.addEvent(EventCowbellSFX(engine, startBeat + 2 + i, false))
             }
 

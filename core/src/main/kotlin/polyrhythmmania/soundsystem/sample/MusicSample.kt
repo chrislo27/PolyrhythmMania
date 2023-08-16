@@ -72,7 +72,7 @@ abstract class MusicSample(
         }
 
         if (startBuffer.isSampleInBuffer(frame)) {
-            for (i in 0 until nChannels) {
+            for (i in 0..<nChannels) {
                 frameData[i] = startBuffer.data[i][frame - startBuffer.position]
             }
         } else {
@@ -81,7 +81,7 @@ abstract class MusicSample(
                     playbackBuffer.populate((frame - 4).coerceAtLeast(0))
                 }
             }
-            for (i in 0 until nChannels) {
+            for (i in 0..<nChannels) {
                 frameData[i] = playbackBuffer.data[i][frame - playbackBuffer.position]
             }
         }
@@ -110,19 +110,19 @@ abstract class MusicSample(
     fun getFrameLinear(posInMS: Double, result: FloatArray) {
         val frame = msToSamples(posInMS)
         val frameFloor = floor(frame).toInt()
-        if (frameFloor in 1 until nFrames) {
+        if (frameFloor in 1..<nFrames) {
             val frameFrac = frame - frameFloor
             if (frameFloor.toLong() == nFrames - 1) {
                 getFrame(frameFloor, result)
             } else { /* lerp */
                 getFrame(frameFloor, interpCurrent)
                 getFrame(frameFloor + 1, interpNext)
-                for (i in 0 until nChannels) {
+                for (i in 0..<nChannels) {
                     result[i] = ((1 - frameFrac) * interpCurrent.get(i) + frameFrac * interpNext.get(i)).toFloat()
                 }
             }
         } else {
-            for (i in 0 until nChannels) {
+            for (i in 0..<nChannels) {
                 result[i] = 0.0f
             }
         }
@@ -146,7 +146,7 @@ abstract class MusicSample(
         var y0: Float
         var y1: Float
         var y2: Float
-        for (i in 0 until nChannels) {
+        for (i in 0..<nChannels) {
             var realCurrentSample = floor(frame).toInt()
             val fractionOffset = (frame - realCurrentSample).toFloat()
             if (realCurrentSample >= 0 && realCurrentSample < nFrames - 1) {
@@ -265,8 +265,8 @@ abstract class MusicSample(
                     if (samplesReadable == 0) break
 
                     var tmpPtr: Int = 0
-                    for (i in 0 until samplesReadable) {
-                        for (ch in 0 until nChannels) {
+                    for (i in 0..<samplesReadable) {
+                        for (ch in 0..<nChannels) {
                             data[ch][i + samplesRead] = ((tmpBuffer.get(tmpPtr).toInt() and 0xFF) or (tmpBuffer.get(tmpPtr + 1).toInt() shl 8)) / 32_768.0f
                             tmpPtr += bytesPerSample
                         }
@@ -286,7 +286,7 @@ abstract class MusicSample(
         }
 
         fun isSampleInBuffer(sample: Int): Boolean {
-            return sample in position until (position + size)
+            return sample in position..<(position + size)
         }
 
     }

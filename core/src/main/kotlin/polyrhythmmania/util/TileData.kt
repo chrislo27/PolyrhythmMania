@@ -5,7 +5,7 @@ class TileData<T>(val sizeX: Int, val sizeY: Int, val sizeZ: Int, init: (x: Int,
     
     private val totalSize: Int = sizeX * sizeY * sizeZ
     private val totalXYCount: Int = sizeX * sizeY
-    private val data: Array<Any?> = (0 until totalSize).map { i -> init(indexToX(i), indexToY(i), indexToZ(i)) }.toTypedArray()
+    private val data: Array<Any?> = (0..<totalSize).map { i -> init(indexToX(i), indexToY(i), indexToZ(i)) }.toTypedArray()
     
     @Suppress("UNCHECKED_CAST")
     operator fun get(x: Int, y: Int, z: Int): T? {
@@ -61,7 +61,7 @@ class TileData<T>(val sizeX: Int, val sizeY: Int, val sizeZ: Int, init: (x: Int,
     fun toList(): List<T> = data.map { it as T }
 
     inline fun forEach(action: (item: T, x: Int, y: Int, z: Int) -> Unit) {
-        for (i in 0 until (sizeX * sizeY * sizeZ)) {
+        for (i in 0..<(sizeX * sizeY * sizeZ)) {
             val x = indexToX(i)
             val y = indexToY(i)
             val z = indexToZ(i)
@@ -69,8 +69,8 @@ class TileData<T>(val sizeX: Int, val sizeY: Int, val sizeZ: Int, init: (x: Int,
         }
     }
 
-    fun contains(coord: Coord3): Boolean = coord.x in 0 until sizeX && coord.y in 0 until sizeY && coord.z in 0 until sizeZ
-    fun contains(x: Int, y: Int, z: Int): Boolean = x in 0 until sizeX && y in 0 until sizeY && z in 0 until sizeZ
+    fun contains(coord: Coord3): Boolean = coord.x in 0..<sizeX && coord.y in 0..<sizeY && coord.z in 0..<sizeZ
+    fun contains(x: Int, y: Int, z: Int): Boolean = x in 0..<sizeX && y in 0..<sizeY && z in 0..<sizeZ
     
     fun coordToIndex(x: Int, y: Int, z: Int): Int = (z * totalXYCount) + (y * sizeX) + (x)
     fun coordToIndex(coord: Coord3): Int = (coord.z * totalXYCount) + (coord.y * sizeX) + (coord.x)

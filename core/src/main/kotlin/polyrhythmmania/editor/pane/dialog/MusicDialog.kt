@@ -707,7 +707,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     }
                     val startSec = variable.get()
                     var zeroCross = startSec
-                    for (i in 0 until 3) { // Found that repeated iterations improves accuracy (?)
+                    for (i in 0..<3) { // Found that repeated iterations improves accuracy (?)
                         zeroCross = findZeroCrossing(startSec)
                     }
                     variable.set(zeroCross)
@@ -729,11 +729,11 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         val frameData: FloatArray = FloatArray(channels)
         val dist: FloatArray = FloatArray(windowSize) { 0f }
         val prev: FloatArray = FloatArray(channels) { 2f }
-        for (i in 0 until windowSize) {
+        for (i in 0..<windowSize) {
             frameData.fill(2f)
             sample.getFrame(i + left, frameData)
 
-            for (ch in 0 until channels) {
+            for (ch in 0..<channels) {
                 val fd = frameData[ch]
                 var fDist = abs(fd) // score is abs value
                 if (prev[ch] * fd > 0) // Both values are the same sign
@@ -753,7 +753,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
         // Find minimum
         var minIndex = 0
         var minValue = 3f
-        for (i in 0 until windowSize) {
+        for (i in 0..<windowSize) {
             if (dist[i] < minValue) {
                 minIndex = i
                 minValue = dist[i]
@@ -771,7 +771,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     private fun findStartOfNonSilence(): Float {
         val sample = editor.musicData.beadsMusic?.musicSample ?: return -1f
         val array = FloatArray(sample.nChannels) { 0f }
-        for (i in 0 until sample.nFrames) {
+        for (i in 0..<sample.nFrames) {
             sample.getFrame(i.toInt(), array)
             if (array.any { !MathUtils.isEqual(it, 0f, 0.0005f) }) {
                 return sample.samplesToMs(i.toDouble()).toFloat() / 1000f

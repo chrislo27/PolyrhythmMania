@@ -92,7 +92,7 @@ class StoryAsmGameModeBouncyRoad2(main: PRManiaGame)
             var goingRight = startOnLeft
             var next: Int = if (numBouncesInclFire == 1) 2 else (if (startOnLeft) 0 else 3)
 
-            for (i in 0 until numBouncesInclFire - 1) {
+            for (i in 0..<numBouncesInclFire - 1) {
                 this += next
                 if (goingRight) {
                     next += 1

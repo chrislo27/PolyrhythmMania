@@ -72,7 +72,7 @@ class BlockSpawnPatternStoryMode(engine: Engine) : BlockSpawnPattern(engine) {
     override fun copy(): BlockSpawnPatternStoryMode {
         return BlockSpawnPatternStoryMode(engine).also {
             this.copyBaseInfoTo(it)
-            for (i in 0 until ROW_COUNT) {
+            for (i in 0..<ROW_COUNT) {
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }

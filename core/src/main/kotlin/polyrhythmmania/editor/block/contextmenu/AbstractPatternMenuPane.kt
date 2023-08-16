@@ -103,7 +103,7 @@ abstract class AbstractPatternMenuPane<E : CubeTypeLike, Data : AbstractPatternB
             pane.bounds.width.set(blockSize * (data.rowCount + 3))
             pane.bounds.height.set(10f)
             
-            for (b in 0 until (data.rowCount / 2)) {
+            for (b in 0..<(data.rowCount / 2)) {
                 pane += TextLabel("${b + beatIndexStart}", font = editorPane.palette.musicDialogFontBold).apply { 
                     this.bounds.width.set(blockSize)
                     this.bounds.x.set((b * 2 + 1) * blockSize)

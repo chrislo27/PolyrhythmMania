@@ -337,7 +337,7 @@ class EventAsmRodBounce(
 
     override fun onStart(currentBeat: Float) {
         val world = engine.world
-        if (fromIndex !in 0 until world.asmPistons.size) {
+        if (fromIndex !in 0..<world.asmPistons.size) {
             // Out of bounds. Spawn a new rod
             val newRod = EntityRodAsm(world, this.beat, this.targetRodID)
             world.addEntity(newRod)
@@ -371,7 +371,7 @@ class EventAsmRodBounce(
                 }
             }
 
-            if (fromIndex in (0 until pistons.size)) {
+            if (fromIndex in (0..<pistons.size)) {
                 engine.soundInterface.playAudioNoOverlap(AssetRegistry.get<BeadsSound>(when (fromIndex) {
                     0 -> "sfx_asm_left"
                     1 -> "sfx_asm_middle_left"
@@ -393,7 +393,7 @@ class EventAsmRodBounce(
         var bounce = EntityRodAsm.BounceAsm(this.beat, timePerBounce, toPos.y + 1f + (if (nextInputIsFire) 4.5f else 3.5f),
                 fromPos.x, fromPos.y + 1f, toPos.x, toPos.y + 1f, rod.bounce)
 
-        if (nextInputIsFire || toIndex !in 0 until pistons.size) {
+        if (nextInputIsFire || toIndex !in 0..<pistons.size) {
             bounce = EntityRodAsm.BounceAsm(this.beat + bounce.duration, 1f, bounce.endY - 5f,
                     bounce.endX, bounce.endY,
                     bounce.endX + (bounce.endX - bounce.startX).sign * 3f, bounce.endY - 11f, bounce)
@@ -409,7 +409,7 @@ class EventAsmRodBounce(
                 rod.addExpectedInput(EntityRodAsm.NextExpected(inputBeat, nextInputIsFire))
                 // SFX handled in onAudioStart
                 world.asmPlayerPiston.retract()
-            } else if (toIndex !in 0 until pistons.size) {
+            } else if (toIndex !in 0..<pistons.size) {
                 rod.disableInputs = true
             }
 

@@ -61,11 +61,11 @@ class SpotlightsColorData(val numSpotlightsPerRow: Int) {
         val rowsArray = obj.get("rows").asArray()
         allSpotlights.forEach { it.reset() }
         rowsArray.forEachIndexed { index, jsonValue -> 
-            if (index in 0 until rows.size) {
+            if (index in 0..<rows.size) {
                 val arr = jsonValue.asArray()
                 arr.forEachIndexed { i, v -> 
                     val row = rows[index]
-                    if (i in 0 until row.size) {
+                    if (i in 0..<row.size) {
                         val light = row[i]
                         light.fromJson(v.asObject())
                     }

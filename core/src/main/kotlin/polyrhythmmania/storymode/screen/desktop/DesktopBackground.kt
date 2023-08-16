@@ -29,7 +29,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
         private var pathAlpha: Float = 0f
 
         fun update(delta: Float) {
-            if (currentPathIndex !in 0 until path.size - 1) {
+            if (currentPathIndex !in 0..<path.size - 1) {
                 shouldDelete = true
                 return
             }
@@ -139,7 +139,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
     fun triggerPiston(pistonIndex: Int) {
         // pistonIndex = 0, middle = false = index 1
         val newIndex = (pistonIndex * 2) + 1
-        if (this.pistonFrame < newIndex && newIndex in 0 until PISTON_FRAMES) {
+        if (this.pistonFrame < newIndex && newIndex in 0..<PISTON_FRAMES) {
             this.pistonFrame = newIndex
             this.incrementPistonFrameAfterSec = 1f / 20
         }

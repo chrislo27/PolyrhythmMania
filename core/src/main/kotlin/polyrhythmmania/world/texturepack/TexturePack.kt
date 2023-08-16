@@ -151,7 +151,7 @@ open class StockTexturePack(id: String, deprecatedIDs: Set<String>, val regionMa
         add(PackTexRegion.create("rods_fill", regionMap.getOrNull("rods_fill")))
 
         val explosionRegions = regionMap.getIndexedRegionsOrNull("explosion")
-        (0 until explosionFrameCount).forEach { i ->
+        (0..<explosionFrameCount).forEach { i ->
             add(PackTexRegion.create("explosion_${i}", explosionRegions?.getValue(i)))
         }
 

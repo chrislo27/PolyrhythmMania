@@ -686,7 +686,7 @@ class Container(
                             val slotCount = texturePackObj.get("slotCount").asInt()
                             val presentIndicesArr = texturePackObj.get("presentIndices").asArray()
                             val presentIndices: Set<Int> = presentIndicesArr.filter { it.isNumber }.map { it.asInt() }.toSet()
-                            for (i in 0 until min(slotCount, this.customTexturePacks.size)) {
+                            for (i in 0..<min(slotCount, this.customTexturePacks.size)) {
                                 if (i in presentIndices) {
                                     zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack_${i}.zip")).use { zipInputStream ->
                                         val tempFile = TempFileUtils.createTempFile("extres", ".zip")

@@ -30,7 +30,7 @@ enum class Ranking(val sfxFile: String, val color: Color, val localization: Stri
 
     companion object {
         fun getRanking(score: Int): Ranking = when {
-            score in 60 until 80 -> OK
+            score in 60..<80 -> OK
             score >= 80 -> SUPERB
             else -> TRY_AGAIN
         }

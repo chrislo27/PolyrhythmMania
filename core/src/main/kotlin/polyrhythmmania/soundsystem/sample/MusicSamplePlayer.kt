@@ -47,8 +47,8 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
         val loopType = this.loopType
         if ((loopType != SamplePlayer.LoopType.NO_LOOP_FORWARDS && loopType != SamplePlayer.LoopType.LOOP_FORWARDS)
                 || (loopType == SamplePlayer.LoopType.LOOP_FORWARDS && isLoopInvalid())) {
-            for (out in 0 until outs) {
-                for (i in 0 until bufferSize) {
+            for (out in 0..<outs) {
+                for (i in 0..<bufferSize) {
                     bufOut[out][i] = 0f
                 }
             }
@@ -57,7 +57,7 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
 
         val interpType: SamplePlayer.InterpolationType = interpolationType
 //        pitch.update()
-        for (i in 0 until bufferSize) {
+        for (i in 0..<bufferSize) {
             val pitchValue = pitch // pitch.getValue(0, i)
 
             position += musicSample.samplesToMs(1.0) * pitchValue * (this.musicSample.sampleRate / context.sampleRate)
@@ -67,7 +67,7 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
                 position = loopStartMs.toDouble()
             }
             if (position < 0.0) {
-                for (out in 0 until outs) {
+                for (out in 0..<outs) {
                     tmpFrame[out] = 0f
                 }
             } else {
@@ -93,7 +93,7 @@ class MusicSamplePlayer(val musicSample: MusicSample, context: AudioContext)
                 }
             }
 
-            for (out in 0 until outs) {
+            for (out in 0..<outs) {
                 bufOut[out][i] = tmpFrame[out] * currentGain
             }
             

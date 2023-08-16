@@ -52,7 +52,7 @@ data class ResultsText(
                 else Localization.getValue("play.results.defaultTryAgain.1"),
                         if (score < 50) Localization.getValue("play.results.defaultTryAgain.3") else "")
             }
-            score in 60 until 75 -> {
+            score in 60..<75 -> {
                 Pair(resultsText.ok ?: Localization.getValue("play.results.defaultOK.${if (doRandomization) MathUtils.random(1, 4) else 1}"), "")
             }
             score >= 75 -> {

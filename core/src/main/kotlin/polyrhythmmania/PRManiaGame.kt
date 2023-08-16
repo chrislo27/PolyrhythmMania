@@ -918,7 +918,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
         colourPickerHueBar = run {
             val pixmap = Pixmap(360, 1, Pixmap.Format.RGBA8888)
             val tmpColor = Color(1f, 1f, 1f, 1f)
-            for (i in 0 until 360) {
+            for (i in 0..<360) {
                 tmpColor.fromHsv(i.toFloat(), 1f, 1f)
                 pixmap.setColor(tmpColor)
                 pixmap.drawPixel(i, 0)

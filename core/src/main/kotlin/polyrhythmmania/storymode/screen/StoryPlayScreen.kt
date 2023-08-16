@@ -742,7 +742,7 @@ class StoryPlayScreen(
 
                 shader.setUniformf("resolution", max(cam.viewportHeight, cam.viewportWidth))
 
-                for (i in 0 until passes * 2) {
+                for (i in 0..<passes * 2) {
                     val radius = (passes - i / 2) * blurStrength
 
                     writeBuffer.begin()

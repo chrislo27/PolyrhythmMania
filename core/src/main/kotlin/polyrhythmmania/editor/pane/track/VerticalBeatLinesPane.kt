@@ -56,8 +56,8 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
                 val snapCount = (1f / snap).toInt()
                 tmpColor.a *= 0.5f
                 batch.color = tmpColor
-                for (b in beatLines.fromBeat.coerceAtLeast(leftBeat.toInt()) until beatLines.toBeat.coerceAtMost(rightBeat.toInt())) {
-                    for (i in 1 until snapCount) {
+                for (b in beatLines.fromBeat.coerceAtLeast(leftBeat.toInt())..<beatLines.toBeat.coerceAtMost(rightBeat.toInt())) {
+                    for (i in 1..<snapCount) {
                         batch.fillRect(x + trackView.translateBeatToX(b.toFloat() + (i * snap)) - lineWidth / 2f, y - h, lineWidth, h)
                     }
                 }

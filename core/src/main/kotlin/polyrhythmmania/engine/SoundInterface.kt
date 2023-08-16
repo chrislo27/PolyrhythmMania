@@ -42,7 +42,7 @@ sealed class SoundInterface {
             val currentPlayer = this.currentMusicPlayer
             if (currentPlayer != null) {
                 currentPlayer.pause(true)
-                for (i in 0 until ugenToAddTo.ins) {
+                for (i in 0..<ugenToAddTo.ins) {
                     ugenToAddTo.removeConnection(i, currentPlayer, i % currentPlayer.outs)
                 }
                 this.currentMusicPlayer = null

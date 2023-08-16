@@ -20,7 +20,7 @@ class LoadingIconRod : ImageNode(null, renderingMode = ImageRenderingMode.MAINTA
     }
     
     private val regions: List<TextureRegion> = AssetRegistry.get<Texture>("loading_icon_rod").let { tex ->
-        (0 until NUM_FRAMES).map { i ->
+        (0..<NUM_FRAMES).map { i ->
             TextureRegion(tex, 0, tex.height / NUM_FRAMES * i, tex.width, tex.height / NUM_FRAMES)
         }
     }

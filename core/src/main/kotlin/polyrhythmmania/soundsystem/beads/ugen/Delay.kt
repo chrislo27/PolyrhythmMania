@@ -17,16 +17,16 @@ class Delay(context: AudioContext, val inouts: Int, val sampleDelay: Int)
 
     override fun calculateBuffer() {
         if (sampleDelay <= 0) {
-            for (i in 0 until bufferSize) {
+            for (i in 0..<bufferSize) {
                 val gain = this.gainUGen?.getValue(0, i) ?: this.gain
-                for (ch in 0 until inouts) {
+                for (ch in 0..<inouts) {
                     bufOut[ch][i] = gain * bufIn[ch][i]
                 }
             }
         } else {
-            for (i in 0 until bufferSize) {
+            for (i in 0..<bufferSize) {
                 val gain = this.gainUGen?.getValue(0, i) ?: this.gain
-                for (ch in 0 until inouts) {
+                for (ch in 0..<inouts) {
                     bufOut[ch][i] = if (bufferLocRead < 0) 0f else (gain * delayBuffer[ch][bufferLocRead + i])
                 }
             }
@@ -37,8 +37,8 @@ class Delay(context: AudioContext, val inouts: Int, val sampleDelay: Int)
             }
             
             // Copy bufIn into delayBuffer
-            for (ch in 0 until inouts) {
-                for (i in 0 until bufferSize) {
+            for (ch in 0..<inouts) {
+                for (i in 0..<bufferSize) {
                     delayBuffer[ch][bufferLocPut + i] = bufIn[ch][i]
                 }
             }

@@ -86,7 +86,7 @@ class Spotlights(val world: World, val numPerRow: Int) {
 
     init {
         fun buildRow(z: Float): List<Spotlight> {
-            return (0 until numPerRow).map { i ->
+            return (0..<numPerRow).map { i ->
                 Spotlight(this).apply {
                     this.position.set(5f + 0.5f + i, 2f, z + 0.5f)
                 }

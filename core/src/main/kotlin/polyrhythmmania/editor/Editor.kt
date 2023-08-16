@@ -1026,7 +1026,7 @@ class Editor(
                         in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
                             if (currentClick == Click.None) {
                                 val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
-                                if (number in 0 until Tool.VALUES.size) {
+                                if (number in 0..<Tool.VALUES.size) {
                                     changeTool(Tool.VALUES.getOrNull(number) ?: Tool.SELECTION)
                                     inputConsumed = true
                                 }

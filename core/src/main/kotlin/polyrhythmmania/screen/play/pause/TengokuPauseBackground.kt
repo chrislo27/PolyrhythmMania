@@ -82,7 +82,7 @@ class TengokuPauseBackground {
         val currentMsTime = System.currentTimeMillis()
         val squareCount = this.squareCount
         batch.setColor(1f, 1f, 1f, 0.65f)
-        for (i in 0 until squareCount) {
+        for (i in 0..<squareCount) {
             val alpha = i / squareCount.toFloat()
             val size = Interpolation.circleIn.apply(20f, 80f, alpha) * 1.5f
             val rotation = WaveUtils.getSawtoothWave(Interpolation.circleOut.apply(0.65f, 1.15f, alpha) * 0.75f,

@@ -130,7 +130,7 @@ class EngineInputter(val engine: Engine) {
             for (row in world.rows) {
                 row.updateInputIndicators()
                 val activeIndex = row.nextActiveIndex
-                if (activeIndex !in 0 until row.length) continue
+                if (activeIndex !in 0..<row.length) continue
                 val rowBlock = row.rowBlocks[activeIndex]
                 if (rowBlock.type != rowBlockType) continue
 
@@ -140,7 +140,7 @@ class EngineInputter(val engine: Engine) {
                     rod.updateInputTracking(atBeat)
                     val inputTracker = rod.inputTracker
                     val nextBlockIndex = entity.getCurrentIndexFloor(entity.getPosXFromBeat(atBeat - entity.deployBeat))
-                    if (nextBlockIndex !in 0 until entity.row.length) continue // Not in range
+                    if (nextBlockIndex !in 0..<entity.row.length) continue // Not in range
                     if (inputTracker.expected[nextBlockIndex] !is EntityRodPR.ExpectedInput.Expected) continue // Not an expected input
                     if (nextBlockIndex != activeIndex) { // Not the current active index
 //                        Paintbox.LOGGER.debug("$rod: Skipping input because nextBlockIndex != activeIndex (${nextBlockIndex} >= ${activeIndex})")

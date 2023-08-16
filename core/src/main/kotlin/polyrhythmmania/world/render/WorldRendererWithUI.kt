@@ -904,7 +904,7 @@ duration: ${monster.activeDuration.get()} sec
                 if (skillStarSpinAnimation <= 0f) { // Don't trigger if spin animation is playing
                     // Pulse before skill star input
                     val beatThreshold = 0.1f
-                    for (i in 0 until 4) {
+                    for (i in 0..<4) {
                         val beatPoint = engine.tempos.beatsToSeconds(skillStarInput - i)
                         if (lastPulseBeat == beatPoint) {
                             continue

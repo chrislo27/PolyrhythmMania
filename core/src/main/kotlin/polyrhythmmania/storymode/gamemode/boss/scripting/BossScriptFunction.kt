@@ -286,7 +286,7 @@ abstract class BossScriptFunction(val gamemode: StoryBossGameMode, script: Scrip
 
         fun getSwitchedLightColorPairs(side: Boolean): List<Pair<Color?, Float?>> {
             val onIndices = lightSelections.getValue(side)
-            return (0 until spotlights.numPerRow).map { i ->
+            return (0..<spotlights.numPerRow).map { i ->
                 Pair(Spotlights.SPOTLIGHT_RESET_COLOR, if (i in onIndices) lightStrength.selected else 0f)
             }
         }

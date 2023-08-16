@@ -39,7 +39,7 @@ abstract class AbstractStoryAsmGameMode(
             var goingRight = startOnLeft
             var next: Int = if (numBouncesInclFire == 1) 2 else (if (startOnLeft) 0 else 3)
             
-            for (i in 0 until numBouncesInclFire) {
+            for (i in 0..<numBouncesInclFire) {
                 this += next
                 if (goingRight) {
                     next += 1

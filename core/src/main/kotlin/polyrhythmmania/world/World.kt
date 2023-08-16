@@ -139,7 +139,7 @@ class World(numOfSpotlights: Int?) {
             
             // Main floor
             for (x in -3..20) {
-                for (z in -6 until 3) {
+                for (z in -6..<3) {
                     val ent: Entity = when (z) {
                         0, -3 -> EntityPlatform(this, false)
                         1, -2 -> EntityCube(this, withBorder = true, withLine = showRedLine(x))
@@ -274,7 +274,7 @@ class World(numOfSpotlights: Int?) {
 
         // Main floor
         for (x in -2..9) {
-            for (z in -3 until 2) {
+            for (z in -3..<2) {
                 if (x >= 8 && z == -1) continue
                 val ent: Entity = if (z == -1) {
                     EntityPlatform(this, x == 4)
@@ -365,7 +365,7 @@ class World(numOfSpotlights: Int?) {
 
         // Main floor
         for (x in 4..22) {
-            for (z in -7 until -4) {
+            for (z in -7..<-4) {
                 for (y in 0 downTo -11) {
                     if (y != 0 && z != -5) continue
                     if (y <= -(x * 0.5f + 2)) continue

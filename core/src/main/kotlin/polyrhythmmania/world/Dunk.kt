@@ -34,7 +34,7 @@ class EntityDunkBasketBack(world: World) : SpriteEntity(world) {
         val xOff = -0.5f
         vec.x += xOff
         vec.y += xOff * 0.5f
-        for (i in 0 until numLayers) {
+        for (i in 0..<numLayers) {
             val tr = getTintedRegion(tileset, i)
             drawTintedRegion(batch, vec, tileset, tr, (1f / 32f) * 0, 0f, renderWidth, renderHeight)
         }
@@ -56,7 +56,7 @@ class EntityDunkBasketFrontFaceZ(world: World) : SpriteEntity(world) {
         val xOff = -0.5f
         vec.x += xOff
         vec.y += xOff * 0.5f + (0.5f)
-        for (i in 0 until numLayers) {
+        for (i in 0..<numLayers) {
             val tr = getTintedRegion(tileset, i)
             drawTintedRegion(batch, vec, tileset, tr, (1f / 32f) * 0, 0f, renderWidth, renderHeight)
         }

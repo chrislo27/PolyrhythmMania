@@ -154,7 +154,7 @@ class Row(val world: World, val length: Int, val startX: Int, val startY: Int, v
 
     fun updateInputIndicators() {
         var foundActive = false
-        for (i in 0 until length) {
+        for (i in 0..<length) {
             val rowBlock = rowBlocks[i]
             val inputInd = inputIndicators[i]
 
@@ -339,7 +339,7 @@ open class EntityRodPR(
     }
 
     open fun bounce(startIndex: Int) {
-        if (startIndex in 0 until row.length) {
+        if (startIndex in 0..<row.length) {
             val lookahead = getLookaheadIndex(startIndex)
             bounce(startIndex, lookahead)
             if (lookahead >= row.rowBlocks.size - 1) {
@@ -357,7 +357,7 @@ open class EntityRodPR(
             startIndex + 1
         } else {
             var nextNonNull = startIndex + 1
-            for (i in startIndex + 1 until row.length) {
+            for (i in startIndex + 1..<row.length) {
                 nextNonNull = i
                 val rowBlock = row.rowBlocks[i]
                 if (rowBlock.active) {
@@ -389,7 +389,7 @@ open class EntityRodPR(
             val lookahead = getLookaheadIndex(currentIndexFloor)
             inputTracker.expected[currentIndexFloor] = ExpectedInput.Expected(currentIndexFloor, lookahead,
                     getBeatForIndex(currentIndexFloor), getThisInputType())
-            for (i in currentIndexFloor + 1 until lookahead.coerceAtMost(inputTracker.totalResultCount - 1)) {
+            for (i in currentIndexFloor + 1..<lookahead.coerceAtMost(inputTracker.totalResultCount - 1)) {
                 if (inputTracker.expected[i] == ExpectedInput.Unknown)
                     inputTracker.expected[i] = ExpectedInput.InAir
             }
@@ -454,11 +454,11 @@ open class EntityRodPR(
         if (!collision.collidedWithWall && (currentIndexFloat - currentIndex) >= 0.81f && currentIndex >= -1 &&
                 collision.bounce == null /* non-null Bounce indicates that the EngineInputter accepted it */) {
             val nextIndex = currentIndex + 1
-            if (nextIndex in 0 until row.length) {
+            if (nextIndex in 0..<row.length) {
                 val next = row.rowBlocks[nextIndex]
                 val heightOfNext = next.collisionHeight
                 var posYCheck = prevPosY
-                if (currentIndex in 0 until row.length) {
+                if (currentIndex in 0..<row.length) {
                     val blockBelow: EntityRowBlock = row.rowBlocks[currentIndex]
                     val floorBelow: Float = if (!blockBelow.active) row.startY.toFloat() else {
                         blockBelow.position.y + blockBelow.collisionHeight
@@ -497,7 +497,7 @@ open class EntityRodPR(
         }
 
         // Control the Y position
-        if (currentIndex in 0 until row.length) {
+        if (currentIndex in 0..<row.length) {
             if ((collision.bounce?.endX ?: Float.MAX_VALUE) < this.position.x) {
                 collision.bounce = null
             }

@@ -114,11 +114,11 @@ class BlockSelectiveSpawnPattern(engine: Engine) : Block(engine, BlockSelectiveS
     override fun copy(): BlockSelectiveSpawnPattern {
         return BlockSelectiveSpawnPattern(engine).also {
             this.copyBaseInfoTo(it)
-            for (i in 0 until ROW_COUNT) {
+            for (i in 0..<ROW_COUNT) {
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }
-            for (i in 0 until it.tailEndData.rowCount) {
+            for (i in 0..<it.tailEndData.rowCount) {
                 it.tailEndData.rowATypes[i] = this.tailEndData.rowATypes[i]
                 it.tailEndData.rowDpadTypes[i] = this.tailEndData.rowDpadTypes[i]
             }

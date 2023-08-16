@@ -21,7 +21,7 @@ data class Pattern(val rowA: RowPattern, val rowDpad: RowPattern, val difficulty
             val anyDpad = rowDpad.row.isNotEmpty()
             val defaultA = if (anyA) CubeType.PLATFORM else CubeType.NONE
             val defaultDpad = if (anyDpad) CubeType.PLATFORM else CubeType.NONE
-            for (i in 0 until patternData.rowCount) {
+            for (i in 0..<patternData.rowCount) {
                 this.patternData.rowATypes[i] = rowA.row.getOrNull(i) ?: defaultA
                 this.patternData.rowDpadTypes[i] = rowDpad.row.getOrNull(i) ?: defaultDpad
             }

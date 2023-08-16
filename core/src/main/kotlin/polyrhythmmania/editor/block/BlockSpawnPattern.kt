@@ -48,14 +48,14 @@ open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
             // Search for contiguous platform sections
             var index = 0
             val maxSearchIndex = rowArray.size
-            while (index in 0 until maxSearchIndex) {
+            while (index in 0..<maxSearchIndex) {
                 val type = rowArray[index]
                 if (type == CubeType.PLATFORM && index < maxSearchIndex - 1) {
                     // Find contiguous section of platforms
                     val startIndexOfPlatforms = index
                     var subindex = startIndexOfPlatforms + 1
                     var endType: CubeType = rowArray[subindex]
-                    while (subindex in 0 until maxSearchIndex) { // While subindex is still in searchable region
+                    while (subindex in 0..<maxSearchIndex) { // While subindex is still in searchable region
                         endType = rowArray[subindex]
                         if (endType != CubeType.PLATFORM) break // Break at the first non-platform
                         subindex++
@@ -65,13 +65,13 @@ open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
                     when (endType) {
                         CubeType.PISTON -> {
                             // Ends with a piston. All timings for the platform match the piston's
-                            for (i in index until subindex) {
+                            for (i in index..<subindex) {
                                 timings[i] = timings[subindex]
                             }
                         }
                         else -> {
                             // Set all timings for the platform to the firs tof the platform
-                            for (i in index until subindex) {
+                            for (i in index..<subindex) {
                                 timings[i] = timings[index]
                             }
                         }
@@ -188,7 +188,7 @@ open class BlockSpawnPattern(engine: Engine) : Block(engine, BLOCK_TYPES) {
     override fun copy(): BlockSpawnPattern {
         return BlockSpawnPattern(engine).also {
             this.copyBaseInfoTo(it)
-            for (i in 0 until ROW_COUNT) {
+            for (i in 0..<ROW_COUNT) {
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }

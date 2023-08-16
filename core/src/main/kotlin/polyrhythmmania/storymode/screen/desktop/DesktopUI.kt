@@ -73,7 +73,7 @@ class DesktopUI(
     
     private val availableBlinkTexRegs: List<TextureRegion> = run {
         val numFrames = 5
-        (0 until numFrames).map { i -> TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_available_blink_$i")) }
+        (0..<numFrames).map { i -> TextureRegion(StoryAssets.get<Texture>("desk_inboxitem_available_blink_$i")) }
     }
     private val blinkFrameIndex: ReadOnlyIntVar = IntVar {
         val secPerFrame = 0.15f
@@ -457,7 +457,7 @@ class DesktopUI(
             if (indexOfCurrent != -1) {
                 var i = indexOfCurrent + dir
 
-                while (i in 0 until inboxItemListingObjs.size) {
+                while (i in 0..<inboxItemListingObjs.size) {
                     val obj = inboxItemListingObjs[i]
                     if (obj.myInboxItemState.getOrCompute().completion != InboxItemCompletion.UNAVAILABLE) {
                         val targetPos = getTargetVbarValueForInboxItem(obj.inboxItem)

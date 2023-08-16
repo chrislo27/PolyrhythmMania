@@ -41,7 +41,7 @@ class BlockDespawnPattern(engine: Engine) : Block(engine, BlockDespawnPattern.BL
         val b = this.beat
         return if (disableTailEnd.get()) {
             RowSetting.getRows(rowData.rowSetting.getOrCompute(), engine.world).flatMap { row ->
-                (0 until BlockSpawnPattern.ROW_COUNT).map { idx ->
+                (0..<BlockSpawnPattern.ROW_COUNT).map { idx ->
                     EventRowBlockDespawn(engine, row, idx, b)
                 }
             }

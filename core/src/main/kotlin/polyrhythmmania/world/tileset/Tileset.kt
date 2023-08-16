@@ -23,7 +23,7 @@ class Tileset(val texturePack: ReadOnlyVar<TexturePack>) {
             val suggestedRows = TexturePack.rodFrameCount
             val partWidthU = 1f / suggestedColumns
             val partHeightV = 1f / suggestedRows
-            return (0 until count).map { row ->
+            return (0..<count).map { row ->
                 TintedSubregion(parent, col * partWidthU, row * partHeightV, partWidthU, partHeightV)
             }
         }
@@ -128,7 +128,7 @@ class Tileset(val texturePack: ReadOnlyVar<TexturePack>) {
     val defectiveRodDpadAerialFillAnimations: List<TintedRegion> = mapRodTexture(defectiveRodDpadFillSection, TexturePack.rodFrameCount, 1)
 
     val explosionFrames: List<TintedRegion> by lazy {
-        (0 until TexturePack.explosionFrameCount).map { i ->
+        (0..<TexturePack.explosionFrameCount).map { i ->
             TintedRegion("explosion_${i}")
         }
     }
@@ -148,7 +148,7 @@ class Tileset(val texturePack: ReadOnlyVar<TexturePack>) {
     val dunkBasketRear: TintedRegion = TintedRegion("basket_rear")
     val dunkBacking: TintedRegion = TintedRegion("hoop_back")
     val dunkStar: TintedRegion = TintedRegion("dunk_star")
-    val dunkStarAnimation: List<TintedRegion> = (0 until 4).map {
+    val dunkStarAnimation: List<TintedRegion> = (0..<4).map {
         // 39x9, 9x9 each with 1 px spacing on the x axis
         val w = 9f / 39f
         val wWithPad = 10f / 39f

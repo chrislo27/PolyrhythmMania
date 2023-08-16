@@ -25,7 +25,7 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
     override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
         val tmpColor = ColorStack.getAndPush()
         val tint = this.tint
-        for (i in 0 until numLayers) {
+        for (i in 0..<numLayers) {
             val tr = getTintedRegion(tileset, i)
             if (tr != null) {
                 if (tintIsMultiplied) {

@@ -129,7 +129,7 @@ class DaemonJavaSoundAudioIO(startingMixer: Mixer, val systemBufferSizeInFrames:
         var i = 0
         var counter = 0
         while (i < bufferSizeInFrames) {
-            for (j in 0 until audioFormat.channels) {
+            for (j in 0..<audioFormat.channels) {
                 interleavedSamples[counter++] = context.out.getValue(j, i)
             }
             ++i

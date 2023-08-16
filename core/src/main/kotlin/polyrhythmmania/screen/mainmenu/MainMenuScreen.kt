@@ -96,10 +96,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
             diagonalProgress += progressDelta
 
             var anyNotDone = false
-            for (ix in startX until (startX + width)) {
-                if (ix !in 0 until mainMenu.tilesWidth) continue
-                for (iy in startY until (startY + height)) {
-                    if (iy !in 0 until mainMenu.tilesHeight) continue
+            for (ix in startX..<(startX + width)) {
+                if (ix !in 0..<mainMenu.tilesWidth) continue
+                for (iy in startY..<(startY + height)) {
+                    if (iy !in 0..<mainMenu.tilesHeight) continue
                     val tile = mainMenu.tiles[ix][iy]
                     if (tile.flipAmt >= 1f) continue
                     val thisDiag = computeDiagonalIndex(ix, iy)
@@ -474,10 +474,10 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                 val tileSizeU = tileSizeF / camera.viewportWidth
                 val tileSizeV = tileSizeF / camera.viewportHeight
 
-                for (tx in currentFlip.startX until (currentFlip.startX + currentFlip.width)) {
-                    if (tx !in 0 until tilesWidth) continue
-                    for (ty in currentFlip.startY until (currentFlip.startY + currentFlip.height)) {
-                        if (ty !in 0 until tilesHeight) continue
+                for (tx in currentFlip.startX..<(currentFlip.startX + currentFlip.width)) {
+                    if (tx !in 0..<tilesWidth) continue
+                    for (ty in currentFlip.startY..<(currentFlip.startY + currentFlip.height)) {
+                        if (ty !in 0..<tilesHeight) continue
                         val rx: Float = tx * tileSizeF
                         val ry: Float = camera.viewportHeight - ((ty + 1) * tileSizeF)
                         val tile = tiles[tx][ty]

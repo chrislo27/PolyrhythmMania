@@ -49,7 +49,7 @@ class EndlessPolyrhythm(main: PRManiaGame, playTimeType: PlayTimeType, prevHighS
         private val VALID_COLOR_CHANGE_MULTIPLIERS: List<Int> = listOf(5, 7, 11, 13)
 
         private fun findPeriods(limit: Int) {
-            for (i in 3 until limit) {
+            for (i in 3..<limit) {
                 if (limit % i == 0) continue
                 print("Testing $i\n  0  ")
                 val gotten = mutableSetOf<Int>(0)

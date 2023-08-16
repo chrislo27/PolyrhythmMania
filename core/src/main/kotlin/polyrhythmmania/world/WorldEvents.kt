@@ -36,9 +36,9 @@ abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, start
 
     override fun onStart(currentBeat: Float) {
         super.onStart(currentBeat)
-        if (index in 0 until row.length) {
+        if (index in 0..<row.length) {
             if (index < row.length - 1 && affectThisIndexAndForward) {
-                for (i in index until row.length) {
+                for (i in index..<row.length) {
                     entityOnStart(row.rowBlocks[i], currentBeat)
                 }
             } else {
@@ -54,9 +54,9 @@ abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, start
     override fun onUpdate(currentBeat: Float) {
         super.onUpdate(currentBeat)
         val percent = getBeatPercentage(currentBeat).coerceIn(0f, 1f)
-        if (index in 0 until row.length) {
+        if (index in 0..<row.length) {
             if (index < row.length - 1 && affectThisIndexAndForward) {
-                for (i in index until row.length) {
+                for (i in index..<row.length) {
                     entityOnUpdate(row.rowBlocks[i], currentBeat, percent)
                 }
             } else {
@@ -71,9 +71,9 @@ abstract class EventRowBlock(engine: Engine, val row: Row, val index: Int, start
 
     override fun onEnd(currentBeat: Float) {
         super.onEnd(currentBeat)
-        if (index in 0 until row.length) {
+        if (index in 0..<row.length) {
             if (index < row.length - 1 && affectThisIndexAndForward) {
-                for (i in index until row.length) {
+                for (i in index..<row.length) {
                     entityOnEnd(row.rowBlocks[i], currentBeat)
                 }
             } else {

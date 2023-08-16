@@ -102,7 +102,7 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
             
             var currentSegmentMsec: Float = leftMsec
             var blockPxOffset = 0f // Accumulated offset
-            for (segment in 0 until (segmentsInRenderZone.size + 1)) {
+            for (segment in 0..<(segmentsInRenderZone.size + 1)) {
                 val segmentStartMsec: Float = currentSegmentMsec
                 val segmentEndMsec: Float = segmentsInRenderZone.getOrNull(segment) ?: rightMsec
                 

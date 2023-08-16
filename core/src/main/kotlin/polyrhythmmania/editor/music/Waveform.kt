@@ -44,7 +44,7 @@ class Waveform(val musicSample: MusicSample) {
             val startIndex256 = index256
             while (consumed256 > 0 && index256 < numSummaries256) {
                 val amt = consumed256.coerceAtMost(256)
-                for (ch in 0 until nChannels) {
+                for (ch in 0..<nChannels) {
                     val summary = createSummary(buffer, ch, (index256 - startIndex256) * 256, amt)
                     newSummary256[ch][index256] = summary
                 }
@@ -56,7 +56,7 @@ class Waveform(val musicSample: MusicSample) {
             val startIndex2k = index2k
             while (consumed2k > 0 && index2k < numSummaries2k) {
                 val amt = consumed2k.coerceAtMost(2048)
-                for (ch in 0 until nChannels) {
+                for (ch in 0..<nChannels) {
                     val summary = createSummary(buffer, ch, (index2k - startIndex2k) * 2048, amt)
                     newSummary2k[ch][index2k] = summary
                 }
@@ -68,7 +68,7 @@ class Waveform(val musicSample: MusicSample) {
             var consumed65k = buffer.size
             while (consumed65k > 0 && index65k < numSummaries65k) {
                 val amt = consumed65k.coerceAtMost(65536)
-                for (ch in 0 until nChannels) {
+                for (ch in 0..<nChannels) {
                     val summary = createSummary(buffer, ch, (index65k - startIndex65k) * 65536, amt)
                     newSummary65k[ch][index65k] = summary
                 }
@@ -92,7 +92,7 @@ class Waveform(val musicSample: MusicSample) {
         var max = Float.MIN_VALUE
         var rms = 0.0 // Accumulates the sum of the squares first.
         
-        for (i in start until (start + amt)) {
+        for (i in start..<(start + amt)) {
             val x = buffer.data[channel][i]
             if (x < min) min = x
             if (x > max) max = x
@@ -123,8 +123,8 @@ class Waveform(val musicSample: MusicSample) {
 
         val summary256 = waveform.summary256
         pixmap.setColor(mainColor)
-        for (i in 0 until waveform.numSummaries256) {
-            for (ch in 0 until channels) {
+        for (i in 0..<waveform.numSummaries256) {
+            for (ch in 0..<channels) {
                 val summary = summary256[ch][i]
                 val min = summary.min.coerceIn(-1f, 1f)
                 val max = summary.max.coerceIn(-1f, 1f)
@@ -133,8 +133,8 @@ class Waveform(val musicSample: MusicSample) {
             }
         }
         pixmap.setColor(rmsColor)
-        for (i in 0 until waveform.numSummaries256) {
-            for (ch in 0 until channels) {
+        for (i in 0..<waveform.numSummaries256) {
+            for (ch in 0..<channels) {
                 val summary = summary256[ch][i]
                 val rms = summary.rms.coerceIn(0f, 1f)
                 val h = (rms * height).roundToInt() + 1
@@ -143,8 +143,8 @@ class Waveform(val musicSample: MusicSample) {
         }
         val summary2k = waveform.summary2k
         pixmap.setColor(mainColor)
-        for (i in 0 until waveform.numSummaries2k) {
-            for (ch in 0 until channels) {
+        for (i in 0..<waveform.numSummaries2k) {
+            for (ch in 0..<channels) {
                 val summary = summary2k[ch][i]
                 val min = summary.min.coerceIn(-1f, 1f)
                 val max = summary.max.coerceIn(-1f, 1f)
@@ -153,8 +153,8 @@ class Waveform(val musicSample: MusicSample) {
             }
         }
         pixmap.setColor(rmsColor)
-        for (i in 0 until waveform.numSummaries2k) {
-            for (ch in 0 until channels) {
+        for (i in 0..<waveform.numSummaries2k) {
+            for (ch in 0..<channels) {
                 val summary = summary2k[ch][i]
                 val rms = summary.rms.coerceIn(0f, 1f)
                 val h = (rms * height).roundToInt() + 1
@@ -163,8 +163,8 @@ class Waveform(val musicSample: MusicSample) {
         }
         val summary65k = waveform.summary65k
         pixmap.setColor(mainColor)
-        for (i in 0 until waveform.numSummaries65k) {
-            for (ch in 0 until channels) {
+        for (i in 0..<waveform.numSummaries65k) {
+            for (ch in 0..<channels) {
                 val summary = summary65k[ch][i]
                 val min = summary.min.coerceIn(-1f, 1f)
                 val max = summary.max.coerceIn(-1f, 1f)
@@ -173,8 +173,8 @@ class Waveform(val musicSample: MusicSample) {
             }
         }
         pixmap.setColor(rmsColor)
-        for (i in 0 until waveform.numSummaries65k) {
-            for (ch in 0 until channels) {
+        for (i in 0..<waveform.numSummaries65k) {
+            for (ch in 0..<channels) {
                 val summary = summary65k[ch][i]
                 val rms = summary.rms.coerceIn(0f, 1f)
                 val h = (rms * height).roundToInt() + 1

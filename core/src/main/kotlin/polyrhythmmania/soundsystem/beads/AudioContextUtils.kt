@@ -11,7 +11,7 @@ fun AudioContext.getValues(buffer: FloatArray) {
     if (buffer.size != this.bufferSize)
         error("Buffer size incorrect, got ${buffer.size}, should be ${this.bufferSize}")
 
-    for (channel in 0 until out.ins) {
+    for (channel in 0..<out.ins) {
         for (i in buffer.indices) {
             if (channel == 0)
                 buffer[i] = 0f

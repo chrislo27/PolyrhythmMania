@@ -182,7 +182,7 @@ class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, Bloc
         return BlockSpotlightSwitch(engine).also {
             this.copyBaseInfoTo(it)
             it.ambientLightDarken.set(this.ambientLightDarken.get())
-            for (i in 0 until numSpotlightsPerRow) {
+            for (i in 0..<numSpotlightsPerRow) {
                 it.patternData.rowATypes[i] = this.patternData.rowATypes[i]
                 it.patternData.rowDpadTypes[i] = this.patternData.rowDpadTypes[i]
             }

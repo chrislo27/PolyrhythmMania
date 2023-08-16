@@ -92,10 +92,10 @@ sealed class Click {
         }
         val tracksThatWillAccept: Set<Track> = run {
             val allowedTracks = BooleanArray(editor.tracks.size)
-            for (i in 0 until (editor.tracks.size - encompassingRegion.track + 1)) {
+            for (i in 0..<(editor.tracks.size - encompassingRegion.track + 1)) {
                 val targetTrackIndex: Int = (originBlock.trackIndex - topmost.trackIndex) + i
                 if (isPlacementValidForTargetTrack(targetTrackIndex)) {
-                    for (t in 0 until encompassingRegion.track) {
+                    for (t in 0..<encompassingRegion.track) {
                         allowedTracks[i + t] = true
                     }
                 }
@@ -170,9 +170,9 @@ sealed class Click {
             val beat = beat.coerceAtLeast(0f)
             this.beat = beat
             this.track = trackIndex
-            (this.isPlacementInvalid as BooleanVar).set(trackIndex !in 0 until editor.tracks.size)
+            (this.isPlacementInvalid as BooleanVar).set(trackIndex !in 0..<editor.tracks.size)
 //            (this.wouldBeDeleted as Var).set(trackIndex < 0)
-            (this.wouldBeDeleted as BooleanVar).set(trackIndex !in 0 until editor.tracks.size)
+            (this.wouldBeDeleted as BooleanVar).set(trackIndex !in 0..<editor.tracks.size)
 
             // Adjust block regions
             // Set origin block

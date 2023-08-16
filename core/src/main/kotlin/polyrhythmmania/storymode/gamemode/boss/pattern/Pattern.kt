@@ -95,13 +95,13 @@ data class Pattern(
             val anyInRow = row.isNotEmpty()
             val defaultCubeType = if (anyInRow) CubeType.PLATFORM else CubeType.NONE
 
-            for (i in 0 until patternData.rowCount) {
+            for (i in 0..<patternData.rowCount) {
                 patternDataTypes[i] = row.getOrNull(i) ?: defaultCubeType
             }
             
             val lastIndexOfPiston = getLastPistonIndex(patternDataTypes)
             if (lastIndexOfPiston >= 0) {
-                for (i in (lastIndexOfPiston + 1) until patternData.rowCount) {
+                for (i in (lastIndexOfPiston + 1)..<patternData.rowCount) {
                     patternDataTypes[i] = CubeType.NONE
                 }
             }
@@ -113,11 +113,11 @@ data class Pattern(
             this.beat = beat
             this.isSilent.set(silentMode)
 
-            for (i in 0 until patternData.rowCount) {
+            for (i in 0..<patternData.rowCount) {
                 patternData.rowATypes[i] = rowDownside.getOrNull(i) ?: CubeType.NO_CHANGE
                 patternData.rowDpadTypes[i] = rowUpside.getOrNull(i) ?: CubeType.NO_CHANGE
             }
-            for (i in 0 until tailEndData.rowCount) {
+            for (i in 0..<tailEndData.rowCount) {
                 tailEndData.rowATypes[i] = rowDownsideTailEnd?.getOrNull(i) ?: CubeType.NO_CHANGE
                 tailEndData.rowDpadTypes[i] = rowUpsideTailEnd?.getOrNull(i) ?: CubeType.NO_CHANGE
             }

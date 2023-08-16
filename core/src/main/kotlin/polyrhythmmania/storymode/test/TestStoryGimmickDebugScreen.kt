@@ -223,14 +223,14 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                                 Pair(inboxItems, progression)
                             },
                             ProgressionTest("Straight-down progression logic") {
-                                val inboxItems = InboxItems((0 until 30).map { i ->
+                                val inboxItems = InboxItems((0..<30).map { i ->
                                     InboxItem.Debug("debug$i", "item #$i", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "no desc")
                                 })
                                 val progression = Progression.debugItemsInOrder(inboxItems)
                                 Pair(inboxItems, progression)
                             },
                             ProgressionTest("Zig-zag progression logic") {
-                                val inboxItems = InboxItems((0 until 20).map { i ->
+                                val inboxItems = InboxItems((0..<20).map { i ->
                                     InboxItem.Debug("debug$i", "item #$i", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "no desc")
                                 })
 //                                val progression = Progression(inboxItems.items.subList(0, 15).map {

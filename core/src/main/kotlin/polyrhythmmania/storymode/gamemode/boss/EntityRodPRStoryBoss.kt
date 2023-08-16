@@ -39,7 +39,7 @@ class EntityRodPRStoryBoss(
 
     override fun bounce(startIndex: Int) {
         // Special behaviour: Last piston bounces the rod up to the boss
-        if (startIndex in 0 until row.length) {
+        if (startIndex in 0..<row.length) {
             val rowBlocks = row.rowBlocks
             val rowBlock = rowBlocks[startIndex]
             if (rowBlock.type.isPiston && startIndex == lastPistonIndex) {

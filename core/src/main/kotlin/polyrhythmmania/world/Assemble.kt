@@ -231,7 +231,7 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
         
         val tmpColor = ColorStack.getAndPush()
         val tint = this.tint
-        for (i in 0 until numLayers) {
+        for (i in 0..<numLayers) {
             val tr = getTintedRegion(tileset, i)
             if (tr != null) {
                 val allowTint = !(tr == tileset.pistonAExtendedFaceX || tr == tileset.pistonAExtendedFaceZ || tr == tileset.pistonAPartialFaceX || tr == tileset.pistonAPartialFaceZ ||

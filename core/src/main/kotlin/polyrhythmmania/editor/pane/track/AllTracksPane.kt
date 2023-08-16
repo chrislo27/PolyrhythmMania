@@ -40,7 +40,7 @@ class AllTracksPane(val editorPane: EditorPane) : Pane() {
         scrubTrack = ScrubTrack(this)
         bottomTracks += scrubTrack
         
-        val trackColours: List<Color> = (0 until 8).map { Color(1f, 1f, 1f, 1f).fromHsv((it * 3f / 8f * 360f) % 360f, 2 / 3f, 0.75f) }
+        val trackColours: List<Color> = (0..<8).map { Color(1f, 1f, 1f, 1f).fromHsv((it * 3f / 8f * 360f) % 360f, 2 / 3f, 0.75f) }
         editorPane.editor.tracks.forEachIndexed { index, track ->
             editorTrackSides += EditorTrackSidePane(this, track.id).apply {
                 this.sidePanel.sidebarBgColor.set(Color().set(trackColours[index % trackColours.size]))

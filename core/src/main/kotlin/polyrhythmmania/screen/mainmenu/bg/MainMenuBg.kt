@@ -88,7 +88,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
         val world = this.world
         world.clearEntities()
 
-        for (x in 0 until 7) {
+        for (x in 0..<7) {
             for (z in -2..0) {
                 world.addEntity(EntityCubeMM(withBorder = z == 0, showLeftVerticalEdge = z == -2).apply {
                     this.position.set(x.toFloat(), 0f, z.toFloat())
@@ -183,7 +183,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
         val world = this.world
         world.clearEntities()
 
-        for (x in 0 until 7) {
+        for (x in 0..<7) {
             for (z in -2..0) {
                 world.addEntity(EntityCubeMM(withBorder = z == 0, showLeftVerticalEdge = z == -2).apply {
                     this.position.set(x.toFloat(), 0f, z.toFloat())
@@ -223,7 +223,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
         val world = this.world
         world.clearEntities()
 
-        for (x in 0 until 7) {
+        for (x in 0..<7) {
             for (z in -2..0) {
                 world.addEntity(EntityCubeMM(withBorder = z == 0, showLeftVerticalEdge = z == -2).apply {
                     this.position.set(x.toFloat(), 0f, z.toFloat())
@@ -268,7 +268,7 @@ class MainMenuBg(val mainMenu: MainMenuScreen) : Disposable {
         val world = this.world
         world.clearEntities()
 
-        for (x in 0 until 3) {
+        for (x in 0..<3) {
             for (z in -2..2) {
                 world.addEntity(EntityCubeMM(withBorder = false, showLeftVerticalEdge = z == -2).apply {
                     this.position.set(x.toFloat(), 0f, z.toFloat())
