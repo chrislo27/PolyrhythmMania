@@ -11,13 +11,13 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
 import paintbox.Paintbox
+import paintbox.framebuffer.FrameBufferManager
+import paintbox.framebuffer.FrameBufferManager.BufferSettings
 import paintbox.registry.AssetRegistry
 import paintbox.util.*
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.intersects
-import polyrhythmmania.util.FrameBufferManager
-import polyrhythmmania.util.FrameBufferMgrSettings
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.Entity
@@ -106,9 +106,14 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         update()
     }
     protected val frameBufferManager: FrameBufferManager = FrameBufferManager(
-            listOf(FrameBufferMgrSettings(Pixmap.Format.RGBA8888), FrameBufferMgrSettings(Pixmap.Format.RGB888), FrameBufferMgrSettings(Pixmap.Format.RGBA8888)),
-            tag = "WorldRenderer", scaling = Scaling.fit, referenceWindowSize = WindowSize(1280, 720)
+        listOf(
+            BufferSettings(Pixmap.Format.RGBA8888),
+            BufferSettings(Pixmap.Format.RGB888),
+            BufferSettings(Pixmap.Format.RGBA8888)
+        ),
+        loggerTag = "WorldRenderer", scaling = Scaling.fit, referenceWindowSize = WindowSize(1280, 720)
     )
+
     /**
      * Represents the rendered world as a framebuffer. Format has alpha.
      */

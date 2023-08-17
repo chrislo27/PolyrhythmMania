@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Disposable
 import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
+import paintbox.framebuffer.FrameBufferManager
 import paintbox.ui.SceneRoot
 import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
@@ -54,8 +55,6 @@ import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.SimpleTimingProvider
 import polyrhythmmania.soundsystem.SoundSystem
 import polyrhythmmania.soundsystem.TimingProvider
-import polyrhythmmania.util.FrameBufferManager
-import polyrhythmmania.util.FrameBufferMgrSettings
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
@@ -109,7 +108,7 @@ class Editor(
         this.setToOrtho(false, 1280f, 720f)
         this.update()
     }
-    private val previewFbManager: FrameBufferManager = FrameBufferManager(listOf(FrameBufferMgrSettings(Pixmap.Format.RGB888)), tag = "Editor preview", referenceWindowSize = WindowSize(1280, 720))
+    private val previewFbManager: FrameBufferManager = FrameBufferManager(listOf(FrameBufferManager.BufferSettings(Pixmap.Format.RGB888)), loggerTag = "Editor preview", referenceWindowSize = WindowSize(1280, 720))
     val previewFrameBuffer: NestedFrameBuffer?
         get() = previewFbManager.getFramebuffer(0)
     val previewTextureRegion: TextureRegion

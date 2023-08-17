@@ -20,6 +20,7 @@ import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.TextAlign
+import paintbox.framebuffer.FrameBufferManager
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.ui.area.Insets
@@ -49,8 +50,6 @@ import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSample
 import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.statistics.GlobalStats
-import polyrhythmmania.util.FrameBufferManager
-import polyrhythmmania.util.FrameBufferMgrSettings
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.tileset.TintedRegion
 import java.util.concurrent.atomic.AtomicBoolean
@@ -172,7 +171,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     private val tiles: Array<Array<Tile>> = Array(tilesWidth) { x -> Array(tilesHeight) { y -> Tile(x, y) } }
     var flipAnimation: TileFlip? = null
         private set
-    private val framebufferManager: FrameBufferManager = FrameBufferManager(2, FrameBufferMgrSettings(Pixmap.Format.RGB888), tag = "Main Menu tileflip", referenceWindowSize = WindowSize(1280, 720))
+    private val framebufferManager: FrameBufferManager = FrameBufferManager(2, FrameBufferManager.BufferSettings(Pixmap.Format.RGB888), loggerTag = "Main Menu tileflip", referenceWindowSize = WindowSize(1280, 720))
     private var framebufferSwapRequested: Boolean = false
     private var shouldFramebuffersBeSwapped: Boolean = false
 

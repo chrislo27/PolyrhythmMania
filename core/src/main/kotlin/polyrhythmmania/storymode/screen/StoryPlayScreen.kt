@@ -16,6 +16,7 @@ import paintbox.PaintboxScreen
 import paintbox.binding.*
 import paintbox.font.Markup
 import paintbox.font.TextAlign
+import paintbox.framebuffer.FrameBufferManager
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
 import paintbox.transition.TransitionScreen
@@ -58,8 +59,6 @@ import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.gamemode.AbstractStoryGameMode
 import polyrhythmmania.storymode.gamemode.boss.BossModifierModule
 import polyrhythmmania.ui.TextSlideInterp
-import polyrhythmmania.util.FrameBufferManager
-import polyrhythmmania.util.FrameBufferMgrSettings
 import polyrhythmmania.world.EventEndState
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -86,7 +85,7 @@ class StoryPlayScreen(
     private var disableCatchingCursorOnHide: Boolean = false
 
     private val blurShader: ShaderProgram = GaussianBlur.createShaderProgram()
-    private val framebufferMgr: FrameBufferManager = FrameBufferManager(2, FrameBufferMgrSettings(Pixmap.Format.RGB888), tag = "StoryPlayScreen", referenceWindowSize = WindowSize(1280, 720))
+    private val framebufferMgr: FrameBufferManager = FrameBufferManager(2, FrameBufferManager.BufferSettings(Pixmap.Format.RGB888), loggerTag = "StoryPlayScreen", referenceWindowSize = WindowSize(1280, 720))
     
     private val animationHandler: AnimationHandler = AnimationHandler()
     
