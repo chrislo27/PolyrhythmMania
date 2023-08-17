@@ -19,7 +19,6 @@ enum class CardSymbol(
     ;
     
     companion object {
-        val VALUES: List<CardSymbol> = values().toList()
         val SCALE_CARDS: List<CardSymbol> = listOf(NUM_7, NUM_6, NUM_5, NUM_4, NUM_3, NUM_2, NUM_1)
     }
     

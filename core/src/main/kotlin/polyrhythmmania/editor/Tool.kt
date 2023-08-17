@@ -14,8 +14,4 @@ enum class Tool(val textureKey: String, val localizationKey: String) {
     TIME_SIGNATURE("time_signature", "tool.timeSignature.name"),
     
     ;
-    
-    companion object {
-        val VALUES: List<Tool> = values().toList()
-    }
 }

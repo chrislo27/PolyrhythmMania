@@ -10,8 +10,4 @@ enum class CardSuit(val color: Color, val spriteID: String, val spriteIDSmall: S
     C(Color().set(56, 129, 255), "suit_piston"),
     
     ;
-    
-    companion object {
-        val VALUES: List<CardSuit> = values().toList()
-    }
 }

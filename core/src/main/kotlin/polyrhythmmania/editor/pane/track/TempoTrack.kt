@@ -115,7 +115,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                         }
                         
                         val tooltip = editorPane.createDefaultTooltip(Localization.getVar("editor.tempo.startingTempo.tooltip",
-                                Var { listOf("${Tool.values().indexOf(Tool.TEMPO_CHANGE) + 1}") }))
+                                Var { listOf("${Tool.entries.indexOf(Tool.TEMPO_CHANGE) + 1}") }))
                         this.tooltipElement.bind { 
                             if (editor.tool.use() != Tool.TEMPO_CHANGE) tooltip else null
                         }

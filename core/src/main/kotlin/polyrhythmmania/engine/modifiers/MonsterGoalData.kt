@@ -191,8 +191,4 @@ enum class MonsterPresets(val difficulty: Float) {
     HARD(85f),
     SUPER_HARD(90f),
     ;
-    
-    companion object {
-        val VALUES: List<MonsterPresets> = values().toList()
-    }
 }

@@ -15,7 +15,6 @@ enum class CameraPanningSetting(override val persistValueID: String, val localiz
     }
 
     companion object {
-        val VALUES: List<CameraPanningSetting> = values().toList()
-        val MAP: Map<String, CameraPanningSetting> = VALUES.associateBy { it.persistValueID }
+        val MAP: Map<String, CameraPanningSetting> = entries.associateBy { it.persistValueID }
     }
 }

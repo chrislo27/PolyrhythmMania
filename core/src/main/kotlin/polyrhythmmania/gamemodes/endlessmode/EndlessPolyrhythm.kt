@@ -260,7 +260,7 @@ currentlyInPattern: $currentlyInPattern | pauseTime: $pauseTime
 
             val gaussian = nextGaussianAbs(getStdDevFromDifficulty(), getMeanFromDifficulty()).coerceAtLeast(0f)
             val difficultyInt = gaussian.roundToInt()
-            val diff = Difficulty.VALUES[difficultyInt % Difficulty.VALUES.size]
+            val diff = Difficulty.entries[difficultyInt % Difficulty.entries.size]
             
             var pattern = difficultyBags.getValue(diff).next()
             if (pattern.flippable) {

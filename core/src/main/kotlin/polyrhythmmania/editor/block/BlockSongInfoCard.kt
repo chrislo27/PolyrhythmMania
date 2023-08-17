@@ -33,7 +33,7 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
     enum class Field(val jsonId: Int) {
         SONG_TITLE(0), SONG_ARTIST(1);
         companion object {
-            val ID_MAPPING: Map<Int, Field> = values().associateBy { it.jsonId }
+            val ID_MAPPING: Map<Int, Field> = entries.associateBy { it.jsonId }
         }
     }
     

@@ -8,11 +8,11 @@ import polyrhythmmania.editor.block.CubeTypeLike
  * Defines temporal behaviour for palette changes and spotlight changes.
  */
 data class PaletteTransition(
-        val duration: Float,
-        val transitionCurve: TransitionCurve,
+    val duration: Float,
+    val transitionCurve: TransitionCurve,
 
-        val pulseMode: Boolean,
-        val reverse: Boolean,
+    val pulseMode: Boolean,
+    val reverse: Boolean,
 ) {
 
     companion object {
@@ -44,8 +44,8 @@ data class PaletteTransition(
 }
 
 enum class TransitionCurve(
-        override val jsonId: Int, override val localizationNameKey: String, val interpolation: Interpolation,
-        val imageID: String
+    override val jsonId: Int, override val localizationNameKey: String, val interpolation: Interpolation,
+    val imageID: String,
 ) : CubeTypeLike {
 
     LINEAR(0x0, "blockContextMenu.transitionCurve.linear", Interpolation.linear, "linear"),
@@ -72,7 +72,6 @@ enum class TransitionCurve(
     ;
 
     companion object {
-        val VALUES: List<TransitionCurve> = TransitionCurve.values().toList()
-        val INDEX_MAP: Map<Int, TransitionCurve> = VALUES.associateBy { it.jsonId }
+        val INDEX_MAP: Map<Int, TransitionCurve> = entries.associateBy { it.jsonId }
     }
 }

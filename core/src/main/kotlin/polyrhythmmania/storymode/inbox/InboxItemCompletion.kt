@@ -10,8 +10,7 @@ enum class InboxItemCompletion(val jsonID: String) {
     ;
     
     companion object {
-        val VALUES: List<InboxItemCompletion> = values().toList()
-        val JSON_MAPPING: Map<String, InboxItemCompletion> = VALUES.associateBy { it.jsonID }
+        val JSON_MAPPING: Map<String, InboxItemCompletion> = entries.associateBy { it.jsonID }
     }
     
     fun shouldCountAsCompleted(): Boolean {

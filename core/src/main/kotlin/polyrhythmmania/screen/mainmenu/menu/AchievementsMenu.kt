@@ -199,7 +199,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val achievementPanes: Map<Achievement, UIElement> by lazy { Achievements.achievementIDMap.values.associateWith { createAchievementElement(it, false) } }
         val achievementPanesCompact: Map<Achievement, UIElement> by lazy { Achievements.achievementIDMap.values.associateWith { createAchievementElement(it, true) } }
         val categoryHeadings: Map<AchievementCategory, UIElement> by lazy { 
-            AchievementCategory.VALUES.associateWith { category ->
+            AchievementCategory.entries.associateWith { category ->
                 val achievementsInCategory = Achievements.achievementIDMap.values.filter { it.category == category }
                 TextLabel(binding = {
                     AchievementsL10N.getVar("achievement.categoryProgress", Var {
@@ -274,7 +274,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
                 
                 if (isCategorical) {
-                    AchievementCategory.VALUES.forEach { category ->
+                    AchievementCategory.entries.forEach { category ->
                         val achInCat = filteredAchievements.filter { it.category == category }
                         if (achInCat.isNotEmpty()) {
                             vbox += categoryHeadings.getValue(category)
@@ -327,7 +327,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setScaleXY(0.75f)
                 this.margin.set(Insets(0f, 0f, 8f, 0f))
             }
-            val viewTypeList = listOf(ViewType.AllByCategory, ViewType.AllTogether) + AchievementCategory.VALUES.map(ViewType::Category)
+            val viewTypeList = listOf(ViewType.AllByCategory, ViewType.AllTogether) + AchievementCategory.entries.map(ViewType::Category)
             hbox += ComboBox<ViewType>(viewTypeList, viewingCategory.getOrCompute(), font = font).apply {
                 this.bounds.width.set(220f)
                 this.setScaleXY(0.75f)
@@ -352,7 +352,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setScaleXY(0.75f)
                 this.margin.set(Insets(0f, 0f, 8f, 0f))
             }
-            val sortTypeList = SortType.values().toList()
+            val sortTypeList = SortType.entries
             hbox += ComboBox<SortType>(sortTypeList, currentSort.getOrCompute(), font = font).apply {
                 this.bounds.width.set(180f)
                 this.setScaleXY(0.75f)

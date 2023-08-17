@@ -904,7 +904,7 @@ class TexturePackEditDialog(
                     this.bounds.width.set(200f)
                     this.textColor.set(Color.WHITE.cpy())
                 }
-                bgOptionsBox += ComboBox(PreviewBg.values().toList(), PreviewBg.CHECKERED, font = editorPane.palette.musicDialogFont).apply {
+                bgOptionsBox += ComboBox(PreviewBg.entries, PreviewBg.CHECKERED, font = editorPane.palette.musicDialogFont).apply {
                     this.bounds.width.set(200f)
                     this.itemStringConverter.set(StringConverter { 
                         Localization.getValue(it.localizationKey)

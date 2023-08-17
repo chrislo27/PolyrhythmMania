@@ -8,7 +8,6 @@ enum class ForceTilesetPalette(val jsonId: Int) {
     ;
     
     companion object {
-        val VALUES: List<ForceTilesetPalette> = values().toList()
-        val JSON_MAP: Map<Int, ForceTilesetPalette> = VALUES.associateBy { it.jsonId }
+        val JSON_MAP: Map<Int, ForceTilesetPalette> = entries.associateBy { it.jsonId }
     }
 }

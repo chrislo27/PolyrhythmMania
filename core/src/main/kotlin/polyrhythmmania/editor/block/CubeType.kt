@@ -22,8 +22,7 @@ enum class CubeType(override val jsonId: Int, val character: Char, override val 
     ;
 
     companion object {
-        val VALUES: List<CubeType> = values().toList()
-        val INDEX_MAP: Map<Int, CubeType> = VALUES.associateBy { it.jsonId }
-        val CHAR_MAP: Map<Char, CubeType> = VALUES.associateBy { it.character }
+        val INDEX_MAP: Map<Int, CubeType> = entries.associateBy { it.jsonId }
+        val CHAR_MAP: Map<Char, CubeType> = entries.associateBy { it.character }
     }
 }

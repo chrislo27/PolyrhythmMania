@@ -42,9 +42,6 @@ data class FilterInteger(override val enabled: Boolean, override val filterable:
 
     enum class Op(val symbol: String) {
         EQ("="), GT(">"), LT("<"), GEQ(">="), LEQ("<=");
-        companion object {
-            val VALUES: List<Op> = values().toList()
-        }
     }
 
     override fun filter(levelEntry: LevelEntry.Modern): Boolean {

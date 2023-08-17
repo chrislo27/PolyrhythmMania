@@ -9,7 +9,6 @@ enum class SpotlightActionType(override val jsonId: Int, override val localizati
     ;
 
     companion object {
-        val VALUES: List<SpotlightActionType> = values().toList()
-        val INDEX_MAP: Map<Int, SpotlightActionType> = VALUES.associateBy { it.jsonId }
+        val INDEX_MAP: Map<Int, SpotlightActionType> = entries.associateBy { it.jsonId }
     }
 }

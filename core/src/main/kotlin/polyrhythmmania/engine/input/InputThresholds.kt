@@ -32,7 +32,7 @@ object InputThresholds {
         ).forEach { mode ->
             world.worldMode = mode
             world.resetWorld()
-            val types = InputType.values()
+            val types = InputType.entries
             repeat(60) {
                 types.forEach { t ->
                     engine.inputter.onButtonPressed(false, t)

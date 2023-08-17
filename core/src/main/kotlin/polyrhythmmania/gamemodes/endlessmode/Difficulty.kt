@@ -6,8 +6,4 @@ enum class Difficulty(val value: Int) {
     MEDIUM(2),
     HARD(3),
     ;
-    
-    companion object {
-        val VALUES: List<Difficulty> = values().toList()
-    }
 }

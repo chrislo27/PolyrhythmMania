@@ -315,7 +315,7 @@ class SpotlightEditDialog(
                         this.margin.set(Insets(0f, 0f, 0f, 4f))
                         this.autosizeBehavior.set(TextLabel.AutosizeBehavior.Active(TextLabel.AutosizeBehavior.Dimensions.WIDTH_ONLY))
                     }
-                    this += ComboBox(CopyProperties.values().toList(), copyProperties.getOrCompute(), font = palette.musicDialogFont).apply { 
+                    this += ComboBox(CopyProperties.entries, copyProperties.getOrCompute(), font = palette.musicDialogFont).apply { 
                         this.bounds.width.set(220f)
                         this.itemStringConverter.set { Localization.getValue(it.localizationKey) }
                         this.onItemSelected = {

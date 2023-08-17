@@ -11,10 +11,6 @@ enum class AchievementCategory(val id: String, val iconID: String?) {
     EXTRAS("extras", null),
     ;
     
-    companion object {
-        val VALUES: List<AchievementCategory> = values().toList()
-    }
-    
     fun toLocalizationID(): String = "achievement.category.$id"
     
 }

@@ -87,7 +87,7 @@ class BlockTextbox(engine: Engine)
             ctxmenu.addMenuItem(SeparatorMenuItem())
 
             val editorFlags = editor.flags
-            val allowedStyles = TextBoxStyle.values().filter {
+            val allowedStyles = TextBoxStyle.entries.filter {
                 it.requiredEditorFlags.isEmpty() || editorFlags.containsAll(it.requiredEditorFlags)
             }
             val combobox = ComboBox(allowedStyles, style).also { combobox ->

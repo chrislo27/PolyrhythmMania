@@ -171,7 +171,7 @@ class Editor(
     val autosaveInterval: ReadOnlyVar<Int> get() = settings.editorAutosaveInterval
 
     // Editor objects and state
-    val markerMap: Map<MarkerType, Marker> = MarkerType.VALUES.asReversed().associateWith { Marker(it) }
+    val markerMap: Map<MarkerType, Marker> = MarkerType.entries.asReversed().associateWith { Marker(it) }
     val playbackStart: FloatVar = markerMap.getValue(MarkerType.PLAYBACK_START).beat
     val blocks: List<Block> get() = container.blocks
     val selectedBlocks: Map<Block, Boolean> = WeakHashMap()
@@ -1026,8 +1026,8 @@ class Editor(
                         in Input.Keys.NUM_0..Input.Keys.NUM_9 -> { // 0..9: Tools
                             if (currentClick == Click.None) {
                                 val number = (if (keycode == Input.Keys.NUM_0) 10 else keycode - Input.Keys.NUM_0) - 1
-                                if (number in 0..<Tool.VALUES.size) {
-                                    changeTool(Tool.VALUES.getOrNull(number) ?: Tool.SELECTION)
+                                if (number in 0..<Tool.entries.size) {
+                                    changeTool(Tool.entries.getOrNull(number) ?: Tool.SELECTION)
                                     inputConsumed = true
                                 }
                             }

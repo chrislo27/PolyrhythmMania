@@ -157,7 +157,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
             vbox += createCheckbox("editorSettings.playtestStartsPlay", "editorSettings.playtestStartsPlay.tooltip", settings.kv_editorPlaytestStartsPlay)
             vbox += createCheckbox("editorSettings.arrowKeysLikeScroll", "editorSettings.arrowKeysLikeScroll.tooltip", settings.kv_editorArrowKeysLikeScroll)
             vbox += createCycleOption("editorSettings.cameraPanningSetting", "editorSettings.cameraPanningSetting.tooltip",
-                    settings.kv_editorPanningDuringPlayback, CameraPanningSetting.VALUES,
+                    settings.kv_editorPanningDuringPlayback, CameraPanningSetting.entries,
                     itemToStringBinding = { Localization.getVar(it.localization).use() }).first
             vbox += createCycleOption("editorSettings.autosaveInterval", "editorSettings.autosaveInterval.tooltip",
                     settings.kv_editorAutosaveInterval, Editor.AUTOSAVE_INTERVALS,

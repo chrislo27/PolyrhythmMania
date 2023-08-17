@@ -9,7 +9,6 @@ enum class InputTimingRestriction(val id: Int) {
     ;
     
     companion object {
-        val VALUES: List<InputTimingRestriction> = values().toList()
-        val MAP: Map<Int, InputTimingRestriction> = VALUES.associateBy { it.id }
+        val MAP: Map<Int, InputTimingRestriction> = entries.associateBy { it.id }
     }
 }

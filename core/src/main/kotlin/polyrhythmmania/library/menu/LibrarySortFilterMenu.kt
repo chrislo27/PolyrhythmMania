@@ -131,7 +131,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu,
                     }
                 }
             }
-            val sortables = Sortable.VALUES
+            val sortables = Sortable.entries
             vbox += Pane().apply {
                 this.bounds.height.set(32f * (sortables.size / 3 + 1))
                 val toggleGroup = ToggleGroup()
@@ -228,7 +228,7 @@ class LibrarySortFilterMenu(menuCol: MenuCollection, val library: LibraryMenu,
                                     this.bounds.height.set(32f)
                                     this.spacing.set(8f)
 
-                                    this += ComboBox(FilterInteger.Op.VALUES, filter.op, font = main.fontMainMenuMain).apply {
+                                    this += ComboBox(FilterInteger.Op.entries, filter.op, font = main.fontMainMenuMain).apply {
                                         this.bounds.height.set(32f)
                                         this.bounds.width.set(64f)
                                         this.itemStringConverter.set { it.symbol }

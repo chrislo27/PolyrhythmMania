@@ -89,7 +89,7 @@ class InitialAssetLoader : IAssetLoader {
         ), PackedSheet.Config(padding = 1, maxSize = 512, duplicateBorder = false,
                 atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
         AssetRegistry.loadAssetNoFile<PackedSheet>("ui_icon_editor_curves",
-                PackedSheetLoader.PackedSheetLoaderParam(TransitionCurve.VALUES.map {
+                PackedSheetLoader.PackedSheetLoaderParam(TransitionCurve.entries.map {
                     Packable(it.imageID, "textures/curves/${it.imageID}.png")
                 }, PackedSheet.Config(padding = 0, maxSize = 1024, duplicateBorder = false,
                         atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))

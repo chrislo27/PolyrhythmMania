@@ -68,7 +68,7 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += achvNotifPane
 
-            val (forceTexPackPane, forceTexPackCombobox) = createComboboxOption(ForceTexturePack.VALUES, main.settings.forceTexturePack.getOrCompute(),
+            val (forceTexPackPane, forceTexPackCombobox) = createComboboxOption(ForceTexturePack.entries, main.settings.forceTexturePack.getOrCompute(),
                     { Localization.getVar("mainMenu.graphicsSettings.forceTexturePack").use() },
                     percentageContent = 0.4f, itemToString = { choice ->
                 Localization.getValue("mainMenu.graphicsSettings.forceTexturePack.${
@@ -87,7 +87,7 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             forceTexPackPane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceTexturePack.tooltip")))
             vbox += forceTexPackPane
 
-            val (forcePalettePane, forcePaletteCombobox) = createComboboxOption(ForceTilesetPalette.VALUES, main.settings.forceTilesetPalette.getOrCompute(),
+            val (forcePalettePane, forcePaletteCombobox) = createComboboxOption(ForceTilesetPalette.entries, main.settings.forceTilesetPalette.getOrCompute(),
                     { Localization.getVar("mainMenu.graphicsSettings.forceTilesetPalette").use() },
                     percentageContent = 0.4f, itemToString = { choice ->
                 Localization.getValue("mainMenu.graphicsSettings.forceTilesetPalette.${

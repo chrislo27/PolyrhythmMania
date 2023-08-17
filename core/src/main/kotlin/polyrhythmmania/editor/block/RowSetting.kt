@@ -12,8 +12,7 @@ enum class RowSetting(val jsonId: Int, val stringRepresentation: String) {
     BOTH(2, "${RodinSpecialChars.BORDERED_A}${RodinSpecialChars.BORDERED_DPAD}");
 
     companion object {
-        val VALUES: List<RowSetting> = values().toList()
-        val INDEX_MAP: Map<Int, RowSetting> = VALUES.associateBy { it.jsonId }
+        val INDEX_MAP: Map<Int, RowSetting> = entries.associateBy { it.jsonId }
 
         fun getRows(setting: RowSetting, world: World): List<Row> {
             return when (setting) {

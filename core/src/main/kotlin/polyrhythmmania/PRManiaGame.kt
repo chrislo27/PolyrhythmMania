@@ -234,10 +234,10 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 ach.getLocalizedName().getOrCompute()
                 ach.getLocalizedDesc().getOrCompute()
             }
-            AchievementCategory.VALUES.forEach { cat ->
+            AchievementCategory.entries.forEach { cat ->
                 AchievementsL10N.getValue(cat.toLocalizationID())
             }
-            AchievementRank.values().forEach { rank ->
+            AchievementRank.entries.forEach { rank ->
                 AchievementsL10N.getValue(rank.toAchievementLocalizationID(false))
                 AchievementsL10N.getValue(rank.toAchievementLocalizationID(true))
             }

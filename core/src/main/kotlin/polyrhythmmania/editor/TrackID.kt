@@ -21,9 +21,8 @@ enum class TrackID(val id: String, val deprecatedIDs: List<String>) {
     ;
     
     companion object {
-        val VALUES: List<TrackID> = values().toList()
-        val ID_MAP: Map<String, TrackID> = VALUES.associateBy { it.id }
-        val FULL_ID_MAP: Map<String, TrackID> = VALUES.flatMap { trackID ->
+        val ID_MAP: Map<String, TrackID> = entries.associateBy { it.id }
+        val FULL_ID_MAP: Map<String, TrackID> = entries.flatMap { trackID ->
             listOf(trackID.id to trackID) + trackID.deprecatedIDs.map { id -> id to trackID }
         }.toMap()
     }

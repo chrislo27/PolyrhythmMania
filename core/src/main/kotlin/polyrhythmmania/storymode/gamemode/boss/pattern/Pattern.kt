@@ -38,7 +38,7 @@ data class Pattern(
                 .replace('^', CubeType.PISTON_OPEN.character)
                 .map { c ->
                 CubeType.CHAR_MAP[c]
-                    ?: error("Unknown CubeType character '${c}', accepted: [${CubeType.VALUES.joinToString(separator = ", ") { "'${it}'" }}]")
+                    ?: error("Unknown CubeType character '${c}', accepted: [${CubeType.entries.joinToString(separator = ", ") { "'${it}'" }}]")
             }
         }
     }

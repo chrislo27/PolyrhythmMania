@@ -9,7 +9,6 @@ enum class SpotlightTimingMode(override val jsonId: Int, override val localizati
     ;
 
     companion object {
-        val VALUES: List<SpotlightTimingMode> = values().toList()
-        val INDEX_MAP: Map<Int, SpotlightTimingMode> = VALUES.associateBy { it.jsonId }
+        val INDEX_MAP: Map<Int, SpotlightTimingMode> = entries.associateBy { it.jsonId }
     }
 }

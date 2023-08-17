@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.block.data
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.utils.Align
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.*
 import paintbox.packing.PackedSheet
@@ -94,7 +93,7 @@ class PaletteTransitionData(val defaultValue: PaletteTransition = PaletteTransit
                             this[1] += ColumnarHBox(2, useRows = true).apply {
                                 this.spacing.set(1f)
                                 
-                                val curveCombobox = ComboBox(TransitionCurve.VALUES, paletteTransition.getOrCompute().transitionCurve).also { combobox ->
+                                val curveCombobox = ComboBox(TransitionCurve.entries, paletteTransition.getOrCompute().transitionCurve).also { combobox ->
                                     combobox.markup.set(markup)
                                     combobox.itemStringConverter.set {
                                         Localization.getValue(it.localizationNameKey)

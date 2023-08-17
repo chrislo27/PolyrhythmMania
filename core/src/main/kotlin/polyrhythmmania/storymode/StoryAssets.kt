@@ -86,7 +86,7 @@ class StoryAssetLoader : IAssetLoader {
         StoryAssets.loadAsset<Texture>("desk_bg_tube_1", "story/textures/desk/bg/tube_1.png")
         StoryAssets.loadAsset<Texture>("desk_bg_tube_2", "story/textures/desk/bg/tube_2.png")
         StoryAssets.loadAsset<Texture>("desk_bg_tube_3", "story/textures/desk/bg/tube_3.png")
-        Heading.values().forEach { heading ->
+        Heading.entries.forEach { heading ->
             StoryAssets.loadAsset<Texture>(heading.textureID, "story/textures/desk/heading/${heading.id}.png")
         }
         StoryAssets.loadAsset<Texture>("desk_contract_envelope", "story/textures/desk/contract_envelope.png")

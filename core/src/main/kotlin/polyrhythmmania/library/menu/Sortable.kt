@@ -24,8 +24,4 @@ enum class Sortable(val nameKey: String) {
     LAST_PLAYED("mainMenu.librarySortFilter.sort.lastPlayed"),
     PLAY_COUNT("mainMenu.librarySortFilter.sort.playCount"),
     ;
-    
-    companion object {
-        val VALUES: List<Sortable> = values().toList()
-    }
 }

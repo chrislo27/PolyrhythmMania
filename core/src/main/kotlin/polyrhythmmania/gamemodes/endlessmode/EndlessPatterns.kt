@@ -139,7 +139,7 @@ object EndlessPatterns {
         val cubeTypeLists: List<List<CubeType>> = this.lines().take(2).mapIndexed { lineIndex, line ->
             val list = MutableList(line.length) { CubeType.NONE }
             line.forEachIndexed { index, c ->
-                val cubeType = CubeType.CHAR_MAP[c] ?: error("Unknown CubeType character '${c}', accepted: [${CubeType.VALUES.joinToString(separator = ", ") { "'${it}'" }}]")
+                val cubeType = CubeType.CHAR_MAP[c] ?: error("Unknown CubeType character '${c}', accepted: [${CubeType.entries.joinToString(separator = ", ") { "'${it}'" }}]")
                 list[index] = cubeType
             }
             list

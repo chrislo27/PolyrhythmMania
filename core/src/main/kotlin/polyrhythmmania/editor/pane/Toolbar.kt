@@ -233,7 +233,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
         }
         this += mainSection
 
-        val tools = Tool.VALUES
+        val tools = Tool.entries
         val toolsPane = HBox().apply {
             Anchor.TopRight.configure(this)
             this.align.set(HBox.Align.RIGHT)
@@ -362,7 +362,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                         this.renderAlign.set(Align.right)
                                         this.bounds.width.set(200f)
                                     }
-                                    hb += ComboBox(InputTimingRestriction.VALUES, editor.container.storyModeMetadata.getOrCompute().inputTimingRestriction).also { combobox ->
+                                    hb += ComboBox(InputTimingRestriction.entries, editor.container.storyModeMetadata.getOrCompute().inputTimingRestriction).also { combobox ->
                                         combobox.markup.set(editor.editorPane.palette.markup)
                                         combobox.onItemSelected = {
                                             val old = editor.container.storyModeMetadata.getOrCompute()
@@ -434,7 +434,7 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                                         this.bounds.width.set(250f)
                                         this.tooltipElement.set(editorPane.createDefaultTooltip("The difficulty of the monster goal challenge.\nSets how fast it is."))
                                     }
-                                    hbox += ComboBox(MonsterPresets.VALUES, MonsterPresets.VALUES.find { it.difficulty == editor.container.storyModeMetadata.getOrCompute().monsterDifficulty } ?: MonsterPresets.MEDIUM).also { combobox ->
+                                    hbox += ComboBox(MonsterPresets.entries, MonsterPresets.entries.find { it.difficulty == editor.container.storyModeMetadata.getOrCompute().monsterDifficulty } ?: MonsterPresets.MEDIUM).also { combobox ->
                                         combobox.markup.set(editor.editorPane.palette.markup)
                                         combobox.onItemSelected = {
                                             val old = editor.container.storyModeMetadata.getOrCompute()

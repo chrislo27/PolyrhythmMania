@@ -17,8 +17,7 @@ enum class TextBoxStyle(
     ;
     
     companion object {
-        val VALUES: List<TextBoxStyle> = values().toList()
-        val JSON_MAPPING: Map<Int, TextBoxStyle> = VALUES.associateBy { it.jsonId }
+        val JSON_MAPPING: Map<Int, TextBoxStyle> = entries.associateBy { it.jsonId }
     }
 }
 

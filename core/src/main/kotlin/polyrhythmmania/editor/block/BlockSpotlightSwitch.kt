@@ -28,10 +28,10 @@ class BlockSpotlightSwitch(engine: Engine) : AbstractBlockSpotlight(engine, Bloc
 
     companion object {
         val BLOCK_TYPES: EnumSet<BlockType> = EnumSet.of(BlockType.FX)
-        val ALLOWED_ACTION_TYPES: List<SpotlightActionType> by lazy { SpotlightActionType.VALUES }
+        val ALLOWED_ACTION_TYPES: List<SpotlightActionType> by lazy { SpotlightActionType.entries }
         
         fun addTimingModeToContextMenu(ctxmenu: ContextMenu, editor: Editor, timingMode: Var<SpotlightTimingMode>, tooltipLocalizationKey: String) {
-            val combobox = ComboBox(SpotlightTimingMode.VALUES, timingMode.getOrCompute()).also { combobox ->
+            val combobox = ComboBox(SpotlightTimingMode.entries, timingMode.getOrCompute()).also { combobox ->
                 combobox.markup.set(editor.editorPane.palette.markup)
                 combobox.itemStringConverter.set {
                     Localization.getValue(it.localizationNameKey)
