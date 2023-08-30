@@ -622,7 +622,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 true
         )
         
-        cache["unifont_medium"] = UnifontFactory.createUnifont(fontSize = 24).setAfterLoad(defaultAfterLoad)
+        cache["unifont_medium"] = UnifontFactory().createUnifont(fontSize = 24).setAfterLoad(defaultAfterLoad)
 
         addFontFamily(fontIDPrefix = "editor_Roboto", familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight)
         addFontFamily(fontIDPrefix = "editor_status", familyName = "Roboto", fontSize = 16,
