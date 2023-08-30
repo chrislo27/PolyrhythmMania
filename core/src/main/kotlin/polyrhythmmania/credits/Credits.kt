@@ -65,6 +65,7 @@ object Credits : CreditsBase() {
                     "Open Sans",
                     "Flow Circular",
                     "Share Tech Mono",
+                    "Unifont",
             ).map { Localization.getVar("credits.fontName", Var { listOf(it) }) },
     )
     
