@@ -21,7 +21,19 @@ import kotlin.math.roundToInt
 class StoryModeMusicVolumeWarningMenu(menuCol: MenuCollection, private val continueAction: () -> Unit) : StandardMenu(menuCol) {
 
     private val settings: Settings = menuCol.main.settings
-    val menuMusicVolSlider: Slider = Slider().apply {
+    
+    private val masterVolSlider: Slider = Slider().apply {
+        this.bindWidthToParent(multiplier = 0.85f)
+        this.minimum.set(0f)
+        this.maximum.set(100f)
+        this.tickUnit.set(5f)
+        this.setValue(settings.masterVolumeSetting.getOrCompute().toFloat())
+        this.value.addListener { v ->
+            settings.masterVolumeSetting.set(v.getOrCompute().toInt())
+        }
+        this.tooltipElement.set(createTooltip { "${value.use().roundToInt()}" })
+    }
+    private val menuMusicVolSlider: Slider = Slider().apply {
         this.bindWidthToParent(multiplier = 0.85f)
         this.minimum.set(0f)
         this.maximum.set(100f)
@@ -83,6 +95,7 @@ class StoryModeMusicVolumeWarningMenu(menuCol: MenuCollection, private val conti
                 this.textColor.set(LongButtonSkin.TEXT_COLOR)
             }
             vbox += separator()
+            vbox += createSliderPane(masterVolSlider, percentageContent = 0.6f) { Localization.getVar("mainMenu.audioSettings.masterVol").use() }
             vbox += createSliderPane(menuMusicVolSlider, percentageContent = 0.6f) { Localization.getVar("mainMenu.audioSettings.menuMusicVol").use() }
         }
         
