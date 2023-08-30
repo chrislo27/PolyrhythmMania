@@ -227,6 +227,8 @@ class Editor(
             }
             lastPlacedMetronomeBeat = -1
         }
+        
+        renderer.disableSpotlights.set(false)
     }
 
     init { // This init block should be LAST

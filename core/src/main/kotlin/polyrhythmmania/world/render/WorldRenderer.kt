@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
 import paintbox.Paintbox
+import paintbox.binding.BooleanVar
 import paintbox.framebuffer.FrameBufferManager
 import paintbox.framebuffer.FrameBufferManager.BufferSettings
 import paintbox.registry.AssetRegistry
@@ -18,6 +19,7 @@ import paintbox.util.*
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.intersects
+import polyrhythmmania.PRManiaGame
 import polyrhythmmania.world.World
 import polyrhythmmania.world.WorldType
 import polyrhythmmania.world.entity.Entity
@@ -130,6 +132,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     private val entityLightFrameBuffer: NestedFrameBuffer?
         get() = frameBufferManager.getFramebuffer(2)
 
+    val disableSpotlights: BooleanVar = BooleanVar { use(PRManiaGame.instance.settings.disableSpotlights) }
     
     var entitiesRenderedLastCall: Int = 0
         private set
@@ -243,7 +246,10 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         // Build and render light buffer
         val entityLightFb = entityLightFrameBuffer
         val totalLightFb = totalLightFrameBuffer
-        if (entityLightFb != null && totalLightFb != null && !world.spotlights.isAmbientLightingFull()) { // Full ambient lighting means no lights are visible anyway
+        if (entityLightFb != null && totalLightFb != null
+            && !world.spotlights.isAmbientLightingFull() // Full ambient lighting means no lights are visible anyway
+            && !disableSpotlights.get()
+        ) { 
             val oldSrcFunc = batch.blendSrcFunc
             val oldDstFunc = batch.blendDstFunc
             tmpMatrix.set(batch.projectionMatrix)
