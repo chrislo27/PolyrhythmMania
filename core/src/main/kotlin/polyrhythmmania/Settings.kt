@@ -39,6 +39,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_ACHIEVEMENT_NOTIFICATIONS
 import polyrhythmmania.PreferenceKeys.SETTINGS_AUDIODEVICE_BUFFER_COUNT
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
+import polyrhythmmania.PreferenceKeys.SETTINGS_DISABLE_SPOTLIGHTS
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TEXTURE_PACK
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TILESET_PALETTE
@@ -130,6 +131,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     private val kv_forceTexturePack: KeyValue<ForceTexturePack> = KeyValue(SETTINGS_FORCE_TEXTURE_PACK, ForceTexturePack.NO_FORCE)
     private val kv_forceTilesetPalette: KeyValue<ForceTilesetPalette> = KeyValue(SETTINGS_FORCE_TILESET_PALETTE, ForceTilesetPalette.NO_FORCE)
     private val kv_reducedMotion: KeyValue<Boolean> = KeyValue(SETTINGS_REDUCED_MOTION, false)
+    private val kv_disableSpotlights: KeyValue<Boolean> = KeyValue(SETTINGS_DISABLE_SPOTLIGHTS, false)
     private val kv_lastUpdateNotes: KeyValue<String> = KeyValue(LAST_UPDATE_NOTES, "")
 
     val kv_editorDetailedMarkerUndo: KeyValue<Boolean> = KeyValue(EDITORSETTINGS_DETAILED_MARKER_UNDO, false)
@@ -179,6 +181,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     val forceTexturePack: Var<ForceTexturePack> = kv_forceTexturePack.value
     val forceTilesetPalette: Var<ForceTilesetPalette> = kv_forceTilesetPalette.value
     val reducedMotion: Var<Boolean> = kv_reducedMotion.value
+    val disableSpotlights: Var<Boolean> = kv_disableSpotlights.value
     val lastUpdateNotes: Var<String> = kv_lastUpdateNotes.value
 
     val editorDetailedMarkerUndo: Var<Boolean> = kv_editorDetailedMarkerUndo.value
@@ -263,6 +266,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
             prefs.getForceTilesetPalette(kv_forceTilesetPalette)
         }
         prefs.getBoolean(kv_reducedMotion)
+        prefs.getBoolean(kv_disableSpotlights)
         prefs.getString(kv_lastUpdateNotes)
         
         prefs.getBoolean(kv_editorDetailedMarkerUndo)
@@ -316,6 +320,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
                 .putForceTexturePack(kv_forceTexturePack)
                 .putForceTilesetPalette(kv_forceTilesetPalette)
                 .putBoolean(kv_reducedMotion)
+                .putBoolean(kv_disableSpotlights)
                 .putString(kv_lastUpdateNotes)
 
                 .putBoolean(kv_editorDetailedMarkerUndo)

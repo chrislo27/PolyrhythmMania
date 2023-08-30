@@ -113,6 +113,14 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 main.settings.reducedMotion.set(it)
             }
             vbox += reducedMotionPane
+
+            val (disableSpotlightsPane, disableSpotlightsCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.disableSpotlights").use() })
+            disableSpotlightsCheck.selectedState.set(main.settings.disableSpotlights.getOrCompute())
+            disableSpotlightsCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.disableSpotlights.tooltip")))
+            disableSpotlightsCheck.onCheckChanged = {
+                main.settings.disableSpotlights.set(it)
+            }
+            vbox += disableSpotlightsPane
         }
 
         hbox.temporarilyDisableLayouts {
