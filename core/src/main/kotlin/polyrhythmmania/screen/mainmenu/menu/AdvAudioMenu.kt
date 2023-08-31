@@ -1,5 +1,6 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Audio
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -34,10 +35,30 @@ import kotlin.math.roundToInt
 
 class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
+    companion object {
+        private const val OPENAL_SOFT_ON_PREFIX: String = "OpenAL Soft on "
+    }
+    
+    private data class OpenALOutputDevice(val rawName: String) {
+        
+        companion object {
+            val DEFAULT_DEVICE: OpenALOutputDevice? = null // Null on purpose
+
+            fun getOpenALOutputDevices(): List<OpenALOutputDevice?> {
+                return listOf(DEFAULT_DEVICE) + Gdx.audio.availableOutputDevices.map(::OpenALOutputDevice)
+            }
+        }
+        
+        val readableName: String = rawName.removePrefix(OPENAL_SOFT_ON_PREFIX)
+    }
+    
     private val settings: Settings = menuCol.main.settings
     private val audioDeviceSettingsOverridden = PRMania.audioDeviceSettings != null
     private val soundSystemUpdatedFlag: BooleanVar = BooleanVar(false) // Toggled to indicate a sound system change
     private val doneTextTimer: FloatVar = FloatVar(0f)
+    private val legacyAudioEnabled = BooleanVar { use(settings.useLegacyAudio) }
+    
+    private val openalOutputDevices: Var<List<OpenALOutputDevice?>> = Var(listOf(null))
 
     init {
         this.setSize(MMMenu.WIDTH_MEDIUM)
@@ -66,14 +87,29 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
         
-        val legacyAudioEnabled = BooleanVar { use(settings.useLegacyAudio) }
-        
         val audioSettingsPane = VBox().apply {
             Anchor.TopLeft.configure(this)
             this.spacing.set(0f)
         }
-        
+
         audioSettingsPane.temporarilyDisableLayouts {
+            // OpenAL audio devices
+            val (mixerPane, mixerCombobox) = createComboboxOption(
+                openalOutputDevices.getOrCompute(), OpenALOutputDevice.DEFAULT_DEVICE,
+                { Localization.getVar("mainMenu.advancedAudio.audioDeviceSettings.audioDevice").use() },
+                percentageContent = 0.725f, twoRowsTall = false,
+                itemToString = { device ->
+                    device?.readableName
+                        ?: Localization.getValue("mainMenu.advancedAudio.audioDeviceSettings.audioDevice.default")
+                })
+            mixerCombobox.items.bind { openalOutputDevices.use() }
+            mixerCombobox.font.set(main.fontUnifontMedium)
+            mixerCombobox.setScaleXY(0.75f)
+            mixerCombobox.selectedItem.addListener { dev ->
+                switchOpenALOutputDevice(dev.getOrCompute())
+            }
+            audioSettingsPane += mixerPane
+            
             // Buffer count: Should be disabled if the launch argument --audio-device-buffer-count was set (check PRMania.audioDeviceSettings != null)
             val (bufCountPane, bufCountCombobox) = createComboboxOption((3..30).toList(), settings.audioDeviceSettings.getOrCompute().bufferCount,
                     { Localization.getVar("mainMenu.advancedAudio.audioDeviceSettings.bufferCount").use() },
@@ -112,7 +148,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         audioSettingsPane.sizeHeightToChildren(10f)
         audioSettingsPane.visible.bind { !legacyAudioEnabled.use() }
         
-        // Legacy audio settings
+        //region Legacy audio settings
         
         val legacySettingsPane = VBox().apply {
             Anchor.TopLeft.configure(this)
@@ -122,7 +158,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val mixerHandler = MixerHandler.defaultMixerHandler
         val supportedMixers: MixerHandler.SupportedMixers = mixerHandler.supportedMixers
         supportedMixers.mixers.forEach { mixer ->
-            Paintbox.LOGGER.info("Supported JavaSound mixer: ${mixer.mixerInfo.name}")
+            Paintbox.LOGGER.info("Legacy audio: Supported JavaSound mixer: ${mixer.mixerInfo.name}")
         }
 
         val (mixerPane, mixerCombobox) = createComboboxOption(supportedMixers.mixers, mixerHandler.recommendedMixer,
@@ -143,7 +179,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         legacySettingsPane.sizeHeightToChildren(10f)
         legacySettingsPane.visible.bind { legacyAudioEnabled.use() }
         
-        // End of legacy audio settings
+        //endregion
 
         vbox.temporarilyDisableLayouts {
             vbox += TextLabel(binding = { Localization.getVar("mainMenu.advancedAudio.notice").use() }).apply {
@@ -235,8 +271,14 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
         }
     }
-
-    fun setSoundSystemMixer(newMixer: Mixer) {
+    
+    init {
+        openalOutputDevices.addListener { varr ->
+            Paintbox.LOGGER.info("OpenAL audio: Output devices: ${varr.getOrCompute().drop(1).map { it?.readableName }}")
+        }
+    }
+    
+    private fun setSoundSystemMixer(newMixer: Mixer) {
         if (MixerHandler.defaultMixerHandler.recommendedMixer == newMixer) return
         MixerHandler.defaultMixerHandler.recommendedMixer = newMixer
         restartMainMenuAudio()
@@ -245,7 +287,12 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         Paintbox.LOGGER.info("Now using JavaSound audio system; set JavaSound mixer to $name")
     }
     
-    fun restartMainMenuAudio() {
+    private fun switchOpenALOutputDevice(newDevice: OpenALOutputDevice?) {
+        Gdx.audio.switchOutputDevice(newDevice)
+        Paintbox.LOGGER.info("Switched OpenAL output device to ${newDevice?.rawName ?: "<default device (null)>"}")
+    }
+    
+    private fun restartMainMenuAudio() {
         // Restart the main menu sound system.
         synchronized(mainMenu) {
             val oldMusicPos = mainMenu.soundSys.musicPlayer.position
@@ -268,4 +315,12 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             doneTextTimer.set((timer - Gdx.graphics.deltaTime).coerceAtLeast(0f))
         }
     }
+
+    override fun onMenuEntered() {
+        super.onMenuEntered()
+        openalOutputDevices.set(OpenALOutputDevice.getOpenALOutputDevices())
+    }
+
+    private fun Audio.switchOutputDevice(device: OpenALOutputDevice?): Boolean =
+        Gdx.audio.switchOutputDevice(device?.rawName)
 }
