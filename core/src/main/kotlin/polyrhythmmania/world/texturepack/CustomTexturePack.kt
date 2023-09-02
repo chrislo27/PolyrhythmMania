@@ -84,6 +84,14 @@ class CustomTexturePack(id: String, fallbackID: String)
                 "sign_n_shadow",
                 "sign_ta",
                 "sign_ta_shadow",
+                "sign_p",
+                "sign_p_shadow",
+                "sign_r",
+                "sign_r_shadow",
+                "sign_e",
+                "sign_e_shadow",
+                "sign_s",
+                "sign_s_shadow",
         )
         
         fun textureFilterToID(textureFilter: Texture.TextureFilter): String {

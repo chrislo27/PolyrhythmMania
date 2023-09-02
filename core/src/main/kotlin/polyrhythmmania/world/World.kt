@@ -133,20 +133,37 @@ class World(numOfSpotlights: Int?) {
         val signs = mutableListOf<EntitySign>()
         
         if (!english) {
-            signs += EntitySign(this, symbol).apply {
+            signs += EntitySign(this, symbol, EntitySign.RenderCriteria.ONLY_JP).apply {
                 this.position.set(x, y, z)
             }
-            signs += EntitySign(this, EntitySign.Type.JP_BO).apply {
+            signs += EntitySign(this, EntitySign.Type.JP_BO, EntitySign.RenderCriteria.ONLY_JP).apply {
                 this.position.set(x + 1f, y, z)
             }
-            signs += EntitySign(this, EntitySign.Type.JP_TA).apply {
+            signs += EntitySign(this, EntitySign.Type.JP_TA, EntitySign.RenderCriteria.ONLY_JP).apply {
                 this.position.set(x + 2f, y, z)
             }
-            signs += EntitySign(this, EntitySign.Type.JP_N).apply {
+            signs += EntitySign(this, EntitySign.Type.JP_N, EntitySign.RenderCriteria.ONLY_JP).apply {
                 this.position.set(x + 3f, y, z)
             }
         } else {
-            // TODO
+            signs += EntitySign(this, EntitySign.Type.EN_P, EntitySign.RenderCriteria.ONLY_EN).apply {
+                this.position.set(x, y, z)
+            }
+            signs += EntitySign(this, EntitySign.Type.EN_R, EntitySign.RenderCriteria.ONLY_EN).apply {
+                this.position.set(x + 0.75f * 1, y, z)
+            }
+            signs += EntitySign(this, EntitySign.Type.EN_E, EntitySign.RenderCriteria.ONLY_EN).apply {
+                this.position.set(x + 0.75f * 2, y, z)
+            }
+            signs += EntitySign(this, EntitySign.Type.EN_S, EntitySign.RenderCriteria.ONLY_EN).apply {
+                this.position.set(x + 0.75f * 3, y, z)
+            }
+            signs += EntitySign(this, EntitySign.Type.EN_S, EntitySign.RenderCriteria.ONLY_EN).apply {
+                this.position.set(x + 0.75f * 4, y, z)
+            }
+            signs += EntitySign(this, symbol, EntitySign.RenderCriteria.ONLY_EN).apply {
+                this.position.set(x + 4f, y, z)
+            }
         }
         
         return signs
@@ -207,8 +224,10 @@ class World(numOfSpotlights: Int?) {
             }
 
             // Button signs
-            list.addAll(createSignEntities(7f, 2f, 1f, EntitySign.Type.SYMBOL_A, false))
-            list.addAll(createSignEntities(7f, 2f, -2f, EntitySign.Type.SYMBOL_DPAD, false))
+            listOf(false, true).forEach { english ->
+                list.addAll(createSignEntities(7f, 2f, 1f, EntitySign.Type.SYMBOL_A, english))
+                list.addAll(createSignEntities(7f, 2f, -2f, EntitySign.Type.SYMBOL_DPAD, english))
+            }
 
             list += EntityBackgroundImg(this, EntityBackgroundImg.Layer.FORE).apply {
                 this.position.set(0f, 0f, 11f)
@@ -321,7 +340,9 @@ class World(numOfSpotlights: Int?) {
         })
 
         // Button signs
-        val signs = createSignEntities(3f, 2f, 0f, EntitySign.Type.SYMBOL_A, false)
+        val signs = listOf(false, true).flatMap { english ->
+            createSignEntities(3f, 2f, 0f, EntitySign.Type.SYMBOL_A, english)
+        }
         signs.forEach { sign ->
             addEntity(sign)
         }

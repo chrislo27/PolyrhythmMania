@@ -532,20 +532,37 @@ class PaletteEditDialog(
 
             // Button signs
             val signs = mutableListOf<EntitySign>()
-            signs += EntitySign(world, EntitySign.Type.SYMBOL_A).apply {
+            signs += EntitySign(world, EntitySign.Type.SYMBOL_A, EntitySign.RenderCriteria.ALWAYS).apply {
                 this.position.set(5f, 2f, -3f)
             }
-            signs += EntitySign(world, EntitySign.Type.SYMBOL_DPAD).apply {
+            signs += EntitySign(world, EntitySign.Type.SYMBOL_DPAD, EntitySign.RenderCriteria.ALWAYS).apply {
                 this.position.set(6f, 2f, -3f)
             }
-            signs += EntitySign(world, EntitySign.Type.JP_BO).apply {
+            
+            signs += EntitySign(world, EntitySign.Type.JP_BO, EntitySign.RenderCriteria.ALWAYS).apply {
                 this.position.set(4f, 2f, -2f)
             }
-            signs += EntitySign(world, EntitySign.Type.JP_TA).apply {
+            signs += EntitySign(world, EntitySign.Type.JP_TA, EntitySign.RenderCriteria.ALWAYS).apply {
                 this.position.set(5f, 2f, -2f)
             }
-            signs += EntitySign(world, EntitySign.Type.JP_N).apply {
+            signs += EntitySign(world, EntitySign.Type.JP_N, EntitySign.RenderCriteria.ALWAYS).apply {
                 this.position.set(6f, 2f, -2f)
+            }
+            
+            signs += EntitySign(world, EntitySign.Type.EN_P, EntitySign.RenderCriteria.ALWAYS).apply {
+                this.position.set(3.25f, 2f, -1f)
+            }
+            signs += EntitySign(world, EntitySign.Type.EN_R, EntitySign.RenderCriteria.ALWAYS).apply {
+                this.position.set(3.25f + 0.75f, 2f, -1f)
+            }
+            signs += EntitySign(world, EntitySign.Type.EN_E, EntitySign.RenderCriteria.ALWAYS).apply {
+                this.position.set(3.25f + 0.75f * 2, 2f, -1f)
+            }
+            signs += EntitySign(world, EntitySign.Type.EN_S, EntitySign.RenderCriteria.ALWAYS).apply {
+                this.position.set(3.25f + 0.75f * 3, 2f, -1f)
+            }
+            signs += EntitySign(world, EntitySign.Type.EN_S, EntitySign.RenderCriteria.ALWAYS).apply {
+                this.position.set(3.25f + 0.75f * 4, 2f, -1f)
             }
             signs.forEach { sign ->
                 world.addEntity(sign)
@@ -560,7 +577,8 @@ class PaletteEditDialog(
             val h = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
 
-
+            syncWorldSettings()
+            
             val cam = worldRenderer.camera
             cam.zoom = 1f / 2f
             cam.position.x = 3.5f
@@ -584,6 +602,13 @@ class PaletteEditDialog(
             Matrix4Stack.pop()
             
             batch.packedColor = lastPackedColor
+        }
+        
+        private fun syncWorldSettings() {
+            val editorWorldSettings = editor.world.worldSettings
+            if (this.world.worldSettings != editorWorldSettings) {
+                this.world.worldSettings = editorWorldSettings
+            }
         }
 
         override fun dispose() {

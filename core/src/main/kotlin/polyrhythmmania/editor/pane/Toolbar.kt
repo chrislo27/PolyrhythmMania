@@ -336,9 +336,15 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                     if (editor.allowedToEdit.get()) {
                         editor.attemptOpenGenericContextMenu(ContextMenu().also { ctxmenu ->
                             val currentWorldSettings = editor.world.worldSettings
+                            
                             val showInputIndicatorsVar = BooleanVar(currentWorldSettings.showInputIndicators).apply {
                                 addListener {
                                     editor.world.worldSettings = editor.world.worldSettings.copy(showInputIndicators = it.getOrCompute())
+                                }
+                            }
+                            val useEnglishSignsVar = BooleanVar(currentWorldSettings.useEnglishSigns).apply {
+                                addListener {
+                                    editor.world.worldSettings = editor.world.worldSettings.copy(useEnglishSigns = it.getOrCompute())
                                 }
                             }
 
@@ -347,6 +353,8 @@ class Toolbar(val upperPane: UpperPane) : Pane() {
                             ctxmenu.addMenuItem(SeparatorMenuItem())
                             ctxmenu.addMenuItem(CheckBoxMenuItem.create(showInputIndicatorsVar,
                                     Localization.getValue("editor.dialog.worldSettings.showInputIndicators"), editorPane.palette.markup))
+                            ctxmenu.addMenuItem(CheckBoxMenuItem.create(useEnglishSignsVar,
+                                    Localization.getValue("editor.dialog.worldSettings.useEnglishSigns"), editorPane.palette.markup))
 
                             if (EditorSpecialFlags.STORY_MODE in editor.flags) {
                                 ctxmenu.defaultWidth.set(450f)
