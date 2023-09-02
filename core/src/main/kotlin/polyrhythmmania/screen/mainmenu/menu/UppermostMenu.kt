@@ -173,9 +173,10 @@ class UppermostMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 
                 val checkAccessibilityAction = {
                     val anyAccessibilityOptionsOn =
-                        settings.forceTexturePack.getOrCompute() != ForceTexturePack.NO_FORCE
+                        settings.forceTexturePack.getOrCompute() != ForceTexturePack.NO_FORCE 
                                 || settings.forceTilesetPalette.getOrCompute() != ForceTilesetPalette.NO_FORCE
                                 || settings.reducedMotion.getOrCompute()
+                                || settings.disableSpotlights.getOrCompute()
                     
                     if (anyAccessibilityOptionsOn) {
                         val warningMenu = StoryModeAccessibilityOptionsWarningMenu(menuCol, goToStoryModeAction)
