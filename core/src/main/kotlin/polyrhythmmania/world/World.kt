@@ -128,6 +128,29 @@ class World(numOfSpotlights: Int?) {
     fun triggerWorldResetListeners() {
         worldResetListeners.toList().forEach { it.onWorldReset(this) }
     }
+    
+    private fun createSignEntities(x: Float, y: Float, z: Float, symbol: EntitySign.Type, english: Boolean): List<EntitySign> {
+        val signs = mutableListOf<EntitySign>()
+        
+        if (!english) {
+            signs += EntitySign(this, symbol).apply {
+                this.position.set(x, y, z)
+            }
+            signs += EntitySign(this, EntitySign.Type.JP_BO).apply {
+                this.position.set(x + 1f, y, z)
+            }
+            signs += EntitySign(this, EntitySign.Type.JP_TA).apply {
+                this.position.set(x + 2f, y, z)
+            }
+            signs += EntitySign(this, EntitySign.Type.JP_N).apply {
+                this.position.set(x + 3f, y, z)
+            }
+        } else {
+            // TODO
+        }
+        
+        return signs
+    }
 
     private fun populateRegularScene() {
         clearEntities()
@@ -184,34 +207,8 @@ class World(numOfSpotlights: Int?) {
             }
 
             // Button signs
-            val signs = mutableListOf<EntitySign>()
-            signs += EntitySign(this, EntitySign.Type.SYMBOL_A).apply {
-                this.position.set(7f, 2f, 1f)
-            }
-            signs += EntitySign(this, EntitySign.Type.JP_BO).apply {
-                this.position.set(8f, 2f, 1f)
-            }
-            signs += EntitySign(this, EntitySign.Type.JP_TA).apply {
-                this.position.set(9f, 2f, 1f)
-            }
-            signs += EntitySign(this, EntitySign.Type.JP_N).apply {
-                this.position.set(10f, 2f, 1f)
-            }
-            signs += EntitySign(this, EntitySign.Type.SYMBOL_DPAD).apply {
-                this.position.set(7f, 2f, -2f)
-            }
-            signs += EntitySign(this, EntitySign.Type.JP_BO).apply {
-                this.position.set(8f, 2f, -2f)
-            }
-            signs += EntitySign(this, EntitySign.Type.JP_TA).apply {
-                this.position.set(9f, 2f, -2f)
-            }
-            signs += EntitySign(this, EntitySign.Type.JP_N).apply {
-                this.position.set(10f, 2f, -2f)
-            }
-            signs.forEach { sign ->
-                list += sign
-            }
+            list.addAll(createSignEntities(7f, 2f, 1f, EntitySign.Type.SYMBOL_A, false))
+            list.addAll(createSignEntities(7f, 2f, -2f, EntitySign.Type.SYMBOL_DPAD, false))
 
             list += EntityBackgroundImg(this, EntityBackgroundImg.Layer.FORE).apply {
                 this.position.set(0f, 0f, 11f)
@@ -324,19 +321,7 @@ class World(numOfSpotlights: Int?) {
         })
 
         // Button signs
-        val signs = mutableListOf<EntitySign>()
-        signs += EntitySign(this, EntitySign.Type.SYMBOL_A).apply {
-            this.position.set(3f, 2f, 0f)
-        }
-        signs += EntitySign(this, EntitySign.Type.JP_BO).apply {
-            this.position.set(4f, 2f, 0f)
-        }
-        signs += EntitySign(this, EntitySign.Type.JP_TA).apply {
-            this.position.set(5f, 2f, 0f)
-        }
-        signs += EntitySign(this, EntitySign.Type.JP_N).apply {
-            this.position.set(6f, 2f, 0f)
-        }
+        val signs = createSignEntities(3f, 2f, 0f, EntitySign.Type.SYMBOL_A, false)
         signs.forEach { sign ->
             addEntity(sign)
         }
