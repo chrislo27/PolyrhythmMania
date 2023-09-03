@@ -71,29 +71,36 @@ import kotlin.math.min
  * There are also pre-defined external resources as a utility.
  */
 class Container(
-        val soundSystem: SoundSystem?, timingProvider: TimingProvider,
-        val globalSettings: GlobalContainerSettings
+    val soundSystem: SoundSystem?, timingProvider: TimingProvider,
+    val globalSettings: GlobalContainerSettings,
 ) : Disposable {
 
     companion object {
+
         const val LEVEL_FILE_EXTENSION: String = "prmania"
         const val PROJECT_FILE_EXTENSION: String = "prmproj"
-        const val CONTAINER_VERSION: Int = 12
+        const val CONTAINER_VERSION: Int = 13
 
         const val RES_KEY_COMPRESSED_MUSIC: String = "compressed_music"
-        
-        val DEFAULT_TRACKS_BEFORE_V7: List<String> = listOf("input_0", "input_1", "input_2", "fx_0", "fx_1") // Default tracks indexes for container version 6 and below
-        
+
+        val DEFAULT_TRACKS_BEFORE_V7: List<String> = listOf(
+            "input_0",
+            "input_1",
+            "input_2",
+            "fx_0",
+            "fx_1"
+        ) // Default tracks indexes for container version 6 and below
+
         const val VERSION_LEVEL_METADATA_ADDED: Int = 9
         const val VERSION_EXPORT_STATISTICS_ADDED: Int = 10
         const val VERSION_MULTIPLE_TEX_PACK_ADDED: Int = 12
-        
+
         val MIN_BANNER_SIZE: WindowSize = WindowSize(256, 80)
         val MAX_BANNER_SIZE: WindowSize = WindowSize(512, 160)
-        
+
         fun isBannerTextureWithinSize(tex: Texture): Boolean {
-            return tex.width in Container.MIN_BANNER_SIZE.width..Container.MAX_BANNER_SIZE.width
-                    && tex.height in Container.MIN_BANNER_SIZE.height..Container.MAX_BANNER_SIZE.height
+            return tex.width in MIN_BANNER_SIZE.width..MAX_BANNER_SIZE.width
+                    && tex.height in MIN_BANNER_SIZE.height..MAX_BANNER_SIZE.height
         }
     }
 
@@ -104,34 +111,42 @@ class Container(
     val customTexturePacks: Array<Var<CustomTexturePack?>> = Array(TexturePackSource.CUSTOM_RANGE.last) { Var(null) }
     val texturePackSource: Var<TexturePackSource> = Var(TexturePackSource.StockGBA)
     val renderer: WorldRendererWithUI by lazy {
-        WorldRendererWithUI(world, Tileset(when (globalSettings.forceTexturePack) {
-            ForceTexturePack.NO_FORCE -> this.texturePack
-            ForceTexturePack.FORCE_GBA -> Var(StockTexturePacks.gba)
-            ForceTexturePack.FORCE_HD -> Var(StockTexturePacks.hd)
-            ForceTexturePack.FORCE_ARCADE -> Var(StockTexturePacks.arcade)
-        }).apply { 
+        WorldRendererWithUI(world, Tileset(
+            when (globalSettings.forceTexturePack) {
+                ForceTexturePack.NO_FORCE -> this.texturePack
+                ForceTexturePack.FORCE_GBA -> Var(StockTexturePacks.gba)
+                ForceTexturePack.FORCE_HD -> Var(StockTexturePacks.hd)
+                ForceTexturePack.FORCE_ARCADE -> Var(StockTexturePacks.arcade)
+            }
+        ).apply {
             world.tilesetPalette.applyTo(this)
-        }, engine)
+        }, engine
+        )
     }
-    
+
     private val _blocks: MutableList<Block> = CopyOnWriteArrayList()
     val blocks: List<Block> get() = _blocks
-    
+
     var resultsText: ResultsText = ResultsText.DEFAULT
-    var levelMetadata: LevelMetadata = LevelMetadata.DEFAULT_METADATA.copy(initialCreationDate = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC))
+    var levelMetadata: LevelMetadata = LevelMetadata.DEFAULT_METADATA.copy(
+        initialCreationDate = LocalDateTime.ofInstant(
+            Instant.now(),
+            ZoneOffset.UTC
+        )
+    )
     var wasLevelMetadataLoaded: Boolean = false
         private set
     val trackIDs: List<TrackID> = Editor.DEFAULT_TRACKS.map { it.id } // Intentionally doesn't use editor.tracks
-    
+
     val storyModeMetadata: Var<StoryModeContainerMetadata> = Var(StoryModeContainerMetadata.BLANK)
 
-    
+
     private val _resources: MutableMap<String, ExternalResource> = ConcurrentHashMap()
     val resources: Map<String, ExternalResource> get() = _resources
     var compressedMusic: ExternalResource? = null
         private set
     var bannerTexture: Var<Texture?> = Var(null)
-    
+
     var lastBlockPosition: FloatVar = FloatVar(0f) // Position of very last block
         private set
     var endBlockPosition: FloatVar = FloatVar(Float.POSITIVE_INFINITY) // Position of first End State block
@@ -141,7 +156,7 @@ class Container(
         val endBlockPos = endBlockPosition.use()
         if (endBlockPos < Float.POSITIVE_INFINITY) endBlockPos else lastBlockPosition.use()
     }
-    
+
     init {
         engine.inputter.skillStarGotten.addListener {
             if (it.getOrCompute()) {
@@ -150,21 +165,21 @@ class Container(
         }
         storyModeMetadata.addListener {
             val metadata = it.getOrCompute()
-            
+
             engine.inputter.inputChallenge.restriction = metadata.inputTimingRestriction
-            
+
             val livesMode = engine.modifiers.livesMode
             val lives = metadata.lives
             livesMode.enabled.set(lives > 0)
             livesMode.maxLives.set(lives)
             livesMode.resetState()
-            
+
             val defectiveRodsMode = engine.modifiers.defectiveRodsMode
             val defectiveThreshold = metadata.defectiveRodsThreshold
             defectiveRodsMode.enabled.set(defectiveThreshold > 0)
             defectiveRodsMode.maxLives.set(defectiveThreshold)
             defectiveRodsMode.resetState()
-            
+
             val monsterGoal = engine.modifiers.monsterGoal
             val monsterEnabled = metadata.monsterEnabled
             monsterGoal.enabled.set(monsterEnabled)
@@ -175,20 +190,20 @@ class Container(
             world.resetWorld()
         }
     }
-    
+
     /**
      * Resets all mutable state within this [Container].
      */
     fun resetMutableState() {
         engine.resetMutableState()
         world.resetWorld()
-        
+
         this.globalSettings.applyForcedTilesetPaletteSettings(this)
         this.setTexturePackFromSource()
-        
+
         val blocks = this.blocks.toList()
         engine.addEvents(blocks.flatMap { it.compileIntoEvents() })
-        
+
         resetInputFeedbackEntities()
     }
 
@@ -200,7 +215,7 @@ class Container(
             ent.updateCurrentColor(engine)
         }
     }
-    
+
     fun getTexturePackFromSource(source: TexturePackSource): TexturePack? {
         return when (source) {
             TexturePackSource.StockGBA -> StockTexturePacks.gba
@@ -209,20 +224,26 @@ class Container(
             is TexturePackSource.Custom -> getCustomTexturePackAsCascading(source.id - 1)
         }
     }
-    
+
     fun setTexturePackFromSource(source: TexturePackSource = texturePackSource.getOrCompute()): TexturePack {
         val chosen = getTexturePackFromSource(source) ?: StockTexturePacks.gba
         texturePack.set(chosen)
         return chosen
     }
-    
+
     fun getCustomTexturePackAsCascading(index: Int): CascadingTexturePack? {
         val ctp = customTexturePacks[index].getOrCompute()
         if (ctp != null) {
-            return CascadingTexturePack("cascading_custom", emptySet(),
-                    listOf(ctp, StockTexturePacks.allPacksByIDWithDeprecations[ctp.fallbackID.getOrCompute()] ?: StockTexturePacks.gba))
+            return CascadingTexturePack(
+                "cascading_custom", emptySet(),
+                listOf(
+                    ctp,
+                    StockTexturePacks.allPacksByIDWithDeprecations[ctp.fallbackID.getOrCompute()]
+                        ?: StockTexturePacks.gba
+                )
+            )
         }
-        
+
         return null
     }
 
@@ -253,7 +274,7 @@ class Container(
         val removed = _resources.remove(key)
         removed?.dispose()
     }
-    
+
     fun updateLastPoints() {
         val blocks = this.blocks.sortedBy { it.beat }
         val firstEndBlock: BlockEndState? = blocks.firstOrNull { it is BlockEndState } as? BlockEndState?
@@ -295,7 +316,7 @@ class Container(
         if (engine.metricsEnabled) {
             engine.metricsReporter.report()
         }
-        
+
         soundSystem?.dispose()
         customTexturePacks.forEach { pack ->
             (pack.getOrCompute() as? Disposable)?.disposeQuietly()
@@ -328,11 +349,16 @@ class Container(
 
         // Create manifest
         val jsonObj: JsonObject = Json.`object`()
-        val libraryRelevantData = LibraryRelevantData(CONTAINER_VERSION, PRMania.VERSION,
-                saveOptions.isAutosave, saveOptions.exportStatistics, if (!saveOptions.isProject) UUID.randomUUID() else null,
-                levelMetadata.truncateWithLimits())
+        val libraryRelevantData = LibraryRelevantData(
+            CONTAINER_VERSION,
+            PRMania.VERSION,
+            saveOptions.isAutosave,
+            saveOptions.exportStatistics,
+            if (!saveOptions.isProject) UUID.randomUUID() else null,
+            levelMetadata.truncateWithLimits()
+        )
         libraryRelevantData.writeToManifestJson(jsonObj)
-        
+
         jsonObj.add("resources", Json.`object`().also { obj ->
             obj.add("list", Json.array().also { array ->
                 extResMap.forEach { (res, uuid) ->
@@ -424,22 +450,22 @@ class Container(
 
         jsonObj.add("tilesetConfig", Json.`object`().also { tilesetConfigObj ->
             tilesetConfigObj.add("palette", this.world.tilesetPalette.toJson())
-            
+
             tilesetConfigObj.add("texturePack", Json.`object`().also { texturePackObj ->
                 if (customTexturePacks.any { it.getOrCompute() != null }) {
                     texturePackObj.add("hasCustom", true)
-                    
+
                     // As of container version 12:
                     texturePackObj.add("slotCount", customTexturePacks.size)
                     texturePackObj.add("presentIndices", Json.array().also { arr ->
-                        customTexturePacks.forEachIndexed { index, varr -> 
+                        customTexturePacks.forEachIndexed { index, varr ->
                             if (varr.getOrCompute() != null) {
                                 arr.add(index)
                             }
                         }
                     })
                 }
-                
+
                 val currentTexturePack = texturePack.getOrCompute()
                 val src = texturePackSource.getOrCompute()
                 if (src is TexturePackSource.Custom) {
@@ -451,17 +477,17 @@ class Container(
                 }
             })
         })
-        
+
         val resultsText = this.resultsText
         if (resultsText != ResultsText.DEFAULT) {
             jsonObj.add("resultsText", resultsText.toJson())
         }
-        
+
         val worldSettings = this.world.worldSettings
         if (worldSettings != WorldSettings.DEFAULT) {
             jsonObj.add("worldSettings", worldSettings.toJson())
         }
-        
+
         val storyModeMetadata = this.storyModeMetadata.getOrCompute()
         if (storyModeMetadata != StoryModeContainerMetadata.BLANK) {
             jsonObj.add("storyModeMetadata", storyModeMetadata.toJson())
@@ -490,8 +516,8 @@ class Container(
                     }
                     zip.closeEntry()
                 }
-                
-                customTexturePacks.map { it.getOrCompute() }.forEachIndexed { index, pack -> 
+
+                customTexturePacks.map { it.getOrCompute() }.forEachIndexed { index, pack ->
                     if (pack != null) {
                         val tmp = TempFileUtils.createTempFile("savingtexpack")
                         tmp.outputStream().use { tmpOutputStream ->
@@ -521,7 +547,7 @@ class Container(
                         if (texData.disposePixmap()) {
                             pixmap.disposeQuietly()
                         }
-                        
+
                         zip.putNextEntry(ZipEntry("banner.png"))
                         tmp.inputStream().use { input ->
                             input.copyTo(zip)
@@ -551,36 +577,45 @@ class Container(
 
         val libraryRelevantDataLoad = LibraryRelevantData.fromManifestJson(json, file.lastModified())
         val libraryRelevantData: LibraryRelevantData = libraryRelevantDataLoad.first
-        
+
         val containerVersion: Int = libraryRelevantData.containerVersion
 
         this.wasLevelMetadataLoaded = libraryRelevantDataLoad.second.wasLevelMetadataLoaded
         if (libraryRelevantData.levelMetadata != null) {
             this.levelMetadata = libraryRelevantData.levelMetadata
         }
-        
-        val resourcesMap: Map<String, ResourceTag> = json.get("resources").asObject().get("list").asArray().associate { value ->
-            value as JsonObject
-            val res = ResourceTag(value.getString("key", null), value.getString("uuid", null)!!, value.getString("ext", "tmp"))
-            Pair(res.key, res)
-        }
+
+        val resourcesMap: Map<String, ResourceTag> =
+            json.get("resources").asObject().get("list").asArray().associate { value ->
+                value as JsonObject
+                val res = ResourceTag(
+                    value.getString("key", null),
+                    value.getString("uuid", null)!!,
+                    value.getString("ext", "tmp")
+                )
+                Pair(res.key, res)
+            }
         val engineObj = json.get("engine").asObject()
 
         val tempoObj = engineObj.get("tempo").asObject()
 
         fun JsonObject.decodeTempoChange(): TempoChange {
             val swingObj = this.get("swing")
-            val swing: Swing = if (swingObj != null && swingObj.isObject && EditorSpecialFlags.STORY_MODE in editorFlags) {
-                swingObj as JsonObject
-                Swing(swingObj.getInt("ratio", Swing.STRAIGHT.ratio), swingObj.getFloat("div", Swing.STRAIGHT.division))
-            } else Swing.STRAIGHT
+            val swing: Swing =
+                if (swingObj != null && swingObj.isObject && EditorSpecialFlags.STORY_MODE in editorFlags) {
+                    swingObj as JsonObject
+                    Swing(
+                        swingObj.getInt("ratio", Swing.STRAIGHT.ratio),
+                        swingObj.getFloat("div", Swing.STRAIGHT.division)
+                    )
+                } else Swing.STRAIGHT
             return TempoChange(this.getFloat("beat", 0f), this.getFloat("tempo", 1f), swing)
         }
         engine.tempos.addTempoChange(tempoObj.get("startingTempo").asObject().decodeTempoChange().copy(beat = 0f))
         engine.tempos.addTempoChangesBulk(
-                tempoObj.get("changes").asArray().map { value ->
-                    value.asObject().decodeTempoChange()
-                }
+            tempoObj.get("changes").asArray().map { value ->
+                value.asObject().decodeTempoChange()
+            }
         )
 
         val musicObj = engineObj.get("music").asObject()
@@ -589,17 +624,21 @@ class Container(
             return MusicVolume(this.getFloat("beat", 0f), this.getFloat("width", 0f), this.getInt("vol", 100))
         }
         engine.musicData.volumeMap.addMusicVolumesBulk(
-                volumesObj.asArray().map { value ->
-                    value.asObject().decodeMusicVolume()
-                }
+            volumesObj.asArray().map { value ->
+                value.asObject().decodeMusicVolume()
+            }
         )
         engine.musicData.also { musicData ->
             musicData.firstBeatSec = musicObj.getFloat("firstBeatSec", 0f)
             musicData.musicSyncPointBeat = musicObj.getFloat("musicFirstBeat", 0f)
             musicData.loopParams = LoopParams(
-                    if (musicObj.getBoolean("looping", false)) SamplePlayer.LoopType.LOOP_FORWARDS else SamplePlayer.LoopType.NO_LOOP_FORWARDS,
-                    musicObj.getDouble("loopStartMs", 0.0),
-                    musicObj.getDouble("loopEndMs", 0.0)
+                if (musicObj.getBoolean(
+                        "looping",
+                        false
+                    )
+                ) SamplePlayer.LoopType.LOOP_FORWARDS else SamplePlayer.LoopType.NO_LOOP_FORWARDS,
+                musicObj.getDouble("loopStartMs", 0.0),
+                musicObj.getDouble("loopEndMs", 0.0)
             )
             if (containerVersion >= 6) {
                 val rateField = musicObj.get("rate")?.asFloat()
@@ -611,12 +650,18 @@ class Container(
         if (containerVersion >= 2) {
             val timeSigObj = engineObj.get("timeSignatures").asObject()
             val list = timeSigObj.get("list").asArray()
-            list.forEach { 
+            list.forEach {
                 val obj = it.asObject()
-                engine.timeSignatures.add(TimeSignature(obj.getFloat("beat", 0f), obj.getInt("divisions", 4), obj.getInt("beatUnit", 4)))
+                engine.timeSignatures.add(
+                    TimeSignature(
+                        obj.getFloat("beat", 0f),
+                        obj.getInt("divisions", 4),
+                        obj.getInt("beatUnit", 4)
+                    )
+                )
             }
         }
-        
+
         val customTexturePacksRead: Array<CustomTexturePack.ReadResult?> = Array(this.customTexturePacks.size) { null }
         if (containerVersion >= 3) {
             val tilesetObj = json.get("tilesetConfig")?.asObject()
@@ -634,9 +679,9 @@ class Container(
                         tilesetPalette.fromJson(paletteObj)
                         tilesetPalette.allMappings.forEach { it.enabled.set(true) }
                     }
-                    
+
                     val texturePackObj = tilesetObj.get("texturePack")?.asObject()
-                    if (texturePackObj != null) {                        
+                    if (texturePackObj != null) {
                         when (val source: String = texturePackObj.getString("source", "")) {
                             "stock" -> {
                                 val stockID: String = texturePackObj.getString("stockID", "")
@@ -656,53 +701,63 @@ class Container(
                                     texturePackSource.set(TexturePackSource.StockGBA)
                                 }
                             }
+
                             "custom" -> {
                                 // index is present as of container version 12
                                 if (containerVersion >= VERSION_MULTIPLE_TEX_PACK_ADDED) {
-                                    texturePackSource.set(TexturePackSource.Custom((texturePackObj.get("srcIndex").asInt() + 1).coerceIn(TexturePackSource.CUSTOM_RANGE)))
+                                    texturePackSource.set(
+                                        TexturePackSource.Custom(
+                                            (texturePackObj.get("srcIndex")
+                                                .asInt() + 1).coerceIn(TexturePackSource.CUSTOM_RANGE)
+                                        )
+                                    )
                                 } else {
                                     texturePackSource.set(TexturePackSource.Custom(1)) // Default to first pack for older levels
                                 }
                             }
+
                             else -> {
                                 // Ignore texture packs. Just use default GBA
                                 Paintbox.LOGGER.warn("[Container] Unknown tilesetConfig.texturePack.source '${source}', skipping")
                                 texturePackSource.set(TexturePackSource.StockGBA)
                             }
                         }
-                        
+
                         val hasCustomPack = texturePackObj.get("hasCustom")?.asBoolean() == true
                         if (containerVersion < VERSION_MULTIPLE_TEX_PACK_ADDED && hasCustomPack) {
-                            zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack.zip")).use { zipInputStream ->
-                                val tempFile = TempFileUtils.createTempFile("extres", ".zip")
-                                val out = tempFile.outputStream()
-                                zipInputStream.copyTo(out)
-                                val f = ZipFile(tempFile)
-                                val readResult = CustomTexturePack.readFromStream(f)
-                                customTexturePacksRead[0] = readResult
-                                tempFile.delete()
-                            }
+                            zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack.zip"))
+                                .use { zipInputStream ->
+                                    val tempFile = TempFileUtils.createTempFile("extres", ".zip")
+                                    val out = tempFile.outputStream()
+                                    zipInputStream.copyTo(out)
+                                    val f = ZipFile(tempFile)
+                                    val readResult = CustomTexturePack.readFromStream(f)
+                                    customTexturePacksRead[0] = readResult
+                                    tempFile.delete()
+                                }
                         } else if (containerVersion >= VERSION_MULTIPLE_TEX_PACK_ADDED && hasCustomPack) {
                             val slotCount = texturePackObj.get("slotCount").asInt()
                             val presentIndicesArr = texturePackObj.get("presentIndices").asArray()
-                            val presentIndices: Set<Int> = presentIndicesArr.filter { it.isNumber }.map { it.asInt() }.toSet()
+                            val presentIndices: Set<Int> =
+                                presentIndicesArr.filter { it.isNumber }.map { it.asInt() }.toSet()
                             for (i in 0..<min(slotCount, this.customTexturePacks.size)) {
                                 if (i in presentIndices) {
-                                    zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack_${i}.zip")).use { zipInputStream ->
-                                        val tempFile = TempFileUtils.createTempFile("extres", ".zip")
-                                        val out = tempFile.outputStream()
-                                        zipInputStream.copyTo(out)
-                                        val f = ZipFile(tempFile)
-                                        val readResult = CustomTexturePack.readFromStream(f)
-                                        customTexturePacksRead[i] = readResult
-                                        tempFile.delete()
-                                    }
+                                    zipFile.getInputStream(zipFile.getFileHeader("res/texture_pack_${i}.zip"))
+                                        .use { zipInputStream ->
+                                            val tempFile = TempFileUtils.createTempFile("extres", ".zip")
+                                            val out = tempFile.outputStream()
+                                            zipInputStream.copyTo(out)
+                                            val f = ZipFile(tempFile)
+                                            val readResult = CustomTexturePack.readFromStream(f)
+                                            customTexturePacksRead[i] = readResult
+                                            tempFile.delete()
+                                        }
                                 }
                             }
                         }
                     }
                 }
-                
+
                 world.tilesetPalette.applyTo(renderer.tileset)
             }
         }
@@ -774,7 +829,7 @@ class Container(
             engine.musicData.beadsMusic = newMusic
             engine.musicData.update()
         }
-        
+
         var levelBannerFile: File? = null
         val bannerHeader = zipFile.getFileHeader("banner.png")
         if (bannerHeader != null) {
@@ -785,18 +840,18 @@ class Container(
                 levelBannerFile = tempFile
             }
         }
-        
+
         zipFile.closeQuietly()
 
         return LoadMetadata(this, libraryRelevantData, customTexturePacksRead, levelBannerFile)
     }
 
     class LoadMetadata(
-            val container: Container, val libraryRelevantData: LibraryRelevantData,
-            val customTexturePacksRead: Array<CustomTexturePack.ReadResult?>,
-            val levelBannerFile: File?
+        val container: Container, val libraryRelevantData: LibraryRelevantData,
+        val customTexturePacksRead: Array<CustomTexturePack.ReadResult?>,
+        val levelBannerFile: File?,
     ) {
-        
+
         val containerVersion: Int = libraryRelevantData.containerVersion
         val programVersion: Version = libraryRelevantData.programVersion
         val isFutureVersion: Boolean = (programVersion > PRMania.VERSION) || (containerVersion > CONTAINER_VERSION)
@@ -805,14 +860,14 @@ class Container(
          * Must be called on the GL thread.
          */
         fun loadOnGLThread() {
-            customTexturePacksRead.forEachIndexed { index, readResult -> 
+            customTexturePacksRead.forEachIndexed { index, readResult ->
                 if (readResult != null) {
                     val ctp = readResult.createAndLoadTextures()
                     container.customTexturePacks[index].set(ctp)
                 }
             }
             container.setTexturePackFromSource()
-            
+
             if (levelBannerFile != null) {
                 try {
                     val tex = Texture(FileHandle(levelBannerFile))
