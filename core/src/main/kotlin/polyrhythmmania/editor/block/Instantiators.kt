@@ -198,6 +198,13 @@ object Instantiators {
                 BlockTextbox.BLOCK_TYPES) { engine ->
             BlockTextbox(engine)
         })
+        add(CATEGORY_FX, Instantiator("subtitle", BlockSubtitle::class.java,
+                Localization.getVar("instantiator.subtitle.name"),
+                Localization.getVar("instantiator.subtitle.summary"),
+                Localization.getVar("instantiator.subtitle.desc"),
+                BlockSubtitle.BLOCK_TYPES) { engine ->
+            BlockSubtitle(engine)
+        })
         add(CATEGORY_FX, Instantiator("songInfoCard", BlockSongInfoCard::class.java,
                 Localization.getVar("instantiator.songInfoCard.name"),
                 Localization.getVar("instantiator.songInfoCard.summary"),

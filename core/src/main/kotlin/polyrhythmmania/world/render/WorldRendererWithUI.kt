@@ -74,6 +74,8 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
     }
 
+    data class CurrentSubtitle(val text: String, val secondsEnd: Float)
+
     val uiCamera: OrthographicCamera = OrthographicCamera().apply {
         setToOrtho(false, 1280f, 720f)
         update()
@@ -997,10 +999,13 @@ duration: ${monster.activeDuration.get()} sec
             this.margin.set(Insets(32f, 64f + 32f + 8f))
         }
         
+        private val currentSubtitle: Var<CurrentSubtitle?> = Var(null)
         private val textLabel: TextLabel
         
         init {
-            textLabel = TextLabel("", font = PRManiaGame.instance.fontGameUIText).apply {
+            textLabel = TextLabel(binding = {
+                currentSubtitle.use()?.text ?: ""
+            }, font = PRManiaGame.instance.fontGameUIText).apply {
                 this.textAlign.set(TextAlign.CENTRE)
                 this.renderAlign.set(RenderAlign.bottom)
                 this.textColor.set(Color.WHITE)
@@ -1009,13 +1014,20 @@ duration: ${monster.activeDuration.get()} sec
             uiElement += textLabel
         }
         
+        fun setCurrentSubtitle(currentSubtitle: CurrentSubtitle?) {
+            this.currentSubtitle.set(currentSubtitle)
+        }
+        
         override fun renderUI(batch: SpriteBatch) {
-            // TODO tick
+            val subtitle = currentSubtitle.getOrCompute()
+            if (subtitle != null && engine.seconds >= subtitle.secondsEnd) {
+                setCurrentSubtitle(null)
+            }
         }
 
         override fun onWorldReset(world: World) {
             super.onWorldReset(world)
-            // TODO reset
+            setCurrentSubtitle(null)
         }
     }
     
