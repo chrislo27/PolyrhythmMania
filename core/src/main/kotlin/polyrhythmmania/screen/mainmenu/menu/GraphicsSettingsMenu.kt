@@ -1,8 +1,10 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import paintbox.binding.Var
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
+import paintbox.ui.control.Slider
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
@@ -10,11 +12,23 @@ import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
+import kotlin.math.roundToInt
 
 
 class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
     private val settings: Settings = menuCol.main.settings
+    
+    private val subtitleOpacitySlider: Slider = Slider().apply {
+        this.bindWidthToParent(multiplier = 0.85f)
+        this.minimum.set(0f)
+        this.maximum.set(100f)
+        this.tickUnit.set(10f)
+        this.setValue(settings.subtitleOpacity.getOrCompute().toFloat())
+        this.value.addListener { v ->
+            settings.subtitleOpacity.set(v.getOrCompute().toInt())
+        }
+    }
 
     init {
         this.setSize(MMMenu.WIDTH_MEDIUM)
@@ -55,20 +69,20 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
         vbox.temporarilyDisableLayouts {
             val (flipPane, flipCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.mainMenuFlipAnimation").use() })
-            flipCheck.selectedState.set(main.settings.mainMenuFlipAnimation.getOrCompute())
+            flipCheck.selectedState.set(settings.mainMenuFlipAnimation.getOrCompute())
             flipCheck.onCheckChanged = {
-                main.settings.mainMenuFlipAnimation.set(it)
+                settings.mainMenuFlipAnimation.set(it)
             }
             vbox += flipPane
             
             val (achvNotifPane, achvNotifCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.achievementNotifs").use() })
-            achvNotifCheck.selectedState.set(main.settings.achievementNotifications.getOrCompute())
+            achvNotifCheck.selectedState.set(settings.achievementNotifications.getOrCompute())
             achvNotifCheck.onCheckChanged = {
-                main.settings.achievementNotifications.set(it)
+                settings.achievementNotifications.set(it)
             }
             vbox += achvNotifPane
 
-            val (forceTexPackPane, forceTexPackCombobox) = createComboboxOption(ForceTexturePack.entries, main.settings.forceTexturePack.getOrCompute(),
+            val (forceTexPackPane, forceTexPackCombobox) = createComboboxOption(ForceTexturePack.entries, settings.forceTexturePack.getOrCompute(),
                     { Localization.getVar("mainMenu.graphicsSettings.forceTexturePack").use() },
                     percentageContent = 0.4f, itemToString = { choice ->
                 Localization.getValue("mainMenu.graphicsSettings.forceTexturePack.${
@@ -82,12 +96,12 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             })
             forceTexPackCombobox.setScaleXY(0.75f)
             forceTexPackCombobox.selectedItem.addListener { 
-                main.settings.forceTexturePack.set(it.getOrCompute())
+                settings.forceTexturePack.set(it.getOrCompute())
             }
             forceTexPackPane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceTexturePack.tooltip")))
             vbox += forceTexPackPane
 
-            val (forcePalettePane, forcePaletteCombobox) = createComboboxOption(ForceTilesetPalette.entries, main.settings.forceTilesetPalette.getOrCompute(),
+            val (forcePalettePane, forcePaletteCombobox) = createComboboxOption(ForceTilesetPalette.entries, settings.forceTilesetPalette.getOrCompute(),
                     { Localization.getVar("mainMenu.graphicsSettings.forceTilesetPalette").use() },
                     percentageContent = 0.4f, itemToString = { choice ->
                 Localization.getValue("mainMenu.graphicsSettings.forceTilesetPalette.${
@@ -101,26 +115,34 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             })
             forcePaletteCombobox.setScaleXY(0.75f)
             forcePaletteCombobox.selectedItem.addListener { 
-                main.settings.forceTilesetPalette.set(it.getOrCompute())
+                settings.forceTilesetPalette.set(it.getOrCompute())
             }
             forcePalettePane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceTilesetPalette.tooltip")))
             vbox += forcePalettePane
 
             val (reducedMotionPane, reducedMotionCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.reducedMotion").use() })
-            reducedMotionCheck.selectedState.set(main.settings.reducedMotion.getOrCompute())
+            reducedMotionCheck.selectedState.set(settings.reducedMotion.getOrCompute())
             reducedMotionCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.reducedMotion.tooltip")))
             reducedMotionCheck.onCheckChanged = {
-                main.settings.reducedMotion.set(it)
+                settings.reducedMotion.set(it)
             }
             vbox += reducedMotionPane
 
             val (disableSpotlightsPane, disableSpotlightsCheck) = createCheckboxOption({ Localization.getVar("mainMenu.graphicsSettings.disableSpotlights").use() })
-            disableSpotlightsCheck.selectedState.set(main.settings.disableSpotlights.getOrCompute())
+            disableSpotlightsCheck.selectedState.set(settings.disableSpotlights.getOrCompute())
             disableSpotlightsCheck.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.disableSpotlights.tooltip")))
             disableSpotlightsCheck.onCheckChanged = {
-                main.settings.disableSpotlights.set(it)
+                settings.disableSpotlights.set(it)
             }
             vbox += disableSpotlightsPane
+            
+            vbox += createSliderPane(subtitleOpacitySlider, percentageContent = 0.6f) {
+                Localization.getVar("mainMenu.graphicsSettings.subtitleOpacity", Var { 
+                    listOf(subtitleOpacitySlider.value.use().roundToInt().toString())
+                }).use()
+            }.apply { 
+                this.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.subtitleOpacity.tooltip")))
+            }
         }
 
         hbox.temporarilyDisableLayouts {

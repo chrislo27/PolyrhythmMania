@@ -54,6 +54,7 @@ object PreferenceKeys {
     val SETTINGS_FORCE_TILESET_PALETTE = "settings_forceTilesetPalette"
     val SETTINGS_REDUCED_MOTION = "settings_reducedMotion"
     val SETTINGS_DISABLE_SPOTLIGHTS = "settings_disableSpotlights"
+    val SETTINGS_SUBTITLE_OPACITY = "settings_subtitleOpacity"
     
     val EDITORSETTINGS_DETAILED_MARKER_UNDO = "editorsettings_detailed_marker_undo"
     val EDITORSETTINGS_CAMERA_PAN_ON_DRAG_EDGE = "editorsettings_camera_pan_on_drag_edge"

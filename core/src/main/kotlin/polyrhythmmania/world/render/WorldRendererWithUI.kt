@@ -999,6 +999,7 @@ duration: ${monster.activeDuration.get()} sec
             this.margin.set(Insets(32f, 64f + 32f + 8f))
         }
         
+        val textOpacity: FloatVar = FloatVar { use(PRManiaGame.instance.settings.subtitleOpacity) / 100f }
         private val currentSubtitle: Var<CurrentSubtitle?> = Var(null)
         private val textLabel: TextLabel
         
@@ -1010,6 +1011,7 @@ duration: ${monster.activeDuration.get()} sec
                 this.renderAlign.set(RenderAlign.bottom)
                 this.textColor.set(Color.WHITE)
                 this.markup.set(subtitlesMarkup)
+                this.opacity.bind { textOpacity.use() }
             }
             uiElement += textLabel
         }

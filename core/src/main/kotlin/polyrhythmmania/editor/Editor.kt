@@ -235,6 +235,7 @@ class Editor(
         }
         
         renderer.disableSpotlights.set(false)
+        renderer.subtitlesRendering.textOpacity.bind { (use(main.settings.subtitleOpacity) / 100f).coerceAtLeast(0.5f) }
     }
 
     init { // This init block should be LAST
