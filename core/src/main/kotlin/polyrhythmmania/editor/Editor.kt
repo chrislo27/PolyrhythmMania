@@ -139,11 +139,17 @@ class Editor(
     val inputKeymapKeyboard: InputKeymapKeyboard = settings.inputKeymapKeyboard.getOrCompute()
 
     // Default markup used for blocks, bold is inverted
-    val blockMarkup: Markup = Markup.createWithBoldItalic(main.fontEditorBoldBordered, main.fontEditorBordered,
-            main.fontEditorItalicBordered, main.fontEditorBoldItalicBordered, additionalMappings = mapOf(
+    val blockMarkup: Markup = Markup.createWithBoldItalic(
+        main.fontEditorBoldBordered,
+        main.fontEditorBordered,
+        main.fontEditorItalicBordered,
+        main.fontEditorBoldItalicBordered,
+        additionalMappings = mapOf(
             "rodin" to main.fontEditorRodinBordered,
             "prmania_icons" to main.fontIcons,
-    ))
+        ),
+        lenientMode = true
+    )
 
     val tracks: List<Track> = when {
         EditorSpecialFlags.STORY_MODE in flags -> STORY_TRACKS
