@@ -98,6 +98,10 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     private val baseMarkup: Markup = Markup(markupFontMapping, TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
     private val textboxMonoMarkup: Markup = Markup(markupFontMapping + Pair("regular", PRManiaGame.instance.fontGameTextbox),
             TextRun(PRManiaGame.instance.fontGameTextboxMono, ""), lenientMode = true)
+    private val subtitlesMarkup: Markup = Markup(mapOf(
+        "prmania_icons" to PRManiaGame.instance.fontIcons,
+        "unifont" to PRManiaGame.instance.fontUnifontTextboxBordered,
+    ), TextRun(PRManiaGame.instance.fontGameUIText, ""), lenientMode = true)
     
     val endlessModeRendering: EndlessModeRendering
     private val livesModeRendering: LivesModeRendering
@@ -106,6 +110,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     private val perfectRendering: PerfectRendering
     val songCardRendering: SongCardRendering
     private val skillStarRendering: SkillStarRendering
+    val subtitlesRendering: SubtitlesRendering
     private val textboxRendering: TextBoxRendering
     val monsterGoalRendering: MonsterGoalRendering
     private val storyBossRendering: StoryBossRendering
@@ -141,6 +146,9 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         
         this.skillStarRendering = this.SkillStarRendering()
         uiSceneRoot += this.skillStarRendering.uiElement
+
+        this.subtitlesRendering = this.SubtitlesRendering()
+        uiSceneRoot += this.subtitlesRendering.uiElement
         
         // "Game Over" pane must be on top of other UI elements, but below the text box
         uiSceneRoot += this.endlessModeRendering.endlessModeGameOverPane
@@ -148,10 +156,12 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         this.textboxRendering = this.TextBoxRendering()
         uiSceneRoot += this.textboxRendering.uiElement
         
-        
-        this.allInnerRenderers = listOf(endlessModeRendering, livesModeRendering, defectiveRodsModeRendering,
-                practiceRendering, perfectRendering, songCardRendering, skillStarRendering, textboxRendering,
-                monsterGoalRendering, storyBossRendering)
+
+        this.allInnerRenderers = listOf(
+            endlessModeRendering, livesModeRendering, defectiveRodsModeRendering,
+            practiceRendering, perfectRendering, songCardRendering, skillStarRendering, subtitlesRendering,
+            textboxRendering, monsterGoalRendering, storyBossRendering
+        )
     }
 
     override fun onWorldReset(world: World) {
@@ -239,6 +249,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         textboxRendering.renderUI(batch)
         perfectRendering.renderUI(batch)
         songCardRendering.renderUI(batch)
+        subtitlesRendering.renderUI(batch)
         practiceRendering.renderUI(batch)
         livesModeRendering.renderUI(batch)
         defectiveRodsModeRendering.renderUI(batch)
@@ -977,6 +988,34 @@ duration: ${monster.activeDuration.get()} sec
             super.onWorldReset(world)
             songTitleCard.reset()
             songArtistCard.reset()
+        }
+    }
+    
+    inner class SubtitlesRendering : InnerRendering() {
+        
+        override val uiElement: UIElement = Pane().apply {
+            this.margin.set(Insets(32f, 64f + 32f + 8f))
+        }
+        
+        private val textLabel: TextLabel
+        
+        init {
+            textLabel = TextLabel("", font = PRManiaGame.instance.fontGameUIText).apply {
+                this.textAlign.set(TextAlign.CENTRE)
+                this.renderAlign.set(RenderAlign.bottom)
+                this.textColor.set(Color.WHITE)
+                this.markup.set(subtitlesMarkup)
+            }
+            uiElement += textLabel
+        }
+        
+        override fun renderUI(batch: SpriteBatch) {
+            // TODO tick
+        }
+
+        override fun onWorldReset(world: World) {
+            super.onWorldReset(world)
+            // TODO reset
         }
     }
     
