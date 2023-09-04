@@ -93,6 +93,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
             "mainmenu_thin" to PRManiaGame.instance.fontMainMenuThin,
             "mainmenu_heading" to PRManiaGame.instance.fontMainMenuHeading,
             "mainmenu_rodin" to PRManiaGame.instance.fontMainMenuRodin,
+            "unifont" to PRManiaGame.instance.fontUnifontTextbox,
     )
     private val baseMarkup: Markup = Markup(markupFontMapping, TextRun(PRManiaGame.instance.fontGameTextbox, ""), lenientMode = true)
     private val textboxMonoMarkup: Markup = Markup(markupFontMapping + Pair("regular", PRManiaGame.instance.fontGameTextbox),

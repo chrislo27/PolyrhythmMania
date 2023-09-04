@@ -103,8 +103,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         ?: Localization.getValue("mainMenu.advancedAudio.audioDeviceSettings.audioDevice.default")
                 })
             mixerCombobox.items.bind { openalOutputDevices.use() }
-            mixerCombobox.font.set(main.fontUnifontMedium)
-            mixerCombobox.setScaleXY(0.75f)
+            mixerCombobox.font.set(main.fontUnifontMainMenu)
             mixerCombobox.selectedItem.addListener { dev ->
                 switchOpenALOutputDevice(dev.getOrCompute())
             }
@@ -167,8 +166,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         mixerPane.label.textAlign.set(TextAlign.CENTRE)
         mixerPane.label.renderAlign.set(Align.center)
         mixerPane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.advancedAudio.legacyOutputInterface.tooltip")))
-        mixerCombobox.font.set(main.fontUnifontMedium)
-        mixerCombobox.setScaleXY(0.75f)
+        mixerCombobox.font.set(main.fontUnifontMainMenu)
         mixerCombobox.selectedItem.addListener { m ->
             setSoundSystemMixer(m.getOrCompute())
         }

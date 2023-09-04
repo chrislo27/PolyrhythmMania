@@ -622,7 +622,15 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 true
         )
         
-        cache["unifont_medium"] = UnifontFactory().createUnifont(fontSize = 24).setAfterLoad(defaultAfterLoad)
+        cache["unifont_main_menu"] = UnifontFactory()
+            .createUnifont(fontSize = 18)
+            .setAfterLoad(defaultAfterLoad)
+        cache["unifont_textbox"] = UnifontFactory()
+            .createUnifont(fontSize = 48)
+            .setAfterLoad(defaultAfterLoad)
+        cache["unifont_textbox_BORDERED"] = UnifontFactory()
+            .createUnifont(fontSize = 48, borderWidth = 3f)
+            .setAfterLoad(defaultAfterLoad)
 
         addFontFamily(fontIDPrefix = "editor_Roboto", familyName = "Roboto", hinting = FreeTypeFontGenerator.Hinting.Slight)
         addFontFamily(fontIDPrefix = "editor_status", familyName = "Roboto", fontSize = 16,
@@ -856,7 +864,9 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
 
     val fontIcons: PaintboxFont get() = fontCache["prmania_icons"]
     
-    val fontUnifontMedium: PaintboxFont get() = fontCache["unifont_medium"]
+    val fontUnifontMainMenu: PaintboxFont get() = fontCache["unifont_main_menu"]
+    val fontUnifontTextbox: PaintboxFont get() = fontCache["unifont_textbox"]
+    val fontUnifontTextboxBordered: PaintboxFont get() = fontCache["unifont_textbox_BORDERED"]
     
     val fontEditor: PaintboxFont get() = fontCache["editor_Roboto"]
     val fontEditorBold: PaintboxFont get() = fontCache["editor_Roboto_BOLD"]
