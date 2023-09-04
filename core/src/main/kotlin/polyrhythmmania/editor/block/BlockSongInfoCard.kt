@@ -11,14 +11,14 @@ import paintbox.ui.contextmenu.*
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
+import paintbox.util.DecimalFormats
 import polyrhythmmania.Localization
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.LevelMetadata
 import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
-import paintbox.util.DecimalFormats
-import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.world.render.WorldRendererWithUI
 import java.util.*
 import kotlin.math.min
@@ -142,7 +142,6 @@ class BlockSongInfoCard(engine: Engine) : Block(engine, BlockSongInfoCard.BLOCK_
                             this += TextField(font = editor.main.fontEditorRodin).apply {
                                 this.textColor.set(Color(1f, 1f, 1f, 1f))
                                 this.text.set(this@BlockSongInfoCard.customText)
-                                this.canInputNewlines.set(true)
                                 this.text.addListener { t ->
                                     if (hasFocus.get()) {
                                         this@BlockSongInfoCard.customText = t.getOrCompute()
