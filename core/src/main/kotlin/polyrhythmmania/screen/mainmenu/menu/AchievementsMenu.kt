@@ -22,6 +22,7 @@ import paintbox.util.DecimalFormats
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
+import polyrhythmmania.PRManiaLocalePicker
 import polyrhythmmania.achievements.*
 import polyrhythmmania.achievements.ui.Toast
 import polyrhythmmania.ui.PRManiaSkins
@@ -300,7 +301,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         } 
         viewingCategory.addListener(updateCategoryTrigger)
         currentSort.addListener(updateCategoryTrigger)
-        AchievementsL10N.currentBundle.addListener(updateCategoryTrigger)
+        PRManiaLocalePicker.currentLocale.addListener(updateCategoryTrigger)
         compactMode.addListener(updateCategoryTrigger)
         
         
