@@ -51,6 +51,7 @@ import polyrhythmmania.init.InitialAssetLoader
 import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
+import polyrhythmmania.screen.mainmenu.menu.UpdateNotesL10N
 import polyrhythmmania.solitaire.SolitaireAssetLoader
 import polyrhythmmania.solitaire.SolitaireAssets
 import polyrhythmmania.statistics.GlobalStats

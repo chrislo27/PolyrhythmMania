@@ -3,15 +3,16 @@ package polyrhythmmania.statistics
 import paintbox.binding.ReadOnlyIntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
-import paintbox.i18n.LocalizationBase
+import paintbox.i18n.ILocalization
 import polyrhythmmania.Localization
 
 open class LocalizedStatFormatter(
-        val localizationKey: String,
-        val localizationBase: LocalizationBase = Localization
+    val localizationKey: String,
+    val localizationBase: ILocalization = Localization,
 ) : StatFormatter {
 
     companion object {
+
         val DEFAULT: LocalizedStatFormatter = LocalizedStatFormatter("statistics.formatter.default", Localization)
     }
 

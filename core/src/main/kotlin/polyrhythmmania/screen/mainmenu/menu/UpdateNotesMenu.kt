@@ -1,5 +1,6 @@
 package polyrhythmmania.screen.mainmenu.menu
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.ReadOnlyVar
@@ -13,10 +14,13 @@ import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
+import polyrhythmmania.PRManiaLocalizationBase
 import polyrhythmmania.Settings
-import polyrhythmmania.UpdateNotesL10N
 import polyrhythmmania.ui.PRManiaSkins
 
+
+object UpdateNotesL10N
+    : PRManiaLocalizationBase(Gdx.files.internal("localization/update_notes"))
 
 class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 

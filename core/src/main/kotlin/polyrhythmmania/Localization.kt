@@ -2,6 +2,7 @@ package polyrhythmmania
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import paintbox.i18n.ILocalizationWithBundle
 import paintbox.i18n.LocalePickerBase
 import paintbox.i18n.LocalizationBase
 
@@ -13,11 +14,11 @@ object PRManiaLocalePicker : LocalePickerBase(
 )
 
 
-abstract class PRManiaLocalizationBase(baseHandle: FileHandle, localePicker: LocalePickerBase)
-    : LocalizationBase(baseHandle, localePicker)
+abstract class PRManiaLocalizationBase(baseHandle: FileHandle)
+    : LocalizationBase(baseHandle, PRManiaLocalePicker)
 
-object Localization
-    : PRManiaLocalizationBase(LocalizationBase.DEFAULT_BASE_HANDLE, PRManiaLocalePicker)
+object BaseLocalization
+    : PRManiaLocalizationBase(LocalizationBase.DEFAULT_BASE_HANDLE)
 
-object UpdateNotesL10N
-    : PRManiaLocalizationBase(Gdx.files.internal("localization/update_notes"), PRManiaLocalePicker)
+object Localization : ILocalizationWithBundle by BaseLocalization
+
