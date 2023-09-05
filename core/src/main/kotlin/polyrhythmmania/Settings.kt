@@ -256,7 +256,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
 
 
     init {
-        LocalePicker.currentLocale.addListener {
+        PRManiaLocalePicker.currentLocale.addListener {
             val locale = it.getOrCompute()
             this.locale.set(locale.locale.toString())
         }
@@ -383,7 +383,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     }
 
     fun setStartupSettings(game: PRManiaGame) {
-        LocalePicker.attemptToSetNamedLocale(this.locale.getOrCompute())
+        PRManiaLocalePicker.attemptToSetNamedLocale(this.locale.getOrCompute())
 
         Paintbox.LOGGER.info("Using ${if (useLegacyAudio.getOrCompute()) "legacy" else "OpenAL"} sound system")
         // Set correct JavaSound mixer

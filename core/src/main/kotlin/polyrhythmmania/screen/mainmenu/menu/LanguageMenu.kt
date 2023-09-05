@@ -8,7 +8,7 @@ import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import polyrhythmmania.LocalePicker
+import polyrhythmmania.PRManiaLocalePicker
 import polyrhythmmania.Localization
 import polyrhythmmania.credits.Credits
 import polyrhythmmania.ui.PRManiaSkins
@@ -65,12 +65,12 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 this.setScaleXY(0.75f)
             }
 
-            val locales = LocalePicker.namedLocales
-            val (comboboxPane, combobox) = createComboboxOption(locales, LocalePicker.currentLocale.getOrCompute(), {
+            val locales = PRManiaLocalePicker.namedLocales
+            val (comboboxPane, combobox) = createComboboxOption(locales, PRManiaLocalePicker.currentLocale.getOrCompute(), {
                 Localization.getVar("mainMenu.language.title").use()
             }, itemToString = { it.name }, percentageContent = 0.6f)
             combobox.onItemSelected = { newItem ->
-                LocalePicker.currentLocale.set(newItem)
+                PRManiaLocalePicker.currentLocale.set(newItem)
             }
             vbox += comboboxPane
             
@@ -80,7 +80,7 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         b.namedLocale.locale.language == ""
                     }?.allKeys?.size ?: 0
                 }
-                val currentLocale = LocalePicker.currentLocale.use()
+                val currentLocale = PRManiaLocalePicker.currentLocale.use()
                 when (currentLocale.locale.language) {
                     "", "en" -> {
                         // Note: This text is intentionally not localized
