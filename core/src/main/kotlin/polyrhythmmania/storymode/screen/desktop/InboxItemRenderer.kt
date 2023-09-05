@@ -20,9 +20,9 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.GdxDelayedRunnable
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Requester
 import polyrhythmmania.storymode.inbox.IContractDoc
 import polyrhythmmania.storymode.inbox.InboxItem
@@ -84,7 +84,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                 paper.paperPane += VBox().apply {
                     this.spacing.set(1f * UI_SCALE)
                     this.temporarilyDisableLayouts {
-                        this += TextLabel(StoryL10N.getVar("inboxItem.memo.heading"), font = main.fontMainMenuHeading).apply {
+                        this += TextLabel(Localization.getVar("inboxItem.memo.heading"), font = main.fontMainMenuHeading).apply {
                             this.bounds.height.set(9f * UI_SCALE)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.topLeft)
@@ -101,7 +101,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                             fun addField(index: Int, fieldName: String, valueField: String, valueMarkup: Markup? = null) {
                                 this[index] += Pane().apply {
                                     this.margin.set(Insets(0.5f * UI_SCALE, 0f))
-                                    this += TextLabel(StoryL10N.getVar("inboxItem.memo.${fieldName}"), font = main.fontRobotoBold).apply {
+                                    this += TextLabel(Localization.getVar("inboxItem.memo.${fieldName}"), font = main.fontRobotoBold).apply {
                                         this.textColor.set(Color.BLACK)
                                         this.renderAlign.set(Align.left)
                                         this.padding.set(Insets(2f, 2f, 0f, 10f))
@@ -147,7 +147,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                 paper.paperPane += VBox().apply {
                     this.spacing.set(1f * UI_SCALE)
                     this.temporarilyDisableLayouts {
-                        this += TextLabel(StoryL10N.getVar("inboxItem.infoMaterial.heading"), font = main.fontMainMenuHeading).apply {
+                        this += TextLabel(Localization.getVar("inboxItem.infoMaterial.heading"), font = main.fontMainMenuHeading).apply {
                             this.bounds.height.set(9f * UI_SCALE)
                             this.textColor.set(Color.BLACK)
                             this.renderAlign.set(Align.top)
@@ -166,7 +166,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                         this.bounds.height.set(rowHeight)
                                         this.margin.set(Insets(0.5f * UI_SCALE, 0f))
                                         this += TextLabel({
-                                            "[b]${StoryL10N.getVar("inboxItem.infoMaterial.${key}").use()}[] ${value.use()}"
+                                            "[b]${Localization.getVar("inboxItem.infoMaterial.${key}").use()}[] ${value.use()}"
                                         }, font = main.fontRobotoBold).apply {
                                             this.markup.set(slabMarkup)
                                             this.textColor.set(Color.BLACK)
@@ -316,7 +316,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                             this.bounds.height.set(12f * UI_SCALE)
                             this.padding.set(Insets(0f, 2f * UI_SCALE, 0f, 0f))
 
-                            this += TextLabel(StoryL10N.getVar("inboxItem.employmentContract.heading"), font = main.fontMainMenuHeading).apply {
+                            this += TextLabel(Localization.getVar("inboxItem.employmentContract.heading"), font = main.fontMainMenuHeading).apply {
                                 this.textColor.set(Color.BLACK)
                                 this.renderAlign.set(Align.bottom)
                                 this.setScaleXY(0.8f)
@@ -375,7 +375,7 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                                 this.color.bind { color.use() }
                             })
                         }
-                        this += TextLabel(StoryL10N.getVar("inboxItem.employmentContract.clickToSign")).apply {
+                        this += TextLabel(Localization.getVar("inboxItem.employmentContract.clickToSign")).apply {
                             Anchor.TopCentre.configure(this, offsetY = { bounds.height.use() })
                             this.visible.bind { isHovered.use() }
                             this.markup.set(robotoItalicMarkup)

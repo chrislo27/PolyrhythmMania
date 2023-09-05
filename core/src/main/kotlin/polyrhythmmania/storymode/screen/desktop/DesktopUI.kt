@@ -28,9 +28,9 @@ import paintbox.util.gdxutils.isAltDown
 import paintbox.util.gdxutils.isControlDown
 import paintbox.util.gdxutils.isShiftDown
 import paintbox.util.wave.WaveUtils
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.inbox.*
@@ -115,7 +115,7 @@ class DesktopUI(
             }
         }
         bgElement = Pane().apply {
-            this += Button(StoryL10N.getVar("desktop.menu"), font = main.fontRobotoBold).apply {
+            this += Button(Localization.getVar("desktop.menu"), font = main.fontRobotoBold).apply {
                 this.bounds.width.set(24f * UI_SCALE)
                 this.bounds.height.set(11f * UI_SCALE)
                 this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
@@ -615,7 +615,7 @@ class DesktopUI(
 
                         is InboxItem.Memo -> {
                             if (!myInboxItemState.use().newIndicator) {
-                                StoryL10N.getVar("inboxItem.memo.listingSubtitle", Var {
+                                Localization.getVar("inboxItem.memo.listingSubtitle", Var {
                                     listOf(inboxItem.shortFrom.use())
                                 }).use()
                             } else ""
@@ -623,13 +623,13 @@ class DesktopUI(
 
                         is InboxItem.RobotTest -> {
                             if (!myInboxItemState.use().newIndicator) {
-                                StoryL10N.getVar("inboxItem.robotTest.listingSubtitle", Var {
+                                Localization.getVar("inboxItem.robotTest.listingSubtitle", Var {
                                     listOf(inboxItem.listingSubtitle.use())
                                 }).use()
                             } else ""
                         }
                         
-                        is InboxItem.InfoMaterial -> StoryL10N.getVar("inboxItem.infoMaterial.heading").use()
+                        is InboxItem.InfoMaterial -> Localization.getVar("inboxItem.infoMaterial.heading").use()
 
                         else -> ""
                     }
@@ -714,7 +714,7 @@ class DesktopUI(
             }
             contentPane += image
             contentPane += TextLabel(binding = {
-                (if (isFollowingAvailable.use()) heading.text else StoryL10N.getVar("inboxItem.heading.notUnlockedYet")).use()
+                (if (isFollowingAvailable.use()) heading.text else Localization.getVar("inboxItem.heading.notUnlockedYet")).use()
             }, font = main.fontMainMenuHeading).apply {
                 this.bindWidthToParent(multiplier = 0.75f)
                 this.textColor.bind { grey.use() }

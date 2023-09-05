@@ -20,7 +20,6 @@ import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.screen.StoryCreditsScreen
 import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
 import polyrhythmmania.ui.PRManiaSkins
@@ -53,7 +52,7 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
             this.doClipping.set(true)
             this.spacing.set(3f * UI_SCALE)
 
-            this += TextLabel(StoryL10N.getVar("desktop.menu"), font = main.fontMainMenuHeading).apply {
+            this += TextLabel(Localization.getVar("desktop.menu"), font = main.fontMainMenuHeading).apply {
                 this.bounds.height.set(10f * UI_SCALE)
                 this.textColor.set(Color.WHITE)
                 this.renderAlign.set(RenderAlign.center)
@@ -71,7 +70,7 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
                     attemptClose()
                 }
             }
-            this += Button(StoryL10N.getVar("desktop.menu.quitToTitle")).apply {
+            this += Button(Localization.getVar("desktop.menu.quitToTitle")).apply {
                 this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_LIGHT)
                 this.markup.set(robotoRegularMarkup)
                 this.bounds.height.set(14f * UI_SCALE)
@@ -116,7 +115,7 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
             
             // Audio settings
             fun addAudioSettings() {
-                this += TextLabel(StoryL10N.getVar("desktop.menu.settings.audio"), font = main.fontMainMenuHeading).apply {
+                this += TextLabel(Localization.getVar("desktop.menu.settings.audio"), font = main.fontMainMenuHeading).apply {
                     this.bounds.height.set(7f * UI_SCALE)
                     this.textColor.set(Color.WHITE)
                     this.renderAlign.set(RenderAlign.center)
@@ -142,7 +141,7 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
                                     this.setValue(resetValue.toFloat())
                                 }
                             }
-                            this += TextLabel(StoryL10N.getVar("desktop.menu.settings.audio.settingLabel", Var.bind {
+                            this += TextLabel(Localization.getVar("desktop.menu.settings.audio.settingLabel", Var.bind {
                                 listOf(Localization.getVar(nameKey).use(), slider.value.use().toInt())
                             })).apply {
                                 this.markup.set(robotoRegularMarkup)
@@ -172,7 +171,7 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
             }
             
             val vbox = this
-            this += Button(StoryL10N.getVar("desktop.menu.settings.audio")).apply {
+            this += Button(Localization.getVar("desktop.menu.settings.audio")).apply {
                 this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_LIGHT)
                 this.markup.set(robotoRegularMarkup)
                 this.bounds.height.set(10f * UI_SCALE)

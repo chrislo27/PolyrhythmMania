@@ -26,6 +26,7 @@ import paintbox.ui.layout.ColumnarVBox
 import paintbox.ui.layout.HBox
 import paintbox.util.gdxutils.grey
 import paintbox.util.gdxutils.isShiftDown
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
@@ -34,7 +35,6 @@ import polyrhythmmania.editor.EditorSpecialFlags
 import polyrhythmmania.editor.EditorSpecialParams
 import polyrhythmmania.engine.input.Challenges
 import polyrhythmmania.gamemodes.GameMode
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.contract.Contracts
@@ -209,8 +209,8 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                                         InboxItem.Debug("debug2a", "3rd item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 4th item are COMPLETED"),
                                         InboxItem.Debug("debug2b", "4th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER, "This unlocks the 5th item once this and 3rd item are COMPLETED"),
                                         InboxItem.Debug("debug3", "5th item", InboxItem.Debug.DebugSubtype.PROGRESSION_ADVANCER),
-                                        InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
-                                        InboxItem.ContractDoc(Contract("debugcontract_2", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
+                                        InboxItem.ContractDoc(Contract("debugcontract_1", Localization.getVar("test.name"), Localization.getVar("test.listingName"), Localization.getVar("test.desc"), Localization.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
+                                        InboxItem.ContractDoc(Contract("debugcontract_2", Localization.getVar("test.name"), Localization.getVar("test.listingName"), Localization.getVar("test.desc"), Localization.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
                                 ))
                                 val progression = Progression(listOf(
                                         UnlockStage.singleItem("debug0", UnlockStageChecker.alwaysUnlocked(), stageID = "stage0"),
@@ -309,8 +309,8 @@ class TestStoryGimmickDebugScreen(main: PRManiaGame, val storySession: StorySess
                         this.bounds.height.set(32f)
                         this.setOnAction {
                             val inboxItems = InboxItems(listOf(
-                                    InboxItem.ContractDoc(Contract("debugcontract_1", StoryL10N.getVar("test.name"), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
-                                    InboxItem.ContractDoc(Contract("debugcontract_2", "TRAINING-099".toConstVar(), StoryL10N.getVar("test.listingName"), StoryL10N.getVar("test.desc"), StoryL10N.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory), subtype = ContractSubtype.TRAINING),
+                                    InboxItem.ContractDoc(Contract("debugcontract_1", Localization.getVar("test.name"), Localization.getVar("test.listingName"), Localization.getVar("test.desc"), Localization.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory)),
+                                    InboxItem.ContractDoc(Contract("debugcontract_2", "TRAINING-099".toConstVar(), Localization.getVar("test.listingName"), Localization.getVar("test.desc"), Localization.getVar("test.tagline"), Requester("test"), JingleType.GBA, null, 60, gamemodeFactory = Contracts["fillbots"].gamemodeFactory), subtype = ContractSubtype.TRAINING),
                                     InboxItem.Memo("test_memo", true, true)
                             ))
                             val progression = Progression(listOf(

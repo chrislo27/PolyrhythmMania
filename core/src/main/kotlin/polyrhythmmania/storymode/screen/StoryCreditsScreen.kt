@@ -21,10 +21,10 @@ import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.storymode.StoryCredits
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.screen.desktop.DesktopStyledPane
 import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
@@ -62,7 +62,7 @@ class StoryCreditsScreen(main: PRManiaGame, val storySession: StorySession, val 
 
             this.textureToUse = DesktopStyledPane.DEFAULT_TEXTURE_TO_USE_DARK
 
-            this += Button(StoryL10N.getVar("credits.advance"), font = main.fontMainMenuMain).apply {
+            this += Button(Localization.getVar("credits.advance"), font = main.fontMainMenuMain).apply {
                 this.setOnAction {
                     main.playMenuSfx(AssetRegistry.get<Sound>("sfx_pause_exit"))
                     onExit()
@@ -73,7 +73,7 @@ class StoryCreditsScreen(main: PRManiaGame, val storySession: StorySession, val 
         val pane = Pane().apply {
             this.bindHeightToParent(adjust = -32f * UI_SCALE)
 
-            this += TextLabel(StoryL10N.getVar("credits.heading"), font = main.fontMainMenuHeading).apply {
+            this += TextLabel(Localization.getVar("credits.heading"), font = main.fontMainMenuHeading).apply {
                 this.bounds.height.set(12f * UI_SCALE)
                 this.textColor.set(HEADING_TEXT_COLOR)
                 this.renderAlign.set(RenderAlign.center)

@@ -22,10 +22,10 @@ import paintbox.ui.animation.Animation
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.util.gdxutils.GdxDelayedRunnable
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.screen.desktop.DesktopUI.Companion.UI_SCALE
 
@@ -101,7 +101,7 @@ class PostBossCutsceneScreen(
         }
         parent += imageWindow
         
-        parent += TextLabel("${StoryL10N.getValue("cutscene.postboss.clickToAdvance")}\n${if (isSkippable) StoryL10N.getValue("cutscene.postboss.skipPrompt", Input.Keys.toString(SKIP_KEY)) else ""}", font = main.fontRobotoItalic).apply { 
+        parent += TextLabel("${Localization.getValue("cutscene.postboss.clickToAdvance")}\n${if (isSkippable) Localization.getValue("cutscene.postboss.skipPrompt", Input.Keys.toString(SKIP_KEY)) else ""}", font = main.fontRobotoItalic).apply { 
             Anchor.BottomCentre.configure(this)
             this.renderAlign.set(RenderAlign.top)
             this.textAlign.set(TextAlign.CENTRE)

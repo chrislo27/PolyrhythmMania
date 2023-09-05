@@ -37,13 +37,11 @@ import paintbox.util.gdxutils.*
 import polyrhythmmania.achievements.AchievementCategory
 import polyrhythmmania.achievements.AchievementRank
 import polyrhythmmania.achievements.Achievements
-import polyrhythmmania.achievements.AchievementsL10N
 import polyrhythmmania.achievements.ui.AchievementsUIOverlay
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.manifest.SaveOptions
 import polyrhythmmania.discord.DiscordRichPresence
 import polyrhythmmania.editor.EditorScreen
-import polyrhythmmania.editor.help.EditorHelpLocalization
 import polyrhythmmania.engine.input.InputThresholds
 import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.init.AssetRegistryLoadingScreen
@@ -51,13 +49,11 @@ import polyrhythmmania.init.InitialAssetLoader
 import polyrhythmmania.init.TilesetAssetLoader
 import polyrhythmmania.screen.CrashScreen
 import polyrhythmmania.screen.mainmenu.MainMenuScreen
-import polyrhythmmania.screen.mainmenu.menu.UpdateNotesL10N
 import polyrhythmmania.solitaire.SolitaireAssetLoader
 import polyrhythmmania.solitaire.SolitaireAssets
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.storymode.StoryAssetLoader
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.music.StoryMusicAssets
 import polyrhythmmania.storymode.screen.EarlyAccessMsgOnBottom
 import polyrhythmmania.ui.PRManiaSkins
@@ -138,7 +134,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     override fun create() {
         super.create()
         PRManiaGame.instance = this
-        this.reloadableLocalizationInstances = listOf(Localization, EditorHelpLocalization, AchievementsL10N, UpdateNotesL10N, StoryL10N)
+        this.reloadableLocalizationInstances = listOf(Localization)
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         GLFW.glfwSetWindowAspectRatio(windowHandle, 16, 9)
         
@@ -237,11 +233,11 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 ach.getLocalizedDesc().getOrCompute()
             }
             AchievementCategory.entries.forEach { cat ->
-                AchievementsL10N.getValue(cat.toLocalizationID())
+                Localization.getValue(cat.toLocalizationID())
             }
             AchievementRank.entries.forEach { rank ->
-                AchievementsL10N.getValue(rank.toAchievementLocalizationID(false))
-                AchievementsL10N.getValue(rank.toAchievementLocalizationID(true))
+                Localization.getValue(rank.toAchievementLocalizationID(false))
+                Localization.getValue(rank.toAchievementLocalizationID(true))
             }
         }
         

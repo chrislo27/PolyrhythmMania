@@ -1,7 +1,7 @@
 package polyrhythmmania.storymode.contract
 
 import paintbox.binding.ReadOnlyVar
-import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.Localization
 
 
 class Requester(val id: String, val isNameLong: Boolean = false) {
@@ -31,6 +31,6 @@ class Requester(val id: String, val isNameLong: Boolean = false) {
         val TOSS_BOYS: Requester = Requester("toss_boys", false)
     }
     
-    val localizedName: ReadOnlyVar<String> by lazy { StoryL10N.getVar("inboxItem.contract.requester.$id") }
+    val localizedName: ReadOnlyVar<String> by lazy { Localization.getVar("inboxItem.contract.requester.$id") }
     
 }

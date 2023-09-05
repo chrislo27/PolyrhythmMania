@@ -20,10 +20,22 @@ abstract class PRManiaLocalizationBase(baseHandle: FileHandle)
 private object BaseLocalization
     : PRManiaLocalizationBase(Gdx.files.internal("localization/default"))
 
+private object EditorHelpL10N
+    : PRManiaLocalizationBase(Gdx.files.internal("localization/editor_help"))
+
+private object AchievementsL10N
+    : PRManiaLocalizationBase(Gdx.files.internal("localization/achievements"))
+
+private object UpdateNotesL10N
+    : PRManiaLocalizationBase(Gdx.files.internal("localization/update_notes"))
+
+private object StoryL10N
+    : PRManiaLocalizationBase(Gdx.files.internal("localization/story_mode"))
+
 object Localization : LocalizationGroup(PRManiaLocalePicker, listOf(
     BaseLocalization,
-//    EditorHelpLocalization,
-//    AchievementsL10N,
-//    UpdateNotesL10N,
-//    StoryL10N,
+    EditorHelpL10N,
+    AchievementsL10N,
+    UpdateNotesL10N,
+    StoryL10N,
 ))

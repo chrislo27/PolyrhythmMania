@@ -24,7 +24,6 @@ import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySavefile
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.inbox.InboxDB
@@ -102,7 +101,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                 this.opacity.bind { Interpolation.exp10.apply(0f, 1f, fullTitleTransition.use()) }
                 this.visible.bind { titleLogic.fullTitle.use() }
 
-                this += TextLabel(StoryL10N.getVar("titleScreen.clickAnywhereToContinue"), font = main.fontMainMenuHeadingBordered).apply {
+                this += TextLabel(Localization.getVar("titleScreen.clickAnywhereToContinue"), font = main.fontMainMenuHeadingBordered).apply {
                     Anchor.Centre.configure(this)
                     this.renderAlign.set(RenderAlign.center)
                     this.bounds.height.set(64f)
@@ -301,7 +300,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
 
             val filePane = Pane()
             this += filePane
-            filePane += TextLabel(StoryL10N.getVar("titleScreen.file.fileNumber", Var {
+            filePane += TextLabel(Localization.getVar("titleScreen.file.fileNumber", Var {
                 listOf(savefileStateVar.use().number)
             }), main.fontRobotoBold).apply {
                 this.bounds.x.set(3f * UI_SCALE)
@@ -334,35 +333,35 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                         }
                         val playTimeStat = savefileState.savefile.playTime
                         val playTimeFormatted = playTimeStat.formatter.format(playTimeStat.value).use()
-                        "${StoryL10N.getVar("titleScreen.file.contractsCompleted", listOf(numContractsCompleted)).use()}\n[color=#444444 scale=0.875]${playTimeFormatted}[]"
+                        "${Localization.getVar("titleScreen.file.contractsCompleted", listOf(numContractsCompleted)).use()}\n[color=#444444 scale=0.875]${playTimeFormatted}[]"
                     }
-                    is StorySavefile.LoadedState.FailedToLoad -> StoryL10N.getVar("titleScreen.file.failedToLoad").use()
-                    is StorySavefile.LoadedState.NoSavefile -> StoryL10N.getVar("titleScreen.file.noData").use()
+                    is StorySavefile.LoadedState.FailedToLoad -> Localization.getVar("titleScreen.file.failedToLoad").use()
+                    is StorySavefile.LoadedState.NoSavefile -> Localization.getVar("titleScreen.file.noData").use()
                 }
             }
             filePane += TextLabel(binding = {
                 when (val op = currentOperation.use()) {
                     is Operation.Copy -> {
                         if (op.fromNumber == savefileStateVar.use().number) {
-                            StoryL10N.getVar("titleScreen.file.operation.copy.source").use()
+                            Localization.getVar("titleScreen.file.operation.copy.source").use()
                         } else {
                             val canCopyHere = savefileStateVar.use() is StorySavefile.LoadedState.NoSavefile
                             if (!canCopyHere) {
-                                StoryL10N.getVar("titleScreen.file.operation.copy.dest.cannot").use()
+                                Localization.getVar("titleScreen.file.operation.copy.dest.cannot").use()
                             } else regularLabelText.use()
                         }
                     }
                     is Operation.Delete -> {
                         if (op.fromNumber == savefileStateVar.use().number) {
-                            StoryL10N.getVar("titleScreen.file.operation.delete.confirm").use()
+                            Localization.getVar("titleScreen.file.operation.delete.confirm").use()
                         } else ""
                     }
                     is Operation.Move -> {
                         if (op.fromNumber == savefileStateVar.use().number) {
-                            StoryL10N.getVar("titleScreen.file.operation.move.source").use()
+                            Localization.getVar("titleScreen.file.operation.move.source").use()
                         } else {
                             val isThisEmpty = savefileStateVar.use() is StorySavefile.LoadedState.NoSavefile
-                            StoryL10N.getVar(if (isThisEmpty) "titleScreen.file.operation.move.dest.doesNotExist" else "titleScreen.file.operation.move.dest.exists").use()
+                            Localization.getVar(if (isThisEmpty) "titleScreen.file.operation.move.dest.doesNotExist" else "titleScreen.file.operation.move.dest.exists").use()
                         }
                     }
                     Operation.None -> regularLabelText.use()
@@ -385,7 +384,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
             }
 
             val playButton = Button(binding = {
-                StoryL10N.getVar(when (savefileStateVar.use()) {
+                Localization.getVar(when (savefileStateVar.use()) {
                     is StorySavefile.LoadedState.NoSavefile -> "titleScreen.file.start"
                     else -> "titleScreen.file.play"
                 }).use()
@@ -420,7 +419,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                 }
             }
             filePane += cancelOperationButton
-            val copyHereOperationButton = Button(StoryL10N.getVar("titleScreen.file.operation.copy.action"), main.fontRobotoBoldItalic).apply {
+            val copyHereOperationButton = Button(Localization.getVar("titleScreen.file.operation.copy.action"), main.fontRobotoBoldItalic).apply {
                 this.bounds.x.set(21f * UI_SCALE)
                 this.bounds.y.set(37f * UI_SCALE)
                 this.applyBottomButtonStyling()
@@ -448,7 +447,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
             }
             filePane += copyHereOperationButton
             val moveHereOperationButton = Button(binding = {
-                StoryL10N.getVar(if (savefileStateVar.use() is StorySavefile.LoadedState.NoSavefile)
+                Localization.getVar(if (savefileStateVar.use() is StorySavefile.LoadedState.NoSavefile)
                     "titleScreen.file.operation.move.action.move"
                 else "titleScreen.file.operation.move.action.swap").use()
             }, main.fontRobotoBoldItalic).apply {
@@ -514,7 +513,7 @@ class TitleUI(private val titleLogic: TitleLogic, val sceneRoot: SceneRoot) {
                         currentOperation.set(Operation.None)
                     }
                 }
-                this += Button(StoryL10N.getVar("titleScreen.file.operation.delete.action"), main.fontRobotoBoldItalic).apply {
+                this += Button(Localization.getVar("titleScreen.file.operation.delete.action"), main.fontRobotoBoldItalic).apply {
                     this.applyBottomButtonStyling()
                     this.bounds.width.set(28f * UI_SCALE)
 

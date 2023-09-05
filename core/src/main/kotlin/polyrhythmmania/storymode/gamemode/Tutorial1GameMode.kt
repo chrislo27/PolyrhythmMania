@@ -2,6 +2,7 @@ package polyrhythmmania.storymode.gamemode
 
 import com.badlogic.gdx.Input
 import net.beadsproject.beads.ugens.SamplePlayer
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.Block
 import polyrhythmmania.editor.block.BlockTextbox
@@ -17,7 +18,6 @@ import polyrhythmmania.gamemodes.SidemodeAssets
 import polyrhythmmania.gamemodes.practice.*
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.LoopParams
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.world.*
 import polyrhythmmania.world.entity.EntityPiston
 
@@ -76,37 +76,37 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 0f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text1a")
+                this.text = Localization.getValue("textbox.tutorial1.text1a")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 1f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text1b")
+                this.text = Localization.getValue("textbox.tutorial1.text1b")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 2f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text1c")
+                this.text = Localization.getValue("textbox.tutorial1.text1c")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 3f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text1e")
+                this.text = Localization.getValue("textbox.tutorial1.text1e")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 4f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text1f")
+                this.text = Localization.getValue("textbox.tutorial1.text1f")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 6f
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text2", keyboardKeymap.toDpadString())
+                this.text = Localization.getValue("textbox.tutorial1.text2", keyboardKeymap.toDpadString())
             }.compileIntoEvents())
             engine.addEvents(practiceSection2.apply {
                 this.beat = startBeat + 4f + 8f
@@ -149,13 +149,13 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text3")
+                this.text = Localization.getValue("textbox.tutorial1.text3")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text4")
+                this.text = Localization.getValue("textbox.tutorial1.text4")
             }.compileIntoEvents())
             engine.addEvents(practiceSection3.apply {
                 this.beat = startBeat + 4f + 3
@@ -211,13 +211,13 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text5")
+                this.text = Localization.getValue("textbox.tutorial1.text5")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text6")
+                this.text = Localization.getValue("textbox.tutorial1.text6")
             }.compileIntoEvents())
             engine.addEvents(practiceSection4.apply {
                 this.beat = startBeat + 4f + 3
@@ -278,13 +278,13 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 0
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text7")
+                this.text = Localization.getValue("textbox.tutorial1.text7")
             }.compileIntoEvents())
             engine.addEvents(BlockTextbox(engine).apply {
                 this.style = TextBoxStyle.SM_ROBOT
                 this.beat = startBeat + 4f + 1
                 this.requireInput.set(true)
-                this.text = StoryL10N.getValue("textbox.tutorial1.text8")
+                this.text = Localization.getValue("textbox.tutorial1.text8")
             }.compileIntoEvents())
             engine.addEvent(EventEndState(engine, startBeat + 4f + 3))
         }
@@ -313,20 +313,20 @@ class Tutorial1GameMode(main: PRManiaGame) : AbstractStoryGameMode(main) {
             this.style = TextBoxStyle.SM_ROBOT
             this.beat = 0f
             this.requireInput.set(true)
-            this.text = StoryL10N.getValue("textbox.tutorial1.text0a", Input.Keys.toString(keyboardKeymap.buttonA))
+            this.text = Localization.getValue("textbox.tutorial1.text0a", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += BlockTextbox(engine).apply {
             this.style = TextBoxStyle.SM_ROBOT
             this.beat = 1f
             this.requireInput.set(true)
             // Needed since the first char is an icon, messes up the height computation due to scaling
-            this.text = "[font=regular color=#00000000 scalex=0.1]_[]" + StoryL10N.getValue("textbox.tutorial1.text0b")
+            this.text = "[font=regular color=#00000000 scalex=0.1]_[]" + Localization.getValue("textbox.tutorial1.text0b")
         }
         blocks += BlockTextbox(engine).apply {
             this.style = TextBoxStyle.SM_ROBOT
             this.beat = 2f
             this.requireInput.set(true)
-            this.text = StoryL10N.getValue("textbox.tutorial1.text1", Input.Keys.toString(keyboardKeymap.buttonA))
+            this.text = Localization.getValue("textbox.tutorial1.text1", Input.Keys.toString(keyboardKeymap.buttonA))
         }
         blocks += practiceSection1.apply {
             this.beat = 4f

@@ -15,9 +15,9 @@ import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.contract.Contracts
 import polyrhythmmania.storymode.contract.SongInfo
 import polyrhythmmania.storymode.inbox.InboxItem
@@ -98,7 +98,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     private fun addStartContractPanel(inboxItem: InboxItem.ContractDoc) {
         addRightSidePanel("".toConstVar(), 20f * UI_SCALE).apply {
             this.removeAllChildren()
-            this += Button(StoryL10N.getVar("desktop.pane.startContract"), font = main.fontRobotoBold).apply {
+            this += Button(Localization.getVar("desktop.pane.startContract"), font = main.fontRobotoBold).apply {
                 this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_DARK)
                 this.bounds.height.set(8f * UI_SCALE)
 
@@ -111,12 +111,12 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
 
     private fun addContractScorePanel(inboxItem: InboxItem.ContractDoc, inboxItemState: InboxItemState) {
         val contract = inboxItem.contract
-        addRightSidePanel(StoryL10N.getVar("desktop.pane.performance"), 40f * UI_SCALE).apply {
+        addRightSidePanel(Localization.getVar("desktop.pane.performance"), 40f * UI_SCALE).apply {
             this.temporarilyDisableLayouts {
                 val completionData = inboxItemState.stageCompletionData
                 if (completionData != null) {
                     this += TextLabel(binding = {
-                        if (contract.immediatePass) StoryL10N.getVar("play.scoreCard.pass").use() else "${completionData.score}"
+                        if (contract.immediatePass) Localization.getVar("play.scoreCard.pass").use() else "${completionData.score}"
                     }, font = main.fontResultsScore).apply {
                         this.bounds.height.set(11f * UI_SCALE)
                         this.textColor.set(Color.LIGHT_GRAY)
@@ -143,7 +143,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
                         }
                     }
                 } else {
-                    this += TextLabel(StoryL10N.getVar("desktop.pane.performance.noInfo"), font = main.fontRobotoItalic).apply {
+                    this += TextLabel(Localization.getVar("desktop.pane.performance.noInfo"), font = main.fontRobotoItalic).apply {
                         this.bounds.height.set(19f * UI_SCALE)
                         this.textColor.set(Color.BLACK)
                         this.renderAlign.set(RenderAlign.center)
@@ -157,7 +157,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
 
     private fun addSongInfoPanel(songInfo: SongInfo) {
         val numNewlines = songInfo.songNameAndSource.songNameWithLineBreaks.count { it == '\n' }
-        addRightSidePanel(StoryL10N.getVar("desktop.pane.musicInfo"), (36f + (numNewlines * 6)) * UI_SCALE).apply {
+        addRightSidePanel(Localization.getVar("desktop.pane.musicInfo"), (36f + (numNewlines * 6)) * UI_SCALE).apply {
             this.temporarilyDisableLayouts {
                 val additionalMappings = mapOf("rodin" to main.fontMainMenuRodin)
                 val markupNormal = Markup.createWithBoldItalic(main.fontRoboto, main.fontRobotoBold,
@@ -251,16 +251,16 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
         val contract = inboxItem.contract
 
         val primaryText = when {
-            contract.id == Contracts.ID_BOSS -> StoryL10N.getValue("desktop.pane.conditions.primary.unknown")
-            contract.immediatePass -> StoryL10N.getValue("desktop.pane.conditions.primary.noMinScore")
-            else -> StoryL10N.getValue("desktop.pane.conditions.primary.minScore", contract.minimumScore)
+            contract.id == Contracts.ID_BOSS -> Localization.getValue("desktop.pane.conditions.primary.unknown")
+            contract.immediatePass -> Localization.getValue("desktop.pane.conditions.primary.noMinScore")
+            else -> Localization.getValue("desktop.pane.conditions.primary.minScore", contract.minimumScore)
         }
         
         var clearText = primaryText
-        val ellipse = StoryL10N.getValue("desktop.pane.conditions.ellipsis")
-        val conjunction1 = StoryL10N.getValue("desktop.pane.conditions.conjunction.1")
-        val conjunction2 = StoryL10N.getValue("desktop.pane.conditions.conjunction.2")
-        val exclamationSuffix = StoryL10N.getValue("desktop.pane.conditions.exclamationSuffix")
+        val ellipse = Localization.getValue("desktop.pane.conditions.ellipsis")
+        val conjunction1 = Localization.getValue("desktop.pane.conditions.conjunction.1")
+        val conjunction2 = Localization.getValue("desktop.pane.conditions.conjunction.2")
+        val exclamationSuffix = Localization.getValue("desktop.pane.conditions.exclamationSuffix")
         val extras: List<String> = contract.extraConditions.sorted().map { c -> c.text.getOrCompute() }
         if (extras.isNotEmpty()) {
             clearText += extras.withIndex().joinToString(separator = "\n", prefix = "\n", postfix = exclamationSuffix) { (index, s) ->
@@ -271,7 +271,7 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
 
         val numNewlines = clearText.count { c -> c == '\n' }
         val addHeightDueToNl = 5f * UI_SCALE * numNewlines
-        addRightSidePanel(StoryL10N.getVar("desktop.pane.conditions"), 30f * UI_SCALE + addHeightDueToNl).apply {
+        addRightSidePanel(Localization.getVar("desktop.pane.conditions"), 30f * UI_SCALE + addHeightDueToNl).apply {
             this += TextLabel(clearText, font = main.fontRobotoItalic).apply {
                 this.bounds.height.set(10f * UI_SCALE + addHeightDueToNl)
                 this.textColor.set(Color.BLACK)
@@ -286,14 +286,14 @@ class DesktopInfoPane(val desktopUI: DesktopUI) : VBox() {
     //region Custom memo handling
 
     private fun addPlayBonusMusic(inboxItem: InboxItem.Memo) {
-        addRightSidePanel(StoryL10N.getVar("desktop.pane.music"), 29f * UI_SCALE, useDarkPane = true).apply {
+        addRightSidePanel(Localization.getVar("desktop.pane.music"), 29f * UI_SCALE, useDarkPane = true).apply {
             val bonusMusic = desktopUI.bonusMusic
             val isPlaying = bonusMusic.isPlaying
             
             this += Button(binding = {
                 (if (isPlaying.use()) {
-                    StoryL10N.getVar("desktop.pane.playBonusMusic.stop")
-                } else StoryL10N.getVar("desktop.pane.playBonusMusic.play")).use()
+                    Localization.getVar("desktop.pane.playBonusMusic.stop")
+                } else Localization.getVar("desktop.pane.playBonusMusic.play")).use()
             }, font = main.fontRobotoBold).apply {
                 this.skinID.set(PRManiaSkins.BUTTON_SKIN_STORY_LIGHT)
                 

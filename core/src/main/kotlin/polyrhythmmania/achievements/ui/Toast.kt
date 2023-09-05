@@ -11,10 +11,10 @@ import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.util.gdxutils.grey
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.achievements.Achievement
 import polyrhythmmania.achievements.AchievementCategory
-import polyrhythmmania.achievements.AchievementsL10N
 import polyrhythmmania.achievements.Fulfillment
 
 
@@ -91,7 +91,7 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
     
     init {
         val shouldSayHidden = achievement.isHidden && achievement.category != AchievementCategory.STORY_MODE
-        this.titleLabel.text.set(AchievementsL10N.getValue(achievement.rank.toAchievementLocalizationID(shouldSayHidden)))
+        this.titleLabel.text.set(Localization.getValue(achievement.rank.toAchievementLocalizationID(shouldSayHidden)))
         this.nameLabel.text.set(achievement.getLocalizedName().getOrCompute())
         this.imageIcon.textureRegion.set(TextureRegion(AssetRegistry.get<PackedSheet>("achievements_icon")[achievement.getIconID()]))
     }

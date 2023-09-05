@@ -3,11 +3,11 @@ package polyrhythmmania.storymode.gamemode.boss.scripting
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
+import polyrhythmmania.Localization
 import polyrhythmmania.engine.Event
 import polyrhythmmania.engine.TextBox
 import polyrhythmmania.engine.TextBoxStyle
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.gamemode.boss.StoryBossGameMode
 import polyrhythmmania.storymode.music.StoryMusicAssets
 import polyrhythmmania.world.EventMoveCameraRelative
@@ -44,10 +44,10 @@ class BossScriptIntro(
             .changeLightStrength(LightStrength.DARK_BOSS_INTRO, 0.0f)
             .rest(3.0f)
             .playMenuSfx(AssetRegistry["sfx_pause_robot_on"])
-            .textBox(TextBox(StoryL10N.getValue("textbox.boss.start.0"), true, style = TextBoxStyle.SM_ROBOT), 0.0f)
+            .textBox(TextBox(Localization.getValue("textbox.boss.start.0"), true, style = TextBoxStyle.SM_ROBOT), 0.0f)
             .rest(2.0f)
             .playMenuSfx(AssetRegistry["sfx_pause_robot_off"])
-            .textBox(TextBox(StoryL10N.getValue("textbox.boss.start.1"), true, style = TextBoxStyle.SM_ROBOT), 0.0f)
+            .textBox(TextBox(Localization.getValue("textbox.boss.start.1"), true, style = TextBoxStyle.SM_ROBOT), 0.0f)
             .rest(2.0f)
             .rest(1.0f)
 

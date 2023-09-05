@@ -36,6 +36,7 @@ import paintbox.util.WindowSize
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
+import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.container.Container
 import polyrhythmmania.engine.Event
@@ -52,7 +53,6 @@ import polyrhythmmania.screen.play.pause.PauseMenuHandler
 import polyrhythmmania.screen.play.pause.PauseOption
 import polyrhythmmania.screen.play.pause.TengokuBgPauseMenuHandler
 import polyrhythmmania.storymode.StoryAssets
-import polyrhythmmania.storymode.StoryL10N
 import polyrhythmmania.storymode.StorySession
 import polyrhythmmania.storymode.contract.Contract
 import polyrhythmmania.storymode.contract.Contracts
@@ -137,7 +137,7 @@ class StoryPlayScreen(
         optionList += PauseOption("play.pause.startOver", !(gameMode is EndlessPolyrhythm && gameMode.dailyChallenge != null)) {
             startOverPauseAction()
         }
-        optionList += PauseOption(StoryL10N.getVar("play.pause.quit"), true) {
+        optionList += PauseOption(Localization.getVar("play.pause.quit"), true) {
             quitPauseAction(ExitReason.Quit(currentFailureCount.get()))
         }
         this.pauseOptions.set(optionList)
@@ -284,7 +284,7 @@ class StoryPlayScreen(
                         
                         .bold()
                         .lineHeight(1.25f)
-                        .text(StoryL10N.getValue("play.introCard.levelCreators"))
+                        .text(Localization.getValue("play.introCard.levelCreators"))
                         .text("\n")
                         .endTag()
                         
@@ -370,17 +370,17 @@ class StoryPlayScreen(
 
         failScoreCardOptions = listOfNotNull(
                 PauseOption("play.pause.startOver", true) { startOverPauseAction() },
-                if (!couldSkipLevelEventually) null else PauseOption(StoryL10N.getVar("play.pause.skipThisLevel"), false) {
+                if (!couldSkipLevelEventually) null else PauseOption(Localization.getVar("play.pause.skipThisLevel"), false) {
                     quitPauseAction(ExitReason.Skipped)
                 }.apply {
                     this.enabled.bind { previousFailureCount + currentFailureCount.use() >= contract.skipAfterNFailures }
                 },
-                PauseOption(StoryL10N.getVar("play.pause.quit"), true) {
+                PauseOption(Localization.getVar("play.pause.quit"), true) {
                     quitPauseAction(ExitReason.Quit(currentFailureCount.get()))
                 },
         )
         successScoreCardOptions = listOf(
-                PauseOption(StoryL10N.getVar("play.pause.continue"), true) {
+                PauseOption(Localization.getVar("play.pause.continue"), true) {
                     quitPauseAction(successExitReason)
                 },
 //                PauseOption("play.pause.startOver", true) { startOverPauseAction() }, // TODO Callback problem: Starting over with a passing score means it doesn't get reflected back in the callback
@@ -423,7 +423,7 @@ class StoryPlayScreen(
                             (engineBeat.use() / container.stopPosition.use().coerceAtLeast(1f) * 100).roundToInt()
                                 .coerceIn(0, 99)
                         }
-                        this += TextLabel(StoryL10N.getVar("play.scoreCard.progress"), font = main.fontMainMenuMain).apply {
+                        this += TextLabel(Localization.getVar("play.scoreCard.progress"), font = main.fontMainMenuMain).apply {
                             this.bindWidthToParent(multiplier = 0.275f)
                             this.textColor.set(Color.WHITE)
                             this.renderAlign.set(RenderAlign.right)
@@ -440,7 +440,7 @@ class StoryPlayScreen(
                                 this.bindWidthToParent(multiplierBinding = { progress.use() / 100f }) { 0f }
                             }
                         }
-                        this += TextLabel(StoryL10N.getVar("play.scoreCard.percentage", Var { listOf(progress.use()) }), font = main.fontMainMenuMain).apply {
+                        this += TextLabel(Localization.getVar("play.scoreCard.percentage", Var { listOf(progress.use()) }), font = main.fontMainMenuMain).apply {
                             this.bindWidthToParent(multiplier = 0.125f)
                             this.textColor.set(Color.WHITE)
                             this.renderAlign.set(RenderAlign.left)
@@ -466,7 +466,7 @@ class StoryPlayScreen(
             this.spacing.set(8f)
 
             this.temporarilyDisableLayouts {
-                this += TextLabel(StoryL10N.getVar("play.scoreCard.scoreCardTitle"), font = main.fontMainMenuHeading).apply {
+                this += TextLabel(Localization.getVar("play.scoreCard.scoreCardTitle"), font = main.fontMainMenuHeading).apply {
                     this.bounds.height.set(50f)
                     this.textColor.set(Color.WHITE)
                     this.renderAlign.set(RenderAlign.center)
@@ -506,7 +506,7 @@ class StoryPlayScreen(
                                 }
                                 this += TextLabel(binding = {
                                     if (contract.immediatePass) {
-                                        if (progress.use() < 100f) "" else StoryL10N.getValue("play.scoreCard.pass")
+                                        if (progress.use() < 100f) "" else Localization.getValue("play.scoreCard.pass")
                                     } else {
                                         val minToPass = contract.minimumScore
                                         val minToPassDenom = "[scale=0.5]/${minToPass}[]"
@@ -528,7 +528,7 @@ class StoryPlayScreen(
                             }
                         }
                     }
-                    this += TextLabel(StoryL10N.getValue("play.scoreCard.minScore", contract.minimumScore), font = main.fontMainMenuMain).apply {
+                    this += TextLabel(Localization.getValue("play.scoreCard.minScore", contract.minimumScore), font = main.fontMainMenuMain).apply {
                         this.bounds.height.set(20f)
                         this.margin.set(Insets(4f, 0f, 8f, 8f))
                         this.renderAlign.set(RenderAlign.bottom)

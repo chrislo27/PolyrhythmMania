@@ -2,7 +2,7 @@ package polyrhythmmania.storymode.inbox
 
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.toConstVar
-import polyrhythmmania.storymode.StoryL10N
+import polyrhythmmania.Localization
 import polyrhythmmania.storymode.contract.*
 import polyrhythmmania.storymode.inbox.IContractDoc.ContractSubtype
 
@@ -25,12 +25,12 @@ sealed class InboxItem(
             id: String,
             val hasToField: Boolean, hasSeparateListingName: Boolean, 
             hasDifferentShortFrom: Boolean = false,
-            val subject: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.subject"),
-            val from: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.from"),
-            val to: ReadOnlyVar<String> = if (hasToField) StoryL10N.getVar("inboxItemDetails.memo.$id.to") else "".toConstVar(),
-            val desc: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.memo.$id.desc"),
-            val shortFrom: ReadOnlyVar<String> = if (hasDifferentShortFrom) StoryL10N.getVar("inboxItemDetails.memo.$id.from.short") else from,
-    ) : InboxItem(id, if (hasSeparateListingName) StoryL10N.getVar("inboxItemDetails.memo.$id.listing") else subject) {
+            val subject: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.memo.$id.subject"),
+            val from: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.memo.$id.from"),
+            val to: ReadOnlyVar<String> = if (hasToField) Localization.getVar("inboxItemDetails.memo.$id.to") else "".toConstVar(),
+            val desc: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.memo.$id.desc"),
+            val shortFrom: ReadOnlyVar<String> = if (hasDifferentShortFrom) Localization.getVar("inboxItemDetails.memo.$id.from.short") else from,
+    ) : InboxItem(id, if (hasSeparateListingName) Localization.getVar("inboxItemDetails.memo.$id.listing") else subject) {
         var songInfo: SongInfo? = null
         
         fun hasBonusMusic(): Boolean = this.id == InboxDB.ITEM_WITH_END_OF_THE_ASSEMBLY_LINE_MUSIC
@@ -38,10 +38,10 @@ sealed class InboxItem(
     
     class InfoMaterial(
             id: String, hasSeparateListingName: Boolean,
-            val topic: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.infoMaterial.$id.topic"),
-            val audience: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.infoMaterial.$id.audience"),
-            val desc: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.infoMaterial.$id.desc"),
-    ) : InboxItem(id, if (hasSeparateListingName) StoryL10N.getVar("inboxItemDetails.infoMaterial.$id.listing") else topic)
+            val topic: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.infoMaterial.$id.topic"),
+            val audience: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.infoMaterial.$id.audience"),
+            val desc: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.infoMaterial.$id.desc"),
+    ) : InboxItem(id, if (hasSeparateListingName) Localization.getVar("inboxItemDetails.infoMaterial.$id.listing") else topic)
 
     class ContractDoc(
             val contract: Contract, itemID: String = getDefaultContractDocID(contract),
@@ -57,7 +57,7 @@ sealed class InboxItem(
             fun getDefaultContractDocID(contract: Contract): String = getDefaultContractDocID(contract.id)
         }
 
-        val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
+        val headingText: ReadOnlyVar<String> = Localization.getVar(subtype.headingL10NKey)
         val ignoreNoMiss: Boolean get() = subtype == ContractSubtype.TRAINING
         val ignoreSkillStar: Boolean get() = subtype == ContractSubtype.TRAINING
 
@@ -80,18 +80,18 @@ sealed class InboxItem(
 
     class RobotTest(
         itemID: String,
-        override val name: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$itemID.name")
+        override val name: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.robotTest.$itemID.name")
     ) : InboxItem(itemID, name), IContractDoc {
 
         override val subtype: ContractSubtype = ContractSubtype.ROBOT_TEST
         override val requester: Requester = Requester.POLYBUILD_ROBOT_TEST
         override val hasLongCompanyName: Boolean = true
 
-        override val desc: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$itemID.desc")
-        override val tagline: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$itemID.tagline")
-        val listingSubtitle: ReadOnlyVar<String> = StoryL10N.getVar("inboxItemDetails.robotTest.$id.listing")
+        override val desc: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.robotTest.$itemID.desc")
+        override val tagline: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.robotTest.$itemID.tagline")
+        val listingSubtitle: ReadOnlyVar<String> = Localization.getVar("inboxItemDetails.robotTest.$id.listing")
         
-        val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
+        val headingText: ReadOnlyVar<String> = Localization.getVar(subtype.headingL10NKey)
 
         override fun isCompletedWhenRead(): Boolean = true // There is no contract to play
     }
@@ -110,7 +110,7 @@ sealed class InboxItem(
         override val name: ReadOnlyVar<String> = name.toConstVar()
         override val desc: ReadOnlyVar<String> = "Placeholder contract desc\n\n$desc".toConstVar()
         override val tagline: ReadOnlyVar<String> = tagline.toConstVar()
-        val headingText: ReadOnlyVar<String> = StoryL10N.getVar(subtype.headingL10NKey)
+        val headingText: ReadOnlyVar<String> = Localization.getVar(subtype.headingL10NKey)
         
         override fun isCompletedWhenRead(): Boolean = true // There is no contract to play
     }

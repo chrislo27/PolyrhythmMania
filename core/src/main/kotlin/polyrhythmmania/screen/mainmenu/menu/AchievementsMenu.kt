@@ -23,7 +23,10 @@ import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaLocalePicker
-import polyrhythmmania.achievements.*
+import polyrhythmmania.achievements.Achievement
+import polyrhythmmania.achievements.AchievementCategory
+import polyrhythmmania.achievements.Achievements
+import polyrhythmmania.achievements.Fulfillment
 import polyrhythmmania.achievements.ui.Toast
 import polyrhythmmania.ui.PRManiaSkins
 import java.time.Instant
@@ -108,7 +111,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 //        panePerCategory = linkedMapOf()
         
         totalProgressLabel = TextLabel(binding = {
-            AchievementsL10N.getVar("achievement.totalProgress", Var {
+            Localization.getVar("achievement.totalProgress", Var {
                 val map = Achievements.fulfillmentMap.use()
                 val numGotten = map.size
                 val numTotal = Achievements.achievementIDMap.size
@@ -144,7 +147,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                     Anchor.TopRight.configure(this)
                     this.bindWidthToSelfHeight()
                     this.visible.bind { achievementEarned.use() }
-                    this.tooltipElement.set(createTooltip(AchievementsL10N.getVar("achievement.unlockedTooltip", Var {
+                    this.tooltipElement.set(createTooltip(Localization.getVar("achievement.unlockedTooltip", Var {
                         listOf(ZonedDateTime.ofInstant(Achievements.fulfillmentMap.use()[achievement]?.gotAt ?: Instant.EPOCH, ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME))
                     })))
                 }
@@ -158,15 +161,15 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         val formatter = achievement.stat.formatter
                         val formattedValue = formatter.format(achievement.stat.value)
                         val formattedThreshold = formatter.format(IntVar(achievement.threshold))
-                        AchievementsL10N.getVar("achievement.statProgress", Var {
+                        Localization.getVar("achievement.statProgress", Var {
                             listOf(formattedValue.use(), formattedThreshold.use())
                         })
                     } else Var("")
                     val achDesc = Var.bind {
                         val stillHidden = achievement.isHidden && !achievementEarned.use()
                         if (stillHidden) {
-                            "[i]${AchievementsL10N.getVar("achievement.hidden.desc").use()}[]"
-                        } else "${if (achievement.isHidden) "${AchievementsL10N.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}"
+                            "[i]${Localization.getVar("achievement.hidden.desc").use()}[]"
+                        } else "${if (achievement.isHidden) "${Localization.getVar("achievement.hidden.desc").use()} " else ""}${achievement.getLocalizedDesc().use()}"
                     }
                     this += TextLabel(binding = {
                         val stillHidden = achievement.isHidden && !achievementEarned.use()
@@ -203,12 +206,12 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             AchievementCategory.entries.associateWith { category ->
                 val achievementsInCategory = Achievements.achievementIDMap.values.filter { it.category == category }
                 TextLabel(binding = {
-                    AchievementsL10N.getVar("achievement.categoryProgress", Var {
+                    Localization.getVar("achievement.categoryProgress", Var {
                         val map = Achievements.fulfillmentMap.use()
                         val numGotten = map.keys.count { it.category == category }
                         val numTotal = achievementsInCategory.size
                         val percentageWhole = (100f * numGotten / numTotal).coerceIn(0f, 100f)
-                        listOf(AchievementsL10N.getVar(category.toLocalizationID()).use(), percentFormat.format(percentageWhole), numGotten, numTotal)
+                        listOf(Localization.getVar(category.toLocalizationID()).use(), percentFormat.format(percentageWhole), numGotten, numTotal)
                     }).use()
                 }).apply {
                     this.textColor.set(Color().grey(0.35f))
@@ -337,7 +340,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         when (view) {
                             ViewType.AllByCategory -> Localization.getVar("mainMenu.achievements.viewAll.category").use()
                             ViewType.AllTogether -> Localization.getVar("mainMenu.achievements.viewAll.together").use()
-                            is ViewType.Category -> AchievementsL10N.getVar(view.category.toLocalizationID()).use()
+                            is ViewType.Category -> Localization.getVar(view.category.toLocalizationID()).use()
                         }
                     }
                 }

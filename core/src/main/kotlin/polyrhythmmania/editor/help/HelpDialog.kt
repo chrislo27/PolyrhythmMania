@@ -43,7 +43,7 @@ class HelpDialog(editorPane: EditorPane) : EditorDialog(editorPane), Disposable 
         this.titleLabel.text.bind { 
             val currentDocTitle = helpData.currentDocument.use()?.title
             if (currentDocTitle != null) {
-                EditorHelpLocalization.getValue(currentDocTitle)
+                Localization.getValue(currentDocTitle)
             } else {
                 Localization.getValue("editor.dialog.help.title")
             }
@@ -211,7 +211,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
     override fun renderLayer(helpData: HelpData, layer: Layer): UIElement {
         return when (layer) {
             is LayerTitle -> {
-                TextLabel(binding = { EditorHelpLocalization.getVar(layer.text).use() }, font = main.fontEditorDialogTitle).apply {
+                TextLabel(binding = { Localization.getVar(layer.text).use() }, font = main.fontEditorDialogTitle).apply {
                     this.renderAlign.set(Align.center)
                     this.textAlign.set(TextAlign.CENTRE)
                     this.setScaleXY(0.75f)
@@ -221,7 +221,7 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                 }
             }
             is LayerParagraph -> {
-                TextLabel(binding = { EditorHelpLocalization.getVar(layer.text).use() }).apply {
+                TextLabel(binding = { Localization.getVar(layer.text).use() }).apply {
                     this.markup.set(this@HelpDocRenderer.markup)
                     this.renderAlign.set(layer.renderAlign)
                     this.textAlign.set(layer.textAlign)
@@ -342,11 +342,11 @@ class HelpDocRenderer(val dialog: HelpDialog) : DocumentRenderer() {
                     {
                         (if (layer.newIndicator.value.use())
                                 (Localization.getVar("common.newIndicator").use() + " ")
-                        else "") + EditorHelpLocalization.getVar(layer.text).use()
+                        else "") + Localization.getVar(layer.text).use()
                     }
                 } else {
                     {
-                        EditorHelpLocalization.getVar(layer.text).use()
+                        Localization.getVar(layer.text).use()
                     }
                 }
                 Button(binding = textBinding, font = defaultFont).apply {

@@ -3,6 +3,7 @@ package polyrhythmmania.achievements
 import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
+import polyrhythmmania.Localization
 import polyrhythmmania.statistics.Stat
 
 
@@ -25,7 +26,7 @@ sealed class Achievement(
         : Achievement(id, rank, category, isHidden) {
         
         override fun getLocalizedDesc(): ReadOnlyVar<String> {
-            return AchievementsL10N.getVar("achievement.desc.$id", Var { listOf(scoreMinimum) })
+            return Localization.getVar("achievement.desc.$id", Var { listOf(scoreMinimum) })
         }
         
         override fun toString(): String {
@@ -38,7 +39,7 @@ sealed class Achievement(
         : Achievement(id, rank, category, isHidden) {
         
         override fun getLocalizedDesc(): ReadOnlyVar<String> {
-            return AchievementsL10N.getVar("achievement.desc.$id", Var { listOf(minimumValue) })
+            return Localization.getVar("achievement.desc.$id", Var { listOf(minimumValue) })
         }
         
         override fun toString(): String {
@@ -51,7 +52,7 @@ sealed class Achievement(
         : Achievement(id, rank, category, isHidden) {
 
         override fun getLocalizedDesc(): ReadOnlyVar<String> {
-            return AchievementsL10N.getVar("achievement.desc.$id", Var { listOf(stat.formatter.format(IntVar(threshold)).use()) })
+            return Localization.getVar("achievement.desc.$id", Var { listOf(stat.formatter.format(IntVar(threshold)).use()) })
         }
         
         override fun toString(): String {
@@ -61,8 +62,8 @@ sealed class Achievement(
     
     var overrideIconID: String? = null
     
-    open fun getLocalizedName(): ReadOnlyVar<String> = AchievementsL10N.getVar("achievement.name.$id")
-    open fun getLocalizedDesc(): ReadOnlyVar<String> = AchievementsL10N.getVar("achievement.desc.$id")
+    open fun getLocalizedName(): ReadOnlyVar<String> = Localization.getVar("achievement.name.$id")
+    open fun getLocalizedDesc(): ReadOnlyVar<String> = Localization.getVar("achievement.desc.$id")
     
     fun getIconID(): String {
         return overrideIconID ?: category.iconID ?: rank.defaultIconID
