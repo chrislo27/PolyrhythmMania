@@ -25,7 +25,7 @@ import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.font.*
-import paintbox.i18n.LocalizationBase
+import paintbox.i18n.ILocalization
 import paintbox.logging.Logger
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -126,7 +126,8 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
     }
     
     val httpClient: CloseableHttpClient by lazy { HttpClients.createDefault() }
-    val allLocalizations: List<LocalizationBase> get() = this.reloadableLocalizationInstances
+    val allLocalizations: List<ILocalization> 
+        get() = this.reloadableLocalizationInstances
     
     private var discordCallbackDelta: Float = 0f
     private val hasLevelRecoveryHookBeenRun: AtomicBoolean = AtomicBoolean(false)

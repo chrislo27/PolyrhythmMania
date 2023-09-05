@@ -1,6 +1,7 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.utils.Align
+import paintbox.i18n.ILocalizationWithBundle
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
@@ -9,7 +10,6 @@ import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import polyrhythmmania.LocalePicker
 import polyrhythmmania.Localization
-import polyrhythmmania.Settings
 import polyrhythmmania.credits.Credits
 import polyrhythmmania.ui.PRManiaSkins
 import java.text.NumberFormat
@@ -18,7 +18,8 @@ import kotlin.math.roundToInt
 
 class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
-    private val settings: Settings = menuCol.main.settings
+    private val bundledLocalizations: List<ILocalizationWithBundle> =
+        main.allLocalizations.filterIsInstance<ILocalizationWithBundle>()
     
     init {
         this.setSize(MMMenu.WIDTH_SMALL)
@@ -74,7 +75,7 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             vbox += comboboxPane
             
             vbox += TextLabel(binding = { 
-                val numBaseKeys = main.allLocalizations.sumOf { locBase ->
+                val numBaseKeys = bundledLocalizations.sumOf { locBase ->
                     locBase.bundles.use().find { b -> 
                         b.namedLocale.locale.language == ""
                     }?.allKeys?.size ?: 0
@@ -86,7 +87,7 @@ class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         "This is the default language for the game. Did you know there are ${NumberFormat.getIntegerInstance(currentLocale.locale).format(numBaseKeys)} strings in the game that can be translated? That's a lot!"
                     }
                     else -> {
-                        val numKeys = main.allLocalizations.sumOf { locBase ->
+                        val numKeys = bundledLocalizations.sumOf { locBase ->
                             val bundle = locBase.bundlesMap.use()[currentLocale]?.takeIf { 
                                 it.namedLocale.locale.language == it.bundle.locale.language
                             }
