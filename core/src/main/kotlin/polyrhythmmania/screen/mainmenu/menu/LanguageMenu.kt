@@ -1,15 +1,15 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.utils.Align
-import paintbox.i18n.ILocalizationWithBundle
+import paintbox.i18n.LocalizationBase
 import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.control.ScrollPane
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import polyrhythmmania.PRManiaLocalePicker
 import polyrhythmmania.Localization
+import polyrhythmmania.PRManiaLocalePicker
 import polyrhythmmania.credits.Credits
 import polyrhythmmania.ui.PRManiaSkins
 import java.text.NumberFormat
@@ -18,8 +18,8 @@ import kotlin.math.roundToInt
 
 class LanguageMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
 
-    private val bundledLocalizations: List<ILocalizationWithBundle> =
-        main.allLocalizations.filterIsInstance<ILocalizationWithBundle>()
+    private val bundledLocalizations: List<LocalizationBase> =
+        Localization.localizationInstances.filterIsInstance<LocalizationBase>()
     
     init {
         this.setSize(MMMenu.WIDTH_SMALL)

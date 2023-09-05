@@ -2,9 +2,9 @@ package polyrhythmmania
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import paintbox.i18n.ILocalizationWithBundle
 import paintbox.i18n.LocalePickerBase
 import paintbox.i18n.LocalizationBase
+import paintbox.i18n.LocalizationGroup
 
 
 object PRManiaLocalePicker : LocalePickerBase(
@@ -17,8 +17,13 @@ object PRManiaLocalePicker : LocalePickerBase(
 abstract class PRManiaLocalizationBase(baseHandle: FileHandle)
     : LocalizationBase(baseHandle, PRManiaLocalePicker)
 
-object BaseLocalization
-    : PRManiaLocalizationBase(LocalizationBase.DEFAULT_BASE_HANDLE)
+private object BaseLocalization
+    : PRManiaLocalizationBase(Gdx.files.internal("localization/default"))
 
-object Localization : ILocalizationWithBundle by BaseLocalization
-
+object Localization : LocalizationGroup(PRManiaLocalePicker, listOf(
+    BaseLocalization,
+//    EditorHelpLocalization,
+//    AchievementsL10N,
+//    UpdateNotesL10N,
+//    StoryL10N,
+))
