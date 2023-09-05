@@ -14,8 +14,8 @@ object PRManiaLocalePicker : LocalePickerBase(
 )
 
 
-abstract class PRManiaLocalizationBase(baseHandle: FileHandle)
-    : LocalizationBase(baseHandle, PRManiaLocalePicker)
+abstract class PRManiaLocalizationBase(baseHandle: FileHandle) : LocalizationBase(baseHandle, PRManiaLocalePicker)
+
 
 private object BaseLocalization
     : PRManiaLocalizationBase(Gdx.files.internal("localization/default"))
@@ -32,10 +32,13 @@ private object UpdateNotesL10N
 private object StoryL10N
     : PRManiaLocalizationBase(Gdx.files.internal("localization/story_mode"))
 
-object Localization : LocalizationGroup(PRManiaLocalePicker, listOf(
-    BaseLocalization,
-    EditorHelpL10N,
-    AchievementsL10N,
-    UpdateNotesL10N,
-    StoryL10N,
-))
+object Localization : LocalizationGroup(
+    PRManiaLocalePicker,
+    listOf(
+        BaseLocalization,
+        EditorHelpL10N,
+        AchievementsL10N,
+        UpdateNotesL10N,
+        StoryL10N,
+    )
+)
