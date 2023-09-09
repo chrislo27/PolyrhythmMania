@@ -250,8 +250,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
         NewIndicator(NEW_INDICATOR_ENDLESS_MODE_HELP, Version(2, 0, 0), newEvenIfFirstPlay = true)
     val allNewIndicators: List<NewIndicator> = listOf(
         newIndicatorLibrary, newIndicatorEditorHelpTexpack,
-        newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorExtrasAssemble,
-        newIndicatorExtrasSolitaire, newIndicatorStoryMode, newIndicatorEndlessModeHelp
+        newIndicatorEditorHelpExporting, newIndicatorEditorHelpPrmproj, newIndicatorEditorHelpSpotlights,
+        newIndicatorExtrasAssemble, newIndicatorExtrasSolitaire, newIndicatorStoryMode, newIndicatorEndlessModeHelp,
     )
 
 
