@@ -259,7 +259,9 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
 
 
     init {
-        checkAllNewIndicatorsInList()
+        if (PRMania.isDevVersion) {
+            checkAllNewIndicatorsInList()
+        }
         
         PRManiaLocalePicker.currentLocale.addListener {
             val locale = it.getOrCompute()
