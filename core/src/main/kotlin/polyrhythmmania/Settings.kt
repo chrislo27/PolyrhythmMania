@@ -77,6 +77,9 @@ import polyrhythmmania.world.render.ForceTilesetPalette
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.typeOf
 
 
 @Suppress("PrivatePropertyName", "PropertyName")
@@ -256,6 +259,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
 
 
     init {
+        checkAllNewIndicatorsInList()
+        
         PRManiaLocalePicker.currentLocale.addListener {
             val locale = it.getOrCompute()
             this.locale.set(locale.locale.toString())
@@ -419,6 +424,24 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
             gr.setForegroundFPS(this.maxFramerate.getOrCompute())
             gr.setVSync(this.vsyncEnabled.getOrCompute())
             Paintbox.LOGGER.debug("DEBUG MONITORS: Primary=${gr.primaryMonitor?.name}, current=${gr.monitor?.name}, allMonitors=${gr.monitors.joinToString { it.name }}")
+        }
+    }
+    
+    private fun checkAllNewIndicatorsInList() {
+        val allNewIndicatorFields = this::class.memberProperties.filter { prop ->
+            prop.returnType == typeOf<NewIndicator>()
+        }.map {
+            @Suppress("UNCHECKED_CAST")
+            it as KProperty1<Settings, NewIndicator>
+        }
+        val allNewIndicatorInstances = allNewIndicatorFields.associateWith { prop ->
+            prop.get(this)
+        }
+        val missingInstances = allNewIndicatorInstances.filter { (_, indicator) ->
+            indicator !in this.allNewIndicators
+        }
+        if (missingInstances.isNotEmpty()) {
+            throw AssertionError("New indicators are missing from Settings#allNewIndicators: ${missingInstances.map { it.key.name }}")
         }
     }
 
