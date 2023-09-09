@@ -28,8 +28,7 @@ class BlockDeployRodCustomSpeed(engine: Engine, blockTypes: EnumSet<BlockType> =
     var xUnitsPerBeat: Float = EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT
     
     init {
-        val text = Localization.getVar("block.deployRodCustomSpeed.name")
-        this.defaultText.bind { text.use() }
+        this.defaultText.bind { Localization.getVar("block.deployRodCustomSpeed.name").use() }
     }
 
     override fun compileIntoEvents(): List<Event> {

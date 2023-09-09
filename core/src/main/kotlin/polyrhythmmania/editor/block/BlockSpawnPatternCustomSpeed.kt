@@ -29,10 +29,6 @@ class BlockSpawnPatternCustomSpeed(engine: Engine) : BlockSpawnPattern(engine) {
 
     private var xUnitsPerBeat: Float = DEFAULT_X_UNITS_PER_BEAT
     
-    constructor(engine: Engine, xUnitsPerBeat: Float) : this(engine) {
-        this.xUnitsPerBeat = xUnitsPerBeat
-    }
-    
     init {
         this.width = 4f
         this.defaultText.bind { Localization.getVar("block.spawnPatternCustomSpeed.name").use() }

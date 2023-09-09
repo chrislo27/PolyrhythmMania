@@ -304,15 +304,6 @@ object Instantiators {
             BlockSelectiveSpawnPattern(engine)
         })
         add(CATEGORY_ADVANCED, Instantiator(
-            "deployRodCustomSpeed", BlockDeployRodCustomSpeed::class.java,
-            Localization.getVar("instantiator.deployRodCustomSpeed.name"),
-            Localization.getVar("instantiator.deployRodCustomSpeed.summary"),
-            Localization.getVar("instantiator.deployRodCustomSpeed.desc"),
-            BlockDeployRod.BLOCK_TYPES
-        ) { engine ->
-            BlockDeployRodCustomSpeed(engine)
-        })
-        add(CATEGORY_ADVANCED, Instantiator(
             "spawnPatternCustomSpeed", BlockSpawnPatternCustomSpeed::class.java,
             Localization.getVar("instantiator.spawnPatternCustomSpeed.name"),
             Localization.getVar("instantiator.spawnPatternCustomSpeed.summary"),
@@ -320,6 +311,15 @@ object Instantiators {
             BlockSpawnPattern.BLOCK_TYPES
         ) { engine ->
             BlockSpawnPatternCustomSpeed(engine)
+        })
+        add(CATEGORY_ADVANCED, Instantiator(
+            "deployRodCustomSpeed", BlockDeployRodCustomSpeed::class.java,
+            Localization.getVar("instantiator.deployRodCustomSpeed.name"),
+            Localization.getVar("instantiator.deployRodCustomSpeed.summary"),
+            Localization.getVar("instantiator.deployRodCustomSpeed.desc"),
+            BlockDeployRod.BLOCK_TYPES
+        ) { engine ->
+            BlockDeployRodCustomSpeed(engine)
         })
         //endregion
 
