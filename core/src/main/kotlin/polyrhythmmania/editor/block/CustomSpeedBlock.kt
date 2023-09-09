@@ -71,7 +71,7 @@ interface CustomSpeedBlock {
                             this.textColor.set(Color(1f, 1f, 1f, 1f))
 
                             this.value.addListener {
-                                xUnitsPerBeat = 1f / it.getOrCompute().coerceAtLeast(0.25f)
+                                xUnitsPerBeat = 1f / it.getOrCompute().coerceAtLeast(MIN_X_UNITS_PER_BEAT)
                             }
                         }
                         this += textField
