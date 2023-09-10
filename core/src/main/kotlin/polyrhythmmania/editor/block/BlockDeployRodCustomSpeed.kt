@@ -42,7 +42,7 @@ class BlockDeployRodCustomSpeed(
 
     override fun createContextMenu(editor: Editor): ContextMenu {
         return super.createContextMenu(editor).also { ctxmenu ->
-            ctxmenu.defaultWidth.set(300f)
+            ctxmenu.defaultWidth.set(352f)
             ctxmenu.addMenuItem(SeparatorMenuItem())
             ctxmenu.addToContextMenu(editor)
         }

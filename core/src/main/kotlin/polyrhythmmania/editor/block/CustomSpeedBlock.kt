@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.block
 
 import com.badlogic.gdx.graphics.Color
-import paintbox.ui.Anchor
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.contextmenu.ContextMenu
@@ -25,9 +24,9 @@ interface CustomSpeedBlock {
 
         const val DEFAULT_X_UNITS_PER_BEAT: Float = EntityRodDecor.DEFAULT_X_UNITS_PER_BEAT
         const val MIN_X_UNITS_PER_BEAT: Float = 0.25f
-        
+
         val INPUT_DECIMAL_FORMAT: DecimalFormat = DecimalFormats["0.0##"]
-        
+
         private fun invertButtonSkin(button: Button) = AbstractPatternMenuPane.invertButtonSkin(button)
     }
 
@@ -35,6 +34,8 @@ interface CustomSpeedBlock {
 
 
     fun ContextMenu.addToContextMenu(editor: Editor): ContextMenu {
+        val textField: DecimalTextField
+
         return this.also { ctxmenu ->
             ctxmenu.addMenuItem(
                 LabelMenuItem.create(
@@ -53,12 +54,10 @@ interface CustomSpeedBlock {
                 HBox().apply {
                     this.bounds.height.set(32f)
                     this.spacing.set(4f)
-                    
-                    val textField: DecimalTextField
-                    
+
                     this += RectElement(Color(0f, 0f, 0f, 1f)).apply {
                         this.bounds.width.set(175f)
-                        
+
                         this.border.set(Insets(1f))
                         this.borderStyle.set(SolidBorder(Color.WHITE))
                         this.padding.set(Insets(2f))
@@ -81,11 +80,36 @@ interface CustomSpeedBlock {
                         Localization.getVar("common.reset"),
                         font = editor.editorPane.main.fontEditor
                     ).apply {
-                        Anchor.CentreRight.configure(this)
                         this.bounds.width.set(64f)
                         invertButtonSkin(this)
                         this.setOnAction {
                             textField.setValue(1f / DEFAULT_X_UNITS_PER_BEAT)
+                        }
+                    }
+                }
+            ))
+            ctxmenu.addMenuItem(
+                LabelMenuItem.create(
+                    Localization.getValue("blockContextMenu.customSpeedBlock.presets"),
+                    editor.editorPane.palette.markup
+                )
+            )
+            ctxmenu.addMenuItem(CustomMenuItem(
+                HBox().apply {
+                    this.bounds.height.set(32f)
+                    this.spacing.set(4f)
+
+                    val presets = listOf(0.500f, 0.400f, 0.333f, 0.375f, 0.250f).sortedDescending()
+                    presets.forEach { presetValue ->
+                        this += Button(
+                            INPUT_DECIMAL_FORMAT.format(presetValue.toDouble()),
+                            font = editor.editorPane.main.fontEditor
+                        ).apply {
+                            this.bounds.width.set(64f)
+                            invertButtonSkin(this)
+                            this.setOnAction {
+                                textField.setValue(presetValue)
+                            }
                         }
                     }
                 }
