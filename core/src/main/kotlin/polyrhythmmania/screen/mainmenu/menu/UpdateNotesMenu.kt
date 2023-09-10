@@ -22,7 +22,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     companion object {
         private val TEXT_COLOR: Color = LongButtonSkin.TEXT_COLOR
         
-        val updates: List<String> = listOf("v1.1", "v1.2", "v2.0")
+        val updates: List<String> = listOf("v1.1", "v1.2", "v2.0", "v2.1")
         val latestUpdate: String = updates.last()
     }
     
@@ -94,16 +94,6 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.vBar.blockIncrement.set(40f)
         }
         contentPane.addChild(scrollPane)
-
-//        val vbox = VBox().apply {
-//            Anchor.TopLeft.configure(this)
-//            this.bounds.height.set(300f)
-//            this.spacing.set(0f)
-//        }
-//
-//        vbox.temporarilyDisableLayouts {
-//        }
-//        vbox.sizeHeightToChildren(100f)
 
         val descVar: ReadOnlyVar<String> = Var {
             val u = viewingUpdate.use()
