@@ -23,8 +23,8 @@ allprojects {
     ext {
         appName = "PolyrhythmMania"
         
-        paintboxVersion = "0.13.0"
-        useLocalPaintbox = false
+        paintboxVersion = "0.14.0"
+        useLocalPaintbox = true
     }
     
     java {
@@ -64,6 +64,8 @@ project(":core") {
 
         api "net.beadsproject:beads:3.2"
         implementation "com.badlogicgames.jlayer:jlayer:1.0.1-gdx"
+        api "io.dropwizard.metrics:metrics-core:4.2.19"
+        api "com.eclipsesource.minimal-json:minimal-json:0.9.5"
         api "net.lingala.zip4j:zip4j:2.11.5"
         api "org.apache.httpcomponents:httpclient:4.5.13"
         api "space.earlygrey:shapedrawer:v2.6.0"
