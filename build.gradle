@@ -9,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+        classpath "com.github.johnrengelman:shadow:8.1.1"
     }
 }
 
