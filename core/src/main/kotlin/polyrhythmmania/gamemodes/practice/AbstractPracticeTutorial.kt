@@ -16,7 +16,7 @@ abstract class AbstractPracticeTutorial(main: PRManiaGame, playTimeType: PlayTim
     init {
         container.world.worldMode = WorldMode(WorldType.Polyrhythm())
         container.world.showInputFeedback = true // Overrides user settings
-        container.world.worldSettings = WorldSettings(showInputIndicators = true)
+        container.world.worldSettings = WorldSettings(showInputIndicators = true, useEnglishSigns = true)
     }
 
     init {

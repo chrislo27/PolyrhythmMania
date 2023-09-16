@@ -53,8 +53,8 @@ class EntitySign(world: World, val type: Type, val renderCriteria: RenderCriteri
     
     enum class RenderCriteria(val check: (World) -> Boolean) {
         ALWAYS({ true }),
-        ONLY_JP({ w -> !w.worldSettings.useEnglishSigns }),
-        ONLY_EN({ w -> w.worldSettings.useEnglishSigns }),
+        ONLY_JP({ w -> !w.shouldShowEnglishSigns() }),
+        ONLY_EN({ w -> w.shouldShowEnglishSigns() }),
     }
 
     enum class Type(val renderWidth: Float, val renderHeight: Float, val useEnOffset: Boolean) {

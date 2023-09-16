@@ -41,6 +41,7 @@ import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_AUDIO_OFFSET_MS
 import polyrhythmmania.PreferenceKeys.SETTINGS_CALIBRATION_DISABLE_INPUT_SFX
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISABLE_SPOTLIGHTS
 import polyrhythmmania.PreferenceKeys.SETTINGS_DISCORD_RPC
+import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_SIGN_LANGUAGE
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TEXTURE_PACK
 import polyrhythmmania.PreferenceKeys.SETTINGS_FORCE_TILESET_PALETTE
 import polyrhythmmania.PreferenceKeys.SETTINGS_FULLSCREEN
@@ -72,6 +73,7 @@ import polyrhythmmania.gamemodes.endlessmode.DailyChallengeScore
 import polyrhythmmania.gamemodes.endlessmode.EndlessHighScore
 import polyrhythmmania.soundsystem.AudioDeviceSettings
 import polyrhythmmania.soundsystem.javasound.MixerHandler
+import polyrhythmmania.world.render.ForceSignLanguage
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import java.time.LocalDate
@@ -142,6 +144,8 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
         KeyValue(SETTINGS_FORCE_TEXTURE_PACK, ForceTexturePack.NO_FORCE)
     private val kv_forceTilesetPalette: KeyValue<ForceTilesetPalette> =
         KeyValue(SETTINGS_FORCE_TILESET_PALETTE, ForceTilesetPalette.NO_FORCE)
+    private val kv_forceSignLanguage: KeyValue<ForceSignLanguage> =
+        KeyValue(SETTINGS_FORCE_SIGN_LANGUAGE, ForceSignLanguage.NO_FORCE)
     private val kv_reducedMotion: KeyValue<Boolean> = KeyValue(SETTINGS_REDUCED_MOTION, false)
     private val kv_disableSpotlights: KeyValue<Boolean> = KeyValue(SETTINGS_DISABLE_SPOTLIGHTS, false)
     private val kv_subtitleOpacity: KeyValue<Int> = KeyValue(SETTINGS_SUBTITLE_OPACITY, 100)
@@ -198,6 +202,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     val maxFramerate: Var<Int> = kv_maxFramerate.value
     val forceTexturePack: Var<ForceTexturePack> = kv_forceTexturePack.value
     val forceTilesetPalette: Var<ForceTilesetPalette> = kv_forceTilesetPalette.value
+    val forceSignLanguage: Var<ForceSignLanguage> = kv_forceSignLanguage.value
     val reducedMotion: Var<Boolean> = kv_reducedMotion.value
     val disableSpotlights: Var<Boolean> = kv_disableSpotlights.value
     val subtitleOpacity: Var<Int> = kv_subtitleOpacity.value
@@ -302,6 +307,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
         } else {
             prefs.getForceTilesetPalette(kv_forceTilesetPalette)
         }
+        prefs.getForceSignLanguage(kv_forceSignLanguage)
         prefs.getBoolean(kv_reducedMotion)
         prefs.getBoolean(kv_disableSpotlights)
         prefs.getInt(kv_subtitleOpacity)
@@ -359,6 +365,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
             .putInt(kv_maxFramerate)
             .putForceTexturePack(kv_forceTexturePack)
             .putForceTilesetPalette(kv_forceTilesetPalette)
+            .putForceSignLanguage(kv_forceSignLanguage)
             .putBoolean(kv_reducedMotion)
             .putBoolean(kv_disableSpotlights)
             .putInt(kv_subtitleOpacity)
@@ -629,6 +636,19 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     }
 
     private fun Preferences.putForceTilesetPalette(kv: KeyValue<ForceTilesetPalette>): Preferences {
+        val prefs: Preferences = this
+        return prefs.putInteger(kv.key, kv.value.getOrCompute().jsonId)
+    }
+
+    private fun Preferences.getForceSignLanguage(kv: KeyValue<ForceSignLanguage>) {
+        val prefs: Preferences = this
+        if (prefs.contains(kv.key)) {
+            val i = prefs.getInteger(kv.key, ForceSignLanguage.NO_FORCE.jsonId)
+            kv.value.set(ForceSignLanguage.JSON_MAP[i] ?: ForceSignLanguage.NO_FORCE)
+        }
+    }
+
+    private fun Preferences.putForceSignLanguage(kv: KeyValue<ForceSignLanguage>): Preferences {
         val prefs: Preferences = this
         return prefs.putInteger(kv.key, kv.value.getOrCompute().jsonId)
     }

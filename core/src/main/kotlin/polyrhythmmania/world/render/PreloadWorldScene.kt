@@ -14,8 +14,16 @@ import polyrhythmmania.soundsystem.SimpleTimingProvider
  */
 class PreloadWorldScene(private val main: PRManiaGame) : Disposable {
 
-    private val container: Container = Container(null, SimpleTimingProvider { false },
-            GlobalContainerSettings(ForceTexturePack.NO_FORCE, ForceTilesetPalette.NO_FORCE, false))
+    private val container: Container = Container(
+        null,
+        SimpleTimingProvider { false },
+        GlobalContainerSettings(
+            forceTexturePack = ForceTexturePack.NO_FORCE,
+            forceTilesetPalette = ForceTilesetPalette.NO_FORCE,
+            forceSignLanguage = ForceSignLanguage.NO_FORCE,
+            reducedMotion = false
+        )
+    )
     private var frameBuffer: NestedFrameBuffer? = null
     
     init {

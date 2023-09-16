@@ -58,6 +58,7 @@ import polyrhythmmania.soundsystem.TimingProvider
 import polyrhythmmania.world.EventDeployRod
 import polyrhythmmania.world.World
 import polyrhythmmania.world.entity.TemporaryEntity
+import polyrhythmmania.world.render.ForceSignLanguage
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.render.WorldRendererWithUI
@@ -128,6 +129,7 @@ class Editor(
     val globalContainerSettings: GlobalContainerSettings = GlobalContainerSettings(
             forceTexturePack = ForceTexturePack.NO_FORCE,
             forceTilesetPalette = ForceTilesetPalette.NO_FORCE,
+            forceSignLanguage = ForceSignLanguage.NO_FORCE,
             reducedMotion = false
     )
     val container: Container = Container(this.soundSystem, this.timing, globalContainerSettings)

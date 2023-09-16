@@ -7,6 +7,7 @@ import polyrhythmmania.PRManiaGame
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.world.entity.*
+import polyrhythmmania.world.render.ForceSignLanguage
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.spotlights.Spotlights
 import polyrhythmmania.world.tileset.TilesetPalette
@@ -33,6 +34,7 @@ class World(numOfSpotlights: Int?) {
     // Settings
     var showInputFeedback: Boolean = PRManiaGame.instance.settings.showInputFeedbackBar.getOrCompute()
     var worldSettings: WorldSettings = WorldSettings.DEFAULT
+    var forceSignLanguage: ForceSignLanguage = ForceSignLanguage.NO_FORCE
     
     val worldResetListeners: MutableList<WorldResetListener> = mutableListOf()
     
@@ -100,6 +102,14 @@ class World(numOfSpotlights: Int?) {
 
     fun sortEntitiesByRenderOrder(comparator: Comparator<Entity> = WorldRenderer.comparatorRenderOrder) {
         (entities as MutableList).sortWith(comparator)
+    }
+    
+    fun shouldShowEnglishSigns(): Boolean {
+        return when (forceSignLanguage) {
+            ForceSignLanguage.NO_FORCE -> worldSettings.useEnglishSigns
+            ForceSignLanguage.FORCE_JAPANESE -> false
+            ForceSignLanguage.FORCE_ENGLISH -> true
+        }
     }
     
     // ------------------------------------------------------------------------------------------------------

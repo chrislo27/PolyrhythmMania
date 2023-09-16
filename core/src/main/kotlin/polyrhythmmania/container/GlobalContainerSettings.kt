@@ -1,5 +1,7 @@
 package polyrhythmmania.container
 
+import polyrhythmmania.world.World
+import polyrhythmmania.world.render.ForceSignLanguage
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import polyrhythmmania.world.tileset.TilesetPalette
@@ -8,12 +10,13 @@ import polyrhythmmania.world.tileset.TilesetPalette
 data class GlobalContainerSettings(
     val forceTexturePack: ForceTexturePack,
     val forceTilesetPalette: ForceTilesetPalette,
+    val forceSignLanguage: ForceSignLanguage,
     val reducedMotion: Boolean,
     val numberOfSpotlightsOverride: Int? = null,
 ) {
 
     fun applyForcedTilesetPaletteSettings(container: Container) {
-        when (container.globalSettings.forceTilesetPalette) {
+        when (this.forceTilesetPalette) {
             ForceTilesetPalette.NO_FORCE ->
                 container.world.tilesetPalette
 
@@ -28,5 +31,7 @@ data class GlobalContainerSettings(
         }.applyTo(container.renderer.tileset)
     }
 
+    fun applyForcedSignLanguageSettings(world: World) {
+        world.forceSignLanguage = this.forceSignLanguage
+    }
 }
-

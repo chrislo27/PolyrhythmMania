@@ -10,6 +10,7 @@ import paintbox.ui.layout.VBox
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.ui.PRManiaSkins
+import polyrhythmmania.world.render.ForceSignLanguage
 import polyrhythmmania.world.render.ForceTexturePack
 import polyrhythmmania.world.render.ForceTilesetPalette
 import kotlin.math.roundToInt
@@ -143,6 +144,24 @@ class GraphicsSettingsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }.apply { 
                 this.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.subtitleOpacity.tooltip")))
             }
+            
+            val (forceSignLanguagePane, forceSignLanguageCombobox) = createComboboxOption(ForceSignLanguage.entries, settings.forceSignLanguage.getOrCompute(),
+                { Localization.getVar("mainMenu.graphicsSettings.forceSignLanguage").use() },
+                percentageContent = 0.4f, itemToString = { choice ->
+                    Localization.getValue("mainMenu.graphicsSettings.forceSignLanguage.${
+                        when (choice) {
+                            ForceSignLanguage.NO_FORCE -> "noForce"
+                            ForceSignLanguage.FORCE_JAPANESE -> "forceJapanese"
+                            ForceSignLanguage.FORCE_ENGLISH -> "forceEnglish"
+                        }
+                    }")
+                })
+            forceSignLanguageCombobox.setScaleXY(0.75f)
+            forceSignLanguageCombobox.selectedItem.addListener {
+                settings.forceSignLanguage.set(it.getOrCompute())
+            }
+            forceSignLanguagePane.label.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.graphicsSettings.forceSignLanguage.tooltip")))
+            vbox += forceSignLanguagePane
         }
 
         hbox.temporarilyDisableLayouts {

@@ -199,6 +199,7 @@ class Container(
         world.resetWorld()
 
         this.globalSettings.applyForcedTilesetPaletteSettings(this)
+        this.globalSettings.applyForcedSignLanguageSettings(this.world)
         this.setTexturePackFromSource()
 
         val blocks = this.blocks.toList()
