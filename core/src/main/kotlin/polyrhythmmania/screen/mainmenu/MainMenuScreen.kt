@@ -191,7 +191,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     val beadsMusic: BeadsMusic
     var soundSys: SoundSys by settableLazy {
         SoundSys(this).apply {
-            musicPlayer.pause(true)
+            titleMusicPlayer.pause(true)
         }
     }
     private val enoughMusicLoaded: AtomicBoolean = AtomicBoolean(false)
@@ -209,7 +209,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
                     Gdx.app.postRunnable {
                         val ss = this@MainMenuScreen.soundSys
                         ss.resetMusic()
-                        ss.musicPlayer.pause(false)
+                        ss.titleMusicPlayer.pause(false)
                     }
                 }
             }
@@ -656,8 +656,8 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
     override fun getDebugString(): String {
         return """path: ${sceneRoot.mainLayer.lastHoveredElementPath.map { it::class.java.simpleName }}
 currentMenu: ${menuCollection.activeMenu.getOrCompute()?.javaClass?.simpleName}
-soundSysPaused: ${soundSys.soundSystem.isPaused} / player: ${soundSys.musicPlayer.isPaused}
-playerPos: ${soundSys.musicPlayer.position}
+soundSysPaused: ${soundSys.soundSystem.isPaused} / player: ${soundSys.titleMusicPlayer.isPaused}
+playerPos: ${soundSys.titleMusicPlayer.position}
 """
     }
 }

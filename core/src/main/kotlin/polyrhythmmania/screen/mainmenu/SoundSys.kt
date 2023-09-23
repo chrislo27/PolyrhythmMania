@@ -24,21 +24,23 @@ class SoundSys(private val mainMenuScreen: MainMenuScreen) : Disposable {
         this.setPaused(true)
         this.audioContext.out.gain = menuMusicVolume.get()
     }
-    val musicPlayer: MusicSamplePlayer = mainMenuScreen.beadsMusic.createPlayer(soundSystem.audioContext).also { player ->
+    
+    val titleMusicPlayer: MusicSamplePlayer = mainMenuScreen.beadsMusic.createPlayer(soundSystem.audioContext).also { player ->
         val sample = mainMenuScreen.musicSample
         player.loopStartMs = sample.samplesToMs(123_381.0).toFloat()
         player.loopEndMs = sample.samplesToMs(8_061_382.0).toFloat()
         player.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
     }
+    
     val bandpassVolume: FloatVar = FloatVar {
         if (use(main.settings.solitaireMusic)) 1f else 0f
     }
-    val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs)
-    val bandpassGain: Gain = Gain(soundSystem.audioContext, musicPlayer.outs, bandpassVolume.get())
-    val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpassGain else musicPlayer)
+    val bandpass: Bandpass = Bandpass(soundSystem.audioContext, titleMusicPlayer.outs)
+    val bandpassGain: Gain = Gain(soundSystem.audioContext, titleMusicPlayer.outs, bandpassVolume.get())
+    val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpassGain else titleMusicPlayer)
 
     init {
-        bandpass.addInput(musicPlayer)
+        bandpass.addInput(titleMusicPlayer)
         bandpassGain.addInput(bandpass)
 
         soundSystem.audioContext.out.addInput(crossFade)
@@ -67,18 +69,18 @@ class SoundSys(private val mainMenuScreen: MainMenuScreen) : Disposable {
     fun fadeToNormal(durationMs: Float = 1000f) {
         if (!shouldBeBandpass) return
         shouldBeBandpass = false
-        crossFade.fadeTo(musicPlayer, durationMs)
+        crossFade.fadeTo(titleMusicPlayer, durationMs)
     }
 
     fun resetMusic() {
-        musicPlayer.gain = 1f
-        musicPlayer.position = 0.0
+        titleMusicPlayer.gain = 1f
+        titleMusicPlayer.position = 0.0
         fadeToNormal(1f)
     }
 
     fun fadeMusicToSilent() {
-        Gdx.app.postRunnable(GdxRunnableTransition(musicPlayer.gain.coerceIn(0f, 1f), 0f, 0.15f) { value, _ ->
-            musicPlayer.gain = value
+        Gdx.app.postRunnable(GdxRunnableTransition(titleMusicPlayer.gain.coerceIn(0f, 1f), 0f, 0.15f) { value, _ ->
+            titleMusicPlayer.gain = value
         })
     }
 

@@ -294,11 +294,11 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private fun restartMainMenuAudio() {
         // Restart the main menu sound system.
         synchronized(mainMenu) {
-            val oldMusicPos = mainMenu.soundSys.musicPlayer.position
+            val oldMusicPos = mainMenu.soundSys.titleMusicPlayer.position
             mainMenu.soundSys.shutdown()
             mainMenu.soundSys = SoundSys(mainMenu).apply {
                 start()
-                musicPlayer.position = oldMusicPos
+                titleMusicPlayer.position = oldMusicPos
             }
             soundSystemUpdatedFlag.invert()
             if (mainMenu.soundSys.soundSystem.realtimeOutput is RealtimeOutput.OpenAL) {
@@ -321,5 +321,5 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
 
     private fun Audio.switchOutputDevice(device: OpenALOutputDevice?): Boolean =
-        Gdx.audio.switchOutputDevice(device?.rawName)
+        this.switchOutputDevice(device?.rawName)
 }
