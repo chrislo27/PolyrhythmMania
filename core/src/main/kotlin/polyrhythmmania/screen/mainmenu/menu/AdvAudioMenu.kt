@@ -22,6 +22,7 @@ import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
 import polyrhythmmania.Settings
+import polyrhythmmania.screen.mainmenu.SoundSys
 import polyrhythmmania.soundsystem.AudioDeviceSettings
 import polyrhythmmania.soundsystem.RealtimeOutput
 import polyrhythmmania.soundsystem.beads.DaemonJavaSoundAudioIO
@@ -295,7 +296,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         synchronized(mainMenu) {
             val oldMusicPos = mainMenu.soundSys.musicPlayer.position
             mainMenu.soundSys.shutdown()
-            mainMenu.soundSys = mainMenu.SoundSys().apply {
+            mainMenu.soundSys = SoundSys(mainMenu).apply {
                 start()
                 musicPlayer.position = oldMusicPos
             }

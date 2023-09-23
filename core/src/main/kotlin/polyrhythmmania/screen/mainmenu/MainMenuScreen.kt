@@ -9,13 +9,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.StreamUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import net.beadsproject.beads.ugens.CrossFade
-import net.beadsproject.beads.ugens.Gain
-import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
 import paintbox.binding.*
 import paintbox.font.Markup
@@ -29,7 +25,10 @@ import paintbox.ui.control.TextLabelSkin
 import paintbox.ui.layout.VBox
 import paintbox.util.Version
 import paintbox.util.WindowSize
-import paintbox.util.gdxutils.*
+import paintbox.util.gdxutils.NestedFrameBuffer
+import paintbox.util.gdxutils.disposeQuietly
+import paintbox.util.gdxutils.fillRect
+import paintbox.util.gdxutils.grey
 import paintbox.util.settableLazy
 import paintbox.util.viewport.ExtendNoOversizeViewport
 import paintbox.util.wave.WaveUtils
@@ -44,11 +43,8 @@ import polyrhythmmania.screen.mainmenu.bg.BgType
 import polyrhythmmania.screen.mainmenu.bg.MainMenuBg
 import polyrhythmmania.screen.mainmenu.menu.*
 import polyrhythmmania.soundsystem.BeadsMusic
-import polyrhythmmania.soundsystem.SoundSystem
-import polyrhythmmania.soundsystem.beads.ugen.Bandpass
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.MusicSample
-import polyrhythmmania.soundsystem.sample.MusicSamplePlayer
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.tileset.TintedRegion
@@ -188,14 +184,13 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         get() = framebufferManager.getFramebuffer(if (shouldFramebuffersBeSwapped) 1 else 0)
 
     // Music related ----------------------------------------------------------------------------------------------
-    private val menuMusicVolume: FloatVar = FloatVar { 
+    val menuMusicVolume: FloatVar = FloatVar { 
         use(main.settings.menuMusicVolume) / 100f
     }
-    private val musicSample: MusicSample
-    private val beadsMusic: BeadsMusic
-    private var shouldBeBandpass: Boolean = false // Used if the sound system restarts
+    val musicSample: MusicSample
+    val beadsMusic: BeadsMusic
     var soundSys: SoundSys by settableLazy {
-        SoundSys().apply {
+        SoundSys(this).apply {
             musicPlayer.pause(true)
         }
     }
@@ -664,74 +659,5 @@ currentMenu: ${menuCollection.activeMenu.getOrCompute()?.javaClass?.simpleName}
 soundSysPaused: ${soundSys.soundSystem.isPaused} / player: ${soundSys.musicPlayer.isPaused}
 playerPos: ${soundSys.musicPlayer.position}
 """
-    }
-    
-    inner class SoundSys : Disposable {
-        val soundSystem: SoundSystem = SoundSystem.createDefaultSoundSystem(settings = SoundSystem.SoundSystemSettings()).apply {
-            this.setPaused(true)
-            this.audioContext.out.gain = menuMusicVolume.get()
-        }
-        val musicPlayer: MusicSamplePlayer = beadsMusic.createPlayer(soundSystem.audioContext).also { player ->
-            val sample = musicSample
-            player.loopStartMs = sample.samplesToMs(123_381.0).toFloat()
-            player.loopEndMs = sample.samplesToMs(8_061_382.0).toFloat()
-            player.loopType = SamplePlayer.LoopType.LOOP_FORWARDS
-        }
-        val bandpassVolume: FloatVar = FloatVar {
-            if (use(main.settings.solitaireMusic)) 1f else 0f
-        }
-        val bandpass: Bandpass = Bandpass(soundSystem.audioContext, musicPlayer.outs)
-        val bandpassGain: Gain = Gain(soundSystem.audioContext, musicPlayer.outs, bandpassVolume.get())
-        val crossFade: CrossFade = CrossFade(soundSystem.audioContext, if (shouldBeBandpass) bandpassGain else musicPlayer)
-        
-        init {
-            bandpass.addInput(musicPlayer)
-            bandpassGain.addInput(bandpass)
-            
-            soundSystem.audioContext.out.addInput(crossFade)
-            
-            bandpassVolume.addListener {
-                bandpassGain.gain = it.getOrCompute()
-            }
-        }
-        
-        fun start() {
-            soundSystem.setPaused(false)
-            soundSystem.startRealtime()
-        }
-        
-        fun shutdown() {
-            soundSystem.setPaused(true)
-            soundSystem.stopRealtime()
-        }
-        
-        fun fadeToBandpass(durationMs: Float = 1000f) {
-            if (shouldBeBandpass) return
-            shouldBeBandpass = true
-            crossFade.fadeTo(bandpassGain, durationMs)
-        }
-        
-        fun fadeToNormal(durationMs: Float = 1000f) {
-            if (!shouldBeBandpass) return
-            shouldBeBandpass = false
-            crossFade.fadeTo(musicPlayer, durationMs)
-        }
-        
-        fun resetMusic() {
-            musicPlayer.gain = 1f
-            musicPlayer.position = 0.0
-            fadeToNormal(1f)
-        }
-        
-        fun fadeMusicToSilent() {
-            Gdx.app.postRunnable(GdxRunnableTransition(musicPlayer.gain.coerceIn(0f, 1f), 0f, 0.15f) { value, _ -> 
-                musicPlayer.gain = value
-            })
-        }
-
-        override fun dispose() {
-            shutdown()
-            soundSystem.dispose()
-        }
     }
 }
