@@ -554,7 +554,7 @@ class MainMenuScreen(main: PRManiaGame) : PRManiaScreen(main) {
         requestTileFlip(TileFlip(0, 0, tilesWidth, tilesHeight, cornerStart = Corner.TOP_LEFT))
         this.transitionAway = action
         main.inputMultiplexer.removeProcessor(processor)
-        soundSys.fadeMusicToSilent()
+        soundSys.fadeToSilent()
     }
 
     fun prepareShow(doFlipAnimation: Boolean = false): MainMenuScreen {

@@ -21,11 +21,11 @@ import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.discord.DefaultPresences
 import polyrhythmmania.discord.DiscordRichPresence
-import polyrhythmmania.screen.mainmenu.bg.BgType
-import polyrhythmmania.screen.play.regular.ResultsBehaviour
 import polyrhythmmania.gamemodes.AssembleMode
 import polyrhythmmania.gamemodes.DunkMode
 import polyrhythmmania.gamemodes.EndlessModeScore
+import polyrhythmmania.screen.mainmenu.bg.BgType
+import polyrhythmmania.screen.play.regular.ResultsBehaviour
 import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.ui.PRManiaSkins
 
@@ -113,6 +113,9 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                         newIndicator.value.set(false)
                         main.settings.persist()
                     }
+                    
+                    mainMenu.soundSys.fadeOutTitleForSolitaire()
+                    menuCol.solitaireMenu.startSolitaireMusic()
                 }
                 this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.play.solitaire.tooltip")))
             }

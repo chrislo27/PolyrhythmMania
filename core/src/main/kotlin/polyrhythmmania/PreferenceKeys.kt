@@ -75,7 +75,7 @@ object PreferenceKeys {
     val ENDLESS_HIGH_SCORE = "endlessMode_endless_highScore"
     val SIDEMODE_ASSEMBLE_NORMAL = "sideMode_assemble_normal"
     val SIDEMODE_SOLITAIRE_GAME_SFX = "sideMode_solitaire_gameSFX"
-    val SIDEMODE_SOLITAIRE_GAME_MUSIC = "sideMode_solitaire_gameMusic"
+    val SIDEMODE_SOLITAIRE_GAME_MUSIC = "sideMode_solitaire_gameMusic_new" // _new was suffixed for the new v2.1 music
     
     
 }

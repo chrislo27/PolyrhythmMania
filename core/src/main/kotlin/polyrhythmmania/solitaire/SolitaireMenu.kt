@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
-import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.binding.invert
 import paintbox.registry.AssetRegistry
@@ -17,9 +16,9 @@ import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.CheckBox
 import paintbox.ui.control.TextLabel
-import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
-import paintbox.util.gdxutils.set
+import paintbox.util.gdxutils.GdxDelayedRunnable
+import paintbox.util.gdxutils.GdxRunnableTransition
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.discord.DefaultPresences
@@ -31,7 +30,7 @@ import polyrhythmmania.statistics.GlobalStats
 import polyrhythmmania.statistics.PlayTimeType
 
 
-class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
+class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol), SolitaireGameListener {
     
     private val settings: Settings = main.settings
     private var loading: Boolean = true
@@ -77,8 +76,9 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     
     private fun createGame(): SolitaireGame {
         GlobalStats.solitaireGamesPlayed.increment()
-        return SolitaireGame().apply {
-            this.doClipping.set(false)
+        return SolitaireGame().also { g ->
+            g.doClipping.set(false)
+            g.gameListeners += this
         }
     }
     
@@ -87,7 +87,7 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             hbox += createSmallButton(binding = { Localization.getVar("common.close").use() }).apply {
                 this.bounds.width.set(100f)
                 this.setOnAction {
-                    mainMenu.soundSys.fadeToNormal()
+                    mainMenu.soundSys.fadeToTitle()
                     menuCol.popLastMenu()
                 }
             }
@@ -145,7 +145,6 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
 
     override fun onMenuEntered() {
-        mainMenu.soundSys.fadeToBandpass()
         DiscordRichPresence.updateActivity(DefaultPresences.playingSolitaire())
     }
 
@@ -153,11 +152,18 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         // Fade to normal handled by close button due to being able to view help menu
         mainMenu.setMainMenuRichPresence()
     }
+    
+    fun startSolitaireMusic() {
+        if (SolitaireMusic.isReady()) {
+            mainMenu.soundSys.playSolitaireMusic()
+        }
+    }
 
     override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
         if (loading) {
+            SolitaireMusic // Initialize music loading
             val progress = SolitaireAssets.load(Gdx.graphics.deltaTime)
-            if (progress >= 1f) {
+            if (progress >= 1f && SolitaireMusic.isReady()) {
                 loading = false
 
                 loadingLabel.visible.set(false)
@@ -166,6 +172,8 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 game = createGame()
                 gameParent.addChild(game)
                 addMenubarButtons()
+                
+                startSolitaireMusic()
             }
         }
         
@@ -173,4 +181,28 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         
         GlobalStats.updateModePlayTime(PlayTimeType.SOLITAIRE)
     }
+    
+    //region SolitaireGameListener
+
+    override fun onWin() {
+        // Dampen music for 3 seconds
+        if (settings.solitaireSFX.getOrCompute()) {
+            val multiplier = mainMenu.soundSys.solitaireMusicMultiplier
+            val sfxDuration = 3f
+            val quietGain = 0.2f
+            val pauseTransitionSec = 0.125f
+            Gdx.app.postRunnable(GdxRunnableTransition(multiplier.get(), quietGain, pauseTransitionSec) { value, _ ->
+                multiplier.set(value)
+            })
+            
+            val resumeTransitionSec = 1f
+            Gdx.app.postRunnable(GdxDelayedRunnable(sfxDuration) {
+                Gdx.app.postRunnable(GdxRunnableTransition(quietGain, 1f, resumeTransitionSec) { value, _ ->
+                    multiplier.set(value)
+                })
+            })
+        }
+    }
+    
+    //endregion
 }

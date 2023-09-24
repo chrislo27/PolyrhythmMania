@@ -47,7 +47,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
         
         init {
             stack.x.bind { x.use() }
-            stack.y.bind { y.use()}
+            stack.y.bind { y.use() }
         }
         
         fun canDragAsGroup(startIndex: Int): Boolean {
@@ -164,17 +164,19 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
     private val animationQueue: MutableList<EnqueuedAnimation> = mutableListOf()
     private var maxConcurrentAnimations: Int = 1
     private var currentAnimations: List<CardMoveAnimation> = listOf(
-            CardMoveAnimation(Card(CardSuit.A, CardSymbol.WIDGET_HALF), -10000f, -10000f, -10000f, -10000f, null, null, duration = 0.75f).apply {
-                // Short pause before dealing cards
-                val dealSfxID = "sfx_card_deal"
-                val dealSfx = SolitaireAssets.get<Sound>(dealSfxID)
-                dealSfx.stop()
-                this.onComplete = {
-                    playSound(dealSfxID, pitch = 0.70f)
-                }
+        CardMoveAnimation(Card(CardSuit.A, CardSymbol.WIDGET_HALF), -10000f, -10000f, -10000f, -10000f, null, null, duration = 0.75f).apply {
+            // Short pause before dealing cards
+            val dealSfxID = "sfx_card_deal"
+            val dealSfx = SolitaireAssets.get<Sound>(dealSfxID)
+            dealSfx.stop()
+            this.onComplete = {
+                playSound(dealSfxID, pitch = 0.70f)
             }
+        }
     )
     private var gameWon: Boolean = false
+    
+    val gameListeners: MutableList<SolitaireGameListener> = mutableListOf()
     
     init {
         this.bounds.width.set(800f)
@@ -325,6 +327,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
             gameWon = true
             inputsEnabled.set(false)
             playSound("sfx_win", vol = 0.75f)
+            gameListeners.forEach { it.onWin() }
             GlobalStats.solitaireGamesWon.increment()
             // Falldown animation
             maxConcurrentAnimations = Int.MAX_VALUE
