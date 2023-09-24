@@ -54,10 +54,10 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             hbox += TextLabel(binding = { Localization.getVar("mainMenu.updateNotes.selectVersion").use() }, font = font).apply {
-                this.bounds.width.set(130f)
+                this.bounds.width.set(150f)
                 this.renderAlign.set(Align.right)
                 this.padding.set(Insets(0f, 0f, 4f, 0f))
-                this.setScaleXY(0.75f)
+                this.setScaleXY(0.675f)
             }
             hbox += ComboBox(updates.asReversed(), latestUpdate, font = font).apply { 
                 this.bounds.width.set(100f)
@@ -67,7 +67,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                 }
             }
             hbox += CheckBox(binding = { Localization.getVar("mainMenu.updateNotes.dontShowAgain").use() }, font = font).apply {
-                this.bounds.width.set(160f)
+                this.bounds.width.set(175f)
                 this.textLabel.setScaleXY(0.5f)
                 this.textLabel.doLineWrapping.set(true)
                 this.imageNode.padding.set(Insets(4f, 4f, 4f, 0f))
