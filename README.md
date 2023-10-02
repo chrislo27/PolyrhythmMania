@@ -31,7 +31,7 @@ built-in level editor and side modes.
 ## System requirements to play
 **Officially supported operating systems:** Windows 7 or newer, Linux (x86 and ARM). 
 
-> macOS is not officially supported (e.g. we don't accept bug reports from macOS) but you can attempt to run it per [issue #29](https://github.com/chrislo27/PolyrhythmMania/issues/29).
+> macOS is not officially supported (i.e. we don't accept bug reports from macOS) but you can attempt to run it per [issue #29](https://github.com/chrislo27/PolyrhythmMania/issues/29).
 
 **System Specifications:** [Similar requirements as *Minecraft: Java Edition*](https://help.minecraft.net/hc/en-us/articles/4409225939853-Minecraft-Java-Edition-Installation-Issues-FAQ#h_01FFJMSQWJH31CH16H63GX4YKE)
 are used, since the same underlying graphics library (GLFW with OpenGL 4.4) is used.
@@ -43,6 +43,7 @@ are used, since the same underlying graphics library (GLFW with OpenGL 4.4) is u
 * GPU (Discrete): NVIDIA GeForce 400 Series or AMD Radeon HD 7000 series with OpenGL 4.4 
 * HDD: At least 1GB for game and levels 
 * OS: Windows 7 and up, Linux 64-bit distributions from 2018 onwards
+* Display: 1280x720 resolution
 
 ### Recommended requirements
 * CPU: Intel Core i5-4690 3.5GHz / AMD A10-7800 APU 3.5 GHz or equivalent 
@@ -50,6 +51,7 @@ are used, since the same underlying graphics library (GLFW with OpenGL 4.4) is u
 * GPU: NVIDIA GeForce 700 Series or AMD Radeon Rx 200 Series (excluding integrated chipsets) with OpenGL 4.5 
 * HDD: 2GB (SSD is recommended) 
 * OS: Windows 10 and newer (64-bit), Linux 64-bit distributions from 2020 onwards (e.g. Ubuntu 20.04) 
+* Display: 1920x1080 resolution
 
 ## Installation instructions
 These instructions are the same if you're downloading the game for the first time or upgrading to a new version.
