@@ -15,15 +15,15 @@ object PRMania {
     const val GITHUB = "https://github.com/chrislo27/PolyrhythmMania"
     const val HOMEPAGE = "https://polyrhythmmania.rhre.dev"
     const val DONATE_LINK = "https://www.paypal.com/donate/?hosted_button_id=9JLGHKZNWLLQ8"
-    val VERSION: Version = Version(2, 1, 0, "RC1_20231009a")
+    val VERSION: Version = Version(2, 1, 0, "20231014a")
     private const val DEFAULT_WIDTH: Int = 1280
     private const val DEFAULT_HEIGHT: Int = 720
     val DEFAULT_SIZE: WindowSize = WindowSize(DEFAULT_WIDTH, DEFAULT_HEIGHT)
     val MINIMUM_SIZE: WindowSize = WindowSize(1152, 648)
-    
+
     var portableMode: Boolean = false
     var possiblyNewPortableMode: Boolean = false
-    
+
     val MAIN_FOLDER: File by lazy {
         (if (portableMode) File(".polyrhythmmania/") else File(System.getProperty("user.home") + "/.polyrhythmmania/")).apply {
             mkdirs()
@@ -47,35 +47,36 @@ object PRMania {
         }
     }
     val commonResolutions: List<WindowSize> = listOf(
-            WindowSize(1152, 648),
-            WindowSize(1280, 720),
-            WindowSize(1366, 768),
-            WindowSize(1600, 900),
-            WindowSize(1760, 990),
-            WindowSize(1920, 1080),
-            WindowSize(2240, 1260),
-            WindowSize(2560, 1440),
-            WindowSize(3200, 1800),
-            WindowSize(3840, 2160),
+        WindowSize(1152, 648),
+        WindowSize(1280, 720),
+        WindowSize(1366, 768),
+        WindowSize(1600, 900),
+        WindowSize(1760, 990),
+        WindowSize(1920, 1080),
+        WindowSize(2240, 1260),
+        WindowSize(2560, 1440),
+        WindowSize(3200, 1800),
+        WindowSize(3840, 2160),
     ).sortedBy { it.width }
-    
+
     val isDevVersion: Boolean = VERSION.suffix.startsWith("dev")
-    val isPrereleaseVersion: Boolean = listOf("beta", "alpha", "rc").any { VERSION.suffix.startsWith(it, ignoreCase = true) }
+    val isPrereleaseVersion: Boolean =
+        listOf("beta", "alpha", "rc").any { VERSION.suffix.startsWith(it, ignoreCase = true) }
     val enableEarlyAccessMessage: Boolean = (isDevVersion || isPrereleaseVersion)
     val metrics: MetricRegistry = MetricRegistry()
-    
+
     // Command line arguments
     var logMissingLocalizations: Boolean = false
     var dumpPackedSheets: Boolean = false
     var enableMetrics: Boolean = false
     var audioDeviceSettings: AudioDeviceSettings? = null
-    
-    
+
+
     private fun File.copyExampleLevelsToDefaultLocation() {
         val exampleLevelFolder = File("example_levels/Level/")
         if (exampleLevelFolder.exists() && exampleLevelFolder.isDirectory) {
             Paintbox.LOGGER.info("Copying example levels to default levels folder")
-            exampleLevelFolder.listFiles { f: File -> 
+            exampleLevelFolder.listFiles { f: File ->
                 f.isFile && f.extension == Container.LEVEL_FILE_EXTENSION
             }?.forEach { file ->
                 try {
@@ -90,5 +91,5 @@ object PRMania {
             }
         }
     }
-    
+
 }
