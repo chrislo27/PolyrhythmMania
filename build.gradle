@@ -19,11 +19,11 @@ allprojects {
     apply plugin: "java"
     apply plugin: "kotlin"
 
-    version = "2.1.0"
+    version = "2.1.1"
     ext {
         appName = "PolyrhythmMania"
         
-        paintboxVersion = "0.16.1"
+        paintboxVersion = "0.17.0"
         useLocalPaintbox = false
     }
     
@@ -58,8 +58,10 @@ project(":core") {
     dependencies {
         if (useLocalPaintbox) {
             implementation "com.github.chrislo27:paintbox-core:${paintboxVersion}"
+            implementation "com.github.chrislo27:paintbox-ui:${paintboxVersion}"
         } else {
             implementation "com.github.chrislo27.paintbox:paintbox-core:${paintboxVersion}"
+            implementation "com.github.chrislo27.paintbox:paintbox-ui:${paintboxVersion}"
         }
 
         implementation "net.beadsproject:beads:3.2"
