@@ -85,7 +85,5 @@ project(":desktop") {
         } else {
             implementation "com.github.chrislo27.paintbox:paintbox-desktop:${paintboxVersion}"
         }
-        
-        implementation "com.badlogicgames.gdx:gdx-lwjgl3-glfw-awt-macos:${libgdx_version}"
     }
 }
