@@ -24,11 +24,11 @@ allprojects {
         appName = "PolyrhythmMania"
         
         paintboxVersion = "0.18.0"
-        useLocalPaintbox = true
+        useLocalPaintbox = false
     }
     
     java {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+        toolchain.languageVersion.set(JavaLanguageVersion.of(17))
         withSourcesJar()
         withJavadocJar()
     }
@@ -48,7 +48,7 @@ allprojects {
 
     tasks.withType(KotlinCompilationTask).configureEach {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
             freeCompilerArgs.add("-opt-in=kotlin.ExperimentalUnsignedTypes")
         }
     }
