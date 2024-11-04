@@ -196,7 +196,7 @@ class PRManiaGame(paintboxSettings: PaintboxSettings)
                 InputThresholds.initInputClasses()
                 
                 DiscordRichPresence // Initialize discord-gamesdk
-                DiscordRichPresence.enableRichPresence.bind { use(settings.discordRichPresence) }
+                DiscordRichPresence.enableRichPresence.bind { bindAndGet(settings.discordRichPresence) }
                 
                 initializeScreens()
                 

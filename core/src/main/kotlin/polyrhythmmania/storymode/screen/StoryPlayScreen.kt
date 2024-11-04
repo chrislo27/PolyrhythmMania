@@ -93,7 +93,7 @@ class StoryPlayScreen(
     private val currentFailureCount: IntVar = IntVar(0)
     
     // Intro card
-    private val isReducedMotionEnabled: ReadOnlyBooleanVar = BooleanVar { use(main.settings.reducedMotion) }
+    private val isReducedMotionEnabled: ReadOnlyBooleanVar = BooleanVar { bindAndGet(main.settings.reducedMotion) }
     private val introCardDefaultDuration: Float = 3f
     var introCardDuration: Float = introCardDefaultDuration
     private val introCardUnblurDuration: Float = 0.5f

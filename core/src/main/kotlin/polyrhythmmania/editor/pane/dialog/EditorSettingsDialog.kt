@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.PaintboxGame
-import paintbox.binding.ReadOnlyVar
-import paintbox.binding.Var
-import paintbox.binding.VarChangedListener
-import paintbox.binding.WeakVarChangedListener
+import paintbox.binding.*
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
@@ -29,7 +26,7 @@ import polyrhythmmania.ui.PRManiaSkins
 import kotlin.math.max
 
 
-typealias ItemToStringBinding<T> = Var.Context.(item: T) -> String
+typealias ItemToStringBinding<T> = VarContext.(item: T) -> String
 
 class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
     
@@ -189,7 +186,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                             })
                         }
                         pane += slider
-                        pane += TextLabel(binding = { "${use(bindingVar) * 10}%" },
+                        pane += TextLabel(binding = { "${bindAndGet(bindingVar) * 10}%" },
                                 font = editorPane.palette.musicDialogFont).apply {
                             Anchor.TopRight.configure(this)
                             this.bounds.width.set(100f)

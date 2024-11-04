@@ -81,7 +81,7 @@ class StoryMusicHandler(val storySession: StorySession) {
 
     private val stemPlayers: MutableMap<String, StemPlayer> = mutableMapOf()
     private val menuMusicVolume: ReadOnlyFloatVar =
-        FloatVar { use(PRManiaGame.instance.settings.menuMusicVolume) / 100f }
+        FloatVar { bindAndGet(PRManiaGame.instance.settings.menuMusicVolume) / 100f }
 
     private var targetStemMix: StemMix = StemMix.NONE
 

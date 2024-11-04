@@ -57,7 +57,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private val audioDeviceSettingsOverridden = PRMania.audioDeviceSettings != null
     private val soundSystemUpdatedFlag: BooleanVar = BooleanVar(false) // Toggled to indicate a sound system change
     private val doneTextTimer: FloatVar = FloatVar(0f)
-    private val legacyAudioEnabled = BooleanVar { use(settings.useLegacyAudio) }
+    private val legacyAudioEnabled = BooleanVar { bindAndGet(settings.useLegacyAudio) }
     
     private val openalOutputDevices: Var<List<OpenALOutputDevice?>> = Var(listOf(null))
 

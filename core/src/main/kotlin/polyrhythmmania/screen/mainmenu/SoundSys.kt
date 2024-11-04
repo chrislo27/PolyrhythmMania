@@ -33,7 +33,7 @@ class SoundSys(private val mainMenuScreen: MainMenuScreen) : Disposable {
     }
     
     private val solitaireMusicVolume: ReadOnlyFloatVar = FloatVar {
-        (if (use(main.settings.solitaireMusic)) 1f else 0f) * solitaireMusicMultiplier.use()
+        (if (bindAndGet(main.settings.solitaireMusic)) 1f else 0f) * solitaireMusicMultiplier.use()
     }
     val solitaireMusicMultiplier: FloatVar = FloatVar(1f) // Used to attenuate music when win sound played
     private val solitaireGain: Gain = Gain(audioContext, 2, solitaireMusicVolume.get())

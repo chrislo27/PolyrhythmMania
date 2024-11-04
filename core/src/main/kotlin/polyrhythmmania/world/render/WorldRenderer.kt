@@ -132,7 +132,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
     private val entityLightFrameBuffer: NestedFrameBuffer?
         get() = frameBufferManager.getFramebuffer(2)
 
-    val disableSpotlights: BooleanVar = BooleanVar { use(PRManiaGame.instance.settings.disableSpotlights) }
+    val disableSpotlights: BooleanVar = BooleanVar { bindAndGet(PRManiaGame.instance.settings.disableSpotlights) }
     
     var entitiesRenderedLastCall: Int = 0
         private set

@@ -177,7 +177,7 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
         PRMania.audioDeviceSettings
             ?: AudioDeviceSettings(
                 AudioDeviceSettings.getDefaultBufferSize(),
-                use(kv_audioDeviceBufferCount.value).coerceAtLeast(3)
+                bindAndGet(kv_audioDeviceBufferCount.value).coerceAtLeast(3)
             )
     }
 
@@ -229,14 +229,14 @@ class Settings(val main: PRManiaGame, val prefs: Preferences) { // Note: this pr
     val solitaireMusic: Var<Boolean> = kv_solitaireMusic.value
 
     val inputCalibration: ReadOnlyVar<InputCalibration> = Var.bind {
-        InputCalibration(use(calibrationAudioOffsetMs).toFloat(), use(calibrationDisableInputSFX))
+        InputCalibration(bindAndGet(calibrationAudioOffsetMs).toFloat(), bindAndGet(calibrationDisableInputSFX))
     }
     val gameplayVolume: ReadOnlyVar<Int> =
-        Var { (use(gameplayVolumeSetting) * (use(masterVolumeSetting) / 100f)).roundToInt().coerceIn(0, 100) }
+        Var { (bindAndGet(gameplayVolumeSetting) * (bindAndGet(masterVolumeSetting) / 100f)).roundToInt().coerceIn(0, 100) }
     val menuMusicVolume: ReadOnlyVar<Int> =
-        Var { (use(menuMusicVolumeSetting) * (use(masterVolumeSetting) / 100f)).roundToInt().coerceIn(0, 100) }
+        Var { (bindAndGet(menuMusicVolumeSetting) * (bindAndGet(masterVolumeSetting) / 100f)).roundToInt().coerceIn(0, 100) }
     val menuSfxVolume: ReadOnlyVar<Int> =
-        Var { (use(menuSfxVolumeSetting) * (use(masterVolumeSetting) / 100f)).roundToInt().coerceIn(0, 100) }
+        Var { (bindAndGet(menuSfxVolumeSetting) * (bindAndGet(masterVolumeSetting) / 100f)).roundToInt().coerceIn(0, 100) }
 
     val newIndicatorLibrary: NewIndicator =
         NewIndicator(NEW_INDICATOR_LIBRARY, Version(1, 1, 0), newEvenIfFirstPlay = false)

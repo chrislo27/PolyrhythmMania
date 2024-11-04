@@ -14,6 +14,7 @@ import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
 import paintbox.util.ColorStack
+import paintbox.util.DecimalFormats
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
@@ -26,7 +27,6 @@ import polyrhythmmania.editor.undo.impl.AddMusicVolumeAction
 import polyrhythmmania.editor.undo.impl.ChangeMusicVolumeAction
 import polyrhythmmania.editor.undo.impl.DeleteMusicVolumeAction
 import polyrhythmmania.engine.music.MusicVolume
-import paintbox.util.DecimalFormats
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -52,8 +52,8 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
         this.showContentBorder.set(true)
 
         this.contentSection += MusicWaveformPane(editorPane).apply { 
-            this.opacity.bind { (use(editor.settings.editorMusicWaveformOpacity) / 10f).coerceIn(0f, 1f) }
-            this.visible.bind { use(editor.settings.editorMusicWaveformOpacity) > 0 }
+            this.opacity.bind { (bindAndGet(editor.settings.editorMusicWaveformOpacity) / 10f).coerceIn(0f, 1f) }
+            this.visible.bind { bindAndGet(editor.settings.editorMusicWaveformOpacity) > 0 }
         }
         this.contentSection += VerticalBeatLinesPane(editorPane)
 

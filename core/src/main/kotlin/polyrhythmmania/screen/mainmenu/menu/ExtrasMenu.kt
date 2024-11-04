@@ -86,7 +86,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             // Remember to update DataSettingsMenu to reset high scores
             vbox += createSidemodeLongButton(AssetRegistry.get<PackedSheet>("achievements_icon")["dunk"],
                     "mainMenu.play.dunk", Localization.getVar("mainMenu.play.dunk.tooltip",
-                    Var { listOf(use(main.settings.endlessDunkHighScore)) })) { main, _ ->
+                    Var { listOf(bindAndGet(main.settings.endlessDunkHighScore)) })) { main, _ ->
                 DiscordRichPresence.updateActivity(DefaultPresences.playingDunk())
                 mainMenu.backgroundType = BgType.DUNK
                 GlobalStats.timesPlayedDunk.increment()
@@ -94,7 +94,7 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             vbox += createSidemodeLongButton(AssetRegistry.get<PackedSheet>("achievements_icon")["assemble"],
                     "mainMenu.play.assemble", Localization.getVar("mainMenu.play.assemble.tooltip",
-                    Var { listOf(use(main.settings.sidemodeAssembleHighScore)) }),
+                    Var { listOf(bindAndGet(main.settings.sidemodeAssembleHighScore)) }),
                     resultsBehaviour = ResultsBehaviour.ShowResults(null, ResultsBehaviour.PreviousHighScore.Persisted(settings.sidemodeAssembleHighScore)),
                     newIndicator = main.settings.newIndicatorExtrasAssemble) { main, _ ->
                 DiscordRichPresence.updateActivity(DefaultPresences.playingAssemble())

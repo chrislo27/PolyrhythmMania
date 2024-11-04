@@ -94,7 +94,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
             this += ImageNode(TextureRegion(AssetRegistry.get<PackedSheet>("ui_icon_editor")["menubar_save"]))
             val tooltipArgsVar: ReadOnlyVar<List<Any?>> = Var {
                 val ms = editor.lastAutosaveTimeMs.use()
-                val autosaveInterval = use(editor.autosaveInterval)
+                val autosaveInterval = bindAndGet(editor.autosaveInterval)
                 currentTimeSec.use()
                 if (ms <= 0 || autosaveInterval <= 0) {
                     listOf(Localization.getValue("editor.button.save.time.never"))
@@ -133,7 +133,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
                 }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.undo")))
-            this.disabled.bind { use(editor.undoStackSize) <= 0 }
+            this.disabled.bind { bindAndGet(editor.undoStackSize) <= 0 }
             this.setOnAction { 
                 editor.attemptUndo()
             }
@@ -153,7 +153,7 @@ class Menubar(val editorPane: EditorPane) : Pane() {
 //                }
             }
             this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.button.redo")))
-            this.disabled.bind { use(editor.redoStackSize) <= 0 }
+            this.disabled.bind { bindAndGet(editor.redoStackSize) <= 0 }
             this.setOnAction {
                 editor.attemptRedo()
             }
