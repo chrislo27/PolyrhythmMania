@@ -29,7 +29,7 @@ built-in level editor and side modes.
 
 
 ## System requirements to play
-**Officially supported operating systems:** Windows 7 or newer, Linux (x86 and ARM). 
+**Officially supported operating systems:** Windows 10 or newer, Linux (x86-64 and ARM). 
 
 > macOS is not officially supported (i.e. we don't accept bug reports from macOS) but you can attempt to run it per [issue #29](https://github.com/chrislo27/PolyrhythmMania/issues/29).
 
@@ -42,7 +42,7 @@ are used, since the same underlying graphics library (GLFW with OpenGL 4.4) is u
 * GPU (Integrated): Intel HD Graphics 4000 (Ivy Bridge) or AMD Radeon R5 series (Kaveri line) with OpenGL 4.4
 * GPU (Discrete): NVIDIA GeForce 400 Series or AMD Radeon HD 7000 series with OpenGL 4.4 
 * HDD: At least 1GB for game and levels 
-* OS: Windows 7 and up, Linux 64-bit distributions from 2018 onwards
+* OS: Windows 10 and up, Linux 64-bit distributions from 2018 onwards
 * Display: 1280x720 resolution
 
 ### Recommended requirements
@@ -77,7 +77,7 @@ __Other platforms (or for advanced users who already have Java installed)__
 ## Compilation instructions
 These instructions are for people interested in editing the source code of the game.
 
-1. Ensure JDK 11 or newer (JDK 17 recommended) is installed.
+1. Ensure JDK 17 or newer is installed.
 2. `chmod +x gradlew`
 3. `./gradlew :desktop:run`
 
