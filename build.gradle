@@ -70,7 +70,7 @@ project(":core") {
         implementation "com.eclipsesource.minimal-json:minimal-json:0.9.5"
         implementation "net.lingala.zip4j:zip4j:2.11.5"
         implementation "org.apache.httpcomponents:httpclient:4.5.13"
-        implementation "space.earlygrey:shapedrawer:v2.6.0"
+        implementation "com.github.earlygrey:shapedrawer:v2.6.0"
         implementation "com.github.JnCrMx:discord-game-sdk4j:v0.5.5"
         implementation "com.twelvemonkeys.imageio:imageio-tga:$imageio_tga_version"
     }
