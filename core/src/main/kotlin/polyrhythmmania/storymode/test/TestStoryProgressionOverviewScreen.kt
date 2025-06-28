@@ -281,7 +281,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val storySession: St
                 this += RectElement(Color.BLACK).apply { this.bounds.height.set(2f) }
                 this += Button("").apply {
                     this.bounds.height.set(72f)
-                    this.markup.set(main.debugMarkup)
+                    this.markup.set(main.defaultFonts.debugMarkup)
 
                     val normalText = "Copy DEFAULT\nJSON to\nclipboard"
                     this.text.set(normalText)
@@ -300,7 +300,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val storySession: St
                 }
                 this += Button("").apply {
                     this.bounds.height.set(72f)
-                    this.markup.set(main.debugMarkup)
+                    this.markup.set(main.defaultFonts.debugMarkup)
 
                     val normalText = "Reset to\ndefault\nprogression"
                     this.text.set(normalText)
@@ -320,7 +320,7 @@ class TestStoryProgressionOverviewScreen(main: PRManiaGame, val storySession: St
                 this += RectElement(Color.BLACK).apply { this.bounds.height.set(2f) }
                 this += Button("").apply {
                     this.bounds.height.set(96f)
-                    this.markup.set(main.debugMarkup)
+                    this.markup.set(main.defaultFonts.debugMarkup)
 
                     val normalText = "Load JSON\ndata from\nclipboard"
                     this.text.set(normalText)

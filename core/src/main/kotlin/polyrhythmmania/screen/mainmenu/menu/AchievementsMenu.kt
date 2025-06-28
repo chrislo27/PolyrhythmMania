@@ -229,7 +229,7 @@ class AchievementsMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         val compactMode = BooleanVar(false)
         
         fun updateCategory() {
-            vbox.children.forEach(vbox::removeChild)
+            vbox.children.getOrCompute().forEach(vbox::removeChild)
             vbox.temporarilyDisableLayouts {
                 vbox += totalProgressLabel
 

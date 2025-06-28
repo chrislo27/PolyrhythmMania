@@ -616,7 +616,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
                                 this.padding.set(Insets(1f, 0f, 0f, 0f))
                             }
                             val highScoresListener: (levelEntry: LevelEntry?) -> Unit = { l ->
-                                vbox.children.toList().forEach { c -> vbox.removeChild(c) }
+                                vbox.children.getOrCompute().toList().forEach { c -> vbox.removeChild(c) }
                                 if (l != null) {
                                     val scoreCache = GlobalScoreCache.scoreCache.getOrCompute()
                                     val levelScore = scoreCache.map[l.uuid]
@@ -884,7 +884,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     private fun updateLevelListVbox() {
         val buttonBorder = Insets(1f, 0f, 0f, 0f)
         vbox.temporarilyDisableLayouts {
-            vbox.children.forEach { vbox.removeChild(it) }
+            vbox.children.getOrCompute().forEach { vbox.removeChild(it) }
             activeLevelList.getOrCompute().forEachIndexed { index, it ->
                 val button = it.button
                 button.border.set(if (index == 0) Insets.ZERO else buttonBorder)

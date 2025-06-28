@@ -11,7 +11,10 @@ import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.*
+import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
+import paintbox.ui.Pane
+import paintbox.ui.UIElement
 import paintbox.ui.area.Insets
 import paintbox.ui.control.*
 import paintbox.ui.layout.HBox
@@ -242,7 +245,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 Anchor.CentreLeft.configure(this)
                 this.bindWidthToSelfHeight()
                 this.skinID.set(StandardMenu.BUTTON_LONG_SKIN_ID)
-                addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply {
+                addChild(ImageNode(TextureRegion(PaintboxGame.gameInstance.staticAssets.paintboxSpritesheet.upArrow)).apply {
                     this.rotation.set(90f)
                     this.padding.set(Insets(10f))
                     this.tint.set(Color.WHITE)
@@ -257,7 +260,7 @@ class EditorSettingsDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                 Anchor.CentreRight.configure(this)
                 this.bindWidthToSelfHeight()
                 this.skinID.set(StandardMenu.BUTTON_LONG_SKIN_ID)
-                addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply {
+                addChild(ImageNode(TextureRegion(PaintboxGame.gameInstance.staticAssets.paintboxSpritesheet.upArrow)).apply {
                     this.rotation.set(270f)
                     this.padding.set(Insets(10f))
                     this.tint.set(Color.WHITE)

@@ -53,7 +53,8 @@ class EditorScreen(
     }
     
     private fun countChildren(element: UIElement): Int {
-        return 1 + element.children.size + element.children.sumOf { countChildren(it) }
+        val children = element.children.getOrCompute()
+        return 1 + children.size + children.sumOf { countChildren(it) }
     }
 
     override fun getDebugString(): String {

@@ -185,7 +185,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
     
     private fun ensureShapeDrawerReady(batch: Batch) {
         if (shapeDrawer == null || shapeDrawer?.batch !== batch) {
-            val region = TextureRegion(PaintboxGame.fillTexture)
+            val region = TextureRegion(PaintboxGame.gameInstance.staticAssets.fillTexture)
             shapeDrawer = ShapeDrawer(batch, region)
         }
     }

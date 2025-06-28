@@ -19,7 +19,6 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.util.gdxutils.GdxDelayedRunnable
-import paintbox.util.gdxutils.GdxRunnableTransition
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.PRMania
@@ -225,7 +224,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
             
             scrollPaneContent.addListener {
-                internalPane.children.forEach { c -> internalPane.removeChild(c) }
+                internalPane.children.getOrCompute().forEach { c -> internalPane.removeChild(c) }
                 internalPane.addChild(it.getOrCompute())
             }
             scrollPaneContent.bind {

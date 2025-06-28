@@ -75,7 +75,7 @@ object DesktopLauncher {
             val emulatedSize = app.paintboxSettings.emulatedSize
             this.setWindowedMode(emulatedSize.width, emulatedSize.height)
             this.setWindowSizeLimits(PRMania.MINIMUM_SIZE.width, PRMania.MINIMUM_SIZE.height, -1, -1)
-            this.setTitle(app.getTitle())
+            this.setTitle(app.getWindowTitle())
             this.setResizable(true)
             this.setInitialVisible(false)
             this.setInitialBackgroundColor(Color(0f, 0f, 0f, 1f))

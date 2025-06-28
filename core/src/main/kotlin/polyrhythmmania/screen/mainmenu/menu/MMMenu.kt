@@ -444,7 +444,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 Anchor.TopLeft.configure(this)
                 this.bindWidthToSelfHeight()
                 this.skinID.set(BUTTON_LONG_SKIN_ID)
-                addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply { 
+                addChild(ImageNode(TextureRegion(PaintboxGame.gameInstance.staticAssets.paintboxSpritesheet.upArrow)).apply { 
                     this.rotation.set(90f)
                     this.padding.set(Insets(4f))
                     this.tint.bind { settingsOptionPane.textColorVar.use() }
@@ -459,7 +459,7 @@ open class StandardMenu(menuCol: MenuCollection) : MMMenu(menuCol) {
                 Anchor.TopRight.configure(this)
                 this.bindWidthToSelfHeight()
                 this.skinID.set(BUTTON_LONG_SKIN_ID)
-                addChild(ImageNode(TextureRegion(PaintboxGame.paintboxSpritesheet.upArrow)).apply {
+                addChild(ImageNode(TextureRegion(PaintboxGame.gameInstance.staticAssets.paintboxSpritesheet.upArrow)).apply {
                     this.rotation.set(270f)
                     this.padding.set(Insets(4f))
                     this.tint.bind { settingsOptionPane.textColorVar.use() }

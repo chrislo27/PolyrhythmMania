@@ -171,9 +171,9 @@ class ExportLevelDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                         this.bounds.height.set(iconSize)
                         this.margin.set(Insets(6f, 6f, 8f, 8f))
                         val check = ImageIcon(TextureRegion(when (completed) {
-                            ChecklistState.NONE -> PaintboxGame.paintboxSpritesheet.checkboxX
-                            ChecklistState.COMPLETE -> PaintboxGame.paintboxSpritesheet.checkboxCheck
-                            ChecklistState.PARTIAL -> PaintboxGame.paintboxSpritesheet.checkboxLine
+                            ChecklistState.NONE -> PaintboxGame.gameInstance.staticAssets.paintboxSpritesheet.checkboxX
+                            ChecklistState.COMPLETE -> PaintboxGame.gameInstance.staticAssets.paintboxSpritesheet.checkboxCheck
+                            ChecklistState.PARTIAL -> PaintboxGame.gameInstance.staticAssets.paintboxSpritesheet.checkboxLine
                         })).apply {
                             this.margin.set(Insets(4f, 4f, 8f, 8f))
                             this.bounds.width.set(iconSize)

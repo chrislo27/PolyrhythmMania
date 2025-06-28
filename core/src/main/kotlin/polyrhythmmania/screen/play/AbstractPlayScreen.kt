@@ -50,7 +50,7 @@ abstract class AbstractPlayScreen(
     val uiViewport: Viewport = FitViewport(uiCamera.viewportWidth, uiCamera.viewportHeight, uiCamera)
     val sceneRoot: SceneRoot = SceneRoot(uiViewport)
     protected val pauseMenuInputProcessor: InputProcessor = sceneRoot.inputSystem
-    val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.paintboxSpritesheet.fill)
+    val shapeDrawer: ShapeDrawer = ShapeDrawer(batch, PaintboxGame.gameInstance.staticAssets.paintboxSpritesheet.fill)
 
     val pauseOptions: Var<List<PauseOption>> = Var(emptyList())
     val selectedPauseOption: Var<PauseOption?> = Var(null)

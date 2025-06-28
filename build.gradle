@@ -23,12 +23,12 @@ allprojects {
     ext {
         appName = "PolyrhythmMania"
         
-        paintboxVersion = "0.18.0"
-        useLocalPaintbox = false
+        paintboxVersion = "1.0.0"
+        useLocalPaintbox = true
     }
     
     java {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
         withSourcesJar()
         withJavadocJar()
     }
@@ -48,7 +48,7 @@ allprojects {
 
     tasks.withType(KotlinCompilationTask).configureEach {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_21)
             freeCompilerArgs.add("-opt-in=kotlin.ExperimentalUnsignedTypes")
         }
     }
@@ -59,9 +59,13 @@ project(":core") {
         if (useLocalPaintbox) {
             implementation "com.github.chrislo27:paintbox-core:${paintboxVersion}"
             implementation "com.github.chrislo27:paintbox-ui:${paintboxVersion}"
+            implementation "com.github.chrislo27:paintbox-filechooser:${paintboxVersion}"
+            implementation "com.github.chrislo27:paintbox-filechooser-tinyfd:${paintboxVersion}"
         } else {
             implementation "com.github.chrislo27.paintbox:paintbox-core:${paintboxVersion}"
             implementation "com.github.chrislo27.paintbox:paintbox-ui:${paintboxVersion}"
+            implementation "com.github.chrislo27.paintbox:paintbox-filechooser:${paintboxVersion}"
+            implementation "com.github.chrislo27.paintbox:paintbox-filechooser-tinyfd:${paintboxVersion}"
         }
 
         implementation "net.beadsproject:beads:3.2"

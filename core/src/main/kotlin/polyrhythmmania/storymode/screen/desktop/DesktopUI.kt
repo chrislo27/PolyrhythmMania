@@ -307,7 +307,7 @@ class DesktopUI(
     fun getTargetVbarValueForInboxItem(inboxItem: InboxItem): Float {
         val currentValue = inboxItemListScrollbar.value.get()
         val vbox = itemsVbox
-        val listingObj: InboxItemListingObj = vbox.children.find {
+        val listingObj: InboxItemListingObj = vbox.children.getOrCompute().find {
             it is InboxItemListingObj && it.inboxItem == inboxItem
         } as? InboxItemListingObj ?: return currentValue
         
