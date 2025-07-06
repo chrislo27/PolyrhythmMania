@@ -77,7 +77,7 @@ class PRManiaGame(paintboxSettings: IPaintboxSettings)
             private set
         
         fun createPaintboxSettings(launchArguments: List<String>, logger: Logger, logToFile: File?): IPaintboxSettings =
-                IPaintboxSettings.Impl(launchArguments, logger, logToFile, PRMania.VERSION, PRMania.DEFAULT_SIZE,
+                IPaintboxSettings.LegacyImpl(launchArguments, logger, logToFile, PRMania.VERSION, PRMania.DEFAULT_SIZE,
                         ResizeAction.ANY_SIZE, PRMania.MINIMUM_SIZE)
         
         init {
