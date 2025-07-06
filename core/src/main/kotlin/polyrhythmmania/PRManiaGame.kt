@@ -69,15 +69,15 @@ import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 
 
-class PRManiaGame(paintboxSettings: PaintboxSettings)
+class PRManiaGame(paintboxSettings: IPaintboxSettings)
     : PaintboxGame(paintboxSettings), IFullscreenWindowedInputProcessor {
 
     companion object {
         lateinit var instance: PRManiaGame
             private set
         
-        fun createPaintboxSettings(launchArguments: List<String>, logger: Logger, logToFile: File?): PaintboxSettings =
-                PaintboxSettings(launchArguments, logger, logToFile, PRMania.VERSION, PRMania.DEFAULT_SIZE,
+        fun createPaintboxSettings(launchArguments: List<String>, logger: Logger, logToFile: File?): IPaintboxSettings =
+                IPaintboxSettings.Impl(launchArguments, logger, logToFile, PRMania.VERSION, PRMania.DEFAULT_SIZE,
                         ResizeAction.ANY_SIZE, PRMania.MINIMUM_SIZE)
         
         init {
