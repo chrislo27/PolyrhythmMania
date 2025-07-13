@@ -459,6 +459,10 @@ class PRManiaGame(paintboxSettings: IPaintboxSettings)
         Gdx.graphics.setWindowedMode(PRMania.DEFAULT_SIZE.width, PRMania.DEFAULT_SIZE.height)
     }
 
+    override fun attemptSetWindowed(windowSize: WindowSize) {
+        Gdx.graphics.setWindowedMode(windowSize.width, windowSize.height)
+    }
+
     override fun exceptionHandler(t: Throwable) {
         val currentScreen = this.screen
         if (currentScreen !is CrashScreen) {
