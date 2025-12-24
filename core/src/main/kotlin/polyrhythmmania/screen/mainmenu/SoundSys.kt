@@ -105,6 +105,6 @@ class SoundSys(private val mainMenuScreen: MainMenuScreen) : Disposable {
             if (pauseAtEnd && progress >= 1f) {
                 this.pause(true)
             }
-        })
+        }.toRunnable())
     }
 }

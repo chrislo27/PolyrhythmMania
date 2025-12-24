@@ -17,7 +17,6 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.CheckBox
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
-import paintbox.util.gdxutils.GdxDelayedRunnable
 import paintbox.util.gdxutils.GdxRunnableTransition
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
@@ -193,14 +192,12 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol), SolitaireG
             val pauseTransitionSec = 0.125f
             Gdx.app.postRunnable(GdxRunnableTransition(multiplier.get(), quietGain, pauseTransitionSec) { value, _ ->
                 multiplier.set(value)
-            })
+            }.toRunnable())
             
             val resumeTransitionSec = 1f
-            Gdx.app.postRunnable(GdxDelayedRunnable(sfxDuration) {
-                Gdx.app.postRunnable(GdxRunnableTransition(quietGain, 1f, resumeTransitionSec) { value, _ ->
-                    multiplier.set(value)
-                })
-            })
+            Gdx.app.postRunnable(GdxRunnableTransition(quietGain, 1f, resumeTransitionSec, delaySec = sfxDuration) { value, _ ->
+                multiplier.set(value)
+            }.toRunnable())
         }
     }
     

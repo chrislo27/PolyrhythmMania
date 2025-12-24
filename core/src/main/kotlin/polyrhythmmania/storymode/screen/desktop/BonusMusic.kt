@@ -41,7 +41,7 @@ class BonusMusic(val desktopUI: DesktopUI) {
                     if (newValue <= 0f) {
                         player.kill()
                     }
-                })
+                }.toRunnable())
             }
             currentPlayer = null
         }
