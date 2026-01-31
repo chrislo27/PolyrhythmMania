@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=chrislo27&project=PolyrhythmMania&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 # Polyrhythm Mania
 A game that faithfully recreates the *Polyrhythm* minigame from Rhythm Tengoku (リズム天国), with a 
 built-in level editor and side modes.
