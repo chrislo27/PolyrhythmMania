@@ -36,6 +36,8 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
     
     private val mainPaneHeightUnits: FloatVar = FloatVar(MAIN_PANE_HEIGHT_COLLAPSED)
     
+    private var areAudioSettingsOpen: Boolean = false
+    
     init {
         val settings = main.settings
         val robotoRegularMarkup = desktopUI.robotoRegularMarkup
@@ -95,7 +97,9 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
                 this.setOnAction {
                     val currentScreen = main.screen
                     val onExitCredits: () -> Unit = {
-                        addBandpassToMusic()
+                        if (!areAudioSettingsOpen) {
+                            addBandpassToMusic()
+                        }
                         main.screen = TransitionScreen(
                             main, main.screen, currentScreen,
                             FadeToOpaque(0.25f, Color(0f, 0f, 0f, 1f)),
@@ -115,6 +119,11 @@ class DesktopDialogMenu(desktopUI: DesktopUI) : DesktopDialog(desktopUI) {
             
             // Audio settings
             fun addAudioSettings() {
+                if (areAudioSettingsOpen) {
+                    return
+                }
+                areAudioSettingsOpen = true
+                
                 this += TextLabel(Localization.getVar("desktop.menu.settings.audio"), font = main.fontMainMenuHeading).apply {
                     this.bounds.height.set(7f * UI_SCALE)
                     this.textColor.set(Color.WHITE)
