@@ -261,7 +261,7 @@ class CalibrationScreen(main: PRManiaGame, val baseInputCalibration: InputCalibr
         sceneRoot.renderAsRoot(batch)
         
         batch.end()
-        batch.projectionMatrix = main.nativeCamera.combined
+        batch.projectionMatrix = main.actualWindowSizeCamera.combined
         
         super.render(delta)
     }

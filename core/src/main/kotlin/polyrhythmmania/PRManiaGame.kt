@@ -351,7 +351,7 @@ class PRManiaGame(paintboxSettings: IPaintboxSettings)
     override fun postRender() {
         val batch = this.batch
 
-        val cam = nativeCamera
+        val cam = actualWindowSizeCamera
         batch.projectionMatrix = cam.combined
         batch.begin()
         batch.setColor(1f, 1f, 1f, 1f)

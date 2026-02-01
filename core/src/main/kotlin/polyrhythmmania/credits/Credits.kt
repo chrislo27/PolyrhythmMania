@@ -70,7 +70,7 @@ object Credits : CreditsBase() {
     )
     
     val languageCredits: Map<Locale, LanguageCredit> = listOf(
-            LanguageCredit(Locale("es", "", ""), listOf("J-D Thunder"), listOf("Yumiko!")),
+            LanguageCredit(Locale.of("es", "", ""), listOf("J-D Thunder"), listOf("Yumiko!")),
     ).associateBy { it.locale }
     
 }

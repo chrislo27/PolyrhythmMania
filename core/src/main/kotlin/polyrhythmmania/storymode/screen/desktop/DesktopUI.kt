@@ -526,7 +526,6 @@ class DesktopUI(
                                     InboxItemCompletion.AVAILABLE -> "unsigned_blue"
                                     InboxItemCompletion.COMPLETED -> "signed_green"
                                     InboxItemCompletion.SKIPPED -> "signed_red"
-                                    else -> throw IllegalStateException("Unhandled impossible employment contract inbox item state completion: ${state.completion}")
                                 }
                             }"))
                         }

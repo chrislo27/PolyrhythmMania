@@ -8,24 +8,27 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
+import net.beadsproject.beads.ugens.SamplePlayer
 import paintbox.Paintbox
+import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
+import paintbox.binding.LongVar
 import paintbox.binding.Var
+import paintbox.filechooser.FileExtFilter
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
-import paintbox.ui.*
+import paintbox.ui.Anchor
+import paintbox.ui.ImageNode
+import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.filechooser.TinyFDWrapper
-import net.beadsproject.beads.ugens.SamplePlayer
-import paintbox.binding.BooleanVar
-import paintbox.binding.LongVar
-import paintbox.filechooser.FileExtFilter
+import paintbox.util.DecimalFormats
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaColors
 import polyrhythmmania.PreferenceKeys
@@ -35,7 +38,6 @@ import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.soundsystem.BeadsMusic
 import polyrhythmmania.soundsystem.sample.GdxAudioReader
 import polyrhythmmania.soundsystem.sample.LoopParams
-import paintbox.util.DecimalFormats
 import polyrhythmmania.util.TempFileUtils
 import polyrhythmmania.util.TimeUtils
 import java.io.File
@@ -427,7 +429,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                     this.bounds.width.set(220f)
                     this.tooltipElement.set(editorPane.createDefaultTooltip(Localization.getVar("editor.dialog.music.settings.enableLooping.tooltip")))
                 }
-                hbox.addChild(lCheckBox!!)
+                hbox.addChild(lCheckBox)
                 hbox.addChild(Button(binding = { Localization.getVar("editor.dialog.music.settings.resetLoopPoints").use() }, font = editorPane.palette.musicDialogFont).apply {
                     this.applyDialogStyleContent()
                     this.bounds.width.set(200f)
@@ -491,7 +493,7 @@ class MusicDialog(editorPane: EditorPane) : EditorDialog(editorPane) {
                             this.setValue(100f)
                         }
                     }
-                    this += rateSlider!!
+                    this += rateSlider
                 })
             }
         }

@@ -208,7 +208,7 @@ class TengokuBgPauseMenuHandler(screen: AbstractPlayScreen) : PauseMenuHandler(s
             batch.setColor(1f, 1f, 1f, 1f)
 
             batch.flush()
-            shapeRenderer.projectionMatrix = main.nativeCamera.combined
+            shapeRenderer.projectionMatrix = main.actualWindowSizeCamera.combined
 
             screen.sceneRoot.renderAsRoot(batch)
         }

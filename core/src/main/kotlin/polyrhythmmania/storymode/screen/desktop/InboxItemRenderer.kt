@@ -212,7 +212,6 @@ class InboxItemRenderer(val main: PRManiaGame, val scenario: DesktopScenario) {
                     is InboxItem.ContractDoc -> item.headingText
                     is InboxItem.PlaceholderContract -> item.headingText
                     is InboxItem.RobotTest -> item.headingText
-                    else -> "<missing heading text>".toConstVar()
                 }
 
                 paper.paperPane += VBox().apply {

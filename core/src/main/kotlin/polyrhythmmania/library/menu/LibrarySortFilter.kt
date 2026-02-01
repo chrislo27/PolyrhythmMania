@@ -121,13 +121,13 @@ data class LibrarySortFilter(
                 (it.levelEntry as LevelEntry.Modern).exportStatistics.maxBPM
             }
             Sortable.LAST_PLAYED -> {
-                Comparator.comparing<LevelEntryData?, Long?> {
-                    GlobalScoreCache.scoreCache.getOrCompute().map[it.levelEntry.uuid]?.lastPlayed?.epochSecond ?: -1L
+                Comparator.comparing<LevelEntryData?, Long> {
+                    GlobalScoreCache.scoreCache.getOrCompute().map[it?.levelEntry?.uuid]?.lastPlayed?.epochSecond ?: -1L
                 }.reversed()
             }
             Sortable.PLAY_COUNT -> {
-                Comparator.comparing<LevelEntryData?, Int?> {
-                    GlobalScoreCache.scoreCache.getOrCompute().map[it.levelEntry.uuid]?.playCount ?: 0
+                Comparator.comparing<LevelEntryData?, Int> {
+                    GlobalScoreCache.scoreCache.getOrCompute().map[it?.levelEntry?.uuid]?.playCount ?: 0
                 }
             }
         }
