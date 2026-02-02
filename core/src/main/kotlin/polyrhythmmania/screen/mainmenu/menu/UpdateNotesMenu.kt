@@ -22,7 +22,7 @@ class UpdateNotesMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     companion object {
         private val TEXT_COLOR: Color = LongButtonSkin.TEXT_COLOR
         
-        val updates: List<String> = listOf("v1.1", "v1.2", "v2.0", "v2.1")
+        val updates: List<String> = listOf("v1.1", "v1.2", "v2.0", "v2.1", "v2.2")
         val latestUpdate: String = updates.last()
     }
     
