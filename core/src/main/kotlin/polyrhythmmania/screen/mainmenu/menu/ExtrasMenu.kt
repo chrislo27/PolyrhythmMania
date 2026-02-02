@@ -121,6 +121,15 @@ class ExtrasMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             }
 
             vbox += separator()
+            vbox += createLongButtonWithIcon(TextureRegion(AssetRegistry.get<Texture>("mainmenu_builtToScaleSolitaireSteam"))) {
+                Localization.getVar("mainMenu.extras.builtToScaleSolitaireSteam").use()
+            }.apply {
+                val link = """https://store.steampowered.com/app/3477710/Built_to_Scale_Solitaire/"""
+                this.tooltipElement.set(createTooltip(Localization.getVar("mainMenu.extras.builtToScaleSolitaireSteam.tooltip", Var { listOf(link) })))
+                this.setOnAction {
+                    Gdx.net.openURI(link)
+                }
+            }
             vbox += createLongButtonWithIcon(AssetRegistry.get<PackedSheet>("ui_icon_editor")["toolbar_music"]) {
                 Localization.getVar("mainMenu.extras.ost").use()
             }.apply {

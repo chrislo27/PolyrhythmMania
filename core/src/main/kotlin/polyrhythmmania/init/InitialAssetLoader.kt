@@ -116,6 +116,7 @@ class InitialAssetLoader : IAssetLoader {
                 atlasMinFilter = Texture.TextureFilter.Linear, atlasMagFilter = Texture.TextureFilter.Linear)))
         AssetRegistry.loadAsset<Texture>("github_mark", "textures/mainmenu/github_mark.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("support_donate", "textures/mainmenu/support.png", linearTexture())
+        AssetRegistry.loadAsset<Texture>("mainmenu_builtToScaleSolitaireSteam", "textures/mainmenu/builtToScaleSolitaireSteam.png", linearTexture())
         AssetRegistry.loadAsset<Texture>("mainmenu_rhre", "textures/mainmenu/rhre.png")
         AssetRegistry.loadAsset<Texture>("mainmenu_brm", "textures/mainmenu/brm.png")
         AssetRegistry.loadAsset<Texture>("mainmenu_bg_storymode_inbox_entity", "textures/mainmenu/storymode/inbox_entity.png")
