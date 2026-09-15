@@ -1,7 +1,7 @@
 package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import paintbox.binding.IntVar
 import paintbox.util.ColorStack
 import kotlin.system.measureNanoTime
@@ -36,7 +36,7 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
         }
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         super.renderSelf(originX, originY, batch)
         val renderBounds = this.contentZone
         val x = renderBounds.x.get() + originX
@@ -69,7 +69,7 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
         batch.packedColor = lastPackedColor
     }
 
-    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: Batch) {
         super.renderSelfAfterChildren(originX, originY, batch)
         val renderBounds = this.contentZone
         val x = renderBounds.x.get() + originX

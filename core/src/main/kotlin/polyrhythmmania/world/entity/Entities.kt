@@ -1,6 +1,6 @@
 package polyrhythmmania.world.entity
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
@@ -98,7 +98,7 @@ class EntitySign(world: World, val type: Type, val renderCriteria: RenderCriteri
         }
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         if (renderCriteria.check(world)) {
             super.renderSimple(renderer, batch, tileset, vec)
         }

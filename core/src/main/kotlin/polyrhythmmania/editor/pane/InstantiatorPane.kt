@@ -2,7 +2,7 @@ package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -321,7 +321,7 @@ class InstantiatorList(
             this.doClipping.set(true)
         }
 
-        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
             val currentIndexTween = currentIndex.getOrCompute()
             val currentIndex = currentIndexTween.index.get()
             var indexTween = currentIndexTween.tweenY.get()

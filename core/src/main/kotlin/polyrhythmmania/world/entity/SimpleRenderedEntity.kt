@@ -1,7 +1,7 @@
 package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.Vector3Stack
@@ -18,7 +18,7 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
         return this.position
     }
     
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun render(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         val tmpVec = Vector3Stack.getAndPush()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor
@@ -27,10 +27,10 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
         batch.packedColor = packedColor
     }
     
-    protected open fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    protected open fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
     }
     
-    protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion,
+    protected fun drawTintedRegion(batch: Batch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion,
                                    offsetX: Float, offsetY: Float, renderWidth: Float, renderHeight: Float,
                                    tintColor: Color? = null) {
         if (renderWidth == 0f || renderHeight == 0f) return
@@ -75,7 +75,7 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
         batch.setColor(1f, 1f, 1f, 1f)
     }
     
-    protected fun drawTintedRegion(batch: SpriteBatch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion,
+    protected fun drawTintedRegion(batch: Batch, vec: Vector3, tileset: Tileset, tintedRegion: TintedRegion,
                                    tintColor: Color? = null) {
         drawTintedRegion(batch, vec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tintColor)
     }

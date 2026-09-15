@@ -3,7 +3,7 @@ package polyrhythmmania.editor.pane.track
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import paintbox.binding.FloatVar
@@ -12,7 +12,10 @@ import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
-import polyrhythmmania.editor.*
+import polyrhythmmania.editor.Click
+import polyrhythmmania.editor.Editor
+import polyrhythmmania.editor.Tool
+import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.block.Instantiators
 import polyrhythmmania.editor.pane.EditorPane
 import kotlin.math.floor
@@ -218,7 +221,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : PaneWithTooltip() {
         return x + (trackView.translateBeatToX(beat))
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         super.renderSelf(originX, originY, batch)
 
         val renderBounds = this.contentZone
@@ -242,7 +245,7 @@ class EditorTrackArea(val allTracksPane: AllTracksPane) : PaneWithTooltip() {
         batch.packedColor = lastPackedColor
     }
 
-    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: Batch) {
         super.renderSelfAfterChildren(originX, originY, batch)
 
         val renderBounds = this.contentZone

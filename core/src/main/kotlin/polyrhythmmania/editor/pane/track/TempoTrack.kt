@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
@@ -18,6 +18,7 @@ import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.util.ColorStack
+import paintbox.util.DecimalFormats
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
@@ -31,7 +32,6 @@ import polyrhythmmania.editor.undo.impl.ChangeStartingTempoAction
 import polyrhythmmania.editor.undo.impl.ChangeTempoChangeAction
 import polyrhythmmania.editor.undo.impl.DeleteTempoChangeAction
 import polyrhythmmania.engine.tempo.TempoChange
-import paintbox.util.DecimalFormats
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -311,7 +311,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             }
         }
 
-        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
             val renderBounds = this.contentZone
             val x = renderBounds.x.get() + originX
             val y = originY - renderBounds.y.get()
@@ -384,7 +384,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             batch.packedColor = lastPackedColor
         }
 
-        private fun drawTempoChange(batch: SpriteBatch, color: Color, x: Float, y: Float, h: Float, trackView: TrackView, lineWidth: Float,
+        private fun drawTempoChange(batch: Batch, color: Color, x: Float, y: Float, h: Float, trackView: TrackView, lineWidth: Float,
                                     triangle: Texture, triangleSize: Float, beat: Float, tempo: Float, font: BitmapFont?) {
             font?.color = color
             batch.color = color

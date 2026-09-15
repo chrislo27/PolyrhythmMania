@@ -1,7 +1,7 @@
 package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
@@ -64,7 +64,7 @@ open class EntityRodDecor(world: World, isInAir: Boolean = false) : SimpleRender
         return tileset.rodAAerialFillAnimations
     }
     
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         val animationAlpha = getAnimationAlpha().coerceIn(0f, 1f)
 
         val renderW = renderWidth

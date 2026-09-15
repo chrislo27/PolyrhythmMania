@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
@@ -233,7 +233,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
             }
         }
 
-        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
             val renderBounds = this.contentZone
             val x = renderBounds.x.get() + originX
             val y = originY - renderBounds.y.get()
@@ -310,7 +310,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
             batch.packedColor = lastPackedColor
         }
 
-        private fun drawMusicVol(batch: SpriteBatch, color: Color, x: Float, y: Float, h: Float, trackView: TrackView, lineWidth: Float,
+        private fun drawMusicVol(batch: Batch, color: Color, x: Float, y: Float, h: Float, trackView: TrackView, lineWidth: Float,
                                  triangle: Texture, triangleSize: Float, beat: Float, mvWidth: Float, volume: Int, font: BitmapFont?) {
 
             font?.color = color

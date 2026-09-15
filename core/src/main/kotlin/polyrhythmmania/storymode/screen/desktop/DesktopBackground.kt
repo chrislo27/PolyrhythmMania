@@ -3,7 +3,7 @@ package polyrhythmmania.storymode.screen.desktop
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Interpolation
 import paintbox.util.wave.WaveUtils
 import polyrhythmmania.storymode.StoryAssets
@@ -80,7 +80,7 @@ class DesktopBackground(val camera: OrthographicCamera) {
     private var pistonFrame: Int = 0
     private var incrementPistonFrameAfterSec: Float = 0f
     
-    fun render(batch: SpriteBatch, isItemAvailable: Boolean) {
+    fun render(batch: Batch, isItemAvailable: Boolean) {
         val width = camera.viewportWidth
         val height = camera.viewportHeight
         

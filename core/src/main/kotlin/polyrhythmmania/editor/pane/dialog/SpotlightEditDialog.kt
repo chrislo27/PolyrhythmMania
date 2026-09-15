@@ -2,7 +2,7 @@ package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
@@ -551,7 +551,7 @@ class SpotlightEditDialog(
             }
         }
 
-        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
             val paddingBounds = element.paddingZone
             val rectX = paddingBounds.x.get() + originX
             val rectY = originY - paddingBounds.y.get()
@@ -635,7 +635,7 @@ class SpotlightEditDialog(
             batch.packedColor = lastPackedColor
         }
 
-        override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+        override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: Batch) {
             // NO-OP
         }
     }

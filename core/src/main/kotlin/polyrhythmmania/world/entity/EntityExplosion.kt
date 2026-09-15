@@ -1,6 +1,6 @@
 package polyrhythmmania.world.entity
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
@@ -45,7 +45,7 @@ class EntityExplosion(
         return tileset.explosionFrames[state.index]
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         if (isKilled) return
         val percentage = this.percentageLife
         if (percentage < 1f) {
@@ -70,7 +70,7 @@ class EntityExplosion(
         }
     }
     
-    override fun renderLightingEffect(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun renderLightingEffect(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         if (this.isKilled || this.percentageLife !in 0f..1f) return
 
         val tmpVec = Vector3Stack.getAndPush()
@@ -92,11 +92,11 @@ class EntityExplosion(
         batch.packedColor = packedColor
     }
 
-    override fun renderBlockingEffectBeforeLighting(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun renderBlockingEffectBeforeLighting(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         // NO-OP
     }
 
-    override fun renderBlockingEffectAfterLighting(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun renderBlockingEffectAfterLighting(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         // NO-OP
     }
 

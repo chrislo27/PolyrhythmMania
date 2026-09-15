@@ -2,7 +2,7 @@ package polyrhythmmania.editor.pane.dialog
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector2
 import paintbox.ui.*
 import paintbox.util.ColorStack
@@ -56,7 +56,7 @@ abstract class AbstrWavePane(val musicDialog: MusicDialog) : Pane() {
     }
 
 
-    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: Batch) {
         super.renderSelfAfterChildren(originX, originY, batch)
         val renderBounds = this.contentZone
         val x = renderBounds.x.get() + originX

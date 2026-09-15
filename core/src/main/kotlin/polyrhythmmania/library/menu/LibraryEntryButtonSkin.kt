@@ -1,7 +1,7 @@
 package polyrhythmmania.library.menu
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import paintbox.binding.Var
 import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.PressedState
@@ -95,7 +95,7 @@ class LibraryEntryButtonSkin(override val element: LibraryEntryButton) : ButtonS
         }
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         val alpha = WaveUtils.getCosineWave(60f / 112.0f, offsetMs = -element.selectedTimeMs)
         selectedBgColor.set(SELECTED_BG_FROM).lerp(SELECTED_BG_TO, alpha)
         

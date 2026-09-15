@@ -1,7 +1,7 @@
 package polyrhythmmania.ui
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import paintbox.binding.FloatVar
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -26,7 +26,7 @@ class ExplosionFX(val style: TilesetStyle, val onFinish: EndBehaviour) : UIEleme
     
     private var deleted: Boolean = false
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         if (animationDuration <= 0f) return
         
         val renderBounds = this.contentZone

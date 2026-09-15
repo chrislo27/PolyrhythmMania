@@ -2,7 +2,7 @@ package polyrhythmmania.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import paintbox.binding.IntVar
@@ -37,7 +37,7 @@ class LoadingIconRod : ImageNode(null, renderingMode = ImageRenderingMode.MAINTA
         }
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         val offsetMs = (animationDuration * animationTimeOffset * 1000).toLong()
         animationFrame.set((WaveUtils.getSawtoothWave(animationDuration, offsetMs = offsetMs) * regions.size).toInt().coerceIn(0, 5))
         super.renderSelf(originX, originY, batch)

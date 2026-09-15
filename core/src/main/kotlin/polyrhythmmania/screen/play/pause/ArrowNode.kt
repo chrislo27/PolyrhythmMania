@@ -1,13 +1,14 @@
 package polyrhythmmania.screen.play.pause
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.ui.UIElement
 import paintbox.util.wave.WaveUtils
 
 
 class ArrowNode(val tex: TextureRegion) : UIElement() {
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         val renderBounds = this.contentZone
         val x = renderBounds.x.get() + originX
         val y = originY - renderBounds.y.get()

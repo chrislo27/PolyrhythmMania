@@ -1,7 +1,7 @@
 package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.ColorStack
@@ -22,7 +22,7 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
     
     abstract fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion?
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         val tmpColor = ColorStack.getAndPush()
         val tint = this.tint
         for (i in 0..<numLayers) {

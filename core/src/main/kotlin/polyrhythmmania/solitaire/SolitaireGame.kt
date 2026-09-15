@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
@@ -535,7 +535,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
         animationQueue += EnqueuedAnimation(card, fromZone, toZone, duration, delay, isUnder, onComplete)
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         // Animations
         val currentAnimationList = this.currentAnimations
         if (currentAnimationList.size < maxConcurrentAnimations) {
@@ -676,7 +676,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
         }
     }
     
-    private fun renderCardStack(x: Float, y: Float, batch: SpriteBatch, cardStack: CardStack, stackOffset: Float,
+    private fun renderCardStack(x: Float, y: Float, batch: Batch, cardStack: CardStack, stackOffset: Float,
                                 font: BitmapFont) {
         val flippedOver = cardStack.flippedOver.get()
         cardStack.cardList.forEachIndexed { index, card ->
@@ -684,7 +684,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
         }
     }
 
-    private fun renderCard(x: Float, y: Float, batch: SpriteBatch, card: Card, flippedOver: Boolean, font: BitmapFont) {
+    private fun renderCard(x: Float, y: Float, batch: Batch, card: Card, flippedOver: Boolean, font: BitmapFont) {
         val lastPackedColor = batch.packedColor
 
         val sheet = SolitaireAssets.get<PackedSheet>("cards")

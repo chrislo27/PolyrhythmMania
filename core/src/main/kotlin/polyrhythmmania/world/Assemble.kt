@@ -3,7 +3,7 @@ package polyrhythmmania.world
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
@@ -38,7 +38,7 @@ object AssembleWorldBackground : WorldBackground() {
     private val gradientStart: Color = Color.valueOf("1B6B17")
     private val gradientEnd: Color = Color.BLACK.cpy()
     
-    override fun render(batch: SpriteBatch, world: World, camera: OrthographicCamera) {
+    override fun render(batch: Batch, world: World, camera: OrthographicCamera) {
         batch.drawQuad(0f, camera.viewportHeight * 0.25f, gradientEnd, 
                 camera.viewportWidth, camera.viewportHeight * 0.25f, gradientEnd,
                 camera.viewportWidth, camera.viewportHeight, gradientStart,
@@ -219,7 +219,7 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
         }
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         if (animation is Animation.Charged) {
             vec.x += MathUtils.random() * MathUtils.randomSign() * 0.025f
             vec.y += MathUtils.random() * MathUtils.randomSign() * 0.025f
@@ -594,7 +594,7 @@ class EntityAsmWidgetHalf(world: World, val goingRight: Boolean,
         }
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         val xOff = -0.5f * 0
         vec.x += xOff
         vec.y += xOff / 2
@@ -659,7 +659,7 @@ class EntityAsmWidgetCompleteBlur(world: World,
         super.engineUpdate(engine, beat, seconds)
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun render(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         super.render(renderer, batch, tileset)
         frameCountdown--
         if (frameCountdown <= 0) {

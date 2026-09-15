@@ -1,7 +1,7 @@
 package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector3
 import paintbox.util.ColorStack
 import paintbox.util.Vector3Stack
@@ -53,7 +53,7 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
         }
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         val tintedRegion = getTintedRegion(tileset)
         val tmpColor = ColorStack.getAndPush().set(tintedRegion.color.getOrCompute()) // tintedRegion's color is likely just white
         tmpColor.mul(this.currentColor)
@@ -61,7 +61,7 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
         ColorStack.pop()
     }
 
-    override fun renderLightingEffect(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun renderLightingEffect(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         val flash = this.currentFlashPercentage
         if (flash > 0f) {
             val tmpVec = Vector3Stack.getAndPush()

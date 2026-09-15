@@ -1,7 +1,7 @@
 package polyrhythmmania.editor.pane
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntIntMap
@@ -266,7 +266,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         }
     }
 
-    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: Batch) {
         super.renderSelfAfterChildren(originX, originY, batch)
         measurePartCache.clear()
     }

@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Interpolation
@@ -190,7 +189,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         }
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun render(batch: Batch) {
         ensureShapeDrawerReady(batch)
         
         val mainFb: NestedFrameBuffer? = if (shouldUseMainFb()) this.mainFrameBuffer else null
@@ -246,7 +245,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         batch.projectionMatrix = tmpMatrix
     }
 
-    private fun renderUI(batch: SpriteBatch) {
+    private fun renderUI(batch: Batch) {
         skillStarRendering.renderUI(batch)
         textboxRendering.renderUI(batch)
         perfectRendering.renderUI(batch)
@@ -265,7 +264,7 @@ class WorldRendererWithUI(world: World, tileset: Tileset, val engine: Engine)
         storyBossRendering.renderRedHud(batch)
     }
 
-    private fun renderSongInfoCard(batch: SpriteBatch, font: BitmapFont,
+    private fun renderSongInfoCard(batch: Batch, font: BitmapFont,
                                    card: SongInfoCard, bottomRight: Boolean, currentSeconds: Float) {
         if (!card.isVisible(currentSeconds)) return
         val lastPackedColor = batch.packedColor
@@ -308,7 +307,7 @@ duration: ${monster.activeDuration.get()} sec
     abstract inner class InnerRendering : World.WorldResetListener {
         abstract val uiElement: UIElement
         
-        abstract fun renderUI(batch: SpriteBatch)
+        abstract fun renderUI(batch: Batch)
         
         override fun onWorldReset(world: World) {
         }
@@ -360,7 +359,7 @@ duration: ${monster.activeDuration.get()} sec
             }
         }
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
             val engine = this@WorldRendererWithUI.engine
 
             val textBox = engine.activeTextBox
@@ -436,7 +435,7 @@ duration: ${monster.activeDuration.get()} sec
             }
         }
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
             val modifiers = this@WorldRendererWithUI.engine.modifiers
             val perfectCh = modifiers.perfectChallenge
             if (perfectCh.enabled.get()) {
@@ -485,14 +484,14 @@ duration: ${monster.activeDuration.get()} sec
             }
         }
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
             val inputter = this@WorldRendererWithUI.engine.inputter
             moreTimesVar.set(inputter.practice.moreTimes.get())
             
             renderClearText(batch, inputter)
         }
         
-        private fun renderClearText(batch: SpriteBatch, inputter: EngineInputter) {
+        private fun renderClearText(batch: Batch, inputter: EngineInputter) {
             val clearText = inputter.practice.clearText
             val uiCam = this@WorldRendererWithUI.uiCamera
             if (clearText > 0f) {
@@ -748,7 +747,7 @@ duration: ${monster.activeDuration.get()} sec
             scoreWiggleTime.set(0f)
         }
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
             val modifiers = this@WorldRendererWithUI.engine.modifiers
             if (showEndlessModeScore.get()) {
                 val endlessScore = modifiers.endlessScore
@@ -792,7 +791,7 @@ duration: ${monster.activeDuration.get()} sec
             }
         }
         
-        fun renderRedHud(batch: SpriteBatch) {
+        fun renderRedHud(batch: Batch) {
             val uiCam = this@WorldRendererWithUI.uiCamera
             val modifiers = this@WorldRendererWithUI.engine.modifiers
             if (hudRedFlash > 0f) {
@@ -897,7 +896,7 @@ duration: ${monster.activeDuration.get()} sec
         
         private var lastPulseBeat: Float = -10000f
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
             val engine = this@WorldRendererWithUI.engine
             val inputter = engine.inputter
             val uiSheet: PackedSheet = AssetRegistry["tileset_ui"]
@@ -976,7 +975,7 @@ duration: ${monster.activeDuration.get()} sec
         val songTitleCard: SongInfoCard = SongInfoCard()
         val songArtistCard: SongInfoCard = SongInfoCard()
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
             val textboxFont = PRManiaGame.instance.fontGameTextbox
             textboxFont.useFont { font ->
                 font.scaleMul(0.75f)
@@ -1020,7 +1019,7 @@ duration: ${monster.activeDuration.get()} sec
             this.currentSubtitle.set(currentSubtitle)
         }
         
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
             val subtitle = currentSubtitle.getOrCompute()
             if (subtitle != null && engine.seconds >= subtitle.secondsEnd) {
                 setCurrentSubtitle(null)
@@ -1077,7 +1076,7 @@ duration: ${monster.activeDuration.get()} sec
             }
         }
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
         }
 
 
@@ -1145,7 +1144,7 @@ duration: ${monster.activeDuration.get()} sec
                 
             }
 
-            override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+            override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
                 if (shakeTime.get() > 0f) {
                     shakeTime.set((shakeTime.get() - Gdx.graphics.deltaTime).coerceAtLeast(0f))
                     
@@ -1231,7 +1230,7 @@ duration: ${monster.activeDuration.get()} sec
             }
         }
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
         }
 
 
@@ -1299,7 +1298,7 @@ duration: ${monster.activeDuration.get()} sec
 
             }
 
-            override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+            override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
                 if (shakeTime.get() > 0f) {
                     shakeTime.set((shakeTime.get() - Gdx.graphics.deltaTime).coerceAtLeast(0f))
 
@@ -1330,7 +1329,7 @@ duration: ${monster.activeDuration.get()} sec
         val scaling: FloatVar = FloatVar(1f)
         val crush: FloatVar = FloatVar(-1f)
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
             val monster = engine.modifiers.monsterGoal
             if (monster.enabled.get()) {
                 val delta = Gdx.graphics.deltaTime
@@ -1348,7 +1347,7 @@ duration: ${monster.activeDuration.get()} sec
             }
         }
         
-        fun renderBehindGame(batch: SpriteBatch, cam: OrthographicCamera) {
+        fun renderBehindGame(batch: Batch, cam: OrthographicCamera) {
             val lastPackedColor = batch.packedColor
             val spikesTex = AssetRegistry.get<Texture>("ui_monstergoal_spikes")
             val spikesTexTop = AssetRegistry.get<Texture>("ui_monstergoal_spikes_top")
@@ -1514,7 +1513,7 @@ duration: ${monster.activeDuration.get()} sec
             }
         }
 
-        override fun renderUI(batch: SpriteBatch) {
+        override fun renderUI(batch: Batch) {
             val bossModifier = engine.modifiers.getModifierModuleByType<BossModifierModule>()
             if (bossModifier != null) {
                 val oldPlayerHP = currentPlayerHealth.get()
@@ -1549,7 +1548,7 @@ duration: ${monster.activeDuration.get()} sec
             hudRedFlash = 0f
         }
 
-        fun renderRedHud(batch: SpriteBatch) {
+        fun renderRedHud(batch: Batch) {
             val uiCam = this@WorldRendererWithUI.uiCamera
             if (hudRedFlash > 0f) {
                 batch.setColor(1f, 0f, 0f, hudRedFlash)

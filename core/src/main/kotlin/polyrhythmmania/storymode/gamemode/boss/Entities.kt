@@ -2,7 +2,7 @@ package polyrhythmmania.storymode.gamemode.boss
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector3
 import paintbox.packing.PackedSheet
@@ -52,11 +52,11 @@ abstract class AbstractEntityBossRobot(
     
     private fun getRandomJitter(): Float = jitterRandom.nextFloat() * jitterAmplitude * (if (jitterRandom.nextBoolean()) -1 else 1) * (1f / 32)
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         renderSimple(renderer, batch, tileset, vec, updateOffsets = true)
     }
     
-    protected fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3, updateOffsets: Boolean) {
+    protected fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3, updateOffsets: Boolean) {
         val oldPackedColor = batch.packedColor
         val tmpColor = ColorStack.getAndPush()
             .set(1f, 1f, 1f, 1f)
@@ -162,7 +162,7 @@ class EntityBossRobotFace(world: World, bossGameMode: StoryBossGameMode, initial
     
     var currentFace: Face = Face.NEUTRAL
 
-    override fun renderLightingEffect(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun renderLightingEffect(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         val tmpVec = Vector3Stack.getAndPush()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor
@@ -223,7 +223,7 @@ class EntityBossExplosion(
         this.position.set(initialPosition)
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         if (isKilled) return
         
         val oldPackedColor = batch.packedColor
@@ -242,7 +242,7 @@ class EntityBossExplosion(
         return StoryAssets.get<PackedSheet>("boss_explosion").getIndexedRegions("explosion").getValue(getCurrentIndex())
     }
 
-    override fun renderLightingEffect(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun renderLightingEffect(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         val tmpVec = Vector3Stack.getAndPush()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor

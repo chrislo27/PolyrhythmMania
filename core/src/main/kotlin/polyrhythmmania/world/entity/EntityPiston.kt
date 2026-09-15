@@ -1,6 +1,6 @@
 package polyrhythmmania.world.entity
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
@@ -118,7 +118,7 @@ open class EntityPiston(world: World)
         }
     }
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         if (active) {
             super.renderSimple(renderer, batch, tileset, vec)
         }

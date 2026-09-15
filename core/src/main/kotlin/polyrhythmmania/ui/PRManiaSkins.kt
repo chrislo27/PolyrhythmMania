@@ -2,7 +2,7 @@ package polyrhythmmania.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import paintbox.ui.area.Insets
 import paintbox.ui.control.Button
@@ -92,7 +92,7 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
         }
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         val contentBounds = element.contentZone
         val rectX = contentBounds.x.get() + originX
         val rectY = originY - contentBounds.y.get()
@@ -177,7 +177,7 @@ open class PRMScrollBarStoryDeskSkin(element: ScrollBar) : ScrollBar.ScrollBarSk
         disabledColor.set(Color(1f, 1f, 1f, 1f))
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         val contentBounds = element.contentZone
         val rectX = contentBounds.x.get() + originX
         val rectY = originY - contentBounds.y.get()

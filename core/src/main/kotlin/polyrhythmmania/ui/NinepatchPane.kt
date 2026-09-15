@@ -2,7 +2,7 @@ package polyrhythmmania.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.ui.Pane
@@ -21,7 +21,7 @@ open class NinepatchPane : Pane() {
     var textureToUse: () -> Texture? = DEFAULT_TEXTURE_TO_USE
     val color: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
     
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         val renderBounds = this.paddingZone
         val x = renderBounds.x.get() + originX
         val y = originY - renderBounds.y.get()

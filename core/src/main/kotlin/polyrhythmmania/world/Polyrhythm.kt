@@ -1,7 +1,7 @@
 package polyrhythmmania.world
 
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
@@ -17,7 +17,6 @@ import polyrhythmmania.world.entity.EntityExplosion
 import polyrhythmmania.world.entity.EntityInputIndicator
 import polyrhythmmania.world.entity.EntityPiston
 import polyrhythmmania.world.entity.EntityRod
-import polyrhythmmania.world.entity.EntityRod.Companion.MIN_COLLISION_UPDATE_RATE
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.Tileset
 import polyrhythmmania.world.tileset.TintedRegion
@@ -601,7 +600,7 @@ open class EntityRodPR(
         engine.inputter.submitInputsFromRod(this)
     }
 
-    override fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    override fun render(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         if (!exploded) super.render(renderer, batch, tileset)
     }
 

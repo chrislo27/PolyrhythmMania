@@ -1,6 +1,6 @@
 package polyrhythmmania.world.entity
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.engine.Engine
@@ -30,7 +30,7 @@ open class Entity(val world: World) {
     open val renderSortOffsetY: Float get() = 0f
     open val renderSortOffsetZ: Float get() = 0f
     
-    open fun render(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    open fun render(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
     }
     
     open fun engineUpdate(engine: Engine, beat: Float, seconds: Float) {}

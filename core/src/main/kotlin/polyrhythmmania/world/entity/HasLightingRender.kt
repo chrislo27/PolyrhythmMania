@@ -1,6 +1,6 @@
 package polyrhythmmania.world.entity
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.Tileset
 
@@ -15,14 +15,14 @@ interface HasLightingRender {
     /**
      * The render for when emitting light.
      */
-    fun renderLightingEffect(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset)
+    fun renderLightingEffect(renderer: WorldRenderer, batch: Batch, tileset: Tileset)
 
 
     /**
      * The render for when blocking light before calling [renderLightingEffect].
      * If this is an [Entity], the default implementation uses [Entity.render].
      */
-    fun renderBlockingEffectBeforeLighting(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    fun renderBlockingEffectBeforeLighting(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         if (this is Entity) {
             this.render(renderer, batch, tileset)
         }
@@ -32,7 +32,7 @@ interface HasLightingRender {
      * The render for when blocking light, after [renderLightingEffect] has been called.
      * The default implementation is to do nothing (you likely do not want to block the light you just drew).
      */
-    fun renderBlockingEffectAfterLighting(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset) {
+    fun renderBlockingEffectAfterLighting(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         // Default implementation is NO-OP
     }
     

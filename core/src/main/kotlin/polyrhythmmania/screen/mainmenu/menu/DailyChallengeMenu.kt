@@ -3,7 +3,7 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.*
 import paintbox.registry.AssetRegistry
@@ -295,7 +295,7 @@ class DailyChallengeMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         disableRefreshUntil = System.currentTimeMillis() + 10_000L
     }
     
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         super.renderSelf(originX, originY, batch)
 
         val newEpochSeconds = System.currentTimeMillis() / 1000

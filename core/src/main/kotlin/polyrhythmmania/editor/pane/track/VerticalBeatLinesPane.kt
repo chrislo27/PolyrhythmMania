@@ -1,6 +1,6 @@
 package polyrhythmmania.editor.pane.track
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import paintbox.binding.FloatVar
 import paintbox.util.ColorStack
 import paintbox.ui.Pane
@@ -21,7 +21,7 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         this.doClipping.set(true)
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         val renderBounds = this.contentZone
         val x = renderBounds.x.get() + originX
         val y = originY - renderBounds.y.get()

@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Align
@@ -330,7 +330,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = UIElement.de
         val leftColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
         val rightColor: Var<Color> = Var(Color(1f, 1f, 1f, 1f))
         
-        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
             val renderBounds = this.paddingZone
             val x = renderBounds.x.get() + originX
             val y = originY - renderBounds.y.get()
@@ -384,7 +384,7 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = UIElement.de
             }
         }
 
-        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
             val renderBounds = this.paddingZone
             val x = renderBounds.x.get() + originX
             val y = originY - renderBounds.y.get()
@@ -408,9 +408,9 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = UIElement.de
 }
 
 class ColourPickerSkin(element: ColourPicker) : Skin<ColourPicker>(element) {
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
     }
 
-    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: Batch) {
     }
 }

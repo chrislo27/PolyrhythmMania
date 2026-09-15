@@ -1,7 +1,7 @@
 package polyrhythmmania.editor.block
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.eclipsesource.json.JsonObject
 import paintbox.binding.Var
 import paintbox.font.TextAlign
@@ -17,7 +17,6 @@ import polyrhythmmania.editor.pane.track.EditorTrackArea
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.Event
 import java.util.*
-
 
 
 /**
@@ -56,7 +55,7 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
     
     var ownedContextMenu: ContextMenu? = null
 
-    protected fun defaultRender(editor: Editor, batch: SpriteBatch, trackView: TrackView, editorTrackArea: EditorTrackArea,
+    protected fun defaultRender(editor: Editor, batch: Batch, trackView: TrackView, editorTrackArea: EditorTrackArea,
                                 offsetX: Float, offsetY: Float, trackHeight: Float, trackTint: Color) {
         if (!isDefaultTextBlockInitialized) {
             isDefaultTextBlockInitialized = true
@@ -141,8 +140,10 @@ abstract class Block(val engine: Engine, blockTypes: EnumSet<BlockType>) {
         batch.packedColor = lastPackedColor
     }
 
-    open fun render(editor: Editor, batch: SpriteBatch, trackView: TrackView, editorTrackArea: EditorTrackArea,
-                    offsetX: Float, offsetY: Float, trackHeight: Float, trackTint: Color) {
+    open fun render(
+        editor: Editor, batch: Batch, trackView: TrackView, editorTrackArea: EditorTrackArea,
+        offsetX: Float, offsetY: Float, trackHeight: Float, trackTint: Color
+    ) {
         defaultRender(editor, batch, trackView, editorTrackArea, offsetX, offsetY, trackHeight, trackTint)
     }
     

@@ -1,6 +1,6 @@
 package polyrhythmmania.world.entity
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector3
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
@@ -19,7 +19,7 @@ class EntityInputIndicator(world: World, var isDpad: Boolean)
     
     private var lastBeat: Float = 0f
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         if (!visible || !world.worldSettings.showInputIndicators) return
         val tintedRegion = if (isDpad) tileset.indicatorDpad else tileset.indicatorA
         val renderWidth = this.renderWidth

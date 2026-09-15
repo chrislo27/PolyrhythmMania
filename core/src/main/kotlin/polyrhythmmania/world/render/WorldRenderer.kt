@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
@@ -173,7 +173,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         return false
     }
 
-    open fun render(batch: SpriteBatch) {
+    open fun render(batch: Batch) {
         // Re-create framebuffers if needed
         frameBufferManager.frameUpdate()
         

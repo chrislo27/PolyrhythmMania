@@ -3,7 +3,7 @@ package polyrhythmmania.screen.mainmenu.menu
 import com.badlogic.gdx.Audio
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.Align
 import paintbox.Paintbox
 import paintbox.binding.BooleanVar
@@ -307,7 +307,7 @@ class AdvAudioMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
         }
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         super.renderSelf(originX, originY, batch)
         val timer = doneTextTimer.get()
         if (timer > 0f) {

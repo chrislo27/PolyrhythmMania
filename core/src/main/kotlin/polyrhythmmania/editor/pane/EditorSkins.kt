@@ -1,6 +1,6 @@
 package polyrhythmmania.editor.pane
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import paintbox.ui.control.Button
 import paintbox.ui.control.ButtonSkin
 import paintbox.ui.skin.DefaultSkins
@@ -30,10 +30,10 @@ object EditorSkins {
             this.roundedCorners.clear()
         }
 
-        override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+        override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         }
 
-        override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+        override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: Batch) {
         }
     }
     

@@ -1,7 +1,7 @@
 package polyrhythmmania.screen.mainmenu
 
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
 import paintbox.util.ColorStack
@@ -22,7 +22,7 @@ class EntityStoryModeDesktopInbox(world: World) : SimpleRenderedEntity(world) {
     override val renderSortOffsetY: Float get() = 1f
     override val renderSortOffsetZ: Float get() = 3f
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         val oldPackedColor = batch.packedColor
         val tmpColor = ColorStack.getAndPush()
             .set(1f, 1f, 1f, 1f)
@@ -45,7 +45,7 @@ class EntityStoryModeDesktopTube(world: World) : SimpleRenderedEntity(world) {
     override val renderSortOffsetY: Float get() = 1f
     override val renderSortOffsetZ: Float get() = 3f
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         val oldPackedColor = batch.packedColor
         val tmpColor = ColorStack.getAndPush()
             .set(1f, 1f, 1f, 1f)
@@ -63,7 +63,7 @@ class EntityStoryModeDesktopPistonHovering(world: World)
     override val renderWidth: Float get() = 1f
     override val renderHeight: Float get() = 1f
 
-    override fun renderSimple(renderer: WorldRenderer, batch: SpriteBatch, tileset: Tileset, vec: Vector3) {
+    override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         val oldPackedColor = batch.packedColor
         val tmpColor = ColorStack.getAndPush()
             .set(1f, 1f, 1f, 1f)

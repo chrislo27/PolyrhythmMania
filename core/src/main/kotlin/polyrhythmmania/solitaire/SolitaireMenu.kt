@@ -3,7 +3,7 @@ package polyrhythmmania.solitaire
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
@@ -158,7 +158,7 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol), SolitaireG
         }
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         if (loading) {
             SolitaireMusic // Initialize music loading
             val progress = SolitaireAssets.load(Gdx.graphics.deltaTime)

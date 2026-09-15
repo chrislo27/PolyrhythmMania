@@ -7,7 +7,7 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -106,7 +106,7 @@ class DesktopUI(
 
         sceneRoot += NoInputPane().apply {
             this += object : Pane() { // renderUpdate hook
-                override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+                override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
                     renderUpdate()
                 }
             }.apply { 
@@ -295,7 +295,7 @@ class DesktopUI(
         }
     }
     
-    fun render(batch: SpriteBatch) {
+    fun render(batch: Batch) {
         batch.projectionMatrix = this.uiCamera.combined
         batch.begin()
         uiViewport.apply()

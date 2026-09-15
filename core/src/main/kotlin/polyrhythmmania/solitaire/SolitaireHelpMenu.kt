@@ -2,7 +2,7 @@ package polyrhythmmania.solitaire
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.ReadOnlyVar
@@ -106,7 +106,7 @@ class SolitaireHelpMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
     }
     
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         super.renderSelf(originX, originY, batch)
         
         GlobalStats.updateModePlayTime(PlayTimeType.SOLITAIRE)

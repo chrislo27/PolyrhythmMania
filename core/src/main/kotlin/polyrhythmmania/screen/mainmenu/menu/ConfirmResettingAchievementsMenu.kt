@@ -1,7 +1,7 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
 import paintbox.font.TextAlign
@@ -87,7 +87,7 @@ class ConfirmResettingAchievementsMenu(menuCol: MenuCollection) : StandardMenu(m
 
     }
 
-    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelfAfterChildren(originX: Float, originY: Float, batch: Batch) {
         super.renderSelfAfterChildren(originX, originY, batch)
         if (unlockButtonIn.get() > 0f) {
             unlockButtonIn.set(unlockButtonIn.get() - Gdx.graphics.deltaTime)

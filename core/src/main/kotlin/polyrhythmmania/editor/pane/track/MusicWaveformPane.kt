@@ -2,7 +2,7 @@ package polyrhythmmania.editor.pane.track
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import net.beadsproject.beads.ugens.SamplePlayer
@@ -21,7 +21,7 @@ class MusicWaveformPane(val editorPane: EditorPane) : Pane() {
         this.doClipping.set(true)
     }
 
-    override fun renderSelf(originX: Float, originY: Float, batch: SpriteBatch) {
+    override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         val renderBounds = this.contentZone
         val x = renderBounds.x.get() + originX
         val y = originY - renderBounds.y.get()
